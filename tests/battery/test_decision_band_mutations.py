@@ -441,8 +441,9 @@ def test_numeric_temperature_spellings_share_alignment_but_distinct_values_do_no
 
 
 def test_source_band_catalog_preserves_series_cell_alignment_groups(
-    tmp_path: Path,
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    import simulator.battery.score as score_module
     from simulator.battery.compilation_tier import _iter_compilation_series_cells
     from simulator.battery.records import Value, ValueKind
 
@@ -454,14 +455,20 @@ def test_source_band_catalog_preserves_series_cell_alignment_groups(
             rows[0],
             value=Value(
                 ValueKind.SERIES,
-                series=((Decimal("1000"), Decimal("10")), (Decimal("1100"), Decimal("20"))),
+                series=(
+                    (Decimal("1000"), Decimal("10")),
+                    (Decimal("1100"), Decimal("20")),
+                ),
             ),
         ),
         replace(
             rows[1],
             value=Value(
                 ValueKind.SERIES,
-                series=((Decimal("1000"), Decimal("12")), (Decimal("1100"), Decimal("22"))),
+                series=(
+                    (Decimal("1000"), Decimal("12")),
+                    (Decimal("1100"), Decimal("22")),
+                ),
             ),
         ),
     )
@@ -474,10 +481,21 @@ def test_source_band_catalog_preserves_series_cell_alignment_groups(
         )
         if (key := _source_alignment_group_key(cell, tier="compilation")) is not None
     }
+    original_group_key = score_module._source_alignment_group_key
+    group_key_calls = []
+
+    def count_group_key_calls(observation, *, tier):
+        group_key_calls.append(observation.observation_id)
+        return original_group_key(observation, tier=tier)
+
+    monkeypatch.setattr(
+        score_module, "_source_alignment_group_key", count_group_key_calls
+    )
 
     bands, records, _no_band_reasons = _source_band_catalog(context, {})
 
     assert len(expected_tokens) == 2
+    assert len(group_key_calls) == len(series_rows)
     assert set(bands) == expected_tokens
     assert [record["aligned_T_K"] for record in records] == [1000, 1100]
     assert all(band.value == _Z95 * _MAD_NORMAL_SCALE for band in bands.values())

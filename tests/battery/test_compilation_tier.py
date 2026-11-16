@@ -711,8 +711,19 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
 
     monkeypatch.setattr(fit_generator, "load_sidecar", lambda: [record])
     monkeypatch.setattr(score, "SCORE_ENGINE_SET", (Engine.THERMOENGINE,))
+    original_iter_cells = compilation_tier._iter_compilation_series_cells
+    expanded_observations = []
+
+    def count_cell_expansions(observation, origin=None):
+        expanded_observations.append(observation.observation_id)
+        yield from original_iter_cells(observation, origin)
+
+    monkeypatch.setattr(
+        compilation_tier, "_iter_compilation_series_cells", count_cell_expansions
+    )
     output_path = tmp_path / "compilation-comparisons.jsonl"
     assert write_compilation_comparisons_jsonl(context, output_path) == len(comparisons)
+    assert len(expanded_observations) == len(context.observations)
     written = tuple(iter_compilation_comparisons_jsonl(output_path))
     fit_row = next(
         row
@@ -741,6 +752,7 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
 
 def test_nasa9_fit_duplicate_records_preserve_comparison_order(monkeypatch) -> None:
     import simulator.battery.compilation_tier as compilation_tier
+    import simulator.battery.generators.compilation_thermo_fits as fit_generator
     from simulator.battery.compilation_tier import ThermoAttempt, _nasa9_fit_comparisons
     from simulator.battery.enums import QUANTITY_UNITS
 
@@ -759,12 +771,22 @@ def test_nasa9_fit_duplicate_records_preserve_comparison_order(monkeypatch) -> N
         )
 
     monkeypatch.setattr(compilation_tier, "predict_thermo_attempt", echo_fit)
+    original_evaluate = fit_generator.evaluate_sidecar_fit
+    evaluations = []
+
+    def count_evaluation(*args, **kwargs):
+        evaluations.append((args[1], args[2]))
+        return original_evaluate(*args, **kwargs)
+
+    monkeypatch.setattr(fit_generator, "evaluate_sidecar_fit", count_evaluation)
     single = _nasa9_fit_comparisons(
         context,
         engines=(Engine.THERMOENGINE,),
         invoke_pure_phase=False,
         fit_records=(record,),
     )
+    single_evaluations = len(evaluations)
+    evaluations.clear()
     repeated = _nasa9_fit_comparisons(
         context,
         engines=(Engine.THERMOENGINE,),
@@ -774,6 +796,8 @@ def test_nasa9_fit_duplicate_records_preserve_comparison_order(monkeypatch) -> N
 
     assert single
     assert repeated == [*single, *single]
+    assert single_evaluations > 0
+    assert len(evaluations) == single_evaluations
 
 
 def test_nasa9_fit_does_not_reuse_values_for_a_different_coefficient_set(

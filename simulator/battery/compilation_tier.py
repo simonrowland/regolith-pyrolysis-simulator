@@ -4389,6 +4389,9 @@ def _write_compilation_comparisons_jsonl(
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary_path: Path | None = None
     written = 0
+    source_cells: dict[
+        str, dict[tuple[str, str, str, Decimal], Observation | _CompilationSeriesCell]
+    ] = {}
     try:
         with tempfile.NamedTemporaryFile(
             mode="w",
@@ -4412,6 +4415,7 @@ def _write_compilation_comparisons_jsonl(
                     continue
 
                 for point in _iter_compilation_series_cells(observation, origin):
+                    _index_nasa9_fit_source_cell(source_cells, point)
                     identity = point.identity
                     if not isinstance(identity, Identity):
                         continue
@@ -4506,6 +4510,7 @@ def _write_compilation_comparisons_jsonl(
                 context,
                 engines=engines,
                 invoke_pure_phase=invoke_pure_phase,
+                _source_cells=source_cells,
                 **nasa9_kwargs,
             ):
                 residual = comparison.residual
@@ -4631,6 +4636,38 @@ def _nasa9_fit_phase_label(identity: Identity) -> str | None:
     return label
 
 
+def _index_nasa9_fit_source_cell(
+    source_cells: dict[
+        str, dict[tuple[str, str, str, Decimal], Observation | _CompilationSeriesCell]
+    ],
+    point: Observation | _CompilationSeriesCell,
+) -> None:
+    observation = point.parent if isinstance(point, _CompilationSeriesCell) else point
+    locator = observation.locator
+    table_id = None if locator is None else locator.record or locator.table
+    identity = point.identity
+    if not table_id or not isinstance(identity, Identity):
+        return
+    quantity = quantity_token(identity)
+    temperature = identity.temperature_K
+    phase_label = _nasa9_fit_phase_label(identity)
+    if (
+        quantity is None
+        or not isinstance(temperature, State)
+        or not temperature.is_value
+        or temperature.value is None
+        or phase_label is None
+    ):
+        return
+    key = (
+        identity.species.formula,
+        phase_label,
+        quantity.value,
+        as_decimal(temperature.value),
+    )
+    source_cells.setdefault(str(table_id), {}).setdefault(key, point)
+
+
 def _nasa9_fit_comparisons(
     context,
     *,
@@ -4641,6 +4678,9 @@ def _nasa9_fit_comparisons(
     rail: Rail | None = None,
     observation_filter: Callable[[Observation], bool] | None = None,
     _validation_indexes=None,
+    _source_cells: dict[
+        str, dict[tuple[str, str, str, Decimal], Observation | _CompilationSeriesCell]
+    ] | None = None,
 ) -> list[_Nasa9FitComparison]:
     """Score NASA-9 cells with one lineage index for this store snapshot."""
 
@@ -4667,6 +4707,7 @@ def _nasa9_fit_comparisons(
             rail=rail,
             observation_filter=observation_filter,
             _validation_indexes=indexes,
+            _source_cells=_source_cells,
         )
 
 
@@ -4680,6 +4721,9 @@ def _nasa9_fit_comparisons_with_bound_lineage(
     rail: Rail | None = None,
     observation_filter: Callable[[Observation], bool] | None = None,
     _validation_indexes=None,
+    _source_cells: dict[
+        str, dict[tuple[str, str, str, Decimal], Observation | _CompilationSeriesCell]
+    ] | None = None,
 ) -> list[_Nasa9FitComparison]:
     """Score precision-qualified NASA-9 grid points with the shared residual owner."""
 
@@ -4697,49 +4741,22 @@ def _nasa9_fit_comparisons_with_bound_lineage(
     reference_curves = sidecar_element_reference_curves(records)
     source_cells: dict[
         str, dict[tuple[str, str, str, Decimal], Observation | _CompilationSeriesCell]
-    ] = {}
-    for observation in context.observations.values():
-        if not _observation_matches_run_filters(
-            context,
-            observation,
-            work_id=work_id,
-            rail=rail,
-            observation_filter=observation_filter,
-        ):
-            continue
-        origin = context.origins.get(observation.observation_id)
-        if not _is_janaf_compilation_observation(observation, origin):
-            continue
-        locator = observation.locator
-        table_id = (
-            None
-            if locator is None
-            else locator.record or locator.table
-        )
-        if not table_id:
-            continue
-        for point in _iter_compilation_series_cells(observation, origin):
-            identity = point.identity
-            if not isinstance(identity, Identity):
-                continue
-            quantity = quantity_token(identity)
-            temperature = identity.temperature_K
-            phase_label = _nasa9_fit_phase_label(identity)
-            if (
-                quantity is None
-                or not isinstance(temperature, State)
-                or not temperature.is_value
-                or temperature.value is None
-                or phase_label is None
+    ] = {} if _source_cells is None else _source_cells
+    if _source_cells is None:
+        for observation in context.observations.values():
+            if not _observation_matches_run_filters(
+                context,
+                observation,
+                work_id=work_id,
+                rail=rail,
+                observation_filter=observation_filter,
             ):
                 continue
-            key = (
-                identity.species.formula,
-                phase_label,
-                quantity.value,
-                as_decimal(temperature.value),
-            )
-            source_cells.setdefault(str(table_id), {}).setdefault(key, point)
+            origin = context.origins.get(observation.observation_id)
+            if not _is_janaf_compilation_observation(observation, origin):
+                continue
+            for point in _iter_compilation_series_cells(observation, origin):
+                _index_nasa9_fit_source_cell(source_cells, point)
 
     comparisons: list[_Nasa9FitComparison] = []
     fit_quantities = (
@@ -4749,6 +4766,9 @@ def _nasa9_fit_comparisons_with_bound_lineage(
         Quantity.DELTA_FH,
         Quantity.DELTA_FG,
     )
+    fit_evaluation_cache: dict[
+        tuple[object, ...], tuple[float | None, str | None]
+    ] = {}
     for record in records:
         if record.get("status") != "accepted":
             continue
@@ -4792,6 +4812,7 @@ def _nasa9_fit_comparisons_with_bound_lineage(
             valid_max = float(validity["T_max_K"])
         except (KeyError, TypeError, ValueError):
             continue
+        fit_settings: tuple[object, ...] | None = None
 
         for quantity in fit_quantities:
             if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG} and not record.get(
@@ -4857,13 +4878,54 @@ def _nasa9_fit_comparisons_with_bound_lineage(
                     continue
                 if point.value.kind is not ValueKind.POINT or point.value.point is None:
                     continue
-                fit_value, refusal = evaluate_sidecar_fit(
-                    record,
+                if fit_settings is None:
+                    thermo_record = record.get("thermo_record")
+                    if isinstance(thermo_record, Mapping):
+                        raw_segments = thermo_record.get("segments", ())
+                        segment_settings = tuple(
+                            (
+                                float(segment["T_min_K"]),
+                                float(segment["T_max_K"]),
+                                tuple(
+                                    float(coefficient)
+                                    for coefficient in segment["a_coefficients"]
+                                ),
+                                float(segment["b1"]),
+                                float(segment["b2"]),
+                            )
+                            for segment in raw_segments
+                            if isinstance(segment, Mapping)
+                        )
+                    else:
+                        segment_settings = None
+                    fit_settings = (
+                        str(record.get("formula") or ""),
+                        str(record.get("phase") or ""),
+                        valid_min,
+                        valid_max,
+                        segment_settings,
+                        bool(record.get("formation_capable")),
+                        str(record.get("formation_reason_code") or ""),
+                        bool(record.get("is_element_reference")),
+                        repr(record.get("reference_pressure_Pa")),
+                    )
+                evaluation_key = (
+                    fit_settings,
                     quantity,
                     temperature_K,
-                    reference_curves=reference_curves,
-                    formation_enthalpy_anchor_kJ_mol=h_anchor_kJ_mol,
+                    h_anchor_kJ_mol,
                 )
+                if evaluation_key not in fit_evaluation_cache:
+                    # ``reference_curves`` and accepted status are fixed for this
+                    # invocation; the key carries every other evaluator input.
+                    fit_evaluation_cache[evaluation_key] = evaluate_sidecar_fit(
+                        record,
+                        quantity,
+                        temperature_K,
+                        reference_curves=reference_curves,
+                        formation_enthalpy_anchor_kJ_mol=h_anchor_kJ_mol,
+                    )
+                fit_value, refusal = fit_evaluation_cache[evaluation_key]
                 if refusal is not None or fit_value is None:
                     continue
                 printed_value = float(as_decimal(point.value.point))

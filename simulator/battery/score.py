@@ -6682,6 +6682,13 @@ def _axis_alignment_value(identity: Identity, name: str, profile: object) -> obj
     return None
 
 
+def _source_aligned_temperature(identity: Identity) -> object | None:
+    temperature = identity.temperature_K
+    if isinstance(temperature, State) and temperature.is_value:
+        return to_plain(temperature.value)
+    return None
+
+
 def _source_alignment_group_key(
     observation: Observation,
     *,
@@ -6713,10 +6720,6 @@ def _source_alignment_group_key(
         if value is None:
             return None
         axes[name] = value
-    if isinstance(identity.temperature_K, State) and identity.temperature_K.is_value:
-        aligned_temperature = to_plain(identity.temperature_K.value)
-    else:
-        aligned_temperature = None
     return {
         "comparison_set": tier,
         "formula": identity.species.formula,
@@ -6726,7 +6729,7 @@ def _source_alignment_group_key(
         "quantity": quantity.value,
         "unit": unit,
         "axes": axes,
-        "aligned_T_K": aligned_temperature,
+        "aligned_T_K": _source_aligned_temperature(identity),
     }
 
 
@@ -6813,6 +6816,8 @@ def _source_band_catalog(
             )
         ):
             continue
+        alignment_template: dict[str, object] | None = None
+        alignment_profile: object | None = None
         for cell in _iter_compilation_series_cells(parent, origin):
             if not isinstance(cell.identity, Identity):
                 continue
@@ -6822,9 +6827,25 @@ def _source_band_catalog(
             magnitude = point_magnitude(cell.value)
             if magnitude is None or not magnitude.is_finite():
                 continue
-            key_doc = _source_alignment_group_key(cell, tier=tier)
-            if key_doc is None:
-                continue
+            if alignment_template is None:
+                key_doc = _source_alignment_group_key(cell, tier=tier)
+                if key_doc is None:
+                    continue
+                alignment_template = key_doc
+                alignment_profile = profile_for(cell.identity)
+            else:
+                key_doc = dict(alignment_template)
+                axes = dict(alignment_template["axes"])
+                if "temperature_K" in axes:
+                    assert alignment_profile is not None
+                    temperature_axis = _axis_alignment_value(
+                        cell.identity, "temperature_K", alignment_profile
+                    )
+                    if temperature_axis is None:
+                        continue
+                    axes["temperature_K"] = temperature_axis
+                key_doc["axes"] = axes
+                key_doc["aligned_T_K"] = _source_aligned_temperature(cell.identity)
             key = _group_token(key_doc)
             group_keys[key] = key_doc
             identities[key] = cell.identity

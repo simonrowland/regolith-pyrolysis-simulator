@@ -448,10 +448,16 @@ def test_compilation_comparison_writer_filters_observations(
         return ()
 
     def nasa9_comparisons(
-        _context, *, engines, invoke_pure_phase, observation_filter=None
+        _context,
+        *,
+        engines,
+        invoke_pure_phase,
+        observation_filter=None,
+        _source_cells=None,
     ):
         assert engines == ()
         assert invoke_pure_phase is False
+        assert _source_cells == {}
         filters.append(observation_filter)
         return []
 

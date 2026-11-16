@@ -11013,10 +11013,22 @@ def test_indexed_work_inputs_match_independent_per_work_resolution() -> None:
         first_observation.observation_id: first_observation,
         second_observation.observation_id: second_observation,
     }
-    experiments = {
-        first_experiment.experiment_id: first_experiment,
-        second_experiment.experiment_id: second_experiment,
-    }
+
+    class CountingExperiments(dict):
+        def __init__(self, values):
+            super().__init__(values)
+            self.lookups = 0
+
+        def get(self, key, default=None):
+            self.lookups += 1
+            return super().get(key, default)
+
+    experiments = CountingExperiments(
+        {
+            first_experiment.experiment_id: first_experiment,
+            second_experiment.experiment_id: second_experiment,
+        }
+    )
     indexes = validate._build_validation_indexes(works, observations, experiments)
 
     expected = {
@@ -11030,9 +11042,12 @@ def test_indexed_work_inputs_match_independent_per_work_resolution() -> None:
         for work in works.values()
     }
 
-    assert validate._index_work_inputs(
+    experiments.lookups = 0
+    indexed = validate._index_work_inputs(
         works, observations, experiments, indexes
-    ) == expected
+    )
+    assert indexed == expected
+    assert experiments.lookups == len(observations)
     assert expected[first_work.work_id].ids == {first_observation.observation_id}
     assert expected[second_work.work_id].ids == {second_observation.observation_id}
 
