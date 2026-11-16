@@ -52,6 +52,7 @@ import re
 import tempfile
 import unicodedata
 from collections import Counter, defaultdict
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field, fields, is_dataclass, replace
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation, localcontext
 from enum import Enum
@@ -62,10 +63,8 @@ from types import UnionType
 from typing import (
     Any,
     Callable,
-    Iterable,
     Iterator,
     Literal,
-    Mapping,
     Sequence,
     Union,
     get_args,
@@ -964,8 +963,13 @@ def _mass_percent_component_stem(name: str) -> tuple[str, bool]:
     )
 
 
+@lru_cache(maxsize=2048)
+def _is_as_printed_provenance_echo_text(name: str) -> bool:
+    return name.strip().casefold().endswith("_as_printed")
+
+
 def _is_as_printed_provenance_echo(name: object) -> bool:
-    return str(name).strip().casefold().endswith("_as_printed")
+    return _is_as_printed_provenance_echo_text(str(name))
 
 
 def _mass_percent_component_key(name: str) -> tuple[str, bool]:
@@ -2062,8 +2066,14 @@ def _composition_map_items_for_wrapper_check(
     )
 
 
-def _composition_map_reserved_scalar_reason(payload: object) -> str | None:
-    for name, value in _composition_map_items_for_wrapper_check(payload):
+def _composition_map_reserved_scalar_reason(
+    payload: object,
+    *,
+    items: tuple[tuple[str, object], ...] | None = None,
+) -> str | None:
+    if items is None:
+        items = _composition_map_items_for_wrapper_check(payload)
+    for name, value in items:
         if (
             name in _COMPOSITION_MAP_RESERVED_KEYS
             and _as_dec_or_none(value) is not None
@@ -2503,7 +2513,7 @@ def _point_condition_from_plain(
         for name, _value in composition_items
     )
     reserved_reason = (
-        _composition_map_reserved_scalar_reason(payload)
+        _composition_map_reserved_scalar_reason(payload, items=composition_items)
         if is_composition_map
         else None
     )
@@ -4177,36 +4187,42 @@ def observation_from_plain(payload: object) -> Observation:
     point_conditions = None
     raw_pc = payload.get("point_conditions")
     if isinstance(raw_pc, Mapping):
-        point_conditions = {
-            str(k): _point_condition_from_plain(v, key=str(k))
-            for k, v in raw_pc.items()
-        }
+        point_conditions = {}
+        for key, raw_condition in raw_pc.items():
+            name = str(key)
+            point_conditions[name] = _point_condition_from_plain(
+                raw_condition, key=name
+            )
     derived_from = payload.get("derived_from")
     annotations = None
-    if isinstance(payload.get("annotations"), Mapping):
+    raw_annotations = payload.get("annotations")
+    if isinstance(raw_annotations, Mapping):
         annotations = Annotations(**{
-            k: payload["annotations"].get(k)
+            k: raw_annotations.get(k)
             for k in ("crystal_system", "space_group", "transition_note")
         })
+    raw_provenance = payload.get("provenance")
+    raw_uncertainty = payload.get("uncertainty")
+    raw_derivation = payload.get("derivation")
     return Observation(
         observation_id=observation_id,
         experiment_id=str(payload["experiment_id"]),
         identity=identity,
         value=value,
-        uncertainty=_uncertainty_from_plain(payload.get("uncertainty")),
+        uncertainty=_uncertainty_from_plain(raw_uncertainty),
         evidence=_evidence_from_plain(payload["evidence"]),
         admission=admission,
         notices=notices,
-        provenance=dict(payload["provenance"])
-        if isinstance(payload.get("provenance"), Mapping)
+        provenance=dict(raw_provenance)
+        if isinstance(raw_provenance, Mapping)
         else None,
         source_id=payload.get("source_id"),
         locator=_locator_from_plain(payload.get("locator")),
         read_from=payload.get("read_from"),
         point_conditions=point_conditions,
         derived_from=None if derived_from is None else tuple(str(x) for x in derived_from),
-        derivation=_derivation_from_plain(payload["derivation"])
-        if payload.get("derivation")
+        derivation=_derivation_from_plain(raw_derivation)
+        if raw_derivation
         else None,
         annotations=annotations,
         authority=payload.get("authority"),

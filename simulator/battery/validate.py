@@ -42,11 +42,12 @@ from __future__ import annotations
 import json
 import re
 from collections import Counter
+from collections.abc import Mapping
 from contextlib import contextmanager, nullcontext
 from dataclasses import dataclass, field, fields, is_dataclass
 from decimal import Decimal, InvalidOperation
 from enum import Enum
-from typing import Any, Iterable, Iterator, Mapping, Sequence
+from typing import Any, Iterable, Iterator, Sequence
 
 from simulator.battery.enums import (
     AdmissionStatus,
