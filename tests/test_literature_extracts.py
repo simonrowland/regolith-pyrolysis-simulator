@@ -5270,16 +5270,21 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # group are one number. No extract is review_status reviewed and no sample
 # has reviewed_by, so the source matcher does not run. Recount held at the
 # same ceilings.
-# Both coverage ceilings may only fall.
+# Existing extract contributions may only fall. New extracts add only their
+# measured warning contributions, with the per-extract changes recorded below.
 # b261 landing: the main join adds 67 extracts (782 -> 849). Re-derived with
 # vle.fidelity_source_warnings over every extract on the regen tree cf19376f3:
 # uncovered observations 48664 -> 50791, uncovered extracts 617 -> 639,
 # unattested 3131 -> 3385; pilot pins unchanged at 57. New extracts, not a
 # fidelity regression in existing ones.
-# Each ceiling may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 50791
-_UNCOVERED_EXTRACTS_CEILING = 639
-_UNATTESTED_SAMPLES_CEILING = 3385
+# 2026-11-16 t-1859 Cohen: uncovered observations 50791 -> 50806, extracts 639 -> 640, unattested samples 3385 -> 3389.
+# 2026-11-16 t-1859 Navrotsky: uncovered observations 50806 -> 50856, extracts 640 -> 641, unattested samples 3389 -> 3395.
+# 2026-11-16 t-1859 Pretorius: uncovered observations 50856 -> 51560, extracts 641 -> 642, unattested samples 3395 -> 3396.
+# 2026-11-16 t-1859 Smythe: uncovered observations 51560 -> 51564, extracts 642 -> 643, unattested samples 3396 -> 3399.
+# 2026-11-16 t-1859 Van Westrenen: uncovered observations 51564 -> 51590, extracts 643 -> 644, unattested samples 3399 -> 3402.
+_UNCOVERED_OBSERVATIONS_CEILING = 51590
+_UNCOVERED_EXTRACTS_CEILING = 644
+_UNATTESTED_SAMPLES_CEILING = 3402
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
 # A second pilot pin inside an already-affected extract must still fail.
