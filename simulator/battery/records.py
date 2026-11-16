@@ -89,6 +89,46 @@ _LOCATOR_KEYS = (
     "source_path",
     "record",
 )
+_LOCATOR_METADATA_KEYS = frozenset(
+    {"page_verification", "table_caption_page", "table_continued"}
+)
+
+# One vocabulary for aliases accepted by migration and extract validation.
+# Coordinates stay strings because they identify printed labels, not quantities.
+_LOCATOR_FIELD_ALIASES = {
+    "row_label": "row",
+    "table_row": "row",
+    "table_row_number": "row",
+    "column_header": "column",
+    "table_column": "column",
+    "table_column_number": "column",
+    "column_label": "column",
+    "additional_page": "page",
+    "continued_page": "page",
+    "pdf_page": "page",
+    "additional_published_page": "published_page",
+    "journal_page": "published_page",
+    "printed_page": "published_page",
+    "continuation_pdf_page_index": "pdf_page_index",
+    "appendix": "section",
+    "heading": "section",
+    "section_header_as_printed": "section",
+    "subsection": "section",
+    "paragraph b": "paragraph",
+    "line": "line_range",
+    "table_file": "source_path",
+    "repaired_table_path": "source_path",
+    "file": "source_path",
+    "path": "source_path",
+    "pdf": "source_path",
+    "source_file": "source_path",
+    "pdftotext_layout_page_file": "source_path",
+    "quotes_path": "source_path",
+    "table_id": "table",
+    "table_key": "table",
+    "table_index": "table",
+    "citation_id": "record",
+}
 
 
 def _decimal_from_scalar(value: object) -> Decimal:
@@ -508,7 +548,7 @@ class Locator:
 
     def has_location(self) -> bool:
         for name in _LOCATOR_KEYS:
-            if name in {"page_verification", "table_caption_page", "table_continued"}:
+            if name in _LOCATOR_METADATA_KEYS:
                 continue
             raw = getattr(self, name)
             if raw is None:

@@ -237,6 +237,9 @@ from simulator.battery.records import (
     Uncertainty,
     Value,
     Work,
+    _LOCATOR_FIELD_ALIASES,
+    _LOCATOR_KEYS,
+    _LOCATOR_METADATA_KEYS,
     _bound_operator_semantics,
     _is_source_internally_inconsistent,
     _value_has_numeric_value,
@@ -1415,40 +1418,6 @@ def dump_yaml(payload: object, path: Path) -> None:
 
 
 _LOCATOR_FIELD_NAMES = {item.name for item in fields(Locator)}
-# These aliases share the existing Locator axis with the same printed meaning.
-# Row/column strings preserve numeric-looking labels as coordinates, not values.
-_LOCATOR_FIELD_ALIASES = {
-    "row_label": "row",
-    "table_row_number": "row",
-    "column_header": "column",
-    "table_column_number": "column",
-    "column_label": "column",
-    "additional_page": "page",
-    "continued_page": "page",
-    "pdf_page": "page",
-    "additional_published_page": "published_page",
-    "journal_page": "published_page",
-    "printed_page": "published_page",
-    "continuation_pdf_page_index": "pdf_page_index",
-    "appendix": "section",
-    "heading": "section",
-    "section_header_as_printed": "section",
-    "subsection": "section",
-    "paragraph b": "paragraph",
-    "line": "line_range",
-    "table_file": "source_path",
-    "repaired_table_path": "source_path",
-    "file": "source_path",
-    "path": "source_path",
-    "pdf": "source_path",
-    "source_file": "source_path",
-    "pdftotext_layout_page_file": "source_path",
-    "quotes_path": "source_path",
-    "table_id": "table",
-    "table_key": "table",
-    "table_index": "table",
-    "citation_id": "record",
-}
 _LOCATOR_NOTE_FIELDS = frozenset(
     {
         "abstract",
@@ -1558,26 +1527,6 @@ _LOCATOR_STRING_FIELDS = frozenset(
         "record",
     }
 )
-_LOCATOR_ADDRESS_FIELDS = frozenset(
-    {
-        "page",
-        "published_page",
-        "pdf_page_index",
-        "table",
-        "row",
-        "column",
-        "figure",
-        "paragraph",
-        "section",
-        "equation",
-        "line_range",
-        "note",
-        "source_path",
-        "record",
-    }
-)
-
-
 class _InvalidLocator(ValueError):
     """An invalid source locator that becomes a typed INVALID_SOURCE issue."""
 
@@ -1592,10 +1541,24 @@ def _locator_key_is_supported(name: str) -> bool:
     )
 
 
+def _locator_mapping_first_unsupported_key(payload: object) -> str | None:
+    """Return the first unrecognized key without resolving alias conflicts."""
+    if not isinstance(payload, Mapping):
+        return None
+    return next(
+        (
+            str(name)
+            for name in payload
+            if not _locator_key_is_supported(str(name))
+        ),
+        None,
+    )
+
+
 def _locator_mapping_keys_are_supported(payload: object) -> bool:
     """Check locator vocabulary without interpreting conflicting coordinates."""
-    return isinstance(payload, Mapping) and all(
-        _locator_key_is_supported(str(name)) for name in payload
+    return isinstance(payload, Mapping) and (
+        _locator_mapping_first_unsupported_key(payload) is None
     )
 
 
@@ -1617,7 +1580,7 @@ def _locator_mapping_has_address(payload: object) -> bool:
             if name in _LOCATOR_NOTE_FIELDS
             else _LOCATOR_FIELD_ALIASES.get(name, name)
         )
-        if target in _LOCATOR_ADDRESS_FIELDS:
+        if target in _LOCATOR_KEYS and target not in _LOCATOR_METADATA_KEYS:
             return True
     return False
 
@@ -1633,13 +1596,23 @@ def _locator_field_value(name: str, value: object, *, alias: bool) -> object:
     if name in {"row", "column"}:
         # Printed row/column numbers are labels, not numeric quantities.
         return _locator_text(value)
-    if name == "pdf_page_index" and alias:
-        # Preserve the mapping decoder's integer conversion for this alias.
-        # Canonical pdf_page_index values keep the historical plain-migration path.
+    if name == "pdf_page_index":
+        # Numeric canonical and alias spellings share the zero-based integer type.
         if isinstance(value, bool):
             raise _InvalidLocator("pdf_page_index must be an integer")
+        if isinstance(value, str):
+            token = value.strip()
+            if token.isdecimal():
+                return int(token)
+            if re.fullmatch(r"\d+\s*[-–]\s*\d+", token):
+                # Existing source locators use textual multi-page spans.
+                return token
+            raise _InvalidLocator("pdf_page_index must be an integer")
         try:
-            return int(value)  # type: ignore[arg-type]
+            converted = int(value)  # type: ignore[arg-type]
+            if converted != value:
+                raise _InvalidLocator("pdf_page_index must be an integer")
+            return converted
         except (TypeError, ValueError) as exc:
             raise _InvalidLocator("pdf_page_index must be an integer") from exc
     if alias and name in _LOCATOR_STRING_FIELDS:
@@ -1863,6 +1836,31 @@ def _decode_locator_from_plain(
         return Locator(**kwargs)
     except (TypeError, ValueError) as exc:
         raise _InvalidLocator(f"invalid locator: {exc}") from exc
+
+
+def _validate_persisted_locator_mappings(payload: object) -> None:
+    """Refuse unknown locator axes before tolerant decoding can discard them."""
+    pending: list[tuple[object, str]] = [(payload, "")]
+    while pending:
+        current, path = pending.pop()
+        if isinstance(current, Mapping):
+            for key, value in current.items():
+                name = str(key)
+                child_path = f"{path}.{name}" if path else name
+                if name in {"locator", "source_locator"} and isinstance(
+                    value, Mapping
+                ):
+                    unknown = _locator_mapping_first_unsupported_key(value)
+                    if unknown is not None:
+                        raise _InvalidLocator(
+                            f"{child_path}: unknown locator key {unknown!r}"
+                        )
+                pending.append((value, child_path))
+        elif isinstance(current, (list, tuple)):
+            pending.extend(
+                (value, f"{path}[{index}]")
+                for index, value in enumerate(current)
+            )
 
 
 def _derivation_inputs_requirement_error(
@@ -3876,6 +3874,7 @@ def _source_method_uncertainty_from_plain(
 
 def work_from_plain(payload: object) -> Work:
     assert isinstance(payload, Mapping)
+    _validate_persisted_locator_mappings(payload)
     files_payload = payload.get("source_files") or {}
     files = tuple(_source_file_from_plain(f) for f in (files_payload.get("files") or ()))
     commit = files_payload.get("corpus_commit")
@@ -4095,6 +4094,7 @@ def bench_from_plain(payload: object) -> Bench:
 
     if not isinstance(payload, Mapping):
         raise TypeError("bench must be a mapping")
+    _validate_persisted_locator_mappings(payload)
     raw_identity = payload.get("identity")
     if not isinstance(raw_identity, Mapping):
         raise TypeError("bench identity must be a mapping")
@@ -4412,6 +4412,7 @@ def _experiment_from_plain(
     payload: object, *, registry_issues: list[ValidationIssue] | None
 ) -> Experiment:
     assert isinstance(payload, Mapping)
+    _validate_persisted_locator_mappings(payload)
     conditions = {}
     for key, value in (payload.get("conditions") or {}).items():
         try:
@@ -4488,6 +4489,7 @@ def _experiment_from_plain(
 
 def observation_from_plain(payload: object) -> Observation:
     assert isinstance(payload, Mapping)
+    _validate_persisted_locator_mappings(payload)
     notices = tuple(_notice_from_plain(n) for n in (payload.get("notices") or ()))
     observation_id = str(payload["observation_id"])
     projection_notices: list[Notice] = []
@@ -25049,7 +25051,7 @@ class Migrator:
     def _validate_extract_locators(
         self, doc: Mapping[str, Any], *, source_key: str
     ) -> None:
-        """Report invalid locators while leaving value-inference annotations intact."""
+        """Report invalid locators and canonicalize accepted spellings at ingest."""
         pending: list[tuple[object, str]] = [(doc, "")]
         while pending:
             current, path = pending.pop()
@@ -25057,10 +25059,14 @@ class Migrator:
                 for field_name in ("locator", "source_locator"):
                     if field_name not in current:
                         continue
+                    raw_locator = current[field_name]
+                    if raw_locator is not None and not isinstance(
+                        raw_locator, (Mapping, Locator)
+                    ):
+                        # Preserve legacy annotations used by value inference.
+                        continue
                     try:
-                        _locator_from_plain(
-                            current[field_name], refuse_invalid=True
-                        )
+                        locator = _locator_from_plain(raw_locator, refuse_invalid=True)
                     except _InvalidLocator as exc:
                         locator_path = (
                             f"{path}.{field_name}" if path else field_name
@@ -25072,6 +25078,9 @@ class Migrator:
                                 detail=str(exc),
                             )
                         )
+                    else:
+                        if locator is not None:
+                            current[field_name] = to_plain(locator)
                 for key, value in current.items():
                     child_path = f"{path}.{key}" if path else str(key)
                     pending.append((value, child_path))
@@ -32771,7 +32780,18 @@ class Migrator:
         ):
             phase, _unmapped = map_phase("(c)")
         loc_raw = doc.get("source_locator")
-        locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
+        try:
+            locator = _locator_from_plain(loc_raw, refuse_invalid=True)
+        except _InvalidLocator as exc:
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"compilation[{rel}].source_locator",
+                    reason=exc.reason,
+                    detail=str(exc),
+                )
+            )
+            return
+        locator = locator or Locator(record=record_id)
         if not locator.source_path:
             locator = replace(locator, source_path=rel)
         t = _compilation_temperature_state(doc)

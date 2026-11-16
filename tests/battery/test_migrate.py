@@ -1762,6 +1762,8 @@ def test_stolyarova_1992_untyped_bulk_thermodynamics_stays_in_context(
         and "conflicting locator fields" in issue.detail
     ]
     assert len(locator_conflicts) == 1
+    assert result.validation.hard_issues == tuple(locator_conflicts)
+    assert result.registry_issues == locator_conflicts
     assert locator_conflicts[0].path.endswith(".locator")
     assert all(
         field in locator_conflicts[0].detail

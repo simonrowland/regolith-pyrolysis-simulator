@@ -934,7 +934,7 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
         assert len(matches) == 1, (sample, temperature, condition)
         observation = matches[0]
         assert observation.experiment_id.endswith(f"::{row['experiment']}")
-        assert f"row={sample}" in observation.locator.note
+        assert observation.locator.row == str(sample)
         experiment = migrator.result.experiments[observation.experiment_id]
         assert experiment.sample.form is not None
         assert experiment.sample.form.state.value == "bulk rock"
@@ -12499,12 +12499,48 @@ _SC456_SOURCE_IDS = (
 )
 
 
+def _expected_extract_locator_conflicts(
+    document: dict[str, object], source_id: str
+) -> dict[str, tuple[str, ...]]:
+    """Find source locators whose printed and numeric table axes disagree."""
+    prefix = f"extract[data/literature/extracts/{source_id}.yaml]"
+    conflicts: dict[str, tuple[str, ...]] = {}
+
+    def visit(value: object, path: str) -> None:
+        if isinstance(value, dict):
+            for key, child in value.items():
+                child_path = f"{path}.{key}"
+                if key in {"locator", "source_locator"} and isinstance(child, dict):
+                    fields = []
+                    for printed, numeric in (
+                        ("row_label", "table_row_number"),
+                        ("column", "table_column_number"),
+                    ):
+                        if (
+                            printed in child
+                            and numeric in child
+                            and str(child[printed]) != str(child[numeric])
+                        ):
+                            fields.extend((printed, numeric))
+                    if fields:
+                        conflicts[child_path] = tuple(fields)
+                visit(child, child_path)
+        elif isinstance(value, list):
+            for index, child in enumerate(value):
+                visit(child, f"{path}[{index}]")
+
+    visit(document, prefix)
+    return conflicts
+
+
 @pytest.mark.parametrize("source_id", _SC456_SOURCE_IDS, ids=_SC456_SOURCE_IDS)
 def test_sc456_assigned_extract_migrates_without_hard_issues(source_id: str) -> None:
     """Keep each SC-456 source independently migratable after evidence relabels."""
     from simulator.battery.enums import RefusalReason
 
     source = EXTRACTS / f"{source_id}.yaml"
+    document = yaml.safe_load(source.read_text(encoding="utf-8"))
+    expected_conflicts = _expected_extract_locator_conflicts(document, source_id)
     migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
     migrator._migrate_extract(source)
     migrator.finalize()
@@ -12512,11 +12548,63 @@ def test_sc456_assigned_extract_migrates_without_hard_issues(source_id: str) -> 
     if source_id == "banya-hino-takezoe-1985-na-fe-silicate-redox":
         conflicts = [
             issue
-            for issue in migrator.result.validation.hard_issues
+            for issue in migrator.result.registry_issues
             if issue.reason is RefusalReason.INVALID_SOURCE
             and "conflicting locator fields" in issue.detail
         ]
-        assert conflicts
+        assert len(conflicts) == len(expected_conflicts)
+        assert len(migrator.result.registry_issues) == len(conflicts)
+        assert {issue.path for issue in conflicts} == set(expected_conflicts)
+        assert all(
+            issue.reason is RefusalReason.INVALID_SOURCE
+            and all(
+                field in issue.detail for field in expected_conflicts[issue.path]
+            )
+            for issue in conflicts
+        )
+        expected_missing_locator_paths = {
+            f"observation[{source_id}::{row['observation_id']}].locator"
+            for species_name, species in document["species"].items()
+            for index, row in enumerate(species.get("observations", []))
+            if (
+                f"extract[data/literature/extracts/{source_id}.yaml]"
+                f".species.{species_name}.observations[{index}].locator"
+            )
+            in expected_conflicts
+        }
+        hard_issues = migrator.result.validation.hard_issues
+        hard_categories = Counter(
+            (
+                issue.reason,
+                "conflicting locator fields"
+                if "conflicting locator fields" in issue.detail
+                else issue.detail,
+            )
+            for issue in hard_issues
+        )
+        assert hard_categories == Counter(
+            {
+                (RefusalReason.INVALID_SOURCE, "conflicting locator fields"): len(
+                    expected_conflicts
+                ),
+                (
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "empirical Located value requires a locator",
+                ): 129,
+                (
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "literature observation requires locator",
+                ): len(expected_missing_locator_paths),
+            }
+        )
+        expected_missing_owners = {
+            path.rsplit(".", 1)[0] for path in expected_missing_locator_paths
+        }
+        assert all(
+            any(issue.path.startswith(f"{owner}.") for owner in expected_missing_owners)
+            for issue in hard_issues
+            if issue.reason is RefusalReason.CONDITIONAL_FIELD
+        )
         assert migrator.result.observations
         assert all(
             observation.value is not None
@@ -12558,6 +12646,9 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
     migrator.finalize()
 
     assert migrator.result.validation is not None
+    expected_locator_conflicts = _expected_extract_locator_conflicts(
+        document, source_id
+    )
     source_rows = {
         row["observation_id"]
         for species in document["species"].values()
@@ -12573,8 +12664,8 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
         ]
         assert migrated_ids, observation_id
 
-    for species in document["species"].values():
-        for row in species.get("observations", []):
+    for species_name, species in document["species"].items():
+        for row_index, row in enumerate(species.get("observations", [])):
             source_conditions = row.get("point_conditions") or {}
             if not source_conditions:
                 continue
@@ -12592,36 +12683,134 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
             for name, condition in source_conditions.items():
                 migrated_name = "temperature_K" if name == "temperature_C" else name
                 migrated_condition = observation.point_conditions.get(migrated_name)
-                locator_is_refused = (
-                    bool(condition.get("locator"))
-                    and battery_migrate.locator_from_mapping(
-                        condition.get("locator")
-                    )
-                    is None
+                locator = condition.get("locator")
+                condition_state = condition.get("state")
+                locator_path = (
+                    f"extract[data/literature/extracts/{source_id}.yaml]"
+                    f".species.{species_name}.observations[{row_index}]"
+                    f".point_conditions.{name}.locator"
                 )
+                unreported_total_pressure = (
+                    name == "total_pressure_Pa"
+                    and isinstance(condition_state, dict)
+                    and condition_state.get("tag") == "unknown"
+                    and condition_state.get("reason") == "not_published"
+                )
+                conflict_fields = expected_locator_conflicts.get(locator_path)
+                if conflict_fields is not None:
+                    locator_issues = [
+                        issue
+                        for issue in migrator.result.registry_issues
+                        if issue.path == locator_path
+                    ]
+                    assert len(locator_issues) == 1, locator_path
+                    assert locator_issues[0].reason is RefusalReason.INVALID_SOURCE
+                    assert "conflicting locator fields" in locator_issues[0].detail
+                    assert all(
+                        field in locator_issues[0].detail
+                        for field in conflict_fields
+                    )
+                elif unreported_total_pressure:
+                    assert migrated_condition is None
+                elif locator:
+                    assert migrated_condition is not None, locator_path
+                    assert migrated_condition.locator is not None, locator_path
                 if name in {"temperature_C", "temperature_K"}:
                     assert migrated_condition is not None
-                elif (
-                    condition.get("locator")
-                    and migrated_condition is not None
-                    and not locator_is_refused
-                ):
-                    assert migrated_condition.locator is not None
                 if (
-                    condition.get("state")
-                    and migrated_condition is not None
+                    condition_state
                     and name != "composition"
+                    and not unreported_total_pressure
                 ):
-                    assert migrated_condition.state.tag.value == condition["state"]["tag"]
+                    assert migrated_condition is not None
+                    assert migrated_condition.state.tag.value == condition_state["tag"]
     if source_id == "kunisada-1986-na-silicate-dephosphorization":
-        conflicts = [
+        expected_paths = set(expected_locator_conflicts)
+        registry_paths = {issue.path for issue in migrator.result.registry_issues}
+        assert len(migrator.result.registry_issues) == len(
+            expected_paths
+        )
+        assert registry_paths == expected_paths
+        assert all(
+            issue.reason is RefusalReason.INVALID_SOURCE
+            and "conflicting locator fields" in issue.detail
+            for issue in migrator.result.registry_issues
+        )
+        hard_conflicts = [
             issue
             for issue in migrator.result.validation.hard_issues
             if issue.reason is RefusalReason.INVALID_SOURCE
             and "conflicting locator fields" in issue.detail
         ]
-        assert conflicts
+        assert len(hard_conflicts) == len(expected_paths)
+        assert {issue.path for issue in hard_conflicts} == expected_paths
+        expected_hard_categories = Counter(
+            (
+                issue.reason,
+                "conflicting locator fields"
+                if "conflicting locator fields" in issue.detail
+                else issue.detail,
+            )
+            for issue in migrator.result.validation.hard_issues
+        )
+        assert expected_hard_categories == Counter(
+            {
+                (RefusalReason.INVALID_SOURCE, "conflicting locator fields"): len(
+                    expected_paths
+                ),
+                (
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "empirical Located value requires a locator",
+                ): 798,
+                (
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "literature observation requires locator",
+                ): 266,
+                (
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "decided admission requires decided_by",
+                ): 266,
+                (
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "literature requires locator",
+                ): 32,
+            }
+        )
+
+        affected_observations = set()
+        affected_experiments = set()
+        extract_prefix = f"extract[data/literature/extracts/{source_id}.yaml]"
+        for species_name, species in document["species"].items():
+            for row_index, row in enumerate(species.get("observations", [])):
+                row_prefix = (
+                    f"{extract_prefix}.species.{species_name}.observations[{row_index}]"
+                )
+                if any(
+                    path == row_prefix or path.startswith(f"{row_prefix}.")
+                    for path in expected_paths
+                ):
+                    affected_observations.add(
+                        f"observation[{source_id}::{row['observation_id']}]"
+                    )
+        for experiment_index, experiment in enumerate(document.get("experiments", [])):
+            experiment_prefix = f"{extract_prefix}.experiments[{experiment_index}]"
+            if any(
+                path == experiment_prefix or path.startswith(f"{experiment_prefix}.")
+                for path in expected_paths
+            ):
+                affected_experiments.add(str(experiment.get("experiment_id") or ""))
+        assert all(
+            any(issue.path.startswith(f"{owner}.") for owner in affected_observations)
+            if issue.path.startswith("observation[")
+            else any(
+                f"::experiment::{experiment_id}]" in issue.path
+                for experiment_id in affected_experiments
+            )
+            for issue in migrator.result.validation.hard_issues
+            if issue.reason is RefusalReason.CONDITIONAL_FIELD
+        )
     else:
+        assert not expected_locator_conflicts
         assert not migrator.result.registry_issues
         assert not migrator.result.validation.hard_issues
 def test_kroger_fingas_1935_alkali_silicate_equilibria_method_and_temperatures():
