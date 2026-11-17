@@ -18,17 +18,6 @@ review_status: draft
 fidelity_samples:
 - species: SiO2
   observable: equilibrium_phase_composition
-  observation_id: chen22_C1_liquid_tio2
-  field: value
-  value: 45.9
-  locator:
-    published_page: 678
-    pdf_page_index: 2
-    table: II
-    row: C1, Liquid
-    column: TiO2
-- species: SiO2
-  observable: equilibrium_phase_composition
   observation_id: chen22_C52_liquid_sio2
   field: value
   value: 58.0
@@ -60,6 +49,7 @@ fidelity_samples:
     table: II
     row: C66, MgO·2TiO2
     column: MgO
+# Q3: Table II labels the following six samples “Single liquid”. Store each analyzed liquid as the run composition, and retain the starting charge separately as printed_composition. The source cells, sigmas, and locators remain in context below.
 experiments:
 - experiment_id: chen22_C1
   series: Table II sample C1
@@ -71,6 +61,24 @@ experiments:
     row: C1
   sample:
     initial_composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - TiO2
+            - '45.9'
+          - - SiO2
+            - '33.5'
+          - - MgO
+            - '20.5'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        record: "C1, Liquid"
+    printed_composition:
       state:
         tag: value
         value:
@@ -97,6 +105,24 @@ experiments:
       state:
         tag: value
         value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - TiO2
+            - '10.2'
+          - - SiO2
+            - '57.0'
+          - - MgO
+            - '32.7'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        record: "C68, Liquid"
+    printed_composition:
+      state:
+        tag: value
+        value:
           basis: printed oxides
           amount_basis: mass_percent
           components:
@@ -117,6 +143,24 @@ experiments:
     row: C69
   sample:
     initial_composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - TiO2
+            - '12.8'
+          - - SiO2
+            - '53.9'
+          - - MgO
+            - '33.3'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        record: "C69, Liquid"
+    printed_composition:
       state:
         tag: value
         value:
@@ -143,6 +187,24 @@ experiments:
       state:
         tag: value
         value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - TiO2
+            - '15.3'
+          - - SiO2
+            - '51.5'
+          - - MgO
+            - '33.2'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        record: "C70, Liquid"
+    printed_composition:
+      state:
+        tag: value
+        value:
           basis: printed oxides
           amount_basis: mass_percent
           components:
@@ -166,6 +228,24 @@ experiments:
       state:
         tag: value
         value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - TiO2
+            - '17.8'
+          - - SiO2
+            - '49.0'
+          - - MgO
+            - '33.2'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        record: "C71, Liquid"
+    printed_composition:
+      state:
+        tag: value
+        value:
           basis: printed oxides
           amount_basis: mass_percent
           components:
@@ -186,6 +266,24 @@ experiments:
     row: C75
   sample:
     initial_composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - TiO2
+            - '37.8'
+          - - SiO2
+            - '35.8'
+          - - MgO
+            - '26.4'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        record: "C75, Liquid"
+    printed_composition:
       state:
         tag: value
         value:
@@ -800,1188 +898,6 @@ experiments:
 species:
   SiO2:
     observations:
-    - observation_id: chen22_C1_liquid_tio2
-      experiment: chen22_C1
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C1, Liquid
-        column: TiO2 equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.9
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C1
-          locator: &id033
-            published_page: 678
-            pdf_page_index: 2
-            table: II
-            row: C1, Liquid
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C1
-          locator: *id033
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id033
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id033
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id033
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: &id034
-              TiO2: '44.92'
-              SiO2: '33.23'
-              MgO: '21.84'
-          locator: &id035
-            published_page: 678
-            pdf_page_index: 2
-            table: II
-            row: C1
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: &id036
-              TiO2: 45.9 ± 0.9
-              SiO2: 33.5 ± 0.5
-              MgO: 20.5 ± 0.4
-          locator: *id033
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: TiO2 wt.% in Liquid as printed
-        component_as_published: TiO2
-        method_class: measured_direct
-        T_C: 1500
-        value: 45.9
-        value_as_published: '45.9'
-        uncertainty_as_published: ± 0.9
-    - observation_id: chen22_C1_liquid_sio2
-      experiment: chen22_C1
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C1, Liquid
-        column: SiO2 equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.5
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C1
-          locator: *id033
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C1
-          locator: *id033
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id033
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id033
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id033
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: *id034
-          locator: *id035
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: *id036
-          locator: *id033
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: SiO2 wt.% in Liquid as printed
-        component_as_published: SiO2
-        method_class: measured_direct
-        T_C: 1500
-        value: 33.5
-        value_as_published: '33.5'
-        uncertainty_as_published: ± 0.5
-    - observation_id: chen22_C1_liquid_mgo
-      experiment: chen22_C1
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C1, Liquid
-        column: MgO equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.4
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C1
-          locator: *id033
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C1
-          locator: *id033
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id033
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id033
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id033
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: *id034
-          locator: *id035
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: *id036
-          locator: *id033
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: MgO wt.% in Liquid as printed
-        component_as_published: MgO
-        method_class: measured_direct
-        T_C: 1500
-        value: 20.5
-        value_as_published: '20.5'
-        uncertainty_as_published: ± 0.4
-    - observation_id: chen22_C68_liquid_tio2
-      experiment: chen22_C68
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C68, Liquid
-        column: TiO2 equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C68
-          locator: &id037
-            published_page: 678
-            pdf_page_index: 2
-            table: II
-            row: C68, Liquid
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C68
-          locator: *id037
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id037
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id037
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id037
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: &id038
-              TiO2: '10.07'
-              SiO2: '55.81'
-              MgO: '34.12'
-          locator: &id039
-            published_page: 678
-            pdf_page_index: 2
-            table: II
-            row: C68
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: &id040
-              TiO2: 10.2 ± 0.1
-              SiO2: 57.0 ± 0.1
-              MgO: 32.7 ± 0.1
-          locator: *id037
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: TiO2 wt.% in Liquid as printed
-        component_as_published: TiO2
-        method_class: measured_direct
-        T_C: 1500
-        value: 10.2
-        value_as_published: '10.2'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C68_liquid_sio2
-      experiment: chen22_C68
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C68, Liquid
-        column: SiO2 equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C68
-          locator: *id037
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C68
-          locator: *id037
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id037
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id037
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id037
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: *id038
-          locator: *id039
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: *id040
-          locator: *id037
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: SiO2 wt.% in Liquid as printed
-        component_as_published: SiO2
-        method_class: measured_direct
-        T_C: 1500
-        value: 57.0
-        value_as_published: '57.0'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C68_liquid_mgo
-      experiment: chen22_C68
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C68, Liquid
-        column: MgO equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C68
-          locator: *id037
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C68
-          locator: *id037
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id037
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id037
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id037
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: *id038
-          locator: *id039
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: *id040
-          locator: *id037
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: MgO wt.% in Liquid as printed
-        component_as_published: MgO
-        method_class: measured_direct
-        T_C: 1500
-        value: 32.7
-        value_as_published: '32.7'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C69_liquid_tio2
-      experiment: chen22_C69
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C69, Liquid
-        column: TiO2 equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C69
-          locator: &id041
-            published_page: 678
-            pdf_page_index: 2
-            table: II
-            row: C69, Liquid
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C69
-          locator: *id041
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id041
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id041
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id041
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: &id042
-              TiO2: '12.47'
-              SiO2: '52.91'
-              MgO: '34.62'
-          locator: &id043
-            published_page: 678
-            pdf_page_index: 2
-            table: II
-            row: C69
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: &id044
-              TiO2: 12.8 ± 0.1
-              SiO2: 53.9 ± 0.1
-              MgO: 33.3 ± 0.1
-          locator: *id041
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: TiO2 wt.% in Liquid as printed
-        component_as_published: TiO2
-        method_class: measured_direct
-        T_C: 1500
-        value: 12.8
-        value_as_published: '12.8'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C69_liquid_sio2
-      experiment: chen22_C69
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C69, Liquid
-        column: SiO2 equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C69
-          locator: *id041
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C69
-          locator: *id041
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id041
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id041
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id041
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: *id042
-          locator: *id043
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: *id044
-          locator: *id041
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: SiO2 wt.% in Liquid as printed
-        component_as_published: SiO2
-        method_class: measured_direct
-        T_C: 1500
-        value: 53.9
-        value_as_published: '53.9'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C69_liquid_mgo
-      experiment: chen22_C69
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C69, Liquid
-        column: MgO equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C69
-          locator: *id041
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C69
-          locator: *id041
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id041
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id041
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id041
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: *id042
-          locator: *id043
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: *id044
-          locator: *id041
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: MgO wt.% in Liquid as printed
-        component_as_published: MgO
-        method_class: measured_direct
-        T_C: 1500
-        value: 33.3
-        value_as_published: '33.3'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C70_liquid_tio2
-      experiment: chen22_C70
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C70, Liquid
-        column: TiO2 equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C70
-          locator: &id045
-            published_page: 678
-            pdf_page_index: 2
-            table: II
-            row: C70, Liquid
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C70
-          locator: *id045
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id045
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id045
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id045
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: &id046
-              TiO2: '15.2'
-              SiO2: '50.15'
-              MgO: '34.65'
-          locator: &id047
-            published_page: 678
-            pdf_page_index: 2
-            table: II
-            row: C70
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: &id048
-              TiO2: 15.3 ± 0.1
-              SiO2: 51.5 ± 0.1
-              MgO: 33.2 ± 0.1
-          locator: *id045
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: TiO2 wt.% in Liquid as printed
-        component_as_published: TiO2
-        method_class: measured_direct
-        T_C: 1500
-        value: 15.3
-        value_as_published: '15.3'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C70_liquid_sio2
-      experiment: chen22_C70
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C70, Liquid
-        column: SiO2 equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C70
-          locator: *id045
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C70
-          locator: *id045
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id045
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id045
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id045
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: *id046
-          locator: *id047
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: *id048
-          locator: *id045
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: SiO2 wt.% in Liquid as printed
-        component_as_published: SiO2
-        method_class: measured_direct
-        T_C: 1500
-        value: 51.5
-        value_as_published: '51.5'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C70_liquid_mgo
-      experiment: chen22_C70
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C70, Liquid
-        column: MgO equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C70
-          locator: *id045
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C70
-          locator: *id045
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id045
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id045
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id045
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: *id046
-          locator: *id047
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: *id048
-          locator: *id045
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: MgO wt.% in Liquid as printed
-        component_as_published: MgO
-        method_class: measured_direct
-        T_C: 1500
-        value: 33.2
-        value_as_published: '33.2'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C71_liquid_tio2
-      experiment: chen22_C71
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C71, Liquid
-        column: TiO2 equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C71
-          locator: &id049
-            published_page: 678
-            pdf_page_index: 2
-            table: II
-            row: C71, Liquid
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C71
-          locator: *id049
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id049
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id049
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id049
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: &id050
-              TiO2: '17.7'
-              SiO2: '47.79'
-              MgO: '34.51'
-          locator: &id051
-            published_page: 678
-            pdf_page_index: 2
-            table: II
-            row: C71
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: &id052
-              TiO2: 17.8 ± 0.1
-              SiO2: 49.0 ± 0.1
-              MgO: 33.2 ± 0.1
-          locator: *id049
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: TiO2 wt.% in Liquid as printed
-        component_as_published: TiO2
-        method_class: measured_direct
-        T_C: 1500
-        value: 17.8
-        value_as_published: '17.8'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C71_liquid_sio2
-      experiment: chen22_C71
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C71, Liquid
-        column: SiO2 equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C71
-          locator: *id049
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C71
-          locator: *id049
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id049
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id049
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id049
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: *id050
-          locator: *id051
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: *id052
-          locator: *id049
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: SiO2 wt.% in Liquid as printed
-        component_as_published: SiO2
-        method_class: measured_direct
-        T_C: 1500
-        value: 49.0
-        value_as_published: '49.0'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C71_liquid_mgo
-      experiment: chen22_C71
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C71, Liquid
-        column: MgO equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C71
-          locator: *id049
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C71
-          locator: *id049
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id049
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id049
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id049
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: *id050
-          locator: *id051
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: *id052
-          locator: *id049
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: MgO wt.% in Liquid as printed
-        component_as_published: MgO
-        method_class: measured_direct
-        T_C: 1500
-        value: 33.2
-        value_as_published: '33.2'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C75_liquid_tio2
-      experiment: chen22_C75
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C75, Liquid
-        column: TiO2 equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C75
-          locator: &id053
-            published_page: 678
-            pdf_page_index: 2
-            table: II
-            row: C75, Liquid
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C75
-          locator: *id053
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id053
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id053
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id053
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: &id054
-              TiO2: '38.03'
-              SiO2: '35.11'
-              MgO: '26.86'
-          locator: &id055
-            published_page: 678
-            pdf_page_index: 2
-            table: II
-            row: C75
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: &id056
-              TiO2: 37.8 ± 0.1
-              SiO2: 35.8 ± 0.1
-              MgO: 26.4 ± 0.1
-          locator: *id053
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: TiO2 wt.% in Liquid as printed
-        component_as_published: TiO2
-        method_class: measured_direct
-        T_C: 1500
-        value: 37.8
-        value_as_published: '37.8'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C75_liquid_sio2
-      experiment: chen22_C75
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C75, Liquid
-        column: SiO2 equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C75
-          locator: *id053
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C75
-          locator: *id053
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id053
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id053
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id053
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: *id054
-          locator: *id055
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: *id056
-          locator: *id053
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: SiO2 wt.% in Liquid as printed
-        component_as_published: SiO2
-        method_class: measured_direct
-        T_C: 1500
-        value: 35.8
-        value_as_published: '35.8'
-        uncertainty_as_published: ± 0.1
-    - observation_id: chen22_C75_liquid_mgo
-      experiment: chen22_C75
-      type: equilibrium_phase_composition
-      locator:
-        published_page: 678
-        pdf_page_index: 2
-        table: II
-        row: C75, Liquid
-        column: MgO equilibrium wt.%
-      phase: l
-      units: wt.% as printed
-      uncertainty:
-        reported_status: printed
-        as_published: ± 0.1
-        confidence_level: not_stated
-        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: C75
-          locator: *id053
-        assemblage_id:
-          state:
-            tag: value
-            value: chen22_C75
-          locator: *id053
-        assemblage_as_published:
-          state:
-            tag: value
-            value: Single liquid
-          locator: *id053
-        system_as_published:
-          state:
-            tag: value
-            value: SiO2-MgO-TiO2
-          locator: *id053
-        atmosphere:
-          state:
-            tag: value
-            value: air
-          locator: *id053
-        initial_composition_as_published:
-          state:
-            tag: value
-            value: *id054
-          locator: *id055
-        phase_composition_as_published:
-          state:
-            tag: value
-            value: *id056
-          locator: *id053
-      values:
-        quantity: equilibrium_phase_composition
-        basis_as_published: MgO wt.% in Liquid as printed
-        component_as_published: MgO
-        method_class: measured_direct
-        T_C: 1500
-        value: 26.4
-        value_as_published: '26.4'
-        uncertainty_as_published: ± 0.1
     - observation_id: chen22_C46_liquid_tio2
       experiment: chen22_C46
       type: equilibrium_phase_composition
@@ -7419,6 +6335,1190 @@ species:
         numeric_points: none
         marker_count_note: Panels show boundary curves, phase fields, and legend symbols; no discrete plotted point series
           is counted.
+    # Q3: these source-grounded single-liquid analyses define the run compositions above. Their component values, sigmas, conditions, and locators stay here as source evidence.
+
+    - observation_id: chen22_C1_liquid_tio2
+      experiment: chen22_C1
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C1, Liquid
+        column: TiO2 equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.9
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C1
+          locator: &id033
+            published_page: 678
+            pdf_page_index: 2
+            table: II
+            row: C1, Liquid
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C1
+          locator: *id033
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id033
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id033
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id033
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: &id034
+              TiO2: '44.92'
+              SiO2: '33.23'
+              MgO: '21.84'
+          locator: &id035
+            published_page: 678
+            pdf_page_index: 2
+            table: II
+            row: C1
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: &id036
+              TiO2: 45.9 ± 0.9
+              SiO2: 33.5 ± 0.5
+              MgO: 20.5 ± 0.4
+          locator: *id033
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: TiO2 wt.% in Liquid as printed
+        component_as_published: TiO2
+        method_class: measured_direct
+        T_C: 1500
+        value: 45.9
+        value_as_published: '45.9'
+        uncertainty_as_published: ± 0.9
+    - observation_id: chen22_C1_liquid_sio2
+      experiment: chen22_C1
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C1, Liquid
+        column: SiO2 equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.5
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C1
+          locator: *id033
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C1
+          locator: *id033
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id033
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id033
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id033
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: *id034
+          locator: *id035
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: *id036
+          locator: *id033
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: SiO2 wt.% in Liquid as printed
+        component_as_published: SiO2
+        method_class: measured_direct
+        T_C: 1500
+        value: 33.5
+        value_as_published: '33.5'
+        uncertainty_as_published: ± 0.5
+    - observation_id: chen22_C1_liquid_mgo
+      experiment: chen22_C1
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C1, Liquid
+        column: MgO equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.4
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C1
+          locator: *id033
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C1
+          locator: *id033
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id033
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id033
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id033
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: *id034
+          locator: *id035
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: *id036
+          locator: *id033
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: MgO wt.% in Liquid as printed
+        component_as_published: MgO
+        method_class: measured_direct
+        T_C: 1500
+        value: 20.5
+        value_as_published: '20.5'
+        uncertainty_as_published: ± 0.4
+    - observation_id: chen22_C68_liquid_tio2
+      experiment: chen22_C68
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C68, Liquid
+        column: TiO2 equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C68
+          locator: &id037
+            published_page: 678
+            pdf_page_index: 2
+            table: II
+            row: C68, Liquid
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C68
+          locator: *id037
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id037
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id037
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id037
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: &id038
+              TiO2: '10.07'
+              SiO2: '55.81'
+              MgO: '34.12'
+          locator: &id039
+            published_page: 678
+            pdf_page_index: 2
+            table: II
+            row: C68
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: &id040
+              TiO2: 10.2 ± 0.1
+              SiO2: 57.0 ± 0.1
+              MgO: 32.7 ± 0.1
+          locator: *id037
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: TiO2 wt.% in Liquid as printed
+        component_as_published: TiO2
+        method_class: measured_direct
+        T_C: 1500
+        value: 10.2
+        value_as_published: '10.2'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C68_liquid_sio2
+      experiment: chen22_C68
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C68, Liquid
+        column: SiO2 equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C68
+          locator: *id037
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C68
+          locator: *id037
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id037
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id037
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id037
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: *id038
+          locator: *id039
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: *id040
+          locator: *id037
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: SiO2 wt.% in Liquid as printed
+        component_as_published: SiO2
+        method_class: measured_direct
+        T_C: 1500
+        value: 57.0
+        value_as_published: '57.0'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C68_liquid_mgo
+      experiment: chen22_C68
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C68, Liquid
+        column: MgO equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C68
+          locator: *id037
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C68
+          locator: *id037
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id037
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id037
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id037
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: *id038
+          locator: *id039
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: *id040
+          locator: *id037
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: MgO wt.% in Liquid as printed
+        component_as_published: MgO
+        method_class: measured_direct
+        T_C: 1500
+        value: 32.7
+        value_as_published: '32.7'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C69_liquid_tio2
+      experiment: chen22_C69
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C69, Liquid
+        column: TiO2 equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C69
+          locator: &id041
+            published_page: 678
+            pdf_page_index: 2
+            table: II
+            row: C69, Liquid
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C69
+          locator: *id041
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id041
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id041
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id041
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: &id042
+              TiO2: '12.47'
+              SiO2: '52.91'
+              MgO: '34.62'
+          locator: &id043
+            published_page: 678
+            pdf_page_index: 2
+            table: II
+            row: C69
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: &id044
+              TiO2: 12.8 ± 0.1
+              SiO2: 53.9 ± 0.1
+              MgO: 33.3 ± 0.1
+          locator: *id041
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: TiO2 wt.% in Liquid as printed
+        component_as_published: TiO2
+        method_class: measured_direct
+        T_C: 1500
+        value: 12.8
+        value_as_published: '12.8'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C69_liquid_sio2
+      experiment: chen22_C69
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C69, Liquid
+        column: SiO2 equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C69
+          locator: *id041
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C69
+          locator: *id041
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id041
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id041
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id041
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: *id042
+          locator: *id043
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: *id044
+          locator: *id041
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: SiO2 wt.% in Liquid as printed
+        component_as_published: SiO2
+        method_class: measured_direct
+        T_C: 1500
+        value: 53.9
+        value_as_published: '53.9'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C69_liquid_mgo
+      experiment: chen22_C69
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C69, Liquid
+        column: MgO equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C69
+          locator: *id041
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C69
+          locator: *id041
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id041
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id041
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id041
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: *id042
+          locator: *id043
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: *id044
+          locator: *id041
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: MgO wt.% in Liquid as printed
+        component_as_published: MgO
+        method_class: measured_direct
+        T_C: 1500
+        value: 33.3
+        value_as_published: '33.3'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C70_liquid_tio2
+      experiment: chen22_C70
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C70, Liquid
+        column: TiO2 equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C70
+          locator: &id045
+            published_page: 678
+            pdf_page_index: 2
+            table: II
+            row: C70, Liquid
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C70
+          locator: *id045
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id045
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id045
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id045
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: &id046
+              TiO2: '15.2'
+              SiO2: '50.15'
+              MgO: '34.65'
+          locator: &id047
+            published_page: 678
+            pdf_page_index: 2
+            table: II
+            row: C70
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: &id048
+              TiO2: 15.3 ± 0.1
+              SiO2: 51.5 ± 0.1
+              MgO: 33.2 ± 0.1
+          locator: *id045
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: TiO2 wt.% in Liquid as printed
+        component_as_published: TiO2
+        method_class: measured_direct
+        T_C: 1500
+        value: 15.3
+        value_as_published: '15.3'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C70_liquid_sio2
+      experiment: chen22_C70
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C70, Liquid
+        column: SiO2 equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C70
+          locator: *id045
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C70
+          locator: *id045
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id045
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id045
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id045
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: *id046
+          locator: *id047
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: *id048
+          locator: *id045
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: SiO2 wt.% in Liquid as printed
+        component_as_published: SiO2
+        method_class: measured_direct
+        T_C: 1500
+        value: 51.5
+        value_as_published: '51.5'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C70_liquid_mgo
+      experiment: chen22_C70
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C70, Liquid
+        column: MgO equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C70
+          locator: *id045
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C70
+          locator: *id045
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id045
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id045
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id045
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: *id046
+          locator: *id047
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: *id048
+          locator: *id045
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: MgO wt.% in Liquid as printed
+        component_as_published: MgO
+        method_class: measured_direct
+        T_C: 1500
+        value: 33.2
+        value_as_published: '33.2'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C71_liquid_tio2
+      experiment: chen22_C71
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C71, Liquid
+        column: TiO2 equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C71
+          locator: &id049
+            published_page: 678
+            pdf_page_index: 2
+            table: II
+            row: C71, Liquid
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C71
+          locator: *id049
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id049
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id049
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id049
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: &id050
+              TiO2: '17.7'
+              SiO2: '47.79'
+              MgO: '34.51'
+          locator: &id051
+            published_page: 678
+            pdf_page_index: 2
+            table: II
+            row: C71
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: &id052
+              TiO2: 17.8 ± 0.1
+              SiO2: 49.0 ± 0.1
+              MgO: 33.2 ± 0.1
+          locator: *id049
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: TiO2 wt.% in Liquid as printed
+        component_as_published: TiO2
+        method_class: measured_direct
+        T_C: 1500
+        value: 17.8
+        value_as_published: '17.8'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C71_liquid_sio2
+      experiment: chen22_C71
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C71, Liquid
+        column: SiO2 equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C71
+          locator: *id049
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C71
+          locator: *id049
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id049
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id049
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id049
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: *id050
+          locator: *id051
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: *id052
+          locator: *id049
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: SiO2 wt.% in Liquid as printed
+        component_as_published: SiO2
+        method_class: measured_direct
+        T_C: 1500
+        value: 49.0
+        value_as_published: '49.0'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C71_liquid_mgo
+      experiment: chen22_C71
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C71, Liquid
+        column: MgO equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C71
+          locator: *id049
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C71
+          locator: *id049
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id049
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id049
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id049
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: *id050
+          locator: *id051
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: *id052
+          locator: *id049
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: MgO wt.% in Liquid as printed
+        component_as_published: MgO
+        method_class: measured_direct
+        T_C: 1500
+        value: 33.2
+        value_as_published: '33.2'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C75_liquid_tio2
+      experiment: chen22_C75
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C75, Liquid
+        column: TiO2 equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C75
+          locator: &id053
+            published_page: 678
+            pdf_page_index: 2
+            table: II
+            row: C75, Liquid
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C75
+          locator: *id053
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id053
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id053
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id053
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: &id054
+              TiO2: '38.03'
+              SiO2: '35.11'
+              MgO: '26.86'
+          locator: &id055
+            published_page: 678
+            pdf_page_index: 2
+            table: II
+            row: C75
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: &id056
+              TiO2: 37.8 ± 0.1
+              SiO2: 35.8 ± 0.1
+              MgO: 26.4 ± 0.1
+          locator: *id053
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: TiO2 wt.% in Liquid as printed
+        component_as_published: TiO2
+        method_class: measured_direct
+        T_C: 1500
+        value: 37.8
+        value_as_published: '37.8'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C75_liquid_sio2
+      experiment: chen22_C75
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C75, Liquid
+        column: SiO2 equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C75
+          locator: *id053
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C75
+          locator: *id053
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id053
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id053
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id053
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: *id054
+          locator: *id055
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: *id056
+          locator: *id053
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: SiO2 wt.% in Liquid as printed
+        component_as_published: SiO2
+        method_class: measured_direct
+        T_C: 1500
+        value: 35.8
+        value_as_published: '35.8'
+        uncertainty_as_published: ± 0.1
+    - observation_id: chen22_C75_liquid_mgo
+      experiment: chen22_C75
+      type: phase_composition_context
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+        row: C75, Liquid
+        column: MgO equilibrium wt.%
+      phase: l
+      units: wt.% as printed
+      uncertainty:
+        reported_status: printed
+        as_published: ± 0.1
+        confidence_level: not_stated
+        note: The full table cell is retained in values.phase_composition_as_published; no parenthetical notation is interpreted.
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: C75
+          locator: *id053
+        assemblage_id:
+          state:
+            tag: value
+            value: chen22_C75
+          locator: *id053
+        assemblage_as_published:
+          state:
+            tag: value
+            value: Single liquid
+          locator: *id053
+        system_as_published:
+          state:
+            tag: value
+            value: SiO2-MgO-TiO2
+          locator: *id053
+        atmosphere:
+          state:
+            tag: value
+            value: air
+          locator: *id053
+        initial_composition_as_published:
+          state:
+            tag: value
+            value: *id054
+          locator: *id055
+        phase_composition_as_published:
+          state:
+            tag: value
+            value: *id056
+          locator: *id053
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: MgO wt.% in Liquid as printed
+        component_as_published: MgO
+        method_class: measured_direct
+        T_C: 1500
+        value: 26.4
+        value_as_published: '26.4'
+        uncertainty_as_published: ± 0.1
   MgO:
     observations:
     - observation_id: chen22_C73_liquid_tio2
