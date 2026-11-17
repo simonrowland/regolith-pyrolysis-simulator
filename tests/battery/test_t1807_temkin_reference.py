@@ -242,14 +242,12 @@ def test_temkin_rejection_arms_are_behavioral(migration, consumer: str) -> None:
         "temkin-fo2", "exp-feo", fo2_identity, Decimal("0.8")
     )
     if consumer == "fo2":
-        iron_saturated_experiment = F.tabulation_experiment(
-            T_K=Decimal("2153.15"), total_P=Decimal("100000")
-        )
-        iron_saturated_experiment = replace(
-            iron_saturated_experiment,
+        experiment = migration.experiments[row.experiment_id]
+        experiment = replace(
+            experiment,
             sample=replace(
-                iron_saturated_experiment.sample,
-                form=F.located("liquid iron"),
+                experiment.sample,
+                form=F.located("melt in equilibrium with liquid iron"),
             ),
         )
         activity = replace(
@@ -263,7 +261,7 @@ def test_temkin_rejection_arms_are_behavioral(migration, consumer: str) -> None:
         )
         assert (
             metal_saturation_activity_refusal(
-                iron_saturated_experiment, activity, Quantity.ACTIVITY
+                experiment, activity, Quantity.ACTIVITY
             )
             is None
         )
@@ -271,7 +269,7 @@ def test_temkin_rejection_arms_are_behavioral(migration, consumer: str) -> None:
         # cannot supply its own fO2 through the retired saturation shortcut.
         assert (
             resolve_row_fo2(
-                iron_saturated_experiment,
+                experiment,
                 None,
                 activity,
                 quantity=Quantity.ACTIVITY,
