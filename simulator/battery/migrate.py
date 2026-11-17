@@ -1359,7 +1359,11 @@ def to_plain(obj: object) -> object:
             if value is None:
                 continue
             key = "class" if item.name == "class_" else item.name
-            out[key] = to_plain(value)
+            # Locator extras are source-native YAML facts, not decimal quantities.
+            out[key] = (
+                dict(value) if isinstance(obj, Locator) and item.name == "extras"
+                else to_plain(value)
+            )
         return out
     if isinstance(obj, Mapping):
         return {str(k): to_plain(v) for k, v in obj.items()}
@@ -1761,7 +1765,7 @@ def _decode_locator_from_plain(
 
 
 def _validate_persisted_locator_mappings(payload: object) -> None:
-    """Refuse unknown locator axes before tolerant decoding can discard them."""
+    """Strictly decode persisted locations before tolerant inference sees them."""
     pending: list[tuple[object, str]] = [(payload, "")]
     while pending:
         current, path = pending.pop()
@@ -1776,11 +1780,10 @@ def _validate_persisted_locator_mappings(payload: object) -> None:
                 if (
                     name in {"locator", "source_locator"} or is_admission_evidence
                 ) and isinstance(value, Mapping):
-                    unknown = _locator_mapping_first_unsupported_key(value)
-                    if unknown is not None:
-                        raise _InvalidLocator(
-                            f"{child_path}: unknown locator key {unknown!r}"
-                        )
+                    try:
+                        _locator_from_plain(value, refuse_invalid=True)
+                    except _InvalidLocator as exc:
+                        raise _InvalidLocator(f"{child_path}: {exc}") from exc
                 pending.append((value, child_path))
         elif isinstance(current, (list, tuple)):
             pending.extend(
