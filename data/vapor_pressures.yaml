@@ -15171,7 +15171,7 @@ families:
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 1400
+              - 1809
               - 1900
             provenance:
             - source_id: nasa-cea-thermo
@@ -15200,7 +15200,7 @@ families:
               # Units: A dimensionless in log10(Pa), B in K, C in K. Sanity: at 1500 K,
               # JANAF Fe-008/Fe-007/Fe-021 give p_FeO = 1.248 Pa at pO2 = 1.5e-3 bar
               # (a_Fe = 1). This liquid Antoine's construction support starts at 1809 K,
-              # so 1500 K is a flagged-or-in-band extrapolation of that rail and sits
+              # so the composite is flagged out_of_range below 1809 K; 1500 K sits
               # above the solid-Fe JANAF value. K itself matches JANAF (2.110e3).
               coefficients:
                 A: 10.670336

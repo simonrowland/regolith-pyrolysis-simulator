@@ -1056,9 +1056,9 @@ def test_t609_feo_association_tracks_pure_fe_and_janaf_k() -> None:
         True,
         True,
         True,
-        False,
-        False,
-        False,
+        True,
+        True,
+        True,
         False,
     ]
 
