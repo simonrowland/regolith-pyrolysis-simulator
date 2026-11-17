@@ -117,6 +117,11 @@ from simulator.battery.identity import (
     quantity_token,
     _STANDARD_PRESSURE_AMBIGUITY_RELATION,
 )
+from simulator.battery.non_observations import (
+    INTERNAL_CONSISTENCY_STEMS,
+    is_internal_consistency,
+    is_non_observation,
+)
 from simulator.battery.source_oxygen import (
     CO_MEASURED_CONSISTENCY_ORIGIN,
     SourceOxygenCondition,
@@ -414,12 +419,6 @@ TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER = "bulk_composition_in_two_phase_region"
 SF04_WORKBOOK_SOURCE_ID = "sf04-magma-companion-workbook"
 SF04_WORKBOOK_REGIME = "magma_model_companion_workbook"
 
-INTERNAL_CONSISTENCY_STEMS: frozenset[str] = frozenset(
-    {
-        "gibbs_battery_residual_ledger.yaml",
-        "species_rail_differential_ledger.yaml",
-    }
-)
 COMPILATION_SOURCE_MARKERS: frozenset[str] = frozenset(
     {
         "janaf",
@@ -1960,10 +1959,6 @@ def is_compilation_source(source_id: str | None, origin: str | None = None) -> b
         # Origin present but not under compilations-* → not a compilation by path.
         return False
     return any(lowered.startswith(marker) for marker in COMPILATION_SOURCE_MARKERS)
-
-
-def is_internal_consistency(origin: str | None) -> bool:
-    return bool(origin) and origin in INTERNAL_CONSISTENCY_STEMS
 
 
 def is_sf04_workbook(observation: Observation) -> bool:
@@ -18872,7 +18867,7 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
         if _has_duplicate_observation_link(obs, getattr(context, "experiments", None)):
             continue
         origin = getattr(context, "origins", {}).get(obs.observation_id)
-        if is_internal_consistency(origin):
+        if is_non_observation(obs, origin):
             continue
         if ev.is_value and ev.value is EvidenceClass.COMPILATION_ASSESSED:
             continue
