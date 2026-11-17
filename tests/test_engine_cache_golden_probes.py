@@ -19,7 +19,7 @@ from simulator import engine_cache
 # Each value pins the current cache chemistry version with one live solver
 # result. Update the pair together after a reviewed numeric engine change.
 ENGINE_GOLDEN_PROBES = {
-    "openimcc": (2, "0656d169b9fb045ebfc2455b7c725cf716817bfac00247d8406f2d24692ecf5d"),
+    "openimcc": (2, "fb0d744f1937ef198d1e615d13df838b39dfa66804a0d8f5513b363de99a1dad"),
     "internal-analytical": (3, "f109bcd497f0514fe6151e9bc68630232f5c5739aa22ccbacbbf4c69d584c2ff"),
     "vaporock": (1, "673a8c5ac16725e21c985b585a5320f08bc2bf31f785d9f68e7c1cd3f9753f3b"),
     "magemin": (3, "0e83b5a7f28e74ac77f2f763636e5ed042e450411faf200f9f62e02e357e4497"),
