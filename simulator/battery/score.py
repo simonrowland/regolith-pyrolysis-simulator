@@ -4362,6 +4362,7 @@ def _composition_notice(
 def _stoichiometric_standard(standard_state: StandardState) -> StandardState:
     return replace(
         standard_state,
+        convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
         endmember=replace(
             standard_state.endmember, formula=_FEO_STOICHIOMETRIC_FORMULA
         ),
@@ -4476,11 +4477,18 @@ def _iron_saturated_feo_comparison(
     if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
         return None
     standard_state = identity.reference_state.value
+    if standard_state.convention is ReferenceStateConvention.TEMKIN:
+        # Route Temkin through this function's recorded iron-saturation owner.
+        pass
+    elif (
+        standard_state.convention
+        is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    ):
+        return None
     if (
         identity.species.formula != _FEO_STOICHIOMETRIC_FORMULA
         or standard_state.endmember.formula != _FEO_WUSTITE_FORMULA
         or standard_state.component_basis != _FEO_WUSTITE_FORMULA
-        or standard_state.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
         or phase_token(standard_state.endmember) is not Phase.L
         or reference.value.kind is not ValueKind.POINT
         or reference.value.point is None
@@ -4640,6 +4648,22 @@ def fusion_comparison_reference(
     ):
         return reference
     standard_state = identity.reference_state.value
+    if standard_state.convention is ReferenceStateConvention.TEMKIN:
+        # Only the iron-saturated Fe(1-x)O(l) shape above has an owner path.
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                "Temkin reference conversion requires a recorded iron-saturated "
+                "Fe(1-x)O(l) comparison path"
+            ),
+            origin=reference.observation_id,
+            band="Temkin reference conversion unavailable for this observation",
+        )
+        return replace(
+            reference,
+            notices=union_notices(reference.notices, (notice,)),
+        )
     formula = standard_state.endmember.formula
     observed_reference_phase = phase_token(standard_state.endmember)
     magemin_native_reference = any(
@@ -9410,6 +9434,11 @@ def _implied_alpha_coefficient_basis_matches(
         return False
     expected_standard = expected_state.value
     actual_standard = actual_state.value
+    if (
+        expected_standard.convention is ReferenceStateConvention.TEMKIN
+        or actual_standard.convention is ReferenceStateConvention.TEMKIN
+    ):
+        return False
     return (
         actual_standard.convention is expected_standard.convention
         and actual_standard.endmember.formula == expected_standard.endmember.formula
@@ -12819,6 +12848,8 @@ def _catalog_reference_identity_reason(
     if state is None or not state.is_value or not isinstance(state.value, StandardState):
         return "catalog_reference_state_missing"
     standard = state.value
+    if standard.convention is ReferenceStateConvention.TEMKIN:
+        return "catalog_reference_convention_mismatch"
     if standard.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER:
         return "catalog_reference_convention_mismatch"
     if not _catalog_formulas_equal(standard.endmember.formula, declaration.component_id):
@@ -15041,6 +15072,8 @@ def _predict_with_engine(
                 )
                 if (
                     expected_standard_state is None
+                    or expected_standard_state.convention
+                    is ReferenceStateConvention.TEMKIN
                     or expected_phase is None
                     or not isinstance(reported_standard_state, Mapping)
                     or reported_standard_state.get("convention")
