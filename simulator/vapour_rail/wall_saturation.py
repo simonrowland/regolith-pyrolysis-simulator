@@ -8,19 +8,34 @@ resolved Gibbs terms to that function. It does not contain a second K.
 
 Phase selection
 ---------------
-Premise. The wall standard state is the condensed phase stable at ``T_wall``,
-activity 1. A NASA record whose phase is ``L`` is liquid. A JANAF ``state``
-of ``l`` is liquid. Gas records are the vapour or O2, never a product.
-Every other cited phase is a solid. A published interval with
-``T_min >= T_max`` is degenerate: ``Nasa9Segment`` rejects it, and it is not
-a temperature record. Skipping it leaves the covering interval's G unchanged.
+Premise. At fixed T and the table standard pressure, the stable pure
+condensed phase is the one with the lowest Gibbs energy, activity 1. A NASA
+record whose phase is ``L`` is liquid. A JANAF ``state`` of ``l`` is liquid.
+Gas records are the vapour or O2, never a product. Every other cited phase
+is a solid. A published interval with ``T_min >= T_max`` is degenerate:
+``Nasa9Segment`` rejects it, and it is not a temperature record. Skipping it
+leaves the covering interval's G unchanged.
 
-Rule. Among non-liquid records whose remaining interval contains ``T``, the
-lowest G wins. The liquid is used only when no solid contains ``T``. An exact
-G tie keeps the record declared first. Outside cited intervals, the nearest
-NASA segment or JANAF pair is continued and the resulting saturation is
-marked extrapolated (d-019). Missing or invalid records still refuse; no
-failure is converted to Psat = 0.
+Algebra. Among cited condensed records whose published interval contains T,
+choose the minimum of G°/(R T). At fixed T that ratio is dimensionless and
+strictly increasing in G°, so the minimum is the minimum of G°. An exact tie
+keeps the record declared first. A higher-G solid that still covers T is
+metastable and is not the standard state. If no cited interval contains T,
+each candidate is continued from its nearest segment, the same minimum is
+taken, and the saturation is marked extrapolated (d-019).
+
+Units. No conversion is required to compare G°/(R T). T is kelvin. The
+tables are the 0.1 MPa / 1 bar standard state the equilibrium constant
+uses. Condensed PΔV between phases is not applied.
+
+Sanity. Silicon liquid (NASA NG-1859, JANAF Si-003) has lower G than crystal
+(NG-1858, Si-002) above the melting point. JANAF marks crystal ↔ liquid at
+1685 K and the crystal table keeps going, so the crystal still covers
+1773.15 K and must lose. NASA's crystal interval ends at 1690 K, so above
+that only the liquid covers. Below the melting point the crystal is lower,
+or it is the only covering phase.
+
+Missing or invalid records still refuse; no failure is converted to Psat = 0.
 
 A declaration with ``missing: wall_condensation_thermo_missing`` refuses with
 that reason. NiO, CoO and MnO are that case: the corpus has no condensed row
@@ -425,17 +440,16 @@ def _select_condensed(
     *,
     what: str,
 ) -> tuple[float, str, str, str, tuple[float, float]]:
-    """Lowest-G solid at T, else the liquid if no solid is cited."""
+    """Minimum-G condensed phase whose published interval contains T.
+
+    Premise, algebra, units, and the silicon sanity check are in the module
+    docstring. Covering records outrank extrapolated ones. Inside the chosen
+    tier the lowest G°/(R T) wins, and an exact tie keeps declaration order.
+    """
 
     record_ids = _record_ids(thermo, citation, what=what)
-    solids: list[tuple[float, int, str, str, str, tuple[float, float]]] = []
-    liquids: list[tuple[float, int, str, str, str, tuple[float, float]]] = []
-    extrapolated_solids: list[
-        tuple[float, int, str, str, str, tuple[float, float]]
-    ] = []
-    extrapolated_liquids: list[
-        tuple[float, int, str, str, str, tuple[float, float]]
-    ] = []
+    covering: list[tuple[float, int, str, str, str, tuple[float, float]]] = []
+    extrapolated: list[tuple[float, int, str, str, str, tuple[float, float]]] = []
     for index, record_id in enumerate(record_ids):
         try:
             g_over_rt, phase, authority, valid_range = _record_state(
@@ -448,15 +462,11 @@ def _select_condensed(
                 "wall_reaction_declaration_invalid",
                 f"{what}: {record_id} is a gas and cannot be the condensed product",
             )
-        if authority == "extrapolated":
-            bucket = extrapolated_liquids if phase in _LIQUID_PHASES else extrapolated_solids
-        else:
-            bucket = liquids if phase in _LIQUID_PHASES else solids
+        bucket = extrapolated if authority == "extrapolated" else covering
         bucket.append((g_over_rt, index, record_id, phase, authority, valid_range))
-    # Use a cited phase whose interval covers T before extrapolating another
-    # candidate phase. Within the selected authority tier solids remain the
-    # standard state, with liquid as fallback only when no solid is available.
-    pool = solids or liquids or extrapolated_solids or extrapolated_liquids
+    # A phase whose interval contains T is the standard-state candidate.
+    # Continuation is only the out-of-domain prediction, and it stays flagged.
+    pool = covering or extrapolated
     if not pool:
         raise WallSaturationLawRefusal(
             "wall_condensation_thermo_missing",

@@ -8,6 +8,7 @@ published values, and the mass-action identity uses
 
 from __future__ import annotations
 
+import copy
 import json
 import math
 import os
@@ -42,6 +43,7 @@ from simulator.vapour_rail.nasa_cea import (
 )
 from simulator.vapour_rail.wall_saturation import (
     admissible_wall_reactions,
+    janaf_record_g_over_rt,
     nasa_record_g_over_rt,
     resolve_wall_saturation,
     wall_reactions_declaration,
@@ -382,20 +384,21 @@ def _nasa_g_and_phase(record_id: str, temperature_K: float) -> tuple[float, str]
 
 
 def _covering_nasa_record(record_ids: list[str], temperature_K: float) -> tuple[str, float]:
-    """Lowest-G solid whose interval contains T, else the liquid."""
+    """Minimum-G cited record whose NASA interval contains T.
 
-    solids: list[tuple[float, int, str]] = []
-    liquids: list[tuple[float, int, str]] = []
+    This is the independent Gibbs comparison, not a call to the selector.
+    A domain error means that record does not cover T.
+    """
+
+    covering: list[tuple[float, int, str]] = []
     for index, record_id in enumerate(record_ids):
         try:
-            g_over_rt, phase = _nasa_g_and_phase(record_id, temperature_K)
+            g_over_rt, _phase = _nasa_g_and_phase(record_id, temperature_K)
         except NasaCeaDomainError:
             continue
-        bucket = liquids if phase == "L" else solids
-        bucket.append((g_over_rt, index, record_id))
-    pool = solids if solids else liquids
-    assert pool, record_ids
-    _g, _index, record_id = min(pool, key=lambda item: (item[0], item[1]))
+        covering.append((g_over_rt, index, record_id))
+    assert covering, record_ids
+    _g, _index, record_id = min(covering, key=lambda item: (item[0], item[1]))
     g_over_rt, _phase = _nasa_g_and_phase(record_id, temperature_K)
     return record_id, g_over_rt
 
@@ -403,6 +406,25 @@ def _covering_nasa_record(record_ids: list[str], temperature_K: float) -> tuple[
 def _janaf_g_over_rt(table_id: str, temperature_K: float) -> float:
     g_kJ = janaf._formation_gibbs_energy_kj_per_mol_at(table_id, temperature_K)
     return (float(g_kJ) * 1000.0) / (R_J_PER_MOL_K * temperature_K)
+
+
+def _covering_janaf_record(table_ids: list[str], temperature_K: float) -> tuple[str, float]:
+    """Minimum-G cited JANAF table whose printed rows contain T.
+
+    Independent of the selector. ``JanafParseError`` means that table does
+    not cover T.
+    """
+
+    covering: list[tuple[float, int, str]] = []
+    for index, table_id in enumerate(table_ids):
+        try:
+            g_over_rt = _janaf_g_over_rt(str(table_id), temperature_K)
+        except janaf.JanafParseError:
+            continue
+        covering.append((g_over_rt, index, str(table_id)))
+    assert covering, table_ids
+    g_over_rt, _index, table_id = min(covering, key=lambda item: (item[0], item[1]))
+    return table_id, g_over_rt
 
 
 def _independent_operative(row: dict, temperature_K: float, pO2_Pa: float | None):
@@ -427,12 +449,12 @@ def _independent_operative(row: dict, temperature_K: float, pO2_Pa: float | None
                 table_ids = product["janaf"]
                 if isinstance(table_ids, str):
                     table_ids = [table_ids]
-                table_id = str(table_ids[0])
+                table_id, g_over_rt = _covering_janaf_record(list(table_ids), temperature_K)
                 condensed.append(
                     WallCondensedTerm(
                         product["species"],
                         float(product["stoichiometry"]),
-                        _janaf_g_over_rt(table_id, temperature_K),
+                        g_over_rt,
                     )
                 )
                 product_records.append(table_id)
@@ -606,6 +628,64 @@ def test_phase_at_1323_selects_cristobalite_not_beta_quartz() -> None:
         if participant.role == "product"
     }
     assert records == {"Si": "NG-1858", "SiO2": "NG-1864"}
+
+
+def _product_record_ids(resolved) -> dict[str, str]:
+    return {
+        participant.species: participant.record_id
+        for participant in resolved.participants
+        if participant.role == "product"
+    }
+
+
+def test_condensed_phase_is_minimum_g_not_metastable_solid() -> None:
+    """The covering condensed phase is the one with the lowest G.
+
+    JANAF marks crystal Si ↔ liquid at 1685 K and keeps Si-002 rows through
+    2500 K, so the crystal still covers 1773.15 K. Liquid Si-003 is lower
+    there and is the stable phase. Below the melting point the crystal is
+    lower. NASA's crystal interval ends at 1690 K, so at 1773.15 K only
+    liquid NG-1859 covers.
+    """
+
+    row = copy.deepcopy(_species_rows()["SiO"])
+    row["wall_reactions"]["thermo"] = "janaf"
+
+    below = resolve_wall_saturation(row, species_id="SiO", T_K=1500.0, pO2_Pa=None)
+    assert _product_record_ids(below)["Si"] == "Si-002"
+    assert janaf_record_g_over_rt("Si-002", 1500.0) < janaf_record_g_over_rt(
+        "Si-003", 1500.0
+    )
+
+    above_melt = resolve_wall_saturation(
+        row, species_id="SiO", T_K=1687.0, pO2_Pa=None
+    )
+    assert _product_record_ids(above_melt)["Si"] == "Si-003"
+    assert janaf_record_g_over_rt("Si-003", 1687.0) < janaf_record_g_over_rt(
+        "Si-002", 1687.0
+    )
+
+    hot = 1773.15
+    resolved = resolve_wall_saturation(row, species_id="SiO", T_K=hot, pO2_Pa=None)
+    assert resolved.reaction_id == "disproportionation"
+    assert _product_record_ids(resolved) == {"Si": "Si-003", "SiO2": "O-035"}
+    assert janaf_record_g_over_rt("Si-003", hot) < janaf_record_g_over_rt("Si-002", hot)
+    expected, product_records = _independent_operative(row, hot, None)
+    assert product_records == ("Si-003", "O-035")
+    assert resolved.pressure_Pa == pytest.approx(expected.pressure_Pa, rel=1.0e-9)
+
+    at_2000 = resolve_wall_saturation(row, species_id="SiO", T_K=2000.0, pO2_Pa=None)
+    assert _product_record_ids(at_2000) == {"Si": "Si-003", "SiO2": "O-038"}
+    assert janaf_record_g_over_rt("O-038", 2000.0) < janaf_record_g_over_rt(
+        "O-035", 2000.0
+    )
+
+    nasa = resolve_wall_saturation(
+        _species_rows()["SiO"], species_id="SiO", T_K=hot, pO2_Pa=None
+    )
+    assert _product_record_ids(nasa) == {"Si": "NG-1859", "SiO2": "NG-1864"}
+    with pytest.raises(NasaCeaDomainError):
+        _nasa_g_and_phase("NG-1858", hot)
 
 
 def test_collapsed_interval_does_not_change_si_gibbs() -> None:
