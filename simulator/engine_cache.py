@@ -1,9 +1,8 @@
 """One process-local HOT SQLite cache for engine outputs.
 
-When an engine or adapter change can alter predictions, increment that
-engine's ``ENGINE_CHEMISTRY_VERSION`` entry by hand and append a dated
-history entry below the version map. Runtime identity is diagnostic metadata
-only; it never changes or expires cache keys.
+Code-side numeric changes require a chemistry-version bump. The key also
+contains the selected engine pin and bytes of its runtime data files, so those
+input edits miss old rows without expiring or deleting them.
 """
 
 from __future__ import annotations
@@ -14,11 +13,13 @@ import inspect
 import json
 import logging
 import math
+import re
 import struct
 import os
 import sqlite3
 import threading
 import time
+import tomllib
 import zlib
 from collections import OrderedDict
 from collections.abc import Iterable, Iterator, Mapping
@@ -309,13 +310,14 @@ ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
     "internal-analytical": 2,
     "vaporock": 1,
-    "magemin": 4,
+    "magemin": 3,
     "alphamelts": 3,
     "thermoengine": 3,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
-# diagnostic and never participates in the cache key.
+# diagnostic; the declared engine pin and runtime data bytes are separate key
+# material because they can change outputs without a code-side version bump.
 # alphamelts v1: 2026-11-08 alphaMELTS 2.3.1 Darwin arm64 binary - initial cache version
 # alphamelts v2: 2026-11-11 alphaMELTS 2.3.1, b257r landing 982a8d9fa - canonical activity labels, oxide-vapour projection and typed missing-pO2 refusal (18be4a5cd, b4e6e0dda, 959731207)
 # alphamelts v3: 2026-11-16 alphaMELTS binary pin unchanged, b267 bugs stack - engine-cache disclosure wrapper for b-119 executed-law replay
@@ -331,6 +333,221 @@ ENGINE_CHEMISTRY_VERSION = {
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
 # internal-analytical v2: 2026-11-16 simulator code at b267 bugs stack - b-906 d-412 Langmuir surface-pO2 root changes evaporation_flux.py and vapor_pressure.py outputs
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
+# magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
+# alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
+# thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
+# internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
+
+
+@dataclass(frozen=True)
+class EngineCacheInput:
+    path: str
+    kind: str
+    selector: str | None
+
+
+_ENGINE_CACHE_ROOT = Path(__file__).resolve().parents[1]
+
+# Only inputs read by a numeric engine path belong here. Package code/data
+# selected by each lock or OpenIMCC pin are covered by that immutable pin;
+# code-side tables stay under the versioned live-probe guard.
+# PySulfSat runs after cached equilibrium, and Thermobar has no cached-engine
+# caller, so neither lock entry can affect the value stored by this cache.
+ENGINE_CACHE_INPUTS = {
+    "openimcc": (
+        EngineCacheInput(
+            "pyproject.toml", "pyproject-dependency", "openimcc"
+        ),  # This pin selects OpenIMCC's solver and packaged datapacks.
+    ),
+    "internal-analytical": (
+        EngineCacheInput(
+            "pyproject.toml", "pyproject-dependency", "openimcc"
+        ),  # The oxygen-balance branch delegates to OpenIMCC.
+        EngineCacheInput(
+            "data/vapor_pressures.yaml", "data", None
+        ),  # The builtin vapor-pressure provider reads these coefficients.
+        EngineCacheInput(
+            "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
+        ),  # The builtin catalog reads these executable NASA thermo rows.
+        EngineCacheInput(
+            "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
+        ),  # The builtin catalog reads these executable IVTAN thermo rows.
+        EngineCacheInput(
+            "data/setpoints.yaml", "data", None
+        ),  # The core reads fallback and activity settings from this file.
+        EngineCacheInput(
+            "data/species_catalog.yaml", "data", None
+        ),  # The core's formula registry supplies formula masses for this path.
+    ),
+    "vaporock": (
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.vaporock"
+        ),  # VapoRock supplies the cached vapor result.
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.thermoengine"
+        ),  # The VapoRock package loads ThermoEngine native libraries.
+    ),
+    "magemin": (
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.magemin"
+        ),  # This entry selects MAGEMin source, patches and built artifact.
+    ),
+    "alphamelts": (
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.alphamelts"
+        ),  # This entry selects the alphaMELTS runtime artifact.
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.petthermotools"
+        ),  # The alternate Python transport runs PetThermoTools.
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.vaporock"
+        ),  # The Python transport delegates vapor equilibrium to VapoRock.
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.thermoengine"
+        ),  # VapoRock loads ThermoEngine native libraries.
+        EngineCacheInput(
+            "pyproject.toml", "pyproject-dependency", "openimcc"
+        ),  # Builtin subprocess projection may evaluate melt activity with OpenIMCC.
+        EngineCacheInput(
+            "data/vapor_pressures.yaml", "data", None
+        ),  # Shared MELTS support reads coefficients for oxide vapor projection.
+        EngineCacheInput(
+            "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
+        ),  # Shared MELTS support reads CEA rows for O2 dissociation.
+        EngineCacheInput(
+            "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
+        ),  # Catalog fallback reads this executable IVTAN extract.
+    ),
+    "thermoengine": (
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.thermoengine"
+        ),  # This entry selects ThermoEngine source, patches and native libraries.
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.vaporock"
+        ),  # ThermoEngine delegates its vapor path to VapoRock.
+        EngineCacheInput(
+            "data/vapor_pressures.yaml", "data", None
+        ),  # Shared MELTS support reads coefficients for oxide vapor projection.
+        EngineCacheInput(
+            "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
+        ),  # Shared MELTS support reads CEA rows for O2 dissociation.
+        EngineCacheInput(
+            "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
+        ),  # Catalog-backed vapor fallback reads this executable IVTAN extract.
+    ),
+}
+_ENGINE_CACHE_INPUT_IDENTITY_BYTES = 16
+_ENGINE_CACHE_KEY_PREFIX_BYTES = 4 + _ENGINE_CACHE_INPUT_IDENTITY_BYTES
+
+
+class EngineCacheInputIdentityError(ValueError):
+    """A declared engine pin or runtime data input cannot be identified."""
+
+    def __init__(self, engine_id: str, path: str, reason: str) -> None:
+        self.engine_id = engine_id
+        self.path = path
+        self.reason = reason
+        super().__init__(
+            f"engine cache input identity unavailable for {engine_id!r} at "
+            f"{path!r}: {reason}"
+        )
+
+
+def _cache_input_component(engine_id: str, input_ref: EngineCacheInput) -> bytes:
+    path = _ENGINE_CACHE_ROOT / input_ref.path
+    try:
+        source = path.read_bytes()
+    except OSError as exc:
+        raise EngineCacheInputIdentityError(
+            engine_id, input_ref.path, f"cannot read declared input ({exc})"
+        ) from exc
+
+    if input_ref.kind == "data":
+        return source
+
+    try:
+        document = tomllib.loads(source.decode("utf-8"))
+    except (UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
+        raise EngineCacheInputIdentityError(
+            engine_id, input_ref.path, f"invalid TOML input ({exc})"
+        ) from exc
+
+    if input_ref.kind == "engine-lock":
+        try:
+            selector_root, selector_name = (input_ref.selector or "").split(".", 1)
+            value = document[selector_root][selector_name]
+        except (KeyError, ValueError, TypeError) as exc:
+            raise EngineCacheInputIdentityError(
+                engine_id,
+                input_ref.path,
+                f"missing lock entry {input_ref.selector!r}",
+            ) from exc
+    elif input_ref.kind == "pyproject-dependency":
+        dependency_name = (input_ref.selector or "").replace("_", "-").lower()
+        project = document.get("project")
+        if not isinstance(project, Mapping):
+            raise EngineCacheInputIdentityError(
+                engine_id, input_ref.path, "project is not a TOML table"
+            )
+        dependencies = project.get("dependencies", ())
+        if not isinstance(dependencies, list):
+            raise EngineCacheInputIdentityError(
+                engine_id, input_ref.path, "project.dependencies is not a list"
+            )
+        matches = []
+        for dependency in dependencies:
+            if not isinstance(dependency, str):
+                continue
+            match = re.match(r"\s*([A-Za-z0-9._-]+)", dependency)
+            if match and match.group(1).replace("_", "-").lower() == dependency_name:
+                matches.append(dependency)
+        if len(matches) != 1:
+            raise EngineCacheInputIdentityError(
+                engine_id,
+                input_ref.path,
+                f"expected one {dependency_name!r} dependency, found {len(matches)}",
+            )
+        value = matches[0]
+    else:
+        raise EngineCacheInputIdentityError(
+            engine_id, input_ref.path, f"unknown input kind {input_ref.kind!r}"
+        )
+
+    try:
+        return json.dumps(
+            value, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+        ).encode("ascii")
+    except (TypeError, ValueError) as exc:
+        raise EngineCacheInputIdentityError(
+            engine_id, input_ref.path, f"input is not canonicalizable ({exc})"
+        ) from exc
+
+
+@lru_cache(maxsize=len(ENGINE_CHEMISTRY_VERSION))
+def _engine_cache_input_identity_digest(engine_id: str) -> bytes:
+    try:
+        inputs = ENGINE_CACHE_INPUTS[engine_id]
+    except KeyError as exc:
+        raise EngineCacheInputIdentityError(
+            engine_id, "ENGINE_CACHE_INPUTS", "engine has no declared inputs"
+        ) from exc
+
+    digest = hashlib.blake2b(digest_size=_ENGINE_CACHE_INPUT_IDENTITY_BYTES)
+    digest.update(b"engine-cache-input-identity-v1\0")
+    digest.update(engine_id.encode("utf-8"))
+    for input_ref in inputs:
+        label = json.dumps(
+            (input_ref.path, input_ref.kind, input_ref.selector),
+            separators=(",", ":"),
+        ).encode("utf-8")
+        component = _cache_input_component(engine_id, input_ref)
+        digest.update(len(label).to_bytes(4, "big"))
+        digest.update(label)
+        digest.update(len(component).to_bytes(8, "big"))
+        digest.update(component)
+    return digest.digest()
+
+
 ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     "openimcc": {
         "identity": "commit:66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84",
@@ -362,6 +579,28 @@ OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2eafdcb2139bb1cce9309ceff1aa0b981b609f305406
 
 _TABLE = "engine_outputs"
 _CACHE_SCHEMA_VERSION = 3
+_CACHE_TABLE_DEFINITIONS = (
+    (
+        _TABLE,
+        (
+            ("key", "BLOB PRIMARY KEY"),
+            ("value", "BLOB NOT NULL"),
+            ("engine", "TEXT NOT NULL"),
+            ("chem_version", "TEXT NOT NULL"),
+            ("source_box", "TEXT NOT NULL"),
+            ("row_seq", "INTEGER NOT NULL"),
+            ("provenance_id", "INTEGER NOT NULL DEFAULT 0"),
+        ),
+        True,
+    ),
+    ("provenance", (("id", "INTEGER PRIMARY KEY"), ("value", "BLOB NOT NULL UNIQUE")), False),
+    ("box_sequences", (("source_box", "TEXT PRIMARY KEY"), ("next_seq", "INTEGER NOT NULL")), True),
+)
+_CACHE_INDEX_DEFINITIONS = (
+    ("engine_outputs_box_seq", _TABLE, ("source_box", "row_seq"), True),
+    ("engine_outputs_engine_version", _TABLE, ("engine", "chem_version"), False),
+)
+_SYNC_WATERMARKS_TABLE = "sync_watermarks"
 _ENGINE_NUMBERS = {
     name: number for number, name in enumerate((
         "openimcc", "internal-analytical", "vaporock", "magemin",
@@ -552,8 +791,12 @@ def engine_cache_key(engine_id: str, chem_version: str | int, request: Any) -> b
         payload = pack(request, key=True)
     except (TypeError, ValueError) as exc:
         raise ValueError("engine request must contain finite canonical scalars") from exc
-    header = bytes((_ENGINE_NUMBERS[engine_id],)) + version.to_bytes(2, "big")
-    if len(payload) + 4 > _NATURAL_KEY_LIMIT:
+    header = (
+        bytes((_ENGINE_NUMBERS[engine_id],))
+        + version.to_bytes(2, "big")
+        + _engine_cache_input_identity_digest(engine_id)
+    )
+    if len(payload) + _ENGINE_CACHE_KEY_PREFIX_BYTES > _NATURAL_KEY_LIMIT:
         return header + b"\xff" + hashlib.blake2b(payload, digest_size=16).digest()
     return header + b"\x00" + payload
 
@@ -960,41 +1203,133 @@ def _unwrap_engine_cache_value(engine_id: str, value: Any) -> Any:
         return live_hot(value[_ENGINE_CACHE_VALUE_KEY])
     return value
 
+def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = False) -> bool:
+    expected_columns = {
+        table: tuple(name for name, _ in columns)
+        for table, columns, _ in _CACHE_TABLE_DEFINITIONS
+    }
+    expected_tables = set(expected_columns)
+    optional_tables = {_SYNC_WATERMARKS_TABLE}
+    own_transaction = not connection.in_transaction
+    if own_transaction:
+        connection.execute("BEGIN")
+    try:
+        found_tables = {
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+            )
+        }
+        namespace = connection.execute("PRAGMA user_version").fetchone()[0]
+        unexpected_tables = found_tables - expected_tables - optional_tables
 
-def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = False) -> None:
-    expected = ["key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id"]
-    found = [row[1] for row in connection.execute(f"PRAGMA table_info({_TABLE})")]
-    namespace = connection.execute("PRAGMA user_version").fetchone()[0]
-    if not found and allow_empty and namespace == 0:
-        return
-    if found != expected:
-        raise EngineCacheSchemaMismatch(_TABLE, expected, found)
-    if namespace != _CACHE_SCHEMA_VERSION:
-        raise EngineCacheSchemaMismatch("user_version", (str(_CACHE_SCHEMA_VERSION),), (str(namespace),))
+        missing_tables = expected_tables - found_tables
+        for table, _, _ in _CACHE_TABLE_DEFINITIONS:
+            if table not in found_tables:
+                continue
+            expected = expected_columns[table]
+            found = tuple(row[1] for row in connection.execute(f"PRAGMA table_info({table})"))
+            if found != expected:
+                raise EngineCacheSchemaMismatch(table, expected, found)
+
+        empty = not found_tables
+        if empty:
+            if allow_empty and namespace in (0, _CACHE_SCHEMA_VERSION):
+                if own_transaction:
+                    connection.commit()
+                return True
+            if namespace != _CACHE_SCHEMA_VERSION:
+                raise EngineCacheSchemaMismatch(
+                    "user_version", (str(_CACHE_SCHEMA_VERSION),), (str(namespace),)
+                )
+            raise EngineCacheSchemaMismatch(_TABLE, expected_columns[_TABLE], ())
+
+        if namespace != _CACHE_SCHEMA_VERSION:
+            raise EngineCacheSchemaMismatch(
+                "user_version", (str(_CACHE_SCHEMA_VERSION),), (str(namespace),)
+            )
+
+        found_indexes = {
+            row[0]: row[1]
+            for row in connection.execute(
+                "SELECT name, tbl_name FROM sqlite_master WHERE type='index'"
+            )
+        }
+        table_indexes = {
+            row[1]: bool(row[2])
+            for row in connection.execute(f"PRAGMA index_list({_TABLE})")
+        } if _TABLE in found_tables else {}
+        missing_indexes = set()
+        for name, table, columns, unique in _CACHE_INDEX_DEFINITIONS:
+            if name not in found_indexes:
+                missing_indexes.add(name)
+                continue
+            if found_indexes[name] != table:
+                raise EngineCacheSchemaMismatch(name, columns, ())
+            found = tuple(
+                row[2] for row in connection.execute(f"PRAGMA index_info('{name}')")
+            )
+            if found != columns:
+                raise EngineCacheSchemaMismatch(name, columns, found)
+            if table_indexes.get(name) is not unique:
+                expected_unique = ("unique",) if unique else ("non-unique",)
+                found_unique = ("unique",) if table_indexes.get(name) else ("non-unique",)
+                raise EngineCacheSchemaMismatch(name, expected_unique, found_unique)
+
+        incomplete = bool(missing_tables or missing_indexes)
+        if incomplete and unexpected_tables:
+            raise EngineCacheSchemaMismatch(
+                "tables", sorted(expected_tables | optional_tables), sorted(found_tables)
+            )
+        if incomplete and not allow_empty:
+            if missing_tables:
+                table = sorted(missing_tables)[0]
+                raise EngineCacheSchemaMismatch(table, expected_columns[table], ())
+            name, table, columns, _ = next(
+                item for item in _CACHE_INDEX_DEFINITIONS if item[0] in missing_indexes
+            )
+            raise EngineCacheSchemaMismatch(name, columns, ())
+    except BaseException:
+        if own_transaction:
+            connection.rollback()
+        raise
+    else:
+        if own_transaction:
+            connection.commit()
+        return incomplete
 
 
 def _initialize_cache(connection: sqlite3.Connection) -> None:
-    connection.execute(f"PRAGMA user_version={_CACHE_SCHEMA_VERSION}")
-    connection.execute(
-        f"CREATE TABLE IF NOT EXISTS {_TABLE} "
-        "(key BLOB PRIMARY KEY, value BLOB NOT NULL, engine TEXT NOT NULL, "
-        "chem_version TEXT NOT NULL, source_box TEXT NOT NULL, "
-        "row_seq INTEGER NOT NULL, provenance_id INTEGER NOT NULL DEFAULT 0) WITHOUT ROWID"
-    )
-    connection.execute(
-        "CREATE TABLE IF NOT EXISTS provenance (id INTEGER PRIMARY KEY, value BLOB NOT NULL UNIQUE)"
-    )
-    connection.execute(
-        "CREATE TABLE IF NOT EXISTS box_sequences (source_box TEXT PRIMARY KEY, next_seq INTEGER NOT NULL) WITHOUT ROWID"
-    )
-    connection.execute(
-        "CREATE UNIQUE INDEX IF NOT EXISTS engine_outputs_box_seq ON engine_outputs(source_box, row_seq)"
-    )
-    connection.execute(
-        "CREATE INDEX IF NOT EXISTS engine_outputs_engine_version "
-        "ON engine_outputs(engine, chem_version)"
-    )
-    connection.commit()
+    if connection.in_transaction:
+        raise sqlite3.ProgrammingError("cache initialization requires a connection with no active transaction")
+    isolation_level = connection.isolation_level
+    connection.isolation_level = None
+    try:
+        connection.execute("BEGIN IMMEDIATE")
+        try:
+            for table, columns, without_rowid in _CACHE_TABLE_DEFINITIONS:
+                definitions = ", ".join(f"{name} {sql}" for name, sql in columns)
+                suffix = " WITHOUT ROWID" if without_rowid else ""
+                connection.execute(
+                    f"CREATE TABLE IF NOT EXISTS {table} ({definitions}){suffix}"
+                )
+            for name, table, columns, unique in _CACHE_INDEX_DEFINITIONS:
+                unique_sql = "UNIQUE " if unique else ""
+                column_sql = ", ".join(columns)
+                connection.execute(
+                    f"CREATE {unique_sql}INDEX IF NOT EXISTS {name} "
+                    f"ON {table}({column_sql})"
+                )
+            # BEGIN IMMEDIATE serializes first openers before schema writes. SQLite commits these DDLs
+            # and user_version together, so a concurrent check in one read transaction sees either
+            # the empty database or the complete schema, never a version-only intermediate state.
+            connection.execute(f"PRAGMA user_version={_CACHE_SCHEMA_VERSION}")
+            connection.commit()
+        except BaseException:
+            connection.rollback()
+            raise
+    finally:
+        connection.isolation_level = isolation_level
 
 
 def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
@@ -1040,7 +1375,10 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
                     raise
                 time.sleep(0.01)
     try:
-        _check_cache_schema(connection, allow_empty=True)
+        incomplete = _check_cache_schema(connection, allow_empty=True)
+        if incomplete and readonly:
+            connection.close()
+            return None
         if not readonly:
             _initialize_cache(connection)
     except Exception:
@@ -1533,7 +1871,7 @@ def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -
         destination.execute("PRAGMA journal_mode=WAL")
         destination.execute("PRAGMA cold.journal_mode=WAL")
         _initialize_cold(destination, "cold")
-        destination.execute("CREATE TABLE IF NOT EXISTS sync_watermarks "
+        destination.execute(f"CREATE TABLE IF NOT EXISTS {_SYNC_WATERMARKS_TABLE} "
                             "(source_box TEXT PRIMARY KEY, row_seq INTEGER NOT NULL) WITHOUT ROWID")
         destination.commit()
         report = stack.enter_context(report_path.open("a", encoding="utf-8"))
