@@ -5438,6 +5438,108 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
     assert match_errors == [], "\n".join(match_errors)
 
 
+def test_aithala_s5_preserves_all_61_row_addressable_series_summaries():
+    extract_path = EXTRACTS / "aithala-2026-magmatic-iron-redox-to-2100c.yaml"
+    doc = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
+    observations = doc["species"]["Fe"]["observations"]
+    rows = [
+        row for row in observations
+        if row.get("observation_id", "").startswith("aithala_2026_s5_")
+    ]
+
+    assert len(rows) == 61
+    assert len({row["provenance"]["series_id"] for row in rows}) == 61
+    assert Counter(row["locator"]["page"] for row in rows) == Counter(
+        {16: 34, 17: 27}
+    )
+    assert Counter(row["values"]["source_code_as_printed"] for row in rows) == Counter(
+        {
+            "Present Study": 1,
+            "Ken48": 1,
+            "Kil83": 8,
+            "KC88": 1,
+            "M95": 2,
+            "BM2010": 6,
+            "B13-18": 42,
+        }
+    )
+    assert all(row["values"]["atmosphere"] == "air" for row in rows)
+    source_attributions = {
+        "Present Study": "Aithala, Macris & Hirschmann (2026), present study",
+        "Ken48": "Kennedy (1948)",
+        "Kil83": "Kilinc et al. (1983)",
+        "KC88": "Kress and Carmichael (1988)",
+        "M95": "Moore et al. (1995)",
+        "BM2010": "Borisov and McCammon (2010)",
+        "B13-18": "Borisov et al. (2013, 2015, 2017, 2018)",
+    }
+    for row in rows:
+        values = row["values"]
+        assert row["locator"]["table"] == "S-5"
+        original_source = source_attributions[values["source_code_as_printed"]]
+        expected_attribution = (
+            original_source
+            if values["source_code_as_printed"] == "Present Study"
+            else f"compiled from {original_source}"
+        )
+        assert values["attribution"] == expected_attribution
+        assert values["temperature_range_C"]["as_printed"]
+        assert values["temperature_range_C"]["min"]
+        assert values["temperature_range_C"]["max"]
+        assert values["h_c"]["unit"] == "K"
+        assert values["composition_context_as_printed"]["SiO2_wt_pct"]
+        assert values["composition_context_as_printed"]["FeO_star_wt_pct"]
+        if values["h_c"]["as_printed"].endswith("*"):
+            assert values["n"] == 2
+            assert values["h_c"]["uncertainty"]["state"]["tag"] == "unknown"
+        else:
+            assert "±" in values["h_c"]["as_printed"]
+            assert values["h_c"]["uncertainty"]["state"]["tag"] == "value"
+            assert values["h_c"]["uncertainty"]["confidence"] == "1-sigma"
+    assert all(
+        row["values"]["quantity"]
+        == "regressed_log10_fe3_fe2_vs_inverse_temperature_slope"
+        and row["values"]["schema_gap"] == "no_matching_quantity_token"
+        for row in rows
+    )
+    assert all("fO2" not in row["values"] for row in rows)
+
+    by_name = {row["values"]["series_name"]: row for row in rows}
+    assert by_name["Humphrey"]["values"]["attribution"] == (
+        "Aithala, Macris & Hirschmann (2026), present study"
+    )
+    assert by_name["Humphrey"]["values"]["h_c"]["as_printed"] == "4894±232.5"
+    assert by_name["NMF"]["values"]["attribution"] == "compiled from Kennedy (1948)"
+    assert by_name["IC-2"]["values"]["temperature_range_C"] == {
+        "as_printed": "1342–1443",
+        "min": "1342",
+        "max": "1443",
+    }
+    assert by_name["IC-2"]["values"]["h_c"]["as_printed"] == "-1960±406"
+    assert by_name["IC-2"]["locator"]["page"] == 16
+    assert by_name["IC-2"]["values"]["composition_context_as_printed"] == {
+        "SiO2_wt_pct": "73.76",
+        "FeO_star_wt_pct": "3.24",
+    }
+    assert by_name["121"]["values"]["h_c"]["as_printed"] == "-909.0*"
+    assert by_name["121"]["values"]["h_c"]["uncertainty"]["state"] == {
+        "tag": "unknown",
+        "reason": "two-point series; no fitted uncertainty is printed (Table S-5 asterisk note)",
+    }
+    assert by_name["HAFS"]["values"]["h_c"]["as_printed"] == "10190±4510"
+    assert by_name["HAFS"]["locator"]["page"] == 17
+
+    table = next(
+        row for row in doc["species"]["Fe"]["context"]
+        if row.get("locator", {}).get("table") == "S-5"
+    )
+    assert table["values"]["series_count"] == 61
+    assert "regressed slope of log(XFe3+/XFe2+)" in table["values"]["slope_definition_as_printed"]
+    assert table["values"]["log_base"] == 10
+    assert "Inferred" in table["values"]["log_base_basis"]
+    assert "two experiments" in table["values"]["asterisk_note_as_printed"]
+
+
 # Measured on this corpus. Six ``observations[<integer>]`` pins are positions
 # and do not cover; counting them would report 46,335 observations in 524
 # extracts. Equipment pins also do not cover a measured payload
@@ -5524,9 +5626,14 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # unattested 3131 -> 3385; pilot pins unchanged at 57. New extracts, not a
 # fidelity regression in existing ones.
 # Each ceiling may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 50791
+# 2026-11-17 t-1645: Table S-5 adds 61 row-addressable observations to the
+# already-uncovered Aithala extract and 3 located fidelity samples. Recounted
+# contribution: uncovered observations 50791 -> 50852; uncovered extracts
+# stay 639 because this source was already counted; unattested samples
+# 3385 -> 3388. No reviewed_by was added. These ceilings may only fall.
+_UNCOVERED_OBSERVATIONS_CEILING = 50852
 _UNCOVERED_EXTRACTS_CEILING = 639
-_UNATTESTED_SAMPLES_CEILING = 3385
+_UNATTESTED_SAMPLES_CEILING = 3388
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
 # A second pilot pin inside an already-affected extract must still fail.
