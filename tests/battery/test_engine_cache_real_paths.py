@@ -625,8 +625,8 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
         lambda *_args, **_kwargs: (_ for _ in ()).throw(FileNotFoundError()),
     )
     # The leading version bytes are chemistry cache invalidation pins; b267
-    # moves internal-analytical to v2, MAGEMin to v3, and AlphaMELTS and
-    # ThermoEngine to v3 for executed-law disclosure replay.
+    # moves internal-analytical to v3 and MAGEMin, AlphaMELTS, and ThermoEngine
+    # to v4 for the b-906, b-1225/b-1240, and executed-law disclosure changes.
     snapshots = (
         (
             "internal-analytical default",

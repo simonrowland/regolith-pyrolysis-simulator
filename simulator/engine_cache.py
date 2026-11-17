@@ -308,11 +308,11 @@ def cacheable_refusal(result) -> bool:
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
-    "internal-analytical": 2,
+    "internal-analytical": 3,
     "vaporock": 1,
-    "magemin": 3,
-    "alphamelts": 3,
-    "thermoengine": 3,
+    "magemin": 4,
+    "alphamelts": 4,
+    "thermoengine": 4,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
@@ -320,23 +320,21 @@ ENGINE_CHEMISTRY_VERSION = {
 # material because they can change outputs without a code-side version bump.
 # alphamelts v1: 2026-11-08 alphaMELTS 2.3.1 Darwin arm64 binary - initial cache version
 # alphamelts v2: 2026-11-11 alphaMELTS 2.3.1, b257r landing 982a8d9fa - canonical activity labels, oxide-vapour projection and typed missing-pO2 refusal (18be4a5cd, b4e6e0dda, 959731207)
-# alphamelts v3: 2026-11-16 alphaMELTS binary pin unchanged, b267 bugs stack - engine-cache disclosure wrapper for b-119 executed-law replay
 # thermoengine v1: 2026-11-08 ThermoEngine df7a5f4609116a83bf40a5a352a19e3826a822d9 - initial cache version
 # thermoengine v2: 2026-11-11 ThermoEngine df7a5f4609116a83bf40a5a352a19e3826a822d9 - apply configured redox buffer, fO2 offset and Fe3Fet ratio during backend initialization (bd99e209c)
-# thermoengine v3: 2026-11-16 ThermoEngine pin unchanged, b267 bugs stack - engine-cache disclosure wrapper for b-119 executed-law replay
 # magemin v1: 2026-11-08 MAGEMin commit 40ed109d07d4246001cab59382596d33fed79086 - initial cache version
 # magemin v2: 2026-11-11 MAGEMin binary pin unchanged, b257r landing 982a8d9fa - d-367 mode-vector closure before liquid-fraction and composition extraction (cd48a78fe)
-# magemin v3: 2026-11-16 MAGEMin binary pin unchanged, b267 bugs stack - b-1225 typed silicate-window refusal for SiO2-poor bulks
-# magemin v4: 2026-11-17 MAGEMin pin unchanged, b-1240 adds cached backend_status_reason for empty/invalid input, untyped non-ok returns, and disposition-free engine timeout, lifecycle, exit, missing-binary, parse and crash failures; v3 left it absent.
-# New reasons: missing_input, invalid_input, magemin_untyped_failure, magemin_subprocess_timeout, magemin_subprocess_slot_timeout, magemin_subprocess_slot_unavailable, magemin_aggregate_budget_timeout, magemin_engine_worker_died, magemin_engine_worker_unavailable, nonzero_exit, missing_binary, parse_empty_output, engine_crash.
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
-# internal-analytical v2: 2026-11-16 simulator code at b267 bugs stack - b-906 d-412 Langmuir surface-pO2 root changes evaporation_flux.py and vapor_pressure.py outputs
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
 # magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
+# magemin v4: 2026-11-17 MAGEMin pin unchanged, b267 bugs stack - b-1225 typed silicate-window refusal for SiO2-poor bulks; b-1240 typed cached failure reasons for missing_input, invalid_input, timeout/lifecycle/exit/parse/crash.
+# internal-analytical v3: 2026-11-17 simulator code at b267 bugs stack - b-906 d-412 Langmuir surface-pO2 root changes evaporation_flux.py and vapor_pressure.py outputs
+# alphamelts v4: 2026-11-17 alphaMELTS binary pin unchanged, b267 bugs stack - engine-cache disclosure wrapper for b-119 executed-law replay (stored engine result and disclosure set)
+# thermoengine v4: 2026-11-17 ThermoEngine pin unchanged, b267 bugs stack - engine-cache disclosure wrapper for b-119 executed-law replay (stored engine result and disclosure set)
 
 
 @dataclass(frozen=True)
