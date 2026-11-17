@@ -10,6 +10,14 @@
   "date": "2026-10-18"
   "worker": "trial-grok-1018"
 "review_status": "draft"
+"experiments":
+- "experiment_id": "shornikov_2011_fig1_kems_data"
+  "method": "knudsen_effusion"
+  "locator":
+    "page": 2
+    "pdf_page_index": 1
+    "figure": "1"
+    "note": 'The caption says “symbols 1–4 were obtained by the mass-spectrometric Knudsen effusion method” (refs. 2000, 2003).'
 "skipped_empty_or_dash":
   "total": 10
   "tables":
@@ -185,6 +193,7 @@
             "note": "The temperature is the 2050 printed in each Gibbs-energy column header and in the\
               \ table caption."
     - "observation_id": "shornikov_2011_fig1a_CaO_activity"
+      "experiment": "shornikov_2011_fig1_kems_data"
       "type": "activity_coefficient"
       "locator":
         "page": 2
@@ -796,6 +805,7 @@
             "note": "Figure 1 panel a, symbol 1 (black square). Shared 50 mole % TiO2 endpoint on the\
               \ panel divider, stored once."
     - "observation_id": "shornikov_2011_fig1b_CaO_activity"
+      "experiment": "shornikov_2011_fig1_kems_data"
       "type": "activity_coefficient"
       "locator":
         "page": 2
@@ -3281,6 +3291,7 @@
               "point": "2050"
           "locator": *id011
     - "observation_id": "shornikov_2011_fig1a_TiO2_activity"
+      "experiment": "shornikov_2011_fig1_kems_data"
       "type": "activity_coefficient"
       "locator":
         "page": 2
@@ -4183,6 +4194,7 @@
               \ divider, stored once."
           "read_uncertainty_dex": "0.001"
     - "observation_id": "shornikov_2011_fig1b_TiO2_activity"
+      "experiment": "shornikov_2011_fig1_kems_data"
       "type": "activity_coefficient"
       "locator":
         "page": 2
@@ -5536,6 +5548,7 @@
               "point": "2050"
           "locator": *id013
     - "observation_id": "shornikov_2011_fig1a_SiO2_activity"
+      "experiment": "shornikov_2011_fig1_kems_data"
       "type": "activity_coefficient"
       "locator":
         "page": 2
@@ -6212,6 +6225,7 @@
             "marker": "blue triangle"
             "note": "Figure 1 panel a, symbol 3 (blue triangle)."
     - "observation_id": "shornikov_2011_fig1b_SiO2_activity"
+      "experiment": "shornikov_2011_fig1_kems_data"
       "type": "activity_coefficient"
       "locator":
         "page": 2

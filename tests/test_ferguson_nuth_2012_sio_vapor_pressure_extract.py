@@ -1,9 +1,17 @@
+from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Quantity, StateTag, ValueKind
+from simulator.battery.enums import (
+    EvidenceClass,
+    MethodToken,
+    Quantity,
+    StateTag,
+    ValueKind,
+)
+from tests.battery.test_migrate import _migrate_real_extract
 from tests.battery.factories import migrate_one_extract
 
 
@@ -82,6 +90,11 @@ def test_ferguson_nuth_table_rows_and_printed_alpha_migrate() -> None:
         and row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         for row in alpha_rows
     )
+    assert all(
+        migrator.result.experiments[row.experiment_id].method.value
+        is MethodToken.KNUDSEN_EFFUSION
+        for row in alpha_rows
+    )
 
     # Every run carries only printed T and orifice geometry as conditions.
     # Apparent pressure and fitted equilibrium pressure are not total pressure.
@@ -100,3 +113,27 @@ def test_ferguson_nuth_table_rows_and_printed_alpha_migrate() -> None:
         assert row.identity.total_pressure_Pa.tag is StateTag.UNKNOWN
         assert row.identity.fO2_Pa.tag is StateTag.UNKNOWN
         assert row.identity.composition.tag is StateTag.UNKNOWN
+
+
+def test_removing_alpha_experiment_method_returns_to_typed_unknown(
+    tmp_path: Path,
+) -> None:
+    raw = yaml.safe_load(EXTRACT.read_text())
+    alpha_experiment = next(
+        experiment
+        for experiment in raw["experiments"]
+        if experiment["experiment_id"] == "ferguson_nuth_2012_alpha_fit"
+    )
+    del alpha_experiment["method"]
+
+    result = _migrate_real_extract(
+        tmp_path,
+        EXTRACT.name,
+        extract_doc=deepcopy(raw),
+    )
+    migrated = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith("ferguson_nuth_2012_alpha_T1433")
+    )
+    assert result.experiments[migrated.experiment_id].method.is_unknown
