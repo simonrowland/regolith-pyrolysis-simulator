@@ -139,7 +139,8 @@ def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
     assert first.get_engine_version() == 'MAGEMin 1.9.6'
     assert second.get_engine_version() == 'MAGEMin 1.9.6'
     assert len(run_calls) == 1
-    assert slot_calls == [5]
+    assert slot_calls == [60]
+    assert run_calls[0][1]['timeout'] == 5
 
     @contextmanager
     def timed_out_slot(_timeout_s):
@@ -150,11 +151,62 @@ def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
 
     monkeypatch.setattr(magemin, '_magemin_subprocess_slot', timed_out_slot)
     busy = MAGEMinBackend()
-    busy._binary_path = tmp_path / 'BusyMAGEMin'
-    assert busy.get_engine_version() == (
-        f'MAGEMin subprocess ({busy._binary_path.resolve()})'
-    )
+    busy._binary_path = binary
+    assert busy.get_engine_version() == 'MAGEMin 1.9.6'
     assert len(run_calls) == 1
+
+
+def test_version_probe_slot_failure_and_timeout_share_typed_unknown(
+    monkeypatch, tmp_path,
+):
+    from contextlib import contextmanager
+
+    import simulator.engine_local_config as local_config
+    from simulator.engine_binding_admission import version_getter_provenance
+
+    monkeypatch.setattr(local_config, 'cache_version_for', lambda _: None)
+    monkeypatch.setattr(local_config, 'warn_legacy_once', lambda *_args: None)
+
+    def unavailable_slot(_timeout_s):
+        raise magemin._MAGEMinEngineLifecycleError(
+            'MAGEMinSubprocessSlotTimeout', 'slot timed out'
+        )
+
+    monkeypatch.setattr(magemin, '_magemin_subprocess_slot', unavailable_slot)
+    monkeypatch.setattr(
+        magemin.subprocess,
+        'run',
+        lambda *_args, **_kwargs: pytest.fail('slot failure must skip probe'),
+    )
+    slot_failure_backend = MAGEMinBackend()
+    slot_failure_backend._binary_path = tmp_path / 'slot-failure-MAGEMin'
+    slot_failure_version = slot_failure_backend.get_engine_version()
+    slot_failure_state = version_getter_provenance(
+        lambda: slot_failure_version
+    )
+
+    @contextmanager
+    def available_slot(_timeout_s):
+        yield
+
+    def timed_out_probe(args, **_kwargs):
+        raise subprocess.TimeoutExpired(args, timeout=5)
+
+    monkeypatch.setattr(magemin, '_magemin_subprocess_slot', available_slot)
+    monkeypatch.setattr(magemin.subprocess, 'run', timed_out_probe)
+    timeout_backend = MAGEMinBackend()
+    timeout_backend._binary_path = tmp_path / 'probe-timeout-MAGEMin'
+    timeout_version = timeout_backend.get_engine_version()
+    timeout_state = version_getter_provenance(
+        lambda: timeout_version
+    )
+
+    assert slot_failure_version == timeout_version == 'unavailable'
+    assert slot_failure_state == timeout_state == {
+        'tag': 'unknown',
+        'value': None,
+        'reason': 'version getter failed: ValueError',
+    }
 
 
 def test_version_probe_repeats_when_binary_changes_at_same_path(

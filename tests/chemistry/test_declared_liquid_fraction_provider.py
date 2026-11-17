@@ -867,9 +867,41 @@ def test_optimizer_resolves_gate_declared_in_loaded_setpoints(monkeypatch):
 @pytest.mark.parametrize('prior_good', [False, True])
 def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     monkeypatch, failure, prior_good,
-    vapor_pressure_data, feedstocks_data, setpoints_data,
+    tmp_path, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
+    from simulator import engine_binding_admission as admission
     from tests.binding_admission_fixtures import register_synthetic_gate_curve_producer
+
+    identity = admission.BindingIdentity(
+        "magemin", "ig", "magemin-ig-r1", "subprocess"
+    )
+    provenance = {
+        "binding_provenance_verifiable": True,
+        "runtime_version": {
+            "tag": "value",
+            "value": "MAGEMin fixture runtime",
+            "reason": None,
+        },
+        "runtime_artifacts": {
+            "magemin_selected_binary": {"sha256": "a" * 64},
+        },
+    }
+    monkeypatch.setattr(
+        admission, "binding_identity_for_backend", lambda _backend: identity
+    )
+    monkeypatch.setattr(
+        admission,
+        "current_backend_provenance",
+        lambda *_args, **_kwargs: provenance,
+    )
+    monkeypatch.setattr(
+        admission, "selected_binding_identities", lambda *_args, **_kwargs: ()
+    )
+    monkeypatch.setattr(
+        admission,
+        "binding_receipt_path",
+        lambda: tmp_path / "missing-binding-admission.json",
+    )
 
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     register_synthetic_gate_curve_producer(sim)

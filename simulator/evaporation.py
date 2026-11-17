@@ -3398,7 +3398,7 @@ class EvaporationMixin:
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
         from simulator.engine_binding_admission import (
-            gate_curve_memo_origin_matches,
+            gate_curve_memo_reuse_eligible,
         )
 
         if (
@@ -3449,12 +3449,12 @@ class EvaporationMixin:
             )
             and isinstance(cached_curve, Mapping)
             and isinstance(cached_notices, list)
-            and gate_curve_memo_origin_matches(
+            and gate_curve_memo_reuse_eligible(
                 self,
                 cached_curve,
                 cache.get('origin'),
                 fresh_evidence=True,
-                **redox_state_kwargs,
+                redox_state=redox_state,
             )
         ):
             with bind_simulation_run(self):
@@ -3523,12 +3523,12 @@ class EvaporationMixin:
                 )
                 and isinstance(shared_value, Mapping)
                 and isinstance(shared_notices, list)
-                and gate_curve_memo_origin_matches(
+                and gate_curve_memo_reuse_eligible(
                     self,
                     shared_value,
                     shared_origin,
                     fresh_evidence=True,
-                    **redox_state_kwargs,
+                    redox_state=redox_state,
                 )
             ):
                 with bind_simulation_run(self):
@@ -3707,6 +3707,7 @@ class EvaporationMixin:
                 )
                 from simulator.engine_binding_admission import (
                     gate_curve_memo_evidence,
+                    gate_curve_memo_reuse_eligible,
                     write_gate_curve_memo_record,
                 )
 
@@ -3724,6 +3725,14 @@ class EvaporationMixin:
                     **redox_state_kwargs,
                 )
                 origin = record['origin']
+                cache_eligible = cache_eligible and gate_curve_memo_reuse_eligible(
+                    self,
+                    curve,
+                    origin,
+                    fresh_evidence=True,
+                    evidence=evidence,
+                    redox_state=redox_state,
+                )
                 last_good = self._freeze_gate_last_good_curve
                 if last_good is not None and last_good['curve'] == curve:
                     last_good['origin'] = origin

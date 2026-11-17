@@ -3186,6 +3186,45 @@ def _production_freeze_gate_memo_key(host):
     )
 
 
+def _known_magemin_gate_curve_evidence():
+    from simulator.engine_binding_admission import (
+        BindingIdentity,
+        GateCurveEvidence,
+        admission_fingerprint,
+    )
+
+    identity = BindingIdentity(
+        "magemin",
+        "magemin-shadow-fixture",
+        "fixture-r1",
+        "native",
+    )
+    provenance = {
+        "binding_provenance_verifiable": True,
+        "runtime_version": {
+            "tag": "value",
+            "value": "MAGEMin fixture runtime",
+            "reason": None,
+        },
+        "runtime_artifacts": {
+            "magemin_selected_binary": {"sha256": "a" * 64},
+        },
+    }
+    return GateCurveEvidence(
+        admission_fingerprint(identity, provenance),
+        False,
+        identity,
+        provenance,
+    )
+
+
+def _known_magemin_gate_curve_origin():
+    return {
+        "producer_pid": 1,
+        "producer_evidence": _known_magemin_gate_curve_evidence().producer_evidence,
+    }
+
+
 def _in_domain_freeze_gate_ledger():
     from simulator.accounting.ledger import AtomLedger
     from simulator.evaporation import _FREEZE_GATE_ACCOUNT
@@ -3208,11 +3247,11 @@ def _in_domain_freeze_gate_ledger():
 def _memo_record(host, *, disclosures):
     record = {
         "key": _production_freeze_gate_memo_key(host),
-        "curve": {"tag": "cached", "status": "in_range"},
+        "curve": {"tag": "cached", "status": "ok"},
         "repair_notices": [],
         "disposition": "live",
         "provider_outcome": "produced",
-        "origin": {"producer_pid": 1},
+        "origin": _known_magemin_gate_curve_origin(),
     }
     if disclosures is not None:
         record["law_disclosures"] = disclosures
@@ -3234,13 +3273,17 @@ def test_preseeded_freeze_gate_memo_without_disclosure_recomputes(
     monkeypatch.setattr(
         admission, "gate_curve_memo_origin_matches", lambda *_a, **_k: True
     )
-    monkeypatch.setattr(admission, "gate_curve_memo_evidence", lambda *_a, **_k: {})
+    monkeypatch.setattr(
+        admission,
+        "gate_curve_memo_evidence",
+        lambda *_a, **_k: _known_magemin_gate_curve_evidence(),
+    )
     monkeypatch.setattr(
         admission,
         "write_gate_curve_memo_record",
         lambda _self, curve, notices, **kwargs: {
             "curve": dict(curve),
-            "origin": {"producer_pid": 1},
+            "origin": _known_magemin_gate_curve_origin(),
             "repair_notices": list(notices),
             "disposition": "live",
             "provider_outcome": kwargs.get("provider_outcome"),
@@ -3381,7 +3424,7 @@ def _core_memo_record(host, *, disclosures, tag: str = "cached") -> dict:
         "repair_notices": [],
         "disposition": "live",
         "provider_outcome": "produced",
-        "origin": {"producer_pid": 1},
+        "origin": _known_magemin_gate_curve_origin(),
     }
     if disclosures is not None:
         record["law_disclosures"] = disclosures
@@ -3595,13 +3638,17 @@ def _patch_gate_memo_live(monkeypatch) -> None:
     monkeypatch.setattr(
         admission, "gate_curve_memo_origin_matches", lambda *_a, **_k: True
     )
-    monkeypatch.setattr(admission, "gate_curve_memo_evidence", lambda *_a, **_k: {})
+    monkeypatch.setattr(
+        admission,
+        "gate_curve_memo_evidence",
+        lambda *_a, **_k: _known_magemin_gate_curve_evidence(),
+    )
     monkeypatch.setattr(
         admission,
         "write_gate_curve_memo_record",
         lambda _self, curve, notices, **kwargs: {
             "curve": dict(curve),
-            "origin": {"producer_pid": 1},
+            "origin": _known_magemin_gate_curve_origin(),
             "repair_notices": list(notices),
             "disposition": "live",
             "provider_outcome": kwargs.get("provider_outcome"),

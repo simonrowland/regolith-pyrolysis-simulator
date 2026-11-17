@@ -2567,9 +2567,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 else None
             )
             if legacy is None:
+                # A failed probe has the same typed-unknown representation as
+                # a missing binary. The binding-admission resolver marks this
+                # sentinel unknown instead of treating a scheduling failure
+                # as a path-derived engine version.
+                legacy = 'unavailable'
                 try:
                     with (
-                        _magemin_subprocess_slot(5),
+                        _magemin_subprocess_slot(60),
                         tempfile.TemporaryDirectory() as tmpdir,
                     ):
                         result = subprocess.run(
@@ -2590,14 +2595,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         legacy = lines[0].strip()
                         if version_key is not None:
                             _MAGEMIN_ENGINE_VERSION_CACHE[version_key] = legacy
-                    else:
-                        legacy = f'MAGEMin subprocess ({resolved_binary_path})'
                 except (
                     _MAGEMinEngineLifecycleError,
                     OSError,
                     subprocess.TimeoutExpired,
                 ):
-                    legacy = f'MAGEMin subprocess ({resolved_binary_path})'
+                    pass
         warn_legacy_once(
             'magemin',
             'engines.local.toml absent; using legacy MAGEMin '

@@ -3096,6 +3096,11 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
         ),
         provenance_override={
             "binding_provenance_verifiable": True,
+            "runtime_version": {
+                "tag": "value",
+                "value": "MAGEMin fixture runtime",
+                "reason": None,
+            },
             "runtime_artifacts": {
                 "magemin_selected_binary": {"sha256": "a" * 64},
             },
