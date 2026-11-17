@@ -2231,6 +2231,45 @@ def test_fo2_gas_ratio_round_trips_as_a_located_printed_value() -> None:
     assert ratio["value"]["locator"] == {"published_page": 800, "table": "I"}
 
 
+def test_aithala_s5_regression_summaries_migrate_as_typed_quantity_gaps() -> None:
+    extract = (
+        REPO_ROOT
+        / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
+    )
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    rows = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
+        and observation.observation_id.rsplit("::", 1)[-1].startswith(
+            "aithala_2026_s5_"
+        )
+    }
+    assert len(rows) == 61
+    assert len({row.provenance["series_id"] for row in rows.values()}) == 61
+    assert all(row.identity.quantity.is_unknown for row in rows.values())
+    assert all(
+        "unsupported quantity" in row.identity.quantity.reason
+        for row in rows.values()
+    )
+    assert all(row.value.kind is ValueKind.UNAVAILABLE for row in rows.values())
+    assert all(row.admission.status is AdmissionStatus.PENDING for row in rows.values())
+    assert all(row.admission.reason for row in rows.values())
+
+    nmf = rows["aithala_2026_s5_nmf"]
+    assert nmf.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert nmf.evidence.attribution == "compiled from Kennedy (1948)"
+    assert nmf.identity.quantity.reason == (
+        "unsupported quantity 'regressed_log10_fe3_fe2_vs_inverse_temperature_slope'"
+    )
+
+    present = rows["aithala_2026_s5_humphrey"]
+    assert present.evidence.class_.value is EvidenceClass.AUTHOR_ESTIMATE
+
+
 def test_darken_gurry_equilibrium_compositions_migrate_with_conditions() -> None:
     extract = REPO_ROOT / "data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml"
     migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
