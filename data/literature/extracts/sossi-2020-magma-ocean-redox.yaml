@@ -58,6 +58,9 @@ experiments:
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2173.15'}}, locator: {page: 2, table: S1, note: '1900 °C as printed; converted by K = °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '21'}}, locator: {page: 2, table: S1, note: '±21 °C as printed; uncertainty magnitude unchanged in kelvins'}}
+    gas_fO2_evaluation_temperature_K: &sossi_gas_fO2_evaluation_temperature
+      state: {tag: value, value: {kind: point, point: '2173.15'}}
+      locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15'}
     log_fO2: {state: {tag: value, value: {kind: point, point: '0.00'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '0.00'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: O2}, locator: {page: 2, table: S1}}
@@ -81,6 +84,7 @@ experiments:
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2166.15'}}, locator: {page: 2, table: S1, note: '1893 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '40'}}, locator: {page: 2, table: S1, note: '±40 °C'}}
+    gas_fO2_evaluation_temperature_K: *sossi_gas_fO2_evaluation_temperature
     log_fO2: {state: {tag: value, value: {kind: point, point: '-2.49'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-2.49'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: CO2}, locator: {page: 2, table: S1}}
@@ -97,6 +101,7 @@ experiments:
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2134.15'}}, locator: {page: 2, table: S1, note: '1861 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '29'}}, locator: {page: 2, table: S1, note: '±29 °C'}}
+    gas_fO2_evaluation_temperature_K: *sossi_gas_fO2_evaluation_temperature
     log_fO2: {state: {tag: value, value: {kind: point, point: '-2.53'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-2.53'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '99CO2:1H2'}, locator: {page: 2, table: S1}}
@@ -113,6 +118,7 @@ experiments:
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2151.15'}}, locator: {page: 2, table: S1, note: '1878 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '23'}}, locator: {page: 2, table: S1, note: '±23 °C'}}
+    gas_fO2_evaluation_temperature_K: *sossi_gas_fO2_evaluation_temperature
     log_fO2: {state: {tag: value, value: {kind: point, point: '-2.58'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-2.58'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '98CO2:2H2'}, locator: {page: 2, table: S1}}
@@ -129,6 +135,7 @@ experiments:
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2124.15'}}, locator: {page: 2, table: S1, note: '1851 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '13'}}, locator: {page: 2, table: S1, note: '±13 °C'}}
+    gas_fO2_evaluation_temperature_K: *sossi_gas_fO2_evaluation_temperature
     log_fO2: {state: {tag: value, value: {kind: point, point: '-2.72'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-2.72'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '95CO2:5H2'}, locator: {page: 2, table: S1}}
@@ -145,6 +152,7 @@ experiments:
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2139.15'}}, locator: {page: 2, table: S1, note: '1866 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '13'}}, locator: {page: 2, table: S1, note: '±13 °C'}}
+    gas_fO2_evaluation_temperature_K: *sossi_gas_fO2_evaluation_temperature
     log_fO2: {state: {tag: value, value: {kind: point, point: '-2.72'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-2.72'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '95CO2:5H2'}, locator: {page: 2, table: S1}}
@@ -161,6 +169,7 @@ experiments:
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2148.15'}}, locator: {page: 2, table: S1, note: '1875 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '41'}}, locator: {page: 2, table: S1, note: '±41 °C'}}
+    gas_fO2_evaluation_temperature_K: *sossi_gas_fO2_evaluation_temperature
     log_fO2: {state: {tag: value, value: {kind: point, point: '-2.72'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-2.72'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '95CO2:5H2'}, locator: {page: 2, table: S1}}
@@ -177,6 +186,7 @@ experiments:
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2197.15'}}, locator: {page: 2, table: S1, note: '1924 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '13'}}, locator: {page: 2, table: S1, note: '±13 °C'}}
+    gas_fO2_evaluation_temperature_K: *sossi_gas_fO2_evaluation_temperature
     log_fO2: {state: {tag: value, value: {kind: point, point: '-3.00'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-3.00'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '90CO2:10H2'}, locator: {page: 2, table: S1}}
@@ -193,6 +203,7 @@ experiments:
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2175.15'}}, locator: {page: 2, table: S1, note: '1902 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '15'}}, locator: {page: 2, table: S1, note: '±15 °C'}}
+    gas_fO2_evaluation_temperature_K: *sossi_gas_fO2_evaluation_temperature
     log_fO2: {state: {tag: value, value: {kind: point, point: '-3.92'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-3.92'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '75CO2:25H2'}, locator: {page: 2, table: S1}}
@@ -209,6 +220,7 @@ experiments:
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2173.15'}}, locator: {page: 2, table: S1, note: '1900 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '21'}}, locator: {page: 2, table: S1, note: '±21 °C'}}
+    gas_fO2_evaluation_temperature_K: *sossi_gas_fO2_evaluation_temperature
     log_fO2: {state: {tag: value, value: {kind: point, point: '-5.32'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-5.32'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '50CO2:50H2'}, locator: {page: 2, table: S1}}
@@ -225,6 +237,7 @@ experiments:
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2169.15'}}, locator: {page: 2, table: S1, note: '1896 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '16'}}, locator: {page: 2, table: S1, note: '±16 °C'}}
+    gas_fO2_evaluation_temperature_K: *sossi_gas_fO2_evaluation_temperature
     log_fO2: {state: {tag: value, value: {kind: point, point: '-6.74'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-6.74'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '25CO2:75H2'}, locator: {page: 2, table: S1}}
@@ -241,6 +254,7 @@ experiments:
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2112.15'}}, locator: {page: 2, table: S1, note: '1839 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '17'}}, locator: {page: 2, table: S1, note: '±17 °C'}}
+    gas_fO2_evaluation_temperature_K: *sossi_gas_fO2_evaluation_temperature
     log_fO2: {state: {tag: value, value: {kind: point, point: '-7.86'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-7.86'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '10CO2:90H2'}, locator: {page: 2, table: S1}}
