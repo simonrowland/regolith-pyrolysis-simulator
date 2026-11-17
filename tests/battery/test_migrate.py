@@ -9837,7 +9837,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # t-1781 retypes Su & Zhang's 3,435 natural-glass profile cells as an
     # explicit typed absence; the numeric census excludes them from the residue
     # quantity. Richter et al. (2011) still contributes 324 Table 1 oxide cells.
-    assert census.get("residue_component_composition") == 4677
+    # b-1209 adds 36 printed residue cells from Mendybaev 2017; mismatches stay 0.
+    assert census.get("residue_component_composition") == 4713
     assert (
         per_source.get("su-zhang-2023-lunar-orange-glass-na-k-cu-degassing", {})
         .get("residue_component_composition", 0)
