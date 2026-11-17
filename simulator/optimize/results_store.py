@@ -10,7 +10,7 @@ latest result for that EvalSpec, not an append-only audit log.
 
 from __future__ import annotations
 
-from collections.abc import Sequence as SequenceABC
+from collections.abc import Mapping as MappingABC, Sequence as SequenceABC
 from dataclasses import MISSING, fields, replace
 import errno
 import fcntl
@@ -1877,7 +1877,22 @@ def _storage_run_reference_trace(run_reference: RunReference) -> dict[str, Any]:
 
 
 def _jsonable(value: Any) -> Any:
-    if isinstance(value, Mapping):
+    value_type = type(value)
+    if value_type is dict:
+        return {str(key): _jsonable(item) for key, item in value.items()}
+    if value_type in (set, frozenset):
+        return sorted((_jsonable(item) for item in value), key=repr)
+    if value_type is tuple:
+        return [_jsonable(item) for item in value]
+    if value_type is list:
+        return [_jsonable(item) for item in value]
+    if value_type is float:
+        return value if math.isfinite(value) else str(value)
+    if value_type in (str, int, bool, type(None)):
+        return value
+    # The stored result tree is made of built-ins; keep custom Mapping and
+    # sequence implementations compatible through these slower fallbacks.
+    if isinstance(value, MappingABC):
         return {str(key): _jsonable(item) for key, item in value.items()}
     if isinstance(value, (set, frozenset)):
         return sorted((_jsonable(item) for item in value), key=repr)

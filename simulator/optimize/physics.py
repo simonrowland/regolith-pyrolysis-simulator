@@ -4693,7 +4693,9 @@ def _coating_fraction_payload(
         if key != _WALL_SUPPLY_WINDOW_REPORT_KEY
     }
     payload = {
-        **_plain_value(public_report),
+        # GateMargin.__post_init__ converts the complete payload to plain
+        # containers, so converting the report here would walk it twice.
+        **public_report,
         "coating_constraint_mode": "upstream_deposit_fraction",
         "coating_constraint_authoritative": constraint_authoritative,
         "constraint_mode": "fraction",
@@ -5286,7 +5288,21 @@ def _plain_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _plain_value(value: Any) -> Any:
-    if isinstance(value, Mapping):
+    value_type = type(value)
+    if value_type is dict:
+        return {
+            key: _plain_value(item)
+            for key, item in value.items()
+        }
+    if value_type is tuple:
+        return tuple(_plain_value(item) for item in value)
+    if value_type is list:
+        return [_plain_value(item) for item in value]
+    if value_type in (str, int, float, bool, type(None), set, frozenset):
+        return value
+    # Preserve support for custom mappings and sequence subclasses without
+    # sending every built-in value through typing/ABC instance checks.
+    if isinstance(value, MappingABC):
         return {
             key: _plain_value(item)
             for key, item in value.items()

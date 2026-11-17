@@ -9,7 +9,7 @@ import queue
 import sqlite3
 import threading
 import time
-from types import SimpleNamespace
+from types import MappingProxyType, SimpleNamespace
 
 import pytest
 
@@ -164,6 +164,50 @@ def test_numeric_partial_objective_status_survives_result_serialization():
     assert serialized["value"] == 8.5
     assert serialized["value_status"] == "partial"
     assert serialized["evidence"]["excluded"] == excluded
+
+
+def test_optimizer_coating_margin_serialization_matches_golden_json() -> None:
+    status_payload = MappingProxyType({
+        "coating_verdict": "violated",
+        "coating_diagnostics": MappingProxyType({
+            "upstream_hot_wall_findings": (
+                MappingProxyType({
+                    "hour": 1,
+                    "segment": "hot",
+                    "evidence": MappingProxyType({"excess": 0.1}),
+                }),
+            ),
+        }),
+        "refusal_diagnostic": MappingProxyType({
+            "species": "SiO",
+            "reasons": {"z", "a"},
+        }),
+    })
+    serialized = json.dumps(
+        _serialize_margins({
+            "coating": _coating_margin(
+                feasible=False,
+                observed=0.75,
+                threshold=1.0,
+                status_payload=status_payload,
+            ),
+        }),
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
+
+    assert serialized == (
+        '{"coating":{"authoritative":true,"detail":"coating test margin",'
+        '"feasible":false,"gate":"coating","margin":-0.25,'
+        '"observed":0.75,"output_status":"authoritative","status":"available",'
+        '"status_payload":{"coating_diagnostics":{"upstream_hot_wall_findings":['
+        '{"evidence":{"excess":0.1},"hour":1,"segment":"hot"}]},'
+        '"coating_verdict":"violated","refusal_diagnostic":{"reasons":["a","z"],'
+        '"species":"SiO"}},"threshold":{"id":"coating_min_campaigns_to_resinter",'
+        '"source":"profile","source_ref":"test profile","tolerance":0.0,'
+        '"units":"campaigns","value":1.0}}}'
+    )
 
 
 # Shape written by alphamelts._build_result: backend_name and engine_version
