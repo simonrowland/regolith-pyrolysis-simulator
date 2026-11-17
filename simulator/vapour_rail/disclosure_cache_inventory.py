@@ -309,6 +309,14 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Pure loader or identity digest. It never evaluates a vapour law, so a cached value cannot carry a disclosure.',
     },
+    'store:simulator/battery/compilation_tier.py:fit_evaluation_cache': {
+        "path": 'simulator/battery/compilation_tier.py',
+        "line": 4770,
+        "kind": 'store',
+        "name": 'fit_evaluation_cache',
+        "carries_disclosure": False,
+        "how": 'Per-call cache of accepted thermochemistry fit evaluations against reference curves; it does not evaluate a vapour law.',
+    },
     'lru:simulator/battery/generators/janaf.py:_cached_table_property_points': {
         "path": 'simulator/battery/generators/janaf.py',
         "line": 3158,
@@ -460,6 +468,14 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "name": '_volatile_closure_component',
         "carries_disclosure": False,
         "how": 'Pure loader or identity digest. It never evaluates a vapour law, so a cached value cannot carry a disclosure.',
+    },
+    'lru:simulator/battery/migrate.py:_is_as_printed_provenance_echo_text': {
+        "path": 'simulator/battery/migrate.py',
+        "line": 966,
+        "kind": 'lru',
+        "name": '_is_as_printed_provenance_echo_text',
+        "carries_disclosure": False,
+        "how": 'Memoizes a deterministic printed-label suffix check; it does not cache a chemistry result.',
     },
     'lru:simulator/battery/score.py:_b1259_tridymite_cristobalite_offset_rows': {
         "path": 'simulator/battery/score.py',

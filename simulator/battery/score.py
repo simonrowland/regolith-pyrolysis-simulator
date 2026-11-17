@@ -16426,6 +16426,7 @@ def _sossi_residue_prediction(
                 f"no positive Sossi {formula} prediction",
             )
         provenance = dict(prediction.provenance)
+        provenance.pop("code_revision", None)
         sources = (
             *sources,
             *openimcc_pack_coefficient_sources(
