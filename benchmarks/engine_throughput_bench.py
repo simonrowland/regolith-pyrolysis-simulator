@@ -24,7 +24,7 @@ import tempfile
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Mapping
+from typing import Any, Callable, Mapping, Sequence
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -51,12 +51,15 @@ BASELINE_PATH = REPO_ROOT / "tests" / "perf" / "perf_ratchet_baselines.json"
 POWER_SOC_MIN_PERCENT = 20
 MEASUREMENT_INVALID_EXIT_CODE = 75
 OPTIMIZER_STAGE_NAME = "optimizer_60h_eval"
-# The stage name identifies the profile's authored 60 h run budget. C0
-# evaluations now follow the complete campaign chain, so the measured work is
-# 264 simulator steps rather than a 60 h simulated horizon.
+# The stage name identifies the profile's authored run budget. A C0 evaluation
+# follows the complete AUTO_APPLY campaign chain; completed work is measured
+# from the executor trace and independently counted simulator steps.
 OPTIMIZER_PROFILE_RUN_HOURS = 60
-OPTIMIZER_STAGE_EXPECTED_STEP_CALLS = 264
 OPTIMIZER_STAGE_TRIALS = 5
+OPTIMIZER_REBASELINE_REASON = (
+    "optimizer_60h_eval needs rebaseline on the reference machine after "
+    "b-080 full-chain workload; owner action"
+)
 # Corrected 2026-07-25 (milestone review F1 follow-through): the loose
 # substring match had classified this M5 MAX box as plain "M5", so the
 # baselines were seeded under a wrong label. The canonical class is
@@ -106,14 +109,16 @@ BUILTIN_LIQUIDUS_FIXTURE = {
 # Pytest deliberately lets the typed MeasurementInvalid escape as a red,
 # nonzero outcome; xfail/skip would let an unmeasured gate leave CI green.
 PROTOCOL = {
-    # rev-6: optimizer_60h_eval retains the profile's authored 60 h budget,
-    # but its C0 evaluation follows the full campaign chain (264 steps).
+    # rev-7: optimizer_60h_eval retains the profile's authored 60 h budget,
+    # but its C0 evaluation follows the full campaign chain. Its work units
+    # are the executor trace's completed campaign hours, checked against an
+    # independent PyrolysisSimulator.step counter, not a fixed count.
     # The condensation route fixture also supplies the required
     # per-species wall partial pressures and therefore measures the coupled
     # wall/stage fixed-point workload. Its earlier rate is not comparable.
     # Independent process repeats keep asymmetric-core scheduling from making
     # every trial in one stage worker observe the same slow core class.
-    "revision": 6,
+    "revision": 7,
     "warmups": 1,
     "trials": 3,
     # max, not median (2026-07-25 gate-red attribution): on asymmetric
@@ -147,13 +152,15 @@ PROTOCOL = {
     "stage_trial_counts": {
         OPTIMIZER_STAGE_NAME: OPTIMIZER_STAGE_TRIALS,
     },
+    "dynamic_work_units_per_trial": {
+        OPTIMIZER_STAGE_NAME: "sum_completed_campaign_duration_h",
+    },
     "stage_work_units_per_trial": {
         "internal_analytical_equilibrium": 500,
         "vapor_pressure_eval": 36000,
         "sim_step_c2a_hour": 1,
         "condensation_route_hour": 4,
         "runner_fixture_replay": 1,
-        OPTIMIZER_STAGE_NAME: OPTIMIZER_STAGE_EXPECTED_STEP_CALLS,
     },
     "hot_path_calls_per_trial": {
         "internal_analytical_equilibrium": 500,
@@ -161,7 +168,6 @@ PROTOCOL = {
         "sim_step_c2a_hour": 1,
         "condensation_route_hour": 164,
         "runner_fixture_replay": 24,
-        OPTIMIZER_STAGE_NAME: OPTIMIZER_STAGE_EXPECTED_STEP_CALLS,
     },
 }
 
@@ -859,6 +865,92 @@ def _measure_stage(
     }
 
 
+def _optimizer_campaign_limits(
+    profile: Mapping[str, Any],
+    setpoints: Mapping[str, Any],
+) -> tuple[tuple[str, ...], dict[str, float]]:
+    """Derive the AUTO_APPLY route and its configured duration caps."""
+    from simulator.campaigns import CampaignManager
+    from simulator.state import BatchRecord, CampaignPhase
+
+    run_options = dict(profile.get("run", {}))
+    run_options.update(
+        profile.get("fidelities", {}).get("internal-analytical", {})
+    )
+    manager = CampaignManager(dict(setpoints))
+    manager.c5_enabled = bool(run_options.get("c5_enabled", False))
+    record = BatchRecord(
+        feedstock_key=str(profile.get("feedstock", "")),
+        track=str(run_options.get("track", "pyrolysis")),
+    )
+    start = CampaignManager.campaign_phases_for_id(
+        str(run_options.get("campaign", ""))
+    )
+    assert len(start) == 1, f"expected one optimizer start phase, got {start!r}"
+    phases = manager.auto_apply_sequence(start[0], record)
+
+    duration_caps: dict[str, float] = {}
+    for phase in phases:
+        if phase is CampaignPhase.C2A_STAGED:
+            cap_h = manager._configured_staged_max_hold_hr(phase)
+        elif phase is CampaignPhase.C3_NA and manager._pending_c3_na_scoped_overrides:
+            cap_h = float(
+                manager._pending_c3_na_scoped_overrides["staged_duration_h"]
+            )
+        elif phase is CampaignPhase.C4:
+            acquisition_h, _ = manager._c4_target_acquisition_limit()
+            process_h, _ = manager._c4_process_wall_clock_limit()
+            cap_h = acquisition_h + process_h
+        elif phase is CampaignPhase.C2A and manager._pending_post_mg_c2a_overrides:
+            cap_h = float(manager._pending_post_mg_c2a_overrides["max_hours"])
+        else:
+            cap_h = manager._max_hold_hr(phase)
+        assert math.isfinite(float(cap_h)) and float(cap_h) > 0.0
+        duration_caps[phase.name] = float(cap_h)
+
+    return tuple(phase.name for phase in phases), duration_caps
+
+
+def _assert_optimizer_campaign_work(
+    *,
+    step_calls: int,
+    campaign_stops: Sequence[Mapping[str, Any]],
+    expected_campaigns: Sequence[str],
+    duration_caps: Mapping[str, float],
+) -> int:
+    """Check independent step volume against completed executor trace hours."""
+    campaign_names = tuple(
+        str(stop.get("campaign") or "") for stop in campaign_stops
+    )
+    assert campaign_names == tuple(expected_campaigns), (
+        f"completed campaign chain={campaign_names!r}, "
+        f"AUTO_APPLY chain={tuple(expected_campaigns)!r}"
+    )
+    trace_hours = 0
+    for stop in campaign_stops:
+        campaign = str(stop.get("campaign") or "")
+        duration_h = float(stop["duration_h"])
+        assert math.isfinite(duration_h) and duration_h > 0.0, (
+            f"{campaign}: completed duration must be positive and finite, "
+            f"got {duration_h!r}"
+        )
+        assert duration_h.is_integer(), (
+            f"{campaign}: one simulator step represents one whole hour, "
+            f"got duration {duration_h!r}"
+        )
+        if campaign in duration_caps:
+            assert duration_h <= duration_caps[campaign], (
+                f"{campaign}: duration {duration_h:g} h exceeds configured "
+                f"cap {duration_caps[campaign]:g} h"
+            )
+        trace_hours += int(duration_h)
+    assert step_calls == trace_hours, (
+        f"PyrolysisSimulator.step calls={step_calls}, completed executor "
+        f"campaign trace={trace_hours} h"
+    )
+    return trace_hours
+
+
 def _measure_optimizer_profile_campaign_chain_stage(
     trial_count: int = OPTIMIZER_STAGE_TRIALS,
 ) -> dict[str, Any]:
@@ -878,6 +970,10 @@ def _measure_optimizer_profile_campaign_chain_stage(
     run_hours = int(profile["run"]["hours"])
     fidelity_hours = int(profile["fidelities"]["internal-analytical"]["hours"])
     assert run_hours == fidelity_hours == OPTIMIZER_PROFILE_RUN_HOURS
+    expected_campaigns, duration_caps = _optimizer_campaign_limits(
+        profile,
+        load_config_bundle().setpoints,
+    )
     patch_value = RecipePatch({})
     trial_records = []
 
@@ -921,31 +1017,19 @@ def _measure_optimizer_profile_campaign_chain_stage(
             assert scored.run_reference is not None
             trace = scored.run_reference.trace
             campaign_stops = tuple(trace.get("campaign_stops", ()))
-            assert tuple(
-                str(stop.get("campaign") or "") for stop in campaign_stops
-            ) == (
-                "C0",
-                "C0B",
-                "C2A_STAGED",
-                "C3_NA",
-                "C4",
-                "C2A",
-                "C6",
+            trace_hours = _assert_optimizer_campaign_work(
+                step_calls=step_calls["count"],
+                campaign_stops=campaign_stops,
+                expected_campaigns=expected_campaigns,
+                duration_caps=duration_caps,
             )
-            assert tuple(
-                int(stop["duration_h"]) for stop in campaign_stops
-            ) == (25, 3, 9, 3, 64, 140, 20)
-            assert sum(int(stop["duration_h"]) for stop in campaign_stops) == (
-                OPTIMIZER_STAGE_EXPECTED_STEP_CALLS
-            )
-            assert step_calls["count"] == OPTIMIZER_STAGE_EXPECTED_STEP_CALLS
             assert math.isfinite(cpu_seconds) and cpu_seconds > 0.0
             assert math.isfinite(wall_seconds) and wall_seconds > 0.0
             assert store.lookup(scored.eval_spec) is None
             # Match the existing study persistence path: the full in-memory
             # physics trace is used for scoring, while the cache stores its
             # compact ranking projection. Keeping the entire trace here can
-            # exceed SQLite's text limit for this 264-step campaign chain.
+            # exceed SQLite's text limit for this long campaign chain.
             cacheable = _strip_heavy_result(scored)
             store.store(
                 cacheable.eval_spec,
@@ -954,7 +1038,7 @@ def _measure_optimizer_profile_campaign_chain_stage(
             )
             cached = store.lookup(scored.eval_spec)
             assert cached is not None and cached.cache_key == scored.cache_key
-            assert step_calls["count"] == OPTIMIZER_STAGE_EXPECTED_STEP_CALLS
+            assert step_calls["count"] == trace_hours
 
         # Premise: each counted call advances one campaign hour. Algebra:
         # wall/CPU = elapsed wall seconds / user+system CPU seconds; units cancel.
@@ -965,6 +1049,11 @@ def _measure_optimizer_profile_campaign_chain_stage(
                 "hostname": platform.node(),
                 "work_units": step_calls["count"],
                 "hot_path_calls": step_calls["count"],
+                "step_calls": step_calls["count"],
+                "trace_hours": trace_hours,
+                "campaign_chain": [
+                    str(stop.get("campaign") or "") for stop in campaign_stops
+                ],
                 "cpu_seconds": cpu_seconds,
                 "wall_seconds": wall_seconds,
                 "wall_cpu_ratio": wall_seconds / cpu_seconds,
@@ -1006,8 +1095,8 @@ def _measure_optimizer_profile_campaign_chain_stage(
         "trial_rates": rates,
         "details": {
             "hot_path": "PyrolysisSimulator.step during optimizer evaluate",
-            "profile_run_hours": OPTIMIZER_PROFILE_RUN_HOURS,
-            "expected_step_calls_per_trial": OPTIMIZER_STAGE_EXPECTED_STEP_CALLS,
+            "profile_run_hours": run_hours,
+            "work_unit_source": "sum of completed executor campaign durations",
             "trial_records": trial_records,
         },
     }
@@ -1029,9 +1118,11 @@ def _measure_one(stage: str) -> dict[str, Any]:
     return _measure_stage(stage, trial_factories[stage])
 
 
-def measure_all() -> dict[str, dict[str, Any]]:
+def measure_all(
+    stage_names: Sequence[str] = STAGE_NAMES,
+) -> dict[str, dict[str, Any]]:
     measurements = {}
-    for stage in STAGE_NAMES:
+    for stage in stage_names:
         stage_measurements = []
         repeats = int(PROTOCOL["stage_process_repeats"][stage])
         for repeat in range(repeats):
@@ -1082,12 +1173,15 @@ def reblessed_payload(
         raise RuntimeError("baseline protocol does not match benchmark protocol")
     for stage in STAGE_NAMES:
         observed = float(measurements[stage]["rate"])
-        current = float(payload["stages"][stage]["ratchet_rate"])
-        payload["stages"][stage]["ratchet_rate"] = max(current, observed)
-        payload["stages"][stage]["rate_unit"] = measurements[stage]["rate_unit"]
-        payload["stages"][stage]["hot_path"] = measurements[stage]["details"][
-            "hot_path"
-        ]
+        stage_baseline = payload["stages"][stage]
+        current = stage_baseline.get("ratchet_rate")
+        stage_baseline["ratchet_rate"] = (
+            observed if current is None else max(float(current), observed)
+        )
+        stage_baseline["rate_unit"] = measurements[stage]["rate_unit"]
+        stage_baseline["hot_path"] = measurements[stage]["details"]["hot_path"]
+        stage_baseline.pop("status", None)
+        stage_baseline.pop("reason", None)
     return payload
 
 

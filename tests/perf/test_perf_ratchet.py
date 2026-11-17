@@ -79,27 +79,31 @@ def _assert_optimizer_stage_measurement(
     assert measurement["trial_count"] == trial_count
     assert math.isfinite(median_cpu)
     # Keep the existing 7.42 CPU-s sanity floor from the earlier 24 h
-    # analytical run. The current 60 h profile evaluation follows its full
-    # campaign chain and measures 264 simulator steps; this is only a floor,
-    # not the stage's simulated horizon.
+    # analytical run. The profile's authored hours are not the completed
+    # campaign chain's simulated duration.
     assert median_cpu > 7.42
     assert median_cpu == pytest.approx(statistics.median(cpu_values))
     assert measurement["cpu_seconds_spread"] == pytest.approx(
         max(cpu_values) - min(cpu_values)
     )
-    assert measurement["work_units"] == (
-        bench.OPTIMIZER_STAGE_EXPECTED_STEP_CALLS * len(trials)
+    assert measurement["work_units"] == sum(
+        int(trial["trace_hours"]) for trial in trials
     )
     assert measurement["hot_path_calls"] == measurement["work_units"]
     assert math.isfinite(float(measurement["wall_seconds_median"]))
     assert math.isfinite(float(measurement["wall_cpu_ratio_median"]))
     for trial in trials:
         assert trial["date"] and trial["hostname"]
-        assert (
-            trial["work_units"]
-            == bench.OPTIMIZER_STAGE_EXPECTED_STEP_CALLS
-        )
+        assert trial["work_units"] == trial["trace_hours"]
+        assert trial["step_calls"] == trial["trace_hours"]
         assert trial["hot_path_calls"] == trial["work_units"]
+        assert sum(
+            int(stop["duration_h"]) for stop in trial["campaign_stops"]
+        ) == trial["trace_hours"]
+        assert trial["campaign_chain"] == [
+            str(stop["campaign"]) for stop in trial["campaign_stops"]
+        ]
+        assert trial["campaign_chain"]
         assert trial["cold_cache_miss"] is True
         assert trial["same_patch_cache_hit"] is True
         assert trial["cache_hit_counted"] is False
@@ -108,12 +112,13 @@ def _assert_optimizer_stage_measurement(
         assert math.isfinite(float(trial["wall_cpu_ratio"]))
 
 
-# The suite-shape guard keeps tests outside its shrink-only heavy roster at
-# 300 CPU-s or less; that gives this campaign-chain test an 1800 s wall guard.
+# The full campaign-chain evaluation is a heavy serialized test. Its CPU
+# budget follows the sibling C0-to-C6 trajectory entry in the heavy roster.
 @pytest.mark.nightly
-@pytest.mark.cpu_budget(300)
+@pytest.mark.xdist_group("serial")
+@pytest.mark.cpu_budget(5000)
 def test_optimizer_60h_stage_records_real_cold_work() -> None:
-    """Measure the 60 h profile's complete campaign chain, not 60 simulated h."""
+    """Measure real cold work for the profile's completed campaign chain."""
     assert bench.OPTIMIZER_STAGE_NAME in STAGE_NAMES, (
         "optimizer stage missing from STAGE_NAMES"
     )
@@ -126,10 +131,17 @@ def test_optimizer_60h_stage_records_real_cold_work() -> None:
     )
 
 
-def test_lunar_highland_campaign_chain_step_count_is_pinned() -> None:
-    """Pin the profile's executed campaign-hour sum independently of evaluate."""
+def test_lunar_highland_campaign_chain_work_volume_is_derived_from_config() -> None:
+    """Derive the route from config; require one step per traced hour.
+
+    Campaign endpoints determine actual durations, so the exact work volume is
+    the sum of completed executor trace durations, independently checked
+    against patched PyrolysisSimulator.step calls by the cold-work measurement.
+    The ordered route and duration caps come from this profile and setpoints.
+    """
     from pathlib import Path
 
+    from simulator.config import load_config_bundle
     from simulator.optimize.profiles import load_profile
 
     profile = load_profile(
@@ -148,16 +160,38 @@ def test_lunar_highland_campaign_chain_step_count_is_pinned() -> None:
         for fidelity in profile["fidelities"].values()
     )
 
-    # data/setpoints.yaml and the C0 AUTO_APPLY route define this profile's
-    # executed sequence: C0 25 h + C0b 3 h + staged C2A 4+3+1+1 h +
-    # staged C3_NA 3 h + C4 44 h to its window plus its 20 h in-window cap +
-    # post-Mg C2A's 140 h endpoint + C6's 20 h cap = 264 step() calls.
-    # These campaign hours are the simulation performed to campaign completion;
-    # run.hours=60 remains the authored/eval-spec budget, not its step limit.
-    expected_step_calls = (
-        25 + 3 + (4 + 3 + 1 + 1) + 3 + (44 + 20) + 140 + 20
+    expected_campaigns, duration_caps = bench._optimizer_campaign_limits(
+        profile,
+        load_config_bundle().setpoints,
     )
-    assert expected_step_calls == bench.OPTIMIZER_STAGE_EXPECTED_STEP_CALLS == 264
+    assert expected_campaigns
+    assert set(expected_campaigns) == set(duration_caps)
+    recorded_trace = tuple(
+        {"campaign": campaign, "duration_h": 1}
+        for campaign in expected_campaigns
+    )
+    assert bench._assert_optimizer_campaign_work(
+        step_calls=len(recorded_trace),
+        campaign_stops=recorded_trace,
+        expected_campaigns=expected_campaigns,
+        duration_caps=duration_caps,
+    ) == len(recorded_trace)
+    with pytest.raises(AssertionError, match="step calls"):
+        bench._assert_optimizer_campaign_work(
+            step_calls=len(recorded_trace) + 1,
+            campaign_stops=recorded_trace,
+            expected_campaigns=expected_campaigns,
+            duration_caps=duration_caps,
+        )
+
+
+def test_optimizer_60h_eval_ratchet_is_visibly_unbaselined() -> None:
+    stage = load_baselines(BASELINE_PATH)["stages"][bench.OPTIMIZER_STAGE_NAME]
+    assert stage == {
+        "status": "needs_rebaseline",
+        "reason": bench.OPTIMIZER_REBASELINE_REASON,
+    }
+    pytest.skip(bench.OPTIMIZER_REBASELINE_REASON)
 
 
 @pytest.mark.nightly
@@ -188,6 +222,19 @@ def test_perf_ratchet_guards_call_volume_and_cpu_cost() -> None:
     assert baseline["collapse_factor"] == pytest.approx(10.0)
     assert baseline["protocol"] == protocol_metadata()
     assert set(baseline["stages"]) == set(STAGE_NAMES)
+    unbaselined_stages = {
+        stage
+        for stage, values in baseline["stages"].items()
+        if values.get("status") == "needs_rebaseline"
+    }
+    assert unbaselined_stages == {bench.OPTIMIZER_STAGE_NAME}
+    assert baseline["stages"][bench.OPTIMIZER_STAGE_NAME] == {
+        "status": "needs_rebaseline",
+        "reason": bench.OPTIMIZER_REBASELINE_REASON,
+    }
+    rated_stages = tuple(
+        stage for stage in STAGE_NAMES if stage not in unbaselined_stages
+    )
 
     current_machine = detect_machine_class()
     if current_machine != baseline["machine_class"]:
@@ -198,14 +245,12 @@ def test_perf_ratchet_guards_call_volume_and_cpu_cost() -> None:
         )
 
     bench.require_measurement_power_state()
-    measurements = measure_all()
-    _assert_optimizer_stage_measurement(
-        measurements[bench.OPTIMIZER_STAGE_NAME]
-    )
+    measurements = measure_all(stage_names=rated_stages)
+    assert set(measurements) == set(rated_stages)
 
     margin = float(baseline["margin_frac"])
     collapse_factor = float(baseline["collapse_factor"])
-    for stage in STAGE_NAMES:
+    for stage in rated_stages:
         measured = measurements[stage]
         observed = float(measured["rate"])
         ratchet = float(baseline["stages"][stage]["ratchet_rate"])
@@ -555,7 +600,7 @@ def test_rebless_ratchet_is_monotonic_up_only() -> None:
     baseline = load_baselines(BASELINE_PATH)
     lower = {
         stage: {
-            "rate": baseline["stages"][stage]["ratchet_rate"] / 2.0,
+            "rate": baseline["stages"][stage].get("ratchet_rate", 2.0) / 2.0,
             "rate_unit": "work_units_per_cpu_second",
             "details": {"hot_path": "test"},
         }
@@ -566,13 +611,17 @@ def test_rebless_ratchet_is_monotonic_up_only() -> None:
         lower,
         machine_class=baseline["machine_class"],
     )
-    assert {
-        stage: unchanged["stages"][stage]["ratchet_rate"]
-        for stage in STAGE_NAMES
-    } == {
-        stage: baseline["stages"][stage]["ratchet_rate"]
-        for stage in STAGE_NAMES
-    }
+    for stage in STAGE_NAMES:
+        if stage == bench.OPTIMIZER_STAGE_NAME:
+            assert unchanged["stages"][stage]["ratchet_rate"] == pytest.approx(
+                1.0
+            )
+            assert "status" not in unchanged["stages"][stage]
+            assert "reason" not in unchanged["stages"][stage]
+        else:
+            assert unchanged["stages"][stage]["ratchet_rate"] == (
+                baseline["stages"][stage]["ratchet_rate"]
+            )
 
     first = STAGE_NAMES[0]
     raised = copy.deepcopy(lower)

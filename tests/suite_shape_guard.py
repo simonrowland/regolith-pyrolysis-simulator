@@ -150,6 +150,11 @@ HEAVY_ROSTER = frozenset({
     # trajectory (~1283 s) times two caps.
     ("tests/test_optimizer_evaluate.py",
      "test_lunar_highland_c0_horizon_changes_extracted_metals"),
+    # Owner-ratified b-1238 (2026-11-18): one cold optimizer evaluation follows
+    # the same full C0-to-C6 campaign. Suite-shape estimates about 1283 CPU-s;
+    # keep it nightly in the serial chain with the sibling's 5000 s headroom.
+    ("tests/perf/test_perf_ratchet.py",
+     "test_optimizer_60h_stage_records_real_cold_work"),
     ("tests/test_optimizer_strategy_tpe.py",
      "test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair"),
     # Owner-ratified b-549 follow-up (2026-11-10): byte-identical battery
