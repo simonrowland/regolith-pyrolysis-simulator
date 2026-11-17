@@ -1402,6 +1402,9 @@ _MAGEMIN_EQUILIBRATE_FAILURE_EXIT_EXPECTATIONS = (
     ('bridge_type_error', 'not_converged', 'engine_crash'),
     ('bridge_key_error', 'not_converged', 'engine_crash'),
     ('bridge_custom_error', 'not_converged', 'engine_crash'),
+    ('bridge_os_error', 'not_converged', 'engine_crash'),
+    ('bridge_permission_error', 'not_converged', 'engine_crash'),
+    ('bridge_file_not_found_error', 'not_converged', 'missing_binary'),
 )
 
 
@@ -1514,7 +1517,8 @@ def _magemin_failure_exit_result(monkeypatch, failure_kind):
         ))
     elif failure_kind in {
         'bridge_runtime_error', 'bridge_value_error', 'bridge_type_error',
-        'bridge_key_error', 'bridge_custom_error',
+        'bridge_key_error', 'bridge_custom_error', 'bridge_os_error',
+        'bridge_permission_error', 'bridge_file_not_found_error',
     }:
         class CustomBridgeError(Exception):
             pass
@@ -1525,6 +1529,9 @@ def _magemin_failure_exit_result(monkeypatch, failure_kind):
             'bridge_type_error': TypeError,
             'bridge_key_error': KeyError,
             'bridge_custom_error': CustomBridgeError,
+            'bridge_os_error': OSError,
+            'bridge_permission_error': PermissionError,
+            'bridge_file_not_found_error': FileNotFoundError,
         }[failure_kind]
 
         def fail_bridge(**_kwargs):
@@ -1778,6 +1785,18 @@ _MAGEMIN_GATE_OUTCOME_EXPECTATIONS = (
     ('bridge_type_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
     ('bridge_key_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
     ('bridge_custom_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
+    (
+        'bridge_os_error', 'engine_crash', 'failed', 'failed',
+        'An OSError from the bridge is environment or infrastructure failure, as on base.',
+    ),
+    (
+        'bridge_permission_error', 'engine_crash', 'failed', 'failed',
+        'A bridge PermissionError is an environment failure, as on base.',
+    ),
+    (
+        'bridge_file_not_found_error', 'missing_binary', 'failed', 'failed',
+        'A bridge FileNotFoundError is an unavailable executable, as on base.',
+    ),
     ('untyped_failure', 'magemin_untyped_failure', 'failed', 'failed', None),
 )
 
@@ -1822,6 +1841,8 @@ def test_magemin_failure_paths_keep_reviewed_gate_outcomes(
     else:
         assert failure_kind in {
             'empty_composition', 'slot_unavailable', 'worker_died',
+            'bridge_os_error', 'bridge_permission_error',
+            'bridge_file_not_found_error',
         }
         assert expected_outcome == 'failed'
     result = _magemin_failure_exit_result(monkeypatch, failure_kind)

@@ -3096,10 +3096,9 @@ def gate_curve_provider_outcome_for_status(
     # MAGEMinOutputError is unusable solver output; keep its flagged fallback.
     # Other providers' parse-empty contract failures remain fail-closed below.
     magemin_invalid_output = "mageminoutputerror" in reasons
-    # The backend marks exceptions caught at the third-party bridge boundary
-    # with a typed disposition. Their Python class names do not determine the
-    # gate outcome; subprocess and worker infrastructure errors keep their own
-    # typed reasons and remain fail-closed.
+    # Opaque third-party bridge errors carry a numerical disposition so solver
+    # failures retain the flagged fallback. Environment exceptions also keep
+    # their backend_failure_exception tokens, which remain fail-closed below.
     magemin_bridge_numerical_failure = (
         "magemin_bridge_numerical_failure" in reasons
     )

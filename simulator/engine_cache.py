@@ -309,7 +309,7 @@ ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
     "internal-analytical": 2,
     "vaporock": 1,
-    "magemin": 3,
+    "magemin": 4,
     "alphamelts": 3,
     "thermoengine": 3,
 }
@@ -325,6 +325,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v1: 2026-11-08 MAGEMin commit 40ed109d07d4246001cab59382596d33fed79086 - initial cache version
 # magemin v2: 2026-11-11 MAGEMin binary pin unchanged, b257r landing 982a8d9fa - d-367 mode-vector closure before liquid-fraction and composition extraction (cd48a78fe)
 # magemin v3: 2026-11-16 MAGEMin binary pin unchanged, b267 bugs stack - b-1225 typed silicate-window refusal for SiO2-poor bulks
+# magemin v4: 2026-11-16 MAGEMin binary pin unchanged, b-1240 typed failures - empty-composition requests now store backend_status_reason='missing_input' (previously absent)
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
 # internal-analytical v2: 2026-11-16 simulator code at b267 bugs stack - b-906 d-412 Langmuir surface-pO2 root changes evaporation_flux.py and vapor_pressure.py outputs
