@@ -152,7 +152,7 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
 
     context = object()
     refs = tuple(
-        SimpleNamespace(observation_id=f"observation-{index}") for index in range(2)
+        SimpleNamespace(observation_id=f"ref-{index}") for index in (1, 2)
     )
     prepared = SimpleNamespace(
         context=context,
@@ -204,7 +204,7 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
         workers=2,
     )
 
-    assert metadata.selected_reference_ids == {"observation-0", "observation-1"}
+    assert metadata.selected_reference_ids == {"ref-1", "ref-2"}
     assert metadata.engine_cache_counters is not None
     assert set(metadata.engine_cache_counters) == {
         engine.value
