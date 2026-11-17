@@ -361,11 +361,14 @@ ENGINE_CACHE_INPUTS = {
             "data/vapor_pressures.yaml", "data", None
         ),  # The builtin vapor-pressure provider reads these coefficients.
         EngineCacheInput(
-            "data/melt_activity_models.yaml", "data", None
-        ),  # The runtime melt-activity resolver reads this model registry.
+            "data/vapor_pressures.yaml", "catalog-thermo-dependencies", None
+        ),  # Catalog references select NASA/IVTAN extracts used for pressures.
         EngineCacheInput(
             "data/setpoints.yaml", "data", None
         ),  # The core reads fallback and activity settings from this file.
+        EngineCacheInput(
+            "data/species_catalog.yaml", "data", None
+        ),  # The core's formula registry supplies formula masses for this path.
     ),
     "vaporock": (
         EngineCacheInput(
@@ -388,11 +391,23 @@ ENGINE_CACHE_INPUTS = {
             "engines/engines.lock.toml", "engine-lock", "engines.petthermotools"
         ),  # The alternate Python transport runs PetThermoTools.
         EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.vaporock"
+        ),  # The Python transport delegates vapor equilibrium to VapoRock.
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.thermoengine"
+        ),  # VapoRock loads ThermoEngine native libraries.
+        EngineCacheInput(
+            "pyproject.toml", "pyproject-dependency", "openimcc"
+        ),  # Builtin subprocess projection may evaluate melt activity with OpenIMCC.
+        EngineCacheInput(
             "data/vapor_pressures.yaml", "data", None
         ),  # Shared MELTS support reads coefficients for oxide vapor projection.
         EngineCacheInput(
             "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
         ),  # Shared MELTS support reads CEA rows for O2 dissociation.
+        EngineCacheInput(
+            "data/vapor_pressures.yaml", "catalog-thermo-dependencies", None
+        ),  # Either transport's catalog fallback reads referenced NASA/IVTAN rows.
     ),
     "thermoengine": (
         EngineCacheInput(
@@ -407,6 +422,9 @@ ENGINE_CACHE_INPUTS = {
         EngineCacheInput(
             "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
         ),  # Shared MELTS support reads CEA rows for O2 dissociation.
+        EngineCacheInput(
+            "data/vapor_pressures.yaml", "catalog-thermo-dependencies", None
+        ),  # Catalog-backed vapor fallback reads its referenced thermo extracts.
     ),
 }
 _ENGINE_CACHE_INPUT_IDENTITY_BYTES = 16
@@ -434,6 +452,28 @@ def _cache_input_component(engine_id: str, input_ref: EngineCacheInput) -> bytes
         raise EngineCacheInputIdentityError(
             engine_id, input_ref.path, f"cannot read declared input ({exc})"
         ) from exc
+
+    if input_ref.kind == "catalog-thermo-dependencies":
+        try:
+            from simulator.vapour_rail import catalog
+            from simulator.yaml_cache import load_cached_safe_yaml
+
+            payload = load_cached_safe_yaml(source)
+            if not isinstance(payload, Mapping):
+                raise TypeError("vapor-pressure catalog is not a mapping")
+            dependencies = catalog._thermo_extract_dependencies(payload)
+            return json.dumps(
+                dependencies,
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=True,
+            ).encode("ascii")
+        except Exception as exc:
+            raise EngineCacheInputIdentityError(
+                engine_id,
+                input_ref.path,
+                f"cannot identify catalog thermo extracts ({exc})",
+            ) from exc
 
     if input_ref.kind == "data":
         return source
