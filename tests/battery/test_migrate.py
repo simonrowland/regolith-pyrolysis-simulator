@@ -9938,7 +9938,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     assert census.get("fe3_fe2_ratio") == 65
     # t-1781 removes Su & Zhang's 3,435 natural-glass profile cells from the
     # residue quantity census: 12,505->9,070 numeric cells.
-    assert n_numeric == 9070, (n_numeric, census, n_unavailable)
+    # b-1209 adds 36 Mendybaev 2017 residue cells: n_numeric 9,070->9,106.
+    assert n_numeric == 9106, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
