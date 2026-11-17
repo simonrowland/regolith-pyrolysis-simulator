@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import os
@@ -1698,109 +1699,155 @@ def test_engine_notice_codes_round_trip_with_typed_values() -> None:
     )
 
 
-def test_engine_notice_emitters_use_registered_codes() -> None:
-    from simulator.diagnostic_helpers.binary_pot_battery import (
-        engine_flags_from_result,
-    )
+def test_engine_notice_emitter_literals_are_registered() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.melt_backend.base import ENGINE_CACHE_NOTICE_CODE_TABLE
+
+    source_root = Path(__file__).resolve().parents[1]
+    modules = {
+        "battery": ast.parse(
+            (
+                source_root
+                / "simulator/diagnostic_helpers/binary_pot_battery.py"
+            ).read_text(),
+        ),
+        "openimcc_bridge": ast.parse(
+            (source_root / "simulator/melt_backend/openimcc_bridge.py").read_text()
+        ),
+    }
+
+    def notice_kind_literals(module: ast.Module) -> list[tuple[tuple[str, ...], str]]:
+        literals: list[tuple[tuple[str, ...], str]] = []
+        scope: list[str] = []
+
+        def literal(value: ast.AST) -> str | None:
+            if isinstance(value, ast.Constant) and isinstance(value.value, str):
+                return value.value
+            if (
+                isinstance(value, ast.Attribute)
+                and value.attr == "value"
+                and isinstance(value.value, ast.Attribute)
+                and isinstance(value.value.value, ast.Name)
+                and value.value.value.id == "NoticeKind"
+            ):
+                return str(getattr(NoticeKind, value.value.attr).value)
+            return None
+
+        class Visitor(ast.NodeVisitor):
+            def visit_ClassDef(self, node: ast.ClassDef) -> None:
+                scope.append(node.name)
+                self.generic_visit(node)
+                scope.pop()
+
+            def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+                scope.append(node.name)
+                self.generic_visit(node)
+                scope.pop()
+
+            visit_AsyncFunctionDef = visit_FunctionDef
+
+            def visit_Dict(self, node: ast.Dict) -> None:
+                for key, value in zip(node.keys, node.values, strict=True):
+                    if isinstance(key, ast.Constant) and key.value == "kind":
+                        kind = literal(value)
+                        if kind is not None:
+                            literals.append((tuple(scope), kind))
+                self.generic_visit(node)
+
+            def visit_Assign(self, node: ast.Assign) -> None:
+                if any(
+                    isinstance(target, ast.Subscript)
+                    and isinstance(target.slice, ast.Constant)
+                    and target.slice.value == "kind"
+                    for target in node.targets
+                ):
+                    kind = literal(node.value)
+                    if kind is not None:
+                        literals.append((tuple(scope), kind))
+                self.generic_visit(node)
+
+        Visitor().visit(module)
+        return literals
+
+    registered = {
+        (engine, kind)
+        for engine, _number, kind, _description in ENGINE_CACHE_NOTICE_CODE_TABLE
+    }
+
+    for module_name, module in modules.items():
+        for scope, kind in notice_kind_literals(module):
+            engine: str | None = None
+            if module_name == "openimcc_bridge":
+                engine = "openimcc"
+            elif "_OpenImccBatteryBackend" in scope or scope[-1:] in {
+                ("_carried_ferric_fold_notice",),
+                ("_openimcc_gas_channels_and_omission_notices",),
+            }:
+                engine = "openimcc"
+            elif "_internal_analytical_vapor_pressure_adapter" in scope:
+                engine = "internal-analytical"
+            elif "engine_flags_from_result" in scope:
+                # The common extractor's literal branches are constrained by
+                # their input diagnostics: d-207 reaches IA, gas-only reaches
+                # AlphaMELTS/ThermoEngine, and the repair warning is AlphaMELTS.
+                common_paths = {
+                    "openimcc_notice": ("internal-analytical",),
+                    "engine_model_caveat": (
+                        "alphamelts",
+                        "thermoengine",
+                        "magemin",
+                    ),
+                    "input_omitted": ("alphamelts",),
+                }
+                engines = common_paths.get(kind)
+                assert engines is not None, (
+                    f"unclassified engine_flags_from_result notice literal {kind!r}"
+                )
+                assert all((candidate, kind) in registered for candidate in engines), (
+                    f"engine_flags_from_result emits unregistered {kind!r} "
+                    f"for {engines!r}"
+                )
+                continue
+            elif scope[-1:] == ("qualification_notice",):
+                # Qualification-arm output is not an engine result cached by
+                # the equilibrium seam. Pin these exclusions so new literals
+                # in this helper cannot silently escape the guard.
+                assert kind == "melts_domain_gate"
+                continue
+            elif scope[-1:] == ("build_report",):
+                # Report-arm notice is presentation output, not an engine
+                # equilibrium notice. Keep this explicit and closed as above.
+                assert kind == "binary_pot_engine_arm"
+                continue
+            else:
+                raise AssertionError(
+                    f"unclassified engine notice emitter scope {scope!r}: {kind!r}"
+                )
+
+            assert (engine, kind) in registered, (
+                f"{module_name}.{'.'.join(scope)} emits unregistered "
+                f"{engine} engine notice kind {kind!r}"
+            )
+
+
+def test_engine_warning_codes_round_trip_for_registered_engines() -> None:
     from simulator.melt_backend.base import (
-        decode_engine_notice_codes,
+        ENGINE_CACHE_NOTICE_CODE_TABLE,
         decode_engine_warning_codes,
-        encode_engine_notice_codes,
         encode_engine_warning_codes,
     )
 
-    openimcc_notices = [
-        {"kind": "openimcc_flag"},
-        {"kind": "imcc_complex_saturation"},
-        {"kind": "openimcc_temperature_extrapolated"},
-        {"kind": "openimcc_composition_outside_validated_envelope"},
-        {"kind": "openimcc_notice"},
-        {"kind": "openimcc_notice", "code": "openimcc_fe2o3_fold"},
+    engine_ids = sorted(
         {
-            "kind": "openimcc_notice",
-            "code": "openimcc_ferric_component_collapsed",
-        },
-        {
-            "kind": "openimcc_notice",
-            "code": "openimcc_projection_crmn_relaxed",
-        },
-        {"kind": "openimcc_notice", "code": "openimcc_projected_bulk"},
-        {"kind": "openimcc_gas_flag"},
-        {"kind": "openimcc_gas_unavailable"},
-        {"kind": "fo2_oxygen_balance_effusion_solved"},
-        {"kind": "input_omitted"},
-    ]
-    emitted = {
-        "openimcc": [
-            SimpleNamespace(
-                diagnostics={
-                    "imcc_notices": openimcc_notices
-                },
-                warnings=(),
-            )
-        ],
-        "alphamelts": [
-            SimpleNamespace(
-                diagnostics={
-                    "commissioning_notice": {
-                        "kind": "out_of_certified_band",
-                        "authority": "extrapolated",
-                    },
-                    "fo2_gas_only": {"notice": "external_fO2_gas_only"},
-                },
-                warnings=(
-                    "AlphaMELTS provider omitted diagnostic_oxide_activities field FeO",
-                ),
-            )
-        ],
-        "thermoengine": [
-            SimpleNamespace(
-                diagnostics={
-                    "commissioning_notice": {
-                        "kind": "engine_model_caveat",
-                        "authority": "extrapolated",
-                    },
-                    "fo2_gas_only": {"notice": "external_fO2_gas_only"},
-                    "imcc_notices": [{"kind": "fallback"}],
-                },
-                warnings=(),
-            )
-        ],
-        "vaporock": [
-            SimpleNamespace(
-                diagnostics={
-                    "commissioning_notice": {
-                        "kind": "out_of_certified_band",
-                        "authority": "extrapolated",
-                    }
-                },
-                warnings=(),
-            )
-        ],
-        "magemin": [
-            SimpleNamespace(
-                diagnostics={
-                    "commissioning_notice": {
-                        "kind": "input_omitted",
-                        "authority": "extrapolated",
-                    }
-                },
-                warnings=(),
-            )
-        ],
-    }
-
-    for engine_id, results in emitted.items():
-        warning_codes, warning_values = encode_engine_warning_codes(
-            engine_id, [f"{engine_id} warning"]
-        )
-        assert decode_engine_warning_codes(
-            engine_id, warning_codes, warning_values
-        ) == [f"{engine_id} warning"]
-        for result in results:
-            notices, _authority, _band = engine_flags_from_result(result)
-            codes, values = encode_engine_notice_codes(engine_id, notices)
-            assert decode_engine_notice_codes(engine_id, codes, values) == notices
+            engine
+            for engine, _number, _kind, _description
+            in ENGINE_CACHE_NOTICE_CODE_TABLE
+        }
+    )
+    for engine_id in engine_ids:
+        warnings = [f"{engine_id} warning"]
+        codes, values = encode_engine_warning_codes(engine_id, warnings)
+        assert decode_engine_warning_codes(engine_id, codes, values) == warnings
 
 
 def test_unknown_engine_notice_code_requires_table_entry() -> None:
@@ -1818,10 +1865,6 @@ def test_real_commissioning_notices_round_trip_for_every_emitting_engine() -> No
     from engines.engine_commissioning import (
         assess_engine_commissioning, load_engine_commissioning,
     )
-    from simulator.diagnostic_helpers.binary_pot_battery import (
-        engine_flags_from_result,
-    )
-    from simulator.melt_backend.base import decode_engine_notice_codes, encode_engine_notice_codes
 
     for engine, specification in load_engine_commissioning().engines.items():
         notice = assess_engine_commissioning(
@@ -1830,8 +1873,9 @@ def test_real_commissioning_notices_round_trip_for_every_emitting_engine() -> No
             temperature_K=specification.temperature_K.certified.maximum + 1.0,
         ).notice
         assert notice is not None
-        codes, values = encode_engine_notice_codes(engine, [notice])
-        assert decode_engine_notice_codes(engine, codes, values) == json.loads(json.dumps([notice]))
+        result = SimpleNamespace(diagnostics={"commissioning_notice": notice})
+        restored = _assert_engine_notice_hot_round_trip(engine, result)
+        assert restored == [json.loads(json.dumps(notice))]
 
     # The d-207 provider hands these notices through engine_flags_from_result
     # on the internal-analytical route. Exercise both phase-signal branches
@@ -1854,9 +1898,174 @@ def test_real_commissioning_notices_round_trip_for_every_emitting_engine() -> No
             "vapor_pressure_diagnostic": {"d207_notices": d207_notices},
         },
     )
-    notices, _authority, _band = engine_flags_from_result(result)
-    codes, values = encode_engine_notice_codes("internal-analytical", notices)
-    assert decode_engine_notice_codes("internal-analytical", codes, values) == notices
+    assert {
+        row["kind"]
+        for row in _assert_engine_notice_hot_round_trip(
+            "internal-analytical", result
+        )
+    } == {"openimcc_notice"}
+
+
+def _assert_engine_notice_hot_round_trip(
+    engine_id: str,
+    result: Any,
+) -> list[dict[str, Any]]:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        engine_flags_from_result,
+    )
+    from simulator.melt_backend.base import (
+        equilibrium_cache_from_value,
+        equilibrium_to_hot,
+    )
+
+    cold_notices, _authority, _band = engine_flags_from_result(result)
+    hot = equilibrium_to_hot(vars(result), engine_id=engine_id)
+    restored = equilibrium_cache_from_value(hot, engine_id=engine_id)
+    warm_notices, _authority, _band = engine_flags_from_result(
+        SimpleNamespace(**restored)
+    )
+    assert warm_notices == cold_notices
+    return cold_notices
+
+
+def test_real_battery_notice_emitters_are_registered_and_survive_hot(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("openimcc")
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_OXYGEN_BALANCE_EFFUSION,
+        _InternalAnalyticalBatteryBackend,
+        _OpenImccBatteryBackend,
+        _new_internal_analytical_core,
+        _internal_analytical_vapor_pressure_adapter,
+        composition_kg_and_mol,
+    )
+
+    openimcc_kinds: set[str] = set()
+
+    def check_openimcc(result: Any) -> set[str]:
+        notices = _assert_engine_notice_hot_round_trip("openimcc", result)
+        kinds = {row["kind"] for row in notices}
+        openimcc_kinds.update(kinds)
+        return kinds
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    edge = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_mol={"K2O": 0.55, "SiO2": 0.45},
+    )
+    assert {
+        "openimcc_flag",
+        "imcc_complex_saturation",
+        "openimcc_composition_outside_validated_envelope",
+    } <= check_openimcc(edge)
+
+    out_of_band = backend.equilibrate(
+        temperature_C=1600.0 - 273.15,
+        composition_mol={"SiO2": 0.5, "MgO": 0.5},
+    )
+    assert "openimcc_temperature_extrapolated" in check_openimcc(out_of_band)
+
+    folded = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_kg={"SiO2": 0.6, "FeO": 0.2, "Fe2O3": 0.2},
+    )
+    assert "openimcc_notice" in check_openimcc(folded)
+
+    gas_flag = backend.equilibrate(
+        temperature_C=800.0 - 273.15,
+        composition_mol={"K2O": 0.5, "SiO2": 0.5},
+        fO2_log=-9.0,
+    )
+    assert "openimcc_gas_flag" in check_openimcc(gas_flag)
+
+    backend._gas = None
+    backend._gas_error = "test gas-pack absence"
+    unavailable = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_mol={"K2O": 0.5, "SiO2": 0.5},
+        fO2_log=-9.0,
+    )
+    assert "openimcc_gas_unavailable" in check_openimcc(unavailable)
+
+    fixture_root = Path(__file__).resolve().parent / "fixtures/openimcc/vaporock-typed"
+    monkeypatch.setenv("OPENIMCC_VAPOROCK_ROOT", str(fixture_root))
+    omission_backend = _OpenImccBatteryBackend("openimcc")
+    hand_rows_path = (
+        Path(__file__).resolve().parent
+        / "fixtures/openimcc/plante_1979_hand_rows.json"
+    )
+    hand_rows = json.loads(hand_rows_path.read_text(encoding="utf-8"))["hand_rows"]
+    row = hand_rows[0]
+    composition_kg, composition_mol = composition_kg_and_mol(
+        {
+            "K2O": float(row["K2O_wt_pct"]),
+            "SiO2": float(row["SiO2_wt_pct"]),
+        }
+    )
+    omitted = omission_backend.equilibrate(
+        temperature_C=float(row["T_K"]) - 273.15,
+        composition_kg=composition_kg,
+        composition_mol=composition_mol,
+        fO2_log=-9.0,
+    )
+    assert "input_omitted" in check_openimcc(omitted)
+
+    oxygen_balance = backend.equilibrate(
+        temperature_C=1933.0 - 273.15,
+        composition_mol={"K2O": 0.5, "SiO2": 0.5},
+        po2_request=Po2Request(
+            mode=PO2_OXYGEN_BALANCE_EFFUSION,
+            po2_bar=None,
+        ),
+    )
+    assert "fo2_oxygen_balance_effusion_solved" in check_openimcc(oxygen_balance)
+
+    internal = _InternalAnalyticalBatteryBackend()
+    internal_oxygen = internal.equilibrate(
+        temperature_C=1933.0 - 273.15,
+        composition_mol={"K2O": 0.5, "SiO2": 0.5},
+        po2_request=Po2Request(
+            mode=PO2_OXYGEN_BALANCE_EFFUSION,
+            po2_bar=None,
+        ),
+    )
+    internal_oxygen_notices = _assert_engine_notice_hot_round_trip(
+        "internal-analytical", internal_oxygen
+    )
+    assert "fo2_oxygen_balance_effusion_solved" in {
+        row["kind"] for row in internal_oxygen_notices
+    }
+
+    internal_core = _new_internal_analytical_core()
+    internal_floor_and_band = _internal_analytical_vapor_pressure_adapter(
+        core=internal_core,
+        temperature_C=4500.0 - 273.15,
+        pressure_bar=1.0,
+        composition_kg={"SiO2": 0.6, "Na2O": 0.4},
+        composition_mol=None,
+        fO2_log=None,
+        po2_request=Po2Request(mode="commanded", po2_bar=1.0e-30),
+        include_diagnostic_shadows=False,
+    )
+    internal_kinds = {
+        row["kind"]
+        for row in _assert_engine_notice_hot_round_trip(
+            "internal-analytical", internal_floor_and_band
+        )
+    }
+    assert {"out_of_certified_band", "floor_inversion"} <= internal_kinds
+
+    assert {
+        "openimcc_flag",
+        "openimcc_temperature_extrapolated",
+        "openimcc_composition_outside_validated_envelope",
+        "openimcc_notice",
+        "openimcc_gas_flag",
+        "openimcc_gas_unavailable",
+        "input_omitted",
+        "fo2_oxygen_balance_effusion_solved",
+    } <= openimcc_kinds
 
 
 def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip(
@@ -1886,6 +2095,7 @@ def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip(
     }
     cold_result = SimpleNamespace(diagnostics=diagnostics)
     cold_notices, _authority, _band = engine_flags_from_result(cold_result)
+    assert cold_notices
 
     request = {"call": "internal-analytical d-207 notice"}
     cold_hot = engine_cache.cached_engine_call(
@@ -1910,10 +2120,11 @@ def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip(
     warm_notices, _authority, _band = engine_flags_from_result(
         SimpleNamespace(diagnostics=warm["diagnostics"])
     )
-    cold_notices, _authority, _band = engine_flags_from_result(
+    cold_cache_notices, _authority, _band = engine_flags_from_result(
         SimpleNamespace(diagnostics=cold["diagnostics"])
     )
 
+    assert cold_cache_notices == cold_notices
     assert warm_notices == cold_notices
 
 
