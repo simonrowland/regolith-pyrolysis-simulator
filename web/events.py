@@ -10,6 +10,7 @@ from collections.abc import Mapping
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 try:
     from flask import request, session as flask_session
