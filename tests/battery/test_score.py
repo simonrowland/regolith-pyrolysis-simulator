@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import importlib
 import inspect
 import json
 import math
@@ -100,6 +101,8 @@ from simulator.battery.score import (
     ScoreContext,
     SINGLE_CATION_COEFFICIENT_BASIS,
     SINGLE_LIQUID_ENGINES,
+    _catalog_score_rows,
+    _janaf_pure_solid_table_index,
     _battery_hero_minor_foulant_facets,
     _battery_hero_sio2_mole_fraction,
     _battery_hero_sweet_spot_records,
@@ -163,7 +166,16 @@ def test_score_eligible_conjunct_red_then_green(conjunct: str) -> None:
 
 
 def test_retired_imcc_engines_are_excluded_from_score_set() -> None:
-    assert Engine.OPENIMCC in SCORE_ENGINE_SET
+    assert SCORE_ENGINE_SET == (
+        Engine.VAPOROCK,
+        Engine.ALPHAMELTS,
+        Engine.THERMOENGINE,
+        Engine.MAGEMIN,
+        Engine.OPENIMCC,
+        Engine.INTERNAL_ANALYTICAL,
+        Engine.NASA_CEA_9,
+        Engine.CATALOG_EVALUATOR,
+    )
     assert {engine.value for engine in SCORE_ENGINE_SET}.isdisjoint(
         {"imcc_sf04", "imcc_sf04_ext"}
     )
@@ -185,6 +197,117 @@ def test_retired_imcc_engines_are_excluded_from_score_set() -> None:
     assert "Call" not in src
     assert engines_from_names(["nasa_cea_9"]) == (Engine.NASA_CEA_9,)
     assert engines_from_names(["catalog_evaluator"]) == (Engine.CATALOG_EVALUATOR,)
+
+
+def test_engine_payload_source_precedence_and_residual_key_tokens_are_pinned() -> None:
+    from simulator.battery.score import _engine_from_payload
+
+    assert _engine_from_payload(
+        {
+            "candidate_request": {"engine": Engine.OPENIMCC.value},
+            "candidate": "engine:vaporock",
+            "key": "row::T=1500::p_sat::vapour::thermoengine",
+        }
+    ) == Engine.OPENIMCC.value
+    assert _engine_from_payload(
+        {
+            "candidate": "engine:vaporock",
+            "key": "row::T=1500::p_sat::vapour::thermoengine",
+        }
+    ) == Engine.VAPOROCK.value
+    assert _engine_from_payload(
+        {"key": "row::T=1500::p_sat::vapour::thermoengine::fo2_mode=shared_ladder"}
+    ) == Engine.THERMOENGINE.value
+    assert _engine_from_payload({}) == "unknown"
+
+
+@pytest.mark.parametrize(
+    "cache_name, owner_cache",
+    (
+        ("_janaf_pure_solid_table_index", _janaf_pure_solid_table_index),
+        ("_catalog_score_rows", _catalog_score_rows),
+    ),
+)
+def test_score_lru_cache_keeps_one_wrapper_and_cached_value(
+    cache_name: str, owner_cache
+) -> None:
+    if cache_name == "_catalog_score_rows":
+        # This is the only other module that imports this cache by name.
+        importlib.import_module("tests.battery.test_catalog_evaluator_battery_engine")
+
+    bindings = {
+        f"{module_name}.{cache_name}": binding
+        for module_name, module in tuple(sys.modules.items())
+        if module is not None
+        and (binding := vars(module).get(cache_name)) is not None
+        and getattr(binding, "__module__", None) == owner_cache.__module__
+    }
+    assert f"{owner_cache.__module__}.{cache_name}" in bindings
+    assert bindings
+    assert all(binding is owner_cache for binding in bindings.values()), bindings
+
+    owner_cache.cache_clear()
+
+    first = owner_cache()
+    after_first = owner_cache.cache_info()
+    second = owner_cache()
+    after_second = owner_cache.cache_info()
+
+    assert second is first
+    assert after_second.misses == after_first.misses
+    assert after_second.hits == after_first.hits + 1
+
+
+def test_catalog_public_scoring_path_uses_the_owner_cache() -> None:
+    temperature_K = Decimal("180")
+    experiment = F.tabulation_experiment(
+        experiment_id="catalog-cache-exp",
+        work_id="catalog-cache-work",
+        T_K=temperature_K,
+    )
+    observation = F.observation(
+        "catalog-cache-reference",
+        experiment.experiment_id,
+        F.psat_identity("H2O", T_K=temperature_K, reservoir_phase=Phase.CR),
+        Decimal("1"),
+    )
+    owner_cache = _catalog_score_rows
+    owner_cache.cache_clear()
+    before = owner_cache.cache_info()
+
+    predictions = tuple(
+        predict_with_engine(
+            Engine.CATALOG_EVALUATOR, observation, experiment=experiment
+        )
+        for _ in range(2)
+    )
+
+    after = owner_cache.cache_info()
+    assert all(
+        prediction.engine is Engine.CATALOG_EVALUATOR for prediction in predictions
+    )
+    assert after.misses == before.misses + 1
+    assert after.hits == before.hits + 1
+
+
+def test_catalog_score_rows_share_the_catalog_module_cache() -> None:
+    from simulator.vapour_rail import catalog as catalog_mod
+
+    compile_cache = catalog_mod._COMPILE_CACHE
+    score_mod._catalog_score_rows.cache_clear()
+    rows, error = score_mod._catalog_score_rows()
+
+    assert error is None
+    assert rows
+    assert catalog_mod._COMPILE_CACHE is compile_cache
+    assert all(
+        any(
+            row.species is species
+            for compiled in compile_cache.values()
+            for species in compiled.species.values()
+        )
+        for row in rows
+    )
 
 
 @pytest.mark.parametrize("name", ("imcc_sf04", "imcc_sf04_ext"))
