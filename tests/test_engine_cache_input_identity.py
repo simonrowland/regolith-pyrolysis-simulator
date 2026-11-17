@@ -23,7 +23,8 @@ _EXPECTED_ENGINE_INPUTS = {
     "internal-analytical": {
         ("pyproject.toml", "pyproject-dependency", "openimcc"),
         ("data/vapor_pressures.yaml", "data", None),
-        ("data/vapor_pressures.yaml", "catalog-thermo-dependencies", None),
+        ("data/literature/extracts/nasa-cea-thermo.yaml", "data", None),
+        ("data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None),
         ("data/setpoints.yaml", "data", None),
         ("data/species_catalog.yaml", "data", None),
     },
@@ -46,7 +47,11 @@ _EXPECTED_ENGINE_INPUTS = {
             "data",
             None,
         ),
-        ("data/vapor_pressures.yaml", "catalog-thermo-dependencies", None),
+        (
+            "data/literature/extracts/ivtan-mno-coo-thermo.yaml",
+            "data",
+            None,
+        ),
     },
     "thermoengine": {
         ("engines/engines.lock.toml", "engine-lock", "engines.thermoengine"),
@@ -57,7 +62,11 @@ _EXPECTED_ENGINE_INPUTS = {
             "data",
             None,
         ),
-        ("data/vapor_pressures.yaml", "catalog-thermo-dependencies", None),
+        (
+            "data/literature/extracts/ivtan-mno-coo-thermo.yaml",
+            "data",
+            None,
+        ),
     },
 }
 
@@ -144,45 +153,18 @@ def _changed_source_bytes(input_ref, original: bytes) -> bytes:
     return original[:start] + altered + original[stop:]
 
 
-def _catalog_extract_paths(root: Path) -> tuple[Path, ...]:
-    from simulator.vapour_rail import catalog
-    from simulator.yaml_cache import load_cached_safe_yaml
-
-    payload = load_cached_safe_yaml((root / "data/vapor_pressures.yaml").read_bytes())
-    dependencies = catalog._thermo_extract_dependencies(payload)
-    paths = tuple(
-        root / "data/literature/extracts" / f"{source_id}.yaml"
-        for source_id in dependencies
-    )
-    assert {
-        path.relative_to(root).as_posix() for path in paths
-    } == _EXPECTED_CATALOG_EXTRACT_PATHS
-    return paths
-
-
-def _changed_catalog_extract(raw: bytes) -> bytes:
-    payload = yaml.safe_load(raw)
-    payload["cache_identity_probe"] = "changed"
-    return yaml.safe_dump(payload, sort_keys=False).encode()
-
-
 def _assert_input_byte_changes_only_consumers(
     input_ref,
     expected_consumers: set[str],
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
-    *,
-    catalog_extract: Path | None = None,
 ) -> None:
     source_root = engine_cache._ENGINE_CACHE_ROOT
-    catalog_paths = _catalog_extract_paths(source_root)
     paths = {
         ref.path
         for refs in engine_cache.ENGINE_CACHE_INPUTS.values()
         for ref in refs
-    } | {input_ref.path} | {
-        path.relative_to(source_root).as_posix() for path in catalog_paths
-    }
+    } | {input_ref.path}
     copied_root = tmp_path / "identity-inputs"
     for relative_path in paths:
         source = source_root / relative_path
@@ -193,28 +175,13 @@ def _assert_input_byte_changes_only_consumers(
     source = source_root / input_ref.path
     target = copied_root / input_ref.path
     original = source.read_bytes()
-    if input_ref.kind == "catalog-thermo-dependencies":
-        source = catalog_extract or next(
-            path for path in catalog_paths if path.name == "nasa-cea-thermo.yaml"
-        )
-        target = copied_root / source.relative_to(source_root)
-        target.write_bytes(_changed_catalog_extract(source.read_bytes()))
-    else:
-        target.write_bytes(_changed_source_bytes(input_ref, original))
+    target.write_bytes(_changed_source_bytes(input_ref, original))
     original_root = engine_cache._ENGINE_CACHE_ROOT
     identity_cache = engine_cache._engine_cache_input_identity_digest
-    from simulator.vapour_rail import catalog
-
-    original_extract_dir = catalog._THERMO_EXTRACT_DIR
     try:
         identity_cache.cache_clear()
         before = _keys()
         monkeypatch.setattr(engine_cache, "_ENGINE_CACHE_ROOT", copied_root)
-        monkeypatch.setattr(
-            catalog,
-            "_THERMO_EXTRACT_DIR",
-            copied_root / "data/literature/extracts",
-        )
         identity_cache.cache_clear()
         after = _keys()
         changed = {engine for engine in before if before[engine] != after[engine]}
@@ -224,9 +191,6 @@ def _assert_input_byte_changes_only_consumers(
         )
     finally:
         monkeypatch.setattr(engine_cache, "_ENGINE_CACHE_ROOT", original_root)
-        monkeypatch.setattr(catalog, "_THERMO_EXTRACT_DIR", original_extract_dir)
-        catalog._THERMO_EXTRACT_PARSE_CACHE.clear()
-        catalog._THERMO_OBSERVATION_CACHE.clear()
         identity_cache.cache_clear()
 
 
@@ -242,18 +206,6 @@ def test_each_engine_identity_input_is_present_and_byte_sensitive(
     for engine, refs in _EXPECTED_ENGINE_INPUTS.items():
         for expected_ref in refs:
             consumers_by_input.setdefault(expected_ref, set()).add(engine)
-    catalog_extract_consumers = {
-        engine
-        for engine, refs in _EXPECTED_ENGINE_INPUTS.items()
-        if ("data/vapor_pressures.yaml", "catalog-thermo-dependencies", None) in refs
-    }
-    extract_paths = {
-        path.relative_to(engine_cache._ENGINE_CACHE_ROOT).as_posix()
-        for path in _catalog_extract_paths(engine_cache._ENGINE_CACHE_ROOT)
-    }
-    for input_key in consumers_by_input:
-        if input_key[1] == "data" and input_key[0] in extract_paths:
-            consumers_by_input[input_key].update(catalog_extract_consumers)
     for engine, refs in inputs.items():
         assert refs, engine
         assert {_input_key(ref) for ref in refs} == _EXPECTED_ENGINE_INPUTS[engine], engine
@@ -263,9 +215,13 @@ def test_each_engine_identity_input_is_present_and_byte_sensitive(
                 input_ref.path,
             )
 
-    catalog_paths = _catalog_extract_paths(engine_cache._ENGINE_CACHE_ROOT)
-    assert catalog_paths
-    assert all(path.is_file() for path in catalog_paths)
+    for engine in ("internal-analytical", "alphamelts", "thermoengine"):
+        declared_extracts = {
+            path
+            for path, kind, _selector in _EXPECTED_ENGINE_INPUTS[engine]
+            if kind == "data" and path in _EXPECTED_CATALOG_EXTRACT_PATHS
+        }
+        assert declared_extracts == _EXPECTED_CATALOG_EXTRACT_PATHS, engine
 
     for index, (input_key, consumers) in enumerate(consumers_by_input.items()):
         input_ref = next(
@@ -274,24 +230,12 @@ def test_each_engine_identity_input_is_present_and_byte_sensitive(
             for ref in refs
             if _input_key(ref) == input_key
         )
-        if input_ref.kind == "catalog-thermo-dependencies":
-            for extract_index, extract_path in enumerate(
-                _catalog_extract_paths(engine_cache._ENGINE_CACHE_ROOT)
-            ):
-                _assert_input_byte_changes_only_consumers(
-                    input_ref,
-                    consumers,
-                    tmp_path / str(index) / str(extract_index),
-                    monkeypatch,
-                    catalog_extract=extract_path,
-                )
-        else:
-            _assert_input_byte_changes_only_consumers(
-                input_ref,
-                consumers,
-                tmp_path / str(index),
-                monkeypatch,
-            )
+        _assert_input_byte_changes_only_consumers(
+            input_ref,
+            consumers,
+            tmp_path / str(index),
+            monkeypatch,
+        )
 
 
 def test_every_input_association_is_required_by_independent_mutation_oracle(
@@ -304,52 +248,12 @@ def test_every_input_association_is_required_by_independent_mutation_oracle(
             input_ref = next(
                 ref for ref in original[engine] if _input_key(ref) == expected_ref
             )
-            catalog_ref = (
-                "data/vapor_pressures.yaml",
-                "catalog-thermo-dependencies",
-                None,
-            )
-            remove_refs = {expected_ref}
-            catalog_extract = None
-            if expected_ref == catalog_ref:
-                for extract_path in _catalog_extract_paths(
-                    engine_cache._ENGINE_CACHE_ROOT
-                ):
-                    remove_refs = {catalog_ref}
-                    extract_relative = extract_path.relative_to(
-                        engine_cache._ENGINE_CACHE_ROOT
-                    ).as_posix()
-                    direct_extract_ref = (extract_relative, "data", None)
-                    if direct_extract_ref in _EXPECTED_ENGINE_INPUTS[engine]:
-                        remove_refs.add(direct_extract_ref)
-                    _assert_removing_engine_input_fails(
-                        engine,
-                        remove_refs,
-                        input_ref,
-                        tmp_path / engine / input_ref.kind / extract_path.stem,
-                        monkeypatch,
-                        catalog_extract=extract_path,
-                    )
-                continue
-            if (
-                expected_ref[1] == "data"
-                and expected_ref[0]
-                in {
-                    path.relative_to(engine_cache._ENGINE_CACHE_ROOT).as_posix()
-                    for path in _catalog_extract_paths(engine_cache._ENGINE_CACHE_ROOT)
-                }
-                and catalog_ref in _EXPECTED_ENGINE_INPUTS[engine]
-            ):
-                # The catalog dependency mutation above covers this file with
-                # both key paths removed for the target engine.
-                continue
             _assert_removing_engine_input_fails(
                 engine,
-                remove_refs,
+                {expected_ref},
                 input_ref,
-                tmp_path / engine / input_ref.kind / str(len(expected_refs)),
+                tmp_path / engine / input_ref.kind / input_ref.path.replace("/", "_"),
                 monkeypatch,
-                catalog_extract=catalog_extract,
             )
 
 
@@ -359,8 +263,6 @@ def _assert_removing_engine_input_fails(
     input_ref,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
-    *,
-    catalog_extract: Path | None = None,
 ) -> None:
     original = engine_cache.ENGINE_CACHE_INPUTS
     expected_consumers = {
@@ -368,18 +270,6 @@ def _assert_removing_engine_input_fails(
         for name, refs in _EXPECTED_ENGINE_INPUTS.items()
         if any(ref in refs for ref in remove_refs)
     }
-    # A catalog-derived extract is also a consumer for explicit data refs to
-    # the same file; preserve that independent physical-input expectation.
-    if input_ref.kind == "data" and input_ref.path in {
-        path.relative_to(engine_cache._ENGINE_CACHE_ROOT).as_posix()
-        for path in _catalog_extract_paths(engine_cache._ENGINE_CACHE_ROOT)
-    }:
-        expected_consumers.update(
-            name
-            for name, refs in _EXPECTED_ENGINE_INPUTS.items()
-            if ("data/vapor_pressures.yaml", "catalog-thermo-dependencies", None)
-            in refs
-        )
     engine_cache.ENGINE_CACHE_INPUTS = {
         **original,
         engine: tuple(
@@ -393,7 +283,6 @@ def _assert_removing_engine_input_fails(
                 expected_consumers,
                 tmp_path,
                 monkeypatch,
-                catalog_extract=catalog_extract,
             )
     finally:
         engine_cache.ENGINE_CACHE_INPUTS = original

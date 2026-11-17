@@ -361,8 +361,11 @@ ENGINE_CACHE_INPUTS = {
             "data/vapor_pressures.yaml", "data", None
         ),  # The builtin vapor-pressure provider reads these coefficients.
         EngineCacheInput(
-            "data/vapor_pressures.yaml", "catalog-thermo-dependencies", None
-        ),  # Catalog references select NASA/IVTAN extracts used for pressures.
+            "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
+        ),  # The builtin catalog reads these executable NASA thermo rows.
+        EngineCacheInput(
+            "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
+        ),  # The builtin catalog reads these executable IVTAN thermo rows.
         EngineCacheInput(
             "data/setpoints.yaml", "data", None
         ),  # The core reads fallback and activity settings from this file.
@@ -406,8 +409,8 @@ ENGINE_CACHE_INPUTS = {
             "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
         ),  # Shared MELTS support reads CEA rows for O2 dissociation.
         EngineCacheInput(
-            "data/vapor_pressures.yaml", "catalog-thermo-dependencies", None
-        ),  # Either transport's catalog fallback reads referenced NASA/IVTAN rows.
+            "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
+        ),  # Catalog fallback reads this executable IVTAN extract.
     ),
     "thermoengine": (
         EngineCacheInput(
@@ -423,8 +426,8 @@ ENGINE_CACHE_INPUTS = {
             "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
         ),  # Shared MELTS support reads CEA rows for O2 dissociation.
         EngineCacheInput(
-            "data/vapor_pressures.yaml", "catalog-thermo-dependencies", None
-        ),  # Catalog-backed vapor fallback reads its referenced thermo extracts.
+            "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
+        ),  # Catalog-backed vapor fallback reads this executable IVTAN extract.
     ),
 }
 _ENGINE_CACHE_INPUT_IDENTITY_BYTES = 16
@@ -452,28 +455,6 @@ def _cache_input_component(engine_id: str, input_ref: EngineCacheInput) -> bytes
         raise EngineCacheInputIdentityError(
             engine_id, input_ref.path, f"cannot read declared input ({exc})"
         ) from exc
-
-    if input_ref.kind == "catalog-thermo-dependencies":
-        try:
-            from simulator.vapour_rail import catalog
-            from simulator.yaml_cache import load_cached_safe_yaml
-
-            payload = load_cached_safe_yaml(source)
-            if not isinstance(payload, Mapping):
-                raise TypeError("vapor-pressure catalog is not a mapping")
-            dependencies = catalog._thermo_extract_dependencies(payload)
-            return json.dumps(
-                dependencies,
-                sort_keys=True,
-                separators=(",", ":"),
-                ensure_ascii=True,
-            ).encode("ascii")
-        except Exception as exc:
-            raise EngineCacheInputIdentityError(
-                engine_id,
-                input_ref.path,
-                f"cannot identify catalog thermo extracts ({exc})",
-            ) from exc
 
     if input_ref.kind == "data":
         return source

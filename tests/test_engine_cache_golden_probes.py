@@ -139,10 +139,7 @@ def _assert_trace_is_keyed(
     observed: set[str],
     callsites: Mapping[str, set[str]],
 ) -> None:
-    from tests.test_engine_cache_input_identity import (
-        _EXPECTED_ENGINE_INPUTS,
-        _catalog_extract_paths,
-    )
+    from tests.test_engine_cache_input_identity import _EXPECTED_ENGINE_INPUTS
 
     numeric_reads = _numeric_trace_paths(observed, callsites)
     declared = {
@@ -150,14 +147,6 @@ def _assert_trace_is_keyed(
         for path, kind, _selector in _EXPECTED_ENGINE_INPUTS[engine_name]
         if kind == "data"
     }
-    if any(
-        kind == "catalog-thermo-dependencies"
-        for _path, kind, _selector in _EXPECTED_ENGINE_INPUTS[engine_name]
-    ):
-        declared.update(
-            path.relative_to(engine_cache._ENGINE_CACHE_ROOT).as_posix()
-            for path in _catalog_extract_paths(engine_cache._ENGINE_CACHE_ROOT)
-        )
     unkeyed = numeric_reads - declared
     callsite_detail = {
         path: sorted(callsites.get(path, set())) for path in unkeyed
@@ -188,19 +177,9 @@ def _assert_expected_numeric_trace(
 ) -> None:
     from tests.test_engine_cache_input_identity import (
         _EXPECTED_NUMERIC_TRACE_PATHS,
-        _EXPECTED_ENGINE_INPUTS,
-        _catalog_extract_paths,
     )
 
     expected = set(_EXPECTED_NUMERIC_TRACE_PATHS[engine_name])
-    if any(
-        kind == "catalog-thermo-dependencies"
-        for _path, kind, _selector in _EXPECTED_ENGINE_INPUTS[engine_name]
-    ):
-        expected.update(
-            path.relative_to(engine_cache._ENGINE_CACHE_ROOT).as_posix()
-            for path in _catalog_extract_paths(engine_cache._ENGINE_CACHE_ROOT)
-        )
     # Engine binding admission hashes these files only for runtime provenance;
     # that diagnostic snapshot is not part of the cached numeric result.
     numeric_reads = _numeric_trace_paths(observed, callsites)
