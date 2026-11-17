@@ -27,7 +27,6 @@ from simulator.physical_constants import BAR_PA_DECIMAL
 # 1 bar = 1e5 Pa exactly. An atmosphere frame passes 101325 Pa instead.
 BAR_PA = BAR_PA_DECIMAL
 
-
 def log10_fo2_to_pa(
     log10_fO2: Decimal, reference_pressure_pa: Decimal = BAR_PA
 ) -> Decimal:
@@ -43,7 +42,28 @@ def log10_fo2_to_pa(
 
 
 _ATM_BAR = Decimal("1.01325")
-_AIR_O2_MOLE_FRACTION = Decimal("0.2095")
+
+# For ideal gases, dry-air O2 volume fraction equals its mole fraction. The
+# five-place standard dry-air composition is 20.946%: log10(0.20946) is
+# -0.67890 at 1 bar total, and log10(0.20946 × 1.01325) is -0.67318 at 1 atm
+# total (both to five decimal places). Versus 0.2095, the delta is
+# log10(0.20946 / 0.2095) = -0.00008293 dex (~1e-4), below the precision of
+# every printed four-place pin except when rounding flips its fourth place;
+# these anchors change from -0.6788/-0.6731 to -0.6789/-0.6732.
+_AIR_O2_MOLE_FRACTION = Decimal("0.20946")
+
+
+def _oxygen_pressure_point(located: object) -> Decimal | None:
+    if not isinstance(located, Located) or not located.state.is_value:
+        return None
+    raw = located.state.value
+    if isinstance(raw, Value):
+        if raw.kind is not ValueKind.POINT or raw.point is None:
+            return None
+        raw = raw.point
+    if isinstance(raw, Decimal) and raw.is_finite():
+        return raw
+    return None
 
 
 def _gas_mixture_evaluation_temperature(
