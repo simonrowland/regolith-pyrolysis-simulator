@@ -50,6 +50,17 @@ from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.supervised_process_pool import (
     supervised_process_map,
 )
+from simulator.battery.source_declarations import (
+    HASHIMOTO_RESIDUE_PREDICTOR,
+    SOSSI_RESIDUE_PREDICTOR,
+    declared_residue_predictor as _declared_residue_predictor,
+    source_rule_enabled as _source_rule_enabled,
+)
+from simulator.source_ids import (
+    HASHIMOTO_SOURCE_ID as _HASHIMOTO_SOURCE_ID,
+    SF04_WORKBOOK_SOURCE_ID,
+    SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
+)
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
@@ -403,9 +414,6 @@ def _score_identity_equal(
 
 TWO_PHASE_BULK_COMPOSITION_STATUS = "two_phase_bulk_composition_not_liquid_composition"
 TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER = "bulk_composition_in_two_phase_region"
-# Engines that consume the SF04 magma companion workbook. Never score them
-# against those rows (chunk-3 carried ruling).
-SF04_WORKBOOK_SOURCE_ID = "sf04-magma-companion-workbook"
 SF04_WORKBOOK_REGIME = "magma_model_companion_workbook"
 
 INTERNAL_CONSISTENCY_STEMS: frozenset[str] = frozenset(
@@ -546,13 +554,13 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     # B677 and B689 are different bulletins from the B672 Mn rows and
     # are not coefficient sources.
     "ellingham": ("janaf-4th", "nasa-cea-thermo", "nasa-glenn"),
-    "imcc-sf04-v1.0.2": ("sf04-magma-companion-workbook",),
-    "imcc-sf04-ext-v4": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.2": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.2-ext-sp-2": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.3-d066-v1": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.3-d066-ext-v1": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.3-d066-v1-kcaalsi2o7": ("sf04-magma-companion-workbook",),
+    "imcc-sf04-v1.0.2": (SF04_WORKBOOK_SOURCE_ID,),
+    "imcc-sf04-ext-v4": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.2": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.2-ext-sp-2": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.3-d066-v1": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.3-d066-ext-v1": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.3-d066-v1-kcaalsi2o7": (SF04_WORKBOOK_SOURCE_ID,),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
@@ -1960,7 +1968,7 @@ def is_internal_consistency(origin: str | None) -> bool:
 
 
 def is_sf04_workbook(observation: Observation) -> bool:
-    if observation.source_id == SF04_WORKBOOK_SOURCE_ID:
+    if _source_rule_enabled(observation.source_id, "sf04_workbook"):
         return True
     evidence = observation.evidence
     if evidence.original_method_class == SF04_WORKBOOK_REGIME:
@@ -3872,7 +3880,6 @@ _HOLZHEID_PRINTED_FACTOR_1400_C = "1.94"
 _HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
 _FEO_WUSTITE_FORMULA = "Fe(1-x)O"
 _FEO_STOICHIOMETRIC_FORMULA = "FeO"
-_DISTIN_SOURCE_ID = "distin-1971-ferrous-silicate-melts"
 # Ruled Darken & Gurry iron–liquid-oxide saturation, Tables III A/B, at the
 # three Table III B temperatures. These are the owner's anchors. A linear fit
 # of the stored line-CN r column does not reproduce them, so they are not
@@ -8675,7 +8682,12 @@ def _openimcc_redox_result_evidence(
 def _distin_has_fe_metal_saturation(
     observation: Observation, experiment: Experiment | None
 ) -> bool:
-    if observation.source_id != _DISTIN_SOURCE_ID or experiment is None:
+    if (
+        not _source_rule_enabled(
+            observation.source_id, "distin_fe_metal_saturation"
+        )
+        or experiment is None
+    ):
         return False
     condition = experiment.fe_metal_saturated
     return (
@@ -13673,7 +13685,9 @@ def _predict_with_engine(
         )
 
     distin_feo_activity = (
-        observation.source_id == _DISTIN_SOURCE_ID
+        _source_rule_enabled(
+            observation.source_id, "distin_fe_metal_saturation"
+        )
         and quantity is Quantity.ACTIVITY
         and formula.strip().casefold() == "feo"
     )
@@ -15434,9 +15448,6 @@ def candidate_observation(
     )
 
 
-_HASHIMOTO_SOURCE_ID = "kems-015-hashimoto-1983"
-
-
 def _openimcc_liquid_row_extrapolated_notice(
     *,
     reason: str,
@@ -15594,7 +15605,8 @@ def _hashimoto_residue_prediction(
             observations = [
                 row
                 for row in context.observations.values()
-                if row.source_id == _HASHIMOTO_SOURCE_ID
+                if _declared_residue_predictor(row.source_id)
+                == HASHIMOTO_RESIDUE_PREDICTOR
                 and row.observation_id.startswith(_HASHIMOTO_SOURCE_ID + "::")
                 and (
                     test_experiment_ids is None
@@ -15627,7 +15639,7 @@ def _hashimoto_residue_prediction(
                 )
             source_path = (
                 REPO_ROOT
-                / "data/literature/extracts/kems-015-hashimoto-1983.yaml"
+                / f"data/literature/extracts/{_HASHIMOTO_SOURCE_ID}.yaml"
             )
             source = load_yaml(source_path)
             geometry = next(
@@ -15921,9 +15933,6 @@ def _hashimoto_residue_prediction(
         )
 
 
-_SOSSI_SOURCE_ID = "kems-012-sossi-2019"
-
-
 def _knudsen_residue_prediction(
     context,
     reference,
@@ -16116,7 +16125,8 @@ def _sossi_residue_prediction(
             live_rows = [
                 row
                 for row in context.observations.values()
-                if row.source_id == _SOSSI_SOURCE_ID
+                if _declared_residue_predictor(row.source_id)
+                == SOSSI_RESIDUE_PREDICTOR
                 and (
                     test_experiment_ids is None
                     or row.experiment_id in test_experiment_ids
@@ -16167,7 +16177,7 @@ def _sossi_residue_prediction(
                     f"{expected_count}",
                 )
             source = load_yaml(
-                REPO_ROOT / "data/literature/extracts/kems-012-sossi-2019.yaml"
+                REPO_ROOT / f"data/literature/extracts/{_SOSSI_SOURCE_ID}.yaml"
             )
             source_experiments = {
                 str(item.get("experiment_id")): item
