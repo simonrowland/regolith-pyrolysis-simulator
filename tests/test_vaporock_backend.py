@@ -776,11 +776,13 @@ def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch)
         return provider.dispatch(request)
 
     sim._dispatch_only = dispatch_only
+    # The direct core call needs phase evidence; this test isolates vapor-pressure authority.
     result = backend.equilibrate(
         1600.0,
         composition_mol={"Na2O": 1.0},
         fO2_log=-8.0,
         pressure_bar=1e-6,
+        liquid_fraction=0.5,
     )
     assert result.status == "non_authoritative"
     assert result.vapor_pressures_Pa == {}
