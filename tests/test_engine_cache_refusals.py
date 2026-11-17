@@ -64,11 +64,13 @@ def test_abandoned_timeout_thread_cannot_insert_a_late_result(tmp_path, monkeypa
 
 
 def test_bulk_loader_rejects_transient_refusals(tmp_path):
-    key = engine_cache.engine_cache_key("alphamelts", 2, {})
+    # AlphaMELTS v3 carries the engine-cache disclosure value wrapper.
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["alphamelts"]
+    key = engine_cache.engine_cache_key("alphamelts", version, {})
     with pytest.raises(ValueError, match="refusal code is not cacheable"):
         engine_cache.load_cache_rows(tmp_path / "cache.sqlite", [(
             key, {"status": "refusal", "refusal_reason": "engine_timeout"},
-            "alphamelts", 2, "laptop", 1,
+            "alphamelts", version, "laptop", 1,
         )])
 
 

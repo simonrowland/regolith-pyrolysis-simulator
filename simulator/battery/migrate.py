@@ -257,6 +257,7 @@ from simulator.battery.records import (
     as_decimal,
     identity_pressure_from_converted_point,
     identity_pressure_state,
+    notice_from_plain as _notice_from_plain,
     nominal_pressure_pa,
     phase_token,
 )
@@ -1357,6 +1358,10 @@ def _buffer_conversion_notices(
 
 
 def to_plain(obj: object) -> object:
+    return _to_plain(obj, preserve_json_numbers=False)
+
+
+def _to_plain(obj: object, *, preserve_json_numbers: bool) -> object:
     if obj is None:
         return None
     if isinstance(obj, Enum):
@@ -1370,7 +1375,9 @@ def to_plain(obj: object) -> object:
     if isinstance(obj, State):
         payload: dict[str, object] = {"tag": obj.tag.value}
         if obj.value is not None:
-            payload["value"] = to_plain(obj.value)
+            payload["value"] = _to_plain(
+                obj.value, preserve_json_numbers=preserve_json_numbers
+            )
         if obj.reason is not None:
             payload["reason"] = obj.reason
         if obj.rejection_kind is not None:
@@ -1383,17 +1390,38 @@ def to_plain(obj: object) -> object:
             if value is None:
                 continue
             key = "class" if item.name == "class_" else item.name
-            out[key] = to_plain(value)
+            out[key] = _to_plain(
+                value,
+                preserve_json_numbers=(
+                    preserve_json_numbers or key == "law_disclosures"
+                ),
+            )
         return out
     if isinstance(obj, Mapping):
-        return {str(k): to_plain(v) for k, v in obj.items()}
+        return {
+            str(k): _to_plain(
+                v,
+                preserve_json_numbers=(
+                    preserve_json_numbers or str(k) == "law_disclosures"
+                ),
+            )
+            for k, v in obj.items()
+        }
     if isinstance(obj, tuple):
-        return [to_plain(v) for v in obj]
+        return [
+            _to_plain(v, preserve_json_numbers=preserve_json_numbers)
+            for v in obj
+        ]
     if isinstance(obj, list):
-        return [to_plain(v) for v in obj]
+        return [
+            _to_plain(v, preserve_json_numbers=preserve_json_numbers)
+            for v in obj
+        ]
     if isinstance(obj, (str, int, bool)):
         return obj
     if isinstance(obj, float):
+        if preserve_json_numbers:
+            return obj
         return _dec_str(as_decimal(obj))
     return obj
 
@@ -3514,30 +3542,6 @@ def _admission_from_plain(payload: object, *, value: Value) -> Admission:
         reason=reason,
         superseded_by=payload.get("superseded_by"),
         decided_by=decided,
-    )
-
-
-def _notice_from_plain(payload: object) -> Notice:
-    assert _is_mapping(payload)
-    affected = tuple(Quantity(str(q)) for q in (payload.get("affected_quantities") or ()))
-    dropped = payload.get("dropped")
-    return Notice(
-        kind=NoticeKind(str(payload["kind"])),
-        affected_quantities=affected,
-        reason=str(payload.get("reason") or ""),
-        origin=str(payload.get("origin") or ""),
-        original=None if payload.get("original") is None else as_decimal(payload["original"]),
-        source=payload.get("source"),
-        destination=payload.get("destination"),
-        band=payload.get("band"),
-        dropped=None if dropped is None else tuple(str(x) for x in dropped),
-        dropped_mass_fraction=None
-        if payload.get("dropped_mass_fraction") is None
-        else as_decimal(payload["dropped_mass_fraction"]),
-        authority=None
-        if payload.get("authority") is None
-        else Authority(str(payload["authority"])),
-        certification=payload.get("certification"),
     )
 
 
@@ -25821,6 +25825,9 @@ class Migrator:
                 f"{source_id}: extract observation without observation_id reached "
                 "_migrate_extract_observation"
             )
+        source_notices = tuple(
+            _notice_from_plain(notice) for notice in (obs.get("notices") or ())
+        )
         obs_id = f"{source_id}::{raw_obs_id}"
         raw_values = obs.get("values")
         if isinstance(raw_values, list):
@@ -28472,7 +28479,11 @@ class Migrator:
                     source_derivation=source_derivation,
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
-                    notices=(*point_notices, *ambient_pressure_notices),
+                    notices=(
+                        *source_notices,
+                        *point_notices,
+                        *ambient_pressure_notices,
+                    ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
                     parent_values=values,
@@ -28600,6 +28611,7 @@ class Migrator:
                         phase_provenance=phase_provenance,
                         identity_provenance=identity_provenance,
                         notices=(
+                            *source_notices,
                             *(
                                 ()
                                 if total_iron_notice is None
@@ -28738,6 +28750,7 @@ class Migrator:
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     notices=(
+                        *source_notices,
                         *(
                             ()
                             if total_iron_notice is None
@@ -28937,6 +28950,7 @@ class Migrator:
                         source_derivation=source_derivation,
                         phase_provenance=sample_source_provenance,
                         notices=(
+                            *source_notices,
                             *(
                                 ()
                                 if total_iron_notice is None
@@ -28968,6 +28982,7 @@ class Migrator:
                     work=work,
                     source_key=source_key,
                     source_id=source_id,
+                    notices=source_notices,
                 )
             if self._count(source_key).observations_out > before:
                 return
@@ -28994,10 +29009,7 @@ class Migrator:
             elif obs.get("uncertainty"):
                 verbatim["source_uncertainty"] = obs.get("uncertainty")
             uncertainty = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim)
-        observation_notices: list[Notice] = []
-        observation_notices.extend(
-            _notice_from_plain(notice) for notice in (obs.get("notices") or ())
-        )
+        observation_notices: list[Notice] = list(source_notices)
         if ambient_pressure_notice is not None:
             observation_notices.append(ambient_pressure_notice)
         if obs.get("standard_pressure") == "not_printed":
@@ -29237,6 +29249,7 @@ class Migrator:
         work: Work,
         source_key: str,
         source_id: str,
+        notices: tuple[Notice, ...],
     ) -> None:
         """Add Johnston's ratio alongside its unchanged printed cell children."""
 
@@ -29483,7 +29496,7 @@ class Migrator:
             uncertainty=Uncertainty(kind=UncertaintyKind.NONE),
             evidence=evidence,
             admission=admission,
-            notices=(),
+            notices=notices,
             source_id=source_id,
             locator=reference.locator,
             read_from=reference.read_from,
@@ -32886,6 +32899,21 @@ class Migrator:
             ),
         )
 
+    def _queue_generator_unknown_phase(
+        self, work_id: str, observation: Observation, source: str
+    ) -> None:
+        species = observation.identity.species
+        if species is None or not species.phase.is_unknown:
+            return
+        self.result.add_queue(
+            work_id,
+            observation.locator,
+            ["phase"],
+            species.phase.reason or "missing phase",
+            source=source,
+            observation_id=observation.observation_id,
+        )
+
     def _lift_janaf_from_generator(
         self,
         work: Work,
@@ -32928,15 +32956,7 @@ class Migrator:
                 observation_id=observation.observation_id,
                 source=rel,
             )
-            if observation.identity.species.phase.is_unknown:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["phase"],
-                    observation.identity.species.phase.reason or "missing phase",
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
+            self._queue_generator_unknown_phase(work.work_id, observation, rel)
             if observation.value.kind is ValueKind.UNAVAILABLE:
                 q_label = (
                     observation.identity.quantity.value
@@ -33012,15 +33032,7 @@ class Migrator:
                 observation_id=observation.observation_id,
                 source=rel,
             )
-            if observation.identity.species.phase.is_unknown:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["phase"],
-                    observation.identity.species.phase.reason or "missing phase",
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
+            self._queue_generator_unknown_phase(work.work_id, observation, rel)
             if observation.value.kind is ValueKind.UNAVAILABLE:
                 q_label = (
                     observation.identity.quantity.value
@@ -33096,15 +33108,7 @@ class Migrator:
                 observation_id=observation.observation_id,
                 source=rel,
             )
-            if observation.identity.species.phase.is_unknown:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["phase"],
-                    observation.identity.species.phase.reason or "missing phase",
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
+            self._queue_generator_unknown_phase(work.work_id, observation, rel)
             if observation.value.kind is ValueKind.UNAVAILABLE:
                 q_label = (
                     observation.identity.quantity.value
@@ -33180,15 +33184,7 @@ class Migrator:
                 observation_id=observation.observation_id,
                 source=rel,
             )
-            if observation.identity.species.phase.is_unknown:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["phase"],
-                    observation.identity.species.phase.reason or "missing phase",
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
+            self._queue_generator_unknown_phase(work.work_id, observation, rel)
             if observation.value.kind is ValueKind.UNAVAILABLE:
                 q_label = (
                     observation.identity.quantity.value
@@ -33264,15 +33260,7 @@ class Migrator:
                 observation_id=observation.observation_id,
                 source=rel,
             )
-            if observation.identity.species.phase.is_unknown:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["phase"],
-                    observation.identity.species.phase.reason or "missing phase",
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
+            self._queue_generator_unknown_phase(work.work_id, observation, rel)
             if observation.value.kind is ValueKind.UNAVAILABLE:
                 q_label = (
                     observation.identity.quantity.value

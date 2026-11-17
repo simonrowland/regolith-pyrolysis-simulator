@@ -80,16 +80,21 @@ def _injected_launch_exception(name):
 
 
 def _bootstrap_magemin_launch_failure_worker(
-    binary_path, database, config, exception_name,
+    binary_path, database, config, exception_name, lock_dir,
 ):
     backend, ready = _bootstrap_magemin_subprocess_worker(
         binary_path, database, config,
     )
-    return (backend, exception_name), ready
+    return (backend, exception_name, lock_dir), ready
 
 
 def _handle_magemin_launch_failure_request(resource, request, errlog):
-    backend, exception_name = resource
+    backend, exception_name, lock_dir = resource
+    lock_dir = Path(lock_dir)
+    magemin_module._MAGEMIN_SUBPROCESS_LOCK_DIR = lock_dir
+    magemin_module._MAGEMIN_SUBPROCESS_LOCK = (
+        lock_dir / magemin_module._MAGEMIN_SUBPROCESS_LOCK.name
+    )
     original_run = magemin_module.subprocess.run
 
     def fail_launch(*_args, **_kwargs):
@@ -102,7 +107,7 @@ def _handle_magemin_launch_failure_request(resource, request, errlog):
         magemin_module.subprocess.run = original_run
 
 
-def _warm_magemin_launch_failure_pool(backend, exception_name):
+def _warm_magemin_launch_failure_pool(backend, exception_name, lock_dir):
     def worker_factory(index):
         return WarmEngineWorker(
             name=f'MAGEMin injected launch failure slot {index}',
@@ -113,6 +118,7 @@ def _warm_magemin_launch_failure_pool(backend, exception_name):
                 backend._database,
                 backend._config,
                 exception_name,
+                str(lock_dir),
             ),
             startup_timeout_s=30.0,
             call_timeout_s=30.0,
@@ -323,6 +329,29 @@ def test_binary_absence_keeps_campaign_and_direct_gate_refusals(
     gate_sim = _sim(
         'magemin', vapor_pressure_data, feedstocks_data, setpoints_data,
     )
+    from simulator.accounting.formulas import resolve_species_formula
+
+    composition_wt_pct = {
+        'SiO2': 50.0,
+        'Al2O3': 15.0,
+        'MgO': 12.0,
+        'FeO': 10.0,
+        'CaO': 10.0,
+        'Na2O': 3.0,
+    }
+    composition_mol = {
+        species: amount
+        / resolve_species_formula(
+            species, gate_sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    gate_sim.atom_ledger.load_external_mol(
+        'process.cleaned_melt',
+        composition_mol,
+        source='b-1225 direct gate missing-binary refusal pin',
+        material_origin='feedstock',
+    )
     with pytest.raises(EvaporationFluxRefusal) as gate_error:
         gate_sim._melt_redox_liquidus_gate_curve()
     assert (
@@ -330,6 +359,16 @@ def test_binary_absence_keeps_campaign_and_direct_gate_refusals(
         == 'liquid_fraction_provider_failed'
     )
     assert gate_error.value.diagnostic['provider'] == 'magemin'
+    projected = gate_error.value.diagnostic['provider_diagnostic'][
+        'backend_diagnostics'
+    ]
+    assert projected['projected_liquidus_status'] == 'unavailable'
+    assert projected['projected_liquidus_diagnostics'][
+        'backend_status_reason'
+    ] == 'missing_binary'
+    assert projected['projected_liquidus_diagnostics'][
+        'backend_failure_disposition'
+    ] == 'environment'
     assert gate_sim._last_melt_redox_liquidus_gate_diagnostic == {}
 
 
@@ -539,7 +578,7 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
     (OSError, errno.EMFILE),
 ])
 def test_actual_magemin_launch_oserror_is_typed_environment_refusal(
-    monkeypatch, error_type, error_number,
+    monkeypatch, magemin_subprocess_lock_dir, error_type, error_number,
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
@@ -593,7 +632,7 @@ def test_actual_magemin_launch_oserror_is_typed_environment_refusal(
     'MemoryError', 'SubprocessError', 'TimeoutExpired', 'CalledProcessError',
 ])
 def test_magemin_launch_environment_errors_keep_type_in_every_execution_mode(
-    monkeypatch, mode, exception_name,
+    monkeypatch, magemin_subprocess_lock_dir, mode, exception_name,
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
@@ -603,7 +642,7 @@ def test_magemin_launch_environment_errors_keep_type_in_every_execution_mode(
     assert backend.initialize({'warm_worker': False})
     if mode == 'warm_pool':
         backend._subprocess_pool = _warm_magemin_launch_failure_pool(
-            backend, exception_name,
+            backend, exception_name, magemin_subprocess_lock_dir,
         )
     elif mode == 'bridge_retry':
         backend._bridge = 'pymagemin'
@@ -652,7 +691,8 @@ def test_magemin_launch_environment_errors_keep_type_in_every_execution_mode(
 
 @pytest.mark.parametrize('mode', ['cold', 'bridge_retry', 'warm_pool'])
 def test_magemin_launch_programming_errors_still_propagate(
-    monkeypatch, mode, vapor_pressure_data, feedstocks_data, setpoints_data,
+    monkeypatch, magemin_subprocess_lock_dir, mode,
+    vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     sim._register_freeze_gate_liquid_fraction_providers()
@@ -661,7 +701,7 @@ def test_magemin_launch_programming_errors_still_propagate(
     assert backend.initialize({'warm_worker': False})
     if mode == 'warm_pool':
         backend._subprocess_pool = _warm_magemin_launch_failure_pool(
-            backend, 'TypeError',
+            backend, 'TypeError', magemin_subprocess_lock_dir,
         )
     elif mode == 'bridge_retry':
         backend._bridge = 'pymagemin'
@@ -693,6 +733,11 @@ def test_magemin_launch_programming_errors_still_propagate(
 @pytest.mark.parametrize('nested, expected', [
     ({'backend_status': 'unavailable'}, 'failed'),
     ({'backend_status': 'not_converged'}, 'numerical_failure'),
+    ({'backend_status': 'not_converged',
+      'backend_status_reason': 'parse_empty_output',
+      'backend_failure_exception': 'MAGEMinOutputError'}, 'numerical_failure'),
+    ({'backend_status': 'not_converged',
+      'backend_status_reason': 'parse_empty_output'}, 'failed'),
     ({'backend_status_reason': 'engine_worker_timeout'}, 'failed'),
     ({'projected_liquidus_status': 'unavailable'}, 'numerical_failure'),
     ({'projected_liquidus_status': 'not_converged'}, 'numerical_failure'),
@@ -834,9 +879,41 @@ def test_optimizer_resolves_gate_declared_in_loaded_setpoints(monkeypatch):
 @pytest.mark.parametrize('prior_good', [False, True])
 def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     monkeypatch, failure, prior_good,
-    vapor_pressure_data, feedstocks_data, setpoints_data,
+    tmp_path, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
+    from simulator import engine_binding_admission as admission
     from tests.binding_admission_fixtures import register_synthetic_gate_curve_producer
+
+    identity = admission.BindingIdentity(
+        "magemin", "ig", "magemin-ig-r1", "subprocess"
+    )
+    provenance = {
+        "binding_provenance_verifiable": True,
+        "runtime_version": {
+            "tag": "value",
+            "value": "MAGEMin fixture runtime",
+            "reason": None,
+        },
+        "runtime_artifacts": {
+            "magemin_selected_binary": {"sha256": "a" * 64},
+        },
+    }
+    monkeypatch.setattr(
+        admission, "binding_identity_for_backend", lambda _backend: identity
+    )
+    monkeypatch.setattr(
+        admission,
+        "current_backend_provenance",
+        lambda *_args, **_kwargs: provenance,
+    )
+    monkeypatch.setattr(
+        admission, "selected_binding_identities", lambda *_args, **_kwargs: ()
+    )
+    monkeypatch.setattr(
+        admission,
+        "binding_receipt_path",
+        lambda: tmp_path / "missing-binding-admission.json",
+    )
 
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     register_synthetic_gate_curve_producer(sim)

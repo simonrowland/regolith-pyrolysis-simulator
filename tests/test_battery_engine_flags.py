@@ -7,6 +7,7 @@ and attaching the flag does not move the value.
 
 from __future__ import annotations
 
+import json
 import types
 from dataclasses import replace
 from decimal import Decimal
@@ -22,6 +23,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Quantity,
+    RefusalReason,
 )
 from simulator.battery.records import Composition, Species
 from simulator.battery.score import (
@@ -489,3 +491,88 @@ def test_predict_keeps_engine_flag(monkeypatch) -> None:
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND for notice in warm.notices
     )
     assert float(warm.value) != float(hot.value)
+
+
+def test_magemin_diagnostic_gap_survives_scored_prediction(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("SiO2", Decimal("0.5")),
+            ("Al2O3", Decimal("0.5")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = F.activity_identity(
+        formula="SiO2",
+        component_basis="SiO2",
+        composition=composition,
+        T_K=Decimal("1673.15"),
+    )
+    experiment = F.tabulation_experiment()
+    observation = F.observation(
+        "magemin-diagnostic-gap",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    backend = MAGEMinBackend()
+    bare_failure = EquilibriumResult(status="not_converged", diagnostics={})
+    monkeypatch.setattr(
+        backend,
+        "_equilibrate_body",
+        lambda *_args, **_kwargs: bare_failure,
+    )
+    # This uninitialized backend is an intentional in-process fake. Keep the
+    # supplied handle live so scoring does not retire it and reopen MAGEMin.
+    monkeypatch.setattr(backend, "is_available", lambda: True)
+    handle = EngineHandle(
+        name=Engine.MAGEMIN.value,
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    cells = []
+    equilibrate_cell_impl = battery.equilibrate_cell
+
+    def capture_cell(*args, **kwargs):
+        cell = equilibrate_cell_impl(*args, **kwargs)
+        cells.append(cell)
+        return cell
+
+    monkeypatch.setattr(battery, "equilibrate_cell", capture_cell)
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        observation,
+        handles={Engine.MAGEMIN.value: handle},
+        isolated=False,
+    )
+
+    assert len(cells) == 1
+    assert cells[0].refusal_reason == "diagnostic_gap"
+    assert any(
+        notice.get("magemin_untyped_failure_diagnostic_gap") is True
+        for notice in cells[0].notices
+    )
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["reason"] == "diagnostic_gap"
+    assert prediction.refusal_detail["cell_refusal_reason"] == "diagnostic_gap"
+    gap_notices = [
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and '"kind":"diagnostic_gap"' in notice.reason
+    ]
+    assert len(gap_notices) == 1
+    assert json.loads(gap_notices[0].reason)[
+        "magemin_untyped_failure_diagnostic_gap"
+    ] is True

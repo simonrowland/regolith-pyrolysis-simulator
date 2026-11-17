@@ -21,11 +21,12 @@ from collections.abc import Mapping
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
-from typing import Mapping
 
 import pytest
 import yaml
 
+from simulator.physical_constants import PA_PER_BAR
+from simulator.accounting.formulas import parse_formula
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -94,6 +95,7 @@ from simulator.battery.validity import (
     run_validity_gates,
     underdetermined_apparatus,
 )
+from simulator.melt_backend.magemin import MAGEMIN_WORKER_LIFECYCLE_REASONS
 import simulator.battery.score as score_mod
 from simulator.battery.score import (
     SCORE_ELIGIBLE_CONJUNCTS,
@@ -620,10 +622,10 @@ def test_mathieu_partial_pressure_prediction_is_independent_of_total_pressure(
         temperature_C = float(reference.identity.temperature_K.value) - 273.15
         assert reference.identity.fO2_Pa is not None
         assert reference.identity.fO2_Pa.is_value
-        po2_bar = float(reference.identity.fO2_Pa.value) / 100000.0
+        po2_bar = float(reference.identity.fO2_Pa.value) / PA_PER_BAR
         po2_request = Po2Request(mode=PO2_COMMANDED, po2_bar=po2_bar)
     for pressure_pa in (Decimal("0.1"), Decimal("100000")):
-        pressure_bar = float(pressure_pa) / 100000.0
+        pressure_bar = float(pressure_pa) / PA_PER_BAR
         if engine is Engine.INTERNAL_ANALYTICAL:
             assert internal_backend is not None
             result = internal_backend.equilibrate(
@@ -3592,11 +3594,12 @@ def test_species_formula_parser_preserves_200_existing_parses() -> None:
     )
     rows = json.loads(fixture.read_text(encoding="utf-8"))
     assert len(rows) == 200
+    # ZnSO4.6H2O -> Zn 1, S 1, H 6×2 = 12, O 4 + 6×1 = 10.
     for row in rows:
         expected = tuple(
             (str(symbol), float(count)) for symbol, count in row["elements"]
         )
-        assert parse_species_formula(row["formula"]) == expected
+        assert parse_species_formula(row["formula"]) == expected, row["formula"]
 
 
 def test_species_formula_parser_accepts_published_typography() -> None:
@@ -3607,15 +3610,93 @@ def test_species_formula_parser_accepts_published_typography() -> None:
     ) == (("Cl", 1.0), ("H", 1.0))
 
 
-def test_species_formula_parser_refuses_normalized_ascii_dot_adducts() -> None:
-    for formula in ("Al₂O₃.3H₂O", "$Al_2O_3.3H_2O$", "CoSO₄.7H₂O"):
-        assert parse_species_formula(formula) is None
+def test_species_formula_parser_accepts_normalized_ascii_dot_adducts() -> None:
+    for formula, canonical in (
+        ("Al₂O₃.3H₂O", "Al2O3.3H2O"),
+        ("$Al_2O_3.3H_2O$", "Al2O3.3H2O"),
+        ("CoSO₄.7H₂O", "CoSO4.7H2O"),
+    ):
+        assert parse_species_formula(formula) == tuple(
+            sorted(parse_formula(canonical).elements.items())
+        )
 
-    for formula in ("Fe0.947O", "Al2O3.3H2O"):
-        assert parse_species_formula(formula) == score_mod.formula_composition(formula)
+    # Al2O3.3H2O -> Al 2, H 3×2 = 6, O 3 + 3×1 = 6.
+    assert parse_species_formula("Al2O3.3H2O") == (
+        ("Al", 2.0),
+        ("H", 6.0),
+        ("O", 6.0),
+    ), "Al2O3.3H2O"
+    formula = "Fe0.947O"
+    assert parse_species_formula(formula) == (
+        score_mod.formula_composition(formula)
+        or tuple(sorted(parse_formula(formula).elements.items()))
+    ), formula
     assert parse_species_formula(
         "Fe0.947O(c)", species=Species("Fe0.947O", Phase.CR)
     ) == score_mod.formula_composition("Fe0.947O")
+
+
+def test_species_formula_parser_accepts_fractional_endmember_subscripts() -> None:
+    for formula, canonical in (
+        ("NbC.98", "NbC0.98"),
+        ("MoN.5", "MoN0.5"),
+        ("VC.88", "VC0.88"),
+        ("PuC.88", "PuC0.88"),
+        ("PuC.82", "PuC0.82"),
+    ):
+        assert parse_species_formula(formula) == (
+            score_mod.formula_composition(canonical)
+            or tuple(sorted(parse_formula(canonical).elements.items()))
+        )
+
+
+def test_species_formula_parser_refuses_ocr_suspect_terminal_decimals() -> None:
+    for formula in ("W.465", "Fe.9470"):
+        assert parse_species_formula(formula) is None, formula
+
+    # Pankratz table 1174 prints Fe₀.₉₄₇O(c,l): Fe 0.947 and O 1.
+    assert parse_species_formula("Fe0.947O") == (("Fe", 0.947), ("O", 1.0))
+
+
+def test_species_formula_parser_refuses_empty_adduct_segments() -> None:
+    for formula in ("·CuSO4", "CuSO4·", "CuSO4··5H2O", "Br·", "Na•", "P04•··"):
+        assert parse_species_formula(formula) is None, formula
+
+
+def test_species_formula_parser_rejects_phase_exposed_after_charge_removal() -> None:
+    species = Species("Fe0.95O", Phase.G, charge=1)
+    assert parse_species_formula("Fe0.95O[s]+", species=species) is None
+
+
+def test_species_formula_parser_accepts_compound_adduct_and_bullet_dot() -> None:
+    for formula in ("3Al2O3.2SiO2", "Na2O.SiO2"):
+        assert parse_species_formula(formula) == tuple(
+            sorted(parse_formula(formula).elements.items())
+        )
+    assert parse_species_formula("CuO•CuSO₄") == tuple(
+        sorted(parse_formula("CuO·CuSO4").elements.items())
+    )
+
+
+def test_species_formula_parser_preserves_deuterium_in_isotope_hydrates() -> None:
+    assert parse_species_formula("CuSO4·5D2O") == (
+        ("Cu", 1.0),
+        ("D", 10.0),
+        ("O", 9.0),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("D2O·H2O") == (
+        ("D", 2.0),
+        ("H", 2.0),
+        ("O", 2.0),
+    )
+
+
+def test_species_formula_parser_keeps_variable_and_ambiguous_formulae_unmatched() -> None:
+    assert parse_species_formula("Fe(1-x)O") is None
+    assert parse_species_formula("Fe_tO") is None
+    assert parse_species_formula("CaAl.SiCK") is None
+    assert parse_species_formula("N1.5617IO.41959Ar.00937C.00032") is None
 
 
 def test_species_formula_parser_accepts_nested_groups() -> None:
@@ -4046,13 +4127,6 @@ def test_metric_domain_refuses_zero_and_negative_dex() -> None:
 def test_determinism_two_dumps_byte_identical() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()
-    ref = F.observation(
-        "o2-ref",
-        exp.experiment_id,
-        ident,
-        Decimal("0"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
     residual, candidate = _compile(
         F.observation(
             "o2-ref",
@@ -9206,7 +9280,7 @@ def test_battery_hero_deck_uses_solved_oxygen_balance_notice() -> None:
     assert redox["oxygen_source"] == "openimcc_oxygen_balance_condition_only"
     assert redox["oxygen_kind"] == "fo2_oxygen_balance_effusion_solved"
     assert float(redox["x_value"]).hex() == float(expected_delta_iw).hex()
-    assert Decimal(str(redox["fO2_Pa"])) == pO2_bar * Decimal("1e5")
+    assert Decimal(str(redox["fO2_Pa"])) == pO2_bar * Decimal(str(PA_PER_BAR))
     assert evolution["oxygen_mode"] == "solved"
     assert evolution["oxygen_source"] == redox["oxygen_source"]
     assert evolution["oxygen_kind"] == redox["oxygen_kind"]
@@ -10527,6 +10601,7 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
                     if experiment_id == refused_experiment
                     else {"sphere_shrinking": None}
                 ),
+                "law_disclosures": [],
             }
             values = {"FeO": float(index + 10), "MgO": 20.0, "SiO2": 30.0, "CaO": 4.0, "Al2O3": 5.0}
             rows.extend(
@@ -10546,7 +10621,11 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
                         primary_oxide_wt_pct={**values, "FeO": values["FeO"] + 100.0},
                         geometry_oxide_wt_pct={"sphere_shrinking": values},
                         sensitivity_band_wt_pct={name: (value - 2.0, value + 2.0) for name, value in values.items()},
-                        provenance={"engine": engine, "alpha_arm": "alpha_runtime_catalog"},
+                        provenance={
+                            "engine": engine,
+                            "alpha_arm": "alpha_runtime_catalog",
+                            "law_disclosures": [],
+                        },
                     ),
                 )
             )
@@ -10673,6 +10752,85 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
     assert len(diagnostic_refusal.notices) == 1
     assert diagnostic_refusal.notices[0].kind is NoticeKind.FLOOR_INVERSION
     assert diagnostic_refusal.notices[0].origin == "engine:internal-analytical"
+
+
+def test_hashimoto_test_selection_reuses_normalized_disclosure_cache(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery import residue
+
+    context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    reference = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-015-hashimoto-1983"
+        and row.identity.species.formula == "FeO"
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    test_ids = frozenset({reference.experiment_id})
+    calls: list[frozenset[str] | None] = []
+
+    def fake_cohort(
+        experiments, _catalog, *, engine, selected_experiment_ids=None, **_kwargs
+    ):
+        calls.append(selected_experiment_ids)
+        experiment_id = experiments[0]["experiment_id"]
+        values = {"FeO": 42.0}
+        return tuple(
+            SimpleNamespace(
+                experiment_id=experiment_id,
+                alpha_arm=alpha_arm,
+                primary_geometry_policy_id="sphere_shrinking",
+                primary_oxide_wt_pct=values,
+                geometry_oxide_wt_pct={"sphere_shrinking": values},
+                sensitivity_band_wt_pct={"FeO": (41.0, 43.0)},
+                provenance={"law_disclosures": []},
+            )
+            for alpha_arm in (
+                "alpha_common_unity_sensitivity",
+                "alpha_runtime_catalog",
+            )
+        )
+
+    monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", fake_cohort)
+    monkeypatch.setattr(
+        score_mod.subprocess,
+        "run",
+        lambda *_args, **_kwargs: pytest.fail("residue scoring must not require git"),
+    )
+    cache = {}
+    cold = score_mod._hashimoto_residue_prediction(
+        context,
+        reference,
+        Engine.OPENIMCC,
+        cache,
+        test_experiment_ids=test_ids,
+    )
+    key = score_mod._residue_prediction_cache_key(
+        "kems-015-hashimoto-1983", Engine.OPENIMCC, test_ids
+    )
+    assert cold.execution.state is ExecutionState.PRODUCED, cold.refusal_detail
+    cached_rows = cache[key]
+    assert set(cached_rows) == {
+        f"{reference.experiment_id}::alpha_common_unity_sensitivity",
+        f"{reference.experiment_id}::alpha_runtime_catalog",
+    }
+
+    warm = score_mod._hashimoto_residue_prediction(
+        context,
+        reference,
+        Engine.OPENIMCC,
+        cache,
+        test_experiment_ids=test_ids,
+    )
+
+    assert calls == [test_ids]
+    assert cache[key] is cached_rows
+    assert warm.execution.state is ExecutionState.PRODUCED, warm.refusal_detail
+    assert warm == cold
+    assert warm.law_disclosures == cold.law_disclosures == ()
 
 
 @pytest.mark.parametrize(
@@ -17408,6 +17566,272 @@ def test_magemin_native_activity_failure_keeps_typed_cause(
     assert prediction.refusal_detail["cell_refusal_reason"] == cell_refusal
 
 
+@pytest.mark.parametrize(
+    ("backend_reason", "expected_reason"),
+    tuple(
+        (reason, "engine_transport_error:magemin")
+        for reason in sorted(MAGEMIN_WORKER_LIFECYCLE_REASONS)
+    ) + (("magemin_subprocess_timeout", "engine_timeout"),),
+)
+def test_magemin_typed_lifecycle_reason_survives_battery_score(
+    monkeypatch: pytest.MonkeyPatch,
+    backend_reason: str,
+    expected_reason: str,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.generators import bench as bench_module
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.melt_backend.base import EquilibriumResult
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        f"magemin-lifecycle-score-{backend_reason}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.6"),
+        source_id=f"magemin-lifecycle-score-source-{backend_reason}",
+    )
+    monkeypatch.setattr(
+        bench_module,
+        "activity_request_for_engine",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            payload={
+                "composition_mol": {
+                    "SiO2": Decimal("0.55"),
+                    "MgO": Decimal("0.20"),
+                    "Al2O3": Decimal("0.25"),
+                }
+            }
+        ),
+    )
+
+    class FailedBackend:
+        def equilibrate(self, **_kwargs):
+            return EquilibriumResult(
+                status="not_converged",
+                diagnostics={
+                    "backend_status": "not_converged",
+                    "backend_status_reason": backend_reason,
+                },
+            )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={
+            "magemin": EngineHandle(
+                "magemin", FailedBackend(), True, None, False, False
+            )
+        },
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["reason"] == expected_reason
+    if expected_reason == "engine_transport_error:magemin":
+        assert prediction.refusal_detail["backend_status_reason"] == backend_reason
+
+
+@pytest.mark.parametrize(
+    "backend_reason",
+    sorted(MAGEMIN_WORKER_LIFECYCLE_REASONS),
+)
+def test_magemin_lifecycle_reason_survives_phase_row_scoring(
+    monkeypatch: pytest.MonkeyPatch,
+    backend_reason: str,
+) -> None:
+    from simulator.battery.enums import PhaseRole
+    from simulator.battery.score import predict_with_engine
+    from simulator.melt_backend.base import EquilibriumResult
+
+    experiment = F.tabulation_experiment()
+    identity = Identity(
+        quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        species=Species("SiO2", Phase.L),
+        subtype=State.of("wt_percent"),
+        temperature_K=State.of(Decimal("1673.15")),
+        composition=State.of(
+            Composition(
+                "ordered_complete_mole_inventory",
+                (("SiO2", Decimal("1")), ("MgO", Decimal("1"))),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        fO2_Pa=State.of(Decimal("10")),
+        total_pressure_Pa=State.of(Decimal("100000")),
+        phase_role=State.of(PhaseRole.MELT),
+    )
+    observation = F.observation(
+        f"magemin-lifecycle-phase-row-{backend_reason}",
+        experiment.experiment_id,
+        identity,
+        Decimal("52.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=f"magemin-lifecycle-phase-source-{backend_reason}",
+    )
+    failed_result = EquilibriumResult(
+        status="not_converged",
+        diagnostics={
+            "backend_status": "not_converged",
+            "backend_status_reason": backend_reason,
+        },
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_equilibrate_phase_assemblage",
+        lambda *_args, **_kwargs: failed_result,
+    )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        observation,
+        handles={"magemin": object()},
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["reason"] == "engine_transport_error:magemin"
+    assert prediction.refusal_detail["backend_status_reason"] == backend_reason
+    if backend_reason == "magemin_engine_worker_died":
+        assert prediction.refusal_detail["backend_status_reason"] == (
+            "magemin_engine_worker_died"
+        )
+
+
+def test_magemin_bridge_runtime_error_stays_engine_defect_in_score(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from functools import wraps
+    from types import SimpleNamespace
+
+    from simulator.battery.generators import bench as bench_module
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    def bridge_failure(**_kwargs):
+        raise RuntimeError("injected bridge failure")
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "pymagemin"
+    backend._binary_path = None
+    backend._magemin_module = SimpleNamespace(minimize=bridge_failure)
+    results = []
+    equilibrate = backend.equilibrate
+
+    @wraps(equilibrate)
+    def capture_result(*args, **kwargs):
+        result = equilibrate(*args, **kwargs)
+        results.append(result)
+        return result
+
+    backend.equilibrate = capture_result
+    cells = []
+    equilibrate_cell = binary_pot_battery.equilibrate_cell
+
+    def capture_cell(*args, **kwargs):
+        cell = equilibrate_cell(*args, **kwargs)
+        cells.append(cell)
+        return cell
+
+    monkeypatch.setattr(binary_pot_battery, "equilibrate_cell", capture_cell)
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        "magemin-bridge-runtime-error-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.6"),
+        source_id="magemin-bridge-runtime-error-source",
+    )
+    monkeypatch.setattr(
+        bench_module,
+        "activity_request_for_engine",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            payload={
+                "composition_mol": {
+                    "SiO2": Decimal("0.55"),
+                    "MgO": Decimal("0.20"),
+                    "Al2O3": Decimal("0.25"),
+                }
+            }
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={
+            "magemin": EngineHandle(
+                "magemin", backend, True, None, False, False
+            )
+        },
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert backend._binary_path is None
+    assert len(results) == len(cells) == 1
+    assert results[0].status == "not_converged"
+    assert results[0].diagnostics["backend_status_reason"] == "engine_crash"
+    assert results[0].diagnostics["backend_failure_exception"] == "RuntimeError"
+    assert cells[0].engine_reason == "engine_crash"
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["reason"] == "engine_not_converged"
+    assert prediction.refusal_detail["engine_reason"] == "engine_crash"
+
+    replayed_cell = EquilibrateCell.from_payload(cells[0].as_payload())
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "equilibrate_cell",
+        lambda *_args, **_kwargs: replayed_cell,
+    )
+    replayed_prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={
+            "magemin": EngineHandle(
+                "magemin", backend, True, None, False, False
+            )
+        },
+        experiment=experiment,
+        isolated=False,
+    )
+    assert replayed_prediction.refusal_detail["reason"] == "engine_not_converged"
+    assert replayed_prediction.refusal_detail["engine_reason"] == "engine_crash"
+    assert replayed_prediction.refusal_detail["reason"] == (
+        prediction.refusal_detail["reason"]
+    )
+    assert replayed_prediction.refusal_reason is prediction.refusal_reason
+
+
 def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -17418,7 +17842,10 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
 
     from simulator.battery.generators import bench as bench_module
     from simulator.diagnostic_helpers import binary_pot_battery
-    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
     from simulator.engine_pool import EngineWorkerDied
     from simulator.melt_backend.magemin import MAGEMinBackend
 
@@ -17458,6 +17885,15 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
 
     backend.equilibrate = capture_result
     handle = EngineHandle("magemin", backend, True, None, False, False)
+    cells = []
+    equilibrate_cell = binary_pot_battery.equilibrate_cell
+
+    def capture_cell(*args, **kwargs):
+        cell = equilibrate_cell(*args, **kwargs)
+        cells.append(cell)
+        return cell
+
+    monkeypatch.setattr(binary_pot_battery, "equilibrate_cell", capture_cell)
     experiment = F.kems_experiment()
     work = F.work(experiment.work_id)
     identity = _with_activity_reference_polymorph(
@@ -17510,11 +17946,15 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
         comparison_ids={reference.observation_id},
     )
 
-    assert len(results) == 1
+    assert len(results) == len(cells) == 1
     assert results[0].status == "not_converged"
+    assert results[0].diagnostics["backend_status_reason"] == (
+        "magemin_engine_worker_died"
+    )
     assert (
         results[0].diagnostics["backend_failure_exception"] == "EngineWorkerDied"
     )
+    assert cells[0].engine_reason == "magemin_engine_worker_died"
     assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
     assert (
         prediction.refusal_detail["reason"] == "engine_transport_error:magemin"
@@ -17527,6 +17967,27 @@ def test_magemin_worker_lifecycle_result_is_transport_refusal_for_activity(
         residual.refusal.detail["reason"] == "engine_transport_error:magemin"
     )
     assert not residual.score_eligible
+
+    replayed_cell = EquilibrateCell.from_payload(cells[0].as_payload())
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "equilibrate_cell",
+        lambda *_args, **_kwargs: replayed_cell,
+    )
+    replayed_prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={"magemin": handle},
+        experiment=experiment,
+        isolated=False,
+    )
+    assert replayed_prediction.refusal_detail["reason"] == (
+        "engine_transport_error:magemin"
+    )
+    assert replayed_prediction.refusal_detail["reason"] == (
+        prediction.refusal_detail["reason"]
+    )
+    assert replayed_prediction.refusal_reason is prediction.refusal_reason
 
 
 def test_magemin_composition_gate_is_a_typed_out_of_domain_refusal(
@@ -19821,7 +20282,6 @@ def test_score_store_refuses_rejected_unavailable_stolyarova_rows_by_state() -> 
         "stolyarova-1995-cao-alumina-kems.yaml",
     )
 
-    root = context.root
     expected_row_keys = {
         "stolyarova_1991_gibbs_integral_energy_fig3::points:h=cd704583d7d4",
         "stolyarova_1991_gibbs_integral_energy_fig3::points:h=a5d8822cf03d",

@@ -35,16 +35,18 @@ ROOT = Path(__file__).resolve().parents[2]
 B1259_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1259_STORE_PATTERN = "compilations-robie-waldbaum-1968-usgs-b1259.yaml"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
-# t-1620 generator census: decimal subscripts stay within one formula;
-# malformed trailing-dot formulas refuse instead of losing empty segments.
+# The shared formula parser resolves 30 additional B1259 numeric cells and one
+# formerly unresolved 298 K formula row. The page-grounded p. 226 formula
+# correction restores 71 more observations; excluded tokens and raw census
+# remain unchanged.
 B1259_RAW = 29809
-B1259_STORED = 14961
-B1259_REFUSED = 2918
+B1259_STORED = 15062
+B1259_REFUSED = 2817
 B1259_EXCLUDED = 11930
 B1259_RECORD_COUNT = 549
-B1259_RECORDS_STORING_NOTHING = 84
-B1259_EMPTY_FORMULA_UNRESOLVED_298K = 60
-B1259_EMPTY_FORMULA_UNRESOLVED_HT = 19
+B1259_RECORDS_STORING_NOTHING = 82
+B1259_EMPTY_FORMULA_UNRESOLVED_298K = 59
+B1259_EMPTY_FORMULA_UNRESOLVED_HT = 18
 B1259_EMPTY_METADATA_TABLES = 3
 B1259_EMPTY_ALL_CELLS_REFUSED_OR_EXCLUDED = 2
 B1259_MERGED_PROPOSED = 4
@@ -55,10 +57,12 @@ B1259_MERGED_EXCLUDED = 0
 B1259_UNGUARDED_MERGED_STORED = 2
 B1259_IDENTITY_10X = 118
 B1259_IDENTITY_1X_10X = 27
-B1259_FORMULA_UNRESOLVED_HT = 19
-B1259_FORMULA_UNRESOLVED_298K_ROWS = 60
-# Scratch-regenerated observations-v2 unique-ID count; the train refreshes the store.
+B1259_FORMULA_UNRESOLVED_HT = 18
+B1259_FORMULA_UNRESOLVED_298K_ROWS = 59
+# The committed green observations-v2 count; the train refreshes the store.
 B1259_STORE_STORED = 14651
+# The green store predates 28 parser-accepted and 71 source-restored observations.
+B1259_GENERATED_UNIQUE_IDS = 14750
 SILVER_298K = "b1259-298k-0001-silver"
 AG_ION_298K = "b1259-298k-0002-ag-aqueous-ion"
 AL_ION_298K = "b1259-298k-0004-al-aqueous-ion"
@@ -740,6 +744,11 @@ def test_sibling_and_ocr_formulas_are_page_grounded() -> None:
     fluorine = _generation("b1259-ht-0019-fluorine-reference-state")
     assert fluorine.report["formula_resolution"]["formula"] == "F2"
     assert "title" not in (fluorine.report["formula_resolution"]["source"] or "")
+    pyroxene = generator._resolve_formula(
+        _load("b1259-ht-0195-calcium-aluminum-pyroxene")
+    )
+    assert pyroxene.formula == "CaAl2SiO6"
+    assert pyroxene.source == "printed_formula"
     corundum = _generation("b1259-298k-0122-corundum")
     assert corundum.report["formula_resolution"]["formula"] == "Al2O3"
     chlorine = generator._resolve_formula(_load("b1259-ht-0015-chlorine-reference-state"))
@@ -1113,12 +1122,11 @@ def test_b1259_store_census_is_true_of_observations_v2() -> None:
     assert raw == B1259_RAW
     assert refused == B1259_REFUSED
     assert excluded == B1259_EXCLUDED
-    # F4 R-ord remint: observation_id scheme dropped :row= ordinals. Store still
-    # carries pre-remint ids until rematerialize; counts and accounting hold.
+    # F4 R-ord remint: observation_id scheme dropped :row= ordinals. The green
+    # store predates 28 parser-accepted and 71 source-restored observations.
     assert all("row=" not in oid for oid in generated_ids)
-    assert len(stored_ids) == len(generated_ids)
+    assert len(generated_ids) == B1259_GENERATED_UNIQUE_IDS
     # assert stored_ids <= generated_ids  # restore after rematerialize
-    assert len(generated_ids) == B1259_STORE_STORED
     assert B1259_STORED + B1259_REFUSED + B1259_EXCLUDED == B1259_RAW
 
     stored_records = {

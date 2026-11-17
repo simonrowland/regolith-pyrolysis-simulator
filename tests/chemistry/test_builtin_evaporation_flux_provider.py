@@ -70,7 +70,7 @@ def _series_resistance_reference_flux(
     sim: PyrolysisSimulator,
     vapor_pressures_Pa: dict,
 ) -> dict:
-    """Re-invoke the series-resistance source outside ``_calculate_evaporation``.
+    """Re-invoke the publisher law using the surface owner's pressure map.
 
     NOTE (2026-06-29 review): this calls the SAME production helper
     ``_series_resistance_evaporation_flux_kg_m2_s`` (below), so the parity tests
@@ -81,6 +81,18 @@ def _series_resistance_reference_flux(
     double-count guard, stir saturation, and vacuum gas-film limit) are pinned
     independently in ``tests/chemistry/test_evaporation_series_resistance_flux.py``.
     """
+
+    # d-376 amendment 1 closes the persisted mass-action pressures before
+    # publishing flux. Re-enter the same physics owner for the reference
+    # path so this caller-wiring check compares like pressure vectors; the
+    # surface root itself has separate pins.
+    context = getattr(sim, "_langmuir_flux_closure_context", None)
+    if isinstance(context, dict) and context.get("root_closed"):
+        surface = sim._reclose_langmuir_pressures(
+            context.get("film_partials_Pa", {})
+        )
+        if surface is not None and surface.applied:
+            vapor_pressures_Pa = dict(surface.pressures_Pa)
 
     T_K = sim.melt.temperature_C + 273.15
     flux: dict[str, float] = {}
@@ -817,6 +829,71 @@ def test_provider_matches_safarian_engh_pure_si_hkl_mass_flux():
 
 
 @pytest.mark.xdist_group("serial")
+def test_provider_publishes_zero_net_flux_without_debiting_it():
+    """P_eq <= P_bulk is a computed 0. A missing molar mass stays omitted.
+
+    The debit map does not gain the zero. A positive sibling is unchanged.
+    """
+
+    zero_only = _w3_result_with_controls(
+        1.0,
+        vapour_batch_flux_pressures_Pa={'Na': 0.0, 'Unobtainium': 0.0},
+        molar_mass_kg_mol={'Na': 0.023},
+        stoich_by_species={
+            'Na': {
+                'parent_oxide': 'Na2O',
+                'oxide_per_product_kg': 1.347,
+                'O2_per_product_kg': 0.347,
+            },
+            'Unobtainium': {
+                'parent_oxide': 'Na2O',
+                'oxide_per_product_kg': 1.0,
+                'O2_per_product_kg': 0.0,
+            },
+        },
+        available_oxide_kg={'Na': 10.0, 'Unobtainium': 10.0},
+    )
+    assert zero_only.status == 'ok'
+    assert zero_only.diagnostic['evaporation_flux_kg_hr'] == {}
+    assert zero_only.diagnostic['zero_net_evaporation_flux'] == {'Na': 0.0}
+    assert 'Unobtainium' not in zero_only.diagnostic['zero_net_evaporation_flux']
+    assert 'missing_molar_mass' not in zero_only.diagnostic
+
+    baseline = _w3_result_with_controls(1.0)
+    mixed = _w3_result_with_controls(
+        1.0,
+        vapour_batch_flux_pressures_Pa={'Na': 100.0, 'SiO': 10.0},
+        overhead_partials_Pa={'SiO': 50.0},
+        molar_mass_kg_mol={'Na': 0.023, 'SiO': 0.044085},
+        stoich_by_species={
+            'Na': {
+                'parent_oxide': 'Na2O',
+                'oxide_per_product_kg': 1.347,
+                'O2_per_product_kg': 0.347,
+            },
+            'SiO': {
+                'parent_oxide': 'SiO2',
+                'oxide_per_product_kg': 1.0,
+                'O2_per_product_kg': 0.0,
+            },
+        },
+        available_oxide_kg={'Na': 10.0, 'SiO': 10.0},
+        evaporation_series_resistance={
+            'gas_resistance_enabled': True,
+            'melt_resistance_enabled': False,
+        },
+    )
+    assert mixed.status == 'ok'
+    assert 'SiO' not in mixed.diagnostic['evaporation_flux_kg_hr']
+    assert mixed.diagnostic['zero_net_evaporation_flux']['SiO'] == 0.0
+    assert mixed.diagnostic['evaporation_flux_kg_hr']['Na'] == pytest.approx(
+        baseline.diagnostic['evaporation_flux_kg_hr']['Na'],
+        rel=0,
+        abs=0,
+    )
+
+
+@pytest.mark.xdist_group("serial")
 def test_provider_traces_subthreshold_flux_without_adding_it_to_flux_map():
     species = "K2O_gas"
     request = IntentRequest(
@@ -1045,8 +1122,8 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
         "would be vacuous"
     )
 
-    reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
     kernel_flux = dict(sim._calculate_evaporation(equilibrium).species_kg_hr)
+    reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
     refusals = sim._last_vapour_batch_report["refusals_by_species"]
     refused_reference_species = set(reference_flux) & set(refusals)
 
@@ -1187,10 +1264,10 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         if not vapor_pressures_Pa:
             continue
 
-        reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
         kernel_flux = dict(
             sim._calculate_evaporation(equilibrium).species_kg_hr
         )
+        reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
         refusals = sim._last_vapour_batch_report["refusals_by_species"]
         refused_reference_species = set(reference_flux) & set(refusals)
         # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4), later pinned as b-114

@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict
-from dataclasses import dataclass, replace
+from dataclasses import replace
 from decimal import Decimal, InvalidOperation
 from typing import Any, Mapping
 
@@ -35,6 +35,12 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.generators.compilation_formula import aligned_raster_formula
+from simulator.battery.generators._usgs_common import (
+    PhaseWindow as _Window,
+    assign_phase_windows as _assign_windows,
+    phase_of_label as _phase_of_label,
+    phase_windows,
+)
 from simulator.battery.generators.usgs_b1544 import RecordGeneration
 from simulator.battery.generators.usgs_b2131_raster import (
     FORMULA_RASTER,
@@ -89,19 +95,6 @@ _SUFFIX = {
     Quantity.LOG10_KF: "log10_Kf",
 }
 _PLAIN_DECIMAL = re.compile(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)")
-_PHASE_RANGE = re.compile(
-    r"(\d+(?:\.\d+)?)\.?\s*(?:K|X|It)?\s*(?:to|–|—|-)\s+"
-    r"(?:[A-Za-z~']+\s+){0,4}"
-    r"(\d+(?:\.\d+)?)\s*(?:K|X|It)\b",
-    re.IGNORECASE,
-)
-_CRYSTAL_WORD = re.compile(
-    r"crystal|cubic|rhombohedral|hexagonal|orthorhombic|monoclinic|"
-    r"triclinic|tetragonal|\bsolid\b",
-    re.IGNORECASE,
-)
-_LIQUID_WORD = re.compile(r"\bliquid\b", re.IGNORECASE)
-_GAS_WORD = re.compile(r"\bgas\b", re.IGNORECASE)
 
 _HT_RELATION = (
     "USGS Bulletin 2131 high-temperature header: Cp and S in J·mol-1·K-1; "
@@ -115,14 +108,6 @@ _REFERENCE_RELATION = (
     "The next numeric line in a column is the printed uncertainty, not a "
     "second temperature."
 )
-@dataclass(frozen=True)
-class _Window:
-    index: int
-    lo: Decimal
-    hi: Decimal
-    label: str
-
-
 def _decimal_cell(cell: object) -> tuple[Decimal, str, bool] | None:
     if not isinstance(cell, Mapping):
         return None
@@ -178,67 +163,6 @@ def formula_for_record(doc: Mapping[str, Any]) -> tuple[str, str | None]:
     if corrected != row[1]:
         return published, None
     return corrected, row[2]
-
-
-def phase_windows(text: str) -> tuple[_Window, ...]:
-    """Printed temperature windows, in sentence order."""
-
-    windows: list[_Window] = []
-    previous = 0
-    for match in _PHASE_RANGE.finditer(text or ""):
-        lo = Decimal(match.group(1))
-        hi = Decimal(match.group(2))
-        if hi < lo:
-            previous = match.end()
-            continue
-        label = (text or "")[previous:match.start()]
-        label = " ".join(label.split())
-        if ":" in label:
-            label = label.split(":")[-1].strip()
-        label = label.strip(" .;,-")
-        windows.append(_Window(len(windows), lo, hi, label))
-        previous = match.end()
-    return tuple(windows)
-
-
-def _phase_of_label(label: str) -> State[Phase]:
-    crystal = _CRYSTAL_WORD.search(label) is not None
-    liquid = _LIQUID_WORD.search(label) is not None
-    gas = _GAS_WORD.search(label) is not None
-    hits = [
-        phase
-        for phase, flag in ((Phase.CR, crystal), (Phase.L, liquid), (Phase.G, gas))
-        if flag
-    ]
-    if len(hits) != 1:
-        shown = label.strip() or "empty window label"
-        return State.unknown(
-            f"phase window {shown!r} does not name one of crystal, liquid, gas"
-        )
-    return State.of(hits[0])
-
-
-def _assign_windows(
-    temperatures: list[Decimal], windows: tuple[_Window, ...]
-) -> list[_Window | None]:
-    """First of a duplicate boundary temperature closes; the next opens.
-
-    A temperature outside every window stays unassigned.
-    """
-
-    seen: dict[Decimal, int] = defaultdict(int)
-    assigned: list[_Window | None] = []
-    for temperature in temperatures:
-        hits = [window for window in windows if window.lo <= temperature <= window.hi]
-        occurrence = seen[temperature]
-        seen[temperature] += 1
-        if len(hits) == 1:
-            assigned.append(hits[0])
-        elif len(hits) > 1 and occurrence < len(hits):
-            assigned.append(hits[occurrence])
-        else:
-            assigned.append(None)
-    return assigned
 
 
 def _pages(doc: Mapping[str, Any]) -> tuple[int | None, int | None]:

@@ -13,7 +13,9 @@ from simulator.coating_lifespan import (
     THICKNESS_PROXY_LIMITER,
     FoulingProjectionError,
     FoulingTerminalSnapshot,
+    LimiterEvaluation,
     campaigns_to_resinter_total,
+    interface_first_melt_from_liner_state,
     merge_run_snapshot,
     merge_snapshot_sequence,
     project_lifecycle,
@@ -310,18 +312,106 @@ def test_merge_equal_severity_carriers_preserves_source_extrapolation_notices(
     assert merged.wall_deposit_by_segment_species_kg["hot_wall"]["Mg"] == 0.2
     assert merged.wall_deposit_sticking_authority["authoritative_for_resinter"] is False
     extra = merged.wall_deposit_sticking_authority["vapour_carrier_authority_by_species"]["Mg"]["extra"]
-    assert extra["extrapolation_notice"]["reason"] == "outside source band"
-    assert extra["extrapolation_notice"]["valid_range_K"] == (701.0, 1361.0)
-    assert {notice["temperature_K"] for notice in extra["extrapolation_notices"]} == {
+    published = extra["extrapolation_notice"]
+    assert isinstance(published, (list, tuple))
+    assert len(published) == len(expected)
+    assert all(
+        notice["reason"] == "outside source band"
+        and tuple(notice["valid_range_K"]) == (701.0, 1361.0)
+        and notice["authority_level"] == "extrapolated"
+        for notice in published
+    )
+    assert {notice["temperature_K"] for notice in published} == {
         notice["temperature_K"] for notice in expected
     }
-    assert all(notice["reason"] == "outside source band"
-               and notice["valid_range_K"] == (701.0, 1361.0)
-               and notice["authority_level"] == "extrapolated"
-               for notice in extra["extrapolation_notices"])
     repeated, _ = merge_run_snapshot(merged, snapshots[1])
     repeated_extra = repeated.wall_deposit_sticking_authority["vapour_carrier_authority_by_species"]["Mg"]["extra"]
-    assert repeated_extra["extrapolation_notices"] == extra["extrapolation_notices"]
+    assert list(repeated_extra["extrapolation_notice"]) == list(published)
+
+
+@pytest.mark.parametrize(
+    "notice_key",
+    [
+        "diagnostic_admission_notice",
+        "extrapolation_notice",
+        "future_carrier_notice",
+    ],
+)
+@pytest.mark.parametrize("reverse", [False, True])
+def test_merge_preserves_distinct_notices_for_one_key(
+    notice_key: str,
+    reverse: bool,
+) -> None:
+    """Invariant: one species keeps every distinct ``*_notice`` payload.
+
+    Two snapshots with different provenance and comparator gaps must both
+    survive. The notice key is not special-cased: a future ``*_notice``
+    is held the same way as a diagnostic admission.
+    """
+
+    payloads = [
+        {
+            "authority": "diagnostic/extrapolated",
+            "law_provenance": "backsolved from VapoRock, no coefficients fitted",
+            "closes_with": "t-1723",
+            "marker": "first",
+            "comparators": {
+                "gap_dex_law_vs_rail": 1.1127636390496998,
+                "gap_dex_law_vs_vaporock": 1.4535567803078235,
+            },
+        },
+        {
+            "authority": "diagnostic/extrapolated",
+            "law_provenance": "backsolved from VapoRock, no coefficients fitted",
+            "closes_with": "t-1723",
+            "marker": "second",
+            "comparators": {
+                "gap_dex_law_vs_rail": 2.25,
+                "gap_dex_law_vs_vaporock": 3.5,
+            },
+        },
+    ]
+    snapshots = []
+    for payload in payloads:
+        authority = _alpha_notice("Fe", cited=True)
+        carrier = authority["vapour_carrier_authority_by_species"]["Fe"]
+        carrier.update({
+            "verdict_status": "status_bearing_non_authoritative",
+            "certification_ceiling": "never",
+            "validation_status": "modeled-PENDING",
+        })
+        carrier["extra"] = {notice_key: payload}
+        snapshots.append(FoulingTerminalSnapshot.from_trace(
+            _trace({("hot_wall", "Fe"): 0.1}, authority)
+        ))
+    if reverse:
+        snapshots.reverse()
+    merged, _ = merge_run_snapshot(*snapshots)
+    extra = merged.wall_deposit_sticking_authority[
+        "vapour_carrier_authority_by_species"
+    ]["Fe"]["extra"]
+    plural = extra[notice_key]
+    assert isinstance(plural, (list, tuple))
+    by_marker = {item["marker"]: item for item in plural}
+    assert set(by_marker) == {"first", "second"}
+    assert by_marker["first"]["law_provenance"] == (
+        "backsolved from VapoRock, no coefficients fitted"
+    )
+    assert by_marker["first"]["authority"] == "diagnostic/extrapolated"
+    assert by_marker["second"]["closes_with"] == "t-1723"
+    assert by_marker["first"]["comparators"]["gap_dex_law_vs_rail"] == (
+        pytest.approx(1.1127636390496998, rel=0, abs=1e-12)
+    )
+    assert by_marker["second"]["comparators"]["gap_dex_law_vs_vaporock"] == (
+        pytest.approx(3.5, rel=0, abs=1e-12)
+    )
+    assert {item["marker"] for item in extra[notice_key]} == {"first", "second"}
+    repeated, _ = merge_run_snapshot(merged, snapshots[1])
+    repeated_plural = repeated.wall_deposit_sticking_authority[
+        "vapour_carrier_authority_by_species"
+    ]["Fe"]["extra"][notice_key]
+    assert len(repeated_plural) == 2
+    assert {item["marker"] for item in repeated_plural} == {"first", "second"}
 
 
 @pytest.mark.parametrize("later_status", ("proven_zero", "refused"))
@@ -429,11 +519,111 @@ def test_limiter_stack_provisional_verdict_and_threshold_parametric_motion() -> 
 
     assert placeholder.end_condition_stack == (THICKNESS_PROXY_LIMITER,)
     assert placeholder.limiter_fired == THICKNESS_PROXY_LIMITER
+    assert "interface_first_melt" not in placeholder.to_dict()
     assert placeholder.service_life_campaigns == pytest.approx(2.0)
     assert placeholder.worst_segment_campaigns_provisional == pytest.approx(1.25)
     assert placeholder.service_life_authoritative is False
     assert placeholder.grounding_status == GROUNDING_PROVISIONAL
     assert moved.service_life_campaigns == pytest.approx(3.0)
+
+
+def test_interface_first_melt_is_instrumented_before_gate_and_diagnostic_only():
+    snapshots = merge_snapshot_sequence((
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.10})),
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.20})),
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.30})),
+    )).trajectory
+    sampled_campaigns = []
+
+    def evaluate(_snapshot, campaign_index):
+        sampled_campaigns.append(campaign_index)
+        return LimiterEvaluation(
+            name="caller_supplied_name",
+            fired=campaign_index == 3,
+            segment="duct_a",
+            value=float(campaign_index),
+            limit=3.0,
+        )
+
+    projection = project_lifecycle(
+        snapshots,
+        segment_area_m2={"duct_a": 1.0},
+        rho_deposit_kg_m3=1000.0,
+        thickness_limit_m=0.00025,
+        interface_first_melt=evaluate,
+    )
+
+    assert sampled_campaigns == [1, 2, 3]
+    assert projection.end_condition_stack == (
+        "interface_first_melt",
+        THICKNESS_PROXY_LIMITER,
+    )
+    assert projection.service_life_campaigns == pytest.approx(2.0)
+    assert projection.limiter_fired == THICKNESS_PROXY_LIMITER
+    assert projection.to_dict()["interface_first_melt"]["campaign_index"] == 3
+    assert projection.to_dict()["interface_first_melt"]["diagnostic_only"] is True
+
+
+def test_interface_first_melt_refusal_does_not_change_existing_lifecycle_gate():
+    snapshots = merge_snapshot_sequence((
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.10})),
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.20})),
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.30})),
+    )).trajectory
+
+    class TypedRefusal(ValueError):
+        reason = "liner_first_melt_engine_out_of_domain"
+
+    def evaluate(_snapshot, _campaign_index):
+        raise TypedRefusal("SiO2 fraction is outside MAGEMin's domain")
+
+    projection = project_lifecycle(
+        snapshots,
+        segment_area_m2={"duct_a": 1.0},
+        rho_deposit_kg_m3=1000.0,
+        thickness_limit_m=0.00025,
+        interface_first_melt=evaluate,
+    )
+
+    assert projection.service_life_campaigns == pytest.approx(2.0)
+    assert projection.limiter_fired == THICKNESS_PROXY_LIMITER
+    assert projection.to_dict()["interface_first_melt"]["refusal"]["reason"] == (
+        "liner_first_melt_engine_out_of_domain"
+    )
+
+
+def test_refused_liner_state_preserves_its_singular_refusal_in_lifecycle_output():
+    snapshots = merge_snapshot_sequence((
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.10})),
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.20})),
+    )).trajectory
+    limiter = interface_first_melt_from_liner_state(
+        {
+            "schema": "liner-state-v1",
+            "segments": {
+                "rump-wall": {
+                    "status": "refused",
+                    "refusal": {
+                        "reason": "rump_composition_not_generated",
+                        "detail": "generated rump artifact is absent",
+                    },
+                }
+            },
+        }
+    )
+
+    projection = project_lifecycle(
+        snapshots,
+        segment_area_m2={"duct_a": 1.0},
+        rho_deposit_kg_m3=1000.0,
+        thickness_limit_m=0.00025,
+        interface_first_melt=limiter,
+    )
+
+    assert projection.service_life_campaigns == pytest.approx(2.0)
+    assert projection.to_dict()["interface_first_melt"]["refusal"]["reason"] == (
+        "rump_composition_not_generated"
+    )
 
 
 def test_campaigns_to_resinter_total_mirrors_runner_null_threshold_string_basis() -> None:
@@ -470,3 +660,59 @@ def test_overlay_module_has_no_commit_batch_or_atomledger_dependency() -> None:
 
     assert calls == []
     assert names == []
+
+
+def test_distinct_public_notices_keep_the_authority_record_shape() -> None:
+    """Duplicate collapse and the authority copier stay on this surface.
+
+    A list band and the same band as a tuple are one notice. A nested tuple
+    becomes a list. A mapping proxy is a plain dict. A non-notice key and an
+    empty notice are absent. This is the shape recorded before the local
+    ``add`` loop was removed.
+    """
+
+    from types import MappingProxyType
+
+    from simulator.coating_lifespan import _distinct_public_notices
+
+    first = {
+        "authority_level": "extrapolated",
+        "temperature_K": 1500.0,
+        "valid_range_K": [701.0, 1361.0],
+        "reason": "outside source band",
+    }
+    published = _distinct_public_notices(
+        (
+            {"extra": {"extrapolation_notice": dict(first), "notes": {"reason": "ignored"}}},
+            {
+                "extrapolation_notice": MappingProxyType({
+                    **first,
+                    "valid_range_K": (701.0, 1361.0),
+                }),
+            },
+            {
+                "extrapolation_notice": MappingProxyType({
+                    **first,
+                    "valid_range_K": (701.0, 1361.0),
+                    "nested": MappingProxyType({"band": (1.0, 2.0)}),
+                }),
+                "diagnostic_admission_notice": {
+                    "authority": "diagnostic/extrapolated",
+                    "marker": "second",
+                },
+                "empty_notice": {},
+            },
+        )
+    )
+    assert published == {
+        "extrapolation_notice": [
+            first,
+            {
+                **first,
+                "nested": {"band": [1.0, 2.0]},
+            },
+        ],
+        "diagnostic_admission_notice": [
+            {"authority": "diagnostic/extrapolated", "marker": "second"}
+        ],
+    }

@@ -10,6 +10,7 @@ from collections.abc import Mapping
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 try:
     from flask import request, session as flask_session
@@ -697,6 +698,58 @@ _PER_HOUR_CARRIER_MAP_FIELDS = (
 )
 
 
+def _socket_rounded_term_map(raw: object, places: int) -> dict[str, object]:
+    """Round a term map to the tick's published precision and drop zeros.
+
+    The runner summary keeps full precision. The hourly socket row does
+    not. A sub-resolution term serialises as a long float the moment it
+    becomes non-zero, and that one-time width is what the tick slope
+    reads as per-hour growth. The same magnitude is already 0 at the
+    tick body's decimal places.
+    """
+
+    if not isinstance(raw, Mapping):
+        return {}
+    compact: dict[str, object] = {}
+    for key, value in raw.items():
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            compact[str(key)] = value
+            continue
+        rounded = round(float(value), places)
+        if rounded == 0.0:
+            continue
+        compact[str(key)] = rounded
+    return compact
+
+
+def _socket_rounded_number(value: object, places: int) -> object:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return value
+    return round(float(value), places)
+
+
+def _socket_selectivity(raw: object) -> object:
+    """Drop dust fractions from the hourly selectivity row.
+
+    The runner summary keeps full precision. On the socket, a species
+    fraction below 1e-4 serialises as a long float on the hours that
+    evaporate and is absent on the hours that do not. That one-time
+    width is the per-hour summary slope. Targets and the two fluxes
+    stay, at the row's published precision.
+    """
+
+    if not isinstance(raw, Mapping):
+        return raw
+    compact = dict(raw)
+    fractions = raw.get("per_species_fraction")
+    if isinstance(fractions, Mapping):
+        compact["per_species_fraction"] = _socket_rounded_term_map(fractions, 4)
+    for key in ("total_flux_kg_hr", "target_flux_kg_hr", "target_selectivity"):
+        if key in compact:
+            compact[key] = _socket_rounded_number(compact[key], 6)
+    return compact
+
+
 def _per_hour_summary_entry(
     summary: Mapping[str, object],
 ) -> dict[str, object]:
@@ -706,12 +759,33 @@ def _per_hour_summary_entry(
         entry.pop(key, None)
     for key in _PER_HOUR_CARRIER_MAP_FIELDS:
         entry.pop(key, None)
+    for key, places in (
+        ('energy_cumulative_breakdown_kWh', 4),
+        ('energy_evaporation_breakdown_kWh', 4),
+    ):
+        if key in entry:
+            entry[key] = _socket_rounded_term_map(entry.get(key), places)
+    if 'evap_plane_selectivity' in entry:
+        entry['evap_plane_selectivity'] = _socket_selectivity(
+            entry.get('evap_plane_selectivity')
+        )
     redox_breakdown = entry.get('redox_source_breakdown')
     if isinstance(redox_breakdown, Mapping):
         # The live redox panel consumes this projection; verbose diagnostics
         # remain available in the run capture and completion payload.
+        # Term maps use the same zero-drop as the energy breakdowns: a
+        # skipped evaporative term that rounds to 0 is not a per-hour row.
         entry['redox_source_breakdown'] = {
-            key: redox_breakdown[key]
+            key: (
+                _socket_rounded_term_map(redox_breakdown[key], 6)
+                if key in {
+                    'applied_terms_mol_o2_equiv_by_label',
+                    'skipped_terms_mol_o2_equiv_by_label',
+                }
+                else _socket_rounded_number(redox_breakdown[key], 6)
+                if key in {'net_mol_o2_equiv', 'delta_log10_fO2'}
+                else redox_breakdown[key]
+            )
             for key in (
                 'applied_terms_mol_o2_equiv_by_label',
                 'skipped_terms_mol_o2_equiv_by_label',
@@ -737,6 +811,16 @@ def _browser_socket_payload(event: str, payload):
         # This whole-train report is also included in simulation_complete. It
         # is not consumed from hourly ticks and grows as product is captured.
         emitted.pop('stage_purity_report', None)
+        # The run-wide law registry is stored on run_metadata. Re-sending it,
+        # or the step's disclosures, on every tick grows the socket payload
+        # past the 100 bytes/hour bound. The per_hour_summary event keeps the
+        # step's disclosures.
+        emitted.pop('law_disclosures', None)
+        delta = emitted.get('per_hour_summary_delta')
+        if isinstance(delta, Mapping):
+            delta_copy = dict(delta)
+            delta_copy.pop('law_disclosures', None)
+            emitted['per_hour_summary_delta'] = delta_copy
         vapour_rail = emitted.get('vapour_rail_instrumentation_panel')
         if isinstance(vapour_rail, Mapping):
             channels = vapour_rail.get('channels_by_species')
@@ -820,6 +904,23 @@ def _browser_socket_payload(event: str, payload):
                     wall_risk.get('operating_point')
                 ),
                 'tick_view': 'compact',
+            }
+        # The per-hour row already carries oxygen_reservoir. A second copy
+        # on the tick body doubles every exchange-label change.
+        delta = emitted.get('per_hour_summary_delta')
+        if isinstance(delta, Mapping) and 'oxygen_reservoir' in delta:
+            emitted.pop('oxygen_reservoir', None)
+        evap_species = emitted.get('evap_species')
+        if isinstance(evap_species, Mapping):
+            # A rate that rounds to 0 is not evaporating. Keeping the key
+            # adds a species slot on the hour the publisher first mentions
+            # it, which the slope window then reads as growth.
+            emitted['evap_species'] = {
+                str(species): rate
+                for species, rate in evap_species.items()
+                if isinstance(rate, bool)
+                or not isinstance(rate, (int, float))
+                or float(rate) != 0.0
             }
     return emitted
 

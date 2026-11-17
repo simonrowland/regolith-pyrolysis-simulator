@@ -24,6 +24,15 @@ class FurnaceMaterialCatalogLoadError(RuntimeError):
         super().__init__(f"furnace material catalog unavailable: {load_error}")
 
 
+class InterfaceChemistryRefusal(ValueError):
+    """Typed refusal for optional liner chemistry data."""
+
+    def __init__(self, reason: str, detail: str = "") -> None:
+        self.reason = str(reason)
+        self.detail = str(detail or reason)
+        super().__init__(self.detail)
+
+
 # RUNTIME TEMPERATURE ENVELOPE.
 #
 # The ceiling is DERIVED FROM THE CATALOG, not asserted here. It is the highest
@@ -107,6 +116,161 @@ def load_furnace_materials(
                 f"furnace material catalog is malformed: {source_path}: {exc}"
             ) from exc
     return catalog
+
+
+def load_interface_chemistry(
+    material_id: str,
+    *,
+    catalog: Mapping[str, Any] | None = None,
+) -> dict[str, Any] | None:
+    """Load one optional interface chemistry record and its generated bulk.
+
+    The furnace catalog remains loadable before generated artifacts exist.
+    A selected material that points at a not-yet-generated rump gets a typed
+    refusal here, so unrelated furnace settings and golden outputs stay stable.
+    """
+
+    materials = catalog if catalog is not None else load_furnace_materials()
+    row = materials.get(str(material_id)) if isinstance(materials, Mapping) else None
+    if not isinstance(row, Mapping):
+        raise InterfaceChemistryRefusal(
+            "furnace_material_missing", str(material_id)
+        )
+    raw_chemistry = row.get("interface_chemistry")
+    if raw_chemistry is None:
+        return None
+    if not isinstance(raw_chemistry, Mapping):
+        raise InterfaceChemistryRefusal(
+            "interface_chemistry_invalid", str(material_id)
+        )
+    chemistry = dict(raw_chemistry)
+    composition = chemistry.get("composition")
+    composition_file = chemistry.get("composition_file")
+    if not isinstance(composition, Mapping) or not composition:
+        if not isinstance(composition_file, str) or not composition_file.strip():
+            raise InterfaceChemistryRefusal("liner_composition_missing")
+        source_path = Path(composition_file)
+        if source_path.is_absolute():
+            raise InterfaceChemistryRefusal(
+                "interface_chemistry_path_invalid", composition_file
+            )
+        source_path = DATA_DIR.parent / source_path
+        if not source_path.is_file():
+            raise InterfaceChemistryRefusal(
+                str(chemistry.get("missing_composition_reason") or "liner_composition_missing"),
+                f"generated composition is absent: {source_path}",
+            )
+        try:
+            generated = load_cached_safe_yaml(source_path.read_text(encoding="utf-8")) or {}
+        except Exception as exc:  # noqa: BLE001 - expose typed catalog refusal
+            raise InterfaceChemistryRefusal(
+                "liner_composition_invalid", str(source_path)
+            ) from exc
+        if not isinstance(generated, Mapping):
+            raise InterfaceChemistryRefusal(
+                "liner_composition_invalid", str(source_path)
+            )
+        composition = generated.get("composition")
+        if not isinstance(composition, Mapping) or not composition:
+            raise InterfaceChemistryRefusal(
+                "liner_composition_missing", str(source_path)
+            )
+        chemistry["composition"] = dict(composition)
+        provenance = generated.get("provenance")
+        if isinstance(provenance, Mapping):
+            chemistry["generated_provenance"] = dict(provenance)
+
+    citation = chemistry.get("citation")
+    if not isinstance(citation, str) or not citation.strip():
+        raise InterfaceChemistryRefusal("liner_composition_citation_missing")
+    try:
+        from simulator.liner_corrosion import validate_oxide_composition
+
+        chemistry["composition"] = validate_oxide_composition(composition)
+    except Exception as exc:
+        if isinstance(exc, InterfaceChemistryRefusal):
+            raise
+        reason = getattr(exc, "reason", "liner_composition_invalid")
+        raise InterfaceChemistryRefusal(str(reason), str(exc)) from exc
+    return chemistry
+
+
+def load_interface_invariant_table(
+    material_id: str,
+    *,
+    catalog: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Load the optional Tier A invariant table or refuse with a typed reason."""
+
+    chemistry = load_interface_chemistry(material_id, catalog=catalog)
+    if chemistry is None:
+        raise InterfaceChemistryRefusal("interface_chemistry_missing", material_id)
+    table = chemistry.get("invariant_table")
+    if isinstance(table, Mapping) and table:
+        if table.get("loader") != "liner_corrosion_source_extracts":
+            return dict(table)
+        subsystems = table.get("subsystems")
+        if (
+            not isinstance(subsystems, list)
+            or not subsystems
+            or any(not isinstance(item, str) or not item.strip() for item in subsystems)
+        ):
+            raise InterfaceChemistryRefusal(
+                "liner_invariant_subsystems_invalid", material_id
+            )
+        try:
+            from simulator.liner_corrosion import load_liner_corrosion_invariants
+
+            rows = load_liner_corrosion_invariants()
+        except Exception as exc:  # noqa: BLE001 - keep source failures typed
+            raise InterfaceChemistryRefusal(
+                "liner_invariant_source_unavailable", str(exc)
+            ) from exc
+        requested = {str(item).strip() for item in subsystems}
+        selected = [row for row in rows if row.get("subsystem") in requested]
+        if not selected:
+            raise InterfaceChemistryRefusal(
+                "liner_invariant_rows_missing", ", ".join(sorted(requested))
+            )
+        return {
+            "schema": "liner-source-invariants-v1",
+            "source": table.get("loader"),
+            "subsystems": sorted(requested),
+            "acquisition_gaps": dict(table.get("acquisition_gaps") or {}),
+            "invariants": selected,
+        }
+    table_path = chemistry.get("invariant_table_file")
+    if not isinstance(table_path, str) or not table_path.strip():
+        raise InterfaceChemistryRefusal("liner_invariant_table_missing", material_id)
+    path = Path(table_path)
+    if path.is_absolute():
+        raise InterfaceChemistryRefusal("interface_chemistry_path_invalid", table_path)
+    path = DATA_DIR.parent / path
+    if not path.is_file():
+        raise InterfaceChemistryRefusal(
+            "liner_invariant_table_missing", f"invariant table is absent: {path}"
+        )
+    try:
+        data = load_cached_safe_yaml(path.read_text(encoding="utf-8")) or {}
+    except Exception as exc:  # noqa: BLE001 - preserve a typed refusal boundary
+        raise InterfaceChemistryRefusal("liner_invariant_table_invalid", str(path)) from exc
+    if not isinstance(data, Mapping) or not isinstance(data.get("invariants"), list):
+        raise InterfaceChemistryRefusal("liner_invariant_table_invalid", str(path))
+    return dict(data)
+
+
+def require_interface_porosity(chemistry: Mapping[str, Any]) -> float:
+    """Return declared sintered-body porosity for later infiltration models."""
+
+    raw = chemistry.get("porosity_fraction")
+    if raw is None:
+        raise InterfaceChemistryRefusal("liner_porosity_missing")
+    if not is_declared_real_scalar(raw):
+        raise InterfaceChemistryRefusal("liner_porosity_invalid")
+    value = float(raw)
+    if not math.isfinite(value) or not 0.0 <= value <= 1.0:
+        raise InterfaceChemistryRefusal("liner_porosity_invalid")
+    return value
 
 
 def validate_furnace_material_grounding(material_id: str, row: Any) -> None:

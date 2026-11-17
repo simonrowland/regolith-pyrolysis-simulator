@@ -101,15 +101,22 @@ def _install_gate_curve_binding_receipt(
         artifact_name = "alphamelts_selected_binary"
     else:
         raise ValueError(f"unsupported gate-curve test engine: {engine_id}")
+    provenance = {
+        "binding_provenance_verifiable": True,
+        "runtime_artifacts": {artifact_name: {"sha256": "a" * 64}},
+    }
+    if engine_id == "magemin":
+        provenance["runtime_version"] = {
+            "tag": "value",
+            "value": "MAGEMin fixture runtime",
+            "reason": None,
+        }
     install_synthetic_binding_receipt(
         tmp_path,
         monkeypatch,
         bind_direct_backend=True,
         identity_override=identity,
-        provenance_override={
-            "binding_provenance_verifiable": True,
-            "runtime_artifacts": {artifact_name: {"sha256": "a" * 64}},
-        },
+        provenance_override=provenance,
     )
 
 
