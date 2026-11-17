@@ -486,6 +486,79 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
     assert refusal.refusal_detail["reason"] == "channel_missing"
 
 
+def test_sossi_test_selection_reuses_normalized_disclosure_cache(monkeypatch) -> None:
+    from simulator.battery.enums import Engine, ExecutionState
+    from simulator.battery.score import (
+        _residue_prediction_cache_key,
+        _sossi_residue_prediction,
+        load_score_context,
+        point_magnitude,
+    )
+    import simulator.battery.score as score_module
+    import simulator.battery.residue as residue
+
+    context = load_score_context(sources=("kems-012-sossi-2019",))
+    reference = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-012-sossi-2019"
+        and row.admission.status.value == "admitted"
+        and point_magnitude(row.value) is not None
+        and row.identity.species.formula == "Mn"
+    )
+    test_ids = frozenset({reference.experiment_id})
+    calls: list[tuple[str, ...]] = []
+
+    def fake_cohort(experiments, *_args, **_kwargs):
+        calls.append(tuple(item["experiment_id"] for item in experiments))
+        return tuple(
+            SimpleNamespace(
+                experiment_id=item["experiment_id"],
+                primary_element_ppm={"Mn": 900.0, "Ti": 450.0},
+                sensitivity_band_ppm={"Mn": (800.0, 1000.0), "Ti": (400.0, 500.0)},
+                channel_missing_elements=(),
+                provenance={"law_disclosures": []},
+            )
+            for item in experiments
+        )
+
+    monkeypatch.setattr(residue, "_predict_sossi_residue_cohort", fake_cohort)
+    monkeypatch.setattr(
+        score_module.subprocess,
+        "run",
+        lambda *_args, **_kwargs: pytest.fail("residue scoring must not require git"),
+    )
+    cache = {}
+    cold = _sossi_residue_prediction(
+        context,
+        reference,
+        Engine.OPENIMCC,
+        cache,
+        test_experiment_ids=test_ids,
+    )
+    key = _residue_prediction_cache_key(
+        "kems-012-sossi-2019", Engine.OPENIMCC, test_ids
+    )
+    assert cold.execution.state is ExecutionState.PRODUCED, cold.refusal_detail
+    cached_cohort = cache[key]
+    short_id = reference.experiment_id.rsplit("::", 1)[-1]
+    assert short_id in cached_cohort
+
+    warm = _sossi_residue_prediction(
+        context,
+        reference,
+        Engine.OPENIMCC,
+        cache,
+        test_experiment_ids=test_ids,
+    )
+
+    assert len(calls) == 1
+    assert cache[key] is cached_cohort
+    assert warm.execution.state is ExecutionState.PRODUCED, warm.refusal_detail
+    assert warm == cold
+    assert warm.law_disclosures == cold.law_disclosures == ()
+
+
 def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -15678,7 +15678,7 @@ def _hashimoto_residue_prediction(
         )
         production_key = reference.experiment_id + "::alpha_runtime_catalog"
         cache_key = _residue_prediction_cache_key(
-            _HASHIMOTO_SOURCE_ID, engine, selected_experiment_ids
+            _HASHIMOTO_SOURCE_ID, engine, cohort_selection
         )
         rows_by_key = (
             _cached_hashimoto_cohort(
@@ -16271,7 +16271,7 @@ def _sossi_residue_prediction(
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("sossi_engine_unsupported")
         cache_key = _residue_prediction_cache_key(
-            _SOSSI_SOURCE_ID, engine, selected_experiment_ids
+            _SOSSI_SOURCE_ID, engine, cohort_selection
         )
         short_id = reference.experiment_id.rsplit("::", 1)[-1]
         prediction = _cached_sossi_prediction(cache, cache_key, short_id)

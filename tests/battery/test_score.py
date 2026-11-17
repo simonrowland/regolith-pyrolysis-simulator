@@ -10022,6 +10022,85 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
     assert diagnostic_refusal.notices[0].origin == "engine:internal-analytical"
 
 
+def test_hashimoto_test_selection_reuses_normalized_disclosure_cache(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery import residue
+
+    context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    reference = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-015-hashimoto-1983"
+        and row.identity.species.formula == "FeO"
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    test_ids = frozenset({reference.experiment_id})
+    calls: list[frozenset[str] | None] = []
+
+    def fake_cohort(
+        experiments, _catalog, *, engine, selected_experiment_ids=None, **_kwargs
+    ):
+        calls.append(selected_experiment_ids)
+        experiment_id = experiments[0]["experiment_id"]
+        values = {"FeO": 42.0}
+        return tuple(
+            SimpleNamespace(
+                experiment_id=experiment_id,
+                alpha_arm=alpha_arm,
+                primary_geometry_policy_id="sphere_shrinking",
+                primary_oxide_wt_pct=values,
+                geometry_oxide_wt_pct={"sphere_shrinking": values},
+                sensitivity_band_wt_pct={"FeO": (41.0, 43.0)},
+                provenance={"law_disclosures": []},
+            )
+            for alpha_arm in (
+                "alpha_common_unity_sensitivity",
+                "alpha_runtime_catalog",
+            )
+        )
+
+    monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", fake_cohort)
+    monkeypatch.setattr(
+        score_mod.subprocess,
+        "run",
+        lambda *_args, **_kwargs: pytest.fail("residue scoring must not require git"),
+    )
+    cache = {}
+    cold = score_mod._hashimoto_residue_prediction(
+        context,
+        reference,
+        Engine.OPENIMCC,
+        cache,
+        test_experiment_ids=test_ids,
+    )
+    key = score_mod._residue_prediction_cache_key(
+        "kems-015-hashimoto-1983", Engine.OPENIMCC, test_ids
+    )
+    assert cold.execution.state is ExecutionState.PRODUCED, cold.refusal_detail
+    cached_rows = cache[key]
+    assert set(cached_rows) == {
+        f"{reference.experiment_id}::alpha_common_unity_sensitivity",
+        f"{reference.experiment_id}::alpha_runtime_catalog",
+    }
+
+    warm = score_mod._hashimoto_residue_prediction(
+        context,
+        reference,
+        Engine.OPENIMCC,
+        cache,
+        test_experiment_ids=test_ids,
+    )
+
+    assert calls == [test_ids]
+    assert cache[key] is cached_rows
+    assert warm.execution.state is ExecutionState.PRODUCED, warm.refusal_detail
+    assert warm == cold
+    assert warm.law_disclosures == cold.law_disclosures == ()
+
+
 @pytest.mark.parametrize(
     "reason",
     (
