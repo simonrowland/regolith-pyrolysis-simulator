@@ -9600,7 +9600,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 12505, (n_numeric, census, n_unavailable)
+    # b-1209 adds 36 Mendybaev 2017 residue cells: n_numeric 12,505->12,541.
+    assert n_numeric == 12541, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
