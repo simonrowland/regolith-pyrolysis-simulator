@@ -614,11 +614,13 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
         lambda *_args, **_kwargs: (_ for _ in ()).throw(FileNotFoundError()),
     )
     snapshots = (
+        # b-1124 changes internal-analytical Fe vapour numerics; the chemistry
+        # version 2 header is part of this pinned key.
         (
             "internal-analytical default",
             "internal-analytical",
             None,
-            "0200010008018b08020514686967685f745f6d656c745f616374697669747905086f70656e696d636305166f787967656e5f62616c616e63655f6261636b656e64050764656661756c74",
+            "0200020008018b08020514686967685f745f6d656c745f616374697669747905086f70656e696d636305166f787967656e5f62616c616e63655f6261636b656e64050764656661756c74",
         ),
         (
             "openimcc default",

@@ -639,7 +639,8 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         # seam baseline at 2023.15 K; OpenIMCC activity is unchanged.
         # IA stateless: the 7 hour-16 certified-gamma certificates carry hour/window_K/composition_window_L1 = null (21 leaves);
         # the history-dependent cap-step seam notice is gone (1 notice); 2 keys reordered; 0 numeric leaves changed. Payload = runner C0 fixture bytes.
-        "b70c7f454134f4e5b5b3775241c97e67e8b2f0cd4fe9157bfd848a1f04eccbdd"
+        # b-1124: out-of-band native-Fe values now carry the Holzheid extrapolation notice and flags.
+        "52298e82f6f63365c449ff01a1043fc1955b04b16cd5d780e3e14297ee0ccfd2"
     )
 
 

@@ -105,9 +105,10 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     assert len(execution.snapshots) == 2
     # Studio-3 actual for this Mars C2A 2 h payload (pins2 log, tree
     # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
-    # the laptop and studio-3, so this digest is not a laptop re-run.
+    # the laptop and studio-3, so this digest is not a laptop re-run. b-1124
+    # adds the Holzheid extrapolation notice and flags to this runner payload.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "db9b5ffda079b4886252281c2fabad6413ac60c76a29f175b799188fb8696e3a"
+        "4f1e1e77bda44e7a941863af7732d5e8d2c594aa7183509e2b62aaebd8bbd32c"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"

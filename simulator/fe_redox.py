@@ -1212,17 +1212,19 @@ def _with_liquid_model_below_liquidus_notice(
 
     if liquid_domain is None or liquid_domain.below_liquidus is False:
         return components
-    components["notices"] = [
-        {
-            "type": "typed_notice",
-            "kind": LIQUID_MODEL_BELOW_LIQUIDUS_KIND,
-            "temperature_K": liquid_domain.temperature_K,
-            "liquidus_T_C": liquid_domain.liquidus_T_C,
-            "solidus_T_C": liquid_domain.solidus_T_C,
-            "source": liquid_domain.source,
-            "authority": "extrapolated",
-        }
-    ]
+    notice = {
+        "type": "typed_notice",
+        "kind": LIQUID_MODEL_BELOW_LIQUIDUS_KIND,
+        "temperature_K": liquid_domain.temperature_K,
+        "liquidus_T_C": liquid_domain.liquidus_T_C,
+        "solidus_T_C": liquid_domain.solidus_T_C,
+        "source": liquid_domain.source,
+        "authority": "extrapolated",
+    }
+    notices = list(components.get("notices", []))
+    if notice not in notices:
+        notices.append(notice)
+    components["notices"] = notices
     return components
 
 
@@ -1362,7 +1364,7 @@ def _calphad_feo_activity_components(
     else:
         regime = 'iw_pure_feo_to_iw_pure_feo_plus_1_smooth_blend'
 
-    return _with_liquid_model_below_liquidus_notice({
+    components: dict[str, object] = {
         'status': 'ok',
         'diagnostic_only': False,
         'consumed_by_behavior': True,
@@ -1461,7 +1463,11 @@ def _calphad_feo_activity_components(
         },
         'cation_fractions': cation_fractions,
         'sources': FEO_ACTIVITY_DIAGNOSTIC_SOURCES,
-    }, liquid_domain)
+    }
+    holzheid_notice = holzheid.get('notice')
+    if isinstance(holzheid_notice, Mapping):
+        components['notices'] = [dict(holzheid_notice)]
+    return _with_liquid_model_below_liquidus_notice(components, liquid_domain)
 
 
 def calphad_ferrous_feo_activity_diagnostic(
