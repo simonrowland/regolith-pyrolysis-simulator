@@ -187,7 +187,13 @@ def scan_cache_sites(root: Path | None = None) -> dict[str, dict[str, Any]]:
                     source = ast.get_source_segment(
                         path.read_text(encoding="utf-8"), node
                     ) or ""
-                    if "CREATE TABLE IF NOT EXISTS {_TABLE}" in source:
+                    if (
+                        "CREATE TABLE IF NOT EXISTS {_TABLE}" in source
+                        or (
+                            "_CACHE_TABLE_DEFINITIONS" in source
+                            and "CREATE TABLE IF NOT EXISTS {table}" in source
+                        )
+                    ):
                         add(
                             f"sqlite:{rel}:engine_outputs",
                             rel,
@@ -236,6 +242,14 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "name": 'runtime_identity',
         "carries_disclosure": False,
         "how": 'Memoizes diagnostic engine identity metadata. It does not cache chemistry outputs or skip a law execution.',
+    },
+    'lru:simulator/engine_cache.py:_engine_cache_input_identity_digest': {
+        "path": 'simulator/engine_cache.py',
+        "line": 527,
+        "kind": 'lru',
+        "name": '_engine_cache_input_identity_digest',
+        "carries_disclosure": False,
+        "how": 'Memoizes the source-input digest used to construct engine request keys. It returns key bytes, not an evaluated vapour-law result.',
     },
     'store:simulator/battery/score_run.py:residue_prediction_cache': {
         "path": 'simulator/battery/score_run.py',
