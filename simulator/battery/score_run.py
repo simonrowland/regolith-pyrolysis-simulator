@@ -769,6 +769,7 @@ _SCORE_WORKER_SETUP: (
     tuple[
         _PreparedScoreRun,
         Callable[..., EnginePrediction] | None,
+        Mapping[str, object],
     ]
 ) | None = None
 
@@ -915,9 +916,12 @@ def _initialize_score_worker(
     prepared: _PreparedScoreRun,
     predict: Callable[..., EnginePrediction] | None,
     engine_cache_path_scope_state: tuple[bool, str | None] = (False, None),
+    store_stamp: Mapping[str, object] | None = None,
 ) -> None:
     global _SCORE_WORKER_SETUP
-    _SCORE_WORKER_SETUP = (prepared, predict)
+    if store_stamp is None:
+        raise ValueError("score worker requires the parent store stamp")
+    _SCORE_WORKER_SETUP = (prepared, predict, store_stamp)
     from simulator.engine_cache import _set_engine_cache_path_scope_state
 
     _set_engine_cache_path_scope_state(engine_cache_path_scope_state)
@@ -930,13 +934,16 @@ def _score_group_shard(
         _ResidualJsonlStream,
         _score_store_with_decisions,
     )
-    prepared, predict = _SCORE_WORKER_SETUP or (None, None)
+    prepared, predict, store_stamp = _SCORE_WORKER_SETUP or (None, None, None)
     if prepared is None:
         raise RuntimeError("battery score worker was not initialized")
+    if store_stamp is None:
+        raise RuntimeError("battery score worker has no parent store stamp")
     _shard_index, engine, refs, path_text, root_text = task
     stream = _ResidualJsonlStream(
         Path(path_text),
         root=None if root_text is None else Path(root_text),
+        store_stamp=store_stamp,
         sort_on_finalize=False,
     )
     try:
@@ -977,6 +984,7 @@ def _materialize_failed_score_shard(
     prepared: _PreparedScoreRun,
     *,
     expected_header: bytes,
+    store_stamp: Mapping[str, object],
     predict: Callable[..., EnginePrediction] | None,
 ) -> _ScoreShardResult:
     from simulator.battery.score import (
@@ -993,6 +1001,7 @@ def _materialize_failed_score_shard(
     recovered_stream = _ResidualJsonlStream(
         recovered_path,
         root=None if task[4] is None else Path(task[4]),
+        store_stamp=store_stamp,
         sort_on_finalize=False,
     )
     completed_orders: set[tuple[str, int, int, int]] = set()
@@ -1182,6 +1191,10 @@ def _score_store_to_jsonl(
                             prepared,
                             predict,
                             cache_path_scope_state,
+                            # The parent-derived stamp is this run's identity.
+                            # Shards must carry it because a concurrent Git write
+                            # can change the abbreviation length of a fresh %h.
+                            stream.store_stamp,
                         ),
                         mp_context=mp.get_context("spawn"),
                         timeout_seconds=None,
@@ -1199,6 +1212,7 @@ def _score_store_to_jsonl(
                                 shard_result,
                                 prepared,
                                 expected_header=header,
+                                store_stamp=stream.store_stamp,
                                 predict=predict,
                             )
                             shard_failures.append(
