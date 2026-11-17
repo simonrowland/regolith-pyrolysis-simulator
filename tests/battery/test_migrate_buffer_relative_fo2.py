@@ -1055,3 +1055,67 @@ def test_piston_cylinder_pressure_pins_frost_iw_delta_v_term() -> None:
     actual_delta = high_pressure.state.value.log10() - one_bar.state.value.log10()
     assert abs(actual_delta - expected_delta) < Decimal("1e-25")
     assert "pressure correction=Frost 1991 molar-volume ΔV term" in high_pressure.notice_reason
+
+
+@pytest.mark.parametrize("number", (".5", "1e-3", "1e2", "+.5", "-.5", "+1E-3", "-1E+2", "1."))
+@pytest.mark.parametrize("direction,sign", (("above", 1), ("below", -1)))
+@pytest.mark.parametrize("units", ("", "log units "))
+def test_distance_consumes_complete_number_through_oxygen_decision(number, direction, sign, units):
+    expected = _decision({"delta_IW": str(sign * abs(Decimal(number)))})
+    actual = _decision({"oxygen_fugacity_buffer_relation": f"{number} {units}{direction} IW"})
+    assert expected is not None and expected.state.is_value
+    assert actual is not None and actual.state == expected.state
+
+
+@pytest.mark.parametrize("number", ("+.5", "-.5", "+1e-3", "-1e-3", "+1e2", "-1e2", "+0e0", "-0.00"))
+@pytest.mark.parametrize("direction,operator", (("below", "<"), ("under", "<"), ("less than", "<"), ("above", ">"), ("over", ">"), ("greater than", ">")))
+def test_bound_consumes_complete_number_through_oxygen_decision(number, direction, operator):
+    actual = _decision({"oxygen_fugacity_buffer_relation": f"{direction} IW{number}"})
+    assert actual is not None and actual.state.is_unknown
+    assert actual.interval_condition is not None and actual.interval_condition.state.is_value
+    bound = actual.interval_condition.state.value
+    assert bound.bound_operator == operator
+    assert bound.bound_value == Decimal(number)
+
+
+@pytest.mark.parametrize("number", ("+not-a-number", "+NaN", "+", "-bad", "+1e", "+1e-3junk", "+.5junk", "+1.2.3", "+1/2", "++1"))
+@pytest.mark.parametrize("shape", ("{} log units above IW", "{} below IW", "IW{}", "below IW{}", "above IW{}"))
+@pytest.mark.parametrize("bare_sibling", (False, True))
+@pytest.mark.parametrize("field", ("oxygen_fugacity_buffer_relation", "oxygen_buffer_as_published"))
+def test_invalid_number_refuses_without_fabricating_zero(number, shape, bare_sibling, field):
+    raw = {field: shape.format(number)}
+    if bare_sibling:
+        raw["fO2_control" if field == "oxygen_buffer_as_published" else "oxygen_buffer_as_published"] = "IW"
+    actual = _decision(raw)
+    assert actual is not None and actual.state.is_unknown
+    assert actual.refusal_code is _PrintedOxygenRefusalCode.BUFFER_RELATIVE
+    assert actual.interval_condition is None or actual.interval_condition.state.is_unknown
+
+
+@pytest.mark.parametrize("family", _GRAMMAR_FAMILIES)
+@pytest.mark.parametrize("direction,operator", (("below", "<"), ("above", ">")))
+@pytest.mark.parametrize("offset", ("", "+.5", "-1e-3"))
+def test_every_family_retains_bound_without_calibration_or_temperature(family, direction, operator, offset):
+    actual = printed_oxygen_decision(
+        PrintedOxygenFacts(),
+        raw_item={"oxygen_fugacity_buffer_relation": f"{direction} {family}{offset}"},
+        point_conditions=None, scope="row",
+    )
+    assert actual is not None and actual.state.is_unknown
+    assert actual.interval_condition is not None and actual.interval_condition.state.is_value
+    condition = actual.interval_condition
+    assert condition.state.value.bound_operator == operator
+    assert condition.state.value.bound_value == Decimal(offset or "0")
+    expected_family = _classify_buffer_phrase(family)[0]
+    assert condition.inference.output_unit == f"log10({expected_family})"
+    assert "calibration=" not in condition.inference.relation
+
+
+@pytest.mark.parametrize("label", ("FMQ+0.5.", "FMQ+1e-3.", "FMQ+.5."))
+def test_terminal_sentence_period_keeps_the_complete_printed_offset(label):
+    # The Borisov 2021 supplement prints its buffer control as "FMQ+0.5.".
+    expected = _decision({"delta_FMQ": label.removeprefix("FMQ").removesuffix(".")})
+    actual = _decision({"fO2_control": label})
+    assert expected is not None and expected.state.is_value
+    assert actual is not None and actual.state == expected.state
+    assert actual.buffer_request.offset_as_printed == label.removeprefix("FMQ").removesuffix(".")
