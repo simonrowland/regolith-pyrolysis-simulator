@@ -421,6 +421,12 @@ def test_table_1_source_attestation_rejects_missing_additional_locator(
 
 
 def test_table_1_residues_migrate_with_run_charge_clock_and_conditions() -> None:
+    from simulator.battery.waypoints import (
+        ReadinessStatus,
+        consumer_readiness,
+        oxygen_condition,
+    )
+
     migrator = _migrate()
     rows = _residues(migrator)
 
@@ -429,12 +435,23 @@ def test_table_1_residues_migrate_with_run_charge_clock_and_conditions() -> None
     assert not migrator.result.validation.hard_issues
     assert {row.identity.species.formula for row in rows} == OXIDES
     assert {row.identity.temperature_K.value for row in rows} == {Decimal("2173.15")}
+    bench = next(iter(migrator.result.benches.values()))
     for row in rows:
         run = row.locator.note.partition(";")[0].removeprefix("row=")
+        experiment = migrator.result.experiments[row.experiment_id]
         assert row.experiment_id.endswith(f"::experiment::{run.casefold()}")
         assert row.identity.sample_mass_kg.is_value
+        temperature = row.point_conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == Decimal("2173.15")
+        assert temperature.locator is not None
+        assert temperature.locator.pdf_page_index == 38
+        assert temperature.locator.table == "1"
         starting = row.point_conditions["starting_composition"]
         assert starting.state.is_value
+        assert starting.locator is not None
+        assert starting.locator.pdf_page_index == 38
+        assert starting.locator.table == "1"
         assert {
             oxide: Decimal(str(value))
             for oxide, value in starting.state.value.items()
@@ -444,6 +461,22 @@ def test_table_1_residues_migrate_with_run_charge_clock_and_conditions() -> None
         assert elapsed.locator is not None
         assert elapsed.locator.pdf_page_index == 38
         assert elapsed.locator.table == "1"
+        composition = row.point_conditions["composition"]
+        assert composition.state.is_value
+        assert composition.locator is not None
+        assert composition.locator.pdf_page_index == 38
+        assert composition.locator.table == "1"
+        assert set(composition.state.value.as_map()) == OXIDES
+        oxygen = oxygen_condition(experiment, bench, row).selected
+        assert oxygen is not None
+        assert oxygen.route == "vacuum_total_pressure_upper_bound"
+        internal = next(
+            readiness
+            for readiness in consumer_readiness(experiment, bench, row)
+            if readiness.engine == "internal-analytical"
+        )
+        assert internal.status is ReadinessStatus.READY
+        assert not internal.gaps
         assert row.locator.pdf_page_index == 38
         assert row.locator.table == "1"
 

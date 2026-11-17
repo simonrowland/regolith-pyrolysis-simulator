@@ -9505,7 +9505,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # Table 1 oxide cells. Its 325th printed oxide cell is <0.01 Na2O and remains
     # typed-refused. The count moved because these data became visible, not
     # because a check was relaxed; mismatches stay 0.
-    assert census.get("residue_component_composition") == 8112
+    # b-1209 adds 36 printed residue cells from Mendybaev 2017; mismatches stay 0.
+    assert census.get("residue_component_composition") == 8148
     assert per_source.get("su-zhang-2023-lunar-orange-glass-na-k-cu-degassing") == {
         "residue_component_composition": 3435
     }

@@ -30372,11 +30372,26 @@ class Migrator:
         printed: Located[Mapping[str, Any]] | None = None
         residual: Located[Composition] | None = None
         if has_residue_composition_cells:
+            # The emitted value is one oxide cell; a named sibling map is the
+            # full row composition used for its readiness conditions.
+            residue_composition_map = point_oxide_map
+            residue_declared_component_map = point_declared_component_map
+            named_composition_map = _named_printed_composition_map(
+                point_composition_context
+            )
+            if named_composition_map is not None:
+                residue_composition_map = _oxide_map_from_mapping(
+                    point_composition_context,
+                    declared_map=True,
+                    declared_component_map=named_composition_map,
+                    closure_context=point_composition_context,
+                )
+                residue_declared_component_map = named_composition_map
             printed, residual = _located_printed_and_initial(
-                point_oxide_map or {},
+                residue_composition_map or {},
                 point_locator,
                 closure_context=point_composition_context,
-                declared_component_map=point_declared_component_map,
+                declared_component_map=residue_declared_component_map,
             )
         elif point_oxide_map:
             if point_printed_composition is None:
