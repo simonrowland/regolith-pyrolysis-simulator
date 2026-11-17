@@ -779,8 +779,10 @@ def test_co_co2_label_without_a_ratio_stays_a_typed_refusal(tmp_path: Path) -> N
     oxygen = observation.identity.fO2_Pa
     assert oxygen is not None and oxygen.is_unknown
     assert oxygen.reason is not None
-    assert "CO-CO2." in oxygen.reason
-    assert "no calibration in the buffer owner" in oxygen.reason
+    assert oxygen.reason == (
+        "CO-CO2. buffer-relative fO2 requires the printed CO/CO2 ratio; "
+        "no fO2_Pa assigned"
+    )
     assert not any(
         notice.kind
         in {
@@ -921,7 +923,10 @@ def test_borisov_veksler_2021_rows_convert_per_buffer_family() -> None:
         ]
         if family == "CO-CO2":
             assert oxygen is not None and oxygen.is_unknown
-            assert oxygen.reason is not None and "CO-CO2." in oxygen.reason
+            assert oxygen.reason == (
+                "CO-CO2. buffer-relative fO2 requires the printed CO/CO2 ratio; "
+                "no fO2_Pa assigned"
+            )
             assert conversion == []
             refused[family] += 1
             continue
@@ -1202,7 +1207,7 @@ def test_child_printed_pressure_bound_beats_parent_log(tmp_path: Path) -> None:
     assert len(rows) == 1
     oxygen = rows[0].identity.fO2_Pa
     assert oxygen is not None and oxygen.is_unknown
-    assert oxygen.reason == _BOUNDED_FO2_REASON
+    assert oxygen.reason == "bounded or qualitative fO2 retained as a typed condition"
     assert oxygen.value != _log_fO2_to_pa(Decimal("-9"))
 
 
