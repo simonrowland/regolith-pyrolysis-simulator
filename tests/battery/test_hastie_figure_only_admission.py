@@ -30,6 +30,7 @@ from simulator.battery.validity import effusion_regime_unverified
 
 SOURCE_ID = "kems-020-hastie-1981-nbsir"
 ROOT = Path(__file__).resolve().parents[2]
+SCORING_ENGINES = (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL)
 
 
 def _hastie_store():
@@ -119,14 +120,13 @@ def test_hastie_figure_rows_without_supported_inputs_keep_typed_refusals() -> No
         )
         assert regime.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
-        prediction = predict_with_engine(
-            Engine.INTERNAL_ANALYTICAL, row, experiment=experiment
-        )
-        assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-        assert (
-            prediction.refusal_detail["reason"]
-            == "composition_not_stated_pure_reservoir"
-        )
+        for engine in SCORING_ENGINES:
+            prediction = predict_with_engine(engine, row, experiment=experiment)
+            assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+            assert (
+                prediction.refusal_detail["reason"]
+                == "composition_not_stated_pure_reservoir"
+            )
 
     unsupported_figure_summaries = tuple(
         observation
@@ -139,10 +139,11 @@ def test_hastie_figure_rows_without_supported_inputs_keep_typed_refusals() -> No
     )
     assert len(unsupported_figure_summaries) == 3
     for row in unsupported_figure_summaries:
-        prediction = predict_with_engine(
-            Engine.INTERNAL_ANALYTICAL,
-            row,
-            experiment=experiments[row.experiment_id],
-        )
-        assert prediction.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
-        assert prediction.refusal_detail["reason"] == "quantity_unknown"
+        for engine in SCORING_ENGINES:
+            prediction = predict_with_engine(
+                engine,
+                row,
+                experiment=experiments[row.experiment_id],
+            )
+            assert prediction.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+            assert prediction.refusal_detail["reason"] == "quantity_unknown"
