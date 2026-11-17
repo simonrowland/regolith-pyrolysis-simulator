@@ -2063,8 +2063,8 @@ def _missing_apparatus_fact(
     check: GateCheck,
     *,
     allow_calibration: bool,
-    allow_missing_calibration: bool,
-    allow_missing_geometry: bool,
+    allow_missing_calibration: bool = False,
+    allow_missing_geometry: bool = False,
     allow_unknown_method: bool,
 ) -> str | None:
     check = _require_gate_check(check)
@@ -2103,6 +2103,8 @@ def _missing_apparatus_fact(
         return None
     if name == "geometry_determinants":
         missing = detail.get("missing")
+        if detail.get("invalid"):
+            return None
         if (
             allow_calibration
             and isinstance(missing, (list, tuple, set))
