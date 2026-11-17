@@ -11367,6 +11367,7 @@ def test_nasa9_comparisons_reuse_one_work_lineage_index(
     from simulator.battery.compilation_tier import (
         ThermoAttempt,
         _nasa9_fit_comparisons,
+        _nasa9_fit_temperature_grid,
     )
     from simulator.battery.generators import compilation_thermo_fits
     from simulator.battery.records import Locator
@@ -11479,15 +11480,17 @@ def test_nasa9_comparisons_reuse_one_work_lineage_index(
         fit_records=(record,),
     )
 
-    assert len(comparisons) == 2
+    assert len(comparisons) == len(
+        _nasa9_fit_temperature_grid(Decimal("900"), Decimal("1200"))
+    )
     assert all(
         item.residual.source_relation is SourceRelation.SAME_INPUT
         for item in comparisons
     )
     assert work_expansions[0] == 1
-    # The first comparison resolves the work's registered inputs; the shared
-    # snapshot memo serves the second comparison without another registered
-    # lookup. Two references still each get their own ancestry classification.
+    # The first generated grid point resolves the work's registered inputs;
+    # the snapshot memo serves the remaining points without another lookup.
+    # Each reference still gets its own ancestry classification.
     assert len(registered_lookup_walks) == 1
     assert all(
         walks == 0 and complete for walks, complete in registered_lookup_walks
