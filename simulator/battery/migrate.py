@@ -9333,6 +9333,13 @@ def _initial_charge_only_composition_proxy(
     ):
         return identity, point_conditions, list(notices)
 
+    if point_composition_invalid_reason is not None:
+        invalid = Located(
+            State.unknown(point_composition_invalid_reason), locator=locator
+        )
+        conditions["composition"] = invalid
+        return replace(identity, composition=invalid.state), conditions, list(notices)
+
     refusal_reasons = list(point_composition_refusal)
     if isinstance(point_composition, Located) and point_composition.state.is_unknown:
         point_reason = point_composition.state.reason
@@ -9346,9 +9353,6 @@ def _initial_charge_only_composition_proxy(
             )
         ):
             refusal_reasons.append(point_reason)
-    if point_composition_invalid_reason:
-        refusal_reasons.append(point_composition_invalid_reason)
-
     composition = None
     composition_locator = locator
     if point_composition_map_declared:
@@ -31348,14 +31352,7 @@ class Migrator:
             notice_composition_located = (point_conditions or {}).get(
                 "composition"
             )
-        initial_charge_proxy_present = (
-            identity.composition is not None
-            and identity.composition.is_value
-            and isinstance(identity.composition.value, Composition)
-            and identity.composition.value.proxy_flag
-            == INITIAL_CHARGE_ONLY_PROXY_FLAG
-        )
-        if malformed_composition_amount is not None and not initial_charge_proxy_present:
+        if malformed_composition_amount is not None:
             identity = replace(
                 identity,
                 composition=State.unknown(malformed_composition_amount),

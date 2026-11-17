@@ -20,11 +20,18 @@ from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
-from simulator.battery.enums import AmountBasis, NoticeKind, RefusalReason
+from simulator.battery.enums import (
+    AmountBasis,
+    Engine,
+    NoticeKind,
+    Quantity,
+    RefusalReason,
+)
 from simulator.battery.identity import _composition_is_fixed_valence
 from simulator.battery.migrate import (
     _declared_composition_role,
     _catalogue_composition_located_from_values,
+    _initial_charge_only_composition_proxy,
     REPO_ROOT,
     migrate,
     sample_from_equipment,
@@ -42,6 +49,7 @@ from simulator.battery.score import (
     _catalogue_composition_notice,
     _initial_charge_composition_notice,
     flagged_strata,
+    predict_with_engine,
 )
 from tests.battery import factories as F
 from tests.battery.test_migrate import (
@@ -309,6 +317,80 @@ def test_initial_charge_role_without_printed_charge_still_refuses(tmp_path) -> N
     point_composition = observation.point_conditions["composition"]
     assert point_composition.state.is_unknown
     assert "printed initial charge is unavailable" in point_composition.state.reason
+
+
+def test_malformed_point_mole_amount_refuses_before_initial_charge_fallback(
+    tmp_path: Path,
+) -> None:
+    extract = _series_extract(
+        {
+            "composition_role": INITIAL_CHARGE_ONLY,
+            "composition_wt_pct": {
+                "SiO2": 50.0,
+                "Al2O3": 30.0,
+                "CaO": 20.0,
+            },
+        }
+    )
+    point = extract["species"]["Fe"]["observations"][0]["values"]["points"][0]
+    point.pop("composition_wt_pct")
+    point["composition_mol"] = {
+        "SiO2": "0.5",
+        "Al2O3": "not-a-number",
+        "CaO": "0.3",
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+    identity_composition = observation.identity.composition
+    assert identity_composition is not None and identity_composition.is_unknown
+    assert "malformed declared amount: 'not-a-number'" in (
+        identity_composition.reason or ""
+    )
+    point_composition = observation.point_conditions["composition"]
+    assert point_composition.state.is_unknown
+    assert "malformed declared amount: 'not-a-number'" in (
+        point_composition.state.reason or ""
+    )
+    hard_issues = result.validation.hard_issues if result.validation is not None else ()
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and "composition_mol" in (issue.path or "")
+        and "malformed declared amount: 'not-a-number'" in (issue.detail or "")
+        for issue in hard_issues
+    )
+
+    experiment = result.experiments[observation.experiment_id]
+    for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
+        prediction = predict_with_engine(engine, observation, experiment=experiment)
+        assert prediction.value is None
+        assert prediction.refusal_reason is not None
+
+
+def test_initial_charge_only_composition_quantities_are_not_promoted_to_proxies() -> None:
+    identity = replace(F.activity_identity(), composition=None)
+    initial_charge = {"composition_wt_pct": {"SiO2": 50, "MgO": 50}}
+    excluded_quantities = (
+        (Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "equilibrium_phase_composition"),
+        (Quantity.RESIDUE_COMPONENT_COMPOSITION, "residue_component_composition"),
+        (None, "composition"),
+    )
+
+    for quantity, quantity_as_printed in excluded_quantities:
+        unchanged, conditions, notices = _initial_charge_only_composition_proxy(
+            identity,
+            None,
+            (),
+            role=INITIAL_CHARGE_ONLY,
+            quantity=quantity,
+            quantity_as_printed=quantity_as_printed,
+            locator=None,
+            origin="excluded-composition-quantity",
+            initial_charge_context=initial_charge,
+        )
+        assert unchanged.composition is None, (quantity, quantity_as_printed)
+        assert conditions is None, (quantity, quantity_as_printed)
+        assert notices == [], (quantity, quantity_as_printed)
 
 
 def test_unknown_composition_role_is_queued_not_stamped(tmp_path) -> None:
