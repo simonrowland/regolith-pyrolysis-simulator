@@ -1116,6 +1116,55 @@ def test_janaf_wall_endpoint_continuation_retains_extrapolated_authority(table_i
         assert g_over_rt == (float(expected) * 1000.0) / (R_J_PER_MOL_K * float(temperature))
 
 
+@pytest.mark.parametrize("table_id", ["O-037", "O-038"])
+@pytest.mark.parametrize("temperature_K", [1700.0, 1750.0])
+def test_janaf_wall_reaction_uses_sign_restored_repaired_silica_gibbs(
+    table_id, temperature_K,
+):
+    from decimal import Decimal
+
+    document = janaf.load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    rows = {
+        Decimal(str(row["temperature"]["value"])): row
+        for row in document["table"]["values"]
+    }
+    at_1700 = rows[Decimal("1700")]["formation_gibbs_energy"]
+    assert at_1700["as_published"] == (
+        "609.041" if table_id == "O-037" else "609.059"
+    )
+    assert at_1700["locator"]["parse_repair"] == janaf.NIST_TAIL_PARSE_REPAIR
+    g_1700 = Decimal(str(at_1700["value"]))
+    assert g_1700 < 0
+
+    # Premise: JANAF interpolates G linearly between 1700 and 1800 K.
+    # Algebra: G(1750) = (G(1700) + G(1800)) / 2, still in kJ/mol.
+    # Limit: at 1700 K use the repaired node directly. Convert G/(RT) with
+    # 1000 J/kJ, R in J/(mol K), and T in K; the units cancel.
+    expected_g_kJ_mol = g_1700
+    if temperature_K == 1750.0:
+        g_1800 = Decimal(
+            str(rows[Decimal("1800")]["formation_gibbs_energy"]["value"])
+        )
+        expected_g_kJ_mol = (g_1700 + g_1800) / 2
+
+    row = copy.deepcopy(_species_rows()["SiO2_gas"])
+    row["wall_reactions"]["thermo"] = "janaf"
+    row["wall_reactions"]["reactions"][0]["products"][0]["janaf"] = table_id
+    result = resolve_wall_saturation(
+        row, species_id="SiO2_gas", T_K=temperature_K,
+    )
+    product = next(
+        participant for participant in result.participants
+        if participant.role == "product"
+    )
+
+    assert result.thermo == "janaf"
+    assert product.record_id == table_id
+    assert product.g_over_RT == pytest.approx(
+        float(expected_g_kJ_mol) * 1000.0 / (R_J_PER_MOL_K * temperature_K),
+    )
+
+
 @pytest.mark.parametrize("temperature_index,temperature_K", [(0, 1323.15), (1, 1500.0)])
 def test_default_wall_route_numeric_pins_before_janaf_owner(temperature_index, temperature_K):
     # Measured on d9ee6f0031 before the JANAF owner consolidation. These

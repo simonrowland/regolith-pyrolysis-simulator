@@ -1441,8 +1441,9 @@ def _formation_gibbs_rows_from_table(
         if not row_temperature.is_finite():
             continue
         try:
+            # Keep the published token as provenance; value carries validated sign repairs.
             formation_gibbs = Decimal(
-                str(gibbs.get("as_published") if isinstance(gibbs, Mapping) else None)
+                str(gibbs.get("value") if isinstance(gibbs, Mapping) else None)
             )
         except (InvalidOperation, TypeError, ValueError):
             missing_temperatures.add(row_temperature)
