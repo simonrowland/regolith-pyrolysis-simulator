@@ -224,6 +224,12 @@ def test_concurrent_processes_can_write_the_same_cache_key(
     tmp_path: Path,
 ) -> None:
     database = tmp_path / "engine-cache.sqlite"
+    setup = sqlite3.connect(database)
+    try:
+        setup.execute("PRAGMA journal_mode=WAL")
+        engine_cache._initialize_cache(setup)
+    finally:
+        setup.close()
     start = tmp_path / "start"
     ready_files = [tmp_path / f"ready-{index}" for index in range(4)]
     child_code = """
@@ -244,7 +250,8 @@ assert cached_engine_call('openimcc', {'request': 'same'}, solve) == {'answer': 
 """
     environment = dict(os.environ)
     environment["REGOLITH_ENGINE_CACHE"] = str(database)
-    environment.pop("REGOLITH_ENGINE_CACHE_MODE", None)
+    environment["REGOLITH_ENGINE_CACHE_MODE"] = ""
+    environment["REGOLITH_ENGINE_CACHE_BOX"] = "laptop"
     environment["PYTHONPATH"] = str(Path(__file__).resolve().parents[1])
     processes: list[subprocess.Popen[str]] = []
     try:
@@ -1659,6 +1666,8 @@ def test_engine_notice_codes_round_trip_with_typed_values() -> None:
     from simulator.melt_backend.base import (
         ENGINE_CACHE_NOTICE_CODE_TABLE,
         decode_engine_notice_codes,
+        equilibrium_cache_from_value,
+        equilibrium_cache_value,
         encode_engine_notice_codes,
     )
 
@@ -1691,6 +1700,45 @@ def test_engine_notice_codes_round_trip_with_typed_values() -> None:
     assert decode_engine_notice_codes(
         "thermoengine", commissioning_codes, commissioning_values
     ) == [commissioning]
+
+    openimcc_payloads = [
+        {"kind": "openimcc_notice", "code": code, "reason": code}
+        for code in (
+            "openimcc_fe2o3_fold",
+            "openimcc_ferric_component_collapsed",
+            "openimcc_projection_crmn_relaxed",
+            "openimcc_projected_bulk",
+        )
+    ]
+    payload_codes, payload_values = encode_engine_notice_codes(
+        "openimcc", openimcc_payloads
+    )
+    assert decode_engine_notice_codes(
+        "openimcc", payload_codes, payload_values
+    ) == openimcc_payloads
+
+    thermoengine_notices = [
+        {"kind": "fallback", "reason": "ThermoEngine used its fallback."},
+        {"kind": "fo2_gas_only", "reason": "external oxygen fugacity"},
+    ]
+    thermoengine_codes, thermoengine_values = encode_engine_notice_codes(
+        "thermoengine", thermoengine_notices
+    )
+    assert decode_engine_notice_codes(
+        "thermoengine", thermoengine_codes, thermoengine_values
+    ) == thermoengine_notices
+
+    gas_only = {"notice": "external oxygen fugacity"}
+    gas_only_hot = equilibrium_cache_value(
+        {"diagnostics": {"fo2_gas_only": gas_only}},
+        engine_id="thermoengine",
+    )
+    assert equilibrium_cache_from_value(
+        gas_only_hot, engine_id="thermoengine"
+    )["diagnostics"]["fo2_gas_only"] == {
+        "notice": "external oxygen fugacity",
+        "kind": "fo2_gas_only",
+    }
     assert len({(engine, number) for engine, number, _code, _description in ENGINE_CACHE_NOTICE_CODE_TABLE}) == len(
         ENGINE_CACHE_NOTICE_CODE_TABLE
     )
@@ -1701,6 +1749,7 @@ def test_engine_notice_codes_round_trip_with_typed_values() -> None:
 
 def test_engine_notice_emitter_literals_are_registered() -> None:
     from simulator.battery.enums import NoticeKind
+    from engines.engine_commissioning import load_engine_commissioning
     from simulator.melt_backend.base import ENGINE_CACHE_NOTICE_CODE_TABLE
 
     source_root = Path(__file__).resolve().parents[1]
@@ -1714,13 +1763,25 @@ def test_engine_notice_emitter_literals_are_registered() -> None:
         "openimcc_bridge": ast.parse(
             (source_root / "simulator/melt_backend/openimcc_bridge.py").read_text()
         ),
+        "commissioning": ast.parse(
+            (source_root / "engines/engine_commissioning.py").read_text()
+        ),
     }
 
     def notice_kind_literals(module: ast.Module) -> list[tuple[tuple[str, ...], str]]:
         literals: list[tuple[tuple[str, ...], str]] = []
         scope: list[str] = []
+        module_constants = {
+            target.id: node.value
+            for node in module.body
+            if isinstance(node, (ast.Assign, ast.AnnAssign))
+            for target in (
+                node.targets if isinstance(node, ast.Assign) else [node.target]
+            )
+            if isinstance(target, ast.Name) and node.value is not None
+        }
 
-        def literal(value: ast.AST) -> str | None:
+        def literal(value: ast.AST, resolving: frozenset[str] = frozenset()) -> str:
             if isinstance(value, ast.Constant) and isinstance(value.value, str):
                 return value.value
             if (
@@ -1731,7 +1792,19 @@ def test_engine_notice_emitter_literals_are_registered() -> None:
                 and value.value.value.id == "NoticeKind"
             ):
                 return str(getattr(NoticeKind, value.value.attr).value)
-            return None
+            if isinstance(value, ast.Name) and value.id in module_constants:
+                assert value.id not in resolving, (
+                    f"cyclic notice kind constant {value.id!r}"
+                )
+                return literal(
+                    module_constants[value.id], resolving | {value.id}
+                )
+            if isinstance(value, ast.BinOp) and isinstance(value.op, ast.Add):
+                return literal(value.left, resolving) + literal(value.right, resolving)
+            raise AssertionError(
+                f"unresolved notice kind expression at line {value.lineno}: "
+                f"{ast.unparse(value)}"
+            )
 
         class Visitor(ast.NodeVisitor):
             def visit_ClassDef(self, node: ast.ClassDef) -> None:
@@ -1749,9 +1822,7 @@ def test_engine_notice_emitter_literals_are_registered() -> None:
             def visit_Dict(self, node: ast.Dict) -> None:
                 for key, value in zip(node.keys, node.values, strict=True):
                     if isinstance(key, ast.Constant) and key.value == "kind":
-                        kind = literal(value)
-                        if kind is not None:
-                            literals.append((tuple(scope), kind))
+                        literals.append((tuple(scope), literal(value)))
                 self.generic_visit(node)
 
             def visit_Assign(self, node: ast.Assign) -> None:
@@ -1761,9 +1832,7 @@ def test_engine_notice_emitter_literals_are_registered() -> None:
                     and target.slice.value == "kind"
                     for target in node.targets
                 ):
-                    kind = literal(node.value)
-                    if kind is not None:
-                        literals.append((tuple(scope), kind))
+                    literals.append((tuple(scope), literal(node.value)))
                 self.generic_visit(node)
 
         Visitor().visit(module)
@@ -1774,11 +1843,28 @@ def test_engine_notice_emitter_literals_are_registered() -> None:
         for engine, _number, kind, _description in ENGINE_CACHE_NOTICE_CODE_TABLE
     }
 
+    configured_commissioning_engines = tuple(
+        load_engine_commissioning().engines
+    )
     for module_name, module in modules.items():
         for scope, kind in notice_kind_literals(module):
             engine: str | None = None
             if module_name == "openimcc_bridge":
                 engine = "openimcc"
+            elif module_name == "commissioning":
+                if "assess_engine_commissioning" in scope:
+                    engines = configured_commissioning_engines
+                elif "vaporock_temperature_notice" in scope:
+                    engines = ("vaporock",)
+                else:
+                    raise AssertionError(
+                        f"unclassified commissioning emitter {scope!r}: {kind!r}"
+                    )
+                assert all((candidate, kind) in registered for candidate in engines), (
+                    f"commissioning emitter {scope!r} emits unregistered "
+                    f"{kind!r} for {engines!r}"
+                )
+                continue
             elif "_OpenImccBatteryBackend" in scope or scope[-1:] in {
                 ("_carried_ferric_fold_notice",),
                 ("_openimcc_gas_channels_and_omission_notices",),
@@ -1857,7 +1943,10 @@ def test_unknown_engine_notice_code_requires_table_entry() -> None:
         encode_engine_notice_codes("openimcc", [{"kind": "future_notice"}])
 
 
-def test_real_commissioning_notices_round_trip_for_every_emitting_engine() -> None:
+def test_real_commissioning_notices_round_trip_for_every_emitting_engine(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from engines.builtin.vapor_pressure import (
         _append_openimcc_liquid_sio_band_notice,
         _openimcc_vapour_phase_signal_notice,
@@ -1865,6 +1954,12 @@ def test_real_commissioning_notices_round_trip_for_every_emitting_engine() -> No
     from engines.engine_commissioning import (
         assess_engine_commissioning, load_engine_commissioning,
     )
+
+    monkeypatch.setenv(
+        "REGOLITH_ENGINE_CACHE", str(tmp_path / "commissioning-notices.sqlite")
+    )
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "")
 
     for engine, specification in load_engine_commissioning().engines.items():
         notice = assess_engine_commissioning(
@@ -1919,16 +2014,17 @@ def _assert_engine_notice_hot_round_trip(
     )
 
     cold_notices, _authority, _band = engine_flags_from_result(result)
-    hot = equilibrium_to_hot(vars(result), engine_id=engine_id)
+    hot = equilibrium_to_hot(vars(result), engine_id=engine_id).hot
     restored = equilibrium_cache_from_value(hot, engine_id=engine_id)
     warm_notices, _authority, _band = engine_flags_from_result(
         SimpleNamespace(**restored)
     )
     assert warm_notices == cold_notices
-    return cold_notices
+    return warm_notices
 
 
 def test_real_battery_notice_emitters_are_registered_and_survive_hot(
+    tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     pytest.importorskip("openimcc")
@@ -1940,6 +2036,12 @@ def test_real_battery_notice_emitters_are_registered_and_survive_hot(
         _internal_analytical_vapor_pressure_adapter,
         composition_kg_and_mol,
     )
+
+    monkeypatch.setenv(
+        "REGOLITH_ENGINE_CACHE", str(tmp_path / "battery-notices.sqlite")
+    )
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "")
 
     openimcc_kinds: set[str] = set()
 
@@ -1979,9 +2081,10 @@ def test_real_battery_notice_emitters_are_registered_and_survive_hot(
     )
     assert "openimcc_gas_flag" in check_openimcc(gas_flag)
 
-    backend._gas = None
-    backend._gas_error = "test gas-pack absence"
-    unavailable = backend.equilibrate(
+    unavailable_backend = _OpenImccBatteryBackend("openimcc")
+    unavailable_backend._gas = None
+    unavailable_backend._gas_error = "test gas-pack absence"
+    unavailable = unavailable_backend.equilibrate(
         temperature_C=1800.0 - 273.15,
         composition_mol={"K2O": 0.5, "SiO2": 0.5},
         fO2_log=-9.0,
@@ -2048,13 +2151,27 @@ def test_real_battery_notice_emitters_are_registered_and_survive_hot(
         po2_request=Po2Request(mode="commanded", po2_bar=1.0e-30),
         include_diagnostic_shadows=False,
     )
-    internal_kinds = {
-        row["kind"]
-        for row in _assert_engine_notice_hot_round_trip(
-            "internal-analytical", internal_floor_and_band
+    internal_notices = _assert_engine_notice_hot_round_trip(
+        "internal-analytical", internal_floor_and_band
+    )
+    assert any(
+        row["kind"] == "out_of_certified_band"
+        and row["reason"].startswith(
+            (
+                "extrapolated_beyond_valid_range_K:",
+                "ellingham_extrapolated_beyond_fit_range_K:",
+            )
         )
-    }
-    assert {"out_of_certified_band", "floor_inversion"} <= internal_kinds
+        for row in internal_notices
+    )
+    assert any(
+        row["kind"] == "out_of_certified_band"
+        and row["reason"].startswith(
+            ("vapor_pressure_authority:", "ellingham_authority:")
+        )
+        for row in internal_notices
+    )
+    assert any(row["kind"] == "floor_inversion" for row in internal_notices)
 
     assert {
         "openimcc_flag",
@@ -2071,6 +2188,7 @@ def test_real_battery_notice_emitters_are_registered_and_survive_hot(
 def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    request: pytest.FixtureRequest,
 ) -> None:
     from engines.builtin.vapor_pressure import (
         _openimcc_vapour_phase_signal_notice,
@@ -2085,7 +2203,8 @@ def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip(
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "d207.sqlite"))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "")
+    request.addfinalizer(engine_cache._close_connections)
     provider_notice = _openimcc_vapour_phase_signal_notice("missing")
     assert provider_notice is not None
     diagnostics = {
@@ -2097,10 +2216,10 @@ def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip(
     cold_notices, _authority, _band = engine_flags_from_result(cold_result)
     assert cold_notices
 
-    request = {"call": "internal-analytical d-207 notice"}
+    cache_request = {"call": "internal-analytical d-207 notice"}
     cold_hot = engine_cache.cached_engine_call(
         "internal-analytical",
-        request,
+        cache_request,
         lambda: equilibrium_to_hot(
             {"status": "ok", "diagnostics": diagnostics},
             engine_id="internal-analytical",
@@ -2108,7 +2227,7 @@ def test_internal_analytical_d207_notices_match_after_hot_cache_round_trip(
     )
     warm_hot = engine_cache.cached_engine_call(
         "internal-analytical",
-        request,
+        cache_request,
         lambda: pytest.fail("expected the warmed HOT cache result"),
     )
     cold = equilibrium_cache_from_value(
