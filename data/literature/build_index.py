@@ -573,29 +573,40 @@ def nist_janaf_index_row(
     )
     if isinstance(corpus_block, dict):
         corpus_block["tables"] = nist_janaf_txt_tables(root, corpus)
-    return {
-        "source_id": source_id,
-        "aliases": [],
-        "citation": citation,
-        "doi": doi,
-        "report_number": None,
-        "identifier": doi,
-        "pdf_status": "ABSENT",
-        "pdf_path": None,
-        "pdf_last_seen": [],
-        "pdf_sha256": None,
-        "pdf_tracked": None,
-        "sidecar_path": None,
-        "sidecar_missing_fields": list(SIDECAR_FIELDS),
-        "access_status": access_for(source_id, src, None, compilations, False),
-        "extracts": [],
-        "battery_datasets": [],
-        "hunt_ids": [],
-        "copies": [],
-        "measurement_sets": [],
-        "corpus_status": "available" if corpus_available(corpus, commit) else "unavailable",
-        "corpus": corpus_block,
-    }
+    return compilation_index_row(
+        source_id, citation, doi, None, src, corpus_block, corpus, commit, compilations
+    )
+
+
+def robie_hemingway_index_row(
+    root: Path,
+    corpus: Path,
+    commit: str | None,
+    compilations: dict,
+) -> dict | None:
+    """INDEX row for Robie & Hemingway's compilation, which has no extract/PDF row."""
+    source_id = "robie-hemingway-1995-usgs-b2131"
+    manifest = root / "data/literature/compilations" / source_id / "manifest.yaml"
+    if not manifest.is_file():
+        return None
+    sid, _doi, _raw_ids = compilation_manifest_identity(manifest, scan_raw=False)
+    if sid != source_id:
+        return None
+    citation = (
+        "Robie & Hemingway (1995), Thermodynamic properties of minerals and related substances "
+        "at 298.15 K and 1 bar pressure and at higher temperatures, U.S. Geological Survey "
+        "Bulletin 2131. https://pubs.usgs.gov/bul/2131/report.pdf"
+    )
+    corpus_block = corpus_pointers(
+        corpus,
+        source_id,
+        None,
+        root / "data/literature/extracts" / f"{source_id}.yaml",
+        commit,
+    )
+    return compilation_index_row(
+        source_id, citation, None, "USGS Bulletin 2131", {}, corpus_block, corpus, commit, compilations
+    )
 
 def corpus_pointers(corpus: Path, source_id: str, pdf_sha: str | None,
                     extract_path: Path, commit: str | None,
@@ -684,6 +695,43 @@ def corpus_pointers(corpus: Path, source_id: str, pdf_sha: str | None,
                    "last_stage": last, "date": str(stages[last].get("date"))
                    if last and stages[last].get("date") is not None else None},
         "commit": commit,
+    }
+
+
+def compilation_index_row(
+    source_id: str,
+    citation: str | None,
+    doi: str | None,
+    report_number: str | None,
+    src: dict,
+    corpus_block: dict,
+    corpus: Path,
+    commit: str | None,
+    compilations: dict,
+) -> dict:
+    """Build a citable INDEX row for a compilation without an extract/PDF row."""
+    return {
+        "source_id": source_id,
+        "aliases": [],
+        "citation": citation,
+        "doi": doi,
+        "report_number": report_number,
+        "identifier": doi or report_number,
+        "pdf_status": "ABSENT",
+        "pdf_path": None,
+        "pdf_last_seen": [],
+        "pdf_sha256": None,
+        "pdf_tracked": None,
+        "sidecar_path": None,
+        "sidecar_missing_fields": list(SIDECAR_FIELDS),
+        "access_status": access_for(source_id, src, None, compilations, False),
+        "extracts": [],
+        "battery_datasets": [],
+        "hunt_ids": [],
+        "copies": [],
+        "measurement_sets": [],
+        "corpus_status": "available" if corpus_available(corpus, commit) else "unavailable",
+        "corpus": corpus_block,
     }
 
 def load_consumers(root: Path) -> tuple[list[dict], list[dict]]:
@@ -916,6 +964,10 @@ def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_jso
     janaf_row = nist_janaf_index_row(root, corpus, corpus_commit, compilations)
     if janaf_row is not None and all(row["source_id"] != janaf_row["source_id"] for row in rows):
         rows.append(janaf_row)
+        rows.sort(key=lambda row: row["source_id"])
+    robie_row = robie_hemingway_index_row(root, corpus, corpus_commit, compilations)
+    if robie_row is not None and all(row["source_id"] != robie_row["source_id"] for row in rows):
+        rows.append(robie_row)
         rows.sort(key=lambda row: row["source_id"])
     pdfs_wo = sorted(r["source_id"] for r in rows if r["pdf_status"] == "present" and not r["extracts"])
     extracts_wo = sorted(r["source_id"] for r in rows if r["extracts"] and r["pdf_status"] == "ABSENT")
