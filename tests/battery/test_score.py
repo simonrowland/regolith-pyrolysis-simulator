@@ -5285,6 +5285,79 @@ def test_kems_activity_with_invalid_geometry_still_refuses(
 
 
 @pytest.mark.parametrize(
+    ("field", "low", "high"),
+    (
+        ("orifice_area_m2", "-2", "-1"),
+        ("orifice_diameter_m", "-2", "-1"),
+        ("clausing_factor", "2", "3"),
+    ),
+)
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_activity_with_impossible_geometry_interval_still_refuses(
+    quantity: Quantity, field: str, low: str, high: str
+) -> None:
+    identity = replace(F.activity_identity(formula="NaO0.5"), quantity=quantity)
+    experiment = F.kems_experiment(
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=True,
+    )
+    geometry = replace(
+        experiment.apparatus.geometry,
+        **{
+            field: F.located(
+                Value(
+                    ValueKind.INTERVAL,
+                    interval_low=Decimal(low),
+                    interval_high=Decimal(high),
+                )
+            )
+        },
+    )
+    experiment = replace(
+        experiment,
+        apparatus=replace(experiment.apparatus, geometry=geometry),
+    )
+    reference = F.observation(
+        f"impossible-geometry-interval-{quantity.value}-{field}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+    )
+
+    gates = run_validity_gates(experiment, reference)
+    geometry_check = next(
+        check for check in gates.checks if check.name == "geometry_determinants"
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert geometry_check.passed is False
+    assert geometry_check.detail["invalid"] == [field]
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        comparison_ids={reference.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in residual.notices
+    )
+
+
+@pytest.mark.parametrize(
     "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
 )
 def test_uncalibrated_kems_activity_uses_calibration_not_grounded_stratum(

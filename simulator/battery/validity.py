@@ -233,6 +233,25 @@ def _printed_positive_diameter_interval(
     return extent is not None and extent[2] == "interval"
 
 
+def _impossible_kems_geometry_interval(
+    located: Located[Value | Decimal] | None,
+    *,
+    clausing_factor: bool = False,
+) -> bool:
+    bounds = _pressure_bounds(located)
+    if bounds is None:
+        return False
+    low, high, kind = bounds
+    if kind != "interval" or low is None or high is None:
+        return False
+    if high <= 0:
+        return True
+    if not clausing_factor:
+        return False
+    extent = _positive_extent(located)
+    return extent is not None and not _clausing_value_ok(extent[0])
+
+
 def _invalid_kems_geometry_fields(
     geometry: ApparatusGeometry | None,
 ) -> tuple[str, ...]:
@@ -241,19 +260,24 @@ def _invalid_kems_geometry_fields(
     invalid: list[str] = []
     area = geometry.orifice_area_m2
     area_value = _located_decimal(area)
-    if area_value is not None and _finite_positive(area) is None:
+    if (area_value is not None and _finite_positive(area) is None) or (
+        _impossible_kems_geometry_interval(area)
+    ):
         invalid.append("orifice_area_m2")
     diameter = geometry.orifice_diameter_m
     if (
-        _located_decimal(diameter) is not None
-        and _finite_positive(diameter) is None
-        and not _printed_positive_diameter_interval(diameter)
+        (
+            _located_decimal(diameter) is not None
+            and _finite_positive(diameter) is None
+            and not _printed_positive_diameter_interval(diameter)
+        )
+        or _impossible_kems_geometry_interval(diameter)
     ):
         invalid.append("orifice_diameter_m")
     clausing = geometry.clausing_factor
     if (
-        _located_decimal(clausing) is not None
-        and not _clausing_ok(clausing)
+        (_located_decimal(clausing) is not None and not _clausing_ok(clausing))
+        or _impossible_kems_geometry_interval(clausing, clausing_factor=True)
     ):
         invalid.append("clausing_factor")
     return tuple(invalid)
