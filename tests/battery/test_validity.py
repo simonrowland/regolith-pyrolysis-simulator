@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -120,6 +121,38 @@ def test_comparison_ratio_kind_cancellation_golden_pin(
     }
 
     assert comparison_method_cell_constant_cancels(provenance) is True
+
+
+@pytest.mark.parametrize(
+    ("orifice_area", "clausing", "expected_missing", "expected_invalid"),
+    (
+        (None, None, {"orifice_area_m2", "clausing_factor"}, set()),
+        (Decimal("-1"), None, {"clausing_factor"}, {"orifice_area_m2"}),
+        (None, Decimal("2"), {"orifice_area_m2"}, {"clausing_factor"}),
+    ),
+)
+def test_kems_activity_geometry_reports_absence_and_invalid_values_separately(
+    orifice_area: Decimal | None,
+    clausing: Decimal | None,
+    expected_missing: set[str],
+    expected_invalid: set[str],
+) -> None:
+    experiment = F.kems_experiment(
+        orifice_area=orifice_area,
+        clausing=clausing,
+        kn=None,
+        calibrated=True,
+    )
+
+    outcome = underdetermined_apparatus(experiment, Quantity.ACTIVITY)
+
+    assert outcome.passed is False
+    assert outcome.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    check = next(
+        check for check in outcome.checks if check.name == "geometry_determinants"
+    )
+    assert set(check.detail["missing"]) == expected_missing
+    assert set(check.detail.get("invalid", ())) == expected_invalid
 
 
 def test_comparison_ratio_does_not_admit_activity_coefficient() -> None:

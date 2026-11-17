@@ -300,6 +300,7 @@ from simulator.battery.validate import (
 from simulator.battery.validity import (
     GateCheck,
     GateOutcome,
+    KEMS_GEOMETRY_FACTS,
     _calibration_grounded,
     _partial_pressure_observations_by_experiment,
     apparatus_geometry_interval_notice,
@@ -2063,6 +2064,8 @@ def _missing_apparatus_fact(
     check: GateCheck,
     *,
     allow_calibration: bool,
+    allow_missing_calibration: bool = False,
+    allow_missing_geometry: bool = False,
     allow_unknown_method: bool,
 ) -> str | None:
     check = _require_gate_check(check)
@@ -2087,14 +2090,36 @@ def _missing_apparatus_fact(
         # A stated high or straddling background is an explicit invalid input,
         # not an unverified apparatus fact.
         return None
+    if (
+        name == "kems_calibration"
+        and allow_missing_calibration
+        and not check.passed
+    ):
+        missing = detail.get("missing")
+        if isinstance(missing, (list, tuple, set)) and set(missing) == {"calibration"}:
+            return "calibration"
     if name == "in_cell_partial_pressure_sum" and not check.passed:
         if detail.get("printed_partial_pressure_sum_Pa") is None:
             return "in_cell_partial_pressure_sum"
         return None
-    if name == "geometry_determinants" and allow_calibration:
+    if name == "geometry_determinants":
         missing = detail.get("missing")
-        if isinstance(missing, (list, tuple, set)) and set(missing) == {"calibration"}:
+        if detail.get("invalid"):
+            return None
+        if (
+            allow_calibration
+            and isinstance(missing, (list, tuple, set))
+            and set(missing) == {"calibration"}
+        ):
             return "calibration"
+        missing_geometry = set(KEMS_GEOMETRY_FACTS)
+        if (
+            allow_missing_geometry
+            and isinstance(missing, (list, tuple, set))
+            and bool(missing)
+            and set(missing) <= missing_geometry
+        ):
+            return "geometry_determinants"
     return None
 
 
@@ -2167,8 +2192,14 @@ def _unverified_apparatus_notices(
         or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
     ):
         return ()
+    kems_activity = (
+        experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        and quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+    )
     comparison_activity = (
-        quantity is Quantity.ACTIVITY
+        not kems_activity
+        and quantity is Quantity.ACTIVITY
         and author_reported_activity
         and comparison_method_cell_constant_cancels(reference.provenance)
     )
@@ -2193,13 +2224,15 @@ def _unverified_apparatus_notices(
         and _has_calibration_not_grounded(gates.checks)
     )
     calibration_flagged_activity = (
-        quantity is Quantity.ACTIVITY
+        not kems_activity
+        and quantity is Quantity.ACTIVITY
         and author_reported_activity
         and _has_calibration_not_grounded(gates.checks)
     )
     if not (
         measured_pressure
         or figure_only_partial_pressure
+        or kems_activity
         or comparison_activity
         or unknown_method_activity
         or calibration_flagged_partial_pressure
@@ -2207,7 +2240,10 @@ def _unverified_apparatus_notices(
     ):
         return ()
     allow_calibration = (
-        author_reported_pressure or comparison_activity or calibration_flagged_activity
+        author_reported_pressure
+        or kems_activity
+        or comparison_activity
+        or calibration_flagged_activity
     )
     missing: dict[str, Mapping] = {}
     calibration_notice = None
@@ -2233,6 +2269,8 @@ def _unverified_apparatus_notices(
         fact = _missing_apparatus_fact(
             check,
             allow_calibration=allow_calibration,
+            allow_missing_calibration=kems_activity,
+            allow_missing_geometry=kems_activity,
             allow_unknown_method=unknown_method_activity,
         )
         if fact is None:

@@ -29,6 +29,8 @@ from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
     Authority,
+    BoundDirection,
+    BoundInclusivity,
     Engine,
     EvidenceClass,
     ExecutionState,
@@ -5058,27 +5060,241 @@ def test_different_cell_comparison_activity_still_refuses_geometry() -> None:
     assert residual.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
 
 
-def test_comparison_ratio_does_not_flag_unverified_activity_coefficient_regime() -> None:
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+@pytest.mark.parametrize(
+    ("orifice_area", "clausing"),
+    (
+        (None, None),
+        (None, Decimal("0.9")),
+        (Decimal("3.14e-7"), None),
+    ),
+)
+def test_kems_activity_with_unverified_regime_scores_in_flagged_stratum(
+    quantity: Quantity,
+    orifice_area: Decimal | None,
+    clausing: Decimal | None,
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        flagged_stratum_payloads,
+        flagged_stratum_rows,
+        flagged_strata,
+        headline_payloads,
+        headline_rows,
+    )
+
     identity = replace(
         F.activity_identity(formula="NaO0.5"),
-        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        quantity=quantity,
     )
     experiment = F.kems_experiment(
-        orifice_area=Decimal("3.14e-7"),
-        clausing=Decimal("0.9"),
+        orifice_area=orifice_area,
+        clausing=clausing,
         kn=None,
         calibrated=True,
     )
-    reference = replace(
-        F.observation(
-            "comparison-activity-coefficient-unverified-regime",
-            experiment.experiment_id,
-            identity,
-            Decimal("0.2"),
-            evidence=EvidenceClass.MEASURED_DIRECT,
-        ),
-        provenance=_comparison_activity_provenance("same_effective_setup_assumed"),
+    reference = F.observation(
+        "comparison-activity-coefficient-unverified-regime",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.FIGURE_ONLY,
     )
+
+    gates = run_validity_gates(experiment, reference)
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={reference.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.score_eligible is False
+    assert residual.refusal is None
+    apparatus_notices = [
+        item
+        for item in residual.notices
+        if item.kind is NoticeKind.UNVERIFIED_APPARATUS
+    ]
+    assert any(
+        item.reason.startswith("apparatus_unverified:in_cell_partial_pressure_sum")
+        for item in apparatus_notices
+    )
+    assert any(
+        item.reason == "apparatus_unverified:geometry_determinants"
+        for item in apparatus_notices
+    )
+    assert FLAGGED_STRATUM_UNVERIFIED_APPARATUS in flagged_strata(
+        residual.notices
+    )
+    assert headline_rows(
+        (residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+    )[0]["n"] == 0
+    assert {
+        row["stratum"]: row["n"]
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    }[FLAGGED_STRATUM_UNVERIFIED_APPARATUS] == 1
+    payload = residual_to_plain(residual)
+    for tier in ("measured", "compilation"):
+        assert headline_payloads(
+            (payload,), (Engine.INTERNAL_ANALYTICAL,), tier=tier
+        )[0]["n"] == 0
+    assert {
+        row["stratum"]: row["n"]
+        for row in flagged_stratum_payloads(
+            (payload,), (Engine.INTERNAL_ANALYTICAL,)
+        )
+    }[FLAGGED_STRATUM_UNVERIFIED_APPARATUS] == 1
+
+    valueless = replace(
+        reference,
+        value=Value(
+            kind=ValueKind.UNAVAILABLE, unavailable_reason="no printed value"
+        ),
+    )
+    refused, _candidate = compile_residual(
+        valueless,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, valueless, review="reviewed"),
+        comparison_ids={valueless.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+    )
+    assert refused.status is ResidualStatus.REFUSED
+    assert refused.numeric is None
+    assert refused.refusal is not None
+    assert refused.refusal.reason is RefusalReason.METRIC_DOMAIN
+
+
+@pytest.mark.parametrize(
+    ("orifice_area", "clausing", "invalid_field"),
+    (
+        (Decimal("-1"), None, "orifice_area_m2"),
+        (None, Decimal("2"), "clausing_factor"),
+    ),
+)
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_activity_with_invalid_geometry_still_refuses(
+    quantity: Quantity,
+    orifice_area: Decimal | None,
+    clausing: Decimal | None,
+    invalid_field: str,
+) -> None:
+    identity = replace(F.activity_identity(formula="NaO0.5"), quantity=quantity)
+    experiment = F.kems_experiment(
+        orifice_area=orifice_area,
+        clausing=clausing,
+        kn=None,
+        calibrated=True,
+    )
+    reference = F.observation(
+        f"invalid-geometry-{quantity.value}-{invalid_field}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+    )
+
+    gates = run_validity_gates(experiment, reference)
+    geometry_check = next(
+        check for check in gates.checks if check.name == "geometry_determinants"
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert geometry_check.passed is False
+    assert geometry_check.detail["invalid"] == [invalid_field]
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        comparison_ids={reference.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in residual.notices
+    )
+
+
+def _kems_experiment_with_geometry_value(field: str, value: Value):
+    experiment = F.kems_experiment(
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=True,
+    )
+    geometry = replace(
+        experiment.apparatus.geometry,
+        **{field: F.located(value)},
+    )
+    return replace(
+        experiment,
+        apparatus=replace(experiment.apparatus, geometry=geometry),
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "low", "high"),
+    (
+        ("orifice_area_m2", "-2", "-1"),
+        ("orifice_diameter_m", "-2", "-1"),
+        ("clausing_factor", "2", "3"),
+    ),
+)
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_activity_with_impossible_geometry_interval_still_refuses(
+    quantity: Quantity, field: str, low: str, high: str
+) -> None:
+    identity = replace(F.activity_identity(formula="NaO0.5"), quantity=quantity)
+    experiment = _kems_experiment_with_geometry_value(
+        field,
+        Value(
+            ValueKind.INTERVAL,
+            interval_low=Decimal(low),
+            interval_high=Decimal(high),
+        ),
+    )
+    reference = F.observation(
+        f"impossible-geometry-interval-{quantity.value}-{field}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+    )
+
+    gates = run_validity_gates(experiment, reference)
+    geometry_check = next(
+        check for check in gates.checks if check.name == "geometry_determinants"
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert geometry_check.passed is False
+    assert geometry_check.detail["invalid"] == [field]
 
     residual, _candidate = _compile(
         reference,
@@ -5088,8 +5304,189 @@ def test_comparison_ratio_does_not_flag_unverified_activity_coefficient_regime()
     )
 
     assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in residual.notices
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "operator", "bound", "direction", "inclusivity"),
+    (
+        ("orifice_area_m2", "<=", "-1", None, None),
+        ("orifice_diameter_m", "<=", "-1", None, None),
+        ("clausing_factor", ">=", "2", None, None),
+        ("clausing_factor", ">", "1", None, None),
+        (
+            "clausing_factor",
+            None,
+            "2",
+            BoundDirection.LOWER,
+            BoundInclusivity.INCLUDED,
+        ),
+        (
+            "clausing_factor",
+            None,
+            "1",
+            BoundDirection.LOWER,
+            BoundInclusivity.EXCLUDED,
+        ),
+    ),
+)
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_activity_with_impossible_geometry_bound_still_refuses(
+    quantity: Quantity,
+    field: str,
+    operator: str | None,
+    bound: str,
+    direction: BoundDirection | None,
+    inclusivity: BoundInclusivity | None,
+) -> None:
+    identity = replace(F.activity_identity(formula="NaO0.5"), quantity=quantity)
+    value = Value(
+        ValueKind.BOUND,
+        bound_operator=operator,
+        bound_value=Decimal(bound),
+        bound_direction=direction,
+        bound_inclusivity=inclusivity,
+    )
+    experiment = _kems_experiment_with_geometry_value(field, value)
+    reference = F.observation(
+        (
+            f"impossible-geometry-bound-{quantity.value}-{field}-"
+            f"{operator or inclusivity}"
+        ),
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+    )
+
+    gates = run_validity_gates(experiment, reference)
+    geometry_check = next(
+        check for check in gates.checks if check.name == "geometry_determinants"
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert geometry_check.passed is False
+    assert geometry_check.detail["invalid"] == [field]
+
+    residual, _candidate = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+        review="reviewed",
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in residual.notices
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        (
+            "orifice_area_m2",
+            Value(
+                ValueKind.INTERVAL,
+                interval_low=Decimal("-1"),
+                interval_high=Decimal("2"),
+            ),
+        ),
+        (
+            "orifice_diameter_m",
+            Value(
+                ValueKind.INTERVAL,
+                interval_low=Decimal("-1"),
+                interval_high=Decimal("2"),
+            ),
+        ),
+        (
+            "clausing_factor",
+            Value(
+                ValueKind.INTERVAL,
+                interval_low=Decimal("0.5"),
+                interval_high=Decimal("1.2"),
+            ),
+        ),
+        (
+            "orifice_area_m2",
+            Value(ValueKind.BOUND, bound_operator=">=", bound_value=Decimal("-1")),
+        ),
+        (
+            "orifice_area_m2",
+            Value(ValueKind.BOUND, bound_operator="<=", bound_value=Decimal("1")),
+        ),
+        (
+            "orifice_diameter_m",
+            Value(ValueKind.BOUND, bound_operator=">=", bound_value=Decimal("-1")),
+        ),
+        (
+            "orifice_diameter_m",
+            Value(ValueKind.BOUND, bound_operator="<=", bound_value=Decimal("1")),
+        ),
+        (
+            "clausing_factor",
+            Value(ValueKind.BOUND, bound_operator=">=", bound_value=Decimal("1")),
+        ),
+        (
+            "clausing_factor",
+            Value(
+                ValueKind.BOUND,
+                bound_value=Decimal("1"),
+                bound_direction=BoundDirection.LOWER,
+                bound_inclusivity=BoundInclusivity.UNKNOWN,
+            ),
+        ),
+    ),
+)
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_activity_with_possible_geometry_ranges_stays_flagged(
+    quantity: Quantity, field: str, value: Value
+) -> None:
+    identity = replace(F.activity_identity(formula="NaO0.5"), quantity=quantity)
+    experiment = _kems_experiment_with_geometry_value(field, value)
+    reference = F.observation(
+        f"possible-geometry-range-{quantity.value}-{field}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+    )
+
+    gates = run_validity_gates(experiment, reference)
+    geometry_check = next(
+        check for check in gates.checks if check.name == "geometry_determinants"
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert geometry_check.passed is False
+    assert "invalid" not in geometry_check.detail
+
+    residual, _candidate = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+        review="reviewed",
+    )
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.score_eligible is False
+    assert residual.refusal is None
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in residual.notices
+    )
 
 
 @pytest.mark.parametrize(
@@ -5167,8 +5564,15 @@ def test_uncalibrated_kems_activity_uses_calibration_not_grounded_stratum(
     )
 
 
-def test_uncalibrated_kems_activity_pressure_sum_over_limit_still_refuses() -> None:
-    identity = F.activity_identity(formula="NaO0.5")
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_activity_pressure_sum_over_limit_still_refuses(
+    quantity: Quantity,
+) -> None:
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"), quantity=quantity
+    )
     experiment = F.kems_experiment(
         orifice_area=None, clausing=None, kn=None, calibrated=False
     )
@@ -18115,8 +18519,8 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             if row.reference not in class_s_activity_refs
         )
         assert any(
-            row.refusal is not None
-            and row.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+            score_module.FLAGGED_STRATUM_UNVERIFIED_APPARATUS
+            in score_module.flagged_strata(row.notices)
             for row in activity_rows
         )
         assert all(not row.score_eligible for row in stolyarova_rows)
@@ -19816,6 +20220,16 @@ def test_knudsen_raw_rate_interval_evaluates_at_geometric_mean_diameter() -> Non
         origin="synthetic-knudsen-ideal-orifice",
     )
     assert ideal.pressure_Pa == result.pressure_Pa
+    for invalid_clausing in (Decimal("0"), Decimal("1.01")):
+        with pytest.raises(ValueError, match="clausing_factor must be a point"):
+            knudsen_effusion_pressure_from_mass_rate(
+                rate,
+                temperature,
+                molar_mass,
+                diameter,
+                clausing_factor=invalid_clausing,
+                origin="synthetic-knudsen-invalid-clausing",
+            )
 
     assert result.notice is not None
     assert result.notice.kind is NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED
