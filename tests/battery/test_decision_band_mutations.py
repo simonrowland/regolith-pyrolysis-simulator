@@ -23,6 +23,7 @@ from simulator.battery.enums import (
     PerBasis,
     Phase,
     Quantity,
+    ResidualStatus,
     SourceRelation,
     UncertaintyKind,
     ValenceDenominatorKind,
@@ -43,6 +44,7 @@ from simulator.battery.score import (
     DECISION_BAND_POLICY_VERSION,
     DECISION_BAND_PERCENTILE,
     EnginePrediction,
+    NORMAL_95_TICKET_MULTIPLIER,
     ScoreContext,
     _decision_band_kind,
     _group_token,
@@ -50,6 +52,7 @@ from simulator.battery.score import (
     _source_alignment_group_key,
     _source_band_catalog,
     decision_band_for,
+    match_status,
     populate_numeric,
     score_store,
     update_decision_band_ratchet,
@@ -212,6 +215,68 @@ def test_printed_uncertainty_kinds_precede_derived_and_unparseable_refuses() -> 
         printed_refusal=unparseable.refusal,
         derived_band=derived,
     ) is None
+
+
+def test_unstated_plus_minus_defaults_to_one_sigma_with_two_sigma_alternative() -> None:
+    resolved = _printed_uncertainty_band(
+        Quantity.DELTA_FG,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="± 0.1 kJ/mol",
+        ),
+        Decimal("2"),
+    )
+
+    assert resolved.band is not None
+    assert _decision_band_kind(resolved.band) == "printed_1sigma"
+    assert resolved.band.value == Decimal("0.1") * NORMAL_95_TICKET_MULTIPLIER
+    assert resolved.notice is not None
+    assert resolved.notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+    assert resolved.two_sigma_band is not None
+    assert resolved.two_sigma_band.value == Decimal("0.1")
+
+
+def test_printed_confidence_text_precedes_default_and_method_override() -> None:
+    resolved = _printed_uncertainty_band(
+        Quantity.DELTA_FG,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="±0.1 kJ/mol (2 sigma)",
+        ),
+        Decimal("2"),
+        confidence_level_override="one_sigma",
+    )
+
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("0.1")
+    assert _decision_band_kind(resolved.band) == "printed_2sigma"
+    assert resolved.notice is None
+    assert resolved.two_sigma_band is None
+    numeric, reason, detail = populate_numeric(
+        quantity=Quantity.DELTA_FG,
+        candidate=Decimal("2.15"),
+        reference=Decimal("2"),
+        source_relation=SourceRelation.UNKNOWN,
+        printed_band=resolved.band,
+        printed_refusal=resolved.refusal,
+    )
+    assert reason is None, detail
+    assert numeric is not None
+    assert match_status(numeric) is ResidualStatus.MISMATCH
+
+    sossi_sd = _printed_uncertainty_band(
+        Quantity.DELTA_FG,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="±0.1 kJ/mol (as printed; SD per Fig. 2 caption)",
+        ),
+        Decimal("2"),
+    )
+    assert sossi_sd.band is not None
+    assert sossi_sd.band.value == Decimal("0.1") * NORMAL_95_TICKET_MULTIPLIER
+    assert _decision_band_kind(sossi_sd.band) == "printed_1sigma"
+    assert sossi_sd.notice is None
+    assert sossi_sd.two_sigma_band is None
 
 
 def test_printed_uncertainty_converts_units_before_setting_ticket() -> None:
