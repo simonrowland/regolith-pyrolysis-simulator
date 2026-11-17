@@ -16869,6 +16869,74 @@ def test_magemin_typed_lifecycle_reason_survives_battery_score(
         assert prediction.refusal_detail["backend_status_reason"] == backend_reason
 
 
+@pytest.mark.parametrize(
+    "backend_reason",
+    sorted(MAGEMIN_WORKER_LIFECYCLE_REASONS),
+)
+def test_magemin_lifecycle_reason_survives_phase_row_scoring(
+    monkeypatch: pytest.MonkeyPatch,
+    backend_reason: str,
+) -> None:
+    from simulator.battery.enums import PhaseRole
+    from simulator.battery.score import predict_with_engine
+    from simulator.melt_backend.base import EquilibriumResult
+
+    experiment = F.tabulation_experiment()
+    identity = Identity(
+        quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        species=Species("SiO2", Phase.L),
+        subtype=State.of("wt_percent"),
+        temperature_K=State.of(Decimal("1673.15")),
+        composition=State.of(
+            Composition(
+                "ordered_complete_mole_inventory",
+                (("SiO2", Decimal("1")), ("MgO", Decimal("1"))),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        fO2_Pa=State.of(Decimal("10")),
+        total_pressure_Pa=State.of(Decimal("100000")),
+        phase_role=State.of(PhaseRole.MELT),
+    )
+    observation = F.observation(
+        f"magemin-lifecycle-phase-row-{backend_reason}",
+        experiment.experiment_id,
+        identity,
+        Decimal("52.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=f"magemin-lifecycle-phase-source-{backend_reason}",
+    )
+    failed_result = EquilibriumResult(
+        status="not_converged",
+        diagnostics={
+            "backend_status": "not_converged",
+            "backend_status_reason": backend_reason,
+        },
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_equilibrate_phase_assemblage",
+        lambda *_args, **_kwargs: failed_result,
+    )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        observation,
+        handles={"magemin": object()},
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["reason"] == "engine_transport_error:magemin"
+    assert prediction.refusal_detail["backend_status_reason"] == backend_reason
+    if backend_reason == "magemin_engine_worker_died":
+        assert prediction.refusal_detail["backend_status_reason"] == (
+            "magemin_engine_worker_died"
+        )
+
+
 def test_magemin_bridge_runtime_error_stays_engine_defect_in_score(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
