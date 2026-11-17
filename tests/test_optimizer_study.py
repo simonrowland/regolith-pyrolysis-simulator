@@ -3911,24 +3911,33 @@ def test_parallel_composition_target_stub_study_completes(
             ]
             # Product booking keeps the 24-hour run integral in kg/run.
             # This fixture spans 24/35 campaign, so its published authority
-            # is that total divided by 24/35 (factor 35/24).
+            # is that total divided by 24/35 (factor 35/24). Under d-430/d-431,
+            # booked species mass stays separate from any unlocated bound;
+            # this total sums only the booked per-species masses.
+            sio_booking = next(item for item in bookings if item["species"] == "SiO")
             assert bounds["SiO"] == pytest.approx(
-                bookings[0]["supply_upper_bound_kg"] / (24.0 / 35.0)
+                sio_booking["supply_upper_bound_kg"] / (24.0 / 35.0)
             )
-            assert summary["wall_deposit_total_kg"] == pytest.approx(bounds["SiO"])
+            assert summary["wall_deposit_kg_by_species"]["SiO"] == pytest.approx(
+                bounds["SiO"]
+            )
+            assert summary["wall_deposit_total_kg"] == pytest.approx(
+                sum(summary["wall_deposit_kg_by_species"].values())
+            )
             assert summary["campaigns_to_resinter_worst_segment"].startswith(
                 "resinter_threshold_kg / "
             )
             assert summary["supply_interval_upper_bound_used"]["SiO"] > 0
-            assert len(bookings) == 1
-            assert bookings[0]["species"] == "SiO"
-            assert bookings[0]["flag"] == "wall_deposit_upper_bound_used"
-            assert bookings[0]["deposit_kg"] == pytest.approx(
-                bookings[0]["supply_upper_bound_kg"]
+            assert sio_booking["flag"] == "wall_deposit_upper_bound_used"
+            assert sio_booking["deposit_kg"] == pytest.approx(
+                sio_booking["supply_upper_bound_kg"]
             )
-            assert bookings[0]["deposit_kg"] > 0.0
+            assert sio_booking["deposit_kg"] > 0.0
+            assert summary["wall_deposit_cumulative_kg_by_species"]["SiO"] == pytest.approx(
+                sio_booking["deposit_kg"]
+            )
             assert summary["wall_deposit_cumulative_total_kg"] == pytest.approx(
-                bookings[0]["deposit_kg"]
+                sum(summary["wall_deposit_cumulative_kg_by_species"].values())
             )
         else:
             assert "SiO" not in list(refused)
@@ -7739,19 +7748,23 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     rows = list(csv.DictReader(leaderboard_path.open()))
     assert rows
     assert rows[0]["rank"] == "1"
-    assert rows[0]["is_winner"] == "True"
+    assert rows[0]["is_winner"] == "False"
     assert rows[0]["furnace_cost_comparison_flag"] == "furnace cost excluded: 1 of 1 unpriced"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
-    # Seed 0 starts at 40 C (313.15 K), without committed pO2. The
-    # unavailable wall figure is unpriced; other objectives still rank.
+    # Seed 0 starts at 40 C (313.15 K), without committed pO2. d-424 leaves
+    # reductive carrier supply bounds unavailable; d-367 keeps that typed
+    # refusal from becoming zero. d-429 excludes only the furnace-cost term,
+    # so the hard coating gate still rejects this candidate while other
+    # objectives keep it rankable.
     assert rows[0]["lifespan_cost_status"] == "wall_deposit_unavailable"
     provenance = _read_provenance(out_dir)
     assert len(provenance) == 1
     summary = provenance[0]["product_summary"]
     assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
     assert summary["wall_deposit_refusal"]
-    assert provenance[0]["feasible"] is True
+    assert provenance[0]["feasible"] is False
+    assert provenance[0]["failing_gates"] == ["coating"]
     authority = summary["wall_deposit_sticking_authority"]
     assert authority["code"] == "wall_deposit_vapour_carrier_non_authoritative"
     assert authority["output_status"] == "status_bearing"
