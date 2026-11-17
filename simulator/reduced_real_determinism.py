@@ -3081,6 +3081,12 @@ def gate_curve_provider_outcome_for_status(
     # MAGEMinOutputError is unusable solver output; keep its flagged fallback.
     # Other providers' parse-empty contract failures remain fail-closed below.
     magemin_invalid_output = "mageminoutputerror" in reasons
+    # Bridge RuntimeError/ValueError retains its type with engine_crash; the
+    # solve is numerical when no subprocess fallback handled that bridge error.
+    magemin_bridge_numerical_failure = (
+        "engine_crash" in reasons
+        and any(reason in {"runtimeerror", "valueerror"} for reason in reasons)
+    )
     if "environment" in reasons:
         return GateCurveProviderOutcome.FAILED
     if any(reason in {
@@ -3099,7 +3105,11 @@ def gate_curve_provider_outcome_for_status(
         for reason in TRANSIENT_OUT_OF_DOMAIN_REASONS
     } | _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS
     if gate_curve_provider_timed_out(diagnostic) or any(
-        reason in transient_reasons - numerical_reasons for reason in reasons
+        reason in transient_reasons - numerical_reasons
+        and not (
+            reason == "engine_crash" and magemin_bridge_numerical_failure
+        )
+        for reason in reasons
     ):
         return GateCurveProviderOutcome.FAILED
     nested_outcomes = []
@@ -3130,6 +3140,7 @@ def gate_curve_provider_outcome_for_status(
         GateCurveProviderOutcome.NUMERICAL_FAILURE in nested_outcomes
         or normalized_status == "not_converged"
         or magemin_invalid_output
+        or magemin_bridge_numerical_failure
         or any(reason in numerical_reasons for reason in reasons)
     ):
         return GateCurveProviderOutcome.NUMERICAL_FAILURE

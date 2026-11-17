@@ -1364,6 +1364,7 @@ _MAGEMIN_EQUILIBRATE_FAILURE_EXIT_EXPECTATIONS = (
 
 def _magemin_failure_exit_result(monkeypatch, failure_kind):
     from simulator.melt_backend import magemin as magemin_module
+    from simulator.melt_backend.base import EquilibriumResult
     from simulator.melt_backend.magemin import (
         _MAGEMinDeclaredInputError,
         _MAGEMinEngineCallError,
@@ -1468,6 +1469,34 @@ def _magemin_failure_exit_result(monkeypatch, failure_kind):
         call_with_error(_MAGEMinEngineCallError(
             'MAGEMinOutputError', 'injected invalid output',
         ))
+    elif failure_kind in {'bridge_runtime_error', 'bridge_value_error'}:
+        error_type = (
+            RuntimeError
+            if failure_kind == 'bridge_runtime_error'
+            else ValueError
+        )
+
+        def fail_bridge(**_kwargs):
+            raise error_type('injected optional bridge failure')
+
+        backend._bridge = 'pymagemin'
+        backend._binary_path = None
+        backend._magemin_module = types.SimpleNamespace(minimize=fail_bridge)
+    elif failure_kind in {'generic_parse_empty_output', 'untyped_failure'}:
+        diagnostics = (
+            {'backend_status_reason': 'parse_empty_output'}
+            if failure_kind == 'generic_parse_empty_output'
+            else {}
+        )
+        monkeypatch.setattr(
+            backend,
+            '_equilibrate_body',
+            lambda *_args, **_kwargs: EquilibriumResult(
+                status='not_converged',
+                diagnostics=diagnostics,
+            ),
+        )
+        return backend.equilibrate(1500.0, composition_mol=composition)
     elif failure_kind in {
         'slot_timeout', 'slot_unavailable', 'aggregate_budget', 'worker_died',
         'worker_pool_lifecycle', 'worker_unavailable',
@@ -1650,6 +1679,83 @@ def test_magemin_lifecycle_reasons_keep_existing_consumer_classification(
         assert gate_curve_provider_timeout_reason(
             {'backend_status_reason': reason}
         ) is None
+
+
+_MAGEMIN_GATE_OUTCOME_EXPECTATIONS = (
+    # kind, backend reason, base outcome, expected outcome, ruled exception
+    ('invalid_scalar', 'invalid_input', 'failed', 'failed', None),
+    ('invalid_domain', 'invalid_fo2_log', 'failed', 'failed', None),
+    (
+        'empty_composition', 'missing_input', 'stable_refusal', 'failed',
+        'The missing-input ruling requires empty composition to fail closed.',
+    ),
+    ('dropped_source_species', 'forbidden_species', 'stable_refusal', 'stable_refusal', None),
+    ('missing_bulk_projection', 'out_of_domain', 'stable_refusal', 'stable_refusal', None),
+    ('dropped_bulk_component', 'composition_projected', 'stable_refusal', 'stable_refusal', None),
+    ('mode_vector_deficit', 'magemin_mode_vector_mass_deficit', 'stable_refusal', 'stable_refusal', None),
+    ('clamped_operating_point', 'clamped_operating_point', 'stable_refusal', 'stable_refusal', None),
+    ('unavailable_without_binary', 'missing_binary', 'failed', 'failed', None),
+    ('subprocess_timeout', 'magemin_subprocess_timeout', 'failed', 'failed', None),
+    ('nonzero_exit', 'nonzero_exit', 'failed', 'failed', None),
+    ('invalid_engine_output', 'parse_empty_output', 'numerical_failure', 'numerical_failure', None),
+    ('generic_parse_empty_output', 'parse_empty_output', 'failed', 'failed', None),
+    ('slot_timeout', 'magemin_subprocess_slot_timeout', 'failed', 'failed', None),
+    ('aggregate_budget', 'magemin_aggregate_budget_timeout', 'failed', 'failed', None),
+    (
+        'slot_unavailable', 'magemin_subprocess_slot_unavailable',
+        'numerical_failure', 'failed',
+        'Lock-directory or slot acquisition failure is infrastructure failure.',
+    ),
+    (
+        'worker_died', 'magemin_engine_worker_died', 'failed', 'failed',
+        'A dead MAGEMin worker is infrastructure failure and stays fail-closed.',
+    ),
+    ('worker_pool_lifecycle', 'magemin_engine_worker_unavailable', 'failed', 'failed', None),
+    ('worker_unavailable', 'magemin_engine_worker_unavailable', 'failed', 'failed', None),
+    ('bridge_fallback_slot_timeout', 'magemin_subprocess_slot_timeout', 'failed', 'failed', None),
+    ('negative_convergence', 'negative_convergence_evidence', 'numerical_failure', 'numerical_failure', None),
+    ('native_activity_invalid', 'engine_not_converged', 'numerical_failure', 'numerical_failure', None),
+    ('bridge_runtime_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
+    ('bridge_value_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
+    ('untyped_failure', 'magemin_untyped_failure', 'failed', 'failed', None),
+)
+
+
+@pytest.mark.parametrize(
+    (
+        'failure_kind', 'expected_reason', 'base_outcome', 'expected_outcome',
+        'ruled_exception',
+    ),
+    _MAGEMIN_GATE_OUTCOME_EXPECTATIONS,
+)
+def test_magemin_failure_paths_keep_reviewed_gate_outcomes(
+    monkeypatch,
+    failure_kind,
+    expected_reason,
+    base_outcome,
+    expected_outcome,
+    ruled_exception,
+):
+    from simulator.reduced_real_determinism import (
+        GateCurveProviderOutcome,
+        gate_curve_provider_outcome_for_status,
+    )
+
+    if ruled_exception is None:
+        assert expected_outcome == base_outcome
+    else:
+        assert failure_kind in {
+            'empty_composition', 'slot_unavailable', 'worker_died',
+        }
+        assert expected_outcome == 'failed'
+    result = _magemin_failure_exit_result(monkeypatch, failure_kind)
+    assert result.diagnostics['backend_status_reason'] == expected_reason
+
+    actual_outcome = gate_curve_provider_outcome_for_status(
+        result.status,
+        result.diagnostics,
+    )
+    assert actual_outcome is GateCurveProviderOutcome(expected_outcome)
 
 
 @pytest.mark.parametrize(
