@@ -20,6 +20,9 @@ from simulator.physical_constants import BAR_PA_DECIMAL
 # 1 bar = 1e5 Pa exactly. An atmosphere frame passes 101325 Pa instead.
 BAR_PA = BAR_PA_DECIMAL
 
+# Dry-air oxygen mole fraction: 20.946% (five-place standard composition).
+_AIR_O2_MOLE_FRACTION = Decimal("0.20946")
+
 
 def log10_fo2_to_pa(
     log10_fO2: Decimal, reference_pressure_pa: Decimal = BAR_PA

@@ -9,7 +9,7 @@ import pytest
 import yaml
 
 from tests.helpers.corpus_paths import regolith_corpus_root
-from simulator.battery.enums import AmountBasis, Phase, Quantity, ValueKind
+from simulator.battery.enums import AmountBasis, NoticeKind, Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -275,7 +275,26 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
             assert conditions["duration_h"].state.is_unknown
         else:
             assert conditions["duration_h"].state.is_value
-        assert conditions["fO2_log"].state.is_unknown
+        if (
+            conditions["atmosphere"].state.is_value
+            and str(conditions["atmosphere"].state.value).casefold() == "air"
+        ):
+            # The source states one-atmosphere pressure and air, so migration
+            # retains air pO2 as a degenerate interval instead of a point fO2.
+            oxygen_log = conditions["fO2_log"]
+            assert oxygen_log.state.is_value
+            assert oxygen_log.state.value.kind is ValueKind.INTERVAL
+            assert record.identity.fO2_Pa.is_unknown
+            interval_notices = [
+                notice
+                for notice in record.notices
+                if "interval condition not yet scorable" in notice.reason
+            ]
+            assert len(interval_notices) == 1
+            assert interval_notices[0].kind is NoticeKind.INPUT_OMITTED
+            assert interval_notices[0].origin == record.observation_id
+        else:
+            assert conditions["fO2_log"].state.is_unknown
         assert conditions["total_pressure_Pa"].state.value == Decimal("101325")
         source = source_observations[record.observation_id.split("::", 1)[1]]
         source_values = source["values"]
@@ -335,7 +354,6 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
         assert record.identity.composition.is_unknown
         assert record.identity.composition.reason
         oxygen = conditions["fO2_log"]
-        assert oxygen.state.is_unknown and oxygen.state.reason
         assert oxygen.locator is not None
         assert record.identity.fO2_Pa.is_unknown
         assert record.identity.fO2_Pa.reason
@@ -343,7 +361,20 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
         assert atmosphere.state.is_value and atmosphere.locator is not None
         if "dafp10_air" in record.observation_id:
             assert atmosphere.state.value == "air"
+            # This source row has air at one atmosphere; migration retains its
+            # degenerate interval even though identity fO2 remains unknown.
+            assert oxygen.state.is_value
+            assert oxygen.state.value.kind is ValueKind.INTERVAL
+            interval_notices = [
+                notice
+                for notice in record.notices
+                if "interval condition not yet scorable" in notice.reason
+            ]
+            assert len(interval_notices) == 1
+            assert interval_notices[0].kind is NoticeKind.INPUT_OMITTED
+            assert interval_notices[0].origin == record.observation_id
         else:
+            assert oxygen.state.is_unknown and oxygen.state.reason
             assert "CO/CO2" in atmosphere.state.value
             assert "approximately IW" in atmosphere.state.value
 
