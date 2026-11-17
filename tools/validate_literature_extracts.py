@@ -264,6 +264,7 @@ from tools.mineru_table_draft import (
     parse_table_html,
     printed_formula_tokens,
 )
+from simulator.corpus_paths import regolith_corpus_root
 
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
 SCHEMA_VERSION = "literature_extract.v1"
@@ -2750,6 +2751,24 @@ def _malformed_locator_artifact_keys(locator: Any) -> list[str]:
     ]
 
 
+def locator_artifact_candidate_groups(
+    locator: Mapping[str, Any],
+) -> list[tuple[str, list[str]]]:
+    """Enumerate artifact candidates; callers validate locator syntax separately."""
+    candidate_groups = [
+        (key, [raw.strip()])
+        for key in _ARTIFACT_PATH_KEYS
+        if isinstance((raw := locator.get(key)), str) and raw.strip()
+    ]
+    record = locator.get("record")
+    if isinstance(record, str) and record.strip():
+        text = record.strip()
+        token = text.split()[0]
+        candidates = [text] if token == text else [text, token]
+        candidate_groups.append(("record", candidates))
+    return candidate_groups
+
+
 def _sample_addresses_scored_evidence(sample: Mapping[str, Any]) -> bool:
     """True when the pin's address is ``values`` or a scored numeric condition.
 
@@ -3804,17 +3823,7 @@ def _locator_source_blind_reason(
             f"({', '.join(malformed_keys)} must be non-empty strings)",
             frozenset({"locator_key_malformed"}),
         )
-    candidate_groups = [
-        (key, [raw.strip()])
-        for key in _ARTIFACT_PATH_KEYS
-        if isinstance((raw := locator.get(key)), str) and raw.strip()
-    ]
-    record = locator.get("record")
-    if isinstance(record, str) and record.strip():
-        text = record.strip()
-        token = text.split()[0]
-        candidates = [text] if token == text else [text, token]
-        candidate_groups.append(("record", candidates))
+    candidate_groups = locator_artifact_candidate_groups(locator)
     if not candidate_groups:
         return _LocatorSourceBlindReason(
             "locator was not opened: no source_path, quotes_path, or file record "
@@ -4314,9 +4323,7 @@ def fidelity_source_warnings(
     source_blind_reason_codes: list[frozenset[str]] = []
     root = artifact_root if artifact_root is not None else ROOT
     configured_corpus_root = os.environ.get("REGOLITH_CORPUS_ROOT", "").strip()
-    corpus_root = (
-        Path(configured_corpus_root).expanduser() if configured_corpus_root else None
-    )
+    corpus_root = regolith_corpus_root() if configured_corpus_root else None
     for index, sample in enumerate(samples):
         sample_label = f"{label}:fidelity_samples[{index}]"
         if not isinstance(sample, Mapping):
