@@ -10,6 +10,7 @@ from pathlib import Path
 import pickle
 import re
 import stat
+import sys
 import tempfile
 from typing import Any
 
@@ -19,6 +20,7 @@ import yaml
 _CACHE_ENV = "REGOLITH_PARSED_YAML_CACHE_DIR"
 _CACHE_ENABLED_ENV = "REGOLITH_PARSED_YAML_CACHE"
 _CACHE_MAX_BYTES_ENV = "REGOLITH_PARSED_YAML_CACHE_MAX_BYTES"
+_CACHE_DIRECTORY = ("regolith-pyrolysis-simulator", "parsed-yaml")
 _DEFAULT_CACHE_MAX_BYTES = 1536 * 1024 * 1024
 # The first write triggers a sweep for short-lived processes; later full-root
 # sweeps every 32 writes keep hits scan-free and bound growth between scans.
@@ -250,9 +252,12 @@ def load_cached_safe_yaml(
     if not _cache_enabled():
         return yaml.load(payload, Loader=YAML12SafeLoader)
 
-    max_bytes = _cache_max_bytes()
     loader_identity = _loader_identity()
     cache_path = _cache_path(digest, loader_identity)
+    if cache_path is None:
+        return yaml.load(payload, Loader=YAML12SafeLoader)
+
+    max_bytes = _cache_max_bytes()
     cached = _read_cache(cache_path, digest, loader_identity)
     if cached is not _CACHE_MISS:
         return cached
@@ -296,8 +301,12 @@ def _loader_identity() -> str:
     return f"pyyaml={yaml.__version__};base={base_identity};schema={_YAML12_SCHEMA_ID}"
 
 
-def _cache_path(content_sha256: str, loader_identity: str | None = None) -> Path:
+def _cache_path(
+    content_sha256: str, loader_identity: str | None = None
+) -> Path | None:
     root = _cache_root()
+    if root is None:
+        return None
     loader_version = re.sub(r"[^A-Za-z0-9_.-]", "_", str(yaml.__version__))
     identity = loader_identity or _loader_identity()
     loader_token = sha256(identity.encode("utf-8")).hexdigest()
@@ -310,37 +319,34 @@ def _cache_path(content_sha256: str, loader_identity: str | None = None) -> Path
     )
 
 
-def _cache_root() -> Path:
+def _cache_root() -> Path | None:
     override = os.environ.get(_CACHE_ENV)
     if override:
         candidate = Path(override)
         if _ensure_private_directory(candidate):
             return candidate
-    else:
-        xdg_cache = os.environ.get("XDG_CACHE_HOME")
-        if xdg_cache:
-            xdg_root = Path(xdg_cache).resolve()
-            if _ensure_private_directory(xdg_root):
-                candidate = _private_descendant(
-                    xdg_root,
-                    "regolith-pyrolysis-simulator",
-                    "parsed-yaml",
-                )
-                if candidate is not None:
-                    return candidate
-        else:
-            user_token = str(os.getuid()) if hasattr(os, "getuid") else "user"
-            candidate = _private_descendant(
-                Path(tempfile.gettempdir()).resolve(),
-                f"regolith-pyrolysis-simulator-{user_token}",
-                "parsed-yaml",
-            )
+
+    xdg_cache = os.environ.get("XDG_CACHE_HOME")
+    if xdg_cache:
+        try:
+            xdg_root = Path(xdg_cache).expanduser().resolve()
+        except (OSError, RuntimeError):
+            xdg_root = None
+        if xdg_root is not None and _ensure_private_directory(xdg_root):
+            candidate = _private_descendant(xdg_root, *_CACHE_DIRECTORY)
             if candidate is not None:
                 return candidate
 
-    fallback = Path(tempfile.mkdtemp(prefix="regolith-parsed-yaml-"))
-    os.environ[_CACHE_ENV] = str(fallback)
-    return fallback
+    # XDG and system-temp roots may be shared or fail owner/mode checks. Studio
+    # jobs share the system temp area, where a per-process mkdtemp fallback
+    # cannot be reused. Keep this cache in the user's persistent cache area and
+    # bypass it if no private root works.
+    home = Path.home().resolve()
+    if sys.platform == "darwin":
+        return _private_descendant(
+            home, "Library", "Caches", *_CACHE_DIRECTORY
+        )
+    return _private_descendant(home, ".cache", *_CACHE_DIRECTORY)
 
 
 def _private_descendant(base: Path, *parts: str) -> Path | None:

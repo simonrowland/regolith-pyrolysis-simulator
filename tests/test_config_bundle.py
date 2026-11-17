@@ -71,34 +71,36 @@ def test_load_config_bundle_returns_all_required_data_and_digests() -> None:
     assert set(bundle.digests) == set(REQUIRED_CONFIGS)
 
 
-def test_yaml_cache_root_resolves_tmpdir_symlink_and_reuses_cache(
+def test_yaml_cache_default_root_is_stable_outside_tmpdir(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    private_temp = tmp_path / "private-temp"
-    private_temp.mkdir()
-    private_temp.chmod(0o1777)
-    tmp_link = tmp_path / "tmp-link"
-    tmp_link.symlink_to(private_temp, target_is_directory=True)
+    home = tmp_path / "home"
+    home.mkdir()
+    shared_temp = tmp_path / "shared-temp"
+    shared_temp.mkdir()
+    shared_temp.chmod(0o770)
 
-    monkeypatch.setenv("TMPDIR", str(tmp_link))
-    monkeypatch.setenv("XDG_CACHE_HOME", "ignored")
-    monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
-    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", "ignored")
+    monkeypatch.setenv("HOME", str(home))
+    monkeypatch.setenv("TMPDIR", str(shared_temp))
     monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE_DIR", raising=False)
+    monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
     monkeypatch.setattr(tempfile, "tempdir", None)
 
     def unexpected_mkdtemp(*args: object, **kwargs: object) -> str:
-        pytest.fail("private resolved TMPDIR should not use a fresh cache")
+        pytest.fail("the cache root must not allocate a per-process temp directory")
 
     monkeypatch.setattr(tempfile, "mkdtemp", unexpected_mkdtemp)
 
     first = yaml_cache_module._cache_root()
-    assert first.is_relative_to(private_temp.resolve())
+    cache_parent = (
+        home / "Library" / "Caches"
+        if sys.platform == "darwin"
+        else home / ".cache"
+    )
+    assert first == cache_parent / "regolith-pyrolysis-simulator" / "parsed-yaml"
+    assert not first.is_relative_to(shared_temp)
 
-    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", "ignored again")
-    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE_DIR", raising=False)
-    monkeypatch.setattr(tempfile, "tempdir", None)
     second = yaml_cache_module._cache_root()
 
     assert second == first
@@ -127,35 +129,31 @@ def test_yaml_cache_root_resolves_xdg_cache_symlink(
     assert cache_root.is_relative_to(private_cache.resolve())
 
 
-def test_yaml_cache_root_rejects_symlink_to_group_writable_non_sticky_dir(
+def test_yaml_cache_root_falls_back_from_untrusted_xdg_to_home_cache(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    unsafe_temp = tmp_path / "unsafe-temp"
-    unsafe_temp.mkdir()
-    unsafe_temp.chmod(0o770)
-    tmp_link = tmp_path / "tmp-link"
-    tmp_link.symlink_to(unsafe_temp, target_is_directory=True)
-    fallback = tmp_path / "private-fallback"
+    home = tmp_path / "home"
+    home.mkdir()
+    unsafe_xdg = tmp_path / "unsafe-xdg"
+    unsafe_xdg.mkdir()
+    unsafe_xdg.chmod(0o770)
 
-    monkeypatch.setenv("TMPDIR", str(tmp_link))
-    monkeypatch.setenv("XDG_CACHE_HOME", "ignored")
-    monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
-    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", "ignored")
+    monkeypatch.setenv("HOME", str(home))
+    monkeypatch.setenv("XDG_CACHE_HOME", str(unsafe_xdg))
     monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE_DIR", raising=False)
-    monkeypatch.setattr(tempfile, "tempdir", None)
-
-    def make_private_fallback(*, prefix: str) -> str:
-        assert prefix == "regolith-parsed-yaml-"
-        fallback.mkdir(mode=0o700)
-        return str(fallback)
-
-    monkeypatch.setattr(tempfile, "mkdtemp", make_private_fallback)
 
     cache_root = yaml_cache_module._cache_root()
 
-    assert cache_root == fallback
-    assert not (unsafe_temp / "regolith-pyrolysis-simulator").exists()
+    cache_parent = (
+        home / "Library" / "Caches"
+        if sys.platform == "darwin"
+        else home / ".cache"
+    )
+    assert cache_root == (
+        cache_parent / "regolith-pyrolysis-simulator" / "parsed-yaml"
+    )
+    assert not cache_root.is_relative_to(unsafe_xdg)
 
 
 def test_load_config_bundle_digests_are_stable_and_scoped() -> None:
@@ -663,41 +661,75 @@ assert cache_module.load_cached_safe_yaml(b"root:\\n  value: 1\\n") == {
     )
 
 
-def test_parsed_yaml_cache_default_is_in_writable_temp_root(
+def test_parsed_yaml_cache_default_path_uses_stable_home_root(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
+    home = tmp_path / "home"
+    home.mkdir()
+    shared_temp = tmp_path / "shared-temp"
+    shared_temp.mkdir()
+
+    monkeypatch.setenv("HOME", str(home))
+    monkeypatch.setenv("TMPDIR", str(shared_temp))
     monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE_DIR", raising=False)
     monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
-    monkeypatch.setattr(yaml_cache_module.tempfile, "gettempdir", lambda: str(tmp_path))
 
     path = yaml_cache_module._cache_path("a" * 64)
 
-    assert tmp_path in path.parents
+    assert home in path.parents
+    assert shared_temp not in path.parents
     assert path.name == f"{'a' * 64}.pickle"
 
 
-def test_parsed_yaml_cache_rejects_untrusted_temp_root(
+def test_unusable_stable_cache_root_creates_no_temp_dirs_in_fresh_processes(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
+    unsafe_home = tmp_path / "unsafe-home"
+    unsafe_home.mkdir()
+    unsafe_home.chmod(0o777)
+    unsafe_temp = tmp_path / "unsafe-temp"
+    unsafe_temp.mkdir()
+    unsafe_temp.chmod(0o770)
+
+    monkeypatch.setenv("HOME", str(unsafe_home))
+    monkeypatch.setenv("TMPDIR", str(unsafe_temp))
     monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE_DIR", raising=False)
     monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
-    monkeypatch.setattr(yaml_cache_module.tempfile, "gettempdir", lambda: str(tmp_path))
-    user_token = (
-        str(yaml_cache_module.os.getuid())
-        if hasattr(yaml_cache_module.os, "getuid")
-        else "user"
-    )
-    hostile_parent = tmp_path / f"regolith-pyrolysis-simulator-{user_token}"
-    hostile_parent.mkdir()
-    hostile_parent.chmod(0o777)
-    hostile = hostile_parent / "parsed-yaml"
+    monkeypatch.setattr(tempfile, "tempdir", None)
+    child = """
+import tempfile
+import simulator.yaml_cache as cache
 
-    path = yaml_cache_module._cache_path("b" * 64)
+def unexpected_mkdtemp(*args, **kwargs):
+    raise AssertionError("unusable cache root allocated a temp directory")
 
-    assert hostile not in path.parents
-    assert yaml_cache_module._ensure_private_directory(path.parents[2])
+cache.tempfile.mkdtemp = unexpected_mkdtemp
+assert cache._cache_root() is None
+original_load = cache.yaml.load
+parse_calls = 0
+
+def counted_load(*args, **kwargs):
+    global parse_calls
+    parse_calls += 1
+    return original_load(*args, **kwargs)
+
+cache.yaml.load = counted_load
+for _ in range(4):
+    assert cache.load_cached_safe_yaml(b"value: 7\\n") == {"value": 7}
+assert parse_calls == 4, parse_calls
+"""
+    for _ in range(3):
+        subprocess.run(
+            [sys.executable, "-c", child],
+            check=True,
+            cwd=DEFAULT_DATA_DIR.parent,
+            capture_output=True,
+            text=True,
+        )
+
+    assert list(unsafe_temp.iterdir()) == []
 
 
 def test_functional_data_digest_resolves_mre_canonical_voltage_tokens() -> None:
