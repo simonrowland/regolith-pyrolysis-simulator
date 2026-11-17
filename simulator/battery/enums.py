@@ -398,13 +398,21 @@ class NoticeKind(StrEnum):
 
 
 class ReferenceStateConvention(StrEnum):
-    """Reference-frame conventions used by activity and formation records."""
+    """Reference frames used by activity and formation records.
+
+    Premise: FeO follows the Temkin ideal-ionic-solution model. Its expression
+    is ``a_FeO = (N_Fe2+)(N_O2-)``: the first factor counts Fe2+ over the
+    cation sublattice; the second counts O2- over the anion sublattice,
+    including silicate anions. Pure FeO has both fractions equal to one, so
+    its activity is one.
+    """
 
     RAOULTIAN_PURE_ENDMEMBER = "raoultian_pure_endmember"
     HENRIAN_SOLID = "henrian_solid"
     HENRIAN_LIQUID = "henrian_liquid"
     HYPOTHETICAL_1WT_PCT = "hypothetical_1wt_pct"
     CONDENSED_ELEMENT_REFERENCE = "condensed_element_reference"
+    TEMKIN = "temkin"
 
 
 class Phase(StrEnum):

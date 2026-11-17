@@ -108,7 +108,7 @@ species:
           state:
             tag: value
             value:
-              convention: raoultian_pure_endmember
+              convention: temkin
               endmember:
                 formula: Fe(1-x)O
                 phase: {tag: value, value: l}
@@ -146,9 +146,13 @@ species:
                 band_dex: '0.002431240492822927046941972422'
           inferred: false
           note: >-
-            Masson's Temkin frame is recorded by the non-stoichiometric
-            Fe(1-x)O endmember and its table-derived zero-silica N0.
-            The supporting source quote is at printed p. 75, Discussion.
+            The Discussion gives the measured standard as nonstoichiometric
+            oxide in equilibrium with liquid iron (printed p. 75) and
+            introduces the Temkin frame on printed p. 76; conversion to the
+            stoichiometric standard is subsequent. Equation (1), printed
+            p. 76, defines
+            a_FeO as the Fe2+ cation fraction times the O2- anion fraction,
+            including silicate anions.
           locator: {page: 75, section: Discussion}
         units: dimensionless activity
         point_conditions:
@@ -244,7 +248,7 @@ species:
           state:
             tag: value
             value:
-              convention: raoultian_pure_endmember
+              convention: temkin
               endmember:
                 formula: Fe(1-x)O
                 phase: {tag: value, value: l}
@@ -282,9 +286,13 @@ species:
                 band_dex: '0.007436620909554859980899190015'
           inferred: false
           note: >-
-            Masson's Temkin frame is recorded by the non-stoichiometric
-            Fe(1-x)O endmember and its table-derived zero-silica N0.
-            The supporting source quote is at printed p. 75, Discussion.
+            The Discussion gives the measured standard as nonstoichiometric
+            oxide in equilibrium with liquid iron (printed p. 75) and
+            introduces the Temkin frame on printed p. 76; conversion to the
+            stoichiometric standard is subsequent. Equation (1), printed
+            p. 76, defines
+            a_FeO as the Fe2+ cation fraction times the O2- anion fraction,
+            including silicate anions.
           locator: {page: 75, section: Discussion}
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}
@@ -377,7 +385,7 @@ species:
           state:
             tag: value
             value:
-              convention: raoultian_pure_endmember
+              convention: temkin
               endmember:
                 formula: Fe(1-x)O
                 phase: {tag: value, value: l}
@@ -415,9 +423,13 @@ species:
                 band_dex: '0.009119584210532076176535328665'
           inferred: false
           note: >-
-            Masson's Temkin frame is recorded by the non-stoichiometric
-            Fe(1-x)O endmember and its table-derived zero-silica N0.
-            The supporting source quote is at printed p. 75, Discussion.
+            The Discussion gives the measured standard as nonstoichiometric
+            oxide in equilibrium with liquid iron (printed p. 75) and
+            introduces the Temkin frame on printed p. 76; conversion to the
+            stoichiometric standard is subsequent. Equation (1), printed
+            p. 76, defines
+            a_FeO as the Fe2+ cation fraction times the O2- anion fraction,
+            including silicate anions.
           locator: {page: 75, section: Discussion}
         units: dimensionless activity
         point_conditions: {atmosphere: {state: {tag: value, value: helium or argon + helium}, locator: {page: 74, section: Experimental}}}

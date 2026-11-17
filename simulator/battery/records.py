@@ -877,6 +877,8 @@ class IronSaturationComposition:
 
 @dataclass(frozen=True)
 class StandardState:
+    """Typed activity reference; numerical conversion belongs to its consumer."""
+
     convention: ReferenceStateConvention
     endmember: Species
     component_basis: str
@@ -886,6 +888,12 @@ class StandardState:
     iron_saturation_composition: IronSaturationComposition | None = None
 
     def __post_init__(self) -> None:
+        if not isinstance(self.convention, ReferenceStateConvention):
+            raise TypeError("StandardState.convention must be ReferenceStateConvention")
+        if self.convention is ReferenceStateConvention.TEMKIN:
+            # Preserve the frame as typed input; only the scorer's recorded
+            # iron-saturation owner is permitted to convert it.
+            pass
         if not self.component_basis:
             raise ValueError("StandardState.component_basis is required")
         if self.component_basis == "single_cation_oxide":
