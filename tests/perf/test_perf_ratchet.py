@@ -78,22 +78,27 @@ def _assert_optimizer_stage_measurement(
     assert len(trials) == trial_count
     assert measurement["trial_count"] == trial_count
     assert math.isfinite(median_cpu)
-    # The plan's measured 24 h analytical run is 7.42 CPU-s; a 1 h stage
-    # cannot satisfy this derived lower bound, while the 60 h C4 path can.
+    # Keep the existing 7.42 CPU-s sanity floor from the earlier 24 h
+    # analytical run. The current 60 h profile evaluation follows its full
+    # campaign chain and measures 264 simulator steps; this is only a floor,
+    # not the stage's simulated horizon.
     assert median_cpu > 7.42
     assert median_cpu == pytest.approx(statistics.median(cpu_values))
     assert measurement["cpu_seconds_spread"] == pytest.approx(
         max(cpu_values) - min(cpu_values)
     )
     assert measurement["work_units"] == (
-        bench.OPTIMIZER_STAGE_HORIZON_HOURS * len(trials)
+        bench.OPTIMIZER_STAGE_EXPECTED_STEP_CALLS * len(trials)
     )
     assert measurement["hot_path_calls"] == measurement["work_units"]
     assert math.isfinite(float(measurement["wall_seconds_median"]))
     assert math.isfinite(float(measurement["wall_cpu_ratio_median"]))
     for trial in trials:
         assert trial["date"] and trial["hostname"]
-        assert trial["work_units"] == bench.OPTIMIZER_STAGE_HORIZON_HOURS
+        assert (
+            trial["work_units"]
+            == bench.OPTIMIZER_STAGE_EXPECTED_STEP_CALLS
+        )
         assert trial["hot_path_calls"] == trial["work_units"]
         assert trial["cold_cache_miss"] is True
         assert trial["same_patch_cache_hit"] is True
@@ -103,20 +108,56 @@ def _assert_optimizer_stage_measurement(
         assert math.isfinite(float(trial["wall_cpu_ratio"]))
 
 
-# Premise: the slowest observed single-trial CPU was about 145.3 CPU-s
-# (s1 serial: 726.6 CPU-s / 5); Studio-3 medians were 143.0 CPU-s at
-# f30a49a628 and 83.2 CPU-s at be76d28ad. A 2x factor covers host/trial
-# variation; 2 * 145.3 CPU-s = 290.6 CPU-s, rounded up to 300 CPU-s.
-@pytest.mark.cpu_budget(300)
+# The suite-shape guard keeps tests outside its shrink-only heavy roster at
+# 300 CPU-s or less; that gives this campaign-chain test an 1800 s wall guard.
 @pytest.mark.nightly
+@pytest.mark.cpu_budget(300)
 def test_optimizer_60h_stage_records_real_cold_work() -> None:
+    """Measure the 60 h profile's complete campaign chain, not 60 simulated h."""
     assert bench.OPTIMIZER_STAGE_NAME in STAGE_NAMES, (
         "optimizer stage missing from STAGE_NAMES"
     )
+    measurement = bench._measure_optimizer_profile_campaign_chain_stage(
+        trial_count=1
+    )
     _assert_optimizer_stage_measurement(
-        bench._measure_optimizer_60h_eval_stage(trial_count=1),
+        measurement,
         trial_count=1,
     )
+
+
+def test_lunar_highland_campaign_chain_step_count_is_pinned() -> None:
+    """Pin the profile's executed campaign-hour sum independently of evaluate."""
+    from pathlib import Path
+
+    from simulator.optimize.profiles import load_profile
+
+    profile = load_profile(
+        Path(__file__).resolve().parents[2]
+        / "data"
+        / "optimize_profiles"
+        / "lunar_highland.yaml"
+    )
+    assert profile["run"]["hours"] == bench.OPTIMIZER_PROFILE_RUN_HOURS == 60
+    assert (
+        profile["fidelities"]["internal-analytical"]["hours"]
+        == bench.OPTIMIZER_PROFILE_RUN_HOURS
+    )
+    assert all(
+        fidelity["hours"] == bench.OPTIMIZER_PROFILE_RUN_HOURS
+        for fidelity in profile["fidelities"].values()
+    )
+
+    # data/setpoints.yaml and the C0 AUTO_APPLY route define this profile's
+    # executed sequence: C0 25 h + C0b 3 h + staged C2A 4+3+1+1 h +
+    # staged C3_NA 3 h + C4 44 h to its window plus its 20 h in-window cap +
+    # post-Mg C2A's 140 h endpoint + C6's 20 h cap = 264 step() calls.
+    # These campaign hours are the simulation performed to campaign completion;
+    # run.hours=60 remains the authored/eval-spec budget, not its step limit.
+    expected_step_calls = (
+        25 + 3 + (4 + 3 + 1 + 1) + 3 + (44 + 20) + 140 + 20
+    )
+    assert expected_step_calls == bench.OPTIMIZER_STAGE_EXPECTED_STEP_CALLS == 264
 
 
 @pytest.mark.nightly
