@@ -131,15 +131,24 @@ def test_reference_formation_gibbs_reader_refuses_a_missing_grid_node(
             "values": [
                 {
                     "temperature": {"as_published": "100"},
-                    "formation_gibbs_energy": {"as_published": "-10"},
+                    "formation_gibbs_energy": {
+                        "as_published": "-10",
+                        "value": "-10",
+                    },
                 },
                 {
                     "temperature": {"as_published": "200"},
-                    "formation_gibbs_energy": {"as_published": None},
+                    "formation_gibbs_energy": {
+                        "as_published": None,
+                        "value": None,
+                    },
                 },
                 {
                     "temperature": {"as_published": "300"},
-                    "formation_gibbs_energy": {"as_published": "-30"},
+                    "formation_gibbs_energy": {
+                        "as_published": "-30",
+                        "value": "-30",
+                    },
                 },
             ],
         },

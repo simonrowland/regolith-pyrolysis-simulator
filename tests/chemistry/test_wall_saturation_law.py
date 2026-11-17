@@ -951,6 +951,24 @@ def test_query_outside_every_cited_interval_predicts_and_flags_extrapolation() -
     assert all(item.valid_range_K for item in extrapolated)
 
 
+def test_outside_every_interval_uses_the_nearest_condensed_record() -> None:
+    resolved = resolve_wall_saturation(
+        _species_rows()["SiO"],
+        species_id="SiO",
+        T_K=298.15,
+        pO2_Pa=_PO2_PA,
+    )
+    selected_products = [
+        item
+        for item in resolved.participants
+        if item.role == "product" and item.species == "SiO2"
+    ]
+    assert len(selected_products) == 1
+    assert selected_products[0].record_id == "NG-1862"
+    assert selected_products[0].authority_level == "extrapolated"
+    assert "wall_condensation_thermo_extrapolated" in resolved.notices
+
+
 def test_perturbing_the_gibbs_term_the_resolver_reads_moves_psat(monkeypatch) -> None:
     row = _species_rows()["SiO"]
     baseline = resolve_wall_saturation(
