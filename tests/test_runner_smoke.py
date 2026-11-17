@@ -2194,6 +2194,8 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     # after repair: melt_redox_gate_floor_fallback_engagement = {engaged:
     # false, total_count: 0}. ci_carbonaceous_chondrite_C2B_12h.json was
     # unchanged. docs-private/research/2026-08-02-train13-adjudication.md
+    # d-339 changes lunar row 15's native Fe activity and Kress91 FeO seam
+    # comparator at 2023.15 K; OpenIMCC's FeO activity remains 0.14324692359108157.
     actual, capture, expected_text = runner_golden_loader(scenario)
     expected = json.loads(expected_text)
 
