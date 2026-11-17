@@ -257,6 +257,7 @@ from simulator.melt_backend.base import (
     EquilibriumResult,
     multivalent_components,
 )
+from simulator.melt_backend.magemin import MAGEMIN_WORKER_LIFECYCLE_REASONS
 from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
@@ -10467,13 +10468,6 @@ _ENGINE_WORKER_LIFECYCLE_FAILURES = (
     "EngineWorkerUnavailable",
     "EngineWorkerPoolLifecycleError",
 )
-_MAGEMIN_WORKER_LIFECYCLE_REASONS = frozenset({
-    "magemin_subprocess_slot_timeout",
-    "magemin_subprocess_slot_unavailable",
-    "magemin_aggregate_budget_timeout",
-    "magemin_engine_worker_unavailable",
-    "magemin_engine_worker_died",
-})
 
 
 def _engine_worker_lifecycle_failure(
@@ -10510,7 +10504,7 @@ def _engine_worker_lifecycle_failure(
         return {"backend_failure_exception": failure}
     if (
         engine is Engine.MAGEMIN
-        and engine_reason in _MAGEMIN_WORKER_LIFECYCLE_REASONS
+        and engine_reason in MAGEMIN_WORKER_LIFECYCLE_REASONS
     ):
         return {"backend_status_reason": engine_reason}
     return None

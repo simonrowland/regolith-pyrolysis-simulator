@@ -92,6 +92,7 @@ from simulator.battery.validity import (
     run_validity_gates,
     underdetermined_apparatus,
 )
+from simulator.melt_backend.magemin import MAGEMIN_WORKER_LIFECYCLE_REASONS
 import simulator.battery.score as score_mod
 from simulator.battery.score import (
     SCORE_ELIGIBLE_CONJUNCTS,
@@ -16792,29 +16793,10 @@ def test_magemin_native_activity_failure_keeps_typed_cause(
 
 @pytest.mark.parametrize(
     ("backend_reason", "expected_reason"),
-    (
-        (
-            "magemin_subprocess_slot_timeout",
-            "engine_transport_error:magemin",
-        ),
-        (
-            "magemin_subprocess_slot_unavailable",
-            "engine_transport_error:magemin",
-        ),
-        (
-            "magemin_aggregate_budget_timeout",
-            "engine_transport_error:magemin",
-        ),
-        (
-            "magemin_engine_worker_unavailable",
-            "engine_transport_error:magemin",
-        ),
-        (
-            "magemin_engine_worker_died",
-            "engine_transport_error:magemin",
-        ),
-        ("magemin_subprocess_timeout", "engine_timeout"),
-    ),
+    tuple(
+        (reason, "engine_transport_error:magemin")
+        for reason in sorted(MAGEMIN_WORKER_LIFECYCLE_REASONS)
+    ) + (("magemin_subprocess_timeout", "engine_timeout"),),
 )
 def test_magemin_typed_lifecycle_reason_survives_battery_score(
     monkeypatch: pytest.MonkeyPatch,

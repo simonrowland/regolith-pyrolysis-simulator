@@ -438,6 +438,16 @@ _MAGEMIN_FAILURE_REASON_BY_EXCEPTION = {
     'FileNotFoundError': 'missing_binary',
     'MAGEMinOutputError': 'parse_empty_output',
 }
+_MAGEMIN_WORKER_LIFECYCLE_EXCEPTION_PREFIXES = (
+    'EngineWorker',
+    'MAGEMinAggregateBudget',
+    'MAGEMinSubprocessSlot',
+)
+MAGEMIN_WORKER_LIFECYCLE_REASONS = frozenset(
+    reason
+    for exception_type, reason in _MAGEMIN_FAILURE_REASON_BY_EXCEPTION.items()
+    if exception_type.startswith(_MAGEMIN_WORKER_LIFECYCLE_EXCEPTION_PREFIXES)
+)
 _MAGEMIN_UNTYPED_FAILURE_REASON = 'magemin_untyped_failure'
 
 
