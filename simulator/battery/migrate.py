@@ -20601,9 +20601,12 @@ def _printed_oxygen_buffer_text(
     return None
 
 
+_BUFFER_OFFSET_NUMBER_TOKEN = r"(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
+
+
 _BUFFER_OFFSET_TEXT_RE = re.compile(
     rf"^\s*({_BUFFER_TOKEN})"
-    r"\s*([+−-])\s*((?:\d+(?:\.\d*)?|\.\d+))\s*$",
+    rf"\s*([+−-])\s*({_BUFFER_OFFSET_NUMBER_TOKEN})\s*$",
     re.IGNORECASE,
 )
 # A printed log whose unit is the buffer name is the offset, not an absolute
@@ -21147,18 +21150,15 @@ _BUFFER_TOKEN_RE = re.compile(
 _BUFFER_OFFSET_RE = re.compile(
     rf"(?<![a-z0-9])(?P<buf>{_BUFFER_TOKEN})(?![a-z0-9])"
     # Unsigned numbers need '='; otherwise a sign must introduce the offset.
-    r"(?P<equals>\s*=)?\s*(?P<off>(?(equals)[+-]?|[+-])\s*"
-    r"(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)?",
-    re.IGNORECASE,
-)
-# A sign or equals with no number is an offset that failed to parse.
-# It must not fall through to the bare-name offset of 0.
-_BUFFER_OFFSET_INTRO_RE = re.compile(
-    rf"(?<![a-z0-9])(?:{_BUFFER_TOKEN})(?![a-z0-9])\s*(?:=|[+-])",
+    r"(?P<equals>\s*=)?\s*(?:(?P<off>(?(equals)[+-]?|[+-])\s*"
+    rf"{_BUFFER_OFFSET_NUMBER_TOKEN})\.?(?=$|[\s,;()])"
+    r"|(?P<invalid_off>(?(equals)|[+-])\s*[^\s,;()]*))?",
     re.IGNORECASE,
 )
 _BUFFER_DISTANCE_PHRASE_RE = re.compile(
-    r"(?P<n>[+-]?\d+(?:\.\d+)?)\s+(?:log\s+units?\s+)?(?P<dir>below|above)\s+"
+    # Capture the whole supplied token; the offset decoder validates it.
+    r"(?<!\S)(?P<n>[+\-.\d]\S*|\S+(?=\s+log\s+units?\s+))"
+    r"\s+(?:log\s+units?\s+)?(?P<dir>below|above)\s+"
     rf"(?<![a-z0-9])(?P<buf>{_BUFFER_TOKEN})(?![a-z0-9])",
     re.IGNORECASE,
 )
@@ -21246,6 +21246,8 @@ def _offset_number(raw: object) -> tuple[Decimal, str] | None:
     )
     if normalized.endswith("."):
         normalized = normalized[:-1]
+    if re.fullmatch(rf"[+-]?{_BUFFER_OFFSET_NUMBER_TOKEN}", normalized) is None:
+        return None
     try:
         number = Decimal(normalized)
     except (InvalidOperation, ValueError):
@@ -21371,7 +21373,8 @@ def _classify_buffer_phrase(
 
     A bare buffer name is offset 0 with printed=None (zero by statement).
     ``delta-IW`` with no number is prose, even inside decorated labels.
-    A printed sign or ``=`` whose number does not parse is prose, not offset 0.
+    A printed sign or ``=`` whose number does not parse is prose, not offset 0;
+    its raw offset token remains in the third item so callers cannot default it.
     ``IW = -2`` is offset -2. Unicode minus, en dash, and em dash are minus.
     """
 
@@ -21386,7 +21389,7 @@ def _classify_buffer_phrase(
     if phrase is not None:
         number, _printed = _offset_number(phrase.group("n")) or (None, None)
         if number is None:
-            return "", None, None, True
+            return _canonical_buffer_name(phrase.group("buf")), None, phrase.group("n"), True
         if phrase.group("dir").casefold() == "below":
             number = -abs(number)
         else:
@@ -21400,25 +21403,29 @@ def _classify_buffer_phrase(
     matches = list(_BUFFER_OFFSET_RE.finditer(text))
     if not matches:
         return "", None, None, False
+    invalid_offsets = [
+        item.group("invalid_off") for item in matches
+        if item.group("invalid_off") is not None
+    ]
+    if invalid_offsets:
+        return _canonical_buffer_name(matches[0].group("buf")), None, invalid_offsets[0], True
     families = {_canonical_buffer_name(item.group("buf")) for item in matches}
     if len(families) != 1:
         return "", None, None, True
     family = next(iter(families))
     offsets = [item.group("off") for item in matches if item.group("off")]
+    parsed_offsets = [_offset_number(item) for item in offsets]
+    if None in parsed_offsets:
+        return family, None, offsets[0], True
     if _leftover_buffer_words(text):
         return family, None, None, True
-    if len({_offset_number(item)[0] for item in offsets}) > 1:
+    if len({item[0] for item in parsed_offsets}) > 1:
         return family, None, None, True
     if not offsets:
-        if _BUFFER_OFFSET_INTRO_RE.search(text):
-            return family, None, None, True
         if _has_relative_buffer_marker(text):
             return family, None, None, True
         return family, Decimal(0), None, False
-    number, _printed = _offset_number(offsets[0]) or (None, None)
-    if number is None:
-        return family, None, None, True
-    return family, number, offsets[0].replace(" ", ""), False
+    return family, parsed_offsets[0][0], offsets[0].replace(" ", ""), False
 
 
 def _push_point(
@@ -21463,6 +21470,10 @@ def _buffer_request_from_row(
             oxygen_text.append(piece)
             family, offset, printed, is_prose = _classify_buffer_phrase(piece)
             if is_prose:
+                if printed is not None:
+                    return _buffer_refusal(
+                        _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=piece)
+                    )
                 prose.append((family, piece))
                 if family and _has_relative_buffer_marker(piece):
                     relative_markers_without_offset.append(piece)
@@ -21504,6 +21515,10 @@ def _buffer_request_from_row(
             ):
                 unknown.append(raw_buffer.strip())
             elif is_prose:
+                if printed is not None:
+                    return _buffer_refusal(
+                        _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=raw_buffer.strip())
+                    )
                 prose.append((family, raw_buffer.strip()))
                 if family and _has_relative_buffer_marker(raw_buffer):
                     relative_markers_without_offset.append(raw_buffer.strip())
@@ -22074,17 +22089,17 @@ def _printed_fo2_interval(
                 "interval condition not yet scorable",
             )
 
+        buffer_text = _normalize_offset_dashes(text)
+        if _BUFFER_DISTANCE_PHRASE_RE.search(buffer_text) is not None:
+            continue
         bound_match = re.search(
-            r"(?:(?P<distance>\d+(?:\.\d+)?)\s*(?:log\s+units?\s+)?)?"
             r"\b(?P<direction>below|under|less than|above|over|greater than)\s+"
-            r"(?P<buffer>IW|FMQ|QFM|NNO|iron[- ]w[uü]stite(?:\s+buffer)?)\b"
-            r"(?P<threshold_offset>\s*[+-]\s*\d+(?:\.\d+)?)?",
-            text,
+            rf"(?P<buffer>{_BUFFER_FAMILY_TOKEN})(?![a-z0-9])"
+            r"(?P<threshold_offset>\s*[+-]\s*[^\s,;()]*)?",
+            buffer_text,
             re.IGNORECASE,
         )
         if bound_match is None:
-            continue
-        if bound_match.group("distance") is not None:
             continue
         buffer = _canonical_buffer_name(bound_match.group("buffer"))
         direction = (
