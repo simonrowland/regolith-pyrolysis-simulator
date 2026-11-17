@@ -1,16 +1,86 @@
 """Migration pins for Kirschen and DeCapitani (1999), Tables 1 and 2."""
 
+from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
+from simulator.battery.migrate import wt_pct_to_mole_fraction
 from tests.battery.factories import migrate_one_extract
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ID = "kirschen-decapitani-1999-liquid-miscibility"
 EXTRACT = ROOT / f"data/literature/extracts/{SOURCE_ID}.yaml"
+SINGLE_LIQUID_COMPOSITIONS = {
+    "kirschen_decapitani_1999_t2_stc_16_1h": [
+        ("CaO", "10.58"),
+        ("SiO2", "35.94"),
+        ("TiO2", "54.55"),
+    ],
+    "kirschen_decapitani_1999_t2_stm_7_2h": [
+        ("MgO", "9.93"),
+        ("SiO2", "39.76"),
+        ("TiO2", "50.55"),
+    ],
+    "kirschen_decapitani_1999_t2_stmc_4_1h": [
+        ("CaO", "5.91"),
+        ("MgO", "3.86"),
+        ("SiO2", "45.30"),
+        ("TiO2", "45.56"),
+    ],
+    "kirschen_decapitani_1999_t2_stmc_5_2h": [
+        ("CaO", "6.35"),
+        ("MgO", "4.31"),
+        ("SiO2", "33.52"),
+        ("TiO2", "55.70"),
+    ],
+}
+SINGLE_LIQUID_ROW_IDS = {
+    f"{experiment_id}_phase1_{formula.lower()}"
+    for experiment_id in SINGLE_LIQUID_COMPOSITIONS
+    for formula in ("CaO", "MgO", "SiO2", "TiO2")
+}
+
+
+def _rows_by_id(document: dict, *, include_context: bool = False) -> dict[str, dict]:
+    sections = ("observations", "context") if include_context else ("observations",)
+    return {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for section in sections
+        for row in species.get(section, [])
+        if "observation_id" in row
+    }
+
+
+def _assert_single_liquid_run_compositions(document: dict) -> None:
+    experiments = {row["experiment_id"]: row for row in document["experiments"]}
+    observations = _rows_by_id(document)
+    all_rows = _rows_by_id(document, include_context=True)
+    moved = {row_id: all_rows[row_id] for row_id in SINGLE_LIQUID_ROW_IDS if row_id in all_rows}
+    assert set(moved) == SINGLE_LIQUID_ROW_IDS
+    assert not (SINGLE_LIQUID_ROW_IDS & set(observations))
+
+    for experiment_id, expected in SINGLE_LIQUID_COMPOSITIONS.items():
+        experiment = experiments[experiment_id]
+        components = experiment["sample"]["initial_composition"]["state"]["value"]["components"]
+        assert components == [list(component) for component in expected]
+        run_rows = [row for row in moved.values() if row["experiment"] == experiment_id]
+        assert len(run_rows) == 4
+        assert all(row["type"] == "phase_composition_context" for row in run_rows)
+        assert all(row["values"]["phase_assemblage_as_printed"] == "One liquid" for row in run_rows)
+        numeric = {
+            row["values"]["formula"]: Decimal(row["values"]["component_amount"]["value"])
+            for row in run_rows
+            if row["values"].get("status") != "typed_refusal"
+        }
+        assert numeric == {formula: Decimal(amount) for formula, amount in expected}
+        refused = [row for row in run_rows if row["values"].get("status") == "typed_refusal"]
+        assert len(refused) == (0 if len(expected) == 4 else 1)
+        assert all(row["values"]["printed_cell_as_published"] == "..." for row in refused)
 
 
 def _migrated_rows():
@@ -25,7 +95,7 @@ def _migrated_rows():
         for formula, species in document["species"].items()
         for row in species.get("observations", [])
     }
-    assert len(raw_rows) == len(result.observations) == 576
+    assert len(raw_rows) == len(result.observations) == 560
     refused_ids = {
         observation_id
         for observation_id, (_formula, row) in raw_rows.items()
@@ -72,10 +142,46 @@ def _migrated_rows():
             assert amount["sigma"] not in (None, "", "0", "0.0")
             assert Decimal(str(raw["uncertainty"]["sigma"])) == Decimal(str(amount["sigma"]))
             assert not observation.notices
-    assert point_count == 466
-    assert unavailable_count == 110
+    assert point_count == 452
+    assert unavailable_count == 108
     assert len(result.experiments) == len(document["experiments"]) == 74
+    _assert_single_liquid_run_compositions(document)
+    work_id = result.aliases[SOURCE_ID]
+    for experiment_id, expected in SINGLE_LIQUID_COMPOSITIONS.items():
+        migrated = result.experiments[f"{work_id}::experiment::{experiment_id}"]
+        initial = migrated.sample.initial_composition
+        assert initial is not None and initial.state.is_value
+        assert initial.state.value.components == wt_pct_to_mole_fraction(
+            {formula: Decimal(amount) for formula, amount in expected}
+        ).components
+        assert initial.locator is not None
+        assert initial.locator.page == 15
+        assert initial.locator.pdf_page_index == 14
+        assert initial.locator.published_page == "598"
     return document, result
+
+
+def test_single_liquid_compositions_move_to_run_conditions_and_reject_mutations() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_single_liquid_run_compositions(document)
+
+    changed_run = deepcopy(document)
+    sample = next(
+        row["sample"]
+        for row in changed_run["experiments"]
+        if row["experiment_id"] == "kirschen_decapitani_1999_t2_stc_16_1h"
+    )
+    sample["initial_composition"]["state"]["value"]["components"][0][1] = "10.59"
+    with pytest.raises(AssertionError):
+        _assert_single_liquid_run_compositions(changed_run)
+
+    changed_analysis = deepcopy(document)
+    rows = _rows_by_id(changed_analysis, include_context=True)
+    rows["kirschen_decapitani_1999_t2_stc_16_1h_phase1_cao"]["values"][
+        "component_amount"
+    ]["value"] = "10.59"
+    with pytest.raises(AssertionError):
+        _assert_single_liquid_run_compositions(changed_analysis)
 
 
 def test_all_table_cells_migrate_with_species_temperature_and_atmosphere() -> None:
@@ -84,11 +190,8 @@ def test_all_table_cells_migrate_with_species_temperature_and_atmosphere() -> No
 
 def test_measured_glass_rows_bind_their_printed_phase_compositions() -> None:
     document, result = _migrated_rows()
-    source_rows = {
-        row["observation_id"]: row
-        for species in document["species"].values()
-        for row in species.get("observations", [])
-    }
+    source_rows = _rows_by_id(document)
+    all_source_rows = _rows_by_id(document, include_context=True)
     measured_count = 0
     for observation_id, raw in source_rows.items():
         values = raw["values"]
@@ -108,7 +211,7 @@ def test_measured_glass_rows_bind_their_printed_phase_compositions() -> None:
         assert condition.state.is_value, observation_id
         assert condition.locator.page == raw["locator"]["page"]
         assert condition.locator.table == raw["locator"]["table"]
-    assert measured_count == 466
+    assert measured_count == 452
 
     # Independently transcribed from Table 1 (PDF p. 9) and Table 2 (PDF p. 15).
     expected = {
@@ -135,18 +238,14 @@ def test_measured_glass_rows_bind_their_printed_phase_compositions() -> None:
         ],
     }
     for observation_id, components in expected.items():
-        raw = source_rows[observation_id]
+        raw = all_source_rows[observation_id]
         point = raw["point_conditions"]["composition"]
         assert point["state"]["value"]["components"] == components
 
 
 def test_render_transcribed_stmc_grids_and_printed_precision() -> None:
     document, result = _migrated_rows()
-    source_rows = {
-        row["observation_id"]: row
-        for species in document["species"].values()
-        for row in species.get("observations", [])
-    }
+    source_rows = _rows_by_id(document, include_context=True)
     # Independently transcribed from the 600 dpi article renders: Table 1, PDF p. 14;
     # Table 2, PDF p. 15. Values include printed one-sigma uncertainties.
     grid = {
@@ -186,14 +285,21 @@ def test_render_transcribed_stmc_grids_and_printed_precision() -> None:
         for formula, (amount, sigma) in components.items():
             row_id = f"kirschen_decapitani_1999_t{table}_{sample.lower().replace(' ', '_').replace('-', '_')}_phase{phase}_{formula.lower()}"
             row = source_rows[row_id]
-            observation = result.observations[f"{SOURCE_ID}::{row_id}"]
             assert row["values"]["component_amount"] == {"value": amount, "sigma": sigma}
-            assert observation.value.point == Decimal(amount)
-            assert Decimal(str(observation.identity.temperature_K.value)) == Decimal(temperature) + Decimal("273.15")
-            assert observation.locator.page == page
-            assert observation.locator.pdf_page_index == page - 1
-            assert observation.identity.species.formula == formula
-            assert observation.point_conditions["gas_mix"].state.value == "air"
+            assert row["values"]["formula"] == formula
+            assert row["locator"]["page"] == page
+            assert row["locator"]["pdf_page_index"] == page - 1
+            if row_id in SINGLE_LIQUID_ROW_IDS:
+                assert row["type"] == "phase_composition_context"
+                assert row_id not in result.observations
+            else:
+                observation = result.observations[f"{SOURCE_ID}::{row_id}"]
+                assert observation.value.point == Decimal(amount)
+                assert Decimal(str(observation.identity.temperature_K.value)) == Decimal(temperature) + Decimal("273.15")
+                assert observation.locator.page == page
+                assert observation.locator.pdf_page_index == page - 1
+                assert observation.identity.species.formula == formula
+                assert observation.point_conditions["gas_mix"].state.value == "air"
     # Preserve the scan's two-decimal precision even though the value equals 0.4.
     laser_sigma = source_rows[
         "kirschen_decapitani_1999_t2_stmc_4_1h_phase1_sio2"
@@ -205,12 +311,15 @@ def test_unavailable_cells_are_only_the_printed_ellipses() -> None:
     document, result = _migrated_rows()
     unavailable = [
         row
-        for row in document["species"]["SiO2"]["observations"]
-        if row["values"].get("status") == "typed_refusal"
+        for row in _rows_by_id(document, include_context=True).values()
+        if row.get("values", {}).get("status") == "typed_refusal"
     ]
     assert len(unavailable) == 110
     assert all(row["values"]["printed_cell_as_published"] == "..." for row in unavailable)
-    assert all(
-        result.observations[f"{SOURCE_ID}::{row['observation_id']}"].value.kind.value == "unavailable"
-        for row in unavailable
-    )
+    for row in unavailable:
+        observation_id = row["observation_id"]
+        if observation_id in SINGLE_LIQUID_ROW_IDS:
+            assert row["type"] == "phase_composition_context"
+            assert f"{SOURCE_ID}::{observation_id}" not in result.observations
+        else:
+            assert result.observations[f"{SOURCE_ID}::{observation_id}"].value.kind.value == "unavailable"
