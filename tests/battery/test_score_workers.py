@@ -223,6 +223,47 @@ def test_parallel_scoring_matches_serial_rows_and_summary(tmp_path: Path) -> Non
     assert parallel_summary == serial_summary
 
 
+def test_parallel_score_shards_reuse_parent_store_stamp(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+
+    context = _worker_fixture(experiment_count=12)
+    parent_stamp = derive_store_stamp(score_mod.REPO_ROOT)
+    derive_calls = 0
+
+    def changing_store_stamp(_root: Path | None = None) -> dict[str, object]:
+        nonlocal derive_calls
+        derive_calls += 1
+        if derive_calls == 1:
+            return parent_stamp
+        return {
+            **parent_stamp,
+            "revision": f"{parent_stamp['revision']}x",
+        }
+
+    def run_workers_in_process(tasks, worker, *, initializer, initargs, **_kwargs):
+        initializer(*initargs)
+        return [worker(task) for task in tasks]
+
+    monkeypatch.setattr(score_mod, "derive_store_stamp", changing_store_stamp)
+    monkeypatch.setattr(score_mod, "supervised_process_map", run_workers_in_process)
+
+    path = tmp_path / "changing-store-stamp.jsonl"
+    written, _metadata = _score_store_to_jsonl(
+        context,
+        path,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=_worker_test_predict,
+        workers=2,
+    )
+
+    assert written > 0
+    assert derive_calls == 1
+    header = path.with_name(path.name + ".partial").read_bytes().splitlines()[0]
+    assert json.loads(header) == parent_stamp
+
+
 @pytest.mark.parametrize("workers", (1, 2), ids=("serial", "worker"))
 def test_condensed_frame_diagnostics_reach_serial_and_worker_scoring(
     tmp_path: Path, workers: int
