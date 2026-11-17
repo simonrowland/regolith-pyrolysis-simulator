@@ -83,6 +83,7 @@ from simulator.battery.enums import (
     PURE_STANDARD_THERMO,
     QuenchDirection,
     QuenchState,
+    QuotedTargetKind,
     Quantity,
     ReferenceStateConvention,
     Rail,
@@ -292,6 +293,7 @@ from simulator.battery.validate import (
     _observation_lineage,
     observation_issue_location,
     _pressure_blocking_notices,
+    _quoted_source_observation_ids,
     _resolve_coefficient_sources,
     _VAPOUR_EQUILIBRIUM,
     _build_validation_indexes,
@@ -5345,6 +5347,7 @@ def _resolve_source_relation_with_indexes(
         reference.observation_id,
         observations,
         indexes.table_ids,
+        experiments=experiments,
         asset_ids=indexes.asset_ids,
         _cache=indexes.observation_lineages,
     )
@@ -5422,6 +5425,7 @@ class _ScoringLineageResolver:
                 reference.observation_id,
                 self.context.observations,
                 self.indexes.table_ids,
+                experiments=self.context.experiments,
                 asset_ids=self.indexes.asset_ids,
                 _cache=self.indexes.observation_lineages,
             )
@@ -16845,16 +16849,19 @@ def _compile_residual_with_lineage(
             fo2_mode=fo2_mode,
         )
 
-    if (
-        prediction is not None
-        and prediction.refusal_reason is RefusalReason.REFERENTIAL_INTEGRITY
-        and prediction.refusal_detail.get("reason") == "duplicate_of"
-    ):
+    duplicate_detail = _duplicate_observation_refusal_detail(context, reference)
+    if duplicate_detail is not None:
+        source_relation = (
+            SourceRelation.SAME_INPUT
+            if duplicate_detail.get("resolution")
+            in {"excluded", "primary_not_admitted"}
+            else SourceRelation.UNKNOWN
+        )
         return _refused(
             RefusalReason.REFERENTIAL_INTEGRITY,
-            prediction.refusal_detail,
-            execution=prediction.execution,
-            extra_notices=prediction.notices,
+            duplicate_detail,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            source_relation=source_relation,
             exclusions=("duplicate_of",),
         )
 
@@ -17414,6 +17421,7 @@ def _compile_residual_with_lineage(
             relation_reference.observation_id,
             context.observations,
             validation_indexes.table_ids,
+            experiments=context.experiments,
             asset_ids=validation_indexes.asset_ids,
             _cache=validation_indexes.observation_lineages,
         )
@@ -18256,20 +18264,62 @@ def load_score_context(
     )
 
 
-def _has_duplicate_observation_link(observation: Observation) -> bool:
+def _has_duplicate_observation_link(
+    observation: Observation,
+    experiments: Mapping[str, Experiment] | None = None,
+) -> bool:
     provenance = observation.provenance
-    return (
+    explicit_duplicate = (
         isinstance(provenance, Mapping)
         and "duplicate_of_observation_id" in provenance
+    )
+    experiment = (
+        experiments.get(observation.experiment_id)
+        if experiments is not None
+        else None
+    )
+    return explicit_duplicate or (
+        experiment is not None and experiment.quoted_from is not None
     )
 
 
 def _duplicate_observation_refusal_detail(
     context: ScoreContext, observation: Observation
-) -> dict[str, object]:
+) -> dict[str, object] | None:
     provenance = observation.provenance
-    assert isinstance(provenance, Mapping)
-    target = provenance["duplicate_of_observation_id"]
+    has_explicit_duplicate = (
+        isinstance(provenance, Mapping)
+        and "duplicate_of_observation_id" in provenance
+    )
+    if has_explicit_duplicate:
+        explicit_target = provenance["duplicate_of_observation_id"]
+    else:
+        experiments = getattr(context, "experiments", {})
+        experiment = experiments.get(observation.experiment_id)
+        quoted_from = experiment.quoted_from if experiment is not None else None
+        if quoted_from is None:
+            return None
+        primary_ids = _quoted_source_observation_ids(
+            experiment, context.observations, experiments
+        )
+        if quoted_from.target_kind is QuotedTargetKind.EXPERIMENT:
+            return {
+                "reason": "duplicate_of",
+                "primary_experiment_id": quoted_from.target_id,
+                "primary_observation_ids": list(primary_ids or ()),
+                "resolution": "excluded"
+                if primary_ids is not None
+                else "primary_missing",
+            }
+        if primary_ids is None:
+            return {
+                "reason": "duplicate_of",
+                "primary_observation_id": quoted_from.target_id,
+                "resolution": "primary_missing",
+            }
+        explicit_target = primary_ids[0]
+
+    target = explicit_target
     detail: dict[str, object] = {
         "reason": "duplicate_of",
         "primary_observation_id": target,
@@ -18327,7 +18377,7 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
         ev = obs.evidence.class_
         if obs.admission.status not in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}:
             continue
-        if _has_duplicate_observation_link(obs):
+        if _has_duplicate_observation_link(obs, getattr(context, "experiments", None)):
             continue
         origin = getattr(context, "origins", {}).get(obs.observation_id)
         if is_internal_consistency(origin):
@@ -18510,6 +18560,10 @@ def score_proprietary_aggregate(
             raise ValueError(
                 f"observation_id {observation_id!r} has no score rail"
             )
+
+        if _duplicate_observation_refusal_detail(context, observation) is not None:
+            count_refusal(rail, RefusalReason.REFERENTIAL_INTEGRITY.value)
+            continue
 
         if provider is None:
             outcome: ProprietaryProviderResult = ProprietaryRefused(

@@ -11071,7 +11071,8 @@ def test_indexed_work_inputs_match_independent_per_work_resolution() -> None:
         works, observations, experiments, indexes
     )
     assert indexed == expected
-    assert experiments.lookups == len(observations)
+    # Work grouping and quoted-source lineage each resolve an experiment.
+    assert experiments.lookups == 2 * len(observations)
     assert expected[first_work.work_id].ids == {
         first_observation.observation_id,
         "nasa-cea-thermo",
