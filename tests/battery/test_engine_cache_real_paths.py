@@ -584,6 +584,7 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
     from simulator.melt_backend import alphamelts as alphamelts_module
     from simulator.melt_backend.alphamelts import AlphaMELTSBackend
     from simulator import environment
+    from simulator import engine_cache
     from simulator.diagnostic_helpers.binary_pot_battery import (
         normalize_engine_settings,
     )
@@ -592,6 +593,25 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
         engine_cache_key,
         engine_cache_settings,
     )
+
+    expected_rebumped_versions = {
+        "openimcc": 2,
+        "internal-analytical": 3,
+    }
+
+    def expected_current_key(engine: str, legacy_wire_hex: str) -> bytes:
+        # These snapshots pin the canonical request tail. Chemistry versions
+        # and the new source-input digest form the current key header.
+        expected_version = expected_rebumped_versions.get(
+            engine, ENGINE_CHEMISTRY_VERSION[engine]
+        )
+        assert ENGINE_CHEMISTRY_VERSION[engine] == expected_version
+        return (
+            bytes((engine_cache._ENGINE_NUMBERS[engine],))
+            + expected_version.to_bytes(2, "big")
+            + engine_cache._engine_cache_input_identity_digest(engine)
+            + bytes.fromhex(legacy_wire_hex[6:])
+        )
 
     monkeypatch.setattr(
         environment,
@@ -689,17 +709,17 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
         ),
     )
     mismatches = {}
-    for label, engine, configuration, expected_hex in snapshots:
+    for label, engine, configuration, legacy_wire_hex in snapshots:
         normalized = normalize_engine_settings(engine, configuration)
         key = engine_cache_key(
             engine,
             ENGINE_CHEMISTRY_VERSION[engine],
             {"engine_settings": engine_cache_settings(engine, normalized)},
         )
-        if key.hex() != expected_hex:
+        if key != expected_current_key(engine, legacy_wire_hex):
             mismatches[label] = key.hex()
 
-    case_key_hex = {
+    case_legacy_wire_hex = {
         "AlphaMELTS transport mode": (
             "050002ff08aef82d27a383e073ad83ef3a95a1f5"
         ),
@@ -766,7 +786,9 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
                 )
             },
         )
-        if key.hex() != case_key_hex[case.label]:
+        if key != expected_current_key(
+            case.engine.value, case_legacy_wire_hex[case.label]
+        ):
             mismatches[case.label] = key.hex()
     assert not mismatches, repr(mismatches)
 
