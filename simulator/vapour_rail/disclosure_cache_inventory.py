@@ -253,7 +253,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score_run.py:residue_prediction_cache': {
         "path": 'simulator/battery/score_run.py',
-        "line": 430,
+        "line": 433,
         "kind": 'store',
         "name": 'residue_prediction_cache',
         "carries_disclosure": True,
@@ -261,7 +261,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score.py:residue_prediction_cache': {
         "path": 'simulator/battery/score.py',
-        "line": 15576,
+        "line": 16278,
         "kind": 'store',
         "name": 'residue_prediction_cache',
         "carries_disclosure": True,
@@ -325,7 +325,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/compilation_tier.py:fit_evaluation_cache': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 4770,
+        "line": 4816,
         "kind": 'store',
         "name": 'fit_evaluation_cache',
         "carries_disclosure": False,

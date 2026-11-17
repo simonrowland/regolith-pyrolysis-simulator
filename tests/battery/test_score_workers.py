@@ -624,7 +624,7 @@ def test_group_partition_keeps_series_and_sossi_cohort_together() -> None:
 
 class _SortAggregate:
     def __init__(self, *args, **kwargs) -> None:
-        self.tier_accumulator = SimpleNamespace(selected=None)
+        self.tier_accumulator = SimpleNamespace(selected=set())
 
     def add(self, _payload):
         return None
