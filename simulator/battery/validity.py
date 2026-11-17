@@ -47,6 +47,8 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    BoundDirection,
+    BoundInclusivity,
     EvidenceClass,
     MEASURED_EVIDENCE,
     MethodToken,
@@ -70,6 +72,7 @@ from simulator.battery.records import (
     Observation,
     State,
     Value,
+    _bound_operator_semantics,
     as_decimal,
 )
 from simulator.reference_data.janaf import formula_composition
@@ -174,15 +177,24 @@ def _pressure_bounds(
     return None
 
 
+def _positive_decimal(value: Decimal | None) -> bool:
+    return value is not None and value.is_finite() and value > 0
+
+
 def _finite_positive(located: Located[Value | Decimal] | None) -> Decimal | None:
     value = _located_decimal(located)
-    if value is None or not value.is_finite() or value <= 0:
-        return None
-    return value
+    return value if _positive_decimal(value) else None
+
+
+_CLAUSING_FACTOR_MAX = Decimal("1")
 
 
 def _clausing_value_ok(value: Decimal | None) -> bool:
-    return value is not None and value.is_finite() and value > 0 and value <= 1
+    return (
+        _positive_decimal(value)
+        and value is not None
+        and value <= _CLAUSING_FACTOR_MAX
+    )
 
 
 def _clausing_ok(located: Located[Value | Decimal] | None) -> bool:
@@ -233,23 +245,69 @@ def _printed_positive_diameter_interval(
     return extent is not None and extent[2] == "interval"
 
 
-def _impossible_kems_geometry_interval(
+def _impossible_kems_geometry_value(
     located: Located[Value | Decimal] | None,
     *,
     clausing_factor: bool = False,
 ) -> bool:
-    bounds = _pressure_bounds(located)
-    if bounds is None:
+    # Refuse only when every admissible value violates the physical domain.
+    # A straddling interval or bound remains missing/unverified because it
+    # still admits a physically possible value.
+    if located is None or not located.state.is_value:
         return False
-    low, high, kind = bounds
-    if kind != "interval" or low is None or high is None:
+    raw = located.state.value
+    if raw is None:
         return False
-    if high <= 0:
-        return True
-    if not clausing_factor:
-        return False
-    extent = _positive_extent(located)
-    return extent is not None and not _clausing_value_ok(extent[0])
+    if not isinstance(raw, Value):
+        if clausing_factor:
+            return not _clausing_value_ok(raw)
+        return not _positive_decimal(raw)
+    if raw.kind is ValueKind.POINT:
+        return not (
+            _clausing_value_ok(raw.point)
+            if clausing_factor
+            else _positive_decimal(raw.point)
+        )
+    if raw.kind is ValueKind.INTERVAL:
+        low = raw.interval_low
+        high = raw.interval_high
+        if low is None or high is None or low > high:
+            return True
+        bounds = _pressure_bounds(located)
+        if bounds is None:
+            return True
+        low, high, kind = bounds
+        if kind != "interval" or low is None or high is None:
+            return True
+        if not _positive_decimal(high):
+            return True
+        if not clausing_factor:
+            return False
+        extent = _positive_extent(located)
+        return extent is not None and low > _CLAUSING_FACTOR_MAX
+    if raw.kind is ValueKind.BOUND:
+        bound = raw.bound_value
+        if bound is None:
+            return True
+        operator_semantics = _bound_operator_semantics(raw.bound_operator)
+        direction = raw.bound_direction
+        inclusivity = raw.bound_inclusivity
+        if direction is None and operator_semantics is not None:
+            direction, inclusivity = operator_semantics
+        if direction is None or inclusivity is None:
+            return True
+        if direction is BoundDirection.UPPER:
+            return not _positive_decimal(bound)
+        if not clausing_factor:
+            return False
+        return bound > _CLAUSING_FACTOR_MAX or (
+            bound == _CLAUSING_FACTOR_MAX
+            and inclusivity is BoundInclusivity.EXCLUDED
+        )
+    # Geometry extracts use POINT, INTERVAL, and legacy scalar values; BOUND
+    # is also supported by the parser and handled above. Other Value kinds do
+    # not occur on these fields and are not inferred as numeric ranges here.
+    return False
 
 
 def _invalid_kems_geometry_fields(
@@ -259,26 +317,13 @@ def _invalid_kems_geometry_fields(
         return ()
     invalid: list[str] = []
     area = geometry.orifice_area_m2
-    area_value = _located_decimal(area)
-    if (area_value is not None and _finite_positive(area) is None) or (
-        _impossible_kems_geometry_interval(area)
-    ):
+    if _impossible_kems_geometry_value(area):
         invalid.append("orifice_area_m2")
     diameter = geometry.orifice_diameter_m
-    if (
-        (
-            _located_decimal(diameter) is not None
-            and _finite_positive(diameter) is None
-            and not _printed_positive_diameter_interval(diameter)
-        )
-        or _impossible_kems_geometry_interval(diameter)
-    ):
+    if _impossible_kems_geometry_value(diameter):
         invalid.append("orifice_diameter_m")
     clausing = geometry.clausing_factor
-    if (
-        (_located_decimal(clausing) is not None and not _clausing_ok(clausing))
-        or _impossible_kems_geometry_interval(clausing, clausing_factor=True)
-    ):
+    if _impossible_kems_geometry_value(clausing, clausing_factor=True):
         invalid.append("clausing_factor")
     return tuple(invalid)
 
