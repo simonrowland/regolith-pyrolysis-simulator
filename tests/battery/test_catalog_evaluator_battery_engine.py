@@ -188,6 +188,15 @@ def test_catalog_evaluator_predicts_and_flags_temperature_extrapolation() -> Non
     assert prediction.certified_band == {
         "temperature_K": (Decimal("100.0"), Decimal("273.16"))
     }
+    assert len(prediction.law_disclosures) == 1
+    disclosure = dict(prediction.law_disclosures[0])
+    assert disclosure["law_id"].startswith("H2O:")
+    assert disclosure["provenance"]
+    assert disclosure["authority"] == "extrapolated"
+    assert disclosure["certified_band_K"] == [100.0, 273.16]
+    assert disclosure["anchor_gaps_dex"] == {}
+    assert disclosure["closer"] == ""
+    assert disclosure["evaluation_count"] == 1
     assert any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         for notice in prediction.notices

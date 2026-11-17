@@ -20,7 +20,7 @@ from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.mass_balance import MassBalance
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import EvaporationFlux, MOLAR_MASS
-from simulator.trace import PhysicsTrace
+from simulator.trace import PhysicsTrace, wall_zone_by_segment
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -340,3 +340,26 @@ def test_from_simulator_provenance_gate_matches_legacy_verdict():
 
     assert "fail-closed: no result" not in provenance_margin.detail
     assert provenance_margin.feasible == legacy_margin.feasible
+
+
+def test_wall_zone_keeps_maximum_history_temperature_and_static_fallback():
+    sim = SimpleNamespace(
+        condensation_model=SimpleNamespace(
+            operating_history=(
+                {"pipe_segment_temperatures_C": {"a": 100.0, "b": 120.0}},
+                {"pipe_segment_temperatures_C": {"a": 150.0}},
+            ),
+            pipe_segments=(
+                SimpleNamespace(name="a", wall_temperature_C=10.0),
+                SimpleNamespace(name="b", wall_temperature_C=10.0),
+                SimpleNamespace(name="c", wall_temperature_C=80.0),
+            ),
+        )
+    )
+
+    # Golden pin before moving temperature extraction into its reusable trace helper.
+    assert wall_zone_by_segment(sim) == {
+        "a": "Hottest",
+        "b": "Hot",
+        "c": "Rest",
+    }

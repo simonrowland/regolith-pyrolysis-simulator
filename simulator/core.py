@@ -675,6 +675,14 @@ from simulator.evaporation import (
     EvaporationFluxRefusal,
     EvaporationMixin,
     _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+    attach_evaluated_transport_pO2,
+    attach_pre_evaporation_melt_oxide_kg,
+    attach_wall_supply_interval_physical_zero,
+    evaporation_flux_for_campaign_hour,
+    note_pre_evaporation_melt_oxide_kg,
+    pressure_vapour_evaluation_consumed,
+    publish_wall_supply_on_flux,
+    remember_evaluated_transport_pO2,
 )
 from simulator.extraction import ExtractionMixin
 from simulator.melt_backend.base import (
@@ -1429,6 +1437,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._poisoned_hour: PoisonedHourState | None = None
         self._last_overhead_gas_equilibrium: Dict[str, Any] = {}
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
+        # Transport pO2 the latest vapour evaluation consumed. The
+        # snapshot reservoir is refreshed after the bleed and is not
+        # this value (d-401).
+        self._evaluated_transport_pO2_bar: float | None = None
+        self._evaluated_transport_pO2_recorded: bool = False
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
         self._last_partial_melt_offgassing_diagnostic: Dict[str, Any] = {}
         # b-149 silent-zero class: typed zero_because notes (diagnostic only).
@@ -5290,6 +5303,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_curve_memo_is_cacheable,
             record_repair_notice,
         )
+        from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+        def _carried_disclosures(
+            source: Mapping[str, Any] | None,
+        ) -> dict[str, Any]:
+            # Normalization rebuilds the record. A measured disclosure field,
+            # including [], must survive that rebuild. Absence stays absent.
+            if isinstance(source, Mapping) and "law_disclosures" in source:
+                return {"law_disclosures": source.get("law_disclosures")}
+            return {}
 
         self._last_reduced_real_replay_notices = None
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
@@ -5302,7 +5325,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
-        key = self._freeze_gate_cache_key(
+        key, magemin_domain_reason = self._freeze_gate_cache_key_and_domain(
             pressure_bar=pressure_bar,
             fO2_log=redox_key_fO2_log,
             **redox_state_kwargs,
@@ -5312,7 +5335,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         cache_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
         record = None
         cache_hit = bool(
-            isinstance(cache, dict)
+            magemin_domain_reason is None
+            and isinstance(cache, dict)
             and cache.get('key') == key
             and cache.get('disposition') in {'live', 'memo-hit'}
             and isinstance(curve, Mapping)
@@ -5331,6 +5355,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 **redox_state_kwargs,
             )
         )
+        published_cache = None
+        if cache_hit:
+            # Same miss-or-replay gate as the evaporation slots. No field
+            # is unknown, so this row is not a curve. A known field is
+            # re-registered onto this session before the curve is used.
+            published_cache = accept_stored_memo(cache, owner=self)
+            if published_cache is None:
+                cache_hit = False
         if not cache_hit:
             curve = None
         else:
@@ -5340,6 +5372,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 cache_notices,
                 'memo-hit',
                 provider_outcome=cache.get('provider_outcome'),
+                law_disclosures=published_cache,
             )
 
         memo = getattr(
@@ -5348,7 +5381,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             None,
         )
         core_memo_hit = False
-        if curve is None and isinstance(memo, dict):
+        if (
+            curve is None
+            and magemin_domain_reason is None
+            and isinstance(memo, dict)
+        ):
             memoized_record = memo.get(key)
             if (
                 isinstance(memoized_record, Mapping)
@@ -5368,16 +5405,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     **redox_state_kwargs,
                 )
             ):
-                record = gate_curve_memo_record(
-                    memoized_record['curve'],
-                    memoized_record.get('origin'),
-                    memoized_record.get('repair_notices'),
-                    'memo-hit',
-                    provider_outcome=memoized_record.get('provider_outcome'),
+                published_memo = accept_stored_memo(
+                    memoized_record,
+                    owner=self,
                 )
-                curve = record['curve']
-                cache_notices = record['repair_notices']
-                core_memo_hit = True
+                if published_memo is None:
+                    memo.pop(key, None)
+                else:
+                    record = gate_curve_memo_record(
+                        memoized_record['curve'],
+                        memoized_record.get('origin'),
+                        memoized_record.get('repair_notices'),
+                        'memo-hit',
+                        provider_outcome=memoized_record.get(
+                            'provider_outcome'
+                        ),
+                        law_disclosures=published_memo,
+                    )
+                    curve = record['curve']
+                    cache_notices = record['repair_notices']
+                    core_memo_hit = True
             elif memoized_record is not None:
                 memo.pop(key, None)
 
@@ -5464,6 +5511,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             record.get('repair_notices'),
             record.get('disposition', 'live'),
             provider_outcome=record.get('provider_outcome'),
+            **_carried_disclosures(record),
         )
         validated_cache = self._freeze_gate_liquid_fraction_cache
         if cache_hit:
@@ -5506,6 +5554,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     provider_outcome=normalized_record.get(
                         'provider_outcome'
                     ),
+                    **_carried_disclosures(normalized_record),
                 ),
                 'key': key,
             }
@@ -5524,6 +5573,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 cache_notices,
                 normalized_record.get('disposition', 'live'),
                 provider_outcome=normalized_record.get('provider_outcome'),
+                **_carried_disclosures(normalized_record),
             )
         self._record_composition_projected_liquidus_notice_from_curve(
             normalized_curve
@@ -7424,6 +7474,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._degraded_path_engagement = degraded_before
 
     def _compute_capacity_coupling_shadow_impl(self, equilibrium):
+        # Drop the previous hour's publication. A skipped resolve must
+        # not re-close this hour on that map.
+        self._langmuir_flux_closure_context = None
         from engines.builtin.evaporation_flux import (
             BuiltinEvaporationFluxProvider,
         )
@@ -7529,6 +7582,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             iteration_controls['overhead_pressure_pa'] = (
                 self._evaporation_overhead_total_pressure_Pa(partials_Pa)
             )
+            # The map in ``controls`` was closed on the partials at the
+            # start of this shadow. Each trial vector re-enters the same
+            # closure from the stored publication. Do not write the
+            # diagnostic here: the resolver owns it, and the live
+            # evaporation call closes on the solved vector afterwards.
+            reclosed = self._reclose_langmuir_pressures(partials_Pa)
+            # The trial's map and its O2 drive bound are one state.
+            # ``root_closed`` is applied and a solved surface. A trial
+            # that did not close a root keeps green's drive, including
+            # O2 on a disabled film or an HKL upper bound. The controls
+            # copied above were closed on the partials at the start of
+            # the shadow; this trial must not keep that flag.
+            owns_oxygen_drive = False
+            if reclosed is not None:
+                iteration_controls['vapour_batch_flux_pressures_Pa'] = dict(
+                    reclosed.pressures_Pa
+                )
+                owns_oxygen_drive = bool(
+                    reclosed.applied and reclosed.surface_pO2_bar is not None
+                )
+            iteration_controls['surface_oxygen_bound'] = owns_oxygen_drive
             request = IntentRequest(
                 intent=ChemistryIntent.EVAPORATION_FLUX,
                 account_view=account_view,
@@ -7543,6 +7617,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     str(diagnostic.get('reason') or result.status),
                     diagnostic,
                 )
+            # Debit vector only. Rates at or below the 1e-12 kg/h floor
+            # stay out of this solve so the partials stay on the published
+            # flux closure. Wall supply reads the live publisher diagnostic
+            # after this solve, which keeps those rates.
             rates = {
                 species: float(rate) * liquid_fraction_factor
                 for species, rate in dict(
@@ -9915,18 +9993,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         A forecast can disable the post-equilibrium SulfSat hook because its
         candidate temperatures are not realized run steps.
+
+        Replay, write-through, and the live solve share one bind. A hit that
+        returns before the bind drops its stored disclosure: re-registration
+        has no registry, and the owner's snapshot is published on the way out.
         """
-        store = _pt0_determinism_store_for(self)
-        if store is not None and getattr(store, 'replay_enabled', False):
-            return store.replay_equilibrium(self)
-        cache_write_through = (
-            store is not None
-            and getattr(store, 'write_through_enabled', False)
+        from simulator.vapour_rail.run_disclosure import (
+            bind_simulation_run,
+            open_computation,
         )
-        if cache_write_through:
-            cached_result = store.cached_equilibrium(self)
-            if cached_result is not None:
-                return cached_result
+
+        with bind_simulation_run(self):
+            store = _pt0_determinism_store_for(self)
+            if store is not None and getattr(store, 'replay_enabled', False):
+                return store.replay_equilibrium(self)
+            cache_write_through = (
+                store is not None
+                and getattr(store, 'write_through_enabled', False)
+            )
+            if cache_write_through:
+                cached_result = store.cached_equilibrium(self)
+                if cached_result is not None:
+                    return cached_result
+            # The live solve is one computation. Its cache row stores only the
+            # laws this solve executes. A bound session receives those counts.
+            # With no session, the simulator registry keeps them.
+            with open_computation():
+                return self._get_equilibrium_live(
+                    store,
+                    cache_write_through=cache_write_through,
+                    run_post_equilibrium_sulfsat=run_post_equilibrium_sulfsat,
+                )
+
+    def _get_equilibrium_live(
+        self,
+        store,
+        *,
+        cache_write_through: bool,
+        run_post_equilibrium_sulfsat: bool,
+    ):
         if self.backend is None:
             if cache_write_through:
                 raise RuntimeError(
@@ -10340,6 +10445,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         entry so a failure cannot expose a prior call's result.
         """
 
+        # This hour's evaluation has not consumed a transport pO2 yet.
+        # Early exits (sub-400 K, frozen melt) leave that absence. A
+        # previous hour's pressure must not survive them. The success
+        # path below overwrites it with the pressure the dispatch used.
+        remember_evaluated_transport_pO2(self, None)
+        consumed_transport_pO2_bar: float | None = None
         self._last_vapor_pressure_diagnostic = {}
         self._last_vapor_pressures_source = {}
         self._last_high_t_melt_activity = {}
@@ -10439,6 +10550,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._vapor_pressure_dispatch_pO2_bar()
             if observation_pO2_bar is None else observation_pO2_bar
         )
+        consumed_transport_pO2_bar = pO2_bar
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         intrinsic_fO2_log = getattr(
             reservoir,
@@ -10699,6 +10811,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         co2_diagnostic = getattr(self, '_headspace_co2_dissociation_diagnostic', {})
         if co2_diagnostic:
             diagnostic['co2_dissociation'] = dict(co2_diagnostic)
+        # d-401. The provider's recorded transport pO2 is the pressure
+        # this evaluation consumed. The dispatch value is that pressure
+        # only when the diagnostic omits it. The reservoir is refreshed
+        # again after the bleed and is not this value. Cache consumption
+        # stamps through the same choice.
+        remember_evaluated_transport_pO2(
+            self,
+            pressure_vapour_evaluation_consumed(
+                diagnostic,
+                dispatch_pO2_bar=consumed_transport_pO2_bar,
+            ),
+        )
         self._last_vapor_pressure_diagnostic = diagnostic
         note_high_t_fallback = getattr(
             self, '_note_high_t_melt_activity_fallback', None
@@ -14461,15 +14585,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     else {}
                 ),
             }
-        prediction = context._evaluate_c0_exit_forecast(
-            alkali_retention_budget_fraction=(
-                alkali_retention_budget_fraction
-            ),
-            p_total_mbar=p_total_mbar,
-            pO2_mbar=pO2_mbar,
-            remaining_hold_budget_hr=remaining_hold_budget_hr,
-            preferred_exit_temperature_C=preferred_exit_temperature_C,
-        )
+        try:
+            prediction = context._evaluate_c0_exit_forecast(
+                alkali_retention_budget_fraction=(
+                    alkali_retention_budget_fraction
+                ),
+                p_total_mbar=p_total_mbar,
+                pO2_mbar=pO2_mbar,
+                remaining_hold_budget_hr=remaining_hold_budget_hr,
+                preferred_exit_temperature_C=preferred_exit_temperature_C,
+            )
+        finally:
+            # The context is dropped with the prediction. Publish the
+            # parent registry, which the forecast shares, onto this simulator.
+            from simulator.vapour_rail.run_disclosure import RunDisclosure
+
+            parent_registry = getattr(self, '_law_disclosure_registry', None)
+            if (
+                isinstance(parent_registry, RunDisclosure)
+                and not parent_registry.computation
+            ):
+                self.law_disclosures = parent_registry.snapshot()
         forecast_engine = getattr(context, '_c0_forecast_engine', None)
         if forecast_engine is not None:
             prediction['forecast_engine'] = forecast_engine
@@ -14547,14 +14683,80 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         context = type(self).__new__(type(self))
         try:
+            # C0 forecasts sweep temperature on a detached copy of this same
+            # melt composition. Reuse only an authority record already pinned
+            # for this hour and still admitted by the gate owner. Resolving
+            # here mutates parent cache and replay state; without an admitted
+            # pin, the forecast's normal owner path resolves it when needed.
+            current_hour = int(self.melt.hour)
+            gate_authority = getattr(
+                self,
+                '_melt_redox_gate_authority_this_tick',
+                _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
+            )
+            gate_authority_hour = getattr(
+                self,
+                '_melt_redox_gate_authority_tick_hour',
+                None,
+            )
+            # Admission rebuilds producer configuration, whose key helper
+            # registers the gate provider lazily. A present fallback makes
+            # that existing registration path return without writing.
+            gate_provider_registered = (
+                self._chem_registry.fallback_for(
+                    ChemistryIntent.GATE_LIQUID_FRACTION
+                )
+                is not None
+            )
+            reuse_gate_authority = (
+                gate_provider_registered
+                and gate_authority_hour == current_hour
+                and isinstance(gate_authority, Mapping)
+                and self._melt_redox_gate_record_is_admitted(gate_authority)
+            )
+            if not reuse_gate_authority:
+                gate_authority = _RESOLVE_MELT_REDOX_GATE_AUTHORITY
             ledger = snapshot_atom_ledger(self.atom_ledger)
             memo = {id(self): context, id(self.atom_ledger): ledger}
+            # A copied registry would record forecast evaluations on an
+            # object this method drops. Share the parent's run registry.
+            from simulator.vapour_rail.run_disclosure import RunDisclosure
+
+            parent_registry = getattr(self, '_law_disclosure_registry', None)
+            if (
+                isinstance(parent_registry, RunDisclosure)
+                and not parent_registry.computation
+            ):
+                memo[id(parent_registry)] = parent_registry
+            if reuse_gate_authority:
+                # The forecast's temperature sweep does not change this
+                # composition-derived curve. Preserve the admitted record and
+                # curve through the deepcopy memo, so its origin, notices,
+                # and provider admission remain intact.
+                memo[id(gate_authority)] = gate_authority
+                gate_curve = gate_authority.get('curve')
+                if isinstance(gate_curve, Mapping):
+                    memo[id(gate_curve)] = gate_curve
             if self.backend is not None:
                 memo[id(self.backend)] = forecast_backend
+            from simulator.reduced_real_determinism import _sulfsat_identity
+
+            sulfsat_identity = _sulfsat_identity(
+                getattr(self, '_sulfsat_gate', None)
+            )
             if live_store is not None:
                 memo[id(live_store)] = forecast_store
             forecast_state = dict(self.__dict__)
+            forecast_state['_melt_redox_gate_authority_this_tick'] = (
+                gate_authority
+            )
+            forecast_state['_melt_redox_gate_authority_tick_hour'] = (
+                current_hour if reuse_gate_authority else None
+            )
             forecast_state['_sulfsat_gate'] = None
+            forecast_state['_c0_forecast_sulfsat_identity'] = (
+                sulfsat_identity
+            )
             # The forecast gets independent provider registrations. Deep-copying
             # the live registry would traverse engine subprocess/warm pools;
             # sharing it would let forecast dispatch mutate live providers.
@@ -14563,6 +14765,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             context.__dict__.update(
                 _deepcopy_refusal_state(forecast_state, memo)
             )
+            if (
+                isinstance(parent_registry, RunDisclosure)
+                and not parent_registry.computation
+            ):
+                context._law_disclosure_registry = parent_registry
             context._c0_forecast_context = True
             context._c0_forecast_engine = forecast_engine
             context._c0_forecast_backend_factory = None
@@ -15177,6 +15384,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if rate * scale > 1.0e-15
         }
         evap_flux.update_totals()
+        # Same scale on the supply map, without the 1e-15 debit floor.
+        self._scale_wall_supply_computed(scale)
         pending = getattr(self, "_subsolidus_pending_release", None)
         if scale <= 0.0 or not pending:
             self._subsolidus_pending_release = None
@@ -15956,6 +16165,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._native_fe_vapor_residual_capacity_mol_this_hr = None
         self._last_partial_melt_offgassing_diagnostic = {}
         self._silent_zero_notes = []
+        # Drop the previous hour before this hour's vapour evaluation.
+        # A path that snapshots without evaluating must not reuse it.
+        self._evaluated_transport_pO2_bar = None
+        self._evaluated_transport_pO2_recorded = False
         self._last_extraction_completeness_diagnostic = {}
         self._last_target_inventory_diagnostic = {}
         self._last_overlap_evaporation_diagnostic = {}
@@ -16055,7 +16268,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Hertz-Knudsen-Langmuir: how fast each species leaves the melt.
         # Only during pyrolysis campaigns (C0, C2A, C2B, C3 bakeout, C4).
         # Not during MRE (C5) — electrolysis produces O₂ at the anode.
-        evap_flux = EvaporationFlux()
+        # Drop the previous hour before this hour's publisher runs. A
+        # non-evaporation campaign leaves the rate map empty and stamps
+        # the interval physical zero, so the empty map is not a gap.
+        self._wall_supply_computed_kg_hr = {}
+        self._wall_supply_interval_physical_zero = None
+        self._pre_evaporation_melt_oxide_kg = None
+        evap_flux = evaporation_flux_for_campaign_hour(
+            evaporation_campaign=evaporation_campaign,
+            host=self,
+        )
         capacity_result = None
         if evaporation_campaign:
             if (
@@ -16155,6 +16377,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if rate * joint_scale > 1.0e-15
                 }
                 evap_flux.update_totals()
+                self._scale_wall_supply_computed(joint_scale)
         # Ruling A: C0 joint release (ordinary gas plus solid-host gas)
         # is capped this step. Outside C0 this leaves the flux alone.
         evap_flux = self._cap_c0_joint_release_to_pipe_capacity(evap_flux)
@@ -16205,7 +16428,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._pending_knudsen_zero_overhead_flow_marker = None
 
         # --- 6. Update melt composition ---
-        # Subtract evaporated mass from the melt.
+        # Subtract evaporated mass from the melt. The note is the
+        # pre-debit inventory; the projection that follows is the
+        # remainder the snapshot copies.
+        note_pre_evaporation_melt_oxide_kg(self)
         self._update_melt_composition(evap_flux)
         self._settle_evaporative_redox_after_batch()
 
@@ -16409,6 +16635,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             snapshot.imcc_activity_shadow = self._imcc_activity_shadow_for_hour(
                 snapshot
             )
+        # Routing writes the supply map when it runs. This call is the
+        # same writer: it covers a skipped route and does not scale an
+        # already published map a second time. The interval zero is
+        # copied here, after condensation may have replaced the flux
+        # object, so a known non-evaporating hour still carries it.
+        attach_wall_supply_interval_physical_zero(evap_flux, self)
+        # After the bleed refresh. The reservoir on the snapshot is the
+        # later oxygen state; this copies the pressure vapour evaluation
+        # consumed. The oxide map was noted before the evaporation
+        # projection, so the remainder on the snapshot is not the charge.
+        attach_pre_evaporation_melt_oxide_kg(evap_flux, self)
+        attach_evaluated_transport_pO2(evap_flux, self)
+        publish_wall_supply_on_flux(
+            evap_flux,
+            getattr(self, "_wall_supply_computed_kg_hr", None),
+        )
+        # HourSnapshot does not carry melt area. A refused interval's
+        # supply bound converts the activity-1 flux density to kg/h with
+        # the area this hour's kernel integrated over.
+        raw_area = getattr(self.melt, "melt_surface_area_m2", None)
+        if not isinstance(raw_area, bool) and isinstance(raw_area, (int, float)):
+            area_m2 = float(raw_area)
+            if math.isfinite(area_m2) and area_m2 > 0.0:
+                evap_flux.melt_surface_area_m2 = area_m2
         snapshot.evap_flux = evap_flux
         snapshot.melt_headspace_composition_mbar = dict(
             self._melt_headspace_composition_mbar

@@ -231,6 +231,16 @@ def _make_fake_magemin_cli_liquidus(monkeypatch):
     return backend, calls
 
 
+def _expected_magemin_bulk_arg(backend, bulk_projection):
+    args = backend._build_magemin_subprocess_args(
+        bulk_projection=bulk_projection,
+        temperature_C=1200.0,
+        pressure_kbar=0.001,
+        fO2_log=-9.0,
+    )[0]
+    return next(arg for arg in args if arg.startswith('--Bulk='))
+
+
 def _assert_magemin_cli_absolute_targets(calls, expected_fO2_log):
     assert len(calls) > 10, "expected coarse samples and refinement probes"
     for args in calls:
@@ -1133,7 +1143,7 @@ def test_magemin_worker_exit_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -1156,7 +1166,7 @@ def test_magemin_pool_unavailable_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -1180,7 +1190,7 @@ def test_magemin_pool_lifecycle_error_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -1203,7 +1213,7 @@ def test_magemin_in_process_budget_exhaustion_returns_typed_status():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
         call_timeout_s=0.0,
@@ -1247,7 +1257,7 @@ def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -1287,7 +1297,7 @@ def test_magemin_subprocess_slot_permission_error_returns_not_converged(
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -1454,6 +1464,14 @@ def test_magemin_and_alphamelts_reject_exact_major_oxide_boundary():
     assert alpha_reason == OutOfDomainReason.MAJOR_SUM.value
     assert magemin_reason == OutOfDomainReason.MAJOR_SUM.value
 
+    magemin_above_valid, _warnings, magemin_above_reason = (
+        MAGEMinDomainGate.validate_with_reason(
+            {'SiO2': 50.0, 'MgO': 45.0001}
+        )
+    )
+    assert magemin_above_valid is True
+    assert magemin_above_reason is None
+
 
 def test_magemin_as_active_backend_fails_closed_with_clear_message(monkeypatch):
     # MAGEMin is not wired into any active call site. If someone DOES
@@ -1487,7 +1505,7 @@ def test_magemin_as_active_backend_fails_closed_with_clear_message(monkeypatch):
         {
             "oxide": {
                 "label": "Oxide",
-                "composition_wt_pct": {"SiO2": 100.0},
+                "composition_wt_pct": {"SiO2": 50.0, "MgO": 50.0},
             }
         },
         {"metals": {}, "oxide_vapors": {}},
@@ -1514,7 +1532,7 @@ def test_magemin_equilibrate_never_emits_ledger_transition(monkeypatch):
 
     result = backend.equilibrate(
         1600.0,
-        composition_mol={"SiO2": 1.0},
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
         fO2_log=-8.0,
         pressure_bar=1e-6,
     )
@@ -1702,7 +1720,7 @@ def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         pressure_bar=1.0,
         fO2_log=-8.0,
     )
@@ -2144,7 +2162,7 @@ def test_magemin_liquidus_flags_flat_renormalised_bracket(monkeypatch):
     monkeypatch.setattr(backend, 'equilibrate', fake_equilibrate)
 
     result = backend.find_liquidus_solidus(
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
         min_T_C=1000.0,
@@ -2274,6 +2292,374 @@ def test_magemin_plante_mode_deficit_is_typed_out_of_domain(monkeypatch):
     assert result.phase_masses_kg == {}
     assert len(calls) == 1
     assert any('mass deficit=0.33313' in warning for warning in result.warnings)
+
+
+def _basalt_like_bulk_at_sio2(sio2_wt_pct: float) -> dict[str, float]:
+    remainder = {
+        'Al2O3': 15.0,
+        'FeO': 10.0,
+        'MgO': 20.0,
+        'CaO': 20.0,
+        'Na2O': 5.0,
+    }
+    scale = (100.0 - sio2_wt_pct) / sum(remainder.values())
+    return {
+        'SiO2': sio2_wt_pct,
+        **{name: amount * scale for name, amount in remainder.items()},
+    }
+
+
+def _magemin_backend_with_spied_engine_call(monkeypatch):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    calls = []
+
+    def fake_call(**kwargs):
+        calls.append(kwargs)
+        return {'phases': {'liq': 1.0}}
+
+    monkeypatch.setattr(backend, '_call_magemin', fake_call)
+    return backend, calls
+
+
+@pytest.mark.parametrize(
+    ('composition', 'expected_reason', 'expected_warning'),
+    [
+        (
+            {'Al2O3': 100.0},
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            {'MgO': 100.0},
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            {'CaO': 60.0, 'Al2O3': 40.0},
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            {'Al2O3': 95.0, 'Na2O': 5.0},
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(0.0),
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(10.0),
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 10.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(20.0),
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 20.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(29.9),
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 29.90 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            {'Al2O3': 90.0, 'SiO2': 5.0, 'Na2O': 5.0},
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 5.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(80.1),
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 80.10 wt% is outside MELTS calibration window [30.0, 80.0] wt% (above the window).',
+        ),
+    ],
+)
+def test_magemin_equilibrate_refuses_out_of_domain_silica(
+    monkeypatch, composition, expected_reason, expected_warning
+):
+    backend, engine_calls = _magemin_backend_with_spied_engine_call(monkeypatch)
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg=composition,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status'] == 'out_of_domain'
+    assert result.diagnostics['backend_status_reason'] == expected_reason
+    assert expected_warning in result.warnings
+    assert result.phases_present == []
+    assert result.phase_masses_kg == {}
+    assert engine_calls == []
+
+
+def test_magemin_projected_equilibrate_gates_submitted_bulk(monkeypatch):
+    backend, engine_calls = _magemin_backend_with_spied_engine_call(monkeypatch)
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg={'SiO2': 50.0, 'MgO': 50.0},
+        projected_oxide_wt_pct={'Al2O3': 100.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert (
+        result.diagnostics['backend_status_reason']
+        == 'silicate_window'
+    )
+    assert engine_calls == []
+
+
+@pytest.mark.parametrize(
+    ('source', 'submitted', 'expected_gate_input'),
+    [
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 25.0, 'MgO': 15.0, 'FeO': 50.0, 'FeOt': 10.0},
+            # FeO 50 + FeOt 10 = 60 wt% FeO-equivalent. In moles,
+            # (60 g / 71.844 g mol-1) * 71.844 g mol-1 = 60 g.
+            {'SiO2': 25.0, 'MgO': 15.0, 'FeO': 60.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {
+                'SiO2': 29.9,
+                'MgO': 10.1,
+                'FeO': 30.0,
+                'FeOt': 10.0,
+                'O': 20.0,
+            },
+            # FeOt+O contributes 10+20=30 wt%; with FeO 30, the
+            # FeO-equivalent mass is 60 g = (60/71.844 mol)*71.844 g/mol.
+            {'SiO2': 29.9, 'MgO': 10.1, 'FeO': 60.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 39.0, 'P2O5': 10.0, 'MnO': 1.0},
+            {'SiO2': 50.0, 'MgO': 39.0},
+            # The retained 50+39=89 wt% is normalized: 50/89 and 39/89.
+            {'SiO2': 56.17977528089888, 'MgO': 43.82022471910112},
+        ),
+        (
+            {'SiO2': 79.0, 'MgO': 16.0, 'P2O5': 5.0},
+            {'SiO2': 79.0, 'MgO': 16.0},
+            # Retained mass is 95 wt%; 79/95 and 16/95 are the normalized
+            # submitted oxide-basis fractions.
+            {
+                'SiO2': 83.15789473684211,
+                'MgO': 16.842105263157894,
+            },
+        ),
+        (
+            {'SiO2': 29.0, 'MgO': 66.0, 'P2O5': 5.0},
+            {'SiO2': 29.0, 'MgO': 66.0},
+            # Retained mass is 95 wt%; 29/95 and 66/95 cross the 30% floor.
+            {
+                'SiO2': 30.526315789473685,
+                'MgO': 69.47368421052632,
+            },
+        ),
+        (
+            {
+                'SiO2': 50.0,
+                'MgO': 35.0,
+                'FeO': 5.0,
+                'FeOt': 5.0,
+                'P2O5': 5.0,
+            },
+            {'SiO2': 50.0, 'MgO': 35.0, 'FeO': 5.0, 'FeOt': 5.0},
+            # FeO 5 and FeOt 5 give 10 wt% FeO-equivalent. The IG
+            # FeOt+O pair carries 10 g, (10/71.844 mol)*71.844 g/mol.
+            {
+                'SiO2': 52.63157894736842,
+                'MgO': 36.8421052631579,
+                'FeO': 10.526315789473685,
+            },
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 49.0, 'MgO': 49.0, 'H2O': 2.0},
+            # 49+49+2=100 wt%; these submitted values stay unchanged.
+            {'SiO2': 49.0, 'MgO': 49.0, 'H2O': 2.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 48.0, 'MgO': 46.0, 'H2O': 6.0},
+            # 48+46+6=100 wt%; these submitted values stay unchanged.
+            {'SiO2': 48.0, 'MgO': 46.0, 'H2O': 6.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 25.0, 'MgO': 25.0},
+            # 25+25=50 wt%; dividing each by 50 gives 50 wt% each.
+            {'SiO2': 50.0, 'MgO': 50.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 29.9, 'MgO': 70.1},
+            # 29.9+70.1=100 wt%; these values stay unchanged.
+            {'SiO2': 29.9, 'MgO': 70.1},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 30.0, 'MgO': 70.0},
+            # 30+70=100 wt%; these values stay unchanged.
+            {'SiO2': 30.0, 'MgO': 70.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 30.1, 'MgO': 69.9},
+            # 30.1+69.9=100 wt%; these values stay unchanged.
+            {'SiO2': 30.1, 'MgO': 69.9},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 79.9, 'MgO': 20.1},
+            # 79.9+20.1=100 wt%; these values stay unchanged.
+            {'SiO2': 79.9, 'MgO': 20.1},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 80.0, 'MgO': 20.0},
+            # 80+20=100 wt%; these values stay unchanged.
+            {'SiO2': 80.0, 'MgO': 20.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 80.1, 'MgO': 19.9},
+            # 80.1+19.9=100 wt%; these values stay unchanged.
+            {'SiO2': 80.1, 'MgO': 19.9},
+        ),
+    ],
+)
+def test_magemin_projected_gate_input_matches_submitted_bulk(
+    monkeypatch, source, submitted, expected_gate_input
+):
+    import simulator.melt_backend.magemin as magemin_module
+
+    backend, _ = _magemin_backend_with_spied_engine_call(monkeypatch)
+    built_bulks = []
+    build_bulk = backend._build_db_bulk_projection
+
+    def capture_bulk(composition_wt_pct, **kwargs):
+        bulk = build_bulk(composition_wt_pct, **kwargs)
+        built_bulks.append(bulk)
+        return bulk
+
+    monkeypatch.setattr(backend, '_build_db_bulk_projection', capture_bulk)
+    engine_submissions = []
+
+    def submit(*, bulk_projection, **_kwargs):
+        engine_submissions.append(bulk_projection)
+        return {'phases': {'liq': {'mass_kg': 1.0}}}
+
+    monkeypatch.setattr(backend, '_call_magemin', submit)
+    gate_inputs = []
+    validate = magemin_module._validate_magemin_projection_with_reason
+
+    def capture_gate_input(composition_wt_pct, **kwargs):
+        gate_inputs.append(dict(composition_wt_pct))
+        return validate(composition_wt_pct, **kwargs)
+
+    monkeypatch.setattr(
+        magemin_module,
+        '_validate_magemin_projection_with_reason',
+        capture_gate_input,
+    )
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg=source,
+        projected_oxide_wt_pct=submitted,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert len(built_bulks) == 1
+    assert len(gate_inputs) == 1
+    submitted_bulk = built_bulks[0]
+    gate_input = gate_inputs[0]
+    assert tuple(
+        submitted_bulk.composition_wt_pct.get(component, 0.0)
+        for component in submitted_bulk.order
+    ) == submitted_bulk.vector
+
+    assert set(gate_input) == set(expected_gate_input)
+    for species, amount in expected_gate_input.items():
+        assert gate_input[species] == pytest.approx(
+            amount, rel=0.0, abs=1e-9
+        )
+
+    submitted_total = sum(submitted_bulk.composition_wt_pct.values())
+    submitted_sio2_wt_pct = (
+        100.0 * submitted_bulk.composition_wt_pct.get('SiO2', 0.0)
+        / submitted_total
+    )
+    auxiliary_mass = sum(
+        submitted_bulk.composition_wt_pct.get(species, 0.0)
+        for species in ('H2O', 'S')
+    )
+    submitted_major_wt_pct = (
+        100.0 * (submitted_total - auxiliary_mass) / submitted_total
+    )
+    expected_in_domain = (
+        30.0 <= submitted_sio2_wt_pct <= 80.0
+        and submitted_major_wt_pct > 95.0
+    )
+    assert (result.status == 'ok') is expected_in_domain
+    if expected_in_domain:
+        assert len(engine_submissions) == 1
+        assert engine_submissions[0] is submitted_bulk
+    else:
+        assert result.status == 'out_of_domain'
+        assert engine_submissions == []
+    if submitted == {
+        'SiO2': 25.0,
+        'MgO': 15.0,
+        'FeO': 50.0,
+        'FeOt': 10.0,
+    }:
+        assert result.diagnostics['backend_status_reason'] == (
+            'silicate_window'
+        )
+        assert any(
+            'SiO2 = 25.00 wt%' in warning
+            for warning in result.warnings
+        )
+
+
+@pytest.mark.parametrize(
+    ('composition', 'expected_status', 'expected_reason'),
+    [
+        ({'SiO2': 30.0, 'Al2O3': 70.0}, 'ok', None),
+        ({'SiO2': 80.0, 'Al2O3': 20.0}, 'ok', None),
+    ],
+)
+def test_magemin_equilibrate_domain_boundaries(
+    monkeypatch, composition, expected_status, expected_reason
+):
+    backend, engine_calls = _magemin_backend_with_spied_engine_call(monkeypatch)
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg=composition,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == expected_status
+    if expected_reason is None:
+        assert len(engine_calls) == 1
+    else:
+        assert result.diagnostics['backend_status_reason'] == expected_reason
+        assert engine_calls == []
 
 
 def test_magemin_plante_mode_vector_is_not_renormalized():
@@ -2425,6 +2811,84 @@ def test_magemin_projected_retry_records_absolute_fo2_per_sample(monkeypatch):
     assert result.status == "out_of_domain"
     assert result.diagnostics["projected_liquidus_status"] == "ok"
     _assert_magemin_cli_absolute_targets(calls, -9.0)
+
+
+def test_magemin_iron_projected_retry_gates_oxide_bulk_and_keeps_engine_bulk(
+    monkeypatch,
+):
+    backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
+    source = {
+        'SiO2': 50.0,
+        'MgO': 29.0,
+        'FeO': 10.0,
+        'P2O5': 10.0,
+        'MnO': 1.0,
+    }
+
+    # After the ig database drops P2O5 and MnO, the supported source totals
+    # 89 wt%. The domain oxide basis normalizes that remainder: SiO2 is
+    # 50/89*100 = 56.179775... wt%, and the major-oxide total is 89/89*100
+    # = 100 wt%. The solver still receives the existing unnormalized
+    # FeOt+O projection of the supported 50/29/10 wt% bulk.
+    retained_total = 50.0 + 29.0 + 10.0
+    assert 50.0 / retained_total * 100.0 == pytest.approx(56.1797752809)
+    assert retained_total / retained_total * 100.0 == pytest.approx(100.0)
+
+    result = backend.find_liquidus_solidus(
+        composition_kg=source,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=900.0,
+        max_T_C=1300.0,
+        scan_step_C=50.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['projected_liquidus_status'] == 'ok'
+    expected_projection = backend._build_db_bulk_projection({
+        'SiO2': 50.0,
+        'MgO': 29.0,
+        'FeO': 10.0,
+    })
+    expected_bulk = _expected_magemin_bulk_arg(backend, expected_projection)
+    submitted_bulks = {
+        next(arg for arg in args if arg.startswith('--Bulk='))
+        for args in calls
+    }
+    assert submitted_bulks == {expected_bulk}
+
+
+def test_magemin_preprojected_iron_bulk_uses_oxide_gate_basis(monkeypatch):
+    backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
+    projected = backend._build_db_bulk_projection({
+        'SiO2': 50.0,
+        'MgO': 30.0,
+        'FeO': 20.0,
+    })
+
+    result = backend.find_liquidus_solidus(
+        projected_oxide_wt_pct=projected.composition_wt_pct,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=900.0,
+        max_T_C=1300.0,
+        scan_step_C=50.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == 'ok'
+    assert projected.composition_wt_pct['SiO2'] == pytest.approx(50.0)
+    assert projected.composition_wt_pct['MgO'] == pytest.approx(30.0)
+    assert (
+        projected.composition_wt_pct['FeOt']
+        + projected.composition_wt_pct['O']
+    ) == pytest.approx(20.0)
+    expected_bulk = _expected_magemin_bulk_arg(backend, projected)
+    assert {
+        next(arg for arg in args if arg.startswith('--Bulk='))
+        for args in calls
+    } == {expected_bulk}
 
 
 def test_magemin_liquidus_evaluates_redox_state_at_each_sample_temperature(
@@ -2594,7 +3058,7 @@ def test_magemin_liquidus_finder_invalid_budget_is_refused(budget):
     backend._config = {'liquidus_finder_budget_s': budget}
 
     result = backend.find_liquidus_solidus(
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         min_T_C=800.0,
         max_T_C=1000.0,
         scan_step_C=100.0,
@@ -3334,7 +3798,7 @@ def test_magemin_fake_bridge_library_error_returns_warning(monkeypatch):
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={"SiO2": 1.0},
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -3362,7 +3826,7 @@ def test_magemin_equilibrate_propagates_local_call_helper_errors(monkeypatch):
     with pytest.raises(KeyError, match='local MAGEMin wrapper defect'):
         backend.equilibrate(
             1500.0,
-            composition_mol={'SiO2': 1.0},
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
             fO2_log=-8.0,
             pressure_bar=1.0,
         )
@@ -3386,7 +3850,7 @@ def test_magemin_remote_handler_error_propagates_with_remote_traceback(
     with pytest.raises(remote_type) as raised:
         backend.equilibrate(
             1500.0,
-            composition_mol={'SiO2': 1.0},
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
             fO2_log=-8.0,
             pressure_bar=1.0,
         )
@@ -3409,7 +3873,7 @@ def test_magemin_remote_builtin_with_multi_argument_constructor_is_preserved():
     with pytest.raises(EngineWorkerRemoteError) as raised:
         backend.equilibrate(
             1500.0,
-            composition_mol={'SiO2': 1.0},
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
             fO2_log=-8.0,
             pressure_bar=1.0,
         )
@@ -3495,7 +3959,7 @@ def test_magemin_equilibrate_invalid_declared_scalar_is_typed_refusal(
     backend._magemin_module = types.SimpleNamespace(minimize=fake_minimize)
     params = {
         'temperature_C': 1500.0,
-        'composition_mol': {'SiO2': 1.0},
+        'composition_mol': {'SiO2': 1.0, 'MgO': 1.0},
         'pressure_bar': 1.0,
         'fO2_log': -8.0,
     }
@@ -3539,7 +4003,7 @@ def test_magemin_equilibrate_invalid_engine_output_is_typed_not_converged(
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         pressure_bar=1.0,
         fO2_log=-8.0,
     )
@@ -3573,7 +4037,7 @@ def test_magemin_equilibrate_parser_local_defect_propagates(
     with pytest.raises(local_error, match='local MAGEMin parser defect'):
         backend.equilibrate(
             1500.0,
-            composition_mol={'SiO2': 1.0},
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
             pressure_bar=1.0,
             fO2_log=-8.0,
         )
@@ -3619,7 +4083,7 @@ def test_magemin_remote_engine_call_error_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -3646,7 +4110,7 @@ def test_magemin_remote_engine_lifecycle_error_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )

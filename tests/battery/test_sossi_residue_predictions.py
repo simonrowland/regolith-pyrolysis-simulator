@@ -437,6 +437,8 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
                 channel_missing_elements=(),
                 provenance={
                     "integration": {"primary": {"status": "converged"}},
+                    "code_revision": "fixture-revision",
+                    "law_disclosures": [],
                     "melt_activity_extensions": {
                         "MnO": {
                             "reason": "MnO is outside the IMCC-SF04 melt-activity domain",
@@ -530,6 +532,8 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
                         provenance={
                             "geometry_refusal_by_geometry": {},
                             "integration": {"refinement_status": "converged"},
+                            "code_revision": "fixture-revision",
+                            "law_disclosures": [],
                         },
                     )
                 )
@@ -544,6 +548,8 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
                 channel_missing_elements=(),
                 provenance={
                     "integration": {"primary": {"status": "converged"}},
+                    "code_revision": "fixture-revision",
+                    "law_disclosures": [],
                 },
             )
             for experiment in experiments
@@ -654,6 +660,8 @@ def test_sossi_below_liquid_floor_reaches_the_scored_notice(
                     channel_missing_elements=(),
                     provenance={
                         "integration": {"primary": {"status": "converged"}},
+                        "code_revision": "fixture-revision",
+                        "law_disclosures": [],
                         "liquid_rows_used": (
                             _liquid_row(
                                 "MnO(l)", certified_band, below_floor=below
@@ -817,6 +825,7 @@ def test_hashimoto_below_liquid_floor_reaches_the_scored_notice(
                 "assumption_flags": {
                     "openimcc_liquid_row_extrapolated": below,
                 },
+                "law_disclosures": [],
             }
             rows.extend(
                 (
@@ -846,6 +855,7 @@ def test_hashimoto_below_liquid_floor_reaches_the_scored_notice(
                         provenance={
                             "engine": engine,
                             "alpha_arm": "alpha_runtime_catalog",
+                            "law_disclosures": [],
                         },
                     ),
                 )
