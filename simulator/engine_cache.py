@@ -310,9 +310,9 @@ ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 2,
     "internal-analytical": 3,
     "vaporock": 1,
-    "magemin": 2,
-    "alphamelts": 2,
-    "thermoengine": 2,
+    "magemin": 3,
+    "alphamelts": 3,
+    "thermoengine": 3,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
