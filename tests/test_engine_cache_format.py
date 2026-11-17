@@ -61,9 +61,28 @@ def test_key_namespace_is_explicit_and_store_is_without_rowid(tmp_path: Path, mo
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
     engine_cache.cached_engine_call("openimcc", {"temperature_K": 1700.0}, lambda: {"answer": 1.0})
     with sqlite3.connect(path) as connection:
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 2
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
         schema = connection.execute("SELECT sql FROM sqlite_master WHERE name='engine_outputs'").fetchone()[0]
         assert "WITHOUT ROWID" in schema
+
+
+def test_lossy_v2_cache_cannot_supply_a_hit(tmp_path: Path, monkeypatch) -> None:
+    path = tmp_path / "legacy.sqlite"
+    key = engine_cache.engine_cache_key("internal-analytical", 1, {})
+    payload = engine_cache.pack({"vapor_pressure_backend_status_reason": "fallback"})
+    with sqlite3.connect(path) as connection:
+        engine_cache._initialize_cache(connection)
+        connection.execute("PRAGMA user_version=2")
+        connection.execute(
+            "INSERT INTO engine_outputs VALUES (?,?,?,?,?,?,?)",
+            (key, payload, "internal-analytical", "1", "laptop", 1, 0),
+        )
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    with pytest.raises(engine_cache.EngineCacheSchemaMismatch, match="user_version"):
+        engine_cache.cached_engine_call("internal-analytical", {}, lambda: pytest.fail("old cache accepted"))
+    with sqlite3.connect(path) as connection:
+        assert connection.execute("SELECT value FROM engine_outputs").fetchone()[0] == payload
 
 
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), -float("inf")])
