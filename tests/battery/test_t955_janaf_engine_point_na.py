@@ -193,6 +193,19 @@ def test_predicate_selects_on_the_declared_field() -> None:
     assert obs.source_id == "some-compilation"
 
 
+def test_compilation_role_flags_parse_the_declared_tokens() -> None:
+    from simulator.battery.waypoints import _compilation_role_flags
+
+    assert _compilation_role_flags(
+        "Direct tabulation; compilation_role engine_reference_input=true, "
+        "scoring_eligible=false; circularity_warning=Do not compare"
+    ) == {"engine_reference_input": True, "scoring_eligible": False}
+    assert _compilation_role_flags("scoring_eligible=false only") == {
+        "engine_reference_input": None,
+        "scoring_eligible": False,
+    }
+
+
 def test_engine_point_not_applicable_with_typed_reason() -> None:
     experiment = factories.tabulation_experiment(experiment_id="exp-pure-1")
     bench = _bench_for(experiment)
