@@ -1359,6 +1359,13 @@ _MAGEMIN_EQUILIBRATE_FAILURE_EXIT_EXPECTATIONS = (
     ),
     ('native_activity_invalid', 'not_converged', 'engine_not_converged'),
     ('clamped_operating_point', 'out_of_domain', 'clamped_operating_point'),
+    ('generic_parse_empty_output', 'not_converged', 'parse_empty_output'),
+    ('untyped_failure', 'not_converged', 'magemin_untyped_failure'),
+    ('bridge_runtime_error', 'not_converged', 'engine_crash'),
+    ('bridge_value_error', 'not_converged', 'engine_crash'),
+    ('bridge_type_error', 'not_converged', 'engine_crash'),
+    ('bridge_key_error', 'not_converged', 'engine_crash'),
+    ('bridge_custom_error', 'not_converged', 'engine_crash'),
 )
 
 
@@ -1469,12 +1476,20 @@ def _magemin_failure_exit_result(monkeypatch, failure_kind):
         call_with_error(_MAGEMinEngineCallError(
             'MAGEMinOutputError', 'injected invalid output',
         ))
-    elif failure_kind in {'bridge_runtime_error', 'bridge_value_error'}:
-        error_type = (
-            RuntimeError
-            if failure_kind == 'bridge_runtime_error'
-            else ValueError
-        )
+    elif failure_kind in {
+        'bridge_runtime_error', 'bridge_value_error', 'bridge_type_error',
+        'bridge_key_error', 'bridge_custom_error',
+    }:
+        class CustomBridgeError(Exception):
+            pass
+
+        error_type = {
+            'bridge_runtime_error': RuntimeError,
+            'bridge_value_error': ValueError,
+            'bridge_type_error': TypeError,
+            'bridge_key_error': KeyError,
+            'bridge_custom_error': CustomBridgeError,
+        }[failure_kind]
 
         def fail_bridge(**_kwargs):
             raise error_type('injected optional bridge failure')
@@ -1587,9 +1602,12 @@ def test_magemin_equilibrate_failure_exits_have_literal_typed_expectations(
     assert result.status == expected_status
     assert result.diagnostics['backend_status'] == expected_status
     assert result.diagnostics['backend_status_reason'] == expected_reason
-    assert result.diagnostics['backend_status_reason'] != (
-        'magemin_untyped_failure'
-    )
+    if failure_kind == 'untyped_failure':
+        assert result.diagnostics['magemin_untyped_failure_diagnostic_gap'] is True
+    else:
+        assert result.diagnostics['backend_status_reason'] != (
+            'magemin_untyped_failure'
+        )
 
 
 def test_public_magemin_equilibrate_normalizes_bare_failure_result(monkeypatch):
@@ -1695,6 +1713,10 @@ _MAGEMIN_GATE_OUTCOME_EXPECTATIONS = (
     ('mode_vector_deficit', 'magemin_mode_vector_mass_deficit', 'stable_refusal', 'stable_refusal', None),
     ('clamped_operating_point', 'clamped_operating_point', 'stable_refusal', 'stable_refusal', None),
     ('unavailable_without_binary', 'missing_binary', 'failed', 'failed', None),
+    ('unavailable_with_binary', 'magemin_engine_worker_unavailable', 'failed', 'failed', None),
+    ('declared_input_error', 'invalid_input', 'failed', 'failed', None),
+    ('launch_error', 'missing_binary', 'failed', 'failed', None),
+    ('permission_launch_error', 'magemin_engine_worker_unavailable', 'failed', 'failed', None),
     ('subprocess_timeout', 'magemin_subprocess_timeout', 'failed', 'failed', None),
     ('nonzero_exit', 'nonzero_exit', 'failed', 'failed', None),
     ('invalid_engine_output', 'parse_empty_output', 'numerical_failure', 'numerical_failure', None),
@@ -1717,8 +1739,26 @@ _MAGEMIN_GATE_OUTCOME_EXPECTATIONS = (
     ('native_activity_invalid', 'engine_not_converged', 'numerical_failure', 'numerical_failure', None),
     ('bridge_runtime_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
     ('bridge_value_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
+    ('bridge_type_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
+    ('bridge_key_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
+    ('bridge_custom_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
     ('untyped_failure', 'magemin_untyped_failure', 'failed', 'failed', None),
 )
+
+
+def test_magemin_gate_outcome_table_covers_every_failure_exit():
+    failure_exit_kinds = {
+        failure_kind
+        for failure_kind, _status, _reason
+        in _MAGEMIN_EQUILIBRATE_FAILURE_EXIT_EXPECTATIONS
+    }
+    gate_outcome_kinds = {
+        failure_kind
+        for failure_kind, _reason, _base, _expected, _exception
+        in _MAGEMIN_GATE_OUTCOME_EXPECTATIONS
+    }
+
+    assert gate_outcome_kinds == failure_exit_kinds
 
 
 @pytest.mark.parametrize(

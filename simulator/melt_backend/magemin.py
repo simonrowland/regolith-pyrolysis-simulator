@@ -398,6 +398,27 @@ class _MAGEMinEngineLifecycleError(_MAGEMinEngineCallError):
     """A MAGEMin worker, budget, or subprocess slot lifecycle failure."""
 
 
+def _magemin_bridge_failure_error(exc: Exception) -> _MAGEMinEngineCallError:
+    """Retain a typed numerical disposition for third-party bridge failures."""
+    if isinstance(exc, _MAGEMinEngineCallError):
+        return exc
+    infrastructure_errors = (
+        EngineWorkerDied,
+        EngineWorkerPoolLifecycleError,
+        EngineWorkerUnavailable,
+    )
+    disposition = (
+        None
+        if isinstance(exc, infrastructure_errors)
+        else 'magemin_bridge_numerical_failure'
+    )
+    return _MAGEMinEngineCallError(
+        type(exc).__name__,
+        str(exc),
+        failure_disposition=disposition,
+    )
+
+
 _MAGEMIN_FAILURE_REASON_BY_EXCEPTION = {
     'MAGEMinSubprocessSlotTimeout': 'magemin_subprocess_slot_timeout',
     'MAGEMinSubprocessSlotUnavailable': 'magemin_subprocess_slot_unavailable',
@@ -3196,9 +3217,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                                 call_started,
                             ),
                         )
-                    raise _MAGEMinEngineCallError(
-                        type(exc).__name__, str(exc)
-                    ) from exc
+                    raise _magemin_bridge_failure_error(exc) from exc
             if self._binary_path is not None:
                 return self._call_magemin_subprocess_after_bridge_failure(
                     bulk_projection=bulk_projection,
@@ -3244,9 +3263,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             call_started,
                         ),
                     )
-                raise _MAGEMinEngineCallError(
-                    type(exc).__name__, str(exc)
-                ) from exc
+                raise _magemin_bridge_failure_error(exc) from exc
 
         if self._bridge == 'ctypes':
             # ctypes path is intentionally NOT auto-marshaled here —
