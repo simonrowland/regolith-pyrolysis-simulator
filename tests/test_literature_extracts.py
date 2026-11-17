@@ -14648,6 +14648,88 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     assert allibert.experiments[emf[0].experiment_id].bench_id is None
 
 
+def test_shornikov_kems_methods_migrate_with_typed_unverified_regime(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import Quantity, RefusalReason
+    from simulator.battery.validity import run_validity_gates
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    cases = (
+        (
+            "shornikov-2008-mgo-aluminosilicate-melts.yaml",
+            "shornikov-archakov-2001-kems",
+            "Mass-spectrometric Knudsen effusion measurements, as attributed in the paper.",
+            17,
+        ),
+        (
+            "shornikov-2011-cao-mgo-alumina-melts.yaml",
+            "shornikov_2011_figure1_series1_allibert_1979",
+            "mass-spectrometric Knudsen effusion method",
+            15,
+        ),
+    )
+    for filename, local_id, prior_method, expected_measurements in cases:
+        source = EXTRACTS / filename
+        extract = battery_migrate.load_yaml(source)
+        declaration = next(
+            item for item in extract["experiments"]
+            if item["experiment_id"] == local_id
+        )
+        assert declaration["method"] == "knudsen_effusion"
+
+        migrated = _migrate_real_extract(
+            tmp_path / f"{source.stem}-current", filename, extract_doc=extract
+        )
+        experiment = next(
+            item for item in migrated.experiments.values()
+            if item.experiment_id.endswith(f"::experiment::{local_id}")
+        )
+        assert experiment.method.is_value
+        assert experiment.method.value.value == "knudsen_effusion"
+        assert experiment.pressure_environment.regime.regime_class.is_value
+        assert (
+            experiment.pressure_environment.regime.regime_class.value.value
+            == "molecular"
+        )
+        assert experiment.pressure_environment.total_pressure_Pa.state.is_unknown
+        knudsen_number = experiment.pressure_environment.regime.knudsen_number_orifice
+        assert knudsen_number is not None and knudsen_number.state.is_unknown
+
+        measurements = [
+            item for item in migrated.observations.values()
+            if item.experiment_id == experiment.experiment_id
+            and item.identity.quantity.is_value
+            and item.identity.quantity.value in {
+                Quantity.ACTIVITY,
+                Quantity.ACTIVITY_COEFFICIENT,
+            }
+        ]
+        assert len(measurements) == expected_measurements
+        gates = [run_validity_gates(experiment, item) for item in measurements]
+        assert all(
+            not gate.passed
+            and gate.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+            for gate in gates
+        )
+
+        mutated = copy.deepcopy(extract)
+        next(
+            item for item in mutated["experiments"]
+            if item["experiment_id"] == local_id
+        )["method"] = prior_method
+        mutant_migration = _migrate_real_extract(
+            tmp_path / f"{source.stem}-mutated",
+            filename,
+            extract_doc=mutated,
+        )
+        mutant_experiment = next(
+            item for item in mutant_migration.experiments.values()
+            if item.experiment_id.endswith(f"::experiment::{local_id}")
+        )
+        assert mutant_experiment.method.is_unknown
+
+
 def test_shornikov_and_demaria_printed_cell_materials_reach_observations(
     tmp_path: Path,
 ) -> None:

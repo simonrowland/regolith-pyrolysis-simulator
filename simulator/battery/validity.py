@@ -47,6 +47,8 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    BoundDirection,
+    BoundInclusivity,
     EvidenceClass,
     MEASURED_EVIDENCE,
     MethodToken,
@@ -62,6 +64,7 @@ from simulator.battery.identity import (
     quantity_token,
 )
 from simulator.battery.records import (
+    ApparatusGeometry,
     Composition,
     Experiment,
     Located,
@@ -69,11 +72,14 @@ from simulator.battery.records import (
     Observation,
     State,
     Value,
+    _bound_operator_semantics,
     as_decimal,
 )
 from simulator.reference_data.janaf import formula_composition
 from simulator.physical_constants import TABLE_SELF_CHECK_FINDING_DEX
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
+
+KEMS_GEOMETRY_FACTS = ("orifice_area_m2", "clausing_factor")
 
 # KEMS equilibrium background ceiling (Pa). This remains a separate signal
 # quality check; it does not determine the in-cell effusion regime.
@@ -171,16 +177,28 @@ def _pressure_bounds(
     return None
 
 
+def _positive_decimal(value: Decimal | None) -> bool:
+    return value is not None and value.is_finite() and value > 0
+
+
 def _finite_positive(located: Located[Value | Decimal] | None) -> Decimal | None:
     value = _located_decimal(located)
-    if value is None or not value.is_finite() or value <= 0:
-        return None
-    return value
+    return value if _positive_decimal(value) else None
+
+
+_CLAUSING_FACTOR_MAX = Decimal("1")
+
+
+def _clausing_value_ok(value: Decimal | None) -> bool:
+    return (
+        _positive_decimal(value)
+        and value is not None
+        and value <= _CLAUSING_FACTOR_MAX
+    )
 
 
 def _clausing_ok(located: Located[Value | Decimal] | None) -> bool:
-    value = _located_decimal(located)
-    return value is not None and value.is_finite() and value > 0 and value <= 1
+    return _clausing_value_ok(_located_decimal(located))
 
 
 def _positive_extent(
@@ -225,6 +243,89 @@ def _printed_positive_diameter_interval(
         return False
     extent = _positive_extent(located)
     return extent is not None and extent[2] == "interval"
+
+
+def _impossible_kems_geometry_value(
+    located: Located[Value | Decimal] | None,
+    *,
+    clausing_factor: bool = False,
+) -> bool:
+    # Refuse only when every admissible value violates the physical domain.
+    # A straddling interval or bound remains missing/unverified because it
+    # still admits a physically possible value.
+    if located is None or not located.state.is_value:
+        return False
+    raw = located.state.value
+    if raw is None:
+        return False
+    if not isinstance(raw, Value):
+        if clausing_factor:
+            return not _clausing_value_ok(raw)
+        return not _positive_decimal(raw)
+    if raw.kind is ValueKind.POINT:
+        return not (
+            _clausing_value_ok(raw.point)
+            if clausing_factor
+            else _positive_decimal(raw.point)
+        )
+    if raw.kind is ValueKind.INTERVAL:
+        low = raw.interval_low
+        high = raw.interval_high
+        if low is None or high is None or low > high:
+            return True
+        bounds = _pressure_bounds(located)
+        if bounds is None:
+            return True
+        low, high, kind = bounds
+        if kind != "interval" or low is None or high is None:
+            return True
+        if not _positive_decimal(high):
+            return True
+        if not clausing_factor:
+            return False
+        extent = _positive_extent(located)
+        return extent is not None and low > _CLAUSING_FACTOR_MAX
+    if raw.kind is ValueKind.BOUND:
+        bound = raw.bound_value
+        if bound is None:
+            return True
+        operator_semantics = _bound_operator_semantics(raw.bound_operator)
+        direction = raw.bound_direction
+        inclusivity = raw.bound_inclusivity
+        if direction is None and operator_semantics is not None:
+            direction, inclusivity = operator_semantics
+        if direction is None or inclusivity is None:
+            return True
+        if direction is BoundDirection.UPPER:
+            return not _positive_decimal(bound)
+        if not clausing_factor:
+            return False
+        return bound > _CLAUSING_FACTOR_MAX or (
+            bound == _CLAUSING_FACTOR_MAX
+            and inclusivity is BoundInclusivity.EXCLUDED
+        )
+    # Geometry extracts use POINT, INTERVAL, and legacy scalar values; BOUND
+    # is also supported by the parser and handled above. Other Value kinds do
+    # not occur on these fields and are not inferred as numeric ranges here.
+    return False
+
+
+def _invalid_kems_geometry_fields(
+    geometry: ApparatusGeometry | None,
+) -> tuple[str, ...]:
+    if geometry is None:
+        return ()
+    invalid: list[str] = []
+    area = geometry.orifice_area_m2
+    if _impossible_kems_geometry_value(area):
+        invalid.append("orifice_area_m2")
+    diameter = geometry.orifice_diameter_m
+    if _impossible_kems_geometry_value(diameter):
+        invalid.append("orifice_diameter_m")
+    clausing = geometry.clausing_factor
+    if _impossible_kems_geometry_value(clausing, clausing_factor=True):
+        invalid.append("clausing_factor")
+    return tuple(invalid)
 
 
 def _calibration_grounded(calibration: object) -> bool:
@@ -466,6 +567,7 @@ def underdetermined_apparatus(
     method = method_state.value
     geometry = None if experiment.apparatus is None else experiment.apparatus.geometry
     missing: list[str] = []
+    invalid: tuple[str, ...] = ()
     if _is_kems_calibrated_pressure(method, quantity):
         # Knudsen-effusion mass spectrometry uses the calibrated pressure
         # relation P_i = k_i I_i^+ T.  k_i comes from a calibration (for
@@ -504,11 +606,13 @@ def underdetermined_apparatus(
         # usable only when it is printed: area does not enter p = k I T, so
         # that interval is not a value band (d-326 case 1). An inferred or
         # unlocated interval, a bound, and an area interval stay missing.
+        invalid = _invalid_kems_geometry_fields(geometry)
         if geometry is not None:
             if (
                 geometry.orifice_area_m2 is not None
                 and geometry.orifice_area_m2.state.is_value
                 and _finite_positive(geometry.orifice_area_m2) is None
+                and "orifice_area_m2" not in invalid
             ):
                 missing.append("orifice_area_m2")
             if (
@@ -518,15 +622,18 @@ def underdetermined_apparatus(
                 and not _printed_positive_diameter_interval(
                     geometry.orifice_diameter_m
                 )
+                and "orifice_diameter_m" not in invalid
             ):
                 missing.append("orifice_diameter_m")
             if (
                 geometry.clausing_factor is not None
                 and geometry.clausing_factor.state.is_value
                 and not _clausing_ok(geometry.clausing_factor)
+                and "clausing_factor" not in invalid
             ):
                 missing.append("clausing_factor")
     elif _is_effusion_pressure(method, quantity):
+        invalid = _invalid_kems_geometry_fields(geometry)
         provenance = observation.provenance if observation is not None else None
         method_provenance = (
             provenance.get("comparison_method")
@@ -585,14 +692,18 @@ def underdetermined_apparatus(
                 )
             )
         elif geometry is None:
-            missing.extend(["orifice_area_m2", "clausing_factor"])
+            missing.extend(KEMS_GEOMETRY_FACTS)
         else:
             if (
                 _finite_positive(geometry.orifice_area_m2) is None
                 and _finite_positive(geometry.orifice_diameter_m) is None
+                and "orifice_area_m2" not in invalid
             ):
                 missing.append("orifice_area_m2")
-            if not _clausing_ok(geometry.clausing_factor):
+            if (
+                not _clausing_ok(geometry.clausing_factor)
+                and "clausing_factor" not in invalid
+            ):
                 missing.append("clausing_factor")
         calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
         calibrated = _calibration_grounded(calibration)
@@ -666,6 +777,8 @@ def underdetermined_apparatus(
             elif "exposed_area_m2" not in missing:
                 missing.append("exposed_area_m2")
     detail = {"missing": missing, "method": method.value, "quantity": quantity.value}
+    if invalid:
+        detail["invalid"] = list(invalid)
     if _is_kems_calibrated_pressure(method, quantity):
         interval_notice = apparatus_geometry_interval_notice(
             experiment,
@@ -677,8 +790,8 @@ def underdetermined_apparatus(
             detail["apparatus_geometry_interval_printed"] = True
             detail["regime_checked_at"] = _interval_regime_check_label(experiment)
             detail["value_band"] = None
-    checks.append(GateCheck("geometry_determinants", not missing, detail))
-    if missing:
+    checks.append(GateCheck("geometry_determinants", not missing and not invalid, detail))
+    if missing or invalid:
         return _fail(
             RefusalReason.UNDERDETERMINED_APPARATUS, checks, "geometry_determinants"
         )
@@ -1306,7 +1419,7 @@ def _constant_clausing(
                 "missing clausing_factor: a Clausing interval is not a point"
             )
     if clausing is not None:
-        if not clausing.is_finite() or clausing <= 0 or clausing > 1:
+        if not _clausing_value_ok(clausing):
             raise ValueError("clausing_factor must be a point in (0, 1]")
         return clausing
     length_printed = isinstance(orifice_channel_length_m, Decimal) or (
