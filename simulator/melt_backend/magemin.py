@@ -402,6 +402,62 @@ class _MAGEMinEngineLifecycleError(_MAGEMinEngineCallError):
     """A MAGEMin worker, budget, or subprocess slot lifecycle failure."""
 
 
+def _magemin_bridge_failure_error(exc: Exception) -> _MAGEMinEngineCallError:
+    """Retain a typed numerical disposition for third-party bridge failures."""
+    if isinstance(exc, _MAGEMinEngineCallError):
+        return exc
+    infrastructure_errors = (
+        EngineWorkerDied,
+        EngineWorkerPoolLifecycleError,
+        EngineWorkerUnavailable,
+    )
+    disposition = (
+        None
+        if isinstance(exc, infrastructure_errors)
+        else 'magemin_bridge_numerical_failure'
+    )
+    return _MAGEMinEngineCallError(
+        type(exc).__name__,
+        str(exc),
+        failure_disposition=disposition,
+    )
+
+
+_MAGEMIN_FAILURE_REASON_BY_EXCEPTION = {
+    'MAGEMinSubprocessSlotTimeout': 'magemin_subprocess_slot_timeout',
+    'MAGEMinSubprocessSlotUnavailable': 'magemin_subprocess_slot_unavailable',
+    # Existing gate and battery readers classify on the ``timeout`` token.
+    'MAGEMinAggregateBudgetExceeded': 'magemin_aggregate_budget_timeout',
+    'EngineWorkerDied': 'magemin_engine_worker_died',
+    'EngineWorkerPoolLifecycleError': (
+        'magemin_engine_worker_unavailable'
+    ),
+    'EngineWorkerUnavailable': 'magemin_engine_worker_unavailable',
+    'TimeoutExpired': 'magemin_subprocess_timeout',
+    'MAGEMinProcessExit': 'nonzero_exit',
+    'FileNotFoundError': 'missing_binary',
+    'MAGEMinOutputError': 'parse_empty_output',
+}
+_MAGEMIN_UNTYPED_FAILURE_REASON = 'magemin_untyped_failure'
+
+
+def _normalize_magemin_equilibrium_result(
+    result: EquilibriumResult,
+) -> EquilibriumResult:
+    """Backstop non-success returns that bypass a typed failure path."""
+    if result.status == 'ok':
+        return result
+    diagnostics = dict(result.diagnostics or {})
+    diagnostics['backend_status'] = result.status
+    if not diagnostics.get('backend_status_reason'):
+        diagnostics.update({
+            'backend_status_reason': _MAGEMIN_UNTYPED_FAILURE_REASON,
+            'magemin_untyped_failure_diagnostic_gap': True,
+        })
+    result.diagnostics = diagnostics
+    return result
+
+
 def _admit_magemin_call_scalars(
     temperature_C: Any,
     pressure_bar: Any,
@@ -1736,32 +1792,82 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         projected_oxide_wt_pct: Optional[Mapping[str, float]] = None,
         native_activity_formula: Optional[str] = None,
     ) -> EquilibriumResult:
-        """
-        Minimize Gibbs energy via MAGEMin.
+        """Minimize Gibbs energy via MAGEMin.
 
         Conforms to the layered ``MeltBackend`` ABC: when
         ``composition_mol_by_account`` is supplied, only the
         ``process.cleaned_melt`` account is consumed — gas, metal, salt,
-        sulfide and halide accounts are filtered out before the library
-        is called (binding spec §7).  Populates ``phases_present``,
+        sulfide and halide accounts are filtered out before the library is
+        called (binding spec §7). Populates ``phases_present``,
         ``phase_masses_kg``, ``liquid_fraction``, and
         ``liquid_composition_wt_pct``.
 
         ``EquilibriumResult.ledger_transition`` is left ``None``: MAGEMin
-        holds no ``AtomLedger`` authority.  Because this method still
+        holds no ``AtomLedger`` authority. Because this method still
         populates ``phase_masses_kg`` with a phase assemblage, a result
         from this adapter is **not** safe to feed through
         ``simulator/core.py::_get_equilibrium`` as the active backend —
         that path rejects a populated phase result with no ledger
         transition and fails closed (see the module "Authority posture"
-        note).  The result is only meaningful to a shadow comparator.
+        note). The result is only meaningful to a shadow comparator.
 
-        On library error returns an empty result with a warning rather
-        than raising.
+        Every returned non-success result has a matching ``backend_status``
+        and a typed ``backend_status_reason``. The return boundary marks any
+        missed typed failure so it remains visible without raising.
         """
+        return _normalize_magemin_equilibrium_result(
+            self._equilibrate_body(
+                temperature_C,
+                composition_kg,
+                fO2_log,
+                pressure_bar,
+                composition_mol=composition_mol,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_formula_registry,
+                call_timeout_s=call_timeout_s,
+                projected_oxide_wt_pct=projected_oxide_wt_pct,
+                native_activity_formula=native_activity_formula,
+            )
+        )
+
+    def _equilibrate_body(
+        self,
+        temperature_C: float,
+        composition_kg: Optional[Dict[str, float]] = None,
+        fO2_log: float = -9.0,
+        pressure_bar: float = 1e-6,
+        *,
+        composition_mol: Optional[Dict[str, float]] = None,
+        composition_mol_by_account: Optional[
+            Mapping[str, Mapping[str, float]]
+        ] = None,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+        call_timeout_s: Optional[float] = None,
+        projected_oxide_wt_pct: Optional[Mapping[str, float]] = None,
+        native_activity_formula: Optional[str] = None,
+    ) -> EquilibriumResult:
+        """Implementation behind the public typed-result boundary."""
         requested_temperature_C = temperature_C
         requested_pressure_bar = pressure_bar
         requested_fO2_log = fO2_log
+
+        def typed_failure_result(
+            result: EquilibriumResult,
+            *,
+            reason: str,
+        ) -> EquilibriumResult:
+            if result.status == 'ok' or not reason.strip():
+                raise ValueError(
+                    'MAGEMin failure results require a non-empty typed reason'
+                )
+            diagnostics = dict(result.diagnostics)
+            diagnostics.update({
+                'backend_status': result.status,
+                'backend_status_reason': reason,
+            })
+            result.diagnostics = diagnostics
+            return result
+
         try:
             temperature_C, pressure_bar, fO2_log, call_timeout_s = (
                 _admit_magemin_call_scalars(
@@ -1773,7 +1879,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
         except _MAGEMinDeclaredInputError as exc:
             message = f'MAGEMin equilibrate failed: {exc}'
-            return EquilibriumResult(
+            return typed_failure_result(EquilibriumResult(
                 temperature_C=requested_temperature_C,
                 pressure_bar=requested_pressure_bar,
                 fO2_log=requested_fO2_log,
@@ -1784,7 +1890,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'backend_failure_message': exc.engine_message,
                     'reason': 'invalid_input',
                 },
-            )
+            ), reason='invalid_input')
 
         prior_warnings: List[str] = []
         dropped_accounts: List[str] = []
@@ -1888,7 +1994,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 projection_reason
                 or OutOfDomainReason.FORBIDDEN_SPECIES.value
             )
-            return EquilibriumResult(
+            return typed_failure_result(EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
@@ -1898,10 +2004,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'MAGEMin refused projected/dropped non-basis melt input',
                 ],
                 diagnostics=diagnostics,
-            )
+            ), reason=(
+                projection_reason or OutOfDomainReason.FORBIDDEN_SPECIES.value
+            ))
         if not comp_wt:
             # No oxide species in MAGEMin's basis after the account split.
-            return EquilibriumResult(
+            return typed_failure_result(EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
@@ -1912,7 +2020,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'equilibrium result',
                 ],
                 diagnostics=projection_diagnostics,
-            )
+            ), reason='missing_input')
 
         if bulk_projection is None:
             _valid, domain_warnings, domain_reason = domain_verdict
@@ -1927,14 +2035,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_status': 'out_of_domain',
                 'backend_status_reason': domain_reason,
             })
-            return EquilibriumResult(
+            return typed_failure_result(EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 status='out_of_domain',
                 warnings=[*prior_warnings, *domain_warnings],
                 diagnostics=diagnostics,
-            )
+            ), reason=domain_reason or 'out_of_domain')
 
         result_diagnostics = projection_diagnostics_for_melt_input(
             backend='MAGEMin',
@@ -1956,7 +2064,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             diagnostics['backend_status'] = 'out_of_domain'
             diagnostics['backend_status_reason'] = COMPOSITION_PROJECTED
             dropped = ', '.join(bulk_projection.dropped_components)
-            return EquilibriumResult(
+            return typed_failure_result(EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
@@ -1968,7 +2076,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     f'components have no documented ig endmember: {dropped}',
                 ],
                 diagnostics=diagnostics,
-            )
+            ), reason=COMPOSITION_PROJECTED)
 
         domain_valid, domain_warnings, domain_reason = domain_verdict
         if not domain_valid:
@@ -1977,14 +2085,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_status': 'out_of_domain',
                 'backend_status_reason': domain_reason,
             })
-            return EquilibriumResult(
+            return typed_failure_result(EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 status='out_of_domain',
                 warnings=[*prior_warnings, *domain_warnings],
                 diagnostics=diagnostics,
-            )
+            ), reason=domain_reason or 'out_of_domain')
 
         # Apply the gate before availability so out-of-domain bulks receive
         # the same typed answer whether or not the binary is installed.
@@ -1993,16 +2101,19 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_status': 'unavailable',
                 'backend_failure_disposition': 'environment',
             }
-            if self._binary_path is None:
-                diagnostics['backend_status_reason'] = 'missing_binary'
-            return EquilibriumResult(
+            unavailable_reason = (
+                'missing_binary'
+                if self._binary_path is None
+                else 'magemin_engine_worker_unavailable'
+            )
+            return typed_failure_result(EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 status='unavailable',
                 warnings=['MAGEMin backend not initialized'],
                 diagnostics=diagnostics,
-            )
+            ), reason=unavailable_reason)
 
         try:
             raw = self._call_magemin(
@@ -2024,29 +2135,45 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             # usable result.
             message = f'MAGEMin equilibrate failed: {exc}'
             self._last_error = message
+            failure_status = (
+                'refused'
+                if isinstance(exc, _MAGEMinDeclaredInputError)
+                else 'not_converged'
+            )
             failure_diagnostics = dict(result_diagnostics)
             failure_diagnostics.update({
                 'backend_failure_exception': exc.exception_type,
                 'backend_failure_message': exc.engine_message,
             })
+            if isinstance(exc, _MAGEMinDeclaredInputError):
+                failure_reason = 'invalid_input'
+            else:
+                default_failure_reason = (
+                    'magemin_engine_worker_unavailable'
+                    if (
+                        isinstance(exc, _MAGEMinEngineLifecycleError)
+                        or exc.failure_disposition == 'environment'
+                    )
+                    else 'engine_crash'
+                )
+                failure_reason = _MAGEMIN_FAILURE_REASON_BY_EXCEPTION.get(
+                    exc.exception_type,
+                    default_failure_reason,
+                )
             if exc.failure_disposition is not None:
                 failure_diagnostics['backend_failure_disposition'] = (
                     exc.failure_disposition
                 )
             if isinstance(exc, _MAGEMinDeclaredInputError):
                 failure_diagnostics['reason'] = 'invalid_input'
-            return EquilibriumResult(
+            return typed_failure_result(EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
-                status=(
-                    'refused'
-                    if isinstance(exc, _MAGEMinDeclaredInputError)
-                    else 'not_converged'
-                ),
+                status=failure_status,
                 warnings=[*prior_warnings, *bulk_projection.warnings, message],
                 diagnostics=failure_diagnostics,
-            )
+            ), reason=failure_reason)
 
         # ledger_transition is left None: MAGEMin holds no AtomLedger
         # authority.  _populate_result fills phase_masses_kg, so a result
@@ -2087,14 +2214,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_status': 'not_converged',
                 'backend_status_reason': 'negative_convergence_evidence',
             })
-            return EquilibriumResult(
+            return typed_failure_result(EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 status='not_converged',
                 warnings=[*all_warnings, message],
                 diagnostics=result_diagnostics,
-            )
+            ), reason='negative_convergence_evidence')
         if isinstance(raw, dict):
             buffer_warnings = raw.get('buffer_warnings') or []
             for line in buffer_warnings:
@@ -2153,14 +2280,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'MAGEMin returned an incomplete Mode vector; '
                     f'mass deficit={deficit:.9g}'
                 )
-                return EquilibriumResult(
+                return typed_failure_result(EquilibriumResult(
                     temperature_C=temperature_C,
                     pressure_bar=pressure_bar,
                     fO2_log=result_fO2_log,
                     status='out_of_domain',
                     warnings=[*all_warnings, message],
                     diagnostics=result_diagnostics,
-                )
+                ), reason=MAGEMIN_MODE_VECTOR_MASS_DEFICIT)
         native_activities: Dict[str, float] = {}
         if native_activity_formula is not None:
             from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
@@ -2200,7 +2327,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'backend_status_reason': 'engine_not_converged',
                     'magemin_native_activity_invalid': True,
                 })
-                return EquilibriumResult(
+                return typed_failure_result(EquilibriumResult(
                     temperature_C=temperature_C,
                     pressure_bar=pressure_bar,
                     fO2_log=result_fO2_log,
@@ -2212,7 +2339,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         f'activity={raw_activity!r}',
                     ],
                     diagnostics=result_diagnostics,
-                )
+                ), reason='engine_not_converged')
             for formula, (field, _polymorph) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
                 try:
                     value = float(native.get(formula))
@@ -2246,6 +2373,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             warnings=all_warnings,
             diagnostics=result_diagnostics,
         )
+        if result.status != 'ok':
+            return typed_failure_result(
+                result,
+                reason=result_diagnostics['backend_status_reason'],
+            )
         return result
 
     def find_liquidus_solidus(
@@ -3111,9 +3243,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                                 call_started,
                             ),
                         )
-                    raise _MAGEMinEngineCallError(
-                        type(exc).__name__, str(exc)
-                    ) from exc
+                    raise _magemin_bridge_failure_error(exc) from exc
             if self._binary_path is not None:
                 return self._call_magemin_subprocess_after_bridge_failure(
                     bulk_projection=bulk_projection,
@@ -3159,9 +3289,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             call_started,
                         ),
                     )
-                raise _MAGEMinEngineCallError(
-                    type(exc).__name__, str(exc)
-                ) from exc
+                raise _magemin_bridge_failure_error(exc) from exc
 
         if self._bridge == 'ctypes':
             # ctypes path is intentionally NOT auto-marshaled here —
@@ -3392,6 +3520,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 call_timeout_s=call_timeout_s,
             )
         except _MAGEMinEngineCallError as subprocess_exc:
+            if isinstance(subprocess_exc, _MAGEMinEngineLifecycleError):
+                raise
             raise _MAGEMinEngineCallError(
                 subprocess_exc.exception_type,
                 f'{message}; subprocess retry failed: '

@@ -3012,9 +3012,12 @@ class GateCurveProviderOutcome(str, Enum):
 _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS = frozenset({
     "engine_crash",
     "engine_worker_unavailable",
+    "magemin_engine_worker_died",
+    "magemin_subprocess_slot_unavailable",
+    "magemin_engine_worker_unavailable",
+    "magemin_untyped_failure",
     "missing_binary",
     "nonzero_exit",
-    "parse_empty_output",
     "subprocess_died",
     "subprocess_fe_free_absolute_fo2_crash",
     "system_output_missing",
@@ -3090,12 +3093,24 @@ def gate_curve_provider_outcome_for_status(
 
     normalized_status = str(status).strip().lower()
     reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
+    # MAGEMinOutputError is unusable solver output; keep its flagged fallback.
+    # Other providers' parse-empty contract failures remain fail-closed below.
+    magemin_invalid_output = "mageminoutputerror" in reasons
+    # The backend marks exceptions caught at the third-party bridge boundary
+    # with a typed disposition. Their Python class names do not determine the
+    # gate outcome; subprocess and worker infrastructure errors keep their own
+    # typed reasons and remain fail-closed.
+    magemin_bridge_numerical_failure = (
+        "magemin_bridge_numerical_failure" in reasons
+    )
     if "environment" in reasons:
         return GateCurveProviderOutcome.FAILED
     if any(reason in {
         "missing_input", "invalid_input", "invalid_fo2_log",
         "invalid_pressure_bar", "non_finite_composition",
     } for reason in reasons):
+        return GateCurveProviderOutcome.FAILED
+    if "parse_empty_output" in reasons and not magemin_invalid_output:
         return GateCurveProviderOutcome.FAILED
     numerical_reasons = {
         "not_converged", "engine_not_converged", "negative_convergence_evidence",
@@ -3106,7 +3121,11 @@ def gate_curve_provider_outcome_for_status(
         for reason in TRANSIENT_OUT_OF_DOMAIN_REASONS
     } | _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS
     if gate_curve_provider_timed_out(diagnostic) or any(
-        reason in transient_reasons - numerical_reasons for reason in reasons
+        reason in transient_reasons - numerical_reasons
+        and not (
+            reason == "engine_crash" and magemin_bridge_numerical_failure
+        )
+        for reason in reasons
     ):
         return GateCurveProviderOutcome.FAILED
     nested_outcomes = []
@@ -3136,6 +3155,8 @@ def gate_curve_provider_outcome_for_status(
     if (
         GateCurveProviderOutcome.NUMERICAL_FAILURE in nested_outcomes
         or normalized_status == "not_converged"
+        or magemin_invalid_output
+        or magemin_bridge_numerical_failure
         or any(reason in numerical_reasons for reason in reasons)
     ):
         return GateCurveProviderOutcome.NUMERICAL_FAILURE

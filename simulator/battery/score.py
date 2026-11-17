@@ -7093,6 +7093,7 @@ def cell_notices(
     from simulator.diagnostic_helpers.binary_pot_battery import (
         AUTHORITY_EXTRAPOLATED,
         AUTHORITY_FALLBACK,
+        REFUSAL_DIAGNOSTIC_GAP,
         _FLOOR_INVERSION_REASON,
     )
 
@@ -7210,6 +7211,17 @@ def cell_notices(
                     kind=NoticeKind.INPUT_OMITTED,
                     affected_quantities=(quantity,),
                     reason=str(row.get("reason") or kind),
+                    origin=f"engine:{engine.value}",
+                )
+            )
+        elif kind == REFUSAL_DIAGNOSTIC_GAP:
+            notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(quantity,),
+                    reason=json.dumps(
+                        dict(row), sort_keys=True, separators=(",", ":")
+                    ),
                     origin=f"engine:{engine.value}",
                 )
             )
@@ -10455,10 +10467,19 @@ _ENGINE_WORKER_LIFECYCLE_FAILURES = (
     "EngineWorkerUnavailable",
     "EngineWorkerPoolLifecycleError",
 )
+_MAGEMIN_WORKER_LIFECYCLE_REASONS = frozenset({
+    "magemin_subprocess_slot_timeout",
+    "magemin_subprocess_slot_unavailable",
+    "magemin_aggregate_budget_timeout",
+    "magemin_engine_worker_unavailable",
+    "magemin_engine_worker_died",
+})
 
 
-def _engine_worker_lifecycle_failure(result: object) -> str | None:
-    """Return a typed worker lifecycle failure preserved by the backend."""
+def _engine_worker_lifecycle_failure(
+    result: object, *, engine: Engine
+) -> dict[str, str] | None:
+    """Return the typed worker lifecycle detail preserved by the backend."""
 
     diagnostics = getattr(result, "diagnostics", None)
     failure = (
@@ -10466,17 +10487,33 @@ def _engine_worker_lifecycle_failure(result: object) -> str | None:
         if isinstance(diagnostics, Mapping)
         else None
     )
-    if failure not in _ENGINE_WORKER_LIFECYCLE_FAILURES:
-        engine_reason = str(getattr(result, "engine_reason", None) or "")
-        failure = next(
-            (
-                name
-                for name in _ENGINE_WORKER_LIFECYCLE_FAILURES
-                if f"{name}:" in engine_reason
-            ),
-            None,
-        )
-    return failure if failure in _ENGINE_WORKER_LIFECYCLE_FAILURES else None
+    if failure in _ENGINE_WORKER_LIFECYCLE_FAILURES:
+        return {"backend_failure_exception": failure}
+
+    backend_reason = (
+        diagnostics.get("backend_status_reason")
+        if isinstance(diagnostics, Mapping)
+        else None
+    )
+    engine_reason = str(
+        backend_reason or getattr(result, "engine_reason", None) or ""
+    )
+    failure = next(
+        (
+            name
+            for name in _ENGINE_WORKER_LIFECYCLE_FAILURES
+            if f"{name}:" in engine_reason
+        ),
+        None,
+    )
+    if failure is not None:
+        return {"backend_failure_exception": failure}
+    if (
+        engine is Engine.MAGEMIN
+        and engine_reason in _MAGEMIN_WORKER_LIFECYCLE_REASONS
+    ):
+        return {"backend_status_reason": engine_reason}
+    return None
 
 
 def _phase_role_value(identity: Identity, name: str) -> PhaseRole | None:
@@ -11510,14 +11547,14 @@ def _predict_phase_row(
             notices=exclusion_notices,
         )
 
-    worker_failure = _engine_worker_lifecycle_failure(result)
+    worker_failure = _engine_worker_lifecycle_failure(result, engine=engine)
     if worker_failure is not None:
         return refused(
             RefusalReason.ATTEMPTED_UNAVAILABLE,
             {
                 "reason": f"engine_transport_error:{engine.value}",
                 "engine": engine.value,
-                "backend_failure_exception": worker_failure,
+                **worker_failure,
             },
             execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
             notices=exclusion_notices,
@@ -13221,6 +13258,7 @@ def _predict_with_engine(
         MELTS_FAMILY_ENGINES,
         PO2_COMMANDED,
         PO2_OXYGEN_BALANCE_EFFUSION,
+        REFUSAL_DIAGNOSTIC_GAP,
         REFUSAL_ENGINE_CRASH,
         REFUSAL_TIMEOUT,
         REFUSAL_UNAVAILABLE,
@@ -14576,8 +14614,14 @@ def _predict_with_engine(
         engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
             cell_status = str(getattr(cell, "engine_status", "") or "")
-            worker_failure = _engine_worker_lifecycle_failure(cell)
-            if typed in {"out_of_domain", "out_of_basis"} or cell_status == "out_of_domain":
+            worker_failure = _engine_worker_lifecycle_failure(cell, engine=engine)
+            if typed == REFUSAL_DIAGNOSTIC_GAP:
+                refusal_reason = RefusalReason.ATTEMPTED_UNAVAILABLE
+                typed_reason = REFUSAL_DIAGNOSTIC_GAP
+            elif (
+                typed in {"out_of_domain", "out_of_basis"}
+                or cell_status == "out_of_domain"
+            ):
                 refusal_reason = RefusalReason.METRIC_DOMAIN
                 typed_reason = "out_of_domain"
             elif worker_failure is not None:
@@ -14610,11 +14654,7 @@ def _predict_with_engine(
                     "cell_refusal_reason": typed,
                     "engine_status": cell_status,
                     "engine_reason": engine_side_reason,
-                    **(
-                        {"backend_failure_exception": worker_failure}
-                        if worker_failure is not None
-                        else {}
-                    ),
+                    **(worker_failure or {}),
                 },
                 identity=identity,
                 requested_composition=requested,
@@ -14629,7 +14669,11 @@ def _predict_with_engine(
                 "imcc_sp_extension_required",
             )
         )
-        if typed in {REFUSAL_ENGINE_CRASH, "subprocess_died"} or getattr(cell, "exit_signal", None):
+        if typed in {
+            REFUSAL_ENGINE_CRASH,
+            "magemin_engine_worker_died",
+            "subprocess_died",
+        } or getattr(cell, "exit_signal", None):
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
@@ -14654,6 +14698,9 @@ def _predict_with_engine(
                 version=engine_version,
             )
         if typed == REFUSAL_TIMEOUT:
+            exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
+            reason = RefusalReason.ATTEMPTED_UNAVAILABLE
+        elif typed == REFUSAL_DIAGNOSTIC_GAP:
             exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
             reason = RefusalReason.ATTEMPTED_UNAVAILABLE
         elif typed == REFUSAL_UNAVAILABLE:
@@ -14689,6 +14736,11 @@ def _predict_with_engine(
             refusal_detail={
                 "refusal_reason": typed,
                 "engine_reason": engine_side_reason,
+                **(
+                    {"reason": REFUSAL_DIAGNOSTIC_GAP}
+                    if typed == REFUSAL_DIAGNOSTIC_GAP
+                    else {}
+                ),
                 **(
                     {"reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value}
                     if openimcc_outside_species

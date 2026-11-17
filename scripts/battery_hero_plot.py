@@ -123,6 +123,9 @@ from simulator.battery.score import (  # noqa: E402
     _battery_hero_sweet_spot_records_from_database,
     _residual_engine_observable,
 )
+from simulator.diagnostic_helpers.binary_pot_battery import (  # noqa: E402
+    REFUSAL_DIAGNOSTIC_GAP,
+)
 
 
 DEFAULT_BIN_WIDTH_K = 100.0
@@ -795,11 +798,15 @@ def _record_hero_diagnostic(
 
 def _refusal_reason(row: Mapping[str, Any]) -> str:
     refusal = row.get("refusal")
-    return (
-        str(refusal.get("reason") or "untyped_refusal")
-        if isinstance(refusal, Mapping)
-        else "untyped_refusal"
-    )
+    if not isinstance(refusal, Mapping):
+        return "untyped_refusal"
+    detail = refusal.get("detail")
+    if (
+        isinstance(detail, Mapping)
+        and detail.get("reason") == REFUSAL_DIAGNOSTIC_GAP
+    ):
+        return REFUSAL_DIAGNOSTIC_GAP
+    return str(refusal.get("reason") or "untyped_refusal")
 
 
 def _normalized_hero_diagnostics(

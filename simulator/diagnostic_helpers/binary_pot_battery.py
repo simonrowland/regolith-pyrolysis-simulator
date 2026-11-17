@@ -159,6 +159,7 @@ from simulator.engine_cache import (
 )
 
 ENGINE_ANNOTATION_CRASH_FLOOR = "sio2_below_observed_crash_floor"
+REFUSAL_DIAGNOSTIC_GAP = "diagnostic_gap"
 AUTHORITY_EXTRAPOLATED = "extrapolated"
 _OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON = "oxygen_balance_no_admitted_bracket"
 # Token published by engines/builtin/vapor_pressure.py on pO2-floor inversion.
@@ -183,6 +184,7 @@ _TIMEOUT_TOKENS = frozenset(
 _CRASH_TOKENS = frozenset(
     {
         "engine_crash",
+        "magemin_engine_worker_died",
         "subprocess_died",
         "sigabrt",
         "sigsegv",
@@ -191,7 +193,10 @@ _CRASH_TOKENS = frozenset(
     }
 )
 _UNAVAILABLE_TOKENS = frozenset(
-    {"unavailable", "backend_unavailable", "not_initialized"}
+    {
+        "unavailable", "backend_unavailable", "missing_binary",
+        "not_initialized",
+    }
 )
 _IMCC_OUT_OF_BASIS_CODES = frozenset(
     {
@@ -1618,6 +1623,15 @@ def engine_flags_from_result(
     ):
         certified_band = _plain_data(diagnostics["certified_band"])
 
+    if diagnostics.get("magemin_untyped_failure_diagnostic_gap"):
+        notices.append(
+            {
+                "kind": REFUSAL_DIAGNOSTIC_GAP,
+                "reason": diagnostics.get("backend_status_reason"),
+                "magemin_untyped_failure_diagnostic_gap": True,
+            }
+        )
+
     if diagnostics.get("imcc_notices"):
         imcc_rows = diagnostics["imcc_notices"]
     else:
@@ -1984,8 +1998,17 @@ def classify_equilibrate_outcome(
     engine_reason = structured or ("; ".join(str(w) for w in warnings) if warnings else engine_status)
     haystack = _haystack(engine_status, structured, category, warnings, diagnostics)
     if (
+        diagnostics.get("magemin_untyped_failure_diagnostic_gap")
+        or structured == "magemin_untyped_failure"
+    ):
+        return "refusal", REFUSAL_DIAGNOSTIC_GAP, engine_reason
+    if (
         category == REFUSAL_ENGINE_CRASH
-        or structured in {"subprocess_died", REFUSAL_ENGINE_CRASH}
+        or structured in {
+            "magemin_engine_worker_died",
+            "subprocess_died",
+            REFUSAL_ENGINE_CRASH,
+        }
         or engine_status == REFUSAL_ENGINE_CRASH
     ):
         return "refusal", REFUSAL_ENGINE_CRASH, engine_reason

@@ -80,16 +80,21 @@ def _injected_launch_exception(name):
 
 
 def _bootstrap_magemin_launch_failure_worker(
-    binary_path, database, config, exception_name,
+    binary_path, database, config, exception_name, lock_dir,
 ):
     backend, ready = _bootstrap_magemin_subprocess_worker(
         binary_path, database, config,
     )
-    return (backend, exception_name), ready
+    return (backend, exception_name, lock_dir), ready
 
 
 def _handle_magemin_launch_failure_request(resource, request, errlog):
-    backend, exception_name = resource
+    backend, exception_name, lock_dir = resource
+    lock_dir = Path(lock_dir)
+    magemin_module._MAGEMIN_SUBPROCESS_LOCK_DIR = lock_dir
+    magemin_module._MAGEMIN_SUBPROCESS_LOCK = (
+        lock_dir / magemin_module._MAGEMIN_SUBPROCESS_LOCK.name
+    )
     original_run = magemin_module.subprocess.run
 
     def fail_launch(*_args, **_kwargs):
@@ -102,7 +107,7 @@ def _handle_magemin_launch_failure_request(resource, request, errlog):
         magemin_module.subprocess.run = original_run
 
 
-def _warm_magemin_launch_failure_pool(backend, exception_name):
+def _warm_magemin_launch_failure_pool(backend, exception_name, lock_dir):
     def worker_factory(index):
         return WarmEngineWorker(
             name=f'MAGEMin injected launch failure slot {index}',
@@ -113,6 +118,7 @@ def _warm_magemin_launch_failure_pool(backend, exception_name):
                 backend._database,
                 backend._config,
                 exception_name,
+                str(lock_dir),
             ),
             startup_timeout_s=30.0,
             call_timeout_s=30.0,
@@ -572,7 +578,7 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
     (OSError, errno.EMFILE),
 ])
 def test_actual_magemin_launch_oserror_is_typed_environment_refusal(
-    monkeypatch, error_type, error_number,
+    monkeypatch, magemin_subprocess_lock_dir, error_type, error_number,
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
@@ -626,7 +632,7 @@ def test_actual_magemin_launch_oserror_is_typed_environment_refusal(
     'MemoryError', 'SubprocessError', 'TimeoutExpired', 'CalledProcessError',
 ])
 def test_magemin_launch_environment_errors_keep_type_in_every_execution_mode(
-    monkeypatch, mode, exception_name,
+    monkeypatch, magemin_subprocess_lock_dir, mode, exception_name,
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
@@ -636,7 +642,7 @@ def test_magemin_launch_environment_errors_keep_type_in_every_execution_mode(
     assert backend.initialize({'warm_worker': False})
     if mode == 'warm_pool':
         backend._subprocess_pool = _warm_magemin_launch_failure_pool(
-            backend, exception_name,
+            backend, exception_name, magemin_subprocess_lock_dir,
         )
     elif mode == 'bridge_retry':
         backend._bridge = 'pymagemin'
@@ -685,7 +691,8 @@ def test_magemin_launch_environment_errors_keep_type_in_every_execution_mode(
 
 @pytest.mark.parametrize('mode', ['cold', 'bridge_retry', 'warm_pool'])
 def test_magemin_launch_programming_errors_still_propagate(
-    monkeypatch, mode, vapor_pressure_data, feedstocks_data, setpoints_data,
+    monkeypatch, magemin_subprocess_lock_dir, mode,
+    vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     sim._register_freeze_gate_liquid_fraction_providers()
@@ -694,7 +701,7 @@ def test_magemin_launch_programming_errors_still_propagate(
     assert backend.initialize({'warm_worker': False})
     if mode == 'warm_pool':
         backend._subprocess_pool = _warm_magemin_launch_failure_pool(
-            backend, 'TypeError',
+            backend, 'TypeError', magemin_subprocess_lock_dir,
         )
     elif mode == 'bridge_retry':
         backend._bridge = 'pymagemin'
@@ -726,6 +733,11 @@ def test_magemin_launch_programming_errors_still_propagate(
 @pytest.mark.parametrize('nested, expected', [
     ({'backend_status': 'unavailable'}, 'failed'),
     ({'backend_status': 'not_converged'}, 'numerical_failure'),
+    ({'backend_status': 'not_converged',
+      'backend_status_reason': 'parse_empty_output',
+      'backend_failure_exception': 'MAGEMinOutputError'}, 'numerical_failure'),
+    ({'backend_status': 'not_converged',
+      'backend_status_reason': 'parse_empty_output'}, 'failed'),
     ({'backend_status_reason': 'engine_worker_timeout'}, 'failed'),
     ({'projected_liquidus_status': 'unavailable'}, 'numerical_failure'),
     ({'projected_liquidus_status': 'not_converged'}, 'numerical_failure'),
