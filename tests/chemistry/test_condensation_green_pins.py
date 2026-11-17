@@ -190,7 +190,9 @@ def test_green_runner_capture_pin(staged, route_totals, tmp_path):
     # lunar_24h and c2a_staged runner_sha256 are the studio-3 actuals (pins2
     # log, tree 9666fc129 plus the de32c69ca runner regen). Lunar and Mars
     # full runs diverge between the laptop and studio-3, so these digests are
-    # not a laptop re-run.
+    # not a laptop re-run. d-339 changes the 2023.15 K FeO below-cap
+    # comparator, while b-1124 adds Holzheid extrapolation notices to runner
+    # metadata above 1600 C; the route totals remain unchanged.
     patch = (load_recipe_patch(Path("data/recipes/c2a_staged_temperature_ladder.yaml"))
              if staged else {})
     run = PyrolysisRun(

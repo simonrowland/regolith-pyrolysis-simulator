@@ -308,7 +308,7 @@ def cacheable_refusal(result) -> bool:
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
-    "internal-analytical": 2,
+    "internal-analytical": 3,
     "vaporock": 1,
     "magemin": 3,
     "alphamelts": 3,
@@ -326,11 +326,12 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v2: 2026-11-11 MAGEMin binary pin unchanged, b257r landing 982a8d9fa - d-367 mode-vector closure before liquid-fraction and composition extraction (cd48a78fe)
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
+# internal-analytical v2: 2026-11-17 b-1244 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
+# internal-analytical v3: 2026-11-17 b-1124 d-339 Holzheid FeO gamma continuation changes analytical Fe vapour predictions
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
 # magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
-# internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 
 
 @dataclass(frozen=True)
@@ -548,8 +549,8 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
         "date": "2026-11-08",
     },
     "internal-analytical": {
-        "identity": "source-sha256:ac03c54243b61890960158318fb40a52972f301e9ac1dc9c381fa3a495818740",
-        "date": "2026-11-08",
+        "identity": "source-sha256:c49b38579b949b893865bce76a22fa7d07cf0bd547dc684537a5d0a266056404",
+        "date": "2026-11-17",
     },
     "vaporock": {
         "identity": "version:1.0.0;record-sha256:89e860e3d6995f542337748019c4f6198f76c127ce3ca90fbbc2063bd401fc5a",

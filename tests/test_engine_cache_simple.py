@@ -577,6 +577,71 @@ def test_stateless_internal_analytical_cache_call_hits(
     assert database.exists()
 
 
+def test_internal_analytical_chemistry_version_bypasses_stale_fe_pressure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache.engine_cache_counters(reset=True)
+    request = {
+        "call": "residue_pressure",
+        "temperature_C": 1670.0,
+        "pressure_bar": 1.0e-6,
+        "commanded_pO2_bar": 1.0e-8,
+        "composition": "stateless_test_composition",
+    }
+    old_pressure = {"Fe_Pa": 8.415257183125004}
+    fresh_pressure = {"Fe_Pa": 8.106558774068347}
+    current_version = engine_cache.ENGINE_CHEMISTRY_VERSION[
+        "internal-analytical"
+    ]
+    old_version = current_version - 1
+    assert old_version != current_version
+    assert current_version > 1
+    monkeypatch.setitem(
+        engine_cache.ENGINE_CHEMISTRY_VERSION,
+        "internal-analytical",
+        old_version,
+    )
+    assert engine_cache.cached_engine_call(
+        "internal-analytical", request, lambda: old_pressure
+    ) == old_pressure
+
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    monkeypatch.setitem(
+        engine_cache.ENGINE_CHEMISTRY_VERSION,
+        "internal-analytical",
+        current_version,
+    )
+    calls = 0
+
+    def solve() -> dict[str, float]:
+        nonlocal calls
+        calls += 1
+        return fresh_pressure
+
+    assert engine_cache.cached_engine_call("internal-analytical", request, solve) == (
+        fresh_pressure
+    )
+    assert old_pressure != fresh_pressure
+    assert calls == 1
+    counts = engine_cache.engine_cache_counters(reset=True)["internal-analytical"]
+    assert counts["hits"] == 0
+    assert counts["misses"] == counts["stores"] == 1
+    with sqlite3.connect(database) as connection:
+        versions = {
+            row[0]
+            for row in connection.execute(
+                "SELECT DISTINCT chem_version FROM engine_outputs "
+                "WHERE engine='internal-analytical'"
+            )
+        }
+    assert versions == {str(old_version), str(current_version)}
+
+
 def test_openimcc_chemistry_version_change_with_same_pack_name_is_a_miss(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

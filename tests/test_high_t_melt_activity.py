@@ -418,14 +418,25 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
         result,
         exclude_b813_temperature_notices=True,
     )
+    high_t = result.diagnostic["high_t_melt_activity"]
+    feo_seam = high_t["seam"]["FeO"]
+    assert feo_seam["below_cap_activity_basis"] == "kress91_ferrous"
+    assert feo_seam["below_cap_activity"] == result.diagnostic[
+        "a_FeO_calphad"
+    ]["a_FeO_authoritative"]
+    assert feo_seam["openimcc_activity"] == high_t[
+        "openimcc_activities_by_oxide"
+    ]["FeO"]
     # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "7d93eda6e2a5812bad5bfa80351c187c88adc91e79c2e369b9f7d64d336fdfc8"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    # d-339's regular-solution extrapolation changes the Kress91 FeO
+    # below-cap comparator carried in the OpenIMCC seam provenance. The
+    # OpenIMCC response and numeric vapor/activities payload above stay exact.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "934e52dd541fc5e6933b7fa9d3b106003b5d20f103aa0c6489c4f4ced3f74cc9"
+    ).hexdigest() == "9d10cae68751a99786f5e7468919938fdae970cce0b3392918ea4e7f401ccca1"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
