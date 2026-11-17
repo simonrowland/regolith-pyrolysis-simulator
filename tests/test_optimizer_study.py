@@ -3895,19 +3895,14 @@ def test_parallel_composition_target_stub_study_completes(
         wall_authority = summary["wall_deposit_sticking_authority"]
         refused = wall_authority.get("wall_saturation_pressure_refused_species") or []
         if candidate.candidate_id == hot_id:
-            assert "SiO" in list(refused)
-            sio_refusals = wall_authority[
-                "wall_saturation_pressure_refusals_by_species"
-            ]["SiO"]
-            assert set(sio_refusals) == {
-                "stage_0_to_stage_1",
-                "stage_1_to_stage_2",
-                STAGE3_BYPASS_SEGMENT_NAME,
-            }
-            assert all(
-                record["status"] == "refused"
-                and record["temperature_K"] == pytest.approx(1773.15)
-                for record in sio_refusals.values()
+            # d-402 / 37143839d3a: at 1773.15 K, the pO2-free route
+            # 2 SiO(g) -> Si(s) + SiO2(s) has nu_O2=0. The production
+            # resolver returns 2730.832886566473 Pa and flags its use, so
+            # this wall pressure is resolved rather than refused.
+            assert "SiO" not in list(refused)
+            assert "SiO" not in (
+                wall_authority.get("wall_saturation_pressure_refusals_by_species")
+                or {}
             )
             assert summary["wall_deposit_upper_bound_used"] is True
             bookings = summary["wall_supply_bound_bookings"]
