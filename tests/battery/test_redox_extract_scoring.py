@@ -26,6 +26,7 @@ from simulator.battery.enums import (
     ResidualStatus,
 )
 from simulator.battery.migrate import (
+    FERRIC_FRACTION_RELATION,
     Migrator,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
@@ -106,6 +107,54 @@ def _sossi_aithala_redox_context():
     return context, observations
 
 
+def _printed_fraction_sigma_r(observation):
+    uncertainty = observation.uncertainty
+    if uncertainty is None:
+        return None
+    source_value, _shape, mapped_unit = score_module._printed_uncertainty_source(
+        uncertainty,
+        exact_fields=("Fe3_over_FeT", "Fe3_over_sum_Fe"),
+    )
+    if source_value is None:
+        return None
+    width = (
+        (source_value[1] - source_value[0]) / Decimal(2)
+        if isinstance(source_value, tuple)
+        else source_value
+    )
+    raw_text = score_module._uncertainty_original(uncertainty)
+    source_unit = score_module._uncertainty_unit(
+        Quantity.FE3_FE2_RATIO,
+        uncertainty,
+        observation,
+        mapped_unit,
+        source_value,
+        raw_text,
+    )
+    converted, converted_unit = score_module._convert_uncertainty_width(
+        Quantity.FE3_FE2_RATIO,
+        width,
+        source_unit,
+        source_observation=observation,
+    )
+    if converted is None or converted_unit not in {
+        "fraction",
+        score_module.QUANTITY_UNITS[Quantity.FE3_FE2_RATIO],
+    }:
+        return None
+    confidence_level = (
+        score_module._stated_printed_confidence_level(uncertainty) or "not_stated"
+    )
+    confidence_scale = (
+        Decimal(2)
+        if confidence_level == "two_sigma"
+        else score_module.NORMAL_95_TICKET_MULTIPLIER
+        if confidence_level == "ci95"
+        else Decimal(1)
+    )
+    return converted / confidence_scale
+
+
 def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     pytest.importorskip("openimcc")
     import openimcc
@@ -169,9 +218,12 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     assert len(residuals) == 1
     assert residuals[0].numeric is not None
     assert residuals[0].numeric.operation is MetricOperation.DEX
-    assert residuals[0].status is ResidualStatus.NO_BAND
-    assert residuals[0].refusal is not None
-    assert residuals[0].refusal.reason is RefusalReason.DECISION_RULE_MISSING
+    assert residuals[0].status is ResidualStatus.MISMATCH
+    assert residuals[0].refusal is None
+    assert not any(
+        notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+        for notice in residuals[0].notices
+    )
 
 
 def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
@@ -491,11 +543,54 @@ def test_sossi_internal_analytical_numeric_count_matches_green():
     )
 
 
-def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical():
-    context, _observations = _sossi_aithala_redox_context()
+def test_internal_analytical_sossi_aithala_redox_payload_pin():
+    context, observations = _sossi_aithala_redox_context()
     residuals, _ = score_store(
         context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
     )
+    sossi_sd_ids = {
+        observation_id
+        for observation_id, observation in observations.items()
+        if observation.source_id == "sossi-2020-magma-ocean-redox"
+        and isinstance(observation.uncertainty.verbatim, dict)
+        and "confidence_level" not in observation.uncertainty.verbatim
+    }
+    assert len(sossi_sd_ids) == 11
+    sossi_sd_residuals = [
+        residual for residual in residuals if residual.reference in sossi_sd_ids
+    ]
+    assert len(sossi_sd_residuals) == 11
+    boundary_refusals = []
+    for residual in sossi_sd_residuals:
+        assert residual.numeric is not None
+        observation = observations[residual.reference]
+        fraction = dict(observation.derivation.parameters)[
+            "original_Fe3_over_FeT"
+        ].state.value
+        sigma_r = _printed_fraction_sigma_r(observation)
+        assert sigma_r is not None
+        if Decimal(2) * sigma_r >= fraction or Decimal(2) * sigma_r >= (
+            Decimal(1) - fraction
+        ):
+            assert residual.numeric.decision_band is None
+            assert residual.status is ResidualStatus.NO_BAND
+            assert residual.refusal is not None
+            assert residual.refusal.detail["reason"] == (
+                "ferric_fraction_uncertainty_linearization_invalid"
+            )
+            boundary_refusals.append(residual.reference)
+        else:
+            assert residual.refusal is None
+            assert residual.numeric.decision_band is not None
+            assert residual.numeric.decision_band.rule.startswith("printed_1sigma:")
+        assert not any(
+            notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+            or "two_sigma_reading_verdict=" in (notice.band or "")
+            for notice in residual.notices
+        )
+    assert len(boundary_refusals) == 2
+    assert any(reference.endswith("sossi_2020_per_f_o2_11_xanes") for reference in boundary_refusals)
+    assert any(reference.endswith("sossi_2020_per_f_o2_12_xanes") for reference in boundary_refusals)
     encoded = json.dumps(
         [residual_to_plain(residual) for residual in residuals],
         sort_keys=True,
@@ -515,10 +610,154 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     # 1ab48f4d30da838c5ae5a6445b3a773bee1c04738637e2693f7b2e17263d46b2
     # and the twelve Sossi rows were refused input_phase_assemblage_unstated.
     # Those twelve now score. The six Aithala rows are byte-identical.
-    # The previous pin was already stale at that base.
+    # t-1792 validates the ten Sossi gas-ratio rows against their printed
+    # atmosphere. Nine fO2 identities match green again; fO2-10 keeps its
+    # pressure. Their residual notices now carry the certified atmosphere
+    # frame instead of the prior 1-bar-convention notice. The two Sossi rows
+    # without gas ratios and all six Aithala rows are unchanged by t-1792.
+    # d-341 (t-1646) assumes 1 sigma only where neither metadata nor printed
+    # text states the level; the Sossi rows' printed SD caption keeps their
+    # primary 1-sigma verdicts without the assumption/alternative notices.
+    # t-1646 round 5 refuses the Sossi (11)/(12) two-sigma spans that cross
+    # r=0; the remaining source widths use the transformed log-ratio metric.
+    # The payload now hashes to
+    # 6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "5035aea8b78ad081fda458e8565b4f1bb49fd2e9381af7fedc68d111ae93dd23"
+        "6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862"
     )
+
+
+def test_real_sossi_aithala_bands_propagate_fraction_uncertainty_to_dex():
+    context, observations = _sossi_aithala_redox_context()
+    residuals, _ = score_store(
+        context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
+    )
+    residual_by_reference = {row.reference: row for row in residuals}
+    assert set(residual_by_reference) == set(observations)
+    assert len(residual_by_reference) == 18
+
+    boundary_refusals = []
+    for reference, observation in observations.items():
+        derivation_parameters = dict(observation.derivation.parameters)
+        fraction = derivation_parameters["original_Fe3_over_FeT"].state.value
+        printed_sigma = _printed_fraction_sigma_r(observation)
+        assert isinstance(fraction, Decimal)
+        assert isinstance(printed_sigma, Decimal)
+        residual = residual_by_reference[reference]
+        assert residual.numeric is not None
+        assert residual.numeric.value.is_finite()
+
+        # Independent first-order propagation into the scorer's log10 ratio
+        # metric, using only each row's recorded printed r and sigma_r.
+        crosses_log_domain = (
+            Decimal(2) * printed_sigma >= fraction
+            or Decimal(2) * printed_sigma >= Decimal(1) - fraction
+        )
+        if crosses_log_domain:
+            assert residual.numeric.decision_band is None
+            assert residual.status is ResidualStatus.NO_BAND
+            assert residual.refusal is not None
+            assert residual.refusal.detail["reason"] == (
+                "ferric_fraction_uncertainty_linearization_invalid"
+            )
+            boundary_refusals.append(reference)
+        else:
+            assert residual.refusal is None
+            assert residual.numeric.decision_band is not None
+            expected_band = (
+                printed_sigma
+                / (Decimal(10).ln() * fraction * (Decimal(1) - fraction))
+                * score_module.NORMAL_95_TICKET_MULTIPLIER
+            )
+            assert abs(residual.numeric.decision_band.value - expected_band) < Decimal("1e-20")
+
+    assert len(boundary_refusals) == 2
+    assert {reference.rsplit("::", 1)[-1] for reference in boundary_refusals} == {
+        "sossi_2020_per_f_o2_11_xanes",
+        "sossi_2020_per_f_o2_12_xanes",
+    }
+    assert sum(row.status is ResidualStatus.MATCH for row in residuals) == 2
+    assert sum(row.status is ResidualStatus.MISMATCH for row in residuals) == 14
+    assert sum(row.status is ResidualStatus.NO_BAND for row in residuals) == 2
+    aithala_1800_30 = next(
+        observation_id
+        for observation_id, observation in observations.items()
+        if observation.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
+        and observation.experiment_id.rsplit("::", 1)[-1] == "aithala-2026-1800-30"
+    )
+    assert residual_by_reference[aithala_1800_30].status is ResidualStatus.MATCH
+
+
+def test_fraction_uncertainty_boundaries_cover_all_migrated_source_rows():
+    root = Path(__file__).resolve().parents[2]
+    extracts = root / "data/literature/extracts"
+    source_paths = [
+        path
+        for path in sorted(extracts.glob("*.yaml"))
+        if "Fe3_over_FeT" in path.read_text(encoding="utf-8")
+        or "Fe3_over_sum_Fe" in path.read_text(encoding="utf-8")
+    ]
+    assert len(source_paths) == 11
+
+    migrator = Migrator(root)
+    for path in source_paths:
+        migrator._migrate_extract(path)
+    migrator.finalize()
+    fraction_rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.FE3_FE2_RATIO
+        and observation.derivation is not None
+        and FERRIC_FRACTION_RELATION in (observation.derivation.relation or "")
+        and observation.value.kind.value == "point"
+    ]
+    assert len(fraction_rows) == 168
+
+    invalid_rows = []
+    band_counts = {}
+    for observation in fraction_rows:
+        fraction_parameter = next(
+            parameter
+            for name, parameter in observation.derivation.parameters
+            if name in {"original_Fe3_over_FeT", "original_Fe3_over_sum_Fe"}
+        )
+        fraction = fraction_parameter.state.value
+        resolution = score_module._printed_uncertainty_band(
+            Quantity.FE3_FE2_RATIO,
+            observation.uncertainty,
+            observation.value.point,
+            source_observation=observation,
+        )
+        sigma_r = _printed_fraction_sigma_r(observation)
+        if resolution.band is not None:
+            assert sigma_r is not None
+            assert Decimal(2) * sigma_r < fraction
+            assert Decimal(2) * sigma_r < Decimal(1) - fraction
+            band_counts[observation.source_id] = (
+                band_counts.get(observation.source_id, 0) + 1
+            )
+        elif (
+            resolution.refusal is not None
+            and resolution.refusal.get("reason")
+            == "ferric_fraction_uncertainty_linearization_invalid"
+        ):
+            assert sigma_r is not None
+            assert Decimal(2) * sigma_r >= fraction or Decimal(2) * sigma_r >= (
+                Decimal(1) - fraction
+            )
+            invalid_rows.append(observation.observation_id)
+
+    assert band_counts == {
+        "aithala-2026-magmatic-iron-redox-to-2100c": 16,
+        "cottrell-2009-iron-xanes": 18,
+        "sossi-2020-magma-ocean-redox": 10,
+    }
+    assert len(invalid_rows) == 2
+    assert {row.rsplit("::", 1)[-1] for row in invalid_rows} == {
+        "sossi_2020_per_f_o2_11_xanes",
+        "sossi_2020_per_f_o2_12_xanes",
+    }
 
 
 def _assert_kress91_citation_is_unknown(residuals, observations) -> None:
@@ -1362,8 +1601,13 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
             "openimcc",
         }:
             assert residual.numeric is not None
-            assert residual.refusal is not None
-            assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+            assert residual.refusal is None
+            assert residual.numeric.decision_band is not None
+            assert residual.numeric.decision_band.rule.startswith("printed_1sigma:")
+            assert any(
+                notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+                for notice in residual.notices
+            )
         elif engine in {"alphamelts", "thermoengine"}:
             # Composition is printed, so these engines attempt a ferric split.
             # The unsupported-engine refusal is the one from before that path.

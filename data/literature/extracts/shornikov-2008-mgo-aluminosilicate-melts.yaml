@@ -4749,13 +4749,48 @@ experiments:
 - experiment_id: shornikov-archakov-2001-kems
   kind: literature
   locator:
-    page: 2
-    pdf_page_index: 1
-    published_page: 148
-    figure: '1'
-    panel: a-d
+    page: 1
+    pdf_page_index: 0
+    published_page: 147
+    section: Thermodynamic properties of MgO–Al2O3–SiO2 melts
+    note: Method statement location; each plotted observation locates to Figure 1 on page 148.
   citation: Shornikov and Archakov (2001), cited as reference [1].
-  method: Mass-spectrometric Knudsen effusion measurements, as attributed in the paper.
+  method: knudsen_effusion
+  attribution_as_printed: >-
+    The obtained results are shown in the Figure below in comparison with the experimental data obtained by the mass
+    spectrometric Knudsen effusion method in MgAl2O4 - SiO2 concentration range at 2050 K [1].
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state the KEMS cell pressure.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 147
+        section: Thermodynamic properties of MgO–Al2O3–SiO2 melts
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The paper does not state a sweep gas.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 147
+        section: Thermodynamic properties of MgO–Al2O3–SiO2 melts
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+      knudsen_number_orifice:
+        state:
+          tag: unknown
+          reason: The paper does not state an orifice Knudsen number or mean-free-path comparison.
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 147
+          section: Thermodynamic properties of MgO–Al2O3–SiO2 melts
 - experiment_id: shornikov-2008-present-study-model
   kind: thermodynamic_model
   locator:

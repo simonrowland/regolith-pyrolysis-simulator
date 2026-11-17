@@ -147,7 +147,15 @@ def test_isolated_migration_maps_all_rows_phases_and_temperatures() -> None:
 
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
-    migrated = migrator.result.observations
+    nafeo2_ids = {
+        f"{SOURCE_ID}::{observation['observation_id']}"
+        for observation in document["species"]["NaFeO2"]["observations"]
+    }
+    migrated = {
+        observation_id: observation
+        for observation_id, observation in migrator.result.observations.items()
+        if observation_id.split("::T=", 1)[0] in nafeo2_ids
+    }
     assert len(migrated) == 89
     assert not migrator.result.validation.hard_issues
 

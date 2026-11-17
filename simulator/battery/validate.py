@@ -62,6 +62,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     QUANTITY_UNITS,
+    QuotedTargetKind,
     Quantity,
     RefusalReason,
     ResidualStatus,
@@ -84,6 +85,7 @@ from simulator.battery.records import (
     Located,
     Notice,
     Observation,
+    QuotedFrom,
     Reaction,
     Residual,
     Species,
@@ -977,6 +979,21 @@ def validate_sweep_gas(gas: object, path: str) -> list[ValidationIssue]:
     return issues
 
 
+def _quoted_source_experiment(
+    target: QuotedFrom,
+    experiments: Mapping[str, Experiment],
+    observations: Mapping[str, Observation] | None,
+) -> Experiment | None:
+    if target.target_kind is QuotedTargetKind.EXPERIMENT:
+        return experiments.get(target.target_id)
+    if observations is None:
+        return None
+    observation = observations.get(target.target_id)
+    if observation is None:
+        return None
+    return experiments.get(observation.experiment_id)
+
+
 def validate_experiment(
     experiment: Experiment,
     works: Mapping[str, Work],
@@ -984,8 +1001,10 @@ def validate_experiment(
     path: str = "experiment",
     benches: Mapping[str, Bench] | None = None,
     context_rows: Mapping[str, Any] | None = None,
+    observations: Mapping[str, Observation] | None = None,
 ) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
+    source_experiment: Experiment | None = None
     if experiment.kind is ExperimentKind.LITERATURE:
         if not experiment.work_id:
             issues.append(
@@ -1018,6 +1037,139 @@ def validate_experiment(
                     f"{path}.simulated_experiment_id",
                     RefusalReason.REFERENTIAL_INTEGRITY,
                     f"simulated_experiment_id {experiment.simulated_experiment_id!r} does not resolve",
+                )
+            )
+    if experiment.quoted_from is not None:
+        target = experiment.quoted_from
+        if target.target_kind is QuotedTargetKind.EXPERIMENT:
+            resolves = target.target_id in experiments
+        else:
+            resolves = observations is not None and target.target_id in observations
+        if not resolves:
+            issues.append(
+                _issue(
+                    f"{path}.quoted_from",
+                    RefusalReason.REFERENTIAL_INTEGRITY,
+                    f"quoted_from {target.target_kind.value} {target.target_id!r} does not resolve",
+                )
+            )
+        source_experiment = _quoted_source_experiment(
+            target, experiments, observations
+        )
+        if (
+            source_experiment is not None
+            and source_experiment.experiment_id == experiment.experiment_id
+        ):
+            issues.append(
+                _issue(
+                    f"{path}.quoted_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "quoted_from cannot point to the quoting experiment itself",
+                )
+            )
+    if experiment.method_inherited_from:
+        if experiment.quoted_from is None:
+            issues.append(
+                _issue(
+                    f"{path}.method_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "inherited method requires quoted_from",
+                )
+            )
+        elif source_experiment is None:
+            issues.append(
+                _issue(
+                    f"{path}.method_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "inherited method requires a resolvable cited experiment",
+                )
+            )
+        elif not experiment.method.is_value:
+            issues.append(
+                _issue(
+                    f"{path}.method_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "inherited method flag requires a method value",
+                )
+            )
+        elif not source_experiment.method.is_value:
+            issues.append(
+                _issue(
+                    f"{path}.method_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "cited experiment has no method value to inherit",
+                )
+            )
+        elif experiment.method.value != source_experiment.method.value:
+            issues.append(
+                _issue(
+                    f"{path}.method_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "inherited method does not match the cited experiment",
+                )
+            )
+    if experiment.sample.initial_composition_inherited_from:
+        composition = experiment.sample.initial_composition
+        if experiment.quoted_from is None:
+            issues.append(
+                _issue(
+                    f"{path}.sample.initial_composition_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "inherited run composition requires quoted_from",
+                )
+            )
+        elif source_experiment is None:
+            issues.append(
+                _issue(
+                    f"{path}.sample.initial_composition_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "inherited run composition requires a resolvable cited experiment",
+                )
+            )
+        if composition is None or not composition.state.is_value:
+            issues.append(
+                _issue(
+                    f"{path}.sample.initial_composition_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "inherited run composition flag requires an initial composition value",
+                )
+            )
+        elif (
+            source_experiment is not None
+            and source_experiment.sample.initial_composition is None
+        ):
+            issues.append(
+                _issue(
+                    f"{path}.sample.initial_composition_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "cited experiment has no initial composition to inherit",
+                )
+            )
+        elif (
+            source_experiment is not None
+            and source_experiment.sample.initial_composition is not None
+            and not source_experiment.sample.initial_composition.state.is_value
+        ):
+            issues.append(
+                _issue(
+                    f"{path}.sample.initial_composition_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "cited experiment has no initial composition value to inherit",
+                )
+            )
+        elif (
+            source_experiment is not None
+            and source_experiment.sample.initial_composition is not None
+            and composition is not None
+            and composition.state.is_value
+            and composition.state.value
+            != source_experiment.sample.initial_composition.state.value
+        ):
+            issues.append(
+                _issue(
+                    f"{path}.sample.initial_composition_inherited_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "inherited initial composition does not match the cited experiment",
                 )
             )
     if benches is not None and experiment.bench_id is not None:
@@ -1982,6 +2134,7 @@ def _inputs_for_work(
             obs.observation_id,
             observations,
             table_ids,
+            experiments=experiments,
             asset_ids=registered,
             _cache=lineage_cache,
         )
@@ -2105,11 +2258,34 @@ def _inputs_registered_under_work(
     )
 
 
+def _quoted_source_observation_ids(
+    experiment: Experiment,
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment],
+) -> tuple[str, ...] | None:
+    target = experiment.quoted_from
+    if target is None:
+        return ()
+    if target.target_kind is QuotedTargetKind.OBSERVATION:
+        return (target.target_id,) if target.target_id in observations else None
+    if target.target_id not in experiments:
+        return None
+    source_ids = tuple(
+        sorted(
+            observation.observation_id
+            for observation in observations.values()
+            if observation.experiment_id == target.target_id
+        )
+    )
+    return source_ids or None
+
+
 def _observation_lineage(
     observation_id: str,
     observations: Mapping[str, Observation],
     table_ids: set[str],
     *,
+    experiments: Mapping[str, Experiment] | None = None,
     asset_ids: set[str] | None = None,
     _cache: dict[str, Ancestry] | None = None,
     _stack: set[str] | None = None,
@@ -2119,9 +2295,10 @@ def _observation_lineage(
     A shared ancestor is returned from the cache. An id still on the
     active stack is a cycle. A derivation input that is neither an
     observation, a table, nor a registered source asset is unresolvable
-    and is not dropped. read_from is a work asset, not an observation
-    edge: a table is an ancestor, a registered non-table asset stays
-    out of the id set, and any other nonempty value is unresolvable.
+    and is not dropped. Citation links are traversed as scoring ancestry
+    without changing ``derived_from``. read_from is a work asset, not an
+    observation edge: a table is an ancestor, a registered non-table asset
+    stays out of the id set, and any other nonempty value is unresolvable.
     """
 
     if _cache is None:
@@ -2165,6 +2342,7 @@ def _observation_lineage(
                     parent,
                     observations,
                     table_ids,
+                    experiments=experiments,
                     asset_ids=asset_ids,
                     _cache=_cache,
                     _stack=_stack,
@@ -2189,6 +2367,7 @@ def _observation_lineage(
                             inp,
                             observations,
                             table_ids,
+                            experiments=experiments,
                             asset_ids=asset_ids,
                             _cache=_cache,
                             _stack=_stack,
@@ -2199,6 +2378,33 @@ def _observation_lineage(
                         assert nested.ids is not None and result.ids is not None
                         ids |= set(nested.ids)
                         result = Ancestry.of(ids)
+            if result.complete and experiments is not None:
+                experiment = experiments.get(obs.experiment_id)
+                if experiment is not None and experiment.quoted_from is not None:
+                    source_ids = _quoted_source_observation_ids(
+                        experiment, observations, experiments
+                    )
+                    if source_ids is None:
+                        result = Ancestry.incomplete(
+                            AncestryFailure.UNRESOLVABLE_INPUT
+                        )
+                    else:
+                        for source_id in source_ids:
+                            nested = _observation_lineage(
+                                source_id,
+                                observations,
+                                table_ids,
+                                experiments=experiments,
+                                asset_ids=asset_ids,
+                                _cache=_cache,
+                                _stack=_stack,
+                            )
+                            if not nested.complete:
+                                result = nested
+                                break
+                            assert nested.ids is not None and result.ids is not None
+                            ids |= set(nested.ids)
+                            result = Ancestry.of(ids)
     _stack.remove(observation_id)
     _cache[observation_id] = result
     return result
@@ -2242,6 +2448,7 @@ def _resolve_coefficient_sources(
                 src,
                 observations,
                 indexes.table_ids,
+                experiments=experiments,
                 asset_ids=indexes.asset_ids,
                 _cache=indexes.observation_lineages,
             )
@@ -2530,6 +2737,7 @@ def _validate_residual_with_indexes(
                             reference.observation_id,
                             observations,
                             indexes.table_ids,
+                            experiments=experiments,
                             asset_ids=indexes.asset_ids,
                             _cache=indexes.observation_lineages,
                         )
@@ -2731,6 +2939,7 @@ def validate_corpus(
                 f"experiment[{experiment.experiment_id}]",
                 bench_map,
                 context_map,
+                observations=obs_map,
             )
         )
     source_owners = _source_owners(work_map)
