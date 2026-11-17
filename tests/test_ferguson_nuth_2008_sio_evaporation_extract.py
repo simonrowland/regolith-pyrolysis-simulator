@@ -6,6 +6,7 @@ from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import MethodToken
 from simulator.battery.migrate import REPO_ROOT
 from simulator.battery.validate import validate_corpus
 from tests.battery.test_migrate import _migrate_real_extract
@@ -80,6 +81,11 @@ def test_table_rows_migrate_temperature_conditions_and_source_pins(
         if observation_id.startswith(ROW_PREFIX)
     }
     assert len(rows) == 42
+    assert all(
+        result.experiments[observation.experiment_id].method.value
+        is MethodToken.KNUDSEN_EFFUSION
+        for observation in rows.values()
+    )
 
     for point in points:
         row = point["row"]
@@ -104,6 +110,23 @@ def test_table_rows_migrate_temperature_conditions_and_source_pins(
         assert condition.state.is_value
         assert condition.state.value == Decimal(str(point["d_mm"]))
         assert condition.locator is not None
+
+    changed_method = deepcopy(document)
+    changed_method["species"]["SiO"]["observations"][0]["regime"] = (
+        "Knudsen_effusion"
+    )
+    changed_result = _migrate_real_extract(
+        tmp_path / "changed-method",
+        EXTRACT_NAME,
+        extract_doc=changed_method,
+    )
+    changed_row = next(
+        observation
+        for observation in changed_result.observations.values()
+        if observation.observation_id.startswith(ROW_PREFIX)
+        and ":row=1" in observation.observation_id
+    )
+    assert changed_result.experiments[changed_row.experiment_id].method.is_unknown
 
     validation = validate_corpus(
         result.works,
