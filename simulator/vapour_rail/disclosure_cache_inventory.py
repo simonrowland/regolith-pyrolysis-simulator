@@ -221,7 +221,7 @@ def scan_cache_sites(root: Path | None = None) -> dict[str, dict[str, Any]]:
 CACHE_SITES: dict[str, dict[str, Any]] = {
     'lru:simulator/engine_cache.py:_string_bytes': {
         "path": 'simulator/engine_cache.py',
-        "line": 97,
+        "line": 98,
         "kind": 'lru',
         "name": '_string_bytes',
         "carries_disclosure": False,
@@ -229,7 +229,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/engine_cache.py:_key_float_bytes': {
         "path": 'simulator/engine_cache.py',
-        "line": 107,
+        "line": 108,
         "kind": 'lru',
         "name": '_key_float_bytes',
         "carries_disclosure": False,
@@ -237,7 +237,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/engine_cache.py:runtime_identity': {
         "path": 'simulator/engine_cache.py',
-        "line": 810,
+        "line": 1055,
         "kind": 'lru',
         "name": 'runtime_identity',
         "carries_disclosure": False,
@@ -245,7 +245,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/engine_cache.py:_engine_cache_input_identity_digest': {
         "path": 'simulator/engine_cache.py',
-        "line": 527,
+        "line": 525,
         "kind": 'lru',
         "name": '_engine_cache_input_identity_digest',
         "carries_disclosure": False,
@@ -261,7 +261,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score.py:residue_prediction_cache': {
         "path": 'simulator/battery/score.py',
-        "line": 15762,
+        "line": 15576,
         "kind": 'store',
         "name": 'residue_prediction_cache',
         "carries_disclosure": True,
@@ -269,7 +269,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/engine_cache.py:_MEMORY_CACHE': {
         "path": 'simulator/engine_cache.py',
-        "line": 388,
+        "line": 629,
         "kind": 'store',
         "name": '_MEMORY_CACHE',
         "carries_disclosure": True,
@@ -277,7 +277,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'sqlite:simulator/engine_cache.py:engine_outputs': {
         "path": 'simulator/engine_cache.py',
-        "line": 929,
+        "line": 1300,
         "kind": 'sqlite',
         "name": 'engine_outputs',
         "carries_disclosure": True,
@@ -285,7 +285,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'attr:simulator/evaporation.py:_freeze_gate_shared_curve_cache': {
         "path": 'simulator/evaporation.py',
-        "line": 2418,
+        "line": 3499,
         "kind": 'attr',
         "name": '_freeze_gate_shared_curve_cache',
         "carries_disclosure": True,
@@ -293,7 +293,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'class:simulator/optimize/results_store.py:ResultStore': {
         "path": 'simulator/optimize/results_store.py',
-        "line": 187,
+        "line": 188,
         "kind": 'class',
         "name": 'ResultStore',
         "carries_disclosure": True,
@@ -301,7 +301,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'class:simulator/reduced_real_determinism.py:PT1PersistentEquilibriumStore': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 1645,
+        "line": 1676,
         "kind": 'class',
         "name": 'PT1PersistentEquilibriumStore',
         "carries_disclosure": True,
@@ -309,7 +309,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'fn:simulator/optimize/study.py:_scored_result_from_journal_payload': {
         "path": 'simulator/optimize/study.py',
-        "line": 2254,
+        "line": 2293,
         "kind": 'fn',
         "name": '_scored_result_from_journal_payload',
         "carries_disclosure": True,
@@ -317,7 +317,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/compilation_thermo_fits.py:_generator_commit': {
         "path": 'simulator/battery/generators/compilation_thermo_fits.py',
-        "line": 1803,
+        "line": 1804,
         "kind": 'lru',
         "name": '_generator_commit',
         "carries_disclosure": False,
@@ -333,7 +333,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_cached_table_property_points': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 3158,
+        "line": 3750,
         "kind": 'lru',
         "name": '_cached_table_property_points',
         "carries_disclosure": False,
@@ -341,7 +341,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_element_reference_schedule': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 1095,
+        "line": 1120,
         "kind": 'lru',
         "name": '_element_reference_schedule',
         "carries_disclosure": False,
@@ -349,7 +349,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_element_reference_state': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 1158,
+        "line": 1183,
         "kind": 'lru',
         "name": '_element_reference_state',
         "carries_disclosure": False,
@@ -357,7 +357,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_fusion_enthalpy_points': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 2861,
+        "line": 3028,
         "kind": 'lru',
         "name": '_fusion_enthalpy_points',
         "carries_disclosure": False,
@@ -365,7 +365,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_fusion_entropy_points': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 2893,
+        "line": 3060,
         "kind": 'lru',
         "name": '_fusion_entropy_points',
         "carries_disclosure": False,
@@ -373,7 +373,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_fusion_missing_gibbs_temperatures': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 2994,
+        "line": 3161,
         "kind": 'lru',
         "name": '_fusion_missing_gibbs_temperatures',
         "carries_disclosure": False,
@@ -381,7 +381,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_fusion_table_points': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 2824,
+        "line": 2991,
         "kind": 'lru',
         "name": '_fusion_table_points',
         "carries_disclosure": False,
@@ -389,7 +389,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_janaf_gas_table_ids': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 3125,
+        "line": 3296,
         "kind": 'lru',
         "name": '_janaf_gas_table_ids',
         "carries_disclosure": False,
@@ -397,7 +397,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_janaf_pure_solid_table_index': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 2657,
+        "line": 2690,
         "kind": 'lru',
         "name": '_janaf_pure_solid_table_index',
         "carries_disclosure": False,
@@ -405,7 +405,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/janaf.py:_janaf_pure_solid_table_temperature_range': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 2679,
+        "line": 2712,
         "kind": 'lru',
         "name": '_janaf_pure_solid_table_temperature_range',
         "carries_disclosure": False,
@@ -413,7 +413,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/usgs_b1259.py:_formula_index_from_298k': {
         "path": 'simulator/battery/generators/usgs_b1259.py',
-        "line": 1195,
+        "line": 1027,
         "kind": 'lru',
         "name": '_formula_index_from_298k',
         "carries_disclosure": False,
@@ -421,7 +421,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/usgs_b1259.py:_formula_weight_index_from_298k': {
         "path": 'simulator/battery/generators/usgs_b1259.py',
-        "line": 1218,
+        "line": 1050,
         "kind": 'lru',
         "name": '_formula_weight_index_from_298k',
         "carries_disclosure": False,
@@ -429,7 +429,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/usgs_b1259.py:_sibling_formula_index': {
         "path": 'simulator/battery/generators/usgs_b1259.py',
-        "line": 1237,
+        "line": 1069,
         "kind": 'lru',
         "name": '_sibling_formula_index',
         "carries_disclosure": False,
@@ -437,7 +437,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/usgs_b1259.py:_table2_elements': {
         "path": 'simulator/battery/generators/usgs_b1259.py',
-        "line": 964,
+        "line": 813,
         "kind": 'lru',
         "name": '_table2_elements',
         "carries_disclosure": False,
@@ -445,7 +445,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/usgs_b1452.py:_corrections_by_token': {
         "path": 'simulator/battery/generators/usgs_b1452.py',
-        "line": 429,
+        "line": 438,
         "kind": 'lru',
         "name": '_corrections_by_token',
         "carries_disclosure": False,
@@ -453,7 +453,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/usgs_b1452.py:_formula_index_from_298k': {
         "path": 'simulator/battery/generators/usgs_b1452.py',
-        "line": 988,
+        "line": 843,
         "kind": 'lru',
         "name": '_formula_index_from_298k',
         "carries_disclosure": False,
@@ -461,7 +461,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/usgs_b1452.py:_formula_weight_index_from_298k': {
         "path": 'simulator/battery/generators/usgs_b1452.py',
-        "line": 1014,
+        "line": 869,
         "kind": 'lru',
         "name": '_formula_weight_index_from_298k',
         "carries_disclosure": False,
@@ -469,7 +469,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/usgs_b1452.py:_table2_elements': {
         "path": 'simulator/battery/generators/usgs_b1452.py',
-        "line": 1060,
+        "line": 915,
         "kind": 'lru',
         "name": '_table2_elements',
         "carries_disclosure": False,
@@ -477,7 +477,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/migrate.py:_volatile_closure_component': {
         "path": 'simulator/battery/migrate.py',
-        "line": 4562,
+        "line": 5351,
         "kind": 'lru',
         "name": '_volatile_closure_component',
         "carries_disclosure": False,
@@ -485,7 +485,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/migrate.py:_is_as_printed_provenance_echo_text': {
         "path": 'simulator/battery/migrate.py',
-        "line": 966,
+        "line": 967,
         "kind": 'lru',
         "name": '_is_as_printed_provenance_echo_text',
         "carries_disclosure": False,
@@ -493,7 +493,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_b1259_tridymite_cristobalite_offset_rows': {
         "path": 'simulator/battery/score.py',
-        "line": 2560,
+        "line": 3782,
         "kind": 'lru',
         "name": '_b1259_tridymite_cristobalite_offset_rows',
         "carries_disclosure": False,
@@ -501,7 +501,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_e15_binding_log10_k': {
         "path": 'simulator/battery/score.py',
-        "line": 15243,
+        "line": 19650,
         "kind": 'lru',
         "name": '_e15_binding_log10_k',
         "carries_disclosure": False,
@@ -509,7 +509,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_iron_saturated_feo_calibration': {
         "path": 'simulator/battery/score.py',
-        "line": 2902,
+        "line": 4375,
         "kind": 'lru',
         "name": '_iron_saturated_feo_calibration',
         "carries_disclosure": False,
@@ -517,7 +517,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_janaf_pure_solid_table_index': {
         "path": 'simulator/battery/score.py',
-        "line": 2500,
+        "line": 3722,
         "kind": 'lru',
         "name": '_janaf_pure_solid_table_index',
         "carries_disclosure": False,
@@ -525,7 +525,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_janaf_pure_solid_table_temperature_range': {
         "path": 'simulator/battery/score.py',
-        "line": 2533,
+        "line": 3755,
         "kind": 'lru',
         "name": '_janaf_pure_solid_table_temperature_range',
         "carries_disclosure": False,
@@ -533,7 +533,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/campaigns.py:_derived_override_field_names': {
         "path": 'simulator/campaigns.py',
-        "line": 690,
+        "line": 843,
         "kind": 'lru',
         "name": '_derived_override_field_names',
         "carries_disclosure": False,
@@ -541,7 +541,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/campaigns.py:_species_molar_mass_kg_per_mol': {
         "path": 'simulator/campaigns.py',
-        "line": 210,
+        "line": 304,
         "kind": 'lru',
         "name": '_species_molar_mass_kg_per_mol',
         "carries_disclosure": False,
@@ -549,7 +549,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/chemistry/langmuir_knudsen.py:_vapor_pressure_data': {
         "path": 'simulator/chemistry/langmuir_knudsen.py',
-        "line": 299,
+        "line": 317,
         "kind": 'lru',
         "name": '_vapor_pressure_data',
         "carries_disclosure": False,
@@ -557,7 +557,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/chemistry/melt_activity.py:_na2o_janaf_liquid_source_data': {
         "path": 'simulator/chemistry/melt_activity.py',
-        "line": 712,
+        "line": 727,
         "kind": 'lru',
         "name": '_na2o_janaf_liquid_source_data',
         "carries_disclosure": False,
@@ -565,7 +565,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/chemistry/offgas_fo2.py:_load_cea_polynomials_from_text': {
         "path": 'simulator/chemistry/offgas_fo2.py',
-        "line": 251,
+        "line": 266,
         "kind": 'lru',
         "name": '_load_cea_polynomials_from_text',
         "carries_disclosure": False,
@@ -589,7 +589,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/config.py:_parse_required_yaml': {
         "path": 'simulator/config.py',
-        "line": 187,
+        "line": 221,
         "kind": 'lru',
         "name": '_parse_required_yaml',
         "carries_disclosure": False,
@@ -597,7 +597,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/diagnostic_helpers/gibbs_battery.py:load_cea_extract': {
         "path": 'simulator/diagnostic_helpers/gibbs_battery.py',
-        "line": 621,
+        "line": 622,
         "kind": 'lru',
         "name": 'load_cea_extract',
         "carries_disclosure": False,
@@ -605,7 +605,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/diagnostic_helpers/species_rail_differential.py:_vapor_pressures_payload': {
         "path": 'simulator/diagnostic_helpers/species_rail_differential.py',
-        "line": 996,
+        "line": 1024,
         "kind": 'lru',
         "name": '_vapor_pressures_payload',
         "carries_disclosure": False,
@@ -613,7 +613,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/diagnostic_helpers/species_rail_differential.py:cea_by_formula': {
         "path": 'simulator/diagnostic_helpers/species_rail_differential.py',
-        "line": 548,
+        "line": 576,
         "kind": 'lru',
         "name": 'cea_by_formula',
         "carries_disclosure": False,
@@ -621,7 +621,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/diagnostic_helpers/species_rail_differential.py:cea_index': {
         "path": 'simulator/diagnostic_helpers/species_rail_differential.py',
-        "line": 513,
+        "line": 541,
         "kind": 'lru',
         "name": 'cea_index',
         "carries_disclosure": False,
@@ -629,7 +629,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/diagnostic_helpers/species_rail_differential.py:vapour_rail_catalog': {
         "path": 'simulator/diagnostic_helpers/species_rail_differential.py',
-        "line": 1001,
+        "line": 1029,
         "kind": 'lru',
         "name": 'vapour_rail_catalog',
         "carries_disclosure": False,
@@ -637,7 +637,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/diagnostic_helpers/species_rail_differential.py:vapour_rail_legacy_view': {
         "path": 'simulator/diagnostic_helpers/species_rail_differential.py',
-        "line": 1010,
+        "line": 1038,
         "kind": 'lru',
         "name": 'vapour_rail_legacy_view',
         "carries_disclosure": False,
@@ -661,7 +661,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/furnace_materials.py:load_furnace_materials': {
         "path": 'simulator/furnace_materials.py',
-        "line": 77,
+        "line": 100,
         "kind": 'lru',
         "name": 'load_furnace_materials',
         "carries_disclosure": False,
@@ -677,7 +677,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/melt_backend/openimcc_bridge.py:_load_pack': {
         "path": 'simulator/melt_backend/openimcc_bridge.py',
-        "line": 860,
+        "line": 1018,
         "kind": 'lru',
         "name": '_load_pack',
         "carries_disclosure": False,
@@ -693,7 +693,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/optimize/evaluate.py:_resolved_engine_identity_for_eval': {
         "path": 'simulator/optimize/evaluate.py',
-        "line": 2845,
+        "line": 3037,
         "kind": 'lru',
         "name": '_resolved_engine_identity_for_eval',
         "carries_disclosure": False,
@@ -701,7 +701,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/optimize/evaluate.py:_vapor_pressure_provider_code_fingerprint': {
         "path": 'simulator/optimize/evaluate.py',
-        "line": 3596,
+        "line": 3896,
         "kind": 'lru',
         "name": '_vapor_pressure_provider_code_fingerprint',
         "carries_disclosure": False,
@@ -709,7 +709,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/optimize/objective.py:_campaign_product_claims_by_id': {
         "path": 'simulator/optimize/objective.py',
-        "line": 1735,
+        "line": 1751,
         "kind": 'lru',
         "name": '_campaign_product_claims_by_id',
         "carries_disclosure": False,
@@ -717,7 +717,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/optimize/objective.py:_c0_auto_apply_phase_names': {
         "path": 'simulator/optimize/objective.py',
-        "line": 1800,
+        "line": 1816,
         "kind": 'lru',
         "name": '_c0_auto_apply_phase_names',
         "carries_disclosure": False,
@@ -725,7 +725,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/optimize/pool.py:_default_feedstocks': {
         "path": 'simulator/optimize/pool.py',
-        "line": 981,
+        "line": 955,
         "kind": 'lru',
         "name": '_default_feedstocks',
         "carries_disclosure": False,
@@ -733,7 +733,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/recipe.py:_cached_default_allowlist': {
         "path": 'simulator/recipe.py',
-        "line": 2073,
+        "line": 2109,
         "kind": 'lru',
         "name": '_cached_default_allowlist',
         "carries_disclosure": False,
@@ -741,7 +741,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/recipe.py:_default_setpoints': {
         "path": 'simulator/recipe.py',
-        "line": 2760,
+        "line": 2796,
         "kind": 'lru',
         "name": '_default_setpoints',
         "carries_disclosure": False,
@@ -749,7 +749,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/reduced_real_determinism.py:_source_module_digest': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 4888,
+        "line": 4926,
         "kind": 'lru',
         "name": '_source_module_digest',
         "carries_disclosure": False,
@@ -765,7 +765,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/refractory_vaporization.py:_thermo_data': {
         "path": 'simulator/refractory_vaporization.py',
-        "line": 101,
+        "line": 102,
         "kind": 'lru',
         "name": '_thermo_data',
         "carries_disclosure": False,
@@ -773,7 +773,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/runner/__init__.py:_resolve_kernel_commit_sha': {
         "path": 'simulator/runner/__init__.py',
-        "line": 763,
+        "line": 771,
         "kind": 'lru',
         "name": '_resolve_kernel_commit_sha',
         "carries_disclosure": False,
@@ -797,7 +797,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/volatile_properties.py:_catalog': {
         "path": 'simulator/volatile_properties.py',
-        "line": 877,
+        "line": 878,
         "kind": 'lru',
         "name": '_catalog',
         "carries_disclosure": False,
@@ -805,7 +805,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/volatile_properties.py:_default_registry': {
         "path": 'simulator/volatile_properties.py',
-        "line": 2652,
+        "line": 2653,
         "kind": 'lru',
         "name": '_default_registry',
         "carries_disclosure": False,
@@ -829,7 +829,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:engines/builtin/foulant_disposition.py:_VAPOR_PAYLOAD_CACHE': {
         "path": 'engines/builtin/foulant_disposition.py',
-        "line": 162,
+        "line": 163,
         "kind": 'store',
         "name": '_VAPOR_PAYLOAD_CACHE',
         "carries_disclosure": False,
@@ -837,7 +837,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/generators/janaf.py:formation_basis_cache': {
         "path": 'simulator/battery/generators/janaf.py',
-        "line": 2171,
+        "line": 2196,
         "kind": 'store',
         "name": 'formation_basis_cache',
         "carries_disclosure": False,
@@ -845,7 +845,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/migrate.py:_DEST_CACHE': {
         "path": 'simulator/battery/migrate.py',
-        "line": 15311,
+        "line": 18459,
         "kind": 'store',
         "name": '_DEST_CACHE',
         "carries_disclosure": False,
@@ -853,7 +853,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/migrate.py:_VOCAB_CACHE': {
         "path": 'simulator/battery/migrate.py',
-        "line": 15155,
+        "line": 18303,
         "kind": 'store',
         "name": '_VOCAB_CACHE',
         "carries_disclosure": False,
@@ -861,7 +861,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/migrate.py:manifest_cache': {
         "path": 'simulator/battery/migrate.py',
-        "line": 34093,
+        "line": 34128,
         "kind": 'store',
         "name": 'manifest_cache',
         "carries_disclosure": False,
@@ -869,7 +869,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/migrate.py:equality_fallback_entries': {
         "path": 'simulator/battery/migrate.py',
-        "line": 27322,
+        "line": 33490,
         "kind": 'store',
         "name": 'equality_fallback_entries',
         "carries_disclosure": False,
@@ -877,7 +877,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/migrate.py:seen_entries': {
         "path": 'simulator/battery/migrate.py',
-        "line": 27321,
+        "line": 33489,
         "kind": 'store',
         "name": 'seen_entries',
         "carries_disclosure": False,
@@ -885,7 +885,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/migrate.py:unique_entries': {
         "path": 'simulator/battery/migrate.py',
-        "line": 27320,
+        "line": 33488,
         "kind": 'store',
         "name": 'unique_entries',
         "carries_disclosure": False,
@@ -893,7 +893,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/residue.py:pressure_cache': {
         "path": 'simulator/battery/residue.py',
-        "line": 3615,
+        "line": 4093,
         "kind": 'store',
         "name": 'pressure_cache',
         "carries_disclosure": True,
@@ -901,7 +901,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/residue.py:pressure_state_cache': {
         "path": 'simulator/battery/residue.py',
-        "line": 1433,
+        "line": 1467,
         "kind": 'store',
         "name": 'pressure_state_cache',
         "carries_disclosure": True,
@@ -909,7 +909,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score.py:_row_metadata_cache': {
         "path": 'simulator/battery/score.py',
-        "line": 19856,
+        "line": 23964,
         "kind": 'store',
         "name": '_row_metadata_cache',
         "carries_disclosure": False,
@@ -917,7 +917,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/validate.py:_cache': {
         "path": 'simulator/battery/validate.py',
-        "line": 1948,
+        "line": 2111,
         "kind": 'store',
         "name": '_cache',
         "carries_disclosure": False,
@@ -925,7 +925,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/chemistry/offgas_fo2.py:_K_cache': {
         "path": 'simulator/chemistry/offgas_fo2.py',
-        "line": 915,
+        "line": 1126,
         "kind": 'store',
         "name": '_K_cache',
         "carries_disclosure": False,
@@ -933,7 +933,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_held_curve_record': {
         "path": 'simulator/core.py',
-        "line": 1393,
+        "line": 1412,
         "kind": 'store',
         "name": '_freeze_gate_held_curve_record',
         "carries_disclosure": True,
@@ -941,7 +941,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_liquid_fraction_cache': {
         "path": 'simulator/core.py',
-        "line": 1391,
+        "line": 1410,
         "kind": 'store',
         "name": '_freeze_gate_liquid_fraction_cache',
         "carries_disclosure": True,
@@ -949,7 +949,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_liquid_fraction_curve_memo': {
         "path": 'simulator/core.py',
-        "line": 1394,
+        "line": 1413,
         "kind": 'store',
         "name": '_freeze_gate_liquid_fraction_curve_memo',
         "carries_disclosure": True,
@@ -965,7 +965,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:published_cache': {
         "path": 'simulator/core.py',
-        "line": 5302,
+        "line": 5357,
         "kind": 'store',
         "name": 'published_cache',
         "carries_disclosure": False,
@@ -973,7 +973,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:rates_cache': {
         "path": 'simulator/core.py',
-        "line": 7508,
+        "line": 7570,
         "kind": 'store',
         "name": 'rates_cache',
         "carries_disclosure": False,
@@ -981,7 +981,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/diagnostic_helpers/extract_reproduction.py:_LEGACY_VIEW_CACHE': {
         "path": 'simulator/diagnostic_helpers/extract_reproduction.py',
-        "line": 1916,
+        "line": 1966,
         "kind": 'store',
         "name": '_LEGACY_VIEW_CACHE',
         "carries_disclosure": False,
@@ -989,7 +989,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/diagnostic_helpers/extract_reproduction.py:_MELT_PSAT_CACHE': {
         "path": 'simulator/diagnostic_helpers/extract_reproduction.py',
-        "line": 1603,
+        "line": 1623,
         "kind": 'store',
         "name": '_MELT_PSAT_CACHE',
         "carries_disclosure": True,
@@ -997,7 +997,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/diagnostic_helpers/extract_reproduction.py:_VP_PROVIDER_CACHE': {
         "path": 'simulator/diagnostic_helpers/extract_reproduction.py',
-        "line": 1598,
+        "line": 1618,
         "kind": 'store',
         "name": '_VP_PROVIDER_CACHE',
         "carries_disclosure": False,
@@ -1005,7 +1005,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/diagnostic_helpers/kems.py:_surface_cache': {
         "path": 'simulator/diagnostic_helpers/kems.py',
-        "line": 595,
+        "line": 596,
         "kind": 'store',
         "name": '_surface_cache',
         "carries_disclosure": True,
@@ -1013,7 +1013,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/engine_binding_admission.py:grouped_entries': {
         "path": 'simulator/engine_binding_admission.py',
-        "line": 1536,
+        "line": 1646,
         "kind": 'store',
         "name": 'grouped_entries',
         "carries_disclosure": False,
@@ -1021,7 +1021,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/engine_binding_admission.py:receipt_entries': {
         "path": 'simulator/engine_binding_admission.py',
-        "line": 1548,
+        "line": 1658,
         "kind": 'store',
         "name": 'receipt_entries',
         "carries_disclosure": False,
@@ -1029,7 +1029,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/evaporation.py:_freeze_gate_held_curve_record': {
         "path": 'simulator/evaporation.py',
-        "line": 2223,
+        "line": 3300,
         "kind": 'store',
         "name": '_freeze_gate_held_curve_record',
         "carries_disclosure": True,
@@ -1037,7 +1037,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/evaporation.py:_freeze_gate_liquid_fraction_cache': {
         "path": 'simulator/evaporation.py',
-        "line": 2647,
+        "line": 3740,
         "kind": 'store',
         "name": '_freeze_gate_liquid_fraction_cache',
         "carries_disclosure": True,
@@ -1045,7 +1045,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/evaporation.py:computing_cache': {
         "path": 'simulator/evaporation.py',
-        "line": 2495,
+        "line": 3579,
         "kind": 'store',
         "name": 'computing_cache',
         "carries_disclosure": False,
@@ -1053,7 +1053,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/liner_corrosion.py:_point_cache': {
         "path": 'simulator/liner_corrosion.py',
-        "line": 4060,
+        "line": 4064,
         "kind": 'store',
         "name": '_point_cache',
         "carries_disclosure": False,
@@ -1061,7 +1061,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/liner_corrosion.py:_curve_cache': {
         "path": 'simulator/liner_corrosion.py',
-        "line": 4062,
+        "line": 4066,
         "kind": 'store',
         "name": '_curve_cache',
         "carries_disclosure": False,
@@ -1077,7 +1077,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/melt_backend/magemin.py:_MAGEMIN_ENGINE_VERSION_CACHE': {
         "path": 'simulator/melt_backend/magemin.py',
-        "line": 188,
+        "line": 191,
         "kind": 'store',
         "name": '_MAGEMIN_ENGINE_VERSION_CACHE',
         "carries_disclosure": False,
@@ -1085,7 +1085,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/melt_backend/vaporock.py:_SESSION_BACKEND_CACHE': {
         "path": 'simulator/melt_backend/vaporock.py',
-        "line": 1270,
+        "line": 1277,
         "kind": 'store',
         "name": '_SESSION_BACKEND_CACHE',
         "carries_disclosure": False,
@@ -1093,7 +1093,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/melt_backend/vaporock.py:_VAPOROCK_RUNTIME_AVAILABLE_CACHE': {
         "path": 'simulator/melt_backend/vaporock.py',
-        "line": 1207,
+        "line": 1214,
         "kind": 'store',
         "name": '_VAPOROCK_RUNTIME_AVAILABLE_CACHE',
         "carries_disclosure": False,
@@ -1101,7 +1101,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/optimize/evaluate.py:_VAPOROCK_AVAILABLE_CACHE': {
         "path": 'simulator/optimize/evaluate.py',
-        "line": 3569,
+        "line": 3869,
         "kind": 'store',
         "name": '_VAPOROCK_AVAILABLE_CACHE',
         "carries_disclosure": False,
@@ -1109,7 +1109,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/optimize/evaluate.py:per_hour_cache': {
         "path": 'simulator/optimize/evaluate.py',
-        "line": 6320,
+        "line": 6760,
         "kind": 'store',
         "name": 'per_hour_cache',
         "carries_disclosure": False,
@@ -1117,7 +1117,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/optimize/study.py:prefix_replay_cache': {
         "path": 'simulator/optimize/study.py',
-        "line": 712,
+        "line": 732,
         "kind": 'store',
         "name": 'prefix_replay_cache',
         "carries_disclosure": False,
@@ -1125,7 +1125,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/reduced_real_determinism.py:_entries': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 438,
+        "line": 439,
         "kind": 'store',
         "name": '_entries',
         "carries_disclosure": True,
@@ -1133,7 +1133,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/reduced_real_determinism.py:physics_bucket_entries': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 439,
+        "line": 440,
         "kind": 'store',
         "name": 'physics_bucket_entries',
         "carries_disclosure": False,
@@ -1141,7 +1141,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/runner/__init__.py:per_hour_summary_cache': {
         "path": 'simulator/runner/__init__.py',
-        "line": 5994,
+        "line": 6161,
         "kind": 'store',
         "name": 'per_hour_summary_cache',
         "carries_disclosure": False,
@@ -1149,7 +1149,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/runner/__init__.py:reduced_real_cache': {
         "path": 'simulator/runner/__init__.py',
-        "line": 1037,
+        "line": 1045,
         "kind": 'store',
         "name": 'reduced_real_cache',
         "carries_disclosure": False,
@@ -1173,7 +1173,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/vapour_rail/catalog.py:_COMPILE_CACHE': {
         "path": 'simulator/vapour_rail/catalog.py',
-        "line": 411,
+        "line": 448,
         "kind": 'store',
         "name": '_COMPILE_CACHE',
         "carries_disclosure": False,
@@ -1181,7 +1181,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/vapour_rail/catalog.py:_THERMO_EXTRACT_PARSE_CACHE': {
         "path": 'simulator/vapour_rail/catalog.py',
-        "line": 97,
+        "line": 100,
         "kind": 'store',
         "name": '_THERMO_EXTRACT_PARSE_CACHE',
         "carries_disclosure": False,
@@ -1189,7 +1189,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/vapour_rail/catalog.py:_THERMO_OBSERVATION_CACHE': {
         "path": 'simulator/vapour_rail/catalog.py',
-        "line": 100,
+        "line": 103,
         "kind": 'store',
         "name": '_THERMO_OBSERVATION_CACHE',
         "carries_disclosure": False,
@@ -1205,7 +1205,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/compilation_tier.py:_b677_printed_ideal_gas_h298': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 2554,
+        "line": 2749,
         "kind": 'lru',
         "name": '_b677_printed_ideal_gas_h298',
         "carries_disclosure": False,
@@ -1213,7 +1213,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/compilation_tier.py:_nasa_cea_9_polynomial': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 960,
+        "line": 1155,
         "kind": 'lru',
         "name": '_nasa_cea_9_polynomial',
         "carries_disclosure": False,
@@ -1221,7 +1221,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/compilation_tier.py:_nasa_cea_9_record_index': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 904,
+        "line": 1099,
         "kind": 'lru',
         "name": '_nasa_cea_9_record_index',
         "carries_disclosure": False,
@@ -1253,7 +1253,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/generators/usgs_b1259.py:reference_enthalpy_zero_is_ideal_gas_span': {
         "path": 'simulator/battery/generators/usgs_b1259.py',
-        "line": 1552,
+        "line": 1507,
         "kind": 'lru',
         "name": 'reference_enthalpy_zero_is_ideal_gas_span',
         "carries_disclosure": False,
@@ -1261,7 +1261,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/migrate.py:_mass_percent_component_stem': {
         "path": 'simulator/battery/migrate.py',
-        "line": 987,
+        "line": 950,
         "kind": 'lru',
         "name": '_mass_percent_component_stem',
         "carries_disclosure": False,
@@ -1269,7 +1269,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_catalog_score_rows': {
         "path": 'simulator/battery/score.py',
-        "line": 12781,
+        "line": 12703,
         "kind": 'lru',
         "name": '_catalog_score_rows',
         "carries_disclosure": False,

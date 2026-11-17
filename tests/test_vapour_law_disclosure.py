@@ -4617,6 +4617,9 @@ def test_cache_inventory_matches_the_production_scan() -> None:
     scanned = scan_cache_sites(_ROOT)
     assert set(scanned) == set(CACHE_SITES)
     for site_id, row in CACHE_SITES.items():
+        assert row["line"] == scanned[site_id]["line"], site_id
+        assert row["path"] == scanned[site_id]["path"], site_id
+        assert row["kind"] == scanned[site_id]["kind"], site_id
         assert row["how"]
         assert row["carries_disclosure"] is (site_id in DISCLOSURE_CARRYING)
         if row["carries_disclosure"]:
