@@ -13,6 +13,12 @@ from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Mapping, Sequence
 
+from simulator.battery.source_declarations import (
+    HASHIMOTO_RESIDUE_PREDICTOR,
+    SOSSI_RESIDUE_PREDICTOR,
+    declared_residue_predictor,
+)
+
 if TYPE_CHECKING:
     from simulator.battery.score import (
         CandidateRequest,
@@ -108,8 +114,6 @@ def _prepare_score_run(
         SCORE_ENGINE_SET,
         Identity,
         Quantity,
-        _HASHIMOTO_SOURCE_ID,
-        _SOSSI_SOURCE_ID,
         _build_validation_indexes,
         _condensed_element_reference_table_diagnostics,
         _has_duplicate_observation_link,
@@ -204,7 +208,7 @@ def _prepare_score_run(
     hashimoto_experiment_ids = frozenset(
         obs.experiment_id
         for obs in refs
-        if obs.source_id == _HASHIMOTO_SOURCE_ID
+        if declared_residue_predictor(obs.source_id) == HASHIMOTO_RESIDUE_PREDICTOR
         and isinstance(obs.identity, Identity)
         and quantity_token(obs.identity)
         is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -212,7 +216,7 @@ def _prepare_score_run(
     sossi_experiment_ids = frozenset(
         obs.experiment_id.rsplit("::", 1)[-1]
         for obs in refs
-        if obs.source_id == _SOSSI_SOURCE_ID
+        if declared_residue_predictor(obs.source_id) == SOSSI_RESIDUE_PREDICTOR
         and isinstance(obs.identity, Identity)
         and quantity_token(obs.identity)
         is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -272,9 +276,7 @@ def _prepare_score_run(
 
 
 def _score_group_id(observation: Observation) -> str:
-    from simulator.battery.score import _HASHIMOTO_SOURCE_ID, _SOSSI_SOURCE_ID
-
-    if observation.source_id in {_HASHIMOTO_SOURCE_ID, _SOSSI_SOURCE_ID}:
+    if declared_residue_predictor(observation.source_id) is not None:
         return f"source:{observation.source_id}"
     if observation.experiment_id:
         return f"experiment:{observation.experiment_id}"
@@ -336,8 +338,6 @@ def _score_store_with_decisions(
         Quantity,
         RefusalReason,
         Residual,
-        _HASHIMOTO_SOURCE_ID,
-        _SOSSI_SOURCE_ID,
         _ResidualJsonlStream,
         _ScoringLineageResolver,
         _compilation_decision_strata,
@@ -544,7 +544,8 @@ def _score_store_with_decisions(
                                 Quantity.RESIDUE_COMPONENT_COMPOSITION,
                                 Quantity.ELEMENT_RETENTION_RATIO,
                             }
-                            and point.source_id == _HASHIMOTO_SOURCE_ID
+                            and declared_residue_predictor(point.source_id)
+                            == HASHIMOTO_RESIDUE_PREDICTOR
                             and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
                         ):
                             prediction = _hashimoto_residue_prediction(
@@ -564,7 +565,8 @@ def _score_store_with_decisions(
                                 Quantity.RESIDUE_COMPONENT_COMPOSITION,
                                 Quantity.ELEMENT_RETENTION_RATIO,
                             }
-                            and point.source_id == _SOSSI_SOURCE_ID
+                            and declared_residue_predictor(point.source_id)
+                            == SOSSI_RESIDUE_PREDICTOR
                             and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
                         ):
                             prediction = _sossi_residue_prediction(
