@@ -356,6 +356,28 @@ OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2eafdcb2139bb1cce9309ceff1aa0b981b609f305406
 
 _TABLE = "engine_outputs"
 _CACHE_SCHEMA_VERSION = 3
+_CACHE_TABLE_DEFINITIONS = (
+    (
+        _TABLE,
+        (
+            ("key", "BLOB PRIMARY KEY"),
+            ("value", "BLOB NOT NULL"),
+            ("engine", "TEXT NOT NULL"),
+            ("chem_version", "TEXT NOT NULL"),
+            ("source_box", "TEXT NOT NULL"),
+            ("row_seq", "INTEGER NOT NULL"),
+            ("provenance_id", "INTEGER NOT NULL DEFAULT 0"),
+        ),
+        True,
+    ),
+    ("provenance", (("id", "INTEGER PRIMARY KEY"), ("value", "BLOB NOT NULL UNIQUE")), False),
+    ("box_sequences", (("source_box", "TEXT PRIMARY KEY"), ("next_seq", "INTEGER NOT NULL")), True),
+)
+_CACHE_INDEX_DEFINITIONS = (
+    ("engine_outputs_box_seq", _TABLE, ("source_box", "row_seq"), True),
+    ("engine_outputs_engine_version", _TABLE, ("engine", "chem_version"), False),
+)
+_SYNC_WATERMARKS_TABLE = "sync_watermarks"
 _ENGINE_NUMBERS = {
     name: number for number, name in enumerate((
         "openimcc", "internal-analytical", "vaporock", "magemin",
@@ -897,24 +919,91 @@ def _remember_memory_value(key: tuple[str, bytes, bool], value: Any) -> None:
 
 
 def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = False) -> bool:
-    expected = ["key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id"]
+    expected_columns = {
+        table: tuple(name for name, _ in columns)
+        for table, columns, _ in _CACHE_TABLE_DEFINITIONS
+    }
+    expected_tables = set(expected_columns)
+    optional_tables = {_SYNC_WATERMARKS_TABLE}
     own_transaction = not connection.in_transaction
     if own_transaction:
         connection.execute("BEGIN")
     try:
-        found = [row[1] for row in connection.execute(f"PRAGMA table_info({_TABLE})")]
-        namespace = connection.execute("PRAGMA user_version").fetchone()[0]
-        empty = False
-        if not found and allow_empty and namespace in (0, _CACHE_SCHEMA_VERSION):
-            tables = connection.execute(
+        found_tables = {
+            row[0]
+            for row in connection.execute(
                 "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-            ).fetchall()
-            empty = not tables
-        if not empty:
+            )
+        }
+        namespace = connection.execute("PRAGMA user_version").fetchone()[0]
+        unexpected_tables = found_tables - expected_tables - optional_tables
+
+        missing_tables = expected_tables - found_tables
+        for table, _, _ in _CACHE_TABLE_DEFINITIONS:
+            if table not in found_tables:
+                continue
+            expected = expected_columns[table]
+            found = tuple(row[1] for row in connection.execute(f"PRAGMA table_info({table})"))
             if found != expected:
-                raise EngineCacheSchemaMismatch(_TABLE, expected, found)
+                raise EngineCacheSchemaMismatch(table, expected, found)
+
+        empty = not found_tables
+        if empty:
+            if allow_empty and namespace in (0, _CACHE_SCHEMA_VERSION):
+                if own_transaction:
+                    connection.commit()
+                return True
             if namespace != _CACHE_SCHEMA_VERSION:
-                raise EngineCacheSchemaMismatch("user_version", (str(_CACHE_SCHEMA_VERSION),), (str(namespace),))
+                raise EngineCacheSchemaMismatch(
+                    "user_version", (str(_CACHE_SCHEMA_VERSION),), (str(namespace),)
+                )
+            raise EngineCacheSchemaMismatch(_TABLE, expected_columns[_TABLE], ())
+
+        if namespace != _CACHE_SCHEMA_VERSION:
+            raise EngineCacheSchemaMismatch(
+                "user_version", (str(_CACHE_SCHEMA_VERSION),), (str(namespace),)
+            )
+
+        found_indexes = {
+            row[0]: row[1]
+            for row in connection.execute(
+                "SELECT name, tbl_name FROM sqlite_master WHERE type='index'"
+            )
+        }
+        table_indexes = {
+            row[1]: bool(row[2])
+            for row in connection.execute(f"PRAGMA index_list({_TABLE})")
+        } if _TABLE in found_tables else {}
+        missing_indexes = set()
+        for name, table, columns, unique in _CACHE_INDEX_DEFINITIONS:
+            if name not in found_indexes:
+                missing_indexes.add(name)
+                continue
+            if found_indexes[name] != table:
+                raise EngineCacheSchemaMismatch(name, columns, ())
+            found = tuple(
+                row[2] for row in connection.execute(f"PRAGMA index_info('{name}')")
+            )
+            if found != columns:
+                raise EngineCacheSchemaMismatch(name, columns, found)
+            if table_indexes.get(name) is not unique:
+                expected_unique = ("unique",) if unique else ("non-unique",)
+                found_unique = ("unique",) if table_indexes.get(name) else ("non-unique",)
+                raise EngineCacheSchemaMismatch(name, expected_unique, found_unique)
+
+        incomplete = bool(missing_tables or missing_indexes)
+        if incomplete and unexpected_tables:
+            raise EngineCacheSchemaMismatch(
+                "tables", sorted(expected_tables | optional_tables), sorted(found_tables)
+            )
+        if incomplete and not allow_empty:
+            if missing_tables:
+                table = sorted(missing_tables)[0]
+                raise EngineCacheSchemaMismatch(table, expected_columns[table], ())
+            name, table, columns, _ = next(
+                item for item in _CACHE_INDEX_DEFINITIONS if item[0] in missing_indexes
+            )
+            raise EngineCacheSchemaMismatch(name, columns, ())
     except BaseException:
         if own_transaction:
             connection.rollback()
@@ -922,7 +1011,7 @@ def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = F
     else:
         if own_transaction:
             connection.commit()
-        return empty
+        return incomplete
 
 
 def _initialize_cache(connection: sqlite3.Connection) -> None:
@@ -933,25 +1022,19 @@ def _initialize_cache(connection: sqlite3.Connection) -> None:
     try:
         connection.execute("BEGIN IMMEDIATE")
         try:
-            connection.execute(
-                f"CREATE TABLE IF NOT EXISTS {_TABLE} "
-                "(key BLOB PRIMARY KEY, value BLOB NOT NULL, engine TEXT NOT NULL, "
-                "chem_version TEXT NOT NULL, source_box TEXT NOT NULL, "
-                "row_seq INTEGER NOT NULL, provenance_id INTEGER NOT NULL DEFAULT 0) WITHOUT ROWID"
-            )
-            connection.execute(
-                "CREATE TABLE IF NOT EXISTS provenance (id INTEGER PRIMARY KEY, value BLOB NOT NULL UNIQUE)"
-            )
-            connection.execute(
-                "CREATE TABLE IF NOT EXISTS box_sequences (source_box TEXT PRIMARY KEY, next_seq INTEGER NOT NULL) WITHOUT ROWID"
-            )
-            connection.execute(
-                "CREATE UNIQUE INDEX IF NOT EXISTS engine_outputs_box_seq ON engine_outputs(source_box, row_seq)"
-            )
-            connection.execute(
-                "CREATE INDEX IF NOT EXISTS engine_outputs_engine_version "
-                "ON engine_outputs(engine, chem_version)"
-            )
+            for table, columns, without_rowid in _CACHE_TABLE_DEFINITIONS:
+                definitions = ", ".join(f"{name} {sql}" for name, sql in columns)
+                suffix = " WITHOUT ROWID" if without_rowid else ""
+                connection.execute(
+                    f"CREATE TABLE IF NOT EXISTS {table} ({definitions}){suffix}"
+                )
+            for name, table, columns, unique in _CACHE_INDEX_DEFINITIONS:
+                unique_sql = "UNIQUE " if unique else ""
+                column_sql = ", ".join(columns)
+                connection.execute(
+                    f"CREATE {unique_sql}INDEX IF NOT EXISTS {name} "
+                    f"ON {table}({column_sql})"
+                )
             # BEGIN IMMEDIATE serializes first openers before schema writes. SQLite commits these DDLs
             # and user_version together, so a concurrent check in one read transaction sees either
             # the empty database or the complete schema, never a version-only intermediate state.
@@ -1007,11 +1090,11 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
                     raise
                 time.sleep(0.01)
     try:
-        empty = _check_cache_schema(connection, allow_empty=True)
-        if empty and readonly:
+        incomplete = _check_cache_schema(connection, allow_empty=True)
+        if incomplete and readonly:
             connection.close()
             return None
-        if empty:
+        if not readonly:
             _initialize_cache(connection)
     except Exception:
         connection.close()
@@ -1459,7 +1542,7 @@ def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -
         destination.execute("PRAGMA journal_mode=WAL")
         destination.execute("PRAGMA cold.journal_mode=WAL")
         _initialize_cold(destination, "cold")
-        destination.execute("CREATE TABLE IF NOT EXISTS sync_watermarks "
+        destination.execute(f"CREATE TABLE IF NOT EXISTS {_SYNC_WATERMARKS_TABLE} "
                             "(source_box TEXT PRIMARY KEY, row_seq INTEGER NOT NULL) WITHOUT ROWID")
         destination.commit()
         report = stack.enter_context(report_path.open("a", encoding="utf-8"))
