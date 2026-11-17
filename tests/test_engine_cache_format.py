@@ -66,6 +66,17 @@ def test_key_namespace_is_explicit_and_store_is_without_rowid(tmp_path: Path, mo
         assert "WITHOUT ROWID" in schema
 
 
+def test_schema_check_accepts_fresh_cache_after_interrupted_version_write(tmp_path: Path) -> None:
+    path = tmp_path / "cache.sqlite"
+    with sqlite3.connect(path) as connection:
+        connection.execute(f"PRAGMA user_version={engine_cache._CACHE_SCHEMA_VERSION}")
+
+    with sqlite3.connect(path) as connection:
+        engine_cache._check_cache_schema(connection, allow_empty=True)
+        engine_cache._initialize_cache(connection)
+        engine_cache._check_cache_schema(connection)
+
+
 def test_lossy_v2_cache_cannot_supply_a_hit(tmp_path: Path, monkeypatch) -> None:
     path = tmp_path / "legacy.sqlite"
     key = engine_cache.engine_cache_key("internal-analytical", 1, {})

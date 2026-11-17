@@ -898,38 +898,69 @@ def _remember_memory_value(key: tuple[str, bytes, bool], value: Any) -> None:
 
 def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = False) -> None:
     expected = ["key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id"]
-    found = [row[1] for row in connection.execute(f"PRAGMA table_info({_TABLE})")]
-    namespace = connection.execute("PRAGMA user_version").fetchone()[0]
-    if not found and allow_empty and namespace == 0:
-        return
-    if found != expected:
-        raise EngineCacheSchemaMismatch(_TABLE, expected, found)
-    if namespace != _CACHE_SCHEMA_VERSION:
-        raise EngineCacheSchemaMismatch("user_version", (str(_CACHE_SCHEMA_VERSION),), (str(namespace),))
+    own_transaction = not connection.in_transaction
+    if own_transaction:
+        connection.execute("BEGIN")
+    try:
+        found = [row[1] for row in connection.execute(f"PRAGMA table_info({_TABLE})")]
+        namespace = connection.execute("PRAGMA user_version").fetchone()[0]
+        empty = False
+        if not found and allow_empty and namespace in (0, _CACHE_SCHEMA_VERSION):
+            tables = connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+            ).fetchall()
+            empty = not tables
+        if not empty:
+            if found != expected:
+                raise EngineCacheSchemaMismatch(_TABLE, expected, found)
+            if namespace != _CACHE_SCHEMA_VERSION:
+                raise EngineCacheSchemaMismatch("user_version", (str(_CACHE_SCHEMA_VERSION),), (str(namespace),))
+    except BaseException:
+        if own_transaction:
+            connection.rollback()
+        raise
+    else:
+        if own_transaction:
+            connection.commit()
 
 
 def _initialize_cache(connection: sqlite3.Connection) -> None:
-    connection.execute(f"PRAGMA user_version={_CACHE_SCHEMA_VERSION}")
-    connection.execute(
-        f"CREATE TABLE IF NOT EXISTS {_TABLE} "
-        "(key BLOB PRIMARY KEY, value BLOB NOT NULL, engine TEXT NOT NULL, "
-        "chem_version TEXT NOT NULL, source_box TEXT NOT NULL, "
-        "row_seq INTEGER NOT NULL, provenance_id INTEGER NOT NULL DEFAULT 0) WITHOUT ROWID"
-    )
-    connection.execute(
-        "CREATE TABLE IF NOT EXISTS provenance (id INTEGER PRIMARY KEY, value BLOB NOT NULL UNIQUE)"
-    )
-    connection.execute(
-        "CREATE TABLE IF NOT EXISTS box_sequences (source_box TEXT PRIMARY KEY, next_seq INTEGER NOT NULL) WITHOUT ROWID"
-    )
-    connection.execute(
-        "CREATE UNIQUE INDEX IF NOT EXISTS engine_outputs_box_seq ON engine_outputs(source_box, row_seq)"
-    )
-    connection.execute(
-        "CREATE INDEX IF NOT EXISTS engine_outputs_engine_version "
-        "ON engine_outputs(engine, chem_version)"
-    )
-    connection.commit()
+    if connection.in_transaction:
+        raise sqlite3.ProgrammingError("cache initialization requires a connection with no active transaction")
+    isolation_level = connection.isolation_level
+    connection.isolation_level = None
+    try:
+        connection.execute("BEGIN IMMEDIATE")
+        try:
+            connection.execute(
+                f"CREATE TABLE IF NOT EXISTS {_TABLE} "
+                "(key BLOB PRIMARY KEY, value BLOB NOT NULL, engine TEXT NOT NULL, "
+                "chem_version TEXT NOT NULL, source_box TEXT NOT NULL, "
+                "row_seq INTEGER NOT NULL, provenance_id INTEGER NOT NULL DEFAULT 0) WITHOUT ROWID"
+            )
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS provenance (id INTEGER PRIMARY KEY, value BLOB NOT NULL UNIQUE)"
+            )
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS box_sequences (source_box TEXT PRIMARY KEY, next_seq INTEGER NOT NULL) WITHOUT ROWID"
+            )
+            connection.execute(
+                "CREATE UNIQUE INDEX IF NOT EXISTS engine_outputs_box_seq ON engine_outputs(source_box, row_seq)"
+            )
+            connection.execute(
+                "CREATE INDEX IF NOT EXISTS engine_outputs_engine_version "
+                "ON engine_outputs(engine, chem_version)"
+            )
+            # BEGIN IMMEDIATE serializes first openers before schema writes. SQLite commits these DDLs
+            # and user_version together, so a concurrent check in one read transaction sees either
+            # the empty database or the complete schema, never a version-only intermediate state.
+            connection.execute(f"PRAGMA user_version={_CACHE_SCHEMA_VERSION}")
+            connection.commit()
+        except BaseException:
+            connection.rollback()
+            raise
+    finally:
+        connection.isolation_level = isolation_level
 
 
 def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
