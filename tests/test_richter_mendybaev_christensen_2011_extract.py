@@ -317,6 +317,16 @@ def test_isolated_migration_binds_conditions_and_exact_schema_gaps() -> None:
                 mapped = mapped or identity_axis[key].is_value
             assert mapped, (source_id, key, condition)
 
+    for migrated in result.observations.values():
+        oxygen_log = (migrated.point_conditions or {}).get("fO2_log")
+        if (
+            oxygen_log is not None
+            and oxygen_log.state.is_value
+            and getattr(oxygen_log.state.value, "kind", None)
+            in {ValueKind.BOUND, ValueKind.INTERVAL}
+        ):
+            assert oxygen_log.locator is not None
+
     quantity_unknown = {
         source_id
         for source_id, rows in migrated_by_source_id.items()

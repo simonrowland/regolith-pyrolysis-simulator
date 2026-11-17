@@ -78,7 +78,10 @@ from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
 from simulator.battery import schema_gap as sg
 from simulator.battery.source_declarations import SOURCE_DECLARATIONS
-from simulator.battery.oxygen_identity import log10_fo2_to_pa
+from simulator.battery.oxygen_identity import (
+    _AIR_O2_MOLE_FRACTION,
+    log10_fo2_to_pa,
+)
 from simulator.battery.polymorph_dictionary import (
     POLYMORPH_ALIASES,
     is_generic_polymorph_name,
@@ -19880,13 +19883,23 @@ class PrintedOxygenFacts:
     bare_log: bool = False
 
 
-# Tokens the buffer owner can evaluate. Longer tokens are first so the
-# alternation cannot take a prefix. Any other non-empty
-# oxygen_buffer_as_published string, including CO-CO2 with no ratio, stays
-# a typed missing-input refusal. The curve is not applied to a bounded or
-# approximate print.
-_BUFFER_TOKEN = r"mo-moo2|m-h|fmq|qfm|nno|mh|mw|iw"
-_BUFFER_NAME_TOKENS = ("mo-moo2", "m-h", "fmq", "qfm", "nno", "mh", "mw", "iw")
+# Longer tokens are first so the alternation cannot take a prefix. CO-CO2 is
+# recognized as a family, but still refuses without the ratio it requires.
+# The curve is not applied to a bounded or approximate print.
+_BUFFER_RELATIVE_MARKERS = ("delta", "dlog", "log", "d", "Δ", "∆", "relative to", "relative")
+_BUFFER_RELATIVE_MARKER = (
+    "(?:" + "|".join(
+        re.escape(item).replace(r"\ ", r"\s+") for item in _BUFFER_RELATIVE_MARKERS
+    ) + ")"
+)
+_BUFFER_FAMILY_TOKEN = (
+    r"(?:magnetite(?:-|\s+)hematite|iron(?:-|\s+)w[uü]stite(?:\s+buffer)?|"
+    r"mo-moo2|co[-–]co2|m-h|fmq|qfm|nno|mh|mw|iw)"
+)
+_BUFFER_TOKEN = (
+    rf"(?:{_BUFFER_RELATIVE_MARKER}[-_\s]*)?{_BUFFER_FAMILY_TOKEN}"
+    rf"(?:[-_\s]*{_BUFFER_RELATIVE_MARKER})?"
+)
 _BOUNDED_FO2_REASON = (
     "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
 )
@@ -19998,6 +20011,23 @@ class _BufferRequest:
     source_id: str | None = None
 
 
+class _PrintedOxygenRefusalCode(Enum):
+    BUFFER_RELATIVE = "buffer_relative"
+
+
+@dataclass(frozen=True)
+class _BufferRefusal:
+    reason: str
+    code: _PrintedOxygenRefusalCode
+
+
+def _buffer_refusal(reason: str) -> _BufferRefusal:
+    return _BufferRefusal(
+        reason=reason,
+        code=_PrintedOxygenRefusalCode.BUFFER_RELATIVE,
+    )
+
+
 @dataclass(frozen=True)
 class PrintedOxygenDecision:
     """Identity outcome for one printed oxygen fact.
@@ -20022,6 +20052,17 @@ class PrintedOxygenDecision:
     notices: tuple[PrintedOxygenNotice, ...] = ()
     buffer_request: _BufferRequest | None = None
     pressure_pa_used: Decimal | None = None
+    interval_condition: Located[Any] | None = None
+    interval_notice_reason: str | None = None
+    refusal_code: _PrintedOxygenRefusalCode | None = None
+
+
+def _buffer_refusal_decision(refusal: _BufferRefusal) -> PrintedOxygenDecision:
+    return PrintedOxygenDecision(
+        "refusal",
+        State.unknown(refusal.reason),
+        refusal_code=refusal.code,
+    )
 
 
 def _oxygen_pressure_point(located: object) -> Decimal | None:
@@ -20038,7 +20079,6 @@ def _oxygen_pressure_point(located: object) -> Decimal | None:
 
 
 _ATM_BAR = Decimal("1.01325")
-_AIR_O2_MOLE_FRACTION = Decimal("0.2095")
 
 
 def _atmosphere_kind(
@@ -20171,8 +20211,8 @@ def _bare_log_frame_decision(
 ) -> PrintedOxygenDecision:
     """Apply the IW plausibility window, then printed atmosphere consistency.
 
-    These anchors are all log10(fO2/bar): air is -0.6788 at 1 bar total and
-    -0.6731 at 1 atm total (0.2095 × 1.01325 bar); pure O2 is 0.0000 at
+    These anchors are all log10(fO2/bar): air is -0.6789 at 1 bar total and
+    -0.6732 at 1 atm total (0.20946 × 1.01325 bar); pure O2 is 0.0000 at
     1 bar total and +0.0057 at 1 atm total. Convert the printed log with
     1 bar = 100000 Pa regardless of which total-pressure anchor matches.
     The anchors differ by log10(1.01325) = 0.0057 dex, below the 0.01 dex
@@ -20564,7 +20604,7 @@ def _printed_oxygen_buffer_text(
         and isinstance(buffer_control.state.value, str)
     ):
         control_text = buffer_control.state.value
-        if any(token in control_text.casefold() for token in _BUFFER_NAME_TOKENS):
+        if _BUFFER_TOKEN_RE.search(control_text):
             return control_text
     if not isinstance(raw_item, Mapping):
         return None
@@ -20576,13 +20616,13 @@ def _printed_oxygen_buffer_text(
         if not isinstance(raw_log, Mapping):
             continue
         units = str(raw_log.get("units") or raw_log.get("unit") or "")
-        if any(token in units.casefold() for token in _BUFFER_NAME_TOKENS):
+        if _BUFFER_TOKEN_RE.search(units):
             return units
     return None
 
 
 _BUFFER_OFFSET_TEXT_RE = re.compile(
-    r"^\s*(?:Δ\s*)?(IW|FMQ|QFM|NNO|CO[-–]CO2|M[-–]H|MH|MW|Mo[-–]MoO2)"
+    rf"^\s*({_BUFFER_TOKEN})"
     r"\s*([+−-])\s*((?:\d+(?:\.\d*)?|\.\d+))\s*$",
     re.IGNORECASE,
 )
@@ -20590,7 +20630,7 @@ _BUFFER_OFFSET_TEXT_RE = re.compile(
 # pressure. log10(bar) and log10(atm) stay absolute frames.
 _LOG_BUFFER_UNITS_RE = re.compile(
     r"^\s*log(?:10)?\s*\(\s*"
-    r"(IW|FMQ|QFM|NNO|CO[-–]CO2|M[-–]H|MH|MW|Mo[-–]MoO2)"
+    rf"({_BUFFER_TOKEN})"
     r"\s*\)\s*$",
     re.IGNORECASE,
 )
@@ -20601,22 +20641,19 @@ _KEMS_137_SOURCE_ID = "kems-137-bischof-2023"
 
 def _canonical_buffer_name(text: str) -> str:
     lowered = text.casefold().replace("−", "-").replace("–", "-")
-    if "fmq" in lowered or "qfm" in lowered:
-        return "QFM"
-    if "iw" in lowered:
-        return "IW"
-    if "nno" in lowered:
-        return "NNO"
-    if "co-co2" in lowered:
-        return "CO-CO2"
-    if "mo-moo2" in lowered:
-        return "Mo-MoO2"
-    if "m-h" in lowered:
-        return "M-H"
-    if "mh" in lowered:
-        return "MH"
-    if "mw" in lowered:
-        return "MW"
+    match = _BUFFER_TOKEN_RE.search(lowered)
+    if match is not None:
+        token = re.sub(
+            rf"^(?:{_BUFFER_RELATIVE_MARKER})[-_\s]*|[-_\s]*(?:{_BUFFER_RELATIVE_MARKER})$",
+            "",
+            match.group("buf"),
+            flags=re.IGNORECASE,
+        )
+        token = token.casefold().replace("ü", "u")
+        token = re.sub(r"\s+", "-", token)
+        return _BUFFER_FAMILY[token]
+    if "co-co2" in lowered or "coco2" in re.sub(r"[^a-z0-9]", "", lowered):
+        return _BUFFER_FAMILY["co-co2"]
     return text.strip()
 
 
@@ -20632,24 +20669,33 @@ def _buffer_named_by_log_units(units: object) -> str | None:
 
 
 def _relative_buffer_for_field(name: str) -> str | None:
-    normalized = re.sub(r"[^a-z0-9]", "", name.casefold())
-    suffixes = (
-        ("iw", "IW"),
-        ("fmq", "QFM"),
-        ("qfm", "QFM"),
-        ("nno", "NNO"),
-        ("coco2", "CO-CO2"),
-        ("momoo2", "Mo-MoO2"),
-        ("mw", "MW"),
-        ("mh", "M-H" if re.search(r"m\s*[-–]\s*h", name, re.I) else "MH"),
-    )
-    prefixes = ("delta", "d", "fo2delta", "logfo2asdelta")
-    for suffix, buffer in suffixes:
-        if any(normalized == f"{prefix}{suffix}" for prefix in prefixes) or any(
-            normalized == f"{prefix}{suffix}asprinted" for prefix in prefixes
-        ):
-            return buffer
-    return None
+    match = _BUFFER_TOKEN_RE.search(name)
+    if match is None:
+        return None
+    token = match.group("buf")
+    if not _has_relative_buffer_marker(token):
+        return None
+    prefix = re.sub(r"[^a-z0-9]", "", name[: match.start()].casefold())
+    suffix = re.sub(r"[^a-z0-9]", "", name[match.end() :].casefold())
+    if prefix not in {"", "fo2", "fo2log", "logfo2as"}:
+        return None
+    if suffix not in {"", "asprinted"}:
+        return None
+    family = _canonical_buffer_name(token)
+    return family if family in set(_BUFFER_FAMILY.values()) else None
+
+
+def _has_relative_buffer_marker(text: str) -> bool:
+    """Detect markers in prose/units independently of valid field-name syntax."""
+
+    return any(
+        re.fullmatch(_BUFFER_FAMILY_TOKEN, match.group("buf"), re.IGNORECASE) is None
+        for match in _BUFFER_TOKEN_RE.finditer(text)
+    ) or re.search(
+        rf"(?<![a-z0-9]){_BUFFER_RELATIVE_MARKER}(?![a-z0-9])",
+        text,
+        re.IGNORECASE,
+    ) is not None
 
 
 def _relative_offset_value(raw: object) -> tuple[Decimal, str] | None:
@@ -20673,12 +20719,22 @@ def _relative_offset_value(raw: object) -> tuple[Decimal, str] | None:
                 return None
             original = state.get("value")
             raw = original
-        elif "value" in raw:
-            original = raw.get("value")
-            raw = original
-    value = _printed_decimal(raw)
-    if value is None:
+        else:
+            key = next(
+                (
+                    name
+                    for name in ("delta_as_published", "delta", "value")
+                    if name in raw
+                ),
+                None,
+            )
+            if key is not None:
+                original = raw.get(key)
+                raw = original
+    parsed = _offset_number(raw)
+    if parsed is None:
         return None
+    value, _printed = parsed
     return value, str(original if original is not None else raw).strip()
 
 
@@ -20711,15 +20767,9 @@ def _printed_relative_oxygen(
             if located is not None:
                 candidates.append((buffer, located[0], located[1]))
     if buffer_text:
-        match = _BUFFER_OFFSET_TEXT_RE.match(buffer_text)
-        if match is not None:
-            buffer = _canonical_buffer_name(match.group(1))
-            signed = match.group(3)
-            if match.group(2) in {"-", "−"}:
-                signed = f"-{signed}"
-            elif match.group(2) == "+":
-                signed = f"+{signed}"
-            candidates.append((buffer, Decimal(signed), buffer_text.strip()))
+        buffer, offset, printed, is_prose = _classify_buffer_phrase(buffer_text)
+        if not is_prose and offset is not None and printed is not None:
+            candidates.append((buffer, offset, buffer_text.strip()))
     unique = {(buffer, offset) for buffer, offset, _printed in candidates}
     if not unique:
         return None
@@ -20728,7 +20778,7 @@ def _printed_relative_oxygen(
     buffer, offset = next(iter(unique))
     if buffer_text:
         control_buffer = _canonical_buffer_name(buffer_text)
-        known_buffers = {"IW", "QFM", "NNO", "CO-CO2", "M-H", "MH", "MW", "Mo-MoO2"}
+        known_buffers = {*_BUFFER_FAMILY.values()}
         if control_buffer in known_buffers and control_buffer != buffer:
             return ("ambiguous", Decimal(0), "offset and buffer control disagree")
     printed = next(
@@ -21048,19 +21098,17 @@ def _relative_oxygen_decision(
         return None
     buffer, offset, offset_as_printed = relative
     if buffer == "ambiguous":
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(
+        return _buffer_refusal_decision(
+            _buffer_refusal(
                 "buffer-relative fO2 is ambiguous; no fO2_Pa assigned"
-            ),
+            )
         )
     if temperature_K is None or not temperature_K.is_finite() or temperature_K <= 0:
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(
+        return _buffer_refusal_decision(
+            _buffer_refusal(
                 f"buffer-relative fO2 ({buffer} {offset_as_printed}) has no "
                 "finite run temperature; no fO2_Pa assigned"
-            ),
+            )
         )
     pressure_bar = (
         pressure_bar
@@ -21083,12 +21131,11 @@ def _relative_oxygen_decision(
             if calibration_text
             else f"buffer {buffer} has no cited canonical calibration"
         )
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(
+        return _buffer_refusal_decision(
+            _buffer_refusal(
                 f"buffer-relative fO2 ({buffer}, offset {offset_as_printed}) "
                 f"refused: {cited}; no fO2_Pa assigned"
-            ),
+            )
         )
     calibration_log = calibrated[0]
     absolute_log = Decimal(str(calibration_log)) + offset
@@ -21119,7 +21166,9 @@ _BUFFER_TOKEN_RE = re.compile(
 )
 _BUFFER_OFFSET_RE = re.compile(
     rf"(?<![a-z0-9])(?P<buf>{_BUFFER_TOKEN})(?![a-z0-9])"
-    r"(?:\s*=)?\s*(?P<off>[+-]\s*\d+(?:\.\d+)?)?",
+    # Unsigned numbers need '='; otherwise a sign must introduce the offset.
+    r"(?P<equals>\s*=)?\s*(?P<off>(?(equals)[+-]?|[+-])\s*"
+    r"(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)?",
     re.IGNORECASE,
 )
 # A sign or equals with no number is an offset that failed to parse.
@@ -21128,8 +21177,8 @@ _BUFFER_OFFSET_INTRO_RE = re.compile(
     rf"(?<![a-z0-9])(?:{_BUFFER_TOKEN})(?![a-z0-9])\s*(?:=|[+-])",
     re.IGNORECASE,
 )
-_LOG_UNITS_PHRASE_RE = re.compile(
-    r"(?P<n>[+-]?\d+(?:\.\d+)?)\s+log\s+units?\s+(?P<dir>below|above)\s+"
+_BUFFER_DISTANCE_PHRASE_RE = re.compile(
+    r"(?P<n>[+-]?\d+(?:\.\d+)?)\s+(?:log\s+units?\s+)?(?P<dir>below|above)\s+"
     rf"(?<![a-z0-9])(?P<buf>{_BUFFER_TOKEN})(?![a-z0-9])",
     re.IGNORECASE,
 )
@@ -21143,24 +21192,18 @@ _IDEAL_FEO_FE_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 _BUFFER_FAMILY = {
+    "co-co2": "CO-CO2",
     "iw": "IW",
+    "iron-wustite": "IW",
+    "iron-wustite-buffer": "IW",
     "qfm": "QFM",
     "fmq": "QFM",
     "nno": "NNO",
     "mo-moo2": "Mo-MoO2",
+    "magnetite-hematite": "MH",
     "mh": "MH",
     "m-h": "MH",
     "mw": "MW",
-}
-_DELTA_FIELD_FAMILY = {
-    "fO2_delta_IW": "IW",
-    "delta_IW": "IW",
-    "fO2_delta_QFM": "QFM",
-    "delta_QFM": "QFM",
-    "fO2_delta_FMQ": "QFM",
-    "delta_FMQ": "QFM",
-    "fO2_delta_NNO": "NNO",
-    "delta_NNO": "NNO",
 }
 _CALIBRATION_TEXT_FIELDS = (
     "buffer_calibration",
@@ -21169,10 +21212,6 @@ _CALIBRATION_TEXT_FIELDS = (
     "fo2_calibration",
 )
 _BUFFER_NAME_WORDS = (
-    "iron-wüstite",
-    "iron-wustite",
-    "iron wüstite",
-    "iron wustite",
     "fayalite-magnetite-quartz",
     "fayalite magnetite quartz",
     "nickel-nickel oxide",
@@ -21181,8 +21220,7 @@ _BUFFER_NAME_WORDS = (
 
 
 def _units_name_buffer(units: str) -> bool:
-    folded = units.casefold()
-    return any(token in folded for token in _BUFFER_NAME_TOKENS)
+    return _BUFFER_TOKEN_RE.search(units) is not None
 
 
 def _buffer_named_in_mapping(mapping: Mapping[str, Any]) -> bool:
@@ -21336,9 +21374,13 @@ def _normalize_offset_dashes(text: str) -> str:
 
 def _leftover_buffer_words(text: str) -> str:
     folded = _normalize_offset_dashes(text).casefold()
+    # A citation/units parenthesis decorates a label; its year is not an offset.
+    folded = re.sub(r"\([^()]*\)", " ", folded)
     for word in _BUFFER_NAME_WORDS:
         folded = folded.replace(word.casefold(), " ")
     folded = _BUFFER_OFFSET_RE.sub(" ", folded)
+    folded = re.sub(r"\blog\s+units?\b", " ", folded)
+    folded = re.sub(rf"\b{_BUFFER_RELATIVE_MARKER}\b", " ", folded)
     return re.sub(r"[^a-z]+", " ", folded).strip()
 
 
@@ -21347,7 +21389,8 @@ def _classify_buffer_phrase(
 ) -> tuple[str, Decimal | None, str | None, bool]:
     """Return family, offset, offset-as-printed, and whether the phrase is prose.
 
-    A bare buffer name is offset 0. ``delta-IW`` with no number is prose.
+    A bare buffer name is offset 0 with printed=None (zero by statement).
+    ``delta-IW`` with no number is prose, even inside decorated labels.
     A printed sign or ``=`` whose number does not parse is prose, not offset 0.
     ``IW = -2`` is offset -2. Unicode minus, en dash, and em dash are minus.
     """
@@ -21357,9 +21400,9 @@ def _classify_buffer_phrase(
         family = None
         match = _BUFFER_TOKEN_RE.search(text.casefold())
         if match is not None:
-            family = _BUFFER_FAMILY[match.group("buf").casefold()]
+            family = _canonical_buffer_name(match.group("buf"))
         return family or "", None, None, True
-    phrase = _LOG_UNITS_PHRASE_RE.search(text)
+    phrase = _BUFFER_DISTANCE_PHRASE_RE.search(text)
     if phrase is not None:
         number, _printed = _offset_number(phrase.group("n")) or (None, None)
         if number is None:
@@ -21369,7 +21412,7 @@ def _classify_buffer_phrase(
         else:
             number = abs(number)
         return (
-            _BUFFER_FAMILY[phrase.group("buf").casefold()],
+            _canonical_buffer_name(phrase.group("buf")),
             number,
             phrase.group("n"),
             False,
@@ -21377,19 +21420,21 @@ def _classify_buffer_phrase(
     matches = list(_BUFFER_OFFSET_RE.finditer(text))
     if not matches:
         return "", None, None, False
-    families = {_BUFFER_FAMILY[item.group("buf").casefold()] for item in matches}
+    families = {_canonical_buffer_name(item.group("buf")) for item in matches}
     if len(families) != 1:
         return "", None, None, True
     family = next(iter(families))
     offsets = [item.group("off") for item in matches if item.group("off")]
     if _leftover_buffer_words(text):
         return family, None, None, True
-    if len(offsets) > 1 and len({item.replace(" ", "") for item in offsets}) > 1:
+    if len({_offset_number(item)[0] for item in offsets}) > 1:
         return family, None, None, True
     if not offsets:
         if _BUFFER_OFFSET_INTRO_RE.search(text):
             return family, None, None, True
-        return family, Decimal(0), "0", False
+        if _has_relative_buffer_marker(text):
+            return family, None, None, True
+        return family, Decimal(0), None, False
     number, _printed = _offset_number(offsets[0]) or (None, None)
     if number is None:
         return family, None, None, True
@@ -21400,48 +21445,55 @@ def _push_point(
     points: list[tuple[str, Decimal, str, str, bool]],
     family: str,
     offset: Decimal,
-    offset_as_printed: str,
+    offset_as_printed: str | None,
     source: str,
     *,
     bare_name: bool,
 ) -> None:
     # bare_name marks a buffer word with no printed number (IW, iron-wüstite).
     # It is offset 0 only when nothing else on the row supplies the offset.
-    points.append((family, offset, offset_as_printed, source, bare_name))
+    printed = offset_as_printed if offset_as_printed is not None else "0 (at buffer by statement)"
+    points.append((family, offset, printed, source, bare_name))
 
 
 def _buffer_request_from_row(
     raw_item: object,
     point_conditions: Mapping[str, Any] | None,
     temperature_K: Decimal | None,
-) -> _BufferRequest | str | None:
-    """A buffer point, a refusal sentence, or None when the row names no buffer."""
+) -> _BufferRequest | _BufferRefusal | None:
+    """A buffer point, a typed refusal, or None when the row names no buffer."""
 
     points: list[tuple[str, Decimal, str, str, bool]] = []
     prose: list[tuple[str, str]] = []
     unknown: list[str] = []
     oxygen_text: list[str] = []
     calibration_bits: list[str] = []
+    relative_field_families: set[str] = set()
+    relative_markers_without_offset: list[str] = []
     for mapping in _buffer_mappings(raw_item, point_conditions):
         for key in _CALIBRATION_TEXT_FIELDS:
             raw_bit = mapping.get(key)
             if isinstance(raw_bit, str) and raw_bit.strip():
                 calibration_bits.append(raw_bit.strip())
                 oxygen_text.append(raw_bit.strip())
-        control = mapping.get("fO2_control")
-        for piece in _text_pieces(control):
+        for piece in (
+            *_text_pieces(mapping.get("fO2_control")),
+            *_text_pieces(mapping.get("oxygen_fugacity_buffer_relation")),
+        ):
             oxygen_text.append(piece)
             family, offset, printed, is_prose = _classify_buffer_phrase(piece)
             if is_prose:
                 prose.append((family, piece))
+                if family and _has_relative_buffer_marker(piece):
+                    relative_markers_without_offset.append(piece)
             elif offset is not None and family:
                 _push_point(
                     points,
                     family,
                     offset,
-                    printed or "0",
+                    printed,
                     piece,
-                    bare_name=printed == "0",
+                    bare_name=printed is None,
                 )
         raw_buffer = mapping.get("oxygen_buffer_as_published")
         if isinstance(raw_buffer, str) and raw_buffer.strip():
@@ -21473,14 +21525,16 @@ def _buffer_request_from_row(
                 unknown.append(raw_buffer.strip())
             elif is_prose:
                 prose.append((family, raw_buffer.strip()))
+                if family and _has_relative_buffer_marker(raw_buffer):
+                    relative_markers_without_offset.append(raw_buffer.strip())
             elif offset is not None and family:
                 _push_point(
                     points,
                     family,
                     offset,
-                    printed or "0",
+                    printed,
                     raw_buffer.strip(),
-                    bare_name=printed == "0",
+                    bare_name=printed is None,
                 )
         for key in _PRINTED_LOG_FO2_KEYS:
             node = mapping.get(key)
@@ -21491,37 +21545,41 @@ def _buffer_request_from_row(
                 continue
             oxygen_text.append(units)
             match = _BUFFER_TOKEN_RE.search(units.casefold())
-            parsed = _offset_number(node.get("value"))
+            parsed = _relative_offset_value(node)
             if match is None or parsed is None:
                 prose.append(("", units))
+                # A log field naming a buffer is a relative frame even when
+                # the units print only IW or log10(IW), without 'delta'.
+                relative_markers_without_offset.append(units)
                 continue
             number, printed = parsed
             _push_point(
                 points,
-                _BUFFER_FAMILY[match.group("buf").casefold()],
+                _canonical_buffer_name(match.group("buf")),
                 number,
                 printed,
                 units,
                 bare_name=False,
             )
-        for key, family in _DELTA_FIELD_FAMILY.items():
-            if key not in mapping:
+        for key, raw in mapping.items():
+            family = _relative_buffer_for_field(str(key))
+            if family is None:
                 continue
-            payload = _condition_payload(mapping.get(key))
-            oxygen_text.extend(_text_pieces(mapping.get(key)))
-            raw_delta: object = payload
+            payload = _condition_payload(raw)
+            oxygen_text.extend(_text_pieces(raw))
             if isinstance(payload, Mapping):
-                raw_delta = payload.get("delta_as_published", payload.get("delta"))
                 reference = payload.get("reference_buffer")
                 if isinstance(reference, str) and reference.strip():
                     ref_family, _, _, ref_prose = _classify_buffer_phrase(reference)
                     if ref_family and ref_family != family and not ref_prose:
                         prose.append((ref_family, reference.strip()))
-            parsed = _offset_number(raw_delta)
+            parsed = _relative_offset_value(payload)
             if parsed is None:
                 prose.append((family, key))
+                relative_markers_without_offset.append(key)
                 continue
             number, printed = parsed
+            relative_field_families.add(family)
             source = key
             if isinstance(payload, Mapping) and isinstance(payload.get("reference_buffer"), str):
                 source = payload["reference_buffer"].strip() or key
@@ -21535,21 +21593,32 @@ def _buffer_request_from_row(
         numbered = [item for item in points if not item[4]]
         if numbered:
             points = numbered
+        elif relative_markers_without_offset:
+            label = relative_markers_without_offset[0]
+            return _buffer_refusal(
+                _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=label)
+            )
         families = {item[0] for item in points}
         offsets = {item[1] for item in points}
         if len(families) != 1 or len(offsets) != 1:
-            return _BUFFER_RELATIVE_CONFLICT.format(
-                buffer=" / ".join(item[3] for item in points)
+            return _buffer_refusal(
+                _BUFFER_RELATIVE_CONFLICT.format(
+                    buffer=" / ".join(item[3] for item in points)
+                )
             )
         family, offset, offset_printed, source, _bare = points[0]
         for prose_family, prose_text in prose:
             if prose_family and prose_family != family:
-                return _BUFFER_RELATIVE_CONFLICT.format(
-                    buffer=f"{source} / {prose_text}"
+                return _buffer_refusal(
+                    _BUFFER_RELATIVE_CONFLICT.format(
+                        buffer=f"{source} / {prose_text}"
+                    )
                 )
         if unknown:
-            return _BUFFER_RELATIVE_CONFLICT.format(
-                buffer=f"{source} / {unknown[0]}"
+            return _buffer_refusal(
+                _BUFFER_RELATIVE_CONFLICT.format(
+                    buffer=f"{source} / {unknown[0]}"
+                )
             )
         if (
             temperature_K is None
@@ -21557,7 +21626,18 @@ def _buffer_request_from_row(
             or not temperature_K.is_finite()
             or temperature_K <= 0
         ):
-            return _BUFFER_RELATIVE_NO_TEMPERATURE.format(buffer=source)
+            return _buffer_refusal(
+                _BUFFER_RELATIVE_NO_TEMPERATURE.format(buffer=source)
+            )
+        if family in relative_field_families and _relative_buffer_calibration(
+            family,
+            float(temperature_K),
+            1.0,
+            _printed_buffer_calibration(raw_item, source, point_conditions),
+        ) is None:
+            # The relative-oxygen resolver owns typed refusals for families
+            # without an applicable cited or canonical migration calibration.
+            return None
         matched = match_printed_calibration(family, joined)
         unmatched = None
         if matched is None and calibration_bits:
@@ -21577,9 +21657,13 @@ def _buffer_request_from_row(
             ),
         )
     if unknown:
-        return _BUFFER_RELATIVE_FO2_REASON.format(buffer=unknown[0])
+        return _buffer_refusal(
+            _BUFFER_RELATIVE_FO2_REASON.format(buffer=unknown[0])
+        )
     label = next((text for _family, text in prose if text), "buffer")
-    return _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=label)
+    return _buffer_refusal(
+        _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=label)
+    )
 
 
 def _band_text(width: Decimal | None) -> str:
@@ -21625,11 +21709,21 @@ def _decision_for_buffer(
         and request.calibration_id is None
         and request.calibration_text is None
     ):
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(
+        return _buffer_refusal_decision(
+            _buffer_refusal(
                 "Bischof ΔIW has no cited buffer calibration; no fO2_Pa assigned"
-            ),
+            )
+        )
+    if request.buffer == "CO-CO2":
+        printed_buffer = (request.buffer_as_printed or "").strip()
+        if printed_buffer.removesuffix(".").casefold() != request.buffer.casefold():
+            printed_buffer = request.buffer
+        return _buffer_refusal_decision(
+            _buffer_refusal(
+                f"{printed_buffer} buffer-relative fO2 requires the printed "
+                "CO/CO2 ratio; "
+                "no fO2_Pa assigned"
+            )
         )
     pressure_bar = (
         total_pressure_pa / _BAR_PA
@@ -21800,8 +21894,8 @@ def _buffer_relative_decision(
     outcome = _buffer_request_from_row(raw_item, point_conditions, run_temperature_K)
     if outcome is None:
         return None
-    if isinstance(outcome, str):
-        return PrintedOxygenDecision("refusal", State.unknown(outcome))
+    if isinstance(outcome, _BufferRefusal):
+        return _buffer_refusal_decision(outcome)
     outcome = replace(outcome, source_id=source_id)
     resolved = _point_total_pressure_pa(point_conditions)
     if resolved is None:
@@ -21826,6 +21920,231 @@ def _refresh_buffer_decision(
     ):
         return decision
     return _decision_for_buffer(decision.buffer_request, total_pressure_pa)
+
+
+def _printed_fo2_interval(
+    raw_item: object,
+    point_conditions: Mapping[str, Any] | None,
+    *,
+    total_pressure_pa: Decimal | None,
+) -> tuple[Located[Any], str] | None:
+    """Retain a printed fO2 bound or qualitative air/buffer condition."""
+
+    def value_condition(
+        payload: Mapping[str, Any],
+        locator: Locator | None,
+        inference: Derivation,
+    ) -> Located[Any]:
+        located = _point_condition_from_plain(
+            {"state": {"tag": StateTag.VALUE.value, "value": payload}},
+            key="fO2_log",
+        )
+        return replace(
+            located,
+            locator=locator or located.locator,
+            inference=inference,
+        )
+
+    located = (point_conditions or {}).get("fO2_log")
+    if isinstance(located, Located) and located.state.is_value:
+        value = located.state.value
+        if isinstance(value, Value) and value.kind in {
+            ValueKind.BOUND,
+            ValueKind.INTERVAL,
+        }:
+            return (
+                located,
+                "bound_type=printed_inequality; interval condition not yet scorable",
+            )
+
+    mappings = list(_buffer_mappings(raw_item, point_conditions))
+    texts: list[tuple[str, str, Locator | None]] = []
+    for mapping in mappings:
+        for key in (
+            "fO2_control",
+            "oxygen_buffer_as_published",
+            "oxygen_fugacity_buffer_relation",
+            "atmosphere_as_published",
+            "atmosphere",
+        ):
+            candidates = [(mapping.get(key), mapping.get(key))]
+            if key == "fO2_control" and isinstance(mapping.get(key), Mapping):
+                candidates.append((mapping[key].get("buffer"), mapping[key]))
+            for candidate, locator_source in candidates:
+                if isinstance(locator_source, Located):
+                    locator = locator_source.locator
+                elif isinstance(locator_source, Mapping):
+                    locator = _locator_from_plain(locator_source.get("locator"))
+                else:
+                    locator = None
+                if locator is None:
+                    locator = _locator_from_plain(mapping.get("locator"))
+                for text in _text_pieces(candidate):
+                    texts.append((key, text.strip(), locator))
+
+    for mapping in mappings:
+        node = mapping.get("oxygen_partial_pressure")
+        if not isinstance(node, Mapping):
+            continue
+        raw_value = node.get("value")
+        if not isinstance(raw_value, str):
+            continue
+        comparison = re.fullmatch(
+            r"\s*(?P<operator><=|>=|<|>|≤|≥)\s*(?P<amount>.*?)\s*",
+            raw_value,
+        )
+        if comparison is None:
+            continue
+        amount = _printed_decimal(comparison.group("amount"))
+        units = str(node.get("units") or node.get("unit") or "").strip()
+        pressure_pa, conversion = convert_pressure_to_pa(amount, units)
+        if amount is None or amount <= 0 or pressure_pa is None or pressure_pa <= 0:
+            continue
+        operator = {"≤": "<=", "≥": ">="}.get(
+            comparison.group("operator"), comparison.group("operator")
+        )
+        log_bar = (pressure_pa / PA_PER_BAR_DEC).log10()
+        locator = _locator_from_plain(node.get("locator")) or _locator_from_plain(
+            mapping.get("locator")
+        )
+        condition = value_condition(
+            {
+                "kind": ValueKind.BOUND.value,
+                "bound_operator": operator,
+                "bound_value": log_bar,
+            },
+            locator,
+            Derivation(
+                relation="printed_oxygen_pressure_inequality_to_log_fO2_bound",
+                inputs=(
+                    f"values.oxygen_partial_pressure={raw_value}",
+                    f"units={units}",
+                    f"pressure_conversion={conversion}",
+                ),
+                parameters=(),
+                output_unit="log10(fO2/bar)",
+            ),
+        )
+        return (
+            condition,
+            "bound_type=printed_oxygen_pressure_inequality; "
+            "frame=log10(fO2/bar); interval condition not yet scorable",
+        )
+
+    for key, text, locator in texts:
+        atmosphere = _atmosphere_kind(text)
+        is_air = (
+            atmosphere is not None and atmosphere[0] == "air"
+        ) or (
+            "/" not in text
+            and not re.search(r"\b(?:ratio|mixture)\b", text, re.IGNORECASE)
+            and bool(re.search(r"\bair\b", text, re.IGNORECASE))
+        )
+        if is_air:
+            total_pa = total_pressure_pa
+            explicit_total_bar = atmosphere[2] if atmosphere is not None else None
+            if explicit_total_bar is not None:
+                total_pa = explicit_total_bar * PA_PER_BAR_DEC
+            if total_pa is None or not total_pa.is_finite() or total_pa <= 0:
+                has_pressure_input = any(
+                    "total_pressure_Pa" in mapping for mapping in mappings
+                )
+                reason = (
+                    "invalid total pressure for printed air fO2; no value assigned"
+                    if has_pressure_input or total_pa is not None
+                    else "missing input: printed air fO2 requires stated total pressure"
+                )
+                return (
+                    Located(
+                        State.unknown(reason),
+                        locator=locator,
+                        inference=Derivation(
+                            relation="air_fO2_requires_stated_total_pressure",
+                            inputs=(f"{key}={text}",),
+                            parameters=(),
+                            output_unit="log10(fO2/bar)",
+                        ),
+                    ),
+                    reason,
+                )
+            po2_pa = total_pa * _AIR_O2_MOLE_FRACTION
+            log_bar = (po2_pa / PA_PER_BAR_DEC).log10()
+            condition = value_condition(
+                {
+                    "kind": ValueKind.INTERVAL.value,
+                    "interval_low": log_bar,
+                    "interval_high": log_bar,
+                },
+                locator,
+                Derivation(
+                    relation=(
+                        "air_interval_from_total_pressure; "
+                        f"pO2={_dec_str(_AIR_O2_MOLE_FRACTION)}*P_total; "
+                        "degenerate interval"
+                    ),
+                    inputs=(f"{key}={text}", "point_conditions.total_pressure_Pa"),
+                    parameters=(),
+                    output_unit="log10(fO2/bar)",
+                ),
+            )
+            return (
+                condition,
+                "bound_type=degenerate_air_interval; computed pO2="
+                f"{_dec_str(_AIR_O2_MOLE_FRACTION)} x stated total pressure; "
+                "interval condition not yet scorable",
+            )
+
+        bound_match = re.search(
+            r"(?:(?P<distance>\d+(?:\.\d+)?)\s*(?:log\s+units?\s+)?)?"
+            r"\b(?P<direction>below|under|less than|above|over|greater than)\s+"
+            r"(?P<buffer>IW|FMQ|QFM|NNO|iron[- ]w[uü]stite(?:\s+buffer)?)\b"
+            r"(?P<threshold_offset>\s*[+-]\s*\d+(?:\.\d+)?)?",
+            text,
+            re.IGNORECASE,
+        )
+        if bound_match is None:
+            continue
+        if bound_match.group("distance") is not None:
+            continue
+        buffer = _canonical_buffer_name(bound_match.group("buffer"))
+        direction = (
+            BoundDirection.UPPER
+            if bound_match.group("direction").casefold()
+            in {"below", "under", "less than"}
+            else BoundDirection.LOWER
+        )
+        threshold_offset = bound_match.group("threshold_offset")
+        if threshold_offset is None:
+            bound = Decimal(0)
+        else:
+            parsed_offset = _offset_number(threshold_offset)
+            if parsed_offset is None:
+                continue
+            bound = parsed_offset[0]
+        frame = f"log10({buffer})"
+        condition = value_condition(
+            {
+                "kind": ValueKind.BOUND.value,
+                "bound_operator": "<" if direction is BoundDirection.UPPER else ">",
+                "bound_value": bound,
+            },
+            locator,
+            Derivation(
+                relation=(
+                    f"buffer_relative_fO2_inequality; buffer={buffer}; "
+                    f"frame={frame}"
+                ),
+                inputs=(f"{key}={text}",),
+                parameters=(),
+                output_unit=frame,
+            ),
+        )
+        return (
+            condition,
+            f"bound_type={direction.value}; buffer={buffer}; frame={frame}; "
+            "interval condition not yet scorable",
+        )
+    return None
 
 
 def printed_oxygen_decision(
@@ -21908,6 +22227,30 @@ def printed_oxygen_decision(
         if not absolute
         else None
     )
+    interval = (
+        _printed_fo2_interval(
+            raw_item,
+            point_conditions,
+            total_pressure_pa=total_pressure_pa,
+        )
+        if not absolute
+        else None
+    )
+    if interval is not None:
+        interval_condition, interval_notice = interval
+        interval_state = (
+            interval_condition.state
+            if interval_condition.state.is_unknown
+            else State.unknown(
+                "bounded or qualitative fO2 retained as a typed condition"
+            )
+        )
+        return PrintedOxygenDecision(
+            "interval",
+            interval_state,
+            interval_condition=interval_condition,
+            interval_notice_reason=interval_notice,
+        )
     # An absolute log is an explicit point even when the same source row also
     # reports its buffer-relative offset. The absolute value takes precedence.
     if not absolute and not facts.rejected_log_fO2 and non_point_reason is None:
@@ -21955,9 +22298,10 @@ def printed_oxygen_decision(
     if relative_decision is not None:
         return relative_decision
     if buffer_text is not None:
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(_BUFFER_RELATIVE_FO2_REASON.format(buffer=buffer_text)),
+        return _buffer_refusal_decision(
+            _buffer_refusal(
+                _BUFFER_RELATIVE_FO2_REASON.format(buffer=buffer_text)
+            )
         )
     return None
 
@@ -22163,7 +22507,7 @@ def _printed_oxygen_state_for(
         and current.reason != decision.state.reason
         and decision.state.reason != _BOUNDED_FO2_REASON
         and decision.state.reason != _BARE_LOG_SCALE_UNKNOWN
-        and not (decision.state.reason or "").startswith("buffer-relative fO2 (")
+        and decision.refusal_code is not _PrintedOxygenRefusalCode.BUFFER_RELATIVE
     ):
         return None
     if (
@@ -22181,6 +22525,37 @@ def _printed_oxygen_state_for(
     ):
         return None
     return decision.state
+
+
+def _retain_printed_fo2_interval(
+    point_conditions: Mapping[str, Located[Any]] | None,
+    decision: PrintedOxygenDecision | None,
+) -> Mapping[str, Located[Any]] | None:
+    if decision is None or decision.interval_condition is None:
+        return point_conditions
+    return {
+        **(point_conditions or {}),
+        "fO2_log": decision.interval_condition,
+    }
+
+
+def _printed_fo2_interval_notice(
+    decision: PrintedOxygenDecision | None,
+    quantity: object,
+    origin: str,
+) -> Notice | None:
+    if (
+        decision is None
+        or decision.interval_notice_reason is None
+        or not isinstance(quantity, Quantity)
+    ):
+        return None
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason=decision.interval_notice_reason,
+        origin=origin,
+    )
 
 
 def _fO2_conventional_reference_pressure_pa(condition: object) -> Decimal | None:
@@ -27943,6 +28318,9 @@ class Migrator:
             total_pressure_pa=_positive_pressure_pa(pressure_for_oxygen),
             printed_atmospheres=printed_atmospheres,
         )
+        point_conditions = _retain_printed_fo2_interval(
+            point_conditions, oxygen_decision
+        )
         oxygen_state = _printed_oxygen_state_for(
             fill_identity(
                 quantity,
@@ -29046,6 +29424,11 @@ class Migrator:
         )
         if oxygen_conversion_notice is not None:
             observation_notices.append(oxygen_conversion_notice)
+        interval_notice = _printed_fo2_interval_notice(
+            oxygen_decision, q_token, obs_id
+        )
+        if interval_notice is not None:
+            observation_notices.append(interval_notice)
         observation_notices.extend(
             _buffer_conversion_notices(
                 oxygen_decision,
@@ -30916,6 +31299,9 @@ class Migrator:
             ),
             printed_atmospheres=printed_atmospheres,
         )
+        point_conditions = _retain_printed_fo2_interval(
+            point_conditions, oxygen_decision
+        )
         oxygen_state = _printed_oxygen_state_for(
             identity,
             oxygen_decision,
@@ -31327,6 +31713,11 @@ class Migrator:
         )
         if oxygen_conversion_notice is not None:
             child_notices.append(oxygen_conversion_notice)
+        interval_notice = _printed_fo2_interval_notice(
+            oxygen_decision, q_token_point, point_id
+        )
+        if interval_notice is not None:
+            child_notices.append(interval_notice)
         child_notices.extend(
             _buffer_conversion_notices(
                 oxygen_decision,
