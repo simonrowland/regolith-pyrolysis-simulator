@@ -896,7 +896,7 @@ def _remember_memory_value(key: tuple[str, bytes, bool], value: Any) -> None:
         _MEMORY_CACHE.popitem(last=False)
 
 
-def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = False) -> None:
+def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = False) -> bool:
     expected = ["key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id"]
     own_transaction = not connection.in_transaction
     if own_transaction:
@@ -922,6 +922,7 @@ def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = F
     else:
         if own_transaction:
             connection.commit()
+        return empty
 
 
 def _initialize_cache(connection: sqlite3.Connection) -> None:
@@ -1006,8 +1007,11 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
                     raise
                 time.sleep(0.01)
     try:
-        _check_cache_schema(connection, allow_empty=True)
-        if not readonly:
+        empty = _check_cache_schema(connection, allow_empty=True)
+        if empty and readonly:
+            connection.close()
+            return None
+        if empty:
             _initialize_cache(connection)
     except Exception:
         connection.close()

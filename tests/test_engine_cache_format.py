@@ -77,6 +77,23 @@ def test_schema_check_accepts_fresh_cache_after_interrupted_version_write(tmp_pa
         engine_cache._check_cache_schema(connection)
 
 
+def test_readonly_version_only_database_can_be_opened_twice(tmp_path: Path, monkeypatch) -> None:
+    path = tmp_path / "cache.sqlite"
+    with sqlite3.connect(path) as connection:
+        connection.execute(f"PRAGMA user_version={engine_cache._CACHE_SCHEMA_VERSION}")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    engine_cache._close_connections()
+    try:
+        for attempt in range(2):
+            expected = {"answer": attempt}
+            assert engine_cache.cached_engine_call(
+                "openimcc", {"request": attempt}, lambda: expected
+            ) == expected
+    finally:
+        engine_cache._close_connections()
+
+
 def test_lossy_v2_cache_cannot_supply_a_hit(tmp_path: Path, monkeypatch) -> None:
     path = tmp_path / "legacy.sqlite"
     key = engine_cache.engine_cache_key("internal-analytical", 1, {})
