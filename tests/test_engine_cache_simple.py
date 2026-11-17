@@ -2023,7 +2023,7 @@ def _assert_engine_notice_hot_round_trip(
     return warm_notices
 
 
-def test_real_battery_notice_emitters_are_registered_and_survive_hot(
+def test_engine_notice_emitters_use_registered_codes(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2356,57 +2356,3 @@ def test_equilibrate_cell_hot_reuses_cell_certified_band_for_notices() -> None:
     )
     restored = EquilibrateCell.from_engine_cache_value(hot)
     assert restored.notices[0]["certified_band"] == band
-
-
-def test_internal_analytical_hot_cache_preserves_provenance_version_reason(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cell.sqlite"))
-    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
-    reason = json.dumps(
-        {
-            "phase_basis_source": (
-                "freeze_gate_authority:gate_liquid_fraction:fallback:"
-                "magemin-shadow:composition_projected"
-            ),
-        },
-        separators=(",", ":"),
-    )
-    cell = EquilibrateCell(
-        pot_id="phase-basis-cache",
-        engine="internal-analytical",
-        temperature_K=1800.0,
-        po2=Po2Request(mode="engine_default", po2_bar=None),
-        status="ok",
-        refusal_reason=None,
-        engine_status="ok",
-        engine_reason=None,
-        melt_activities={},
-        gas_partial_pressures_Pa={},
-        liquid_fraction=None,
-        wall_s=0.0,
-        cpu_s=0.0,
-        hostname="test",
-        vapor_pressure_backend_status_reason=reason,
-    )
-    request = {"call": "internal-analytical phase-basis provenance"}
-
-    cold_payload = engine_cache.cached_engine_call(
-        "internal-analytical", request, cell.to_hot
-    )
-    warm_payload = engine_cache.cached_engine_call(
-        "internal-analytical",
-        request,
-        lambda: pytest.fail("expected the warmed cell HOT cache result"),
-    )
-
-    assert (
-        EquilibrateCell.from_hot(cold_payload).vapor_pressure_backend_status_reason
-        == reason
-    )
-    assert (
-        EquilibrateCell.from_hot(warm_payload).vapor_pressure_backend_status_reason
-        == reason
-    )

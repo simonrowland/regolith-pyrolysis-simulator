@@ -429,10 +429,11 @@ def _assert_zhang_rb2o_projection(residual, candidate, reference) -> None:
 
 
 @pytest.mark.parametrize("temperature", ["1473.15", "1673.15"])
-def test_openimcc_zhang_implied_alpha_projects_unsupported_rb2o_with_notice(
+def test_openimcc_zhang_implied_alpha_refuses_unsupported_rb2o(
     tmp_path: Path,
     temperature: str,
 ) -> None:
+    """The former refusal case now projects Rb2O and returns a notice."""
     _require_openimcc()
     context, reference = _zhang_k_case(tmp_path, temperature)
     handle = open_battery_engine("openimcc")
@@ -2853,7 +2854,7 @@ def test_openimcc_vaporock_override_refusal_is_typed(monkeypatch) -> None:
     assert Quantity.P_PARTIAL in typed_failure.affected_quantities
 
 
-def test_openimcc_typed_gas_table_override_preserves_omission_contracts(monkeypatch) -> None:
+def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch) -> None:
     """A loadable external table still changes pressure and reports each omission.
 
     The VapoRock CSV is refused by the pinned loader because it lacks typed

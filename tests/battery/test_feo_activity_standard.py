@@ -133,7 +133,7 @@ def _case(
     return context, experiment, reference, prediction
 
 
-def test_internal_analytical_zero_offset_preserves_residual_bytes() -> None:
+def test_declared_zero_offset_feo_standards_preserve_residual_bytes() -> None:
     engine = Engine.INTERNAL_ANALYTICAL
     sources = ("nasa-cea-thermo",)
     expected_digest = _RESIDUAL_SHA256_BEFORE_STANDARD_STEP
@@ -165,6 +165,69 @@ def test_internal_analytical_zero_offset_preserves_residual_bytes() -> None:
     assert before.numeric.value.as_tuple() == Decimal("0.0").as_tuple()
     assert before_bytes == after_bytes
     assert sha256(before_bytes).hexdigest() == expected_digest
+
+
+def test_openimcc_feo_row_refuses_a_changed_condensate_digest() -> None:
+    """A legacy condensate identity without the current melt binding is refused."""
+    identity = _melt_pack_identity("default")
+    actual_digest = "a" * 64
+    sources = tuple(
+        source
+        for source in _openimcc_sources(
+            pack_version=identity["pack_version"],
+            pack_digest=identity["binding_digest"],
+            condensate_digest=actual_digest,
+        )
+        if not source.startswith("openimcc-melt-binding:")
+    )
+    standard, refusal = feo_standard_module._resolve_feo_activity_standard(
+        Engine.OPENIMCC,
+        sources,
+        melt_pack_identity=identity,
+        temperature_K=Decimal("1643.15"),
+    )
+
+    assert standard is None
+    assert refusal is not None
+    assert refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert refusal.detail["reason"] == (
+        "openimcc_feo_standard_melt_pack_identity_missing"
+    )
+
+
+def test_openimcc_feo_row_refuses_when_gas_load_loses_condensate_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import openimcc
+
+    from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
+
+    def fail_gas_load():
+        raise RuntimeError("test gas datapack failure")
+
+    monkeypatch.setattr(openimcc, "load_gas_datapack", fail_gas_load)
+    handle = open_battery_engine("openimcc")
+    assert handle.available, handle.unavailable_reason
+    assert "engine_binding_identity" not in handle.identity
+    assert "condensate_table_digest" not in handle.identity
+    assert handle.identity["gas_load_failure"] == (
+        "RuntimeError: test gas datapack failure"
+    )
+
+    context, _experiment, reference, _prediction = _case(Engine.OPENIMCC, ())
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        handles={"openimcc": handle},
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert residual.refusal.detail["reason"] == (
+        "openimcc_feo_standard_melt_pack_identity_missing"
+    )
 
 
 @pytest.mark.parametrize(
