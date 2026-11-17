@@ -2014,8 +2014,24 @@ def _assert_engine_notice_hot_round_trip(
     )
 
     cold_notices, _authority, _band = engine_flags_from_result(result)
-    hot = equilibrium_to_hot(vars(result), engine_id=engine_id).hot
-    restored = equilibrium_cache_from_value(hot, engine_id=engine_id)
+    cache_request = {
+        "call": "engine notice HOT round trip",
+        "result_id": id(result),
+    }
+    engine_cache.cached_engine_call(
+        engine_id,
+        cache_request,
+        lambda: equilibrium_to_hot(
+            vars(result), engine_id=engine_id, live_value=result
+        ),
+    )
+    engine_cache._MEMORY_CACHE.clear()
+    restored_hot = engine_cache.cached_engine_call(
+        engine_id,
+        cache_request,
+        lambda: pytest.fail("expected the warmed notice HOT cache result"),
+    )
+    restored = equilibrium_cache_from_value(restored_hot, engine_id=engine_id)
     warm_notices, _authority, _band = engine_flags_from_result(
         SimpleNamespace(**restored)
     )
@@ -2026,6 +2042,7 @@ def _assert_engine_notice_hot_round_trip(
 def test_engine_notice_emitters_use_registered_codes(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    request: pytest.FixtureRequest,
 ) -> None:
     pytest.importorskip("openimcc")
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -2042,6 +2059,7 @@ def test_engine_notice_emitters_use_registered_codes(
     )
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "")
+    request.addfinalizer(engine_cache._close_connections)
 
     openimcc_kinds: set[str] = set()
 

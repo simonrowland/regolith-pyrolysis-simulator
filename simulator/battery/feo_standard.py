@@ -228,6 +228,11 @@ def _resolve_feo_activity_standard(
         coefficient_sources,
         "openimcc-melt-binding:sha256:",
     )
+    if melt_binding_digest is None:
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {"reason": "openimcc_feo_standard_melt_pack_identity_missing"},
+        )
     if melt_pack_identity is not None:
         identity, identity_refusal = _validate_openimcc_melt_pack_identity(
             melt_pack_identity
@@ -235,10 +240,7 @@ def _resolve_feo_activity_standard(
         if identity_refusal is not None:
             return None, identity_refusal
         assert identity is not None
-        if (
-            melt_binding_digest is not None
-            and melt_binding_digest != identity["binding_digest"]
-        ):
+        if melt_binding_digest != identity["binding_digest"]:
             return None, ResidualRefusal(
                 RefusalReason.METRIC_DOMAIN,
                 {
@@ -260,11 +262,6 @@ def _resolve_feo_activity_standard(
                 {"reason": reason, "melt_pack_identity": identity, "detail": str(exc)},
             )
     else:
-        if melt_binding_digest is None:
-            return None, ResidualRefusal(
-                RefusalReason.METRIC_DOMAIN,
-                {"reason": "openimcc_feo_standard_melt_pack_identity_missing"},
-            )
         try:
             pack_name, identity, pack_payload = (
                 _openimcc_melt_pack_payload_for_digest(melt_binding_digest)
