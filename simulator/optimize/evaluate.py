@@ -4842,6 +4842,19 @@ def _notes_for_executed_campaign_score(
     return existing + (note,)
 
 
+def _with_infeasible_furnace_amortization_status(
+    run_reference: RunReference,
+) -> RunReference:
+    product_summary = dict(run_reference.product_summary)
+    product_summary.update(
+        {
+            "furnace_amortization_status": "not_evaluated_infeasible",
+            "furnace_amortization_cost_per_run_usd": None,
+        }
+    )
+    return replace(run_reference, product_summary=product_summary)
+
+
 def _infeasible_result(
     candidate_id: str | None,
     spec: EvalSpec,
@@ -4876,7 +4889,13 @@ def _infeasible_result(
         objectives=objectives,
         feasibility_margins=feasibility.margins,
         failing_gates=feasibility.failing_gates,
-        run_reference=_run_reference(run_execution, profile, trace_payload=trace_payload),
+        run_reference=_with_infeasible_furnace_amortization_status(
+            _run_reference(
+                run_execution,
+                profile,
+                trace_payload=trace_payload,
+            )
+        ),
         notes=notes,
     )
 
@@ -4918,10 +4937,12 @@ def _target_infeasible_result(
         failure_category=FailureCategory.INFEASIBLE_RECIPE,
         feasibility_margins={gate: margin},
         failing_gates=(gate,),
-        run_reference=_run_reference(
-            run_execution,
-            profile,
-            trace_payload=trace_payload,
+        run_reference=_with_infeasible_furnace_amortization_status(
+            _run_reference(
+                run_execution,
+                profile,
+                trace_payload=trace_payload,
+            )
         ),
         notes=notes,
     )
@@ -5323,10 +5344,12 @@ def _pumping_infeasible_result(
         ),
         feasibility_margins={PUMPING_FEASIBILITY_GATE: margin},
         failing_gates=(PUMPING_FEASIBILITY_GATE,),
-        run_reference=_run_reference(
-            run_execution,
-            profile,
-            trace_payload=trace_payload,
+        run_reference=_with_infeasible_furnace_amortization_status(
+            _run_reference(
+                run_execution,
+                profile,
+                trace_payload=trace_payload,
+            )
         ),
         notes=(margin.detail,),
     )
@@ -5550,19 +5573,21 @@ def _out_of_domain_result(
             )
         },
         failing_gates=("backend_domain",),
-        run_reference=_run_reference(
-            run_execution,
-            profile,
-            trace_payload=_trace_payload_with_backend_status_reason(
+        run_reference=_with_infeasible_furnace_amortization_status(
+            _run_reference(
                 run_execution,
-                assessment.trace_payload,
-            ),
-            # The gate reached this verdict; the stored artifact must say so.
-            # Without it an explicit `ok` carrying a crash point persists as
-            # `ok` -- and then canonicalises to authoritative, certifiable and
-            # a green operator badge for a candidate this very result is
-            # pruning as out of domain.
-            decided_backend_status="out_of_domain",
+                profile,
+                trace_payload=_trace_payload_with_backend_status_reason(
+                    run_execution,
+                    assessment.trace_payload,
+                ),
+                # The gate reached this verdict; the stored artifact must say so.
+                # Without it an explicit `ok` carrying a crash point persists as
+                # `ok` -- and then canonicalises to authoritative, certifiable and
+                # a green operator badge for a candidate this very result is
+                # pruning as out of domain.
+                decided_backend_status="out_of_domain",
+            )
         ),
         notes=(
             *assessment.notes,
@@ -5591,12 +5616,14 @@ def _preflight_out_of_domain_result(
         failure_category=FailureCategory.OUT_OF_DOMAIN,
         feasibility_margins={"backend_domain": _out_of_domain_margin(reason)},
         failing_gates=("backend_domain",),
-        run_reference=RunReference(
-            status="failed",
-            reason=reason,
-            trace=trace,
-            backend_status="out_of_domain",
-            backend_status_reason=reason,
+        run_reference=_with_infeasible_furnace_amortization_status(
+            RunReference(
+                status="failed",
+                reason=reason,
+                trace=trace,
+                backend_status="out_of_domain",
+                backend_status_reason=reason,
+            )
         ),
         notes=(
             "backend_status=out_of_domain",

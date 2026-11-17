@@ -41,6 +41,7 @@ from simulator.electrolysis import (
 )
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.optimize import cli as optimizer_cli
+import simulator.optimize.evaluate as evaluation_module
 from simulator.optimize import physics as physics_module
 from simulator.optimize import pool as optimizer_pool
 from simulator.optimize import study
@@ -57,8 +58,10 @@ from simulator.optimize.knob_saturation import compute_knob_saturation
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     LEGACY_ENERGY_KWH_METRIC,
+    ObjectiveComputationError,
     ObjectiveValue,
     ObjectiveVector,
+    cost_adjusted_objective_scores,
     compute_objectives,
     furnace_amortization_cost_per_run,
     objective_definitions,
@@ -3773,6 +3776,8 @@ def test_parallel_composition_target_stub_study_completes(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
+    from simulator.optimize import objective as objective_module
+
     monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
     profile_path = tmp_path / "lunar_mare_low_ti__pc-glass-retain-na-k-c3.real.yaml"
     assert (
@@ -3819,11 +3824,11 @@ def test_parallel_composition_target_stub_study_completes(
     # per-campaign load is higher than the run cumulative load because this
     # 24-hour run represents 24/35 of a campaign. The thermal remobilization
     # flag is diagnostic and does not subtract mass from the committed ledger.
-    # The thermo step s003 still sits on the 2200 C ceiling and refuses SiO at
-    # 1773.15 K on stage_0_to_stage_1 and stage_1_to_stage_2. d-401 books its
-    # positive supply upper bound, so s003 has a finite deposit/lifetime
-    # projection and objective values; it remains feasible but is dominated
-    # on the Pareto objectives.
+    # The thermo step s003 still sits on the 2200 C ceiling. At 1773.15 K the
+    # d-402 pO2-free SiO route resolves wall saturation; d-401 then classifies
+    # its run-total supply below ledger resolution as an authorized zero. The
+    # other booked deposits keep s003's lifetime projection and objective
+    # values finite; it remains feasible but is dominated on Pareto objectives.
     priced_ids = {
         "morris-screen-0-t0000-s000",
         "morris-screen-0-t0000-s001",
@@ -3895,10 +3900,13 @@ def test_parallel_composition_target_stub_study_completes(
         wall_authority = summary["wall_deposit_sticking_authority"]
         refused = wall_authority.get("wall_saturation_pressure_refused_species") or []
         if candidate.candidate_id == hot_id:
-            # d-402 / 37143839d3a: at 1773.15 K, the pO2-free route
-            # 2 SiO(g) -> Si(s) + SiO2(s) has nu_O2=0. The production
-            # resolver returns 2730.832886566473 Pa and flags its use, so
-            # this wall pressure is resolved rather than refused.
+            # d-402 / 6927b5116c: at 1773.15 K, the resolved pO2-free route
+            # is 2 SiO(g) -> Si(l) + SiO2 on NASA rows
+            # NG-1135/NG-1859/NG-1864. It resolves to 2730.83 Pa and carries
+            # wall_pO2_unknown_pO2_free_route_used. JANAF gives 3008 Pa for
+            # liquid Si + cristobalite; the phase-selection issue is tracked
+            # as b-1246. Do not pin the pressure while those phase choices
+            # remain different.
             assert "SiO" not in list(refused)
             assert "SiO" not in (
                 wall_authority.get("wall_saturation_pressure_refusals_by_species")
@@ -3909,35 +3917,70 @@ def test_parallel_composition_target_stub_study_completes(
             bounds = summary[
                 "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
             ]
-            # Product booking keeps the 24-hour run integral in kg/run.
-            # This fixture spans 24/35 campaign, so its published authority
-            # is that total divided by 24/35 (factor 35/24). Under d-430/d-431,
-            # booked species mass stays separate from any unlocated bound;
-            # this total sums only the booked per-species masses.
-            sio_booking = next(item for item in bookings if item["species"] == "SiO")
+            sio_booking = next(
+                item
+                for item in bookings
+                if item["species"] == "SiO"
+            )
             assert bounds["SiO"] == pytest.approx(
                 sio_booking["supply_upper_bound_kg"] / (24.0 / 35.0)
             )
-            assert summary["wall_deposit_kg_by_species"]["SiO"] == pytest.approx(
-                bounds["SiO"]
+            assert sio_booking["reason"] == "below_wall_supply_upper_bound"
+            assert sio_booking["deposit_kg"] == 0.0
+            assert "flag" not in sio_booking
+            assert 0.0 < sio_booking["supply_upper_bound_kg"]
+            assert (
+                sio_booking["supply_upper_bound_kg"]
+                < sio_booking["ledger_resolution_kg"]
+            )
+            assert "SiO" not in summary["wall_deposit_kg_by_species"]
+
+            # The segment map is kg/run and contains only located deposit.
+            # Grouping it independently, then dividing by the elapsed
+            # 24/35 campaign fraction, gives the located kg/campaign total.
+            located_by_species_run: dict[str, float] = {}
+            for species_by_segment in summary[
+                "wall_deposit_kg_by_segment_species"
+            ].values():
+                for species, kilograms in species_by_segment.items():
+                    located_by_species_run[species] = (
+                        located_by_species_run.get(species, 0.0) + kilograms
+                    )
+            located_total_run_kg = sum(located_by_species_run.values())
+            located_total_per_campaign_kg = located_total_run_kg / (24.0 / 35.0)
+            assert summary["wall_deposit_cumulative_total_kg"] == pytest.approx(
+                located_total_run_kg
             )
             assert summary["wall_deposit_total_kg"] == pytest.approx(
-                sum(summary["wall_deposit_kg_by_species"].values())
+                located_total_per_campaign_kg
+            )
+            assert bounds["SiO"] > 0.0
+            assert sio_booking["ledger_resolution_kg"] == (
+                objective_module._mass_balance_ledger_resolution_kg(
+                    profile["run"]["mass_kg"]
+                )
             )
             assert summary["campaigns_to_resinter_worst_segment"].startswith(
                 "resinter_threshold_kg / "
             )
             assert summary["supply_interval_upper_bound_used"]["SiO"] > 0
-            assert sio_booking["flag"] == "wall_deposit_upper_bound_used"
-            assert sio_booking["deposit_kg"] == pytest.approx(
-                sio_booking["supply_upper_bound_kg"]
+            assert "SiO" not in summary["wall_deposit_cumulative_kg_by_species"]
+
+            # d-431 keeps the unlocated alternative out of booked wall mass
+            # and adds positive unlocated bounds once to the aggregate
+            # re-sinter load. The below-resolution SiO zero is not in U.
+            unlocated = summary["unlocated_supply_bound_worst_segment"]
+            unlocated_run_kg = sum(
+                unlocated["supply_kg_by_species"].values()
             )
-            assert sio_booking["deposit_kg"] > 0.0
-            assert summary["wall_deposit_cumulative_kg_by_species"]["SiO"] == pytest.approx(
-                sio_booking["deposit_kg"]
+            aggregate_run_kg = located_total_run_kg + unlocated_run_kg
+            assert "SiO" not in unlocated["supply_kg_by_species"]
+            assert unlocated["aggregate_potential_load_kg"] == pytest.approx(
+                aggregate_run_kg
             )
-            assert summary["wall_deposit_cumulative_total_kg"] == pytest.approx(
-                sum(summary["wall_deposit_cumulative_kg_by_species"].values())
+            aggregate_per_campaign_kg = aggregate_run_kg / (24.0 / 35.0)
+            assert summary["aggregate_campaigns_to_resinter"] == (
+                f"resinter_threshold_kg / {aggregate_per_campaign_kg:.12g}"
             )
         else:
             assert "SiO" not in list(refused)
@@ -6139,6 +6182,156 @@ def test_fidelity_pilot_profile_defaults_to_physics_constraints() -> None:
     assert isinstance(constraints, PhysicsConstraintSet)
 
 
+def test_infeasible_results_declare_furnace_amortization_not_evaluated(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    patch = RecipePatch({})
+    spec = _spec(patch, FEEDSTOCK, "internal-analytical", PROFILE)
+    execution = SimpleNamespace(status="ok", trace={})
+    reference_calls: list[dict[str, Any]] = []
+
+    def run_reference(*args: Any, **kwargs: Any) -> RunReference:
+        reference_calls.append(kwargs)
+        return RunReference(
+            status="ok",
+            product_summary={"furnace_amortization_status": "available"},
+        )
+
+    monkeypatch.setattr(evaluation_module, "_run_reference", run_reference)
+    monkeypatch.setattr(
+        evaluation_module,
+        "_trace_payload_with_interpolation_feasibility",
+        lambda trace, *_args: trace,
+    )
+    monkeypatch.setattr(
+        evaluation_module,
+        "_abort_on_mass_balance_breach",
+        lambda *_args, **_kwargs: None,
+    )
+    monkeypatch.setattr(
+        evaluation_module,
+        "_assess_rump_terminal",
+        lambda *_args: SimpleNamespace(earned=False, notes=(), trace_payload={}),
+    )
+    monkeypatch.setattr(
+        evaluation_module,
+        "composition_targets_require_terminal_rump",
+        lambda *_args: False,
+    )
+    monkeypatch.setattr(
+        evaluation_module,
+        "_latest_backend_status_reason",
+        lambda *_args: "backend-domain",
+    )
+    monkeypatch.setattr(
+        evaluation_module,
+        "_trace_payload_with_backend_status_reason",
+        lambda _execution, trace: trace,
+    )
+    monkeypatch.setattr(
+        evaluation_module,
+        "_out_of_domain_note",
+        lambda *_args: "out of domain",
+    )
+    monkeypatch.setattr(
+        evaluation_module,
+        "_out_of_domain_reason_notes",
+        lambda *_args: (),
+    )
+
+    infeasible = evaluation_module._infeasible_result(
+        "candidate",
+        spec,
+        cache_key(spec),
+        SimpleNamespace(
+            margins={"delivered_stream_purity": _margin(feasible=False)},
+            failing_gates=("delivered_stream_purity",),
+        ),
+        execution,
+        PROFILE,
+    )
+    target_infeasible = evaluation_module._target_infeasible_result(
+        "candidate",
+        spec,
+        cache_key(spec),
+        execution,
+        PROFILE,
+        gate="composition_target",
+        detail="target not met",
+        notes=(),
+    )
+    pumping_infeasible = evaluation_module._pumping_infeasible_result(
+        "candidate",
+        spec,
+        cache_key(spec),
+        execution,
+        PROFILE,
+        _margin(feasible=False),
+    )
+    out_of_domain = evaluation_module._out_of_domain_result(
+        "candidate",
+        spec,
+        cache_key(spec),
+        execution,
+        PROFILE,
+        patch=patch,
+        schema=RecipeSchema(),
+        constraints=None,
+    )
+    preflight_out_of_domain = evaluation_module._preflight_out_of_domain_result(
+        "candidate",
+        spec,
+        cache_key(spec),
+        "backend-domain",
+    )
+
+    for scored in (
+        infeasible,
+        target_infeasible,
+        pumping_infeasible,
+        out_of_domain,
+        preflight_out_of_domain,
+    ):
+        assert scored.run_reference is not None
+        assert (
+            scored.run_reference.product_summary["furnace_amortization_status"]
+            == "not_evaluated_infeasible"
+        )
+        assert (
+            scored.run_reference.product_summary[
+                "furnace_amortization_cost_per_run_usd"
+            ]
+            is None
+        )
+
+    assert len(reference_calls) == 4
+    assert all("cost_parameters" not in kwargs for kwargs in reference_calls)
+    assert all("coating_margin" not in kwargs for kwargs in reference_calls)
+
+    definitions = objective_definitions(PROFILE)
+    objectives = ObjectiveVector(
+        tuple(
+            ObjectiveValue(
+                definition.metric,
+                definition.sense,
+                1.0,
+                definition.units,
+                ordinal=definition.ordinal,
+            )
+            for definition in definitions
+        )
+    )
+    with pytest.raises(ObjectiveComputationError, match="not_evaluated_infeasible"):
+        cost_adjusted_objective_scores(
+            objectives,
+            definitions,
+            product_summary={
+                "furnace_amortization_status": "not_evaluated_infeasible",
+                "furnace_amortization_cost_per_run_usd": None,
+            },
+        )
+
+
 def test_feasibility_filter_excludes_infeasible_from_pareto_but_logs_provenance(tmp_path) -> None:
     study.run(
         PROFILE,
@@ -7793,8 +7986,8 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert summary["wall_deposit_kg_by_segment_species"] == {}
     assert summary["resinter_threshold_kg"] is None
     assert summary["has_positive_qualified_fouling"] is None
-    assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
-    assert summary["furnace_amortization_batch_cost_equivalents"] is None
+    assert summary["furnace_amortization_status"] == "not_evaluated_infeasible"
+    assert summary["furnace_amortization_cost_per_run_usd"] is None
 
 
 def test_constrained_max_nullable_lifespan_persists_and_round_trips(

@@ -1409,7 +1409,8 @@ def test_refused_empty_wall_deposit_is_unpriced_and_ranks_on_physical_objectives
     assert summary["campaigns_to_resinter_worst_segment"] is None
     assert summary["has_positive_qualified_fouling"] is None
     assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
-    assert "furnace_amortization_cost_per_run_usd" not in summary
+    assert "furnace_amortization_cost_per_run_usd" in summary
+    assert summary["furnace_amortization_cost_per_run_usd"] is None
     assert summary["furnace_amortization_batch_cost_equivalents"] is None
     assert cost_adjusted_objective_scores(
         {"oxygen_kg": 10.0, "energy_kWh": 1.0},

@@ -630,6 +630,8 @@ def test_freeze_gate_cache_key_distinguishes_nio_coo_moles(
 # base run timed out at 310.90 s total under the unchanged 300 s test limit.
 @pytest.mark.nightly
 def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
+    import sys
+
     from simulator.accounting.run_artifact import build_run_artifact
     from simulator.core import (
         PyrolysisSimulator,
@@ -720,21 +722,80 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 ((1018.75, 0.0), (1320.3125, 1.0)),
             ),
         ],
-        # Six standing reads occur in each of 12 hours. d-376 amendment 1's
-        # evaluated-pO2 capacity check also reads the liquid-fraction gate at
-        # evaporation.py:1561 in hours 10 and 11, adding one read in each.
-        # These are required consumers; all 74 records retain the same curve.
-        # d-297 rejects >1 wt% NiO before a retry. The stable refusal's
-        # qualified floor is reusable, unlike the old numerical failure.
-        'ci_carbonaceous_chondrite_C2B_12h': [
-            (
-                'C2B',
-                'kress91_liquid_calibration_floor',
-                1200.0,
-                1200.000001,
-                ((1200.0, 0.0), (1200.000001, 1.0)),
-            ),
-        ] * 74,
+    }
+    ci_scenario = 'ci_carbonaceous_chondrite_C2B_12h'
+    ci_curve_row = (
+        'C2B',
+        'kress91_liquid_calibration_floor',
+        1200.0,
+        1200.000001,
+        ((1200.0, 0.0), (1200.000001, 1.0)),
+    )
+    # A logical read is one consumer request for gate authority. Resolver
+    # acquisition belongs to its caller; a concrete-curve helper is a new
+    # request only when that same caller chain did not just resolve the curve.
+    # The measured 62 requests are 12 hours * (1 + 2 + 1 + 1) requests at
+    # four consumer sites, plus one SENTINEL resolve attributed to
+    # `_melt_redox_liquid_fraction_factor` at hours 10 and 11:
+    # `_langmuir_melt_redox_capacity_mol_per_ln_fO2` calls
+    # `_melt_redox_source_capacity_mol_per_ln_fO2` without `gate_authority`.
+    # Thus 10 * 5 + 2 * 6 = 62. Counts are unitless requests grouped into
+    # 50 (site, hour) bins, not curve rows or elapsed hours. The 12-hour run
+    # covers hours 0..11; the final hour has six requests and hour 12 has none.
+    # This measured structure is 62, not the previous 74-event accounting.
+    # Pin every observed (consumer site, melt hour) pair, and retain each
+    # request's curve row so site accounting cannot hide curve drift.
+    expected_logical_gate_reads: dict[tuple[str, int], int] = {
+        ('simulator.core._apply_oxygen_reservoir_exchange', 0): 1,
+        ('simulator.core._apply_oxygen_reservoir_exchange', 1): 1,
+        ('simulator.core._apply_oxygen_reservoir_exchange', 2): 1,
+        ('simulator.core._apply_oxygen_reservoir_exchange', 3): 1,
+        ('simulator.core._apply_oxygen_reservoir_exchange', 4): 1,
+        ('simulator.core._apply_oxygen_reservoir_exchange', 5): 1,
+        ('simulator.core._apply_oxygen_reservoir_exchange', 6): 1,
+        ('simulator.core._apply_oxygen_reservoir_exchange', 7): 1,
+        ('simulator.core._apply_oxygen_reservoir_exchange', 8): 1,
+        ('simulator.core._apply_oxygen_reservoir_exchange', 9): 1,
+        ('simulator.core._apply_oxygen_reservoir_exchange', 10): 1,
+        ('simulator.core._apply_oxygen_reservoir_exchange', 11): 1,
+        ('simulator.core._apply_fe_redox_respeciation', 0): 2,
+        ('simulator.core._apply_fe_redox_respeciation', 1): 2,
+        ('simulator.core._apply_fe_redox_respeciation', 2): 2,
+        ('simulator.core._apply_fe_redox_respeciation', 3): 2,
+        ('simulator.core._apply_fe_redox_respeciation', 4): 2,
+        ('simulator.core._apply_fe_redox_respeciation', 5): 2,
+        ('simulator.core._apply_fe_redox_respeciation', 6): 2,
+        ('simulator.core._apply_fe_redox_respeciation', 7): 2,
+        ('simulator.core._apply_fe_redox_respeciation', 8): 2,
+        ('simulator.core._apply_fe_redox_respeciation', 9): 2,
+        ('simulator.core._apply_fe_redox_respeciation', 10): 2,
+        ('simulator.core._apply_fe_redox_respeciation', 11): 2,
+        ('simulator.core._apply_native_fe_saturation_split', 0): 1,
+        ('simulator.core._apply_native_fe_saturation_split', 1): 1,
+        ('simulator.core._apply_native_fe_saturation_split', 2): 1,
+        ('simulator.core._apply_native_fe_saturation_split', 3): 1,
+        ('simulator.core._apply_native_fe_saturation_split', 4): 1,
+        ('simulator.core._apply_native_fe_saturation_split', 5): 1,
+        ('simulator.core._apply_native_fe_saturation_split', 6): 1,
+        ('simulator.core._apply_native_fe_saturation_split', 7): 1,
+        ('simulator.core._apply_native_fe_saturation_split', 8): 1,
+        ('simulator.core._apply_native_fe_saturation_split', 9): 1,
+        ('simulator.core._apply_native_fe_saturation_split', 10): 1,
+        ('simulator.core._apply_native_fe_saturation_split', 11): 1,
+        ('simulator.evaporation._freeze_gate_liquid_fraction_factor', 0): 1,
+        ('simulator.evaporation._freeze_gate_liquid_fraction_factor', 1): 1,
+        ('simulator.evaporation._freeze_gate_liquid_fraction_factor', 2): 1,
+        ('simulator.evaporation._freeze_gate_liquid_fraction_factor', 3): 1,
+        ('simulator.evaporation._freeze_gate_liquid_fraction_factor', 4): 1,
+        ('simulator.evaporation._freeze_gate_liquid_fraction_factor', 5): 1,
+        ('simulator.evaporation._freeze_gate_liquid_fraction_factor', 6): 1,
+        ('simulator.evaporation._freeze_gate_liquid_fraction_factor', 7): 1,
+        ('simulator.evaporation._freeze_gate_liquid_fraction_factor', 8): 1,
+        ('simulator.evaporation._freeze_gate_liquid_fraction_factor', 9): 1,
+        ('simulator.evaporation._freeze_gate_liquid_fraction_factor', 10): 1,
+        ('simulator.evaporation._freeze_gate_liquid_fraction_factor', 11): 1,
+        ('simulator.core._melt_redox_liquid_fraction_factor', 10): 1,
+        ('simulator.core._melt_redox_liquid_fraction_factor', 11): 1,
     }
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}
@@ -747,7 +808,13 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     original_redox_liquid_fraction = (
         PyrolysisSimulator._melt_redox_liquid_fraction_factor
     )
+    original_redox_temperature_shift = (
+        PyrolysisSimulator._melt_redox_temperature_shift_is_liquid
+    )
     original_equilibrate = MAGEMinBackend.equilibrate
+    logical_gate_reads: dict[tuple[str, int], list[tuple]] = {}
+    resolved_curves = []
+    current_read_scope = [None]
 
     def freeze_gate_curve_row(sim, curve):
         return (
@@ -757,6 +824,36 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             curve['liquidus_T_C'],
             tuple(tuple(point) for point in curve['path']),
         )
+
+    def read_scope_hour(sim):
+        hour = int(sim.melt.hour)
+        scope = (current_scenario[0], hour)
+        if current_read_scope[0] != scope:
+            resolved_curves.clear()
+            current_read_scope[0] = scope
+        return hour
+
+    def consumer_site(frame):
+        module = str(frame.f_globals.get('__name__', ''))
+        return f'{module}.{frame.f_code.co_name}'
+
+    def record_gate_read(sim, site, curve, hour):
+        logical_gate_reads.setdefault((site, hour), []).append(
+            freeze_gate_curve_row(sim, curve)
+        )
+
+    def resolved_in_call_chain(caller_frame, curve, hour):
+        frame = caller_frame
+        while frame is not None:
+            if any(
+                resolved_frame is frame
+                and resolved_curve is curve
+                and resolved_hour == hour
+                for resolved_frame, resolved_curve, resolved_hour in resolved_curves
+            ):
+                return True
+            frame = frame.f_back
+        return False
 
     def record_curve(sim, *args, **kwargs):
         record = original_record(sim, *args, **kwargs)
@@ -779,8 +876,9 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             )
         return record
 
-    # The sentinel marks a consumer requesting gate authority; consumers that
-    # pass an already-resolved authority are using the same read downstream.
+    # A sentinel resolver request is assigned to its immediate named consumer
+    # site. Remember that exact curve and caller frame so a concrete curve
+    # passed to a downstream helper in the same call chain is not counted twice.
     def record_logical_read(sim, *args, **kwargs):
         gate_authority = (
             args[0]
@@ -792,39 +890,75 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         )
         curve = original_resolve_gate(sim, *args, **kwargs)
         if (
-            current_scenario[0] == 'ci_carbonaceous_chondrite_C2B_12h'
+            current_scenario[0] == ci_scenario
             and not getattr(sim, '_c0_forecast_context', False)
             and gate_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY
             and isinstance(curve, dict)
         ):
-            observed.setdefault(current_scenario[0], []).append(
-                freeze_gate_curve_row(sim, curve)
+            hour = read_scope_hour(sim)
+            caller_frame = sys._getframe(1)
+            record_gate_read(
+                sim,
+                consumer_site(caller_frame),
+                curve,
+                hour,
             )
+            resolved_curves.append((caller_frame, curve, hour))
         return curve
 
-    # Redox capacity reads the fraction from an already-resolved curve, so it
-    # does not make another sentinel request at the resolver boundary.
     def record_resolved_capacity_read(
         sim,
         T_K,
         *,
         gate_authority=_RESOLVE_MELT_REDOX_GATE_AUTHORITY,
     ):
-        fraction = original_redox_liquid_fraction(
-            sim,
-            T_K,
-            gate_authority=gate_authority,
-        )
         if (
-            current_scenario[0] == 'ci_carbonaceous_chondrite_C2B_12h'
+            current_scenario[0] == ci_scenario
             and not getattr(sim, '_c0_forecast_context', False)
             and gate_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
             and isinstance(gate_authority, dict)
         ):
-            observed.setdefault(current_scenario[0], []).append(
-                freeze_gate_curve_row(sim, gate_authority)
-            )
-        return fraction
+            hour = read_scope_hour(sim)
+            caller_frame = sys._getframe(1)
+            if not resolved_in_call_chain(caller_frame, gate_authority, hour):
+                record_gate_read(
+                    sim,
+                    f'{consumer_site(caller_frame)}->_melt_redox_liquid_fraction_factor',
+                    gate_authority,
+                    hour,
+                )
+        return original_redox_liquid_fraction(
+            sim,
+            T_K,
+            gate_authority=gate_authority,
+        )
+
+    def record_resolved_temperature_shift_read(
+        sim,
+        T_K,
+        *,
+        gate_authority=_RESOLVE_MELT_REDOX_GATE_AUTHORITY,
+    ):
+        if (
+            current_scenario[0] == ci_scenario
+            and not getattr(sim, '_c0_forecast_context', False)
+            and gate_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+            and isinstance(gate_authority, dict)
+        ):
+            hour = read_scope_hour(sim)
+            caller_frame = sys._getframe(1)
+            if not resolved_in_call_chain(caller_frame, gate_authority, hour):
+                record_gate_read(
+                    sim,
+                    f'{consumer_site(caller_frame)}->_melt_redox_temperature_shift_is_liquid',
+                    gate_authority,
+                    hour,
+                )
+        return original_redox_temperature_shift(
+            sim,
+            T_K,
+            gate_authority=gate_authority,
+        )
 
     def count_equilibrium(self, *args, **kwargs):
         equilibrium_count[0] += 1
@@ -844,6 +978,11 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         PyrolysisSimulator,
         '_melt_redox_liquid_fraction_factor',
         record_resolved_capacity_read,
+    )
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        '_melt_redox_temperature_shift_is_liquid',
+        record_resolved_temperature_shift_read,
     )
     monkeypatch.setattr(MAGEMinBackend, 'equilibrate', count_equilibrium)
 
@@ -867,8 +1006,18 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             assert rebuild_counts.get(name, 0) == 1
             assert equilibrium_count[0] > equilibrations_before
 
-    c2b_scenario = 'ci_carbonaceous_chondrite_C2B_12h'
-    assert len(observed.get(c2b_scenario, ())) == len(expected[c2b_scenario])
+    observed_read_counts = {
+        site_hour: len(curves)
+        for site_hour, curves in logical_gate_reads.items()
+    }
+    assert observed_read_counts == expected_logical_gate_reads, (
+        f'observed logical gate reads by site and hour: {observed_read_counts!r}'
+    )
+    assert all(
+        curve == ci_curve_row
+        for curves in logical_gate_reads.values()
+        for curve in curves
+    )
     assert observed == expected
 
 
