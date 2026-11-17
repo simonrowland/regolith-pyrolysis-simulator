@@ -4592,7 +4592,11 @@ def test_optimizer_overlay_null_refused_species_stays_flux_bounded() -> None:
     )
     assert summary["coating_status"] == "warning"
     assert "coating_unavailable_reason" not in summary
-    assert summary["furnace_amortization_cost_per_run_usd"] is not None
+    # d-429: the flux bound keeps coating status known, but this run's
+    # qualified-fouling lifetime is unpriced. Exclude its furnace-cost term;
+    # the population comparison flags the exclusion instead of scoring zero.
+    assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
+    assert summary["furnace_amortization_cost_per_run_usd"] is None
 
 
 def test_parametric_null_campaign_deposit_is_unavailable(

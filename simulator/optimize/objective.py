@@ -4821,6 +4821,7 @@ def _furnace_amortization_summary(
     if has_positive_fouling is None or refusal is not None:
         payload = {
             "furnace_amortization_status": "batch_cost_unavailable",
+            "furnace_amortization_cost_per_run_usd": None,
             "furnace_amortization_batch_cost_equivalents": None,
         }
         if refusal is not None:
