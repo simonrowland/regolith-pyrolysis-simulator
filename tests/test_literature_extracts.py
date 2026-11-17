@@ -893,8 +893,8 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
         obs for obs in observations if "table1_added_fe_70017_31::T=1273.15" in obs.observation_id
     )
     assert natural.identity.temperature_K == added_fe.identity.temperature_K
-    assert "row=70017,31" in natural.locator.note
-    assert "row=70017,31" in added_fe.locator.note
+    assert natural.locator.row == "70017,31"
+    assert added_fe.locator.row == "70017,31"
     assert natural.experiment_id != added_fe.experiment_id
     assert migrator.result.experiments[natural.experiment_id].method.value.value == "emf_cell"
     assert migrator.result.experiments[added_fe.experiment_id].method.value.value == "emf_cell"
@@ -945,7 +945,7 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
         assert len(matches) == 1, (sample, temperature, condition)
         observation = matches[0]
         assert observation.experiment_id.endswith(f"::{row['experiment']}")
-        assert f"row={sample}" in observation.locator.note
+        assert observation.locator.row == str(sample)
         experiment = migrator.result.experiments[observation.experiment_id]
         assert experiment.sample.form is not None
         assert experiment.sample.form.state.value == "bulk rock"
@@ -6509,6 +6509,17 @@ def test_source_sha256_locator_requires_lowercase_64_digit_hex(digest):
         {"source_path": "text/paper.txt", "source_sha256": digest}
     )
     assert not vle._locator_ok({"source_sha256": "a" * 64})
+
+
+@pytest.mark.parametrize("coordinate", ["row", "column"])
+def test_row_and_column_are_locator_location_keys(coordinate):
+    assert vle._locator_ok({coordinate: "printed coordinate"})
+
+
+def test_locator_validator_rejects_unrecognized_key_even_with_known_location():
+    assert not vle._locator_ok(
+        {"row": "printed coordinate", "unreviewed_locator_axis": "value"}
+    )
 
 
 def _source_locator(root: Path, text: str) -> dict:
@@ -15461,11 +15472,13 @@ _SC456_SOURCE_IDS = (
 @pytest.mark.parametrize("source_id", _SC456_SOURCE_IDS, ids=_SC456_SOURCE_IDS)
 def test_sc456_assigned_extract_migrates_without_hard_issues(source_id: str) -> None:
     """Keep each SC-456 source independently migratable after evidence relabels."""
+
     source = EXTRACTS / f"{source_id}.yaml"
     migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
     migrator._migrate_extract(source)
     migrator.finalize()
     assert migrator.result.validation is not None
+    assert migrator.result.registry_issues == []
     assert migrator.result.validation.hard_issues == ()
 
 
@@ -15491,6 +15504,8 @@ def test_sc456_assigned_extract_migrates_without_hard_issues(source_id: str) -> 
     ],
 )
 def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
+    from simulator.battery.enums import Quantity
+
     extract_path = EXTRACTS / f"{source_id}.yaml"
     document = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
     migrator = battery_factories.migrate_one_extract(
@@ -15514,8 +15529,8 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
         ]
         assert migrated_ids, observation_id
 
-    for species in document["species"].values():
-        for row in species.get("observations", []):
+    for species_name, species in document["species"].items():
+        for row_index, row in enumerate(species.get("observations", [])):
             source_conditions = row.get("point_conditions") or {}
             if not source_conditions:
                 continue
@@ -15533,19 +15548,47 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
             for name, condition in source_conditions.items():
                 migrated_name = "temperature_K" if name == "temperature_C" else name
                 migrated_condition = observation.point_conditions.get(migrated_name)
+                locator = condition.get("locator")
+                condition_state = condition.get("state")
+                locator_path = (
+                    f"extract[data/literature/extracts/{source_id}.yaml]"
+                    f".species.{species_name}.observations[{row_index}]"
+                    f".point_conditions.{name}.locator"
+                )
+                unreported_total_pressure = (
+                    name == "total_pressure_Pa"
+                    and isinstance(condition_state, dict)
+                    and condition_state.get("tag") == "unknown"
+                    and condition_state.get("reason") == "not_published"
+                )
+                keeps_unknown_pressure = (
+                    observation.identity.quantity is not None
+                    and observation.identity.quantity.value
+                    is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+                )
+                if unreported_total_pressure and keeps_unknown_pressure and locator:
+                    assert migrated_condition is not None, locator_path
+                    assert migrated_condition.locator is not None, locator_path
+                    assert migrated_condition.state.tag.value == "unknown"
+                    assert migrated_condition.state.reason == "not_published"
+                elif unreported_total_pressure:
+                    assert migrated_condition is None
+                elif locator:
+                    assert migrated_condition is not None, locator_path
+                    assert migrated_condition.locator is not None, locator_path
                 if name in {"temperature_C", "temperature_K"}:
                     assert migrated_condition is not None
-                    assert migrated_condition.locator is not None
-                elif condition.get("locator") and migrated_condition is not None:
-                    assert migrated_condition.locator is not None
                 if (
-                    condition.get("state")
-                    and migrated_condition is not None
+                    condition_state
                     and name != "composition"
+                    and not unreported_total_pressure
                 ):
-                    assert migrated_condition.state.tag.value == condition["state"]["tag"]
-    assert not migrator.result.registry_issues
-    assert not migrator.result.validation.hard_issues
+                    assert migrated_condition is not None
+                    assert migrated_condition.state.tag.value == condition_state["tag"]
+    assert migrator.result.registry_issues == []
+    assert migrator.result.validation.hard_issues == ()
+
+
 def test_kroger_fingas_1935_alkali_silicate_equilibria_method_and_temperatures():
     from simulator.battery.enums import MethodToken
 

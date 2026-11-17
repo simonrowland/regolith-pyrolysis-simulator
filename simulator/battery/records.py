@@ -10,8 +10,8 @@ Ambiguity resolutions:
   missing dataclass field (``None``) means "not stored"; that is distinct
   from ``unknown`` (archival hole) and ``not_applicable`` (profile forbids
   the axis).
-- Locator keys are the existing extract SCHEMA set; at least one nonempty
-  location key is required when a Locator is present.
+- Locator fields retain structured locations and recognized extras; at least
+  one nonempty location fact is required when a Locator is present.
 - Reaction coefficients are ``fractions.Fraction`` (signed, products
   positive). Atom-balance is a validator concern, not a constructor
   default.
@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping
-from dataclasses import dataclass, fields, is_dataclass
+from dataclasses import dataclass, field, fields, is_dataclass
 from decimal import Decimal, localcontext
 from enum import StrEnum
 from fractions import Fraction
@@ -79,6 +79,8 @@ _LOCATOR_KEYS = (
     "table_caption_page",
     "table_continued",
     "table",
+    "row",
+    "column",
     "figure",
     "paragraph",
     "section",
@@ -88,6 +90,152 @@ _LOCATOR_KEYS = (
     "source_path",
     "record",
 )
+_LOCATOR_METADATA_KEYS = frozenset(
+    {"page_verification", "table_caption_page", "table_continued"}
+)
+
+# One vocabulary for aliases accepted by migration and extract validation.
+# Printed labels stay strings; grid indexes are one-based table positions.
+_LOCATOR_FIELD_ALIASES = {
+    "row_label": "row",
+    "column_header": "column",
+    "column_label": "column",
+    "table_row": "table_row_number",
+    "table_column": "table_column_number",
+    "pdf_page": "page",
+    "journal_page": "published_page",
+    "printed_page": "published_page",
+    "continuation_pdf_page_index": "pdf_page_index",
+    "appendix": "section",
+    "heading": "section",
+    "section_header_as_printed": "section",
+    "subsection": "section",
+    "paragraph b": "paragraph",
+    "line": "line_range",
+    "table_file": "source_path",
+    "file": "source_path",
+    "path": "source_path",
+    "pdf": "source_path",
+    "source_file": "source_path",
+    "pdftotext_layout_page_file": "source_path",
+    "quotes_path": "source_path",
+    "table_id": "table",
+    "table_key": "table",
+    "table_index": "table",
+    "citation_id": "record",
+}
+
+_LOCATOR_EXTRA_KEYS = frozenset(
+    {
+        "abstract",
+        "additional_locator",
+        "additional_page",
+        "additional_published_page",
+        "attribution",
+        "authors",
+        "bbox",
+        "buffer",
+        "byte_end",
+        "byte_start",
+        "candidate_row",
+        "cas_line",
+        "canonical_unit",
+        "caption",
+        "cell_range",
+        "citation",
+        "component",
+        "coefficient_lines",
+        "complete_source_block_sha256",
+        "continued_page",
+        "continuation_from_locator",
+        "continuation_locator",
+        "curve",
+        "derivation",
+        "draft_row",
+        "end_line",
+        "equation_result",
+        "equations",
+        "extraction",
+        "extraction_method",
+        "figures",
+        "footnote",
+        "header",
+        "header_line",
+        "html_row",
+        "html_row_id",
+        "linked_table_1_run_label_as_printed",
+        "mark",
+        "marker",
+        "marker_count",
+        "marker_symbol",
+        "markers",
+        "mineru_chunk",
+        "mineru_page_idx",
+        "mineru_table_index",
+        "name_line",
+        "not chamber background pressure",
+        "note_block_sha256",
+        "page_date",
+        "pages",
+        "panel",
+        "paragraphs",
+        "pdf_page_indices",
+        "pdf_pages",
+        "pdftotext_layout_page_file",
+        "phase",
+        "phase_label",
+        "pixel_read_1_page",
+        "pixel_read_2_page",
+        "point",
+        "point_id",
+        "polythermal_figure",
+        "polythermal_published_page",
+        "printed_pages",
+        "printed_cell",
+        "published_pages",
+        "quote",
+        "quote_en",
+        "reading",
+        "reference",
+        "references",
+        "repaired_table_path",
+        "row_group",
+        "rows",
+        "run_footnote_as_printed",
+        "sample",
+        "sections",
+        "series",
+        "series_numeral",
+        "sheet",
+        "species_row",
+        "source_location",
+        "source_sha256",
+        "standard",
+        "statistic",
+        "subrow",
+        "sulphates and oxides in silicate melts",
+        "supporting_prose",
+        "symbol",
+        "system",
+        "table_phase_column",
+        "table_sha256",
+        "table_system",
+        "tables",
+        "technique",
+        "temperature_C",
+        "unit_as_printed",
+        "url",
+    }
+)
+
+
+def _locator_field_target(name: str, value: object) -> str:
+    """Resolve a locator spelling to its fact, keeping labels apart from indexes."""
+    if name == "row" and type(value) is int:
+        return "table_row_number"
+    if name == "column" and type(value) is int:
+        return "table_column_number"
+    return _LOCATOR_FIELD_ALIASES.get(name, name)
 
 
 def _decimal_from_scalar(value: object) -> Decimal:
@@ -467,7 +615,11 @@ def as_fraction(value: object) -> Fraction:
 
 @dataclass(frozen=True)
 class Locator:
-    """Extract SCHEMA locator; page is one-based physical PDF page, pdf_page_index is zero-based, and published_page is the printed folio (which may be absent or non-numeric)."""
+    """Extract location; labels and positional table coordinates are distinct.
+
+    Page is the one-based physical PDF page, pdf_page_index is zero-based, and
+    published_page is the printed folio (which may be absent or non-numeric).
+    """
 
     page: str | int | None = None
     published_page: str | int | None = None
@@ -476,6 +628,10 @@ class Locator:
     table_caption_page: int | None = None
     table_continued: bool | None = None
     table: str | None = None
+    row: str | None = field(default=None, repr=False)
+    column: str | None = field(default=None, repr=False)
+    table_row_number: int | None = None
+    table_column_number: int | None = None
     figure: str | None = None
     paragraph: str | None = None
     section: str | None = None
@@ -484,10 +640,28 @@ class Locator:
     note: str | None = None
     source_path: str | None = None
     record: str | None = None
+    extras: Mapping[str, object] | None = field(
+        default=None, repr=False, hash=False
+    )
 
     def __post_init__(self) -> None:
+        if self.extras is not None:
+            if not isinstance(self.extras, Mapping):
+                raise TypeError("Locator.extras must be a mapping")
+            if any(not isinstance(name, str) for name in self.extras):
+                raise TypeError("Locator.extras keys must be strings")
         if not self.has_location():
             raise ValueError("Locator requires at least one nonempty location key")
+        for name in ("row", "column"):
+            label = getattr(self, name)
+            if label is not None and not isinstance(label, str):
+                raise TypeError(f"{name} must be a printed label string")
+        for name in ("table_row_number", "table_column_number"):
+            coordinate = getattr(self, name)
+            if coordinate is not None and type(coordinate) is not int:
+                raise TypeError(f"{name} must be an integer table index")
+            if coordinate is not None and coordinate < 1:
+                raise ValueError(f"{name} must be a positive one-based table index")
         if self.table_caption_page is not None:
             if type(self.table_caption_page) is not int:
                 raise TypeError("table_caption_page must be an integer physical page")
@@ -501,13 +675,20 @@ class Locator:
 
     def has_location(self) -> bool:
         for name in _LOCATOR_KEYS:
-            if name in {"page_verification", "table_caption_page", "table_continued"}:
+            if name in _LOCATOR_METADATA_KEYS:
                 continue
             raw = getattr(self, name)
             if raw is None:
                 continue
             if isinstance(raw, str) and not raw.strip():
                 continue
+            return True
+        if self.extras is not None and any(
+            name != "source_sha256"
+            and value is not None
+            and not (isinstance(value, str) and not value.strip())
+            for name, value in self.extras.items()
+        ):
             return True
         return False
 

@@ -147,8 +147,8 @@ def test_tachibana_2002_migration_preserves_conditions_for_every_row() -> None:
         if is_mass_loss_fraction:
             expected_condition_keys.update({"composition", "printed_composition"})
         assert set(conditions) == expected_condition_keys
-        expected_row = observation.locator.note.removeprefix("row=")
-        assert observation.locator.note == f"row={expected_row}"
+        expected_row = observation.locator.row
+        assert expected_row is not None and expected_row.isdecimal()
         raw_row = raw_rows[int(expected_row) - 1]
         for key in conditions:
             assert conditions[key].state.is_value
@@ -176,10 +176,10 @@ def test_tachibana_2002_migration_preserves_conditions_for_every_row() -> None:
             assert total_pressure.value == expected_pressure
 
     fraction_rows = {
-        observation.locator.note.removeprefix("row="): observation
+        observation.locator.row: observation
         for observation in result.observations.values()
         if observation.locator is not None
-        and observation.locator.note is not None
+        and observation.locator.row is not None
         and observation.identity.quantity.is_value
         and observation.identity.quantity.value.value == "mass_loss_fraction"
     }

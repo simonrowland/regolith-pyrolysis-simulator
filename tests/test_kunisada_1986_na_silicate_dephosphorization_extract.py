@@ -498,7 +498,7 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
             assert closure_error in row.identity.composition.reason
         assert row.locator.page == page
         assert row.locator.table == table
-        assert row.locator.note is not None or row.locator.table == "2"
+        assert row.locator.row == row_label
         for axis in (row.identity.total_pressure_Pa, row.identity.fO2_Pa):
             assert axis.is_unknown
         assert row.point_conditions["total_pressure_Pa"].state.is_unknown
@@ -537,9 +537,7 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
             assert point_composition.locator.note == sample_composition[
                 "locator"
             ]["note"]
-            assert source_row["locator"]["row_label"] in (
-                point_composition.locator.note
-            )
+            assert point_composition.locator.row == source_row["locator"]["row_label"]
             expected_sum = sum(
                 (
                     Decimal(amount)
