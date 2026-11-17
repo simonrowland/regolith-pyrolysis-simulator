@@ -1013,12 +1013,22 @@ def test_pending_validation_is_not_refusal() -> None:
 
 
 @pytest.mark.parametrize(
-    ("temperature_K", "expected_out_of_range"),
-    ((448.15, True), (1800.0, False), (2300.0, True)),
+    (
+        "temperature_K",
+        "expected_fe_out_of_range",
+        "expected_nio_out_of_range",
+    ),
+    (
+        (448.15, True, True),
+        # 1800 K is below FeO's 1809 K floor; NiO remains in-range.
+        (1800.0, True, False),
+        (2300.0, True, True),
+    ),
 )
 def test_t609_real_rows_stay_status_bearing_through_request_layer(
     temperature_K: float,
-    expected_out_of_range: bool,
+    expected_fe_out_of_range: bool,
+    expected_nio_out_of_range: bool,
 ) -> None:
     payload = _yaml("vapor_pressures.yaml")
     catalog = compile_vapour_rail_catalog(
@@ -1049,6 +1059,11 @@ def test_t609_real_rows_stay_status_bearing_through_request_layer(
     )
 
     for species_id in ("FeO_association_gas", "NiO_gas"):
+        expected_out_of_range = (
+            expected_fe_out_of_range
+            if species_id == "FeO_association_gas"
+            else expected_nio_out_of_range
+        )
         answer = batch.channel(species_id)
         assert answer.source_account == "process.cleaned_melt"
         assert answer.validation_status == "pending_validation"

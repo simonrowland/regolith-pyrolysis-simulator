@@ -15191,12 +15191,12 @@ families:
               evaluator_family: antoine
               # Premise: p_Fe is pure-Fe saturation at a_Fe = 1 (metals.Fe.pure_component_antoine,
               # REF-012 CRC/NIST, C = 0), not the VapoRock effective fit. At fixed pO2,
-              # d ln p_FeO / d(1/T) = -(ΔH_vap,Fe + ΔH_assoc)/R = -ΔfH(FeO,g)/R.
-              # JANAF Fe-021 ΔfH°(298.15 K) = +251.040 kJ/mol, so p_FeO falls as T falls.
+              # d ln p_FeO / d(1/T) = -(dH_vap,Fe + dH_assoc)/R = -dHf(FeO,g)/R.
+              # JANAF Fe-021 dHf_deg(298.15 K) = +251.040 kJ/mol, so p_FeO falls as T falls.
               # Algebra: log10(p_Fe/Pa) = A - B/(T+C). With C = 0, d log10 p / d(1/T) = -B
-              # = -ΔH_vap/(R ln 10). The activity-folded fit A=9.408547, B=23312.312336, C=1000 has
-              # d log10 p / d(1/T) = -B T²/(T+C)², only 152 kJ/mol at 1400 K and flatter
-              # below the band, so |ΔH_assoc| won and p_FeO rose as T fell.
+              # = -dH_vap/(R ln 10). The activity-folded fit A=9.408547, B=23312.312336, C=1000 has
+              # d log10 p / d(1/T) = -B T^2/(T+C)^2, only 152 kJ/mol at 1400 K and flatter
+              # below the band, so |dH_assoc| won and p_FeO rose as T fell.
               # Units: A dimensionless in log10(Pa), B in K, C in K. Sanity: at 1500 K,
               # JANAF Fe-008/Fe-007/Fe-021 give p_FeO = 1.248 Pa at pO2 = 1.5e-3 bar
               # (a_Fe = 1). This liquid Antoine's construction support starts at 1809 K,
@@ -15234,8 +15234,8 @@ families:
             # Algebra: e_O2=-nu_O2/nu_FeO=-(-0.5)/1=+0.5; the compiler derives
             # this from source_reactions and emits CHANNEL_O2. No pO2 exponent is stored.
             # Unit check: K, p_Fe/Pstd, and pO2/Pstd are dimensionless; Pstd restores Pa.
-            # Sanity: at 1800 K and 1 bar O2, JANAF Fe-008/Fe-021 give K ≈ 217,
-            # so p_FeO/p_Fe(pure) ≈ 217; lowering pO2 by 100 lowers that ratio by 10.
+            # Sanity: at 1800 K and 1 bar O2, JANAF Fe-008/Fe-021 give K ~= 217,
+            # so p_FeO/p_Fe(pure) ~= 217; lowering pO2 by 100 lowers that ratio by 10.
     fiat_routing:
       plant_bin: null
       engineering_capture_policy: temperature_threshold
