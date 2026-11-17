@@ -23064,6 +23064,7 @@ class _ResidualJsonlStream:
         path: Path,
         *,
         root: Path | None = None,
+        store_stamp: Mapping[str, object] | None = None,
         sort_on_finalize: bool = True,
         compact_static_refusals: bool = False,
     ) -> None:
@@ -23072,7 +23073,11 @@ class _ResidualJsonlStream:
         self.root = root or REPO_ROOT
         self.compact_static_refusals = compact_static_refusals
         self.static_refusal_counts: Counter[tuple[str, str, str]] = Counter()
-        self.store_stamp = derive_store_stamp(self.root)
+        self.store_stamp = (
+            derive_store_stamp(self.root)
+            if store_stamp is None
+            else dict(store_stamp)
+        )
         path.parent.mkdir(parents=True, exist_ok=True)
         self.file = self.partial_path.open("wb")
         self.file.write(
