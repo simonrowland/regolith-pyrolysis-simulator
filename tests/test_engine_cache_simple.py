@@ -2154,15 +2154,11 @@ def test_real_battery_notice_emitters_are_registered_and_survive_hot(
     internal_notices = _assert_engine_notice_hot_round_trip(
         "internal-analytical", internal_floor_and_band
     )
-    for source_field in (
-        "extrapolated_beyond_valid_range_K",
-        "ellingham_extrapolated_beyond_fit_range_K",
-    ):
-        assert any(
-            row["kind"] == "out_of_certified_band"
-            and row["reason"].startswith(f"{source_field}:")
-            for row in internal_notices
-        )
+    assert any(
+        row["kind"] == "out_of_certified_band"
+        and row["reason"].startswith("extrapolated_beyond_valid_range_K:")
+        for row in internal_notices
+    )
 
     authority_core = _new_internal_analytical_core()
     internal_authority_limit = _internal_analytical_vapor_pressure_adapter(
@@ -2182,6 +2178,36 @@ def test_real_battery_notice_emitters_are_registered_and_survive_hot(
         row["kind"] == "out_of_certified_band"
         and row["reason"].startswith("vapor_pressure_authority:Mg:")
         for row in authority_notices
+    )
+
+    # Mg is the metals/Mg row with parent_oxide MgO and no
+    # standard_reaction_term fit target, so this request takes its Ellingham
+    # gas-fugacity route. At 4500 K it is beyond the Mg fit range.
+    ellingham_core = _new_internal_analytical_core()
+    ellingham_extrapolation = _internal_analytical_vapor_pressure_adapter(
+        core=ellingham_core,
+        temperature_C=4500.0 - 273.15,
+        pressure_bar=1.0,
+        composition_kg={"MgO": 1.0},
+        composition_mol=None,
+        fO2_log=None,
+        po2_request=Po2Request(mode="commanded", po2_bar=1.0e-30),
+        include_diagnostic_shadows=False,
+    )
+    ellingham_notices = _assert_engine_notice_hot_round_trip(
+        "internal-analytical", ellingham_extrapolation
+    )
+    assert any(
+        row["kind"] == "out_of_certified_band"
+        and row["reason"].startswith(
+            "ellingham_extrapolated_beyond_fit_range_K:Mg:"
+        )
+        for row in ellingham_notices
+    )
+    assert any(
+        row["kind"] == "out_of_certified_band"
+        and row["reason"].startswith("ellingham_authority:Mg:")
+        for row in ellingham_notices
     )
     assert any(row["kind"] == "floor_inversion" for row in internal_notices)
 
