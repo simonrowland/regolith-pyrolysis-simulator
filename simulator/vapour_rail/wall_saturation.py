@@ -9,31 +9,38 @@ resolved Gibbs terms to that function. It does not contain a second K.
 Phase selection
 ---------------
 Premise. At fixed T and the table standard pressure, the stable pure
-condensed phase is the one with the lowest Gibbs energy, activity 1. A NASA
-record whose phase is ``L`` is liquid. A JANAF ``state`` of ``l`` is liquid.
-Gas records are the vapour or O2, never a product. Every other cited phase
-is a solid. A published interval with ``T_min >= T_max`` is degenerate:
-``Nasa9Segment`` rejects it, and it is not a temperature record. Skipping it
-leaves the covering interval's G unchanged.
+condensed phase among records whose published interval contains T is the
+one with the lowest Gibbs energy, activity 1. A NASA record whose phase is
+``L`` is liquid. A JANAF ``state`` of ``l`` is liquid. Gas records are the
+vapour or O2, never a product. Every other cited phase is a solid. A
+published interval with ``T_min >= T_max`` is degenerate: ``Nasa9Segment``
+rejects it, and it is not a temperature record. Skipping it leaves the
+covering interval's G unchanged.
 
-Algebra. Among cited condensed records whose published interval contains T,
-choose the minimum of G°/(R T). At fixed T that ratio is dimensionless and
-strictly increasing in G°, so the minimum is the minimum of G°. An exact tie
-keeps the record declared first. A higher-G solid that still covers T is
-metastable and is not the standard state. If no cited interval contains T,
-each candidate is continued from its nearest segment, the same minimum is
-taken, and the saturation is marked extrapolated (d-019).
+Algebra. If any cited interval covers T, choose the minimum G°/(R T). At
+fixed T that ratio is dimensionless and strictly increasing in G°, so the
+minimum is the minimum of G°. An exact tie keeps the record declared first.
+A higher-G solid that still covers T is metastable and is not the standard
+state. If none covers T, choose the record whose nearest published interval
+edge has the smallest distance to T, d(T) = min(|T − T_min|,
+|T − T_max|); among equal distances, choose the minimum extrapolated G°/(R T),
+then keep declaration order for an exact tie. d is in kelvin and G°/(R T) is
+dimensionless. At a shared interval edge d = 0 and the covering-record rule
+applies. The continued record remains flagged extrapolated (d-019).
 
-Units. No conversion is required to compare G°/(R T). T is kelvin. The
-tables are the 0.1 MPa / 1 bar standard state the equilibrium constant
-uses. Condensed PΔV between phases is not applied.
+Units. The nearest-edge distance is in kelvin; G°/(R T) is dimensionless.
+T is kelvin. No conversion is required to compare G°/(R T). The tables are
+the 0.1 MPa / 1 bar standard state the equilibrium constant uses. Condensed
+PΔV between phases is not applied.
 
 Sanity. Silicon liquid (NASA NG-1859, JANAF Si-003) has lower G than crystal
 (NG-1858, Si-002) above the melting point. JANAF marks crystal ↔ liquid at
 1685 K and the crystal table keeps going, so the crystal still covers
 1773.15 K and must lose. NASA's crystal interval ends at 1690 K, so above
 that only the liquid covers. Below the melting point the crystal is lower,
-or it is the only covering phase.
+or it is the only covering phase. At 298.15 K neither cited NASA SiO2 record
+covers; NG-1862 begins 1.85 K away at 300 K while liquid NG-1865 begins at
+1996 K, so the nearest-interval prediction is NG-1862 and remains flagged.
 
 Missing or invalid records still refuse; no failure is converted to Psat = 0.
 
@@ -440,11 +447,12 @@ def _select_condensed(
     *,
     what: str,
 ) -> tuple[float, str, str, str, tuple[float, float]]:
-    """Minimum-G condensed phase whose published interval contains T.
+    """Select the lowest-G covering phase or the nearest extrapolated record.
 
     Premise, algebra, units, and the silicon sanity check are in the module
-    docstring. Covering records outrank extrapolated ones. Inside the chosen
-    tier the lowest G°/(R T) wins, and an exact tie keeps declaration order.
+    docstring. Covering records keep the minimum-G°/(R T) rule. If none
+    covers, nearest interval wins, then minimum G°/(R T), then declaration
+    order. Extrapolated candidates remain flagged by the caller.
     """
 
     record_ids = _record_ids(thermo, citation, what=what)
@@ -464,17 +472,26 @@ def _select_condensed(
             )
         bucket = extrapolated if authority == "extrapolated" else covering
         bucket.append((g_over_rt, index, record_id, phase, authority, valid_range))
-    # A phase whose interval contains T is the standard-state candidate.
-    # Continuation is only the out-of-domain prediction, and it stays flagged.
+    # Covering phases are comparable as standard states. Outside all cited
+    # intervals, prefer the nearest source domain before comparing continuations.
     pool = covering or extrapolated
     if not pool:
         raise WallSaturationLawRefusal(
             "wall_condensation_thermo_missing",
             f"{what} has no usable condensed record",
         )
-    g_over_rt, _index, record_id, phase, authority, valid_range = min(
-        pool, key=lambda item: (item[0], item[1]),
-    )
+    if covering:
+        selected = min(pool, key=lambda item: (item[0], item[1]))
+    else:
+        selected = min(
+            pool,
+            key=lambda item: (
+                min(abs(T_K - item[5][0]), abs(T_K - item[5][1])),
+                item[0],
+                item[1],
+            ),
+        )
+    g_over_rt, _index, record_id, phase, authority, valid_range = selected
     return g_over_rt, record_id, phase, authority, valid_range
 
 
