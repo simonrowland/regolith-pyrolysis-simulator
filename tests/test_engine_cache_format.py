@@ -66,6 +66,136 @@ def test_key_namespace_is_explicit_and_store_is_without_rowid(tmp_path: Path, mo
         assert "WITHOUT ROWID" in schema
 
 
+def test_schema_check_accepts_fresh_cache_after_interrupted_version_write(tmp_path: Path) -> None:
+    path = tmp_path / "cache.sqlite"
+    with sqlite3.connect(path) as connection:
+        connection.execute(f"PRAGMA user_version={engine_cache._CACHE_SCHEMA_VERSION}")
+
+    with sqlite3.connect(path) as connection:
+        engine_cache._check_cache_schema(connection, allow_empty=True)
+        engine_cache._initialize_cache(connection)
+        engine_cache._check_cache_schema(connection)
+
+
+def test_readonly_version_only_database_can_be_opened_twice(tmp_path: Path, monkeypatch) -> None:
+    path = tmp_path / "cache.sqlite"
+    with sqlite3.connect(path) as connection:
+        connection.execute(f"PRAGMA user_version={engine_cache._CACHE_SCHEMA_VERSION}")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    engine_cache._close_connections()
+    try:
+        for attempt in range(2):
+            expected = {"answer": attempt}
+            assert engine_cache.cached_engine_call(
+                "openimcc", {"request": attempt}, lambda: expected
+            ) == expected
+    finally:
+        engine_cache._close_connections()
+
+
+@pytest.mark.parametrize(
+    ("missing_tables", "missing_indexes"),
+    [
+        (
+            ("provenance", "box_sequences"),
+            ("engine_outputs_box_seq", "engine_outputs_engine_version"),
+        ),
+        (
+            ("box_sequences",),
+            ("engine_outputs_box_seq", "engine_outputs_engine_version"),
+        ),
+        ((), ("engine_outputs_box_seq", "engine_outputs_engine_version")),
+    ],
+    ids=("engine-outputs-only", "engine-outputs-and-provenance", "missing-indexes"),
+)
+@pytest.mark.parametrize("readonly", [False, True], ids=("writable", "readonly"))
+def test_partial_cache_schema_is_repaired_or_missed(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    missing_tables: tuple[str, ...],
+    missing_indexes: tuple[str, ...],
+    readonly: bool,
+) -> None:
+    path = tmp_path / "partial.sqlite"
+    with sqlite3.connect(path) as connection:
+        engine_cache._initialize_cache(connection)
+        for table in missing_tables:
+            connection.execute(f"DROP TABLE {table}")
+        for index in missing_indexes:
+            connection.execute(f"DROP INDEX {index}")
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly" if readonly else "")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache._close_connections()
+    engine_cache.engine_cache_counters(reset=True)
+    expected = {"answer": 42}
+    try:
+        assert engine_cache.cached_engine_call(
+            "openimcc", {"request": "partial-schema"}, lambda: expected
+        ) == expected
+        counts = engine_cache.engine_cache_counters()["openimcc"]
+        if readonly:
+            assert counts["stores"] == 0
+            assert engine_cache._CONNECTIONS == {}
+            assert engine_cache._BLOOMS == {}
+            with sqlite3.connect(path) as connection:
+                names = {
+                    row[0]
+                    for row in connection.execute(
+                        "SELECT name FROM sqlite_master WHERE type IN ('table', 'index')"
+                    )
+                }
+            assert not (set(missing_tables) | set(missing_indexes)) & names
+        else:
+            assert counts["stores"] == 1
+            assert counts["store_error"] == 0
+            engine_cache._MEMORY_CACHE.clear()
+            assert engine_cache.cached_engine_call(
+                "openimcc",
+                {"request": "partial-schema"},
+                lambda: pytest.fail("repaired cache entry was not persisted"),
+            ) == expected
+            with sqlite3.connect(path) as connection:
+                names = {
+                    row[0]
+                    for row in connection.execute(
+                        "SELECT name FROM sqlite_master WHERE type IN ('table', 'index')"
+                    )
+                }
+            assert {"engine_outputs", "provenance", "box_sequences"} <= names
+            assert {
+                "engine_outputs_box_seq",
+                "engine_outputs_engine_version",
+            } <= names
+    finally:
+        engine_cache._close_connections()
+
+
+def test_wrong_auxiliary_cache_schema_is_not_repaired(tmp_path: Path, monkeypatch) -> None:
+    path = tmp_path / "wrong-partial.sqlite"
+    with sqlite3.connect(path) as connection:
+        engine_cache._initialize_cache(connection)
+        connection.execute("DROP TABLE box_sequences")
+        connection.execute(
+            "CREATE TABLE box_sequences (source_box TEXT PRIMARY KEY, wrong INTEGER NOT NULL) WITHOUT ROWID"
+        )
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache._close_connections()
+    try:
+        with pytest.raises(engine_cache.EngineCacheSchemaMismatch, match="box_sequences"):
+            engine_cache.cached_engine_call(
+                "openimcc", {"request": "wrong-partial-schema"}, lambda: {"answer": 42}
+            )
+        assert engine_cache._CONNECTIONS == {}
+        assert engine_cache._BLOOMS == {}
+    finally:
+        engine_cache._close_connections()
+
+
 def test_lossy_v2_cache_cannot_supply_a_hit(tmp_path: Path, monkeypatch) -> None:
     path = tmp_path / "legacy.sqlite"
     key = engine_cache.engine_cache_key("internal-analytical", 1, {})
