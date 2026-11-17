@@ -224,12 +224,6 @@ def test_concurrent_processes_can_write_the_same_cache_key(
     tmp_path: Path,
 ) -> None:
     database = tmp_path / "engine-cache.sqlite"
-    setup = sqlite3.connect(database)
-    try:
-        setup.execute("PRAGMA journal_mode=WAL")
-        engine_cache._initialize_cache(setup)
-    finally:
-        setup.close()
     start = tmp_path / "start"
     ready_files = [tmp_path / f"ready-{index}" for index in range(4)]
     child_code = """
@@ -1665,6 +1659,7 @@ def test_equilibrium_cache_maps_use_compact_canonical_json_objects() -> None:
 def test_engine_notice_codes_round_trip_with_typed_values() -> None:
     from simulator.melt_backend.base import (
         ENGINE_CACHE_NOTICE_CODE_TABLE,
+        FO2_GAS_ONLY_NOTICE,
         decode_engine_notice_codes,
         equilibrium_cache_from_value,
         equilibrium_cache_value,
@@ -1719,7 +1714,11 @@ def test_engine_notice_codes_round_trip_with_typed_values() -> None:
 
     thermoengine_notices = [
         {"kind": "fallback", "reason": "ThermoEngine used its fallback."},
-        {"kind": "fo2_gas_only", "reason": "external oxygen fugacity"},
+        {
+            "kind": "fo2_gas_only",
+            "notice": FO2_GAS_ONLY_NOTICE,
+            "printed_fO2_log": -5.0,
+        },
     ]
     thermoengine_codes, thermoengine_values = encode_engine_notice_codes(
         "thermoengine", thermoengine_notices
@@ -1728,7 +1727,7 @@ def test_engine_notice_codes_round_trip_with_typed_values() -> None:
         "thermoengine", thermoengine_codes, thermoengine_values
     ) == thermoengine_notices
 
-    gas_only = {"notice": "external oxygen fugacity"}
+    gas_only = {"notice": FO2_GAS_ONLY_NOTICE, "printed_fO2_log": -5.0}
     gas_only_hot = equilibrium_cache_value(
         {"diagnostics": {"fo2_gas_only": gas_only}},
         engine_id="thermoengine",
@@ -1736,7 +1735,8 @@ def test_engine_notice_codes_round_trip_with_typed_values() -> None:
     assert equilibrium_cache_from_value(
         gas_only_hot, engine_id="thermoengine"
     )["diagnostics"]["fo2_gas_only"] == {
-        "notice": "external oxygen fugacity",
+        "notice": FO2_GAS_ONLY_NOTICE,
+        "printed_fO2_log": -5.0,
         "kind": "fo2_gas_only",
     }
     assert len({(engine, number) for engine, number, _code, _description in ENGINE_CACHE_NOTICE_CODE_TABLE}) == len(
@@ -2154,22 +2154,34 @@ def test_real_battery_notice_emitters_are_registered_and_survive_hot(
     internal_notices = _assert_engine_notice_hot_round_trip(
         "internal-analytical", internal_floor_and_band
     )
-    assert any(
-        row["kind"] == "out_of_certified_band"
-        and row["reason"].startswith(
-            (
-                "extrapolated_beyond_valid_range_K:",
-                "ellingham_extrapolated_beyond_fit_range_K:",
-            )
+    for source_field in (
+        "extrapolated_beyond_valid_range_K",
+        "ellingham_extrapolated_beyond_fit_range_K",
+    ):
+        assert any(
+            row["kind"] == "out_of_certified_band"
+            and row["reason"].startswith(f"{source_field}:")
+            for row in internal_notices
         )
-        for row in internal_notices
+
+    authority_core = _new_internal_analytical_core()
+    internal_authority_limit = _internal_analytical_vapor_pressure_adapter(
+        core=authority_core,
+        temperature_C=1361.0 - 273.15,
+        pressure_bar=1.0,
+        composition_kg={"MgO": 1.0},
+        composition_mol=None,
+        fO2_log=None,
+        po2_request=Po2Request(mode="commanded", po2_bar=1.0e-9),
+        include_diagnostic_shadows=False,
+    )
+    authority_notices = _assert_engine_notice_hot_round_trip(
+        "internal-analytical", internal_authority_limit
     )
     assert any(
         row["kind"] == "out_of_certified_band"
-        and row["reason"].startswith(
-            ("vapor_pressure_authority:", "ellingham_authority:")
-        )
-        for row in internal_notices
+        and row["reason"].startswith("vapor_pressure_authority:Mg:")
+        for row in authority_notices
     )
     assert any(row["kind"] == "floor_inversion" for row in internal_notices)
 
