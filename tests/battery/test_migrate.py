@@ -366,6 +366,8 @@ def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_v
     assert decoded_legacy.certification is None
     assert to_plain(decoded_legacy) == legacy
 from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
     Bench,
     BenchIdentity,
     Derivation,
@@ -2472,7 +2474,7 @@ def test_model_derived_raw_input_method_rejects_non_string_values(
     )
 
 
-def test_hastie_initial_charges_stay_contextual_for_figure_points(
+def test_hastie_initial_charges_use_flagged_proxies_for_figure_points(
     tmp_path: Path,
 ) -> None:
     from simulator.battery.fo2_ladder import resolve_row_fo2
@@ -2502,23 +2504,20 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
             )
         for observation in rows:
             composition = observation.identity.composition
-            assert composition is not None and composition.is_unknown
-            assert "per-run composition is not published" in composition.reason
+            assert composition is not None and composition.is_value
+            assert composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
             point_composition = (observation.point_conditions or {}).get(
                 "composition"
             )
             assert point_composition is not None
-            assert point_composition.state.is_unknown
-            assert (
-                "per-run composition is not published"
-                in point_composition.state.reason
-            )
+            assert point_composition.state.is_value
+            assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
 
 
             role_notices = [
                 notice
                 for notice in observation.notices
-                if "composition_role=initial_charge_only" in notice.reason
+                if INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
             ]
             assert len(role_notices) == 1
             assert role_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
@@ -2588,12 +2587,12 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
     assert moved_observation.identity.temperature_K.is_value
     assert moved_observation.identity.temperature_K.value == Decimal("1575.0")
     moved_composition = moved_observation.identity.composition
-    assert moved_composition is not None and moved_composition.is_unknown
-    assert "per-run composition is not published" in moved_composition.reason
+    assert moved_composition is not None and moved_composition.is_value
+    assert moved_composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
     moved_notices = [
         notice
         for notice in moved_observation.notices
-        if "composition_role=initial_charge_only" in notice.reason
+        if INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
     ]
     assert len(moved_notices) == 1
     assert moved_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
@@ -2604,18 +2603,22 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
         moved_observation,
         quantity=Quantity.ACTIVITY_COEFFICIENT,
     )
-    assert moved_fo2 is None
+    assert moved_fo2 is not None
+    assert moved_fo2.route == "intrinsic_melt_fO2"
+    assert moved_fo2.tier == 4
+    assert moved_fo2.borrowed
     moved_prediction = predict_with_engine(
         Engine.OPENIMCC,
         moved_observation,
         experiment=moved_experiment,
     )
     assert moved_prediction.value is None
-    assert moved_prediction.refusal_reason is RefusalReason.INVALID_SOURCE
-    assert moved_prediction.refusal_detail["reason"] == "invalid_source"
-    gap, = moved_prediction.refusal_detail["gaps"]
-    assert gap["waypoint"] == "normalized_composition"
-    assert gap["reason"] == "unsupported_print_form"
+    assert moved_prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert (
+        moved_prediction.refusal_detail["reason"]
+        == "species_unmatched_in_engine_output"
+    )
+    assert moved_prediction.refusal_detail["formula"] == "K2O"
 
     na_kms = next(
         row

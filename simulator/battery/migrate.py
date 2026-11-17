@@ -197,6 +197,8 @@ from simulator.battery.stable_ids import (
 )
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
+    SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     AmbientPressureEvidence,
     Admission,
     AdmissionDecision,
@@ -8637,8 +8639,8 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
     """Return (role, refusal) from the first ``composition_role`` declared.
 
     The row is read before its parent values block. ``initial_charge_only``
-    marks a printed starting charge that stays sample context and cannot supply
-    a later datum's composition. ``datum_state`` marks the sample composition
+    marks a printed starting charge that may supply a later datum as a flagged
+    proxy. ``datum_state`` marks the sample composition
     at this datum's measurement state, including a bulk two-phase sample; it
     applies to the observation's point conditions and never marks the
     experiment's starting charge. Each typed declaration is a bare token or a
@@ -8659,17 +8661,6 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
             f"{sorted(_COMPOSITION_ROLE_TOKENS)}; composition left unstamped"
         )
     return None, None
-
-
-def _has_printed_initial_series_start(role: str | None, values: object) -> bool:
-    """The declared initial charge supplies points in its printed series."""
-
-    return (
-        role == INITIAL_CHARGE_ONLY_PROXY_FLAG
-        and isinstance(values, Mapping)
-        and isinstance(values.get("series"), list)
-        and bool(values["series"])
-    )
 
 
 # A closed-system equilibrium experiment's printed starting bulk is the
@@ -9293,22 +9284,45 @@ def _apply_equilibrium_starting_bulk(
     return point_conditions, notices
 
 
-def _initial_charge_only_missing_composition(
+def _initial_charge_only_composition_proxy(
     identity: Identity,
     point_conditions: Mapping[str, Located[Any]] | None,
     notices: Sequence[Notice],
     *,
     role: str | None,
-    printed_series_start: bool,
     quantity: Quantity | None,
     quantity_as_printed: object,
     locator: Locator | None,
     origin: str,
+    initial_charge_context: Mapping[str, Any] | None = None,
+    point_composition_refusal: Sequence[str] = (),
+    point_composition_context: Mapping[str, Any] | None = None,
+    point_oxide_map: Mapping[str, Decimal] | None = None,
+    point_declared_component_map: Mapping[str, Any] | None = None,
+    point_composition_map_declared: bool = False,
+    point_composition_invalid_reason: str | None = None,
 ) -> tuple[Identity, Mapping[str, Located[Any]] | None, list[Notice]]:
+    conditions = dict(point_conditions or {})
+    point_composition = conditions.get("composition")
+    existing_initial_charge_proxy = (
+        identity.composition is not None
+        and identity.composition.is_value
+        and isinstance(identity.composition.value, Composition)
+        and identity.composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    ) or (
+        isinstance(point_composition, Located)
+        and point_composition.state.is_value
+        and isinstance(point_composition.state.value, Composition)
+        and point_composition.state.value.proxy_flag
+        == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    )
     if (
-        role != INITIAL_CHARGE_ONLY_PROXY_FLAG
-        or printed_series_start
-        or quantity in {
+        (
+            role != INITIAL_CHARGE_ONLY_PROXY_FLAG
+            and not existing_initial_charge_proxy
+        )
+        or quantity
+        in {
             Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
             Quantity.RESIDUE_COMPONENT_COMPOSITION,
         }
@@ -9318,32 +9332,146 @@ def _initial_charge_only_missing_composition(
         )
     ):
         return identity, point_conditions, list(notices)
-    reason = (
-        "missing input: per-run composition is not published; the printed "
-        "initial charge is retained as sample context only"
-    )
-    conditions = {
-        **(point_conditions or {}),
-        "composition": Located(State.unknown(reason), locator=locator),
-    }
+
+    refusal_reasons = list(point_composition_refusal)
+    if isinstance(point_composition, Located) and point_composition.state.is_unknown:
+        point_reason = point_composition.state.reason
+        if point_reason and any(
+            marker in point_reason.casefold()
+            for marker in (
+                "unsupported component",
+                "malformed printed component amount",
+                "mass-percent composition",
+                "partial_composition:",
+            )
+        ):
+            refusal_reasons.append(point_reason)
+    if point_composition_invalid_reason:
+        refusal_reasons.append(point_composition_invalid_reason)
+
+    composition = None
+    composition_locator = locator
+    if point_composition_map_declared:
+        declared_map = point_declared_component_map or point_oxide_map
+        initial = None
+        if declared_map is not None:
+            initial = _owner_initial_from_printed(
+                Located(State.of(declared_map), locator=locator),
+                proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                closure_context=point_composition_context,
+            )
+        if (
+            initial is not None
+            and initial.state.is_value
+            and isinstance(initial.state.value, Composition)
+        ):
+            composition = initial.state.value
+            composition_locator = initial.locator or locator
+        elif initial is not None and initial.state.is_unknown:
+            refusal_reasons.append(
+                initial.state.reason or "printed point composition is unusable"
+            )
+        if composition is None and declared_map is not None:
+            reason = refusal_reasons[0] if refusal_reasons else (
+                "explicit printed point composition map is unusable"
+            )
+            unknown = Located(State.unknown(reason), locator=locator)
+            conditions["composition"] = unknown
+            return replace(identity, composition=unknown.state), conditions, list(notices)
+
+    if composition is None and initial_charge_context is not None:
+        initial_map = _named_printed_composition_map(initial_charge_context)
+        if initial_map:
+            initial = _owner_initial_from_printed(
+                Located(State.of(initial_map), locator=locator),
+                proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                closure_context=initial_charge_context,
+            )
+            if (
+                initial is not None
+                and initial.state.is_value
+                and isinstance(initial.state.value, Composition)
+            ):
+                composition = initial.state.value
+                composition_locator = initial.locator or locator
+            else:
+                reason = (
+                    initial.state.reason
+                    if initial is not None and initial.state.is_unknown
+                    else "printed initial charge is not a usable composition proxy"
+                )
+                unknown = Located(State.unknown(reason), locator=locator)
+                conditions["composition"] = unknown
+                return replace(identity, composition=unknown.state), conditions, list(notices)
+
+    printed = conditions.get("printed_composition")
+    if (
+        composition is None
+        and isinstance(printed, Located)
+        and printed.state.is_value
+    ):
+        initial = _owner_initial_from_printed(
+            printed,
+            proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            closure_context=initial_charge_context,
+        )
+        if initial is not None and initial.state.is_value:
+            candidate = initial.state.value
+            if isinstance(candidate, Composition):
+                composition = candidate
+                composition_locator = initial.locator or locator
+        if composition is None:
+            refusal_reasons.append("printed initial charge is not a usable composition proxy")
+    if composition is None:
+        located = conditions.get("composition")
+        if isinstance(located, Located) and located.state.is_value:
+            candidate = located.state.value
+            if isinstance(candidate, Composition):
+                composition = candidate
+                composition_locator = located.locator or locator
+    if composition is None and identity.composition is not None:
+        if identity.composition.is_value and isinstance(
+            identity.composition.value, Composition
+        ):
+            composition = identity.composition.value
+
     updated_notices = list(notices)
+    if composition is None:
+        if refusal_reasons:
+            reason = refusal_reasons[0]
+        elif point_composition_map_declared:
+            reason = "explicit printed point composition map is unusable"
+        else:
+            reason = (
+                "missing input: printed initial charge is unavailable for "
+                "initial_charge_only composition proxy"
+            )
+        unknown = Located(State.unknown(reason), locator=locator)
+        conditions["composition"] = unknown
+        return replace(identity, composition=unknown.state), conditions, updated_notices
+
+    composition = replace(
+        composition,
+        proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+        input_provenance=PRINTED_STARTING_BULK,
+    )
+    located_proxy = Located(State.of(composition), locator=composition_locator)
+    conditions["composition"] = located_proxy
+    updated_identity = replace(identity, composition=State.of(composition))
     if quantity is not None:
         updated_notices.append(
             Notice(
                 kind=NoticeKind.SOURCE_DISAGREEMENT,
                 affected_quantities=(quantity,),
                 reason=(
-                    "composition_role=initial_charge_only: printed initial "
-                    "charge is sample context; per-run composition is not published"
+                    f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+                    f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
+                    f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
                 ),
                 origin=origin,
             )
         )
-    return (
-        replace(identity, composition=State.unknown(reason)),
-        conditions,
-        updated_notices,
-    )
+    return updated_identity, conditions, updated_notices
 
 
 def _owner_initial_from_printed(
@@ -9358,6 +9486,23 @@ def _owner_initial_from_printed(
         return None
     raw = printed.state.value
     locator = printed.locator
+    if isinstance(raw, Composition):
+        composition = raw
+        if proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+            composition = replace(composition, proxy_flag=proxy_flag)
+        return Located(State.of(composition), locator=locator)
+    if (
+        isinstance(raw, Mapping)
+        and _enum(AmountBasis, raw.get("amount_basis"))
+        is AmountBasis.MOLE_PERCENT
+    ):
+        try:
+            composition = _composition_from_plain(raw)
+        except ValueError as exc:
+            return Located(State.unknown(str(exc)), locator=locator)
+        if proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+            composition = replace(composition, proxy_flag=proxy_flag)
+        return Located(State.of(composition), locator=locator)
     if isinstance(raw, Mapping) and sum(
         isinstance(value, Mapping) for value in raw.values()
     ) > 1:
@@ -28916,13 +29061,13 @@ class Migrator:
                     row_temperature_K, uncertainty, observation_id=obs_id
                 )
         identity, point_conditions, observation_notices = (
-            _initial_charge_only_missing_composition(
+            _initial_charge_only_composition_proxy(
                 identity,
                 point_conditions,
                 observation_notices,
                 role=composition_role,
-                printed_series_start=_has_printed_initial_series_start(
-                    composition_role, values
+                initial_charge_context=(
+                    values if isinstance(values, Mapping) else None
                 ),
                 quantity=q_token,
                 quantity_as_printed=values.get("quantity"),
@@ -31171,13 +31316,13 @@ class Migrator:
                 )
             )
         identity, point_conditions, child_notices = (
-            _initial_charge_only_missing_composition(
+            _initial_charge_only_composition_proxy(
                 identity,
                 point_conditions,
                 child_notices,
                 role=point_composition_role,
-                printed_series_start=_has_printed_initial_series_start(
-                    point_composition_role, parent_values
+                initial_charge_context=(
+                    parent_values if isinstance(parent_values, Mapping) else None
                 ),
                 quantity=q_token_point,
                 quantity_as_printed=(
@@ -31189,13 +31334,28 @@ class Migrator:
                 ),
                 locator=point_locator,
                 origin=point_id,
+                point_composition_refusal=point_composition_refusal,
+                point_composition_context=(
+                    raw_item if isinstance(raw_item, Mapping) else None
+                ),
+                point_oxide_map=point_oxide_map,
+                point_declared_component_map=point_declared_component_map,
+                point_composition_map_declared=point_map_explicit,
+                point_composition_invalid_reason=malformed_composition_amount,
             )
         )
         if notice_composition_located is None:
             notice_composition_located = (point_conditions or {}).get(
                 "composition"
             )
-        if malformed_composition_amount is not None:
+        initial_charge_proxy_present = (
+            identity.composition is not None
+            and identity.composition.is_value
+            and isinstance(identity.composition.value, Composition)
+            and identity.composition.value.proxy_flag
+            == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        )
+        if malformed_composition_amount is not None and not initial_charge_proxy_present:
             identity = replace(
                 identity,
                 composition=State.unknown(malformed_composition_amount),

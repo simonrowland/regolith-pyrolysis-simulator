@@ -11,6 +11,7 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     NoticeKind,
+    MethodToken,
     Phase,
     Quantity,
     RefusalReason,
@@ -18,14 +19,23 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import quantity_token
-from simulator.battery.migrate import load_migrated_store
-from simulator.battery.records import Uncertainty
+from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
+    Uncertainty,
+)
+from simulator.battery.input_provenance import PRINTED_STARTING_BULK
+from tests.battery.test_migrate import _migrate_real_extract
 from simulator.battery.score import (
     _evidence_class_notice,
+    _missing_apparatus_fact,
     _printed_uncertainty_band,
+    _unverified_apparatus_notices,
+    ScoreContext,
+    compile_residual,
     predict_with_engine,
 )
-from simulator.battery.validity import effusion_regime_unverified
+from simulator.battery.validity import effusion_regime_unverified, run_validity_gates
 
 
 SOURCE_ID = "kems-020-hastie-1981-nbsir"
@@ -33,8 +43,11 @@ ROOT = Path(__file__).resolve().parents[2]
 SCORING_ENGINES = (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL)
 
 
-def _hastie_store():
-    return load_migrated_store(ROOT, sources=(SOURCE_ID,))
+def _hastie_store(tmp_path):
+    result = _migrate_real_extract(
+        tmp_path, f"{SOURCE_ID}.yaml", write=False
+    )
+    return result.works, result.experiments, result.observations
 
 
 def _fig4_sio_points(observations):
@@ -56,8 +69,10 @@ def _fig4_sio_points(observations):
     )
 
 
-def test_every_hastie_fig4_sio_point_is_admitted_with_its_figure_band() -> None:
-    _works, experiments, observations = _hastie_store()
+def test_every_hastie_fig4_sio_point_is_admitted_with_its_figure_band(
+    tmp_path,
+) -> None:
+    _works, experiments, observations = _hastie_store(tmp_path)
     rows = _fig4_sio_points(observations)
 
     assert len(rows) == 6
@@ -67,6 +82,22 @@ def test_every_hastie_fig4_sio_point_is_admitted_with_its_figure_band() -> None:
         assert row.evidence.class_.value is EvidenceClass.FIGURE_ONLY
         assert row.identity.species.phase.is_value
         assert row.identity.species.phase.value is Phase.G
+        assert row.identity.composition is not None
+        assert row.identity.composition.is_value
+        assert (
+            row.identity.composition.value.proxy_flag
+            == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        )
+        assert any(
+            notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+            and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+            for notice in row.notices
+        )
+        assert row.uncertainty.kind is UncertaintyKind.PRINTED
+        assert row.uncertainty.verbatim["value"] == 0.10
+        assert row.uncertainty.verbatim["units"] == "dex"
+        assert row.uncertainty.verbatim["scope"] == "every point in this series"
+        assert row.uncertainty.verbatim["as_printed"] == "±0.10 dex"
 
         experiment = experiments[row.experiment_id]
         method = experiment.method.value if experiment.method.is_value else None
@@ -89,8 +120,10 @@ def test_every_hastie_fig4_sio_point_is_admitted_with_its_figure_band() -> None:
         assert notice.origin == row.observation_id
 
 
-def test_figure_only_without_digitization_uncertainty_has_no_zero_band() -> None:
-    _works, _experiments, observations = _hastie_store()
+def test_figure_only_without_digitization_uncertainty_has_no_zero_band(
+    tmp_path,
+) -> None:
+    _works, _experiments, observations = _hastie_store(tmp_path)
     row = _fig4_sio_points(observations)[0]
     missing_uncertainty = replace(
         row, uncertainty=Uncertainty(kind=UncertaintyKind.NONE)
@@ -110,10 +143,16 @@ def test_figure_only_without_digitization_uncertainty_has_no_zero_band() -> None
     assert notice.origin == row.observation_id
 
 
-def test_hastie_figure_rows_without_supported_inputs_keep_typed_refusals() -> None:
-    _works, experiments, observations = _hastie_store()
+def test_hastie_figure_rows_without_supported_inputs_keep_typed_refusals(
+    tmp_path,
+) -> None:
+    _works, experiments, observations = _hastie_store(tmp_path)
     for row in _fig4_sio_points(observations):
-        assert row.point_conditions["composition"].state.is_unknown
+        assert row.point_conditions["composition"].state.is_value
+        assert (
+            row.point_conditions["composition"].state.value.proxy_flag
+            == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        )
         experiment = experiments[row.experiment_id]
         regime = effusion_regime_unverified(
             experiment, Quantity.P_PARTIAL, observation=row
@@ -122,23 +161,16 @@ def test_hastie_figure_rows_without_supported_inputs_keep_typed_refusals() -> No
 
         for engine in SCORING_ENGINES:
             prediction = predict_with_engine(engine, row, experiment=experiment)
-            assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-            assert (
-                prediction.refusal_detail["reason"]
-                == "composition_not_stated_pure_reservoir"
-            )
+            assert prediction.refusal_reason is None, prediction.refusal_detail
 
-    unsupported_figure_summaries = tuple(
+    unsupported_quantity_rows = tuple(
         observation
         for observation in observations.values()
         if observation.source_id == SOURCE_ID
-        and observation.locator is not None
-        and observation.locator.figure == "4"
-        and observation.value.kind is ValueKind.CATEGORICAL
         and observation.identity.quantity.is_unknown
     )
-    assert len(unsupported_figure_summaries) == 3
-    for row in unsupported_figure_summaries:
+    assert len(unsupported_quantity_rows) == 81
+    for row in unsupported_quantity_rows:
         for engine in SCORING_ENGINES:
             prediction = predict_with_engine(
                 engine,
@@ -147,3 +179,198 @@ def test_hastie_figure_rows_without_supported_inputs_keep_typed_refusals() -> No
             )
             assert prediction.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
             assert prediction.refusal_detail["reason"] == "quantity_unknown"
+
+
+def test_hastie_unknown_kms_regime_rows_still_refuse_with_their_reason(
+    tmp_path,
+) -> None:
+    works, experiments, observations = _hastie_store(tmp_path)
+    rows = tuple(
+        row
+        for row in observations.values()
+        if row.source_id == SOURCE_ID
+        and quantity_token(row.identity) is Quantity.ACTIVITY_COEFFICIENT
+        and experiments[row.experiment_id].method.is_value
+        and experiments[row.experiment_id].method.value
+        is MethodToken.KNUDSEN_EFFUSION
+    )
+    assert len(rows) == 18
+    context = ScoreContext(
+        works=works,
+        experiments=experiments,
+        observations=observations,
+        extract_review={SOURCE_ID: "reviewed"},
+        root=ROOT,
+    )
+
+    for row in rows:
+        experiment = experiments[row.experiment_id]
+        gates = run_validity_gates(
+            experiment,
+            row,
+            point_observations=tuple(observations.values()),
+        )
+        assert not gates.passed
+        assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        assert gates.primary_check == "in_cell_partial_pressure_sum"
+        for engine in SCORING_ENGINES:
+            residual, _candidate = compile_residual(
+                row,
+                engine,
+                context=context,
+                point_observations=tuple(observations.values()),
+            )
+            assert residual.numeric is None
+            assert residual.refusal is not None
+            assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+
+def test_hastie_fig5_points_use_the_printed_initial_glass_proxy(tmp_path) -> None:
+    _works, _experiments, observations = _hastie_store(tmp_path)
+    rows = tuple(
+        row
+        for row in observations.values()
+        if row.source_id == SOURCE_ID
+        and "fig5_glass_Na_this_work_digitized" in row.observation_id
+        and quantity_token(row.identity) is Quantity.P_PARTIAL
+        and row.identity.temperature_K is not None
+        and row.identity.temperature_K.is_value
+    )
+    assert len(rows) == 6
+    proxy_compositions = []
+
+    for row in rows:
+        composition = row.identity.composition
+        assert composition is not None and composition.is_value
+        assert composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        assert composition.value.input_provenance == PRINTED_STARTING_BULK
+        proxy_compositions.append(composition.value.components)
+        point_composition = row.point_conditions["composition"]
+        assert point_composition.state.is_value
+        assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        assert any(
+            notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+            and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+            for notice in row.notices
+        )
+    assert all(components == proxy_compositions[0] for components in proxy_compositions)
+
+
+def test_hastie_fig4_rows_reach_outer_compiler_and_keep_both_flags(tmp_path) -> None:
+    works, experiments, observations = _hastie_store(tmp_path)
+    rows = _fig4_sio_points(observations)
+    point_observations = tuple(observations.values())
+    context = ScoreContext(
+        works=works,
+        experiments=experiments,
+        observations=observations,
+        extract_review={SOURCE_ID: "reviewed"},
+        root=ROOT,
+    )
+
+    for engine in SCORING_ENGINES:
+        for row in rows:
+            experiment = experiments[row.experiment_id]
+            prediction = predict_with_engine(engine, row, experiment=experiment)
+            gates = run_validity_gates(
+                experiment, row, point_observations=point_observations
+            )
+            pressure_sum_check = next(
+                check
+                for check in gates.checks
+                if check.name == "in_cell_partial_pressure_sum"
+            )
+            assert not gates.passed
+            assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+            assert gates.primary_check == "in_cell_partial_pressure_sum"
+            assert [
+                check.name for check in gates.checks if not check.passed
+            ] == ["in_cell_partial_pressure_sum"]
+            assert not pressure_sum_check.passed
+            assert (
+                pressure_sum_check.detail["reason"]
+                == "no admitted printed partial pressures at this exact point"
+            )
+            assert (
+                pressure_sum_check.detail.get("printed_partial_pressure_sum_Pa")
+                is None
+            )
+            calibration_check = next(
+                check for check in gates.checks if check.name == "kems_calibration"
+            )
+            assert calibration_check.passed
+            assert calibration_check.detail["flag"] == "calibration_not_grounded"
+            assert (
+                _missing_apparatus_fact(
+                    pressure_sum_check,
+                    allow_calibration=False,
+                    allow_unknown_method=False,
+                )
+                == "in_cell_partial_pressure_sum"
+            )
+            apparatus_notices = _unverified_apparatus_notices(
+                row, experiment, gates
+            )
+            failed_checks = tuple(
+                (check.name, check.detail)
+                for check in gates.checks
+                if not check.passed
+            )
+            unclassified_failures = tuple(
+                (check.name, check.detail)
+                for check in gates.checks
+                if not check.passed
+                and _missing_apparatus_fact(
+                    check,
+                    allow_calibration=False,
+                    allow_unknown_method=False,
+                )
+                is None
+            )
+            assert not unclassified_failures, (
+                row.observation_id,
+                gates.checks,
+                unclassified_failures,
+            )
+            assert any(
+                notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+                for notice in apparatus_notices
+            ), (row.observation_id, gates.checks, apparatus_notices)
+            residual, _candidate = compile_residual(
+                row,
+                engine,
+                context=context,
+                prediction=prediction,
+                point_observations=point_observations,
+            )
+            assert residual.numeric is not None, (
+                row.observation_id,
+                gates.reason,
+                gates.primary_check,
+                failed_checks,
+                residual.notices,
+            )
+            assert residual.numeric.decision_band is not None
+            assert residual.numeric.decision_band.value == Decimal("0.10")
+            assert residual.numeric.decision_band.band_basis == "row_printed"
+            assert residual.numeric.metric_uncertainty == row.uncertainty
+            assert residual.refusal is None, (
+                row.observation_id,
+                gates.reason,
+                failed_checks,
+                apparatus_notices,
+                residual.refusal,
+            )
+            assert any(
+                notice.kind is NoticeKind.FIGURE_ONLY
+                for notice in residual.notices
+            )
+            assert any(
+                notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+                and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+                for notice in residual.notices
+            )
+            assert any(
+                notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+                for notice in residual.notices
+            ), (row.observation_id, gates.checks, residual.notices)

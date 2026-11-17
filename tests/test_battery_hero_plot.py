@@ -2269,8 +2269,8 @@ def test_source_disagreement_flag_uses_notice_kind_for_other_reason_strings() ->
     ]
     for row in rows:
         row["notices"][0]["reason"] = (
-            "composition_role=initial_charge_only: printed initial charge is "
-            "sample context; per-run composition is not published"
+            "composition_role=initial_charge_only: composition = printed initial "
+            "charge; run composition evolves during vaporization"
         )
 
     metric = hero_plot._hero_metric_records(

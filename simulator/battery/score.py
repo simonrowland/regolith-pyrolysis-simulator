@@ -179,6 +179,7 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
     SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     Bench,
     CandidateRequest,
@@ -2021,6 +2022,12 @@ def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
     quantity = quantity_token(identity)
     if quantity is None:
         return None
+    if any(
+        notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+        and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+        for notice in reference.notices
+    ):
+        return None
     point = (reference.point_conditions or {}).get("composition")
     states = (identity.composition, point.state if isinstance(point, Located) else None)
     if not any(
@@ -2031,18 +2038,11 @@ def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
         for state in states
     ):
         return None
-    if reference.source_id == "kems-020-hastie-1981-nbsir":
-        reason = (
-            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-            "composition_role=initial_charge_only: composition = printed initial "
-            "charge; run composition evolves during vaporization"
-        )
-    else:
-        reason = (
-            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-            f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: the printed "
-            "composition is the starting charge, not the state of this datum"
-        )
+    reason = (
+        f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+        f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
+        f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
+    )
     return Notice(
         kind=NoticeKind.SOURCE_DISAGREEMENT,
         affected_quantities=(quantity,),
@@ -18021,6 +18021,21 @@ def _compile_residual_with_lineage(
         NoticeKind.FIGURE_ONLY,
         NoticeKind.REACTIVE_CELL_NOT_MODELLED,
     }
+    initial_charge_figure_band = (
+        numeric.decision_band is not None
+        and numeric.decision_band.band_basis == "row_printed"
+        and evidence_class.is_value
+        and evidence_class.value is EvidenceClass.FIGURE_ONLY
+        and reference.identity.composition is not None
+        and reference.identity.composition.is_value
+        and isinstance(reference.identity.composition.value, Composition)
+        and reference.identity.composition.value.proxy_flag
+        == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    )
+    if initial_charge_figure_band:
+        band_preserving_kinds.update(
+            {NoticeKind.SOURCE_DISAGREEMENT, NoticeKind.UNVERIFIED_APPARATUS}
+        )
     if (
         evidence_class.is_value
         and evidence_class.value is EvidenceClass.FIGURE_ONLY
