@@ -359,7 +359,7 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
 OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2eafdcb2139bb1cce9309ceff1aa0b981b609f305406dff8b1d7c3e3002fa69d"
 
 _TABLE = "engine_outputs"
-_CACHE_SCHEMA_VERSION = 2
+_CACHE_SCHEMA_VERSION = 3
 _ENGINE_NUMBERS = {
     name: number for number, name in enumerate((
         "openimcc", "internal-analytical", "vaporock", "magemin",
