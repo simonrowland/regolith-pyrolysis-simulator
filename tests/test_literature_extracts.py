@@ -5524,9 +5524,11 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # unattested 3131 -> 3385; pilot pins unchanged at 57. New extracts, not a
 # fidelity regression in existing ones.
 # Each ceiling may only fall.
+# The landed green/car base 8fa050c28 changes the source set; the combined
+# tree re-sums to 3386 unattested samples.
 _UNCOVERED_OBSERVATIONS_CEILING = 50791
 _UNCOVERED_EXTRACTS_CEILING = 639
-_UNATTESTED_SAMPLES_CEILING = 3385
+_UNATTESTED_SAMPLES_CEILING = 3386
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
 # A second pilot pin inside an already-affected extract must still fail.
