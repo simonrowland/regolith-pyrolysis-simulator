@@ -1123,6 +1123,16 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
         for row in stored["observations"]
         if row["identity"]["quantity"].get("value") == "delta_fG"
     }
+    baseline_rows = sorted(
+        baseline.values(), key=lambda row: row["observation_id"]
+    )
+    baseline_payload = json.dumps(
+        baseline_rows, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    assert (len(baseline_rows), hashlib.sha256(baseline_payload).hexdigest()) == (
+        945,
+        "13187d096dd3ffcc4079d147484c31edbfb8e432be9f2def01393a4cf1a2c2d7",
+    )
     candidate = {row["observation_id"]: row for row in observations}
     assert set(candidate) == set(baseline)
     non_admission_diffs = {
@@ -1158,20 +1168,12 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
         for observation_id, row in candidate.items()
         if row["admission"] != baseline[observation_id]["admission"]
     }
-    assert changed_admissions
-    assert all(
-        before["status"] == "pending"
-        and before["reason"] == "no observation admission_status mapped from source"
-        and after["status"] == "admitted"
-        and after["reason"] == "batch admission d-413-batch-literature"
-        and after["decided_by"]["worker"] == "d-413-batch-literature"
-        for before, after in changed_admissions.values()
-    )
+    assert not changed_admissions
     payload = json.dumps(
         observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
-    # d-413 changes admission on positive literature evidence, and the
-    # manifest adds its declared compilation role provenance.
+    # The old digest matches the committed baseline exactly. These rows do not
+    # change admission; the new digest records the manifest role provenance.
     assert (len(observations), hashlib.sha256(payload).hexdigest()) == (
         945,
         "bf062b5860bc2f5ac3e1980a6d42e85ac9d10539c26b06449705a40a1234dda7",
