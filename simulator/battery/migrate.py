@@ -1679,12 +1679,12 @@ def _locator_from_plain(payload: object, *, refuse_invalid: bool = False) -> Loc
                 return _decode_locator_from_plain(
                     payload, reject_unknown=False, ignore_coordinates=True
                 )
-        if "conflicting locator fields:" in str(exc) and (
-            " for row" in str(exc) or " for column" in str(exc)
+        if "conflicting locator fields:" in str(exc) and any(
+            f" for {name}" in str(exc)
+            for name in ("row", "column", "table_row_number", "table_column_number")
         ):
-            # Before row and column were Locator axes these fields did not
-            # participate in value inference. Retain only the older anchor
-            # fields internally; strict decoding still refuses the locator.
+            # Refuse disputed coordinates while retaining independent anchors.
+            # Strict persisted decoding still refuses the source mapping.
             return _decode_locator_from_plain(
                 payload, reject_unknown=False, ignore_coordinates=True
             )
@@ -1728,41 +1728,54 @@ def _decode_locator_from_plain(
                 else:
                     extra_values[extra_name] = extra_value
             continue
-        if name in _LOCATOR_EXTRA_KEYS:
-            if name in extra_values and extra_values[name] != value:
-                conflicts.append(
-                    f"{name}={extra_values[name]!r} conflicts with {name}={value!r}"
-                )
-            else:
-                extra_values[name] = value
-            continue
-        if value is None or value == "":
-            continue
         target = _locator_field_target(name, value)
-        if ignore_coordinates and target in {
-            "row",
-            "column",
-            "table_row_number",
-            "table_column_number",
-        }:
-            continue
-        is_alias = name != target
-        try:
-            normalized = _locator_field_value(target, value, alias=is_alias)
-        except _InvalidLocator as exc:
-            raise _InvalidLocator(f"{name}: {exc}") from exc
-        comparison = _locator_compare_value(target, normalized)
-        previous = target_sources.get(target)
-        if previous is not None:
-            previous_name, previous_comparison = previous
-            if previous_comparison != comparison:
-                conflicts.append(
-                    f"{previous_name}={kwargs[target]!r} conflicts with "
-                    f"{name}={normalized!r} for {target}"
-                )
-            continue
-        target_sources[target] = (name, comparison)
-        kwargs[target] = normalized
+        multiple_pages = target in {"page", "published_page", "pdf_page_index"} and isinstance(
+            value, (list, tuple)
+        )
+        if name not in _LOCATOR_EXTRA_KEYS:
+            if value is None or value == "":
+                continue
+            if ignore_coordinates and target in {
+                "row", "column", "table_row_number", "table_column_number",
+            }:
+                continue
+            try:
+                if multiple_pages:
+                    if not value:
+                        raise _InvalidLocator("page list must not be empty")
+                    normalized = [
+                        _locator_field_value(target, page, alias=name != target)
+                        for page in value
+                    ]
+                    comparison = [
+                        _locator_compare_value(target, page) for page in normalized
+                    ]
+                else:
+                    normalized = _locator_field_value(target, value, alias=name != target)
+                    comparison = _locator_compare_value(target, normalized)
+            except _InvalidLocator as exc:
+                raise _InvalidLocator(f"{name}: {exc}") from exc
+            previous = target_sources.get(target)
+            if previous is not None:
+                previous_name, previous_comparison = previous
+                if previous_comparison != comparison:
+                    conflicts.append(
+                        f"{previous_name}={kwargs.get(target, previous_comparison)!r} conflicts with "
+                        f"{name}={normalized!r} for {target}"
+                    )
+                    continue
+                if not multiple_pages:
+                    continue
+            target_sources[target] = (name, comparison)
+            if not multiple_pages:
+                kwargs[target] = normalized
+                continue
+        if name in extra_values and extra_values[name] != value:
+            conflicts.append(
+                f"{name}={extra_values[name]!r} conflicts with {name}={value!r}"
+            )
+        else:
+            extra_values[name] = value
     if conflicts:
         raise _InvalidLocator("conflicting locator fields: " + "; ".join(conflicts))
     if extra_values:
@@ -4940,7 +4953,9 @@ def locator_from_mapping(raw: object, fallback: str | None = None) -> Locator | 
         return None
     try:
         locator = _locator_from_plain(raw, refuse_invalid=True)
-    except _InvalidLocator:
+    except _InvalidLocator as exc:
+        if "conflicting locator fields:" in str(exc):
+            return _locator_from_plain(raw)
         return None
     return locator or (Locator(note=fallback) if fallback else None)
 
@@ -26297,9 +26312,8 @@ class Migrator:
         locator = locator_from_mapping(
             obs.get("locator"), fallback=f"extract:{source_id}:{obs_id}"
         )
-        # Keep the refused locator off the observation. Value inference retains
-        # only its pre-coordinate anchors (the old behavior); an explicit
-        # composition annotation can provide a separate valid locator too.
+        # Refused coordinates stay absent; independent source anchors still
+        # locate the printed value and its conditions.
         value_locator = (
             locator
             or _locator_from_plain(obs.get("locator"))
