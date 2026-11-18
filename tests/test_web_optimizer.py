@@ -2082,12 +2082,18 @@ def test_web_optimizer_readers_decode_shared_coating_payloads(client) -> None:
     assert coating["verdict"] == "pass"
     assert detail.status_code == 200
     assert "Constraint Margins" in detail.get_data(as_text=True)
-    resolved = web_routes._optimizer_result_row("run-shared-coating-payload", key)
-    assert resolved is not None
-    root, detail_dir, row = resolved
-    detail_model = web_routes._result_detail_model(root, detail_dir, row)
-    assert detail_model["result_blob"]["backend_status"] == "ok"
-    assert "__optimizer_result_store_envelope_v1__" not in detail_model["result_blob"]
+    with client.application.app_context():
+        resolved = web_routes._optimizer_result_row(
+            "run-shared-coating-payload",
+            key,
+        )
+        assert resolved is not None
+        root, detail_dir, row = resolved
+        detail_model = web_routes._result_detail_model(root, detail_dir, row)
+        assert detail_model["result_blob"]["backend_status"] == "ok"
+        assert "__optimizer_result_store_envelope_v1__" not in detail_model[
+            "result_blob"
+        ]
 
 
 @pytest.mark.parametrize(
