@@ -293,7 +293,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'class:simulator/optimize/results_store.py:ResultStore': {
         "path": 'simulator/optimize/results_store.py',
-        "line": 188,
+        "line": 197,
         "kind": 'class',
         "name": 'ResultStore',
         "carries_disclosure": True,
@@ -309,7 +309,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'fn:simulator/optimize/study.py:_scored_result_from_journal_payload': {
         "path": 'simulator/optimize/study.py',
-        "line": 2293,
+        "line": 2296,
         "kind": 'fn',
         "name": '_scored_result_from_journal_payload',
         "carries_disclosure": True,
@@ -1117,7 +1117,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/optimize/physics.py:shared_authority_cache': {
         "path": 'simulator/optimize/physics.py',
-        "line": 2766,
+        "line": 3013,
         "kind": 'store',
         "name": 'shared_authority_cache',
         "carries_disclosure": False,
