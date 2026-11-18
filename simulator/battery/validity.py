@@ -62,6 +62,7 @@ from simulator.battery.identity import (
     quantity_token,
 )
 from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
     Composition,
     Experiment,
     Located,
@@ -934,6 +935,11 @@ def _composition_components(
             return None
         value = value.state.value
     if isinstance(value, Composition):
+        # An initial-charge proxy is an engine input for prediction, not a
+        # measurement-state composition that can establish in-cell species
+        # coverage.
+        if value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+            return None
         value = value.components
     elif isinstance(value, Mapping):
         value = value.get("components", tuple(value.items()))

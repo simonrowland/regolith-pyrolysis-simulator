@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    AmountBasis,
     EvidenceClass,
     Quantity,
     RefusalReason,
@@ -18,7 +20,14 @@ from simulator.battery.migrate import (
     load_yaml,
     observation_from_plain,
 )
-from simulator.battery.records import Experiment, Located, Observation, State
+from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    Composition,
+    Experiment,
+    Located,
+    Observation,
+    State,
+)
 from simulator.battery.validity import (
     comparison_method_cell_constant_cancels,
     run_validity_gates,
@@ -263,6 +272,55 @@ def test_kems_apparatus_gates_apply_to_measured_rows() -> None:
     assert any(
         check.name == "kems_calibration" and not check.passed
         for check in outcome.checks
+    )
+
+
+def test_initial_charge_proxy_cannot_verify_in_cell_pressure_sum() -> None:
+    experiment = F.kems_experiment(
+        experiment_id="kems-initial-charge-proxy",
+        kn=None,
+    )
+    proxy = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+        proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    )
+    identity = replace(
+        F.psat_identity("Na"),
+        quantity=Quantity.P_PARTIAL,
+        composition=State.of(proxy),
+        reservoir=State.not_applicable("mixture partial pressure"),
+    )
+    observation = F.observation(
+        "initial-charge-proxy-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            **(observation.point_conditions or {}),
+            "composition": Located(State.of(proxy), locator=F.loc(page=1)),
+        },
+    )
+
+    outcome = run_validity_gates(
+        experiment,
+        observation,
+        point_observations=(observation,),
+    )
+
+    pressure_sum = next(
+        check
+        for check in outcome.checks
+        if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_sum.passed is False
+    assert pressure_sum.detail["reason"] == (
+        "composition is unknown; printed species coverage cannot be established"
     )
 
 

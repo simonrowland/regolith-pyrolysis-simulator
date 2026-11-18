@@ -990,6 +990,9 @@ def _mass_percent_component_key(name: str) -> tuple[str, bool]:
     return token, has_suffix
 
 
+_MALFORMED_DECLARED_AMOUNT_PREFIX = "malformed declared amount"
+
+
 def parse_declared_amount(value: object) -> Decimal:
     """Single owner for source-declared numeric amounts.
 
@@ -998,11 +1001,11 @@ def parse_declared_amount(value: object) -> Decimal:
     """
 
     if value is None or value == "" or isinstance(value, bool):
-        raise ValueError(f"malformed declared amount: {value!r}")
+        raise ValueError(f"{_MALFORMED_DECLARED_AMOUNT_PREFIX}: {value!r}")
     try:
         return _parse_declared_decimal(value)
     except _InvalidDecimalValue as exc:
-        raise ValueError(f"malformed declared amount: {value!r}") from exc
+        raise ValueError(f"{_MALFORMED_DECLARED_AMOUNT_PREFIX}: {value!r}") from exc
 
 
 def _provenance_with_printed_phase(
@@ -8231,7 +8234,7 @@ def _mole_fraction_composition_error(
     exc: ValueError, values: Mapping[str, object]
 ) -> tuple[str, str]:
     detail = str(exc)
-    if not detail.startswith("malformed declared amount"):
+    if not detail.startswith(_MALFORMED_DECLARED_AMOUNT_PREFIX):
         raise exc
     composition_key = (
         "composition_mol"
@@ -9300,10 +9303,35 @@ def _initial_charge_only_composition_proxy(
     point_oxide_map: Mapping[str, Decimal] | None = None,
     point_declared_component_map: Mapping[str, Any] | None = None,
     point_composition_map_declared: bool = False,
-    point_composition_invalid_reason: str | None = None,
 ) -> tuple[Identity, Mapping[str, Located[Any]] | None, list[Notice]]:
     conditions = dict(point_conditions or {})
     point_composition = conditions.get("composition")
+    malformed_composition_reason = None
+    # A declared but malformed composition is present invalid input, never a
+    # missing run composition eligible for the initial-charge proxy.
+    incoming_compositions = (
+        point_composition.state
+        if isinstance(point_composition, Located)
+        else None,
+        identity.composition,
+    )
+    for incoming in incoming_compositions:
+        if (
+            incoming is not None
+            and incoming.is_unknown
+            and (incoming.reason or "").startswith(
+                f"{_MALFORMED_DECLARED_AMOUNT_PREFIX}:"
+            )
+        ):
+            malformed_composition_reason = incoming.reason
+            break
+    if malformed_composition_reason is not None:
+        invalid = Located(
+            State.unknown(malformed_composition_reason), locator=locator
+        )
+        conditions["composition"] = invalid
+        return replace(identity, composition=invalid.state), conditions, list(notices)
+
     existing_initial_charge_proxy = (
         identity.composition is not None
         and identity.composition.is_value
@@ -9332,13 +9360,6 @@ def _initial_charge_only_composition_proxy(
         )
     ):
         return identity, point_conditions, list(notices)
-
-    if point_composition_invalid_reason is not None:
-        invalid = Located(
-            State.unknown(point_composition_invalid_reason), locator=locator
-        )
-        conditions["composition"] = invalid
-        return replace(identity, composition=invalid.state), conditions, list(notices)
 
     refusal_reasons = list(point_composition_refusal)
     if isinstance(point_composition, Located) and point_composition.state.is_unknown:
@@ -31345,17 +31366,11 @@ class Migrator:
                 point_oxide_map=point_oxide_map,
                 point_declared_component_map=point_declared_component_map,
                 point_composition_map_declared=point_map_explicit,
-                point_composition_invalid_reason=malformed_composition_amount,
             )
         )
         if notice_composition_located is None:
             notice_composition_located = (point_conditions or {}).get(
                 "composition"
-            )
-        if malformed_composition_amount is not None:
-            identity = replace(
-                identity,
-                composition=State.unknown(malformed_composition_amount),
             )
         notice_point_conditions = point_conditions
         if notice_composition_located is not None:
