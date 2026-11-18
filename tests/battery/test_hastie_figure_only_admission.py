@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from decimal import Decimal
 from pathlib import Path
 
 from simulator.battery.enums import (
@@ -69,6 +68,18 @@ def _fig4_sio_points(observations):
     )
 
 
+def _printed_hastie_band(row, experiment, *, confidence_level_override=None):
+    method = experiment.method.value if experiment.method.is_value else None
+    return _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        row.uncertainty,
+        row.value.point,
+        source_observation=row,
+        method=method,
+        confidence_level_override=confidence_level_override,
+    )
+
+
 def test_every_hastie_fig4_sio_point_is_admitted_with_its_figure_band(
     tmp_path,
 ) -> None:
@@ -98,19 +109,20 @@ def test_every_hastie_fig4_sio_point_is_admitted_with_its_figure_band(
         assert row.uncertainty.verbatim["units"] == "dex"
         assert row.uncertainty.verbatim["scope"] == "every point in this series"
         assert row.uncertainty.verbatim["as_printed"] == "±0.10 dex"
+        assert row.uncertainty.verbatim.get("confidence_level", "not_stated") == (
+            "not_stated"
+        )
 
         experiment = experiments[row.experiment_id]
-        method = experiment.method.value if experiment.method.is_value else None
-        resolution = _printed_uncertainty_band(
-            Quantity.P_PARTIAL,
-            row.uncertainty,
-            row.value.point,
-            source_observation=row,
-            method=method,
+        resolution = _printed_hastie_band(row, experiment)
+        explicit_one_sigma = _printed_hastie_band(
+            row, experiment, confidence_level_override="one_sigma"
         )
         assert resolution.refusal is None
         assert resolution.band is not None
-        assert resolution.band.value == Decimal("0.10")
+        assert explicit_one_sigma.refusal is None
+        assert explicit_one_sigma.band is not None
+        assert resolution.band == explicit_one_sigma.band
         assert resolution.band.unit == "dimensionless"
         assert resolution.band.band_basis == "row_printed"
 
@@ -350,8 +362,13 @@ def test_hastie_fig4_rows_reach_outer_compiler_and_keep_both_flags(tmp_path) -> 
                 failed_checks,
                 residual.notices,
             )
+            expected_band = _printed_hastie_band(
+                row, experiment, confidence_level_override="one_sigma"
+            )
+            assert expected_band.refusal is None
+            assert expected_band.band is not None
             assert residual.numeric.decision_band is not None
-            assert residual.numeric.decision_band.value == Decimal("0.10")
+            assert residual.numeric.decision_band == expected_band.band
             assert residual.numeric.decision_band.band_basis == "row_printed"
             assert residual.numeric.metric_uncertainty == row.uncertainty
             assert residual.refusal is None, (
