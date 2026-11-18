@@ -753,8 +753,7 @@ def _normalize_openimcc_feo_activity_prediction(
                 prediction.coefficient_sources,
                 prediction.provenance.get("melt_pack_identity"),
                 temperature_K,
-                quantity=Quantity.ACTIVITY_COEFFICIENT,
-                source_reference_state=comparison_identity.reference_state,
+                quantity=quantity,
             )
         )
     if refusal is not None:
@@ -764,12 +763,6 @@ def _normalize_openimcc_feo_activity_prediction(
             authority=Authority.REFUSED,
             refusal_reason=refusal.reason,
             refusal_detail=dict(refusal.detail),
-        )
-    if record is None:
-        assert quantity is Quantity.ACTIVITY_COEFFICIENT and notice is not None
-        return replace(
-            prediction,
-            notices=union_notices(prediction.notices, (notice,)),
         )
     assert value is not None and record is not None and notice is not None
     authority = prediction.authority

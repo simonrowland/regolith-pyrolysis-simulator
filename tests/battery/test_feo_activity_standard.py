@@ -15,16 +15,18 @@ import yaml
 
 import simulator.battery.feo_standard as feo_standard_module
 from simulator.battery.enums import (
+    AdmissionStatus,
     AmountBasis,
     Authority,
     Engine,
     EvidenceClass,
     ExecutionState,
-    NoticeKind,
     Quantity,
     RefusalReason,
     ResidualStatus,
+    ValueKind,
 )
+from simulator.battery.identity import Identity
 from simulator.battery.records import Composition, Execution
 from simulator.battery.migrate import REPO_ROOT, Migrator, _identity_from_plain
 from simulator.battery.score import (
@@ -60,7 +62,6 @@ _TYPED_FEO_GAMMA_SOURCES = (
     "holzheid-1997-feo-nio-coo-activity-metal-saturated",
     "li-2005-na-al-phosphate-fe-activities",
     "hayashi-2025-ca-fe-silicate-redox-activities",
-    "snyder-carmichael-1992-olivine-liquid-feo-activity",
     "wood-wade-2013-trace-activities",
     "oneill-2002-feo-activity-coefficients-cmas",
     "borisov-2004-tio2-pd-ni-fe-solubilities",
@@ -93,6 +94,29 @@ def _source_feo_gamma_identity(source_id: str, formula: str = "FeO"):
         )
     )
     return _identity_from_plain(row["identity"])
+
+
+@lru_cache(maxsize=None)
+def _score_source_feo_gamma_case(source_id: str, formula: str = "FeO"):
+    context = score_module.load_score_context(sources=(source_id,))
+    rows = tuple(
+        observation
+        for observation in context.observations.values()
+        if observation.source_id == source_id
+        and isinstance(observation.identity, Identity)
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+        and observation.identity.species is not None
+        and observation.identity.species.formula.casefold() == formula.casefold()
+        and observation.value.kind is ValueKind.POINT
+    )
+    assert rows, f"no point {formula} coefficient in {source_id}"
+    admitted = tuple(
+        observation
+        for observation in rows
+        if observation.admission.status is AdmissionStatus.ADMITTED
+    )
+    return context, admitted[0] if admitted else rows[0]
 
 
 def _openimcc_sources(
@@ -753,6 +777,103 @@ def test_openimcc_feo_prediction_is_normalized_and_carries_notice_and_provenance
     )
 
 
+@pytest.mark.parametrize("source_id", _TYPED_FEO_GAMMA_SOURCES)
+def test_openimcc_feo_gamma_gets_the_activity_reference_shift_per_source(
+    source_id: str,
+) -> None:
+    context, gamma_reference = _score_source_feo_gamma_case(source_id)
+    assert gamma_reference.identity.reference_state is not None
+    assert gamma_reference.identity.reference_state.is_value
+    activity_reference = replace(
+        gamma_reference,
+        observation_id=f"{gamma_reference.observation_id}::activity-shift-test",
+        identity=replace(
+            gamma_reference.identity,
+            quantity=State.of(Quantity.ACTIVITY),
+        ),
+    )
+    assert activity_reference.identity.composition == gamma_reference.identity.composition
+
+    activity_residual, activity_candidate = compile_residual(
+        activity_reference, Engine.OPENIMCC, context=context
+    )
+    gamma_residual, gamma_candidate = compile_residual(
+        gamma_reference, Engine.OPENIMCC, context=context
+    )
+
+    assert activity_residual.status is not ResidualStatus.REFUSED
+    assert gamma_residual.status is not ResidualStatus.REFUSED
+    assert activity_candidate is not None and activity_candidate.provenance is not None
+    assert gamma_candidate is not None and gamma_candidate.provenance is not None
+    activity_record = activity_candidate.provenance["feo_standard_normalisation"]
+    gamma_record = gamma_candidate.provenance["feo_standard_normalisation"]
+    assert gamma_record["log10_shift"] == activity_record["log10_shift"]
+    assert gamma_record["to_standard"] == activity_record["to_standard"] == "Fe-019"
+
+
+@pytest.mark.parametrize("source_id", _UNKNOWN_FEO_GAMMA_SOURCES)
+def test_openimcc_feo_gamma_unknown_reference_is_refused_before_prediction(
+    source_id: str,
+) -> None:
+    context, reference = _score_source_feo_gamma_case(source_id)
+    reference_state = reference.identity.reference_state
+    assert reference_state is None or not reference_state.is_value
+
+    residual, candidate = compile_residual(
+        reference, Engine.OPENIMCC, context=context
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert candidate is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == "missing_evidence"
+    assert residual.refusal.detail["gaps"][0]["waypoint"] == "reference_state"
+    assert residual.refusal.detail["gaps"][0]["reason"] == "missing_evidence"
+
+
+def test_snyder_feo_gamma_solid_reference_is_refused_before_normalization() -> None:
+    context, reference = _score_source_feo_gamma_case(
+        "snyder-carmichael-1992-olivine-liquid-feo-activity"
+    )
+    standard_state = reference.identity.reference_state.value
+    assert standard_state.endmember.formula == "Fe0.947O"
+    assert standard_state.endmember.phase.value == "cr"
+
+    residual, candidate = compile_residual(
+        reference, Engine.OPENIMCC, context=context
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert candidate is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail["reason"] == "reference_state_mismatch"
+
+
+@pytest.mark.parametrize(
+    "source_id",
+    (
+        "li-2005-na-al-phosphate-fe-activities",
+        "hayashi-2025-ca-fe-silicate-redox-activities",
+    ),
+)
+def test_openimcc_feo_normalisation_does_not_apply_to_feo1_5_gamma(
+    source_id: str,
+) -> None:
+    context, reference = _score_source_feo_gamma_case(
+        source_id, formula="FeO1.5"
+    )
+    residual, candidate = compile_residual(
+        reference, Engine.OPENIMCC, context=context
+    )
+
+    if candidate is None:
+        assert residual.status is ResidualStatus.REFUSED
+    else:
+        assert "feo_standard_normalisation" not in (candidate.provenance or {})
+
+
 def _openimcc_feo_prediction_for_normalisation() -> EnginePrediction:
     pack_identity = _melt_pack_identity("default")
     sources = _openimcc_sources(
@@ -766,111 +887,6 @@ def _openimcc_feo_prediction_for_normalisation() -> EnginePrediction:
         temperature_K=Decimal("1600"),
         provenance={"melt_pack_identity": pack_identity},
     )[3]
-
-
-@pytest.mark.parametrize("source_id", _TYPED_FEO_GAMMA_SOURCES)
-def test_openimcc_feo_gamma_gets_the_activity_reference_shift_per_source(
-    source_id: str,
-) -> None:
-    source_identity = _source_feo_gamma_identity(source_id)
-    assert source_identity.reference_state is not None
-    assert source_identity.reference_state.is_value
-    prediction = _openimcc_feo_prediction_for_normalisation()
-    shared_identity = replace(
-        prediction.identity,
-        reference_state=source_identity.reference_state,
-    )
-    activity_prediction = replace(
-        prediction,
-        value=Decimal("0.1"),
-        identity=replace(shared_identity, quantity=State.of(Quantity.ACTIVITY)),
-    )
-    gamma_prediction = replace(
-        prediction,
-        value=Decimal("0.5"),
-        identity=replace(
-            shared_identity,
-            quantity=State.of(Quantity.ACTIVITY_COEFFICIENT),
-        ),
-    )
-    assert (
-        activity_prediction.identity.composition
-        == gamma_prediction.identity.composition
-    )
-
-    normalized_activity = score_module._normalize_openimcc_feo_activity_prediction(
-        activity_prediction
-    )
-    normalized_gamma = score_module._normalize_openimcc_feo_activity_prediction(
-        gamma_prediction
-    )
-
-    activity_record = normalized_activity.provenance[
-        "feo_standard_normalisation"
-    ]
-    gamma_record = normalized_gamma.provenance["feo_standard_normalisation"]
-    assert gamma_record["log10_shift"] == activity_record["log10_shift"]
-    assert normalized_gamma.value is not None
-    assert normalized_activity.value is not None
-    assert float(normalized_gamma.value / Decimal("0.5")) == pytest.approx(
-        float(normalized_activity.value / Decimal("0.1")), rel=1e-12
-    )
-
-
-@pytest.mark.parametrize("source_id", _UNKNOWN_FEO_GAMMA_SOURCES)
-def test_openimcc_feo_gamma_unknown_reference_stays_unconverted_and_is_flagged(
-    source_id: str,
-) -> None:
-    source_identity = _source_feo_gamma_identity(source_id)
-    reference_state = source_identity.reference_state
-    assert reference_state is not None and not reference_state.is_value
-    prediction = _openimcc_feo_prediction_for_normalisation()
-    gamma_identity = replace(
-        prediction.identity,
-        quantity=State.of(Quantity.ACTIVITY_COEFFICIENT),
-        reference_state=reference_state,
-    )
-    prediction = replace(
-        prediction, value=Decimal("0.5"), identity=gamma_identity
-    )
-
-    normalized = score_module._normalize_openimcc_feo_activity_prediction(
-        prediction
-    )
-
-    assert normalized.value == prediction.value
-    assert normalized.provenance == prediction.provenance
-    notice = next(
-        notice
-        for notice in normalized.notices
-        if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
-    )
-    assert notice.affected_quantities == (Quantity.ACTIVITY_COEFFICIENT,)
-    assert "source reference is unknown" in notice.reason
-
-
-@pytest.mark.parametrize(
-    "source_id",
-    (
-        "li-2005-na-al-phosphate-fe-activities",
-        "hayashi-2025-ca-fe-silicate-redox-activities",
-    ),
-)
-def test_openimcc_feo_normalisation_does_not_apply_to_feo1_5_gamma(
-    source_id: str,
-) -> None:
-    ferric_identity = _source_feo_gamma_identity(source_id, formula="FeO1.5")
-    prediction = _openimcc_feo_prediction_for_normalisation()
-    gamma_prediction = replace(
-        prediction,
-        value=Decimal("0.5"),
-        identity=ferric_identity,
-    )
-
-    assert (
-        score_module._normalize_openimcc_feo_activity_prediction(gamma_prediction)
-        is gamma_prediction
-    )
 
 
 def test_openimcc_feo_activity_path_remains_unchanged_for_unknown_reference() -> None:

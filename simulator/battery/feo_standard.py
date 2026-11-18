@@ -18,9 +18,8 @@ from simulator.battery.enums import (
     Quantity,
     RefusalReason,
 )
-from simulator.battery.records import Notice, ResidualRefusal, StandardState
+from simulator.battery.records import Notice, ResidualRefusal
 from simulator.physical_constants import GAS_CONSTANT
-from simulator.state_types import State
 
 
 @dataclass(frozen=True)
@@ -461,41 +460,12 @@ def normalize_openimcc_feo_activity_value(
     temperature_K: Decimal | None,
     *,
     quantity: Quantity = Quantity.ACTIVITY,
-    source_reference_state: object = None,
 ) -> tuple[
     Decimal | None,
     Mapping[str, object] | None,
     Notice | None,
     ResidualRefusal | None,
 ]:
-    if quantity is Quantity.ACTIVITY_COEFFICIENT and not (
-        isinstance(source_reference_state, State)
-        and source_reference_state.is_value
-        and isinstance(source_reference_state.value, StandardState)
-    ):
-        if (
-            isinstance(source_reference_state, State)
-            and not source_reference_state.is_value
-        ):
-            reason = source_reference_state.reason or source_reference_state.tag.value
-        else:
-            reason = "reference_state is absent or not a typed StandardState"
-        return (
-            value,
-            None,
-            Notice(
-                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-                affected_quantities=(quantity,),
-                reason=(
-                    "OpenIMCC FeO(l) activity coefficient left unnormalized "
-                    f"because the printed source reference is unknown: {reason}"
-                ),
-                origin="openimcc_feo_standard_normalisation",
-                band="printed FeO reference state is unknown or untyped",
-            ),
-            None,
-        )
-
     standard, refusal = _resolve_feo_activity_standard(
         Engine.OPENIMCC,
         coefficient_sources,
