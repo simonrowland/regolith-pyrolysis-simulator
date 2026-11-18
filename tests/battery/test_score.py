@@ -6338,6 +6338,92 @@ def test_d274_incomplete_printed_pressure_lower_bound_over_limit_still_refuses()
 
 
 @pytest.mark.parametrize(
+    "composition_source", ("absent_point_conditions", "loader_unknown_alias")
+)
+def test_d274_own_pressure_over_limit_survives_incomplete_measurement_context(
+    composition_source: str,
+) -> None:
+    experiment = F.kems_experiment(
+        f"d274-{composition_source}-own-pressure",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
+    )
+    if composition_source == "absent_point_conditions":
+        identity = replace(
+            _partial_identity(),
+            composition=State.unknown("run composition not reported"),
+        )
+        malformed_composition_alias = None
+    else:
+        from simulator.battery.migrate import _composition_located_from_plain
+
+        identity = replace(_partial_identity(), composition=None)
+        malformed_composition_alias = _composition_located_from_plain(
+            {"state": {"tag": "invalid"}}
+        )
+    pressure = F.observation(
+        f"d274-{composition_source}-11-Pa-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("11"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    if composition_source == "absent_point_conditions":
+        pressure = replace(pressure, point_conditions=None)
+    else:
+        pressure = replace(
+            pressure,
+            point_conditions={
+                "composition": malformed_composition_alias
+            },
+        )
+
+    point_observations = (pressure,)
+    gates = run_validity_gates(
+        experiment, pressure, point_observations=point_observations
+    )
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert pressure_check.passed is False
+    assert pressure_check.detail["printed_partial_pressure_lower_bound_Pa"] == "11"
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+    if composition_source == "absent_point_conditions":
+        assert pressure_check.detail["reason"] == (
+            "same-point temperature/point_conditions are incomplete"
+        )
+    else:
+        assert pressure_check.detail["reason"] == (
+            "composition is unknown; printed species coverage cannot be established"
+        )
+        assert malformed_composition_alias is not None
+        assert pressure_check.detail["composition_scope_details"] == [
+            malformed_composition_alias.state.reason
+        ]
+
+    context = _context(F.work(), experiment, pressure, review="reviewed")
+    residual, _ = compile_residual(
+        pressure,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={pressure.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+        point_observations=point_observations,
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+
+@pytest.mark.parametrize(
     "composition_source", ("proxy", "sample_only", "malformed_own")
 )
 def test_d274_over_limit_pressure_still_refuses_without_run_composition(
