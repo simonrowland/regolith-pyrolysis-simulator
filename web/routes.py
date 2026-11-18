@@ -678,6 +678,8 @@ def _optimizer_backend_payload(
     result_blob: Mapping[str, Any],
     run_reference: Mapping[str, Any],
 ) -> dict[str, Any]:
+    if not isinstance(result_blob, Mapping):
+        result_blob = {}
     raw_requested = eval_spec.get('backend_name') or run_reference.get('backend_name')
     requested_token = (
         canonical_backend_name(str(raw_requested)) if raw_requested else None
@@ -800,6 +802,8 @@ def _result_metadata(
     accepted_corpus_versions: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
     margins, result_blob = _decode_optimizer_result_payload(row)
+    if not isinstance(result_blob, Mapping):
+        result_blob = {}
     objectives = _objective_items(row)
     selected = _objective_for(objectives, objective_metric)
     run_reference = _json_value(row['run_reference'], {})

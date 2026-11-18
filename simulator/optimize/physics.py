@@ -2763,12 +2763,25 @@ class PhysicsConstraintSet:
                 for (campaign, segment, species), kg in sorted(by_campaign.items())
                 if kg > COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
             ]
+            shared_authority_cache: dict[
+                int,
+                tuple[
+                    Mapping[str, Any],
+                    Mapping[str, Any],
+                    Mapping[str, Any],
+                ],
+            ] = {}
             reasons = _coating_violation_reasons(
                 authority=authority,
+                shared_cache=shared_authority_cache,
                 deposit_records=deposit_records,
                 diagnostics=diagnostics,
             )
-            warning_flags = _coating_dew_point_warnings(diagnostics, authority)
+            warning_flags = _coating_dew_point_warnings(
+                diagnostics,
+                authority,
+                shared_cache=shared_authority_cache,
+            )
             unavailable_reason = _coating_wall_quantity_unavailable(authority)
             common_payload = {
                 **authority,
@@ -2997,6 +3010,14 @@ class PhysicsConstraintSet:
                 output_status=output_status,
                 status_reason=status_reason,
             )
+        shared_authority_cache: dict[
+            int,
+            tuple[
+                Mapping[str, Any],
+                Mapping[str, Any],
+                Mapping[str, Any],
+            ],
+        ] = {}
         raw_wall_rate = report.get("wall_deposit_kg_per_campaign")
         if (
             "wall_deposit_kg_per_campaign" in report
@@ -3050,6 +3071,7 @@ class PhysicsConstraintSet:
         warning_flags = _coating_dew_point_warnings(
             diagnostics,
             authority_payload,
+            shared_cache=shared_authority_cache,
         )
         unavailable_reason = _coating_wall_quantity_unavailable(
             report,
@@ -3079,6 +3101,7 @@ class PhysicsConstraintSet:
                 )
             reasons = _coating_violation_reasons(
                 authority=authority_payload,
+                shared_cache=shared_authority_cache,
                 deposit_records=deposit_records,
                 aggregate_deposit_kg=rate,
                 diagnostics=diagnostics,
@@ -3205,6 +3228,7 @@ class PhysicsConstraintSet:
                 )
         reasons = _coating_violation_reasons(
             authority=authority_payload,
+            shared_cache=shared_authority_cache,
             deposit_records=deposit_records,
             aggregate_deposit_kg=aggregate_deposit,
             diagnostics=diagnostics,
@@ -4234,9 +4258,28 @@ def _coating_runtime_diagnostics(value: Any) -> dict[str, Any]:
 
 def _coating_authority_values(
     authority: Mapping[str, Any],
+    *,
+    shared_cache: dict[
+        int,
+        tuple[
+            Mapping[str, Any],
+            Mapping[str, Any],
+            Mapping[str, Any],
+        ],
+    ] | None = None,
 ) -> tuple[Mapping[str, Any], Mapping[str, Any]]:
+    identity = id(authority)
+    if shared_cache is not None:
+        cached = shared_cache.get(identity)
+        if cached is not None and cached[0] is authority:
+            return cached[1], cached[2]
     shared_authority = _plain_value(authority)
-    return shared_authority, _coating_authority_flags(shared_authority)
+    shared_flags = _coating_authority_flags(shared_authority)
+    if shared_cache is not None:
+        # This is scoped to one coating evaluation. Holding the source mapping
+        # prevents id reuse while warnings and violation reasons are built.
+        shared_cache[identity] = (authority, shared_authority, shared_flags)
+    return shared_authority, shared_flags
 
 
 def _coating_authority_flags(authority: Mapping[str, Any]) -> dict[str, Any]:
@@ -4443,7 +4486,16 @@ def _coating_from_upstream_deposit_fraction_report(
 
     for explicit in report.get("coating_violation_reasons", ()):
         if isinstance(explicit, Mapping):
-            reason = dict(_plain_value(explicit))
+            reason = {
+                key: (
+                    value
+                    if key in {"authority", "flags"} and type(value) is dict
+                    else _plain_value(value)
+                )
+                for key, value in explicit.items()
+            }
+            if reason.get("authority") is authority:
+                reason["authority"] = shared_authority
             reason.setdefault("authority", shared_authority)
             reason.setdefault("flags", shared_authority_flags)
             violation_reasons.append(reason)
@@ -4934,9 +4986,23 @@ def _unique_coating_records(
     records: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     unique: list[dict[str, Any]] = []
-    seen: set[str] = set()
+    seen: set[tuple[Any, ...]] = set()
     for record in records:
-        key = repr(_plain_value(record))
+        fields: list[tuple[str, Any]] = []
+        for raw_key, value in record.items():
+            key = str(raw_key)
+            if key in {"authority", "flags"}:
+                value_key = ("shared", id(value))
+            elif value is None or type(value) in (str, int, bool):
+                value_key = (type(value), value)
+            elif type(value) is float:
+                value_key = (float, value.hex())
+            else:
+                # Nested findings and diagnostics are never traversed or
+                # stringified while comparing records.
+                value_key = ("payload", id(value))
+            fields.append((key, value_key))
+        key = tuple(sorted(fields, key=lambda item: item[0]))
         if key in seen:
             continue
         seen.add(key)
@@ -4969,6 +5035,14 @@ def _coating_dew_point_warnings(
     authority: Mapping[str, Any],
     *,
     authority_flags: Mapping[str, Any] | None = None,
+    shared_cache: dict[
+        int,
+        tuple[
+            Mapping[str, Any],
+            Mapping[str, Any],
+            Mapping[str, Any],
+        ],
+    ] | None = None,
 ) -> list[dict[str, Any]]:
     """Publish every hot-wall judgement on every coating path.
 
@@ -4982,7 +5056,10 @@ def _coating_dew_point_warnings(
 
     diagnostics = diagnostics or {}
     if authority_flags is None:
-        authority, authority_flags = _coating_authority_values(authority)
+        authority, authority_flags = _coating_authority_values(
+            authority,
+            shared_cache=shared_cache,
+        )
     records: list[dict[str, Any]] = []
     covered: set[tuple[Any, ...]] = set()
 
@@ -5099,9 +5176,20 @@ def _coating_violation_reasons(
     aggregate_deposit_kg: float | None = None,
     diagnostics: Mapping[str, Any] | None = None,
     explicit_reasons: Any = (),
+    shared_cache: dict[
+        int,
+        tuple[
+            Mapping[str, Any],
+            Mapping[str, Any],
+            Mapping[str, Any],
+        ],
+    ] | None = None,
 ) -> list[dict[str, Any]]:
     reasons: list[dict[str, Any]] = []
-    shared_authority, shared_authority_flags = _coating_authority_values(authority)
+    shared_authority, shared_authority_flags = _coating_authority_values(
+        authority,
+        shared_cache=shared_cache,
+    )
     positive_record_seen = False
     scoped_record_seen = False
     for record in deposit_records if isinstance(deposit_records, (tuple, list)) else ():
@@ -5162,19 +5250,20 @@ def _coating_violation_reasons(
         )
     for explicit in explicit_reasons if isinstance(explicit_reasons, (tuple, list)) else ():
         if isinstance(explicit, Mapping):
-            record = dict(_plain_value(explicit))
+            record = {
+                key: (
+                    value
+                    if key in {"authority", "flags"} and type(value) is dict
+                    else _plain_value(value)
+                )
+                for key, value in explicit.items()
+            }
+            if record.get("authority") is authority:
+                record["authority"] = shared_authority
             record.setdefault("authority", shared_authority)
             record.setdefault("flags", shared_authority_flags)
             reasons.append(record)
-    unique: list[dict[str, Any]] = []
-    seen: set[str] = set()
-    for reason in reasons:
-        key = repr(_plain_value(reason))
-        if key in seen:
-            continue
-        seen.add(key)
-        unique.append(reason)
-    return unique
+    return _unique_coating_records(reasons)
 
 
 def _coating_reason_summary(reasons: list[Mapping[str, Any]]) -> str:
@@ -5321,36 +5410,32 @@ def _payload_has_deposited_species(payload: Mapping[str, Any]) -> bool:
 
 
 def _plain_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
-    """Copy margin payloads while preserving read-only shared warning trees.
+    """Copy margin payloads while preserving shared coating record trees.
 
-    Coating warning authority and flags are plain dicts shared by alias for
-    size and worker serialization. Consumers must treat those two trees as
+    Warning and violation authority/flags are plain dicts shared by alias for
+    size and worker serialization. Consumers must treat those trees as
     read-only; the result and web readers only inspect them.
     """
     copied: dict[str, Any] = {}
     for key, value in payload.items():
-        if key == "coating_warning_flags" and isinstance(value, (list, tuple)):
-            warning_flags: list[Any] = []
-            for warning in value:
-                if not isinstance(warning, MappingABC):
-                    warning_flags.append(_plain_value(warning))
+        if key in {"coating_warning_flags", "coating_violation_reasons"} and isinstance(
+            value, (list, tuple)
+        ):
+            copied_records: list[Any] = []
+            for record in value:
+                if not isinstance(record, MappingABC):
+                    copied_records.append(_plain_value(record))
                     continue
-                copied_warning: dict[str, Any] = {}
-                for warning_key, warning_value in warning.items():
-                    # These two plain dicts are shared across coating warnings
-                    # to avoid retaining megabytes of repeated authority data.
-                    # Result readers treat them as immutable by contract. Keep
-                    # the refs ordinary dicts so worker pickling and Flask JSON
-                    # encoding continue to work.
-                    if (
-                        warning_key in {"authority", "flags"}
-                        and type(warning_value) is dict
-                    ):
-                        copied_warning[warning_key] = warning_value
+                copied_record: dict[str, Any] = {}
+                for record_key, record_value in record.items():
+                    # Keep these references plain for worker pickling and Flask
+                    # JSON; readers follow the read-only contract.
+                    if record_key in {"authority", "flags"} and type(record_value) is dict:
+                        copied_record[record_key] = record_value
                     else:
-                        copied_warning[warning_key] = _plain_value(warning_value)
-                warning_flags.append(copied_warning)
-            copied[key] = warning_flags
+                        copied_record[record_key] = _plain_value(record_value)
+                copied_records.append(copied_record)
+            copied[key] = copied_records
         else:
             copied[key] = _plain_value(value)
     return copied

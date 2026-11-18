@@ -81,7 +81,11 @@ READ_COMPATIBILITY_REJECTION_NOTE_PREFIX = (
 _RESULT_BLOB_ENVELOPE_KEY = "__optimizer_result_store_envelope_v1__"
 _RESULT_BLOB_SHARED_STATUS_PAYLOADS_KEY = "shared_status_payloads"
 _SHARED_STATUS_PAYLOAD_REF_KEY = "__optimizer_result_store_ref_v1__"
-_SHARED_COATING_WARNING_FIELDS = frozenset({"authority", "flags"})
+_SHARED_COATING_RECORD_FIELDS = frozenset({"authority", "flags"})
+_COATING_RECORD_LIST_FIELDS = frozenset({
+    "coating_warning_flags",
+    "coating_violation_reasons",
+})
 
 __all__ = [
     "DEFAULT_BUSY_TIMEOUT_MS",
@@ -1656,10 +1660,10 @@ def _serialize_status_payload(
         key_string = str(key)
         if (
             shared_status_payloads is not None
-            and key_string == "coating_warning_flags"
+            and key_string in _COATING_RECORD_LIST_FIELDS
             and isinstance(value, (list, tuple))
         ):
-            serialized[key_string] = _serialize_coating_warning_flags(
+            serialized[key_string] = _serialize_coating_records(
                 value,
                 shared_status_payloads,
                 shared_status_payload_ids,
@@ -1669,21 +1673,21 @@ def _serialize_status_payload(
     return serialized
 
 
-def _serialize_coating_warning_flags(
-    warning_flags: SequenceABC[Any],
+def _serialize_coating_records(
+    records: SequenceABC[Any],
     shared_status_payloads: dict[str, Any],
     shared_status_payload_ids: dict[int, tuple[Any, str, Any]] | None,
 ) -> list[Any]:
-    serialized_flags: list[Any] = []
-    for warning in warning_flags:
-        if not isinstance(warning, MappingABC):
-            serialized_flags.append(_jsonable(warning))
+    serialized_records: list[Any] = []
+    for record in records:
+        if not isinstance(record, MappingABC):
+            serialized_records.append(_jsonable(record))
             continue
-        serialized_warning: dict[str, Any] = {}
-        for key, value in warning.items():
+        serialized_record: dict[str, Any] = {}
+        for key, value in record.items():
             key_string = str(key)
             if (
-                key_string in _SHARED_COATING_WARNING_FIELDS
+                key_string in _SHARED_COATING_RECORD_FIELDS
                 and isinstance(value, MappingABC)
             ):
                 identity = id(value)
@@ -1706,13 +1710,13 @@ def _serialize_coating_warning_flags(
                             shared_value,
                         )
                 shared_status_payloads.setdefault(digest, shared_value)
-                serialized_warning[key_string] = {
+                serialized_record[key_string] = {
                     _SHARED_STATUS_PAYLOAD_REF_KEY: digest,
                 }
             else:
-                serialized_warning[key_string] = _jsonable(value)
-        serialized_flags.append(serialized_warning)
-    return serialized_flags
+                serialized_record[key_string] = _jsonable(value)
+        serialized_records.append(serialized_record)
+    return serialized_records
 
 
 def _deserialize_margins(
@@ -1721,6 +1725,7 @@ def _deserialize_margins(
     shared_status_payloads: Mapping[str, Any] | None = None,
 ) -> dict[str, GateMargin]:
     margins: dict[str, GateMargin] = {}
+    decoded_shared_payloads: dict[str, Mapping[str, Any]] = {}
     for gate, item in payload.items():
         threshold = item["threshold"]
         gate_name = str(item["gate"])
@@ -1735,9 +1740,10 @@ def _deserialize_margins(
             else {}
         )
         if isinstance(status_payload, dict):
-            _resolve_shared_coating_warning_flags(
+            _resolve_shared_coating_records(
                 status_payload,
                 shared_status_payloads,
+                decoded_shared_payloads,
             )
         observed_raw = item.get("observed")
         observed_value = (
@@ -1809,51 +1815,59 @@ def _deserialize_margins(
     return margins
 
 
-def _resolve_shared_coating_warning_flags(
+def _resolve_shared_coating_records(
     status_payload: dict[str, Any],
     shared_status_payloads: Mapping[str, Any] | None,
+    decoded_shared_payloads: dict[str, Mapping[str, Any]],
 ) -> None:
-    warning_flags = status_payload.get("coating_warning_flags")
-    if not isinstance(warning_flags, list):
-        return
-    for warning in warning_flags:
-        if not isinstance(warning, dict):
+    for field in _COATING_RECORD_LIST_FIELDS:
+        records = status_payload.get(field)
+        if not isinstance(records, list):
             continue
-        for key in _SHARED_COATING_WARNING_FIELDS:
-            reference = warning.get(key)
-            if not isinstance(reference, MappingABC) or (
-                _SHARED_STATUS_PAYLOAD_REF_KEY not in reference
-            ):
+        for record in records:
+            if not isinstance(record, dict):
                 continue
-            raw_digest = reference[_SHARED_STATUS_PAYLOAD_REF_KEY]
-            if (
-                set(reference) != {_SHARED_STATUS_PAYLOAD_REF_KEY}
-                or not isinstance(raw_digest, str)
-                or not raw_digest
-            ):
-                raise ResultStoreSchemaError(
-                    "optimizer result-store shared coating reference is malformed"
-                )
-            digest = raw_digest
-            if shared_status_payloads is None or digest not in shared_status_payloads:
-                raise ResultStoreSchemaError(
-                    "optimizer result-store shared coating payload is missing: "
-                    f"{digest}"
-                )
-            shared_value = shared_status_payloads[digest]
-            if not isinstance(shared_value, MappingABC):
-                raise ResultStoreSchemaError(
-                    "optimizer result-store shared coating payload is malformed: "
-                    f"{digest}"
-                )
-            if hashlib.sha256(
-                _json_dump(_jsonable(shared_value)).encode()
-            ).hexdigest() != digest:
-                raise ResultStoreSchemaError(
-                    "optimizer result-store shared coating reference does not match: "
-                    f"{digest}"
-                )
-            warning[key] = shared_value
+            for key in _SHARED_COATING_RECORD_FIELDS:
+                reference = record.get(key)
+                if not isinstance(reference, MappingABC) or (
+                    _SHARED_STATUS_PAYLOAD_REF_KEY not in reference
+                ):
+                    continue
+                raw_digest = reference[_SHARED_STATUS_PAYLOAD_REF_KEY]
+                if (
+                    set(reference) != {_SHARED_STATUS_PAYLOAD_REF_KEY}
+                    or not isinstance(raw_digest, str)
+                    or not raw_digest
+                ):
+                    raise ResultStoreSchemaError(
+                        "optimizer result-store shared coating reference is malformed"
+                    )
+                digest = raw_digest
+                if digest not in decoded_shared_payloads:
+                    if shared_status_payloads is None or digest not in shared_status_payloads:
+                        raise ResultStoreSchemaError(
+                            "optimizer result-store shared coating payload is missing: "
+                            f"{digest}"
+                        )
+                    raw_shared_value = shared_status_payloads[digest]
+                    if not isinstance(raw_shared_value, MappingABC):
+                        raise ResultStoreSchemaError(
+                            "optimizer result-store shared coating payload is malformed: "
+                            f"{digest}"
+                        )
+                    shared_value = _jsonable(raw_shared_value)
+                    if not isinstance(shared_value, MappingABC):
+                        raise ResultStoreSchemaError(
+                            "optimizer result-store shared coating payload is malformed: "
+                            f"{digest}"
+                        )
+                    if hashlib.sha256(_json_dump(shared_value).encode()).hexdigest() != digest:
+                        raise ResultStoreSchemaError(
+                            "optimizer result-store shared coating reference does not match: "
+                            f"{digest}"
+                        )
+                    decoded_shared_payloads[digest] = shared_value
+                record[key] = decoded_shared_payloads[digest]
 
 
 def _deserialize_grounding_margins(

@@ -592,6 +592,158 @@ def test_coating_warning_flag_shared_payloads_round_trip(tmp_path) -> None:
         store.lookup(spec)
 
 
+def test_shared_coating_record_codec_work_scales_with_distinct_trees(monkeypatch) -> None:
+    """One large shared tree is copied, encoded, and validated once per row."""
+    import simulator.optimize.physics as physics_module
+    import simulator.optimize.results_store as results_store_module
+
+    warning_count = 500
+    authority_source = {
+        "code": "synthetic-authority",
+        "output_status": "status_bearing",
+        "large_evidence": "x" * 200_000,
+    }
+    plain_source_calls = 0
+    plain_shared_calls = 0
+    shared_authority_ref = []
+    original_plain_value = physics_module._plain_value
+
+    def count_plain_source(value):
+        nonlocal plain_source_calls, plain_shared_calls
+        if value is authority_source:
+            plain_source_calls += 1
+        if shared_authority_ref and value is shared_authority_ref[0]:
+            plain_shared_calls += 1
+        return original_plain_value(value)
+
+    monkeypatch.setattr(physics_module, "_plain_value", count_plain_source)
+    source_cache = {}
+    shared_authority, shared_flags = physics_module._coating_authority_values(
+        authority_source,
+        shared_cache=source_cache,
+    )
+    cached_authority, cached_flags = physics_module._coating_authority_values(
+        authority_source,
+        shared_cache=source_cache,
+    )
+    shared_authority_ref.append(shared_authority)
+    assert cached_authority is shared_authority
+    assert cached_flags is shared_flags
+    warnings = physics_module._unique_coating_records([
+        physics_module._coating_reason_record(
+            "synthetic-warning",
+            authority=shared_authority,
+            authority_flags=shared_flags,
+            record_number=index,
+        )
+        for index in range(warning_count)
+    ])
+    reasons = physics_module._unique_coating_records([
+        physics_module._coating_reason_record(
+            "synthetic-violation",
+            authority=shared_authority,
+            authority_flags=shared_flags,
+            record_number=index,
+        )
+        for index in range(warning_count)
+    ])
+    margin = GateMargin(
+        gate="coating",
+        feasible=False,
+        margin=-1.0,
+        threshold=ThresholdSpec(
+            id="coating",
+            value=1.0,
+            units="campaigns",
+            source="test",
+            source_ref="synthetic",
+        ),
+        observed=2.0,
+        detail="synthetic shared coating records",
+        status_payload={
+            "coating_verdict": "violated",
+            "coating_warning_flags": warnings,
+            "coating_violation_reasons": reasons,
+        },
+    )
+    assert plain_source_calls == 1
+    assert plain_shared_calls == 0
+    assert len(margin.status_payload["coating_warning_flags"]) == warning_count
+    assert len(margin.status_payload["coating_violation_reasons"]) == warning_count
+    assert all(
+        record["authority"] is shared_authority
+        and record["flags"] is shared_flags
+        for record in margin.status_payload["coating_warning_flags"]
+        + margin.status_payload["coating_violation_reasons"]
+    )
+
+    original_jsonable = results_store_module._jsonable
+    original_json_dump = results_store_module._json_dump
+    original_sha256 = results_store_module.hashlib.sha256
+    stage = "encode"
+    source_convert_calls = 0
+    source_hash_calls = 0
+    decoded_convert_calls = 0
+    decoded_hash_calls = 0
+    decoded_shared_source = None
+    authority_hash_bytes = original_json_dump(
+        original_jsonable(shared_authority)
+    ).encode()
+
+    def count_jsonable(value):
+        nonlocal source_convert_calls, decoded_convert_calls
+        if stage == "encode" and value is shared_authority:
+            source_convert_calls += 1
+        if stage == "decode" and value is decoded_shared_source:
+            decoded_convert_calls += 1
+        return original_jsonable(value)
+
+    def count_sha256(data=b"", *args, **kwargs):
+        nonlocal source_hash_calls, decoded_hash_calls
+        if data == authority_hash_bytes:
+            if stage == "encode":
+                source_hash_calls += 1
+            else:
+                decoded_hash_calls += 1
+        return original_sha256(data, *args, **kwargs)
+
+    monkeypatch.setattr(results_store_module, "_jsonable", count_jsonable)
+    monkeypatch.setattr(results_store_module.hashlib, "sha256", count_sha256)
+    serialized_margins, result_blob = _encode_result_payload(
+        {"coating": margin},
+        {"trace_marker": "synthetic-work-guard"},
+    )
+    assert source_convert_calls == 1
+    assert source_hash_calls == 1
+
+    stored_margins = json.loads(json.dumps(serialized_margins))
+    stored_blob = json.loads(json.dumps(result_blob))
+    projected_bytes = len(json.dumps(stored_margins).encode()) + len(
+        json.dumps(stored_blob).encode()
+    )
+    # One 200 KB authority plus 1,000 small records/references stays below
+    # 1 MB; inline repetition would exceed 100 MB (500 x 200 KB).
+    assert projected_bytes < 1_000_000
+    envelope = stored_blob["__optimizer_result_store_envelope_v1__"]
+    authority_reference = stored_margins["coating"]["status_payload"][
+        "coating_warning_flags"
+    ][0]["authority"]["__optimizer_result_store_ref_v1__"]
+    decoded_shared_source = envelope["shared_status_payloads"][authority_reference]
+    authority_hash_bytes = original_json_dump(decoded_shared_source).encode()
+    stage = "decode"
+
+    decoded, _trace = _decode_result_payload(stored_margins, stored_blob)
+    assert decoded_convert_calls == 1
+    assert decoded_hash_calls == 1
+    decoded_records = (
+        decoded["coating"].status_payload["coating_warning_flags"]
+        + decoded["coating"].status_payload["coating_violation_reasons"]
+    )
+    assert all(record["authority"] is decoded_records[0]["authority"] for record in decoded_records)
+    assert all(record["flags"] is decoded_records[0]["flags"] for record in decoded_records)
+    assert plain_source_calls == 1
+
+
 def test_result_payload_round_trip_preserves_legacy_jsonable_identity() -> None:
     payload = {
         "coating_verdict": "clear",

@@ -2090,6 +2090,48 @@ def test_web_optimizer_readers_decode_shared_coating_payloads(client) -> None:
     assert "__optimizer_result_store_envelope_v1__" not in detail_model["result_blob"]
 
 
+@pytest.mark.parametrize(
+    "stored_blob",
+    [
+        "null",
+        json.dumps({
+            "__optimizer_result_store_envelope_v1__": {
+                "trace": ["non-mapping trace"],
+                "shared_status_payloads": {},
+            }
+        }),
+    ],
+    ids=("null-blob", "non-mapping-envelope-trace"),
+)
+def test_optimizer_result_detail_handles_non_mapping_result_blob(
+    client,
+    stored_blob: str,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-non-mapping-result-blob"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+    spec = _base_spec(profile_id="non-mapping-result-blob")
+    store.store(
+        spec,
+        _scored(spec, candidate_id="candidate-non-mapping-result-blob"),
+        created_at="2026-06-02T00:00:00Z",
+    )
+    key = cache_key(spec)
+    with sqlite3.connect(run_dir / "cache.sqlite") as conn:
+        conn.execute(
+            "UPDATE results SET result_blob = ? WHERE cache_key = ?",
+            (stored_blob, key),
+        )
+
+    response = client.get(
+        f"/optimizer/runs/run-non-mapping-result-blob/results/{key}"
+    )
+
+    assert response.status_code == 200
+    assert "candidate-non-mapping-result-blob" in response.get_data(as_text=True)
+
+
 def test_optimizer_leaderboard_exposes_multiple_current_digest_scopes(client) -> None:
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
     run_dir = runs_dir / "run-multi-digest-scope"
