@@ -4235,11 +4235,11 @@ def _coating_runtime_diagnostics(value: Any) -> dict[str, Any]:
 def _coating_authority_values(
     authority: Mapping[str, Any],
 ) -> tuple[Mapping[str, Any], Mapping[str, Any]]:
-    frozen_authority = _plain_value(authority, freeze=True)
-    return frozen_authority, _coating_authority_flags(frozen_authority)
+    shared_authority = _plain_value(authority)
+    return shared_authority, _coating_authority_flags(shared_authority)
 
 
-def _coating_authority_flags(authority: Mapping[str, Any]) -> Mapping[str, Any]:
+def _coating_authority_flags(authority: Mapping[str, Any]) -> dict[str, Any]:
     keys = (
         "code",
         "output_status",
@@ -4254,11 +4254,11 @@ def _coating_authority_flags(authority: Mapping[str, Any]) -> Mapping[str, Any]:
         "not_applicable_carrier_species",
         "not_applicable_by_species",
     )
-    return MappingProxyType({
+    return {
         key: authority[key]
         for key in keys
         if key in authority
-    })
+    }
 
 
 def _coating_reason_record(
@@ -5321,84 +5321,64 @@ def _payload_has_deposited_species(payload: Mapping[str, Any]) -> bool:
 
 
 def _plain_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
-    return {
-        key: _plain_value(value)
-        for key, value in payload.items()
-    }
+    """Copy margin payloads while preserving read-only shared warning trees.
 
-
-_READ_ONLY_MAPPING_TYPE = type(MappingProxyType({}))
-
-
-class _FrozenList(list):
-    """List-compatible immutable container for shared coating authority values."""
-
-    def _immutable(self, *_args: Any, **_kwargs: Any) -> None:
-        raise TypeError("shared coating authority values are read-only")
-
-    __setitem__ = _immutable
-    __delitem__ = _immutable
-    __iadd__ = _immutable
-    __imul__ = _immutable
-    append = _immutable
-    clear = _immutable
-    extend = _immutable
-    insert = _immutable
-    pop = _immutable
-    remove = _immutable
-    reverse = _immutable
-    sort = _immutable
-
-
-def _is_deeply_immutable(value: Any) -> bool:
-    value_type = type(value)
-    if value_type in (str, int, float, bool, type(None)):
-        return True
-    if value_type is _READ_ONLY_MAPPING_TYPE:
-        return all(_is_deeply_immutable(item) for item in value.values())
-    if isinstance(value, (_FrozenList, tuple, frozenset)):
-        return all(_is_deeply_immutable(item) for item in value)
-    return False
-
-
-def _plain_value(value: Any, *, freeze: bool = False) -> Any:
-    """Copy physics payload containers, optionally freezing shared authority data.
-
-    This preserves Python container values; result-store JSON conversion remains
-    owned by results_store._jsonable.
+    Coating warning authority and flags are plain dicts shared by alias for
+    size and worker serialization. Consumers must treat those two trees as
+    read-only; the result and web readers only inspect them.
     """
+    copied: dict[str, Any] = {}
+    for key, value in payload.items():
+        if key == "coating_warning_flags" and isinstance(value, (list, tuple)):
+            warning_flags: list[Any] = []
+            for warning in value:
+                if not isinstance(warning, MappingABC):
+                    warning_flags.append(_plain_value(warning))
+                    continue
+                copied_warning: dict[str, Any] = {}
+                for warning_key, warning_value in warning.items():
+                    # These two plain dicts are shared across coating warnings
+                    # to avoid retaining megabytes of repeated authority data.
+                    # Result readers treat them as immutable by contract. Keep
+                    # the refs ordinary dicts so worker pickling and Flask JSON
+                    # encoding continue to work.
+                    if (
+                        warning_key in {"authority", "flags"}
+                        and type(warning_value) is dict
+                    ):
+                        copied_warning[warning_key] = warning_value
+                    else:
+                        copied_warning[warning_key] = _plain_value(warning_value)
+                warning_flags.append(copied_warning)
+            copied[key] = warning_flags
+        else:
+            copied[key] = _plain_value(value)
+    return copied
+
+
+def _plain_value(value: Any) -> Any:
     value_type = type(value)
     if value_type is dict:
-        copied = {
-            key: _plain_value(item, freeze=freeze)
+        return {
+            key: _plain_value(item)
             for key, item in value.items()
         }
-        return MappingProxyType(copied) if freeze else copied
     if value_type is tuple:
-        return tuple(_plain_value(item, freeze=freeze) for item in value)
+        return tuple(_plain_value(item) for item in value)
     if value_type is list:
-        if freeze:
-            return _FrozenList(_plain_value(item, freeze=True) for item in value)
         return [_plain_value(item) for item in value]
     if value_type in (str, int, float, bool, type(None), set, frozenset):
-        if freeze and value_type in (set, frozenset):
-            return frozenset(_plain_value(item, freeze=True) for item in value)
-        return value
-    if value_type is _READ_ONLY_MAPPING_TYPE and _is_deeply_immutable(value):
         return value
     # Preserve support for custom mappings and sequence subclasses without
     # sending every built-in value through typing/ABC instance checks.
     if isinstance(value, MappingABC):
-        copied = {
-            key: _plain_value(item, freeze=freeze)
+        return {
+            key: _plain_value(item)
             for key, item in value.items()
         }
-        return MappingProxyType(copied) if freeze else copied
     if isinstance(value, tuple):
-        return tuple(_plain_value(item, freeze=freeze) for item in value)
+        return tuple(_plain_value(item) for item in value)
     if isinstance(value, list):
-        if freeze:
-            return _FrozenList(_plain_value(item, freeze=True) for item in value)
         return [_plain_value(item) for item in value]
     return value
 

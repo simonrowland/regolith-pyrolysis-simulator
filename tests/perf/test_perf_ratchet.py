@@ -138,6 +138,32 @@ def test_optimizer_60h_stage_records_real_cold_work() -> None:
         assert trial["source_flag_object_count"] == 1
         assert trial["loaded_authority_object_count"] == 1
         assert trial["loaded_flag_object_count"] == 1
+        print(
+            "optimizer_60h_stage_records_real_cold_work: "
+            + json.dumps(
+                {
+                    "campaign_chain": trial["campaign_chain"],
+                    "step_calls": trial["step_calls"],
+                    "trace_duration_sum": sum(
+                        int(stop["duration_h"])
+                        for stop in trial["campaign_stops"]
+                    ),
+                    "max_stored_text_cell_bytes": trial[
+                        "max_stored_text_cell_bytes"
+                    ],
+                    "stored_text_cell_ceiling_bytes": 64 * 1024 * 1024,
+                    "source_authority_object_count": trial[
+                        "source_authority_object_count"
+                    ],
+                    "source_flag_object_count": trial["source_flag_object_count"],
+                    "loaded_authority_object_count": trial[
+                        "loaded_authority_object_count"
+                    ],
+                    "loaded_flag_object_count": trial["loaded_flag_object_count"],
+                },
+                sort_keys=True,
+            )
+        )
 
 
 def test_lunar_highland_campaign_chain_work_volume_is_derived_from_config() -> None:

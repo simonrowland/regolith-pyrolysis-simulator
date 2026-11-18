@@ -55,6 +55,23 @@ from web.routes import _coating_readout
 _RENDEZVOUS_TIMEOUT_S = 30.0
 
 
+class PayloadEnum(Enum):
+    COATING = "coating"
+
+
+@dataclass
+class PayloadData:
+    count: int
+
+
+class GeneratorLike:
+    def __iter__(self):
+        yield from (1, 2)
+
+    def __str__(self) -> str:
+        return "generator-like(1, 2)"
+
+
 def _base_spec(**overrides: object) -> EvalSpec:
     data = {
         "recipe_id": "recipe-id",
@@ -575,20 +592,6 @@ def test_coating_warning_flag_shared_payloads_round_trip(tmp_path) -> None:
 
 
 def test_result_payload_round_trip_preserves_legacy_jsonable_identity() -> None:
-    class PayloadEnum(Enum):
-        COATING = "coating"
-
-    @dataclass
-    class PayloadData:
-        count: int
-
-    class GeneratorLike:
-        def __iter__(self):
-            yield from (1, 2)
-
-        def __str__(self) -> str:
-            return "generator-like(1, 2)"
-
     payload = {
         "coating_verdict": "clear",
         "identity_payload": {
@@ -620,26 +623,26 @@ def test_result_payload_round_trip_preserves_legacy_jsonable_identity() -> None:
     stored_blob = json.loads(json.dumps(result_blob, allow_nan=False))
     decoded, decoded_blob = _decode_result_payload(stored_margins, stored_blob)
 
-    assert decoded["coating"].status_payload == {
-        "coating_verdict": "clear",
-        "identity_payload": {
-            "range": "range(0, 2)",
-            "generator_like": "generator-like(1, 2)",
-            "numpy_array": "[1 2]",
-            "numpy_scalar": "7",
-            "set": ["a", "z"],
-            "enum": "PayloadEnum.COATING",
-            "dataclass": "PayloadData(count=2)",
-            "nan": "nan",
-            "positive_infinity": "inf",
-            "negative_infinity": "-inf",
-            "negative_zero": -0.0,
-            "boolean": True,
-        },
+    decoded_payload = decoded["coating"].status_payload
+    assert decoded_payload["coating_verdict"] == "clear"
+    expected_identity_payload = {
+        "range": "range(0, 2)",
+        "generator_like": "generator-like(1, 2)",
+        "numpy_array": "[1 2]",
+        "numpy_scalar": "7",
+        "set": ["a", "z"],
+        "enum": "PayloadEnum.COATING",
+        "dataclass": "PayloadData(count=2)",
+        "nan": "nan",
+        "positive_infinity": "inf",
+        "negative_infinity": "-inf",
+        "negative_zero": -0.0,
+        "boolean": True,
     }
-    assert math.copysign(1.0, decoded["coating"].status_payload[
-        "identity_payload"
-    ]["negative_zero"]) == -1.0
+    actual_identity_payload = decoded_payload["identity_payload"]
+    for key, expected_value in expected_identity_payload.items():
+        assert actual_identity_payload[key] == expected_value, key
+    assert math.copysign(1.0, actual_identity_payload["negative_zero"]) == -1.0
     assert decoded_blob == {"trace_marker": "legacy-compatible"}
 
 

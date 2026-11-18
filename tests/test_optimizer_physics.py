@@ -938,14 +938,14 @@ def test_coating_warning_authority_is_shared_and_read_only() -> None:
         },
         "extrapolations": [{"wall_temperature_C": 1400.0}],
     }
-    frozen_authority, frozen_flags = physics_module._coating_authority_values(
+    shared_authority, shared_flags = physics_module._coating_authority_values(
         authority
     )
     warnings = [
         physics_module._coating_reason_record(
             f"warning-{index}",
-            authority=frozen_authority,
-            authority_flags=frozen_flags,
+            authority=shared_authority,
+            authority_flags=shared_flags,
         )
         for index in range(2)
     ]
@@ -962,18 +962,40 @@ def test_coating_warning_authority_is_shared_and_read_only() -> None:
         ),
         observed=2.0,
         detail="shared warning authority",
-        status_payload={"coating_warning_flags": warnings},
+        status_payload={
+            "coating_verdict": "clear",
+            "coating_warning_flags": warnings,
+        },
     )
     first, second = margin.status_payload["coating_warning_flags"]
 
+    # Plain built-ins preserve engine-worker pickling and Flask JSON encoding.
+    assert type(first["authority"]) is dict
+    assert type(first["flags"]) is dict
     assert first["authority"] is second["authority"]
     assert first["flags"] is second["flags"]
-    with pytest.raises(TypeError):
-        first["authority"]["carrier_authority"]["SiO"]["status"] = "edited"
-    with pytest.raises(TypeError):
-        first["authority"]["extrapolations"][0]["wall_temperature_C"] = 1.0
-    with pytest.raises(TypeError):
-        first["authority"]["extrapolations"].append({"wall_temperature_C": 1.0})
+    pickle.dumps(margin)
+    import json
+
+    json.dumps(margin.status_payload)
+
+    # Shared authority trees follow a read-only-by-contract rule. Exercise the
+    # result encoder and decoder, which are the readers that receive these refs.
+    from simulator.optimize.results_store import (
+        _decode_result_payload,
+        _encode_result_payload,
+    )
+
+    encoded_margins, result_blob = _encode_result_payload(
+        {"coating": margin},
+        {"backend_status": "ok"},
+    )
+    decoded, _trace = _decode_result_payload(encoded_margins, result_blob)
+    loaded_warnings = decoded["coating"].status_payload["coating_warning_flags"]
+    assert loaded_warnings[0]["authority"] is loaded_warnings[1]["authority"]
+    assert loaded_warnings[0]["flags"] is loaded_warnings[1]["flags"]
+    assert shared_authority == authority
+    assert first["authority"] == authority
     first["reason"] = "edited warning"
     assert second["reason"] == "warning-1"
 

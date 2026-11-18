@@ -51,7 +51,7 @@ from simulator.optimize.objective import (
     normalize_objective_sense,
     objective_metric_aliases,
 )
-from simulator.optimize.physics import GateMargin, ThresholdSpec, _plain_value
+from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
@@ -2084,6 +2084,12 @@ def _decode_result_payload(
             if isinstance(margins_payload, str)
             else margins_payload
         )
+    except (TypeError, ValueError):
+        # Malformed legacy margin cells have historically failed closed to an
+        # empty margin map. Keep that contract; malformed references inside a
+        # valid payload still raise ResultStoreSchemaError below.
+        decoded_margins = margins_payload
+    try:
         decoded_result_blob = (
             _json_load(result_blob_payload)
             if isinstance(result_blob_payload, str)
@@ -2096,17 +2102,9 @@ def _decode_result_payload(
     result_blob, shared_status_payloads = _deserialize_result_blob(
         decoded_result_blob
     )
-    frozen_shared_payloads = (
-        {
-            str(key): _plain_value(value, freeze=True)
-            for key, value in shared_status_payloads.items()
-        }
-        if shared_status_payloads is not None
-        else None
-    )
     margins = _deserialize_grounding_margins(
         decoded_margins,
-        shared_status_payloads=frozen_shared_payloads,
+        shared_status_payloads=shared_status_payloads,
     )
     return margins, result_blob
 
