@@ -254,7 +254,7 @@ def _synthetic_optimizer_measurement() -> dict:
         "trial_rates": [trace_hours / cpu_seconds]
         * bench.OPTIMIZER_STAGE_TRIALS,
         "details": {
-            "hot_path": "PyrolysisSimulator.step during optimizer evaluate",
+            "hot_path": bench.STAGE_HOT_PATHS[bench.OPTIMIZER_STAGE_NAME],
             "trial_records": trial_records,
         },
     }
@@ -399,7 +399,7 @@ def test_reblessed_optimizer_stage_is_rated_with_dynamic_work_checks() -> None:
             stage: {
                 "rate": baseline["stages"][stage]["ratchet_rate"],
                 "rate_unit": "work_units_per_cpu_second",
-                "details": {"hot_path": "existing baseline"},
+                "details": {"hot_path": bench.STAGE_HOT_PATHS[stage]},
             }
             for stage in STAGE_NAMES
             if stage != bench.OPTIMIZER_STAGE_NAME
@@ -409,6 +409,10 @@ def test_reblessed_optimizer_stage_is_rated_with_dynamic_work_checks() -> None:
     )
 
     assert "status" not in reblessed["stages"][bench.OPTIMIZER_STAGE_NAME]
+    assert (
+        reblessed["stages"][bench.OPTIMIZER_STAGE_NAME]["hot_path"]
+        == bench.STAGE_HOT_PATHS[bench.OPTIMIZER_STAGE_NAME]
+    )
     for stage in STAGE_NAMES:
         if stage != bench.OPTIMIZER_STAGE_NAME:
             assert reblessed["stages"][stage] == baseline["stages"][stage]

@@ -74,6 +74,22 @@ STAGE_NAMES = (
     "runner_fixture_replay",
     OPTIMIZER_STAGE_NAME,
 )
+STAGE_HOT_PATHS = {
+    "internal_analytical_equilibrium": (
+        "PyrolysisSimulator._internal_analytical_equilibrium"
+    ),
+    "vapor_pressure_eval": "effective_equilibrium_pressure_Pa",
+    "sim_step_c2a_hour": (
+        "PyrolysisSimulator.step -> _internal_analytical_equilibrium"
+    ),
+    "condensation_route_hour": (
+        "CondensationModel.route -> _condensation_efficiency"
+    ),
+    "runner_fixture_replay": (
+        "simulator.runner.main -> PyrolysisSimulator.step"
+    ),
+    OPTIMIZER_STAGE_NAME: "PyrolysisSimulator.step during optimizer evaluate",
+}
 TEMPERATURES_K = (1273.15, 1573.15, 1873.15)
 # Premise: one runner replay is about 5 s wall and its isolated
 # warmup-plus-three-trial stage is under 23 s wall on this class. Algebra:
@@ -494,7 +510,7 @@ def _internal_equilibrium_trial_factory(
             hot_path_calls=hot_path_calls,
             cpu_seconds=cpu_seconds,
             details={
-                "hot_path": "PyrolysisSimulator._internal_analytical_equilibrium",
+                "hot_path": STAGE_HOT_PATHS["internal_analytical_equilibrium"],
                 "fixed_melt_species": len(sim.melt.composition_kg),
             },
         )
@@ -556,7 +572,7 @@ def _vapor_pressure_trial_factory(
             hot_path_calls=hot_path_calls,
             cpu_seconds=cpu_seconds,
             details={
-                "hot_path": "effective_equilibrium_pressure_Pa",
+                "hot_path": STAGE_HOT_PATHS["vapor_pressure_eval"],
                 "roster": roster,
                 "temperatures_K": TEMPERATURES_K,
             },
@@ -608,8 +624,7 @@ def _sim_step_trial_factory(
             hot_path_calls=counter["equilibrium_calls"],
             cpu_seconds=cpu_seconds,
             details={
-                "hot_path": "PyrolysisSimulator.step -> "
-                "_internal_analytical_equilibrium",
+                "hot_path": STAGE_HOT_PATHS["sim_step_c2a_hour"],
                 "campaign": sim.melt.campaign.name,
                 "measured_campaign_hour": sim.melt.campaign_hour,
             },
@@ -685,8 +700,7 @@ def _condensation_trial_factory(
             hot_path_calls=counter["efficiency_calls"],
             cpu_seconds=cpu_seconds,
             details={
-                "hot_path": "CondensationModel.route -> "
-                "_condensation_efficiency",
+                "hot_path": STAGE_HOT_PATHS["condensation_route_hour"],
                 "flux_species": tuple(sorted(flux.species_kg_hr)),
             },
         )
@@ -813,7 +827,7 @@ def _runner_trial_factory() -> Callable[[], TrialObservation]:
             hot_path_calls=int(counter["step_calls"]),
             cpu_seconds=cpu_seconds,
             details={
-                "hot_path": "simulator.runner.main -> PyrolysisSimulator.step",
+                "hot_path": STAGE_HOT_PATHS["runner_fixture_replay"],
                 "fixture": str(fixture_path.relative_to(REPO_ROOT)),
                 "hours_replayed": int(counter["hours_completed"]),
             },
@@ -1177,7 +1191,7 @@ def _measure_optimizer_profile_campaign_chain_stage(
         "trial_count": len(trial_records),
         "trial_rates": rates,
         "details": {
-            "hot_path": "PyrolysisSimulator.step during optimizer evaluate",
+            "hot_path": STAGE_HOT_PATHS[OPTIMIZER_STAGE_NAME],
             "profile_run_hours": run_hours,
             "work_unit_source": "sum of completed executor campaign durations",
             "trial_records": trial_records,
@@ -1262,7 +1276,7 @@ def reblessed_payload(
             observed if current is None else max(float(current), observed)
         )
         stage_baseline["rate_unit"] = measurements[stage]["rate_unit"]
-        stage_baseline["hot_path"] = measurements[stage]["details"]["hot_path"]
+        stage_baseline["hot_path"] = STAGE_HOT_PATHS[stage]
         stage_baseline.pop("status", None)
         stage_baseline.pop("reason", None)
     return payload
