@@ -5536,10 +5536,11 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # 3385 -> 3388.
 # The six t-1859 extracts also move the unmounted corpus-wide source_blind_pin
 # count from 124 to 252; the added pins resolve with the corpus root mounted.
+# The merged-tree fidelity resolver recounts 3,406 unattested samples.
 # Each ceiling may only fall.
 _UNCOVERED_OBSERVATIONS_CEILING = 52231
 _UNCOVERED_EXTRACTS_CEILING = 645
-_UNATTESTED_SAMPLES_CEILING = 3405
+_UNATTESTED_SAMPLES_CEILING = 3406
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
 # A second pilot pin inside an already-affected extract must still fail.
