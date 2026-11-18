@@ -20,7 +20,7 @@ def test_table_1_m01_residue_values_and_conditions_migrate() -> None:
 
     observations = tuple(migrator.result.observations.values())
     assert len(observations) == 27
-    m01 = [o for o in observations if o.locator.note == "row=M01"]
+    m01 = [o for o in observations if o.locator.row == "M01"]
     assert len(m01) == 3
     assert {o.identity.species.formula: o.value.point for o in m01} == {
         "SiO2": Decimal("53.62"),

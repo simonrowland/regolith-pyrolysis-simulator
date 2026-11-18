@@ -1,4 +1,6 @@
 from decimal import Decimal
+from difflib import unified_diff
+import json
 from pathlib import Path
 
 import pytest
@@ -8,9 +10,11 @@ from simulator.battery.enums import Authority, Quantity
 from simulator.battery.records import Located, StandardState
 from simulator.battery.score import iron_saturation_composition, temperature_of
 from tests.battery.test_migrate import _migrate_real_extract
+from tests.locator_assertions import canonical_source_locations
 
 
 ROOT = Path(__file__).resolve().parents[1]
+pytestmark = pytest.mark.timeout(300)
 SOURCE_COUNTS = {
     "distin-1971-ferrous-silicate-melts": 24,
     "roeder-1974-iron-activity-olivine-basaltic-liquids": 90,
@@ -57,17 +61,23 @@ def test_reference_sources_migrate_in_isolation_with_conditions(
         row["observation_id"]: row for row in isolated_doc["observations"]
     }
     assert set(isolated_rows) == set(baseline_rows)
-    # Fixed point (train b263, 2026-11-14): once the train regenerates the store, the isolated migration must
-    # reproduce every committed extracts-v2 row exactly, in every field. Asserting "N rows changed" instead
-    # held only while the committed v2 was stale, so it could never pass on a landed tree. Before the regen
-    # this node is a declared stale node (like the store byte-identity test). The reference-state move itself
-    # is pinned by VALUE below, from the isolated migration (endmember Fe(1-x)O, typed count per source).
-    mismatched = sorted(
+    extract = yaml.safe_load(
+        (ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text(encoding="utf-8")
+    )
+    baseline_rows = canonical_source_locations(baseline_rows, extract)
+    isolated_rows = canonical_source_locations(isolated_rows, extract)
+    mismatches = sorted(
         observation_id
         for observation_id, before in baseline_rows.items()
         if before != isolated_rows[observation_id]
     )
-    assert mismatched == [], mismatched[:5]
+    if mismatches:
+        first = mismatches[0]
+        delta = list(unified_diff(
+            json.dumps(baseline_rows[first], indent=2, sort_keys=True).splitlines(),
+            json.dumps(isolated_rows[first], indent=2, sort_keys=True).splitlines(),
+        ))
+        assert not mismatches, f"{first}:\n" + "\n".join(delta[:80])
     temperature_key = TEMPERATURE_CONDITION[source_id]
     typed = 0
     # Mutation: remove a source's typed state or located temperature coordinate and this fails.
@@ -105,6 +115,26 @@ def test_reference_sources_migrate_in_isolation_with_conditions(
     assert typed == expected_count - (
         1 if source_id == "doyle-1988-feo-activity-multicomponent-magma" else 0
     )
+
+
+@pytest.mark.parametrize(("source_id", "expected_count"), SOURCE_COUNTS.items())
+def test_reference_fixed_point_detects_corrupt_serialized_location(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, source_id: str, expected_count: int,
+) -> None:
+    original = _isolated_migration
+
+    def corrupt_output(root, source_id):
+        result = original(root, source_id)
+        path = root / source_id / "tree/data/literature/extracts-v2" / f"{source_id}.yaml"
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        document["observations"][0]["locator"] = {"page": 999999, "table": "WRONG TABLE"}
+        path.write_text(yaml.safe_dump(document), encoding="utf-8")
+        return result
+
+    with monkeypatch.context() as mutation:
+        mutation.setitem(globals(), "_isolated_migration", corrupt_output)
+        with pytest.raises(AssertionError):
+            test_reference_sources_migrate_in_isolation_with_conditions(tmp_path, source_id, expected_count)
 
 
 def test_rule_precedence_uses_roeder_dg_and_doyle_coughlin(tmp_path: Path) -> None:

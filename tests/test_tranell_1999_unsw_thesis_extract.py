@@ -609,9 +609,8 @@ def test_isolated_migration_preserves_species_temperature_and_conditions() -> No
     for row in ti_rows:
         assert row.identity.temperature_K.is_value
         assert row.point_conditions["temperature_K"].state.is_value
-        locator_note = row.locator.note or ""
-        assert "row=" in locator_note
-        source_row = locator_note.split("row=", maxsplit=1)[1].split(";", maxsplit=1)[0]
+        source_row = row.locator.row
+        assert source_row is not None
         table = row.locator.table.upper()
         if table in {"A3A", "A3B"}:
             source_row = "CST12"

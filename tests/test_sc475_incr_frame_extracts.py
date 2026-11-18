@@ -10,8 +10,10 @@ from simulator.battery import migrate as migrate_module
 from simulator.battery import schema_gap as schema_gap_module
 from simulator.battery.migrate import Migrator
 from simulator.battery.validate import validate_corpus
+from tests.locator_assertions import canonical_source_locations
 
 ROOT = Path(__file__).resolve().parents[1]
+pytestmark = pytest.mark.timeout(300)
 SC475_SOURCE_IDS = frozenset(
     {
         "shornikov-2008-mgo-aluminosilicate-melts",
@@ -3055,7 +3057,7 @@ def test_schema_gap_rejection_decided_by_remains_validator_required():
     )
 
 
-def test_non_sc475_kelley_schema_gap_store_changes_only_for_batch_admissions(tmp_path):
+def test_non_sc475_kelley_series_store_matches_green_without_decided_by(tmp_path):
     source_id = "kelley-1953-alkali-aluminosilicate-thermodynamics"
     observation_id = "kelley_1953_table25_s51_extrapolated_albite"
     extract_path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
@@ -3082,16 +3084,17 @@ def test_non_sc475_kelley_schema_gap_store_changes_only_for_batch_admissions(tmp
         tmp_path / "data/literature/extracts-v2" / f"{source_id}.yaml"
     )
     green_store = ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml"
-    migrated_payload = yaml.safe_load(migrated_store.read_text(encoding="utf-8"))
-    green_payload = yaml.safe_load(green_store.read_text(encoding="utf-8"))
+    before = yaml.safe_load(green_store.read_text(encoding="utf-8"))
+    after = yaml.safe_load(migrated_store.read_text(encoding="utf-8"))
     green_by_id = {
-        row["observation_id"]: row for row in green_payload["observations"]
+        row["observation_id"]: row for row in before["observations"]
     }
-    assert {row["observation_id"] for row in migrated_payload["observations"]} == set(
-        green_by_id
-    )
-    for row in migrated_payload["observations"]:
-        green_row = green_by_id[row["observation_id"]]
+    migrated_by_id = {
+        row["observation_id"]: row for row in after["observations"]
+    }
+    assert migrated_by_id.keys() == green_by_id.keys()
+    for observation_id, row in migrated_by_id.items():
+        green_row = green_by_id[observation_id]
         if row["admission"] == green_row["admission"]:
             continue
         assert row["admission"]["status"] == "admitted"
@@ -3100,4 +3103,28 @@ def test_non_sc475_kelley_schema_gap_store_changes_only_for_batch_admissions(tmp
             "d-413-batch-literature"
         )
         row["admission"] = green_row["admission"]
-    assert migrated_payload == green_payload
+    assert canonical_source_locations(after, extract) == canonical_source_locations(
+        before, extract
+    )
+
+
+def test_kelley_fixed_point_detects_corrupt_serialized_location(tmp_path, monkeypatch):
+    original = migrate_module.write_outputs
+
+    def corrupt_output(result, *, root):
+        original(result, root=root)
+        path = (
+            root
+            / "data/literature/extracts-v2/kelley-1953-alkali-aluminosilicate-thermodynamics.yaml"
+        )
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        document["observations"][0]["locator"] = {
+            "page": 999999,
+            "table": "WRONG TABLE",
+        }
+        path.write_text(yaml.safe_dump(document), encoding="utf-8")
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(migrate_module, "write_outputs", corrupt_output)
+        with pytest.raises(AssertionError):
+            test_non_sc475_kelley_series_store_matches_green_without_decided_by(tmp_path)

@@ -190,7 +190,7 @@ def test_isolated_migration_preserves_species_temperature_and_conditions() -> No
         if row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
     ]
     assert all(
-        row.locator.table == "1" and "row=" in (row.locator.note or "")
+        row.locator.table == "1" and row.locator.row is not None
         for row in mass_loss_observations
     )
 

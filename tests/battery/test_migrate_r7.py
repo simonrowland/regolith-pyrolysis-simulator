@@ -1116,7 +1116,7 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     # p007-13 are typed unavailable. These are source-page grounded changes.
     assert _b2131_formation_observation_serialization(tmp_path) == (
         945,
-        "13187d096dd3ffcc4079d147484c31edbfb8e432be9f2def01393a4cf1a2c2d7",
+        "9acc738c7162288bf01581492eab47b6919fb02377109d94b52edd1313c58718",
     )
 
 

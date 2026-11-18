@@ -570,6 +570,7 @@ def test_richter_declared_sample_survives_fresh_migration() -> None:
         assert "original_unit=wt_pct" in initial.inference.inputs
         assert initial.inference.output_unit == "mole_fraction"
         assert initial.locator is not None and initial.locator.published_page == 5549
+        assert initial.locator.row == "Starting material"
 
         expected_initial = tuple(
             (str(name), as_decimal(value))
