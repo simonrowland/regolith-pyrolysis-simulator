@@ -32,7 +32,7 @@ from simulator.battery.records import Composition, State
 from simulator.battery.score import (
     ScoreContext,
     _oxide_element_inventory,
-    _predict_fe_redox,
+    _predict_redox,
     compile_residual,
     score_store,
 )
@@ -315,7 +315,7 @@ def test_mass_percent_both_fail_stays_unparseable_on_the_redox_inventory() -> No
     )
     row = observation("foobar-redox", "exp-foobar-redox", identity, Decimal("1"))
     with pytest.raises(UnparseableCompositionComponent) as raised:
-        _predict_fe_redox(Engine.OPENIMCC, row, identity, "fe-redox")
+        _predict_redox(Engine.OPENIMCC, row, identity, "fe-redox")
     assert raised.value.component == "foobar"
 
 
