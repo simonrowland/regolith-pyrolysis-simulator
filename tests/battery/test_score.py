@@ -2320,6 +2320,82 @@ def test_unknown_composition_skips_invalid_same_point_pressure_candidate(
     ]
 
 
+@pytest.mark.parametrize("raw_amount", ("<0.03", "tr"))
+@pytest.mark.parametrize(
+    ("candidate_temperature", "composition_detail_expected"),
+    (("1500", True), ("1600", False)),
+)
+def test_malformed_candidate_composition_is_skipped_after_point_filters(
+    raw_amount: str,
+    candidate_temperature: str,
+    composition_detail_expected: bool,
+) -> None:
+    experiment = F.kems_experiment("invalid-same-experiment-composition", kn=None)
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("Na2O", Decimal("1")),),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        _partial_identity(),
+        temperature_K=State.of(Decimal("1500")),
+        composition=State.of(composition),
+    )
+    observation = F.observation(
+        "valid-same-point-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    malformed_composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("Na2O", Decimal("1")),),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    # Raw legacy extract data can bypass Composition's typed constructor.
+    object.__setattr__(
+        malformed_composition,
+        "components",
+        (("Na2O", raw_amount),),
+    )
+    candidate_identity = replace(
+        identity,
+        temperature_K=State.of(Decimal(candidate_temperature)),
+        composition=State.of(malformed_composition),
+    )
+    candidate = F.observation(
+        f"malformed-composition-{candidate_temperature}-{raw_amount}",
+        experiment.experiment_id,
+        candidate_identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    gates = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=observation,
+        point_observations=(observation, candidate),
+    )
+
+    assert gates.passed is True
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    if composition_detail_expected:
+        assert pressure_check.detail["skipped_composition_candidates"] == [
+            {
+                "observation_id": candidate.observation_id,
+                "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+                "detail": "composition component amount is not a decimal",
+            }
+        ]
+    else:
+        assert "skipped_composition_candidates" not in pressure_check.detail
+
+
 def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(
     tmp_path: Path,
 ) -> None:
