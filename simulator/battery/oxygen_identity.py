@@ -43,8 +43,8 @@ def log10_fo2_to_pa(
 
 _ATM_BAR = Decimal("1.01325")
 
-# For ideal gases, dry-air O2 volume fraction equals its mole fraction. The
-# five-place standard dry-air composition is 20.946%: log10(0.20946) is
+# U.S. Standard Atmosphere 1976 gives dry-air O2 as 20.946% by volume. For
+# ideal gases that volume fraction equals the mole fraction: log10(0.20946) is
 # -0.67890 at 1 bar total, and log10(0.20946 × 1.01325) is -0.67318 at 1 atm
 # total (both to five decimal places). Versus 0.2095, the delta is
 # log10(0.20946 / 0.2095) = -0.00008293 dex (~1e-4), below the precision of
