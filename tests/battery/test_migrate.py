@@ -9949,7 +9949,10 @@ def test_j01_store_census_series_numeric_matches_declared_field(
         "isotope_delta": 22
     }
     assert per_source.get("smythe-2013-cerium-thesis") == {"valence_ratio": 46}
-    assert census.get("valence_ratio") == 46
+    # valence_ratio: the base already carries 45 cells from other sources; Smythe 2013
+    # adds 46 (pinned per-source above). Total 91 is the regenerated-store census
+    # (studio-3 scratch regen at the fam13/Floss tip on b268r 8409d652d).
+    assert census.get("valence_ratio") == 91
     # Family car (F39-F50): Bonnand, Bruand, Matzen et al. (2020) adds 14 printed
     # Fe3+/Fe2+ stays the car census (Kress-Carmichael 13, Bonnand 14,
     # store 65). n_numeric is the car 8267 minus the 67 refused
