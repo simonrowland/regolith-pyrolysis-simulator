@@ -20,7 +20,9 @@ import pytest
 from simulator import engine_cache
 
 
-pytestmark = pytest.mark.xdist_group("engine-cache-golden-probes")
+# The controller's full-suite loadgroup run exited a worker with this module
+# grouped, and completed without the group. Each probe is already isolated in
+# its own subprocess, so the probes need no shared xdist worker.
 
 
 # Each value pins the current cache chemistry version with one live solver
@@ -309,12 +311,19 @@ def _run_probe(
     result_path = tmp_path / "probe.json"
     # Keep native work and process-wide I/O patches out of the pytest worker.
     # subprocess.run kills and reaps the probe if its outer deadline expires.
+    # Preserve pytest's activated import paths as well as the parent's engine
+    # environment and cwd; starting a fresh interpreter otherwise loses them.
+    environment = {
+        **os.environ,
+        "PYTHONPATH": os.pathsep.join(str(Path(path).resolve()) for path in sys.path),
+    }
     completed = subprocess.run(
         [
             sys.executable, "-m", "tests.test_engine_cache_golden_probes", engine_name,
             request.node.nodeid, str(result_path), str(int(mutate_cold)),
         ],
-        cwd=engine_cache._ENGINE_CACHE_ROOT,
+        env=environment,
+        stdin=subprocess.DEVNULL,  # The worker's stdin belongs to xdist's channel.
         capture_output=True,
         text=True,
         timeout=timeout_s,
@@ -326,6 +335,8 @@ def _run_probe(
     result = json.loads(result_path.read_text())
     if "skip" in result:
         pytest.skip(result["skip"])
+    if "fail" in result:
+        pytest.fail(result["fail"], pytrace=False)
     assert result["pid"] != os.getpid(), "live probe ran in the pytest worker"
     observed = set(result["observed"])
     callsites = {path: set(sites) for path, sites in result["callsites"].items()}
@@ -367,6 +378,63 @@ def test_probe_timeout_kills_and_reaps_work(request, tmp_path, monkeypatch):
         os.waitpid(pid, os.WNOHANG)
 
 
+@pytest.mark.parametrize(
+    ("reason", "outcome"),
+    (
+        ("No module named 'missing_probe_engine'", pytest.skip.Exception),
+        ("native engine initialization failed", pytest.fail.Exception),
+    ),
+)
+def test_probe_transports_engine_availability_policy(
+    reason, outcome, request, tmp_path, monkeypatch
+):
+    executable = tmp_path / "unavailable-probe"
+    executable.write_text(
+        f"#!{sys.executable}\n"
+        "import runpy, sys\n"
+        "from types import SimpleNamespace\n"
+        "from simulator.diagnostic_helpers import binary_pot_battery\n"
+        "binary_pot_battery.open_battery_engine = lambda name: SimpleNamespace(\n"
+        f"    available=False, backend=None, unavailable_reason={reason!r})\n"
+        "sys.argv = sys.argv[2:]\n"
+        "runpy.run_module(sys.argv[0], run_name='__main__')\n"
+    )
+    executable.chmod(0o755)
+    monkeypatch.setattr(sys, "executable", str(executable))
+    with pytest.raises(outcome, match=reason):
+        _run_probe("magemin", request, tmp_path)
+    result = json.loads((tmp_path / "probe.json").read_text())
+    assert reason in result["skip" if outcome is pytest.skip.Exception else "fail"]
+
+
+def test_probe_inherits_engine_resolution_context(request, tmp_path, monkeypatch):
+    import_root = tmp_path / "imports"
+    import_root.mkdir()
+    (import_root / "probe_activation.py").write_text("activated = True\n")
+    monkeypatch.syspath_prepend(str(import_root))
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("DYLD_FALLBACK_LIBRARY_PATH", str(tmp_path / "lib"))
+    executable = tmp_path / "context-probe"
+    executable.write_text(
+        f"#!{sys.executable}\n"
+        "import json, os, sys\n"
+        "from pathlib import Path\n"
+        "import probe_activation\n"
+        "assert probe_activation.activated\n"
+        f"assert Path.cwd() == Path({str(tmp_path)!r})\n"
+        f"assert os.environ['DYLD_FALLBACK_LIBRARY_PATH'] == {str(tmp_path / 'lib')!r}\n"
+        "assert sys.stdin.read() == ''\n"
+        "Path(sys.argv[4]).write_text(json.dumps({\n"
+        "    'pid': os.getpid(), 'observed': [], 'callsites': {},\n"
+        "    'context_inherited': True,\n"
+        "}))\n"
+    )
+    executable.chmod(0o755)
+    monkeypatch.setattr(sys, "executable", str(executable))
+    result = _run_probe("openimcc", request, tmp_path)
+    assert result["context_inherited"]
+
+
 @pytest.mark.parametrize("engine_name", tuple(engine_cache.ENGINE_CHEMISTRY_VERSION))
 def test_live_engine_numeric_probe_matches_version(
     engine_name, request, tmp_path
@@ -403,4 +471,6 @@ if __name__ == "__main__":
             )
     except pytest.skip.Exception as exc:
         result = {"skip": str(exc)}
+    except pytest.fail.Exception as exc:
+        result = {"fail": str(exc)}
     Path(output).write_text(json.dumps(result))
