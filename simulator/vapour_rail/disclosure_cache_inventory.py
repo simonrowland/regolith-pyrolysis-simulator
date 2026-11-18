@@ -1115,6 +1115,14 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Local scratch for rates, equilibrium constants, metadata, or validation. It does not store a vapour-law disclosure.',
     },
+    'store:simulator/optimize/physics.py:shared_authority_cache': {
+        "path": 'simulator/optimize/physics.py',
+        "line": 2766,
+        "kind": 'store',
+        "name": 'shared_authority_cache',
+        "carries_disclosure": False,
+        "how": 'Local to one coating margin build, keyed by id(authority) while retaining the source mapping. It memoizes converted authority and flags metadata, not vapour-law results, and does not skip law execution.',
+    },
     'store:simulator/optimize/study.py:prefix_replay_cache': {
         "path": 'simulator/optimize/study.py',
         "line": 732,
