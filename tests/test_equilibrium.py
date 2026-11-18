@@ -455,9 +455,11 @@ def test_subliquidus_equilibrium_carries_liquid_feo_notice_without_changing_acti
     )
     plain_diag = plain.diagnostics["a_FeO_calphad"]
     flagged_diag = flagged.diagnostics["a_FeO_calphad"]
+    holzheid = flagged_diag["gamma_FeO"]["holzheid"]
 
     assert flagged.status == "ok"
     assert flagged_diag["notices"] == [
+        holzheid["notice"],
         {
             "type": "typed_notice",
             "kind": "liquid_model_below_liquidus",
@@ -468,12 +470,16 @@ def test_subliquidus_equilibrium_carries_liquid_feo_notice_without_changing_acti
             "authority": "extrapolated",
         }
     ]
+    assert plain_diag["notices"] == [holzheid["notice"]]
     assert {
         key: value for key, value in flagged_diag.items() if key != "notices"
-    } == plain_diag
+    } == {key: value for key, value in plain_diag.items() if key != "notices"}
     assert flagged_diag["a_FeO_authoritative"] == plain_diag["a_FeO_authoritative"]
     assert flagged_diag["a_FeO_authoritative"] > 0.0
     assert "gamma_FeO" in flagged_diag
+    assert holzheid["central"] == pytest.approx(49.2, rel=0.001)
+    assert holzheid["authority_level"] == "extrapolated"
+    assert holzheid["notice"]["kind"] == "out_of_certified_band"
 
 
 def test_above_liquidus_equilibrium_diagnostic_is_byte_identical():
@@ -874,13 +880,21 @@ def test_native_fe_saturation_carries_the_liquidus_notice_on_both_returns():
     cold_fO2 = -14.0
     flagged = _state(below, T_K=cold_K, fO2_log=cold_fO2)
     plain = _state(None, T_K=cold_K, fO2_log=cold_fO2)
-    assert flagged["notices"][0]["kind"] == "liquid_model_below_liquidus"
-    assert flagged["notices"][0]["authority"] == "extrapolated"
+    assert [notice["kind"] for notice in flagged["notices"]] == [
+        "out_of_certified_band",
+        "liquid_model_below_liquidus",
+    ]
+    assert flagged["notices"][0]["reason"] == (
+        "Holzheid stoichiometric FeO gamma conversion extrapolated"
+    )
+    assert flagged["notices"][1]["authority"] == "extrapolated"
+    assert [notice["kind"] for notice in plain["notices"]] == [
+        "out_of_certified_band"
+    ]
     assert flagged["native_fe_activity"] == plain["native_fe_activity"]
     assert {
         key: value for key, value in flagged.items() if key != "notices"
-    } == plain
-    assert "notices" not in plain
+    } == {key: value for key, value in plain.items() if key != "notices"}
 
     hot_K = 1600.0 + 273.15
     hot_plain = _state(None, T_K=hot_K, fO2_log=-10.0)
@@ -891,7 +905,13 @@ def test_native_fe_saturation_carries_the_liquidus_notice_on_both_returns():
     zero = _state(below, T_K=cold_K, fO2_log=1000.0)
     zero_plain = _state(None, T_K=cold_K, fO2_log=1000.0)
     assert zero["native_fe_activity_source"] == "unavailable:no_positive_a_FeO"
-    assert zero["notices"][0]["kind"] == "liquid_model_below_liquidus"
+    assert [notice["kind"] for notice in zero["notices"]] == [
+        "out_of_certified_band",
+        "liquid_model_below_liquidus",
+    ]
+    assert [notice["kind"] for notice in zero_plain["notices"]] == [
+        "out_of_certified_band"
+    ]
     assert {
         key: value for key, value in zero.items() if key != "notices"
-    } == zero_plain
+    } == {key: value for key, value in zero_plain.items() if key != "notices"}

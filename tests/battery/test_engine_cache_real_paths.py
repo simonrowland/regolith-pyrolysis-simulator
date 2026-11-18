@@ -625,14 +625,16 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
         lambda *_args, **_kwargs: (_ for _ in ()).throw(FileNotFoundError()),
     )
     # The leading version bytes are chemistry cache invalidation pins; b267
-    # moves internal-analytical to v3 and MAGEMin, AlphaMELTS, and ThermoEngine
-    # to v4 for the b-906, b-1225/b-1240, and executed-law disclosure changes.
+    # moves internal-analytical to v4 and MAGEMin, AlphaMELTS, and ThermoEngine
+    # to v4 for b-906 plus b-1124, b-1225/b-1240, and executed-law disclosure.
     snapshots = (
+        # b-906 and b-1124 change internal-analytical numerics; the chemistry
+        # version 4 header is part of this pinned key.
         (
             "internal-analytical default",
             "internal-analytical",
             None,
-            "0200020008018b08020514686967685f745f6d656c745f616374697669747905086f70656e696d636305166f787967656e5f62616c616e63655f6261636b656e64050764656661756c74",
+            "0200040008018b08020514686967685f745f6d656c745f616374697669747905086f70656e696d636305166f787967656e5f62616c616e63655f6261636b656e64050764656661756c74",
         ),
         (
             "openimcc default",

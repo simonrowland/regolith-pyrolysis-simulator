@@ -308,7 +308,7 @@ def cacheable_refusal(result) -> bool:
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
-    "internal-analytical": 3,
+    "internal-analytical": 4,
     "vaporock": 1,
     "magemin": 4,
     "alphamelts": 4,
@@ -326,13 +326,14 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v2: 2026-11-11 MAGEMin binary pin unchanged, b257r landing 982a8d9fa - d-367 mode-vector closure before liquid-fraction and composition extraction (cd48a78fe)
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
+# internal-analytical v2: 2026-11-17 b-1244 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
+# internal-analytical v3: 2026-11-17 b-906 d-412 Langmuir surface-pO2 root changes evaporation_flux.py and vapor_pressure.py outputs
+# internal-analytical v4: 2026-11-17 b-1124 d-339 Holzheid FeO gamma continuation changes analytical Fe vapour predictions, on top of the b-906 surface-pO2 change
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
 # magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
-# internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 # magemin v4: 2026-11-17 MAGEMin pin unchanged, b267 bugs stack - b-1225 typed silicate-window refusal for SiO2-poor bulks; b-1240 typed cached failure reasons for missing_input, invalid_input, timeout/lifecycle/exit/parse/crash.
-# internal-analytical v3: 2026-11-17 simulator code at b267 bugs stack - b-906 d-412 Langmuir surface-pO2 root changes evaporation_flux.py and vapor_pressure.py outputs
 # alphamelts v4: 2026-11-17 alphaMELTS binary pin unchanged, b267 bugs stack - engine-cache disclosure wrapper for b-119 executed-law replay (stored engine result and disclosure set)
 # thermoengine v4: 2026-11-17 ThermoEngine pin unchanged, b267 bugs stack - engine-cache disclosure wrapper for b-119 executed-law replay (stored engine result and disclosure set)
 
@@ -552,8 +553,8 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
         "date": "2026-11-08",
     },
     "internal-analytical": {
-        "identity": "source-sha256:ac03c54243b61890960158318fb40a52972f301e9ac1dc9c381fa3a495818740",
-        "date": "2026-11-08",
+        "identity": "source-sha256:90c737d7d2fbca99e892bc88c4889d21e2d5cc98710f600847afe437e7ced5af",
+        "date": "2026-11-17",
     },
     "vaporock": {
         "identity": "version:1.0.0;record-sha256:89e860e3d6995f542337748019c4f6198f76c127ce3ca90fbbc2063bd401fc5a",
