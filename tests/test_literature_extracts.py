@@ -5641,21 +5641,36 @@ def test_aithala_s5_preserves_all_61_row_addressable_series_summaries():
 # group are one number. No extract is review_status reviewed and no sample
 # has reviewed_by, so the source matcher does not run. Recount held at the
 # same ceilings.
-# Both coverage ceilings may only fall.
+# Existing extract contributions may only fall. New extracts add only their
+# measured warning contributions, with the per-extract changes recorded below.
 # b261 landing: the main join adds 67 extracts (782 -> 849). Re-derived with
 # vle.fidelity_source_warnings over every extract on the regen tree cf19376f3:
 # uncovered observations 48664 -> 50791, uncovered extracts 617 -> 639,
 # unattested 3131 -> 3385; pilot pins unchanged at 57. New extracts, not a
 # fidelity regression in existing ones.
+# 2026-11-16 t-1859 Cohen: uncovered observations 50791 -> 50806, extracts 639 -> 640, unattested samples 3385 -> 3389.
+# 2026-11-16 t-1859 Navrotsky: uncovered observations 50806 -> 50856, extracts 640 -> 641, unattested samples 3389 -> 3395.
+# 2026-11-16 t-1859 Pretorius: uncovered observations 50856 -> 51560, extracts 641 -> 642, unattested samples 3395 -> 3396.
+# 2026-11-16 t-1859 Smythe: uncovered observations 51560 -> 51564, extracts 642 -> 643, unattested samples 3396 -> 3399.
+# 2026-11-16 t-1859 Van Westrenen: uncovered observations 51564 -> 51590, extracts 643 -> 644, unattested samples 3399 -> 3402.
+# t-1859 recovery (2026-11-16): re-derived with vle.fidelity_source_warnings;
+# the Floss extract contributes 641 uncovered observations, 1 uncovered
+# extract, and 3 unattested samples. Existing extract counts are unchanged:
+# uncovered observations 50791 -> 51432, extracts 639 -> 640, samples
+# 3385 -> 3388.
+# The six t-1859 extracts add no source_blind_pin warnings on b268r2; the
+# unmounted corpus-wide total remains 124, and the corpus root opens those pins.
+# The merged-tree fidelity resolver recounts 3,406 unattested samples.
 # Each ceiling may only fall.
 # 2026-11-17 t-1645: Table S-5 adds 61 row-addressable observations to the
-# already-uncovered Aithala extract and 3 located fidelity samples. Recounted
-# contribution: uncovered observations 50791 -> 50852; uncovered extracts
-# stay 639 because this source was already counted; unattested samples
-# 3385 -> 3388. No reviewed_by was added. These ceilings may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 50852
-_UNCOVERED_EXTRACTS_CEILING = 639
-_UNATTESTED_SAMPLES_CEILING = 3388
+# already-uncovered Aithala extract and 3 located fidelity samples (uncovered
+# extracts unchanged; the source was already counted). 2026-11-18 combined with
+# the fam13/Floss replay (t-1859), whose own recount gave 52231 / 645 / 3406:
+# 52231 + 61 = 52292 observations, 645 extracts, 3406 + 3 = 3409 samples.
+# No reviewed_by was added. These ceilings may only fall.
+_UNCOVERED_OBSERVATIONS_CEILING = 52292
+_UNCOVERED_EXTRACTS_CEILING = 645
+_UNATTESTED_SAMPLES_CEILING = 3409
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
 # A second pilot pin inside an already-affected extract must still fail.
@@ -5818,6 +5833,19 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     uncovered_obs = unmounted["uncovered_observation"]
     uncovered_extracts = unmounted_extract_counts["uncovered_observation"]
     unattested_samples = unmounted["unattested_sample"]
+    floss_doc = next(
+        doc
+        for label, doc in documents
+        if label == "floss-1998-corundum-hibonite-evaporation-residues"
+    )
+    floss_warnings = Counter()
+    for warning in vle.fidelity_source_warnings(
+        floss_doc, label="floss-1998-corundum-hibonite-evaporation-residues"
+    ):
+        floss_warnings[warning.kind] += warning.count
+    assert floss_warnings == Counter(
+        {"uncovered_observation": 641, "unattested_sample": 3}
+    )
     pilot_pins = unmounted["auto_migrated_pilot_pin"]
     pilot_extracts = unmounted_extract_counts["auto_migrated_pilot_pin"]
     source_blind_pins = unmounted["source_blind_pin"]
