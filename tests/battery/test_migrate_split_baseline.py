@@ -240,6 +240,14 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
     result, observation_id = _one_compilation_table(tmp_path)
     actual[observation_id] = _pinned_output(result, observation_id)
 
+    # PDF p. 78 / folio 72: the closing 1517 K Mn row is delta crystals;
+    # the following duplicate 1517 K row begins the liquid segment.
+    assert observation_id.endswith(":T=1517:col=entropy:v=d630877923:poly=delta")
+    assert actual[observation_id]["identity"]["species"]["polymorph"] == {
+        "tag": "value",
+        "value": "delta",
+    }
+
     # Replaced with literal typed output from the first Studio run.
     expected = json.loads(r'''
 {
@@ -2247,7 +2255,7 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
       ]
     }
   },
-  "robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0046-phase-04:S:shared:T=1517:col=entropy:v=d630877923:poly=reference": {
+  "robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0046-phase-04:S:shared:T=1517:col=entropy:v=d630877923:poly=delta": {
     "admission_status": "admitted",
     "evidence_class": {
       "tag": "value",
@@ -2298,7 +2306,7 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
         },
         "polymorph": {
           "tag": "value",
-          "value": "reference"
+          "value": "delta"
         }
       },
       "standard_pressure_Pa": {

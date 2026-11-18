@@ -16,7 +16,7 @@ from collections import Counter
 from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import replace
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 import pytest
@@ -2408,6 +2408,142 @@ def test_production_migration_accepts_model_derived_raw_input_method(
         yaml.safe_load(yaml.safe_dump(to_plain(observation)))
     )
     assert reloaded.derivation == observation.derivation
+
+
+@pytest.mark.parametrize(
+    ("fallback", "reason"),
+    [
+        ("method_unknown", "method_unknown: no method located in source"),
+        (
+            "none_printed",
+            "input_references_none_printed: source names no input references",
+        ),
+    ],
+)
+@pytest.mark.parametrize("shape", ["scalar", "series"])
+def test_production_migration_preserves_model_derived_fallback_notices(
+    tmp_path: Path, fallback: str, reason: str, shape: str
+) -> None:
+    extract = _raw_inputs_extract("model_derived", include_method=True)
+    row = extract["species"]["Na"]["observations"][0]
+    values = row["values"]
+    derivation = values["derivation"]
+    if fallback == "method_unknown":
+        derivation.pop("method")
+    else:
+        derivation["references"] = ["none_printed"]
+    if shape == "scalar":
+        values.pop("series")
+        values.update(T_K=1200.0, pressure_atm=1.0)
+    row["notices"] = [
+        {
+            "kind": "engine_model_caveat",
+            "affected_quantities": ["p_sat"],
+            "reason": reason,
+            "origin": "literature_extract",
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observations = list(result.observations.values())
+    assert len(observations) == (1 if shape == "scalar" else 2)
+    for observation in observations:
+        assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert any(notice.reason == reason for notice in observation.notices)
+        payload = to_plain(observation)
+        assert any(notice["reason"] == reason for notice in payload["notices"])
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+
+
+def _model_derived_extract_with_notice(observation_id: str) -> dict:
+    extract = _raw_inputs_extract("model_derived", include_method=True)
+    row = extract["species"]["Na"]["observations"][0]
+    row["observation_id"] = observation_id
+    row["values"]["derivation"].pop("method")
+    row["notices"] = [
+        {
+            "kind": "engine_model_caveat",
+            "affected_quantities": ["p_sat"],
+            "reason": "method_unknown: no method located in source",
+            "origin": "literature_extract",
+        }
+    ]
+    return extract
+
+
+def test_extract_notice_survives_scalar_id_with_temperature_suffix(
+    tmp_path: Path,
+) -> None:
+    extract = _model_derived_extract_with_notice("na_psat::T=1200:h=abc")
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series")
+    row["values"].update(T_K=1200.0, pressure_atm=1.0)
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = next(iter(result.observations.values()))
+    assert observation.observation_id == (
+        "fixture-source::na_psat::T=1200:h=abc"
+    )
+    assert observation.notices[0].reason == (
+        "method_unknown: no method located in source"
+    )
+
+
+def test_extract_notice_survives_author_ordinal_rekeying_to_temperature(
+    tmp_path: Path,
+) -> None:
+    extract = _model_derived_extract_with_notice("na_psat::point:0")
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series")
+    row["values"].update(T_K=1200.0, pressure_atm=1.0)
+    sibling = deepcopy(row)
+    sibling["observation_id"] = "na_psat::point:1"
+    sibling["values"].update(T_K=1300.0, pressure_atm=2.0)
+    extract["species"]["Na"]["observations"].append(sibling)
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observations = list(result.observations.values())
+    assert len(observations) == 2
+    assert all(
+        "::point:" not in observation.observation_id for observation in observations
+    )
+    assert all("::T=" in observation.observation_id for observation in observations)
+    assert all(
+        observation.notices[0].reason
+        == "method_unknown: no method located in source"
+        for observation in observations
+    )
+
+
+def test_duplicate_extract_ids_with_different_notices_raise(tmp_path: Path) -> None:
+    extract = _model_derived_extract_with_notice("na_psat")
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series")
+    row["values"].update(T_K=1200.0, pressure_atm=1.0)
+    sibling = deepcopy(row)
+    sibling["notices"][0]["reason"] = "different caveat"
+    extract["species"]["Na"]["observations"].append(sibling)
+
+    with pytest.raises(DuplicateObservationIdError):
+        migrate(_write_min_tree(tmp_path, extract), write=False)
+
+
+def test_documented_model_derived_notice_decodes_canonical_quantity() -> None:
+    payload = {
+        "kind": "engine_model_caveat",
+        "affected_quantities": ["p_partial"],
+        "reason": "input_references_none_printed: source names no input references",
+        "origin": "literature_extract",
+    }
+
+    notice = _notice_from_plain(payload)
+
+    assert notice.affected_quantities == (Quantity.P_PARTIAL,)
+    assert to_plain(notice) == payload
 
 
 def test_shornikov_2015_extract_migrates_model_derived_provenance(
@@ -9074,6 +9210,11 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
     return None
 
 
+_SU_ZHANG_PROFILE_REFUSAL = (
+    "natural glass radial profile; no evaporation experiment"
+)
+
+
 @pytest.fixture(scope="module")
 def _series_census_source_documents() -> dict[str, object]:
     extracts = REPO_ROOT / "data" / "literature" / "extracts"
@@ -9376,6 +9517,187 @@ def _series_census(
     return census, mismatches, n_numeric, n_unavailable, per_source
 
 
+def _fresh_su_zhang_census_store_view(
+    tmp_path: Path, extracts_v2: Path
+) -> Path:
+    source_id = "su-zhang-2023-lunar-orange-glass-na-k-cu-degassing"
+    filename = f"{source_id}.yaml"
+    _migrate_real_extract(tmp_path / "su-zhang", filename, write=True)
+    fresh_store = (
+        tmp_path
+        / "su-zhang"
+        / "tree"
+        / "data"
+        / "literature"
+        / "extracts-v2"
+        / filename
+    )
+    store_view = tmp_path / "extracts-v2-view"
+    store_view.mkdir()
+    for stored_path in extracts_v2.glob("*.yaml"):
+        if stored_path.name != filename:
+            (store_view / stored_path.name).symlink_to(stored_path)
+    (store_view / filename).symlink_to(fresh_store)
+    return store_view
+
+
+def test_su_zhang_natural_glass_profiles_are_typed_absence(tmp_path: Path) -> None:
+    source_id = "su-zhang-2023-lunar-orange-glass-na-k-cu-degassing"
+    refusal_reason = _SU_ZHANG_PROFILE_REFUSAL
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml"
+    source = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    from simulator.battery.migrate import _residue_component_field_sets
+
+    profile_ids: set[str] = set()
+    source_point_locators: dict[str, dict] = {}
+    source_profile_points_by_table: Counter[str] = Counter()
+    numeric_source_cells_by_table: Counter[str] = Counter()
+    null_profile_points_by_table: Counter[str] = Counter()
+    source_profile_points = 0
+    numeric_source_cells = 0
+    for body in source["species"].values():
+        if not isinstance(body, dict):
+            continue
+        for row in body.get("observations") or []:
+            raw_id = row.get("observation_id")
+            values = row.get("values")
+            if (
+                not isinstance(raw_id, str)
+                or not raw_id.endswith("_profile")
+                or not isinstance(values, dict)
+            ):
+                continue
+            series = values.get("series")
+            assert isinstance(series, list)
+            source_profile_points += len(series)
+            assert values.get("quantity") == refusal_reason
+            assert values.get("typed_refused_schema_gap") is True
+            profile_ids.add(raw_id)
+            table = row["locator"]["table"]
+            source_profile_points_by_table[table] += len(series)
+            for index, item in enumerate(series):
+                if not isinstance(item, dict):
+                    continue
+                observation_id = f"{source_id}::{raw_id}::point:{index}"
+                point_locator = item.get("locator") or row.get("locator")
+                assert isinstance(point_locator, dict)
+                source_point_locators[observation_id] = point_locator
+                fields, _invalid = _residue_component_field_sets(item)
+                item_numeric_cells = 0
+                for field in ("residue_ppm", *fields):
+                    if field not in item:
+                        continue
+                    try:
+                        amount = Decimal(str(item[field]))
+                    except (InvalidOperation, ValueError, TypeError):
+                        continue
+                    if amount.is_finite():
+                        numeric_source_cells += 1
+                        numeric_source_cells_by_table[table] += 1
+                        item_numeric_cells += 1
+                if item_numeric_cells == 0:
+                    null_profile_points_by_table[table] += 1
+
+    assert source_profile_points == 3495
+    assert numeric_source_cells == 3435
+    assert source_profile_points_by_table == {
+        "Table S2": 2630,
+        "Table S3": 61,
+        "Table S4": 804,
+    }
+    assert numeric_source_cells_by_table == {
+        "Table S2": 2570,
+        "Table S3": 61,
+        "Table S4": 804,
+    }
+    assert null_profile_points_by_table == {"Table S2": 60}
+
+    migrated = _migrate_real_extract(tmp_path, f"{source_id}.yaml", write=True)
+    migrated_profiles = {
+        observation.observation_id: observation
+        for observation in migrated.observations.values()
+        if observation.observation_id in source_point_locators
+    }
+    assert {
+        observation_id[len(f"{source_id}::") :].split("::", 1)[0]
+        for observation_id in source_point_locators
+    } == profile_ids
+    assert migrated_profiles.keys() == source_point_locators.keys()
+    assert len(migrated_profiles) == 3495
+    assert sum(
+        observation.value.kind is ValueKind.POINT
+        for observation in migrated_profiles.values()
+    ) == 0
+    for observation_id, observation in migrated_profiles.items():
+        assert observation.identity.quantity.is_unknown
+        assert observation.identity.quantity.reason == (
+            f"unsupported quantity {refusal_reason!r}"
+        )
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.value.unavailable_reason == (
+            "declared quantity is unknown; refusing to pick a number"
+        )
+        assert observation.locator is not None
+        assert to_plain(observation.locator) == source_point_locators[observation_id]
+
+    literature = tmp_path / "tree" / "data" / "literature"
+    fresh_census, fresh_mismatches, fresh_numeric, fresh_unavailable, _per_source = (
+        _series_census(literature / "extracts", literature / "extracts-v2")
+    )
+    assert fresh_census == {}
+    assert fresh_mismatches == []
+    assert fresh_numeric == 0
+    assert fresh_unavailable == 3495
+
+    filename = f"{source_id}.yaml"
+    fresh_store_path = literature / "extracts-v2" / filename
+    fresh_store = yaml.safe_load(fresh_store_path.read_text(encoding="utf-8"))
+    first_profile_observation_id = next(iter(source_point_locators))
+
+    numeric_store = deepcopy(fresh_store)
+    numeric_observation = next(
+        observation
+        for observation in numeric_store["observations"]
+        if observation["observation_id"] == first_profile_observation_id
+    )
+    numeric_observation["value"] = {
+        "kind": "point",
+        "point": "42",
+        "approximate": False,
+    }
+    numeric_store_dir = tmp_path / "numeric-store"
+    numeric_store_dir.mkdir()
+    (numeric_store_dir / filename).write_text(
+        yaml.safe_dump(numeric_store, sort_keys=False), encoding="utf-8"
+    )
+    _census, numeric_mismatches, _n_numeric, _n_unavailable, _per_source = (
+        _series_census(literature / "extracts", numeric_store_dir)
+    )
+    assert any(
+        f"{first_profile_observation_id} stored numeric 42" in mismatch
+        for mismatch in numeric_mismatches
+    ), numeric_mismatches
+
+    missing_store = deepcopy(fresh_store)
+    missing_store["observations"] = [
+        observation
+        for observation in missing_store["observations"]
+        if observation["observation_id"] != first_profile_observation_id
+    ]
+    missing_store_dir = tmp_path / "missing-store"
+    missing_store_dir.mkdir()
+    (missing_store_dir / filename).write_text(
+        yaml.safe_dump(missing_store, sort_keys=False), encoding="utf-8"
+    )
+    _census, missing_mismatches, _n_numeric, _n_unavailable, _per_source = (
+        _series_census(literature / "extracts", missing_store_dir)
+    )
+    assert any(
+        f"missing stored point {first_profile_observation_id}" in mismatch
+        for mismatch in missing_mismatches
+    ), missing_mismatches
+
+
 @pytest.mark.xdist_group("migration-series-census")
 def test_j01_store_census_series_numeric_matches_declared_field(
     tmp_path: Path,
@@ -9385,6 +9707,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not extracts_v2.is_dir():
         pytest.skip("migrated store not generated yet")
+    census_store_view = _fresh_su_zhang_census_store_view(tmp_path, extracts_v2)
     source_documents = deepcopy(_series_census_source_documents)
     assert source_documents["source_build_count"] == sum(
         (extracts_v2 / path.name).is_file() for path in extracts.glob("*.yaml")
@@ -9392,9 +9715,20 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     assert source_documents["store_build_count"] == sum(
         (extracts / path.name).is_file() for path in extracts_v2.glob("*.yaml")
     )
+    fresh_su_zhang_store = yaml.load(
+        (
+            census_store_view
+            / "su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.yaml"
+        ).read_text(encoding="utf-8"),
+        Loader=_FAST_SAFE_YAML_LOADER,
+    )
+    source_documents["store_documents"] = dict(source_documents["store_documents"])
+    source_documents["store_documents"][
+        "su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.yaml"
+    ] = fresh_su_zhang_store
     census, mismatches, n_numeric, n_unavailable, per_source = _series_census(
         extracts,
-        extracts_v2,
+        census_store_view,
         source_documents=source_documents["source_documents"],
         store_documents=source_documents["store_documents"],
     )
@@ -9510,15 +9844,15 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # 4110->4319.
     # Yakovlev 2017 (fc7c11533, merge F20 23a54e9b3) adds 34 printed residue
     # cells: 4319->4353.
-    # Data offers 3+4 add Su & Zhang (2023)'s 2,570 Table S2 + 61 Table S3 +
-    # 804 Table S4 numeric residue cells and Richter et al. (2011)'s 324 numeric
-    # Table 1 oxide cells. Its 325th printed oxide cell is <0.01 Na2O and remains
-    # typed-refused. The count moved because these data became visible, not
-    # because a check was relaxed; mismatches stay 0.
-    assert census.get("residue_component_composition") == 8112
-    assert per_source.get("su-zhang-2023-lunar-orange-glass-na-k-cu-degassing") == {
-        "residue_component_composition": 3435
-    }
+    # t-1781 retypes Su & Zhang's 3,435 natural-glass profile cells as an
+    # explicit typed absence; the numeric census excludes them from the residue
+    # quantity. Richter et al. (2011) still contributes 324 Table 1 oxide cells.
+    assert census.get("residue_component_composition") == 4677
+    assert (
+        per_source.get("su-zhang-2023-lunar-orange-glass-na-k-cu-degassing", {})
+        .get("residue_component_composition", 0)
+        == 0
+    )
     assert per_source.get(
         "richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation"
     ) == {"isotope_delta": 21, "residue_component_composition": 324}
@@ -9553,6 +9887,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # components plus 21 isotope deltas), moving n_numeric to 12,505. They also
     # add 60 null Su & Zhang Table S2 cells and Richter's printed <0.01 Na2O
     # cell to the unavailable tally: 949->1,010. These cells are not numeric.
+    # t-1781 adds 3,435 natural-glass profile cells as typed absences, so the
+    # unavailable tally becomes 4,445 without adding them to any quantity rail.
     # The old 8818 total also
     # counted 93 Beyer cells from the Table 6 glass-S and Tables 8/10/12
     # simple-oxide-formation schema-gap rows. SC-475 keeps those rows typed
@@ -9564,7 +9900,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(
         "H_minus_H298": 74,
         "cp": 12,
     }
-    assert n_unavailable == 1010
+    assert n_unavailable == 4445
     assert per_source.get("schumm-1981-alkali-aluminosilicate-thermochemical-tables") == {
         "cp": 123,
         "H_minus_H298": 123,
@@ -9609,7 +9945,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 12505, (n_numeric, census, n_unavailable)
+    # t-1781 removes Su & Zhang's 3,435 natural-glass profile cells from the
+    # residue quantity census: 12,505->9,070 numeric cells.
+    assert n_numeric == 9070, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
@@ -10307,8 +10645,9 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not extracts_v2.is_dir():
         pytest.skip("migrated store not generated yet")
+    fresh_store_view = _fresh_su_zhang_census_store_view(tmp_path, extracts_v2)
     dest = tmp_path / "extracts-v2"
-    shutil.copytree(extracts_v2, dest)
+    shutil.copytree(fresh_store_view, dest)
     # 7baaf334b keeps Fedkin Table 3 alphas as context, so that store file has
     # no evaporation_coefficient_alpha points to corrupt. Shirai 2000's six
     # printed alpha* cells are still series points the census checks. They sit
@@ -10339,7 +10678,10 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(
         source_documents=source_documents["source_documents"],
         store_documents=changed_store_documents,
     )
-    assert mismatches, "census must go red when stored alpha points are corrupted"
+    shirai_mismatches = [
+        mismatch for mismatch in mismatches if mismatch.startswith("ta-shirai-2000-lpsc::")
+    ]
+    assert len(shirai_mismatches) == 6, shirai_mismatches
 
 
 def test_j01_census_rejects_numeric_values_for_unavailable_rows(
@@ -16665,6 +17007,37 @@ def _record_has_numeric_gibbs(doc: dict) -> bool:
 
     census = _census_formation_gibbs(doc)
     return any(info["numeric"] for info in census.values())
+
+
+def test_b1452_reaction_observations_do_not_queue_a_species_phase(
+    tmp_path: Path,
+) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(
+        root,
+        "robie-hemingway-fisher-1978-usgs-b1452",
+        "robie-hemingway-fisher-1978-usgs-b1452-0228-phase-02.json",
+    )
+
+    result = migrate(root, write=False)
+
+    record_prefix = (
+        "robie-hemingway-fisher-1978-usgs-b1452:"
+        "robie-hemingway-fisher-1978-usgs-b1452-0228-phase-02:"
+    )
+    reactions = [
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(record_prefix)
+        and quantity_token(observation.identity) is Quantity.LOG10_K_REACTION
+    ]
+    assert reactions
+    assert all(observation.identity.species is None for observation in reactions)
+    reaction_ids = {observation.observation_id for observation in reactions}
+    assert not any(
+        entry.observation_id in reaction_ids and "phase" in (entry.axes or ())
+        for entry in result.queue
+    )
 
 
 def test_f1_usgs_unavailable_reasons_match_printed_gibbs_cells(tmp_path: Path) -> None:

@@ -1113,10 +1113,12 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     # changes. The new page-level rows are p069/p075/p085/p099/p102's two
     # unavailable windows, p089/p115's one unavailable window, plus the
     # restored p274/p367 formula rows; reference p005-05/p005-11/p006-05/
-    # p007-13 are typed unavailable. These are source-page grounded changes.
+    # p007-13 are typed unavailable. The shared phase parser also resolves
+    # printed glass windows; these source-page grounded identities affect the
+    # serialization digest.
     assert _b2131_formation_observation_serialization(tmp_path) == (
         945,
-        "13187d096dd3ffcc4079d147484c31edbfb8e432be9f2def01393a4cf1a2c2d7",
+        "920c952bbc6a7c9f128265998b5972ab1abf6274ab5fc24f07e802a17586b554",
     )
 
 
