@@ -2427,7 +2427,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     status=result_status,
                     warnings=[*all_warnings, message],
                     diagnostics=result_diagnostics,
-                ), reason=MAGEMIN_MODE_VECTOR_MASS_DEFICIT)
+                ), reason=result_diagnostics['backend_status_reason'])
         native_activities: Dict[str, float] = {}
         if native_activity_formula is not None:
             from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
@@ -4656,6 +4656,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 capture_native_activities=True,
             )
         )
+        buffer_warnings = list(buffer_warnings)
         timeout_s = float(self._config.get('timeout_s', 60.0))
         try:
             with _magemin_subprocess_slot(timeout_s):
