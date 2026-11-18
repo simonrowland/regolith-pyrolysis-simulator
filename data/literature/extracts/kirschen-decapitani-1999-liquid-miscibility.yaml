@@ -18,14 +18,14 @@ extraction:
   date: '2026-10-22'
   worker: fam40-1022
 fidelity_samples:
-- path: species.SiO2.observations[kirschen_decapitani_1999_t2_stmc_4_1h_phase1_sio2].values.component_amount.value
-  value: '45.30'
+- path: species.SiO2.observations[kirschen_decapitani_1999_t1_stmc_4_1_phase1_sio2].values.component_amount.value
+  value: '10.38'
   locator:
-    page: 15
-    pdf_page_index: 14
-    table: '2'
-    note: 600 dpi render transcription, STMC 4-1H, phase 1, SiO2 column; printed sigma 0.40.
-    published_page: '598'
+    page: 14
+    pdf_page_index: 13
+    table: '1'
+    note: 600 dpi render transcription, STMC 4-1, phase 1, SiO2 column; printed sigma 0.86.
+    published_page: '597'
 - path: species.SiO2.observations[kirschen_decapitani_1999_t1_stmc_4_1_phase2_sio2].values.component_amount.value
   value: '55.57'
   locator:
@@ -34,6 +34,7 @@ fidelity_samples:
     table: '1'
     note: 600 dpi render transcription, STMC 4-1, phase 2, SiO2 column.
     published_page: '597'
+# Q3: Table 2 (PDF p. 15, published p. 598) marks these four runs “One liquid”. Their analyzed quenched-glass vectors define run compositions; no unreported starting charge is inferred.
 experiments:
 - experiment_id: kirschen_decapitani_1999_t1_stc_2_1
   method: quench_equilibration
@@ -915,6 +916,26 @@ experiments:
   regime: quench_equilibration
   system_as_printed: CaO-MgO-SiO2-TiO2
   sample_id_as_printed: STC 16-1H
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '10.58'
+          - - SiO2
+            - '35.94'
+          - - TiO2
+            - '54.55'
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: "Table 2, run STC 16-1H, single-liquid quenched glass composition."
   method_as_printed: laser heated air levitation setup at CRMHT Orleans
   pressure_as_printed: ambient pressure
   atmosphere_as_printed: air
@@ -1005,6 +1026,26 @@ experiments:
   regime: quench_equilibration
   system_as_printed: CaO-MgO-SiO2-TiO2
   sample_id_as_printed: STM 7-2H
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '9.93'
+          - - SiO2
+            - '39.76'
+          - - TiO2
+            - '50.55'
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: "Table 2, run STM 7-2H, single-liquid quenched glass composition."
   method_as_printed: laser heated air levitation setup at CRMHT Orleans
   pressure_as_printed: ambient pressure
   atmosphere_as_printed: air
@@ -1110,6 +1151,28 @@ experiments:
   regime: quench_equilibration
   system_as_printed: CaO-MgO-SiO2-TiO2
   sample_id_as_printed: STMC 4-1H
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '5.91'
+          - - MgO
+            - '3.86'
+          - - SiO2
+            - '45.30'
+          - - TiO2
+            - '45.56'
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: "Table 2, run STMC 4-1H, single-liquid quenched glass composition."
   method_as_printed: laser heated air levitation setup at CRMHT Orleans
   pressure_as_printed: ambient pressure
   atmosphere_as_printed: air
@@ -1140,6 +1203,28 @@ experiments:
   regime: quench_equilibration
   system_as_printed: CaO-MgO-SiO2-TiO2
   sample_id_as_printed: STMC 5-2H
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '6.35'
+          - - MgO
+            - '4.31'
+          - - SiO2
+            - '33.52'
+          - - TiO2
+            - '55.70'
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: "Table 2, run STMC 5-2H, single-liquid quenched glass composition."
   method_as_printed: laser heated air levitation setup at CRMHT Orleans
   pressure_as_printed: ambient pressure
   atmosphere_as_printed: air
@@ -27983,235 +28068,6 @@ species:
         units: wt_percent
         confidence_level: one_sigma
         note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stc_16_1h_phase1_cao
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stc_16_1h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STC 16-1H, liquid row 1, CaO column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: CaO
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '1930'
-          units: C
-          sigma: '30'
-        temperature_as_published: 1930±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STC 16-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STC 16-1H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '10.58'
-          sigma: '0.22'
-        printed_sum: '101.07'
-        n_measurements: '50'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: &kdc99_t2_stc_16_1h_p1
-          state:
-            tag: value
-            value:
-              basis: wt_percent
-              amount_basis: mass_percent
-              components:
-              - - CaO
-                - '10.58'
-              - - SiO2
-                - '35.94'
-              - - TiO2
-                - '54.55'
-          locator:
-            page: 15
-            published_page: '598'
-            pdf_page_index: 14
-            table: '2'
-            note: Table 2 run STC 16-1H phase 1 quenched glass composition in wt percent.
-      uncertainty:
-        sigma: '0.22'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stc_16_1h_phase1_mgo
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stc_16_1h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STC 16-1H, liquid row 1, MgO column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: MgO
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '1930'
-          units: C
-          sigma: '30'
-        temperature_as_published: 1930±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STC 16-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STC 16-1H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: typed_refusal
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        status: typed_refusal
-        reason: Table 2 prints an ellipsis ("...") for MgO; no component amount is reported.
-        printed_cell_as_published: '...'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-    - observation_id: kirschen_decapitani_1999_t2_stc_16_1h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stc_16_1h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STC 16-1H, liquid row 1, SiO2 column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '1930'
-          units: C
-          sigma: '30'
-        temperature_as_published: 1930±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STC 16-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STC 16-1H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '35.94'
-          sigma: '0.59'
-        printed_sum: '101.07'
-        n_measurements: '50'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: *kdc99_t2_stc_16_1h_p1
-      uncertainty:
-        sigma: '0.59'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stc_16_1h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stc_16_1h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STC 16-1H, liquid row 1, TiO2 column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '1930'
-          units: C
-          sigma: '30'
-        temperature_as_published: 1930±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STC 16-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STC 16-1H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '54.55'
-          sigma: '0.67'
-        printed_sum: '101.07'
-        n_measurements: '50'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: *kdc99_t2_stc_16_1h_p1
-      uncertainty:
-        sigma: '0.67'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
     - observation_id: kirschen_decapitani_1999_t2_stc_18_2h_phase1_cao
       type: composition_series
       units: wt_percent
@@ -30499,235 +30355,6 @@ species:
         composition: *kdc99_t2_stm_7_1h_p2
       uncertainty:
         sigma: '1.24'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stm_7_2h_phase1_cao
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stm_7_2h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STM 7-2H, liquid row 1, CaO column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: CaO
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '2094'
-          units: C
-          sigma: '30'
-        temperature_as_published: 2094±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STM 7-2H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STM 7-2H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: typed_refusal
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        status: typed_refusal
-        reason: Table 2 prints an ellipsis ("...") for CaO; no component amount is reported.
-        printed_cell_as_published: '...'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-    - observation_id: kirschen_decapitani_1999_t2_stm_7_2h_phase1_mgo
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stm_7_2h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STM 7-2H, liquid row 1, MgO column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: MgO
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '2094'
-          units: C
-          sigma: '30'
-        temperature_as_published: 2094±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STM 7-2H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STM 7-2H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '9.93'
-          sigma: '0.37'
-        printed_sum: '100.24'
-        n_measurements: '51'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: &kdc99_t2_stm_7_2h_p1
-          state:
-            tag: value
-            value:
-              basis: wt_percent
-              amount_basis: mass_percent
-              components:
-              - - MgO
-                - '9.93'
-              - - SiO2
-                - '39.76'
-              - - TiO2
-                - '50.55'
-          locator:
-            page: 15
-            published_page: '598'
-            pdf_page_index: 14
-            table: '2'
-            note: Table 2 run STM 7-2H phase 1 quenched glass composition in wt percent.
-      uncertainty:
-        sigma: '0.37'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stm_7_2h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stm_7_2h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STM 7-2H, liquid row 1, SiO2 column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '2094'
-          units: C
-          sigma: '30'
-        temperature_as_published: 2094±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STM 7-2H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STM 7-2H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '39.76'
-          sigma: '1.17'
-        printed_sum: '100.24'
-        n_measurements: '51'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: *kdc99_t2_stm_7_2h_p1
-      uncertainty:
-        sigma: '1.17'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stm_7_2h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stm_7_2h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STM 7-2H, liquid row 1, TiO2 column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '2094'
-          units: C
-          sigma: '30'
-        temperature_as_published: 2094±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STM 7-2H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STM 7-2H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '50.55'
-          sigma: '0.98'
-        printed_sum: '100.24'
-        n_measurements: '51'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: *kdc99_t2_stm_7_2h_p1
-      uncertainty:
-        sigma: '0.98'
         units: wt_percent
         confidence_level: one_sigma
         note: Parenthetical component standard deviation as printed (1σ).
@@ -33545,246 +33172,6 @@ species:
         units: wt_percent
         confidence_level: one_sigma
         note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stmc_4_1h_phase1_cao
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stmc_4_1h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STMC 4-1H, liquid row 1, CaO column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: CaO
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '1890'
-          units: C
-          sigma: '30'
-        temperature_as_published: 1890±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STMC 4-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STMC 4-1H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '5.91'
-          sigma: '0.12'
-        printed_sum: '100.63'
-        n_measurements: '51'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: &kdc99_t2_stmc_4_1h_p1
-          state:
-            tag: value
-            value:
-              basis: wt_percent
-              amount_basis: mass_percent
-              components:
-              - - CaO
-                - '5.91'
-              - - MgO
-                - '3.86'
-              - - SiO2
-                - '45.30'
-              - - TiO2
-                - '45.56'
-          locator:
-            page: 15
-            published_page: '598'
-            pdf_page_index: 14
-            table: '2'
-            note: Table 2 run STMC 4-1H phase 1 quenched glass composition in wt percent.
-      uncertainty:
-        sigma: '0.12'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stmc_4_1h_phase1_mgo
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stmc_4_1h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STMC 4-1H, liquid row 1, MgO column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: MgO
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '1890'
-          units: C
-          sigma: '30'
-        temperature_as_published: 1890±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STMC 4-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STMC 4-1H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '3.86'
-          sigma: '0.09'
-        printed_sum: '100.63'
-        n_measurements: '51'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: *kdc99_t2_stmc_4_1h_p1
-      uncertainty:
-        sigma: '0.09'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stmc_4_1h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stmc_4_1h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STMC 4-1H, liquid row 1, SiO2 column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '1890'
-          units: C
-          sigma: '30'
-        temperature_as_published: 1890±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STMC 4-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STMC 4-1H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '45.30'
-          sigma: '0.40'
-        printed_sum: '100.63'
-        n_measurements: '51'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: *kdc99_t2_stmc_4_1h_p1
-      uncertainty:
-        sigma: '0.40'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stmc_4_1h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stmc_4_1h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STMC 4-1H, liquid row 1, TiO2 column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '1890'
-          units: C
-          sigma: '30'
-        temperature_as_published: 1890±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STMC 4-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STMC 4-1H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '45.56'
-          sigma: '0.52'
-        printed_sum: '100.63'
-        n_measurements: '51'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: *kdc99_t2_stmc_4_1h_p1
-      uncertainty:
-        sigma: '0.52'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
     - observation_id: kirschen_decapitani_1999_t2_stmc_5_1h_phase1_cao
       type: composition_series
       units: wt_percent
@@ -34262,246 +33649,6 @@ species:
         composition: *kdc99_t2_stmc_5_1h_p2
       uncertainty:
         sigma: '1.27'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stmc_5_2h_phase1_cao
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stmc_5_2h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STMC 5-2H, liquid row 1, CaO column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: CaO
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '1990'
-          units: C
-          sigma: '30'
-        temperature_as_published: 1990±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STMC 5-2H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STMC 5-2H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '6.35'
-          sigma: '0.19'
-        printed_sum: '99.88'
-        n_measurements: '51'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: &kdc99_t2_stmc_5_2h_p1
-          state:
-            tag: value
-            value:
-              basis: wt_percent
-              amount_basis: mass_percent
-              components:
-              - - CaO
-                - '6.35'
-              - - MgO
-                - '4.31'
-              - - SiO2
-                - '33.52'
-              - - TiO2
-                - '55.70'
-          locator:
-            page: 15
-            published_page: '598'
-            pdf_page_index: 14
-            table: '2'
-            note: Table 2 run STMC 5-2H phase 1 quenched glass composition in wt percent.
-      uncertainty:
-        sigma: '0.19'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stmc_5_2h_phase1_mgo
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stmc_5_2h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STMC 5-2H, liquid row 1, MgO column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: MgO
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '1990'
-          units: C
-          sigma: '30'
-        temperature_as_published: 1990±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STMC 5-2H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STMC 5-2H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '4.31'
-          sigma: '0.18'
-        printed_sum: '99.88'
-        n_measurements: '51'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: *kdc99_t2_stmc_5_2h_p1
-      uncertainty:
-        sigma: '0.18'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stmc_5_2h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stmc_5_2h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STMC 5-2H, liquid row 1, SiO2 column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '1990'
-          units: C
-          sigma: '30'
-        temperature_as_published: 1990±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STMC 5-2H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STMC 5-2H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '33.52'
-          sigma: '1.09'
-        printed_sum: '99.88'
-        n_measurements: '51'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: *kdc99_t2_stmc_5_2h_p1
-      uncertainty:
-        sigma: '1.09'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed (1σ).
-    - observation_id: kirschen_decapitani_1999_t2_stmc_5_2h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_decapitani_1999_t2_stmc_5_2h
-      regime: quench_equilibration
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: '598'
-        table: '2'
-        note: Table 2, run STMC 5-2H, liquid row 1, TiO2 column.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        T_C:
-          value: '1990'
-          units: C
-          sigma: '30'
-        temperature_as_published: 1990±30 °C
-        system_as_printed: CaO-MgO-SiO2-TiO2
-        sample_id_as_printed: STMC 5-2H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: Table 2:STMC 5-2H
-        phase_assemblage_as_printed: One liquid
-        phase_as_analyzed: quenched glass by electron microprobe analysis
-        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
-          The quench rate is not stated for Table 2 runs.
-        quench_status: not_stated
-        quench_status_locator: *id003
-        pressure_as_printed: ambient pressure
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id003
-        component_amount:
-          value: '55.70'
-          sigma: '1.02'
-        printed_sum: '99.88'
-        n_measurements: '51'
-        pressure_locator: *id001
-        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
-      point_conditions:
-        composition: *kdc99_t2_stmc_5_2h_p1
-      uncertainty:
-        sigma: '1.02'
         units: wt_percent
         confidence_level: one_sigma
         note: Parenthetical component standard deviation as printed (1σ).
@@ -35245,3 +34392,945 @@ species:
         digitisation: deferred to a figure pass
         method_class: model_derived
         admission_status: figure_only
+
+    # Q3: these source-grounded single-liquid analyses define the experiment run compositions above. Original values, sigmas, typed ellipses, conditions, and locators remain as source context.
+
+    - observation_id: kirschen_decapitani_1999_t2_stc_16_1h_phase1_cao
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stc_16_1h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STC 16-1H, liquid row 1, CaO column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CaO
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '1930'
+          units: C
+          sigma: '30'
+        temperature_as_published: 1930±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STC 16-1H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STC 16-1H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '10.58'
+          sigma: '0.22'
+        printed_sum: '101.07'
+        n_measurements: '50'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: &kdc99_t2_stc_16_1h_p1
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '10.58'
+              - - SiO2
+                - '35.94'
+              - - TiO2
+                - '54.55'
+          locator:
+            page: 15
+            published_page: '598'
+            pdf_page_index: 14
+            table: '2'
+            note: Table 2 run STC 16-1H phase 1 quenched glass composition in wt percent.
+      uncertainty:
+        sigma: '0.22'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+    - observation_id: kirschen_decapitani_1999_t2_stc_16_1h_phase1_sio2
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stc_16_1h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STC 16-1H, liquid row 1, SiO2 column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '1930'
+          units: C
+          sigma: '30'
+        temperature_as_published: 1930±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STC 16-1H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STC 16-1H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '35.94'
+          sigma: '0.59'
+        printed_sum: '101.07'
+        n_measurements: '50'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: *kdc99_t2_stc_16_1h_p1
+      uncertainty:
+        sigma: '0.59'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+    - observation_id: kirschen_decapitani_1999_t2_stc_16_1h_phase1_tio2
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stc_16_1h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STC 16-1H, liquid row 1, TiO2 column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '1930'
+          units: C
+          sigma: '30'
+        temperature_as_published: 1930±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STC 16-1H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STC 16-1H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '54.55'
+          sigma: '0.67'
+        printed_sum: '101.07'
+        n_measurements: '50'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: *kdc99_t2_stc_16_1h_p1
+      uncertainty:
+        sigma: '0.67'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+    - observation_id: kirschen_decapitani_1999_t2_stm_7_2h_phase1_mgo
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stm_7_2h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STM 7-2H, liquid row 1, MgO column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: MgO
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '2094'
+          units: C
+          sigma: '30'
+        temperature_as_published: 2094±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STM 7-2H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STM 7-2H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '9.93'
+          sigma: '0.37'
+        printed_sum: '100.24'
+        n_measurements: '51'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: &kdc99_t2_stm_7_2h_p1
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '9.93'
+              - - SiO2
+                - '39.76'
+              - - TiO2
+                - '50.55'
+          locator:
+            page: 15
+            published_page: '598'
+            pdf_page_index: 14
+            table: '2'
+            note: Table 2 run STM 7-2H phase 1 quenched glass composition in wt percent.
+      uncertainty:
+        sigma: '0.37'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+    - observation_id: kirschen_decapitani_1999_t2_stm_7_2h_phase1_sio2
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stm_7_2h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STM 7-2H, liquid row 1, SiO2 column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '2094'
+          units: C
+          sigma: '30'
+        temperature_as_published: 2094±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STM 7-2H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STM 7-2H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '39.76'
+          sigma: '1.17'
+        printed_sum: '100.24'
+        n_measurements: '51'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: *kdc99_t2_stm_7_2h_p1
+      uncertainty:
+        sigma: '1.17'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+    - observation_id: kirschen_decapitani_1999_t2_stm_7_2h_phase1_tio2
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stm_7_2h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STM 7-2H, liquid row 1, TiO2 column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '2094'
+          units: C
+          sigma: '30'
+        temperature_as_published: 2094±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STM 7-2H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STM 7-2H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '50.55'
+          sigma: '0.98'
+        printed_sum: '100.24'
+        n_measurements: '51'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: *kdc99_t2_stm_7_2h_p1
+      uncertainty:
+        sigma: '0.98'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+    - observation_id: kirschen_decapitani_1999_t2_stmc_4_1h_phase1_cao
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stmc_4_1h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STMC 4-1H, liquid row 1, CaO column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CaO
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '1890'
+          units: C
+          sigma: '30'
+        temperature_as_published: 1890±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STMC 4-1H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STMC 4-1H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '5.91'
+          sigma: '0.12'
+        printed_sum: '100.63'
+        n_measurements: '51'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: &kdc99_t2_stmc_4_1h_p1
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '5.91'
+              - - MgO
+                - '3.86'
+              - - SiO2
+                - '45.30'
+              - - TiO2
+                - '45.56'
+          locator:
+            page: 15
+            published_page: '598'
+            pdf_page_index: 14
+            table: '2'
+            note: Table 2 run STMC 4-1H phase 1 quenched glass composition in wt percent.
+      uncertainty:
+        sigma: '0.12'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+    - observation_id: kirschen_decapitani_1999_t2_stmc_4_1h_phase1_mgo
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stmc_4_1h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STMC 4-1H, liquid row 1, MgO column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: MgO
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '1890'
+          units: C
+          sigma: '30'
+        temperature_as_published: 1890±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STMC 4-1H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STMC 4-1H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '3.86'
+          sigma: '0.09'
+        printed_sum: '100.63'
+        n_measurements: '51'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: *kdc99_t2_stmc_4_1h_p1
+      uncertainty:
+        sigma: '0.09'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+    - observation_id: kirschen_decapitani_1999_t2_stmc_4_1h_phase1_sio2
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stmc_4_1h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STMC 4-1H, liquid row 1, SiO2 column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '1890'
+          units: C
+          sigma: '30'
+        temperature_as_published: 1890±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STMC 4-1H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STMC 4-1H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '45.30'
+          sigma: '0.40'
+        printed_sum: '100.63'
+        n_measurements: '51'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: *kdc99_t2_stmc_4_1h_p1
+      uncertainty:
+        sigma: '0.40'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+    - observation_id: kirschen_decapitani_1999_t2_stmc_4_1h_phase1_tio2
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stmc_4_1h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STMC 4-1H, liquid row 1, TiO2 column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '1890'
+          units: C
+          sigma: '30'
+        temperature_as_published: 1890±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STMC 4-1H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STMC 4-1H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '45.56'
+          sigma: '0.52'
+        printed_sum: '100.63'
+        n_measurements: '51'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: *kdc99_t2_stmc_4_1h_p1
+      uncertainty:
+        sigma: '0.52'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+    - observation_id: kirschen_decapitani_1999_t2_stmc_5_2h_phase1_cao
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stmc_5_2h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STMC 5-2H, liquid row 1, CaO column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CaO
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '1990'
+          units: C
+          sigma: '30'
+        temperature_as_published: 1990±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STMC 5-2H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STMC 5-2H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '6.35'
+          sigma: '0.19'
+        printed_sum: '99.88'
+        n_measurements: '51'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: &kdc99_t2_stmc_5_2h_p1
+          state:
+            tag: value
+            value:
+              basis: wt_percent
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '6.35'
+              - - MgO
+                - '4.31'
+              - - SiO2
+                - '33.52'
+              - - TiO2
+                - '55.70'
+          locator:
+            page: 15
+            published_page: '598'
+            pdf_page_index: 14
+            table: '2'
+            note: Table 2 run STMC 5-2H phase 1 quenched glass composition in wt percent.
+      uncertainty:
+        sigma: '0.19'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+    - observation_id: kirschen_decapitani_1999_t2_stmc_5_2h_phase1_mgo
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stmc_5_2h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STMC 5-2H, liquid row 1, MgO column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: MgO
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '1990'
+          units: C
+          sigma: '30'
+        temperature_as_published: 1990±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STMC 5-2H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STMC 5-2H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '4.31'
+          sigma: '0.18'
+        printed_sum: '99.88'
+        n_measurements: '51'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: *kdc99_t2_stmc_5_2h_p1
+      uncertainty:
+        sigma: '0.18'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+    - observation_id: kirschen_decapitani_1999_t2_stmc_5_2h_phase1_sio2
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stmc_5_2h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STMC 5-2H, liquid row 1, SiO2 column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '1990'
+          units: C
+          sigma: '30'
+        temperature_as_published: 1990±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STMC 5-2H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STMC 5-2H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '33.52'
+          sigma: '1.09'
+        printed_sum: '99.88'
+        n_measurements: '51'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: *kdc99_t2_stmc_5_2h_p1
+      uncertainty:
+        sigma: '1.09'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+    - observation_id: kirschen_decapitani_1999_t2_stmc_5_2h_phase1_tio2
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stmc_5_2h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STMC 5-2H, liquid row 1, TiO2 column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: TiO2
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '1990'
+          units: C
+          sigma: '30'
+        temperature_as_published: 1990±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STMC 5-2H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STMC 5-2H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        component_amount:
+          value: '55.70'
+          sigma: '1.02'
+        printed_sum: '99.88'
+        n_measurements: '51'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+      point_conditions:
+        composition: *kdc99_t2_stmc_5_2h_p1
+      uncertainty:
+        sigma: '1.02'
+        units: wt_percent
+        confidence_level: one_sigma
+        note: Parenthetical component standard deviation as printed (1σ).
+
+    - observation_id: kirschen_decapitani_1999_t2_stc_16_1h_phase1_mgo
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stc_16_1h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STC 16-1H, liquid row 1, MgO column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: MgO
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '1930'
+          units: C
+          sigma: '30'
+        temperature_as_published: 1930±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STC 16-1H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STC 16-1H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: typed_refusal
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        status: typed_refusal
+        reason: Table 2 prints an ellipsis ("...") for MgO; no component amount is reported.
+        printed_cell_as_published: '...'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+    - observation_id: kirschen_decapitani_1999_t2_stm_7_2h_phase1_cao
+      type: phase_composition_context
+      units: wt_percent
+      experiment: kirschen_decapitani_1999_t2_stm_7_2h
+      regime: quench_equilibration
+      locator:
+        page: 15
+        pdf_page_index: 14
+        published_page: '598'
+        table: '2'
+        note: Table 2, run STM 7-2H, liquid row 1, CaO column.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CaO
+        phase_label: glass
+        basis: wt_percent
+        T_C:
+          value: '2094'
+          units: C
+          sigma: '30'
+        temperature_as_published: 2094±30 °C
+        system_as_printed: CaO-MgO-SiO2-TiO2
+        sample_id_as_printed: STM 7-2H
+        run_note_as_printed: ''
+        phase_order: 1
+        assemblage_id: Table 2:STM 7-2H
+        phase_assemblage_as_printed: One liquid
+        phase_as_analyzed: quenched glass by electron microprobe analysis
+        quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air.
+          The quench rate is not stated for Table 2 runs.
+        quench_status: not_stated
+        quench_status_locator: *id003
+        pressure_as_printed: ambient pressure
+        method_class: measured_direct
+        admission_status: typed_refusal
+        point_conditions:
+          gas_mix:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        status: typed_refusal
+        reason: Table 2 prints an ellipsis ("...") for CaO; no component amount is reported.
+        printed_cell_as_published: '...'
+        pressure_locator: *id001
+        condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.

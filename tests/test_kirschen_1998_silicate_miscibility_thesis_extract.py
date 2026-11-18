@@ -100,8 +100,9 @@ def test_journal_repeats_are_linked_context_and_stmc_grid_matches_render() -> No
     article = yaml.safe_load(ARTICLE_EXTRACT.read_text(encoding="utf-8"))
     article_ids = {
         row["observation_id"]
-        for row in article["species"]["SiO2"]["observations"]
-        if row["values"].get("component_amount")
+        for section in ("observations", "context")
+        for row in article["species"]["SiO2"].get(section, [])
+        if row.get("values", {}).get("component_amount")
     }
     assert linked_ids == article_ids
     assert len(linked_ids) == 466

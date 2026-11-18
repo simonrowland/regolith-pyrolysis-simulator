@@ -1,11 +1,11 @@
 # Battery v2.1 migration report
 
-rows in: 93335
-records out (observations): 191609
+rows in: 93363
+records out (observations): 192386
 works: 852
-experiments: 8041
-queue size: 124463
-queue backlog: 97774
+experiments: 8043
+queue size: 125482
+queue backlog: 98793
 reference inputs: 26689
 identical-payload dedupe aliases: 342
 metadata files: 50
@@ -207,17 +207,17 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | citations | 147 | 849 (mismatch) |
 | doi_works | 56 | 455 (mismatch) |
 | no_doi_works | 91 | 397 (mismatch) |
-| admission_statuses | 374 | 32634 (mismatch) |
+| admission_statuses | 374 | 32618 (mismatch) |
 | supersedes | 422 | 654 (mismatch) |
 | series | 60 | 1718 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1921 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1242 (mismatch) |
 | gibbs_reference_101325 | 594 | 639 (mismatch) |
-| formulas | 1625 | 23102 (mismatch) |
+| formulas | 1625 | 23086 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 17547 (mismatch) |
+| absent_admissions | 3511 | 17591 (mismatch) |
 | absent_classes | 2174 | 2100 (mismatch) |
-| range_only_T | 3125 | 3048 (mismatch) |
+| range_only_T | 3125 | 3104 (mismatch) |
 | system_like_phases | 1065 | 2875 (mismatch) |
 | missing_phases | 237 | 1356 (mismatch) |
 | tabulated_lists | — | 6 |
@@ -254,13 +254,15 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 ## Unrecognised polymorph tokens
 
-degradations: 270
+degradations: 1063
 
 Unrecognised printed spellings become State.unknown with the original spelling in the reason; they are never dropped and never invented. Each degradation is queued on species.polymorph.
 
 | token | count |
 |---|---:|
-| `SOL-B` | 69 |
+| `SOL` | 651 |
+| `SOL-B` | 160 |
+| `SOL-A` | 51 |
 | `Cristobalite` | 33 |
 | `CaAl12O19` | 25 |
 | `2MgO·SiO2` | 21 |
@@ -19082,7 +19084,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.yaml` | 60 | 60 | 60 | 0 |
 | `data/literature/extracts/banya-watanabe-1977-feto-p2o5-solid-iron.yaml` | 87 | 87 | 324 | 0 |
 | `data/literature/extracts/barcza-1979-mn-slag-metal-equilibrium.yaml` | 12 | 12 | 4 | 0 |
-| `data/literature/extracts/barin-1995.yaml` | 13 | 89 | 93 | 0 |
+| `data/literature/extracts/barin-1995.yaml` | 75 | 900 | 1133 | 0 |
 | `data/literature/extracts/basu-2008-feo-steelmaking.yaml` | 216 | 216 | 0 | 0 |
 | `data/literature/extracts/beckett-2002-silicate-melt-activities.yaml` | 14 | 14 | 84 | 0 |
 | `data/literature/extracts/beerkens-2001-industrial-glass-evaporation.yaml` | 4 | 4 | 4 | 0 |
@@ -19138,7 +19140,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/chaudary-1997-v-redox-binary-silicate.yaml` | 0 | 0 | 1 | 0 |
 | `data/literature/extracts/chen-2019-sioch-cp-entropy-gibbs.yaml` | 33 | 760 | 24 | 0 |
 | `data/literature/extracts/chen-2020-ce2o3-cmas-activity-phase-equilibria.yaml` | 259 | 259 | 349 | 0 |
-| `data/literature/extracts/chen-2022-mgo-sio2-tio2-phase-equilibria.yaml` | 198 | 198 | 311 | 0 |
+| `data/literature/extracts/chen-2022-mgo-sio2-tio2-phase-equilibria.yaml` | 180 | 180 | 293 | 0 |
 | `data/literature/extracts/chen-2022-sio2-mno-slag-activities.yaml` | 222 | 222 | 222 | 0 |
 | `data/literature/extracts/cheng-2021-fe-ca-si-o-phase-equilibria.yaml` | 990 | 990 | 1065 | 0 |
 | `data/literature/extracts/cho-suito-1994-cas-slag-activities.yaml` | 48 | 48 | 53 | 0 |
@@ -19192,7 +19194,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/fegley-2023-chemical-equilibrium-calculations-bu.yaml` | 28 | 109 | 164 | 0 |
 | `data/literature/extracts/feng-2025-fe-si-ca-v-ti-phase-diagrams.yaml` | 204 | 204 | 0 | 0 |
 | `data/literature/extracts/ferguson-2004-iron-vapor-pressure.yaml` | 1 | 45 | 1 | 0 |
-| `data/literature/extracts/ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient.yaml` | 1 | 42 | 2 | 0 |
+| `data/literature/extracts/ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient.yaml` | 1 | 42 | 1 | 0 |
 | `data/literature/extracts/ferguson-nuth-2012-sio-vapor-pressure-mixture.yaml` | 21 | 109 | 117 | 0 |
 | `data/literature/extracts/ferkl-2026-waste-glass-thermal-redox.yaml` | 2 | 12 | 2 | 0 |
 | `data/literature/extracts/filiberto-lpsc2011-2064-volatiles.yaml` | 3 | 6 | 15 | 0 |
@@ -19400,7 +19402,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/king-1954-cafe2o4-ca2fe2o5-low-t-cp.yaml` | 4 | 76 | 6 | 0 |
 | `data/literature/extracts/kirschen-1998-silicate-miscibility-thesis.yaml` | 21 | 21 | 0 | 0 |
 | `data/literature/extracts/kirschen-1999-si-ti-al-miscibility.yaml` | 51 | 51 | 8 | 0 |
-| `data/literature/extracts/kirschen-decapitani-1999-liquid-miscibility.yaml` | 576 | 576 | 110 | 0 |
+| `data/literature/extracts/kirschen-decapitani-1999-liquid-miscibility.yaml` | 560 | 560 | 108 | 0 |
 | `data/literature/extracts/klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity.yaml` | 14 | 827 | 22 | 0 |
 | `data/literature/extracts/koehler-barany-kelley-1961-ri5711-ferrite-aluminate-formation.yaml` | 38 | 334 | 210 | 0 |
 | `data/literature/extracts/kohsaka-1979-na2o-sio2-emf.yaml` | 95 | 95 | 170 | 0 |
@@ -19985,11 +19987,11 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 318522
+advisory issues: 320677
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 318522 |
+| `identity_incomplete` | 320677 |
 
 ## Notices
 

@@ -373,6 +373,7 @@ LOCATOR_KEYS = frozenset(
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _ABS_PATH_RE = re.compile(r"^(/|[A-Za-z]:\\|\\\\)")
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+_DOTLESS_EXPONENT_RE = re.compile(r"[-+]?\d+(?:\.\d+)?[eE][-+]?\d+")
 
 
 def _valid_source_sha256(value: Any) -> bool:
@@ -1777,7 +1778,7 @@ def _values_equal(
     *,
     rel_tol: float | None = None,
 ) -> bool:
-    """Type-strict structural equality for fidelity pins.
+    """Exact structural equality for fidelity pins.
 
     Default is exact equality (no float tolerance, no bool/int coercion).
     ``rel_tol`` is only applied when the sample explicitly requests it (and

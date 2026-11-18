@@ -7,7 +7,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, MetricOperation, RefusalReason, ResidualStatus
+from simulator.battery.enums import (
+    EvidenceClass,
+    MetricOperation,
+    MethodToken,
+    RefusalReason,
+    ResidualStatus,
+)
 from simulator.battery.score import (
     _e15_residual_point,
     _reference_has_measured_evidence,
@@ -326,3 +332,45 @@ def test_table3_reductions_declare_unprinted_inputs_without_changing_values(tmp_
         observation_id: to_plain(observation.value)
         for observation_id, observation in migrated.observations.items()
     }
+
+
+def test_kems_rows_use_the_published_method_and_keep_unpublished_regime_unknown(
+    tmp_path,
+):
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    source_kems_ids = {
+        observation["observation_id"]
+        for entries in document["species"].values()
+        for observation in entries["observations"]
+        if observation.get("regime") == "kems_effusion"
+    }
+    assert source_kems_ids
+
+    migrated = _migrate_real_extract(
+        tmp_path,
+        EXTRACT_NAME,
+        extract_doc=document,
+    )
+    kems_rows = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.observation_id.rsplit("::", 1)[-1] in source_kems_ids
+    ]
+    assert kems_rows
+    assert {
+        observation.observation_id.rsplit("::", 1)[-1]
+        for observation in kems_rows
+    } <= source_kems_ids
+    assert all(
+        migrated.experiments[row.experiment_id].method.value
+        is MethodToken.KNUDSEN_EFFUSION
+        for row in kems_rows
+    )
+
+    experiment = next(
+        item
+        for experiment_id, item in migrated.experiments.items()
+        if experiment_id.endswith("stolyarova-1996-mi1201-1933k")
+    )
+    assert experiment.pressure_environment.regime.regime_class.is_unknown
+    assert experiment.pressure_environment.total_pressure_Pa.state.is_unknown

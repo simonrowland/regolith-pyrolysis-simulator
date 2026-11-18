@@ -19636,30 +19636,114 @@ def test_bare_log_accepts_explicit_one_atmosphere_pure_oxygen_anchor() -> None:
 
 
 @pytest.mark.parametrize(
-    ("gas_as_printed", "log_fO2"),
+    "gas_as_printed",
     [
-        ("CO2 82.200 × 100.00 SCCM + CO 1.000 × 1.00 SCCM", "-0.68"),
-        ("H2O 275.400 × 100.00 SCCM + H2 1.000 × 1.00 SCCM", "-0.68"),
+        "CO2 82.200 × 100.00 SCCM + CO 1.000 × 1.00 SCCM",
+        "H2O 275.400 × 100.00 SCCM + H2 1.000 × 1.00 SCCM",
     ],
 )
-def test_bare_log_accepts_direct_printed_gas_couple_with_combined_band(
-    gas_as_printed: str, log_fO2: str
+def test_bare_log_accepts_printed_gas_mix_from_full_balance_band(
+    gas_as_printed: str,
 ) -> None:
     from simulator.battery.enums import Authority, NoticeKind
-    from simulator.battery.migrate import _bare_log_frame_decision
+    from simulator.battery.migrate import (
+        _bare_log_frame_decision,
+        _janaf_gas_formation_inputs,
+    )
+    from simulator.battery.oxygen_identity import (
+        _printed_sccm_gas_mixture,
+    )
+    from simulator.chemistry.offgas_fo2 import (
+        _full_balance_fo2_with_janaf_band,
+        load_buffer_polynomials,
+    )
+
+    mix = _printed_sccm_gas_mixture(gas_as_printed)
+    assert mix is not None
+    species_mol, precision = mix
+    gibbs, gas_constant = _janaf_gas_formation_inputs(
+        ("CO", "CO2", "H2", "H2O", "O2"), Decimal("1682.15")
+    )
+    expected, _cea, band = _full_balance_fo2_with_janaf_band(
+        {name: float(amount) for name, amount in species_mol.items()},
+        1682.15,
+        gibbs,
+        gas_constant,
+        load_buffer_polynomials(),
+        initial_total_pressure_bar=1.01325,
+        relative_precision=precision,
+    )
 
     decision = _bare_log_frame_decision(
-        Decimal(log_fO2),
+        Decimal(str(expected.log10_fO2)),
         Decimal("1682.15"),
         printed_atmospheres=(gas_as_printed,),
+        total_pressure_pa=Decimal("101325"),
     )
 
     assert decision.state.is_value
-    assert decision.state.value == Decimal("20892.96130854039483122233736")
+    assert decision.state.value.is_finite()
     assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
     assert decision.notice_authority is Authority.CERTIFIED
-    assert "combined_band=" in decision.notice_band
-    assert "expected CEA log10(fO2/bar)=" in decision.notice_reason
+    assert f"full_balance_cea_janaf_and_mix_band={band}" in decision.notice_band
+    assert "expected JANAF full-balance log10(fO2/bar)=" in decision.notice_reason
+
+
+@pytest.mark.parametrize(
+    ("atmosphere", "couple", "oxidised", "reduced"),
+    (
+        (
+            "CO2 1.000 × 1.00 SCCM + CO 1.000 × 1.00 SCCM",
+            "CO",
+            "CO2",
+            "CO",
+        ),
+        (
+            "H2O 1.000 × 1.00 SCCM + H2 1.000 × 1.00 SCCM",
+            "H2",
+            "H2O",
+            "H2",
+        ),
+    ),
+)
+def test_direct_printed_gas_couple_below_cea_domain_is_extrapolated(
+    atmosphere: str, couple: str, oxidised: str, reduced: str
+) -> None:
+    from simulator.battery.enums import Authority, NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+    from simulator.battery.oxygen_identity import _printed_sccm_gas_mixture
+    from simulator.chemistry.offgas_fo2 import (
+        _couple_log10_fO2,
+        _log10_K_couple,
+        load_buffer_polynomials,
+    )
+
+    temperature_K = 199.0
+    polynomials = load_buffer_polynomials()
+    mix = _printed_sccm_gas_mixture(atmosphere)
+    assert mix is not None
+    species_mol, _precision = mix
+    expected = _couple_log10_fO2(
+        float(species_mol[oxidised] / species_mol[reduced]),
+        _log10_K_couple(
+            polynomials, couple, temperature_K, allow_extrapolation=True
+        ),
+    )
+
+    decision = _bare_log_frame_decision(
+        Decimal(str(expected)),
+        Decimal(str(temperature_K)),
+        printed_atmospheres=(atmosphere,),
+        total_pressure_pa=Decimal("100000"),
+    )
+
+    assert decision.state.is_value
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert decision.notice_authority is Authority.EXTRAPOLATED
+    assert any(
+        "extrapolat" in notice.reason and f"{oxidised}/{reduced}" in notice.reason
+        for notice in decision.notices
+    )
 
 
 def test_bare_log_direct_couple_mismatch_is_refused_as_possible_misprint() -> None:
@@ -19670,141 +19754,18 @@ def test_bare_log_direct_couple_mismatch_is_refused_as_possible_misprint() -> No
         Decimal("-0.30"),
         Decimal("1682.15"),
         printed_atmospheres=("CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM",),
+        total_pressure_pa=Decimal("101325"),
     )
 
     assert decision.state.is_unknown
-    assert decision.notices[0].kind is NoticeKind.PROBABLE_SOURCE_MISPRINT
-    assert "possible source misprint" in decision.notices[0].reason
-
-
-def test_bare_log_direct_couple_outside_cea_domain_carries_extrapolated_authority() -> None:
-    from simulator.battery.enums import Authority, NoticeKind
-    from simulator.battery.migrate import _bare_log_frame_decision
-    from simulator.chemistry.offgas_fo2 import _direct_gas_couple_fo2
-
-    expected = _direct_gas_couple_fo2(
-        {"CO2": 1.0, "CO": 1.0},
-        {"CO2": 0.011, "CO": 0.011},
-        199.0,
-    ).log10_fO2
-    decision = _bare_log_frame_decision(
-        Decimal(str(expected)),
-        Decimal("199"),
-        printed_atmospheres=(
-            "CO2 1.000 × 1.00 SCCM + CO 1.000 × 1.00 SCCM",
-        ),
-    )
-
-    assert decision.state.is_value
-    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
-    assert decision.notice_authority is Authority.EXTRAPOLATED
-
-
-def _printed_wgs_sccm_mix_at_cea_log_fO2(
-    log10_fO2: float,
-) -> tuple[dict[str, float], str]:
-    from simulator.chemistry.offgas_fo2 import (
-        _log10_K_couple,
-        load_buffer_polynomials,
-    )
-
-    temperature_K = 1682.15
-    polynomials = load_buffer_polynomials()
-    log10_k_h2 = _log10_K_couple(polynomials, "H2", temperature_K)
-    log10_k_co = _log10_K_couple(polynomials, "CO", temperature_K)
-
-    # Set H2O/H2 to the requested CEA fO2, then set Q=K_CO/K_H2 so the CEA
-    # water-gas-shift extent is zero and the source prediction is independently
-    # fixed by the production couple resolver.
-    amounts = {
-        "CO2": 10.0 ** (log10_k_co - log10_k_h2) * 10.0 ** (
-            log10_k_h2 + log10_fO2 / 2.0
-        ),
-        "CO": 1.0,
-        "H2O": 10.0 ** (log10_k_h2 + log10_fO2 / 2.0),
-        "H2": 1.0,
-    }
-    atmosphere = " + ".join(
-        f"{species} 1.000000000000 × {amount:.12f} SCCM"
-        for species, amount in amounts.items()
-    )
-    return amounts, atmosphere
-
-
-def _imposed_wgs_result_with_janaf_band(gas: dict[str, float]):
-    from decimal import Decimal
-
-    from simulator.battery.generators.janaf import (
-        JANAF_R_J_PER_MOL_K,
-        _janaf_gas_formation_gibbs_J_per_mol,
-    )
-    from simulator.chemistry.offgas_fo2 import imposed_fo2, load_buffer_polynomials
-
-    temperature_K = 1682.15
-    gibbs = {
-        formula: float(
-            _janaf_gas_formation_gibbs_J_per_mol(
-                formula, Decimal(str(temperature_K))
-            )
-        )
-        for formula in ("CO", "CO2", "H2", "H2O", "O2")
-    }
-    return imposed_fo2(
-        gas,
-        temperature_K,
-        load_buffer_polynomials(),
-        janaf_formation_gibbs_J_per_mol=gibbs,
-        janaf_gas_constant_J_per_mol_K=float(JANAF_R_J_PER_MOL_K),
+    assert decision.state.reason.startswith("gas_mix_fo2_band_mismatch:")
+    assert not any(
+        notice.kind is NoticeKind.PROBABLE_SOURCE_MISPRINT
+        for notice in decision.notices
     )
 
 
-def test_bare_log_accepts_wgs_dependent_mix_with_source_band() -> None:
-    from simulator.battery.enums import NoticeKind
-    from simulator.battery.migrate import _bare_log_frame_decision
-
-    gas, atmosphere = _printed_wgs_sccm_mix_at_cea_log_fO2(-0.30)
-    result = _imposed_wgs_result_with_janaf_band(
-        {species: float(amount) for species, amount in gas.items()}
-    )
-    assert result.uncertainty_band_dex is not None
-    tolerance = Decimal("0.01")
-    band = Decimal(str(result.uncertainty_band_dex))
-    reported = Decimal(str(result.log10_fO2)) + tolerance + band / 2
-    decision = _bare_log_frame_decision(
-        reported,
-        Decimal("1682.15"),
-        printed_atmospheres=(atmosphere,),
-    )
-
-    # Mutation: remove the WGS allowance; this just-outside-tolerance value is refused.
-    difference = reported - Decimal(str(result.log10_fO2))
-    assert tolerance < difference < tolerance + band
-    assert decision.state.is_value
-    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
-    assert atmosphere in decision.notice_reason
-    assert "expected CEA log10(fO2/bar)=-0.3000" in decision.notice_reason
-    assert "wgs_uncertainty_band=" in decision.notice_band
-
-
-def test_bare_log_wgs_mismatch_keeps_the_possible_misprint_notice() -> None:
-    from simulator.battery.enums import NoticeKind
-    from simulator.battery.migrate import _bare_log_frame_decision
-
-    _, atmosphere = _printed_wgs_sccm_mix_at_cea_log_fO2(-0.30)
-    decision = _bare_log_frame_decision(
-        Decimal("-1.00"),
-        Decimal("1682.15"),
-        printed_atmospheres=(atmosphere,),
-    )
-
-    # Mutation: omit the WGS candidate from checked results and this notice assertion fails.
-    assert decision.state.is_unknown
-    assert decision.notices[0].kind is NoticeKind.PROBABLE_SOURCE_MISPRINT
-    assert "possible source misprint" in decision.notices[0].reason
-
-
-def test_direct_gas_couple_without_janaf_uses_mix_band_and_notices(monkeypatch) -> None:
-    from simulator.battery.enums import NoticeKind
+def test_gas_couple_without_janaf_refuses_without_fabricating_a_band(monkeypatch) -> None:
     from simulator.battery.generators import janaf
     from simulator.battery.migrate import _bare_log_frame_decision
 
@@ -19818,14 +19779,11 @@ def test_direct_gas_couple_without_janaf_uses_mix_band_and_notices(monkeypatch) 
         printed_atmospheres=(
             "CO2 82.200 × 100.00 SCCM + CO 1.000 × 1.00 SCCM",
         ),
+        total_pressure_pa=Decimal("101325"),
     )
 
-    assert decision.state.is_value
-    assert any(
-        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
-        and "gas_couple_thermo_spread_unsized" in notice.reason
-        for notice in decision.notices
-    )
+    assert decision.state.is_unknown
+    assert "gas_mix_fo2_band_unavailable" in decision.state.reason
 
 
 def test_bare_log_mismatch_is_refused_and_noticed() -> None:

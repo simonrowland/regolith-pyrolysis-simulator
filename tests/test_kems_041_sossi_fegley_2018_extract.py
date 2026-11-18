@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import Migrator, load_yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/kems-041-sossi-fegley-2018.yaml"
@@ -37,6 +37,51 @@ def _assert_explicit_attributions(document: dict) -> None:
         nested = _rows(document)[observation_id]["values"]["rows"][0]
         assert nested["method_class"] == "quoted_attributed"
         assert nested.get("attribution") == attribution
+
+
+def _assert_dotless_activity_values_are_numeric(document: dict) -> None:
+    rows = _rows(document)
+    sodium = rows[
+        "sossi_fegley_2018_table2_gamma_Na__NaO_0_5_"
+    ]["values"]["rows"][0]
+    assert sodium["gamma"] == 1e-3
+    assert type(sodium["gamma"]) is float
+    assert sodium["gamma_as_published"] == "10⁻³ᵃ"
+
+    phosphorus = rows[
+        "sossi_fegley_2018_table2_gamma_P__PO_2_5_"
+    ]["values"]["rows"][0]
+    assert phosphorus["range"] == [1e-10, 1e-6]
+    assert all(type(value) is float for value in phosphorus["range"])
+    assert phosphorus["gamma_as_published"] == "10⁻⁶–10⁻¹⁰"
+
+
+def test_dotless_activity_values_keep_numeric_types_and_printed_strings() -> None:
+    document = load_yaml(EXTRACT)
+    _assert_dotless_activity_values_are_numeric(document)
+
+
+def test_stringifying_dotless_activity_values_is_rejected() -> None:
+    document = load_yaml(EXTRACT)
+    mutations = (
+        ("sossi_fegley_2018_table2_gamma_Na__NaO_0_5_", "gamma", "1e-3"),
+        (
+            "sossi_fegley_2018_table2_gamma_P__PO_2_5_",
+            "range",
+            ["1e-10", "1e-6"],
+        ),
+    )
+    for observation_id, field, string_value in mutations:
+        mutated = deepcopy(document)
+        row = _rows(mutated)[observation_id]["values"]["rows"][0]
+        row[field] = string_value
+        try:
+            _assert_dotless_activity_values_are_numeric(mutated)
+        except AssertionError:
+            continue
+        raise AssertionError(
+            f"stringified {observation_id}.{field} passed the source pin"
+        )
 
 
 def test_external_relations_name_the_attributed_papers() -> None:

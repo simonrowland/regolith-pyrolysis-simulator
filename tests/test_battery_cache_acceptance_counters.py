@@ -128,7 +128,11 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
     class _Stream(score._ResidualJsonlStream):
         def __init__(self, path: Path, **_kwargs: Any) -> None:
             self.partial_path = path.with_name(path.name + ".partial")
-            self.partial_path.write_bytes(b'{"store_stamp":true}\n')
+            self.store_stamp = score.derive_store_stamp(score.REPO_ROOT)
+            header = (score.dumps_store_stamp(self.store_stamp) + "\n").encode(
+                "utf-8"
+            )
+            self.partial_path.write_bytes(header)
             self.count = 0
             self.band_values: dict = {}
             self.headline_band_values: dict = {}
@@ -161,10 +165,12 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
 
     def _parallel_map(tasks, _worker, **kwargs):
         assert kwargs["max_workers"] == 2
+        store_stamp = kwargs["initargs"][-1]
+        header = (score.dumps_store_stamp(store_stamp) + "\n").encode("utf-8")
         results = []
         for index, engine, _refs, shard_path, _root in tasks:
             shard = Path(shard_path)
-            shard.write_bytes(b'{"store_stamp":true}\n')
+            shard.write_bytes(header)
             shard.with_name(shard.name + ".order").write_text("", encoding="utf-8")
             counters = (
                 {}

@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, ValueKind
+from simulator.battery.enums import MethodToken, Phase, ValueKind
 from simulator.battery.identity import profile_for
 from simulator.battery.migrate import Migrator
 
@@ -339,6 +339,15 @@ def test_isolated_migration_reaches_temperature_on_every_row():
     assert len(activities) == 69
     assert len(curves) == 12
     assert len(pressures) == 1
+    assert all(
+        result.experiments[row.experiment_id].method.value
+        is MethodToken.KNUDSEN_EFFUSION
+        for row in activities
+    )
+    assert all(
+        result.experiments[row.experiment_id].method.is_unknown
+        for row in curves
+    )
 
     for _formula, observation_id, value, _phase in RENDERED_CELLS:
         row = next(item for item in gibbs if item.observation_id.endswith(observation_id))

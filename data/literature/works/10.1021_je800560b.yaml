@@ -34,8 +34,8 @@ experiments:
 - experiment_id: 10.1021/je800560b::ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'Knudsen_effusion' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: knudsen_effusion
   sample: {}
   conditions:
     temperature_K:
