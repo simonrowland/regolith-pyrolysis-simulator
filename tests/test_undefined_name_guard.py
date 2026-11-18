@@ -161,6 +161,58 @@ def test_comprehension_target_does_not_bind_module_name(tmp_path: Path) -> None:
     assert undefined_names(path) == (("leaked", 3),)
 
 
+def test_for_target_binds_module_name(tmp_path: Path) -> None:
+    path = tmp_path / "for_target.py"
+    path.write_text(
+        "for T in (1,):\n"
+        "    pass\n"
+        "def read():\n"
+        "    return T\n"
+    )
+
+    assert undefined_names(path) == ()
+
+
+def test_with_target_rebinds_type_checking_import(tmp_path: Path) -> None:
+    path = tmp_path / "with_target.py"
+    path.write_text(
+        "from typing import TYPE_CHECKING\n"
+        "from contextlib import nullcontext\n"
+        "if TYPE_CHECKING:\n"
+        "    from somewhere import T\n"
+        "with nullcontext() as T:\n"
+        "    pass\n"
+        "def read():\n"
+        "    return T\n"
+    )
+
+    assert undefined_names(path) == ()
+
+
+def test_bare_annotation_does_not_rebind_type_checking_import(tmp_path: Path) -> None:
+    path = tmp_path / "bare_annotation.py"
+    path.write_text(
+        "from typing import TYPE_CHECKING\n"
+        "if TYPE_CHECKING:\n"
+        "    from somewhere import T\n"
+        "T: object\n"
+        "def read():\n"
+        "    return T\n"
+    )
+
+    assert undefined_names(path) == (("T", 6),)
+
+
+def test_dict_comprehension_targets_do_not_bind_enclosing_scope(tmp_path: Path) -> None:
+    path = tmp_path / "dict_comprehension_targets.py"
+    path.write_text(
+        "_OPEN_TO_CLOSE = {'(': ')', '[': ']', '{': '}'}\n"
+        "_CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}\n"
+    )
+
+    assert undefined_names(path) == ()
+
+
 def test_later_variable_annotation_uses_shared_annotation_scope(
     tmp_path: Path,
 ) -> None:

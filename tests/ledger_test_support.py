@@ -1,3 +1,5 @@
+"""Expected ledger quantities come from recorded lots, not the production debit helper."""
+
 from simulator.accounting import resolve_species_formula
 
 

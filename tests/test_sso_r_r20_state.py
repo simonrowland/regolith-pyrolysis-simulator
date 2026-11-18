@@ -87,12 +87,12 @@ def _make_sim(
 
 
 def _cleaned_melt_debit_mol(sim: PyrolysisSimulator, transition, species: str) -> float:
-    formula = resolve_species_formula(species, sim.species_formula_registry)
-    return sum(
-        float(lot.species_kg.get(species, 0.0))
-        / formula.molar_mass_kg_per_mol()
-        for lot in transition.debits
-        if lot.account == "process.cleaned_melt"
+    return _transition_account_species_mol(
+        sim,
+        transition,
+        side="debits",
+        account="process.cleaned_melt",
+        species=species,
     )
 
 
