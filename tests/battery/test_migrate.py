@@ -14117,10 +14117,20 @@ def _score_initial_charge_composition_path(
     *,
     path: str,
     invalid_kind: str | None,
+    consumer: str = "melt",
 ):
-    quantity = "mass_loss_fraction" if path == "yield_series" else "activity"
-    units = "percent" if path == "yield_series" else "dimensionless"
-    obs_type = "mass_loss" if path == "yield_series" else "activity_coefficient"
+    if consumer == "vapour":
+        quantity = "p_partial"
+        units = "Pa"
+        obs_type = "p_partial"
+    elif path == "yield_series":
+        quantity = "mass_loss_fraction"
+        units = "percent"
+        obs_type = "mass_loss"
+    else:
+        quantity = "activity"
+        units = "dimensionless"
+        obs_type = "activity_coefficient"
     values = {
         "quantity": quantity,
         "activity": 0.2,
@@ -14143,6 +14153,8 @@ def _score_initial_charge_composition_path(
         point = (
             {"T_K": 1773.15, "mass_loss_pct": 20.0}
             if path == "yield_series"
+            else {"T_K": 1773.15, "P": 1.0e-4}
+            if consumer == "vapour"
             else {"T_K": 1773.15, "activity": 0.2}
         )
         container = "points" if path == "yield_series" else path
@@ -14160,6 +14172,8 @@ def _score_initial_charge_composition_path(
     elif invalid_kind == "valid_mole_with_wt_refusal":
         target["composition_mol"] = valid_mole_map
         target["composition_wt_pct"] = refused_wt_map
+    elif invalid_kind == "unsupported_map":
+        target["composition_wt_pct"] = {"SiO2": 50, "MgO": 40, "XxO": 10}
     extract = _scalar_extract(
         quantity=quantity,
         units=units,
@@ -14187,7 +14201,7 @@ def _score_initial_charge_composition_path(
             }
         },
     }
-    if path == "yield_series":
+    if path == "yield_series" and consumer != "vapour":
         experiment["method"] = MethodToken.LANGMUIR_FREE_EVAPORATION.value
     extract["experiments"] = [experiment]
     result = migrate(_write_min_tree(tmp_path, extract), write=False)
@@ -14213,7 +14227,7 @@ def _score_initial_charge_composition_path(
         residual
         for residual in residuals
         if residual.reference == observation.observation_id
-    )
+    ), result
 
 
 @pytest.mark.parametrize(
@@ -14229,46 +14243,48 @@ def _score_initial_charge_composition_path(
         ("printed_wt_refusal", "mass-percent composition"),
         ("malformed_amount_with_wt_refusal", "malformed declared amount"),
         ("valid_mole_with_wt_refusal", "mass-percent composition"),
+        ("unsupported_map", "unsupported component"),
     ],
 )
 def test_initial_charge_proxy_classifies_invalid_inputs_across_all_containers(
     tmp_path: Path, path: str, invalid_kind: str, reason_fragment: str
 ) -> None:
-    invalid, refused = _score_initial_charge_composition_path(
+    invalid, refused, result = _score_initial_charge_composition_path(
         tmp_path / "invalid", path=path, invalid_kind=invalid_kind
     )
     composition_states = [invalid.identity.composition]
     point_composition = (invalid.point_conditions or {}).get("composition")
     if isinstance(point_composition, Located):
         composition_states.append(point_composition.state)
-    unknown_states = [
-        state for state in composition_states if state is not None and state.is_unknown
-    ]
-    assert unknown_states, (path, invalid_kind, invalid)
-    assert any(
-        reason_fragment in (state.reason or "") for state in unknown_states
-    ), (path, invalid_kind, unknown_states)
-    if invalid_kind == "valid_mole_with_wt_refusal":
-        assert any(
-            state is not None
-            and state.is_value
-            and isinstance(state.value, Composition)
-            for state in composition_states
-        ), (path, invalid)
+    identity_composition = invalid.identity.composition
+    assert identity_composition is not None and identity_composition.is_unknown, (
+        path,
+        invalid_kind,
+        identity_composition,
+    )
+    assert reason_fragment in (identity_composition.reason or ""), (
+        path,
+        invalid_kind,
+        identity_composition,
+    )
     assert isinstance(point_composition, Located)
     assert point_composition.state.is_unknown, (path, invalid_kind, point_composition)
-    identity_composition = invalid.identity.composition
-    assert identity_composition is not None and identity_composition.is_value
-    assert isinstance(identity_composition.value, Composition)
-    if invalid_kind == "valid_mole_with_wt_refusal":
-        assert identity_composition.value.proxy_flag != INITIAL_CHARGE_ONLY_PROXY_FLAG
-    else:
-        assert (
-            identity_composition.value.proxy_flag
-            == INITIAL_CHARGE_ONLY_PROXY_FLAG
-        )
+    assert reason_fragment in (point_composition.state.reason or ""), (
+        path,
+        invalid_kind,
+        point_composition.state.reason,
+    )
+    assert all(
+        state is None or not state.is_value for state in composition_states
+    ), (path, invalid_kind, composition_states)
+    experiment = result.experiments[invalid.experiment_id]
+    for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
+        prediction = predict_with_engine(engine, invalid, experiment=experiment)
+        assert prediction.value is None, (path, invalid_kind, engine, prediction)
+        assert prediction.refusal_reason is not None, (path, invalid_kind, engine)
     assert refused
     assert all(row.status is ResidualStatus.REFUSED for row in refused)
+    assert all(row.numeric is None for row in refused)
     if path == "yield_series":
         # The declared method gets past METHOD_UNKNOWN; this fixture intentionally
         # leaves Langmuir geometry unstated, so that is the first scoring refusal.
@@ -14287,13 +14303,174 @@ def test_initial_charge_proxy_classifies_invalid_inputs_across_all_containers(
 
 @pytest.mark.parametrize(
     "path",
+    ["scalar", "points", "rows", "series", "tests"],
+    ids=["scalar", "points", "rows", "series", "tests"],
+)
+@pytest.mark.parametrize(
+    ("invalid_kind", "reason_fragment"),
+    [
+        ("malformed_amount", "malformed declared amount"),
+        ("partial_component", "partial_composition"),
+        ("printed_wt_refusal", "mass-percent composition"),
+        ("malformed_amount_with_wt_refusal", "malformed declared amount"),
+        ("valid_mole_with_wt_refusal", "mass-percent composition"),
+        ("unsupported_map", "unsupported component"),
+    ],
+)
+def test_invalid_run_composition_refuses_vapour_prediction(
+    tmp_path: Path, path: str, invalid_kind: str, reason_fragment: str
+) -> None:
+    """Vapour reads identity first. An invalid run map must not predict."""
+
+    invalid, refused, result = _score_initial_charge_composition_path(
+        tmp_path / "vapour",
+        path=path,
+        invalid_kind=invalid_kind,
+        consumer="vapour",
+    )
+    identity_composition = invalid.identity.composition
+    assert identity_composition is not None and identity_composition.is_unknown
+    assert reason_fragment in (identity_composition.reason or "")
+    point_composition = (invalid.point_conditions or {}).get("composition")
+    assert isinstance(point_composition, Located)
+    assert point_composition.state.is_unknown
+    assert reason_fragment in (point_composition.state.reason or "")
+    experiment = result.experiments[invalid.experiment_id]
+    for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
+        prediction = predict_with_engine(engine, invalid, experiment=experiment)
+        assert prediction.value is None
+        assert prediction.refusal_reason is not None
+    assert refused
+    assert all(row.status is ResidualStatus.REFUSED and row.numeric is None for row in refused)
+    assert all(row.refusal is not None for row in refused)
+
+
+def _migrate_flat_run_columns(
+    tmp_path: Path,
+    point_columns: dict,
+    *,
+    depletion: tuple[str, ...] = (),
+):
+    from simulator.battery.input_provenance import PRINTED_STARTING_BULK
+
+    values = {
+        "quantity": "p_partial",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+        "composition_wt_pct": {"SiO2": 40, "MgO": 60},
+        "points": [
+            {
+                "T_K": 1773.15,
+                "P": 1.0e-4,
+                **point_columns,
+            }
+        ],
+    }
+    if depletion:
+        values["caption_depletion_columns"] = {
+            "columns": list(depletion),
+            "locator": {
+                "page": 51,
+                "pdf_page": 57,
+                "note": "caption depletion, not the run composition",
+            },
+            "quote": "start-to-end depletion",
+        }
+    extract = _scalar_extract(
+        quantity="p_partial",
+        units="Pa",
+        values=values,
+        obs_type="p_partial",
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row.update({"experiment": "sample", "T_K": 1773.15})
+    extract["species"] = {"MgO": {"observations": [row]}}
+    extract["experiments"] = [
+        {
+            "experiment_id": "sample",
+            "sample": {
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {"SiO2": 40, "MgO": 60},
+                    },
+                    "locator": {"table": "1", "page": 1},
+                }
+            },
+        }
+    ]
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+    return observation, result, PRINTED_STARTING_BULK
+
+
+def test_parent_flat_columns_are_a_declared_run_composition(tmp_path: Path) -> None:
+    malformed, malformed_result, _provenance = _migrate_flat_run_columns(
+        tmp_path / "malformed",
+        {"SiO2_wt_pct": "17.0-16.7", "MgO_wt_pct": 50},
+    )
+    malformed_identity = malformed.identity.composition
+    assert malformed_identity is not None and malformed_identity.is_unknown
+    assert "malformed printed component amount" in (malformed_identity.reason or "")
+    malformed_point = malformed.point_conditions["composition"]
+    assert malformed_point.state.is_unknown
+    assert "malformed printed component amount" in (malformed_point.state.reason or "")
+    experiment = malformed_result.experiments[malformed.experiment_id]
+    prediction = predict_with_engine(
+        Engine.OPENIMCC, malformed, experiment=experiment
+    )
+    assert prediction.value is None
+
+    valid, _valid_result, _provenance = _migrate_flat_run_columns(
+        tmp_path / "valid",
+        {"SiO2_wt_pct": 50, "MgO_wt_pct": 50},
+    )
+    charge_only, _charge_result, provenance = _migrate_flat_run_columns(
+        tmp_path / "charge",
+        {},
+    )
+    valid_identity = valid.identity.composition
+    charge_identity = charge_only.identity.composition
+    assert valid_identity is not None and valid_identity.is_value
+    assert isinstance(valid_identity.value, Composition)
+    assert valid_identity.value.proxy_flag is None
+    assert valid_identity.value.input_provenance is None
+    assert charge_identity is not None and charge_identity.is_value
+    assert isinstance(charge_identity.value, Composition)
+    assert charge_identity.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert charge_identity.value.input_provenance == provenance
+    assert valid_identity.value.components != charge_identity.value.components
+
+
+def test_caption_depletion_columns_keep_the_initial_charge_proxy(
+    tmp_path: Path,
+) -> None:
+    observation, _result, provenance = _migrate_flat_run_columns(
+        tmp_path,
+        {"SiO2_wt_pct": "17.0-16.7", "MgO_wt_pct": "15.6-13.3"},
+        depletion=("SiO2_wt_pct", "MgO_wt_pct"),
+    )
+    identity_composition = observation.identity.composition
+    assert identity_composition is not None and identity_composition.is_value
+    assert isinstance(identity_composition.value, Composition)
+    assert identity_composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert identity_composition.value.input_provenance == provenance
+    point_composition = observation.point_conditions["composition"]
+    assert point_composition.state.is_value
+    assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert point_composition.state.value.input_provenance == provenance
+
+
+@pytest.mark.parametrize(
+    "path",
     ["scalar", "points", "rows", "series", "yield_series", "tests"],
     ids=["scalar", "points", "rows", "series", "yield-series", "tests"],
 )
 def test_initial_charge_proxy_is_used_only_when_composition_is_not_printed(
     tmp_path: Path, path: str
 ) -> None:
-    unprinted, scored = _score_initial_charge_composition_path(
+    unprinted, scored, _result = _score_initial_charge_composition_path(
         tmp_path / "unprinted", path=path, invalid_kind=None
     )
     composition_states = [unprinted.identity.composition]
