@@ -2236,6 +2236,12 @@ def test_aithala_s5_regression_summaries_migrate_as_typed_quantity_gaps() -> Non
         REPO_ROOT
         / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
     )
+    source = yaml.safe_load(extract.read_text(encoding="utf-8"))
+    source_rows = {
+        row["observation_id"]: row
+        for row in source["species"]["Fe"]["observations"]
+        if row.get("observation_id", "").startswith("aithala_2026_s5_")
+    }
     migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
     migrator._migrate_extract(extract)
     migrator.finalize()
@@ -2249,6 +2255,35 @@ def test_aithala_s5_regression_summaries_migrate_as_typed_quantity_gaps() -> Non
         )
     }
     assert len(rows) == 61
+    summary_experiments = {
+        key.rsplit("::", 1)[-1]: experiment
+        for key, experiment in migrator.result.experiments.items()
+        if key.rsplit("::", 1)[-1].startswith("aithala-2026-s5-")
+    }
+    assert len(summary_experiments) == 61
+    for observation_id, observation in rows.items():
+        source_row = source_rows[observation.observation_id.rsplit("::", 1)[-1]]
+        experiment = migrator.result.experiments[observation.experiment_id]
+        source_values = source_row["values"]
+        assert experiment.locator is not None
+        assert experiment.locator.table == "S-5"
+        assert experiment.locator.note.startswith(
+            f"Table S-5 series regression summary over n={source_values['n']} experiments;"
+        )
+        assert f"temperature-series label: {source_values['series_name']}" in experiment.locator.note
+        composition = source_values["composition_context_as_printed"]
+        assert f"SiO2 {composition['SiO2_wt_pct']} wt.%" in experiment.locator.note
+        assert f"FeO* {composition['FeO_star_wt_pct']} wt.%" in experiment.locator.note
+        assert len(experiment.conditions) == 1
+        temperature = experiment.conditions["temperature_K"].state.value
+        source_range = source_values["temperature_range_C"]
+        assert temperature.kind is ValueKind.INTERVAL
+        assert temperature.interval_low == convert_temperature_to_k(
+            source_range["min"], "C"
+        )[0]
+        assert temperature.interval_high == convert_temperature_to_k(
+            source_range["max"], "C"
+        )[0]
     assert len({row.provenance["series_id"] for row in rows.values()}) == 61
     assert all(row.identity.quantity.is_unknown for row in rows.values())
     assert all(
@@ -2268,6 +2303,33 @@ def test_aithala_s5_regression_summaries_migrate_as_typed_quantity_gaps() -> Non
 
     present = rows["aithala_2026_s5_humphrey"]
     assert present.evidence.class_.value is EvidenceClass.AUTHOR_ESTIMATE
+    assert "n=10" in migrator.result.experiments[present.experiment_id].locator.note
+    assert "12 overlapping Aithala runs" in migrator.result.experiments[
+        present.experiment_id
+    ].locator.note
+
+    missing_experiment_id = present.experiment_id
+    experiments_without_summary = dict(migrator.result.experiments)
+    del experiments_without_summary[missing_experiment_id]
+    context_rows = {
+        str(row["context_id"]): row
+        for work_rows in migrator.result.context_by_work.values()
+        for row in work_rows
+    }
+    mutated = validate_corpus(
+        migrator.result.works,
+        experiments_without_summary,
+        migrator.result.observations,
+        residuals=None,
+        benches=migrator.result.benches,
+        context_rows=context_rows,
+    )
+    assert any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        and issue.path.endswith(".experiment_id")
+        and missing_experiment_id in issue.detail
+        for issue in mutated.hard_issues
+    )
 
 
 def test_darken_gurry_equilibrium_compositions_migrate_with_conditions() -> None:
