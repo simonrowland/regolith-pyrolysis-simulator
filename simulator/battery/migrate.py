@@ -1002,6 +1002,7 @@ def _mass_percent_component_key(name: str) -> tuple[str, bool]:
 
 
 _MALFORMED_DECLARED_AMOUNT_PREFIX = "malformed declared amount"
+_MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX = "malformed printed component amount"
 
 
 def parse_declared_amount(value: object) -> Decimal:
@@ -6192,7 +6193,7 @@ def _oxide_mass_percent_components(
             diagnostics.append(
                 (
                     source,
-                    "malformed printed component amount for "
+                    f"{_MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX} for "
                     f"{raw_name!r}: {raw_amount!r}",
                 )
             )
@@ -9422,46 +9423,50 @@ def _initial_charge_only_composition_proxy(
     ):
         return identity, point_conditions, list(notices)
 
-    identity_invalid_reason = None
-    if identity_composition_state is not None and identity_composition_state.is_unknown:
-        identity_reason = identity_composition_state.reason or ""
-        folded_identity_reason = identity_reason.casefold()
-        if identity_reason.startswith(_MALFORMED_DECLARED_AMOUNT_PREFIX) or any(
-            folded_identity_reason.startswith(prefix)
-            for prefix in (
-                "unsupported component",
-                "malformed printed component amount",
-                "mass-percent composition",
-                "partial_composition:",
-            )
-        ):
-            identity_invalid_reason = identity_reason
-
-    refusal_reasons = list(composition_refusal_reasons)
+    # A direct component column can hold a figure-level range. It is a run
+    # input only when the extract declared a composition map for the point.
+    refusal_reasons = [
+        reason
+        for reason in composition_refusal_reasons
+        if point_composition_map_declared
+        or not reason.casefold().startswith(
+            _MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX
+        )
+    ]
     if malformed_composition_reason is not None:
         refusal_reasons.insert(0, malformed_composition_reason)
     elif omitted_composition_components:
         refusal_reasons.insert(
             0, partial_composition_unknown_reason(omitted_composition_components)
         )
-    elif (
-        point_composition_state is not None
-        and point_composition_state.is_unknown
-        and point_composition_state.reason
+    identity_invalid_reason = None
+    for state in (
+        point_composition_state,
+        declared_composition_state,
+        identity_composition_state,
     ):
-        refusal_reasons.insert(0, point_composition_state.reason)
-    elif (
-        declared_composition_state is not None
-        and declared_composition_state.is_unknown
-        and declared_composition_state.reason
-    ):
-        refusal_reasons.insert(0, declared_composition_state.reason)
-    elif identity_invalid_reason is not None:
-        refusal_reasons.insert(0, identity_invalid_reason)
-    invalid_input = bool(refusal_reasons) or any(
-        state is not None and state.is_unknown
-        for state in (point_composition_state, declared_composition_state)
-    )
+        if state is None or not state.is_unknown:
+            continue
+        state_reason = state.reason or ""
+        folded_reason = state_reason.casefold()
+        if state_reason.startswith(_MALFORMED_DECLARED_AMOUNT_PREFIX) or any(
+            folded_reason.startswith(prefix)
+            for prefix in (
+                "unsupported component",
+                "mass-percent composition",
+                "partial_composition:",
+            )
+        ) or (
+            point_composition_map_declared
+            and folded_reason.startswith(
+                _MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX
+            )
+        ):
+            identity_invalid_reason = state_reason
+            break
+    if identity_invalid_reason is not None and not refusal_reasons:
+        refusal_reasons.append(identity_invalid_reason)
+    invalid_input = bool(refusal_reasons)
     classification = (
         _CompositionProxyInputClass.INVALID
         if invalid_input
@@ -9469,28 +9474,15 @@ def _initial_charge_only_composition_proxy(
     )
     if classification is _CompositionProxyInputClass.INVALID:
         reason = refusal_reasons[0] if refusal_reasons else None
-        if (
-            reason is None
-            and point_composition_state is not None
-            and point_composition_state.is_unknown
-        ):
-            reason = point_composition_state.reason
-        if (
-            reason is None
-            and declared_composition_state is not None
-            and declared_composition_state.is_unknown
-        ):
-            reason = declared_composition_state.reason
         reason = reason or composition_unknown_reason()
         invalid = Located(State.unknown(reason), locator=locator)
         preserved_value = next(
             (
                 state
-                for state in (identity_composition_state, point_composition_state)
+                for state in (point_composition_state, identity_composition_state)
                 if state is not None
                 and state.is_value
                 and isinstance(state.value, Composition)
-                and state.value.proxy_flag != INITIAL_CHARGE_ONLY_PROXY_FLAG
             ),
             None,
         )
@@ -26592,18 +26584,26 @@ class Migrator:
         if omitted_components:
             detail = partial_composition_unknown_reason(omitted_components)
             partial_composition_key = _mole_fraction_composition_source_key(values)
-            self.result.registry_issues.append(
-                ValidationIssue(
-                    path=f"observations.{obs_id}.values.{partial_composition_key}",
-                    reason=RefusalReason.INVALID_SOURCE,
-                    detail=detail,
+            # composition_mol's reader returns omitted names only for
+            # non-formula keys; a hard source issue belongs to declared
+            # initial-charge compositions, not other rows' ancillary maps.
+            if (
+                partial_composition_key == "composition_mol"
+                and composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
+            ):
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=f"observations.{obs_id}.values.{partial_composition_key}",
+                        reason=RefusalReason.INVALID_SOURCE,
+                        detail=detail,
+                    )
                 )
-            )
             self.result.add_queue(
                 work.work_id,
                 locator,
                 ["composition"],
-                detail,
+                "unusable composition component(s): "
+                + ", ".join(omitted_components),
                 source=source_key,
                 observation_id=obs_id,
             )
@@ -29302,7 +29302,12 @@ class Migrator:
                 ),
                 composition_refusal_reasons=composition_refusal,
                 malformed_composition_reason=malformed_composition_amount,
-                omitted_composition_components=omitted_components,
+                omitted_composition_components=(
+                    omitted_components
+                    if _mole_fraction_composition_source_key(values)
+                    == "composition_mol"
+                    else ()
+                ),
                 declared_composition_state=(
                     source_composition_located.state
                     if source_composition_located is not None
@@ -30246,15 +30251,22 @@ class Migrator:
                     detail=malformed_composition_amount,
                 )
             )
-        if point_composition_omitted_components:
-            point_composition_source_key = _mole_fraction_composition_source_key(
-                raw_item if isinstance(raw_item, Mapping) else {}
-            )
+        point_mole_source_key = (
+            _mole_fraction_composition_source_key(raw_item)
+            if isinstance(raw_item, Mapping)
+            else ""
+        )
+        # The mole-map reader's omitted tuple contains non-formula names only.
+        if (
+            point_composition_omitted_components
+            and point_mole_source_key == "composition_mol"
+            and point_composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        ):
             self.result.registry_issues.append(
                 ValidationIssue(
                     path=(
                         f"observations.{point_id}.values."
-                        f"{point_composition_source_key}"
+                        f"{point_mole_source_key}"
                     ),
                     reason=RefusalReason.INVALID_SOURCE,
                     detail=partial_composition_unknown_reason(
@@ -31344,21 +31356,6 @@ class Migrator:
                         identity, total_pressure_Pa=pressure_state
                     )
         if point_composition_refusal:
-            refused_point_composition = (point_conditions or {}).get("composition")
-            preserved_composition = (
-                point_composition_located.state
-                if point_composition_located is not None
-                and point_composition_located.state.is_value
-                else refused_point_composition.state
-                if isinstance(refused_point_composition, Located)
-                and refused_point_composition.state.is_value
-                else None
-            )
-            if (
-                preserved_composition is not None
-                and (identity.composition is None or identity.composition.is_unknown)
-            ):
-                identity = replace(identity, composition=preserved_composition)
             composition_reason = composition_unknown_reason(
                 point_composition_refusal
             )
@@ -31585,7 +31582,11 @@ class Migrator:
                 ),
                 composition_refusal_reasons=point_composition_refusal,
                 malformed_composition_reason=malformed_composition_amount,
-                omitted_composition_components=point_composition_omitted_components,
+                omitted_composition_components=(
+                    point_composition_omitted_components
+                    if point_mole_source_key == "composition_mol"
+                    else ()
+                ),
                 declared_composition_state=(
                     point_composition_located.state
                     if point_composition_located is not None
