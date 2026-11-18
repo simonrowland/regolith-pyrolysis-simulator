@@ -289,9 +289,7 @@ def test_hastie_fig4_rows_reach_outer_compiler_and_keep_both_flags(tmp_path) -> 
             assert not pressure_sum_check.passed
             assert (
                 pressure_sum_check.detail["reason"]
-                == (
-                    "composition is unknown; printed species coverage cannot be established"
-                )
+                == "no admitted printed partial pressures at this exact point"
             )
             assert (
                 pressure_sum_check.detail.get("printed_partial_pressure_sum_Pa")

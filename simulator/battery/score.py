@@ -2022,12 +2022,6 @@ def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
     quantity = quantity_token(identity)
     if quantity is None:
         return None
-    if any(
-        notice.kind is NoticeKind.SOURCE_DISAGREEMENT
-        and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
-        for notice in reference.notices
-    ):
-        return None
     point = (reference.point_conditions or {}).get("composition")
     states = (identity.composition, point.state if isinstance(point, Located) else None)
     if not any(
@@ -2038,6 +2032,21 @@ def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
         for state in states
     ):
         return None
+    existing_proxy_notice = next(
+        (
+            notice
+            for notice in reference.notices
+            if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+            and notice.reason.startswith(SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX)
+            and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+        ),
+        None,
+    )
+    if existing_proxy_notice is not None:
+        # The persisted notice is also the scoring flag that strips bands from
+        # this proxy-backed residual. Keep it in flagged_notices so the band
+        # policy sees it; union_notices deduplicates it in the final row.
+        return existing_proxy_notice
     reason = (
         f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
         f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "

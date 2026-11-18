@@ -2219,7 +2219,8 @@ def test_kems_printed_pressure_envelope_excludes_validation_flagged_rows() -> No
     from simulator.battery.records import INITIAL_CHARGE_ONLY_PROXY_NOTICE
     from simulator.battery.validity import run_validity_gates
 
-    # Without a printed orifice Kn, the lone pressure cannot verify the regime.
+    # Without printed orifice Kn or same-point conditions, pressure cannot
+    # verify the regime.
     experiment = F.kems_experiment("initial-charge-proxy-band", kn=None)
     composition = Composition(
         basis="printed_mole_fraction",
@@ -2239,6 +2240,9 @@ def test_kems_printed_pressure_envelope_excludes_validation_flagged_rows() -> No
             kind=UncertaintyKind.PRINTED,
             verbatim="The source reports pressure errors no higher than 7%.",
         ),
+        # The row has no point-condition record from which to admit a same-
+        # point pressure for the missing-Kn regime fallback.
+        point_conditions=None,
     )
     proxy_notice = _initial_charge_composition_notice(row)
     assert proxy_notice is not None
@@ -2258,6 +2262,7 @@ def test_kems_printed_pressure_envelope_excludes_validation_flagged_rows() -> No
 
     assert not gates.passed
     assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert gates.primary_check == "in_cell_partial_pressure_sum"
     assert FLAGGED_STRATUM_UNVERIFIED_APPARATUS in strata
     assert band is None
 
@@ -6186,6 +6191,51 @@ def test_hastie_initial_charge_notice_reaches_residual() -> None:
     assert flagged_strata(residual.notices) == (
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
     )
+
+
+def test_persisted_initial_charge_notice_still_strips_global_kems_band() -> None:
+    from simulator.battery.score import _initial_charge_composition_notice
+
+    experiment = F.kems_experiment("initial-charge-band-neutral", kn=Decimal("20"))
+    identity = _partial_identity()
+    assert identity.composition is not None and identity.composition.is_value
+    identity = replace(
+        identity,
+        composition=State.of(
+            replace(
+                identity.composition.value,
+                proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            )
+        ),
+    )
+    reference = F.observation(
+        "persisted-initial-charge-model-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+        source_id="shornikov-2026-wollastonite-kems",
+    )
+    notice = _initial_charge_composition_notice(reference)
+    assert notice is not None
+    reference = replace(reference, notices=(notice,))
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+        derived_band=DecisionBand(
+            Decimal("0.1"),
+            "dimensionless",
+            "KEMS p_partial measured uncertainty: source-printed pressure envelope",
+        ),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.status is ResidualStatus.NO_BAND
+    assert notice in residual.notices
 
 
 def test_figure_only_evidence_adds_notice_to_scored_residual() -> None:
