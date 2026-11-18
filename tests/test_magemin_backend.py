@@ -231,6 +231,16 @@ def _make_fake_magemin_cli_liquidus(monkeypatch):
     return backend, calls
 
 
+def _expected_magemin_bulk_arg(backend, bulk_projection):
+    args = backend._build_magemin_subprocess_args(
+        bulk_projection=bulk_projection,
+        temperature_C=1200.0,
+        pressure_kbar=0.001,
+        fO2_log=-9.0,
+    )[0]
+    return next(arg for arg in args if arg.startswith('--Bulk='))
+
+
 def _assert_magemin_cli_absolute_targets(calls, expected_fO2_log):
     assert len(calls) > 10, "expected coarse samples and refinement probes"
     for args in calls:
@@ -1133,12 +1143,16 @@ def test_magemin_worker_exit_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_engine_worker_died'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'EngineWorkerDied'
     )
@@ -1156,12 +1170,16 @@ def test_magemin_pool_unavailable_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_engine_worker_unavailable'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'EngineWorkerUnavailable'
     )
@@ -1180,12 +1198,16 @@ def test_magemin_pool_lifecycle_error_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_engine_worker_unavailable'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'EngineWorkerPoolLifecycleError'
     )
@@ -1203,13 +1225,17 @@ def test_magemin_in_process_budget_exhaustion_returns_typed_status():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
         call_timeout_s=0.0,
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_aggregate_budget_timeout'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'MAGEMinAggregateBudgetExceeded'
     )
@@ -1247,12 +1273,16 @@ def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_subprocess_slot_timeout'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'MAGEMinSubprocessSlotTimeout'
     )
@@ -1287,16 +1317,542 @@ def test_magemin_subprocess_slot_permission_error_returns_not_converged(
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_subprocess_slot_unavailable'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'MAGEMinSubprocessSlotUnavailable'
     )
     assert 'read-only filesystem' in result.diagnostics['backend_failure_message']
+
+
+_MAGEMIN_EQUILIBRATE_FAILURE_EXIT_EXPECTATIONS = (
+    ('invalid_scalar', 'refused', 'invalid_input'),
+    ('dropped_source_species', 'out_of_domain', 'forbidden_species'),
+    ('empty_composition', 'out_of_domain', 'missing_input'),
+    ('missing_bulk_projection', 'out_of_domain', 'out_of_domain'),
+    ('dropped_bulk_component', 'out_of_domain', 'composition_projected'),
+    ('invalid_domain', 'out_of_domain', 'invalid_fo2_log'),
+    ('unavailable_without_binary', 'unavailable', 'missing_binary'),
+    (
+        'unavailable_with_binary',
+        'unavailable',
+        'magemin_engine_worker_unavailable',
+    ),
+    ('declared_input_error', 'refused', 'invalid_input'),
+    ('subprocess_timeout', 'not_converged', 'magemin_subprocess_timeout'),
+    ('launch_error', 'not_converged', 'missing_binary'),
+    (
+        'permission_launch_error',
+        'not_converged',
+        'magemin_engine_worker_unavailable',
+    ),
+    ('nonzero_exit', 'not_converged', 'nonzero_exit'),
+    ('invalid_engine_output', 'not_converged', 'parse_empty_output'),
+    (
+        'slot_timeout',
+        'not_converged',
+        'magemin_subprocess_slot_timeout',
+    ),
+    (
+        'slot_unavailable',
+        'not_converged',
+        'magemin_subprocess_slot_unavailable',
+    ),
+    (
+        'aggregate_budget',
+        'not_converged',
+        'magemin_aggregate_budget_timeout',
+    ),
+    ('worker_died', 'not_converged', 'magemin_engine_worker_died'),
+    (
+        'worker_pool_lifecycle',
+        'not_converged',
+        'magemin_engine_worker_unavailable',
+    ),
+    (
+        'worker_unavailable',
+        'not_converged',
+        'magemin_engine_worker_unavailable',
+    ),
+    (
+        'bridge_fallback_slot_timeout',
+        'not_converged',
+        'magemin_subprocess_slot_timeout',
+    ),
+    ('negative_convergence', 'not_converged', 'negative_convergence_evidence'),
+    (
+        'mode_vector_deficit',
+        'out_of_domain',
+        'magemin_mode_vector_mass_deficit',
+    ),
+    ('native_activity_invalid', 'not_converged', 'engine_not_converged'),
+    ('clamped_operating_point', 'out_of_domain', 'clamped_operating_point'),
+    ('generic_parse_empty_output', 'not_converged', 'parse_empty_output'),
+    ('untyped_failure', 'not_converged', 'magemin_untyped_failure'),
+    ('bridge_runtime_error', 'not_converged', 'engine_crash'),
+    ('bridge_value_error', 'not_converged', 'engine_crash'),
+    ('bridge_type_error', 'not_converged', 'engine_crash'),
+    ('bridge_key_error', 'not_converged', 'engine_crash'),
+    ('bridge_custom_error', 'not_converged', 'engine_crash'),
+    ('bridge_os_error', 'not_converged', 'engine_crash'),
+    ('bridge_permission_error', 'not_converged', 'engine_crash'),
+    ('bridge_file_not_found_error', 'not_converged', 'missing_binary'),
+)
+
+
+def _magemin_failure_exit_result(monkeypatch, failure_kind):
+    from simulator.melt_backend import magemin as magemin_module
+    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.melt_backend.magemin import (
+        _MAGEMinDeclaredInputError,
+        _MAGEMinEngineCallError,
+        _MAGEMinEngineLifecycleError,
+    )
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    composition = {'SiO2': 1.0, 'MgO': 1.0}
+
+    def call_with_error(error):
+        def raise_error(**_kwargs):
+            raise error
+
+        monkeypatch.setattr(backend, '_call_magemin', raise_error)
+
+    if failure_kind == 'invalid_scalar':
+        return backend.equilibrate(
+            float('nan'), composition_mol=composition,
+        )
+    if failure_kind == 'dropped_source_species':
+        projection = types.SimpleNamespace(
+            oxide_wt_pct={'SiO2': 100.0},
+            dropped_mass_kg_by_species={'H2O': 1.0},
+            warnings=(),
+        )
+        monkeypatch.setattr(
+            magemin_module, 'project_melt_to_oxide_projection',
+            lambda **_kwargs: projection,
+        )
+        monkeypatch.setattr(
+            magemin_module, 'projection_diagnostics_for_melt_input',
+            lambda **_kwargs: {},
+        )
+        monkeypatch.setattr(
+            backend, '_submitted_bulk_and_domain_verdict',
+            lambda *_args, **_kwargs: (
+                None, (False, ['forbidden source species'], 'forbidden_species'),
+            ),
+        )
+    elif failure_kind == 'empty_composition':
+        composition = {}
+    elif failure_kind == 'missing_bulk_projection':
+        monkeypatch.setattr(
+            backend, '_submitted_bulk_and_domain_verdict',
+            lambda *_args, **_kwargs: (None, (False, [], None)),
+        )
+    elif failure_kind in {'dropped_bulk_component', 'invalid_domain'}:
+        bulk_projection = types.SimpleNamespace(
+            database='ig', order=(), vector=(),
+            composition_wt_pct={'SiO2': 50.0, 'MgO': 50.0},
+            warnings=('synthetic projection result',),
+            dropped_components=(
+                ('Cr2O3',) if failure_kind == 'dropped_bulk_component' else ()
+            ),
+            dropped_component_mass_fractions=(), merged_components=(),
+            source_sum_wt_pct=100.0, projected_sum_wt_pct=100.0,
+        )
+        valid = failure_kind != 'invalid_domain'
+        reason = None if valid else 'invalid_fo2_log'
+        monkeypatch.setattr(
+            backend, '_submitted_bulk_and_domain_verdict',
+            lambda *_args, **_kwargs: (
+                bulk_projection,
+                (valid, ['synthetic domain verdict'], reason),
+            ),
+        )
+        monkeypatch.setattr(
+            magemin_module, '_magemin_bulk_projection_details',
+            lambda _bulk: {},
+        )
+    elif failure_kind.startswith('unavailable_'):
+        backend._available = False
+        backend._bridge = None
+        if failure_kind == 'unavailable_without_binary':
+            backend._binary_path = None
+    elif failure_kind == 'declared_input_error':
+        call_with_error(_MAGEMinDeclaredInputError(
+            'ValueError', 'injected invalid scalar',
+        ))
+    elif failure_kind == 'subprocess_timeout':
+        call_with_error(_MAGEMinEngineCallError(
+            'TimeoutExpired', 'injected subprocess timeout',
+        ))
+    elif failure_kind == 'launch_error':
+        call_with_error(_MAGEMinEngineCallError(
+            'FileNotFoundError', 'injected missing executable',
+            failure_disposition='environment',
+        ))
+    elif failure_kind == 'permission_launch_error':
+        call_with_error(_MAGEMinEngineCallError(
+            'PermissionError', 'injected non-executable binary',
+            failure_disposition='environment',
+        ))
+    elif failure_kind == 'nonzero_exit':
+        call_with_error(_MAGEMinEngineCallError(
+            'MAGEMinProcessExit', 'injected nonzero process exit',
+        ))
+    elif failure_kind == 'invalid_engine_output':
+        call_with_error(_MAGEMinEngineCallError(
+            'MAGEMinOutputError', 'injected invalid output',
+        ))
+    elif failure_kind in {
+        'bridge_runtime_error', 'bridge_value_error', 'bridge_type_error',
+        'bridge_key_error', 'bridge_custom_error', 'bridge_os_error',
+        'bridge_permission_error', 'bridge_file_not_found_error',
+    }:
+        class CustomBridgeError(Exception):
+            pass
+
+        error_type = {
+            'bridge_runtime_error': RuntimeError,
+            'bridge_value_error': ValueError,
+            'bridge_type_error': TypeError,
+            'bridge_key_error': KeyError,
+            'bridge_custom_error': CustomBridgeError,
+            'bridge_os_error': OSError,
+            'bridge_permission_error': PermissionError,
+            'bridge_file_not_found_error': FileNotFoundError,
+        }[failure_kind]
+
+        def fail_bridge(**_kwargs):
+            raise error_type('injected optional bridge failure')
+
+        backend._bridge = 'pymagemin'
+        backend._binary_path = None
+        backend._magemin_module = types.SimpleNamespace(minimize=fail_bridge)
+    elif failure_kind in {'generic_parse_empty_output', 'untyped_failure'}:
+        diagnostics = (
+            {'backend_status_reason': 'parse_empty_output'}
+            if failure_kind == 'generic_parse_empty_output'
+            else {}
+        )
+        monkeypatch.setattr(
+            backend,
+            '_equilibrate_body',
+            lambda *_args, **_kwargs: EquilibriumResult(
+                status='not_converged',
+                diagnostics=diagnostics,
+            ),
+        )
+        return backend.equilibrate(1500.0, composition_mol=composition)
+    elif failure_kind in {
+        'slot_timeout', 'slot_unavailable', 'aggregate_budget', 'worker_died',
+        'worker_pool_lifecycle', 'worker_unavailable',
+    }:
+        exception_type = {
+            'slot_timeout': 'MAGEMinSubprocessSlotTimeout',
+            'slot_unavailable': 'MAGEMinSubprocessSlotUnavailable',
+            'aggregate_budget': 'MAGEMinAggregateBudgetExceeded',
+            'worker_died': 'EngineWorkerDied',
+            'worker_pool_lifecycle': 'EngineWorkerPoolLifecycleError',
+            'worker_unavailable': 'EngineWorkerUnavailable',
+        }[failure_kind]
+        call_with_error(_MAGEMinEngineLifecycleError(
+            exception_type, 'injected lifecycle failure',
+        ))
+    elif failure_kind == 'bridge_fallback_slot_timeout':
+        def fail_subprocess(**_kwargs):
+            raise _MAGEMinEngineLifecycleError(
+                'MAGEMinSubprocessSlotTimeout', 'injected slot timeout',
+            )
+
+        monkeypatch.setattr(backend, '_call_magemin_subprocess', fail_subprocess)
+
+        def bridge_fallback(**kwargs):
+            return backend._call_magemin_subprocess_after_bridge_failure(
+                bulk_projection=kwargs['bulk_projection'],
+                temperature_C=kwargs['temperature_C'],
+                pressure_kbar=kwargs['pressure_bar'] / 1000.0,
+                fO2_log=kwargs['fO2_log'],
+                bridge='pymagemin',
+                exc=RuntimeError('injected bridge failure'),
+                call_timeout_s=kwargs['call_timeout_s'],
+            )
+
+        monkeypatch.setattr(backend, '_call_magemin', bridge_fallback)
+    elif failure_kind == 'negative_convergence':
+        monkeypatch.setattr(
+            backend, '_call_magemin', lambda **_kwargs: {'converged': False},
+        )
+    elif failure_kind == 'mode_vector_deficit':
+        monkeypatch.setattr(
+            backend, '_call_magemin',
+            lambda **_kwargs: {
+                'mode_vector_mass_deficit': {'mode_sum': 0.5, 'deficit': 0.5},
+            },
+        )
+    elif failure_kind == 'native_activity_invalid':
+        monkeypatch.setattr(
+            backend, '_call_magemin',
+            lambda **_kwargs: {'solver_status': 0, 'native_activities': {}},
+        )
+    elif failure_kind == 'clamped_operating_point':
+        monkeypatch.setattr(
+            backend, '_call_magemin',
+            lambda **_kwargs: {
+                'phases': {'liq': {'mass_kg': 1.0}},
+                'operating_point_diagnostics': {
+                    'operating_point_clamped': True,
+                },
+            },
+        )
+    else:
+        raise AssertionError(f'unknown MAGEMin failure case: {failure_kind}')
+
+    native_activity_formula = (
+        'not-a-native-formula'
+        if failure_kind == 'native_activity_invalid'
+        else None
+    )
+    return backend.equilibrate(
+        1500.0,
+        composition_mol=composition,
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+        native_activity_formula=native_activity_formula,
+    )
+
+
+@pytest.mark.parametrize(
+    ('failure_kind', 'expected_status', 'expected_reason'),
+    _MAGEMIN_EQUILIBRATE_FAILURE_EXIT_EXPECTATIONS,
+)
+def test_magemin_equilibrate_failure_exits_have_literal_typed_expectations(
+    monkeypatch, failure_kind, expected_status, expected_reason,
+):
+    result = _magemin_failure_exit_result(monkeypatch, failure_kind)
+
+    assert result.status == expected_status
+    assert result.diagnostics['backend_status'] == expected_status
+    assert result.diagnostics['backend_status_reason'] == expected_reason
+    if failure_kind == 'untyped_failure':
+        assert result.diagnostics['magemin_untyped_failure_diagnostic_gap'] is True
+    else:
+        assert result.diagnostics['backend_status_reason'] != (
+            'magemin_untyped_failure'
+        )
+
+
+def test_public_magemin_equilibrate_normalizes_bare_failure_result(monkeypatch):
+    from simulator.melt_backend.base import EquilibriumResult
+
+    backend = MAGEMinBackend()
+    bare_failure = EquilibriumResult(status='not_converged')
+    captured = {}
+
+    def return_bare_failure(*args, **kwargs):
+        captured['args'] = args
+        captured['kwargs'] = kwargs
+        return bare_failure
+
+    monkeypatch.setattr(backend, '_equilibrate_body', return_bare_failure)
+    result = backend.equilibrate(
+        1400.0,
+        {'SiO2': 60.0},
+        -8.0,
+        2.0,
+        composition_mol={'SiO2': 1.0},
+        call_timeout_s=3.0,
+    )
+
+    assert result is bare_failure
+    assert captured['args'] == (1400.0, {'SiO2': 60.0}, -8.0, 2.0)
+    assert captured['kwargs']['composition_mol'] == {'SiO2': 1.0}
+    assert captured['kwargs']['call_timeout_s'] == 3.0
+    assert result.diagnostics['backend_status'] == 'not_converged'
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_untyped_failure'
+    )
+    assert result.diagnostics['magemin_untyped_failure_diagnostic_gap'] is True
+
+
+@pytest.mark.parametrize(
+    ('reason', 'expected_refusal', 'is_timeout'),
+    (
+        ('magemin_subprocess_slot_timeout', 'engine_timeout', True),
+        ('magemin_subprocess_timeout', 'engine_timeout', True),
+        ('magemin_subprocess_slot_unavailable', 'unavailable', False),
+        ('magemin_aggregate_budget_timeout', 'engine_timeout', True),
+        ('magemin_untyped_failure', 'diagnostic_gap', False),
+        ('engine_crash', 'engine_crash', False),
+        ('magemin_engine_worker_died', 'engine_crash', False),
+        ('magemin_engine_worker_unavailable', 'unavailable', False),
+    ),
+)
+def test_magemin_lifecycle_reasons_keep_existing_consumer_classification(
+    reason, expected_refusal, is_timeout,
+):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        REFUSAL_TIMEOUT,
+        classify_equilibrate_outcome,
+    )
+    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.reduced_real_determinism import (
+        GateCurveProviderOutcome,
+        gate_curve_provider_timeout_reason,
+        gate_curve_provider_outcome_for_status,
+    )
+
+    result = EquilibriumResult(
+        status='not_converged',
+        diagnostics={
+            'backend_status': 'not_converged',
+            'backend_status_reason': reason,
+            **(
+                {'magemin_untyped_failure_diagnostic_gap': True}
+                if reason == 'magemin_untyped_failure'
+                else {}
+            ),
+        },
+    )
+
+    assert classify_equilibrate_outcome(result) == (
+        'refusal', expected_refusal, reason,
+    )
+    assert gate_curve_provider_outcome_for_status(
+        'not_converged', {'backend_status_reason': reason},
+    ) is GateCurveProviderOutcome.FAILED
+    if is_timeout:
+        assert gate_curve_provider_timeout_reason(
+            {'backend_status_reason': reason}
+        ) == reason
+    else:
+        assert gate_curve_provider_timeout_reason(
+            {'backend_status_reason': reason}
+        ) is None
+
+
+_MAGEMIN_GATE_OUTCOME_EXPECTATIONS = (
+    # kind, backend reason, base outcome, expected outcome, ruled exception
+    ('invalid_scalar', 'invalid_input', 'failed', 'failed', None),
+    ('invalid_domain', 'invalid_fo2_log', 'failed', 'failed', None),
+    (
+        'empty_composition', 'missing_input', 'stable_refusal', 'failed',
+        'The missing-input ruling requires empty composition to fail closed.',
+    ),
+    ('dropped_source_species', 'forbidden_species', 'stable_refusal', 'stable_refusal', None),
+    ('missing_bulk_projection', 'out_of_domain', 'stable_refusal', 'stable_refusal', None),
+    ('dropped_bulk_component', 'composition_projected', 'stable_refusal', 'stable_refusal', None),
+    ('mode_vector_deficit', 'magemin_mode_vector_mass_deficit', 'stable_refusal', 'stable_refusal', None),
+    ('clamped_operating_point', 'clamped_operating_point', 'stable_refusal', 'stable_refusal', None),
+    ('unavailable_without_binary', 'missing_binary', 'failed', 'failed', None),
+    ('unavailable_with_binary', 'magemin_engine_worker_unavailable', 'failed', 'failed', None),
+    ('declared_input_error', 'invalid_input', 'failed', 'failed', None),
+    ('launch_error', 'missing_binary', 'failed', 'failed', None),
+    ('permission_launch_error', 'magemin_engine_worker_unavailable', 'failed', 'failed', None),
+    ('subprocess_timeout', 'magemin_subprocess_timeout', 'failed', 'failed', None),
+    ('nonzero_exit', 'nonzero_exit', 'failed', 'failed', None),
+    ('invalid_engine_output', 'parse_empty_output', 'numerical_failure', 'numerical_failure', None),
+    ('generic_parse_empty_output', 'parse_empty_output', 'failed', 'failed', None),
+    ('slot_timeout', 'magemin_subprocess_slot_timeout', 'failed', 'failed', None),
+    ('aggregate_budget', 'magemin_aggregate_budget_timeout', 'failed', 'failed', None),
+    (
+        'slot_unavailable', 'magemin_subprocess_slot_unavailable',
+        'numerical_failure', 'failed',
+        'Lock-directory or slot acquisition failure is infrastructure failure.',
+    ),
+    (
+        'worker_died', 'magemin_engine_worker_died', 'failed', 'failed',
+        'A dead MAGEMin worker is infrastructure failure and stays fail-closed.',
+    ),
+    ('worker_pool_lifecycle', 'magemin_engine_worker_unavailable', 'failed', 'failed', None),
+    ('worker_unavailable', 'magemin_engine_worker_unavailable', 'failed', 'failed', None),
+    ('bridge_fallback_slot_timeout', 'magemin_subprocess_slot_timeout', 'failed', 'failed', None),
+    ('negative_convergence', 'negative_convergence_evidence', 'numerical_failure', 'numerical_failure', None),
+    ('native_activity_invalid', 'engine_not_converged', 'numerical_failure', 'numerical_failure', None),
+    ('bridge_runtime_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
+    ('bridge_value_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
+    ('bridge_type_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
+    ('bridge_key_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
+    ('bridge_custom_error', 'engine_crash', 'numerical_failure', 'numerical_failure', None),
+    (
+        'bridge_os_error', 'engine_crash', 'failed', 'failed',
+        'An OSError from the bridge is environment or infrastructure failure, as on base.',
+    ),
+    (
+        'bridge_permission_error', 'engine_crash', 'failed', 'failed',
+        'A bridge PermissionError is an environment failure, as on base.',
+    ),
+    (
+        'bridge_file_not_found_error', 'missing_binary', 'failed', 'failed',
+        'A bridge FileNotFoundError is an unavailable executable, as on base.',
+    ),
+    ('untyped_failure', 'magemin_untyped_failure', 'failed', 'failed', None),
+)
+
+
+def test_magemin_gate_outcome_table_covers_every_failure_exit():
+    failure_exit_kinds = {
+        failure_kind
+        for failure_kind, _status, _reason
+        in _MAGEMIN_EQUILIBRATE_FAILURE_EXIT_EXPECTATIONS
+    }
+    gate_outcome_kinds = {
+        failure_kind
+        for failure_kind, _reason, _base, _expected, _exception
+        in _MAGEMIN_GATE_OUTCOME_EXPECTATIONS
+    }
+
+    assert gate_outcome_kinds == failure_exit_kinds
+
+
+@pytest.mark.parametrize(
+    (
+        'failure_kind', 'expected_reason', 'base_outcome', 'expected_outcome',
+        'ruled_exception',
+    ),
+    _MAGEMIN_GATE_OUTCOME_EXPECTATIONS,
+)
+def test_magemin_failure_paths_keep_reviewed_gate_outcomes(
+    monkeypatch,
+    failure_kind,
+    expected_reason,
+    base_outcome,
+    expected_outcome,
+    ruled_exception,
+):
+    from simulator.reduced_real_determinism import (
+        GateCurveProviderOutcome,
+        gate_curve_provider_outcome_for_status,
+    )
+
+    if ruled_exception is None:
+        assert expected_outcome == base_outcome
+    else:
+        assert failure_kind in {
+            'empty_composition', 'slot_unavailable', 'worker_died',
+            'bridge_os_error', 'bridge_permission_error',
+            'bridge_file_not_found_error',
+        }
+        assert expected_outcome == 'failed'
+    result = _magemin_failure_exit_result(monkeypatch, failure_kind)
+    assert result.diagnostics['backend_status_reason'] == expected_reason
+
+    actual_outcome = gate_curve_provider_outcome_for_status(
+        result.status,
+        result.diagnostics,
+    )
+    assert actual_outcome is GateCurveProviderOutcome(expected_outcome)
 
 
 @pytest.mark.parametrize(
@@ -1454,6 +2010,14 @@ def test_magemin_and_alphamelts_reject_exact_major_oxide_boundary():
     assert alpha_reason == OutOfDomainReason.MAJOR_SUM.value
     assert magemin_reason == OutOfDomainReason.MAJOR_SUM.value
 
+    magemin_above_valid, _warnings, magemin_above_reason = (
+        MAGEMinDomainGate.validate_with_reason(
+            {'SiO2': 50.0, 'MgO': 45.0001}
+        )
+    )
+    assert magemin_above_valid is True
+    assert magemin_above_reason is None
+
 
 def test_magemin_as_active_backend_fails_closed_with_clear_message(monkeypatch):
     # MAGEMin is not wired into any active call site. If someone DOES
@@ -1487,7 +2051,7 @@ def test_magemin_as_active_backend_fails_closed_with_clear_message(monkeypatch):
         {
             "oxide": {
                 "label": "Oxide",
-                "composition_wt_pct": {"SiO2": 100.0},
+                "composition_wt_pct": {"SiO2": 50.0, "MgO": 50.0},
             }
         },
         {"metals": {}, "oxide_vapors": {}},
@@ -1514,7 +2078,7 @@ def test_magemin_equilibrate_never_emits_ledger_transition(monkeypatch):
 
     result = backend.equilibrate(
         1600.0,
-        composition_mol={"SiO2": 1.0},
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
         fO2_log=-8.0,
         pressure_bar=1e-6,
     )
@@ -1680,7 +2244,7 @@ _VERB0_MASS_RESIDUAL_1E5 = 'Mass residual      : +1.20000e-05\n'
 
 
 def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
-    monkeypatch,
+    monkeypatch, magemin_subprocess_lock_dir,
 ):
     """A lone liq token of 1.00003 is renormalised. Green refuses it."""
     monkeypatch.setattr(
@@ -1702,7 +2266,7 @@ def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         pressure_bar=1.0,
         fO2_log=-8.0,
     )
@@ -1722,7 +2286,9 @@ def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
     )
 
 
-def test_magemin_hour156_mode_sum_is_renormalised_to_one(monkeypatch):
+def test_magemin_hour156_mode_sum_is_renormalised_to_one(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     """Hour 156 prints 1.00003 + 0.00008, raw sum 1.00011.
 
     Physics re-ruling 2026-11-10: that sum excess is under the 1e-3 cap,
@@ -2144,7 +2710,7 @@ def test_magemin_liquidus_flags_flat_renormalised_bracket(monkeypatch):
     monkeypatch.setattr(backend, 'equilibrate', fake_equilibrate)
 
     result = backend.find_liquidus_solidus(
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
         min_T_C=1000.0,
@@ -2218,7 +2784,9 @@ def test_magemin_duplicate_liquid_modes_are_summed_from_captured_output():
     assert result.liquid_fraction == pytest.approx(0.7176672, abs=1e-7)
 
 
-def test_magemin_plante_mode_deficit_is_typed_out_of_domain(monkeypatch):
+def test_magemin_plante_mode_deficit_is_typed_out_of_domain(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     calls = []
 
     def fake_run(args, **kwargs):
@@ -2274,6 +2842,374 @@ def test_magemin_plante_mode_deficit_is_typed_out_of_domain(monkeypatch):
     assert result.phase_masses_kg == {}
     assert len(calls) == 1
     assert any('mass deficit=0.33313' in warning for warning in result.warnings)
+
+
+def _basalt_like_bulk_at_sio2(sio2_wt_pct: float) -> dict[str, float]:
+    remainder = {
+        'Al2O3': 15.0,
+        'FeO': 10.0,
+        'MgO': 20.0,
+        'CaO': 20.0,
+        'Na2O': 5.0,
+    }
+    scale = (100.0 - sio2_wt_pct) / sum(remainder.values())
+    return {
+        'SiO2': sio2_wt_pct,
+        **{name: amount * scale for name, amount in remainder.items()},
+    }
+
+
+def _magemin_backend_with_spied_engine_call(monkeypatch):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    calls = []
+
+    def fake_call(**kwargs):
+        calls.append(kwargs)
+        return {'phases': {'liq': 1.0}}
+
+    monkeypatch.setattr(backend, '_call_magemin', fake_call)
+    return backend, calls
+
+
+@pytest.mark.parametrize(
+    ('composition', 'expected_reason', 'expected_warning'),
+    [
+        (
+            {'Al2O3': 100.0},
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            {'MgO': 100.0},
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            {'CaO': 60.0, 'Al2O3': 40.0},
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            {'Al2O3': 95.0, 'Na2O': 5.0},
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(0.0),
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(10.0),
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 10.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(20.0),
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 20.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(29.9),
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 29.90 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            {'Al2O3': 90.0, 'SiO2': 5.0, 'Na2O': 5.0},
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 5.00 wt% is outside MELTS calibration window [30.0, 80.0] wt% (below the window).',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(80.1),
+            'silicate_window',
+            'MAGEMinDomainGate: SiO2 = 80.10 wt% is outside MELTS calibration window [30.0, 80.0] wt% (above the window).',
+        ),
+    ],
+)
+def test_magemin_equilibrate_refuses_out_of_domain_silica(
+    monkeypatch, composition, expected_reason, expected_warning
+):
+    backend, engine_calls = _magemin_backend_with_spied_engine_call(monkeypatch)
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg=composition,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status'] == 'out_of_domain'
+    assert result.diagnostics['backend_status_reason'] == expected_reason
+    assert expected_warning in result.warnings
+    assert result.phases_present == []
+    assert result.phase_masses_kg == {}
+    assert engine_calls == []
+
+
+def test_magemin_projected_equilibrate_gates_submitted_bulk(monkeypatch):
+    backend, engine_calls = _magemin_backend_with_spied_engine_call(monkeypatch)
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg={'SiO2': 50.0, 'MgO': 50.0},
+        projected_oxide_wt_pct={'Al2O3': 100.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert (
+        result.diagnostics['backend_status_reason']
+        == 'silicate_window'
+    )
+    assert engine_calls == []
+
+
+@pytest.mark.parametrize(
+    ('source', 'submitted', 'expected_gate_input'),
+    [
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 25.0, 'MgO': 15.0, 'FeO': 50.0, 'FeOt': 10.0},
+            # FeO 50 + FeOt 10 = 60 wt% FeO-equivalent. In moles,
+            # (60 g / 71.844 g mol-1) * 71.844 g mol-1 = 60 g.
+            {'SiO2': 25.0, 'MgO': 15.0, 'FeO': 60.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {
+                'SiO2': 29.9,
+                'MgO': 10.1,
+                'FeO': 30.0,
+                'FeOt': 10.0,
+                'O': 20.0,
+            },
+            # FeOt+O contributes 10+20=30 wt%; with FeO 30, the
+            # FeO-equivalent mass is 60 g = (60/71.844 mol)*71.844 g/mol.
+            {'SiO2': 29.9, 'MgO': 10.1, 'FeO': 60.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 39.0, 'P2O5': 10.0, 'MnO': 1.0},
+            {'SiO2': 50.0, 'MgO': 39.0},
+            # The retained 50+39=89 wt% is normalized: 50/89 and 39/89.
+            {'SiO2': 56.17977528089888, 'MgO': 43.82022471910112},
+        ),
+        (
+            {'SiO2': 79.0, 'MgO': 16.0, 'P2O5': 5.0},
+            {'SiO2': 79.0, 'MgO': 16.0},
+            # Retained mass is 95 wt%; 79/95 and 16/95 are the normalized
+            # submitted oxide-basis fractions.
+            {
+                'SiO2': 83.15789473684211,
+                'MgO': 16.842105263157894,
+            },
+        ),
+        (
+            {'SiO2': 29.0, 'MgO': 66.0, 'P2O5': 5.0},
+            {'SiO2': 29.0, 'MgO': 66.0},
+            # Retained mass is 95 wt%; 29/95 and 66/95 cross the 30% floor.
+            {
+                'SiO2': 30.526315789473685,
+                'MgO': 69.47368421052632,
+            },
+        ),
+        (
+            {
+                'SiO2': 50.0,
+                'MgO': 35.0,
+                'FeO': 5.0,
+                'FeOt': 5.0,
+                'P2O5': 5.0,
+            },
+            {'SiO2': 50.0, 'MgO': 35.0, 'FeO': 5.0, 'FeOt': 5.0},
+            # FeO 5 and FeOt 5 give 10 wt% FeO-equivalent. The IG
+            # FeOt+O pair carries 10 g, (10/71.844 mol)*71.844 g/mol.
+            {
+                'SiO2': 52.63157894736842,
+                'MgO': 36.8421052631579,
+                'FeO': 10.526315789473685,
+            },
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 49.0, 'MgO': 49.0, 'H2O': 2.0},
+            # 49+49+2=100 wt%; these submitted values stay unchanged.
+            {'SiO2': 49.0, 'MgO': 49.0, 'H2O': 2.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 48.0, 'MgO': 46.0, 'H2O': 6.0},
+            # 48+46+6=100 wt%; these submitted values stay unchanged.
+            {'SiO2': 48.0, 'MgO': 46.0, 'H2O': 6.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 25.0, 'MgO': 25.0},
+            # 25+25=50 wt%; dividing each by 50 gives 50 wt% each.
+            {'SiO2': 50.0, 'MgO': 50.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 29.9, 'MgO': 70.1},
+            # 29.9+70.1=100 wt%; these values stay unchanged.
+            {'SiO2': 29.9, 'MgO': 70.1},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 30.0, 'MgO': 70.0},
+            # 30+70=100 wt%; these values stay unchanged.
+            {'SiO2': 30.0, 'MgO': 70.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 30.1, 'MgO': 69.9},
+            # 30.1+69.9=100 wt%; these values stay unchanged.
+            {'SiO2': 30.1, 'MgO': 69.9},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 79.9, 'MgO': 20.1},
+            # 79.9+20.1=100 wt%; these values stay unchanged.
+            {'SiO2': 79.9, 'MgO': 20.1},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 80.0, 'MgO': 20.0},
+            # 80+20=100 wt%; these values stay unchanged.
+            {'SiO2': 80.0, 'MgO': 20.0},
+        ),
+        (
+            {'SiO2': 50.0, 'MgO': 50.0},
+            {'SiO2': 80.1, 'MgO': 19.9},
+            # 80.1+19.9=100 wt%; these values stay unchanged.
+            {'SiO2': 80.1, 'MgO': 19.9},
+        ),
+    ],
+)
+def test_magemin_projected_gate_input_matches_submitted_bulk(
+    monkeypatch, source, submitted, expected_gate_input
+):
+    import simulator.melt_backend.magemin as magemin_module
+
+    backend, _ = _magemin_backend_with_spied_engine_call(monkeypatch)
+    built_bulks = []
+    build_bulk = backend._build_db_bulk_projection
+
+    def capture_bulk(composition_wt_pct, **kwargs):
+        bulk = build_bulk(composition_wt_pct, **kwargs)
+        built_bulks.append(bulk)
+        return bulk
+
+    monkeypatch.setattr(backend, '_build_db_bulk_projection', capture_bulk)
+    engine_submissions = []
+
+    def submit(*, bulk_projection, **_kwargs):
+        engine_submissions.append(bulk_projection)
+        return {'phases': {'liq': {'mass_kg': 1.0}}}
+
+    monkeypatch.setattr(backend, '_call_magemin', submit)
+    gate_inputs = []
+    validate = magemin_module._validate_magemin_projection_with_reason
+
+    def capture_gate_input(composition_wt_pct, **kwargs):
+        gate_inputs.append(dict(composition_wt_pct))
+        return validate(composition_wt_pct, **kwargs)
+
+    monkeypatch.setattr(
+        magemin_module,
+        '_validate_magemin_projection_with_reason',
+        capture_gate_input,
+    )
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg=source,
+        projected_oxide_wt_pct=submitted,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert len(built_bulks) == 1
+    assert len(gate_inputs) == 1
+    submitted_bulk = built_bulks[0]
+    gate_input = gate_inputs[0]
+    assert tuple(
+        submitted_bulk.composition_wt_pct.get(component, 0.0)
+        for component in submitted_bulk.order
+    ) == submitted_bulk.vector
+
+    assert set(gate_input) == set(expected_gate_input)
+    for species, amount in expected_gate_input.items():
+        assert gate_input[species] == pytest.approx(
+            amount, rel=0.0, abs=1e-9
+        )
+
+    submitted_total = sum(submitted_bulk.composition_wt_pct.values())
+    submitted_sio2_wt_pct = (
+        100.0 * submitted_bulk.composition_wt_pct.get('SiO2', 0.0)
+        / submitted_total
+    )
+    auxiliary_mass = sum(
+        submitted_bulk.composition_wt_pct.get(species, 0.0)
+        for species in ('H2O', 'S')
+    )
+    submitted_major_wt_pct = (
+        100.0 * (submitted_total - auxiliary_mass) / submitted_total
+    )
+    expected_in_domain = (
+        30.0 <= submitted_sio2_wt_pct <= 80.0
+        and submitted_major_wt_pct > 95.0
+    )
+    assert (result.status == 'ok') is expected_in_domain
+    if expected_in_domain:
+        assert len(engine_submissions) == 1
+        assert engine_submissions[0] is submitted_bulk
+    else:
+        assert result.status == 'out_of_domain'
+        assert engine_submissions == []
+    if submitted == {
+        'SiO2': 25.0,
+        'MgO': 15.0,
+        'FeO': 50.0,
+        'FeOt': 10.0,
+    }:
+        assert result.diagnostics['backend_status_reason'] == (
+            'silicate_window'
+        )
+        assert any(
+            'SiO2 = 25.00 wt%' in warning
+            for warning in result.warnings
+        )
+
+
+@pytest.mark.parametrize(
+    ('composition', 'expected_status', 'expected_reason'),
+    [
+        ({'SiO2': 30.0, 'Al2O3': 70.0}, 'ok', None),
+        ({'SiO2': 80.0, 'Al2O3': 20.0}, 'ok', None),
+    ],
+)
+def test_magemin_equilibrate_domain_boundaries(
+    monkeypatch, composition, expected_status, expected_reason
+):
+    backend, engine_calls = _magemin_backend_with_spied_engine_call(monkeypatch)
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg=composition,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == expected_status
+    if expected_reason is None:
+        assert len(engine_calls) == 1
+    else:
+        assert result.diagnostics['backend_status_reason'] == expected_reason
+        assert engine_calls == []
 
 
 def test_magemin_plante_mode_vector_is_not_renormalized():
@@ -2392,7 +3328,9 @@ def test_magemin_liquidus_finder_bisects_fake_bridge(monkeypatch):
     assert result.liquidus_T_K == pytest.approx(result.liquidus_T_C + 273.15)
 
 
-def test_magemin_liquidus_scan_records_absolute_fo2_per_sample(monkeypatch):
+def test_magemin_liquidus_scan_records_absolute_fo2_per_sample(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
 
     result = backend.find_liquidus_solidus(
@@ -2409,7 +3347,9 @@ def test_magemin_liquidus_scan_records_absolute_fo2_per_sample(monkeypatch):
     _assert_magemin_cli_absolute_targets(calls, -9.0)
 
 
-def test_magemin_projected_retry_records_absolute_fo2_per_sample(monkeypatch):
+def test_magemin_projected_retry_records_absolute_fo2_per_sample(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
 
     result = backend.find_liquidus_solidus(
@@ -2427,8 +3367,88 @@ def test_magemin_projected_retry_records_absolute_fo2_per_sample(monkeypatch):
     _assert_magemin_cli_absolute_targets(calls, -9.0)
 
 
+def test_magemin_iron_projected_retry_gates_oxide_bulk_and_keeps_engine_bulk(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
+    backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
+    source = {
+        'SiO2': 50.0,
+        'MgO': 29.0,
+        'FeO': 10.0,
+        'P2O5': 10.0,
+        'MnO': 1.0,
+    }
+
+    # After the ig database drops P2O5 and MnO, the supported source totals
+    # 89 wt%. The domain oxide basis normalizes that remainder: SiO2 is
+    # 50/89*100 = 56.179775... wt%, and the major-oxide total is 89/89*100
+    # = 100 wt%. The solver still receives the existing unnormalized
+    # FeOt+O projection of the supported 50/29/10 wt% bulk.
+    retained_total = 50.0 + 29.0 + 10.0
+    assert 50.0 / retained_total * 100.0 == pytest.approx(56.1797752809)
+    assert retained_total / retained_total * 100.0 == pytest.approx(100.0)
+
+    result = backend.find_liquidus_solidus(
+        composition_kg=source,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=900.0,
+        max_T_C=1300.0,
+        scan_step_C=50.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['projected_liquidus_status'] == 'ok'
+    expected_projection = backend._build_db_bulk_projection({
+        'SiO2': 50.0,
+        'MgO': 29.0,
+        'FeO': 10.0,
+    })
+    expected_bulk = _expected_magemin_bulk_arg(backend, expected_projection)
+    submitted_bulks = {
+        next(arg for arg in args if arg.startswith('--Bulk='))
+        for args in calls
+    }
+    assert submitted_bulks == {expected_bulk}
+
+
+def test_magemin_preprojected_iron_bulk_uses_oxide_gate_basis(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
+    backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
+    projected = backend._build_db_bulk_projection({
+        'SiO2': 50.0,
+        'MgO': 30.0,
+        'FeO': 20.0,
+    })
+
+    result = backend.find_liquidus_solidus(
+        projected_oxide_wt_pct=projected.composition_wt_pct,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=900.0,
+        max_T_C=1300.0,
+        scan_step_C=50.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == 'ok'
+    assert projected.composition_wt_pct['SiO2'] == pytest.approx(50.0)
+    assert projected.composition_wt_pct['MgO'] == pytest.approx(30.0)
+    assert (
+        projected.composition_wt_pct['FeOt']
+        + projected.composition_wt_pct['O']
+    ) == pytest.approx(20.0)
+    expected_bulk = _expected_magemin_bulk_arg(backend, projected)
+    assert {
+        next(arg for arg in args if arg.startswith('--Bulk='))
+        for args in calls
+    } == {expected_bulk}
+
+
 def test_magemin_liquidus_evaluates_redox_state_at_each_sample_temperature(
-    monkeypatch,
+    monkeypatch, magemin_subprocess_lock_dir,
 ):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
     absolute = RedoxState.absolute(-9.0)
@@ -2465,7 +3485,9 @@ def test_magemin_liquidus_evaluates_redox_state_at_each_sample_temperature(
     assert state.temperatures_K == [REDOX_STATE_REFERENCE_T_K, *sample_temperatures_K]
 
 
-def test_magemin_buffer_offset_is_evaluated_for_each_liquidus_sample(monkeypatch):
+def test_magemin_buffer_offset_is_evaluated_for_each_liquidus_sample(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
     state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -0.75)
 
@@ -2484,7 +3506,9 @@ def test_magemin_buffer_offset_is_evaluated_for_each_liquidus_sample(monkeypatch
     _assert_magemin_cli_redox_state_targets(calls, state)
 
 
-def test_magemin_projected_retry_preserves_buffer_offset_per_sample(monkeypatch):
+def test_magemin_projected_retry_preserves_buffer_offset_per_sample(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
     state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -0.75)
 
@@ -2594,7 +3618,7 @@ def test_magemin_liquidus_finder_invalid_budget_is_refused(budget):
     backend._config = {'liquidus_finder_budget_s': budget}
 
     result = backend.find_liquidus_solidus(
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         min_T_C=800.0,
         max_T_C=1000.0,
         scan_step_C=100.0,
@@ -2606,24 +3630,9 @@ def test_magemin_liquidus_finder_invalid_budget_is_refused(budget):
 
 
 def test_magemin_subprocess_timeout_clamped_to_remaining_budget(
-    monkeypatch, tmp_path
+    monkeypatch, magemin_subprocess_lock_dir,
 ):
     """Per-call subprocess timeout must be min(configured, remaining)."""
-    import simulator.melt_backend.magemin as magemin_module
-
-    # 2026-07-25 t-419 load-robustness: isolate the machine-wide K-slot
-    # flock into a private namespace. With the shared lock dir, ANY
-    # concurrent test's MAGEMin slot traffic could eat into the 1.5 s
-    # budget during acquisition, surfacing 'cancelled while waiting for
-    # subprocess slot' instead of the clamped-timeout message this test
-    # pins — a flake that blamed the box instead of the shared lock.
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path,
-    )
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK',
-        tmp_path / 'magemin-subprocess.lock',
-    )
     seen_timeouts: list[float] = []
 
     def fake_run(*args, **kwargs):
@@ -2659,7 +3668,7 @@ def test_magemin_subprocess_timeout_clamped_to_remaining_budget(
 
 
 def test_magemin_liquidus_subprocess_path_preserves_sample_timeout_diagnostics(
-    monkeypatch,
+    monkeypatch, magemin_subprocess_lock_dir,
 ):
     """A per-sample timeout stays independent of the finder hang guard.
 
@@ -3334,7 +4343,7 @@ def test_magemin_fake_bridge_library_error_returns_warning(monkeypatch):
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={"SiO2": 1.0},
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -3362,7 +4371,7 @@ def test_magemin_equilibrate_propagates_local_call_helper_errors(monkeypatch):
     with pytest.raises(KeyError, match='local MAGEMin wrapper defect'):
         backend.equilibrate(
             1500.0,
-            composition_mol={'SiO2': 1.0},
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
             fO2_log=-8.0,
             pressure_bar=1.0,
         )
@@ -3386,7 +4395,7 @@ def test_magemin_remote_handler_error_propagates_with_remote_traceback(
     with pytest.raises(remote_type) as raised:
         backend.equilibrate(
             1500.0,
-            composition_mol={'SiO2': 1.0},
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
             fO2_log=-8.0,
             pressure_bar=1.0,
         )
@@ -3409,7 +4418,7 @@ def test_magemin_remote_builtin_with_multi_argument_constructor_is_preserved():
     with pytest.raises(EngineWorkerRemoteError) as raised:
         backend.equilibrate(
             1500.0,
-            composition_mol={'SiO2': 1.0},
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
             fO2_log=-8.0,
             pressure_bar=1.0,
         )
@@ -3495,7 +4504,7 @@ def test_magemin_equilibrate_invalid_declared_scalar_is_typed_refusal(
     backend._magemin_module = types.SimpleNamespace(minimize=fake_minimize)
     params = {
         'temperature_C': 1500.0,
-        'composition_mol': {'SiO2': 1.0},
+        'composition_mol': {'SiO2': 1.0, 'MgO': 1.0},
         'pressure_bar': 1.0,
         'fO2_log': -8.0,
     }
@@ -3524,7 +4533,7 @@ def test_magemin_equilibrate_invalid_declared_scalar_is_typed_refusal(
     ),
 )
 def test_magemin_equilibrate_invalid_engine_output_is_typed_not_converged(
-    monkeypatch, stdout,
+    monkeypatch, magemin_subprocess_lock_dir, stdout,
 ):
     monkeypatch.setattr(
         'simulator.melt_backend.magemin.subprocess.run',
@@ -3539,7 +4548,7 @@ def test_magemin_equilibrate_invalid_engine_output_is_typed_not_converged(
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         pressure_bar=1.0,
         fO2_log=-8.0,
     )
@@ -3553,7 +4562,7 @@ def test_magemin_equilibrate_invalid_engine_output_is_typed_not_converged(
 
 @pytest.mark.parametrize('local_error', (KeyError, TypeError, ValueError))
 def test_magemin_equilibrate_parser_local_defect_propagates(
-    monkeypatch, local_error,
+    monkeypatch, magemin_subprocess_lock_dir, local_error,
 ):
     monkeypatch.setattr(
         'simulator.melt_backend.magemin.subprocess.run',
@@ -3573,13 +4582,15 @@ def test_magemin_equilibrate_parser_local_defect_propagates(
     with pytest.raises(local_error, match='local MAGEMin parser defect'):
         backend.equilibrate(
             1500.0,
-            composition_mol={'SiO2': 1.0},
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
             pressure_bar=1.0,
             fO2_log=-8.0,
         )
 
 
-def test_magemin_subprocess_parser_value_error_propagates(monkeypatch):
+def test_magemin_subprocess_parser_value_error_propagates(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     from simulator.melt_backend import magemin as magemin_module
 
     backend = MAGEMinBackend()
@@ -3619,7 +4630,7 @@ def test_magemin_remote_engine_call_error_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
@@ -3646,12 +4657,16 @@ def test_magemin_remote_engine_lifecycle_error_returns_typed_not_converged():
 
     result = backend.equilibrate(
         1500.0,
-        composition_mol={'SiO2': 1.0},
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         fO2_log=-8.0,
         pressure_bar=1.0,
     )
 
     assert result.status == 'not_converged'
+    assert result.diagnostics['backend_status'] == result.status
+    assert result.diagnostics['backend_status_reason'] == (
+        'magemin_subprocess_slot_timeout'
+    )
     assert result.diagnostics['backend_failure_exception'] == (
         'MAGEMinSubprocessSlotTimeout'
     )
@@ -4072,7 +5087,7 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
 
 
 def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
-    monkeypatch,
+    monkeypatch, magemin_subprocess_lock_dir,
 ):
     backend = MAGEMinBackend()
     backend._available = True
@@ -4443,7 +5458,8 @@ def test_magemin_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
 
 
 def test_magemin_subprocess_runs_in_fresh_temp_cwd(
-    monkeypatch, tmp_path, magemin_openmpi_tmpdir, tmp_path_factory
+    monkeypatch, tmp_path, magemin_subprocess_lock_dir,
+    magemin_openmpi_tmpdir, tmp_path_factory,
 ):
     """MAGEMin appends _pseudosection_output.txt to its CWD; isolate per call."""
     captured: dict = {}
@@ -4513,7 +5529,7 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(
 
 
 def test_magemin_subprocess_launches_are_serialized_across_callers(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path, magemin_subprocess_lock_dir,
 ):
     """With REGOLITH_MAGEMIN_SLOTS=1 launches stay strictly serialized.
 
@@ -4525,13 +5541,6 @@ def test_magemin_subprocess_launches_are_serialized_across_callers(
     import simulator.melt_backend.magemin as magemin_module
 
     monkeypatch.setenv('REGOLITH_MAGEMIN_SLOTS', '1')
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK',
-        tmp_path / 'isolated-magemin.lock',
-    )
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path,
-    )
 
     first_entered = threading.Event()
     release_first = threading.Event()
@@ -4679,7 +5688,9 @@ def test_magemin_live_subprocess_does_not_append_dump_in_engine_tree(request):
     assert size_after == size_before
 
 
-def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
+def test_magemin_subprocess_fo2_log_substitution_recorded(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     # MAGEMin's CLI only accepts a named buffer plus a numeric `buffer_n`
     # offset (see ``MAGEMin/examples/MAGEMin_C_single_point_with_buffer.jl``),
     # so the adapter must translate the caller's absolute log10(fO2) into
@@ -4768,7 +5779,9 @@ def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
     assert any("-12.0" in w for w in substitution_warnings), substitution_warnings
 
 
-def test_magemin_subprocess_unknown_buffer_falls_back_with_warning(monkeypatch):
+def test_magemin_subprocess_unknown_buffer_falls_back_with_warning(
+    monkeypatch, magemin_subprocess_lock_dir,
+):
     # An unrecognised fO2_buffer config still drives the subprocess bridge,
     # but the adapter MUST surface the substitution as a warning rather
     # than silently swapping in 'qfm' (which would hide the requested fO2
@@ -4821,7 +5834,7 @@ def test_magemin_subprocess_unknown_buffer_falls_back_with_warning(monkeypatch):
 
 
 def test_magemin_configured_named_buffer_marks_requested_fo2_out_of_domain(
-    monkeypatch,
+    monkeypatch, magemin_subprocess_lock_dir,
 ):
     captured: dict = {}
 

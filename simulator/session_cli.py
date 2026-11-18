@@ -136,25 +136,35 @@ class SessionScriptRunner:
         steps: list[dict[str, Any]] = []
         decision = self.session.pending_decision()
         if decision is not None:
-            return self._decision_frame(steps, decision)
+            return self._with_run_disclosure(self._decision_frame(steps, decision))
         if self.session.is_complete():
-            return {"frame_type": "complete", "steps": steps}
+            return self._with_run_disclosure(
+                {"frame_type": "complete", "steps": steps}
+            )
 
         for _ in range(count):
             result = self.session.advance()
             steps.append(result.per_hour_summary)
             if result.decision_event is not None:
-                return {
-                    "frame_type": "decision_required",
-                    "steps": steps,
-                    "decision": result.decision_event,
-                }
+                return self._with_run_disclosure(
+                    {
+                        "frame_type": "decision_required",
+                        "steps": steps,
+                        "decision": result.decision_event,
+                    }
+                )
             if self.session.is_complete():
-                return {"frame_type": "complete", "steps": steps}
+                return self._with_run_disclosure(
+                    {"frame_type": "complete", "steps": steps}
+                )
 
         if len(steps) == 1:
-            return {"frame_type": "step", "step": steps[0], "steps": steps}
-        return {"frame_type": "advance", "steps": steps}
+            return self._with_run_disclosure(
+                {"frame_type": "step", "step": steps[0], "steps": steps}
+            )
+        return self._with_run_disclosure(
+            {"frame_type": "advance", "steps": steps}
+        )
 
     def _decide(self, args: list[str]) -> dict[str, Any]:
         if len(args) != 1:
@@ -211,12 +221,20 @@ class SessionScriptRunner:
     def _snapshot(self) -> dict[str, Any]:
         snapshot = self.session.snapshot()
         summary = build_per_hour_summary(self.session.simulator, snapshot)
-        return {
-            "frame_type": "snapshot",
-            "snapshot": summary,
-            "complete": self.session.is_complete(),
-            "paused": bool(getattr(self.session, "_paused", False)),
-        }
+        return self._with_run_disclosure(
+            {
+                "frame_type": "snapshot",
+                "snapshot": summary,
+                "complete": self.session.is_complete(),
+                "paused": bool(getattr(self.session, "_paused", False)),
+            }
+        )
+
+    def _with_run_disclosure(self, frame: dict[str, Any]) -> dict[str, Any]:
+        disclosures = tuple(self.session.law_disclosures or ())
+        if disclosures:
+            frame["law_disclosures"] = [dict(item) for item in disclosures]
+        return frame
 
     def _decision_frame(
         self,

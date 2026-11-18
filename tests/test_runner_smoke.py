@@ -824,12 +824,15 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
 
     assert rows[8]["product_ledger_kg_at_hour"] == rows[8]["metal_yields_kg"]
     # d-137 splits the old 350 C Stage 4 into a 250 C Na/Mg collector and a
-    # 40 C K trap. The c679673f5/85fedcb8e band-integrated capture path gives
-    # this production row total; the next row transfers it to reagent, so live
-    # product returns to zero while cumulative condensate and recycled mass
-    # retain the capture.
+    # 40 C K trap. Under d-412, b-906's d-376 amendment-1 Langmuir
+    # surface-pO2 root changes the pO2 passed to the Na/K vapor-pressure
+    # rails (both have pO2_exponent=-0.25), moving this hour's captured
+    # alkali total from b263 green's 4.975311735864234e-4 kg to
+    # 4.975302301467882e-4 kg (-9.434396352255708e-10 kg). Keep this
+    # absolute value pinned; the per-row condensate/reagent identities below
+    # independently verify the separation this test covers.
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        0.0004975311735864234, rel=1e-12, abs=1e-15
+        0.0004975302301467882, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
@@ -1073,6 +1076,10 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "metal_phase_stratification",
     "condensation_refusals_by_species",
     "high_t_melt_activity",
+    # Optional on a per-hour row and on run_metadata when a law executed.
+    # Not a top-level runner payload key. The hourly simulation_tick omits
+    # it: the cumulative registry would grow the socket payload.
+    "law_disclosures",
 })
 
 VAPOR_PRESSURE_SOURCE_REPORT_KEYS = frozenset({
@@ -3843,6 +3850,12 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
     # class, so it is asserted as a whitelist member rather than helper-driven.
     assert "reduced_real_cache_state" in PER_HOUR_OPTIONAL_KEYS
     assert "reduced_real_cache_state" not in PER_HOUR_KEYS
+
+    # law_disclosures is stamped by SimSession.advance when the run registry
+    # is non-empty. It is optional per-hour metadata, not a top-level key.
+    assert "law_disclosures" in PER_HOUR_OPTIONAL_KEYS
+    assert "law_disclosures" not in PER_HOUR_KEYS
+    assert "law_disclosures" not in TOP_LEVEL_KEYS
 
 
 @pytest.mark.parametrize(

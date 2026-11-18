@@ -27,6 +27,8 @@ from __future__ import annotations
 
 import ast
 import inspect
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -46,11 +48,24 @@ from simulator.fe_redox import (
     REDOX_STATE_REFERENCE_T_K,
     RedoxState,
 )
+from simulator.melt_backend.magemin import MAGEMinBackend
 
 
 # ----------------------------------------------------------------------
 # Domain gate
 # ----------------------------------------------------------------------
+
+
+def test_magemin_import_first_in_a_fresh_interpreter() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-c", "import engines.magemin"],
+        cwd=Path(__file__).resolve().parents[1],
+        capture_output=True,
+        check=False,
+        text=True,
+        timeout=30,
+    )
+    assert completed.returncode == 0, completed.stderr
 
 
 def _basalt_wt_pct() -> dict:
@@ -94,6 +109,25 @@ def test_domain_gate_accepts_basalt():
     valid, warnings = MAGEMinDomainGate.validate(_basalt_wt_pct())
     assert valid is True
     assert warnings == []
+
+
+def test_domain_gate_accepts_auxiliary_water_but_counts_it_against_oxides():
+    trace_water = {'SiO2': 50.0, 'MgO': 49.53, 'H2O': 0.47}
+    valid, warnings, reason = MAGEMinDomainGate.validate_with_reason(
+        trace_water
+    )
+    assert valid is True
+    assert warnings == []
+    assert reason is None
+
+    at_major_boundary = {'SiO2': 50.0, 'MgO': 45.0, 'H2O': 5.0}
+    valid, warnings, reason = MAGEMinDomainGate.validate_with_reason(
+        at_major_boundary
+    )
+    assert valid is False
+    assert reason == 'major_sum'
+    assert any('major-oxide total = 95.00 wt%' in warning for warning in warnings)
+    assert not any('unrecognised species' in warning for warning in warnings)
 
 
 @pytest.mark.parametrize('alias', ['FeO_total', 'feot', 'feototal', 'feo_tot'])
@@ -389,6 +423,49 @@ def test_liquidus_finder_forwards_normalized_redox_state():
     assert calls[0]['fO2_log'] == pytest.approx(
         state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
     )
+
+
+@pytest.mark.parametrize(
+    'intent',
+    (ChemistryIntent.GATE_LIQUID_FRACTION, ChemistryIntent.SILICATE_EQUILIBRIUM),
+    ids=('freeze-gate-liquid-fraction', 'equilibrium'),
+)
+def test_provider_dispatch_preserves_domain_refusal_when_engine_unavailable(
+    monkeypatch, intent,
+):
+    backend = MAGEMinBackend()
+    backend._available = False
+    backend._bridge = None
+    engine_calls = []
+    monkeypatch.setattr(
+        backend,
+        '_call_magemin',
+        lambda **kwargs: engine_calls.append(kwargs),
+    )
+    provider = MAGEMinShadowProvider(backend=backend)
+    request = IntentRequest(
+        intent=intent,
+        account_view=ProviderAccountView(
+            accounts={'process.cleaned_melt': {'Al2O3': 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostic['backend_status_reason'] == (
+        'silicate_window'
+    )
+    assert any(
+        'SiO2 = 0.00 wt% is outside MELTS calibration window '
+        '[30.0, 80.0] wt% (below the window).' in warning
+        for warning in result.warnings
+    )
+    assert engine_calls == []
 
 
 def test_liquidus_finder_keyerror_propagates():

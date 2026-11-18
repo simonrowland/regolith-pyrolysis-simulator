@@ -337,7 +337,11 @@ def test_residue_cohort_caches_are_scoped_by_selected_experiments(
                 primary_oxide_wt_pct={"FeO": 1.0},
                 geometry_oxide_wt_pct={"sphere_shrinking": {"FeO": 1.0}},
                 sensitivity_band_wt_pct={"FeO": (1.0, 1.0)},
-                provenance={"integration": {}},
+                provenance={
+                    "code_revision": "test-revision",
+                    "integration": {},
+                    "law_disclosures": [],
+                },
             )
             for experiment_id in experiment_ids
             for alpha_arm in (
@@ -380,7 +384,7 @@ def test_residue_cohort_caches_are_scoped_by_selected_experiments(
                 geometry_element_ppm={"Mn": {"sphere_constant": 10.0}},
                 sensitivity_band_ppm={"Mn": (9.0, 11.0)},
                 channel_missing_elements=(),
-                provenance={},
+                provenance={"law_disclosures": []},
             )
             for experiment in experiments
             if selected_experiment_ids is None

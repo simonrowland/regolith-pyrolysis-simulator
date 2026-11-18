@@ -18,7 +18,10 @@ from simulator.campaigns import c0_exit_record, c0_exit_run_notice
 from simulator.accounting.ledger import snapshot_atom_ledger
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.reduced_real_determinism import PT0DeterminismStore
+from simulator.reduced_real_determinism import (
+    PT0DeterminismStore,
+    record_dependency_vector,
+)
 from simulator.runner import build_per_hour_summary
 from simulator.state import CondensationTrain, EvaporationFlux
 
@@ -158,6 +161,43 @@ def _canonical_bytes(value):
     ).encode("utf-8")
 
 
+def _forecast_gate_parent_state_bytes(sim):
+    registry = sim._chem_registry
+
+    def provider_slots(slots):
+        return tuple(
+            sorted((intent.value, id(provider)) for intent, provider in slots.items())
+        )
+
+    return _canonical_bytes(
+        {
+            "provider_outcome": getattr(
+                sim, "_freeze_gate_provider_outcome", None
+            ),
+            "replay_reasons": getattr(
+                sim, "_reduced_real_uncacheable_reasons", None
+            ),
+            "cache": getattr(
+                sim, "_freeze_gate_liquid_fraction_cache", None
+            ),
+            "registry": {
+                "identity": id(registry),
+                "authoritative": provider_slots(registry._authoritative),
+                "fallback": provider_slots(registry._fallback),
+                "shadows": tuple(
+                    sorted(
+                        (
+                            intent.value,
+                            tuple(id(provider) for provider in providers),
+                        )
+                        for intent, providers in registry._shadows.items()
+                    )
+                ),
+            },
+        }
+    )
+
+
 _PYSULFSAT_MUTABLE_EXPORTS = (
     "oxide_mass_liq_anhyd",
     "cation_num_liq_anhyd",
@@ -294,6 +334,235 @@ def test_c0_forecast_context_does_not_retain_loaded_sulfsat_module():
         name: getattr(sulfur_module, name)
         for name in _PYSULFSAT_MUTABLE_EXPORTS
     } == mutable_exports_before
+
+
+def test_c0_forecast_preserves_sulfsat_cache_identity_without_gate_object():
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    _attach_mutable_sulfsat_module(sim)
+
+    context, status = sim._build_c0_forecast_context()
+
+    assert status == ""
+    assert context is not None
+    assert context._sulfsat_gate is None
+    forecast_sulfur_side = record_dependency_vector(
+        context,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact="freeze_gate_curve",
+    )["sulfur_side"]
+    assert forecast_sulfur_side["sulfsat_provider_selection"] == "SulfSatGate"
+    assert forecast_sulfur_side["sulfsat_available"] is True
+
+
+def test_c0_forecast_reuses_current_validated_gate_pin_without_resolution():
+    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim._liquid_fraction_provider = "magemin"
+    sim.load_batch("lunar")
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    assert provider is not None
+
+    class CountingMAGEMinBackend(MAGEMinBackend):
+        def __init__(self):
+            super().__init__()
+            self._available = True
+            self._bridge = "subprocess"
+            self._config = {"liquidus_finder_budget_s": 5.0}
+            self.engine_calls = 0
+
+        def equilibrate(
+            self,
+            temperature_C,
+            composition_kg=None,
+            fO2_log=-9.0,
+            pressure_bar=1e-6,
+            **_kwargs,
+        ):
+            self.engine_calls += 1
+            if temperature_C <= 900.0:
+                liquid_fraction = 0.0
+            elif temperature_C >= 1300.0:
+                liquid_fraction = 1.0
+            else:
+                liquid_fraction = (temperature_C - 900.0) / 400.0
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                liquid_fraction=liquid_fraction,
+                liquid_composition_wt_pct={"SiO2": 100.0},
+            )
+
+        def get_engine_version(self):
+            return "test-magemin-engine"
+
+    backend = CountingMAGEMinBackend()
+    provider._backend = backend
+    provider._backend_initialised = True
+
+    sim._establish_melt_redox_gate_authority_for_current_hour()
+    gate_record = sim._melt_redox_gate_authority_this_tick
+    assert sim._melt_redox_gate_authority_tick_hour == int(sim.melt.hour)
+    assert sim._melt_redox_gate_record_is_admitted(gate_record)
+    assert backend.engine_calls > 0
+    state_before = _forecast_gate_parent_state_bytes(sim)
+    engine_calls_before = backend.engine_calls
+
+    context, status = sim._build_c0_forecast_context()
+
+    assert status == ""
+    assert context is not None
+    assert context._melt_redox_gate_authority_this_tick is gate_record
+    assert context._resolved_melt_redox_gate_authority() is gate_record["curve"]
+    assert backend.engine_calls == engine_calls_before
+    assert _forecast_gate_parent_state_bytes(sim) == state_before
+
+
+def test_c0_forecast_without_registered_gate_provider_does_not_register(
+    monkeypatch,
+):
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim._liquid_fraction_provider = "magemin"
+    sim.load_batch("lunar")
+    registry = sim._chem_registry
+    assert registry.authoritative_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    ) is None
+    assert registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION) is None
+    state_before = _forecast_gate_parent_state_bytes(sim)
+    gate_owner_calls = 0
+    engine_calls = 0
+
+    original_gate_owner = PyrolysisSimulator._melt_redox_liquidus_gate_record
+
+    def count_gate_owner(self, *args, **kwargs):
+        nonlocal gate_owner_calls
+        gate_owner_calls += 1
+        return original_gate_owner(self, *args, **kwargs)
+
+    original_equilibrate = MAGEMinBackend.equilibrate
+
+    def count_engine_call(self, *args, **kwargs):
+        nonlocal engine_calls
+        engine_calls += 1
+        return original_equilibrate(self, *args, **kwargs)
+
+    monkeypatch.setattr(
+        PyrolysisSimulator, "_melt_redox_liquidus_gate_record", count_gate_owner
+    )
+    monkeypatch.setattr(MAGEMinBackend, "equilibrate", count_engine_call)
+
+    context, status = sim._build_c0_forecast_context()
+
+    assert status == ""
+    assert context is not None
+    assert context._melt_redox_gate_authority_tick_hour is None
+    assert gate_owner_calls == 0
+    assert engine_calls == 0
+    assert registry.authoritative_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    ) is None
+    assert registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION) is None
+    assert _forecast_gate_parent_state_bytes(sim) == state_before
+
+
+def test_c0_forecast_without_gate_pin_defers_provider_refusal():
+    from simulator.evaporation import EvaporationFluxRefusal
+    from simulator.melt_backend.liquidus import LiquidusSampleError
+
+    class RefusingBackend:
+        backend_name = "magemin"
+
+        def __init__(self):
+            self.equilibrate_calls = 0
+
+        def is_available(self):
+            return True
+
+        def equilibrate(self, **_kwargs):
+            self.equilibrate_calls += 1
+            raise LiquidusSampleError(
+                "unavailable",
+                ("test backend refusal",),
+                {"reason": "missing_input"},
+            )
+
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    assert provider is not None
+    backend = RefusingBackend()
+    provider._backend = backend
+    provider._backend_initialised = True
+    state_before = _forecast_gate_parent_state_bytes(sim)
+
+    context, status = sim._build_c0_forecast_context()
+
+    assert backend.equilibrate_calls == 0
+    assert status == ""
+    assert context is not None
+    assert _forecast_gate_parent_state_bytes(sim) == state_before
+    with pytest.raises(EvaporationFluxRefusal, match="liquid_fraction_provider_failed"):
+        sim._melt_redox_liquidus_gate_record()
+    assert backend.equilibrate_calls == 1
+
+
+def test_c0_forecast_does_not_resolve_gate_after_cache_install_failure(
+    monkeypatch,
+):
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    sim._freeze_gate_provider_outcome = "produced"
+    sim._reduced_real_uncacheable_reasons = ["baseline replay reason"]
+    sim._freeze_gate_liquid_fraction_cache = {
+        "key": "baseline cache entry",
+        "status": "live",
+    }
+    state_before = _forecast_gate_parent_state_bytes(sim)
+    resolver_calls = 0
+
+    def fail_after_cache_install(*_args, **_kwargs):
+        nonlocal resolver_calls
+        resolver_calls += 1
+        sim._freeze_gate_provider_outcome = "failed"
+        sim._reduced_real_uncacheable_reasons.append("late provider failure")
+        sim._freeze_gate_liquid_fraction_cache = {
+            "key": "partially installed cache",
+            "status": "computing",
+        }
+        raise RuntimeError("provider failed after cache install")
+
+    monkeypatch.setattr(
+        sim, "_melt_redox_liquidus_gate_record", fail_after_cache_install
+    )
+
+    context, status = sim._build_c0_forecast_context()
+
+    assert status == ""
+    assert context is not None
+    assert resolver_calls == 0
+    assert _forecast_gate_parent_state_bytes(sim) == state_before
 
 
 def test_c0_forecast_rebuilds_registry_around_live_engine_pool_locks():

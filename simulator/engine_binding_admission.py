@@ -510,13 +510,42 @@ def _gate_curve_evidence(
     )
 
 
+def _magemin_runtime_version_is_unknown(
+    identity: BindingIdentity,
+    provenance: Mapping[str, Any],
+) -> bool:
+    if identity.engine_id != "magemin":
+        return False
+    runtime_version = provenance.get("runtime_version")
+    return not (
+        isinstance(runtime_version, Mapping)
+        and runtime_version.get("tag") == "value"
+        and isinstance(runtime_version.get("value"), str)
+        and bool(runtime_version["value"].strip())
+    )
+
+
 def _gate_curve_producer_evidence(
     identity: BindingIdentity,
     provenance: Mapping[str, Any],
 ) -> str:
-    if _selected_producer_digest(identity, provenance) is None:
+    if (
+        _magemin_runtime_version_is_unknown(identity, provenance)
+        or _selected_producer_digest(identity, provenance) is None
+    ):
         return "evidence-unavailable"
     return admission_fingerprint(identity, provenance)
+
+
+def _gate_curve_evidence_has_known_magemin_version(
+    evidence: GateCurveEvidence,
+) -> bool:
+    if evidence.identity is None or evidence.identity.engine_id != "magemin":
+        return True
+    return not _magemin_runtime_version_is_unknown(
+        evidence.identity,
+        evidence.provenance or {},
+    )
 
 
 def _unresolved_gate_curve_evidence(
@@ -1025,6 +1054,57 @@ def gate_curve_memo_origin_matches(
     return current.producer_evidence == producer_evidence
 
 
+def gate_curve_memo_reuse_eligible(
+    sim: Any,
+    curve: Mapping[str, Any],
+    origin: Mapping[str, Any] | None,
+    *,
+    fresh_evidence: bool = True,
+    evidence: GateCurveEvidence | None = None,
+    redox_state: Any | None = None,
+) -> bool:
+    """Decide whether this curve may be reused by an in-process memo."""
+    from simulator.reduced_real_determinism import (
+        _gate_curve_provider_role,
+        _is_cacheable_gate_curve,
+    )
+
+    if not _is_cacheable_gate_curve(curve) or not isinstance(origin, Mapping):
+        return False
+    provider_role = _gate_curve_provider_role(curve)
+    stored_evidence_reusable = _gate_curve_memo_evidence_can_support_reuse(
+        sim,
+        origin.get("producer_evidence"),
+        provider_role=provider_role,
+    )
+    if not stored_evidence_reusable:
+        return False
+
+    current = evidence
+    if fresh_evidence:
+        current = current or gate_curve_memo_evidence(
+            sim,
+            curve,
+            include_selected_bindings=True,
+        )
+        # A local memo needs reusable producer evidence, but not the
+        # receipt-backed eligibility required for persistent cache replay.
+        if not _gate_curve_memo_evidence_is_locally_reusable(
+            sim,
+            current,
+            provider_role=provider_role,
+        ):
+            return False
+    return gate_curve_memo_origin_matches(
+        sim,
+        curve,
+        origin,
+        fresh_evidence=fresh_evidence,
+        evidence=current,
+        redox_state=redox_state,
+    )
+
+
 def _gate_curve_memo_evidence_can_support_reuse(
     sim: Any,
     producer_evidence: Any,
@@ -1056,19 +1136,41 @@ def _gate_curve_memo_evidence_can_support_reuse(
     )
 
 
+def _gate_curve_memo_evidence_is_locally_reusable(
+    sim: Any,
+    evidence: GateCurveEvidence,
+    *,
+    provider_role: str | None,
+) -> bool:
+    return (
+        _gate_curve_evidence_has_known_magemin_version(evidence)
+        and _gate_curve_memo_evidence_can_support_reuse(
+            sim,
+            evidence.producer_evidence,
+            provider_role=provider_role,
+        )
+    )
+
+
 def gate_curve_memo_eligibility(sim: Any, curve: Mapping[str, Any]) -> bool:
+    """Check whether fresh producer evidence can support a local memo."""
     from simulator.reduced_real_determinism import (
+        _gate_curve_provider_role,
         _is_cacheable_gate_curve,
     )
 
     if not _is_cacheable_gate_curve(curve):
         return False
-    gate_curve_memo_evidence(
+    evidence = gate_curve_memo_evidence(
         sim,
         curve,
         include_selected_bindings=True,
     )
-    return True
+    return _gate_curve_memo_evidence_is_locally_reusable(
+        sim,
+        evidence,
+        provider_role=_gate_curve_provider_role(curve),
+    )
 
 
 def authorize_cached_real_replay(
@@ -1745,6 +1847,14 @@ def _live_cache_eligibility(
     memo_provider_role: str | None = None,
 ) -> bool:
     try:
+        if _magemin_runtime_version_is_unknown(
+            identity,
+            current_provenance,
+        ):
+            raise EngineBindingAdmissionError(
+                identity,
+                "MAGEMin runtime version unknown",
+            )
         authorize_binding(
             identity,
             current_provenance,

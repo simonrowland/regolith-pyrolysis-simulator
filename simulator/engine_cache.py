@@ -308,11 +308,11 @@ def cacheable_refusal(result) -> bool:
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
-    "internal-analytical": 2,
+    "internal-analytical": 3,
     "vaporock": 1,
-    "magemin": 3,
-    "alphamelts": 3,
-    "thermoengine": 3,
+    "magemin": 4,
+    "alphamelts": 4,
+    "thermoengine": 4,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
@@ -331,6 +331,10 @@ ENGINE_CHEMISTRY_VERSION = {
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
+# magemin v4: 2026-11-17 MAGEMin pin unchanged, b267 bugs stack - b-1225 typed silicate-window refusal for SiO2-poor bulks; b-1240 typed cached failure reasons for missing_input, invalid_input, timeout/lifecycle/exit/parse/crash.
+# internal-analytical v3: 2026-11-17 simulator code at b267 bugs stack - b-906 d-412 Langmuir surface-pO2 root changes evaporation_flux.py and vapor_pressure.py outputs
+# alphamelts v4: 2026-11-17 alphaMELTS binary pin unchanged, b267 bugs stack - engine-cache disclosure wrapper for b-119 executed-law replay (stored engine result and disclosure set)
+# thermoengine v4: 2026-11-17 ThermoEngine pin unchanged, b267 bugs stack - engine-cache disclosure wrapper for b-119 executed-law replay (stored engine result and disclosure set)
 
 
 @dataclass(frozen=True)
@@ -1139,6 +1143,64 @@ def _remember_memory_value(key: tuple[str, bytes, bool], value: Any) -> None:
         _MEMORY_CACHE.popitem(last=False)
 
 
+# These cached engines can execute compiled vapour laws:
+# - internal-analytical: residue pressure and inline cell equilibration use the
+#   internal analytical vapour-pressure adapter.
+# - alphamelts: subprocess equilibrium calls
+#   _builtin_vapor_projection_for_subprocess; the Antoine/catalog fallback
+#   also evaluates compiled laws.
+# - thermoengine: the Antoine/catalog fallback runs when VapoRock is absent or
+#   returns no pressures.
+ENGINE_CACHE_DISCLOSURE_ENGINES = frozenset({
+    "internal-analytical",
+    "alphamelts",
+    "thermoengine",
+})
+
+# These cacheable engines have no live path through register_executed_law.
+# OpenIMCC's gas path goes through its bridge; VapoRock does not evaluate
+# compiled laws; MAGEMin solves phase equilibrium without the vapour evaluator.
+ENGINE_CACHE_NO_DISCLOSURE_ENGINES = {
+    "openimcc": "gas evaluations use openimcc_bridge, not the vapour-law evaluator",
+    "vaporock": "equilibrate does not call register_executed_law",
+    "magemin": "phase equilibrium does not call the compiled vapour evaluator",
+}
+_ENGINE_CACHE_VALUE_KEY = "_engine_cache_value"
+
+
+def _engine_carries_disclosures(engine_id: str) -> bool:
+    """Return whether cached values for this engine carry law disclosures."""
+
+    return engine_id in ENGINE_CACHE_DISCLOSURE_ENGINES
+
+
+def _accept_cached_engine_disclosures(engine_id: str, value: Any) -> bool:
+    """Replay a measured engine disclosure before returning a cache hit."""
+
+    if not _engine_carries_disclosures(engine_id):
+        return True
+    if not isinstance(value, Mapping) or _ENGINE_CACHE_VALUE_KEY not in value:
+        return False
+    disclosures = value.get("law_disclosures")
+    if disclosures is None:
+        from simulator.vapour_rail.run_disclosure import active_registry
+
+        # Unscoped values are explicitly unknown and cannot serve a scoped run.
+        return active_registry() is None
+    from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+    return accept_stored_memo(value) is not None
+
+
+def _unwrap_engine_cache_value(engine_id: str, value: Any) -> Any:
+    if (
+        _engine_carries_disclosures(engine_id)
+        and isinstance(value, Mapping)
+        and _ENGINE_CACHE_VALUE_KEY in value
+    ):
+        return live_hot(value[_ENGINE_CACHE_VALUE_KEY])
+    return value
+
 def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = False) -> bool:
     expected_columns = {
         table: tuple(name for name, _ in columns)
@@ -1481,14 +1543,24 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     chem_version = ENGINE_CHEMISTRY_VERSION[engine_id]
     cache_key = engine_cache_key(engine_id, chem_version, request)
     memory_key = (path_value, cache_key, readonly)
+    disclosure_registry = None
+    disclosure_before: tuple[dict[str, Any], ...] = ()
+    if _engine_carries_disclosures(engine_id):
+        from simulator.vapour_rail.run_disclosure import active_registry, active_snapshot
+
+        disclosure_registry = active_registry()
+        if disclosure_registry is not None:
+            disclosure_before = active_snapshot()
     with _LOCK:
         _prepare_memory_cache()
         counts = _counter_bucket(engine_id)
         if memory_key in _MEMORY_CACHE:
             result = _MEMORY_CACHE[memory_key]
-            _MEMORY_CACHE.move_to_end(memory_key)
-            counts["hits"] += 1
-            return result
+            if _accept_cached_engine_disclosures(engine_id, result):
+                _MEMORY_CACHE.move_to_end(memory_key)
+                counts["hits"] += 1
+                return _unwrap_engine_cache_value(engine_id, result)
+            del _MEMORY_CACHE[memory_key]
 
     path = Path(path_value).expanduser()
     try:
@@ -1513,9 +1585,19 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 counts["read_error"] += 1
                 row = None
             else:
-                counts["hits"] += 1
-                _remember_memory_value(memory_key, result)
-                return result
+                if _accept_cached_engine_disclosures(engine_id, result):
+                    counts["hits"] += 1
+                    _remember_memory_value(memory_key, result)
+                    return _unwrap_engine_cache_value(engine_id, result)
+                row = None
+                if _engine_carries_disclosures(engine_id) and not readonly:
+                    try:
+                        connection.execute(
+                            f"DELETE FROM {_TABLE} WHERE key=?", (cache_key,)
+                        )
+                        connection.commit()
+                    except sqlite3.Error:
+                        counts["store_error"] += 1
         counts["misses"] += 1
 
     solved = solve()
@@ -1524,13 +1606,37 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         return hot
     if (_is_refusal(hot) and not cacheable_refusal(hot)) or readonly or connection is None:
         return hot
+    memory_value = hot
+    storage_value = solved.hot if isinstance(solved, EngineCacheValue) else solved
+    if _engine_carries_disclosures(engine_id):
+        from simulator.vapour_rail.run_disclosure import active_registry, active_snapshot, disclosure_delta
+
+        disclosures = None
+        if (
+            disclosure_registry is not None
+            and active_registry() is disclosure_registry
+        ):
+            disclosures = [
+                dict(item)
+                for item in disclosure_delta(
+                    disclosure_before, active_snapshot()
+                )
+            ]
+        storage_value = {
+            _ENGINE_CACHE_VALUE_KEY: storage_value,
+            "law_disclosures": disclosures,
+        }
+        memory_value = {
+            _ENGINE_CACHE_VALUE_KEY: hot,
+            "law_disclosures": disclosures,
+        }
     try:
         if not isinstance(solved, EngineCacheValue) and (
             isinstance(hot, Mapping) and any(isinstance(item, (Mapping, list, tuple)) for item in hot.values())
             or isinstance(hot, (list, tuple))
         ):
             raise TypeError("result has no declared HOT projection")
-        hot_value, provenance = _encode_hot(solved.hot if isinstance(solved, EngineCacheValue) else solved)
+        hot_value, provenance = _encode_hot(storage_value)
     except (TypeError, ValueError):
         with _LOCK:
             counts = _counter_bucket(engine_id)
@@ -1568,7 +1674,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             _counter_bucket(engine_id)["store_error"] += 1
     with _LOCK:
         _prepare_memory_cache()
-        _remember_memory_value(memory_key, hot)
+        _remember_memory_value(memory_key, memory_value)
     return hot
 
 

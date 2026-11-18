@@ -12,6 +12,7 @@ from simulator.alpha_kinetics import (
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
 )
 from simulator.scalar_boundary import finite_float
+from simulator.vapour_rail.instrumentation import public_carrier_notices
 from simulator.wall_deposit_availability import (
     WALL_SATURATION_PRESSURE_REFUSED_CODE,
 )
@@ -49,6 +50,44 @@ WALL_VAPOUR_CARRIER_AUTHORITY_MISSING_CODE = (
 WALL_DEPOSIT_ALIAS_CONFLICT_CODE = (
     "wall_deposit_payload_alias_conflict"
 )
+
+
+def achieved_melt_bakeout(
+    snapshots: Sequence[Any],
+    *,
+    setpoint_C: float,
+    tolerance_C: float,
+) -> dict[str, float]:
+    """Measure peak melt temperature and achieved hold from committed hours."""
+
+    setpoint = finite_float(setpoint_C)
+    tolerance = finite_float(tolerance_C)
+    if setpoint is None or tolerance is None or tolerance < 0.0:
+        raise ValueError("bakeout_temperature_input_invalid")
+    if not snapshots:
+        raise ValueError("bakeout_operating_history_missing")
+    peak_temperature_C: float | None = None
+    held_duration_h = 0.0
+    threshold_C = setpoint - tolerance
+    for index, snapshot in enumerate(snapshots):
+        temperature = finite_float(getattr(snapshot, "temperature_C", None))
+        duration = finite_float(getattr(snapshot, "duration_h", None))
+        if temperature is None or duration is None or duration < 0.0:
+            raise ValueError(f"bakeout_operating_history_invalid: snapshot {index}")
+        peak_temperature_C = (
+            temperature
+            if peak_temperature_C is None
+            else max(peak_temperature_C, temperature)
+        )
+        if temperature >= threshold_C:
+            held_duration_h += duration
+    if peak_temperature_C is None:
+        raise ValueError("bakeout_operating_history_missing")
+    return {
+        "peak_melt_temperature_C": peak_temperature_C,
+        "hold_threshold_C": threshold_C,
+        "hold_duration_h": held_duration_h,
+    }
 
 # Distinct from WALL_STICKING_ALPHA_NOTICE_CODE on purpose.  That code says
 # "every deposited species carries cited sticking provenance", which is
@@ -1560,16 +1599,36 @@ def _positive_int(value: Any) -> int | None:
 def _attach_pareto_source_notices(
     by_species: dict[str, Any], wall_notice: Mapping[str, Any],
 ) -> None:
+    """Publish every carrier notice onto the Pareto species entry.
+
+    ``P_eq_Pa`` rows and the unavailable summary both pass through here.
+    ``extrapolation_notice`` keeps its existing Pareto field name. Every
+    other ``*_notice``, including a diagnostic admission that is the only
+    notice, is copied under its own key with the authority it carries.
+    """
+
     for species, carrier in wall_notice.get("vapour_carrier_authority_by_species", {}).items():
         if not isinstance(carrier, Mapping):
             continue
-        notice = carrier.get("extra", {}).get("extrapolation_notice")
-        if notice:
-            entry = by_species.setdefault(species, {"status": "unavailable", "reason": "evaporation_series_metadata_unavailable"})
-            entry["vapour_pressure_extrapolation_notice"] = _plain_mapping(notice)
-            entry["authority_level"] = "extrapolated"
-            if entry.get("status") == "ok":
-                entry["status"] = "extrapolated"
+        notices = public_carrier_notices(carrier)
+        if not notices:
+            continue
+        entry = by_species.setdefault(species, {"status": "unavailable", "reason": "evaporation_series_metadata_unavailable"})
+        for key, notice_items in notices.items():
+            published = [
+                _plain_mapping(item)
+                for item in notice_items
+                if isinstance(item, Mapping)
+            ]
+            if not published:
+                continue
+            if key == "extrapolation_notice":
+                entry["vapour_pressure_extrapolation_notice"] = published
+                entry["authority_level"] = "extrapolated"
+                if entry.get("status") == "ok":
+                    entry["status"] = "extrapolated"
+                continue
+            entry[key] = published
     for species, records in wall_notice.get("evaporation_transport_notices_by_species", {}).items():
         entry = by_species.setdefault(species, {"status": "unavailable", "reason": "evaporation_transport_unavailable"})
         entry["evaporation_transport_notices"] = _plain_mapping(records)

@@ -12,6 +12,7 @@ from simulator.coating_lifespan import (
     LifecycleProjection,
     NestedDeposit,
     campaigns_to_resinter_total,
+    _interface_first_melt_from_liner_states,
     merge_run_snapshot,
     project_lifecycle,
 )
@@ -113,9 +114,21 @@ class FoulingLifecycleHarness:
         ledgers: list[Any] = []
         snapshots_authoritative = True
         snapshot_notices: list[Mapping[str, Any]] = []
+        liner_states_by_campaign: list[Mapping[str, Any] | None] = []
 
         for campaign_index, campaign_input in enumerate(campaign_inputs, start=1):
             artifact = _coerce_run_artifact(self._run_campaign(campaign_input))
+            document = artifact.result_document
+            run_metadata = (
+                document.get("run_metadata")
+                if isinstance(document, Mapping)
+                else None
+            )
+            liner_state = (
+                run_metadata.get("liner_state")
+                if isinstance(run_metadata, Mapping)
+                else None
+            )
             mass_balance_error_pct = _mass_balance_error_pct(artifact)
             if (
                 mass_balance_error_pct is not None
@@ -154,6 +167,54 @@ class FoulingLifecycleHarness:
                 snapshot,
                 export_includes_carried=self._export_includes_carried,
                 campaign_index=campaign_index,
+            )
+            if (
+                isinstance(liner_state, Mapping)
+                and artifact.simulator is not None
+                and carried is not None
+            ):
+                material_id = (
+                    run_metadata.get("furnace_material_id")
+                    if isinstance(run_metadata, Mapping)
+                    else None
+                )
+                if material_id:
+                    from simulator.liner_corrosion import build_liner_state_for_run
+
+                    try:
+                        accumulated_state = build_liner_state_for_run(
+                            str(material_id),
+                            artifact.simulator,
+                            artifact.trace,
+                            initial_deposit_kg_by_segment_species=(
+                                carried.deposit_plain() if carried is not None else {}
+                            ),
+                            run_deposit_kg_by_segment_species=per_run_net,
+                        )
+                    except Exception as exc:  # noqa: BLE001 - diagnostic cannot gate lifecycle
+                        reason = str(
+                            getattr(exc, "reason", "liner_accumulated_state_rebuild_failed")
+                        )
+                        segments = liner_state.get("segments")
+                        names = (
+                            tuple(str(name) for name in segments)
+                            if isinstance(segments, Mapping)
+                            else ("_run",)
+                        )
+                        accumulated_state = {
+                            "schema": "liner-state-v1",
+                            "segments": {
+                                name: {
+                                    "status": "refused",
+                                    "refusal": {"reason": reason, "detail": str(exc)},
+                                }
+                                for name in names
+                            },
+                        }
+                    if accumulated_state is not None:
+                        liner_state = accumulated_state
+            liner_states_by_campaign.append(
+                liner_state if isinstance(liner_state, Mapping) else None
             )
             total = _campaigns_total_from_artifact(
                 artifact,
@@ -216,6 +277,11 @@ class FoulingLifecycleHarness:
             carried = cumulative
 
         cumulative_snapshots = tuple(record.cumulative_snapshot for record in records)
+        interface_first_melt = (
+            _interface_first_melt_from_liner_states(liner_states_by_campaign)
+            if any(isinstance(state, Mapping) for state in liner_states_by_campaign)
+            else None
+        )
         return FoulingLifecycleHarnessResult(
             campaigns_to_resinter_total=(
                 records[-1].campaigns_to_resinter_total
@@ -233,6 +299,7 @@ class FoulingLifecycleHarness:
                 rho_deposit_kg_m3=self._rho_deposit_kg_m3,
                 thickness_limit_m=self._thickness_limit_m,
                 resinter_threshold_kg=self._resinter_threshold_kg,
+                interface_first_melt=interface_first_melt,
             ),
             fouling_state_trajectory=tuple(trajectory),
             run_records=tuple(records),
