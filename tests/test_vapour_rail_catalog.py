@@ -1060,8 +1060,9 @@ def test_t622_frozen_fe_law_compiles_without_rewriting_the_fixture() -> None:
         emit_u0_request_rules=False,
         bound_effective_fits=fits,
     )
+    live_payload = _yaml("vapor_pressures.yaml")
     live = compile_vapour_rail_catalog(
-        _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
+        live_payload, emit_u0_request_rules=False
     )
     for species_id, kwargs in (
         ("Fe", {}),
@@ -1072,8 +1073,8 @@ def test_t622_frozen_fe_law_compiles_without_rewriting_the_fixture() -> None:
         assert historic_evaluator is not None and live_evaluator is not None
         historic_evaluation = historic_evaluator.evaluate(1800.0, **kwargs)
         live_evaluation = live_evaluator.evaluate(1800.0, **kwargs)
-        assert historic_evaluation.pressure_pa == live_evaluation.pressure_pa
         if species_id == "Fe":
+            assert historic_evaluation.pressure_pa == live_evaluation.pressure_pa
             assert historic_evaluation.pressure_pa == pytest.approx(
                 _FE_PSEUDO_LAW_1800_PA, rel=1e-12, abs=0.0
             )
@@ -1094,6 +1095,60 @@ def test_t622_frozen_fe_law_compiles_without_rewriting_the_fixture() -> None:
             )
             _assert_fe_pseudo_law_disclosure(
                 getattr(live_evaluation, "diagnostic_admission_notice", None)
+            )
+            from simulator.vapour_rail.catalog import (
+                _polynomial_from_thermo_record,
+                _resolve_thermo_record,
+            )
+
+            def _association_pressure(row: dict) -> float:
+                model = row["pressure_models"][0]
+                thermo = {
+                    formula: _polynomial_from_thermo_record(
+                        name=f"t622:{formula}",
+                        family=model["evaluator_family"],
+                        record=_resolve_thermo_record(
+                            record, field=f"t622.species_thermo[{formula}]"
+                        ),
+                    )
+                    for formula, record in model["species_thermo"].items()
+                }
+                delta_g_over_rt = sum(
+                    sign
+                    * float(part["stoichiometry"])
+                    * thermo[part["formula"]].evaluate(1800.0).g_over_RT
+                    for side, sign in (("reactants", -1.0), ("products", 1.0))
+                    for part in model["gas_exchange_reaction"][side]
+                )
+                association_constant = math.exp(-delta_g_over_rt)
+                antoine = model["base_reference_pressure_model"]["coefficients"]
+                log10_p_sat_pa = float(antoine["A"]) - float(antoine["B"]) / (
+                    1800.0 + float(antoine["C"])
+                )
+                p_sat_pa = 10.0**log10_p_sat_pa
+                p_o2_bar, standard_pressure_bar = 1.0, 1.0
+                return association_constant * p_sat_pa * math.sqrt(
+                    p_o2_bar / standard_pressure_bar
+                )
+
+            # d-433 sets the live Fe base to pure-Fe saturation; d-442 freezes
+            # the activity-folded historical fit in the fixture. For
+            # Fe(g)+0.5 O2(g)->FeO(g), K=exp(-ΔG°/RT), so mass action gives
+            # p_FeO=K·p_sat(Fe)·(pO2/P°)^0.5. CEA provides the same K(T) for
+            # each row, while each row's Antoine A/B/C supplies its own p_sat.
+            # K and pO2/P° are dimensionless; p_sat and the result are Pa.
+            # At pO2=P° the square-root factor is 1; as pO2→0, p_FeO→0.
+            historic_feo_row = historic_payload["families"][
+                "oxide_vapors_feo_association_family"
+            ]["physical_properties"]["species"]["FeO_association_gas"]
+            live_feo_row = live_payload["families"][
+                "oxide_vapors_feo_association_family"
+            ]["physical_properties"]["species"]["FeO_association_gas"]
+            assert historic_evaluation.pressure_pa == pytest.approx(
+                _association_pressure(historic_feo_row), rel=1e-9
+            )
+            assert live_evaluation.pressure_pa == pytest.approx(
+                _association_pressure(live_feo_row), rel=1e-9
             )
     assert historic.species["Fe"].validation_anchor_refs == ()
     assert historic.species["FeO_association_gas"].validation_anchor_refs == ()
