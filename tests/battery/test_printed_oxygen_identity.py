@@ -15,6 +15,8 @@ from collections import Counter
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
+import pytest
+
 from simulator.battery.enums import Authority, NoticeKind, Quantity, ValueKind
 from simulator.battery.identity import IdentityEqualKind, identity_equal
 from simulator.battery.migrate import (
@@ -43,6 +45,59 @@ def _migrated(name: str):
     migrator._migrate_extract(path)
     migrator.finalize()
     return migrator.result
+
+
+def _assert_oxygen_conditions_have_locators(result) -> None:
+    issues = [
+        issue for issue in result.validation.hard_issues
+        if issue.path.endswith(".fO2_log")
+    ]
+    assert not issues, issues
+
+
+def test_real_deffrennes_air_intervals_keep_observation_locators(monkeypatch) -> None:
+    from simulator.battery import migrate as migration
+
+    source_id = "deffrennes-2020-ca-o-calphad"
+    result = _migrated(f"{source_id}.yaml")
+    _assert_oxygen_conditions_have_locators(result)
+    rows = (
+        ("deffrennes_2020_manara_air_solidification", "3222", 6),
+        ("deffrennes_2020_yamada_solidification", "3178", 23),
+    )
+    for local_id, temperature, page in rows:
+        observation = result.observations[f"{source_id}::{local_id}"]
+        condition = observation.point_conditions["fO2_log"]
+        assert observation.value.point == Decimal(temperature)
+        assert condition.locator == observation.locator
+        assert condition.locator.page == page
+        interval = condition.state.value
+        assert interval.kind is ValueKind.INTERVAL
+        assert interval.interval_low == interval.interval_high
+
+    retain = migration._retain_printed_fo2_interval
+
+    def without_observation_locator(conditions, decision, *, locator):
+        return retain(conditions, decision, locator=None)
+
+    monkeypatch.setattr(
+        migration, "_retain_printed_fo2_interval", without_observation_locator
+    )
+    reverted = _migrated(f"{source_id}.yaml")
+    with pytest.raises(AssertionError, match="empirical Located value requires a locator"):
+        _assert_oxygen_conditions_have_locators(reverted)
+    assert result.observations.keys() == reverted.observations.keys()
+    for observation_id, observation in result.observations.items():
+        old = reverted.observations[observation_id]
+        assert observation.value == old.value
+        assert observation.identity == old.identity
+    issues = reverted.validation.hard_issues
+    assert {
+        issue.path for issue in issues if issue.path.endswith(".fO2_log")
+    } == {
+        f"observation[{source_id}::{local_id}].point_conditions.fO2_log"
+        for local_id, _, _ in rows
+    }
 
 
 def _one(result, *fragments: str):
