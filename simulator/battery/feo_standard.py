@@ -18,8 +18,9 @@ from simulator.battery.enums import (
     Quantity,
     RefusalReason,
 )
-from simulator.battery.records import Notice, ResidualRefusal
+from simulator.battery.records import Notice, ResidualRefusal, StandardState
 from simulator.physical_constants import GAS_CONSTANT
+from simulator.state_types import State
 
 
 @dataclass(frozen=True)
@@ -438,10 +439,13 @@ def _canonical_log10_feo_activity(
     """Convert FeO(l) activity from its engine standard to Fe-019."""
     if offset_j_mol == 0:
         return log10_engine_activity
-    # For one FeO chemical potential, equating μ = μ° + RT ln(a) gives
-    # log10(a_Fe-019) = log10(a_engine) + delta_G°/(RT ln(10)). The MELT
-    # pack's candidate supplies delta_G° in J/mol; the denominator has the
-    # same units, leaving a dimensionless activity shift.
+    # Premise: at fixed FeO mole fraction X, gamma = a/X, so an FeO(l)
+    # reference change multiplies activity and gamma by the same factor.
+    # Equating μ = μ° + RT ln(a) gives ln(gamma_src) = ln(gamma_model) +
+    # ln(a_ref,model/a_ref,src), and log10(a_Fe-019) = log10(a_engine) +
+    # delta_G°/(RT ln(10)). delta_G° is in J/mol; R*T is also J/mol, so the
+    # exponent and activity shift are dimensionless. Equal references have
+    # a_ref,model/a_ref,src = 1 and therefore produce a zero shift.
     denominator = (
         Decimal(str(GAS_CONSTANT))
         * temperature_K
@@ -454,13 +458,44 @@ def normalize_openimcc_feo_activity_value(
     value: Decimal,
     coefficient_sources: Sequence[str],
     melt_pack_identity: Mapping[str, object] | None,
-    temperature_K: Decimal,
+    temperature_K: Decimal | None,
+    *,
+    quantity: Quantity = Quantity.ACTIVITY,
+    source_reference_state: object = None,
 ) -> tuple[
     Decimal | None,
     Mapping[str, object] | None,
     Notice | None,
     ResidualRefusal | None,
 ]:
+    if quantity is Quantity.ACTIVITY_COEFFICIENT and not (
+        isinstance(source_reference_state, State)
+        and source_reference_state.is_value
+        and isinstance(source_reference_state.value, StandardState)
+    ):
+        if (
+            isinstance(source_reference_state, State)
+            and not source_reference_state.is_value
+        ):
+            reason = source_reference_state.reason or source_reference_state.tag.value
+        else:
+            reason = "reference_state is absent or not a typed StandardState"
+        return (
+            value,
+            None,
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(quantity,),
+                reason=(
+                    "OpenIMCC FeO(l) activity coefficient left unnormalized "
+                    f"because the printed source reference is unknown: {reason}"
+                ),
+                origin="openimcc_feo_standard_normalisation",
+                band="printed FeO reference state is unknown or untyped",
+            ),
+            None,
+        )
+
     standard, refusal = _resolve_feo_activity_standard(
         Engine.OPENIMCC,
         coefficient_sources,
@@ -470,6 +505,7 @@ def normalize_openimcc_feo_activity_value(
     if refusal is not None:
         return None, None, None, refusal
     assert standard is not None and standard.melt_pack_identity is not None
+    assert temperature_K is not None and temperature_K > 0
     shift = _canonical_log10_feo_activity(
         Decimal(0), temperature_K, standard.offset_j_mol
     )
@@ -493,9 +529,10 @@ def normalize_openimcc_feo_activity_value(
         record.update(extrapolation_evidence)
     notice = Notice(
         kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-        affected_quantities=(Quantity.ACTIVITY,),
+        affected_quantities=(quantity,),
         reason=(
-            f"OpenIMCC FeO(l) activity normalized from {standard.name} to "
+            f"OpenIMCC FeO(l) {quantity.value.replace('_', ' ')} normalized "
+            f"from {standard.name} to "
             f"{_FEO_ACTIVITY_CANONICAL_STANDARD}"
         ),
         origin="openimcc_feo_standard_normalisation",

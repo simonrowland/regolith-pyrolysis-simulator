@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import csv
+from dataclasses import replace
 from decimal import Decimal
+from functools import lru_cache
 from hashlib import sha256
 from importlib import resources
 from pathlib import Path
 
 import pytest
+import yaml
 
 import simulator.battery.feo_standard as feo_standard_module
 from simulator.battery.enums import (
@@ -17,17 +20,20 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    NoticeKind,
+    Quantity,
     RefusalReason,
     ResidualStatus,
 )
 from simulator.battery.records import Composition, Execution
-from simulator.battery.migrate import REPO_ROOT, Migrator
+from simulator.battery.migrate import REPO_ROOT, Migrator, _identity_from_plain
 from simulator.battery.score import (
     EnginePrediction,
     ScoreContext,
     compile_residual,
     dumps_residual_line,
 )
+from simulator.state_types import State
 import simulator.battery.score as score_module
 from tests.battery import factories as F
 
@@ -49,6 +55,44 @@ _DISTIN_1880_RESIDUAL_SHA256 = (
 # Dividing by R*T*ln(10) gives +0.1013328 dex; adding this to the prior
 # -0.10531292782444457 residual yields -0.0039800848499234 dex.
 _DISTIN_1880_RESIDUAL_DEX = Decimal("-0.003980084849923409")
+
+_TYPED_FEO_GAMMA_SOURCES = (
+    "holzheid-1997-feo-nio-coo-activity-metal-saturated",
+    "li-2005-na-al-phosphate-fe-activities",
+    "hayashi-2025-ca-fe-silicate-redox-activities",
+    "snyder-carmichael-1992-olivine-liquid-feo-activity",
+    "wood-wade-2013-trace-activities",
+    "oneill-2002-feo-activity-coefficients-cmas",
+    "borisov-2004-tio2-pd-ni-fe-solubilities",
+    "roeder-1974-iron-activity-olivine-basaltic-liquids",
+)
+_UNKNOWN_FEO_GAMMA_SOURCES = (
+    "shornikov-2020-mgo-feo-melts",
+    "inoue-suito-1982-na-silicate-sulfur-partitions",
+    "kems-041-sossi-fegley-2018",
+    "colson-floden-haugen-2005-nio-feo-o2-activities",
+)
+
+
+@lru_cache(maxsize=None)
+def _source_feo_gamma_identity(source_id: str, formula: str = "FeO"):
+    path = (
+        Path(REPO_ROOT)
+        / "data/literature/extracts-v2"
+        / f"{source_id}.yaml"
+    )
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    row = next(
+        observation
+        for observation in document["observations"]
+        if (
+            observation["identity"]["quantity"].get("value")
+            == Quantity.ACTIVITY_COEFFICIENT.value
+            and observation["identity"]["species"]["formula"].casefold()
+            == formula.casefold()
+        )
+    )
+    return _identity_from_plain(row["identity"])
 
 
 def _openimcc_sources(
@@ -706,6 +750,160 @@ def test_openimcc_feo_prediction_is_normalized_and_carries_notice_and_provenance
     assert any(
         "DG46-MASSON65" in notice.reason and "Fe-019" in notice.reason
         for notice in candidate.notices
+    )
+
+
+def _openimcc_feo_prediction_for_normalisation() -> EnginePrediction:
+    pack_identity = _melt_pack_identity("default")
+    sources = _openimcc_sources(
+        pack_version=pack_identity["pack_version"],
+        pack_digest=pack_identity["binding_digest"],
+        condensate_digest="c" * 64,
+    )
+    return _case(
+        Engine.OPENIMCC,
+        sources,
+        temperature_K=Decimal("1600"),
+        provenance={"melt_pack_identity": pack_identity},
+    )[3]
+
+
+@pytest.mark.parametrize("source_id", _TYPED_FEO_GAMMA_SOURCES)
+def test_openimcc_feo_gamma_gets_the_activity_reference_shift_per_source(
+    source_id: str,
+) -> None:
+    source_identity = _source_feo_gamma_identity(source_id)
+    assert source_identity.reference_state is not None
+    assert source_identity.reference_state.is_value
+    prediction = _openimcc_feo_prediction_for_normalisation()
+    shared_identity = replace(
+        prediction.identity,
+        reference_state=source_identity.reference_state,
+    )
+    activity_prediction = replace(
+        prediction,
+        value=Decimal("0.1"),
+        identity=replace(shared_identity, quantity=State.of(Quantity.ACTIVITY)),
+    )
+    gamma_prediction = replace(
+        prediction,
+        value=Decimal("0.5"),
+        identity=replace(
+            shared_identity,
+            quantity=State.of(Quantity.ACTIVITY_COEFFICIENT),
+        ),
+    )
+    assert (
+        activity_prediction.identity.composition
+        == gamma_prediction.identity.composition
+    )
+
+    normalized_activity = score_module._normalize_openimcc_feo_activity_prediction(
+        activity_prediction
+    )
+    normalized_gamma = score_module._normalize_openimcc_feo_activity_prediction(
+        gamma_prediction
+    )
+
+    activity_record = normalized_activity.provenance[
+        "feo_standard_normalisation"
+    ]
+    gamma_record = normalized_gamma.provenance["feo_standard_normalisation"]
+    assert gamma_record["log10_shift"] == activity_record["log10_shift"]
+    assert normalized_gamma.value is not None
+    assert normalized_activity.value is not None
+    assert float(normalized_gamma.value / Decimal("0.5")) == pytest.approx(
+        float(normalized_activity.value / Decimal("0.1")), rel=1e-12
+    )
+
+
+@pytest.mark.parametrize("source_id", _UNKNOWN_FEO_GAMMA_SOURCES)
+def test_openimcc_feo_gamma_unknown_reference_stays_unconverted_and_is_flagged(
+    source_id: str,
+) -> None:
+    source_identity = _source_feo_gamma_identity(source_id)
+    reference_state = source_identity.reference_state
+    assert reference_state is not None and not reference_state.is_value
+    prediction = _openimcc_feo_prediction_for_normalisation()
+    gamma_identity = replace(
+        prediction.identity,
+        quantity=State.of(Quantity.ACTIVITY_COEFFICIENT),
+        reference_state=reference_state,
+    )
+    prediction = replace(
+        prediction, value=Decimal("0.5"), identity=gamma_identity
+    )
+
+    normalized = score_module._normalize_openimcc_feo_activity_prediction(
+        prediction
+    )
+
+    assert normalized.value == prediction.value
+    assert normalized.provenance == prediction.provenance
+    notice = next(
+        notice
+        for notice in normalized.notices
+        if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+    )
+    assert notice.affected_quantities == (Quantity.ACTIVITY_COEFFICIENT,)
+    assert "source reference is unknown" in notice.reason
+
+
+@pytest.mark.parametrize(
+    "source_id",
+    (
+        "li-2005-na-al-phosphate-fe-activities",
+        "hayashi-2025-ca-fe-silicate-redox-activities",
+    ),
+)
+def test_openimcc_feo_normalisation_does_not_apply_to_feo1_5_gamma(
+    source_id: str,
+) -> None:
+    ferric_identity = _source_feo_gamma_identity(source_id, formula="FeO1.5")
+    prediction = _openimcc_feo_prediction_for_normalisation()
+    gamma_prediction = replace(
+        prediction,
+        value=Decimal("0.5"),
+        identity=ferric_identity,
+    )
+
+    assert (
+        score_module._normalize_openimcc_feo_activity_prediction(gamma_prediction)
+        is gamma_prediction
+    )
+
+
+def test_openimcc_feo_activity_path_remains_unchanged_for_unknown_reference() -> None:
+    unknown_reference = _source_feo_gamma_identity(
+        "shornikov-2020-mgo-feo-melts"
+    ).reference_state
+    typed_reference = _source_feo_gamma_identity(
+        "oneill-2002-feo-activity-coefficients-cmas"
+    ).reference_state
+    assert unknown_reference is not None and not unknown_reference.is_value
+    assert typed_reference is not None and typed_reference.is_value
+    prediction = _openimcc_feo_prediction_for_normalisation()
+    unknown_prediction = replace(
+        prediction,
+        identity=replace(
+            prediction.identity, reference_state=unknown_reference
+        ),
+    )
+    typed_prediction = replace(
+        prediction,
+        identity=replace(prediction.identity, reference_state=typed_reference),
+    )
+
+    normalized_unknown = score_module._normalize_openimcc_feo_activity_prediction(
+        unknown_prediction
+    )
+    normalized_typed = score_module._normalize_openimcc_feo_activity_prediction(
+        typed_prediction
+    )
+
+    assert (
+        replace(normalized_unknown, identity=normalized_typed.identity)
+        == normalized_typed
     )
 
 

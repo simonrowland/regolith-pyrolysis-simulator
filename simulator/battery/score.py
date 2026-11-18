@@ -712,17 +712,24 @@ def _normalize_openimcc_feo_activity_prediction(
     prediction: EnginePrediction,
 ) -> EnginePrediction:
     comparison_identity = prediction.identity
+    quantity = (
+        quantity_token(comparison_identity)
+        if isinstance(comparison_identity, Identity)
+        else None
+    )
     if (
         prediction.engine is not Engine.OPENIMCC
         or prediction.value is None
         or not isinstance(comparison_identity, Identity)
-        or quantity_token(comparison_identity) is not Quantity.ACTIVITY
+        or quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
         or comparison_identity.species is None
         or comparison_identity.species.formula.strip().casefold() != "feo"
     ):
         return prediction
     temperature_K = temperature_of(comparison_identity)
-    if temperature_K is None or temperature_K <= 0:
+    if quantity is Quantity.ACTIVITY and (
+        temperature_K is None or temperature_K <= 0
+    ):
         return replace(
             prediction,
             value=None,
@@ -730,12 +737,26 @@ def _normalize_openimcc_feo_activity_prediction(
             refusal_reason=RefusalReason.METRIC_DOMAIN,
             refusal_detail={"reason": "feo_activity_standard_temperature_missing"},
         )
-    value, record, notice, refusal = _feo_standard.normalize_openimcc_feo_activity_value(
-        prediction.value,
-        prediction.coefficient_sources,
-        prediction.provenance.get("melt_pack_identity"),
-        temperature_K,
-    )
+    if quantity is Quantity.ACTIVITY:
+        value, record, notice, refusal = (
+            _feo_standard.normalize_openimcc_feo_activity_value(
+                prediction.value,
+                prediction.coefficient_sources,
+                prediction.provenance.get("melt_pack_identity"),
+                temperature_K,
+            )
+        )
+    else:
+        value, record, notice, refusal = (
+            _feo_standard.normalize_openimcc_feo_activity_value(
+                prediction.value,
+                prediction.coefficient_sources,
+                prediction.provenance.get("melt_pack_identity"),
+                temperature_K,
+                quantity=Quantity.ACTIVITY_COEFFICIENT,
+                source_reference_state=comparison_identity.reference_state,
+            )
+        )
     if refusal is not None:
         return replace(
             prediction,
@@ -743,6 +764,12 @@ def _normalize_openimcc_feo_activity_prediction(
             authority=Authority.REFUSED,
             refusal_reason=refusal.reason,
             refusal_detail=dict(refusal.detail),
+        )
+    if record is None:
+        assert quantity is Quantity.ACTIVITY_COEFFICIENT and notice is not None
+        return replace(
+            prediction,
+            notices=union_notices(prediction.notices, (notice,)),
         )
     assert value is not None and record is not None and notice is not None
     authority = prediction.authority
