@@ -155,6 +155,11 @@ HEAVY_ROSTER = frozenset({
     # keep it nightly in the serial chain with the sibling's 5000 s headroom.
     ("tests/perf/test_perf_ratchet.py",
      "test_optimizer_60h_stage_records_real_cold_work"),
+    # Owner-ratified b-1238 r6 (2026-11-18): rebaseline the full five-trial
+    # optimizer stage plus every other benchmark stage. Its 8,395 CPU-s budget
+    # is derived in test_perf_ratchet.py and runs nightly in the serial chain.
+    ("tests/perf/test_perf_ratchet.py",
+     "test_perf_ratchet_guards_call_volume_and_cpu_cost"),
     ("tests/test_optimizer_strategy_tpe.py",
      "test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair"),
     # Owner-ratified b-549 follow-up (2026-11-10): byte-identical battery

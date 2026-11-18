@@ -260,6 +260,21 @@ def _synthetic_optimizer_measurement() -> dict:
     }
 
 
+# Size the per-test CPU/wall guard to the complete measurement envelope. The
+# optimizer contributes 5 trials * 1,283 CPU-s/trial = 6,415 CPU-s; the other
+# stages contribute configured worker counts * 180 s = 1,980 CPU-s. Unit
+# check: each term is CPU-seconds, so the derived budget is 8,395 CPU-s.
+OPTIMIZER_RATCHET_CPU_BUDGET_SECONDS = math.ceil(
+    bench.OPTIMIZER_STAGE_TRIALS * bench.OPTIMIZER_STAGE_CHAIN_CPU_ESTIMATE_S
+    + sum(
+        bench.PROTOCOL["stage_process_repeats"][stage]
+        * bench.STAGE_WORKER_HANG_WALL_S
+        for stage in STAGE_NAMES
+        if stage != bench.OPTIMIZER_STAGE_NAME
+    )
+)
+
+
 # The full campaign-chain evaluation is a heavy serialized test. Its CPU
 # budget follows the sibling C0-to-C6 trajectory entry in the heavy roster.
 @pytest.mark.nightly
@@ -385,14 +400,12 @@ def test_optimizer_60h_eval_ratchet_is_visibly_unbaselined() -> None:
 def test_reblessed_optimizer_stage_is_rated_with_dynamic_work_checks() -> None:
     baseline = load_baselines(BASELINE_PATH)
     measurement = _synthetic_optimizer_measurement()
-    existing_rate = baseline["stages"][bench.OPTIMIZER_STAGE_NAME].get(
-        "ratchet_rate",
-        0.0,
-    )
-    measurement["rate"] = max(
-        measurement["rate"],
-        float(existing_rate) * 1.01,
-    )
+    optimizer_baseline = baseline["stages"][bench.OPTIMIZER_STAGE_NAME]
+    if "ratchet_rate" in optimizer_baseline:
+        measurement["rate"] = max(
+            measurement["rate"],
+            float(optimizer_baseline["ratchet_rate"]) * 1.01,
+        )
     reblessed = reblessed_payload(
         copy.deepcopy(baseline),
         {
@@ -438,6 +451,8 @@ def test_reblessed_optimizer_stage_is_rated_with_dynamic_work_checks() -> None:
 
 
 @pytest.mark.nightly
+@pytest.mark.xdist_group("serial")
+@pytest.mark.cpu_budget(OPTIMIZER_RATCHET_CPU_BUDGET_SECONDS)
 def test_perf_ratchet_guards_call_volume_and_cpu_cost() -> None:
     """Catch the multi-hour CI incident class before full-run tests wedge.
 
@@ -499,10 +514,12 @@ def test_perf_ratchet_guards_call_volume_and_cpu_cost() -> None:
 
 def test_measure_all_selects_fastest_independent_stage_process(monkeypatch) -> None:
     calls_by_stage = {stage: 0 for stage in STAGE_NAMES}
+    timeouts_by_stage = {}
 
-    def fake_run(command, **_kwargs):
+    def fake_run(command, **kwargs):
         stage = command[-1]
         calls_by_stage[stage] += 1
+        timeouts_by_stage[stage] = kwargs["timeout"]
         return subprocess.CompletedProcess(
             command,
             0,
@@ -518,6 +535,12 @@ def test_measure_all_selects_fastest_independent_stage_process(monkeypatch) -> N
         repeats = bench.PROTOCOL["stage_process_repeats"][stage]
         assert calls_by_stage[stage] == repeats
         assert measurements[stage]["rate"] == pytest.approx(float(repeats))
+        expected_timeout = (
+            bench.OPTIMIZER_STAGE_WORKER_HANG_WALL_S
+            if stage == bench.OPTIMIZER_STAGE_NAME
+            else bench.STAGE_WORKER_HANG_WALL_S
+        )
+        assert timeouts_by_stage[stage] == expected_timeout
 
 
 @pytest.mark.parametrize(
@@ -783,33 +806,78 @@ def test_rebless_refuses_power_limited_measurement(
 
 def test_rebless_ratchet_is_monotonic_up_only() -> None:
     baseline = load_baselines(BASELINE_PATH)
-    lower = {
-        stage: {
-            "rate": baseline["stages"][stage].get("ratchet_rate", 2.0) / 2.0,
-            "rate_unit": "work_units_per_cpu_second",
-            "details": {"hot_path": "test"},
+    optimizer_measurement = _synthetic_optimizer_measurement()
+    actual_optimizer_stage = baseline["stages"][bench.OPTIMIZER_STAGE_NAME]
+    measurements = {}
+    for stage in STAGE_NAMES:
+        if stage == bench.OPTIMIZER_STAGE_NAME:
+            measurements[stage] = optimizer_measurement
+        else:
+            measurements[stage] = {
+                "rate": baseline["stages"][stage]["ratchet_rate"] / 2.0,
+                "rate_unit": "work_units_per_cpu_second",
+                "details": {"hot_path": bench.STAGE_HOT_PATHS[stage]},
+            }
+
+    unbaselined_baseline = copy.deepcopy(baseline)
+    if actual_optimizer_stage.get("status") == "needs_rebaseline":
+        assert actual_optimizer_stage == {
+            "status": "needs_rebaseline",
+            "reason": bench.OPTIMIZER_REBASELINE_REASON,
         }
-        for stage in STAGE_NAMES
-    }
-    unchanged = reblessed_payload(
-        copy.deepcopy(baseline),
-        lower,
+    else:
+        assert "ratchet_rate" in actual_optimizer_stage
+        unbaselined_baseline["stages"][bench.OPTIMIZER_STAGE_NAME] = {
+            "status": "needs_rebaseline",
+            "reason": bench.OPTIMIZER_REBASELINE_REASON,
+        }
+    unbaselined_result = reblessed_payload(
+        unbaselined_baseline,
+        measurements,
         machine_class=baseline["machine_class"],
     )
     for stage in STAGE_NAMES:
         if stage == bench.OPTIMIZER_STAGE_NAME:
-            assert unchanged["stages"][stage]["ratchet_rate"] == pytest.approx(
-                1.0
+            assert unbaselined_result["stages"][stage]["ratchet_rate"] == (
+                optimizer_measurement["rate"]
             )
-            assert "status" not in unchanged["stages"][stage]
-            assert "reason" not in unchanged["stages"][stage]
+            assert "status" not in unbaselined_result["stages"][stage]
+            assert "reason" not in unbaselined_result["stages"][stage]
         else:
-            assert unchanged["stages"][stage]["ratchet_rate"] == (
+            assert unbaselined_result["stages"][stage]["ratchet_rate"] == (
                 baseline["stages"][stage]["ratchet_rate"]
             )
 
+    rated_baseline = copy.deepcopy(baseline)
+    if "ratchet_rate" in actual_optimizer_stage:
+        rated_rate = float(actual_optimizer_stage["ratchet_rate"])
+    else:
+        rated_rate = float(optimizer_measurement["rate"]) * 2.0
+    rated_stage = rated_baseline["stages"][bench.OPTIMIZER_STAGE_NAME]
+    rated_stage["ratchet_rate"] = rated_rate
+    rated_stage["rate_unit"] = "work_units_per_cpu_second"
+    rated_stage["hot_path"] = bench.STAGE_HOT_PATHS[bench.OPTIMIZER_STAGE_NAME]
+    rated_stage.pop("status", None)
+    rated_stage.pop("reason", None)
+    rated_measurements = dict(measurements)
+    rated_measurements[bench.OPTIMIZER_STAGE_NAME] = dict(
+        optimizer_measurement,
+        rate=rated_rate / 2.0,
+    )
+    rated_result = reblessed_payload(
+        rated_baseline,
+        rated_measurements,
+        machine_class=baseline["machine_class"],
+    )
+    assert rated_result["stages"][bench.OPTIMIZER_STAGE_NAME]["ratchet_rate"] == (
+        rated_rate
+    )
+    for stage in STAGE_NAMES:
+        if stage != bench.OPTIMIZER_STAGE_NAME:
+            assert rated_result["stages"][stage] == baseline["stages"][stage]
+
     first = STAGE_NAMES[0]
-    raised = copy.deepcopy(lower)
+    raised = copy.deepcopy(measurements)
     raised[first]["rate"] = baseline["stages"][first]["ratchet_rate"] + 1.0
     updated = reblessed_payload(
         copy.deepcopy(baseline),

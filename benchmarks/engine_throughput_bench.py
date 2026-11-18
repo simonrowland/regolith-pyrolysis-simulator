@@ -57,6 +57,17 @@ OPTIMIZER_STAGE_NAME = "optimizer_60h_eval"
 # from the executor trace and independently counted simulator steps.
 OPTIMIZER_PROFILE_RUN_HOURS = 60
 OPTIMIZER_STAGE_TRIALS = 5
+# Source: the owner-ratified estimate in tests/suite_shape_guard.py's heavy
+# roster is 1,283 CPU-s for one complete C0-to-C6 chain. Five optimizer trials
+# at 1,283 CPU-s/trial with 2x hang headroom produce a 12,830 s wall cap:
+# trials * CPU-s/trial * dimensionless headroom = seconds.
+OPTIMIZER_STAGE_CHAIN_CPU_ESTIMATE_S = 1283
+OPTIMIZER_STAGE_HANG_HEADROOM = 2
+OPTIMIZER_STAGE_WORKER_HANG_WALL_S = (
+    OPTIMIZER_STAGE_TRIALS
+    * OPTIMIZER_STAGE_CHAIN_CPU_ESTIMATE_S
+    * OPTIMIZER_STAGE_HANG_HEADROOM
+)
 OPTIMIZER_REBASELINE_REASON = (
     "optimizer_60h_eval needs rebaseline on the reference machine after "
     "b-080 full-chain workload; owner action"
@@ -1234,7 +1245,11 @@ def measure_all(
                 capture_output=True,
                 check=False,
                 text=True,
-                timeout=STAGE_WORKER_HANG_WALL_S,
+                timeout=(
+                    OPTIMIZER_STAGE_WORKER_HANG_WALL_S
+                    if stage == OPTIMIZER_STAGE_NAME
+                    else STAGE_WORKER_HANG_WALL_S
+                ),
             )
             assert result.returncode == 0, (
                 f"{stage} isolated measurement repeat {repeat + 1}/{repeats} "
