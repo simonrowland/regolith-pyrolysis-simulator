@@ -1078,7 +1078,7 @@ def test_b2131_formation_gibbs_cells_land_at_printed_temperature(tmp_path):
     assert _landed_formation_points(acanthite[0]) == []
 
 
-def _b2131_formation_observation_serialization(tmp_path):
+def _b2131_formation_observations(tmp_path):
     source_id = "robie-hemingway-1995-usgs-b2131"
     root = _write_min_tree(tmp_path / "tree")
     source_dir = REPO_ROOT / "data/literature/compilations" / source_id
@@ -1099,10 +1099,7 @@ def _b2131_formation_observation_serialization(tmp_path):
         ),
         key=lambda obs: obs["observation_id"],
     )
-    payload = json.dumps(
-        observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    ).encode("utf-8")
-    return len(observations), hashlib.sha256(payload).hexdigest()
+    return observations
 
 
 def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
@@ -1114,9 +1111,45 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     # unavailable windows, p089/p115's one unavailable window, plus the
     # restored p274/p367 formula rows; reference p005-05/p005-11/p006-05/
     # p007-13 are typed unavailable. These are source-page grounded changes.
-    # d-413 admits the positively identified literature rows; only their
-    # serialized admission state, reason, and decision evidence change.
-    assert _b2131_formation_observation_serialization(tmp_path) == (
+    observations = _b2131_formation_observations(tmp_path)
+    stored = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "data/literature/observations-v2/compilations-robie-hemingway-1995-usgs-b2131.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    baseline = {
+        row["observation_id"]: row
+        for row in stored["observations"]
+        if row["identity"]["quantity"].get("value") == "delta_fG"
+    }
+    candidate = {row["observation_id"]: row for row in observations}
+    assert set(candidate) == set(baseline)
+    assert all(
+        {key: value for key, value in row.items() if key != "admission"}
+        == {
+            key: value
+            for key, value in baseline[observation_id].items()
+            if key != "admission"
+        }
+        for observation_id, row in candidate.items()
+    )
+    changed_admissions = {
+        observation_id: (baseline[observation_id]["admission"], row["admission"])
+        for observation_id, row in candidate.items()
+        if row["admission"] != baseline[observation_id]["admission"]
+    }
+    assert changed_admissions
+    assert all(
+        before["status"] == "pending" and after["status"] == "admitted"
+        for before, after in changed_admissions.values()
+    )
+    payload = json.dumps(
+        observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    # d-413 admits the positively identified literature rows. The payload
+    # diff above proves the admission object is the only changed field.
+    assert (len(observations), hashlib.sha256(payload).hexdigest()) == (
         945,
         "bf062b5860bc2f5ac3e1980a6d42e85ac9d10539c26b06449705a40a1234dda7",
     )
