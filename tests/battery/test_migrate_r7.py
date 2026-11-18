@@ -1078,7 +1078,7 @@ def test_b2131_formation_gibbs_cells_land_at_printed_temperature(tmp_path):
     assert _landed_formation_points(acanthite[0]) == []
 
 
-def _b2131_formation_observation_serialization(tmp_path):
+def _b2131_formation_observations(tmp_path):
     source_id = "robie-hemingway-1995-usgs-b2131"
     root = _write_min_tree(tmp_path / "tree")
     source_dir = REPO_ROOT / "data/literature/compilations" / source_id
@@ -1099,10 +1099,7 @@ def _b2131_formation_observation_serialization(tmp_path):
         ),
         key=lambda obs: obs["observation_id"],
     )
-    payload = json.dumps(
-        observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    ).encode("utf-8")
-    return len(observations), hashlib.sha256(payload).hexdigest()
+    return observations
 
 
 def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
@@ -1114,9 +1111,72 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     # unavailable windows, p089/p115's one unavailable window, plus the
     # restored p274/p367 formula rows; reference p005-05/p005-11/p006-05/
     # p007-13 are typed unavailable. These are source-page grounded changes.
-    assert _b2131_formation_observation_serialization(tmp_path) == (
+    observations = _b2131_formation_observations(tmp_path)
+    stored = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "data/literature/observations-v2/compilations-robie-hemingway-1995-usgs-b2131.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    baseline = {
+        row["observation_id"]: row
+        for row in stored["observations"]
+        if row["identity"]["quantity"].get("value") == "delta_fG"
+    }
+    baseline_rows = sorted(
+        baseline.values(), key=lambda row: row["observation_id"]
+    )
+    baseline_payload = json.dumps(
+        baseline_rows, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    assert (len(baseline_rows), hashlib.sha256(baseline_payload).hexdigest()) == (
         945,
         "13187d096dd3ffcc4079d147484c31edbfb8e432be9f2def01393a4cf1a2c2d7",
+    )
+    candidate = {row["observation_id"]: row for row in observations}
+    assert set(candidate) == set(baseline)
+    non_admission_diffs = {
+        observation_id: sorted(
+            key
+            for key in row.keys() | baseline[observation_id].keys()
+            if key != "admission" and row.get(key) != baseline[observation_id].get(key)
+        )
+        for observation_id, row in candidate.items()
+    }
+    non_admission_diffs = {
+        observation_id: fields
+        for observation_id, fields in non_admission_diffs.items()
+        if fields
+    }
+    assert non_admission_diffs
+    assert {
+        field for fields in non_admission_diffs.values() for field in fields
+    } == {"provenance"}, json.dumps(non_admission_diffs, sort_keys=True)
+    manifest = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "data/literature/compilations/robie-hemingway-1995-usgs-b2131/manifest.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    expected_role = manifest["compilation_role"]
+    assert all(
+        row["provenance"]["compilation_role"] == expected_role
+        for row in candidate.values()
+    )
+    changed_admissions = {
+        observation_id: (baseline[observation_id]["admission"], row["admission"])
+        for observation_id, row in candidate.items()
+        if row["admission"] != baseline[observation_id]["admission"]
+    }
+    assert not changed_admissions
+    payload = json.dumps(
+        observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    # The old digest matches the committed baseline exactly. These rows do not
+    # change admission; the new digest records the manifest role provenance.
+    assert (len(observations), hashlib.sha256(payload).hexdigest()) == (
+        945,
+        "bf062b5860bc2f5ac3e1980a6d42e85ac9d10539c26b06449705a40a1234dda7",
     )
 
 
