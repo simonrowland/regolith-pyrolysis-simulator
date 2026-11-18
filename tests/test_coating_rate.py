@@ -656,9 +656,15 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     assert hashlib.sha256(actual_bytes).hexdigest() == (
         # b-244: Al/Ti operator T_cond overrides removed (report-only); 14 text/audit leaves, 0 numeric; Al crossing authority -> capture_threshold_fallback.
         # b-1174: wall-report species = positive vapour supply; +20 zero-valued species keys, 0 changed/numeric leaves (train leaf diff).
+        # d-339: lunar row 15 changes native Fe activity and the Kress91 FeO
+        # seam baseline at 2023.15 K; OpenIMCC activity is unchanged.
         # IA stateless: the 7 hour-16 certified-gamma certificates carry hour/window_K/composition_window_L1 = null (21 leaves);
         # the history-dependent cap-step seam notice is gone (1 notice); 2 keys reordered; 0 numeric leaves changed. Payload = runner C0 fixture bytes.
-        "14387e1e0fe81b14d7557d4da279a8d62b9f6e5cab2d8a449931e958860db7de"
+        # b-1124: out-of-band native-Fe values now carry the Holzheid extrapolation notice and flags.
+        # Re-derived on b268+b-1124 at Studio: b-906's Langmuir surface-pO2
+        # closure and b-1124's d-339 continuation/notice propagation are both
+        # present in this 24-hour runner payload.
+        "2930f2d4282a624e02fc8694cfc53f7059324aac88a304eec498435f7ff64326"
     )
 
 

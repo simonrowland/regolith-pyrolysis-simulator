@@ -207,6 +207,45 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
     )
 
 
+def test_native_fe_holzheid_extrapolation_is_flagged_at_1610_c(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.fe_redox import LiquidFeODomain
+
+    sim = _make_sim("lunar_mare_low_ti", temperature_C=1610.0)
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.fO2_log = -10.0
+    sim.melt.melt_fO2_log = -10.0
+    liquid_domain = LiquidFeODomain(
+        below_liquidus=True,
+        temperature_K=1610.0 + 273.15,
+        liquidus_T_C=1650.0,
+        solidus_T_C=1050.0,
+        source="gate_liquid_fraction",
+    )
+    monkeypatch.setattr(
+        sim,
+        "liquid_feo_domain_at",
+        lambda _temperature_K: liquid_domain,
+    )
+
+    split = sim._compute_fe_redox_split_diagnostic()
+
+    assert split["native_fe_frac"] > 0.0
+    notices = split["notices"]
+    assert {notice["kind"] for notice in notices} == {
+        "liquid_model_below_liquidus",
+        "out_of_certified_band",
+    }
+    holzheid_notice = next(
+        notice for notice in notices if notice["kind"] == "out_of_certified_band"
+    )
+    assert holzheid_notice["authority_level"] == "extrapolated"
+    assert holzheid_notice["certified_band"] == {"temperature_C": (1300.0, 1600.0)}
+    assert split["authoritative"] is False
+    assert split["extrapolation"] is True
+
+
 def test_native_fe_authoritative_extent_ignores_diagnostic_payload(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
