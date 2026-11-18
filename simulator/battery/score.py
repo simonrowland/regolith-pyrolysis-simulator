@@ -5766,14 +5766,12 @@ def _derive_kems_partial_pressure_band(
     experiments: Mapping[str, Experiment],
     benches: Mapping[str, Bench],
 ) -> DecisionBand | None:
-    """Resolve pressure uncertainty from source-admitted measured KEMS rows.
-
-    A printed pressure envelope is measurement evidence; it does not depend
-    on a run-composition or apparatus validation stratum. Replicate fallback
-    remains limited to unflagged rows below.
-    """
+    """Resolve one band from admitted measured KEMS partial-pressure rows."""
 
     candidates = []
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        observations.values()
+    )
     for observation in observations.values():
         identity = observation.identity
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
@@ -5783,6 +5781,11 @@ def _derive_kems_partial_pressure_band(
         if _has_ungrounded_kems_partial_pressure_calibration(
             observation, experiment
         ):
+            continue
+        strata = _observation_flagged_strata(
+            observation, experiments, point_observations_by_experiment, benches
+        )
+        if strata:
             continue
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:

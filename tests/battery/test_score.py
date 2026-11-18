@@ -2209,8 +2209,9 @@ def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
     assert "source-printed pressure envelope" in band.rule
 
 
-def test_kems_printed_pressure_envelope_does_not_depend_on_proxy_composition() -> None:
+def test_kems_printed_pressure_envelope_excludes_validation_flagged_rows() -> None:
     from simulator.battery.score import derive_kems_partial_pressure_band
+    from simulator.battery.validity import run_validity_gates
 
     experiment = F.kems_experiment("initial-charge-proxy-band", kn=20)
     composition = Composition(
@@ -2219,9 +2220,9 @@ def test_kems_printed_pressure_envelope_does_not_depend_on_proxy_composition() -
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
     proxy = replace(composition, proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG)
-    proxy_row = replace(
+    row = replace(
         F.observation(
-            "initial-charge-proxy-band-row",
+            "validation-flagged-pressure-envelope-row",
             experiment.experiment_id,
             replace(_partial_identity(), composition=State.of(proxy)),
             Decimal("10"),
@@ -2232,24 +2233,15 @@ def test_kems_printed_pressure_envelope_does_not_depend_on_proxy_composition() -
             verbatim="The source reports pressure errors no higher than 7%.",
         ),
     )
-    direct_row = replace(
-        proxy_row,
-        observation_id="direct-composition-band-row",
-        identity=replace(proxy_row.identity, composition=State.of(composition)),
+    gates = run_validity_gates(
+        experiment, row, point_observations=(row,)
     )
-    experiments = {experiment.experiment_id: experiment}
-
-    proxy_band = derive_kems_partial_pressure_band(
-        {proxy_row.observation_id: proxy_row}, experiments
-    )
-    direct_band = derive_kems_partial_pressure_band(
-        {direct_row.observation_id: direct_row}, experiments
+    band = derive_kems_partial_pressure_band(
+        {row.observation_id: row}, {experiment.experiment_id: experiment}
     )
 
-    assert proxy_band == direct_band
-    assert proxy_band is not None
-    assert proxy_band.value > 0
-    assert "source-printed pressure envelope" in proxy_band.rule
+    assert not gates.passed
+    assert band is None
 
 
 def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(
