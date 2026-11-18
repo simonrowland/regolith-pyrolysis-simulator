@@ -5534,6 +5534,8 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # extract, and 3 unattested samples. Existing extract counts are unchanged:
 # uncovered observations 50791 -> 51432, extracts 639 -> 640, samples
 # 3385 -> 3388.
+# The six t-1859 extracts also move the unmounted corpus-wide source_blind_pin
+# count from 124 to 252; the added pins resolve with the corpus root mounted.
 # Each ceiling may only fall.
 _UNCOVERED_OBSERVATIONS_CEILING = 52231
 _UNCOVERED_EXTRACTS_CEILING = 645
@@ -5719,7 +5721,7 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     ambiguous_ids = unmounted["ambiguous_observation_id"]
     missing_ids = unmounted["missing_observation_id"]
     non_finite = unmounted["non_finite_evidence"]
-    assert source_blind_pins == 124
+    assert source_blind_pins == 252
     record_property("mount_dependent_pins", mount_dependent_pins)
     assert mount_dependent_pins <= source_blind_pins
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
