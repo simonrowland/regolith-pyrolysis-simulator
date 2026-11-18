@@ -6,10 +6,10 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.accounting import resolve_species_formula
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import CampaignPhase
+from tests.ledger_test_support import _transition_account_species_mol
 from tests.magemin_test_support import close_test_owned_magemin_backend
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,24 +17,6 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def _load_yaml(name: str) -> dict:
     return yaml.safe_load((ROOT / "data" / name).read_text())
-
-
-def _transition_species_mol(
-    sim: PyrolysisSimulator,
-    transition,
-    *,
-    side: str,
-    species: str,
-    account: str | None = None,
-) -> float:
-    formula = resolve_species_formula(species, sim.species_formula_registry)
-    lots = transition.debits if side == "debits" else transition.credits
-    return sum(
-        float(lot.species_kg.get(species, 0.0))
-        / formula.molar_mass_kg_per_mol()
-        for lot in lots
-        if account is None or lot.account == account
-    )
 
 
 def test_c7_ca_shuttle_feedback_commits_surplus_from_real_profile() -> None:
@@ -126,20 +108,24 @@ def test_c7_ca_shuttle_feedback_commits_surplus_from_real_profile() -> None:
             for transition in sim.atom_ledger.transitions[transitions_before:]
             if transition.name == "ca_shuttle_alumina_feedback"
         )
-        assert _transition_species_mol(
+        assert _transition_account_species_mol(
             sim,
             shuttle_transition,
             side="debits",
             species="Ca",
             account="process.condensation_train",
         ) == pytest.approx(expected_ca_debit_mol)
-        assert _transition_species_mol(
-            sim,
-            shuttle_transition,
-            side="debits",
-            species="Al2O3",
+        assert sum(
+            _transition_account_species_mol(
+                sim,
+                shuttle_transition,
+                side="debits",
+                species="Al2O3",
+                account=account,
+            )
+            for account in ("process.cleaned_melt", "terminal.slag")
         ) == pytest.approx(expected_al2o3_debit_mol)
-        assert _transition_species_mol(
+        assert _transition_account_species_mol(
             sim,
             shuttle_transition,
             side="credits",

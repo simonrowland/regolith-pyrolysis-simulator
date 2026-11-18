@@ -46,6 +46,7 @@ def test_type_checking_import_used_only_in_annotation_is_allowed(
     guard: str,
 ) -> None:
     source = (
+        "from __future__ import annotations\n"
         f"{header}\n"
         f"if {guard}:\n"
         "    from collections.abc import Iterable\n"
@@ -57,6 +58,96 @@ def test_type_checking_import_used_only_in_annotation_is_allowed(
     path.write_text(source)
 
     assert undefined_names(path) == ()
+
+
+@pytest.mark.parametrize(
+    ("declaration", "line"),
+    [
+        ("def consume(value: TypeOnly):\n    return None\n", 5),
+        ("def produce() -> TypeOnly:\n    return None\n", 5),
+        ("module_value: TypeOnly\n", 5),
+        ("class Box:\n    value: TypeOnly\n", 6),
+    ],
+)
+def test_eager_type_checking_annotations_are_reported(
+    tmp_path: Path,
+    declaration: str,
+    line: int,
+) -> None:
+    source = (
+        "from typing import TYPE_CHECKING\n"
+        "if TYPE_CHECKING:\n"
+        "    from collections.abc import Iterable as TypeOnly\n"
+        "\n"
+        f"{declaration}"
+    )
+    path = tmp_path / "eager_annotations.py"
+    path.write_text(source)
+
+    assert undefined_names(path) == (("TypeOnly", line),)
+
+
+@pytest.mark.parametrize(
+    "declaration",
+    [
+        "def consume(value: TypeOnly):\n    return None\n",
+        "def produce() -> TypeOnly:\n    return None\n",
+        "module_value: TypeOnly\n",
+        "class Box:\n    value: TypeOnly\n",
+    ],
+)
+def test_postponed_type_checking_annotations_are_allowed(
+    tmp_path: Path,
+    declaration: str,
+) -> None:
+    source = (
+        "from __future__ import annotations\n"
+        "from typing import TYPE_CHECKING\n"
+        "if TYPE_CHECKING:\n"
+        "    from collections.abc import Iterable as TypeOnly\n"
+        "\n"
+        f"{declaration}"
+    )
+    path = tmp_path / "postponed_annotations.py"
+    path.write_text(source)
+
+    assert undefined_names(path) == ()
+
+
+def test_local_variable_annotation_is_not_evaluated(tmp_path: Path) -> None:
+    path = tmp_path / "local_annotation.py"
+    path.write_text(
+        "from typing import TYPE_CHECKING\n"
+        "if TYPE_CHECKING:\n"
+        "    from collections.abc import Iterable as TypeOnly\n"
+        "\n"
+        "def consume():\n"
+        "    local_value: TypeOnly\n"
+    )
+
+    assert undefined_names(path) == ()
+
+
+@pytest.mark.parametrize(
+    "expression",
+    [
+        "[missing for value in values]",
+        "{missing for value in values}",
+        "{value: missing for value in values}",
+        "(missing for value in values)",
+    ],
+)
+def test_undefined_names_in_comprehensions_are_reported(
+    tmp_path: Path,
+    expression: str,
+) -> None:
+    path = tmp_path / "comprehension.py"
+    path.write_text(
+        "def collect(values):\n"
+        f"    return {expression}\n"
+    )
+
+    assert undefined_names(path) == (("missing", 2),)
 
 
 def test_undefined_load_line_comes_from_its_own_scope(tmp_path: Path) -> None:

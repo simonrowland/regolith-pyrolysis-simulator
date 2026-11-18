@@ -28,7 +28,13 @@ def undefined_names(path: Path) -> tuple[tuple[str, int], ...]:
     source = path.read_text(encoding="utf-8")
     tree = ast.parse(source, filename=str(path))
     top = symtable.symtable(source, str(path), "exec")
-    runtime_loads = _runtime_loads(tree, top)
+    postponed_annotations = any(
+        isinstance(statement, ast.ImportFrom)
+        and statement.module == "__future__"
+        and any(alias.name == "annotations" for alias in statement.names)
+        for statement in tree.body
+    )
+    runtime_loads = _runtime_loads(tree, top, postponed_annotations)
     type_checking_imports, runtime_imports = _module_imports(tree)
     defined = {
         symbol.get_name()
@@ -77,8 +83,22 @@ def _scope_key(table: symtable.SymbolTable) -> _ScopeKey:
 def _runtime_loads(
     tree: ast.Module,
     top: symtable.SymbolTable,
+    postponed_annotations: bool,
 ) -> dict[_ScopeKey, dict[str, int]]:
     loads: dict[_ScopeKey, dict[str, int]] = {}
+    symbol_scopes: set[_ScopeKey] = set()
+
+    def collect_scopes(table: symtable.SymbolTable) -> None:
+        symbol_scopes.add(_scope_key(table))
+        for child in table.get_children():
+            collect_scopes(child)
+
+    collect_scopes(top)
+
+    def annotation_scope(outer_scope: _ScopeKey, line: int) -> _ScopeKey:
+        # Python 3.14 reports eager annotations in an annotation child table.
+        candidate = ("annotation", "__annotate__", line)
+        return candidate if candidate in symbol_scopes else outer_scope
 
     def record(node: ast.Name, scope: _ScopeKey) -> None:
         if isinstance(node.ctx, ast.Load):
@@ -97,6 +117,21 @@ def _runtime_loads(
             for default in (*node.args.defaults, *node.args.kw_defaults):
                 if default is not None:
                     visit(default, scope)
+            if not postponed_annotations:
+                arguments = [
+                    *node.args.posonlyargs,
+                    *node.args.args,
+                    *node.args.kwonlyargs,
+                ]
+                if node.args.vararg is not None:
+                    arguments.append(node.args.vararg)
+                if node.args.kwarg is not None:
+                    arguments.append(node.args.kwarg)
+                for argument in arguments:
+                    if argument.annotation is not None:
+                        visit(argument.annotation, annotation_scope(scope, node.lineno))
+                if node.returns is not None:
+                    visit(node.returns, annotation_scope(scope, node.lineno))
             function_scope = ("function", node.name, node.lineno)
             for statement in node.body:
                 visit(statement, function_scope)
@@ -120,13 +155,15 @@ def _runtime_loads(
             return
         if isinstance(node, ast.AnnAssign):
             visit(node.target, scope)
+            if not postponed_annotations and scope[0] != "function":
+                visit(node.annotation, annotation_scope(scope, node.lineno))
             if node.value is not None:
                 visit(node.value, scope)
             return
         if isinstance(node, ast.arg):
             return
         if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
-            _visit_comprehension(node, scope, visit)
+            _visit_comprehension(node, scope, visit, symbol_scopes)
             return
         for child in ast.iter_child_nodes(node):
             visit(child, scope)
@@ -139,6 +176,7 @@ def _visit_comprehension(
     node: ast.ListComp | ast.SetComp | ast.DictComp | ast.GeneratorExp,
     outer_scope: _ScopeKey,
     visit,
+    symbol_scopes: set[_ScopeKey],
 ) -> None:
     if not node.generators:
         return
@@ -150,7 +188,8 @@ def _visit_comprehension(
         ast.DictComp: "dictcomp",
         ast.GeneratorExp: "genexpr",
     }
-    inner_scope = ("function", names[type(node)], node.lineno)
+    child_scope = ("function", names[type(node)], node.lineno)
+    inner_scope = child_scope if child_scope in symbol_scopes else outer_scope
     for index, generator in enumerate(node.generators):
         if index:
             visit(generator.iter, inner_scope)
