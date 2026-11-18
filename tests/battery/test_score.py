@@ -6609,6 +6609,10 @@ def test_d274_unknown_point_condition_keeps_own_pressure_refusal_detail(
     assert pressure_check.detail["pressure_limit_Pa"] == "10"
     if Decimal(pressure_text) > Decimal("10"):
         assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == pressure_text
+    else:
+        # The scored row's own pressure is a lower bound only. Unknown fO2
+        # fails the same-point check, so coverage is not established.
+        assert "printed_partial_pressure_sum_Pa" not in pressure_check.detail
 
     residual, _ = compile_residual(
         pressure,
@@ -6631,19 +6635,14 @@ def test_d274_unknown_point_condition_keeps_own_pressure_refusal_detail(
         )
         assert residual.refusal.detail["limit_Pa"] == "10"
     else:
-        # Coverage is not established, so the cell stays under the limit and
-        # the apparatus check is a notice. Prediction continues.
-        assert residual.status is not ResidualStatus.REFUSED
-        assert residual.refusal is None
-        assert residual.numeric is not None
-        apparatus_notices = [
-            notice
-            for notice in residual.notices
-            if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
-            and "in_cell_partial_pressure_sum" in notice.reason
-        ]
-        assert len(apparatus_notices) == 1
-        assert "incomplete printed species coverage" in apparatus_notices[0].reason
+        # SiO(g) from SiO2(l) needs pO2. Unknown fO2 is a missing identity
+        # input and refuses before the apparatus flag. The gate above is what
+        # shows coverage was not established.
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+        assert residual.refusal.detail["fields"] == ["fO2_Pa"]
 
 
 @pytest.mark.parametrize(
