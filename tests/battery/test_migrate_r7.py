@@ -1138,7 +1138,21 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
         for observation_id, fields in non_admission_diffs.items()
         if fields
     }
-    assert not non_admission_diffs, json.dumps(non_admission_diffs, sort_keys=True)
+    assert non_admission_diffs
+    assert {
+        field for fields in non_admission_diffs.values() for field in fields
+    } == {"provenance"}, json.dumps(non_admission_diffs, sort_keys=True)
+    manifest = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "data/literature/compilations/robie-hemingway-1995-usgs-b2131/manifest.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    expected_role = manifest["compilation_role"]
+    assert all(
+        row["provenance"]["compilation_role"] == expected_role
+        for row in candidate.values()
+    )
     changed_admissions = {
         observation_id: (baseline[observation_id]["admission"], row["admission"])
         for observation_id, row in candidate.items()
@@ -1146,14 +1160,18 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     }
     assert changed_admissions
     assert all(
-        before["status"] == "pending" and after["status"] == "admitted"
+        before["status"] == "pending"
+        and before["reason"] == "no observation admission_status mapped from source"
+        and after["status"] == "admitted"
+        and after["reason"] == "batch admission d-413-batch-literature"
+        and after["decided_by"]["worker"] == "d-413-batch-literature"
         for before, after in changed_admissions.values()
     )
     payload = json.dumps(
         observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
-    # d-413 admits the positively identified literature rows. The payload
-    # diff above proves the admission object is the only changed field.
+    # d-413 changes admission on positive literature evidence, and the
+    # manifest adds its declared compilation role provenance.
     assert (len(observations), hashlib.sha256(payload).hexdigest()) == (
         945,
         "bf062b5860bc2f5ac3e1980a6d42e85ac9d10539c26b06449705a40a1234dda7",
