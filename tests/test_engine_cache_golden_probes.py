@@ -311,7 +311,7 @@ def _run_probe(
     # subprocess.run kills and reaps the probe if its outer deadline expires.
     completed = subprocess.run(
         [
-            sys.executable, "-m", __name__, engine_name,
+            sys.executable, "-m", "tests.test_engine_cache_golden_probes", engine_name,
             request.node.nodeid, str(result_path), str(int(mutate_cold)),
         ],
         cwd=engine_cache._ENGINE_CACHE_ROOT,
