@@ -176,6 +176,8 @@ from simulator.battery.migrate import (
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
+    effective_run_composition,
+    invalid_run_composition,
     ALPHA_GAS_SYSTEM_H2,
     HK_RATIO_ALPHA_DEFINITION,
     evaporation_alpha_family_key,
@@ -14338,14 +14340,46 @@ def _predict_with_engine(
                 requested_composition=requested,
                 version=activity.activity_model,
             )
-    elif identity.composition is not None and identity.composition.is_value:
+    elif quantity in _VAPOUR_EQUILIBRIUM and invalid_run_composition(
+        run_composition := effective_run_composition(
+            identity, observation.point_conditions
+        )
+    ):
+        # An invalid printed run map refuses before the pure-reservoir
+        # fallback. The charge proxy is not a substitute for that map.
+        assert run_composition is not None
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=None,
+            reason=RefusalReason.INVALID_SOURCE,
+            detail={
+                "reason": run_composition.reason
+                or RefusalReason.INVALID_SOURCE.value,
+                "consumer": "vapour",
+            },
+            notices=_knudsen_oxygen_refusal_notices(quantity, experiment),
+        )
+    elif (
+        identity.composition is not None
+        and identity.composition.is_value
+        and (
+            run_composition := effective_run_composition(
+                identity, observation.point_conditions
+            )
+        )
+        is not None
+        and run_composition.is_value
+    ):
         if sample_phase_detail is not None:
             return _sample_phase_not_observable_prediction(
                 engine, identity, sample_phase_detail
             )
-        requested = identity.composition
-        assert identity.composition.value is not None
-        composition_value = identity.composition.value
+        requested = run_composition
+        assert run_composition.value is not None
+        composition_value = run_composition.value
     elif quantity in _VAPOUR_EQUILIBRIUM and (
         point_composition := _printed_point_composition(observation)[0]
     ) is not None:
