@@ -14,6 +14,7 @@ from collections.abc import Mapping as MappingABC, Sequence as SequenceABC
 from dataclasses import MISSING, fields, replace
 import errno
 import fcntl
+import hashlib
 import json
 import math
 import os
@@ -77,6 +78,10 @@ APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
 READ_COMPATIBILITY_REJECTION_NOTE_PREFIX = (
     "result_store_read_compatibility_rejections:"
 )
+_RESULT_BLOB_ENVELOPE_KEY = "__optimizer_result_store_envelope_v1__"
+_RESULT_BLOB_SHARED_STATUS_PAYLOADS_KEY = "shared_status_payloads"
+_SHARED_STATUS_PAYLOAD_REF_KEY = "__optimizer_result_store_ref_v1__"
+_SHARED_COATING_WARNING_FIELDS = frozenset({"authority", "flags"})
 
 __all__ = [
     "DEFAULT_BUSY_TIMEOUT_MS",
@@ -317,7 +322,15 @@ class ResultStore:
         _validate_result_artifact(eval_spec, scored_result)
         _assert_cache_write_admissible(scored_result)
         objectives = _serialize_objectives(scored_result.objectives)
-        result_blob = _result_blob(scored_result)
+        shared_status_payloads: dict[str, Any] = {}
+        serialized_margins = _serialize_margins(
+            scored_result.feasibility_margins,
+            shared_status_payloads=shared_status_payloads,
+        )
+        result_blob = _result_blob(
+            scored_result,
+            shared_status_payloads=shared_status_payloads,
+        )
         corpus_version = current_corpus_version()
         def write(conn: sqlite3.Connection) -> None:
             conn.execute(
@@ -370,7 +383,7 @@ class ResultStore:
                         else None
                     ),
                     _json_dump(objectives),
-                    _json_dump(_serialize_margins(scored_result.feasibility_margins)),
+                    _json_dump(serialized_margins),
                     _json_dump(list(scored_result.failing_gates)),
                     scored_result.candidate_id,
                     _json_dump(result_blob),
@@ -819,7 +832,13 @@ def _law_disclosures_from_row(row: sqlite3.Row) -> tuple[dict[str, Any], ...] | 
 def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
     failure_category = row["failure_category"]
     failure = FailureCategory(failure_category) if failure_category is not None else None
-    margins = _deserialize_grounding_margins(row["feasibility_margins"])
+    result_blob, shared_status_payloads = _deserialize_result_blob(
+        _json_load(row["result_blob"])
+    )
+    margins = _deserialize_grounding_margins(
+        row["feasibility_margins"],
+        shared_status_payloads=shared_status_payloads,
+    )
     feasible = grounded_result_feasible(
         bool(row["feasible"]),
         failure_category=failure,
@@ -842,7 +861,7 @@ def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
         ),
         run_reference=_deserialize_run_reference(
             _json_load(row["run_reference"]),
-            _json_load(row["result_blob"]),
+            result_blob,
         ),
         notes=tuple(_json_load(row["notes"])),
         law_disclosures=_law_disclosures_from_row(row),
@@ -1564,7 +1583,11 @@ def _objective_payload_sense(item: Mapping[str, Any]) -> str:
     return normalize_objective_sense(str(item["sense"]))
 
 
-def _serialize_margins(margins: Mapping[str, GateMargin]) -> dict[str, dict[str, Any]]:
+def _serialize_margins(
+    margins: Mapping[str, GateMargin],
+    *,
+    shared_status_payloads: dict[str, Any] | None = None,
+) -> dict[str, dict[str, Any]]:
     result: dict[str, dict[str, Any]] = {}
     for gate, margin in margins.items():
         payload = {
@@ -1585,22 +1608,89 @@ def _serialize_margins(margins: Mapping[str, GateMargin]) -> dict[str, dict[str,
             ),
             "detail": margin.detail,
         }
-        _add_margin_status_fields(payload, margin)
+        _add_margin_status_fields(
+            payload,
+            margin,
+            shared_status_payloads=shared_status_payloads,
+        )
         result[gate] = payload
     return result
 
 
-def _add_margin_status_fields(payload: dict[str, Any], margin: GateMargin) -> None:
+def _add_margin_status_fields(
+    payload: dict[str, Any],
+    margin: GateMargin,
+    *,
+    shared_status_payloads: dict[str, Any] | None = None,
+) -> None:
     payload["status"] = margin.status
     payload["authoritative"] = bool(margin.authoritative)
     payload["output_status"] = margin.output_status
     if margin.status_reason:
         payload["status_reason"] = margin.status_reason
     if margin.status_payload:
-        payload["status_payload"] = _jsonable(margin.status_payload)
+        payload["status_payload"] = _serialize_status_payload(
+            margin.status_payload,
+            shared_status_payloads=shared_status_payloads,
+        )
 
 
-def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, GateMargin]:
+def _serialize_status_payload(
+    status_payload: Mapping[str, Any],
+    *,
+    shared_status_payloads: dict[str, Any] | None,
+) -> dict[str, Any]:
+    serialized: dict[str, Any] = {}
+    for key, value in status_payload.items():
+        key_string = str(key)
+        if (
+            shared_status_payloads is not None
+            and key_string == "coating_warning_flags"
+            and isinstance(value, SequenceABC)
+            and not isinstance(value, (str, bytes))
+        ):
+            serialized[key_string] = _serialize_coating_warning_flags(
+                value,
+                shared_status_payloads,
+            )
+        else:
+            serialized[key_string] = _jsonable(value)
+    return serialized
+
+
+def _serialize_coating_warning_flags(
+    warning_flags: SequenceABC[Any],
+    shared_status_payloads: dict[str, Any],
+) -> list[Any]:
+    serialized_flags: list[Any] = []
+    for warning in warning_flags:
+        if not isinstance(warning, MappingABC):
+            serialized_flags.append(_jsonable(warning))
+            continue
+        serialized_warning: dict[str, Any] = {}
+        for key, value in warning.items():
+            key_string = str(key)
+            if (
+                key_string in _SHARED_COATING_WARNING_FIELDS
+                and isinstance(value, MappingABC)
+            ):
+                shared_value = _jsonable(value)
+                digest = hashlib.sha256(_json_dump(shared_value).encode()).hexdigest()
+                shared_status_payloads.setdefault(digest, shared_value)
+                serialized_warning[key_string] = {
+                    _SHARED_STATUS_PAYLOAD_REF_KEY: digest,
+                }
+            else:
+                serialized_warning[key_string] = _jsonable(value)
+        serialized_flags.append(serialized_warning)
+    return serialized_flags
+
+
+def _deserialize_margins(
+    payload: Mapping[str, Mapping[str, Any]],
+    *,
+    shared_status_payloads: Mapping[str, Any] | None = None,
+) -> dict[str, GateMargin]:
     margins: dict[str, GateMargin] = {}
     for gate, item in payload.items():
         threshold = item["threshold"]
@@ -1615,6 +1705,11 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
             if isinstance(item.get("status_payload", {}), Mapping)
             else {}
         )
+        if isinstance(status_payload, dict):
+            _resolve_shared_coating_warning_flags(
+                status_payload,
+                shared_status_payloads,
+            )
         observed_raw = item.get("observed")
         observed_value = (
             None
@@ -1685,7 +1780,37 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
     return margins
 
 
-def _deserialize_grounding_margins(payload: Any) -> dict[str, GateMargin]:
+def _resolve_shared_coating_warning_flags(
+    status_payload: dict[str, Any],
+    shared_status_payloads: Mapping[str, Any] | None,
+) -> None:
+    warning_flags = status_payload.get("coating_warning_flags")
+    if not isinstance(warning_flags, list):
+        return
+    for warning in warning_flags:
+        if not isinstance(warning, dict):
+            continue
+        for key in _SHARED_COATING_WARNING_FIELDS:
+            reference = warning.get(key)
+            if (
+                not isinstance(reference, MappingABC)
+                or set(reference) != {_SHARED_STATUS_PAYLOAD_REF_KEY}
+            ):
+                continue
+            digest = str(reference[_SHARED_STATUS_PAYLOAD_REF_KEY])
+            if shared_status_payloads is None or digest not in shared_status_payloads:
+                raise ResultStoreSchemaError(
+                    "optimizer result-store shared coating payload is missing: "
+                    f"{digest}"
+                )
+            warning[key] = shared_status_payloads[digest]
+
+
+def _deserialize_grounding_margins(
+    payload: Any,
+    *,
+    shared_status_payloads: Mapping[str, Any] | None = None,
+) -> dict[str, GateMargin]:
     try:
         decoded = _json_load(payload) if isinstance(payload, str) else payload
     except (TypeError, ValueError):
@@ -1693,7 +1818,10 @@ def _deserialize_grounding_margins(payload: Any) -> dict[str, GateMargin]:
     if not isinstance(decoded, Mapping):
         return {}
     try:
-        return _deserialize_margins(decoded)
+        return _deserialize_margins(
+            decoded,
+            shared_status_payloads=shared_status_payloads,
+        )
     except (KeyError, TypeError, ValueError):
         return {}
 
@@ -1818,15 +1946,51 @@ def _deserialize_run_reference(
     return reference
 
 
-def _result_blob(scored_result: ScoredResult) -> Any:
+def _result_blob(
+    scored_result: ScoredResult,
+    *,
+    shared_status_payloads: Mapping[str, Any] | None = None,
+) -> Any:
     if hasattr(scored_result, "result_blob"):
-        return _jsonable(getattr(scored_result, "result_blob"))
-    if scored_result.run_reference is None:
-        return None
-    try:
-        return _jsonable(scored_result.run_reference.trace)
-    except (TypeError, ValueError):
-        return _storage_run_reference_trace(scored_result.run_reference)
+        result_blob = _jsonable(getattr(scored_result, "result_blob"))
+    elif scored_result.run_reference is None:
+        result_blob = None
+    else:
+        try:
+            result_blob = _jsonable(scored_result.run_reference.trace)
+        except (TypeError, ValueError):
+            result_blob = _storage_run_reference_trace(scored_result.run_reference)
+    if shared_status_payloads:
+        return {
+            _RESULT_BLOB_ENVELOPE_KEY: {
+                "trace": result_blob,
+                _RESULT_BLOB_SHARED_STATUS_PAYLOADS_KEY: dict(
+                    shared_status_payloads
+                ),
+            }
+        }
+    return result_blob
+
+
+def _deserialize_result_blob(
+    payload: Any,
+) -> tuple[Any, Mapping[str, Any] | None]:
+    if not isinstance(payload, MappingABC) or _RESULT_BLOB_ENVELOPE_KEY not in payload:
+        return payload, None
+    envelope = payload[_RESULT_BLOB_ENVELOPE_KEY]
+    if not isinstance(envelope, MappingABC) or "trace" not in envelope:
+        raise ResultStoreSchemaError(
+            "optimizer result-store payload envelope is malformed"
+        )
+    shared_status_payloads = envelope.get(
+        _RESULT_BLOB_SHARED_STATUS_PAYLOADS_KEY,
+        {},
+    )
+    if not isinstance(shared_status_payloads, MappingABC):
+        raise ResultStoreSchemaError(
+            "optimizer result-store shared status payloads are malformed"
+        )
+    return envelope["trace"], shared_status_payloads
 
 
 def _storage_run_reference_trace(run_reference: RunReference) -> dict[str, Any]:

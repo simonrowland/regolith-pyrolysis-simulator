@@ -32,6 +32,7 @@ from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, Thresho
 from simulator.optimize.result_scope import result_scope_payload, selector_where
 from simulator.optimize.results_store import (
     ResultStore,
+    ResultStoreSchemaError,
     ResultStoreWriteLock,
     ResultStoreWriteLockTimeout,
     ResultStoreWriteRejected,
@@ -490,6 +491,83 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
         "glass_status": "unavailable",
         "glass_status_reason": "stage_3_missing",
     }
+
+
+def test_coating_warning_flag_shared_payloads_round_trip(tmp_path) -> None:
+    spec = _base_spec()
+    authority = {
+        "carrier_authority": {
+            f"species-{index}": {"status": "status_bearing", "detail": "wall evidence" * 20}
+            for index in range(40)
+        },
+        "extrapolations": [{"temperature_C": 1200.0 + index} for index in range(40)],
+    }
+    flags = {"status": "status_bearing", "codes": ["wall_evidence_pending"]}
+    warning_flags = [
+        {
+            "reason": "upstream_hot_wall_refused",
+            "authority": authority,
+            "flags": flags,
+            "finding": {"segment": f"segment-{index}", "species": "SiO"},
+        }
+        for index in range(4)
+    ]
+    status_payload = {
+        "coating_verdict": "clear",
+        "coating_diagnostics": {"upstream_hot_wall_findings": []},
+        "coating_warning_flags": warning_flags,
+    }
+    scored = _scored(
+        spec,
+        margins={
+            "coating": _coating_margin(
+                feasible=True,
+                observed=11.0,
+                threshold=10.0,
+                status_payload=status_payload,
+            )
+        },
+    )
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+
+    store.store(spec, scored, created_at="2026-11-17T00:00:00Z")
+    loaded = store.lookup(spec)
+
+    assert loaded is not None
+    assert loaded.feasibility_margins["coating"].status_payload == status_payload
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        row = conn.execute(
+            "SELECT feasibility_margins, result_blob FROM results WHERE cache_key = ?",
+            (cache_key(spec),),
+        ).fetchone()
+    stored_margins = json.loads(row[0])
+    stored_flags = stored_margins["coating"]["status_payload"]["coating_warning_flags"]
+    envelope = json.loads(row[1])["__optimizer_result_store_envelope_v1__"]
+    assert len(envelope["shared_status_payloads"]) == 2
+    assert all(
+        set(flag["authority"]) == {"__optimizer_result_store_ref_v1__"}
+        and set(flag["flags"]) == {"__optimizer_result_store_ref_v1__"}
+        for flag in stored_flags
+    )
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        conn.execute(
+            "UPDATE results SET result_blob = ? WHERE cache_key = ?",
+            (
+                json.dumps({
+                    "__optimizer_result_store_envelope_v1__": {
+                        "trace": envelope["trace"],
+                        "shared_status_payloads": {},
+                    }
+                }),
+                cache_key(spec),
+            ),
+        )
+    with pytest.raises(ResultStoreSchemaError, match="shared coating payload is missing"):
+        store.lookup(spec)
 
 
 def test_lookup_preserves_finite_objectives_on_infeasible_rows(tmp_path) -> None:

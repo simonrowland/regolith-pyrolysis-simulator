@@ -17,6 +17,7 @@ import os
 import platform
 import re
 import resource
+import sqlite3
 import statistics
 import subprocess
 import sys
@@ -960,7 +961,7 @@ def _measure_optimizer_profile_campaign_chain_stage(
     from simulator.core import PyrolysisSimulator
     from simulator.optimize.evaluate import evaluate
     from simulator.optimize.profiles import load_profile
-    from simulator.optimize.results_store import ResultStore
+    from simulator.optimize.results_store import ResultStore, _jsonable
     from simulator.optimize.study import _strip_heavy_result
     from simulator.recipe import RecipePatch
 
@@ -1038,6 +1039,52 @@ def _measure_optimizer_profile_campaign_chain_stage(
             )
             cached = store.lookup(scored.eval_spec)
             assert cached is not None and cached.cache_key == scored.cache_key
+            expected_coating = cacheable.feasibility_margins.get("coating")
+            cached_coating = cached.feasibility_margins.get("coating")
+            assert expected_coating is not None and cached_coating is not None
+            expected_payload = expected_coating.status_payload
+            cached_payload = cached_coating.status_payload
+            assert set(cached_payload) == set(expected_payload)
+            expected_warning_flags = expected_payload["coating_warning_flags"]
+            cached_warning_flags = cached_payload["coating_warning_flags"]
+            assert len(cached_warning_flags) == len(expected_warning_flags)
+            shared_payload_ids: set[int] = set()
+            for expected_warning, cached_warning in zip(
+                expected_warning_flags,
+                cached_warning_flags,
+                strict=True,
+            ):
+                assert set(cached_warning) == set(expected_warning)
+                for key in set(expected_warning) - {"authority", "flags"}:
+                    assert _jsonable(cached_warning[key]) == _jsonable(
+                        expected_warning[key]
+                    )
+                for key in ("authority", "flags"):
+                    shared_value = cached_warning[key]
+                    shared_identity = id(shared_value)
+                    if shared_identity not in shared_payload_ids:
+                        assert _jsonable(shared_value) == _jsonable(
+                            expected_warning[key]
+                        )
+                        shared_payload_ids.add(shared_identity)
+            for key in set(expected_payload) - {"coating_warning_flags"}:
+                assert _jsonable(cached_payload[key]) == _jsonable(
+                    expected_payload[key]
+                )
+            with sqlite3.connect(store.path) as conn:
+                stored_payload_sizes = conn.execute(
+                    """
+                    SELECT
+                        length(CAST(feasibility_margins AS BLOB)),
+                        length(CAST(result_blob AS BLOB))
+                    FROM results WHERE cache_key = ?
+                    """,
+                    (scored.cache_key,),
+                ).fetchone()
+            assert stored_payload_sizes is not None
+            max_stored_text_cell_bytes = max(
+                int(size) for size in stored_payload_sizes
+            )
             assert step_calls["count"] == trace_hours
 
         # Premise: each counted call advances one campaign hour. Algebra:
@@ -1062,6 +1109,7 @@ def _measure_optimizer_profile_campaign_chain_stage(
                 "same_patch_cache_hit": True,
                 "cache_hit_counted": False,
                 "cache_hit_work_units": 0,
+                "max_stored_text_cell_bytes": max_stored_text_cell_bytes,
             }
         )
 
