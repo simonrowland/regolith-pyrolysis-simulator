@@ -17,6 +17,7 @@ import os
 import platform
 import re
 import resource
+import sqlite3
 import statistics
 import subprocess
 import sys
@@ -24,7 +25,7 @@ import tempfile
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Mapping
+from typing import Any, Callable, Mapping, Sequence
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -51,8 +52,26 @@ BASELINE_PATH = REPO_ROOT / "tests" / "perf" / "perf_ratchet_baselines.json"
 POWER_SOC_MIN_PERCENT = 20
 MEASUREMENT_INVALID_EXIT_CODE = 75
 OPTIMIZER_STAGE_NAME = "optimizer_60h_eval"
-OPTIMIZER_STAGE_HORIZON_HOURS = 60
+# The stage name identifies the profile's authored run budget. A C0 evaluation
+# follows the complete AUTO_APPLY campaign chain; completed work is measured
+# from the executor trace and independently counted simulator steps.
+OPTIMIZER_PROFILE_RUN_HOURS = 60
 OPTIMIZER_STAGE_TRIALS = 5
+# Source: the owner-ratified estimate in tests/suite_shape_guard.py's heavy
+# roster is 1,283 CPU-s for one complete C0-to-C6 chain. Five optimizer trials
+# at 1,283 CPU-s/trial with 2x hang headroom produce a 12,830 s wall cap:
+# trials * CPU-s/trial * dimensionless headroom = seconds.
+OPTIMIZER_STAGE_CHAIN_CPU_ESTIMATE_S = 1283
+OPTIMIZER_STAGE_HANG_HEADROOM = 2
+OPTIMIZER_STAGE_WORKER_HANG_WALL_S = (
+    OPTIMIZER_STAGE_TRIALS
+    * OPTIMIZER_STAGE_CHAIN_CPU_ESTIMATE_S
+    * OPTIMIZER_STAGE_HANG_HEADROOM
+)
+OPTIMIZER_REBASELINE_REASON = (
+    "optimizer_60h_eval needs rebaseline on the reference machine after "
+    "b-080 full-chain workload; owner action"
+)
 # Corrected 2026-07-25 (milestone review F1 follow-through): the loose
 # substring match had classified this M5 MAX box as plain "M5", so the
 # baselines were seeded under a wrong label. The canonical class is
@@ -66,6 +85,22 @@ STAGE_NAMES = (
     "runner_fixture_replay",
     OPTIMIZER_STAGE_NAME,
 )
+STAGE_HOT_PATHS = {
+    "internal_analytical_equilibrium": (
+        "PyrolysisSimulator._internal_analytical_equilibrium"
+    ),
+    "vapor_pressure_eval": "effective_equilibrium_pressure_Pa",
+    "sim_step_c2a_hour": (
+        "PyrolysisSimulator.step -> _internal_analytical_equilibrium"
+    ),
+    "condensation_route_hour": (
+        "CondensationModel.route -> _condensation_efficiency"
+    ),
+    "runner_fixture_replay": (
+        "simulator.runner.main -> PyrolysisSimulator.step"
+    ),
+    OPTIMIZER_STAGE_NAME: "PyrolysisSimulator.step during optimizer evaluate",
+}
 TEMPERATURES_K = (1273.15, 1573.15, 1873.15)
 # Premise: one runner replay is about 5 s wall and its isolated
 # warmup-plus-three-trial stage is under 23 s wall on this class. Algebra:
@@ -102,12 +137,16 @@ BUILTIN_LIQUIDUS_FIXTURE = {
 # Pytest deliberately lets the typed MeasurementInvalid escape as a red,
 # nonzero outcome; xfail/skip would let an unmeasured gate leave CI green.
 PROTOCOL = {
-    # rev-5: the condensation route fixture now supplies the required
+    # rev-7: optimizer_60h_eval retains the profile's authored 60 h budget,
+    # but its C0 evaluation follows the full campaign chain. Its work units
+    # are the executor trace's completed campaign hours, checked against an
+    # independent PyrolysisSimulator.step counter, not a fixed count.
+    # The condensation route fixture also supplies the required
     # per-species wall partial pressures and therefore measures the coupled
     # wall/stage fixed-point workload. Its earlier rate is not comparable.
     # Independent process repeats keep asymmetric-core scheduling from making
     # every trial in one stage worker observe the same slow core class.
-    "revision": 5,
+    "revision": 7,
     "warmups": 1,
     "trials": 3,
     # max, not median (2026-07-25 gate-red attribution): on asymmetric
@@ -141,13 +180,15 @@ PROTOCOL = {
     "stage_trial_counts": {
         OPTIMIZER_STAGE_NAME: OPTIMIZER_STAGE_TRIALS,
     },
+    "dynamic_work_units_per_trial": {
+        OPTIMIZER_STAGE_NAME: "sum_completed_campaign_duration_h",
+    },
     "stage_work_units_per_trial": {
         "internal_analytical_equilibrium": 500,
         "vapor_pressure_eval": 36000,
         "sim_step_c2a_hour": 1,
         "condensation_route_hour": 4,
         "runner_fixture_replay": 1,
-        OPTIMIZER_STAGE_NAME: OPTIMIZER_STAGE_HORIZON_HOURS,
     },
     "hot_path_calls_per_trial": {
         "internal_analytical_equilibrium": 500,
@@ -155,7 +196,6 @@ PROTOCOL = {
         "sim_step_c2a_hour": 1,
         "condensation_route_hour": 164,
         "runner_fixture_replay": 24,
-        OPTIMIZER_STAGE_NAME: OPTIMIZER_STAGE_HORIZON_HOURS,
     },
 }
 
@@ -481,7 +521,7 @@ def _internal_equilibrium_trial_factory(
             hot_path_calls=hot_path_calls,
             cpu_seconds=cpu_seconds,
             details={
-                "hot_path": "PyrolysisSimulator._internal_analytical_equilibrium",
+                "hot_path": STAGE_HOT_PATHS["internal_analytical_equilibrium"],
                 "fixed_melt_species": len(sim.melt.composition_kg),
             },
         )
@@ -543,7 +583,7 @@ def _vapor_pressure_trial_factory(
             hot_path_calls=hot_path_calls,
             cpu_seconds=cpu_seconds,
             details={
-                "hot_path": "effective_equilibrium_pressure_Pa",
+                "hot_path": STAGE_HOT_PATHS["vapor_pressure_eval"],
                 "roster": roster,
                 "temperatures_K": TEMPERATURES_K,
             },
@@ -595,8 +635,7 @@ def _sim_step_trial_factory(
             hot_path_calls=counter["equilibrium_calls"],
             cpu_seconds=cpu_seconds,
             details={
-                "hot_path": "PyrolysisSimulator.step -> "
-                "_internal_analytical_equilibrium",
+                "hot_path": STAGE_HOT_PATHS["sim_step_c2a_hour"],
                 "campaign": sim.melt.campaign.name,
                 "measured_campaign_hour": sim.melt.campaign_hour,
             },
@@ -672,8 +711,7 @@ def _condensation_trial_factory(
             hot_path_calls=counter["efficiency_calls"],
             cpu_seconds=cpu_seconds,
             details={
-                "hot_path": "CondensationModel.route -> "
-                "_condensation_efficiency",
+                "hot_path": STAGE_HOT_PATHS["condensation_route_hour"],
                 "flux_species": tuple(sorted(flux.species_kg_hr)),
             },
         )
@@ -800,7 +838,7 @@ def _runner_trial_factory() -> Callable[[], TrialObservation]:
             hot_path_calls=int(counter["step_calls"]),
             cpu_seconds=cpu_seconds,
             details={
-                "hot_path": "simulator.runner.main -> PyrolysisSimulator.step",
+                "hot_path": STAGE_HOT_PATHS["runner_fixture_replay"],
                 "fixture": str(fixture_path.relative_to(REPO_ROOT)),
                 "hours_replayed": int(counter["hours_completed"]),
             },
@@ -853,7 +891,93 @@ def _measure_stage(
     }
 
 
-def _measure_optimizer_60h_eval_stage(
+def _optimizer_campaign_limits(
+    profile: Mapping[str, Any],
+    setpoints: Mapping[str, Any],
+) -> tuple[tuple[str, ...], dict[str, float]]:
+    """Derive the AUTO_APPLY route and its configured duration caps."""
+    from simulator.campaigns import CampaignManager
+    from simulator.state import BatchRecord, CampaignPhase
+
+    run_options = dict(profile.get("run", {}))
+    run_options.update(
+        profile.get("fidelities", {}).get("internal-analytical", {})
+    )
+    manager = CampaignManager(dict(setpoints))
+    manager.c5_enabled = bool(run_options.get("c5_enabled", False))
+    record = BatchRecord(
+        feedstock_key=str(profile.get("feedstock", "")),
+        track=str(run_options.get("track", "pyrolysis")),
+    )
+    start = CampaignManager.campaign_phases_for_id(
+        str(run_options.get("campaign", ""))
+    )
+    assert len(start) == 1, f"expected one optimizer start phase, got {start!r}"
+    phases = manager.auto_apply_sequence(start[0], record)
+
+    duration_caps: dict[str, float] = {}
+    for phase in phases:
+        if phase is CampaignPhase.C2A_STAGED:
+            cap_h = manager._configured_staged_max_hold_hr(phase)
+        elif phase is CampaignPhase.C3_NA and manager._pending_c3_na_scoped_overrides:
+            cap_h = float(
+                manager._pending_c3_na_scoped_overrides["staged_duration_h"]
+            )
+        elif phase is CampaignPhase.C4:
+            acquisition_h, _ = manager._c4_target_acquisition_limit()
+            process_h, _ = manager._c4_process_wall_clock_limit()
+            cap_h = acquisition_h + process_h
+        elif phase is CampaignPhase.C2A and manager._pending_post_mg_c2a_overrides:
+            cap_h = float(manager._pending_post_mg_c2a_overrides["max_hours"])
+        else:
+            cap_h = manager._max_hold_hr(phase)
+        assert math.isfinite(float(cap_h)) and float(cap_h) > 0.0
+        duration_caps[phase.name] = float(cap_h)
+
+    return tuple(phase.name for phase in phases), duration_caps
+
+
+def _assert_optimizer_campaign_work(
+    *,
+    step_calls: int,
+    campaign_stops: Sequence[Mapping[str, Any]],
+    expected_campaigns: Sequence[str],
+    duration_caps: Mapping[str, float],
+) -> int:
+    """Check independent step volume against completed executor trace hours."""
+    campaign_names = tuple(
+        str(stop.get("campaign") or "") for stop in campaign_stops
+    )
+    assert campaign_names == tuple(expected_campaigns), (
+        f"completed campaign chain={campaign_names!r}, "
+        f"AUTO_APPLY chain={tuple(expected_campaigns)!r}"
+    )
+    trace_hours = 0
+    for stop in campaign_stops:
+        campaign = str(stop.get("campaign") or "")
+        duration_h = float(stop["duration_h"])
+        assert math.isfinite(duration_h) and duration_h > 0.0, (
+            f"{campaign}: completed duration must be positive and finite, "
+            f"got {duration_h!r}"
+        )
+        assert duration_h.is_integer(), (
+            f"{campaign}: one simulator step represents one whole hour, "
+            f"got duration {duration_h!r}"
+        )
+        if campaign in duration_caps:
+            assert duration_h <= duration_caps[campaign], (
+                f"{campaign}: duration {duration_h:g} h exceeds configured "
+                f"cap {duration_caps[campaign]:g} h"
+            )
+        trace_hours += int(duration_h)
+    assert step_calls == trace_hours, (
+        f"PyrolysisSimulator.step calls={step_calls}, completed executor "
+        f"campaign trace={trace_hours} h"
+    )
+    return trace_hours
+
+
+def _measure_optimizer_profile_campaign_chain_stage(
     trial_count: int = OPTIMIZER_STAGE_TRIALS,
 ) -> dict[str, Any]:
     from datetime import datetime, timezone
@@ -862,7 +986,8 @@ def _measure_optimizer_60h_eval_stage(
     from simulator.core import PyrolysisSimulator
     from simulator.optimize.evaluate import evaluate
     from simulator.optimize.profiles import load_profile
-    from simulator.optimize.results_store import ResultStore
+    from simulator.optimize.results_store import ResultStore, _jsonable
+    from simulator.optimize.study import _strip_heavy_result
     from simulator.recipe import RecipePatch
 
     profile = load_profile(
@@ -870,7 +995,11 @@ def _measure_optimizer_60h_eval_stage(
     )
     run_hours = int(profile["run"]["hours"])
     fidelity_hours = int(profile["fidelities"]["internal-analytical"]["hours"])
-    assert run_hours == fidelity_hours == OPTIMIZER_STAGE_HORIZON_HOURS
+    assert run_hours == fidelity_hours == OPTIMIZER_PROFILE_RUN_HOURS
+    expected_campaigns, duration_caps = _optimizer_campaign_limits(
+        profile,
+        load_config_bundle().setpoints,
+    )
     patch_value = RecipePatch({})
     trial_records = []
 
@@ -911,20 +1040,109 @@ def _measure_optimizer_60h_eval_stage(
                 cpu_seconds = total_cpu_seconds() - cpu_before
 
             assert scored.eval_spec is not None and scored.cache_key
-            assert step_calls["count"] == run_hours
+            assert scored.run_reference is not None
+            trace = scored.run_reference.trace
+            campaign_stops = tuple(trace.get("campaign_stops", ()))
+            trace_hours = _assert_optimizer_campaign_work(
+                step_calls=step_calls["count"],
+                campaign_stops=campaign_stops,
+                expected_campaigns=expected_campaigns,
+                duration_caps=duration_caps,
+            )
             assert math.isfinite(cpu_seconds) and cpu_seconds > 0.0
             assert math.isfinite(wall_seconds) and wall_seconds > 0.0
             assert store.lookup(scored.eval_spec) is None
+            # Match the existing study persistence path: the full in-memory
+            # physics trace is used for scoring, while the cache stores its
+            # compact ranking projection. Keeping the entire trace here can
+            # exceed SQLite's text limit for this long campaign chain.
+            cacheable = _strip_heavy_result(scored)
+            coating_margin = cacheable.feasibility_margins.get("coating")
+            source_warning_flags = (
+                coating_margin.status_payload.get("coating_warning_flags", ())
+                if coating_margin is not None
+                else ()
+            )
+            source_authority_ids = {
+                id(warning["authority"])
+                for warning in source_warning_flags
+                if isinstance(warning, Mapping)
+                and isinstance(warning.get("authority"), Mapping)
+            }
+            source_flag_ids = {
+                id(warning["flags"])
+                for warning in source_warning_flags
+                if isinstance(warning, Mapping)
+                and isinstance(warning.get("flags"), Mapping)
+            }
             store.store(
-                scored.eval_spec,
-                scored,
+                cacheable.eval_spec,
+                cacheable,
                 created_at=datetime.now(timezone.utc).isoformat(),
             )
             cached = store.lookup(scored.eval_spec)
             assert cached is not None and cached.cache_key == scored.cache_key
-            assert step_calls["count"] == run_hours
+            expected_coating = cacheable.feasibility_margins.get("coating")
+            cached_coating = cached.feasibility_margins.get("coating")
+            assert expected_coating is not None and cached_coating is not None
+            expected_payload = expected_coating.status_payload
+            cached_payload = cached_coating.status_payload
+            assert set(cached_payload) == set(expected_payload)
+            expected_warning_flags = expected_payload["coating_warning_flags"]
+            cached_warning_flags = cached_payload["coating_warning_flags"]
+            assert len(cached_warning_flags) == len(expected_warning_flags)
+            cached_authority_ids = {
+                id(warning["authority"])
+                for warning in cached_warning_flags
+                if isinstance(warning, Mapping)
+                and isinstance(warning.get("authority"), Mapping)
+            }
+            cached_flag_ids = {
+                id(warning["flags"])
+                for warning in cached_warning_flags
+                if isinstance(warning, Mapping)
+                and isinstance(warning.get("flags"), Mapping)
+            }
+            shared_payload_ids: set[int] = set()
+            for expected_warning, cached_warning in zip(
+                expected_warning_flags,
+                cached_warning_flags,
+                strict=True,
+            ):
+                assert set(cached_warning) == set(expected_warning)
+                for key in set(expected_warning) - {"authority", "flags"}:
+                    assert _jsonable(cached_warning[key]) == _jsonable(
+                        expected_warning[key]
+                    )
+                for key in ("authority", "flags"):
+                    shared_value = cached_warning[key]
+                    shared_identity = id(shared_value)
+                    if shared_identity not in shared_payload_ids:
+                        assert _jsonable(shared_value) == _jsonable(
+                            expected_warning[key]
+                        )
+                        shared_payload_ids.add(shared_identity)
+            for key in set(expected_payload) - {"coating_warning_flags"}:
+                assert _jsonable(cached_payload[key]) == _jsonable(
+                    expected_payload[key]
+                )
+            with sqlite3.connect(store.path) as conn:
+                stored_payload_sizes = conn.execute(
+                    """
+                    SELECT
+                        length(CAST(feasibility_margins AS BLOB)),
+                        length(CAST(result_blob AS BLOB))
+                    FROM results WHERE cache_key = ?
+                    """,
+                    (scored.cache_key,),
+                ).fetchone()
+            assert stored_payload_sizes is not None
+            max_stored_text_cell_bytes = max(
+                int(size) for size in stored_payload_sizes
+            )
+            assert step_calls["count"] == trace_hours
 
-        # Premise: each step call is one completed profile hour. Algebra:
+        # Premise: each counted call advances one campaign hour. Algebra:
         # wall/CPU = elapsed wall seconds / user+system CPU seconds; units cancel.
         trial_records.append(
             {
@@ -933,20 +1151,33 @@ def _measure_optimizer_60h_eval_stage(
                 "hostname": platform.node(),
                 "work_units": step_calls["count"],
                 "hot_path_calls": step_calls["count"],
+                "step_calls": step_calls["count"],
+                "trace_hours": trace_hours,
+                "campaign_chain": [
+                    str(stop.get("campaign") or "") for stop in campaign_stops
+                ],
                 "cpu_seconds": cpu_seconds,
                 "wall_seconds": wall_seconds,
                 "wall_cpu_ratio": wall_seconds / cpu_seconds,
+                "campaign_stops": [dict(stop) for stop in campaign_stops],
                 "cold_cache_miss": True,
                 "same_patch_cache_hit": True,
                 "cache_hit_counted": False,
                 "cache_hit_work_units": 0,
+                "max_stored_text_cell_bytes": max_stored_text_cell_bytes,
+                "coating_warning_flag_count": len(source_warning_flags),
+                "source_authority_object_count": len(source_authority_ids),
+                "source_flag_object_count": len(source_flag_ids),
+                "loaded_authority_object_count": len(cached_authority_ids),
+                "loaded_flag_object_count": len(cached_flag_ids),
             }
         )
 
     cpu_values = [float(record["cpu_seconds"]) for record in trial_records]
     wall_values = [float(record["wall_seconds"]) for record in trial_records]
-    # Premise: the profile horizon is fixed across trials. Algebra: rate is
-    # completed hours / CPU seconds; spread is max CPU - min CPU, both in s.
+    # Premise: this profile has a fixed executed campaign chain. Algebra: rate
+    # is completed simulator steps / CPU seconds; spread is max CPU - min CPU,
+    # both in s.
     rates = [
         float(record["work_units"]) / float(record["cpu_seconds"])
         for record in trial_records
@@ -971,7 +1202,9 @@ def _measure_optimizer_60h_eval_stage(
         "trial_count": len(trial_records),
         "trial_rates": rates,
         "details": {
-            "hot_path": "PyrolysisSimulator.step during optimizer evaluate",
+            "hot_path": STAGE_HOT_PATHS[OPTIMIZER_STAGE_NAME],
+            "profile_run_hours": run_hours,
+            "work_unit_source": "sum of completed executor campaign durations",
             "trial_records": trial_records,
         },
     }
@@ -979,7 +1212,7 @@ def _measure_optimizer_60h_eval_stage(
 
 def _measure_one(stage: str) -> dict[str, Any]:
     if stage == OPTIMIZER_STAGE_NAME:
-        return _measure_optimizer_60h_eval_stage()
+        return _measure_optimizer_profile_campaign_chain_stage()
     bundle = load_config_bundle()
     trial_factories = {
         "internal_analytical_equilibrium": _internal_equilibrium_trial_factory(
@@ -993,9 +1226,11 @@ def _measure_one(stage: str) -> dict[str, Any]:
     return _measure_stage(stage, trial_factories[stage])
 
 
-def measure_all() -> dict[str, dict[str, Any]]:
+def measure_all(
+    stage_names: Sequence[str] = STAGE_NAMES,
+) -> dict[str, dict[str, Any]]:
     measurements = {}
-    for stage in STAGE_NAMES:
+    for stage in stage_names:
         stage_measurements = []
         repeats = int(PROTOCOL["stage_process_repeats"][stage])
         for repeat in range(repeats):
@@ -1010,7 +1245,11 @@ def measure_all() -> dict[str, dict[str, Any]]:
                 capture_output=True,
                 check=False,
                 text=True,
-                timeout=STAGE_WORKER_HANG_WALL_S,
+                timeout=(
+                    OPTIMIZER_STAGE_WORKER_HANG_WALL_S
+                    if stage == OPTIMIZER_STAGE_NAME
+                    else STAGE_WORKER_HANG_WALL_S
+                ),
             )
             assert result.returncode == 0, (
                 f"{stage} isolated measurement repeat {repeat + 1}/{repeats} "
@@ -1046,12 +1285,15 @@ def reblessed_payload(
         raise RuntimeError("baseline protocol does not match benchmark protocol")
     for stage in STAGE_NAMES:
         observed = float(measurements[stage]["rate"])
-        current = float(payload["stages"][stage]["ratchet_rate"])
-        payload["stages"][stage]["ratchet_rate"] = max(current, observed)
-        payload["stages"][stage]["rate_unit"] = measurements[stage]["rate_unit"]
-        payload["stages"][stage]["hot_path"] = measurements[stage]["details"][
-            "hot_path"
-        ]
+        stage_baseline = payload["stages"][stage]
+        current = stage_baseline.get("ratchet_rate")
+        stage_baseline["ratchet_rate"] = (
+            observed if current is None else max(float(current), observed)
+        )
+        stage_baseline["rate_unit"] = measurements[stage]["rate_unit"]
+        stage_baseline["hot_path"] = STAGE_HOT_PATHS[stage]
+        stage_baseline.pop("status", None)
+        stage_baseline.pop("reason", None)
     return payload
 
 

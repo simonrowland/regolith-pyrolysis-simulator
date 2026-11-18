@@ -8,6 +8,7 @@ import itertools
 import json
 import logging
 import math
+import os
 from pathlib import Path
 import sqlite3
 import subprocess
@@ -44,7 +45,12 @@ from simulator.optimize import pool as optimizer_pool
 from simulator.optimize import study
 from simulator.optimize.doe import SCIPY_SOBOL_SAMPLER, sample_recipe_candidates
 from simulator.optimize.evalspec import EvalSpec, cache_key
-from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
+from simulator.optimize.evaluate import (
+    FailureCategory,
+    RunReference,
+    ScoredResult,
+    _build_eval_inputs,
+)
 from simulator.optimize.evaluate import evaluate
 from simulator.optimize.knob_saturation import compute_knob_saturation
 from simulator.optimize.objective import (
@@ -66,7 +72,7 @@ from simulator.optimize.recipe import (
     conditional_context_from_metadata,
     conditional_context_metadata,
 )
-from simulator.optimize.results_store import ResultStore
+from simulator.optimize.results_store import ResultStore, _decode_result_payload
 from simulator.optimize.save_bundle import ALLOWED_MEMBERS, export_study_bundle
 from simulator.optimize.strategy import (
     Candidate,
@@ -834,6 +840,54 @@ def _journal_cache_evaluator(
     )
 
 
+def _journal_coating_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    scored = _journal_cache_evaluator(
+        patch,
+        feedstock,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        **kwargs,
+    )
+    authority = {"source": "wall saturation", "history": [{"hour": 1}]}
+    flags = {"output_status": "status_bearing"}
+    warning_flags = [
+        {"reason": f"warning-{index}", "authority": authority, "flags": flags}
+        for index in range(3)
+    ]
+    return replace(
+        scored,
+        feasibility_margins={
+            "coating": GateMargin(
+                gate="coating",
+                feasible=True,
+                margin=1.0,
+                threshold=ThresholdSpec(
+                    id="coating",
+                    value=1.0,
+                    units="campaigns",
+                    source="test",
+                    source_ref="test",
+                ),
+                observed=2.0,
+                detail="journal coating margin",
+                status_payload={
+                    "coating_verdict": "clear",
+                    "coating_warning_flags": warning_flags,
+                },
+            ),
+        },
+    )
+
+
 def _journal_any_id_evaluator(
     patch: RecipePatch,
     feedstock: str,
@@ -954,6 +1008,48 @@ def test_study_events_journal_replay_round_trip(tmp_path: Path) -> None:
     ]
     assert state_rows[-1]["strategy_state"] == dict(replay.strategy_state)
     assert state_rows[-1]["strategy_state"]["strategies"][0]["ask_cursor"] == 4
+
+
+def test_study_journal_and_provenance_share_payload_round_trip(tmp_path: Path) -> None:
+    out = tmp_path / "shared-payload-journal"
+    study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        parallel=1,
+        budget=1,
+        out_dir=out,
+        seed=5,
+        evaluator=_journal_coating_evaluator,
+    )
+
+    event = next(
+        json.loads(line)
+        for line in (out / "study.events.jsonl").read_text(encoding="utf-8").splitlines()
+        if json.loads(line)["event_kind"] == "candidate_evaluated"
+    )
+    journal_payload = event["scored_result"]
+    provenance_payload = _read_provenance(out)[0]
+    for payload in (journal_payload, provenance_payload):
+        assert "__optimizer_result_store_ref_v1__" in json.dumps(payload)
+        margins, result_blob = _decode_result_payload(
+            payload["feasibility_margins"],
+            payload["result_blob"],
+        )
+        assert [
+            warning["reason"]
+            for warning in margins["coating"].status_payload[
+                "coating_warning_flags"
+            ]
+        ] == ["warning-0", "warning-1", "warning-2"]
+        assert result_blob["backend_status"] == "ok"
+
+    replay = study.replay_study(out)
+    assert len(replay.records) == 1
+    assert replay.records[0].feasibility_margins["coating"]["status_payload"][
+        "coating_verdict"
+    ] == "clear"
 
 
 def test_infeasible_objectives_survive_cache_hits_and_journal_replay(
@@ -3789,8 +3885,9 @@ def test_parallel_composition_target_stub_study_completes(
         == 0
     )
 
+    profile = yaml.safe_load(profile_path.read_text())
     result = study.run(
-        yaml.safe_load(profile_path.read_text()),
+        profile,
         "lunar_mare_low_ti",
         "screen",
         "internal-analytical",
@@ -3805,17 +3902,17 @@ def test_parallel_composition_target_stub_study_completes(
     payload = json.loads(pareto_path.read_text())
     # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to the
     # 20 C collector band. The Morris base (seed 0, level 1/3) now places the
-    # upstream walls at 746.67 C. The same unit coordinate on the old
-    # 1400-2200 C map was about 1667 C, which is the SiO wall-fit hole:
-    # Psat is refused at 1773.15 K, inside the published 1400-2273.15 K
-    # numeric range but outside the finite positive-denominator branch. At
-    # 746.67 C the three base points are no longer SiO-refused. Deposit mass
-    # is a measured zero, furnace amortization is available at batch cost 0,
-    # and those points form a priced Pareto, so the study completes and
-    # writes winner.recipe.yaml. The thermo step s003 still sits on the
-    # 2200 C ceiling and still refuses SiO at 1773.15 K on
-    # stage_0_to_stage_1 and stage_1_to_stage_2. t-1368 still owns that
-    # rail; s003 stays feasible, unpriced, and off the Pareto.
+    # upstream walls at 746.67 C. The cold candidates commit a small measured
+    # Fe deposit on stage_0_to_stage_1; the d-401 booking path only replaces
+    # species named by wall saturation-pressure refusals. Their reported
+    # per-campaign load is higher than the run cumulative load because this
+    # 24-hour run represents 24/35 of a campaign. The thermal remobilization
+    # flag is diagnostic and does not subtract mass from the committed ledger.
+    # The thermo step s003 still sits on the 2200 C ceiling and refuses SiO at
+    # 1773.15 K on stage_0_to_stage_1 and stage_1_to_stage_2. d-401 books its
+    # positive supply upper bound, so s003 has a finite deposit/lifetime
+    # projection and objective values; it remains feasible but is dominated
+    # on the Pareto objectives.
     priced_ids = {
         "morris-screen-0-t0000-s000",
         "morris-screen-0-t0000-s001",
@@ -3836,23 +3933,45 @@ def test_parallel_composition_target_stub_study_completes(
     for candidate in result.records:
         summary = candidate.product_summary
         if candidate.candidate_id in priced_ids:
-            assert summary["furnace_amortization_status"] == "available"
-            assert summary["wall_deposit_total_kg"] == 0.0
-            assert summary["has_positive_qualified_fouling"] is False
-            refusal = summary.get("wall_deposit_refusal") or {}
-            authority = refusal.get("authority") or {}
-            refused = authority.get("wall_saturation_pressure_refused_species") or []
-            assert "SiO" not in refused
+            assert summary["furnace_amortization_status"] == (
+                "resinter_threshold_ungrounded"
+            )
+            assert summary["has_positive_qualified_fouling"] is True
+            assert summary["wall_deposit_kg_by_species"]["Fe"] == pytest.approx(
+                6.181281691758682e-12,
+                rel=1e-9,
+            )
+            assert summary["wall_deposit_cumulative_kg_by_species"]["Fe"] == (
+                pytest.approx(4.238593160063097e-12, rel=1e-9)
+            )
+            ungrounded_lifetime = "resinter_threshold_kg / 6.18128169176e-12"
+            assert summary["campaigns_to_resinter"] == ungrounded_lifetime
+            assert summary["campaigns_to_resinter_worst_segment"] == (
+                ungrounded_lifetime
+            )
+            assert summary["furnace_amortization_cost_per_run_usd"] is None
         else:
             assert candidate.candidate_id == hot_id
-            assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
-            refusal = summary["wall_deposit_refusal"]
-            authority = refusal["authority"]
-            assert "wall_deposit_saturation_pressure_refused" in authority["codes"]
-            assert authority["wall_saturation_pressure_refused_species"] == ["SiO"]
-            sio_refusals = authority["wall_saturation_pressure_refusals_by_species"][
-                "SiO"
-            ]
+            assert summary["furnace_amortization_status"] == (
+                "resinter_threshold_ungrounded"
+            )
+            assert summary["lifespan_cost_status"] == "threshold_unavailable"
+            assert summary["has_positive_qualified_fouling"] is True
+            assert summary["furnace_amortization_batch_cost_equivalents"] is None
+            assert summary.get("wall_deposit_refusal") is None
+            assert candidate.objectives
+            assert any(
+                value is not None and math.isfinite(float(value))
+                for value in candidate.objectives.values()
+            )
+
+        wall_authority = summary["wall_deposit_sticking_authority"]
+        refused = wall_authority.get("wall_saturation_pressure_refused_species") or []
+        if candidate.candidate_id == hot_id:
+            assert "SiO" in list(refused)
+            sio_refusals = wall_authority[
+                "wall_saturation_pressure_refusals_by_species"
+            ]["SiO"]
             assert set(sio_refusals) == {
                 "stage_0_to_stage_1",
                 "stage_1_to_stage_2",
@@ -3862,8 +3981,34 @@ def test_parallel_composition_target_stub_study_completes(
                 and record["temperature_K"] == pytest.approx(1773.15)
                 for record in sio_refusals.values()
             )
-
-        wall_authority = summary["wall_deposit_sticking_authority"]
+            assert summary["wall_deposit_upper_bound_used"] is True
+            bookings = summary["wall_supply_bound_bookings"]
+            bounds = summary[
+                "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+            ]
+            # Product booking keeps the 24-hour run integral in kg/run.
+            # This fixture spans 24/35 campaign, so its published authority
+            # is that total divided by 24/35 (factor 35/24).
+            assert bounds["SiO"] == pytest.approx(
+                bookings[0]["supply_upper_bound_kg"] / (24.0 / 35.0)
+            )
+            assert summary["wall_deposit_total_kg"] == pytest.approx(bounds["SiO"])
+            assert summary["campaigns_to_resinter_worst_segment"].startswith(
+                "resinter_threshold_kg / "
+            )
+            assert summary["supply_interval_upper_bound_used"]["SiO"] > 0
+            assert len(bookings) == 1
+            assert bookings[0]["species"] == "SiO"
+            assert bookings[0]["flag"] == "wall_deposit_upper_bound_used"
+            assert bookings[0]["deposit_kg"] == pytest.approx(
+                bookings[0]["supply_upper_bound_kg"]
+            )
+            assert bookings[0]["deposit_kg"] > 0.0
+            assert summary["wall_deposit_cumulative_total_kg"] == pytest.approx(
+                bookings[0]["deposit_kg"]
+            )
+        else:
+            assert "SiO" not in list(refused)
         fe_records = wall_authority["alpha_s_provenance_by_species"]["Fe"].values()
         # The shipped Stage-1 condenser wall stays 1150 C = 1423.15 K. That
         # is the train's fixed Fe stage, not a searched overhead dew point,
@@ -7297,6 +7442,58 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     assert "strategy: staged->StagedStrategy" in staged.stdout
 
     out_dir = tmp_path / "cli-run"
+    instrumentation_dir = tmp_path / "perf-instrumentation"
+    instrumentation_dir.mkdir()
+    event_log = tmp_path / "perf-events.tsv"
+    (instrumentation_dir / "sitecustomize.py").write_text(
+        """
+import os
+
+def _record_perf_event(event):
+    path = os.environ.get("REGOLITH_PERF_EVENT_LOG")
+    if not path:
+        return
+    fd = os.open(path, os.O_CREAT | os.O_APPEND | os.O_WRONLY, 0o600)
+    try:
+        os.write(fd, f"{os.getpid()}\\t{event}\\n".encode("utf-8"))
+    finally:
+        os.close(fd)
+
+from simulator.vapour_rail.catalog import VapourRailCatalog
+_legacy_view = VapourRailCatalog.legacy_view
+def _count_legacy_view(self):
+    _record_perf_event("legacy_view")
+    return _legacy_view(self)
+VapourRailCatalog.legacy_view = _count_legacy_view
+
+from simulator.engine_pool import WarmEngineWorker
+_own_launch = WarmEngineWorker._own_launch
+def _count_launch(self, launch):
+    _record_perf_event("engine_launch")
+    return _own_launch(self, launch)
+WarmEngineWorker._own_launch = _count_launch
+
+from simulator.melt_backend.magemin import MAGEMinBackend
+_magemin_initialize = MAGEMinBackend.initialize
+def _count_magemin_initialize(self, *args, **kwargs):
+    _record_perf_event("magemin_initialize")
+    return _magemin_initialize(self, *args, **kwargs)
+MAGEMinBackend.initialize = _count_magemin_initialize
+_magemin_equilibrate = MAGEMinBackend.equilibrate
+def _count_magemin_equilibrate(self, *args, **kwargs):
+    _record_perf_event("magemin_equilibrate")
+    return _magemin_equilibrate(self, *args, **kwargs)
+MAGEMinBackend.equilibrate = _count_magemin_equilibrate
+""",
+        encoding="utf-8",
+    )
+    instrumented_env = os.environ.copy()
+    instrumented_env["REGOLITH_PERF_EVENT_LOG"] = str(event_log)
+    repo_root = str(Path(__file__).resolve().parents[1])
+    pythonpath = [str(instrumentation_dir), repo_root]
+    if instrumented_env.get("PYTHONPATH"):
+        pythonpath.append(instrumented_env["PYTHONPATH"])
+    instrumented_env["PYTHONPATH"] = os.pathsep.join(pythonpath)
     good = subprocess.run(
         [
             sys.executable,
@@ -7323,9 +7520,39 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
         # One-hour smoke. 120s of wall is not enough when campaign-length
         # tests share the studio.
         timeout=600,
+        env=instrumented_env,
     )
     assert good.returncode == 0, good.stderr
+    events_by_pid: dict[int, dict[str, int]] = {}
+    for line in event_log.read_text(encoding="utf-8").splitlines():
+        raw_pid, event = line.split("\t", maxsplit=1)
+        events = events_by_pid.setdefault(int(raw_pid), {})
+        events[event] = events.get(event, 0) + 1
+    # The merged smoke runs one hour of C2A_continuous, so it does not enter
+    # b-080's C0 AUTO_APPLY sequence. Its one simulator initialization, four
+    # compatibility projections, and one legacy adapter lookup account for
+    # six legacy_view calls. The single MAGEMin liquidus scan samples 37 grid
+    # points from 400-2200 C, then 11 midpoint samples across the two 50 C
+    # brackets to reach 2 C, for 48 equilibrates and one initialization.
+    # Pin those code-derived work units and the single engine launch.
+    evaluator_pids = [
+        pid
+        for pid, events in events_by_pid.items()
+        if events.get("legacy_view", 0) == 6
+    ]
+    assert len(evaluator_pids) == 1, events_by_pid
+    assert events_by_pid[evaluator_pids[0]].get("engine_launch", 0) == 1
+    assert events_by_pid[evaluator_pids[0]].get("magemin_initialize", 0) == 1
+    assert events_by_pid[evaluator_pids[0]].get("magemin_equilibrate", 0) == 48
     assert (out_dir / "pareto.json").exists()
+    # This smoke profile explicitly enables only the furnace_temperature
+    # gate, so no coating report publishes a wall-saturation-pressure
+    # refusal. Studio summaries at green and the merged tip have no refused
+    # wall-pressure species; CrO2's carrier authority is instead refused for
+    # missing_evidence (no assemblage/potential evidence and no Henrian upper
+    # bound). d-401 books wall-saturation-pressure refusals, so this run has
+    # no CrO2 wall-supply booking. Furnace amortization remains available at
+    # zero cost.
     # This profile evaluates its one-hour C2A_continuous campaign. It does
     # not enter the C0 AUTO_APPLY sequence or encounter a C6 refusal. The
     # returned priced objective makes the single feasible candidate rankable.
@@ -7334,19 +7561,37 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     assert status["status"] == "SUCCEEDED"
     assert status["study_status"] == "completed"
     assert status["success"] is True
-    assert status["winner_candidate_id"] == "random-7-000000"
+    winner_id = status["winner_candidate_id"]
     pareto = json.loads((out_dir / "pareto.json").read_text(encoding="utf-8"))
     assert pareto["status"] == "completed"
-    assert pareto["winner_candidate_id"] == "random-7-000000"
+    assert pareto["winner_candidate_id"] == winner_id
+    assert winner_id == "random-7-000000"
+    winner_rows = [
+        row for row in pareto["pareto"] if row.get("candidate_id") == winner_id
+    ]
+    assert winner_rows
+    summary = winner_rows[0].get("product_summary") or {}
+    assert summary["furnace_amortization_status"] == "available"
+    authority = summary["wall_deposit_sticking_authority"]
+    assert summary.get("wall_supply_bound_bookings") is None
+    assert authority.get("wall_saturation_pressure_refused_species") in (None, [])
+    assert (
+        authority["vapour_carrier_authority_status_by_species"]["CrO2"]
+        == "refused"
+    )
+    assert (
+        authority["vapour_carrier_authority_by_species"]["CrO2"]["pressure"][
+            "code"
+        ]
+        == "missing_evidence"
+    )
     provenance = _read_provenance(out_dir)
     assert len(provenance) == 1
     assert provenance[0]["candidate_id"] == "random-7-000000"
     assert provenance[0]["feasible"] is True
     assert provenance[0]["failing_gates"] == []
-    assert (
-        provenance[0]["product_summary"]["furnace_amortization_status"]
-        == "available"
-    )
+    provenance_summary = provenance[0]["product_summary"]
+    assert provenance_summary["furnace_amortization_status"] == "available"
     assert any(
         isinstance(value, (int, float)) and not isinstance(value, bool)
         for value in provenance[0]["objectives"].values()

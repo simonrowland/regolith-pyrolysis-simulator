@@ -33,7 +33,10 @@ from simulator.physical_constants import (  # noqa: E402
     MELT_DISSOCIATION_PO2_MIN_BAR,
 )
 from simulator.state import MOLAR_MASS  # noqa: E402
-from simulator.vapour_rail.catalog import compile_vapour_rail_catalog  # noqa: E402
+from simulator.vapour_rail.catalog import (  # noqa: E402
+    bound_effective_fit_evidence,
+    compile_vapour_rail_catalog,
+)
 from simulator.vapour_rail.domain_policy import (  # noqa: E402
     declared_domain_transition,
 )
@@ -188,7 +191,17 @@ def _render(*, catalog_fixture: Path) -> str:
             or oxide in {"SiO2", "TiO2", "Al2O3", "Fe2O3", "Cr2O3", "P2O5"}
         )
     }
-    catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+    # Historic Fe has no provenance of its own. The live catalog's evidenced
+    # fits are an explicit compile input, resolved once here. Compile does
+    # not open the live file itself.
+    live_catalog = yaml.safe_load(
+        (ROOT / "data" / "vapor_pressures.yaml").read_text(encoding="utf-8")
+    )
+    catalog = compile_vapour_rail_catalog(
+        payload,
+        emit_u0_request_rules=False,
+        bound_effective_fits=bound_effective_fit_evidence(live_catalog),
+    )
     species_by_element: dict[str, list] = defaultdict(list)
     raw_rows: dict[str, dict] = {}
     for species_id, compiled in catalog.species.items():

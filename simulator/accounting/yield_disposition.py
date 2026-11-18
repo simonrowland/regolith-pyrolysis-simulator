@@ -187,6 +187,13 @@ def capture_ledger_snapshot(sim: Any, snapshot: Any) -> None:
             if event.get("account") == _CONDENSATION_ACCOUNT
         ],
     }
+    from simulator.vapour_rail.run_disclosure import owning_run_disclosures
+
+    # Same owner rule as the ledger snapshot: the bound registry is not
+    # this simulator's accumulated disclosure.
+    law_disclosures = owning_run_disclosures(sim)
+    if law_disclosures:
+        rows[key]["law_disclosures"] = [dict(item) for item in law_disclosures]
 
 
 def ledger_snapshots_from_sim(sim: Any) -> tuple[Mapping[str, Any], ...]:

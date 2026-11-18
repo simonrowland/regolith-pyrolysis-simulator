@@ -1271,7 +1271,9 @@ def test_t568_typed_evaluator_refuses_wrong_target_and_claimed_authority(
     # oxygen decades contribute +2, +7.75 and -0.75 pressure decades.
     assert valid_result["oxygen_term_ln"] / math.log(10.0) == pytest.approx(oxygen_decades)
     if oxygen != 1e-8:
-        notice = valid_result["extrapolation_notice"]
+        notices = valid_result["extrapolation_notice"]
+        assert isinstance(notices, list)
+        notice = notices[0]
         assert notice["reason"] == "pO2_outside_evaluator_band"
         assert notice["pO2_bar_used"] == oxygen
         assert notice["certified_band"]["pO2_bar"] == (1e-30, 100.0)
@@ -4107,6 +4109,24 @@ def test_compile_cache_uses_explicit_content_identity() -> None:
     assert "NaCl" not in cat_a.species
 
     payload_b = _minimal_family("NaCl", parent_oxide="Na2O", with_reaction=False)
+    # with_reaction=False is a cleaned-melt Antoine at activity exponent 0.
+    # The cache test needs that row to compile, so it carries fit evidence.
+    nacl = payload_b["families"]["nacl_test_family"]["physical_properties"][
+        "species"
+    ]["NaCl"]
+    # Ordinary fitted citation. diagnostic_only is not this fixture: that
+    # status admits only with law_provenance and an anchor disagreement.
+    nacl["pressure_models"][0]["provenance"] = [
+        {
+            "source_id": "fit-grid-source",
+            "observation_id": "fit-grid",
+        }
+    ]
+    nacl["backsolve"] = {
+        "residual_dex": 0.12,
+        "provenance": {"generated_by": "fit.py", "fit_objective": "minimax"},
+    }
+    nacl["validation"]["anchor_refs"] = ["anchor:test"]
     key_b = _compile_input_identity(
         payload_b, emit_u0_request_rules=False, u0_manifest=None
     )

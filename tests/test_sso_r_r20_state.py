@@ -3096,6 +3096,11 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
         ),
         provenance_override={
             "binding_provenance_verifiable": True,
+            "runtime_version": {
+                "tag": "value",
+                "value": "MAGEMin fixture runtime",
+                "reason": None,
+            },
             "runtime_artifacts": {
                 "magemin_selected_binary": {"sha256": "a" * 64},
             },
@@ -3131,13 +3136,15 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
     monkeypatch.setattr(sim, "_compute_intrinsic_melt_fO2", fail_heuristic)
     monkeypatch.setattr(sim, "_stage0_sulfur_input_ppm", lambda: 100.0)
     monkeypatch.setattr(sim._sulfsat_gate, "compute_sulfur_saturation", fake_sulfsat)
+    seeded = write_gate_curve_memo_record(
+        sim,
+        curve,
+        provider_outcome="produced",
+    )
+    seeded["law_disclosures"] = []
     sim._freeze_gate_liquid_fraction_cache = {
         "key": key,
-        **write_gate_curve_memo_record(
-            sim,
-            curve,
-            provider_outcome="produced",
-        ),
+        **seeded,
     }
 
     assert sim._freeze_gate_curve()["source"] == curve_source

@@ -159,6 +159,7 @@ from simulator.engine_cache import (
 )
 
 ENGINE_ANNOTATION_CRASH_FLOOR = "sio2_below_observed_crash_floor"
+REFUSAL_DIAGNOSTIC_GAP = "diagnostic_gap"
 AUTHORITY_EXTRAPOLATED = "extrapolated"
 _OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON = "oxygen_balance_no_admitted_bracket"
 # Token published by engines/builtin/vapor_pressure.py on pO2-floor inversion.
@@ -183,6 +184,7 @@ _TIMEOUT_TOKENS = frozenset(
 _CRASH_TOKENS = frozenset(
     {
         "engine_crash",
+        "magemin_engine_worker_died",
         "subprocess_died",
         "sigabrt",
         "sigsegv",
@@ -191,7 +193,10 @@ _CRASH_TOKENS = frozenset(
     }
 )
 _UNAVAILABLE_TOKENS = frozenset(
-    {"unavailable", "backend_unavailable", "not_initialized"}
+    {
+        "unavailable", "backend_unavailable", "missing_binary",
+        "not_initialized",
+    }
 )
 _IMCC_OUT_OF_BASIS_CODES = frozenset(
     {
@@ -1618,6 +1623,15 @@ def engine_flags_from_result(
     ):
         certified_band = _plain_data(diagnostics["certified_band"])
 
+    if diagnostics.get("magemin_untyped_failure_diagnostic_gap"):
+        notices.append(
+            {
+                "kind": REFUSAL_DIAGNOSTIC_GAP,
+                "reason": diagnostics.get("backend_status_reason"),
+                "magemin_untyped_failure_diagnostic_gap": True,
+            }
+        )
+
     if diagnostics.get("imcc_notices"):
         imcc_rows = diagnostics["imcc_notices"]
     else:
@@ -1984,8 +1998,17 @@ def classify_equilibrate_outcome(
     engine_reason = structured or ("; ".join(str(w) for w in warnings) if warnings else engine_status)
     haystack = _haystack(engine_status, structured, category, warnings, diagnostics)
     if (
+        diagnostics.get("magemin_untyped_failure_diagnostic_gap")
+        or structured == "magemin_untyped_failure"
+    ):
+        return "refusal", REFUSAL_DIAGNOSTIC_GAP, engine_reason
+    if (
         category == REFUSAL_ENGINE_CRASH
-        or structured in {"subprocess_died", REFUSAL_ENGINE_CRASH}
+        or structured in {
+            "magemin_engine_worker_died",
+            "subprocess_died",
+            REFUSAL_ENGINE_CRASH,
+        }
         or engine_status == REFUSAL_ENGINE_CRASH
     ):
         return "refusal", REFUSAL_ENGINE_CRASH, engine_reason
@@ -3890,7 +3913,11 @@ def internal_analytical_residue_vapor_pressure(
     """Run one direct internal-analytical residue pressure request."""
     from types import SimpleNamespace
 
-    from simulator.engine_cache import _configured_engine_cache_path, cached_engine_call, record_engine_open
+    from simulator.engine_cache import (
+        _configured_engine_cache_path,
+        cached_engine_call,
+        record_engine_open,
+    )
     from simulator.melt_backend.base import equilibrium_cache_from_value, equilibrium_to_hot
 
     record_engine_open("internal-analytical", core)
@@ -3910,7 +3937,9 @@ def internal_analytical_residue_vapor_pressure(
     def solve():
         result = solve_live()
         if getattr(result, "status", None) == "ok" and isinstance(getattr(result, "diagnostics", None), Mapping):
-            return equilibrium_to_hot(vars(result), engine_id="internal-analytical", live_value=result)
+            return equilibrium_to_hot(
+                vars(result), engine_id="internal-analytical", live_value=result
+            )
         return result
 
     if _configured_engine_cache_path() is None:
@@ -3924,6 +3953,8 @@ def internal_analytical_residue_vapor_pressure(
             "engine_settings": _internal_analytical_cache_settings(core),
         }
         result = cached_engine_call("internal-analytical", _internal_analytical_cache_inputs(request), solve)
+    if isinstance(result, Mapping) and "_residue_pressure_equilibrium" in result:
+        result = result["_residue_pressure_equilibrium"]
     if isinstance(result, list):
         return SimpleNamespace(**equilibrium_cache_from_value(result, engine_id="internal-analytical"))
     return result
@@ -4562,7 +4593,17 @@ class _IsolatedCellWorker:
         self, payload: Mapping[str, Any], *, timeout_s: float
     ) -> dict[str, Any]:
         started_wall, started_cpu = time.perf_counter(), time.process_time()
+        from simulator.engine_cache import (
+            EngineCacheValue,
+            cached_engine_call,
+            _engine_carries_disclosures,
+            engine_cache_settings,
+        )
+
         def solve() -> Any:
+            from simulator.vapour_rail.run_disclosure import active_registry
+
+            scoped_run = active_registry() is not None
             with self._lock:
                 try:
                     result = self._worker.call(payload, timeout_s=timeout_s)
@@ -4600,9 +4641,16 @@ class _IsolatedCellWorker:
 
                     if not cacheable_refusal(result):
                         return result
-            return EquilibrateCell.from_payload(result).to_hot()
-
-        from simulator.engine_cache import cached_engine_call, engine_cache_settings
+            hot = EquilibrateCell.from_payload(result).to_hot()
+            if _engine_carries_disclosures(self.engine) and scoped_run:
+                # The child process has no run-disclosure registry to attach to
+                # this value, so it cannot safely populate a scoped cache row.
+                if isinstance(hot, EngineCacheValue):
+                    return EngineCacheValue(
+                        hot.hot, hot.cold, cacheable=False
+                    )
+                return EngineCacheValue(hot, cacheable=False)
+            return hot
 
         request = {
             key: payload[key]

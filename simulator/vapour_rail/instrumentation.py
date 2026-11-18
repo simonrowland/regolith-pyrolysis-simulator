@@ -415,6 +415,188 @@ def _activity_payload(activity: Any) -> dict[str, Any] | None:
     }
 
 
+def _singular_notice_key(key: object) -> str | None:
+    """Map a singular or plural notice key onto the singular publication key."""
+
+    if not isinstance(key, str):
+        return None
+    if key.endswith("_notices"):
+        singular = key[:-1]
+        if singular.endswith("_notice"):
+            return singular
+        return None
+    if key.endswith("_notice"):
+        return key
+    return None
+
+
+def _plain_public_value(value: Any) -> Any:
+    """Plain data. Nested mapping proxies pickle and deepcopy as dicts.
+
+    Tuples stay tuples. Certified-band endpoints compare equal to
+    ``(low, high)``. This is not the authority-record copier: that one
+    turns tuples into lists.
+    """
+
+    if isinstance(value, Mapping):
+        return {
+            key: _plain_public_value(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, tuple):
+        return tuple(_plain_public_value(item) for item in value)
+    if isinstance(value, list):
+        return [_plain_public_value(item) for item in value]
+    return value
+
+
+def _copy_public_notice(notice: Mapping[str, Any]) -> dict[str, Any]:
+    # ``dict(notice)`` is shallow. A frozen carrier leaves MappingProxyType
+    # values inside, and deepcopy then fails with
+    # ``TypeError: cannot pickle 'mappingproxy' object``.
+    return _plain_public_value(notice)
+
+
+def _iter_notice_mappings(value: Any) -> tuple[dict[str, Any], ...]:
+    """Unfold one mapping or a sequence of mappings. Strings are not sequences."""
+
+    if isinstance(value, Mapping):
+        if not value:
+            return ()
+        return (_copy_public_notice(value),)
+    if isinstance(value, (list, tuple)) and not isinstance(value, (str, bytes)):
+        items = [
+            _copy_public_notice(item)
+            for item in value
+            if isinstance(item, Mapping) and item
+        ]
+        return tuple(items)
+    return ()
+
+
+def _freeze_notice(value: Any) -> Any:
+    """Identity key for exact-duplicate disclosure collapse."""
+
+    if isinstance(value, Mapping):
+        return tuple(
+            sorted(
+                (str(key), _freeze_notice(item))
+                for key, item in value.items()
+            )
+        )
+    if isinstance(value, (list, tuple)) and not isinstance(value, (str, bytes)):
+        return tuple(_freeze_notice(item) for item in value)
+    return value
+
+
+def _dedupe_notices(
+    notices: Sequence[Mapping[str, Any]],
+) -> tuple[dict[str, Any], ...]:
+    seen: set[Any] = set()
+    kept: list[dict[str, Any]] = []
+    for notice in notices:
+        copied = _copy_public_notice(notice)
+        identity = _freeze_notice(copied)
+        if identity in seen:
+            continue
+        seen.add(identity)
+        kept.append(copied)
+    return tuple(kept)
+
+
+def public_carrier_notices(carrier: Any) -> dict[str, tuple[dict[str, Any], ...]]:
+    """Every notice on a carrier, as a list under the singular key.
+
+    Invariant: a public surface publishes every distinct disclosure on that
+    carrier. Singular ``*_notice`` mappings, singular keys whose value is
+    already a sequence, and plural ``*_notices`` sequences all fold into the
+    singular key. Exact duplicates collapse. Callers do not select
+    ``extrapolation_notice`` by name.
+
+    A mapping contributes its own notice values and, when it has an
+    ``extra`` mapping, that extra too. An object contributes notice
+    attributes stored on the instance. Empty values are omitted.
+    """
+
+    collected: dict[str, list[dict[str, Any]]] = {}
+
+    def take(mapping: Mapping[Any, Any]) -> None:
+        for key, value in mapping.items():
+            singular = _singular_notice_key(key)
+            if singular is None:
+                continue
+            for item in _iter_notice_mappings(value):
+                collected.setdefault(singular, []).append(item)
+
+    if isinstance(carrier, Mapping):
+        take(carrier)
+        extra = carrier.get("extra")
+        if isinstance(extra, Mapping):
+            take(extra)
+    else:
+        attributes = getattr(carrier, "__dict__", None)
+        if isinstance(attributes, Mapping):
+            take(attributes)
+    return {
+        key: _dedupe_notices(items)
+        for key, items in collected.items()
+        if items
+    }
+
+
+def notice_attribute(
+    items: Sequence[Mapping[str, Any]] | None,
+) -> dict[str, Any] | list[dict[str, Any]] | None:
+    """Legacy attribute shape: one dict, or a list when there are several.
+
+    Evaluation attributes and the physics-metadata digest use this.
+    Typed publication does not. ``merge_public_notice`` always stores a list,
+    including a lone ``extrapolation_notice``.
+    """
+
+    copied = _dedupe_notices(tuple(items or ()))
+    if not copied:
+        return None
+    if len(copied) == 1:
+        return copied[0]
+    return list(copied)
+
+
+def merge_public_notice(
+    target: dict[str, Any],
+    key: str,
+    notice: Mapping[str, Any],
+) -> None:
+    """Append one disclosure onto a typed publication surface.
+
+    The value is always a list. One notice and two notices have the same
+    type. An exact duplicate is dropped; a distinct one is kept. Legacy
+    readers that still expect one ``extrapolation_notice`` dict use
+    ``notice_attribute`` on the way into an evaluation attribute or a
+    physics-metadata digest. They do not write the typed surface.
+    """
+
+    if not isinstance(notice, Mapping) or not notice:
+        return
+    existing = target.get(key)
+    current = list(_iter_notice_mappings(existing))
+    merged = _dedupe_notices((*current, notice))
+    target[key] = list(merged)
+
+
+def apply_public_carrier_notices(target: dict[str, Any], carrier: Any) -> None:
+    """Copy every carrier notice onto ``target`` as a list.
+
+    Distinct disclosures under one key are both kept. Exact duplicates
+    collapse. Nothing is dropped by ``setdefault``. A lone notice stays a
+    one-element list.
+    """
+
+    for key, notices in public_carrier_notices(carrier).items():
+        for notice in notices:
+            merge_public_notice(target, key, notice)
+
+
 def serialize_vapour_answer(answer: VapourAnswer) -> dict[str, Any]:
     """JSON-safe channel answer for runner/artifact/UI."""
 
