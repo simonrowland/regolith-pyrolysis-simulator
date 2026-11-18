@@ -308,7 +308,7 @@ def cacheable_refusal(result) -> bool:
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
-    "internal-analytical": 2,
+    "internal-analytical": 4,
     "vaporock": 1,
     "magemin": 3,
     "alphamelts": 3,
@@ -327,11 +327,12 @@ ENGINE_CHEMISTRY_VERSION = {
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
 # internal-analytical v2: 2026-11-17 b-1244 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
+# internal-analytical v3: reserved by b265 immediately after b269 on the landing train
+# internal-analytical v4: b-1124 Holzheid FeO gamma continuation changes analytical Fe vapour predictions
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
 # magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
-# internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 
 
 @dataclass(frozen=True)
