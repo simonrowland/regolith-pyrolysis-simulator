@@ -78,7 +78,16 @@ from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
 from simulator.battery import schema_gap as sg
 from simulator.battery.source_declarations import SOURCE_DECLARATIONS
-from simulator.battery.oxygen_identity import log10_fo2_to_pa
+from simulator.battery.oxygen_identity import (
+    _ATM_BAR,
+    _atmosphere_kind,
+    _display_fo2_dex,
+    _gas_mixture_evaluation_temperature,
+    _last_printed_digit,
+    _printed_sccm_gas_mixture,
+    _row_printed_atmospheres,
+    log10_fo2_to_pa,
+)
 from simulator.battery.polymorph_dictionary import (
     POLYMORPH_ALIASES,
     is_generic_polymorph_name,
@@ -151,6 +160,7 @@ from simulator.battery.enums import (
     Polymorph,
     PolymorphRejectionKind,
     Quantity,
+    QuotedTargetKind,
     RawInputStatus,
     Rail,
     ReferenceStateConvention,
@@ -197,6 +207,8 @@ from simulator.battery.stable_ids import (
 )
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
+    SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     AmbientPressureEvidence,
     Admission,
     AdmissionDecision,
@@ -221,6 +233,7 @@ from simulator.battery.records import (
     Notice,
     Observation,
     PressureEnvironment,
+    QuotedFrom,
     Reaction,
     ReactionTerm,
     Sample,
@@ -988,6 +1001,9 @@ def _mass_percent_component_key(name: str) -> tuple[str, bool]:
     return token, has_suffix
 
 
+_MALFORMED_DECLARED_AMOUNT_PREFIX = "malformed declared amount"
+
+
 def parse_declared_amount(value: object) -> Decimal:
     """Single owner for source-declared numeric amounts.
 
@@ -996,11 +1012,11 @@ def parse_declared_amount(value: object) -> Decimal:
     """
 
     if value is None or value == "" or isinstance(value, bool):
-        raise ValueError(f"malformed declared amount: {value!r}")
+        raise ValueError(f"{_MALFORMED_DECLARED_AMOUNT_PREFIX}: {value!r}")
     try:
         return _parse_declared_decimal(value)
     except _InvalidDecimalValue as exc:
-        raise ValueError(f"malformed declared amount: {value!r}") from exc
+        raise ValueError(f"{_MALFORMED_DECLARED_AMOUNT_PREFIX}: {value!r}") from exc
 
 
 def _provenance_with_printed_phase(
@@ -3753,6 +3769,11 @@ def _sample_from_plain(
         container=None if container is None else _located_from_plain(container, str),
         printed_composition=printed_located,
         initial_composition=initial_located,
+        initial_composition_inherited_from=(
+            None
+            if payload.get("initial_composition_inherited_from") is None
+            else _boolean_from_plain(payload["initial_composition_inherited_from"])
+        ),
         composition_class=None
         if composition_class is None
         else _located_from_plain(composition_class, str),
@@ -4122,6 +4143,22 @@ def experiment_from_plain(payload: object) -> Experiment:
     return _experiment_from_plain(payload, registry_issues=None)
 
 
+def _quoted_from_from_plain(payload: object) -> QuotedFrom | None:
+    if payload is None:
+        return None
+    if not isinstance(payload, Mapping):
+        raise ValueError("quoted_from must be an object with target_kind and target_id")
+    if "target_kind" not in payload or "target_id" not in payload:
+        raise ValueError("quoted_from requires target_kind and target_id")
+    try:
+        return QuotedFrom(
+            target_kind=QuotedTargetKind(str(payload["target_kind"])),
+            target_id=payload["target_id"],
+        )
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"invalid quoted_from: {exc}") from exc
+
+
 def _experiment_from_plain(
     payload: object, *, registry_issues: list[ValidationIssue] | None
 ) -> Experiment:
@@ -4172,6 +4209,12 @@ def _experiment_from_plain(
         experiment_id=str(payload["experiment_id"]),
         kind=ExperimentKind(str(payload.get("kind") or "literature")),
         method=_state_from_plain(payload["method"], lambda v: MethodToken(str(v))),
+        method_inherited_from=(
+            None
+            if payload.get("method_inherited_from") is None
+            else _boolean_from_plain(payload["method_inherited_from"])
+        ),
+        quoted_from=_quoted_from_from_plain(payload.get("quoted_from")),
         sample=_sample_from_plain(
             payload.get("sample"),
             experiment_id=str(payload["experiment_id"]),
@@ -8256,7 +8299,7 @@ def _mole_fraction_composition_error(
     exc: ValueError, values: Mapping[str, object]
 ) -> tuple[str, str]:
     detail = str(exc)
-    if not detail.startswith("malformed declared amount"):
+    if not detail.startswith(_MALFORMED_DECLARED_AMOUNT_PREFIX):
         raise exc
     composition_key = (
         "composition_mol"
@@ -8664,8 +8707,8 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
     """Return (role, refusal) from the first ``composition_role`` declared.
 
     The row is read before its parent values block. ``initial_charge_only``
-    marks a printed starting charge that stays sample context and cannot supply
-    a later datum's composition. ``datum_state`` marks the sample composition
+    marks a printed starting charge that may supply a later datum as a flagged
+    proxy. ``datum_state`` marks the sample composition
     at this datum's measurement state, including a bulk two-phase sample; it
     applies to the observation's point conditions and never marks the
     experiment's starting charge. Each typed declaration is a bare token or a
@@ -8686,17 +8729,6 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
             f"{sorted(_COMPOSITION_ROLE_TOKENS)}; composition left unstamped"
         )
     return None, None
-
-
-def _has_printed_initial_series_start(role: str | None, values: object) -> bool:
-    """The declared initial charge supplies points in its printed series."""
-
-    return (
-        role == INITIAL_CHARGE_ONLY_PROXY_FLAG
-        and isinstance(values, Mapping)
-        and isinstance(values.get("series"), list)
-        and bool(values["series"])
-    )
 
 
 # A closed-system equilibrium experiment's printed starting bulk is the
@@ -9320,22 +9352,70 @@ def _apply_equilibrium_starting_bulk(
     return point_conditions, notices
 
 
-def _initial_charge_only_missing_composition(
+def _initial_charge_only_composition_proxy(
     identity: Identity,
     point_conditions: Mapping[str, Located[Any]] | None,
     notices: Sequence[Notice],
     *,
     role: str | None,
-    printed_series_start: bool,
     quantity: Quantity | None,
     quantity_as_printed: object,
     locator: Locator | None,
     origin: str,
+    initial_charge_context: Mapping[str, Any] | None = None,
+    point_composition_refusal: Sequence[str] = (),
+    point_composition_context: Mapping[str, Any] | None = None,
+    point_oxide_map: Mapping[str, Decimal] | None = None,
+    point_declared_component_map: Mapping[str, Any] | None = None,
+    point_composition_map_declared: bool = False,
 ) -> tuple[Identity, Mapping[str, Located[Any]] | None, list[Notice]]:
+    conditions = dict(point_conditions or {})
+    point_composition = conditions.get("composition")
+    malformed_composition_reason = None
+    # A declared but malformed composition is present invalid input, never a
+    # missing run composition eligible for the initial-charge proxy.
+    incoming_compositions = (
+        point_composition.state
+        if isinstance(point_composition, Located)
+        else None,
+        identity.composition,
+    )
+    for incoming in incoming_compositions:
+        if (
+            incoming is not None
+            and incoming.is_unknown
+            and (incoming.reason or "").startswith(
+                f"{_MALFORMED_DECLARED_AMOUNT_PREFIX}:"
+            )
+        ):
+            malformed_composition_reason = incoming.reason
+            break
+    if malformed_composition_reason is not None:
+        invalid = Located(
+            State.unknown(malformed_composition_reason), locator=locator
+        )
+        conditions["composition"] = invalid
+        return replace(identity, composition=invalid.state), conditions, list(notices)
+
+    existing_initial_charge_proxy = (
+        identity.composition is not None
+        and identity.composition.is_value
+        and isinstance(identity.composition.value, Composition)
+        and identity.composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    ) or (
+        isinstance(point_composition, Located)
+        and point_composition.state.is_value
+        and isinstance(point_composition.state.value, Composition)
+        and point_composition.state.value.proxy_flag
+        == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    )
     if (
-        role != INITIAL_CHARGE_ONLY_PROXY_FLAG
-        or printed_series_start
-        or quantity in {
+        (
+            role != INITIAL_CHARGE_ONLY_PROXY_FLAG
+            and not existing_initial_charge_proxy
+        )
+        or quantity
+        in {
             Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
             Quantity.RESIDUE_COMPONENT_COMPOSITION,
         }
@@ -9345,32 +9425,143 @@ def _initial_charge_only_missing_composition(
         )
     ):
         return identity, point_conditions, list(notices)
-    reason = (
-        "missing input: per-run composition is not published; the printed "
-        "initial charge is retained as sample context only"
-    )
-    conditions = {
-        **(point_conditions or {}),
-        "composition": Located(State.unknown(reason), locator=locator),
-    }
+
+    refusal_reasons = list(point_composition_refusal)
+    if isinstance(point_composition, Located) and point_composition.state.is_unknown:
+        point_reason = point_composition.state.reason
+        if point_reason and any(
+            marker in point_reason.casefold()
+            for marker in (
+                "unsupported component",
+                "malformed printed component amount",
+                "mass-percent composition",
+                "partial_composition:",
+            )
+        ):
+            refusal_reasons.append(point_reason)
+    composition = None
+    composition_locator = locator
+    if point_composition_map_declared:
+        declared_map = point_declared_component_map or point_oxide_map
+        initial = None
+        if declared_map is not None:
+            initial = _owner_initial_from_printed(
+                Located(State.of(declared_map), locator=locator),
+                proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                closure_context=point_composition_context,
+            )
+        if (
+            initial is not None
+            and initial.state.is_value
+            and isinstance(initial.state.value, Composition)
+        ):
+            composition = initial.state.value
+            composition_locator = initial.locator or locator
+        elif initial is not None and initial.state.is_unknown:
+            refusal_reasons.append(
+                initial.state.reason or "printed point composition is unusable"
+            )
+        if composition is None and declared_map is not None:
+            reason = refusal_reasons[0] if refusal_reasons else (
+                "explicit printed point composition map is unusable"
+            )
+            unknown = Located(State.unknown(reason), locator=locator)
+            conditions["composition"] = unknown
+            return replace(identity, composition=unknown.state), conditions, list(notices)
+
+    if composition is None and initial_charge_context is not None:
+        initial_map = _named_printed_composition_map(initial_charge_context)
+        if initial_map:
+            initial = _owner_initial_from_printed(
+                Located(State.of(initial_map), locator=locator),
+                proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                closure_context=initial_charge_context,
+            )
+            if (
+                initial is not None
+                and initial.state.is_value
+                and isinstance(initial.state.value, Composition)
+            ):
+                composition = initial.state.value
+                composition_locator = initial.locator or locator
+            else:
+                reason = (
+                    initial.state.reason
+                    if initial is not None and initial.state.is_unknown
+                    else "printed initial charge is not a usable composition proxy"
+                )
+                unknown = Located(State.unknown(reason), locator=locator)
+                conditions["composition"] = unknown
+                return replace(identity, composition=unknown.state), conditions, list(notices)
+
+    printed = conditions.get("printed_composition")
+    if (
+        composition is None
+        and isinstance(printed, Located)
+        and printed.state.is_value
+    ):
+        initial = _owner_initial_from_printed(
+            printed,
+            proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            closure_context=initial_charge_context,
+        )
+        if initial is not None and initial.state.is_value:
+            candidate = initial.state.value
+            if isinstance(candidate, Composition):
+                composition = candidate
+                composition_locator = initial.locator or locator
+        if composition is None:
+            refusal_reasons.append("printed initial charge is not a usable composition proxy")
+    if composition is None:
+        located = conditions.get("composition")
+        if isinstance(located, Located) and located.state.is_value:
+            candidate = located.state.value
+            if isinstance(candidate, Composition):
+                composition = candidate
+                composition_locator = located.locator or locator
+    if composition is None and identity.composition is not None:
+        if identity.composition.is_value and isinstance(
+            identity.composition.value, Composition
+        ):
+            composition = identity.composition.value
+
     updated_notices = list(notices)
+    if composition is None:
+        if refusal_reasons:
+            reason = refusal_reasons[0]
+        elif point_composition_map_declared:
+            reason = "explicit printed point composition map is unusable"
+        else:
+            reason = (
+                "missing input: printed initial charge is unavailable for "
+                "initial_charge_only composition proxy"
+            )
+        unknown = Located(State.unknown(reason), locator=locator)
+        conditions["composition"] = unknown
+        return replace(identity, composition=unknown.state), conditions, updated_notices
+
+    composition = replace(
+        composition,
+        proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+        input_provenance=PRINTED_STARTING_BULK,
+    )
+    located_proxy = Located(State.of(composition), locator=composition_locator)
+    conditions["composition"] = located_proxy
+    updated_identity = replace(identity, composition=State.of(composition))
     if quantity is not None:
         updated_notices.append(
             Notice(
                 kind=NoticeKind.SOURCE_DISAGREEMENT,
                 affected_quantities=(quantity,),
                 reason=(
-                    "composition_role=initial_charge_only: printed initial "
-                    "charge is sample context; per-run composition is not published"
+                    f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+                    f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
+                    f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
                 ),
                 origin=origin,
             )
         )
-    return (
-        replace(identity, composition=State.unknown(reason)),
-        conditions,
-        updated_notices,
-    )
+    return updated_identity, conditions, updated_notices
 
 
 def _owner_initial_from_printed(
@@ -9385,6 +9576,23 @@ def _owner_initial_from_printed(
         return None
     raw = printed.state.value
     locator = printed.locator
+    if isinstance(raw, Composition):
+        composition = raw
+        if proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+            composition = replace(composition, proxy_flag=proxy_flag)
+        return Located(State.of(composition), locator=locator)
+    if (
+        isinstance(raw, Mapping)
+        and _enum(AmountBasis, raw.get("amount_basis"))
+        is AmountBasis.MOLE_PERCENT
+    ):
+        try:
+            composition = _composition_from_plain(raw)
+        except ValueError as exc:
+            return Located(State.unknown(str(exc)), locator=locator)
+        if proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+            composition = replace(composition, proxy_flag=proxy_flag)
+        return Located(State.of(composition), locator=locator)
     if isinstance(raw, Mapping) and sum(
         isinstance(value, Mapping) for value in raw.values()
     ) > 1:
@@ -13515,6 +13723,10 @@ def _reference_phase_for_formula(
     formula: str,
     convention: ReferenceStateConvention,
 ) -> Phase | State[Phase]:
+    if convention is ReferenceStateConvention.TEMKIN:
+        return State.unknown(
+            "Temkin reference phase requires a structured standard_state payload"
+        )
     attached = {
         phase
         for phase, named in _named_reference_endmembers(text)
@@ -13577,6 +13789,10 @@ def reference_state_from_extract(
     lowered = text.casefold()
     if not text:
         return None
+    if "temkin" in lowered:
+        return State.unknown(
+            "Temkin reference requires a structured standard_state payload"
+        )
 
     if "vapour reference" in lowered or "vapor reference" in lowered:
         return State.unknown(
@@ -16730,6 +16946,40 @@ def fe3_fe2_ratio_from_ferric_fraction(r: Decimal) -> Decimal | None:
     return r / (Decimal(1) - r)
 
 
+def _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+    r: Decimal, sigma_r: Decimal
+) -> tuple[Decimal | None, str | None]:
+    """Propagate a ferric-fraction standard uncertainty into log10(R)."""
+
+    if (
+        not r.is_finite()
+        or r <= 0
+        or r >= 1
+        or not sigma_r.is_finite()
+        or sigma_r < 0
+    ):
+        return None, "ferric_fraction_uncertainty_input_invalid"
+    gap = Decimal(1) - r
+    two_sigma = Decimal(2) * sigma_r
+    if two_sigma >= r or two_sigma >= gap:
+        return None, "ferric_fraction_uncertainty_linearization_invalid"
+
+    # Premise: the print gives r = Fe3+/sumFe, while the stored value is
+    # R = Fe3+/Fe2+ = r/(1-r). Algebra: dR/dr = 1/(1-r)^2, so
+    # sigma_R = sigma_r/(1-r)^2. The scorer uses log10(R), whose derivative
+    # is d(log10R)/dr = (1/r + 1/(1-r))/ln(10), hence
+    # sigma_log10R = sigma_r * (1/r + 1/(1-r))/ln(10).
+    # Unit check: r, R, sigma_r and sigma_R are dimensionless ratios, so both
+    # sides are dimensionless (the final uncertainty is in dex). Sanity:
+    # r=0.5 gives R=1 and sigma_R=4*sigma_r; as r->0, sigma_R->sigma_r.
+    # Refuse when a two-sigma span reaches either endpoint: log10(R) diverges
+    # at r=0 and r=1, so linearisation cannot represent that printed interval.
+    sigma_log10_r = sigma_r / (Decimal(10).ln() * r * gap)
+    if not sigma_log10_r.is_finite():
+        return None, "ferric_fraction_uncertainty_input_invalid"
+    return sigma_log10_r, None
+
+
 def fe3_fe2_ratio_from_oxide_wt_pct(w_fe2o3: Decimal, w_feo: Decimal) -> Decimal | None:
     """R = 2 (w3/M(Fe2O3))/(w2/M(FeO)); None unless both are finite and > 0."""
 
@@ -19592,6 +19842,11 @@ def _merge_experiment_lab_params(
         pretreatment=_prefer_located(
             existing.sample.pretreatment, sample.pretreatment
         ),
+        initial_composition_inherited_from=(
+            sample.initial_composition_inherited_from
+            if sample.initial_composition_inherited_from is not None
+            else existing.sample.initial_composition_inherited_from
+        ),
     )
     return replace(
         existing,
@@ -20051,117 +20306,10 @@ class PrintedOxygenDecision:
     pressure_pa_used: Decimal | None = None
 
 
-def _oxygen_pressure_point(located: object) -> Decimal | None:
-    if not isinstance(located, Located) or not located.state.is_value:
-        return None
-    raw = located.state.value
-    if isinstance(raw, Value):
-        if raw.kind is not ValueKind.POINT or raw.point is None:
-            return None
-        raw = raw.point
-    if isinstance(raw, Decimal) and raw.is_finite():
-        return raw
-    return None
-
-
-_ATM_BAR = Decimal("1.01325")
-_AIR_O2_MOLE_FRACTION = Decimal("0.2095")
-
-
-def _atmosphere_kind(
-    as_printed: str,
-) -> tuple[str, Decimal, Decimal | None] | None:
-    """Recognise only explicitly printed air or pure oxygen atmospheres."""
-
-    text = as_printed.strip().casefold().replace("₂", "2")
-    compact = re.sub(r"\s+", " ", text)
-    air = re.fullmatch(r"(?:dry )?air(?: at 1(?:\.0+)? (atm|bar))?", compact)
-    if air is not None:
-        unit = air.group(1)
-        total_pressure_bar = (
-            _ATM_BAR if unit == "atm" else Decimal(1) if unit == "bar" else None
-        )
-        return "air", _AIR_O2_MOLE_FRACTION, total_pressure_bar
-    oxygen = re.fullmatch(
-        r"(?:pure )?(?:o2|oxygen)(?: at 1(?:\.0+)? (atm|bar))?", compact
-    )
-    if oxygen is not None:
-        unit = oxygen.group(1)
-        total_pressure_bar = (
-            _ATM_BAR if unit == "atm" else Decimal(1) if unit == "bar" else None
-        )
-        return "pure O2", Decimal(1), total_pressure_bar
-    # A row such as Jayasuriya's "O2 100.0 × 200 SCCM" explicitly prints a
-    # single-species atmosphere; it is not a mixed-gas equilibrium.
-    if re.fullmatch(
-        r"o2\s+\d+(?:\.\d+)?\s*[×x]\s*\d+(?:\.\d+)?\s*sccm",
-        compact,
-    ):
-        return "pure O2", Decimal(1), None
-    return None
-
-
-def _last_printed_digit(value: Decimal) -> Decimal:
-    exponent = value.as_tuple().exponent
-    return Decimal(1).scaleb(exponent)
-
-
-def _display_fo2_dex(value: Decimal) -> str:
-    return format(value.quantize(Decimal("0.0001")), "+.4f")
-
-
-def _row_printed_atmospheres(
-    raw_item: object, experiment_atmospheres: Sequence[str]
-) -> tuple[str, ...]:
-    """A run's explicit gas label narrows its experiment-set evidence."""
-
-    if isinstance(raw_item, Mapping):
-        for key in ("gas_mix_as_printed", "atmosphere_as_printed"):
-            value = raw_item.get(key)
-            if isinstance(value, str) and value.strip():
-                return (value.strip(),)
-    return tuple(experiment_atmospheres)
-
-
-def _printed_sccm_gas_mixture(
-    as_printed: str,
-) -> tuple[dict[str, Decimal], dict[str, float]] | None:
-    """Parse a printed SCCM gas mixture and component last-digit precision."""
-
-    normalized = as_printed.replace("₂", "2").replace("₀", "0")
-    pieces = normalized.split("+")
-    species_mol: dict[str, Decimal] = {}
-    relative_precision: dict[str, float] = {}
-    component = re.compile(
-        r"^\s*(CO2|CO|H2O|H2)\s+(\d+(?:\.\d+)?)\s*[×x]\s*"
-        r"(\d+(?:\.\d+)?)\s*SCCM\s*$",
-        re.IGNORECASE,
-    )
-    for piece in pieces:
-        match = component.fullmatch(piece)
-        if match is None:
-            return None
-        species = match.group(1).upper()
-        fraction = Decimal(match.group(2))
-        flow = Decimal(match.group(3))
-        if species in species_mol or fraction <= 0 or flow <= 0:
-            return None
-        species_mol[species] = fraction * flow
-        # The printed percent and SCCM value both contribute to this component
-        # flow's absolute last-digit uncertainty.
-        relative_precision[species] = float(
-            _last_printed_digit(fraction) / fraction
-            + _last_printed_digit(flow) / flow
-        )
-    if len(species_mol) < 2:
-        return None
-    return species_mol, relative_precision
-
-
 def _janaf_gas_formation_inputs(
     formulas: Sequence[str], temperature_K: Decimal
 ) -> tuple[dict[str, float], float]:
-    """Read the requested JANAF gas records through their existing owner."""
+    """Resolve JANAF data in the battery caller before passing it to chemistry."""
 
     from simulator.battery.generators.janaf import (
         JANAF_R_J_PER_MOL_K,
@@ -20177,16 +20325,17 @@ def _janaf_gas_formation_inputs(
     return gibbs, float(JANAF_R_J_PER_MOL_K)
 
 
-def _is_wgs_dependent_gas_mix(as_printed: str) -> bool:
-    normalized = as_printed.replace("₂", "2").replace("₀", "0").upper()
-    compact = re.sub(r"\s+", "", normalized)
-    species = set(re.findall(r"CO2|H2O|CO|H2", compact))
-    carries_carbon = bool(species & {"CO", "CO2"})
-    carries_hydrogen = bool(species & {"H2", "H2O"})
-    return (
-        "WGS" in compact
-        or (carries_carbon and carries_hydrogen)
-    )
+def _oxygen_pressure_point(located: object) -> Decimal | None:
+    if not isinstance(located, Located) or not located.state.is_value:
+        return None
+    raw = located.state.value
+    if isinstance(raw, Value):
+        if raw.kind is not ValueKind.POINT or raw.point is None:
+            return None
+        raw = raw.point
+    if isinstance(raw, Decimal) and raw.is_finite():
+        return raw
+    return None
 
 
 def _bare_log_frame_decision(
@@ -20195,8 +20344,10 @@ def _bare_log_frame_decision(
     *,
     printed_atmospheres: Sequence[str] = (),
     total_pressure_pa: Decimal | None = None,
+    gas_fO2_evaluation_temperature_K: Located[Any] | None = None,
+    require_bare_log_convention: bool = True,
 ) -> PrintedOxygenDecision:
-    """Apply the IW plausibility window, then printed atmosphere consistency.
+    """Check a printed fO2 against its stated atmosphere.
 
     These anchors are all log10(fO2/bar): air is -0.6788 at 1 bar total and
     -0.6731 at 1 atm total (0.2095 × 1.01325 bar); pure O2 is 0.0000 at
@@ -20206,9 +20357,17 @@ def _bare_log_frame_decision(
     minimum printed tolerance.
     No atmosphere is inferred: only these explicit prints can open the frame
     check; every other gas needs its equilibrium owner and sized band.
+    ``require_bare_log_convention`` applies the IW plausibility window only
+    when a unitless value has no known bar frame; a known bar-frame value can
+    still be checked against a linked gas mixture without changing its scale.
     """
 
     candidates = tuple(item.strip() for item in printed_atmospheres if item.strip())
+    explicit_mix_candidates = tuple(
+        atmosphere
+        for atmosphere in candidates
+        if _printed_sccm_gas_mixture(atmosphere) is not None
+    )
     has_total_pressure = (
         total_pressure_pa is not None
         and total_pressure_pa.is_finite()
@@ -20217,10 +20376,18 @@ def _bare_log_frame_decision(
     pressure_bar = (
         total_pressure_pa / _BAR_PA
         if has_total_pressure
-        else (_ATM_BAR if candidates else Decimal(1))
+        else (
+            None
+            if explicit_mix_candidates
+            else (_ATM_BAR if candidates else Decimal(1))
+        )
     )
-    ceiling = pressure_bar.ln() / Decimal(10).ln()
-    if log10_fO2 > ceiling:
+    ceiling = (
+        pressure_bar.ln() / Decimal(10).ln()
+        if pressure_bar is not None
+        else None
+    )
+    if ceiling is not None and log10_fO2 > ceiling:
         reason = (
             "bare log fO2 exceeds the total-pressure pO2 ceiling: "
             f"printed={_dec_str(log10_fO2)} log10(bar), "
@@ -20237,13 +20404,17 @@ def _bare_log_frame_decision(
             ),
         )
 
-    state, notice = _bare_log_convention(log10_fO2, temperature_K)
-    if state.is_value:
+    if require_bare_log_convention:
+        state, notice = _bare_log_convention(log10_fO2, temperature_K)
+    else:
+        state, notice = State.of(_log_fO2_to_pa(log10_fO2, _BAR_PA)), None
+    if state.is_value and not explicit_mix_candidates:
         return PrintedOxygenDecision("log", state, notice_reason=notice)
 
     tolerance = max(_last_printed_digit(log10_fO2), Decimal("0.01"))
     checked: list[tuple[str, Decimal, Decimal]] = []
     unsupported: list[str] = []
+    evaluation_notices: list[PrintedOxygenNotice] = []
 
     def checked_gas_mix_decision(
         atmosphere: str,
@@ -20252,13 +20423,14 @@ def _bare_log_frame_decision(
         band_text: str,
         authority: Authority,
         notices: tuple[PrintedOxygenNotice, ...] = (),
+        expected_method: str = "JANAF full-balance",
     ) -> PrintedOxygenDecision | None:
         checked.append((atmosphere, expected, owner_band))
         if abs(log10_fO2 - expected) > tolerance + owner_band:
             return None
         reason = (
-            "bare fO2 frame matched printed atmosphere "
-            f"{atmosphere!r}; expected CEA log10(fO2/bar)="
+            "printed fO2 frame matched printed atmosphere "
+            f"{atmosphere!r}; expected {expected_method} log10(fO2/bar)="
             f"{_display_fo2_dex(expected)}; {band_text}"
         )
         return PrintedOxygenDecision(
@@ -20275,97 +20447,70 @@ def _bare_log_frame_decision(
         kind = _atmosphere_kind(atmosphere)
         if kind is None:
             parsed_mix = _printed_sccm_gas_mixture(atmosphere)
-            if parsed_mix is not None and temperature_K is not None:
-                species_mol, relative_precision = parsed_mix
-                if _is_wgs_dependent_gas_mix(atmosphere):
-                    formation_gibbs: dict[str, float] | None = None
-                    thermo_missing_reason = ""
-                    try:
-                        formation_gibbs, janaf_gas_constant = (
-                            _janaf_gas_formation_inputs(
-                                ("CO", "CO2", "H2", "H2O", "O2"),
-                                temperature_K,
-                            )
-                        )
-                    except (
-                        FileNotFoundError,
-                        OSError,
-                        KeyError,
-                        TypeError,
-                        ValueError,
-                    ) as exc:
-                        thermo_missing_reason = str(exc)
-                    if formation_gibbs is None:
-                        unsupported.append(
-                            f"{atmosphere!r} (gas_mix_fo2_band_unavailable: "
-                            "JANAF WGS data missing"
-                            + (
-                                f" ({thermo_missing_reason})"
-                                if thermo_missing_reason
-                                else ""
-                            )
-                            + ")"
-                        )
-                        continue
-                    from simulator.chemistry.offgas_fo2 import (
-                        OffgasFO2Unavailable,
-                        imposed_fo2,
-                        load_buffer_polynomials,
+            if parsed_mix is not None:
+                if not has_total_pressure:
+                    pressure_reason = (
+                        "gas-mixture consistency check unavailable: total pressure "
+                        "is missing, unknown, or invalid; printed fO2 identity is "
+                        "retained under its existing reference convention"
                     )
-                    try:
-                        resolution = imposed_fo2(
-                            {
-                                name: float(amount)
-                                for name, amount in species_mol.items()
-                            },
-                            float(temperature_K),
-                            load_buffer_polynomials(),
-                            janaf_formation_gibbs_J_per_mol=formation_gibbs,
-                            janaf_gas_constant_J_per_mol_K=janaf_gas_constant,
-                        )
-                    except (
-                        ArithmeticError,
-                        OffgasFO2Unavailable,
-                        TypeError,
-                        ValueError,
-                    ) as exc:
-                        unsupported.append(
-                            f"{atmosphere!r} (gas_mix_fo2_band_unavailable: {exc})"
-                        )
-                        continue
-                    if resolution.uncertainty_band_dex is None:
-                        unsupported.append(
-                            f"{atmosphere!r} (gas_mix_fo2_band_unavailable: "
-                            "WGS source spread is unsized)"
-                        )
-                        continue
-                    expected = Decimal(str(resolution.log10_fO2))
-                    wgs_band = Decimal(str(resolution.uncertainty_band_dex))
-                    band_text = (
-                        f"tolerance={_dec_str(tolerance)} dex; "
-                        f"wgs_uncertainty_band={_dec_str(wgs_band)} dex; "
-                        f"combined_allowance={_dec_str(tolerance + wgs_band)} dex"
+                    return PrintedOxygenDecision(
+                        "log" if state.is_value else "refusal",
+                        state,
+                        notice_reason="; ".join(
+                            part for part in (notice, pressure_reason) if part
+                        ),
+                        notice_kind=NoticeKind.INPUT_OMITTED,
+                        notices=(
+                            PrintedOxygenNotice(
+                                kind=NoticeKind.INPUT_OMITTED,
+                                reason=pressure_reason,
+                            ),
+                        ),
                     )
-                    decision = checked_gas_mix_decision(
-                        atmosphere,
-                        expected,
-                        wgs_band,
-                        band_text,
-                        Authority.CERTIFIED,
+                (
+                    evaluation_temperature_K,
+                    evaluation_notice_reason,
+                    temperature_error,
+                ) = (
+                    _gas_mixture_evaluation_temperature(
+                        gas_fO2_evaluation_temperature_K,
+                        temperature_K,
                     )
-                    if decision is not None:
-                        return decision
+                )
+                if evaluation_notice_reason is not None:
+                    evaluation_notice = PrintedOxygenNotice(
+                        kind=NoticeKind.INPUT_OMITTED,
+                        reason=evaluation_notice_reason,
+                    )
+                else:
+                    evaluation_notice = None
+                if evaluation_notice is not None and evaluation_notice not in evaluation_notices:
+                    evaluation_notices.append(evaluation_notice)
+                if temperature_error is not None:
+                    unsupported.append(f"{atmosphere!r} ({temperature_error})")
                     continue
+                if evaluation_temperature_K is None:
+                    unsupported.append(
+                        f"{atmosphere!r} (gas_mix_fo2_band_unavailable: "
+                        "run temperature is unavailable for the gas-mixture check)"
+                    )
+                    continue
+                from simulator.chemistry.offgas_fo2 import (
+                    OffgasFO2Unavailable,
+                    _full_balance_fo2_with_janaf_band,
+                    load_buffer_polynomials,
+                )
 
-                if set(species_mol) not in ({"CO2", "CO"}, {"H2O", "H2"}):
-                    unsupported.append(atmosphere)
-                    continue
+                species_mol, relative_precision = parsed_mix
                 formation_gibbs: dict[str, float] | None = None
+                janaf_gas_constant: float | None = None
                 thermo_missing_reason = ""
                 try:
                     formation_gibbs, janaf_gas_constant = (
                         _janaf_gas_formation_inputs(
-                            (*species_mol, "O2"), temperature_K
+                            ("CO", "CO2", "H2", "H2O", "O2", "CH4"),
+                            evaluation_temperature_K,
                         )
                     )
                 except (
@@ -20376,22 +20521,23 @@ def _bare_log_frame_decision(
                     ValueError,
                 ) as exc:
                     thermo_missing_reason = str(exc)
-                from simulator.chemistry.offgas_fo2 import (
-                    OffgasFO2Unavailable,
-                    _direct_gas_couple_fo2,
-                )
-
+                assert pressure_bar is not None
                 try:
-                    resolution = _direct_gas_couple_fo2(
-                        {name: float(amount) for name, amount in species_mol.items()},
-                        relative_precision,
-                        float(temperature_K),
-                        formation_gibbs_J_per_mol=formation_gibbs,
-                        gas_constant_J_per_mol_K=(
-                            janaf_gas_constant
-                            if formation_gibbs is not None
-                            else None
-                        ),
+                    resolution, _cea_log_fO2, full_balance_band = (
+                        _full_balance_fo2_with_janaf_band(
+                            {name: float(amount) for name, amount in species_mol.items()},
+                            float(evaluation_temperature_K),
+                            formation_gibbs,
+                            janaf_gas_constant,
+                            load_buffer_polynomials(),
+                            initial_total_pressure_bar=float(pressure_bar),
+                            relative_precision=relative_precision,
+                            methane_formation_gibbs_J_per_mol=(
+                                formation_gibbs["CH4"]
+                                if formation_gibbs is not None
+                                else None
+                            ),
+                        )
                     )
                 except (
                     ArithmeticError,
@@ -20399,63 +20545,71 @@ def _bare_log_frame_decision(
                     TypeError,
                     ValueError,
                 ) as exc:
-                    unsupported.append(
-                        f"{atmosphere!r} (gas_mix_fo2_band_unavailable: {exc})"
-                    )
+                    if formation_gibbs is None:
+                        unsupported.append(
+                            f"{atmosphere!r} (gas_mix_fo2_band_unavailable: "
+                            "JANAF full-balance data missing"
+                            + (
+                                f" ({thermo_missing_reason})"
+                                if thermo_missing_reason
+                                else ""
+                            )
+                            + ")"
+                        )
+                    else:
+                        unsupported.append(
+                            f"{atmosphere!r} (gas_mix_fo2_band_unavailable: {exc})"
+                        )
                     continue
                 expected = Decimal(str(resolution.log10_fO2))
-                gas_band = Decimal(str(resolution.band_dex))
-                authority = (
-                    Authority.EXTRAPOLATED
-                    if resolution.authority == "extrapolated"
-                    else Authority.CERTIFIED
-                )
-                spread = (
-                    f"{resolution.thermo_spread_dex:.4f} dex"
-                    if resolution.thermo_spread_dex is not None
-                    else "unsized"
-                )
+                full_band = Decimal(str(full_balance_band))
+                domain_reasons = resolution.domain_reasons
+                # The owner only resolves a missing-JANAF input for its
+                # explicitly supported out-of-domain direct CO2/CO couple.
+                direct_couple_extrapolation = formation_gibbs is None
                 band_text = (
                     f"tolerance={_dec_str(tolerance)} dex; "
-                    f"mix_precision={resolution.mix_precision_band_dex:.4f} dex; "
-                    f"thermo_spread={spread}; combined_band={_dec_str(gas_band)} dex"
-                )
-                notices = (
-                    (
-                        PrintedOxygenNotice(
-                            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-                            reason=(
-                                "gas_couple_thermo_spread_unsized: JANAF "
-                                "species data are unavailable; using the "
-                                "printed-flow mix band alone"
-                                + (
-                                    f" ({thermo_missing_reason})"
-                                    if thermo_missing_reason
-                                    else ""
-                                )
-                            ),
-                            band=band_text,
-                            authority=authority,
-                        ),
+                    "direct_CEA_couple_extrapolation; JANAF source spread and "
+                    "mixture precision band unavailable; "
+                    f"combined_allowance={_dec_str(tolerance + full_band)} dex"
+                    if direct_couple_extrapolation
+                    else (
+                        f"tolerance={_dec_str(tolerance)} dex; "
+                        f"full_balance_cea_janaf_and_mix_band={_dec_str(full_band)} dex; "
+                        f"combined_allowance={_dec_str(tolerance + full_band)} dex"
                     )
-                    if resolution.thermo_spread_dex is None
-                    else ()
                 )
+                domain_notice = (
+                    PrintedOxygenNotice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        reason=(
+                            (
+                                "printed gas couple is outside its certified CEA "
+                                "domain: "
+                                if direct_couple_extrapolation
+                                else "gas-mixture full balance is outside its certified "
+                                "species domain: "
+                            )
+                            + "; ".join(domain_reasons)
+                        ),
+                    ),
+                ) if domain_reasons else ()
+                mix_notices = (*domain_notice, *evaluation_notices)
                 decision = checked_gas_mix_decision(
                     atmosphere,
                     expected,
-                    gas_band,
+                    full_band,
                     band_text,
-                    authority,
-                    notices,
+                    Authority.EXTRAPOLATED if domain_reasons else Authority.CERTIFIED,
+                    notices=mix_notices,
+                    expected_method=(
+                        "extrapolated CEA direct-couple"
+                        if direct_couple_extrapolation
+                        else "JANAF full-balance"
+                    ),
                 )
                 if decision is not None:
                     return decision
-                continue
-            if _is_wgs_dependent_gas_mix(atmosphere):
-                unsupported.append(
-                    f"{atmosphere!r} (gas_mix_fo2_band_unavailable: WGS-dependent mix)"
-                )
                 continue
             unsupported.append(atmosphere)
             continue
@@ -20505,7 +20659,7 @@ def _bare_log_frame_decision(
         checked.append((atmosphere, matched_expected, Decimal(0)))
         if abs(log10_fO2 - matched_expected) <= tolerance:
             message = (
-                "bare fO2 frame matched printed atmosphere "
+                "printed fO2 frame matched printed atmosphere "
                 f"{atmosphere!r}; expected log10(fO2/bar)="
                 f"{_display_fo2_dex(matched_expected)}; {matched_anchor}; "
                 "bar-vs-atm unit ambiguity (0.0057 dex) is below the printed "
@@ -20520,30 +20674,39 @@ def _bare_log_frame_decision(
 
     if checked:
         expected = "; ".join(
-            f"{name!r}: log10(fO2/bar)={_display_fo2_dex(value)} "
+            f"{name!r}: mismatch={_dec_str(log10_fO2 - value)} dex; "
+            f"expected log10(fO2/bar)={_display_fo2_dex(value)} "
             f"± {_dec_str(tolerance + band)} dex"
             for name, value, band in checked
         )
-        reason = (
-            "bare log fO2 does not match any printed atmosphere; "
-            f"printed tolerance={_dec_str(tolerance)} dex; "
-            f"printed={_dec_str(log10_fO2)}; "
-            f"expected {expected}"
+        is_gas_mix = any(
+            _printed_sccm_gas_mixture(atmosphere) is not None
+            for atmosphere, _value, _band in checked
         )
-        notices = (
+        reason = (
+            ("gas_mix_fo2_band_mismatch: " if is_gas_mix else "")
+            + "bare log fO2 does not match any printed atmosphere; "
+            + f"printed tolerance={_dec_str(tolerance)} dex; "
+            + f"printed={_dec_str(log10_fO2)}; expected {expected}"
+        )
+        notices = () if is_gas_mix else (
             PrintedOxygenNotice(
                 kind=NoticeKind.PROBABLE_SOURCE_MISPRINT,
                 reason=f"possible source misprint: {reason}",
             ),
         )
         return PrintedOxygenDecision(
-            "refusal", State.unknown(_BARE_LOG_SCALE_UNKNOWN), notices=notices
+            "refusal",
+            State.unknown(reason),
+            notices=(*notices, *evaluation_notices),
         )
     if unsupported:
         reason = "gas_mix_fo2_band_unavailable: " + ", ".join(
             repr(item) for item in unsupported
         )
-        return PrintedOxygenDecision("refusal", State.unknown(reason))
+        return PrintedOxygenDecision(
+            "refusal", State.unknown(reason), notices=tuple(evaluation_notices)
+        )
     return PrintedOxygenDecision(
         "refusal", State.unknown(_BARE_LOG_SCALE_UNKNOWN)
     )
@@ -21866,6 +22029,7 @@ def printed_oxygen_decision(
     source_id: str | None = None,
     total_pressure_pa: Decimal | None = None,
     printed_atmospheres: Sequence[str] = (),
+    gas_fO2_evaluation_temperature_K: Located[Any] | None = None,
 ) -> PrintedOxygenDecision | None:
     """Turn one oxygen scope into one identity state, for every quantity.
 
@@ -21949,17 +22113,28 @@ def printed_oxygen_decision(
         if buffer_decision is not None:
             return buffer_decision
     if has_log:
-        if facts.bare_log:
+        row_atmospheres = _row_printed_atmospheres(
+            raw_item, printed_atmospheres
+        )
+        has_gas_mixture = any(
+            _printed_sccm_gas_mixture(atmosphere) is not None
+            for atmosphere in row_atmospheres
+        )
+        if facts.bare_log or (
+            facts.log_fO2_reference_Pa == _BAR_PA and has_gas_mixture
+        ):
             resolved_pressure = _point_total_pressure_pa(point_conditions)
             if resolved_pressure is None:
                 resolved_pressure = total_pressure_pa
             return _bare_log_frame_decision(
                 log_point,
                 run_temperature_K,
-                printed_atmospheres=_row_printed_atmospheres(
-                    raw_item, printed_atmospheres
-                ),
+                printed_atmospheres=row_atmospheres,
                 total_pressure_pa=resolved_pressure,
+                gas_fO2_evaluation_temperature_K=(
+                    gas_fO2_evaluation_temperature_K
+                ),
+                require_bare_log_convention=facts.bare_log,
             )
         return PrintedOxygenDecision(
             "log",
@@ -22063,6 +22238,7 @@ def _scoped_oxygen_decision(
     source_id: str | None = None,
     total_pressure_pa: Decimal | None = None,
     printed_atmospheres: Sequence[str] = (),
+    gas_fO2_evaluation_temperature_K: Located[Any] | None = None,
 ) -> tuple[PrintedOxygenDecision | None, bool]:
     """Row oxygen first. Inherited facts fill only when the row has none."""
 
@@ -22080,6 +22256,7 @@ def _scoped_oxygen_decision(
         source_id=source_id,
         total_pressure_pa=resolved_pressure,
         printed_atmospheres=printed_atmospheres,
+        gas_fO2_evaluation_temperature_K=gas_fO2_evaluation_temperature_K,
     )
     if row_decision is not None or not from_fallback:
         return row_decision, False
@@ -22094,9 +22271,18 @@ def _scoped_oxygen_decision(
             source_id=source_id,
             total_pressure_pa=resolved_pressure,
             printed_atmospheres=printed_atmospheres,
+            gas_fO2_evaluation_temperature_K=gas_fO2_evaluation_temperature_K,
         ),
         True,
     )
+
+
+def _experiment_gas_fO2_evaluation_temperature(
+    experiment: Experiment | None,
+) -> Located[Any] | None:
+    if experiment is None:
+        return None
+    return experiment.conditions.get("gas_fO2_evaluation_temperature_K")
 
 
 def _row_scope_oxygen_decision(
@@ -23126,6 +23312,78 @@ def _quoted_atmosphere_values(
         and quote.strip()
     ):
         candidates.append(raw_atmosphere.strip())
+    mixture = container.get("gas_mixture_as_printed")
+    mixture_value = (
+        mixture.get("state", {}).get("value")
+        if isinstance(mixture, Mapping)
+        and isinstance(mixture.get("state"), Mapping)
+        else None
+    )
+    components = container.get("gas_components_volume_percent")
+    if (
+        isinstance(mixture_value, str)
+        and mixture_value.strip()
+        and ":" in mixture_value
+        and isinstance(components, Mapping)
+        and components
+    ):
+        total = sum(Decimal(str(value)) for value in components.values())
+        ratio = re.fullmatch(
+            r"\s*(\d+(?:\.\d+)?)(CO2|CO|H2O|H2)\s*:\s*"
+            r"(\d+(?:\.\d+)?)(CO2|CO|H2O|H2)\s*",
+            mixture_value,
+            re.IGNORECASE,
+        )
+        if (
+            total == Decimal(100)
+            and ratio is not None
+            and all(Decimal(str(value)) >= 0 for value in components.values())
+        ):
+            first_amount, first_species, second_amount, second_species = ratio.groups()
+            first_species, second_species = first_species.upper(), second_species.upper()
+            if first_species == second_species:
+                return tuple(candidates)
+            active_total = sum(
+                Decimal(str(value))
+                for formula, value in components.items()
+                if str(formula).upper() in {first_species, second_species}
+            )
+            ratio_total = Decimal(first_amount) + Decimal(second_amount)
+            if active_total <= 0 or ratio_total <= 0:
+                return tuple(candidates)
+            mole_percent = {
+                first_species: active_total * Decimal(first_amount) / ratio_total,
+                second_species: active_total * Decimal(second_amount) / ratio_total,
+                **{
+                    str(formula).upper(): Decimal(str(value))
+                    for formula, value in components.items()
+                    if str(formula).upper() not in {first_species, second_species}
+                },
+            }
+            # At common T and P, gas-volume ratios are mole ratios. Scale the
+            # reactive pair to the printed active-gas total, then append inert
+            # volume percent; the common 1 SCCM basis cancels on normalization.
+            # Full-equilibrium fO2 derivation and unit check live in the owner
+            # `simulator.chemistry.offgas_fo2`.
+            inert = [
+                (formula, value)
+                for formula, value in mole_percent.items()
+                if formula not in {first_species, second_species}
+            ]
+            if len(inert) == 1:
+                inert_species, inert_amount = inert[0]
+                candidates.append(
+                    f"{first_species}:{second_species}:{inert_species} = "
+                    f"{mole_percent[first_species]}:{mole_percent[second_species]}:"
+                    f"{inert_amount} c.c.s/min"
+                )
+            else:
+                candidates.append(
+                    " + ".join(
+                        f"{formula} {value} × 1 SCCM"
+                        for formula, value in mole_percent.items()
+                    )
+                )
     return tuple(dict.fromkeys(candidates))
 
 
@@ -25798,6 +26056,20 @@ class Migrator:
         printed_atmospheres = _printed_atmospheres_for_experiment(
             context, experiment_key
         )
+        raw_derived_from = obs.get("derived_from")
+        if isinstance(raw_derived_from, (list, tuple)):
+            parent_ids = {str(parent_id) for parent_id in raw_derived_from}
+            context_atmospheres = tuple(
+                atmosphere
+                for context_row in self.result.context_by_work.get(
+                    work.work_id, ()
+                )
+                if str(context_row.get("context_id")) in parent_ids
+                for atmosphere in _row_printed_atmospheres(context_row, ())
+            )
+            printed_atmospheres = tuple(
+                dict.fromkeys((*printed_atmospheres, *context_atmospheres))
+            )
         experiment_source_row = (
             context.get("experiment_source_rows", {}).get(experiment_key)
             if isinstance(experiment_key, str)
@@ -27969,6 +28241,11 @@ class Migrator:
             source_id=source_id,
             total_pressure_pa=_positive_pressure_pa(pressure_for_oxygen),
             printed_atmospheres=printed_atmospheres,
+            gas_fO2_evaluation_temperature_K=(
+                _experiment_gas_fO2_evaluation_temperature(
+                    self.result.experiments.get(experiment_id)
+                )
+            ),
         )
         oxygen_state = _printed_oxygen_state_for(
             fill_identity(
@@ -28943,13 +29220,13 @@ class Migrator:
                     row_temperature_K, uncertainty, observation_id=obs_id
                 )
         identity, point_conditions, observation_notices = (
-            _initial_charge_only_missing_composition(
+            _initial_charge_only_composition_proxy(
                 identity,
                 point_conditions,
                 observation_notices,
                 role=composition_role,
-                printed_series_start=_has_printed_initial_series_start(
-                    composition_role, values
+                initial_charge_context=(
+                    values if isinstance(values, Mapping) else None
                 ),
                 quantity=q_token,
                 quantity_as_printed=values.get("quantity"),
@@ -30942,6 +31219,11 @@ class Migrator:
                 getattr(identity, "total_pressure_Pa", None)
             ),
             printed_atmospheres=printed_atmospheres,
+            gas_fO2_evaluation_temperature_K=(
+                _experiment_gas_fO2_evaluation_temperature(
+                    self.result.experiments.get(experiment_id)
+                )
+            ),
         )
         oxygen_state = _printed_oxygen_state_for(
             identity,
@@ -31198,13 +31480,13 @@ class Migrator:
                 )
             )
         identity, point_conditions, child_notices = (
-            _initial_charge_only_missing_composition(
+            _initial_charge_only_composition_proxy(
                 identity,
                 point_conditions,
                 child_notices,
                 role=point_composition_role,
-                printed_series_start=_has_printed_initial_series_start(
-                    point_composition_role, parent_values
+                initial_charge_context=(
+                    parent_values if isinstance(parent_values, Mapping) else None
                 ),
                 quantity=q_token_point,
                 quantity_as_printed=(
@@ -31216,16 +31498,18 @@ class Migrator:
                 ),
                 locator=point_locator,
                 origin=point_id,
+                point_composition_refusal=point_composition_refusal,
+                point_composition_context=(
+                    raw_item if isinstance(raw_item, Mapping) else None
+                ),
+                point_oxide_map=point_oxide_map,
+                point_declared_component_map=point_declared_component_map,
+                point_composition_map_declared=point_map_explicit,
             )
         )
         if notice_composition_located is None:
             notice_composition_located = (point_conditions or {}).get(
                 "composition"
-            )
-        if malformed_composition_amount is not None:
-            identity = replace(
-                identity,
-                composition=State.unknown(malformed_composition_amount),
             )
         notice_point_conditions = point_conditions
         if notice_composition_located is not None:

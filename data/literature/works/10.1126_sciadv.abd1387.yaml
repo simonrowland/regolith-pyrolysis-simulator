@@ -111,6 +111,44 @@ experiments:
         page: 2
         table: S1
         note: ±21 °C as printed; uncertainty magnitude unchanged in kelvins
+    gas_fO2_evaluation_temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+          approximate: false
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+        note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        output_unit: K
+        references: []
     log_fO2:
       state:
         tag: value
@@ -262,6 +300,44 @@ experiments:
         page: 2
         table: S1
         note: ±21 °C
+    gas_fO2_evaluation_temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+          approximate: false
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+        note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        output_unit: K
+        references: []
     log_fO2:
       state:
         tag: value
@@ -414,6 +490,44 @@ experiments:
         page: 2
         table: S1
         note: ±16 °C
+    gas_fO2_evaluation_temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+          approximate: false
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+        note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        output_unit: K
+        references: []
     log_fO2:
       state:
         tag: value
@@ -566,6 +680,44 @@ experiments:
         page: 2
         table: S1
         note: ±17 °C
+    gas_fO2_evaluation_temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+          approximate: false
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+        note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        output_unit: K
+        references: []
     log_fO2:
       state:
         tag: value
@@ -718,6 +870,44 @@ experiments:
         page: 2
         table: S1
         note: ±40 °C
+    gas_fO2_evaluation_temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+          approximate: false
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+        note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        output_unit: K
+        references: []
     log_fO2:
       state:
         tag: value
@@ -871,6 +1061,44 @@ experiments:
         page: 2
         table: S1
         note: ±29 °C
+    gas_fO2_evaluation_temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+          approximate: false
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+        note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        output_unit: K
+        references: []
     log_fO2:
       state:
         tag: value
@@ -1023,6 +1251,44 @@ experiments:
         page: 2
         table: S1
         note: ±23 °C
+    gas_fO2_evaluation_temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+          approximate: false
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+        note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        output_unit: K
+        references: []
     log_fO2:
       state:
         tag: value
@@ -1175,6 +1441,44 @@ experiments:
         page: 2
         table: S1
         note: ±13 °C
+    gas_fO2_evaluation_temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+          approximate: false
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+        note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        output_unit: K
+        references: []
     log_fO2:
       state:
         tag: value
@@ -1327,6 +1631,44 @@ experiments:
         page: 2
         table: S1
         note: ±13 °C
+    gas_fO2_evaluation_temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+          approximate: false
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+        note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        output_unit: K
+        references: []
     log_fO2:
       state:
         tag: value
@@ -1479,6 +1821,44 @@ experiments:
         page: 2
         table: S1
         note: ±15 °C
+    gas_fO2_evaluation_temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+          approximate: false
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+        note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        output_unit: K
+        references: []
     log_fO2:
       state:
         tag: value
@@ -1631,6 +2011,44 @@ experiments:
         page: 2
         table: S1
         note: ±13 °C
+    gas_fO2_evaluation_temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+          approximate: false
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+        note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        output_unit: K
+        references: []
     log_fO2:
       state:
         tag: value
@@ -1783,6 +2201,44 @@ experiments:
         page: 2
         table: S1
         note: ±41 °C
+    gas_fO2_evaluation_temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+          approximate: false
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+        note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: Supplementary Materials PDF p. 14
+              table: S4
+              note: Gas fO2 values were calculated at 1900 °C; converted by K = °C + 273.15
+        output_unit: K
+        references: []
     log_fO2:
       state:
         tag: value

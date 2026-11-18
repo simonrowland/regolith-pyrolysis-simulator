@@ -20,6 +20,14 @@ schema_gaps:
   as a typed refusal with all printed cells in values.points. Table 2 equilibrium pressure is over the two-solid
   assemblage Si(s)+SiO2(s), which the current p_sat identity cannot encode; retained as a typed refusal with printed
   values.
+experiments:
+- experiment_id: ferguson_nuth_2012_alpha_fit
+  method: knudsen_effusion
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Experimental
+    note: 'The paper says “mass loss from a Knudsen effusion cell using a thermogravimetric balance”.'
 species:
   SiO:
     observations:
@@ -1568,6 +1576,7 @@ species:
       table_column_number: 3
       units: Pa
     - observation_id: ferguson_nuth_2012_alpha_T1433
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1593,6 +1602,7 @@ species:
       table_row_number: 3
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1443
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1618,6 +1628,7 @@ species:
       table_row_number: 4
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1453
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1643,6 +1654,7 @@ species:
       table_row_number: 5
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1462
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1668,6 +1680,7 @@ species:
       table_row_number: 6
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1472
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1693,6 +1706,7 @@ species:
       table_row_number: 7
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1481
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1718,6 +1732,7 @@ species:
       table_row_number: 8
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1491
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1743,6 +1758,7 @@ species:
       table_row_number: 9
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1500
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1768,6 +1784,7 @@ species:
       table_row_number: 10
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1510
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1793,6 +1810,7 @@ species:
       table_row_number: 11
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1520
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1818,6 +1836,7 @@ species:
       table_row_number: 12
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1530
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1843,6 +1862,7 @@ species:
       table_row_number: 13
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1540
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1868,6 +1888,7 @@ species:
       table_row_number: 14
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1549
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1893,6 +1914,7 @@ species:
       table_row_number: 15
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1560
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1918,6 +1940,7 @@ species:
       table_row_number: 16
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1570
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1943,6 +1966,7 @@ species:
       table_row_number: 17
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1579
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1968,6 +1992,7 @@ species:
       table_row_number: 18
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1589
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -1993,6 +2018,7 @@ species:
       table_row_number: 19
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1598
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless
@@ -2018,6 +2044,7 @@ species:
       table_row_number: 20
       table_column_number: 2
     - observation_id: ferguson_nuth_2012_alpha_T1608
+      experiment: ferguson_nuth_2012_alpha_fit
       type: alpha
       phase: g
       units: dimensionless

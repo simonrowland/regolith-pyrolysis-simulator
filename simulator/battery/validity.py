@@ -42,11 +42,13 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    BoundDirection,
+    BoundInclusivity,
     EvidenceClass,
     MEASURED_EVIDENCE,
     MethodToken,
@@ -62,6 +64,8 @@ from simulator.battery.identity import (
     quantity_token,
 )
 from simulator.battery.records import (
+    ApparatusGeometry,
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
     Composition,
     Experiment,
     Located,
@@ -69,11 +73,14 @@ from simulator.battery.records import (
     Observation,
     State,
     Value,
+    _bound_operator_semantics,
     as_decimal,
 )
 from simulator.reference_data.janaf import formula_composition
 from simulator.physical_constants import TABLE_SELF_CHECK_FINDING_DEX
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
+
+KEMS_GEOMETRY_FACTS = ("orifice_area_m2", "clausing_factor")
 
 # KEMS equilibrium background ceiling (Pa). This remains a separate signal
 # quality check; it does not determine the in-cell effusion regime.
@@ -171,16 +178,28 @@ def _pressure_bounds(
     return None
 
 
+def _positive_decimal(value: Decimal | None) -> bool:
+    return value is not None and value.is_finite() and value > 0
+
+
 def _finite_positive(located: Located[Value | Decimal] | None) -> Decimal | None:
     value = _located_decimal(located)
-    if value is None or not value.is_finite() or value <= 0:
-        return None
-    return value
+    return value if _positive_decimal(value) else None
+
+
+_CLAUSING_FACTOR_MAX = Decimal("1")
+
+
+def _clausing_value_ok(value: Decimal | None) -> bool:
+    return (
+        _positive_decimal(value)
+        and value is not None
+        and value <= _CLAUSING_FACTOR_MAX
+    )
 
 
 def _clausing_ok(located: Located[Value | Decimal] | None) -> bool:
-    value = _located_decimal(located)
-    return value is not None and value.is_finite() and value > 0 and value <= 1
+    return _clausing_value_ok(_located_decimal(located))
 
 
 def _positive_extent(
@@ -225,6 +244,89 @@ def _printed_positive_diameter_interval(
         return False
     extent = _positive_extent(located)
     return extent is not None and extent[2] == "interval"
+
+
+def _impossible_kems_geometry_value(
+    located: Located[Value | Decimal] | None,
+    *,
+    clausing_factor: bool = False,
+) -> bool:
+    # Refuse only when every admissible value violates the physical domain.
+    # A straddling interval or bound remains missing/unverified because it
+    # still admits a physically possible value.
+    if located is None or not located.state.is_value:
+        return False
+    raw = located.state.value
+    if raw is None:
+        return False
+    if not isinstance(raw, Value):
+        if clausing_factor:
+            return not _clausing_value_ok(raw)
+        return not _positive_decimal(raw)
+    if raw.kind is ValueKind.POINT:
+        return not (
+            _clausing_value_ok(raw.point)
+            if clausing_factor
+            else _positive_decimal(raw.point)
+        )
+    if raw.kind is ValueKind.INTERVAL:
+        low = raw.interval_low
+        high = raw.interval_high
+        if low is None or high is None or low > high:
+            return True
+        bounds = _pressure_bounds(located)
+        if bounds is None:
+            return True
+        low, high, kind = bounds
+        if kind != "interval" or low is None or high is None:
+            return True
+        if not _positive_decimal(high):
+            return True
+        if not clausing_factor:
+            return False
+        extent = _positive_extent(located)
+        return extent is not None and low > _CLAUSING_FACTOR_MAX
+    if raw.kind is ValueKind.BOUND:
+        bound = raw.bound_value
+        if bound is None:
+            return True
+        operator_semantics = _bound_operator_semantics(raw.bound_operator)
+        direction = raw.bound_direction
+        inclusivity = raw.bound_inclusivity
+        if direction is None and operator_semantics is not None:
+            direction, inclusivity = operator_semantics
+        if direction is None or inclusivity is None:
+            return True
+        if direction is BoundDirection.UPPER:
+            return not _positive_decimal(bound)
+        if not clausing_factor:
+            return False
+        return bound > _CLAUSING_FACTOR_MAX or (
+            bound == _CLAUSING_FACTOR_MAX
+            and inclusivity is BoundInclusivity.EXCLUDED
+        )
+    # Geometry extracts use POINT, INTERVAL, and legacy scalar values; BOUND
+    # is also supported by the parser and handled above. Other Value kinds do
+    # not occur on these fields and are not inferred as numeric ranges here.
+    return False
+
+
+def _invalid_kems_geometry_fields(
+    geometry: ApparatusGeometry | None,
+) -> tuple[str, ...]:
+    if geometry is None:
+        return ()
+    invalid: list[str] = []
+    area = geometry.orifice_area_m2
+    if _impossible_kems_geometry_value(area):
+        invalid.append("orifice_area_m2")
+    diameter = geometry.orifice_diameter_m
+    if _impossible_kems_geometry_value(diameter):
+        invalid.append("orifice_diameter_m")
+    clausing = geometry.clausing_factor
+    if _impossible_kems_geometry_value(clausing, clausing_factor=True):
+        invalid.append("clausing_factor")
+    return tuple(invalid)
 
 
 def _calibration_grounded(calibration: object) -> bool:
@@ -466,6 +568,7 @@ def underdetermined_apparatus(
     method = method_state.value
     geometry = None if experiment.apparatus is None else experiment.apparatus.geometry
     missing: list[str] = []
+    invalid: tuple[str, ...] = ()
     if _is_kems_calibrated_pressure(method, quantity):
         # Knudsen-effusion mass spectrometry uses the calibrated pressure
         # relation P_i = k_i I_i^+ T.  k_i comes from a calibration (for
@@ -504,11 +607,13 @@ def underdetermined_apparatus(
         # usable only when it is printed: area does not enter p = k I T, so
         # that interval is not a value band (d-326 case 1). An inferred or
         # unlocated interval, a bound, and an area interval stay missing.
+        invalid = _invalid_kems_geometry_fields(geometry)
         if geometry is not None:
             if (
                 geometry.orifice_area_m2 is not None
                 and geometry.orifice_area_m2.state.is_value
                 and _finite_positive(geometry.orifice_area_m2) is None
+                and "orifice_area_m2" not in invalid
             ):
                 missing.append("orifice_area_m2")
             if (
@@ -518,15 +623,18 @@ def underdetermined_apparatus(
                 and not _printed_positive_diameter_interval(
                     geometry.orifice_diameter_m
                 )
+                and "orifice_diameter_m" not in invalid
             ):
                 missing.append("orifice_diameter_m")
             if (
                 geometry.clausing_factor is not None
                 and geometry.clausing_factor.state.is_value
                 and not _clausing_ok(geometry.clausing_factor)
+                and "clausing_factor" not in invalid
             ):
                 missing.append("clausing_factor")
     elif _is_effusion_pressure(method, quantity):
+        invalid = _invalid_kems_geometry_fields(geometry)
         provenance = observation.provenance if observation is not None else None
         method_provenance = (
             provenance.get("comparison_method")
@@ -585,14 +693,18 @@ def underdetermined_apparatus(
                 )
             )
         elif geometry is None:
-            missing.extend(["orifice_area_m2", "clausing_factor"])
+            missing.extend(KEMS_GEOMETRY_FACTS)
         else:
             if (
                 _finite_positive(geometry.orifice_area_m2) is None
                 and _finite_positive(geometry.orifice_diameter_m) is None
+                and "orifice_area_m2" not in invalid
             ):
                 missing.append("orifice_area_m2")
-            if not _clausing_ok(geometry.clausing_factor):
+            if (
+                not _clausing_ok(geometry.clausing_factor)
+                and "clausing_factor" not in invalid
+            ):
                 missing.append("clausing_factor")
         calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
         calibrated = _calibration_grounded(calibration)
@@ -666,6 +778,8 @@ def underdetermined_apparatus(
             elif "exposed_area_m2" not in missing:
                 missing.append("exposed_area_m2")
     detail = {"missing": missing, "method": method.value, "quantity": quantity.value}
+    if invalid:
+        detail["invalid"] = list(invalid)
     if _is_kems_calibrated_pressure(method, quantity):
         interval_notice = apparatus_geometry_interval_notice(
             experiment,
@@ -677,8 +791,8 @@ def underdetermined_apparatus(
             detail["apparatus_geometry_interval_printed"] = True
             detail["regime_checked_at"] = _interval_regime_check_label(experiment)
             detail["value_band"] = None
-    checks.append(GateCheck("geometry_determinants", not missing, detail))
-    if missing:
+    checks.append(GateCheck("geometry_determinants", not missing and not invalid, detail))
+    if missing or invalid:
         return _fail(
             RefusalReason.UNDERDETERMINED_APPARATUS, checks, "geometry_determinants"
         )
@@ -922,8 +1036,18 @@ def _same_point_conditions(left: Observation, right: Observation) -> bool:
     return True
 
 
+def _record_composition_failure(
+    failure_details: list[str] | None,
+    detail: str,
+) -> None:
+    if failure_details is not None:
+        failure_details.append(detail)
+
+
 def _composition_components(
     value: object | None,
+    *,
+    failure_details: list[str] | None = None,
 ) -> tuple[tuple[str, Decimal], ...] | None:
     if isinstance(value, State):
         if not value.is_value:
@@ -934,42 +1058,102 @@ def _composition_components(
             return None
         value = value.state.value
     if isinstance(value, Composition):
+        # An initial-charge proxy is an engine input for prediction, not a
+        # measurement-state composition that can establish in-cell species
+        # coverage.
+        if value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+            return None
         value = value.components
     elif isinstance(value, Mapping):
         value = value.get("components", tuple(value.items()))
     if not isinstance(value, (tuple, list)) or not value:
+        _record_composition_failure(
+            failure_details,
+            "composition component list is empty or malformed",
+        )
         return None
     components: list[tuple[str, Decimal]] = []
     for item in value:
         if not isinstance(item, (tuple, list)) or len(item) != 2:
+            _record_composition_failure(
+                failure_details,
+                "composition component entry is malformed",
+            )
             return None
         formula, raw_amount = item
         try:
             amount = as_decimal(raw_amount)
-        except (TypeError, ValueError):
+        except (InvalidOperation, TypeError, ValueError):
+            _record_composition_failure(
+                failure_details,
+                "composition component amount is not a decimal",
+            )
             return None
-        if not amount.is_finite() or amount < 0:
+        if not amount.is_finite():
+            _record_composition_failure(
+                failure_details,
+                "composition component amount is not finite",
+            )
+            return None
+        if amount < 0:
+            _record_composition_failure(
+                failure_details,
+                "composition component amount is negative",
+            )
             return None
         components.append((str(formula), amount))
     return tuple(sorted(components))
 
 
+_POINT_COMPOSITION_CONDITION_ALIASES = ("composition", "sample_composition")
+
+
 def _observation_composition(
-    experiment: Experiment,
     observation: Observation,
+    *,
+    composition_failure_details: list[str] | None = None,
 ) -> tuple[tuple[str, Decimal], ...] | None:
+    discovered_details: list[str] = []
     identity = observation.identity
     if isinstance(identity, Identity) and identity.composition is not None:
-        components = _composition_components(identity.composition)
+        components = _composition_components(
+            identity.composition,
+            failure_details=discovered_details,
+        )
         if components is not None:
             return components
+        if composition_failure_details is not None:
+            composition_failure_details.extend(discovered_details)
+        return None
     if observation.point_conditions:
         for key, located in observation.point_conditions.items():
-            if key.lower() in {"composition", "sample_composition"}:
-                components = _composition_components(located)
-                if components is not None:
-                    return components
-    return _composition_components(experiment.sample.initial_composition)
+            if key.lower() not in _POINT_COMPOSITION_CONDITION_ALIASES:
+                continue
+            components = _composition_components(
+                located,
+                failure_details=discovered_details,
+            )
+            if components is not None:
+                return components
+            if composition_failure_details is not None:
+                composition_failure_details.extend(discovered_details)
+            return None
+    if composition_failure_details is not None:
+        composition_failure_details.extend(discovered_details)
+    # Sample.initial_composition describes the starting charge. It is not a
+    # run-composition source for measured in-cell pressure coverage.
+    return None
+
+
+def _skipped_composition_candidate_detail(
+    observation_id: str,
+    details: list[str],
+) -> dict[str, str]:
+    return {
+        "observation_id": observation_id,
+        "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+        "detail": "; ".join(details),
+    }
 
 
 def _point_temperature(observation: Observation) -> Decimal | None:
@@ -1043,16 +1227,17 @@ def _printed_in_cell_pressure_sum(
     point_observations: Iterable[Observation],
 ) -> tuple[Decimal | None, dict[str, Any]]:
     temperature = _point_temperature(observation)
-    composition = _observation_composition(experiment, observation)
+    composition_failure_details: list[str] = []
+    composition = _observation_composition(
+        observation,
+        composition_failure_details=composition_failure_details,
+    )
     conditions = observation.point_conditions
     if temperature is None or not conditions:
         return None, {"reason": "same-point temperature/point_conditions are incomplete"}
-    if composition is None:
-        return None, {
-            "reason": "composition is unknown; printed species coverage cannot be established",
-            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
-        }
     printed: dict[str, list[tuple[Decimal, str]]] = {}
+    skipped_pressure_candidates: list[dict[str, str]] = []
+    skipped_composition_candidates: list[dict[str, str]] = []
     for candidate in point_observations:
         identity = candidate.identity
         if (
@@ -1065,19 +1250,62 @@ def _printed_in_cell_pressure_sum(
             or candidate.locator is None
             or not candidate.locator.has_location()
             or _point_temperature(candidate) != temperature
-            or _observation_composition(experiment, candidate) != composition
-            or not _same_point_conditions(observation, candidate)
-            or candidate.value.kind is not ValueKind.POINT
-            or candidate.value.point is None
         ):
             continue
-        pressure = candidate.value.point
-        if pressure.is_finite() and pressure > 0:
-            printed.setdefault(identity.species.formula, []).append(
-                (pressure, candidate.observation_id)
+        if composition is None:
+            if candidate.observation_id != observation.observation_id:
+                continue
+        else:
+            candidate_composition_details: list[str] = []
+            candidate_composition = _observation_composition(
+                candidate,
+                composition_failure_details=candidate_composition_details,
             )
+            if candidate_composition != composition:
+                if candidate_composition_details:
+                    skipped_composition_candidates.append(
+                        _skipped_composition_candidate_detail(
+                            candidate.observation_id,
+                            candidate_composition_details,
+                        )
+                    )
+                continue
+        if (
+            not _same_point_conditions(observation, candidate)
+            or candidate.value.kind is not ValueKind.POINT
+        ):
+            continue
+        raw_pressure = candidate.value.point
+        try:
+            pressure = as_decimal(raw_pressure)
+        except (InvalidOperation, TypeError, ValueError, ArithmeticError):
+            pressure = None
+        if pressure is None or not pressure.is_finite() or pressure <= 0:
+            skipped_pressure_candidates.append(
+                {
+                    "observation_id": candidate.observation_id,
+                    "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+                    "detail": "candidate pressure point is not a finite positive decimal",
+                }
+            )
+            continue
+        printed.setdefault(identity.species.formula, []).append(
+            (pressure, candidate.observation_id)
+        )
     if not printed:
-        return None, {"reason": "no admitted printed partial pressures at this exact point"}
+        detail: dict[str, Any] = {
+            "reason": "no admitted printed partial pressures at this exact point"
+        }
+        if skipped_pressure_candidates:
+            detail["typed_reason"] = RefusalReason.EFFUSION_REGIME_UNVERIFIED.value
+            detail["skipped_pressure_candidates"] = skipped_pressure_candidates
+        if composition_failure_details:
+            detail["typed_reason"] = RefusalReason.EFFUSION_REGIME_UNVERIFIED.value
+            detail["composition_scope_details"] = composition_failure_details
+        if skipped_composition_candidates:
+            detail["typed_reason"] = RefusalReason.EFFUSION_REGIME_UNVERIFIED.value
+            detail["skipped_composition_candidates"] = skipped_composition_candidates
+        return None, detail
     # Repeated determinations for one species are not distinct gases. The
     # largest admitted value per species is a conservative lower bound even
     # when the printed species coverage is incomplete.
@@ -1093,9 +1321,24 @@ def _printed_in_cell_pressure_sum(
         "included_observation_ids": sorted(row[1] for row in selected.values()),
         "point_condition_keys": sorted(conditions),
     }
+    if skipped_pressure_candidates:
+        sum_detail["skipped_pressure_candidates"] = skipped_pressure_candidates
+    if composition_failure_details:
+        sum_detail["composition_scope_details"] = composition_failure_details
+    if skipped_composition_candidates:
+        sum_detail["skipped_composition_candidates"] = skipped_composition_candidates
     lower_bound_detail = {
         "printed_partial_pressure_lower_bound_Pa": str(pressure_sum)
     }
+    if composition is None:
+        detail = {
+            "reason": "composition is unknown; printed species coverage cannot be established",
+            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+            "printed_species": sorted(printed),
+            **lower_bound_detail,
+            **sum_detail,
+        }
+        return None, detail
     expected = _expected_dominant_vapours(composition)
     if expected is None:
         return None, {
@@ -1306,7 +1549,7 @@ def _constant_clausing(
                 "missing clausing_factor: a Clausing interval is not a point"
             )
     if clausing is not None:
-        if not clausing.is_finite() or clausing <= 0 or clausing > 1:
+        if not _clausing_value_ok(clausing):
             raise ValueError("clausing_factor must be a point in (0, 1]")
         return clausing
     length_printed = isinstance(orifice_channel_length_m, Decimal) or (

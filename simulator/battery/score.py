@@ -83,6 +83,7 @@ from simulator.battery.enums import (
     PURE_STANDARD_THERMO,
     QuenchDirection,
     QuenchState,
+    QuotedTargetKind,
     Quantity,
     ReferenceStateConvention,
     Rail,
@@ -150,6 +151,7 @@ from simulator.battery.migrate import (
     REPO_ROOT,
     _COMPOSITION_COMPONENTS,
     _COMPOSITION_COMPONENTS_RETAINED_BY_DEFAULT,
+    FERRIC_FRACTION_RELATION,
     canonicalize_rail,
     iter_observation_store_paths,
     load_migrated_benches,
@@ -161,6 +163,7 @@ from simulator.battery.migrate import (
     PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE,
     convert_areal_mass_to_kg_per_m2,
     convert_pressure_to_pa,
+    _fe3_fe2_log10_uncertainty_from_ferric_fraction,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     observation_matches_source_tokens,
@@ -177,8 +180,10 @@ from simulator.battery.migrate import (
     HK_RATIO_ALPHA_DEFINITION,
     evaporation_alpha_family_key,
 )
+from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
     SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     Bench,
     CandidateRequest,
@@ -293,6 +298,7 @@ from simulator.battery.validate import (
     _observation_lineage,
     observation_issue_location,
     _pressure_blocking_notices,
+    _quoted_source_observation_ids,
     _resolve_coefficient_sources,
     _VAPOUR_EQUILIBRIUM,
     _build_validation_indexes,
@@ -301,6 +307,7 @@ from simulator.battery.validate import (
 from simulator.battery.validity import (
     GateCheck,
     GateOutcome,
+    KEMS_GEOMETRY_FACTS,
     _calibration_grounded,
     _partial_pressure_observations_by_experiment,
     apparatus_geometry_interval_notice,
@@ -1035,6 +1042,7 @@ class _PrintedBandResolution:
     refusal: Mapping[str, object] | None = None
     notice: Notice | None = None
     standard_uncertainty_dex: Decimal | None = None
+    two_sigma_band: DecisionBand | None = None
 
 
 @dataclass(frozen=True)
@@ -2033,18 +2041,26 @@ def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
         for state in states
     ):
         return None
-    if reference.source_id == "kems-020-hastie-1981-nbsir":
-        reason = (
-            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-            "composition_role=initial_charge_only: composition = printed initial "
-            "charge; run composition evolves during vaporization"
-        )
-    else:
-        reason = (
-            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-            f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: the printed "
-            "composition is the starting charge, not the state of this datum"
-        )
+    existing_proxy_notice = next(
+        (
+            notice
+            for notice in reference.notices
+            if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+            and notice.reason.startswith(SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX)
+            and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+        ),
+        None,
+    )
+    if existing_proxy_notice is not None:
+        # The persisted notice is also the scoring flag that strips bands from
+        # this proxy-backed residual. Keep it in flagged_notices so the band
+        # policy sees it; union_notices deduplicates it in the final row.
+        return existing_proxy_notice
+    reason = (
+        f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+        f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
+        f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
+    )
     return Notice(
         kind=NoticeKind.SOURCE_DISAGREEMENT,
         affected_quantities=(quantity,),
@@ -2065,6 +2081,8 @@ def _missing_apparatus_fact(
     check: GateCheck,
     *,
     allow_calibration: bool,
+    allow_missing_calibration: bool = False,
+    allow_missing_geometry: bool = False,
     allow_unknown_method: bool,
 ) -> str | None:
     check = _require_gate_check(check)
@@ -2089,14 +2107,36 @@ def _missing_apparatus_fact(
         # A stated high or straddling background is an explicit invalid input,
         # not an unverified apparatus fact.
         return None
+    if (
+        name == "kems_calibration"
+        and allow_missing_calibration
+        and not check.passed
+    ):
+        missing = detail.get("missing")
+        if isinstance(missing, (list, tuple, set)) and set(missing) == {"calibration"}:
+            return "calibration"
     if name == "in_cell_partial_pressure_sum" and not check.passed:
         if detail.get("printed_partial_pressure_sum_Pa") is None:
             return "in_cell_partial_pressure_sum"
         return None
-    if name == "geometry_determinants" and allow_calibration:
+    if name == "geometry_determinants":
         missing = detail.get("missing")
-        if isinstance(missing, (list, tuple, set)) and set(missing) == {"calibration"}:
+        if detail.get("invalid"):
+            return None
+        if (
+            allow_calibration
+            and isinstance(missing, (list, tuple, set))
+            and set(missing) == {"calibration"}
+        ):
             return "calibration"
+        missing_geometry = set(KEMS_GEOMETRY_FACTS)
+        if (
+            allow_missing_geometry
+            and isinstance(missing, (list, tuple, set))
+            and bool(missing)
+            and set(missing) <= missing_geometry
+        ):
+            return "geometry_determinants"
     return None
 
 
@@ -2169,8 +2209,14 @@ def _unverified_apparatus_notices(
         or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
     ):
         return ()
+    kems_activity = (
+        experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        and quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+    )
     comparison_activity = (
-        quantity is Quantity.ACTIVITY
+        not kems_activity
+        and quantity is Quantity.ACTIVITY
         and author_reported_activity
         and comparison_method_cell_constant_cancels(reference.provenance)
     )
@@ -2195,13 +2241,15 @@ def _unverified_apparatus_notices(
         and _has_calibration_not_grounded(gates.checks)
     )
     calibration_flagged_activity = (
-        quantity is Quantity.ACTIVITY
+        not kems_activity
+        and quantity is Quantity.ACTIVITY
         and author_reported_activity
         and _has_calibration_not_grounded(gates.checks)
     )
     if not (
         measured_pressure
         or figure_only_partial_pressure
+        or kems_activity
         or comparison_activity
         or unknown_method_activity
         or calibration_flagged_partial_pressure
@@ -2209,7 +2257,10 @@ def _unverified_apparatus_notices(
     ):
         return ()
     allow_calibration = (
-        author_reported_pressure or comparison_activity or calibration_flagged_activity
+        author_reported_pressure
+        or kems_activity
+        or comparison_activity
+        or calibration_flagged_activity
     )
     missing: dict[str, Mapping] = {}
     calibration_notice = None
@@ -2235,6 +2286,8 @@ def _unverified_apparatus_notices(
         fact = _missing_apparatus_fact(
             check,
             allow_calibration=allow_calibration,
+            allow_missing_calibration=kems_activity,
+            allow_missing_geometry=kems_activity,
             allow_unknown_method=unknown_method_activity,
         )
         if fact is None:
@@ -4364,6 +4417,7 @@ def _composition_notice(
 def _stoichiometric_standard(standard_state: StandardState) -> StandardState:
     return replace(
         standard_state,
+        convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
         endmember=replace(
             standard_state.endmember, formula=_FEO_STOICHIOMETRIC_FORMULA
         ),
@@ -4478,11 +4532,18 @@ def _iron_saturated_feo_comparison(
     if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
         return None
     standard_state = identity.reference_state.value
+    if standard_state.convention is ReferenceStateConvention.TEMKIN:
+        # Route Temkin through this function's recorded iron-saturation owner.
+        pass
+    elif (
+        standard_state.convention
+        is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    ):
+        return None
     if (
         identity.species.formula != _FEO_STOICHIOMETRIC_FORMULA
         or standard_state.endmember.formula != _FEO_WUSTITE_FORMULA
         or standard_state.component_basis != _FEO_WUSTITE_FORMULA
-        or standard_state.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
         or phase_token(standard_state.endmember) is not Phase.L
         or reference.value.kind is not ValueKind.POINT
         or reference.value.point is None
@@ -4642,6 +4703,22 @@ def fusion_comparison_reference(
     ):
         return reference
     standard_state = identity.reference_state.value
+    if standard_state.convention is ReferenceStateConvention.TEMKIN:
+        # Only the iron-saturated Fe(1-x)O(l) shape above has an owner path.
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                "Temkin reference conversion requires a recorded iron-saturated "
+                "Fe(1-x)O(l) comparison path"
+            ),
+            origin=reference.observation_id,
+            band="Temkin reference conversion unavailable for this observation",
+        )
+        return replace(
+            reference,
+            notices=union_notices(reference.notices, (notice,)),
+        )
     formula = standard_state.endmember.formula
     observed_reference_phase = phase_token(standard_state.endmember)
     magemin_native_reference = any(
@@ -5347,6 +5424,7 @@ def _resolve_source_relation_with_indexes(
         reference.observation_id,
         observations,
         indexes.table_ids,
+        experiments=experiments,
         asset_ids=indexes.asset_ids,
         _cache=indexes.observation_lineages,
     )
@@ -5424,6 +5502,7 @@ class _ScoringLineageResolver:
                 reference.observation_id,
                 self.context.observations,
                 self.indexes.table_ids,
+                experiments=self.context.experiments,
                 asset_ids=self.indexes.asset_ids,
                 _cache=self.indexes.observation_lineages,
             )
@@ -6208,7 +6287,13 @@ def _uncertainty_unit(
                     return unit
     suffix_re = re.compile(r"(" + _UNCERTAINTY_NUMBER + r")\s*([^\d\s].*)$")
     for text in unit_texts:
-        for suffix in reversed(tuple(suffix_re.finditer(text))):
+        unit_source = re.sub(
+            r"\s*\([^)]*(?:as printed|confidence level)[^)]*\)\s*$",
+            "",
+            text,
+            flags=re.IGNORECASE,
+        )
+        for suffix in reversed(tuple(suffix_re.finditer(unit_source))):
             try:
                 suffix_value = abs(as_decimal(suffix.group(1)))
             except (TypeError, ValueError, ArithmeticError, InvalidOperation):
@@ -6369,18 +6454,76 @@ def _metric_uncertainty_width(
     return None
 
 
+def _combine_independent_standard_uncertainties(
+    first: Decimal,
+    second: Decimal,
+) -> Decimal:
+    """Combine independent standard uncertainties by GUM quadrature."""
+    return (first**2 + second**2).sqrt()
+
+
+def _textual_printed_confidence_level(
+    uncertainty: Uncertainty,
+) -> str | None:
+    raw = uncertainty.verbatim
+    if isinstance(raw, Mapping):
+        text = " ".join(
+            str(value)
+            for key, value in raw.items()
+            if key not in {"confidence_level", "locator", "parent", "k"}
+            and isinstance(value, str)
+        )
+    elif isinstance(raw, str):
+        text = raw
+    else:
+        return None
+    if re.search(
+        r"\b95\s*%?\s*(?:ci|confidence interval)\b",
+        text,
+        re.IGNORECASE,
+    ):
+        return "ci95"
+    if re.search(
+        r"\b(?:2|two)\s*[- ]?\s*(?:sigma|σ)\b",
+        text,
+        re.IGNORECASE,
+    ):
+        return "two_sigma"
+    if re.search(
+        r"\b(?:1|one)\s*[- ]?\s*(?:sigma|σ)\b"
+        r"|\bstandard\s+(?:deviation|error)\b"
+        r"|\bSD\b",
+        text,
+        re.IGNORECASE,
+    ):
+        return "one_sigma"
+    return None
+
+
+def _stated_printed_confidence_level(
+    uncertainty: Uncertainty,
+) -> str | None:
+    raw = uncertainty.verbatim
+    if isinstance(raw, Mapping):
+        confidence_level = raw.get("confidence_level", "not_stated")
+        if confidence_level != "not_stated":
+            return str(confidence_level)
+    return _textual_printed_confidence_level(uncertainty)
+
+
 def _confidence_level_notice(
     quantity: Quantity,
     uncertainty: Uncertainty,
     source_observation: Observation | None,
     source_value: Decimal | tuple[Decimal, Decimal] | None,
+    *,
+    confidence_level_override: str | None = None,
+    assumed_one_sigma: bool = False,
 ) -> Notice | None:
-    confidence_level = (
-        uncertainty.verbatim.get("confidence_level", "not_stated")
-        if isinstance(uncertainty.verbatim, Mapping)
-        else "not_stated"
-    )
-    if confidence_level != "not_stated" or (
+    confidence_level = _stated_printed_confidence_level(uncertainty) or "not_stated"
+    if confidence_level == "not_stated" and confidence_level_override is not None:
+        confidence_level = confidence_level_override
+    if (confidence_level != "not_stated" and not assumed_one_sigma) or (
         quantity is Quantity.ACTIVITY
         and _is_log10_activity_standard_deviation(_uncertainty_original(uncertainty))
     ):
@@ -6408,10 +6551,18 @@ def _confidence_level_notice(
     return Notice(
         kind=NoticeKind.INPUT_OMITTED,
         affected_quantities=(quantity,),
-        reason="confidence_level_not_stated",
+        reason=(
+            "uncertainty_confidence_level_assumed_1sigma"
+            if assumed_one_sigma
+            else "confidence_level_not_stated"
+        ),
         origin="decision-band",
         band=f"field={field}; {detail}; locator={locator}",
     )
+
+
+def _has_printed_plus_minus(uncertainty: Uncertainty) -> bool:
+    return re.search(r"(?:±|\+/-|\\pm)", _uncertainty_original(uncertainty)) is not None
 
 
 def _verbatim_denies_printed_uncertainty(uncertainty: Uncertainty) -> bool:
@@ -6445,6 +6596,7 @@ def _printed_uncertainty_band(
     source_observation: Observation | None = None,
     method: MethodToken | None = None,
     band_basis: str = "row_printed",
+    confidence_level_override: str | None = None,
 ) -> _PrintedBandResolution:
     if uncertainty is None:
         return _PrintedBandResolution()
@@ -6503,6 +6655,7 @@ def _printed_uncertainty_band(
                 source_observation=source_observation,
                 method=method,
                 band_basis="row_printed",
+                confidence_level_override=confidence_level_override,
             )
             if printed.refusal is not None:
                 return printed
@@ -6526,6 +6679,19 @@ def _printed_uncertainty_band(
             if printed.band is not None
             else "derived_bound: standard-pressure kJ/mol ambiguity is the only band source"
         )
+        two_sigma_band = (
+            None
+            if printed.two_sigma_band is None
+            else DecisionBand(
+                printed.two_sigma_band.value + pressure_ticket,
+                QUANTITY_UNITS[quantity],
+                (
+                    f"{printed.two_sigma_band.rule}; "
+                    "standard-pressure ambiguity added linearly"
+                ),
+                band_basis=band_basis,
+            )
+        )
         return _PrintedBandResolution(
             DecisionBand(
                 total_ticket,
@@ -6534,6 +6700,7 @@ def _printed_uncertainty_band(
                 band_basis=band_basis,
             ),
             notice=printed.notice,
+            two_sigma_band=two_sigma_band,
         )
     if uncertainty.kind is not UncertaintyKind.PRINTED:
         return _PrintedBandResolution()
@@ -6552,11 +6719,10 @@ def _printed_uncertainty_band(
             )
         )
     raw_text = _uncertainty_original(uncertainty)
-    confidence_level = (
-        uncertainty.verbatim.get("confidence_level", "not_stated")
-        if isinstance(uncertainty.verbatim, Mapping)
-        else "not_stated"
-    )
+    stated_confidence_level = _stated_printed_confidence_level(uncertainty)
+    confidence_level = stated_confidence_level or "not_stated"
+    if confidence_level == "not_stated" and confidence_level_override is not None:
+        confidence_level = confidence_level_override
     log10_activity_sigma = (
         band_basis == "row_printed"
         and quantity is Quantity.ACTIVITY
@@ -6628,6 +6794,14 @@ def _printed_uncertainty_band(
         kind = "printed_range"
     else:
         kind = "printed_unstated"
+    if confidence_level == "not_stated":
+        if shape == "range" or kind == "printed_range":
+            kind = "printed_range"
+        elif _has_printed_plus_minus(uncertainty):
+            confidence_level = "one_sigma"
+            kind = "printed_1sigma"
+        else:
+            kind = "printed_unstated"
     if isinstance(source_value, tuple):
         lower, upper = source_value
         width = (upper - lower) / Decimal(2)
@@ -6648,6 +6822,95 @@ def _printed_uncertainty_band(
                 "original": raw_text,
             }
         )
+
+    fraction_derivation = None
+    if quantity is Quantity.FE3_FE2_RATIO and source_observation is not None:
+        fraction_derivation = source_observation.derivation
+    if fraction_derivation is not None:
+        relation = fraction_derivation.relation or ""
+        fraction_parameters = [
+            parameter
+            for name, parameter in fraction_derivation.parameters
+            if name.removeprefix("original_") in FERRIC_FRACTION_FIELDS
+        ]
+        if FERRIC_FRACTION_RELATION in relation or fraction_parameters:
+            if FERRIC_FRACTION_RELATION not in relation or len(fraction_parameters) != 1:
+                return _PrintedBandResolution(
+                    refusal={
+                        "reason": "printed_uncertainty_reduction_provenance_unmapped",
+                        "quantity": quantity.value,
+                        "relation": relation,
+                    }
+                )
+            fraction_state = getattr(fraction_parameters[0], "state", None)
+            fraction_r = (
+                fraction_state.value
+                if isinstance(fraction_state, State) and fraction_state.is_value
+                else None
+            )
+            if not isinstance(fraction_r, Decimal):
+                return _PrintedBandResolution(
+                    refusal={
+                        "reason": "printed_uncertainty_reduction_input_unmapped",
+                        "quantity": quantity.value,
+                        "relation": relation,
+                    }
+                )
+            if converted_unit not in {"fraction", QUANTITY_UNITS[quantity]}:
+                return _PrintedBandResolution(
+                    refusal={
+                        "reason": "printed_uncertainty_reduction_unit_unmapped",
+                        "quantity": quantity.value,
+                        "source_unit": source_unit,
+                        "converted_unit": converted_unit,
+                    }
+                )
+            if fe3_fe2_ratio_from_ferric_fraction(fraction_r) != reference:
+                return _PrintedBandResolution(
+                    refusal={
+                        "reason": "printed_uncertainty_reduction_value_mismatch",
+                        "quantity": quantity.value,
+                        "fraction": str(fraction_r),
+                        "reference": str(reference),
+                    }
+                )
+            if operation is not MetricOperation.DEX:
+                return _PrintedBandResolution(
+                    refusal={
+                        "reason": "printed_uncertainty_reduction_metric_unmapped",
+                        "quantity": quantity.value,
+                        "operation": operation.value,
+                    }
+                )
+            confidence_width_scale = (
+                Decimal(2)
+                if confidence_level == "two_sigma"
+                else NORMAL_95_TICKET_MULTIPLIER
+                if confidence_level == "ci95"
+                else Decimal(1)
+            )
+            sigma_r = converted / confidence_width_scale
+            # FE3/Fe2 residuals use log10 distance, so propagate directly to
+            # dex at the reduction owner before the scorer applies its band policy.
+            sigma_log10_r, refusal_reason = (
+                _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+                    fraction_r, sigma_r
+                )
+            )
+            if sigma_log10_r is None:
+                return _PrintedBandResolution(
+                    refusal={
+                        "reason": refusal_reason
+                        or "ferric_fraction_uncertainty_propagation_unavailable",
+                        "quantity": quantity.value,
+                        "fraction": str(fraction_r),
+                        "sigma_r": str(sigma_r),
+                        "distance_to_r_one": str(Decimal(1) - fraction_r),
+                    }
+                )
+            converted = sigma_log10_r * confidence_width_scale
+            converted_unit = "dex"
+
     ticket = _metric_uncertainty_width(
         operation,
         quantity,
@@ -6663,12 +6926,7 @@ def _printed_uncertainty_band(
                 "original": raw_text,
             }
     )
-    if confidence_level == "not_stated":
-        if shape == "range" or kind == "printed_range":
-            kind = "printed_range"
-        else:
-            kind = "printed_unstated"
-    elif kind == "printed_1sigma":
+    if confidence_level == "one_sigma" and kind == "printed_1sigma":
         ticket *= NORMAL_95_TICKET_MULTIPLIER
     unit = (
         "dimensionless"
@@ -6679,7 +6937,19 @@ def _printed_uncertainty_band(
     )
     rule = f"{kind}: source-printed uncertainty; original={raw_text}"
     notice = _confidence_level_notice(
-        quantity, uncertainty, source_observation, source_value
+        quantity,
+        uncertainty,
+        source_observation,
+        source_value,
+        confidence_level_override=(
+            stated_confidence_level or confidence_level_override
+        ),
+        assumed_one_sigma=(
+            kind == "printed_1sigma"
+            and confidence_level_override is None
+            and stated_confidence_level is None
+            and not log10_activity_sigma
+        ),
     )
     standard_uncertainty_dex = None
     if operation is MetricOperation.DEX:
@@ -6687,10 +6957,19 @@ def _printed_uncertainty_band(
             standard_uncertainty_dex = ticket / NORMAL_95_TICKET_MULTIPLIER
         elif confidence_level == "two_sigma":
             standard_uncertainty_dex = ticket / Decimal(2)
+    two_sigma_band = None
+    if notice is not None and notice.reason == "uncertainty_confidence_level_assumed_1sigma":
+        two_sigma_band = DecisionBand(
+            ticket / NORMAL_95_TICKET_MULTIPLIER,
+            unit,
+            f"printed_2sigma_reading: source-printed uncertainty; original={raw_text}",
+            band_basis=band_basis,
+        )
     return _PrintedBandResolution(
         DecisionBand(ticket, unit, rule, band_basis=band_basis),
         notice=notice,
         standard_uncertainty_dex=standard_uncertainty_dex,
+        two_sigma_band=two_sigma_band,
     )
 
 
@@ -9424,6 +9703,11 @@ def _implied_alpha_coefficient_basis_matches(
         return False
     expected_standard = expected_state.value
     actual_standard = actual_state.value
+    if (
+        expected_standard.convention is ReferenceStateConvention.TEMKIN
+        or actual_standard.convention is ReferenceStateConvention.TEMKIN
+    ):
+        return False
     return (
         actual_standard.convention is expected_standard.convention
         and actual_standard.endmember.formula == expected_standard.endmember.formula
@@ -12861,6 +13145,8 @@ def _catalog_reference_identity_reason(
     if state is None or not state.is_value or not isinstance(state.value, StandardState):
         return "catalog_reference_state_missing"
     standard = state.value
+    if standard.convention is ReferenceStateConvention.TEMKIN:
+        return "catalog_reference_convention_mismatch"
     if standard.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER:
         return "catalog_reference_convention_mismatch"
     if not _catalog_formulas_equal(standard.endmember.formula, declaration.component_id):
@@ -15112,6 +15398,8 @@ def _predict_with_engine(
                 )
                 if (
                     expected_standard_state is None
+                    or expected_standard_state.convention
+                    is ReferenceStateConvention.TEMKIN
                     or expected_phase is None
                     or not isinstance(reported_standard_state, Mapping)
                     or reported_standard_state.get("convention")
@@ -17089,16 +17377,19 @@ def _compile_residual_with_lineage(
             fo2_mode=fo2_mode,
         )
 
-    if (
-        prediction is not None
-        and prediction.refusal_reason is RefusalReason.REFERENTIAL_INTEGRITY
-        and prediction.refusal_detail.get("reason") == "duplicate_of"
-    ):
+    duplicate_detail = _duplicate_observation_refusal_detail(context, reference)
+    if duplicate_detail is not None:
+        source_relation = (
+            SourceRelation.SAME_INPUT
+            if duplicate_detail.get("resolution")
+            in {"excluded", "primary_not_admitted"}
+            else SourceRelation.UNKNOWN
+        )
         return _refused(
             RefusalReason.REFERENTIAL_INTEGRITY,
-            prediction.refusal_detail,
-            execution=prediction.execution,
-            extra_notices=prediction.notices,
+            duplicate_detail,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            source_relation=source_relation,
             exclusions=("duplicate_of",),
         )
 
@@ -17658,6 +17949,7 @@ def _compile_residual_with_lineage(
             relation_reference.observation_id,
             context.observations,
             validation_indexes.table_ids,
+            experiments=context.experiments,
             asset_ids=validation_indexes.asset_ids,
             _cache=validation_indexes.observation_lineages,
         )
@@ -17969,6 +18261,28 @@ def _compile_residual_with_lineage(
         row_operation = _residual_metric_operation(quantity, reference)
         band_uncertainty = source_reference.uncertainty
         band_basis = None
+        confidence_level_override = None
+        work = (
+            None
+            if experiment is None
+            else context.works.get(experiment.work_id or "")
+        )
+        method_uncertainties = (
+            None if work is None else work.source_method_uncertainties
+        )
+        source_method_uncertainty = (
+            None
+            if method_uncertainties is None or source_reference.source_id is None
+            else method_uncertainties.get(source_reference.source_id)
+        )
+        if (
+            source_method_uncertainty is not None
+            and (
+                quantity is None
+                or source_method_uncertainty.quantity is not quantity
+            )
+        ):
+            source_method_uncertainty = None
         if _is_standard_pressure_ambiguity_uncertainty(band_uncertainty):
             band_basis = (
                 "printed_plus_derived_bound"
@@ -17977,59 +18291,55 @@ def _compile_residual_with_lineage(
             )
         elif band_uncertainty.kind is UncertaintyKind.PRINTED:
             band_basis = "row_printed"
-        elif band_uncertainty.kind is UncertaintyKind.NONE and experiment is not None:
-            work = context.works.get(experiment.work_id or "")
-            method_uncertainties = (
-                None if work is None else work.source_method_uncertainties
-            )
-            source_method_uncertainty = (
-                None
-                if method_uncertainties is None or source_reference.source_id is None
-                else method_uncertainties.get(source_reference.source_id)
+            row_confidence_level = (
+                _stated_printed_confidence_level(band_uncertainty)
+                or "not_stated"
             )
             if (
-                source_method_uncertainty is not None
-                and (
-                    quantity is None
-                    or source_method_uncertainty.quantity is not quantity
-                )
+                row_confidence_level == "not_stated"
+                and source_method_uncertainty is not None
+                and source_method_uncertainty.meaning
+                in {"one_sigma", "two_sigma", "range_half_width"}
             ):
-                source_method_uncertainty = None
-            if source_method_uncertainty is not None:
-                band_basis = "source_method"
-                if source_method_uncertainty.basis not in {
-                    "log10_dex", "absolute", "relative_percent"
-                }:
-                    printed = _PrintedBandResolution(
-                        refusal={
-                            "reason": "source_method_uncertainty_basis_unmapped",
-                            "basis": source_method_uncertainty.basis,
-                        }
-                    )
-                elif source_method_uncertainty.value <= 0:
-                    printed = _PrintedBandResolution(
-                        refusal={
-                            "reason": "source_method_uncertainty_value_nonpositive",
-                            "value": str(source_method_uncertainty.value),
-                        }
-                    )
-                else:
-                    printed_unit = {
-                        "log10_dex": "dex",
-                        "absolute": QUANTITY_UNITS[quantity],
-                        "relative_percent": "%",
-                    }[source_method_uncertainty.basis]
-                    band_uncertainty = Uncertainty(
-                        kind=UncertaintyKind.PRINTED,
-                        verbatim={
-                            "value": source_method_uncertainty.value,
-                            "unit": printed_unit,
-                            "confidence_level": source_method_uncertainty.meaning,
-                            "note": source_method_uncertainty.locator.note,
-                        },
-                        value=source_method_uncertainty.value,
-                        basis=printed_unit,
-                    )
+                confidence_level_override = source_method_uncertainty.meaning
+        elif (
+            band_uncertainty.kind is UncertaintyKind.NONE
+            and source_method_uncertainty is not None
+        ):
+            band_basis = "source_method"
+            if source_method_uncertainty.basis not in {
+                "log10_dex", "absolute", "relative_percent"
+            }:
+                printed = _PrintedBandResolution(
+                    refusal={
+                        "reason": "source_method_uncertainty_basis_unmapped",
+                        "basis": source_method_uncertainty.basis,
+                    }
+                )
+            elif source_method_uncertainty.value <= 0:
+                printed = _PrintedBandResolution(
+                    refusal={
+                        "reason": "source_method_uncertainty_value_nonpositive",
+                        "value": str(source_method_uncertainty.value),
+                    }
+                )
+            else:
+                printed_unit = {
+                    "log10_dex": "dex",
+                    "absolute": QUANTITY_UNITS[quantity],
+                    "relative_percent": "%",
+                }[source_method_uncertainty.basis]
+                band_uncertainty = Uncertainty(
+                    kind=UncertaintyKind.PRINTED,
+                    verbatim={
+                        "value": source_method_uncertainty.value,
+                        "unit": printed_unit,
+                        "confidence_level": source_method_uncertainty.meaning,
+                        "note": source_method_uncertainty.locator.note,
+                    },
+                    value=source_method_uncertainty.value,
+                    basis=printed_unit,
+                )
         if printed.refusal is None:
             printed = _printed_uncertainty_band(
                 quantity,
@@ -18042,6 +18352,7 @@ def _compile_residual_with_lineage(
                     else None
                 ),
                 band_basis=band_basis or "row_printed",
+                confidence_level_override=confidence_level_override,
             )
         if printed.notice is not None:
             notices = union_notices(notices, (printed.notice,))
@@ -18095,15 +18406,35 @@ def _compile_residual_with_lineage(
                     * Decimal(1000)
                     / _rt_ln_10_j_per_mol_K(T)
                 )
-                sigma_total_dex = (
-                    printed.standard_uncertainty_dex**2
-                    + sigma_conversion_dex**2
-                ).sqrt()
+                sigma_total_dex = _combine_independent_standard_uncertainties(
+                    printed.standard_uncertainty_dex,
+                    sigma_conversion_dex,
+                )
                 combined_basis = (
                     "fusion_combined_source_method"
                     if band_basis == "source_method"
                     else "fusion_combined_row_printed"
                 )
+                two_sigma_band = printed.two_sigma_band
+                if two_sigma_band is not None:
+                    two_sigma_measurement_dex = (
+                        printed.standard_uncertainty_dex / Decimal(2)
+                    )
+                    two_sigma_total_dex = (
+                        _combine_independent_standard_uncertainties(
+                            two_sigma_measurement_dex,
+                            sigma_conversion_dex,
+                        )
+                    )
+                    two_sigma_band = DecisionBand(
+                        NORMAL_95_TICKET_MULTIPLIER * two_sigma_total_dex,
+                        "dimensionless",
+                        (
+                            "printed_2sigma_reading: independent printed reading "
+                            "and JANAF conversion uncertainties; GUM quadrature"
+                        ),
+                        band_basis=combined_basis,
+                    )
                 printed = replace(
                     printed,
                     band=DecisionBand(
@@ -18116,6 +18447,7 @@ def _compile_residual_with_lineage(
                         band_basis=combined_basis,
                     ),
                     standard_uncertainty_dex=sigma_total_dex,
+                    two_sigma_band=two_sigma_band,
                 )
         if fusion_band_refusal is not None:
             reason = str(fusion_band_refusal["reason"])
@@ -18218,6 +18550,29 @@ def _compile_residual_with_lineage(
                 "reason": "observed_value_outside_metric_domain",
                 "observed_value": str(ref_point),
             }
+        if (
+            numeric is not None
+            and printed.refusal is None
+            and printed.notice is not None
+            and printed.two_sigma_band is not None
+            and numeric.decision_band is not None
+        ):
+            one_sigma_verdict = match_status(numeric)
+            two_sigma_verdict = match_status(
+                replace(numeric, decision_band=printed.two_sigma_band)
+            )
+            if two_sigma_verdict is not one_sigma_verdict:
+                updated_notice = replace(
+                    printed.notice,
+                    band=(
+                        f"{printed.notice.band}; "
+                        f"two_sigma_reading_verdict={two_sigma_verdict.value}"
+                    ),
+                )
+                notices = union_notices(
+                    tuple(notice for notice in notices if notice != printed.notice),
+                    (updated_notice,),
+                )
     if numeric is None:
         return _refused(
             metric_reason or RefusalReason.METRIC_DOMAIN,
@@ -18265,6 +18620,21 @@ def _compile_residual_with_lineage(
         NoticeKind.FIGURE_ONLY,
         NoticeKind.REACTIVE_CELL_NOT_MODELLED,
     }
+    initial_charge_figure_band = (
+        numeric.decision_band is not None
+        and numeric.decision_band.band_basis == "row_printed"
+        and evidence_class.is_value
+        and evidence_class.value is EvidenceClass.FIGURE_ONLY
+        and reference.identity.composition is not None
+        and reference.identity.composition.is_value
+        and isinstance(reference.identity.composition.value, Composition)
+        and reference.identity.composition.value.proxy_flag
+        == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    )
+    if initial_charge_figure_band:
+        band_preserving_kinds.update(
+            {NoticeKind.SOURCE_DISAGREEMENT, NoticeKind.UNVERIFIED_APPARATUS}
+        )
     if (
         evidence_class.is_value
         and evidence_class.value is EvidenceClass.FIGURE_ONLY
@@ -18500,20 +18870,62 @@ def load_score_context(
     )
 
 
-def _has_duplicate_observation_link(observation: Observation) -> bool:
+def _has_duplicate_observation_link(
+    observation: Observation,
+    experiments: Mapping[str, Experiment] | None = None,
+) -> bool:
     provenance = observation.provenance
-    return (
+    explicit_duplicate = (
         isinstance(provenance, Mapping)
         and "duplicate_of_observation_id" in provenance
+    )
+    experiment = (
+        experiments.get(observation.experiment_id)
+        if experiments is not None
+        else None
+    )
+    return explicit_duplicate or (
+        experiment is not None and experiment.quoted_from is not None
     )
 
 
 def _duplicate_observation_refusal_detail(
     context: ScoreContext, observation: Observation
-) -> dict[str, object]:
+) -> dict[str, object] | None:
     provenance = observation.provenance
-    assert isinstance(provenance, Mapping)
-    target = provenance["duplicate_of_observation_id"]
+    has_explicit_duplicate = (
+        isinstance(provenance, Mapping)
+        and "duplicate_of_observation_id" in provenance
+    )
+    if has_explicit_duplicate:
+        explicit_target = provenance["duplicate_of_observation_id"]
+    else:
+        experiments = getattr(context, "experiments", {})
+        experiment = experiments.get(observation.experiment_id)
+        quoted_from = experiment.quoted_from if experiment is not None else None
+        if quoted_from is None:
+            return None
+        primary_ids = _quoted_source_observation_ids(
+            experiment, context.observations, experiments
+        )
+        if quoted_from.target_kind is QuotedTargetKind.EXPERIMENT:
+            return {
+                "reason": "duplicate_of",
+                "primary_experiment_id": quoted_from.target_id,
+                "primary_observation_ids": list(primary_ids or ()),
+                "resolution": "excluded"
+                if primary_ids is not None
+                else "primary_missing",
+            }
+        if primary_ids is None:
+            return {
+                "reason": "duplicate_of",
+                "primary_observation_id": quoted_from.target_id,
+                "resolution": "primary_missing",
+            }
+        explicit_target = primary_ids[0]
+
+    target = explicit_target
     detail: dict[str, object] = {
         "reason": "duplicate_of",
         "primary_observation_id": target,
@@ -18571,7 +18983,7 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
         ev = obs.evidence.class_
         if obs.admission.status not in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}:
             continue
-        if _has_duplicate_observation_link(obs):
+        if _has_duplicate_observation_link(obs, getattr(context, "experiments", None)):
             continue
         origin = getattr(context, "origins", {}).get(obs.observation_id)
         if is_internal_consistency(origin):
@@ -18754,6 +19166,10 @@ def score_proprietary_aggregate(
             raise ValueError(
                 f"observation_id {observation_id!r} has no score rail"
             )
+
+        if _duplicate_observation_refusal_detail(context, observation) is not None:
+            count_refusal(rail, RefusalReason.REFERENTIAL_INTEGRITY.value)
+            continue
 
         if provider is None:
             outcome: ProprietaryProviderResult = ProprietaryRefused(
@@ -23308,6 +23724,7 @@ class _ResidualJsonlStream:
         path: Path,
         *,
         root: Path | None = None,
+        store_stamp: Mapping[str, object] | None = None,
         sort_on_finalize: bool = True,
         compact_static_refusals: bool = False,
     ) -> None:
@@ -23316,7 +23733,11 @@ class _ResidualJsonlStream:
         self.root = root or REPO_ROOT
         self.compact_static_refusals = compact_static_refusals
         self.static_refusal_counts: Counter[tuple[str, str, str]] = Counter()
-        self.store_stamp = derive_store_stamp(self.root)
+        self.store_stamp = (
+            derive_store_stamp(self.root)
+            if store_stamp is None
+            else dict(store_stamp)
+        )
         path.parent.mkdir(parents=True, exist_ok=True)
         self.file = self.partial_path.open("wb")
         self.file.write(
