@@ -1125,15 +1125,20 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     }
     candidate = {row["observation_id"]: row for row in observations}
     assert set(candidate) == set(baseline)
-    assert all(
-        {key: value for key, value in row.items() if key != "admission"}
-        == {
-            key: value
-            for key, value in baseline[observation_id].items()
-            if key != "admission"
-        }
+    non_admission_diffs = {
+        observation_id: sorted(
+            key
+            for key in row.keys() | baseline[observation_id].keys()
+            if key != "admission" and row.get(key) != baseline[observation_id].get(key)
+        )
         for observation_id, row in candidate.items()
-    )
+    }
+    non_admission_diffs = {
+        observation_id: fields
+        for observation_id, fields in non_admission_diffs.items()
+        if fields
+    }
+    assert not non_admission_diffs, json.dumps(non_admission_diffs, sort_keys=True)
     changed_admissions = {
         observation_id: (baseline[observation_id]["admission"], row["admission"])
         for observation_id, row in candidate.items()
