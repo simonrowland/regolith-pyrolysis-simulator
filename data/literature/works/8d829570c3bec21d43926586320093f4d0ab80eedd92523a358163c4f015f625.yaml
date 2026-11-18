@@ -1,15 +1,28 @@
 schema_version: battery_work.v2.1
 work:
   work_id: 8d829570c3bec21d43926586320093f4d0ab80eedd92523a358163c4f015f625
-  citation: robie-hemingway-1995-usgs-b2131
+  citation: Robie & Hemingway (1995), Thermodynamic properties of minerals and related substances at 298.15 K and 1 bar pressure
+    and at higher temperatures, U.S. Geological Survey Bulletin 2131. https://pubs.usgs.gov/bul/2131/report.pdf
   source_ids:
   - robie-hemingway-1995-usgs-b2131
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: d984f46a9453f36d01a51ea1960fcdbc8657ae6d
     files:
+    - asset_id: pdf:robie-hemingway-1995-usgs-b2131
+      role: pdf
+      path: raw/robie-hemingway-1995-usgs-b2131/robie-hemingway-1995-usgs-b2131.pdf
+      sha256:
+        tag: value
+        value: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
+    - asset_id: pdftotext:robie-hemingway-1995-usgs-b2131
+      role: pdftotext
+      path: text/robie-hemingway-1995-usgs-b2131
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:robie-hemingway-1995-usgs-b2131
       role: pdftotext
       path: unknown
@@ -1996,6 +2009,7 @@ work:
       sha256:
         tag: unknown
         reason: compilation record asset has no INDEX sha256
+  doi: 10.3133/b2131
 experiments:
 - experiment_id: 8d829570c3bec21d43926586320093f4d0ab80eedd92523a358163c4f015f625::robie-hemingway-1995-usgs-b2131
   kind: literature
