@@ -1032,6 +1032,24 @@ def _measure_optimizer_profile_campaign_chain_stage(
             # compact ranking projection. Keeping the entire trace here can
             # exceed SQLite's text limit for this long campaign chain.
             cacheable = _strip_heavy_result(scored)
+            coating_margin = cacheable.feasibility_margins.get("coating")
+            source_warning_flags = (
+                coating_margin.status_payload.get("coating_warning_flags", ())
+                if coating_margin is not None
+                else ()
+            )
+            source_authority_ids = {
+                id(warning["authority"])
+                for warning in source_warning_flags
+                if isinstance(warning, Mapping)
+                and isinstance(warning.get("authority"), Mapping)
+            }
+            source_flag_ids = {
+                id(warning["flags"])
+                for warning in source_warning_flags
+                if isinstance(warning, Mapping)
+                and isinstance(warning.get("flags"), Mapping)
+            }
             store.store(
                 cacheable.eval_spec,
                 cacheable,
@@ -1048,6 +1066,18 @@ def _measure_optimizer_profile_campaign_chain_stage(
             expected_warning_flags = expected_payload["coating_warning_flags"]
             cached_warning_flags = cached_payload["coating_warning_flags"]
             assert len(cached_warning_flags) == len(expected_warning_flags)
+            cached_authority_ids = {
+                id(warning["authority"])
+                for warning in cached_warning_flags
+                if isinstance(warning, Mapping)
+                and isinstance(warning.get("authority"), Mapping)
+            }
+            cached_flag_ids = {
+                id(warning["flags"])
+                for warning in cached_warning_flags
+                if isinstance(warning, Mapping)
+                and isinstance(warning.get("flags"), Mapping)
+            }
             shared_payload_ids: set[int] = set()
             for expected_warning, cached_warning in zip(
                 expected_warning_flags,
@@ -1110,6 +1140,11 @@ def _measure_optimizer_profile_campaign_chain_stage(
                 "cache_hit_counted": False,
                 "cache_hit_work_units": 0,
                 "max_stored_text_cell_bytes": max_stored_text_cell_bytes,
+                "coating_warning_flag_count": len(source_warning_flags),
+                "source_authority_object_count": len(source_authority_ids),
+                "source_flag_object_count": len(source_flag_ids),
+                "loaded_authority_object_count": len(cached_authority_ids),
+                "loaded_flag_object_count": len(cached_flag_ids),
             }
         )
 

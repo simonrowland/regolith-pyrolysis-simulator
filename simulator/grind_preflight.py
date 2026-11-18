@@ -481,11 +481,16 @@ def assert_strict_vapor_result_store(
     checked_rows = 0
     vapor_active_rows = 0
     source_reports = 0
+    from simulator.optimize.results_store import _decode_result_payload
+
     for row in rows:
         checked_rows += 1
         row_context = f"{context}:{row['cache_key']}"
         eval_spec = _json_mapping(row["eval_spec"], f"{row_context}.eval_spec")
-        result_blob = _json_value(row["result_blob"], f"{row_context}.result_blob")
+        _margins, result_blob = _decode_result_payload(
+            None,
+            row["result_blob"],
+        )
         notes = _json_value(row["notes"], f"{row_context}.notes")
         assert_strict_vapor_config(
             eval_spec,

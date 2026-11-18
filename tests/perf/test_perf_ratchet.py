@@ -133,6 +133,11 @@ def test_optimizer_60h_stage_records_real_cold_work() -> None:
     # ceiling leaves about 32x headroom below that observed failure boundary.
     for trial in measurement["details"]["trial_records"]:
         assert trial["max_stored_text_cell_bytes"] < 64 * 1024 * 1024
+        assert trial["coating_warning_flag_count"] > 0
+        assert trial["source_authority_object_count"] == 1
+        assert trial["source_flag_object_count"] == 1
+        assert trial["loaded_authority_object_count"] == 1
+        assert trial["loaded_flag_object_count"] == 1
 
 
 def test_lunar_highland_campaign_chain_work_volume_is_derived_from_config() -> None:

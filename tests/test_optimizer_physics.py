@@ -12,6 +12,7 @@ from simulator.accounting.yield_disposition import (
 )
 from simulator.optimize.physics import (
     CoatingFeasibilityReportError,
+    GateMargin,
     GATE_ORDER,
     PhysicsConstraintSet,
     ThresholdSpec,
@@ -20,6 +21,7 @@ from simulator.optimize.physics import (
     extraction_completeness_report,
     physics_constraints_digest,
 )
+from simulator.optimize import physics as physics_module
 from simulator.optimize.objective import product_summary
 from simulator.optimize.profiles import physics_constraints_from_profile
 from simulator.state import CampaignPhase, HourSnapshot
@@ -927,6 +929,53 @@ def test_d045_flagged_deposit_below_threshold_passes_with_flag() -> None:
     assert coating.status_payload["coating_warning_flags"][0]["reason"] == (
         "flagged_upstream_wall_deposit_below_threshold"
     )
+
+
+def test_coating_warning_authority_is_shared_and_read_only() -> None:
+    authority = {
+        "carrier_authority": {
+            "SiO": {"status": "status_bearing", "detail": "wall evidence"},
+        },
+        "extrapolations": [{"wall_temperature_C": 1400.0}],
+    }
+    frozen_authority, frozen_flags = physics_module._coating_authority_values(
+        authority
+    )
+    warnings = [
+        physics_module._coating_reason_record(
+            f"warning-{index}",
+            authority=frozen_authority,
+            authority_flags=frozen_flags,
+        )
+        for index in range(2)
+    ]
+    margin = GateMargin(
+        gate="coating",
+        feasible=True,
+        margin=1.0,
+        threshold=ThresholdSpec(
+            id="coating",
+            value=1.0,
+            units="campaigns",
+            source="test",
+            source_ref="test",
+        ),
+        observed=2.0,
+        detail="shared warning authority",
+        status_payload={"coating_warning_flags": warnings},
+    )
+    first, second = margin.status_payload["coating_warning_flags"]
+
+    assert first["authority"] is second["authority"]
+    assert first["flags"] is second["flags"]
+    with pytest.raises(TypeError):
+        first["authority"]["carrier_authority"]["SiO"]["status"] = "edited"
+    with pytest.raises(TypeError):
+        first["authority"]["extrapolations"][0]["wall_temperature_C"] = 1.0
+    with pytest.raises(TypeError):
+        first["authority"]["extrapolations"].append({"wall_temperature_C": 1.0})
+    first["reason"] = "edited warning"
+    assert second["reason"] == "warning-1"
 
 
 def test_d045_silica_exposure_fails_at_zero_wall_deposit_mass() -> None:

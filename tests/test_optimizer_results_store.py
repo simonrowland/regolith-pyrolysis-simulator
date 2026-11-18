@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import fields, replace
+from dataclasses import dataclass, fields, replace
+from enum import Enum
 import json
 import math
 import multiprocessing
@@ -12,6 +13,7 @@ import time
 from types import MappingProxyType, SimpleNamespace
 
 import pytest
+import numpy as np
 
 from simulator.corpus_version import current_corpus_version
 from simulator.chemistry.kernel.dto import DEGRADING_INTENT_RESULT_STATUSES
@@ -38,6 +40,8 @@ from simulator.optimize.results_store import (
     ResultStoreWriteRejected,
     SCHEMA_VERSION,
     _deserialize_margins,
+    _decode_result_payload,
+    _encode_result_payload,
     _serialize_objectives,
     _serialize_margins,
     grounded_result_feasible,
@@ -568,6 +572,102 @@ def test_coating_warning_flag_shared_payloads_round_trip(tmp_path) -> None:
         )
     with pytest.raises(ResultStoreSchemaError, match="shared coating payload is missing"):
         store.lookup(spec)
+
+
+def test_result_payload_round_trip_preserves_legacy_jsonable_identity() -> None:
+    class PayloadEnum(Enum):
+        COATING = "coating"
+
+    @dataclass
+    class PayloadData:
+        count: int
+
+    class GeneratorLike:
+        def __iter__(self):
+            yield from (1, 2)
+
+        def __str__(self) -> str:
+            return "generator-like(1, 2)"
+
+    payload = {
+        "coating_verdict": "clear",
+        "identity_payload": {
+            "range": range(2),
+            "generator_like": GeneratorLike(),
+            "numpy_array": np.array([1, 2]),
+            "numpy_scalar": np.int64(7),
+            "set": {"z", "a"},
+            "enum": PayloadEnum.COATING,
+            "dataclass": PayloadData(count=2),
+            "nan": float("nan"),
+            "positive_infinity": float("inf"),
+            "negative_infinity": float("-inf"),
+            "negative_zero": -0.0,
+            "boolean": True,
+        },
+    }
+    margin = _coating_margin(
+        feasible=True,
+        observed=2.0,
+        threshold=1.0,
+        status_payload=payload,
+    )
+    margins, result_blob = _encode_result_payload(
+        {"coating": margin},
+        {"trace_marker": "legacy-compatible"},
+    )
+    stored_margins = json.loads(json.dumps(margins, allow_nan=False))
+    stored_blob = json.loads(json.dumps(result_blob, allow_nan=False))
+    decoded, decoded_blob = _decode_result_payload(stored_margins, stored_blob)
+
+    assert decoded["coating"].status_payload == {
+        "coating_verdict": "clear",
+        "identity_payload": {
+            "range": "range(0, 2)",
+            "generator_like": "generator-like(1, 2)",
+            "numpy_array": "[1 2]",
+            "numpy_scalar": "7",
+            "set": ["a", "z"],
+            "enum": "PayloadEnum.COATING",
+            "dataclass": "PayloadData(count=2)",
+            "nan": "nan",
+            "positive_infinity": "inf",
+            "negative_infinity": "-inf",
+            "negative_zero": -0.0,
+            "boolean": True,
+        },
+    }
+    assert math.copysign(1.0, decoded["coating"].status_payload[
+        "identity_payload"
+    ]["negative_zero"]) == -1.0
+    assert decoded_blob == {"trace_marker": "legacy-compatible"}
+
+
+def test_result_payload_decoder_refuses_malformed_shared_reference() -> None:
+    authority = {"source": "wall saturation"}
+    flags = {"output_status": "status_bearing"}
+    margin = _coating_margin(
+        feasible=True,
+        observed=2.0,
+        threshold=1.0,
+        status_payload={
+            "coating_verdict": "clear",
+            "coating_warning_flags": [
+                {"reason": "first", "authority": authority, "flags": flags},
+                {"reason": "second", "authority": authority, "flags": flags},
+            ],
+        },
+    )
+    margins, result_blob = _encode_result_payload(
+        {"coating": margin},
+        {"trace_marker": "test"},
+    )
+    margins["coating"]["status_payload"]["coating_warning_flags"][0][
+        "authority"
+    ]["unexpected"] = "malformed"
+
+    with pytest.raises(ResultStoreSchemaError, match="reference is malformed"):
+        _decode_result_payload(margins, result_blob)
 
 
 def test_lookup_preserves_finite_objectives_on_infeasible_rows(tmp_path) -> None:

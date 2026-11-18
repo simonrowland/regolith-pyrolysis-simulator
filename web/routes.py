@@ -799,11 +799,9 @@ def _result_metadata(
     contain_unreadable_backend: bool = False,
     accepted_corpus_versions: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
+    margins, result_blob = _decode_optimizer_result_payload(row)
     objectives = _objective_items(row)
     selected = _objective_for(objectives, objective_metric)
-    result_blob = _json_value(row['result_blob'], {})
-    if not isinstance(result_blob, dict):
-        result_blob = {}
     run_reference = _json_value(row['run_reference'], {})
     if not isinstance(run_reference, dict):
         run_reference = {}
@@ -819,7 +817,7 @@ def _result_metadata(
     if not isinstance(product_summary, dict):
         product_summary = {}
     product_summary = coating_summary_with_grounded_authority(product_summary)
-    constraint_margins = _result_row_constraint_margins(row)
+    constraint_margins = _result_row_constraint_margins(row, margins=margins)
 
     # ★ A ROW THE VOCABULARY CANNOT READ MUST NOT DECIDE WHO SEES THE PAGE.
     # canonicalize_fidelity_emission refuses any backend_status it cannot
@@ -857,7 +855,7 @@ def _result_metadata(
         'recipe_id': row['recipe_id'],
         'profile_id': row['profile_id'],
         'fidelity': row['fidelity'],
-        'feasible': _result_row_feasible(row),
+        'feasible': _result_row_feasible(row, margins=margins),
         'created_at': row['created_at'],
         'corpus_version': corpus_version,
         'corpus_version_label': corpus_badge['label'],
@@ -874,7 +872,7 @@ def _result_metadata(
         'eval_spec': _eval_spec_summary(eval_spec),
         'backend': backend_payload,
         'tier_label': None,
-        'previously_ungated': _result_row_previously_ungated(row),
+        'previously_ungated': _result_row_previously_ungated(row, margins=margins),
         'constraint_margins': constraint_margins,
         'constraint_margin_summary': _constraint_margin_summary(constraint_margins),
         'notes': _json_value(row['notes'], []),
@@ -1361,9 +1359,23 @@ def _numeric_objective_value(objective: dict[str, Any]) -> float | None:
     return None
 
 
-def _result_row_feasible(row: sqlite3.Row) -> bool:
+def _decode_optimizer_result_payload(
+    row: sqlite3.Row,
+) -> tuple[dict[str, Any], Any]:
+    from simulator.optimize.results_store import _decode_result_payload
+
+    return _decode_result_payload(
+        _row_value(row, 'feasibility_margins', {}),
+        _row_value(row, 'result_blob'),
+    )
+
+
+def _result_row_feasible(
+    row: sqlite3.Row,
+    *,
+    margins: Mapping[str, Any] | None = None,
+) -> bool:
     from simulator.optimize.results_store import (
-        _deserialize_grounding_margins,
         grounded_result_feasible,
     )
 
@@ -1371,9 +1383,8 @@ def _result_row_feasible(row: sqlite3.Row) -> bool:
         stored_feasible = int(row['feasible']) == 1
     except (IndexError, KeyError, TypeError, ValueError):
         return False
-    margins = _deserialize_grounding_margins(
-        _json_value(row['feasibility_margins'], {})
-    )
+    if margins is None:
+        margins, _result_blob = _decode_optimizer_result_payload(row)
     return grounded_result_feasible(
         stored_feasible,
         failure_category=_row_value(row, 'failure_category'),
@@ -1381,22 +1392,23 @@ def _result_row_feasible(row: sqlite3.Row) -> bool:
     )
 
 
-def _result_row_previously_ungated(row: sqlite3.Row) -> bool:
-    try:
-        payload = _json_value(row['feasibility_margins'], {})
-    except (IndexError, KeyError, TypeError):
-        return False
-    return isinstance(payload, Mapping) and 'stub_smoke' in payload
+def _result_row_previously_ungated(
+    row: sqlite3.Row,
+    *,
+    margins: Mapping[str, Any] | None = None,
+) -> bool:
+    if margins is None:
+        margins, _result_blob = _decode_optimizer_result_payload(row)
+    return 'stub_smoke' in margins
 
 
-def _result_row_constraint_margins(row: sqlite3.Row) -> list[dict[str, Any]]:
-    from simulator.optimize.results_store import _deserialize_grounding_margins
-
-    try:
-        payload = _json_value(row['feasibility_margins'], {})
-    except (IndexError, KeyError, TypeError):
-        return []
-    margins = _deserialize_grounding_margins(payload)
+def _result_row_constraint_margins(
+    row: sqlite3.Row,
+    *,
+    margins: Mapping[str, Any] | None = None,
+) -> list[dict[str, Any]]:
+    if margins is None:
+        margins, _result_blob = _decode_optimizer_result_payload(row)
     return [_constraint_margin_readout(margin) for margin in margins.values()]
 
 
@@ -3228,7 +3240,7 @@ def _result_detail_model(
     eval_spec = _json_value(row['eval_spec'], {})
     if not isinstance(eval_spec, Mapping):
         eval_spec = {}
-    result_blob = _json_value(row['result_blob'], {})
+    _margins, result_blob = _decode_optimizer_result_payload(row)
     if not isinstance(result_blob, Mapping):
         result_blob = {}
     run_reference = _json_value(row['run_reference'], {})
@@ -4610,7 +4622,7 @@ def _thermal_train_context() -> dict[str, Any]:
                 'selection': {'run_id': run_id, 'cache_key': cache_key},
             }
         _root, _run_dir, row = resolved
-        result_blob = _json_value(_row_value(row, 'result_blob'), {})
+        _margins, result_blob = _decode_optimizer_result_payload(row)
         report = None
         if isinstance(result_blob, Mapping):
             candidate = result_blob.get('thermal_train_report')

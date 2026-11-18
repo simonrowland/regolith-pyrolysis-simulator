@@ -124,13 +124,13 @@ from simulator.optimize.save_bundle import MEMBER_SCHEMA_VERSION, SAVE_SCHEMA_VE
 from simulator.optimize.results_store import (
     ResultStore,
     ResultStoreWriteRejected,
+    _decode_result_payload,
     _deserialize_eval_spec,
-    _deserialize_margins,
     _deserialize_objectives,
     _deserialize_run_reference,
+    _encode_result_payload,
     _result_blob,
     _serialize_eval_spec,
-    _serialize_margins,
     _serialize_objectives,
     _serialize_run_reference,
     reground_scored_result,
@@ -1712,7 +1712,6 @@ class _StudyJournalWriter:
                     else None
                 ),
                 "objectives": _serialize_objectives(scored.objectives),
-                "feasibility_margins": _serialize_margins(scored.feasibility_margins),
                 "failing_gates": list(scored.failing_gates),
                 "scored_result": _scored_result_journal_payload(scored),
             },
@@ -2254,6 +2253,10 @@ def _owner_strategy_payload(owner: StagedStrategy | None) -> Mapping[str, Any] |
 
 
 def _scored_result_journal_payload(scored: ScoredResult) -> Mapping[str, Any]:
+    feasibility_margins, result_blob = _encode_result_payload(
+        scored.feasibility_margins,
+        scored,
+    )
     payload = {
         "candidate_id": scored.candidate_id,
         "eval_spec": (
@@ -2267,10 +2270,10 @@ def _scored_result_journal_payload(scored: ScoredResult) -> Mapping[str, Any]:
             scored.failure_category.value if scored.failure_category is not None else None
         ),
         "objectives": _serialize_objectives(scored.objectives),
-        "feasibility_margins": _serialize_margins(scored.feasibility_margins),
+        "feasibility_margins": feasibility_margins,
         "failing_gates": list(scored.failing_gates),
         "run_reference": _serialize_run_reference(scored.run_reference),
-        "result_blob": _result_blob(scored),
+        "result_blob": result_blob,
         "notes": list(scored.notes),
         # Always present. An omitted key is unknown, not a measured empty list.
         "law_disclosures": [dict(item) for item in scored.law_disclosures],
@@ -2296,6 +2299,10 @@ def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredRes
     objectives = _deserialize_objectives(
         _sequence_of_mappings(payload.get("objectives", ()))
     )
+    feasibility_margins, result_blob = _decode_result_payload(
+        payload.get("feasibility_margins", {}),
+        payload.get("result_blob"),
+    )
     result = ScoredResult(
         candidate_id=(
             str(payload["candidate_id"]) if payload.get("candidate_id") is not None else None
@@ -2311,13 +2318,11 @@ def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredRes
         # Journal replay keeps finite infeasible objectives so cached and live
         # rows tell the optimizer the same measured yield vector.
         objectives=objectives,
-        feasibility_margins=_deserialize_margins(
-            _mapping_of_mappings(payload.get("feasibility_margins", {}))
-        ),
+        feasibility_margins=feasibility_margins,
         failing_gates=tuple(str(item) for item in payload.get("failing_gates", ())),
         run_reference=_deserialize_run_reference(
             _mapping_or_none(payload.get("run_reference")),
-            payload.get("result_blob"),
+            result_blob,
         ),
         notes=tuple(str(item) for item in payload.get("notes", ())),
         law_disclosures=_journal_law_disclosures(payload),
@@ -4740,7 +4745,7 @@ def _margin_payload(margin: Any) -> Mapping[str, Any]:
         payload["status_reason"] = str(getattr(margin, "status_reason"))
     status_payload = getattr(margin, "status_payload", {})
     if isinstance(status_payload, Mapping) and status_payload:
-        payload["status_payload"] = _jsonable_value(status_payload)
+        payload["status_payload"] = status_payload
     return MappingProxyType(payload)
 
 
@@ -5134,6 +5139,11 @@ def _json_number(value: Any, label: str) -> float | str:
 
 
 def _jsonable_value(value: Any) -> Any:
+    """Encode general study artifacts, retaining their signed-infinity tokens.
+
+    Persisted result margins and result blobs bypass this study projection and
+    use the results_store encoder/decoder pair instead.
+    """
     if isinstance(value, Mapping):
         return {str(key): _jsonable_value(item) for key, item in value.items()}
     if isinstance(value, tuple):
@@ -7000,15 +7010,17 @@ def _record_payload(
     search_space_identity: Mapping[str, Any] | None = None,
 ) -> Mapping[str, Any]:
     patch = _materialized_record_patch(record, schema, profile)
+    feasibility_margins, result_blob = _encode_result_payload(
+        record.feasibility_margins,
+        record.result_blob,
+    )
     payload = {
         "cache_hit": record.cache_hit,
         "cache_key": record.cache_key,
         "candidate_id": record.candidate_id,
         "failure_category": record.failure_category,
         "failing_gates": list(record.failing_gates),
-        "feasibility_margins": {
-            key: dict(value) for key, value in record.feasibility_margins.items()
-        },
+        "feasibility_margins": feasibility_margins,
         "feasible": record.feasible,
         "notes": list(record.notes),
         "objectives": dict(record.objectives),
@@ -7016,6 +7028,7 @@ def _record_payload(
         "patch": patch,
         "product_summary": _jsonable_value(record.product_summary),
         "proposal_source": record.proposal_source,
+        "result_blob": result_blob,
         "search_provenance": _jsonable_value(record.search_provenance),
         "seed_lineage": record.seed_lineage,
         "trace_summary": _jsonable_value(record.trace_summary),

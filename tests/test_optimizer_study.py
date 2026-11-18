@@ -72,7 +72,7 @@ from simulator.optimize.recipe import (
     conditional_context_from_metadata,
     conditional_context_metadata,
 )
-from simulator.optimize.results_store import ResultStore
+from simulator.optimize.results_store import ResultStore, _decode_result_payload
 from simulator.optimize.save_bundle import ALLOWED_MEMBERS, export_study_bundle
 from simulator.optimize.strategy import (
     Candidate,
@@ -840,6 +840,54 @@ def _journal_cache_evaluator(
     )
 
 
+def _journal_coating_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    scored = _journal_cache_evaluator(
+        patch,
+        feedstock,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        **kwargs,
+    )
+    authority = {"source": "wall saturation", "history": [{"hour": 1}]}
+    flags = {"output_status": "status_bearing"}
+    warning_flags = [
+        {"reason": f"warning-{index}", "authority": authority, "flags": flags}
+        for index in range(3)
+    ]
+    return replace(
+        scored,
+        feasibility_margins={
+            "coating": GateMargin(
+                gate="coating",
+                feasible=True,
+                margin=1.0,
+                threshold=ThresholdSpec(
+                    id="coating",
+                    value=1.0,
+                    units="campaigns",
+                    source="test",
+                    source_ref="test",
+                ),
+                observed=2.0,
+                detail="journal coating margin",
+                status_payload={
+                    "coating_verdict": "clear",
+                    "coating_warning_flags": warning_flags,
+                },
+            ),
+        },
+    )
+
+
 def _journal_any_id_evaluator(
     patch: RecipePatch,
     feedstock: str,
@@ -960,6 +1008,48 @@ def test_study_events_journal_replay_round_trip(tmp_path: Path) -> None:
     ]
     assert state_rows[-1]["strategy_state"] == dict(replay.strategy_state)
     assert state_rows[-1]["strategy_state"]["strategies"][0]["ask_cursor"] == 4
+
+
+def test_study_journal_and_provenance_share_payload_round_trip(tmp_path: Path) -> None:
+    out = tmp_path / "shared-payload-journal"
+    study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        parallel=1,
+        budget=1,
+        out_dir=out,
+        seed=5,
+        evaluator=_journal_coating_evaluator,
+    )
+
+    event = next(
+        json.loads(line)
+        for line in (out / "study.events.jsonl").read_text(encoding="utf-8").splitlines()
+        if json.loads(line)["event_kind"] == "candidate_evaluated"
+    )
+    journal_payload = event["scored_result"]
+    provenance_payload = _read_provenance(out)[0]
+    for payload in (journal_payload, provenance_payload):
+        assert "__optimizer_result_store_ref_v1__" in json.dumps(payload)
+        margins, result_blob = _decode_result_payload(
+            payload["feasibility_margins"],
+            payload["result_blob"],
+        )
+        assert [
+            warning["reason"]
+            for warning in margins["coating"].status_payload[
+                "coating_warning_flags"
+            ]
+        ] == ["warning-0", "warning-1", "warning-2"]
+        assert result_blob["backend_status"] == "ok"
+
+    replay = study.replay_study(out)
+    assert len(replay.records) == 1
+    assert replay.records[0].feasibility_margins["coating"]["status_payload"][
+        "coating_verdict"
+    ] == "clear"
 
 
 def test_infeasible_objectives_survive_cache_hits_and_journal_replay(
