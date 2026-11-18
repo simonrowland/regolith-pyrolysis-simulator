@@ -225,14 +225,22 @@ def test_every_data_yaml_has_no_untyped_dotless_exponent_in_numeric_fields(yaml_
             continue
         relative = path.relative_to(REPO_ROOT).as_posix()
         if _source_extract(relative):
-            if relative in NEW_EXTRACTS:
-                green_signatures = set()
-            else:
+            try:
                 green_source = subprocess.check_output(
                     ["git", "show", f"{GREEN_SCALAR_BASE}:{relative}"],
                     cwd=REPO_ROOT,
                     text=True,
+                    stderr=subprocess.PIPE,
                 )
+            except subprocess.CalledProcessError as exc:
+                missing_baseline_path = (
+                    f"path '{relative}' exists on disk, but not in "
+                    f"'{GREEN_SCALAR_BASE}'"
+                )
+                if not exc.stderr or missing_baseline_path not in exc.stderr:
+                    raise
+                green_signatures = set()
+            else:
                 _green_exponents, green_losses = _load_with_source_nodes(
                     green_source
                 )
