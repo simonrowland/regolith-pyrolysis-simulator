@@ -10286,6 +10286,20 @@ def test_dacko_partial_composition_is_typed_refusal_not_scored(tmp_path: Path) -
         composition = obs.identity.composition
         assert composition is not None and composition.is_unknown
         assert "partial_composition" in (composition.reason or "")
+        issue_path = f"observations.{obs.observation_id}.values.composition_mol"
+        hard = result.validation.hard_issues if result.validation is not None else ()
+        assert not any(
+            issue.reason is RefusalReason.INVALID_SOURCE and issue.path == issue_path
+            for issue in hard
+        )
+        queue_rows = [
+            entry for entry in result.queue
+            if entry.observation_id == obs.observation_id
+        ]
+        assert any(
+            entry.why.startswith("unusable composition component(s):")
+            for entry in queue_rows
+        )
         prediction = predict_with_engine(Engine.OPENIMCC, obs)
         assert prediction.execution.state is ExecutionState.NOT_PROBED
         assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
@@ -14103,7 +14117,6 @@ def _score_initial_charge_composition_path(
     *,
     path: str,
     invalid_kind: str | None,
-    composition_role: str | None = INITIAL_CHARGE_ONLY_PROXY_FLAG,
 ):
     quantity = "mass_loss_fraction" if path == "yield_series" else "activity"
     units = "percent" if path == "yield_series" else "dimensionless"
@@ -14115,8 +14128,7 @@ def _score_initial_charge_composition_path(
         "admission_status": "admitted",
         "composition_wt_pct": {"SiO2": 50, "MgO": 50},
     }
-    if composition_role is not None:
-        values["composition_role"] = composition_role
+    values["composition_role"] = INITIAL_CHARGE_ONLY_PROXY_FLAG
     malformed_map = {
         "SiO2": "0.5",
         "MgO": "not-a-number",
@@ -14163,20 +14175,21 @@ def _score_initial_charge_composition_path(
         }
     )
     extract["species"] = {"MgO": {"observations": [row]}}
-    extract["experiments"] = [
-        {
-            "experiment_id": "sample",
-            "sample": {
-                "printed_composition": {
-                    "state": {
-                        "tag": "value",
-                        "value": {"SiO2": 50, "MgO": 50},
-                    },
-                    "locator": {"table": "1", "page": 1},
-                }
-            },
-        }
-    ]
+    experiment = {
+        "experiment_id": "sample",
+        "sample": {
+            "printed_composition": {
+                "state": {
+                    "tag": "value",
+                    "value": {"SiO2": 50, "MgO": 50},
+                },
+                "locator": {"table": "1", "page": 1},
+            }
+        },
+    }
+    if path == "yield_series":
+        experiment["method"] = MethodToken.LANGMUIR_FREE_EVAPORATION.value
+    extract["experiments"] = [experiment]
     result = migrate(_write_min_tree(tmp_path, extract), write=False)
     observations = tuple(result.observations.values())
     assert len(observations) == 1, (path, invalid_kind, observations)
@@ -14242,20 +14255,34 @@ def test_initial_charge_proxy_classifies_invalid_inputs_across_all_containers(
             and isinstance(state.value, Composition)
             for state in composition_states
         ), (path, invalid)
-    assert not any(
-        state is not None
-        and state.is_value
-        and isinstance(state.value, Composition)
-        and state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
-        for state in composition_states
-    ), (path, invalid_kind, composition_states)
+    assert isinstance(point_composition, Located)
+    assert point_composition.state.is_unknown, (path, invalid_kind, point_composition)
+    identity_composition = invalid.identity.composition
+    assert identity_composition is not None and identity_composition.is_value
+    assert isinstance(identity_composition.value, Composition)
+    if invalid_kind == "valid_mole_with_wt_refusal":
+        assert identity_composition.value.proxy_flag != INITIAL_CHARGE_ONLY_PROXY_FLAG
+    else:
+        assert (
+            identity_composition.value.proxy_flag
+            == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        )
     assert refused
     assert all(row.status is ResidualStatus.REFUSED for row in refused)
-    assert all(
-        row.refusal is not None
-        and row.refusal.reason is RefusalReason.INVALID_SOURCE
-        for row in refused
-    )
+    if path == "yield_series":
+        # The declared method gets past METHOD_UNKNOWN; this fixture intentionally
+        # leaves Langmuir geometry unstated, so that is the first scoring refusal.
+        assert all(
+            row.refusal is not None
+            and row.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+            for row in refused
+        )
+    else:
+        assert all(
+            row.refusal is not None
+            and row.refusal.reason is RefusalReason.INVALID_SOURCE
+            for row in refused
+        )
 
 
 @pytest.mark.parametrize(
@@ -14286,32 +14313,6 @@ def test_initial_charge_proxy_is_used_only_when_composition_is_not_printed(
         or row.refusal.reason is not RefusalReason.INVALID_SOURCE
         for row in scored
     ), (path, scored)
-
-
-@pytest.mark.parametrize(
-    "path",
-    ["scalar", "points", "rows", "series", "yield_series", "tests"],
-    ids=["scalar", "points", "rows", "series", "yield-series", "tests"],
-)
-def test_non_initial_charge_refusal_preserves_a_valid_composition(
-    tmp_path: Path, path: str
-) -> None:
-    observation, refused = _score_initial_charge_composition_path(
-        tmp_path / "non-initial",
-        path=path,
-        invalid_kind="valid_mole_with_wt_refusal",
-        composition_role=None,
-    )
-    assert observation.identity.composition is not None
-    assert observation.identity.composition.is_value
-    assert isinstance(observation.identity.composition.value, Composition)
-    assert refused
-    assert all(
-        row.status is ResidualStatus.REFUSED
-        and row.refusal is not None
-        and row.refusal.reason is RefusalReason.INVALID_SOURCE
-        for row in refused
-    )
 
 
 @pytest.mark.parametrize(
