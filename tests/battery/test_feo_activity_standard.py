@@ -91,6 +91,28 @@ _UNKNOWN_FEO_GAMMA_ROWS = (
     ),
     ("colson-floden-haugen-2005-nio-feo-o2-activities", None),
 )
+_FEO_GAMMA_TEST_SOURCES = (
+    "holzheid-1997-feo-nio-coo-activity-metal-saturated",
+    "li-2005-na-al-phosphate-fe-activities",
+    "wood-wade-2013-trace-activities",
+    "oneill-2002-feo-activity-coefficients-cmas",
+    "borisov-2004-tio2-pd-ni-fe-solubilities",
+    "roeder-1974-iron-activity-olivine-basaltic-liquids",
+    "inoue-suito-1982-na-silicate-sulfur-partitions",
+    "colson-floden-haugen-2005-nio-feo-o2-activities",
+    "shornikov-2020-mgo-feo-melts",
+    "kems-041-sossi-fegley-2018",
+    "hayashi-2025-ca-fe-silicate-redox-activities",
+    "snyder-carmichael-1992-olivine-liquid-feo-activity",
+)
+_ROOT = Path(__file__).resolve().parents[2]
+
+
+@pytest.fixture(scope="module")
+def _feo_gamma_score_context() -> ScoreContext:
+    return score_module.load_score_context(
+        _ROOT, sources=_FEO_GAMMA_TEST_SOURCES
+    )
 
 
 @lru_cache(maxsize=None)
@@ -114,14 +136,13 @@ def _source_feo_gamma_identity(source_id: str, formula: str = "FeO"):
     return _identity_from_plain(row["identity"])
 
 
-@lru_cache(maxsize=None)
 def _score_source_feo_gamma_case(
+    context: ScoreContext,
     source_id: str,
     formula: str = "FeO",
     *,
     observation_id: str | None = None,
 ):
-    context = score_module.load_score_context(sources=(source_id,))
     rows = tuple(
         observation
         for observation in context.observations.values()
@@ -819,8 +840,10 @@ def test_openimcc_feo_prediction_is_normalized_and_carries_notice_and_provenance
 def test_openimcc_feo_gamma_gets_the_activity_reference_shift_per_source(
     source_id: str,
     observation_id: str,
+    _feo_gamma_score_context: ScoreContext,
 ) -> None:
     context, gamma_reference = _score_source_feo_gamma_case(
+        _feo_gamma_score_context,
         source_id, observation_id=observation_id
     )
     assert gamma_reference.identity.reference_state is not None
@@ -858,8 +881,10 @@ def test_openimcc_feo_gamma_gets_the_activity_reference_shift_per_source(
 def test_openimcc_feo_gamma_unknown_reference_is_refused_before_prediction(
     source_id: str,
     observation_id: str | None,
+    _feo_gamma_score_context: ScoreContext,
 ) -> None:
     context, reference = _score_source_feo_gamma_case(
+        _feo_gamma_score_context,
         source_id, observation_id=observation_id
     )
     reference_state = reference.identity.reference_state
@@ -878,8 +903,11 @@ def test_openimcc_feo_gamma_unknown_reference_is_refused_before_prediction(
     assert residual.refusal.detail["gaps"][0]["reason"] == "missing_evidence"
 
 
-def test_shornikov_feo_gamma_is_refused_for_its_crystalline_sample_phase() -> None:
+def test_shornikov_feo_gamma_is_refused_for_its_crystalline_sample_phase(
+    _feo_gamma_score_context: ScoreContext,
+) -> None:
     context, reference = _score_source_feo_gamma_case(
+        _feo_gamma_score_context,
         "shornikov-2020-mgo-feo-melts"
     )
 
@@ -898,9 +926,11 @@ def test_shornikov_feo_gamma_is_refused_for_its_crystalline_sample_phase() -> No
     }
 
 
-def test_kems_feo_gamma_interval_is_refused_as_nonpoint_value() -> None:
+def test_kems_feo_gamma_interval_is_refused_as_nonpoint_value(
+    _feo_gamma_score_context: ScoreContext,
+) -> None:
     source_id = "kems-041-sossi-fegley-2018"
-    context = score_module.load_score_context(sources=(source_id,))
+    context = _feo_gamma_score_context
     rows = tuple(
         observation
         for observation in context.observations.values()
@@ -938,8 +968,11 @@ def test_kems_feo_gamma_interval_is_refused_as_nonpoint_value() -> None:
     }
 
 
-def test_hayashi_feo_gamma_refuses_its_invalid_source_row() -> None:
+def test_hayashi_feo_gamma_refuses_its_invalid_source_row(
+    _feo_gamma_score_context: ScoreContext,
+) -> None:
     context, reference = _score_source_feo_gamma_case(
+        _feo_gamma_score_context,
         "hayashi-2025-ca-fe-silicate-redox-activities",
         observation_id="hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r07_c14",
     )
@@ -955,8 +988,11 @@ def test_hayashi_feo_gamma_refuses_its_invalid_source_row() -> None:
     assert residual.refusal.detail["reason"] == "invalid_source"
 
 
-def test_snyder_feo_gamma_solid_reference_is_refused_before_normalization() -> None:
+def test_snyder_feo_gamma_solid_reference_is_refused_before_normalization(
+    _feo_gamma_score_context: ScoreContext,
+) -> None:
     context, reference = _score_source_feo_gamma_case(
+        _feo_gamma_score_context,
         "snyder-carmichael-1992-olivine-liquid-feo-activity",
         observation_id="snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_08-58",
     )
@@ -981,9 +1017,10 @@ def test_snyder_feo_gamma_solid_reference_is_refused_before_normalization() -> N
 )
 def test_openimcc_feo_normalisation_does_not_apply_to_feo1_5_gamma(
     source_id: str,
+    _feo_gamma_score_context: ScoreContext,
 ) -> None:
     context, reference = _score_source_feo_gamma_case(
-        source_id, formula="FeO1.5"
+        _feo_gamma_score_context, source_id, formula="FeO1.5"
     )
     residual, candidate = compile_residual(
         reference, Engine.OPENIMCC, context=context
