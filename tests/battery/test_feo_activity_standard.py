@@ -26,7 +26,7 @@ from simulator.battery.enums import (
     ResidualStatus,
     ValueKind,
 )
-from simulator.battery.identity import Identity
+from simulator.battery.identity import Identity, temperature_of
 from simulator.battery.records import Composition, Execution
 from simulator.battery.migrate import REPO_ROOT, Migrator, _identity_from_plain
 from simulator.battery.score import (
@@ -58,20 +58,38 @@ _DISTIN_1880_RESIDUAL_SHA256 = (
 # -0.10531292782444457 residual yields -0.0039800848499234 dex.
 _DISTIN_1880_RESIDUAL_DEX = Decimal("-0.003980084849923409")
 
-_TYPED_FEO_GAMMA_SOURCES = (
-    "holzheid-1997-feo-nio-coo-activity-metal-saturated",
-    "li-2005-na-al-phosphate-fe-activities",
-    "hayashi-2025-ca-fe-silicate-redox-activities",
-    "wood-wade-2013-trace-activities",
-    "oneill-2002-feo-activity-coefficients-cmas",
-    "borisov-2004-tio2-pd-ni-fe-solubilities",
-    "roeder-1974-iron-activity-olivine-basaltic-liquids",
+_TYPED_FEO_GAMMA_ROWS = (
+    (
+        "holzheid-1997-feo-nio-coo-activity-metal-saturated",
+        "holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table2_page23_feo::T=1672:row=bk-59-b:h=6758e70e83a9",
+    ),
+    (
+        "li-2005-na-al-phosphate-fe-activities",
+        "li-2005-na-al-phosphate-fe-activities::li_2005_table_1_feo_activity_coefficient::T=1823:row=1-10:h=de3e88f8288e",
+    ),
+    (
+        "wood-wade-2013-trace-activities",
+        "wood-wade-2013-trace-activities::wood_wade_2013_bw1102_table1_feo_activity_coefficient",
+    ),
+    (
+        "oneill-2002-feo-activity-coefficients-cmas",
+        "oneill-2002-feo-activity-coefficients-cmas::oneill_2002_table7_feo::T=1673.15:row=a:h=6fdff5d6c13f",
+    ),
+    (
+        "borisov-2004-tio2-pd-ni-fe-solubilities",
+        "borisov-2004-tio2-pd-ni-fe-solubilities::borisov2004_t2_feo_row01_activity_coefficient",
+    ),
+    (
+        "roeder-1974-iron-activity-olivine-basaltic-liquids",
+        "roeder-1974-iron-activity-olivine-basaltic-liquids::roeder_1974_table1_run_08_activity_coefficient",
+    ),
 )
-_UNKNOWN_FEO_GAMMA_SOURCES = (
-    "shornikov-2020-mgo-feo-melts",
-    "inoue-suito-1982-na-silicate-sulfur-partitions",
-    "kems-041-sossi-fegley-2018",
-    "colson-floden-haugen-2005-nio-feo-o2-activities",
+_UNKNOWN_FEO_GAMMA_ROWS = (
+    (
+        "inoue-suito-1982-na-silicate-sulfur-partitions",
+        "inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t4_sample_1_3_l_FeO_gamma_feo",
+    ),
+    ("colson-floden-haugen-2005-nio-feo-o2-activities", None),
 )
 
 
@@ -97,7 +115,12 @@ def _source_feo_gamma_identity(source_id: str, formula: str = "FeO"):
 
 
 @lru_cache(maxsize=None)
-def _score_source_feo_gamma_case(source_id: str, formula: str = "FeO"):
+def _score_source_feo_gamma_case(
+    source_id: str,
+    formula: str = "FeO",
+    *,
+    observation_id: str | None = None,
+):
     context = score_module.load_score_context(sources=(source_id,))
     rows = tuple(
         observation
@@ -109,6 +132,10 @@ def _score_source_feo_gamma_case(source_id: str, formula: str = "FeO"):
         and observation.identity.species is not None
         and observation.identity.species.formula.casefold() == formula.casefold()
         and observation.value.kind is ValueKind.POINT
+        and (
+            observation_id is None
+            or observation.observation_id == observation_id
+        )
     )
     assert rows, f"no point {formula} coefficient in {source_id}"
     admitted = tuple(
@@ -116,7 +143,16 @@ def _score_source_feo_gamma_case(source_id: str, formula: str = "FeO"):
         for observation in rows
         if observation.admission.status is AdmissionStatus.ADMITTED
     )
-    return context, admitted[0] if admitted else rows[0]
+    complete_composition = tuple(
+        observation
+        for observation in admitted
+        if observation.identity.composition is not None
+        and observation.identity.composition.is_value
+        and observation.point_conditions is not None
+        and "composition" in observation.point_conditions
+        and observation.point_conditions["composition"].state.is_value
+    )
+    return context, (complete_composition or admitted or rows)[0]
 
 
 def _openimcc_sources(
@@ -777,45 +813,55 @@ def test_openimcc_feo_prediction_is_normalized_and_carries_notice_and_provenance
     )
 
 
-@pytest.mark.parametrize("source_id", _TYPED_FEO_GAMMA_SOURCES)
+@pytest.mark.parametrize(
+    ("source_id", "observation_id"), _TYPED_FEO_GAMMA_ROWS
+)
 def test_openimcc_feo_gamma_gets_the_activity_reference_shift_per_source(
     source_id: str,
+    observation_id: str,
 ) -> None:
-    context, gamma_reference = _score_source_feo_gamma_case(source_id)
+    context, gamma_reference = _score_source_feo_gamma_case(
+        source_id, observation_id=observation_id
+    )
     assert gamma_reference.identity.reference_state is not None
     assert gamma_reference.identity.reference_state.is_value
-    activity_reference = replace(
-        gamma_reference,
-        observation_id=f"{gamma_reference.observation_id}::activity-shift-test",
-        identity=replace(
-            gamma_reference.identity,
-            quantity=State.of(Quantity.ACTIVITY),
-        ),
-    )
-    assert activity_reference.identity.composition == gamma_reference.identity.composition
-
-    activity_residual, activity_candidate = compile_residual(
-        activity_reference, Engine.OPENIMCC, context=context
-    )
     gamma_residual, gamma_candidate = compile_residual(
         gamma_reference, Engine.OPENIMCC, context=context
     )
 
-    assert activity_residual.status is not ResidualStatus.REFUSED
     assert gamma_residual.status is not ResidualStatus.REFUSED
-    assert activity_candidate is not None and activity_candidate.provenance is not None
     assert gamma_candidate is not None and gamma_candidate.provenance is not None
-    activity_record = activity_candidate.provenance["feo_standard_normalisation"]
+    assert gamma_candidate.engine is not None
+    assert gamma_candidate.value.point is not None
+    assert gamma_candidate.identity.composition == gamma_reference.identity.composition
+    temperature_K = temperature_of(gamma_reference.identity)
+    assert temperature_K is not None
+    _, activity_record, _, refusal = (
+        feo_standard_module.normalize_openimcc_feo_activity_value(
+            gamma_candidate.value.point,
+            gamma_candidate.engine.coefficient_sources,
+            gamma_candidate.provenance.get("melt_pack_identity"),
+            temperature_K,
+            quantity=Quantity.ACTIVITY,
+        )
+    )
+    assert refusal is None
+    assert activity_record is not None
     gamma_record = gamma_candidate.provenance["feo_standard_normalisation"]
     assert gamma_record["log10_shift"] == activity_record["log10_shift"]
     assert gamma_record["to_standard"] == activity_record["to_standard"] == "Fe-019"
 
 
-@pytest.mark.parametrize("source_id", _UNKNOWN_FEO_GAMMA_SOURCES)
+@pytest.mark.parametrize(
+    ("source_id", "observation_id"), _UNKNOWN_FEO_GAMMA_ROWS
+)
 def test_openimcc_feo_gamma_unknown_reference_is_refused_before_prediction(
     source_id: str,
+    observation_id: str | None,
 ) -> None:
-    context, reference = _score_source_feo_gamma_case(source_id)
+    context, reference = _score_source_feo_gamma_case(
+        source_id, observation_id=observation_id
+    )
     reference_state = reference.identity.reference_state
     assert reference_state is None or not reference_state.is_value
 
@@ -832,9 +878,87 @@ def test_openimcc_feo_gamma_unknown_reference_is_refused_before_prediction(
     assert residual.refusal.detail["gaps"][0]["reason"] == "missing_evidence"
 
 
+def test_shornikov_feo_gamma_is_refused_for_its_crystalline_sample_phase() -> None:
+    context, reference = _score_source_feo_gamma_case(
+        "shornikov-2020-mgo-feo-melts"
+    )
+
+    residual, candidate = compile_residual(
+        reference, Engine.OPENIMCC, context=context
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert candidate is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail == {
+        "reason": "sample_phase_not_melt_activity_observable",
+        "sample_phase": "cr",
+        "quantity": "activity_coefficient",
+    }
+
+
+def test_kems_feo_gamma_interval_is_refused_as_nonpoint_value() -> None:
+    source_id = "kems-041-sossi-fegley-2018"
+    context = score_module.load_score_context(sources=(source_id,))
+    rows = tuple(
+        observation
+        for observation in context.observations.values()
+        if observation.source_id == source_id
+        and isinstance(observation.identity, Identity)
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+        and observation.identity.species is not None
+        and observation.identity.species.formula.casefold() == "feo"
+    )
+
+    assert len(rows) == 4
+    assert all(row.value.kind is ValueKind.INTERVAL for row in rows)
+    reference = next(
+        row
+        for row in rows
+        if row.observation_id
+        == (
+            "kems-041-sossi-fegley-2018::"
+            "sossi_fegley_2018_table2_gamma_Fe_FeO::T=1600:h=a0442c47d3b9"
+        )
+    )
+
+    residual, candidate = compile_residual(
+        reference, Engine.OPENIMCC, context=context
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert candidate is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert residual.refusal.detail == {
+        "reason": "value_unknown",
+        "value_kind": "interval",
+    }
+
+
+def test_hayashi_feo_gamma_refuses_its_invalid_source_row() -> None:
+    context, reference = _score_source_feo_gamma_case(
+        "hayashi-2025-ca-fe-silicate-redox-activities",
+        observation_id="hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r07_c14",
+    )
+
+    residual, candidate = compile_residual(
+        reference, Engine.OPENIMCC, context=context
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert candidate is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.INVALID_SOURCE
+    assert residual.refusal.detail["reason"] == "invalid_source"
+
+
 def test_snyder_feo_gamma_solid_reference_is_refused_before_normalization() -> None:
     context, reference = _score_source_feo_gamma_case(
-        "snyder-carmichael-1992-olivine-liquid-feo-activity"
+        "snyder-carmichael-1992-olivine-liquid-feo-activity",
+        observation_id="snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_08-58",
     )
     standard_state = reference.identity.reference_state.value
     assert standard_state.endmember.formula == "Fe0.947O"
@@ -853,10 +977,7 @@ def test_snyder_feo_gamma_solid_reference_is_refused_before_normalization() -> N
 
 @pytest.mark.parametrize(
     "source_id",
-    (
-        "li-2005-na-al-phosphate-fe-activities",
-        "hayashi-2025-ca-fe-silicate-redox-activities",
-    ),
+    ("li-2005-na-al-phosphate-fe-activities",),
 )
 def test_openimcc_feo_normalisation_does_not_apply_to_feo1_5_gamma(
     source_id: str,
@@ -868,10 +989,8 @@ def test_openimcc_feo_normalisation_does_not_apply_to_feo1_5_gamma(
         reference, Engine.OPENIMCC, context=context
     )
 
-    if candidate is None:
-        assert residual.status is ResidualStatus.REFUSED
-    else:
-        assert "feo_standard_normalisation" not in (candidate.provenance or {})
+    assert residual.status is ResidualStatus.REFUSED
+    assert candidate is None
 
 
 def _openimcc_feo_prediction_for_normalisation() -> EnginePrediction:
