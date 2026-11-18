@@ -100,6 +100,16 @@ def test_real_deffrennes_air_intervals_keep_observation_locators(monkeypatch) ->
     }
 
 
+def test_real_unknown_air_condition_keeps_its_existing_absence() -> None:
+    result = _migrated("schreiber-1977-tetravalent-cr-diopside.yaml")
+    observation = _one(
+        result, "schreiber_1977_crvi_fraction_blue_diopside_melt"
+    )
+    condition = observation.point_conditions["fO2_log"]
+    assert condition.state.is_unknown
+    assert condition.locator is None
+
+
 def _one(result, *fragments: str):
     matches = [
         observation

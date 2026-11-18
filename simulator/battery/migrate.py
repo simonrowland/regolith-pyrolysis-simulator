@@ -22554,9 +22554,11 @@ def _retain_printed_fo2_interval(
     if decision is None or decision.interval_condition is None:
         return point_conditions
     condition = decision.interval_condition
+    if condition.state.is_value and condition.locator is None:
+        condition = replace(condition, locator=locator)
     return {
         **(point_conditions or {}),
-        "fO2_log": replace(condition, locator=condition.locator or locator),
+        "fO2_log": condition,
     }
 
 
