@@ -112,6 +112,154 @@ def _assert_optimizer_stage_measurement(
         assert math.isfinite(float(trial["wall_cpu_ratio"]))
 
 
+def _assert_stage_ratchet_acceptance(
+    stage: str,
+    measured: dict,
+    baseline: dict,
+) -> None:
+    protocol = baseline["protocol"]
+    if stage == bench.OPTIMIZER_STAGE_NAME:
+        assert protocol["dynamic_work_units_per_trial"][stage] == (
+            "sum_completed_campaign_duration_h"
+        )
+        _assert_optimizer_stage_measurement(
+            measured,
+            trial_count=int(
+                protocol.get("stage_trial_counts", {}).get(
+                    stage,
+                    protocol["trials"],
+                )
+            ),
+        )
+    else:
+        stage_trials = int(
+            protocol.get("stage_trial_counts", {}).get(
+                stage,
+                protocol["trials"],
+            )
+        )
+        # Protocol counts are per trial; multiplying by the declared trial
+        # count derives the expected aggregate work in this measurement.
+        expected_hot_path_calls = (
+            protocol["hot_path_calls_per_trial"][stage] * stage_trials
+        )
+        assert measured["hot_path_calls"] == expected_hot_path_calls, (
+            f"{stage}: intended hot-path counter="
+            f"{measured['hot_path_calls']}, expected={expected_hot_path_calls}"
+        )
+        expected_work_units = (
+            protocol["stage_work_units_per_trial"][stage] * stage_trials
+        )
+        assert measured["work_units"] == expected_work_units, (
+            f"{stage}: measured work units={measured['work_units']}, "
+            f"expected={expected_work_units}"
+        )
+
+    observed = float(measured["rate"])
+    ratchet = float(baseline["stages"][stage]["ratchet_rate"])
+    collapse_factor = float(baseline["collapse_factor"])
+    # Premise: a 10x collapse means one tenth the ratcheted throughput.
+    # Algebra: floor = ratchet/10. Units: work/CPU-s. Sanity: the floor
+    # stays below the ordinary 90% threshold and gets its own loud failure.
+    collapse_floor = ratchet / collapse_factor
+    assert observed >= collapse_floor, (
+        f"10x PERFORMANCE COLLAPSE in {stage}: observed={observed:.6g}, "
+        f"floor={collapse_floor:.6g}, ratchet={ratchet:.6g} "
+        "(silent call-volume explosion or hot-path collapse incident). "
+        f"{RESPONSE_POLICY}"
+    )
+    # Premise: margin m permits one fractional drop from rate R. Algebra:
+    # threshold = R*(1-m). Units: rate*dimensionless = work/CPU-s.
+    # Sanity: m=0.1 requires at least 90% of ratcheted throughput.
+    margin = float(baseline["margin_frac"])
+    threshold = ratchet * (1.0 - margin)
+    assert observed >= threshold, (
+        f"PERF RATCHET REGRESSION in {stage}: observed={observed:.6g}, "
+        f"threshold={threshold:.6g}, ratchet={ratchet:.6g}, "
+        f"margin_frac={margin:.3g}. {RESPONSE_POLICY}"
+    )
+    # Softened-baseline detector (NOT-FIXED lens residual, 2026-07-25):
+    # the machine_class pin closed the skip-forever tamper, but a
+    # down-edited ratchet_rate would silently loosen the bar. Excess
+    # headroom means either a real speedup (rebless — the ratchet
+    # exists to be raised) or a softened baseline; both deserve red.
+    stale_ceiling = ratchet * 1.5
+    assert observed <= stale_ceiling, (
+        f"STALE/SOFTENED RATCHET in {stage}: observed={observed:.6g} "
+        f"exceeds ratchet={ratchet:.6g} by >1.5x. If the code really "
+        "got this much faster, run benchmarks/engine_throughput_bench.py "
+        "--rebless-ratchet and commit the raised bar; if not, the "
+        "baselines JSON has been softened. Never widen this ceiling."
+    )
+
+
+def _synthetic_optimizer_measurement() -> dict:
+    from pathlib import Path
+
+    from simulator.config import load_config_bundle
+    from simulator.optimize.profiles import load_profile
+
+    profile = load_profile(
+        Path(__file__).resolve().parents[2]
+        / "data"
+        / "optimize_profiles"
+        / "lunar_highland.yaml"
+    )
+    expected_campaigns, duration_caps = bench._optimizer_campaign_limits(
+        profile,
+        load_config_bundle().setpoints,
+    )
+    campaign_stops = [
+        {"campaign": campaign, "duration_h": 1}
+        for campaign in expected_campaigns
+    ]
+    trace_hours = bench._assert_optimizer_campaign_work(
+        step_calls=len(campaign_stops),
+        campaign_stops=campaign_stops,
+        expected_campaigns=expected_campaigns,
+        duration_caps=duration_caps,
+    )
+    cpu_seconds = 8.0
+    campaign_chain = [str(stop["campaign"]) for stop in campaign_stops]
+    trial_records = [
+        {
+            "date": "2026-01-01T00:00:00+00:00",
+            "hostname": "perf-test",
+            "cpu_seconds": cpu_seconds,
+            "trace_hours": trace_hours,
+            "work_units": trace_hours,
+            "step_calls": trace_hours,
+            "hot_path_calls": trace_hours,
+            "campaign_stops": campaign_stops,
+            "campaign_chain": campaign_chain,
+            "cold_cache_miss": True,
+            "same_patch_cache_hit": True,
+            "cache_hit_counted": False,
+            "cache_hit_work_units": 0,
+            "wall_seconds": cpu_seconds + 1.0,
+            "wall_cpu_ratio": (cpu_seconds + 1.0) / cpu_seconds,
+        }
+        for _ in range(bench.OPTIMIZER_STAGE_TRIALS)
+    ]
+    return {
+        "rate": trace_hours / cpu_seconds,
+        "rate_unit": "work_units_per_cpu_second",
+        "work_units": trace_hours * bench.OPTIMIZER_STAGE_TRIALS,
+        "hot_path_calls": trace_hours * bench.OPTIMIZER_STAGE_TRIALS,
+        "cpu_seconds_median": cpu_seconds,
+        "cpu_seconds_spread": 0.0,
+        "wall_seconds_median": cpu_seconds + 1.0,
+        "wall_cpu_ratio_median": (cpu_seconds + 1.0) / cpu_seconds,
+        "trial_count": bench.OPTIMIZER_STAGE_TRIALS,
+        "trial_rates": [trace_hours / cpu_seconds]
+        * bench.OPTIMIZER_STAGE_TRIALS,
+        "details": {
+            "hot_path": "PyrolysisSimulator.step during optimizer evaluate",
+            "trial_records": trial_records,
+        },
+    }
+
+
 # The full campaign-chain evaluation is a heavy serialized test. Its CPU
 # budget follows the sibling C0-to-C6 trajectory entry in the heavy roster.
 @pytest.mark.nightly
@@ -222,11 +370,67 @@ def test_lunar_highland_campaign_chain_work_volume_is_derived_from_config() -> N
 
 def test_optimizer_60h_eval_ratchet_is_visibly_unbaselined() -> None:
     stage = load_baselines(BASELINE_PATH)["stages"][bench.OPTIMIZER_STAGE_NAME]
-    assert stage == {
-        "status": "needs_rebaseline",
-        "reason": bench.OPTIMIZER_REBASELINE_REASON,
-    }
-    pytest.skip(bench.OPTIMIZER_REBASELINE_REASON)
+    if stage.get("status") == "needs_rebaseline":
+        assert stage == {
+            "status": "needs_rebaseline",
+            "reason": bench.OPTIMIZER_REBASELINE_REASON,
+        }
+        pytest.skip(bench.OPTIMIZER_REBASELINE_REASON)
+    assert "status" not in stage
+    assert "reason" not in stage
+    assert math.isfinite(float(stage["ratchet_rate"]))
+    assert stage["ratchet_rate"] > 0.0
+
+
+def test_reblessed_optimizer_stage_is_rated_with_dynamic_work_checks() -> None:
+    baseline = load_baselines(BASELINE_PATH)
+    measurement = _synthetic_optimizer_measurement()
+    existing_rate = baseline["stages"][bench.OPTIMIZER_STAGE_NAME].get(
+        "ratchet_rate",
+        0.0,
+    )
+    measurement["rate"] = max(
+        measurement["rate"],
+        float(existing_rate) * 1.01,
+    )
+    reblessed = reblessed_payload(
+        copy.deepcopy(baseline),
+        {
+            stage: {
+                "rate": baseline["stages"][stage]["ratchet_rate"],
+                "rate_unit": "work_units_per_cpu_second",
+                "details": {"hot_path": "existing baseline"},
+            }
+            for stage in STAGE_NAMES
+            if stage != bench.OPTIMIZER_STAGE_NAME
+        }
+        | {bench.OPTIMIZER_STAGE_NAME: measurement},
+        machine_class=baseline["machine_class"],
+    )
+
+    assert "status" not in reblessed["stages"][bench.OPTIMIZER_STAGE_NAME]
+    for stage in STAGE_NAMES:
+        if stage != bench.OPTIMIZER_STAGE_NAME:
+            assert reblessed["stages"][stage] == baseline["stages"][stage]
+    assert bench.OPTIMIZER_STAGE_NAME not in (
+        reblessed["protocol"]["hot_path_calls_per_trial"]
+    )
+    assert bench.OPTIMIZER_STAGE_NAME not in (
+        reblessed["protocol"]["stage_work_units_per_trial"]
+    )
+    _assert_stage_ratchet_acceptance(
+        bench.OPTIMIZER_STAGE_NAME,
+        measurement,
+        reblessed,
+    )
+
+    collapsed = dict(measurement, rate=measurement["rate"] / 20.0)
+    with pytest.raises(AssertionError, match="10x PERFORMANCE COLLAPSE"):
+        _assert_stage_ratchet_acceptance(
+            bench.OPTIMIZER_STAGE_NAME,
+            collapsed,
+            reblessed,
+        )
 
 
 @pytest.mark.nightly
@@ -262,11 +466,12 @@ def test_perf_ratchet_guards_call_volume_and_cpu_cost() -> None:
         for stage, values in baseline["stages"].items()
         if values.get("status") == "needs_rebaseline"
     }
-    assert unbaselined_stages == {bench.OPTIMIZER_STAGE_NAME}
-    assert baseline["stages"][bench.OPTIMIZER_STAGE_NAME] == {
-        "status": "needs_rebaseline",
-        "reason": bench.OPTIMIZER_REBASELINE_REASON,
-    }
+    assert unbaselined_stages <= {bench.OPTIMIZER_STAGE_NAME}
+    if bench.OPTIMIZER_STAGE_NAME in unbaselined_stages:
+        assert baseline["stages"][bench.OPTIMIZER_STAGE_NAME] == {
+            "status": "needs_rebaseline",
+            "reason": bench.OPTIMIZER_REBASELINE_REASON,
+        }
     rated_stages = tuple(
         stage for stage in STAGE_NAMES if stage not in unbaselined_stages
     )
@@ -283,68 +488,9 @@ def test_perf_ratchet_guards_call_volume_and_cpu_cost() -> None:
     measurements = measure_all(stage_names=rated_stages)
     assert set(measurements) == set(rated_stages)
 
-    margin = float(baseline["margin_frac"])
-    collapse_factor = float(baseline["collapse_factor"])
     for stage in rated_stages:
         measured = measurements[stage]
-        observed = float(measured["rate"])
-        ratchet = float(baseline["stages"][stage]["ratchet_rate"])
-        stage_trials = int(
-            baseline["protocol"].get("stage_trial_counts", {}).get(
-                stage,
-                baseline["protocol"]["trials"],
-            )
-        )
-        # Protocol counts are per trial; multiplying by the declared trial
-        # count derives the expected aggregate work in this measurement.
-        expected_hot_path_calls = (
-            baseline["protocol"]["hot_path_calls_per_trial"][stage]
-            * stage_trials
-        )
-        assert measured["hot_path_calls"] == expected_hot_path_calls, (
-            f"{stage}: intended hot-path counter="
-            f"{measured['hot_path_calls']}, expected={expected_hot_path_calls}"
-        )
-        expected_work_units = (
-            baseline["protocol"]["stage_work_units_per_trial"][stage]
-            * stage_trials
-        )
-        assert measured["work_units"] == expected_work_units, (
-            f"{stage}: measured work units={measured['work_units']}, "
-            f"expected={expected_work_units}"
-        )
-        # Premise: a 10x collapse means one tenth the ratcheted throughput.
-        # Algebra: floor = ratchet/10. Units: work/CPU-s. Sanity: the floor
-        # stays below the ordinary 90% threshold and gets its own loud failure.
-        collapse_floor = ratchet / collapse_factor
-        assert observed >= collapse_floor, (
-            f"10x PERFORMANCE COLLAPSE in {stage}: observed={observed:.6g}, "
-            f"floor={collapse_floor:.6g}, ratchet={ratchet:.6g} "
-            "(silent call-volume explosion or hot-path collapse incident). "
-            f"{RESPONSE_POLICY}"
-        )
-        # Premise: margin m permits one fractional drop from rate R. Algebra:
-        # threshold = R*(1-m). Units: rate*dimensionless = work/CPU-s.
-        # Sanity: m=0.1 requires at least 90% of ratcheted throughput.
-        threshold = ratchet * (1.0 - margin)
-        assert observed >= threshold, (
-            f"PERF RATCHET REGRESSION in {stage}: observed={observed:.6g}, "
-            f"threshold={threshold:.6g}, ratchet={ratchet:.6g}, "
-            f"margin_frac={margin:.3g}. {RESPONSE_POLICY}"
-        )
-        # Softened-baseline detector (NOT-FIXED lens residual, 2026-07-25):
-        # the machine_class pin closed the skip-forever tamper, but a
-        # down-edited ratchet_rate would silently loosen the bar. Excess
-        # headroom means either a real speedup (rebless — the ratchet
-        # exists to be raised) or a softened baseline; both deserve red.
-        stale_ceiling = ratchet * 1.5
-        assert observed <= stale_ceiling, (
-            f"STALE/SOFTENED RATCHET in {stage}: observed={observed:.6g} "
-            f"exceeds ratchet={ratchet:.6g} by >1.5x. If the code really "
-            "got this much faster, run benchmarks/engine_throughput_bench.py "
-            "--rebless-ratchet and commit the raised bar; if not, the "
-            "baselines JSON has been softened. Never widen this ceiling."
-        )
+        _assert_stage_ratchet_acceptance(stage, measured, baseline)
 
 
 def test_measure_all_selects_fastest_independent_stage_process(monkeypatch) -> None:
