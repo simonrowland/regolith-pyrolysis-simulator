@@ -17501,9 +17501,34 @@ def _compile_residual_with_lineage(
                 execution=Execution(state=ExecutionState.NOT_PROBED),
             )
     if not gates.passed and not apparatus_flagged:
+        refusal_detail: dict[str, object] = {
+            "primary_check": gates.primary_check,
+            "checks": [check.name for check in gates.checks],
+        }
+        pressure_check = next(
+            (
+                check
+                for check in gates.checks
+                if check.name == "in_cell_partial_pressure_sum" and not check.passed
+            ),
+            None,
+        )
+        if pressure_check is not None:
+            pressure_detail = pressure_check.detail
+            lower_bound = pressure_detail.get(
+                "printed_partial_pressure_lower_bound_Pa"
+            )
+            pressure_sum = pressure_detail.get("printed_partial_pressure_sum_Pa")
+            if lower_bound is not None:
+                refusal_detail["in_cell_pressure_lower_bound_Pa"] = lower_bound
+            elif pressure_sum is not None:
+                refusal_detail["in_cell_pressure_sum_Pa"] = pressure_sum
+            limit = pressure_detail.get("pressure_limit_Pa")
+            if limit is not None:
+                refusal_detail["limit_Pa"] = limit
         return _refused(
             gates.reason or RefusalReason.INVALID_SOURCE,
-            {"primary_check": gates.primary_check, "checks": [c.name for c in gates.checks]},
+            refusal_detail,
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("validity_gates_pass", "status_match_or_mismatch"),
         )
