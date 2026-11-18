@@ -923,10 +923,18 @@ def _same_point_conditions(left: Observation, right: Observation) -> bool:
     return True
 
 
+def _record_composition_failure(
+    failure_details: list[str] | None,
+    detail: str,
+) -> None:
+    if failure_details is not None:
+        failure_details.append(detail)
+
+
 def _composition_components(
     value: object | None,
     *,
-    invalid_amount_details: list[str] | None = None,
+    failure_details: list[str] | None = None,
 ) -> tuple[tuple[str, Decimal], ...] | None:
     if isinstance(value, State):
         if not value.is_value:
@@ -946,21 +954,39 @@ def _composition_components(
     elif isinstance(value, Mapping):
         value = value.get("components", tuple(value.items()))
     if not isinstance(value, (tuple, list)) or not value:
+        _record_composition_failure(
+            failure_details,
+            "composition component list is empty or malformed",
+        )
         return None
     components: list[tuple[str, Decimal]] = []
     for item in value:
         if not isinstance(item, (tuple, list)) or len(item) != 2:
+            _record_composition_failure(
+                failure_details,
+                "composition component entry is malformed",
+            )
             return None
         formula, raw_amount = item
         try:
             amount = as_decimal(raw_amount)
         except (InvalidOperation, TypeError, ValueError):
-            if invalid_amount_details is not None:
-                invalid_amount_details.append(
-                    "composition component amount is not a decimal"
-                )
+            _record_composition_failure(
+                failure_details,
+                "composition component amount is not a decimal",
+            )
             return None
-        if not amount.is_finite() or amount < 0:
+        if not amount.is_finite():
+            _record_composition_failure(
+                failure_details,
+                "composition component amount is not finite",
+            )
+            return None
+        if amount < 0:
+            _record_composition_failure(
+                failure_details,
+                "composition component amount is negative",
+            )
             return None
         components.append((str(formula), amount))
     return tuple(sorted(components))
@@ -979,7 +1005,7 @@ def _observation_composition(
     if isinstance(identity, Identity) and identity.composition is not None:
         components = _composition_components(
             identity.composition,
-            invalid_amount_details=discovered_details,
+            failure_details=discovered_details,
         )
         if components is not None:
             return components
@@ -992,7 +1018,7 @@ def _observation_composition(
                 continue
             components = _composition_components(
                 located,
-                invalid_amount_details=discovered_details,
+                failure_details=discovered_details,
             )
             if components is not None:
                 return components
@@ -1115,14 +1141,6 @@ def _printed_in_cell_pressure_sum(
             continue
         if composition is None:
             if candidate.observation_id != observation.observation_id:
-                continue
-            if composition_failure_details:
-                skipped_composition_candidates.append(
-                    _skipped_composition_candidate_detail(
-                        candidate.observation_id,
-                        composition_failure_details,
-                    )
-                )
                 continue
         else:
             candidate_composition_details: list[str] = []
