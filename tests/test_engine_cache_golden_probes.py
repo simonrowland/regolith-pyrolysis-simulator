@@ -424,7 +424,7 @@ def test_probe_inherits_engine_resolution_context(request, tmp_path, monkeypatch
         f"assert Path.cwd() == Path({str(tmp_path)!r})\n"
         f"assert os.environ['DYLD_FALLBACK_LIBRARY_PATH'] == {str(tmp_path / 'lib')!r}\n"
         "assert sys.stdin.read() == ''\n"
-        "Path(sys.argv[4]).write_text(json.dumps({\n"
+        "Path(sys.argv[5]).write_text(json.dumps({\n"
         "    'pid': os.getpid(), 'observed': [], 'callsites': {},\n"
         "    'context_inherited': True,\n"
         "}))\n"
