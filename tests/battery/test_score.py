@@ -2244,6 +2244,10 @@ def test_kems_printed_pressure_envelope_excludes_validation_flagged_rows() -> No
         # point pressure for the missing-Kn regime fallback.
         point_conditions=None,
     )
+    row = replace(
+        row,
+        evidence=replace(row.evidence, original_method_class="measured_direct"),
+    )
     proxy_notice = _initial_charge_composition_notice(row)
     assert proxy_notice is not None
     row = replace(row, notices=(proxy_notice,))

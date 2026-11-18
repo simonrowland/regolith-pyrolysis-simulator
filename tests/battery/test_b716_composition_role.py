@@ -249,7 +249,10 @@ def test_every_usable_typed_initial_charge_only_row_gets_proxy_and_notice(
                 for stored in row.notices
             ]
             assert sum(stored_notices) == 1, row.observation_id
-            assert _initial_charge_composition_notice(row) is None
+            initial_charge_notice = _initial_charge_composition_notice(row)
+            assert initial_charge_notice is not None
+            assert initial_charge_notice in row.notices
+            assert sum(notice == initial_charge_notice for notice in row.notices) == 1
             assert FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT in flagged_strata(
                 row.notices
             )
@@ -669,6 +672,9 @@ def _initial_charge_proxy_residual():
             "composition": Located(State.of(_composition(INITIAL_CHARGE_ONLY)))
         },
     )
+    persisted_notice = _initial_charge_composition_notice(reference)
+    assert persisted_notice is not None
+    reference = replace(reference, notices=(persisted_notice,))
     context = _context(F.work(), experiment, reference, review="reviewed")
     residual, _ = compile_residual(
         reference,
@@ -676,11 +682,11 @@ def _initial_charge_proxy_residual():
         context=context,
         prediction=_predict(Decimal("0.3"), identity),
     )
-    return residual
+    return residual, persisted_notice
 
 
 def test_initial_charge_proxy_prediction_stays_flagged() -> None:
-    residual = _initial_charge_proxy_residual()
+    residual, persisted_notice = _initial_charge_proxy_residual()
     assert residual.numeric is not None
     assert residual.refusal is None
     assert residual.score_eligible is False
@@ -691,6 +697,7 @@ def test_initial_charge_proxy_prediction_stays_flagged() -> None:
         if "composition_role=initial_charge_only" in notice.reason
     ]
     assert len(role_notices) == 1
+    assert role_notices[0] == persisted_notice
     assert role_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
     assert FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT in flagged_strata(
         residual.notices
