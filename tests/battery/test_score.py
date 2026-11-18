@@ -76,6 +76,7 @@ from simulator.battery.records import (
     Composition,
     Derivation,
     EngineTrace,
+    Experiment,
     Execution,
     Located,
     Notice,
@@ -836,6 +837,35 @@ def _uncalibrated_kems_partial_row(
         source_id="halwax_sergeev_mueller_schenk_2024",
     )
     return observation
+
+
+def _d274_sio_pressure_observation(
+    experiment: Experiment,
+    observation_id: str,
+    pressure_Pa: Decimal,
+    *,
+    composition: State[Composition],
+    temperature: State[Decimal],
+    fO2: State[Decimal],
+    point_conditions: Mapping[str, Located] | None,
+) -> Observation:
+    identity = replace(
+        _partial_identity(),
+        species=Species("SiO", Phase.G),
+        temperature_K=temperature,
+        fO2_Pa=fO2,
+        composition=composition,
+        reservoir=State.not_applicable("mixture partial pressure"),
+    )
+    observation = F.observation(
+        observation_id,
+        experiment.experiment_id,
+        identity,
+        pressure_Pa,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-pressure-gate-test",
+    )
+    return replace(observation, point_conditions=point_conditions)
 
 
 def test_compile_residual_refuses_prediction_unit_mismatch() -> None:
@@ -6245,6 +6275,8 @@ def test_kems_activity_pressure_sum_over_limit_still_refuses(
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.refusal.detail["in_cell_pressure_sum_Pa"] == "11"
+    assert residual.refusal.detail["limit_Pa"] == "10"
 
 
 def test_d274_incomplete_printed_pressure_lower_bound_over_limit_still_refuses() -> None:
@@ -6330,6 +6362,8 @@ def test_d274_incomplete_printed_pressure_lower_bound_over_limit_still_refuses()
     assert residual.numeric is None
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.refusal.detail["in_cell_pressure_lower_bound_Pa"] == "11"
+    assert residual.refusal.detail["limit_Pa"] == "10"
     assert not any(
         notice.kind is NoticeKind.UNVERIFIED_APPARATUS
         and "in_cell_partial_pressure_sum" in notice.reason
@@ -6421,6 +6455,175 @@ def test_d274_own_pressure_over_limit_survives_incomplete_measurement_context(
     assert residual.numeric is None
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+
+@pytest.mark.parametrize(
+    "conditions_case", ("absent", "incomplete", "unknown", "complete")
+)
+@pytest.mark.parametrize("composition_case", ("unknown_alias", "unary", "multi"))
+@pytest.mark.parametrize("pressure_text", ("0.4", "11"))
+def test_d274_coverage_never_uses_the_scored_row_exemption(
+    conditions_case: str,
+    composition_case: str,
+    pressure_text: str,
+) -> None:
+    experiment = F.kems_experiment(
+        f"d274-{conditions_case}-{composition_case}-{pressure_text}",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
+    )
+    composition_value = (
+        Composition(
+            basis="ordered_complete_mole_inventory",
+            components=(("SiO2", Decimal("1")),),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+        if composition_case == "unary"
+        else Composition(
+            basis="ordered_complete_mole_inventory",
+            components=(("SiO2", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+        if composition_case == "multi"
+        else None
+    )
+    composition_state = (
+        State.of(composition_value)
+        if composition_value is not None
+        else State.unknown("run composition not published")
+    )
+    temperature_state = (
+        State.unknown("temperature not published")
+        if conditions_case == "incomplete"
+        else State.of(Decimal("1500"))
+    )
+    fO2_state = (
+        State.unknown("not published")
+        if conditions_case == "unknown"
+        else State.of(Decimal("1e-8"))
+    )
+    point_conditions: Mapping[str, Located] | None
+    if conditions_case == "absent":
+        point_conditions = None
+    elif conditions_case == "incomplete":
+        point_conditions = {
+            "composition": (
+                Located(composition_state, locator=F.loc())
+                if composition_case == "unknown_alias"
+                else F.located(composition_value)
+            )
+        }
+    else:
+        composition_condition = (
+            Located(composition_state, locator=F.loc())
+            if composition_case == "unknown_alias"
+            else F.located(composition_value)
+        )
+        oxygen_condition = (
+            Located(fO2_state, locator=F.loc())
+            if fO2_state.is_unknown
+            else F.located(fO2_state.value)
+        )
+        point_conditions = {
+            "temperature_K": F.located(Decimal("1500")),
+            "composition": composition_condition,
+            "fO2_Pa": oxygen_condition,
+        }
+    pressure = _d274_sio_pressure_observation(
+        experiment,
+        f"d274-{conditions_case}-{composition_case}-{pressure_text}-SiO",
+        Decimal(pressure_text),
+        composition=composition_state,
+        temperature=temperature_state,
+        fO2=fO2_state,
+        point_conditions=point_conditions,
+    )
+
+    pressure_sum, detail = validity_mod._printed_in_cell_pressure_sum(
+        experiment, pressure, (pressure,)
+    )
+    base_coverage_eligible = (
+        validity_mod._point_temperature(pressure) is not None
+        and bool(pressure.point_conditions)
+        and validity_mod._same_point_conditions(pressure, pressure)
+    )
+    assert pressure_sum is None or base_coverage_eligible
+    if conditions_case != "complete" or composition_case != "unary":
+        assert pressure_sum is None
+    else:
+        assert pressure_sum == Decimal(pressure_text)
+    assert detail["printed_partial_pressure_lower_bound_Pa"] == pressure_text
+
+
+@pytest.mark.parametrize("pressure_text", ("0.4", "11"))
+def test_d274_unknown_point_condition_keeps_own_pressure_refusal_detail(
+    pressure_text: str,
+) -> None:
+    experiment = F.kems_experiment(
+        f"d274-unknown-fo2-{pressure_text}",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
+    )
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("SiO2", Decimal("1")),),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    conditions = {
+        "temperature_K": F.located(Decimal("1500")),
+        "composition": F.located(composition),
+        "fO2_Pa": Located(State.unknown("not published"), locator=F.loc()),
+    }
+    pressure = _d274_sio_pressure_observation(
+        experiment,
+        f"d274-unknown-fo2-{pressure_text}-SiO",
+        Decimal(pressure_text),
+        composition=State.of(composition),
+        temperature=State.of(Decimal("1500")),
+        fO2=State.unknown("not published"),
+        point_conditions=conditions,
+    )
+    point_observations = (pressure,)
+    gates = run_validity_gates(
+        experiment, pressure, point_observations=point_observations
+    )
+    pressure_check = next(
+        check
+        for check in gates.checks
+        if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed is False
+    assert pressure_check.detail["reason"] == (
+        "incomplete printed species coverage; pressure sum is only a lower bound"
+    )
+    assert pressure_check.detail["missing_species"] == ["Si"]
+    assert (
+        pressure_check.detail["printed_partial_pressure_lower_bound_Pa"]
+        == pressure_text
+    )
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+    if Decimal(pressure_text) > Decimal("10"):
+        assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == pressure_text
+
+    residual, _ = compile_residual(
+        pressure,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, pressure, review="reviewed"),
+        comparison_ids={pressure.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), pressure.identity
+        ),
+        point_observations=point_observations,
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.refusal.detail["in_cell_pressure_lower_bound_Pa"] == pressure_text
+    assert residual.refusal.detail["limit_Pa"] == "10"
 
 
 @pytest.mark.parametrize(

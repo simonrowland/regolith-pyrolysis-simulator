@@ -1240,6 +1240,7 @@ def _printed_in_cell_pressure_sum(
         "same-point temperature/point_conditions are incomplete"
     )
     printed: dict[str, list[tuple[Decimal, str]]] = {}
+    coverage_species: set[str] = set()
     skipped_pressure_candidates: list[dict[str, str]] = []
     skipped_composition_candidates: list[dict[str, str]] = []
     candidates = tuple(point_observations)
@@ -1289,13 +1290,12 @@ def _printed_in_cell_pressure_sum(
                         )
                     )
                 continue
-        if (
-            candidate.value.kind is not ValueKind.POINT
-            or (
-                not is_scored_observation
-                and not _same_point_conditions(observation, candidate)
-            )
-        ):
+        if candidate.value.kind is not ValueKind.POINT:
+            continue
+        # The scored row may establish a pressure lower bound, but only the
+        # base same-point predicate can establish measured species coverage.
+        same_point_conditions = _same_point_conditions(observation, candidate)
+        if not is_scored_observation and not same_point_conditions:
             continue
         raw_pressure = candidate.value.point
         try:
@@ -1314,6 +1314,8 @@ def _printed_in_cell_pressure_sum(
         printed.setdefault(identity.species.formula, []).append(
             (pressure, candidate.observation_id)
         )
+        if same_point_conditions:
+            coverage_species.add(identity.species.formula)
     if not printed:
         detail: dict[str, Any] = {
             "reason": (
@@ -1382,7 +1384,7 @@ def _printed_in_cell_pressure_sum(
             **sum_detail,
         }
     covered = set()
-    for formula in printed:
+    for formula in coverage_species:
         elements = formula_composition(formula)
         if elements is not None:
             covered.update(element for element, _ in elements)
