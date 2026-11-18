@@ -9844,10 +9844,24 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # 4110->4319.
     # Yakovlev 2017 (fc7c11533, merge F20 23a54e9b3) adds 34 printed residue
     # cells: 4319->4353.
+    # The fam13/Floss replay adds 225 Cohen and 623 Floss Table 1-7 residue
+    # cells. The source-by-source migrated census gives 4677 + 225 + 623 = 5525;
+    # b-1209's later Mendybaev +36 is deliberately outside this pin.
     # t-1781 retypes Su & Zhang's 3,435 natural-glass profile cells as an
     # explicit typed absence; the numeric census excludes them from the residue
     # quantity. Richter et al. (2011) still contributes 324 Table 1 oxide cells.
-    assert census.get("residue_component_composition") == 4677
+    assert census.get("residue_component_composition") == 5525
+    assert per_source.get("cohen-2006-iron-silicate-reduction-isotopes") == {
+        "isotope_delta": 49,
+        "residue_component_composition": 225,
+    }
+    assert per_source.get(
+        "floss-1998-corundum-hibonite-evaporation-residues"
+    ) == {"residue_component_composition": 623}
+    assert per_source.get(
+        "navrotsky-koryttseva-2023-oxide-acid-base-calorimetry"
+    ) == {"H_minus_H298": 95}
+    assert per_source.get("smythe-2013-cerium-thesis") == {"valence_ratio": 46}
     assert (
         per_source.get("su-zhang-2023-lunar-orange-glass-na-k-cu-degassing", {})
         .get("residue_component_composition", 0)
@@ -9895,7 +9909,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # unavailable; their printed cells remain unchanged and are pinned by
     # test_sc475_incr_frame_extracts. Ozawa's 86 flat Table 1 rows are not
     assert census.get("cp") == 1764
-    assert census.get("H_minus_H298") == 451
+    assert census.get("H_minus_H298") == 546
     assert per_source.get("fredrickson-chasanov-1973-na2o-enthalpy-1300k") == {
         "H_minus_H298": 74,
         "cp": 12,
@@ -9930,10 +9944,12 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # printed 0.00 starting-material values remain metadata, not observations.
     # The count moved because the cells became visible, not because a check was
     # relaxed; mismatches stay 0.
-    assert census.get("isotope_delta") == 235
+    assert census.get("isotope_delta") == 284
     assert per_source.get("sossi-2020-cu-zn-isotope-evap-formalism") == {
         "isotope_delta": 22
     }
+    assert per_source.get("smythe-2013-cerium-thesis") == {"valence_ratio": 46}
+    assert census.get("valence_ratio") == 46
     # Family car (F39-F50): Bonnand, Bruand, Matzen et al. (2020) adds 14 printed
     # Fe3+/Fe2+ stays the car census (Kress-Carmichael 13, Bonnand 14,
     # store 65). n_numeric is the car 8267 minus the 67 refused
@@ -9946,8 +9962,13 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
     # t-1781 removes Su & Zhang's 3,435 natural-glass profile cells from the
-    # residue quantity census: 12,505->9,070 numeric cells.
-    assert n_numeric == 9070, (n_numeric, census, n_unavailable)
+    # residue quantity census: 12,505->9,070 numeric cells. The fam13/Floss
+    # replay adds 1,038 series cells: Cohen 274 (225 residue + 49 isotope),
+    # Floss 623 residue, Navrotsky–Koryttseva 95 enthalpy, and Smythe 46 ratios.
+    # Pretorius–Muan's 704 and van Westrenen's 26 migrated rows are flat values,
+    # so they do not enter this series-only census. Unavailable stays 4,445;
+    # all six isolated source censuses report zero mismatches.
+    assert n_numeric == 10108, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
