@@ -2210,7 +2210,13 @@ def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
 
 
 def test_kems_printed_pressure_envelope_excludes_validation_flagged_rows() -> None:
-    from simulator.battery.score import derive_kems_partial_pressure_band
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        _initial_charge_composition_notice,
+        _observation_flagged_strata,
+        derive_kems_partial_pressure_band,
+    )
+    from simulator.battery.records import INITIAL_CHARGE_ONLY_PROXY_NOTICE
     from simulator.battery.validity import run_validity_gates
 
     # Without a printed orifice Kn, the lone pressure cannot verify the regime.
@@ -2234,8 +2240,17 @@ def test_kems_printed_pressure_envelope_excludes_validation_flagged_rows() -> No
             verbatim="The source reports pressure errors no higher than 7%.",
         ),
     )
+    proxy_notice = _initial_charge_composition_notice(row)
+    assert proxy_notice is not None
+    row = replace(row, notices=(proxy_notice,))
+    assert INITIAL_CHARGE_ONLY_PROXY_NOTICE in proxy_notice.reason
     gates = run_validity_gates(
         experiment, row, point_observations=(row,)
+    )
+    strata = _observation_flagged_strata(
+        row,
+        {experiment.experiment_id: experiment},
+        {experiment.experiment_id: (row,)},
     )
     band = derive_kems_partial_pressure_band(
         {row.observation_id: row}, {experiment.experiment_id: experiment}
@@ -2243,6 +2258,7 @@ def test_kems_printed_pressure_envelope_excludes_validation_flagged_rows() -> No
 
     assert not gates.passed
     assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert FLAGGED_STRATUM_UNVERIFIED_APPARATUS in strata
     assert band is None
 
 
@@ -5358,6 +5374,89 @@ def test_d274_incomplete_printed_pressure_lower_bound_over_limit_still_refuses()
         point_observations=point_observations,
     )
     # d-274 preserves refusal when the printed lower bound alone exceeds the limit.
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and "in_cell_partial_pressure_sum" in notice.reason
+        for notice in residual.notices
+    )
+
+
+@pytest.mark.parametrize("composition_source", ("proxy", "sample_only"))
+def test_d274_over_limit_pressure_still_refuses_without_run_composition(
+    composition_source: str,
+) -> None:
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("Na2O", Decimal("1")),),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = F.kems_experiment(
+        f"d274-{composition_source}-over-limit-pressure",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
+    )
+    identity = _partial_identity()
+    if composition_source == "proxy":
+        identity = replace(
+            identity,
+            composition=State.of(
+                replace(composition, proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG)
+            ),
+        )
+    else:
+        identity = replace(
+            identity,
+            composition=State.unknown("run composition not reported"),
+        )
+        experiment = replace(
+            experiment,
+            sample=replace(
+                experiment.sample,
+                initial_composition=F.located(composition),
+            ),
+        )
+    pressure = F.observation(
+        f"d274-{composition_source}-11-Pa-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("11"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    point_observations = (pressure,)
+    gates = run_validity_gates(
+        experiment, pressure, point_observations=point_observations
+    )
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert pressure_check.passed is False
+    assert pressure_check.detail["printed_partial_pressure_lower_bound_Pa"] == "11"
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+    assert "required_dominant_species" not in pressure_check.detail
+    assert pressure_check.detail["reason"] == (
+        "composition is unknown; printed species coverage cannot be established"
+    )
+
+    context = _context(F.work(), experiment, pressure, review="reviewed")
+    residual, _ = compile_residual(
+        pressure,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={pressure.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+        point_observations=point_observations,
+    )
     assert residual.status is ResidualStatus.REFUSED
     assert residual.numeric is None
     assert residual.refusal is not None

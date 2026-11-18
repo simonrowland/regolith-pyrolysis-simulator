@@ -1054,14 +1054,15 @@ def _printed_in_cell_pressure_sum(
     conditions = observation.point_conditions
     if temperature is None or not conditions:
         return None, {"reason": "same-point temperature/point_conditions are incomplete"}
-    if composition is None:
-        return None, {
-            "reason": "composition is unknown; printed species coverage cannot be established",
-            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
-        }
     printed: dict[str, list[tuple[Decimal, str]]] = {}
     for candidate in point_observations:
         identity = candidate.identity
+        candidate_composition = _observation_composition(candidate)
+        same_composition_scope = (
+            candidate.observation_id == observation.observation_id
+            if composition is None
+            else candidate_composition == composition
+        )
         if (
             candidate.experiment_id != observation.experiment_id
             or not isinstance(identity, Identity)
@@ -1072,7 +1073,7 @@ def _printed_in_cell_pressure_sum(
             or candidate.locator is None
             or not candidate.locator.has_location()
             or _point_temperature(candidate) != temperature
-            or _observation_composition(candidate) != composition
+            or not same_composition_scope
             or not _same_point_conditions(observation, candidate)
             or candidate.value.kind is not ValueKind.POINT
             or candidate.value.point is None
@@ -1103,6 +1104,14 @@ def _printed_in_cell_pressure_sum(
     lower_bound_detail = {
         "printed_partial_pressure_lower_bound_Pa": str(pressure_sum)
     }
+    if composition is None:
+        return None, {
+            "reason": "composition is unknown; printed species coverage cannot be established",
+            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+            "printed_species": sorted(printed),
+            **lower_bound_detail,
+            **sum_detail,
+        }
     expected = _expected_dominant_vapours(composition)
     if expected is None:
         return None, {
