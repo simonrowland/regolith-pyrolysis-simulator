@@ -1345,7 +1345,7 @@ def _printed_in_cell_pressure_sum(
             species: str(row[0]) for species, row in sorted(selected.items())
         },
         "included_observation_ids": sorted(row[1] for row in selected.values()),
-        "point_condition_keys": sorted(conditions),
+        "point_condition_keys": sorted(conditions or {}),
     }
     if skipped_pressure_candidates:
         sum_detail["skipped_pressure_candidates"] = skipped_pressure_candidates
