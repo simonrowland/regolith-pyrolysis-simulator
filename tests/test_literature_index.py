@@ -72,6 +72,38 @@ def test_index_extract_row_counts_match_source_extracts() -> None:
             assert extract["rows"] == rows, extract["path"]
 
 
+def test_robie_hemingway_compilation_is_citable_with_published_doi() -> None:
+    index = yaml.safe_load(COMMITTED_YAML.read_text())
+    source = next(
+        row for row in index["sources"]
+        if row["source_id"] == "robie-hemingway-1995-usgs-b2131"
+    )
+    assert source["citation"] == (
+        "Robie & Hemingway (1995), Thermodynamic properties of minerals and related substances "
+        "at 298.15 K and 1 bar pressure and at higher temperatures, U.S. Geological Survey "
+        "Bulletin 2131. https://pubs.usgs.gov/bul/2131/report.pdf"
+    )
+    assert source["doi"] == "10.3133/b2131"
+    assert source["report_number"] == "USGS Bulletin 2131"
+
+
+def test_robie_hemingway_compilation_work_retains_index_doi() -> None:
+    from simulator.battery.migrate import Migrator
+
+    source_id = "robie-hemingway-1995-usgs-b2131"
+    index = yaml.safe_load(COMMITTED_YAML.read_text())
+    row = next(item for item in index["sources"] if item["source_id"] == source_id)
+    manifest = REPO_ROOT / "data/literature/compilations" / source_id / "manifest.yaml"
+    migrator = Migrator(root=REPO_ROOT, index={source_id: row}, aliases={})
+    migrator.migrate_index_only_sources()
+    migrator._migrate_compilation_file(manifest)
+    migrator.finalize()
+
+    works = [work for work in migrator.result.works.values() if source_id in work.source_ids]
+    assert len(works) == 1
+    assert works[0].doi == "10.3133/b2131"
+
+
 def test_builder_temp_corpus_row_truth(tmp_path: Path) -> None:
     """Two fake PDFs + one extract + one preset: exact rows without the corpus."""
     root = tmp_path / "corpus"
@@ -449,7 +481,7 @@ def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
     # Pin the generated index for the approved combined-offer merge stack.
     # The named comparison runs first so an added or dropped extract is
     # reported by filename before this aggregate pin can fail on a bare count.
-    assert counts["sources"] == 850
+    assert counts["sources"] == 851
     # PDF status of every source with extracts, compared by source id against
     # a checked-in manifest so a changed status is named, and the
     # extracts_without_pdf count is pinned to that independent expectation
