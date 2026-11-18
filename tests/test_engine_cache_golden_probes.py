@@ -315,6 +315,7 @@ def _run_probe(
             request.node.nodeid, str(result_path), str(int(mutate_cold)),
         ],
         cwd=engine_cache._ENGINE_CACHE_ROOT,
+        stdin=subprocess.DEVNULL,
         capture_output=True,
         text=True,
         timeout=timeout_s,
