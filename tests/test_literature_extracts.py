@@ -5449,6 +5449,28 @@ def test_aithala_s5_preserves_all_61_row_addressable_series_summaries():
 
     assert len(rows) == 61
     assert len({row["provenance"]["series_id"] for row in rows}) == 61
+    summary_experiments = {
+        item["experiment_id"]: item
+        for item in doc["experiments"]
+        if item["experiment_id"].startswith("aithala-2026-s5-")
+    }
+    assert len(summary_experiments) == 61
+    assert {row["experiment"] for row in rows} == set(summary_experiments)
+    for row in rows:
+        experiment = summary_experiments[row["experiment"]]
+        values = row["values"]
+        note = experiment["locator"]["note"]
+        assert note.startswith(
+            f"Table S-5 series regression summary over n={values['n']} experiments;"
+        )
+        assert f"temperature-series label: {values['series_name']}" in note
+        assert experiment["conditions"].keys() == {"temperature_K"}
+        assert (
+            experiment["conditions"]["temperature_K"]["state"]["value"]["kind"]
+            == "interval"
+        )
+    humphrey_experiment = summary_experiments["aithala-2026-s5-humphrey"]
+    assert "12 overlapping Aithala runs" in humphrey_experiment["locator"]["note"]
     assert Counter(row["locator"]["page"] for row in rows) == Counter(
         {16: 34, 17: 27}
     )
