@@ -11031,6 +11031,148 @@ def test_candidate_census_splits_admitted_from_pending() -> None:
     assert "Pins were not compared" in report
 
 
+def test_comparison_candidates_rehome_context_and_reference_rows() -> None:
+    from simulator.battery.score import comparison_candidates
+
+    experiment = F.tabulation_experiment()
+    unknown_quantity = replace(
+        F.psat_identity("K"), quantity=State.unknown("run condition, not observable")
+    )
+    valueless_context = replace(
+        F.observation(
+            "valueless-context",
+            experiment.experiment_id,
+            unknown_quantity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="measured-source",
+        ),
+        value=Value(ValueKind.UNAVAILABLE, unavailable_reason="no observable"),
+    )
+    reference = F.observation(
+        "reference-input",
+        experiment.experiment_id,
+        F.psat_identity("Zn"),
+        Decimal("2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="measured-source",
+        derivation=Derivation(
+            relation=(
+                "compilation_role engine_reference_input=true, "
+                "scoring_eligible=false"
+            ),
+            inputs=("record",),
+            parameters=(),
+            output_unit="Pa",
+        ),
+    )
+    ledger = F.observation(
+        "internal-ledger",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="measured-source",
+    )
+    known_absence = replace(
+        F.observation(
+            "known-quantity-absence",
+            experiment.experiment_id,
+            F.psat_identity("K"),
+            Decimal("4"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="measured-source",
+        ),
+        value=Value(ValueKind.UNAVAILABLE, unavailable_reason="printed dash"),
+    )
+    not_applicable_identity = replace(
+        F.psat_identity("Si"),
+        quantity=State.not_applicable("not a quantity on this row"),
+    )
+    not_applicable_absence = replace(
+        F.observation(
+            "not-applicable-quantity-absence",
+            experiment.experiment_id,
+            not_applicable_identity,
+            Decimal("6"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="measured-source",
+        ),
+        value=Value(ValueKind.UNAVAILABLE, unavailable_reason="printed dash"),
+    )
+    unmarked_reference = F.observation(
+        "unmarked-reference",
+        experiment.experiment_id,
+        F.psat_identity("Si"),
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="measured-source",
+        derivation=Derivation(
+            relation="scoring_eligible=false only",
+            inputs=("record",),
+            parameters=(),
+            output_unit="Pa",
+        ),
+    )
+    reported_unknown_identity = replace(
+        F.psat_identity("Ca"),
+        quantity=State.unknown("unsupported quantity 'fixture_observable'"),
+    )
+    reported_unknown = F.observation(
+        "reported-unknown-quantity",
+        experiment.experiment_id,
+        reported_unknown_identity,
+        Decimal("7"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="measured-source",
+    )
+    reported_unknown = replace(
+        reported_unknown,
+        value=Value(
+            ValueKind.UNAVAILABLE,
+            unavailable_reason="source printed values but no closed quantity token",
+        ),
+        evidence=replace(
+            reported_unknown.evidence,
+            original_method_class="measured_direct",
+        ),
+    )
+    context = replace(
+        _context(
+            F.work(),
+            experiment,
+            valueless_context,
+            reference,
+            ledger,
+            known_absence,
+            not_applicable_absence,
+            unmarked_reference,
+            reported_unknown,
+        ),
+        origins={
+            reference.observation_id: (
+                "data/literature/compilations/fixture/records/reference.json"
+            ),
+            ledger.observation_id: (
+                "data/literature/observations-v2/"
+                "species_rail_differential_ledger.yaml"
+            ),
+        },
+    )
+
+    candidates = comparison_candidates(context)
+
+    # These free-text refusal reasons do not positively type the row as
+    # context, so unknown quantity plus unavailable value remains a candidate.
+    assert {observation.observation_id for observation in candidates} == {
+        "valueless-context",
+        "known-quantity-absence",
+        "not-applicable-quantity-absence",
+        "unmarked-reference",
+        "reported-unknown-quantity",
+    }
+
+
 def test_predict_success_path_does_not_hardcode_lineage_complete_false() -> None:
     from simulator.battery import score as score_mod
 

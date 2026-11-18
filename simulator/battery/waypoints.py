@@ -28,6 +28,7 @@ from simulator.battery.migrate import (
     _printed_composition_map as _migration_printed_composition_map,
     _unrecognized_printed_chemical_components,
 )
+from simulator.battery.non_observations import _compilation_role_flags
 from simulator.battery.records import (
     Bench,
     Composition,
@@ -2317,31 +2318,6 @@ def _orifice_knudsen(experiment, bench, thermal, pressure):
 PURE_SUBSTANCE_ENGINE_POINT_REASON = (
     "pure-substance reference table; scored by the pure-phase consumer, not engine_point"
 )
-
-
-def _compilation_role_flags(relation: str) -> dict[str, bool | None]:
-    """Parse compilation_role tokens a derivation.relation already carries.
-
-    Generators stamp ``engine_reference_input=true, scoring_eligible=false``
-    into the relation string. Detection is data-driven on those tokens — never
-    on a source-id substring.
-    """
-
-    flags: dict[str, bool | None] = {
-        "engine_reference_input": None,
-        "scoring_eligible": None,
-    }
-    if not relation:
-        return flags
-    normalized = relation.replace(" ", "").lower()
-    for key in flags:
-        true_token = f"{key}=true"
-        false_token = f"{key}=false"
-        if true_token in normalized:
-            flags[key] = True
-        elif false_token in normalized:
-            flags[key] = False
-    return flags
 
 
 def is_pure_substance_engine_reference(observation: Observation) -> bool:
