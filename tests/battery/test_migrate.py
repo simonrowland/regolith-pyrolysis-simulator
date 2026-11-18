@@ -105,10 +105,12 @@ from simulator.battery.migrate import (
     compilation_column_series_from_record,
     _provenance_from_extract,
     _source_method_uncertainty_from_plain,
+    _initial_charge_only_composition_proxy,
     _named_fraction_bound_selection,
     _queue_work_counts,
     _initial_oxide_map_from_values,
     _located_printed_and_initial,
+    fill_identity,
     load_migrated_store,
     expand_queue_entries,
     group_queue_entries,
@@ -14096,35 +14098,61 @@ def test_activity_without_row_composition_uses_sample_numeric_pin(tmp_path: Path
     }
 
 
-def _score_initial_charge_malformed_composition_path(
-    tmp_path: Path, *, path: str, malformed: bool
+def _score_initial_charge_composition_path(
+    tmp_path: Path,
+    *,
+    path: str,
+    invalid_kind: str | None,
+    composition_role: str | None = INITIAL_CHARGE_ONLY_PROXY_FLAG,
 ):
+    quantity = "mass_loss_fraction" if path == "yield_series" else "activity"
+    units = "percent" if path == "yield_series" else "dimensionless"
+    obs_type = "mass_loss" if path == "yield_series" else "activity_coefficient"
     values = {
-        "quantity": "activity",
+        "quantity": quantity,
         "activity": 0.2,
         "method_class": "measured_direct",
         "admission_status": "admitted",
-        "composition_role": "initial_charge_only",
         "composition_wt_pct": {"SiO2": 50, "MgO": 50},
     }
+    if composition_role is not None:
+        values["composition_role"] = composition_role
     malformed_map = {
         "SiO2": "0.5",
         "MgO": "not-a-number",
         "CaO": "0.4",
     }
-    if path == "scalar-row":
-        if malformed:
-            values["composition_mol"] = malformed_map
+    valid_mole_map = {"SiO2": "0.5", "MgO": "0.5"}
+    partial_map = {"SiO2": "0.5", "MgO": "0.4", "minor constituents": "0.1"}
+    refused_wt_map = {"SiO2": 40, "MgO": 20}
+    if path == "scalar":
+        target = values
     else:
-        item = {"T_K": 1773.15, "activity": 0.2}
-        if malformed:
-            item["composition_mol"] = malformed_map
-        values[path] = [item]
+        point = (
+            {"T_K": 1773.15, "mass_loss_pct": 20.0}
+            if path == "yield_series"
+            else {"T_K": 1773.15, "activity": 0.2}
+        )
+        container = "points" if path == "yield_series" else path
+        values[container] = [point]
+        target = point
+    if invalid_kind == "malformed_amount":
+        target["composition_mol"] = malformed_map
+    elif invalid_kind == "partial_component":
+        target["composition_mol"] = partial_map
+    elif invalid_kind == "printed_wt_refusal":
+        target["composition_wt_pct"] = refused_wt_map
+    elif invalid_kind == "malformed_amount_with_wt_refusal":
+        target["composition_mol"] = malformed_map
+        target["composition_wt_pct"] = refused_wt_map
+    elif invalid_kind == "valid_mole_with_wt_refusal":
+        target["composition_mol"] = valid_mole_map
+        target["composition_wt_pct"] = refused_wt_map
     extract = _scalar_extract(
-        quantity="activity",
-        units="dimensionless",
+        quantity=quantity,
+        units=units,
         values=values,
-        obs_type="activity_coefficient",
+        obs_type=obs_type,
     )
     row = extract["species"]["Na"]["observations"][0]
     row.update(
@@ -14151,7 +14179,7 @@ def _score_initial_charge_malformed_composition_path(
     ]
     result = migrate(_write_min_tree(tmp_path, extract), write=False)
     observations = tuple(result.observations.values())
-    assert len(observations) == 1, (path, malformed, observations)
+    assert len(observations) == 1, (path, invalid_kind, observations)
     observation = observations[0]
     validation = result.validation
     context = ScoreContext(
@@ -14166,7 +14194,6 @@ def _score_initial_charge_malformed_composition_path(
     residuals, _candidates = score_store(
         context,
         engines=(Engine.OPENIMCC,),
-        rail=Rail.MELT_ACTIVITY,
         include_diagnostics=False,
     )
     return observation, tuple(
@@ -14178,17 +14205,50 @@ def _score_initial_charge_malformed_composition_path(
 
 @pytest.mark.parametrize(
     "path",
-    ["scalar-row", "points", "rows", "series"],
-    ids=["scalar-row", "child-point", "exploded-child", "series"],
+    ["scalar", "points", "rows", "series", "yield_series", "tests"],
+    ids=["scalar", "points", "rows", "series", "yield-series", "tests"],
 )
-def test_initial_charge_proxy_owner_preserves_malformed_input_across_all_call_paths(
-    tmp_path: Path, path: str
+@pytest.mark.parametrize(
+    ("invalid_kind", "reason_fragment"),
+    [
+        ("malformed_amount", "malformed declared amount"),
+        ("partial_component", "partial_composition"),
+        ("printed_wt_refusal", "mass-percent composition"),
+        ("malformed_amount_with_wt_refusal", "malformed declared amount"),
+        ("valid_mole_with_wt_refusal", "mass-percent composition"),
+    ],
+)
+def test_initial_charge_proxy_classifies_invalid_inputs_across_all_containers(
+    tmp_path: Path, path: str, invalid_kind: str, reason_fragment: str
 ) -> None:
-    malformed, refused = _score_initial_charge_malformed_composition_path(
-        tmp_path / "malformed", path=path, malformed=True
+    invalid, refused = _score_initial_charge_composition_path(
+        tmp_path / "invalid", path=path, invalid_kind=invalid_kind
     )
-    assert malformed.identity.composition is not None
-    assert malformed.identity.composition.is_unknown
+    composition_states = [invalid.identity.composition]
+    point_composition = (invalid.point_conditions or {}).get("composition")
+    if isinstance(point_composition, Located):
+        composition_states.append(point_composition.state)
+    unknown_states = [
+        state for state in composition_states if state is not None and state.is_unknown
+    ]
+    assert unknown_states, (path, invalid_kind, invalid)
+    assert any(
+        reason_fragment in (state.reason or "") for state in unknown_states
+    ), (path, invalid_kind, unknown_states)
+    if invalid_kind == "valid_mole_with_wt_refusal":
+        assert any(
+            state is not None
+            and state.is_value
+            and isinstance(state.value, Composition)
+            for state in composition_states
+        ), (path, invalid)
+    assert not any(
+        state is not None
+        and state.is_value
+        and isinstance(state.value, Composition)
+        and state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        for state in composition_states
+    ), (path, invalid_kind, composition_states)
     assert refused
     assert all(row.status is ResidualStatus.REFUSED for row in refused)
     assert all(
@@ -14197,11 +14257,20 @@ def test_initial_charge_proxy_owner_preserves_malformed_input_across_all_call_pa
         for row in refused
     )
 
-    valid, scored = _score_initial_charge_malformed_composition_path(
-        tmp_path / "valid", path=path, malformed=False
+
+@pytest.mark.parametrize(
+    "path",
+    ["scalar", "points", "rows", "series", "yield_series", "tests"],
+    ids=["scalar", "points", "rows", "series", "yield-series", "tests"],
+)
+def test_initial_charge_proxy_is_used_only_when_composition_is_not_printed(
+    tmp_path: Path, path: str
+) -> None:
+    unprinted, scored = _score_initial_charge_composition_path(
+        tmp_path / "unprinted", path=path, invalid_kind=None
     )
-    composition_states = [valid.identity.composition]
-    point_composition = (valid.point_conditions or {}).get("composition")
+    composition_states = [unprinted.identity.composition]
+    point_composition = (unprinted.point_conditions or {}).get("composition")
     if isinstance(point_composition, Located):
         composition_states.append(point_composition.state)
     assert any(
@@ -14210,13 +14279,78 @@ def test_initial_charge_proxy_owner_preserves_malformed_input_across_all_call_pa
         and isinstance(state.value, Composition)
         and state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
         for state in composition_states
-    ), (path, valid)
+    ), (path, unprinted)
     assert scored, path
     assert all(
         row.refusal is None
         or row.refusal.reason is not RefusalReason.INVALID_SOURCE
         for row in scored
     ), (path, scored)
+
+
+@pytest.mark.parametrize(
+    "path",
+    ["scalar", "points", "rows", "series", "yield_series", "tests"],
+    ids=["scalar", "points", "rows", "series", "yield-series", "tests"],
+)
+def test_non_initial_charge_refusal_preserves_a_valid_composition(
+    tmp_path: Path, path: str
+) -> None:
+    observation, refused = _score_initial_charge_composition_path(
+        tmp_path / "non-initial",
+        path=path,
+        invalid_kind="valid_mole_with_wt_refusal",
+        composition_role=None,
+    )
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_value
+    assert isinstance(observation.identity.composition.value, Composition)
+    assert refused
+    assert all(
+        row.status is ResidualStatus.REFUSED
+        and row.refusal is not None
+        and row.refusal.reason is RefusalReason.INVALID_SOURCE
+        for row in refused
+    )
+
+
+@pytest.mark.parametrize(
+    "quantity",
+    [
+        Quantity.DELTA_FG,
+        Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT,
+    ],
+    ids=["tabulated-delta-fG", "rows-as-printed-fit"],
+)
+def test_initial_charge_proxy_leaves_not_applicable_composition_untouched(
+    quantity: Quantity,
+) -> None:
+    not_applicable = State.not_applicable("quantity profile does not use composition")
+    identity = fill_identity(quantity, None, composition=not_applicable)
+    point_conditions = {
+        "composition": Located(not_applicable),
+    }
+    updated_identity, updated_conditions, notices = (
+        _initial_charge_only_composition_proxy(
+            identity,
+            point_conditions,
+            (),
+            role=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            quantity=quantity,
+            quantity_as_printed=None,
+            locator=None,
+            origin="not-applicable-composition",
+            composition_refusal_reasons=("mass-percent composition refused",),
+            malformed_composition_reason="malformed declared amount: invalid cell",
+        )
+    )
+    assert updated_identity == identity
+    assert updated_conditions == point_conditions
+    assert notices == []
+    assert updated_identity.composition is not None
+    assert updated_identity.composition.is_not_applicable
+    updated_point_composition = updated_conditions["composition"]
+    assert updated_point_composition.state.is_not_applicable
 
 
 @pytest.mark.parametrize("printed_marker", ["<0.01", "tr."])
