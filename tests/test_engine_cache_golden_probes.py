@@ -20,7 +20,7 @@ import pytest
 from simulator import engine_cache
 
 
-pytestmark = pytest.mark.xdist_group("engine-cache-golden-probes")
+# EXPERIMENT: xdist_group mark removed
 
 
 # Each value pins the current cache chemistry version with one live solver
