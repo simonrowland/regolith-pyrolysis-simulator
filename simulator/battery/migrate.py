@@ -22569,12 +22569,15 @@ def _printed_oxygen_state_for(
 def _retain_printed_fo2_interval(
     point_conditions: Mapping[str, Located[Any]] | None,
     decision: PrintedOxygenDecision | None,
+    *,
+    locator: Locator | None,
 ) -> Mapping[str, Located[Any]] | None:
     if decision is None or decision.interval_condition is None:
         return point_conditions
+    condition = decision.interval_condition
     return {
         **(point_conditions or {}),
-        "fO2_log": decision.interval_condition,
+        "fO2_log": replace(condition, locator=condition.locator or locator),
     }
 
 
@@ -28445,7 +28448,7 @@ class Migrator:
             ),
         )
         point_conditions = _retain_printed_fo2_interval(
-            point_conditions, oxygen_decision
+            point_conditions, oxygen_decision, locator=locator
         )
         oxygen_state = _printed_oxygen_state_for(
             fill_identity(
@@ -31431,7 +31434,7 @@ class Migrator:
             ),
         )
         point_conditions = _retain_printed_fo2_interval(
-            point_conditions, oxygen_decision
+            point_conditions, oxygen_decision, locator=point_locator
         )
         oxygen_state = _printed_oxygen_state_for(
             identity,
