@@ -21,6 +21,14 @@ GREEN_SCALAR_BASE = "be76d28ad"
 # Follow-up b-1220 owns reducing green's 139 legacy losses; this round keeps
 # that set as a ceiling while preventing rewritten scalars from adding losses.
 GREEN_LOSSY_FLOAT_CEILING = 139
+NEW_EXTRACTS = (
+    "data/literature/extracts/cohen-2006-iron-silicate-reduction-isotopes.yaml",
+    "data/literature/extracts/floss-1998-corundum-hibonite-evaporation-residues.yaml",
+    "data/literature/extracts/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry.yaml",
+    "data/literature/extracts/pretorius-muan-1992-chromium-oxide-activities.yaml",
+    "data/literature/extracts/smythe-2013-cerium-thesis.yaml",
+    "data/literature/extracts/van-westrenen-1999-garnet-melt-trace-partitioning.yaml",
+)
 
 # These fields intentionally retain printed lexemes or prose as strings. Each
 # rule names a schema field and why converting it would lose its contract.
@@ -182,6 +190,13 @@ def _load_with_source_nodes(source: str):
     )
 
 
+@pytest.mark.parametrize("relative", NEW_EXTRACTS)
+def test_new_extracts_have_no_untyped_dotless_exponents(relative: str) -> None:
+    source = (REPO_ROOT / relative).read_text(encoding="utf-8")
+    findings, _precision_losses = _load_with_source_nodes(source)
+    assert not findings, f"{relative} has untyped dotless exponents: {findings}"
+
+
 @pytest.mark.parametrize(
     "yaml_paths",
     YAML_CORPUS_SHARDS,
@@ -210,15 +225,20 @@ def test_every_data_yaml_has_no_untyped_dotless_exponent_in_numeric_fields(yaml_
             continue
         relative = path.relative_to(REPO_ROOT).as_posix()
         if _source_extract(relative):
-            green_source = subprocess.check_output(
-                ["git", "show", f"{GREEN_SCALAR_BASE}:{relative}"],
-                cwd=REPO_ROOT,
-                text=True,
-            )
-            _green_exponents, green_losses = _load_with_source_nodes(green_source)
-            green_signatures = {
-                (key_path, value) for key_path, _line, value in green_losses
-            }
+            if relative in NEW_EXTRACTS:
+                green_signatures = set()
+            else:
+                green_source = subprocess.check_output(
+                    ["git", "show", f"{GREEN_SCALAR_BASE}:{relative}"],
+                    cwd=REPO_ROOT,
+                    text=True,
+                )
+                _green_exponents, green_losses = _load_with_source_nodes(
+                    green_source
+                )
+                green_signatures = {
+                    (key_path, value) for key_path, _line, value in green_losses
+                }
             current_signatures = {
                 (key_path, value) for key_path, _line, value in precision_losses
             }
