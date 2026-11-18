@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 851
-  extracts: 848
+  sources: 857
+  extracts: 854
   pdfs_present_in_worktree: 0
-  extracts_with_private_locators: 81
+  extracts_with_private_locators: 87
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 848
+  extracts_without_pdf: 854
   alias_groups_needing_resolution: 94
 gaps:
   pdfs_without_extract: []
@@ -121,6 +121,7 @@ gaps:
   - cho-suito-1994-cas-slag-activities
   - christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   - christopoulou-2019-jace102-508-aam
+  - cohen-2006-iron-silicate-reduction-isotopes
   - colson-colson-1995-chromium-dimer-lpsc
   - colson-floden-1998-lpsc-co-nickel-activity
   - colson-floden-haugen-2005-nio-feo-o2-activities
@@ -176,6 +177,7 @@ gaps:
   - filsinger-1990-silica-silicon-carbothermic-kinetics
   - fincham-1954-proc-roy-soc-a
   - florin-2025-cu-silicate-evaporation
+  - floss-1998-corundum-hibonite-evaporation-residues
   - folstad-2024-metals-cao-dissolution-cas
   - forsberg-2002-ca-fe-o-incongruent-melting
   - fortin-2014-sulfur-saturation-natural-melts-thesis
@@ -497,6 +499,7 @@ gaps:
   - nam-2025-cmas-vanadium-thesis
   - nasa-cea-thermo
   - nasa-tm-2024-simulant-guide
+  - navrotsky-koryttseva-2023-oxide-acid-base-calorimetry
   - nazarov-2015-dhofar-silicides
   - nbs-1981-tn270-8-alkali-thermochemistry
   - nekhoroshev-2019-phd-polymtl
@@ -548,6 +551,7 @@ gaps:
   - pending-teo2-vp
   - pickrell-1994-gaseous-alkali-corrosion
   - powell-1971-alkali-sulfate-metasilicate-vapour
+  - pretorius-muan-1992-chromium-oxide-activities
   - qi-1987-fe-c-v-interaction
   - raberg-2007-salt-stability-na2s-thermochemistry-thesis
   - ramteke-2026-alkali-vapor-corrosion-spinels
@@ -734,6 +738,7 @@ gaps:
   - slag-002-banya-hino-nagasaka-1993
   - slag-003-hino-kitagawa-banya-1993
   - smales-1971-lpsc-12022
+  - smythe-2013-cerium-thesis
   - smythe-brenan-2015-cerium-redox
   - snyder-carmichael-1992-olivine-liquid-feo-activity
   - sossi-2020-cu-zn-isotope-evap-formalism
@@ -803,6 +808,7 @@ gaps:
   - van-ende-2008-mn-cr-slag-steel
   - van-kooten-2020-lunar-outgassing
   - van-limpt-2006-sodium-evaporation
+  - van-westrenen-1999-garnet-melt-trace-partitioning
   - vanbuchem-2023-lavatmos
   - vanbuchem-2025-lavatmos2
   - vanlimpt-2011-boron-evaporation-part1
@@ -879,10 +885,12 @@ gaps:
   - boulliung-2025-mercury-volatile-metals-magmatic
   - boulliung-wood-2022-so2-solubility-silicate-melts
   - busemann-2024-noble-gases-ryugu-bennu
+  - cohen-2006-iron-silicate-reduction-isotopes
   - dans-loffler-1930-na-silicate-zirconia-phase-equilibria
   - day-2020-trinitite-volatility
   - fegley-2023-chemical-equilibrium-calculations-bu
   - filiberto-lpsc2011-2064-volatiles
+  - floss-1998-corundum-hibonite-evaporation-residues
   - fortin-2014-sulfur-saturation-natural-melts-thesis
   - georges-2000-potassium-evaporation-thesis
   - itoh-hino-banya-1998-spinel
@@ -930,22 +938,26 @@ gaps:
   - nagabayashi-hino-banya-1989-phosphorus
   - nam-2025-cmas-vanadium-thesis
   - nasa-cea-thermo
+  - navrotsky-koryttseva-2023-oxide-acid-base-calorimetry
   - neubert-2025-vanadium-slag-evaporation
   - neuman-2026-levitation-k-isotopes
   - okazaki-2022-ryugu-gas-treasure-box
   - pahlevan-2026-protolunar-volatile-outflows
   - park-2021-vanadium-thermodynamics-thesis
+  - pretorius-muan-1992-chromium-oxide-activities
   - rusiecka-2026-chlorine-data
   - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
   - shornikov-2013-potassium-silicate-thermodynamics
   - shtenberg-2020-alkaline-oxide-thermodynamic-regression
   - smales-1971-lpsc-12022
+  - smythe-2013-cerium-thesis
   - stebbins-carmichael-weill-1983
   - su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
   - ta-badro-2021
   - ta-flemetakis-2024
   - thomas-2022-chlorine-bonding-silicate-melts
   - van-limpt-2006-sodium-evaporation
+  - van-westrenen-1999-garnet-melt-trace-partitioning
   - vickerfalt-2024-al-si-v-phase-diagram
   - wetzel-gail-2013-sio-arrhenius
   - yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy
@@ -954,110 +966,98 @@ gaps:
   sidecars_missing_fields:
   - source_id: ivtan-cro2-g
     sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-cro2-g.md
-    missing_fields: &id001
+    missing_fields:
     - doi
   - source_id: kems-003-pound-1972
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.md
-    missing_fields: &id002
+    missing_fields:
     - retrieval_url
   - source_id: kems-005-fedkin-2006
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-005-fedkin-2006.md
-    missing_fields: &id003
+    missing_fields:
     - retrieval_url
   - source_id: kems-011-wetzel-gail-2013
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-011-wetzel-gail-2013.md
-    missing_fields: &id004
+    missing_fields:
     - retrieved_date
     - retrieval_url
   - source_id: kems-012-sossi-2019
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.md
-    missing_fields: &id005
+    missing_fields:
     - sha256
     - retrieved_date
   - source_id: kems-014-drowart-2005
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-014-drowart-2005.md
-    missing_fields: &id006
+    missing_fields:
     - sha256
     - retrieval_url
   - source_id: kems-022-demaria-1971
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.md
-    missing_fields: &id007
+    missing_fields:
     - doi
   - source_id: kems-035-sauerborn-2005
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-035-sauerborn-2005.md
-    missing_fields: &id008
+    missing_fields:
     - doi
   - source_id: kems-036-sesko-2024
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md
-    missing_fields: &id009
+    missing_fields:
     - sha256
     - retrieval_url
   - source_id: kems-041-sossi-fegley-2018
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.md
-    missing_fields: &id010
+    missing_fields:
     - retrieval_url
   - source_id: kems-042-plante-1979
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-042-plante-1979.md
-    missing_fields: &id011
+    missing_fields:
     - sha256
   - source_id: kems-050-gorokhov-1977
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-050-gorokhov-1977.md
-    missing_fields: &id012
+    missing_fields:
     - doi
     - sha256
   - source_id: kems-093-piacente-1975
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-093-piacente-1975.md
-    missing_fields: &id013
+    missing_fields:
     - doi
   - source_id: kems-103-fraser-1983
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-103-fraser-1983.md
-    missing_fields: &id014
+    missing_fields:
     - sha256
   - source_id: kems-114-nichols-1995
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-114-nichols-1995.md
-    missing_fields: &id015
+    missing_fields:
     - doi
   - source_id: kems-133-costa-2017
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-133-costa-2017.md
-    missing_fields: &id016
+    missing_fields:
     - sha256
   - source_id: kems-140-heck-2025
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-140-heck-2025.md
-    missing_fields: &id017
+    missing_fields:
     - sha256
   - source_id: kems-184-behrens-1979
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.md
-    missing_fields: &id018
+    missing_fields:
     - doi
     - sha256
   - source_id: kems-ms2000-044
     sidecar_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.md
-    missing_fields: &id019
+    missing_fields:
     - doi
     - retrieval_url
   - source_id: smales-1971-lpsc-12022
     sidecar_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md
-    missing_fields: &id020
+    missing_fields:
     - doi
     - retrieved_date
   - source_id: stebbins-carmichael-weill-1983
     sidecar_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md
-    missing_fields: &id021
+    missing_fields:
     - doi
     - retrieved_date
   source_id_collisions:
-  - type: filename_stem_mismatch
-    key: kems-ms2000-044
-    source_ids:
-    - kems-ms2000-044
-    - ms2000-044
-    resolution: owner/controller
-  - type: pdf_stem_vs_extract
-    key: kems-042-plante-1979
-    source_ids:
-    - kems-042-nbs-sp561-v1-hastie-1979
-    - kems-042-plante-1979
-    resolution: owner/controller
   - type: same_doi
     key: 10.1007/s11663-024-02995-6
     source_ids:
@@ -1330,6 +1330,18 @@ gaps:
     source_ids:
     - kassis-frischat-1981-mixed-alkali-vapor-pressures
     - kassis-frischat-1981-silicate-glass-vapour
+    resolution: owner/controller
+  - type: pdf_stem_vs_extract
+    key: kems-042-plante-1979
+    source_ids:
+    - kems-042-nbs-sp561-v1-hastie-1979
+    - kems-042-plante-1979
+    resolution: owner/controller
+  - type: filename_stem_mismatch
+    key: kems-ms2000-044
+    source_ids:
+    - kems-ms2000-044
+    - ms2000-044
     resolution: owner/controller
   - type: source_id_alias
     key: khedim-2010
@@ -7573,6 +7585,65 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+- source_id: cohen-2006-iron-silicate-reduction-isotopes
+  aliases: []
+  citation: Cohen B.A., Levasseur S., Zanda B., Hewins R.H., and Halliday A.N. (2006). Kinetic isotope
+    effect during reduction of iron from a silicate melt. Geochimica et Cosmochimica Acta 70:3139–3148.
+  doi: 10.1016/j.gca.2006.03.022
+  report_number: null
+  identifier: 10.1016/j.gca.2006.03.022
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/cohen-2006-iron-silicate-reduction-isotopes.yaml
+    review_status: draft
+    rows: 15
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/cohen-2006-iron-silicate-reduction-isotopes/cohen-2006-iron-silicate-reduction-isotopes.pdf
+      present: true
+      sha256: 621283742e78dd5ea4f9d51b2f036d7298fc3329ee80d7f709720c275fc3c14b
+      matches_simulator: null
+    sidecar:
+      path: raw/cohen-2006-iron-silicate-reduction-isotopes/sidecar.yaml
+      present: true
+    text:
+      path: text/cohen-2006-iron-silicate-reduction-isotopes
+      exists: true
+      file_count: 1
+    tables:
+      path: tables/cohen-2006-iron-silicate-reduction-isotopes
+      exists: true
+      file_count: 1
+    extract:
+      path: extracts/cohen-2006-iron-silicate-reduction-isotopes.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/cohen-2006-iron-silicate-reduction-isotopes.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: e1dbb239851508a1a3635ff8a7eec9400953b826
 - source_id: colson-colson-1995-chromium-dimer-lpsc
   aliases: []
   citation: 'Colson RO, Colson MC (1995). Chromium, a dimer in silicate melts?: Implications for redox
@@ -10788,6 +10859,66 @@ sources:
       last_stage: null
       date: null
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: floss-1998-corundum-hibonite-evaporation-residues
+  aliases: []
+  citation: Floss, C., El Goresy, A., Zinner, E., Palme, H., Weckwerth, G., and Rammensee, W. (1998).
+    Corundum-bearing residues produced through the evaporation of natural and synthetic hibonite. Meteoritics
+    & Planetary Science 33, 191–206.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/floss-1998-corundum-hibonite-evaporation-residues.yaml
+    review_status: draft
+    rows: 641
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/floss-1998-corundum-hibonite-evaporation-residues/floss-1998-corundum-hibonite-evaporation-residues.pdf
+      present: true
+      sha256: 95b2fcfb9c4aa4bd1a001f0e86994506a0a20f3d22c222867abbb49dc3b29fd0
+      matches_simulator: null
+    sidecar:
+      path: raw/floss-1998-corundum-hibonite-evaporation-residues/sidecar.yaml
+      present: true
+    text:
+      path: text/floss-1998-corundum-hibonite-evaporation-residues
+      exists: true
+      file_count: 164
+    tables:
+      path: tables/floss-1998-corundum-hibonite-evaporation-residues
+      exists: true
+      file_count: 4
+    extract:
+      path: extracts/floss-1998-corundum-hibonite-evaporation-residues.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/floss-1998-corundum-hibonite-evaporation-residues.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: e1dbb239851508a1a3635ff8a7eec9400953b826
 - source_id: folstad-2024-metals-cao-dissolution-cas
   aliases: []
   citation: Folstad, M. B., Einarsrud, K. E. and Tangstad, M. (2024). Dissolution of CaO in SiO2-CaO-Al2O3
@@ -14724,7 +14855,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-cro2-g.md
-  sidecar_missing_fields: *id001
+  sidecar_missing_fields:
+  - doi
   access_status: OA
   extracts:
   - path: data/literature/extracts/ivtan-cro2-g.yaml
@@ -16593,7 +16725,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.md
-  sidecar_missing_fields: *id002
+  sidecar_missing_fields:
+  - retrieval_url
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-003-pound-1972.yaml
@@ -16650,7 +16783,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-005-fedkin-2006.md
-  sidecar_missing_fields: *id003
+  sidecar_missing_fields:
+  - retrieval_url
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-005-fedkin-2006.yaml
@@ -16999,7 +17133,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-011-wetzel-gail-2013.md
-  sidecar_missing_fields: *id004
+  sidecar_missing_fields:
+  - retrieved_date
+  - retrieval_url
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-011-wetzel-gail-2013.yaml
@@ -17053,7 +17189,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.md
-  sidecar_missing_fields: *id005
+  sidecar_missing_fields:
+  - sha256
+  - retrieved_date
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-012-sossi-2019.yaml
@@ -17108,7 +17246,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-014-drowart-2005.md
-  sidecar_missing_fields: *id006
+  sidecar_missing_fields:
+  - sha256
+  - retrieval_url
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-014-drowart-2005.yaml
@@ -17550,7 +17690,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.md
-  sidecar_missing_fields: *id007
+  sidecar_missing_fields:
+  - doi
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-022-demaria-1971.yaml
@@ -18190,7 +18331,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-035-sauerborn-2005.md
-  sidecar_missing_fields: *id008
+  sidecar_missing_fields:
+  - doi
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-035-sauerborn-2005.yaml
@@ -18246,7 +18388,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md
-  sidecar_missing_fields: *id009
+  sidecar_missing_fields:
+  - sha256
+  - retrieval_url
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-036-sesko-2024.yaml
@@ -18540,7 +18684,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.md
-  sidecar_missing_fields: *id010
+  sidecar_missing_fields:
+  - retrieval_url
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-041-sossi-fegley-2018.yaml
@@ -18597,7 +18742,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-042-plante-1979.md
-  sidecar_missing_fields: *id011
+  sidecar_missing_fields:
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-042-plante-1979.yaml
@@ -19011,7 +19157,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-050-gorokhov-1977.md
-  sidecar_missing_fields: *id012
+  sidecar_missing_fields:
+  - doi
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-050-gorokhov-1977.yaml
@@ -19648,7 +19796,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-093-piacente-1975.md
-  sidecar_missing_fields: *id013
+  sidecar_missing_fields:
+  - doi
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-093-piacente-1975.yaml
@@ -19812,7 +19961,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-103-fraser-1983.md
-  sidecar_missing_fields: *id014
+  sidecar_missing_fields:
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-103-fraser-1983.yaml
@@ -20041,7 +20191,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-114-nichols-1995.md
-  sidecar_missing_fields: *id015
+  sidecar_missing_fields:
+  - doi
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-114-nichols-1995.yaml
@@ -20438,7 +20589,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-133-costa-2017.md
-  sidecar_missing_fields: *id016
+  sidecar_missing_fields:
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-133-costa-2017.yaml
@@ -20650,7 +20802,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-140-heck-2025.md
-  sidecar_missing_fields: *id017
+  sidecar_missing_fields:
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-140-heck-2025.yaml
@@ -20762,7 +20915,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.md
-  sidecar_missing_fields: *id018
+  sidecar_missing_fields:
+  - doi
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-184-behrens-1979.yaml
@@ -21746,7 +21901,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.md
-  sidecar_missing_fields: *id019
+  sidecar_missing_fields:
+  - doi
+  - retrieval_url
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-ms2000-044.yaml
@@ -29467,6 +29624,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: navrotsky-koryttseva-2023-oxide-acid-base-calorimetry
+  aliases: []
+  citation: Navrotsky A. and Koryttseva A. (2023). Acid–Base Properties of Oxides Derived from Oxide Melt
+    Solution Calorimetry. Molecules 28(12):4623.
+  doi: 10.3390/molecules28124623
+  report_number: null
+  identifier: 10.3390/molecules28124623
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry.yaml
+    review_status: draft
+    rows: 50
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry.pdf
+      present: true
+      sha256: ce8cb276008572576f4dd0535df19f108601c11c90fc77312c025be5bb45398f
+      matches_simulator: null
+    sidecar:
+      path: raw/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry/sidecar.yaml
+      present: true
+    text:
+      path: text/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry
+      exists: true
+      file_count: 1
+    tables:
+      path: tables/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry
+      exists: true
+      file_count: 1
+    extract:
+      path: extracts/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: e1dbb239851508a1a3635ff8a7eec9400953b826
 - source_id: nazarov-2015-dhofar-silicides
   aliases: []
   citation: Nazarov, M. A., Shornikov, S. I. & Demidova, S. I. (2015), "Origin of Native Silicon and Iron
@@ -32504,6 +32720,65 @@ sources:
       last_stage: null
       date: null
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: pretorius-muan-1992-chromium-oxide-activities
+  aliases: []
+  citation: Pretorius E.B. and Muan A. (1992). Activity–Composition Relations of Chromium Oxide in Silicate
+    Melts at 1500°C under Strongly Reducing Conditions. Journal of the American Ceramic Society 75(6):1364–1377.
+  doi: 10.1111/j.1151-2916.1992.tb04196.x
+  report_number: null
+  identifier: 10.1111/j.1151-2916.1992.tb04196.x
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/pretorius-muan-1992-chromium-oxide-activities.yaml
+    review_status: draft
+    rows: 704
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/pretorius-muan-1992-chromium-oxide-activities/pretorius-muan-1992-chromium-oxide-activities.pdf
+      present: true
+      sha256: 7901cc3b70794e746e8867d50c2c493a22e9fef3750283d61a7e71bbf133fd7e
+      matches_simulator: null
+    sidecar:
+      path: raw/pretorius-muan-1992-chromium-oxide-activities/sidecar.yaml
+      present: true
+    text:
+      path: text/pretorius-muan-1992-chromium-oxide-activities
+      exists: true
+      file_count: 42
+    tables:
+      path: tables/pretorius-muan-1992-chromium-oxide-activities
+      exists: true
+      file_count: 1
+    extract:
+      path: extracts/pretorius-muan-1992-chromium-oxide-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/pretorius-muan-1992-chromium-oxide-activities.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: e1dbb239851508a1a3635ff8a7eec9400953b826
 - source_id: qi-1987-fe-c-v-interaction
   aliases: []
   citation: Qi, G., Ji, C. and Che, Y. (1987), “Thermodynamic Activity Interaction Coefficients in Fe-C-V
@@ -43389,7 +43664,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md
-  sidecar_missing_fields: *id020
+  sidecar_missing_fields:
+  - doi
+  - retrieved_date
   access_status: OA
   extracts:
   - path: data/literature/extracts/smales-1971-lpsc-12022.yaml
@@ -43429,6 +43706,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: smythe-2013-cerium-thesis
+  aliases: []
+  citation: Smythe, D. J. (2013). Cerium Oxidation State in Silicate Melts and the Application to Ce-in-Zircon
+    Oxygen Barometry. PhD thesis, University of Toronto.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/smythe-2013-cerium-thesis.yaml
+    review_status: draft
+    rows: 4
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/smythe-2013-cerium-thesis/smythe-2013-cerium-thesis.pdf
+      present: true
+      sha256: 87a0e0d65db5281031b49491cf3217befaaaa69659171ed218fb301d9366f2fc
+      matches_simulator: null
+    sidecar:
+      path: raw/smythe-2013-cerium-thesis/sidecar.yaml
+      present: true
+    text:
+      path: text/smythe-2013-cerium-thesis
+      exists: true
+      file_count: 12
+    tables:
+      path: tables/smythe-2013-cerium-thesis
+      exists: true
+      file_count: 1
+    extract:
+      path: extracts/smythe-2013-cerium-thesis.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/smythe-2013-cerium-thesis.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: e1dbb239851508a1a3635ff8a7eec9400953b826
 - source_id: smythe-brenan-2015-cerium-redox
   aliases: []
   citation: Smythe, D. J. & Brenan, J. M. (2015), Cerium oxidation state in silicate melts, Geochimica
@@ -43799,7 +44135,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md
-  sidecar_missing_fields: *id021
+  sidecar_missing_fields:
+  - doi
+  - retrieved_date
   access_status: OA
   extracts:
   - path: data/literature/extracts/stebbins-carmichael-weill-1983.yaml
@@ -47471,6 +47809,65 @@ sources:
       last_stage: null
       date: null
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  aliases: []
+  citation: van Westrenen, W., Blundy, J. & Wood, B. (1999). Crystal-chemical controls on trace element
+    partitioning between garnet and anhydrous silicate melt. American Mineralogist, 84, 838–847.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/van-westrenen-1999-garnet-melt-trace-partitioning.yaml
+    review_status: draft
+    rows: 26
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/van-westrenen-1999-garnet-melt-trace-partitioning/van-westrenen-1999-garnet-melt-trace-partitioning.pdf
+      present: true
+      sha256: b0da2be0e5275b755c2ab90067052363add97087613f370d8612f3c84d3ec8ff
+      matches_simulator: null
+    sidecar:
+      path: raw/van-westrenen-1999-garnet-melt-trace-partitioning/sidecar.yaml
+      present: true
+    text:
+      path: text/van-westrenen-1999-garnet-melt-trace-partitioning
+      exists: true
+      file_count: 1
+    tables:
+      path: tables/van-westrenen-1999-garnet-melt-trace-partitioning
+      exists: true
+      file_count: 1
+    extract:
+      path: extracts/van-westrenen-1999-garnet-melt-trace-partitioning.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/van-westrenen-1999-garnet-melt-trace-partitioning.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: e1dbb239851508a1a3635ff8a7eec9400953b826
 - source_id: vanbuchem-2023-lavatmos
   aliases: []
   citation: 'van Buchem, C. P. A., Miguel, Y., Zilinskas, M. & van Westenen, W. (2023), "LavAtmos: An

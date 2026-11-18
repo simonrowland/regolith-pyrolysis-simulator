@@ -5438,6 +5438,130 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
     assert match_errors == [], "\n".join(match_errors)
 
 
+def test_aithala_s5_preserves_all_61_row_addressable_series_summaries():
+    extract_path = EXTRACTS / "aithala-2026-magmatic-iron-redox-to-2100c.yaml"
+    doc = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
+    observations = doc["species"]["Fe"]["observations"]
+    rows = [
+        row for row in observations
+        if row.get("observation_id", "").startswith("aithala_2026_s5_")
+    ]
+
+    assert len(rows) == 61
+    assert len({row["provenance"]["series_id"] for row in rows}) == 61
+    summary_experiments = {
+        item["experiment_id"]: item
+        for item in doc["experiments"]
+        if item["experiment_id"].startswith("aithala-2026-s5-")
+    }
+    assert len(summary_experiments) == 61
+    assert {row["experiment"] for row in rows} == set(summary_experiments)
+    for row in rows:
+        experiment = summary_experiments[row["experiment"]]
+        values = row["values"]
+        note = experiment["locator"]["note"]
+        assert note.startswith(
+            f"Table S-5 series regression summary over n={values['n']} experiments;"
+        )
+        assert f"temperature-series label: {values['series_name']}" in note
+        assert experiment["conditions"].keys() == {"temperature_K"}
+        assert (
+            experiment["conditions"]["temperature_K"]["state"]["value"]["kind"]
+            == "interval"
+        )
+    humphrey_experiment = summary_experiments["aithala-2026-s5-humphrey"]
+    assert "12 overlapping Aithala runs" in humphrey_experiment["locator"]["note"]
+    assert Counter(row["locator"]["page"] for row in rows) == Counter(
+        {16: 34, 17: 27}
+    )
+    assert Counter(row["values"]["source_code_as_printed"] for row in rows) == Counter(
+        {
+            "Present Study": 1,
+            "Ken48": 1,
+            "Kil83": 8,
+            "KC88": 1,
+            "M95": 2,
+            "BM2010": 6,
+            "B13-18": 42,
+        }
+    )
+    assert all(row["values"]["atmosphere"] == "air" for row in rows)
+    source_attributions = {
+        "Present Study": "Aithala, Macris & Hirschmann (2026), present study",
+        "Ken48": "Kennedy (1948)",
+        "Kil83": "Kilinc et al. (1983)",
+        "KC88": "Kress and Carmichael (1988)",
+        "M95": "Moore et al. (1995)",
+        "BM2010": "Borisov and McCammon (2010)",
+        "B13-18": "Borisov et al. (2013, 2015, 2017, 2018)",
+    }
+    for row in rows:
+        values = row["values"]
+        assert row["locator"]["table"] == "S-5"
+        original_source = source_attributions[values["source_code_as_printed"]]
+        expected_attribution = (
+            original_source
+            if values["source_code_as_printed"] == "Present Study"
+            else f"compiled from {original_source}"
+        )
+        assert values["attribution"] == expected_attribution
+        assert values["temperature_range_C"]["as_printed"]
+        assert values["temperature_range_C"]["min"]
+        assert values["temperature_range_C"]["max"]
+        assert values["h_c"]["unit"] == "K"
+        assert values["composition_context_as_printed"]["SiO2_wt_pct"]
+        assert values["composition_context_as_printed"]["FeO_star_wt_pct"]
+        if values["h_c"]["as_printed"].endswith("*"):
+            assert values["n"] == 2
+            assert values["h_c"]["uncertainty"]["state"]["tag"] == "unknown"
+        else:
+            assert "±" in values["h_c"]["as_printed"]
+            assert values["h_c"]["uncertainty"]["state"]["tag"] == "value"
+            assert values["h_c"]["uncertainty"]["confidence"] == "1-sigma"
+    assert all(
+        row["values"]["quantity"]
+        == "regressed_log10_fe3_fe2_vs_inverse_temperature_slope"
+        and row["values"]["schema_gap"] == "no_matching_quantity_token"
+        for row in rows
+    )
+    assert all("fO2" not in row["values"] for row in rows)
+
+    by_name = {row["values"]["series_name"]: row for row in rows}
+    assert by_name["Humphrey"]["values"]["attribution"] == (
+        "Aithala, Macris & Hirschmann (2026), present study"
+    )
+    assert by_name["Humphrey"]["values"]["h_c"]["as_printed"] == "4894±232.5"
+    assert by_name["NMF"]["values"]["attribution"] == "compiled from Kennedy (1948)"
+    assert by_name["IC-2"]["values"]["temperature_range_C"] == {
+        "as_printed": "1342–1443",
+        "min": "1342",
+        "max": "1443",
+    }
+    assert by_name["IC-2"]["values"]["h_c"]["as_printed"] == "-1960±406"
+    assert by_name["IC-2"]["locator"]["page"] == 16
+    assert by_name["IC-2"]["values"]["composition_context_as_printed"] == {
+        "SiO2_wt_pct": "73.76",
+        "FeO_star_wt_pct": "3.24",
+    }
+    assert by_name["121"]["values"]["h_c"]["as_printed"] == "-909.0*"
+    assert by_name["121"]["values"]["h_c"]["uncertainty"]["state"] == {
+        "tag": "unknown",
+        "reason": "two-point series; no fitted uncertainty is printed (Table S-5 asterisk note)",
+    }
+    assert by_name["HAFS"]["values"]["h_c"]["as_printed"] == "10190±4510"
+    assert by_name["HAFS"]["locator"]["page"] == 17
+
+    table = next(
+        row for row in doc["species"]["Fe"]["context"]
+        if row.get("locator", {}).get("table") == "S-5"
+    )
+    assert table["values"]["series_count"] == 61
+    assert "regressed slope of log(XFe3+/XFe2+)" in table["values"]["slope_definition_as_printed"]
+    assert table["values"]["log_base"] == 10
+    assert "Inferred" in table["values"]["log_base_basis"]
+    assert "two experiments" in table["values"]["asterisk_note_as_printed"]
+
+
 # Measured on this corpus. Six ``observations[<integer>]`` pins are positions
 # and do not cover; counting them would report 46,335 observations in 524
 # extracts. Equipment pins also do not cover a measured payload
@@ -5517,16 +5641,36 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # group are one number. No extract is review_status reviewed and no sample
 # has reviewed_by, so the source matcher does not run. Recount held at the
 # same ceilings.
-# Both coverage ceilings may only fall.
+# Existing extract contributions may only fall. New extracts add only their
+# measured warning contributions, with the per-extract changes recorded below.
 # b261 landing: the main join adds 67 extracts (782 -> 849). Re-derived with
 # vle.fidelity_source_warnings over every extract on the regen tree cf19376f3:
 # uncovered observations 48664 -> 50791, uncovered extracts 617 -> 639,
 # unattested 3131 -> 3385; pilot pins unchanged at 57. New extracts, not a
 # fidelity regression in existing ones.
+# 2026-11-16 t-1859 Cohen: uncovered observations 50791 -> 50806, extracts 639 -> 640, unattested samples 3385 -> 3389.
+# 2026-11-16 t-1859 Navrotsky: uncovered observations 50806 -> 50856, extracts 640 -> 641, unattested samples 3389 -> 3395.
+# 2026-11-16 t-1859 Pretorius: uncovered observations 50856 -> 51560, extracts 641 -> 642, unattested samples 3395 -> 3396.
+# 2026-11-16 t-1859 Smythe: uncovered observations 51560 -> 51564, extracts 642 -> 643, unattested samples 3396 -> 3399.
+# 2026-11-16 t-1859 Van Westrenen: uncovered observations 51564 -> 51590, extracts 643 -> 644, unattested samples 3399 -> 3402.
+# t-1859 recovery (2026-11-16): re-derived with vle.fidelity_source_warnings;
+# the Floss extract contributes 641 uncovered observations, 1 uncovered
+# extract, and 3 unattested samples. Existing extract counts are unchanged:
+# uncovered observations 50791 -> 51432, extracts 639 -> 640, samples
+# 3385 -> 3388.
+# The six t-1859 extracts add no source_blind_pin warnings on b268r2; the
+# unmounted corpus-wide total remains 124, and the corpus root opens those pins.
+# The merged-tree fidelity resolver recounts 3,406 unattested samples.
 # Each ceiling may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 50791
-_UNCOVERED_EXTRACTS_CEILING = 639
-_UNATTESTED_SAMPLES_CEILING = 3385
+# 2026-11-17 t-1645: Table S-5 adds 61 row-addressable observations to the
+# already-uncovered Aithala extract and 3 located fidelity samples (uncovered
+# extracts unchanged; the source was already counted). 2026-11-18 combined with
+# the fam13/Floss replay (t-1859), whose own recount gave 52231 / 645 / 3406:
+# 52231 + 61 = 52292 observations, 645 extracts, 3406 + 3 = 3409 samples.
+# No reviewed_by was added. These ceilings may only fall.
+_UNCOVERED_OBSERVATIONS_CEILING = 52292
+_UNCOVERED_EXTRACTS_CEILING = 645
+_UNATTESTED_SAMPLES_CEILING = 3409
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
 # A second pilot pin inside an already-affected extract must still fail.
@@ -5689,6 +5833,19 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     uncovered_obs = unmounted["uncovered_observation"]
     uncovered_extracts = unmounted_extract_counts["uncovered_observation"]
     unattested_samples = unmounted["unattested_sample"]
+    floss_doc = next(
+        doc
+        for label, doc in documents
+        if label == "floss-1998-corundum-hibonite-evaporation-residues"
+    )
+    floss_warnings = Counter()
+    for warning in vle.fidelity_source_warnings(
+        floss_doc, label="floss-1998-corundum-hibonite-evaporation-residues"
+    ):
+        floss_warnings[warning.kind] += warning.count
+    assert floss_warnings == Counter(
+        {"uncovered_observation": 641, "unattested_sample": 3}
+    )
     pilot_pins = unmounted["auto_migrated_pilot_pin"]
     pilot_extracts = unmounted_extract_counts["auto_migrated_pilot_pin"]
     source_blind_pins = unmounted["source_blind_pin"]
