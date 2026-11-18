@@ -43,7 +43,10 @@ def log10_fo2_to_pa(
 
 _ATM_BAR = Decimal("1.01325")
 
-# U.S. Standard Atmosphere 1976 gives dry-air O2 as 20.946% by volume. For
+# Dry-air O2 is 20.946% by volume (IUPAC Gold Book, "composition of pure air",
+# doi:10.1351/goldbook.C01214). The U.S. Standard Atmosphere 1976 table gives
+# 20.9476%: 0.0016 percentage points higher, i.e. log10(0.209476/0.20946)
+# = +3.3e-5 dex, below the precision of every four-place pin here. For
 # ideal gases that volume fraction equals the mole fraction: log10(0.20946) is
 # -0.67890 at 1 bar total, and log10(0.20946 × 1.01325) is -0.67318 at 1 atm
 # total (both to five decimal places). Versus 0.2095, the delta is
