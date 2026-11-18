@@ -42,7 +42,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
@@ -1055,13 +1055,13 @@ def _printed_in_cell_pressure_sum(
     if temperature is None or not conditions:
         return None, {"reason": "same-point temperature/point_conditions are incomplete"}
     printed: dict[str, list[tuple[Decimal, str]]] = {}
+    skipped_pressure_candidates: list[dict[str, str]] = []
     for candidate in point_observations:
         identity = candidate.identity
-        candidate_composition = _observation_composition(candidate)
         same_composition_scope = (
             candidate.observation_id == observation.observation_id
             if composition is None
-            else candidate_composition == composition
+            else _observation_composition(candidate) == composition
         )
         if (
             candidate.experiment_id != observation.experiment_id
@@ -1072,20 +1072,37 @@ def _printed_in_cell_pressure_sum(
             or candidate.evidence.class_.value not in MEASURED_EVIDENCE
             or candidate.locator is None
             or not candidate.locator.has_location()
-            or _point_temperature(candidate) != temperature
             or not same_composition_scope
+            or _point_temperature(candidate) != temperature
             or not _same_point_conditions(observation, candidate)
             or candidate.value.kind is not ValueKind.POINT
-            or candidate.value.point is None
         ):
             continue
-        pressure = candidate.value.point
-        if pressure.is_finite() and pressure > 0:
-            printed.setdefault(identity.species.formula, []).append(
-                (pressure, candidate.observation_id)
+        raw_pressure = candidate.value.point
+        try:
+            pressure = as_decimal(raw_pressure)
+        except (InvalidOperation, TypeError, ValueError, ArithmeticError):
+            pressure = None
+        if pressure is None or not pressure.is_finite() or pressure <= 0:
+            skipped_pressure_candidates.append(
+                {
+                    "observation_id": candidate.observation_id,
+                    "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+                    "detail": "candidate pressure point is not a finite positive decimal",
+                }
             )
+            continue
+        printed.setdefault(identity.species.formula, []).append(
+            (pressure, candidate.observation_id)
+        )
     if not printed:
-        return None, {"reason": "no admitted printed partial pressures at this exact point"}
+        detail: dict[str, Any] = {
+            "reason": "no admitted printed partial pressures at this exact point"
+        }
+        if skipped_pressure_candidates:
+            detail["typed_reason"] = RefusalReason.EFFUSION_REGIME_UNVERIFIED.value
+            detail["skipped_pressure_candidates"] = skipped_pressure_candidates
+        return None, detail
     # Repeated determinations for one species are not distinct gases. The
     # largest admitted value per species is a conservative lower bound even
     # when the printed species coverage is incomplete.
@@ -1101,6 +1118,8 @@ def _printed_in_cell_pressure_sum(
         "included_observation_ids": sorted(row[1] for row in selected.values()),
         "point_condition_keys": sorted(conditions),
     }
+    if skipped_pressure_candidates:
+        sum_detail["skipped_pressure_candidates"] = skipped_pressure_candidates
     lower_bound_detail = {
         "printed_partial_pressure_lower_bound_Pa": str(pressure_sum)
     }

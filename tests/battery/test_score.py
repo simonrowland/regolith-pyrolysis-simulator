@@ -2271,6 +2271,55 @@ def test_kems_printed_pressure_envelope_excludes_validation_flagged_rows() -> No
     assert band is None
 
 
+@pytest.mark.parametrize("raw_pressure", ("<1e-5", "NaN"))
+def test_unknown_composition_skips_invalid_same_point_pressure_candidate(
+    raw_pressure: str,
+) -> None:
+    experiment = F.kems_experiment("invalid-same-point-pressure", kn=None)
+    identity = replace(_partial_identity(), composition=None)
+    observation = F.observation(
+        "invalid-same-point-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("1e-5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    observation = replace(
+        observation,
+        point_conditions={"same_point": F.located("same point", page=5)},
+    )
+    # Simulate a malformed legacy/raw point that bypassed Value's constructor.
+    # The validator must report it as unusable evidence instead of aborting the
+    # whole score shard while Decimal parses the printed token.
+    object.__setattr__(observation.value, "point", raw_pressure)
+
+    gates = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=observation,
+        point_observations=(observation,),
+    )
+
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.detail["reason"] == (
+        "no admitted printed partial pressures at this exact point"
+    )
+    assert pressure_check.detail["typed_reason"] == (
+        RefusalReason.EFFUSION_REGIME_UNVERIFIED.value
+    )
+    assert pressure_check.detail["skipped_pressure_candidates"] == [
+        {
+            "observation_id": "invalid-same-point-pressure",
+            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+            "detail": "candidate pressure point is not a finite positive decimal",
+        }
+    ]
+
+
 def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(
     tmp_path: Path,
 ) -> None:
