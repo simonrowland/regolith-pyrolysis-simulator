@@ -841,6 +841,7 @@ def test_openimcc_feo_gamma_gets_the_activity_reference_shift_per_source(
     source_id: str,
     observation_id: str,
     _feo_gamma_score_context: ScoreContext,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     context, gamma_reference = _score_source_feo_gamma_case(
         _feo_gamma_score_context,
@@ -848,19 +849,69 @@ def test_openimcc_feo_gamma_gets_the_activity_reference_shift_per_source(
     )
     assert gamma_reference.identity.reference_state is not None
     assert gamma_reference.identity.reference_state.is_value
-    gamma_residual, gamma_candidate = compile_residual(
-        gamma_reference, Engine.OPENIMCC, context=context
+    production_normalizer = (
+        feo_standard_module.normalize_openimcc_feo_activity_value
     )
+    gamma_inputs = []
+
+    def record_gamma_input(
+        value,
+        coefficient_sources,
+        melt_pack_identity,
+        temperature_K,
+        *,
+        quantity=Quantity.ACTIVITY,
+    ):
+        if quantity is Quantity.ACTIVITY_COEFFICIENT:
+            gamma_inputs.append(
+                (value, coefficient_sources, melt_pack_identity, temperature_K)
+            )
+        return production_normalizer(
+            value,
+            coefficient_sources,
+            melt_pack_identity,
+            temperature_K,
+            quantity=quantity,
+        )
+
+    with monkeypatch.context() as capture:
+        capture.setattr(
+            feo_standard_module,
+            "normalize_openimcc_feo_activity_value",
+            record_gamma_input,
+        )
+        gamma_residual, gamma_candidate = compile_residual(
+            gamma_reference, Engine.OPENIMCC, context=context
+        )
 
     assert gamma_residual.status is not ResidualStatus.REFUSED
     assert gamma_candidate is not None and gamma_candidate.provenance is not None
     assert gamma_candidate.engine is not None
     assert gamma_candidate.value.point is not None
     assert gamma_candidate.identity.composition == gamma_reference.identity.composition
+    assert len(gamma_inputs) == 1
+    raw_gamma, gamma_sources, melt_pack_identity, gamma_temperature_K = gamma_inputs[0]
     temperature_K = score_module.temperature_of(gamma_reference.identity)
     assert temperature_K is not None
+    assert gamma_temperature_K == temperature_K
+    resolved_gamma, resolved_record, resolved_notice, refusal = (
+        production_normalizer(
+            raw_gamma,
+            gamma_sources,
+            melt_pack_identity,
+            gamma_temperature_K,
+            quantity=Quantity.ACTIVITY_COEFFICIENT,
+        )
+    )
+    assert refusal is None
+    assert resolved_gamma is not None
+    assert resolved_record is not None
+    assert resolved_notice is not None
+    assert gamma_candidate.value.point == resolved_gamma
+    assert gamma_candidate.value.point != raw_gamma
+
     _, activity_record, _, refusal = (
-        feo_standard_module.normalize_openimcc_feo_activity_value(
+        production_normalizer(
             gamma_candidate.value.point,
             gamma_candidate.engine.coefficient_sources,
             gamma_candidate.provenance.get("melt_pack_identity"),
@@ -873,6 +924,39 @@ def test_openimcc_feo_gamma_gets_the_activity_reference_shift_per_source(
     gamma_record = gamma_candidate.provenance["feo_standard_normalisation"]
     assert gamma_record["log10_shift"] == activity_record["log10_shift"]
     assert gamma_record["to_standard"] == activity_record["to_standard"] == "Fe-019"
+
+    raw_prediction = EnginePrediction(
+        engine=Engine.OPENIMCC,
+        channel=gamma_candidate.engine.channel,
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=raw_gamma,
+        unit="dimensionless",
+        authority=gamma_candidate.authority,
+        coefficient_sources=gamma_sources,
+        identity=gamma_reference.identity,
+        provenance={"melt_pack_identity": melt_pack_identity},
+    )
+
+    def identity_normalizer(value, *_args, **_kwargs):
+        return value, resolved_record, resolved_notice, None
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            feo_standard_module,
+            "normalize_openimcc_feo_activity_value",
+            identity_normalizer,
+        )
+        unconverted_prediction = (
+            score_module._normalize_openimcc_feo_activity_prediction(raw_prediction)
+        )
+    assert unconverted_prediction.value == raw_gamma
+    assert unconverted_prediction.provenance is not None
+    assert (
+        unconverted_prediction.provenance["feo_standard_normalisation"]
+        == resolved_record
+    )
+    with pytest.raises(AssertionError):
+        assert unconverted_prediction.value == resolved_gamma
 
 
 @pytest.mark.parametrize(
