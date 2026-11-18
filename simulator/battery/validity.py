@@ -980,6 +980,10 @@ def _observation_composition(
         )
         if components is not None:
             return components
+        if discovered_details:
+            if invalid_amount_details is not None:
+                invalid_amount_details.extend(discovered_details)
+            return None
     if observation.point_conditions:
         for key, located in observation.point_conditions.items():
             if key.lower() in {"composition", "sample_composition"}:
@@ -1090,12 +1094,19 @@ def _printed_in_cell_pressure_sum(
             or candidate.locator is None
             or not candidate.locator.has_location()
             or _point_temperature(candidate) != temperature
-            or not _same_point_conditions(observation, candidate)
-            or candidate.value.kind is not ValueKind.POINT
         ):
             continue
         if composition is None:
             if candidate.observation_id != observation.observation_id:
+                continue
+            if composition_amount_details:
+                skipped_composition_candidates.append(
+                    {
+                        "observation_id": candidate.observation_id,
+                        "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+                        "detail": "; ".join(composition_amount_details),
+                    }
+                )
                 continue
         else:
             candidate_composition_details: list[str] = []
@@ -1113,6 +1124,11 @@ def _printed_in_cell_pressure_sum(
                         }
                     )
                 continue
+        if (
+            not _same_point_conditions(observation, candidate)
+            or candidate.value.kind is not ValueKind.POINT
+        ):
+            continue
         raw_pressure = candidate.value.point
         try:
             pressure = as_decimal(raw_pressure)

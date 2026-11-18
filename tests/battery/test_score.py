@@ -92,6 +92,7 @@ from simulator.battery.validity import (
     run_validity_gates,
     underdetermined_apparatus,
 )
+import simulator.battery.validity as validity_mod
 import simulator.battery.score as score_mod
 from simulator.battery.score import (
     SCORE_ELIGIBLE_CONJUNCTS,
@@ -2329,6 +2330,7 @@ def test_malformed_candidate_composition_is_skipped_after_point_filters(
     raw_amount: str,
     candidate_temperature: str,
     composition_detail_expected: bool,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     experiment = F.kems_experiment("invalid-same-experiment-composition", kn=None)
     composition = Composition(
@@ -2360,10 +2362,11 @@ def test_malformed_candidate_composition_is_skipped_after_point_filters(
         "components",
         (("Na2O", raw_amount),),
     )
+    malformed_state = State.of(malformed_composition)
     candidate_identity = replace(
         identity,
         temperature_K=State.of(Decimal(candidate_temperature)),
-        composition=State.of(malformed_composition),
+        composition=malformed_state,
     )
     candidate = F.observation(
         f"malformed-composition-{candidate_temperature}-{raw_amount}",
@@ -2371,6 +2374,18 @@ def test_malformed_candidate_composition_is_skipped_after_point_filters(
         candidate_identity,
         Decimal("1"),
         evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    original_composition_components = validity_mod._composition_components
+    malformed_composition_calls = []
+
+    def count_malformed_composition_calls(value, **kwargs):
+        if value is malformed_state:
+            malformed_composition_calls.append(value)
+        return original_composition_components(value, **kwargs)
+
+    monkeypatch.setattr(
+        validity_mod, "_composition_components", count_malformed_composition_calls
     )
 
     gates = effusion_regime_unverified(
@@ -2385,6 +2400,7 @@ def test_malformed_candidate_composition_is_skipped_after_point_filters(
         check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
     )
     if composition_detail_expected:
+        assert len(malformed_composition_calls) == 1
         assert pressure_check.detail["skipped_composition_candidates"] == [
             {
                 "observation_id": candidate.observation_id,
@@ -2393,7 +2409,84 @@ def test_malformed_candidate_composition_is_skipped_after_point_filters(
             }
         ]
     else:
+        assert malformed_composition_calls == []
         assert "skipped_composition_candidates" not in pressure_check.detail
+
+
+@pytest.mark.parametrize("raw_amount", ("<0.03", "tr"))
+def test_malformed_candidate_identity_composition_cannot_fall_back_to_point_composition(
+    raw_amount: str,
+) -> None:
+    experiment = F.kems_experiment("malformed-identity-composition-fallback", kn=None)
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("Na2O", Decimal("1")),),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        _partial_identity(),
+        temperature_K=State.of(Decimal("1500")),
+        composition=State.of(composition),
+    )
+    valid_observation = F.observation(
+        "valid-one-pascal-reading",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    point_conditions = {
+        **valid_observation.point_conditions,
+        "sample_composition": F.located(composition),
+    }
+    valid_observation = replace(
+        valid_observation, point_conditions=point_conditions
+    )
+
+    malformed_composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("Na2O", Decimal("1")),),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    # Raw legacy extract data can bypass Composition's typed constructor.
+    object.__setattr__(
+        malformed_composition,
+        "components",
+        (("Na2O", raw_amount),),
+    )
+    malformed_candidate = F.observation(
+        f"malformed-eleven-pascal-reading-{raw_amount}",
+        experiment.experiment_id,
+        replace(identity, composition=State.of(malformed_composition)),
+        Decimal("11"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    malformed_candidate = replace(
+        malformed_candidate, point_conditions=point_conditions
+    )
+
+    gates = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=valid_observation,
+        point_observations=(valid_observation, malformed_candidate),
+    )
+
+    assert gates.passed is True
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "1"
+    assert pressure_check.detail["included_observation_ids"] == [
+        valid_observation.observation_id
+    ]
+    assert pressure_check.detail["skipped_composition_candidates"] == [
+        {
+            "observation_id": malformed_candidate.observation_id,
+            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+            "detail": "composition component amount is not a decimal",
+        }
+    ]
 
 
 def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(
