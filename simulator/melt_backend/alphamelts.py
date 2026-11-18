@@ -2373,7 +2373,12 @@ class _MELTSBackendSupport(MeltBackend):
             return EquilibriumCrystallizationPathResult(
                 status=comp.status, warnings=comp.warnings, diagnostics=comp.diagnostics,
             )
-        _, calc_mode = resolve_alphamelts_subprocess_model(self._model)
+        subprocess_settings = resolve_alphamelts_subprocess_settings(
+            self._model, os.environ.get('ALPHAMELTS_CALC_MODE')
+        )
+        if subprocess_settings['subprocess_model_error'] is not None:
+            raise ValueError(subprocess_settings['subprocess_model_error'])
+        calc_mode = subprocess_settings['model_calc_mode']
         if os.environ.get('ALPHAMELTS_CALC_MODE', calc_mode) != calc_mode:
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_CALC_MODE_MISMATCH, 'ambient calculation mode mismatch',
