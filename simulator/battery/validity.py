@@ -961,7 +961,6 @@ def _composition_components(
 
 
 def _observation_composition(
-    experiment: Experiment,
     observation: Observation,
 ) -> tuple[tuple[str, Decimal], ...] | None:
     identity = observation.identity
@@ -975,7 +974,9 @@ def _observation_composition(
                 components = _composition_components(located)
                 if components is not None:
                     return components
-    return _composition_components(experiment.sample.initial_composition)
+    # Sample.initial_composition describes the starting charge. It cannot
+    # establish species coverage for a measured in-cell pressure point.
+    return None
 
 
 def _point_temperature(observation: Observation) -> Decimal | None:
@@ -1049,7 +1050,7 @@ def _printed_in_cell_pressure_sum(
     point_observations: Iterable[Observation],
 ) -> tuple[Decimal | None, dict[str, Any]]:
     temperature = _point_temperature(observation)
-    composition = _observation_composition(experiment, observation)
+    composition = _observation_composition(observation)
     conditions = observation.point_conditions
     if temperature is None or not conditions:
         return None, {"reason": "same-point temperature/point_conditions are incomplete"}
@@ -1071,7 +1072,7 @@ def _printed_in_cell_pressure_sum(
             or candidate.locator is None
             or not candidate.locator.has_location()
             or _point_temperature(candidate) != temperature
-            or _observation_composition(experiment, candidate) != composition
+            or _observation_composition(candidate) != composition
             or not _same_point_conditions(observation, candidate)
             or candidate.value.kind is not ValueKind.POINT
             or candidate.value.point is None

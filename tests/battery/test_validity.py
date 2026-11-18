@@ -280,6 +280,20 @@ def test_initial_charge_proxy_cannot_verify_in_cell_pressure_sum() -> None:
         experiment_id="kems-initial-charge-proxy",
         kn=None,
     )
+    unflagged_starting_charge = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=Located(
+                State.of(unflagged_starting_charge), locator=F.loc(page=1)
+            ),
+        ),
+    )
     proxy = Composition(
         basis="printed_mole_fraction",
         components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
