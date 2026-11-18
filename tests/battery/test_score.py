@@ -6550,9 +6550,10 @@ def test_d274_coverage_never_uses_the_scored_row_exemption(
     assert pressure_sum is None or base_coverage_eligible
     if conditions_case != "complete" or composition_case != "unary":
         assert pressure_sum is None
+        assert detail["printed_partial_pressure_lower_bound_Pa"] == pressure_text
     else:
         assert pressure_sum == Decimal(pressure_text)
-    assert detail["printed_partial_pressure_lower_bound_Pa"] == pressure_text
+        assert detail["printed_partial_pressure_sum_Pa"] == pressure_text
 
 
 @pytest.mark.parametrize("pressure_text", ("0.4", "11"))
@@ -6617,11 +6618,30 @@ def test_d274_unknown_point_condition_keeps_own_pressure_refusal_detail(
         ),
         point_observations=point_observations,
     )
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-    assert residual.refusal.detail["in_cell_pressure_lower_bound_Pa"] == pressure_text
-    assert residual.refusal.detail["limit_Pa"] == "10"
+    if Decimal(pressure_text) > Decimal("10"):
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        assert (
+            residual.refusal.detail["in_cell_pressure_lower_bound_Pa"]
+            == pressure_text
+        )
+        assert residual.refusal.detail["limit_Pa"] == "10"
+    else:
+        # Coverage is not established, so the cell stays under the limit and
+        # the apparatus check is a notice. Prediction continues.
+        assert residual.status is not ResidualStatus.REFUSED
+        assert residual.refusal is None
+        assert residual.numeric is not None
+        apparatus_notices = [
+            notice
+            for notice in residual.notices
+            if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+            and "in_cell_partial_pressure_sum" in notice.reason
+        ]
+        assert len(apparatus_notices) == 1
+        assert "incomplete printed species coverage" in apparatus_notices[0].reason
 
 
 @pytest.mark.parametrize(
