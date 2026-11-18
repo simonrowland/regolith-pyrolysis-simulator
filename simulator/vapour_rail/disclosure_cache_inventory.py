@@ -1308,10 +1308,6 @@ def _site_tables() -> tuple[
         by_path.setdefault(path, []).append((name, site_id))
         if row["kind"] == "lru":
             by_function[(path, name)] = site_id
-    # Physics threads shared_authority_cache through the shared_cache parameter.
-    by_path.setdefault("simulator/optimize/physics.py", []).append(
-        ("shared_cache", "store:simulator/optimize/physics.py:shared_authority_cache")
-    )
     for names in by_path.values():
         names.sort(key=lambda item: len(item[0]), reverse=True)
     return by_function, by_path
@@ -1330,6 +1326,19 @@ def _def_after(lines: list[str], index: int) -> str | None:
         if match:
             return match.group(1)
     return None
+
+
+def _def_containing(lines: list[str], lineno: int) -> str | None:
+    tree = ast.parse("\n".join(lines))
+    containing = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.lineno <= lineno <= node.end_lineno
+    ]
+    if not containing:
+        return None
+    return min(containing, key=lambda node: node.end_lineno - node.lineno).name
 
 
 def _token_present(name: str, text: str) -> bool:
@@ -1547,6 +1556,23 @@ def classify_controller_cache_line(
         return ("inert", "Comment. Not a runtime cache.", None)
     if re.search(r"\bimport\b", stripped) and "lru_cache" in stripped:
         return ("inert", "Import of the cache decorator. Not a store.", None)
+
+    if path == "simulator/optimize/physics.py" and re.search(
+        r"\bshared_cache\s*(?::|=)", text
+    ):
+        if lines is None:
+            source = (_repo_root() / path).read_text(encoding="utf-8").splitlines()
+        else:
+            source = lines
+        function = _def_containing(source, lineno)
+        if function in {
+            "_coating_authority_values",
+            "_coating_dew_point_warnings",
+            "_coating_violation_reasons",
+        }:
+            return _classification_of(
+                "store:simulator/optimize/physics.py:shared_authority_cache"
+            )
 
     by_function, by_path = _site_tables()
     if re.search(r"@\s*(?:functools\.)?(?:lru_cache|cache)\b", stripped):

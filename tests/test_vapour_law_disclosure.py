@@ -4718,6 +4718,41 @@ def test_cache_inventory_matches_the_production_scan() -> None:
             assert site_id is None
 
 
+def test_shared_coating_cache_alias_is_limited_to_owning_helpers() -> None:
+    from simulator.vapour_rail.disclosure_cache_inventory import (
+        CACHE_SITES,
+        classify_controller_cache_line,
+    )
+
+    site_id = "store:simulator/optimize/physics.py:shared_authority_cache"
+    for function in (
+        "_coating_authority_values",
+        "_coating_dew_point_warnings",
+        "_coating_violation_reasons",
+    ):
+        lines = [
+            f"def {function}():",
+            "    shared_cache: dict[",
+            "        int, tuple[object, ...]",
+            "    ] | None = None",
+            "    return shared_cache",
+        ]
+        assert classify_controller_cache_line(
+            "simulator/optimize/physics.py", 2, lines[1], lines=lines
+        ) == ("inert", CACHE_SITES[site_id]["how"], None)
+
+    unrelated = [
+        "def unrelated_helper():",
+        "    shared_cache: dict[",
+        "        int, tuple[object, ...]",
+        "    ] | None = None",
+        "    return shared_cache",
+    ]
+    assert classify_controller_cache_line(
+        "simulator/optimize/physics.py", 2, unrelated[1], lines=unrelated
+    ) is None
+
+
 def _assert_replayed_fe(snapshot) -> None:
     match = [item for item in snapshot if item["law_id"] == _FE_ASSOCIATION_LAW_ID]
     assert match
