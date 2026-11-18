@@ -1346,11 +1346,24 @@ def evaluate_redox(
     *,
     lambda_imposed: float | None = None,
     entry: str = "openimcc.evaluate_redox",
+    redox_pack_path: str | Path | None = None,
 ) -> Any:
     import openimcc
     from simulator.engine_cache import cached_engine_call, record_engine_open
 
     record_engine_open("openimcc")
+
+    if redox_pack_path is not None:
+        # The candidate Cr/Ti pack exposes valence amounts that the established
+        # Fe-only HOT record intentionally does not contain. Keep that result
+        # intact rather than changing the cache record shape.
+        return openimcc.evaluate_redox(
+            inventory,
+            temperature_K,
+            mode,
+            lambda_imposed=lambda_imposed,
+            redox_pack_path=redox_pack_path,
+        )
 
     request = {
         "call": entry,
@@ -1367,7 +1380,10 @@ def evaluate_redox(
             result = openimcc_redox.evaluate_redox(inventory, temperature_K, mode)
         else:
             result = openimcc.evaluate_redox(
-                inventory, temperature_K, mode, lambda_imposed=lambda_imposed
+                inventory,
+                temperature_K,
+                mode,
+                lambda_imposed=lambda_imposed,
             )
         lean = OpenImccRedoxResult.from_engine_result(result)
         return lean.to_hot()
