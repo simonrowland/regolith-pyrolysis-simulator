@@ -3410,7 +3410,7 @@ def test_magemin_projected_retry_records_absolute_fo2_per_sample(
     _assert_magemin_cli_absolute_targets(calls, -9.0)
 
 
-def test_magemin_iron_projected_retry_gates_oxide_bulk_and_keeps_engine_bulk(
+def test_magemin_iron_projected_retry_refuses_over_threshold_drop_and_keeps_engine_bulk(
     monkeypatch, magemin_subprocess_lock_dir,
 ):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
@@ -3425,8 +3425,10 @@ def test_magemin_iron_projected_retry_gates_oxide_bulk_and_keeps_engine_bulk(
     # After the ig database drops P2O5 and MnO, the supported source totals
     # 89 wt%. The domain oxide basis normalizes that remainder: SiO2 is
     # 50/89*100 = 56.179775... wt%, and the major-oxide total is 89/89*100
-    # = 100 wt%. The solver still receives the existing unnormalized
-    # FeOt+O projection of the supported 50/29/10 wt% bulk.
+    # = 100 wt%. The 11 wt% drop exceeds the projection owner's threshold,
+    # so the solver must flag it without retrying on that different bulk. The
+    # initial engine call still uses the existing unnormalized FeOt+O
+    # projection of the supported 50/29/10 wt% bulk.
     retained_total = 50.0 + 29.0 + 10.0
     assert 50.0 / retained_total * 100.0 == pytest.approx(56.1797752809)
     assert retained_total / retained_total * 100.0 == pytest.approx(100.0)
@@ -3442,7 +3444,14 @@ def test_magemin_iron_projected_retry_gates_oxide_bulk_and_keeps_engine_bulk(
     )
 
     assert result.status == 'out_of_domain'
-    assert result.diagnostics['projected_liquidus_status'] == 'ok'
+    projected_notice = result.diagnostics['composition_projected_notice']
+    assert projected_notice['reason'].startswith(
+        'composition_projected_over_threshold:'
+    )
+    assert {
+        row['component'] for row in projected_notice['dropped_components']
+    } == {'P2O5', 'MnO'}
+    assert 'projected_liquidus_status' not in result.diagnostics
     expected_projection = backend._build_db_bulk_projection({
         'SiO2': 50.0,
         'MgO': 29.0,
