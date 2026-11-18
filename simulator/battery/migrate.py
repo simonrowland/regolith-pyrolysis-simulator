@@ -249,6 +249,11 @@ from simulator.battery.records import (
     Uncertainty,
     Value,
     Work,
+    _LOCATOR_FIELD_ALIASES,
+    _LOCATOR_EXTRA_KEYS,
+    _LOCATOR_KEYS,
+    _LOCATOR_METADATA_KEYS,
+    _locator_field_target,
     _bound_operator_semantics,
     _is_source_internally_inconsistent,
     _value_has_numeric_value,
@@ -763,24 +768,6 @@ RAIL_MAP = {
     "redox": Rail.REDOX,
     "alkali shuttle": Rail.ALKALI_SHUTTLE,
     "alkali_shuttle": Rail.ALKALI_SHUTTLE,
-}
-
-LOCATOR_FIELDS = {
-    "page",
-    "published_page",
-    "pdf_page_index",
-    "page_verification",
-    "table_caption_page",
-    "table_continued",
-    "table",
-    "figure",
-    "paragraph",
-    "section",
-    "equation",
-    "line_range",
-    "note",
-    "source_path",
-    "record",
 }
 
 SPEC_COUNTS = {
@@ -1383,7 +1370,11 @@ def to_plain(obj: object) -> object:
             if value is None:
                 continue
             key = "class" if item.name == "class_" else item.name
-            out[key] = to_plain(value)
+            # Locator extras are source-native YAML facts, not decimal quantities.
+            out[key] = (
+                dict(value) if isinstance(obj, Locator) and item.name == "extras"
+                else to_plain(value)
+            )
         return out
     if isinstance(obj, Mapping):
         return {str(k): to_plain(v) for k, v in obj.items()}
@@ -1411,6 +1402,137 @@ def dump_yaml(payload: object, path: Path) -> None:
 
 
 _LOCATOR_FIELD_NAMES = {item.name for item in fields(Locator)}
+_LOCATOR_STRING_FIELDS = frozenset(
+    {
+        "row",
+        "column",
+        "table",
+        "paragraph",
+        "section",
+        "line_range",
+        "source_path",
+        "record",
+    }
+)
+class _InvalidLocator(ValueError):
+    """An invalid source locator that becomes a typed INVALID_SOURCE issue."""
+
+    reason = RefusalReason.INVALID_SOURCE
+
+
+def _locator_key_is_supported(name: str) -> bool:
+    return (
+        name in _LOCATOR_FIELD_NAMES
+        or name in _LOCATOR_FIELD_ALIASES
+        or name in _LOCATOR_EXTRA_KEYS
+    )
+
+
+def _locator_mapping_first_unsupported_key(payload: object) -> str | None:
+    """Return the first unrecognized key without resolving alias conflicts."""
+    if not isinstance(payload, Mapping):
+        return None
+    return next(
+        (
+            str(name)
+            for name in payload
+            if not _locator_key_is_supported(str(name))
+        ),
+        None,
+    )
+
+
+def _locator_mapping_keys_are_supported(payload: object) -> bool:
+    """Check locator vocabulary without interpreting conflicting coordinates."""
+    return isinstance(payload, Mapping) and (
+        _locator_mapping_first_unsupported_key(payload) is None
+    )
+
+
+def _locator_mapping_has_address(payload: object) -> bool:
+    """Check for a location address without resolving conflicting aliases."""
+    if not isinstance(payload, Mapping):
+        return False
+    for raw_name, value in payload.items():
+        name = str(raw_name)
+        if (
+            not _locator_key_is_supported(name)
+            or name == "source_sha256"
+            or value is None
+            or (isinstance(value, str) and not value.strip())
+        ):
+            continue
+        if name == "extras" and isinstance(value, Mapping):
+            if any(
+                extra_name != "source_sha256"
+                and extra_value is not None
+                and not (isinstance(extra_value, str) and not extra_value.strip())
+                for extra_name, extra_value in value.items()
+            ):
+                return True
+            continue
+        if name in _LOCATOR_EXTRA_KEYS:
+            return True
+        target = _locator_field_target(name, value)
+        if target in _LOCATOR_KEYS and target not in _LOCATOR_METADATA_KEYS:
+            return True
+    return False
+
+
+def _locator_text(value: object) -> str:
+    if isinstance(value, str):
+        return value
+    # Legacy label aliases keep a stable textual form after migration.
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, default=str)
+
+
+def _locator_field_value(name: str, value: object, *, alias: bool) -> object:
+    if name in {"row", "column"}:
+        if isinstance(value, bool) or not isinstance(value, (str, int)):
+            raise _InvalidLocator(f"{name} label must be a string")
+        # Numeric labels are kept textual when explicitly named as labels.
+        return _locator_text(value)
+    if name in {"table_row_number", "table_column_number"}:
+        if isinstance(value, bool):
+            raise _InvalidLocator(f"{name} must be a positive integer table index")
+        if isinstance(value, str):
+            token = value.strip()
+            if not re.fullmatch(r"[0-9]+", token):
+                raise _InvalidLocator(
+                    f"{name} must be a positive integer table index"
+                )
+            value = int(token)
+        if type(value) is not int or value < 1:
+            raise _InvalidLocator(f"{name} must be a positive integer table index")
+        return value
+    if name == "pdf_page_index":
+        # Numeric canonical and alias spellings share the zero-based integer type.
+        if isinstance(value, bool):
+            raise _InvalidLocator("pdf_page_index must be an integer")
+        if isinstance(value, str):
+            token = value.strip()
+            if token.isdecimal():
+                return int(token)
+            if re.fullmatch(r"\d+\s*[-–]\s*\d+", token):
+                # Existing source locators use textual multi-page spans.
+                return token
+            raise _InvalidLocator("pdf_page_index must be an integer")
+        try:
+            converted = int(value)  # type: ignore[arg-type]
+            if converted != value:
+                raise _InvalidLocator("pdf_page_index must be an integer")
+            return converted
+        except (TypeError, ValueError) as exc:
+            raise _InvalidLocator("pdf_page_index must be an integer") from exc
+    if alias and name in _LOCATOR_STRING_FIELDS:
+        return _locator_text(value)
+    return value
+
+
+def _locator_compare_value(name: str, value: object) -> object:
+    if name in _LOCATOR_STRING_FIELDS or name in {"page", "published_page"}:
+        return str(value)
+    return value
 
 
 def _is_mapping(value: object) -> bool:
@@ -1480,9 +1602,14 @@ def _raw_inputs_from_plain(payload: object) -> Located[RawInputStatus]:
     locator = payload.get("locator")
     if "locator" in payload and not isinstance(locator, (Mapping, Locator)):
         raise _InvalidDerivationAnnotation("raw_inputs locator must be an object")
-    return _located_from_plain(
+    located = _located_from_plain(
         payload, lambda value: _enum(RawInputStatus, value)
     )
+    if "locator" in payload and located.locator is None:
+        raise _InvalidDerivationAnnotation(
+            "Locator requires at least one nonempty location key"
+        )
+    return located
 
 
 def _method_from_plain(payload: object) -> Located[str]:
@@ -1536,17 +1663,144 @@ def _method_from_plain(payload: object) -> Located[str]:
     return _located_from_plain(payload, _method_text)
 
 
-def _locator_from_plain(payload: object) -> Locator | None:
+def _locator_from_plain(payload: object, *, refuse_invalid: bool = False) -> Locator | None:
+    try:
+        return _decode_locator_from_plain(payload)
+    except _InvalidLocator as exc:
+        if refuse_invalid:
+            raise
+        if str(exc).startswith("unknown locator key "):
+            # The extract validator records the unknown key as INVALID_SOURCE.
+            # Keep recognized coordinates available to value inference so that
+            # validation does not erase unrelated scientific values.
+            try:
+                return _decode_locator_from_plain(payload, reject_unknown=False)
+            except _InvalidLocator:
+                return _decode_locator_from_plain(
+                    payload, reject_unknown=False, ignore_coordinates=True
+                )
+        if "conflicting locator fields:" in str(exc) and (
+            " for row" in str(exc) or " for column" in str(exc)
+        ):
+            # Before row and column were Locator axes these fields did not
+            # participate in value inference. Retain only the older anchor
+            # fields internally; strict decoding still refuses the locator.
+            return _decode_locator_from_plain(
+                payload, reject_unknown=False, ignore_coordinates=True
+            )
+        return None
+
+
+def _decode_locator_from_plain(
+    payload: object,
+    *,
+    reject_unknown: bool = True,
+    ignore_coordinates: bool = False,
+) -> Locator | None:
     if payload is None:
         return None
     if isinstance(payload, Locator):
         return payload
     if not _is_mapping(payload):
         return Locator(note=str(payload))
-    kwargs = {k: v for k, v in payload.items() if k in _LOCATOR_FIELD_NAMES and v is not None}
+    kwargs: dict[str, object] = {}
+    target_sources: dict[str, tuple[str, object]] = {}
+    extra_values: dict[str, object] = {}
+    conflicts: list[str] = []
+    for raw_name, value in payload.items():
+        name = str(raw_name)
+        if not _locator_key_is_supported(name):
+            if reject_unknown:
+                raise _InvalidLocator(f"unknown locator key {name!r}")
+            continue
+        if name == "extras":
+            if not isinstance(value, Mapping):
+                raise _InvalidLocator("extras must be an object")
+            for extra_name, extra_value in value.items():
+                if not isinstance(extra_name, str):
+                    raise _InvalidLocator("extras keys must be strings")
+                previous_extra = extra_values.get(extra_name, extra_value)
+                if previous_extra != extra_value:
+                    conflicts.append(
+                        f"extras.{extra_name}={previous_extra!r} conflicts with "
+                        f"extras.{extra_name}={extra_value!r}"
+                    )
+                else:
+                    extra_values[extra_name] = extra_value
+            continue
+        if name in _LOCATOR_EXTRA_KEYS:
+            if name in extra_values and extra_values[name] != value:
+                conflicts.append(
+                    f"{name}={extra_values[name]!r} conflicts with {name}={value!r}"
+                )
+            else:
+                extra_values[name] = value
+            continue
+        if value is None or value == "":
+            continue
+        target = _locator_field_target(name, value)
+        if ignore_coordinates and target in {
+            "row",
+            "column",
+            "table_row_number",
+            "table_column_number",
+        }:
+            continue
+        is_alias = name != target
+        try:
+            normalized = _locator_field_value(target, value, alias=is_alias)
+        except _InvalidLocator as exc:
+            raise _InvalidLocator(f"{name}: {exc}") from exc
+        comparison = _locator_compare_value(target, normalized)
+        previous = target_sources.get(target)
+        if previous is not None:
+            previous_name, previous_comparison = previous
+            if previous_comparison != comparison:
+                conflicts.append(
+                    f"{previous_name}={kwargs[target]!r} conflicts with "
+                    f"{name}={normalized!r} for {target}"
+                )
+            continue
+        target_sources[target] = (name, comparison)
+        kwargs[target] = normalized
+    if conflicts:
+        raise _InvalidLocator("conflicting locator fields: " + "; ".join(conflicts))
+    if extra_values:
+        kwargs["extras"] = extra_values
     if not kwargs:
         return None
-    return Locator(**kwargs)
+    try:
+        return Locator(**kwargs)
+    except (TypeError, ValueError) as exc:
+        raise _InvalidLocator(f"invalid locator: {exc}") from exc
+
+
+def _validate_persisted_locator_mappings(payload: object) -> None:
+    """Strictly decode persisted locations before tolerant inference sees them."""
+    pending: list[tuple[object, str]] = [(payload, "")]
+    while pending:
+        current, path = pending.pop()
+        if isinstance(current, Mapping):
+            for key, value in current.items():
+                name = str(key)
+                child_path = f"{path}.{name}" if path else name
+                is_admission_evidence = (
+                    name == "evidence"
+                    and child_path.endswith("admission.decided_by.evidence")
+                )
+                if (
+                    name in {"locator", "source_locator"} or is_admission_evidence
+                ) and isinstance(value, Mapping):
+                    try:
+                        _locator_from_plain(value, refuse_invalid=True)
+                    except _InvalidLocator as exc:
+                        raise _InvalidLocator(f"{child_path}: {exc}") from exc
+                pending.append((value, child_path))
+        elif isinstance(current, (list, tuple)):
+            pending.extend(
+                (value, f"{path}[{index}]")
+                for index, value in enumerate(current)
+            )
 
 
 def _derivation_inputs_requirement_error(
@@ -3574,6 +3828,7 @@ def _source_method_uncertainty_from_plain(
 
 def work_from_plain(payload: object) -> Work:
     assert _is_mapping(payload)
+    _validate_persisted_locator_mappings(payload)
     files_payload = payload.get("source_files") or {}
     files = tuple(_source_file_from_plain(f) for f in (files_payload.get("files") or ()))
     commit = files_payload.get("corpus_commit")
@@ -3798,6 +4053,7 @@ def bench_from_plain(payload: object) -> Bench:
 
     if not isinstance(payload, Mapping):
         raise TypeError("bench must be a mapping")
+    _validate_persisted_locator_mappings(payload)
     raw_identity = payload.get("identity")
     if not isinstance(raw_identity, Mapping):
         raise TypeError("bench identity must be a mapping")
@@ -4131,6 +4387,7 @@ def _experiment_from_plain(
     payload: object, *, registry_issues: list[ValidationIssue] | None
 ) -> Experiment:
     assert _is_mapping(payload)
+    _validate_persisted_locator_mappings(payload)
     conditions = {}
     for key, value in (payload.get("conditions") or {}).items():
         try:
@@ -4213,6 +4470,7 @@ def _experiment_from_plain(
 
 def observation_from_plain(payload: object) -> Observation:
     assert _is_mapping(payload)
+    _validate_persisted_locator_mappings(payload)
     notices = tuple(_notice_from_plain(n) for n in (payload.get("notices") or ()))
     observation_id = str(payload["observation_id"])
     projection_notices: list[Notice] = []
@@ -4680,34 +4938,11 @@ def locator_from_mapping(raw: object, fallback: str | None = None) -> Locator | 
         if fallback:
             return Locator(note=fallback)
         return None
-    kwargs: dict[str, object] = {}
-    extras: list[str] = []
-    for key, value in raw.items():
-        name = str(key)
-        if value is None or value == "":
-            continue
-        if name not in LOCATOR_FIELDS:
-            extras.append(f"{name}={value}")
-            continue
-        if name == "pdf_page_index":
-            try:
-                kwargs[name] = int(value)  # type: ignore[arg-type]
-            except (TypeError, ValueError):
-                extras.append(f"{name}={value}")
-            continue
-        kwargs[name] = value
-    if extras:
-        extra_note = "; ".join(extras)
-        existing = str(kwargs.get("note") or "")
-        kwargs["note"] = f"{existing}; {extra_note}".strip("; ")
-    if not kwargs:
-        if fallback:
-            return Locator(note=fallback)
-        return None
     try:
-        return Locator(**kwargs)  # type: ignore[arg-type]
-    except (TypeError, ValueError):
-        return Locator(note=fallback or "unparsed locator")
+        locator = _locator_from_plain(raw, refuse_invalid=True)
+    except _InvalidLocator:
+        return None
+    return locator or (Locator(note=fallback) if fallback else None)
 
 
 def located_unknown(reason: str) -> Located[Any]:
@@ -8883,10 +9118,10 @@ def _printed_oxide_map_locator(values: object) -> Locator | None:
 
 def _row_phase_label(row: Mapping[str, Any]) -> str:
     parts = [str(row.get("observation_id") or "")]
-    locator = row.get("locator")
-    if isinstance(locator, Mapping):
-        for key in ("row", "row_label", "note"):
-            raw = locator.get(key)
+    locator = _locator_from_plain(row.get("locator"))
+    if locator is not None:
+        for key in ("row", "note"):
+            raw = getattr(locator, key)
             if raw not in (None, ""):
                 parts.append(str(raw))
     return " ".join(parts)
@@ -8933,10 +9168,8 @@ def _same_run_initial_melts(
         if not any(token in units for token in ("wt", "weight", "mass")):
             continue
         experiment = str(row.get("experiment") or "")
-        locator = row.get("locator")
-        table = ""
-        if isinstance(locator, Mapping) and locator.get("table") not in (None, ""):
-            table = str(locator.get("table"))
+        locator = _locator_from_plain(row.get("locator"))
+        table = "" if locator is None or locator.table is None else str(locator.table)
         if not experiment or not table:
             continue
         oxide = _canonical_printed_oxide_name(str(formula).strip())
@@ -8967,10 +9200,8 @@ def _bind_same_run_initial_composition(
     if not label_marks_final(_row_phase_label(obs)):
         return None
     experiment = str(obs.get("experiment") or "")
-    locator = obs.get("locator")
-    table = ""
-    if isinstance(locator, Mapping) and locator.get("table") not in (None, ""):
-        table = str(locator.get("table"))
+    locator = _locator_from_plain(obs.get("locator"))
+    table = "" if locator is None or locator.table is None else str(locator.table)
     if not experiment or not table:
         return None
     experiment_rows = context.get("experiment_source_rows")
@@ -14971,9 +15202,11 @@ def _enthalpy_increment_subtype(
                 zero_anchors.add(temperature)
 
     labels = [
-        (obs.get("locator") or {}).get("column")
-        if isinstance(obs.get("locator"), Mapping)
-        else None,
+        (
+            locator.column
+            if (locator := _locator_from_plain(obs.get("locator"))) is not None
+            else None
+        ),
         obs.get("units"),
         values.get("quantity_as_printed"),
         values.get("printed_relation"),
@@ -22915,9 +23148,15 @@ def compilation_record_source_file(source_path: str) -> SourceFile:
     )
 
 
-def choose_read_from(work: Work, locator: Locator | None) -> str:
+def choose_read_from(
+    work: Work, locator: Locator | None, *, source_key: str | None = None,
+) -> str:
+    """Bind the ingested compilation record independently of its upstream locator."""
     files = work.source_files.files
-    loc_path = locator.source_path if locator is not None else None
+    loc_path = (
+        source_key if source_key and is_compilation_record_path(source_key)
+        else locator.source_path if locator is not None else None
+    )
     if loc_path:
         for asset in files:
             if asset.path != "unknown" and (
@@ -23284,23 +23523,21 @@ def _same_row_composition_closure_components(
         for composition in composition_payloads:
             if not isinstance(composition, Mapping):
                 continue
-            locator = composition.get("locator")
-            if not isinstance(locator, Mapping):
+            locator = _locator_from_plain(composition.get("locator"))
+            if locator is None:
                 continue
-            table = locator.get("table")
-            row = locator.get("row") or locator.get("row_label")
-            if table not in (None, "") and row not in (None, ""):
-                return ("composition-locator", str(table), str(row))
+            if locator.table not in (None, "") and locator.row not in (None, ""):
+                return ("composition-locator", str(locator.table), str(locator.row))
         experiment = observation.get("experiment")
         if experiment not in (None, ""):
             return ("experiment", str(experiment))
         sample_id = values.get("sample_id") if isinstance(values, Mapping) else None
-        locator = observation.get("locator")
-        if isinstance(locator, Mapping) and locator.get("table") and locator.get("row"):
+        locator = _locator_from_plain(observation.get("locator"))
+        if locator is not None and locator.table and locator.row:
             return (
                 "table-row",
-                str(locator["table"]),
-                str(locator["row"]),
+                str(locator.table),
+                str(locator.row),
                 str(sample_id or ""),
             )
         if sample_id not in (None, ""):
@@ -24877,6 +25114,14 @@ class Migrator:
                 self._migrate_extract(path)
             except _InvalidDecimalValue as exc:
                 self._record_invalid_decimal_source(f"extract[{rel}].numeric", exc)
+            except _InvalidLocator as exc:
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=f"extract[{rel}].locator",
+                        reason=exc.reason,
+                        detail=str(exc),
+                    )
+                )
 
     def _record_invalid_decimal_source(
         self, path: str, error: _InvalidDecimalValue
@@ -24888,6 +25133,47 @@ class Migrator:
                 detail=str(error),
             )
         )
+
+    def _validate_extract_locators(
+        self, doc: Mapping[str, Any], *, source_key: str
+    ) -> None:
+        """Report invalid locators without rewriting the printed source payload."""
+        pending: list[tuple[object, str]] = [(doc, "")]
+        while pending:
+            current, path = pending.pop()
+            if isinstance(current, collections.abc.MutableMapping):
+                for field_name in ("locator", "source_locator"):
+                    if field_name not in current:
+                        continue
+                    raw_locator = current[field_name]
+                    if raw_locator is not None and not isinstance(
+                        raw_locator, (Mapping, Locator)
+                    ):
+                        # Preserve legacy annotations used by value inference.
+                        continue
+                    try:
+                        _locator_from_plain(
+                            raw_locator, refuse_invalid=True
+                        )
+                    except _InvalidLocator as exc:
+                        locator_path = (
+                            f"{path}.{field_name}" if path else field_name
+                        )
+                        self.result.registry_issues.append(
+                            ValidationIssue(
+                                path=f"extract[{source_key}].{locator_path}",
+                                reason=exc.reason,
+                                detail=str(exc),
+                            )
+                        )
+                for key, value in current.items():
+                    child_path = f"{path}.{key}" if path else str(key)
+                    pending.append((value, child_path))
+            elif isinstance(current, list):
+                pending.extend(
+                    (value, f"{path}[{index}]")
+                    for index, value in enumerate(current)
+                )
 
     @staticmethod
     def _qualify_registry_id(work_id: str, kind: str, raw: object) -> str:
@@ -25006,7 +25292,8 @@ class Migrator:
                         path=f"experiment[{experiment_id}].bench_id",
                     )
             locator = locator_from_mapping(
-                raw.get("locator"), fallback=f"{source_key}:experiments:{local_id}"
+                raw.get("locator"),
+                fallback=f"{source_key}:experiments:{local_id}",
             )
             method_raw = raw.get("method")
             if isinstance(method_raw, Mapping) and "tag" in method_raw:
@@ -25350,12 +25637,8 @@ class Migrator:
                 enriched.append(experiment)
                 continue
             experiment = dict(experiment)
-            experiment_locator = experiment.get("locator") or {}
-            row_name = (
-                experiment_locator.get("row")
-                if isinstance(experiment_locator, Mapping)
-                else None
-            )
+            experiment_locator = _locator_from_plain(experiment.get("locator"))
+            row_name = None if experiment_locator is None else experiment_locator.row
             measurement = samples.get(str(row_name))
             if measurement is not None:
                 mass_mg, area_mm2, source_locator = measurement
@@ -25409,6 +25692,7 @@ class Migrator:
                 source=rel,
             )
             return
+        self._validate_extract_locators(doc, source_key=rel)
         doc = self._richter_table1_sample_inputs(doc)
         source = doc.get("source") or {}
         if not isinstance(source, Mapping):
@@ -25776,21 +26060,16 @@ class Migrator:
             if observation.get("type") != "transition_point":
                 continue
             values = observation.get("values")
-            raw_locator = observation.get("locator")
-            if not isinstance(values, Mapping) or not isinstance(raw_locator, Mapping):
+            locator = _locator_from_plain(observation.get("locator"))
+            if not isinstance(values, Mapping) or locator is None:
                 continue
             quantity, _reason = map_quantity(
                 "transition_point", values, units=observation.get("units"), row=observation
             )
             if not quantity.is_value or quantity.value is not Quantity.TRANSITION_TEMPERATURE:
                 continue
-            table, row = raw_locator.get("table"), raw_locator.get("row")
-            locator = locator_from_mapping(raw_locator)
-            if (
-                table in (None, "")
-                or row in (None, "")
-                or locator is None
-            ):
+            table, row = locator.table, locator.row
+            if table in (None, "") or row in (None, ""):
                 continue
             key = (formula, str(table), str(row))
             by_row[key].append(observation)
@@ -26018,7 +26297,14 @@ class Migrator:
         locator = locator_from_mapping(
             obs.get("locator"), fallback=f"extract:{source_id}:{obs_id}"
         )
-        assert locator is not None
+        # Keep the refused locator off the observation. Value inference retains
+        # only its pre-coordinate anchors (the old behavior); an explicit
+        # composition annotation can provide a separate valid locator too.
+        value_locator = (
+            locator
+            or _locator_from_plain(obs.get("locator"))
+            or Locator(note=f"extract:{source_id}:{obs_id}")
+        )
         if q_reason:
             self.result.add_queue(
                 work.work_id,
@@ -26387,9 +26673,9 @@ class Migrator:
             and t_sel.field_name is None
             and not t_sel.condition_ranges
         ):
-            raw_locator = obs.get("locator")
-            if isinstance(raw_locator, Mapping):
-                table, row = raw_locator.get("table"), raw_locator.get("row")
+            raw_locator = _locator_from_plain(obs.get("locator"))
+            if raw_locator is not None:
+                table, row = raw_locator.table, raw_locator.row
                 if table not in (None, "") and row not in (None, ""):
                     transition_rows = (fusion_transition_rows or {}).get(
                         (formula, str(table), str(row))
@@ -27441,7 +27727,7 @@ class Migrator:
                 if isinstance(composition_closure_context, Mapping)
                 else None
             ),
-            locator=locator,
+            locator=value_locator,
         )
         refused_sample_composition = None
         if (
@@ -27514,7 +27800,7 @@ class Migrator:
                 equipment=obs.get("equipment"),
                 values=composition_closure_context,
                 vocabulary=self._vocab,
-                locator=locator,
+                locator=value_locator,
             )
             and not self._repeats_declared_sample_map(
                 experiment_id, row_sample.printed_composition
@@ -27601,7 +27887,7 @@ class Migrator:
             row_printed_fingerprint = _printed_fingerprint(row_printed_values)
             row_printed_locator = row_sample.printed_composition.locator
             for source_values, source_fallback in (
-                (values, locator),
+                (values, value_locator),
                 (obs.get("equipment"), None),
             ):
                 candidate_values = _source_printed_composition_values(
@@ -27683,7 +27969,7 @@ class Migrator:
             experiment_id,
             point_conditions,
             oxygen_roots,
-            locator,
+            value_locator,
             fallback=(experiment_oxygen_fallback,)
             if isinstance(experiment_oxygen_fallback, Mapping)
             else (),
@@ -28282,7 +28568,7 @@ class Migrator:
             quantity=q_token if isinstance(q_token, Quantity) else None,
             formula=species.formula if species is not None else "",
             experiment=self.result.experiments.get(experiment_id),
-            row_locator=locator,
+            row_locator=value_locator,
             map_locator=_printed_oxide_map_locator(
                 values if isinstance(values, Mapping) else None
             ),
@@ -28462,6 +28748,7 @@ class Migrator:
                     experiment_id=experiment_id,
                     printed_atmospheres=printed_atmospheres,
                     locator=locator,
+                oxygen_locator=value_locator,
                     identity_base=(yield_quantity, species, ident_kwargs),
                     evidence=evidence,
                     admission=point_admission,
@@ -28589,6 +28876,7 @@ class Migrator:
                         experiment_id=experiment_id,
                         printed_atmospheres=printed_atmospheres,
                         locator=locator,
+                        oxygen_locator=value_locator,
                         identity_base=(quantity, point_species, ident_kwargs),
                         evidence=evidence,
                         admission=admission,
@@ -28723,6 +29011,7 @@ class Migrator:
                     experiment_id=experiment_id,
                     printed_atmospheres=printed_atmospheres,
                     locator=locator,
+                    oxygen_locator=value_locator,
                     identity_base=(quantity, species, ident_kwargs),
                     evidence=evidence,
                     admission=admission,
@@ -28923,6 +29212,7 @@ class Migrator:
                         experiment_id=experiment_id,
                         printed_atmospheres=printed_atmospheres,
                         locator=locator,
+                        oxygen_locator=value_locator,
                         identity_base=(
                             quantity,
                             species,
@@ -29515,6 +29805,7 @@ class Migrator:
         experiment_id: str,
         locator: Locator,
         printed_atmospheres: Sequence[str],
+        oxygen_locator: Locator | None = None,
         identity_base: tuple[Quantity | State[Quantity], Species, dict[str, Any]],
         evidence: Evidence,
         admission: Admission,
@@ -30469,7 +30760,7 @@ class Migrator:
             experiment_id,
             point_conditions,
             (raw_item,) if isinstance(raw_item, Mapping) else (),
-            point_locator,
+            oxygen_locator or point_locator,
             fallback=(parent_values,) if isinstance(parent_values, Mapping) else (),
         )
         has_residue_composition_cells = (
@@ -31660,7 +31951,7 @@ class Migrator:
             work,
             locator.source_path if locator is not None else None,
         )
-        read_from = choose_read_from(work, locator)
+        read_from = choose_read_from(work, locator, source_key=source_key)
         unmatched = unmatched_read_from_reason(locator, read_from)
         if unmatched:
             self.result.add_queue(
@@ -32553,6 +32844,21 @@ class Migrator:
                 for row in rows:
                     if isinstance(row, Mapping):
                         require_rail_if_stated(row)
+        loc_raw = doc.get("source_locator")
+        unknown_locator_key = _locator_mapping_first_unsupported_key(loc_raw)
+        if unknown_locator_key is not None:
+            exc = _InvalidLocator(
+                f"unknown locator key {unknown_locator_key!r}"
+            )
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"compilation[{rel}].source_locator",
+                    reason=exc.reason,
+                    detail=str(exc),
+                )
+            )
+            return
+        if table is not None:
             if _is_nist_janaf_table(path, doc):
                 self._lift_janaf_from_generator(work, source_id, rel, count, doc)
                 return
@@ -32591,7 +32897,18 @@ class Migrator:
         ):
             phase, _unmapped = map_phase("(c)")
         loc_raw = doc.get("source_locator")
-        locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
+        try:
+            source_locator = _locator_from_plain(loc_raw, refuse_invalid=True)
+        except _InvalidLocator as exc:
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"compilation[{rel}].source_locator",
+                    reason=exc.reason,
+                    detail=str(exc),
+                )
+            )
+            return
+        locator = source_locator or Locator(record=record_id)
         if not locator.source_path:
             locator = replace(locator, source_path=rel)
         t = _compilation_temperature_state(doc)
@@ -32654,7 +32971,7 @@ class Migrator:
                         "all numeric cells retained in mapped compilation series"
                     )
             # One observation per declared mapped series; never first-numeric-cell.
-            read_from = choose_read_from(work, locator)
+            read_from = choose_read_from(work, locator, source_key=rel)
             reference_temperature = _PANKRATZ_H298_REFERENCE_K.get(source_id)
             for index, series in enumerate(column_series):
                 suffix = _compilation_series_obs_suffix(series)
@@ -32809,7 +33126,7 @@ class Migrator:
                         window.unit_trail,
                         None,
                         locator,
-                        choose_read_from(work, locator),
+                        choose_read_from(work, locator, source_key=rel),
                     ),
                 )
             return
@@ -32831,7 +33148,7 @@ class Migrator:
         # Quantity.DELTA_FH is a closed v2.1 token; formation-enthalpy fields are
         # projected above via compilation_quantity_from_record / QUANTITY_SOURCE_FIELDS.
         # Do not re-queue a "not a v2.1 Quantity token" refusal here.
-        read_from = choose_read_from(work, locator)
+        read_from = choose_read_from(work, locator, source_key=rel)
         original_value = None
         if sel.field_name:
             raw_original = doc.get(sel.field_name)
@@ -33788,6 +34105,8 @@ _QUEUE_LOCATOR_KEY_ORDER = (
     "published_page",
     "pdf_page_index",
     "table",
+    "row",
+    "column",
     "figure",
     "paragraph",
     "section",
