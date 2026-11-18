@@ -23132,9 +23132,15 @@ def compilation_record_source_file(source_path: str) -> SourceFile:
     )
 
 
-def choose_read_from(work: Work, locator: Locator | None) -> str:
+def choose_read_from(
+    work: Work, locator: Locator | None, *, source_key: str | None = None,
+) -> str:
+    """Bind the ingested compilation record independently of its upstream locator."""
     files = work.source_files.files
-    loc_path = locator.source_path if locator is not None else None
+    loc_path = (
+        source_key if source_key and is_compilation_record_path(source_key)
+        else locator.source_path if locator is not None else None
+    )
     if loc_path:
         for asset in files:
             if asset.path != "unknown" and (
@@ -31833,7 +31839,7 @@ class Migrator:
             work,
             locator.source_path if locator is not None else None,
         )
-        read_from = choose_read_from(work, locator)
+        read_from = choose_read_from(work, locator, source_key=source_key)
         unmatched = unmatched_read_from_reason(locator, read_from)
         if unmatched:
             self.result.add_queue(
@@ -32853,7 +32859,7 @@ class Migrator:
                         "all numeric cells retained in mapped compilation series"
                     )
             # One observation per declared mapped series; never first-numeric-cell.
-            read_from = choose_read_from(work, locator)
+            read_from = choose_read_from(work, locator, source_key=rel)
             reference_temperature = _PANKRATZ_H298_REFERENCE_K.get(source_id)
             for index, series in enumerate(column_series):
                 suffix = _compilation_series_obs_suffix(series)
@@ -33008,7 +33014,7 @@ class Migrator:
                         window.unit_trail,
                         None,
                         locator,
-                        choose_read_from(work, locator),
+                        choose_read_from(work, locator, source_key=rel),
                     ),
                 )
             return
@@ -33030,7 +33036,7 @@ class Migrator:
         # Quantity.DELTA_FH is a closed v2.1 token; formation-enthalpy fields are
         # projected above via compilation_quantity_from_record / QUANTITY_SOURCE_FIELDS.
         # Do not re-queue a "not a v2.1 Quantity token" refusal here.
-        read_from = choose_read_from(work, locator)
+        read_from = choose_read_from(work, locator, source_key=rel)
         original_value = None
         if sel.field_name:
             raw_original = doc.get(sel.field_name)

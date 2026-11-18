@@ -43,6 +43,56 @@ _COMPILATION_GENERATOR_RECORDS = (
         5,
     ),
 )
+_UPSTREAM_COMPILATION_RECORDS = (
+    "data/literature/compilations/atct/records/atct-1.222-0001.json",
+    "data/literature/compilations/burcat/records/BU-0001.json",
+    "data/literature/compilations/fastchem-v3-1-3/records/FC-C-0001.json",
+    "data/literature/compilations/nasa-glenn/records/NG-0001.json",
+    "data/literature/compilations/pankratz-1984-usbm-b677/records/table-0001.json",
+)
+
+
+@pytest.mark.parametrize("relative_path", _UPSTREAM_COMPILATION_RECORDS)
+def test_compilation_record_binding_retains_upstream_locator_fact(relative_path: str) -> None:
+    from simulator.battery.migrate import compilation_record_asset_id
+
+    path = REPO_ROOT / relative_path
+    document = json.loads(path.read_text(encoding="utf-8"))
+    raw_locator = document["source_locator"]
+    upstream_path = raw_locator.get("path") or raw_locator["file"]
+    assert upstream_path != relative_path
+    migrator = Migrator(REPO_ROOT)
+    migrator._migrate_compilation_file(path)
+    migrator.finalize()
+    observations = list(migrator.result.observations.values())
+    assert observations
+    asset_id = compilation_record_asset_id(relative_path)
+    for observation in observations:
+        assert observation.locator.source_path == upstream_path
+        assert observation.read_from == asset_id
+        if observation.derivation is not None:
+            assert observation.derivation.inputs[0] == asset_id
+    assert any(
+        asset.asset_id == asset_id and asset.path == relative_path
+        for work in migrator.result.works.values()
+        for asset in work.source_files.files
+    )
+
+
+@pytest.mark.parametrize("relative_path", _UPSTREAM_COMPILATION_RECORDS)
+def test_compilation_record_binding_detects_upstream_path_winning(
+    relative_path: str, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery import migrate as migrate_module
+
+    choose = migrate_module.choose_read_from
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            migrate_module, "choose_read_from",
+            lambda work, locator, **_context: choose(work, locator),
+        )
+        with pytest.raises(AssertionError):
+            test_compilation_record_binding_retains_upstream_locator_fact(relative_path)
 
 
 def test_printed_labels_and_grid_aliases_survive_extract_migration(
