@@ -26,7 +26,7 @@ from simulator.battery.enums import (
     ResidualStatus,
     ValueKind,
 )
-from simulator.battery.identity import Identity, temperature_of
+from simulator.battery.identity import Identity
 from simulator.battery.records import Composition, Execution
 from simulator.battery.migrate import REPO_ROOT, Migrator, _identity_from_plain
 from simulator.battery.score import (
@@ -834,7 +834,7 @@ def test_openimcc_feo_gamma_gets_the_activity_reference_shift_per_source(
     assert gamma_candidate.engine is not None
     assert gamma_candidate.value.point is not None
     assert gamma_candidate.identity.composition == gamma_reference.identity.composition
-    temperature_K = temperature_of(gamma_reference.identity)
+    temperature_K = score_module.temperature_of(gamma_reference.identity)
     assert temperature_K is not None
     _, activity_record, _, refusal = (
         feo_standard_module.normalize_openimcc_feo_activity_value(
