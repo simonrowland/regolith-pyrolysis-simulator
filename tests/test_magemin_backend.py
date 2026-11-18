@@ -3410,7 +3410,7 @@ def test_magemin_projected_retry_records_absolute_fo2_per_sample(
     _assert_magemin_cli_absolute_targets(calls, -9.0)
 
 
-def test_magemin_iron_projected_retry_refuses_over_threshold_drop_and_keeps_engine_bulk(
+def test_magemin_iron_projected_retry_refuses_over_threshold_drop_before_engine(
     monkeypatch, magemin_subprocess_lock_dir,
 ):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
@@ -3425,10 +3425,9 @@ def test_magemin_iron_projected_retry_refuses_over_threshold_drop_and_keeps_engi
     # After the ig database drops P2O5 and MnO, the supported source totals
     # 89 wt%. The domain oxide basis normalizes that remainder: SiO2 is
     # 50/89*100 = 56.179775... wt%, and the major-oxide total is 89/89*100
-    # = 100 wt%. The 11 wt% drop exceeds the projection owner's threshold,
-    # so the solver must flag it without retrying on that different bulk. The
-    # initial engine call still uses the existing unnormalized FeOt+O
-    # projection of the supported 50/29/10 wt% bulk.
+    # = 100 wt%. Since the 11 wt% drop exceeds the projection owner's
+    # threshold, flag and stop before any engine call; do not retry on the
+    # different projected bulk.
     retained_total = 50.0 + 29.0 + 10.0
     assert 50.0 / retained_total * 100.0 == pytest.approx(56.1797752809)
     assert retained_total / retained_total * 100.0 == pytest.approx(100.0)
@@ -3452,17 +3451,7 @@ def test_magemin_iron_projected_retry_refuses_over_threshold_drop_and_keeps_engi
         row['component'] for row in projected_notice['dropped_components']
     } == {'P2O5', 'MnO'}
     assert 'projected_liquidus_status' not in result.diagnostics
-    expected_projection = backend._build_db_bulk_projection({
-        'SiO2': 50.0,
-        'MgO': 29.0,
-        'FeO': 10.0,
-    })
-    expected_bulk = _expected_magemin_bulk_arg(backend, expected_projection)
-    submitted_bulks = {
-        next(arg for arg in args if arg.startswith('--Bulk='))
-        for args in calls
-    }
-    assert submitted_bulks == {expected_bulk}
+    assert calls == []
 
 
 def test_magemin_preprojected_iron_bulk_uses_oxide_gate_basis(
@@ -4265,8 +4254,13 @@ def test_magemin_pure_phase_probe_argument_vector_is_preserved(
         f'--buffer_n={buffer_n:.6f}',
         '--out_matlab=1',
     ]
+    expected_control = backend._fo2_operating_point(-9.0, None, False)
+    expected_warnings = [
+        *buffer_warnings,
+        f'MAGEMin pure-phase native fO2 readback: {expected_control}',
+    ]
     assert (stdout, matlab_text, warnings) == (
-        'probe stdout', 'matlab output', list(buffer_warnings)
+        'probe stdout', 'matlab output', expected_warnings
     )
 
 
