@@ -6,6 +6,7 @@ from collections import Counter
 
 from simulator.battery.enums import CellMaterial, MethodToken, Phase, Quantity
 from simulator.battery.migrate import Migrator
+from tests.literature_extract_test_helpers import iter_locators
 from simulator.yaml_cache import YAML12SafeLoader, yaml_mapping_source_issues
 import yaml
 
@@ -138,19 +139,7 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
         point["locator"]["table"] == "9" for point in table9_activity_points
     )
 
-    locators = []
-
-    def collect_locators(value: object) -> None:
-        if isinstance(value, dict):
-            if "page" in value and "pdf_page_index" in value:
-                locators.append(value)
-            for item in value.values():
-                collect_locators(item)
-        elif isinstance(value, list):
-            for item in value:
-                collect_locators(item)
-
-    collect_locators(document)
+    locators = list(iter_locators(document))
     # Typing Tables 7 and 9 adds 162 locators and 75 observations; the KEMS
     # apparatus and experiment registry add three locators.
     # The merged document keeps the two Table 9 NaAlSi_6 points and Na Table
