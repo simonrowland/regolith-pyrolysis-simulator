@@ -4692,7 +4692,7 @@ def test_composite_constituent_continuation_reaches_typed_shadow(
     )
     assert shadow["status"] == "shadow_only_no_behavior_authority"
     assert shadow["out_of_range"]
-    assert shadow["extrapolation_notice"] == scalar.extrapolation_notice
+    assert shadow["extrapolation_notice"] == [scalar.extrapolation_notice]
     minimum_positive_pa = math.nextafter(0.0, math.inf)
     if scalar.pressure_pa == minimum_positive_pa:
         # The scalar projection floors at IEEE-754's minimum; ln space
