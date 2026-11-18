@@ -287,8 +287,8 @@ def _b127_uncovered_na_vapor_data() -> tuple[dict[str, Any], float]:
     import simulator.condensation as condensation_module
 
     na_row = dict(condensation_module._species_vapor_data("Na"))
-    valid_range = na_row["pure_component_antoine"]["valid_range_K"]
-    test_temperature_K = math.nextafter(float(valid_range[1]), math.inf)
+    valid_range = na_row["pure_component_saturation"]["certified_range_K"]
+    test_temperature_K = math.nextafter(float(valid_range[0]), 0.0)
     na_row["interval_required"] = True
     return {"metals": {"Na": na_row}}, test_temperature_K
 
@@ -339,8 +339,8 @@ def test_b127_uncovered_antoine_segment_predicts_and_flags_not_100_pa() -> None:
 
     vapor_data, test_temperature_K = _b127_uncovered_na_vapor_data()
     production_row = condensation_module._species_vapor_data("Na")
-    production_fit = production_row["pure_component_antoine"]
-    valid_range = tuple(float(value) for value in production_fit["valid_range_K"])
+    production_fit = production_row["pure_component_saturation"]
+    valid_range = tuple(float(value) for value in production_fit["certified_range_K"])
     extrapolation_notices: dict[str, dict[str, Any]] = {}
     extrapolated_psat_pa = condensation_module._antoine_psat_pa(
         "Na",
@@ -426,7 +426,16 @@ def test_b127_uncovered_antoine_segment_predicts_and_flags_not_100_pa() -> None:
         efficiency_outcomes=outcomes,
     )
     assert 0.0 < eta <= 1.0
-    assert outcomes == []
+    # d-019 predicts outside the wall-thermochemistry interval and carries
+    # that extrapolation onto the stage outcome instead of dropping its flag.
+    assert any(
+        outcome.get("species") == "Na"
+        and outcome.get("stage_number") == stage.stage_number
+        and outcome.get("status") == "extrapolated"
+        and outcome.get("authority_level") == "extrapolated"
+        and outcome.get("eta") == pytest.approx(eta)
+        for outcome in outcomes
+    )
     assert any(
         record.get("status") == "extrapolated"
         and tuple(record.get("valid_range_K", ())) == valid_range
@@ -931,6 +940,80 @@ def test_evaporation_resolver_failure_at_900c_is_typed_refusal() -> None:
         exc_info.value.diagnostic["vapour_batch_flux_overlay"]["shadow_outcome"]
         == SHADOW_RESOLUTION_ERROR
     )
+
+
+@pytest.mark.parametrize("headspace_pressure", [0.5, 1.0, 2.0])
+@pytest.mark.parametrize("missing_input", [False, True])
+def test_unclosed_surface_requires_nonpositive_capped_drive_for_empty_flux(
+    headspace_pressure, missing_input,
+) -> None:
+    from simulator.langmuir_surface_oxygen import (
+        LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+    )
+
+    model = SimpleNamespace(
+        melt=SimpleNamespace(temperature_C=950.0), setpoints={},
+        _last_vapor_pressure_diagnostic={
+            "vapor_pressure_numerator_provenance": {},
+        },
+    )
+    batch = _toy_batch({"Fe"}, pressures={"Fe": 1.0})
+
+    def resolve(_equilibrium, **_kwargs):
+        model._last_langmuir_surface_oxygen = {
+            "applied": True,
+            "surface_pO2_bar": None,
+            "refused_species": {"Fe": (
+                "missing pO2 reference" if missing_input else
+                "surface closure refusal"
+            )},
+            "refusal_codes_by_species": (
+                {} if missing_input else {
+                    "Fe": LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+                }
+            ),
+            "overhead_partials_Pa": {"Fe": headspace_pressure},
+            "warning": "surface closure refusal",
+        }
+        return (
+            {},
+            {"batch_channel_states": {"Fe": "eligible"},
+             "selected_runtime_pa_by_species": {"Fe": 1.0}},
+            batch, {},
+            {"vapor_pressure_numerator_provenance": {"Fe": {
+                "pressure_rail": "condensed_raoult_psat", "activity_factor": 1.0,
+                "raw_metal_activity_root": 2.0, "P_reference_Antoine_Pa": 1.0,
+            }}},
+            SimpleNamespace(physical_zero_reason=None),
+        )
+
+    model._resolve_evaporation_batch_flux_state = resolve
+    equilibrium = SimpleNamespace(liquid_fraction=1.0, diagnostics={})
+    if missing_input or headspace_pressure < 1.0:
+        with pytest.raises(EvaporationFluxRefusal) as error:
+            EvaporationMixin._calculate_evaporation(model, equilibrium)
+        assert error.value.reason == "vapour_batch_no_debiting_pressure_outcome"
+        if missing_input:
+            assert "Fe" not in error.value.diagnostic["net_driving_force_by_species"]
+        else:
+            drive = error.value.diagnostic["net_driving_force_by_species"]["Fe"]
+            assert drive["capped_equilibrium_pressure_Pa"] == 1.0
+            assert drive["headspace_partial_pressure_Pa"] == headspace_pressure
+            assert drive["driving_force_Pa"] == 0.5
+    else:
+        flux = EvaporationMixin._calculate_evaporation(model, equilibrium)
+        assert flux.species_kg_hr == {}
+        assert model._last_evaporation_flux_diagnostic["batch_channel_states"] == {
+            "Fe": "zero_by_physics",
+        }
+        assert model._last_evaporation_flux_diagnostic[
+            "net_driving_force_by_species"]["Fe"]["driving_force_Pa"] == (
+                1.0 - headspace_pressure
+            )
+        assert flux.carrier_authority_by_species["Fe"]["pressure"] == {
+            "kind": "zero_by_physics",
+            "evidence_ref": "non_positive_capped_net_driving_force",
+        }
 
 
 def test_evaporation_healthy_empty_batch_at_900c_keeps_cheap_zero() -> None:
@@ -1445,18 +1528,22 @@ def test_runner_goldens_pin_the_al_ti_audit_and_capture_threshold_label() -> Non
 
 
 def test_al_ti_vapour_flux_lands_in_an_account_and_closes_atoms() -> None:
-    """Incidental Al/Ti/AlO/TiO vapour is accounted, not dropped.
+    """Incidental Al/Ti/AlO/TiO atoms are accounted, not dropped.
 
     These species have no designated condenser stage. Injected flux must
     still appear in a real ledger account (overhead, wall, terminal
     offgas, or a colder stage the existing capture law already visits)
-    and the per-element balance must close.
+    and the per-element balance must close. d-402 can re-speciate AlO on a
+    solid wall: the elemental-Al account rises by 0.00980406 kg above the
+    0.05 kg Al-only input, while the combined Al atom inventory stays fixed.
     """
 
     from simulator.condensation_routing import (
         DESIGNATED_STAGE,
         METAL_PHASE_DESTINATIONS,
     )
+    from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+    from simulator.accounting.formulas import resolve_species_formula
     from simulator.config import load_config_bundle
     from simulator.core import PyrolysisSimulator
     from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -1493,6 +1580,19 @@ def test_al_ti_vapour_flux_lands_in_an_account_and_closes_atoms() -> None:
     )
     sim.load_batch("lunar_mare_low_ti", mass_kg=100.0)
     sim.melt.temperature_C = 1600.0
+    sinks = {
+        "process.overhead_gas",
+        "process.condensation_train",
+        "process.condensation_retained_holdup",
+        "process.wall_deposit",
+        "terminal.offgas",
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+        *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+    }
+    before_sink_atoms = {
+        account: sim.atom_ledger.atom_moles_by_account(account)
+        for account in sinks
+    }
     before = sim.atom_ledger.element_atom_drift_report()[
         "whole_run_boundary_residual_mol_atoms"
     ]
@@ -1514,23 +1614,26 @@ def test_al_ti_vapour_flux_lands_in_an_account_and_closes_atoms() -> None:
             apply_evaporative_redox_source_terms=False,
         )
 
-    sinks = {
-        "process.overhead_gas",
-        "process.condensation_train",
-        "process.condensation_retained_holdup",
-        "process.wall_deposit",
-        "terminal.offgas",
-        *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+    after_sink_atoms = {
+        account: sim.atom_ledger.atom_moles_by_account(account)
+        for account in sinks
     }
-    by_account = sim.atom_ledger.account_species_kg()
+    expected_atoms = {"Al": 0.0, "Ti": 0.0}
     for species in species_ids:
-        held = sum(
-            float(species_kg.get(species, 0.0))
-            for account, species_kg in by_account.items()
-            if account in sinks
+        formula = resolve_species_formula(species, sim.species_formula_registry)
+        injected_moles = injected_kg / formula.molar_mass_kg_per_mol()
+        for element in expected_atoms:
+            expected_atoms[element] += (
+                injected_moles * formula.elements.get(element, 0.0)
+            )
+    for element, expected_moles in expected_atoms.items():
+        held_moles = sum(
+            after_sink_atoms[account].get(element, 0.0)
+            - before_sink_atoms[account].get(element, 0.0)
+            for account in sinks
         )
-        assert held == pytest.approx(injected_kg), (species, held)
-        assert held > 0.0
+        assert held_moles == pytest.approx(expected_moles, rel=1e-12, abs=1e-12)
+        assert held_moles > 0.0
     after = sim.atom_ledger.element_atom_drift_report()[
         "whole_run_boundary_residual_mol_atoms"
     ]
@@ -2207,6 +2310,8 @@ def test_b3_production_route_folds_stage_outcomes() -> None:
         gas_temperature_C=1500.0,
         campaign_name="C2A",
     )
+    # This fixture has no K cartridge; zero is pass-through, missing refuses.
+    model.stage_area_m2_by_stage["k_stage4b"] = 0.0
     # Force zero residence on every stage so efficiency mints pass-through.
     model.residence_time_s = {
         int(stage.stage_number): 0.0 for stage in model.train.stages

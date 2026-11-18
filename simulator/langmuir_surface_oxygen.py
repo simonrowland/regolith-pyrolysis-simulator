@@ -199,8 +199,15 @@ from simulator.accounting.formulas import (
 LANGMUIR_SURFACE_PO2_REASON = (
     "langmuir_surface_pO2_from_evaporative_oxygen_balance"
 )
+LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED = (
+    "langmuir_surface_oxygen_balance_not_closed"
+)
 _RESIDUAL_CLOSE_MAX = 1.0e-4
 _METAL_RAILS = frozenset({"gas_fugacity", "condensed_raoult_psat"})
+
+
+class _SurfaceOxygenBalanceNoRoot(ValueError):
+    """A valid oxygen-balance solve has no root in its declared bracket."""
 
 
 @dataclass(frozen=True)
@@ -242,9 +249,11 @@ class LangmuirSurfaceOxygen:
     capacity_negligible: bool = False
     eval_pO2_below_physical_floor: bool = False
     overhead_bounded: bool = False
+    refusal_codes_by_species: Mapping[str, str] = field(default_factory=dict)
     # Species whose published pressure is the IEEE floor, not a computed
     # power. Empty when every published log-pressure was representable.
     pressure_continuations: Mapping[str, str] = field(default_factory=dict)
+    alpha_authority_status_by_species: Mapping[str, str] = field(default_factory=dict)
 
     def as_diagnostic(self) -> dict[str, Any]:
         return {
@@ -254,6 +263,7 @@ class LangmuirSurfaceOxygen:
             "relative_residual": self.relative_residual,
             "warning": self.warning,
             "refused_species": dict(self.refused_species),
+            "refusal_codes_by_species": dict(self.refusal_codes_by_species),
             "persisted_pO2_bar_by_species": dict(
                 self.persisted_pO2_bar_by_species
             ),
@@ -263,6 +273,9 @@ class LangmuirSurfaceOxygen:
             ),
             "overhead_bounded": self.overhead_bounded,
             "pressure_continuations": dict(self.pressure_continuations),
+            "alpha_authority_status_by_species": dict(
+                self.alpha_authority_status_by_species
+            ),
         }
 
 
@@ -854,19 +867,11 @@ def _flux_alpha(
     *,
     allow_unmeasured_alpha_fallback: bool = False,
     unmeasured_alpha_fallback_species_allowlist: set[str] | None = None,
-) -> tuple[float | None, str]:
-    """Publisher alpha for the residual, or None when that publisher will not emit.
+) -> tuple[float | None, str, str]:
+    """Use the publisher's tagged coefficient or flagged alpha=1 ceiling.
 
-    ``publisher_effective_alpha`` is the kernel's order: species row,
-    ``*`` wildcard, else the permitted fallback of 1. A broad-proxy row
-    has already been stripped, so the fallback is what publishes Al2.
-    A zero alpha emits no flux and stays out of the sum. The caller
-    still rewrites that pressure onto the solved surface. An unmeasured
-    species the fallback does not permit returns None. The caller
-    refuses that carrier. The publisher's missing-alpha check is not
-    that refusal: it fires only when the parent mass and the alpha-1
-    baseline are both above their thresholds, and otherwise emits
-    alpha 1 with no fallback flag.
+    A zero coefficient contributes no flux. Invalid coefficients refuse;
+    unmeasured coefficients remain status-bearing predictions (b-1195).
     """
 
     from engines.builtin.evaporation_flux import publisher_effective_alpha
@@ -882,18 +887,13 @@ def _flux_alpha(
             ),
         )
     except (TypeError, ValueError):
-        return None, ""
+        return None, "", ""
+    status = str(decision.evaluation["authority_status"])
     if decision.alpha == 0.0:
-        return 0.0, ""
+        return 0.0, "", status
     if not decision.policy_emits():
-        return None, ""
-    status = ""
-    if isinstance(decision.evaluation, Mapping):
-        status = str(decision.evaluation.get("authority_status") or "")
-    if decision.unmeasured and decision.fallback_permitted:
-        status = status or "unmeasured_alpha_fallback"
-    source = status or "catalog evaporation_alpha"
-    return float(decision.alpha), f"evaporation_flux_alpha:{source}"
+        return None, "", status
+    return float(decision.alpha), f"evaporation_flux_alpha:{status}", status
 
 
 def _parent_oxygen_demand(oxygen_atoms: float, exponent: float) -> float:
@@ -1274,7 +1274,7 @@ def _solve_net_surface_balance(
         root = low
         bracket = "lower"
     elif f_low < 0.0 and f_high < 0.0:
-        raise ValueError(
+        raise _SurfaceOxygenBalanceNoRoot(
             "vacuum oxygen balance has no root in the declared pO2 bracket"
         )
     else:
@@ -1333,12 +1333,9 @@ def _solve_or_refuse(
     registry = _formula_registry(rows)
     from simulator.evaporation import (
         _load_evaporation_alpha_by_species,
-        _measured_alpha_control_view,
     )
 
-    alphas = _measured_alpha_control_view(
-        _load_evaporation_alpha_by_species(dict(legacy_catalog or {}))
-    )
+    alphas = _load_evaporation_alpha_by_species(dict(legacy_catalog or {}))
     from simulator.vacuum_oxygen_balance import (
         _OXYGEN_GAS_ALPHA,
         _OXYGEN_GAS_ALPHA_SOURCE,
@@ -1352,6 +1349,7 @@ def _solve_or_refuse(
     # Measured alpha of 0. Not a residual term (J = 0). Still an n != 0
     # pressure, rewritten onto the solved surface after the root.
     zero_alpha: list[_Carrier] = []
+    alpha_authorities: dict[str, str] = {}
     for carrier in carriers:
         # Transport and n == 0 stay at the published pressure. They are
         # not in this residual. Every other carrier is a term in the
@@ -1372,7 +1370,7 @@ def _solve_or_refuse(
                 "formula unresolved; surface pressure omitted"
             )
             continue
-        alpha, alpha_source = _flux_alpha(
+        alpha, alpha_source, authority_status = _flux_alpha(
             carrier.species,
             alphas,
             temperature_K,
@@ -1382,20 +1380,14 @@ def _solve_or_refuse(
             ),
         )
         if alpha is None:
-            # Not in the sum: there is no emitting coefficient to weight.
-            # Do not keep the persisted pressure. The flux publisher
-            # refuses an unmeasured alpha only when the parent mass is
-            # above 1e-12 kg AND the alpha-1 baseline exceeds the
-            # nontrivial-flux threshold. Below either threshold, and
-            # whenever the viscous-domain diagnostic is unset (vacuum
-            # overhead), it emits that alpha of 1 with no fallback flag.
-            # A subthreshold or dust-parent carrier would then reach
-            # wall-supply accounting at this unclosed pO2.
+            # Invalid coefficient: retaining the persisted pressure would
+            # let the publisher emit an unclosed surface prediction.
             refused[carrier.species] = (
                 "evaporation alpha does not enter the balance; "
                 "surface pressure omitted"
             )
             continue
+        alpha_authorities[carrier.species] = authority_status
         if alpha == 0.0:
             zero_alpha.append(carrier)
             continue
@@ -1507,6 +1499,11 @@ def _solve_or_refuse(
             persisted,
             detail=str(exc),
             extra_refused=refused,
+            refusal_code=(
+                LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED
+                if isinstance(exc, _SurfaceOxygenBalanceNoRoot)
+                else None
+            ),
             capacity_negligible=capacity_negligible,
             eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
         )
@@ -1527,6 +1524,7 @@ def _solve_or_refuse(
                 f"(relative_residual={residual:.3e}, "
                 f"bracket={balance.bracket_boundary})"
             ),
+            refusal_code=LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
             extra_refused=refused,
             capacity_negligible=capacity_negligible,
             eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
@@ -1585,6 +1583,17 @@ def _solve_or_refuse(
         refused=refused,
         detail="open-gate carrier was not on the solved surface",
     )
+    for species in adjusted:
+        if species not in alpha_authorities:
+            _alpha, _source, status = _flux_alpha(
+                species, alphas, temperature_K,
+                allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
+                unmeasured_alpha_fallback_species_allowlist=(
+                    unmeasured_alpha_fallback_species_allowlist
+                ),
+            )
+            if status:
+                alpha_authorities[species] = status
     continuations = {
         species: status
         for species, status in continuations.items()
@@ -1616,6 +1625,10 @@ def _solve_or_refuse(
         eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
         overhead_bounded=overhead_bounded,
         pressure_continuations=dict(continuations),
+        alpha_authority_status_by_species={
+            species: status for species, status in alpha_authorities.items()
+            if species in adjusted
+        },
     )
 
 
@@ -1697,6 +1710,7 @@ def _refuse_unclosed_surface(
     *,
     detail: str,
     extra_refused: Mapping[str, str] | None = None,
+    refusal_code: str | None = None,
     capacity_negligible: bool = False,
     eval_pO2_below_physical_floor: bool = False,
 ) -> LangmuirSurfaceOxygen:
@@ -1730,6 +1744,11 @@ def _refuse_unclosed_surface(
         refused=refused,
         detail=detail,
     )
+    refusal_codes_by_species = {
+        species: refusal_code
+        for species in refused
+        if refusal_code is not None and species not in (extra_refused or {})
+    }
     warning = (
         f"{LANGMUIR_SURFACE_PO2_REASON}: surface_pO2_unavailable "
         f"refused={','.join(sorted(refused)) or 'none'} detail={detail}"
@@ -1744,4 +1763,5 @@ def _refuse_unclosed_surface(
         persisted_pO2_bar_by_species=dict(persisted),
         capacity_negligible=capacity_negligible,
         eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
+        refusal_codes_by_species=refusal_codes_by_species,
     )

@@ -184,8 +184,8 @@ def test_build_falls_back_to_canonical_ladder_when_yaml_missing():
     seq = sim._build_mre_voltage_sequence()
     voltages = [entry["voltage"] for entry in seq]
     assert voltages == pytest.approx(
-        [0.3864186271, 0.8043402178, 1.1188684032, 1.2547313977, 1.4910580719,
-         1.5755209919, 1.7926036985, 1.8573244700, 2.2083160725],
+        [0.3864186271, 0.8043402178, 1.0591353074, 1.2547313977, 1.4910580719,
+         1.5555302033, 1.7926036985, 1.8244315731, 2.2083160725],
         abs=1e-6,
     )
     # Values are derived from the authoritative Ellingham ladder; hold-hour
@@ -416,7 +416,8 @@ def test_nio_voltage_is_grounded_and_ordered_before_feo():
     assert nio_ref is not None
     assert feo_ref is not None
     assert nio_ref.authority == "ellingham_graph"
-    assert nio_ref.authoritative is True
+    assert nio_ref.authoritative is False
+    assert "unresolved_standard_state" in nio_ref.status
     assert feo_ref.authority == "ellingham_graph"
     assert nio_ref.voltage < feo_ref.voltage
 

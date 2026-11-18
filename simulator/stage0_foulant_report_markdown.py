@@ -201,6 +201,18 @@ def format_stage0_foulant_report_markdown(
     for group, label in _GROUP_DISPLAY_ORDER:
         payload = partition_by_group.get(group, {}) or {}
         lines.append(f"- **{label}**: {_partition_line(payload)}")
+        for diagnostic in payload.get("diagnostics", ()):
+            lines.append(
+                f"  - {diagnostic['reaction_family']}: "
+                f"T={_format_value(diagnostic.get('temperature_K'))} K; "
+                f"notices={', '.join(diagnostic.get('notice_flags', ()))}"
+            )
+            for host, source in diagnostic.get("dG_sources", {}).items():
+                lines.append(
+                    f"    - {host}: source={source.get('source')}; "
+                    f"source_band_K={source.get('source_band_K')}; "
+                    f"authority={source.get('authority_level')}"
+                )
     lines.append("")
 
     if hourly_by_group is not None:

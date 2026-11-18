@@ -22,10 +22,13 @@ ROOT = Path(__file__).resolve().parents[1]
 PRODUCTION_ROOTS = ("simulator/", "engines/", "web/", "tools/", "scripts/")
 PRODUCTION_FILES = ("app.py",)
 OPERATOR_DOC = ROOT / "docs" / "configuration.md"
-# t-1747 adds two reviewed sites to the 94-token count after removing two
-# local-alias tokens from scripts/grind_home.py. Removing the YAML cache's
-# per-process root assignment leaves 94 + 2 - 1 = 95.
-ENV_ACCESS_TOKEN_CEILING = 95
+# Union of the b268 and b265 ceilings. After removing two local-alias tokens
+# from scripts/grind_home.py the shared count was 94. t-1747 adds two reviewed
+# sites in scripts/check_named_manifest_mutations.py. b268 removes the YAML
+# cache's per-process root assignment (-1). b265 adds two alphaMELTS
+# continuation reads (ALPHAMELTS_CALC_MODE and subprocess os.environ.copy()).
+# 94 + 2 - 1 + 2 = 97.
+ENV_ACCESS_TOKEN_CEILING = 97
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
 # Internal means a probe, diagnostic, debug switch, or harness control. Keep

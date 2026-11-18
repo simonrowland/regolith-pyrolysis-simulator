@@ -53,6 +53,7 @@ import weakref
 from dataclasses import replace
 from typing import Any, Mapping, Optional
 
+from engines.magemin.domain import MAGEMinDomainGate
 from engines.magemin.parity import MAGEMinParityComparator, ParityReport
 from engines.magemin.result import MAGEMinShadowDiagnostics
 from simulator.chemistry.kernel.capabilities import (
@@ -251,8 +252,34 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         control_audit = self._build_control_audit(request)
 
         composition_mol_by_account = self._composition_from_view(request)
+        composition_wt_pct = self._composition_wt_pct(
+            composition_mol_by_account.get(self.DECLARED_ACCOUNT, {}),
+            request.account_view.species_formula_registry,
+        )
+        # The adapter gates direct equilibrate calls. Dispatch also gates
+        # before availability so a missing binary cannot hide an input
+        # refusal, and a band-miss notice is published with the result.
+        valid, gate_warnings, gate_reason = (
+            MAGEMinDomainGate.validate_with_reason(composition_wt_pct)
+        )
+        if not valid:
+            return IntentResult(
+                intent=request.intent,
+                status='out_of_domain',
+                transition=None,
+                control_audit=control_audit,
+                diagnostic=MAGEMinShadowDiagnostics(
+                    mode='unavailable',
+                    engine_version=self._engine_version(),
+                    backend_status='out_of_domain',
+                    backend_status_reason=gate_reason,
+                    backend_warnings=tuple(gate_warnings),
+                ).as_diagnostic(),
+                warnings=tuple(gate_warnings),
+            )
+
         backend = self._ensure_backend()
-        if backend is None:
+        if backend is None or not self._backend_available(backend):
             return IntentResult(
                 intent=request.intent,
                 status='unavailable',
@@ -288,6 +315,15 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             equilibrium,
             mode=self._mode_label(backend),
             engine_version=self._engine_version(),
+        )
+
+        diagnostics = replace(
+            diagnostics,
+            backend_warnings=tuple(
+                warning
+                for warning in gate_warnings
+                if warning not in diagnostics.backend_warnings
+            ) + diagnostics.backend_warnings,
         )
 
         # Hand the adapter's status to the vocabulary owner unchanged.
@@ -491,6 +527,50 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         self._backend_finalizer = backend_finalizer
         self._backend_initialised = True
         return backend
+
+    def _composition_wt_pct(
+        self,
+        species_mol: Mapping[str, float],
+        species_formula_registry: Mapping[str, Any],
+    ) -> dict:
+        """Project mol -> wt% for the domain gate."""
+        if not species_mol:
+            return {}
+        from simulator.accounting.formulas import resolve_species_formula
+
+        kg_by_species: dict = {}
+        total_kg = 0.0
+        for species, mol in species_mol.items():
+            mol_val = float(mol)
+            if mol_val <= 0.0:
+                continue
+            try:
+                formula = resolve_species_formula(species, species_formula_registry)
+            except Exception:
+                continue
+            mass_kg = mol_val * formula.molar_mass_kg_per_mol()
+            if mass_kg <= 0.0:
+                continue
+            kg_by_species[str(species)] = (
+                kg_by_species.get(str(species), 0.0) + mass_kg
+            )
+            total_kg += mass_kg
+        if total_kg <= 0.0:
+            return {}
+        return {
+            species: kg / total_kg * 100.0
+            for species, kg in kg_by_species.items()
+        }
+
+    @staticmethod
+    def _backend_available(backend: Any) -> bool:
+        is_avail = getattr(backend, 'is_available', None)
+        if callable(is_avail):
+            try:
+                return bool(is_avail())
+            except Exception:
+                return False
+        return False
 
     def _run_backend(
         self,

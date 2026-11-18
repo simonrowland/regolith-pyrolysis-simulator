@@ -1672,7 +1672,9 @@ def vapour_crystalline_sample_liquid_engine_refusal(
         return detail
     compound = reservoir[0]
 
-    from simulator.battery.generators.janaf import janaf_fusion_energy
+    from simulator.reference_data.janaf import (
+        janaf_fusion_energy,
+    )
 
     try:
         janaf_fusion_energy(compound, temperature_K)
@@ -3452,14 +3454,16 @@ def _fusion_energy_when_polymorph_absent(
     notice means the value must stay on the solid number.
     """
 
+    from simulator.reference_data.janaf import (
+        _janaf_fusion_energy_for_pair,
+        janaf_fusion_energy,
+    )
     from simulator.battery.generators.janaf import (
         _JANAF_POLYMORPH_BY_TABLE,
         JANAF_R_J_PER_MOL_K,
         JANAFFusionPolymorphUnavailable,
         _janaf_eligible_pure_crystal_tables,
-        _janaf_fusion_energy_for_pair,
         _janaf_stable_crystal_set,
-        janaf_fusion_energy,
     )
 
     fusion = janaf_fusion_energy(formula, temperature_K)
@@ -3626,9 +3630,11 @@ def _janaf_fusion_energy_for_reference(
 ):
     """Resolve the JANAF pair for the phase named by the source reference."""
 
+    from simulator.reference_data.janaf import (
+        _janaf_fusion_energy_for_pair,
+    )
     from simulator.battery.generators.janaf import (
         _fusion_table_pair,
-        _janaf_fusion_energy_for_pair,
         JANAFFusionPolymorphUnavailable,
     )
 
@@ -3943,7 +3949,7 @@ def _least_squares_line(
 def _janaf_formation_gibbs_J(table_id: str, temperature_K: Decimal) -> Decimal:
     """Formation Gibbs energy in J/mol from the production JANAF interpolator."""
 
-    from simulator.battery.generators.janaf import (
+    from simulator.reference_data.janaf import (
         _fusion_table_points,
         _interpolate_formation_gibbs,
     )
@@ -4748,13 +4754,15 @@ def fusion_comparison_reference(
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
+    from simulator.reference_data.janaf import (
+        _janaf_fusion_energy_for_pair,
+        janaf_fusion_energy,
+    )
     from simulator.battery.generators.janaf import (
         JANAF_R_J_PER_MOL_K,
         JANAFFusionPolymorphUnavailable,
         _janaf_eligible_pure_crystal_tables,
-        _janaf_fusion_energy_for_pair,
         _janaf_stable_crystal_set,
-        janaf_fusion_energy,
     )
 
     # d-338: a printed pure solid that names no polymorph takes the JANAF
@@ -12256,6 +12264,96 @@ def _predict_mass_loss_with_residue(
     )
 
 
+def _predict_static_sodium_saturation(
+    *,
+    engine: Engine,
+    channel: str,
+    identity: Identity,
+    observation: Observation,
+    formula: str,
+    temperature: object,
+    reservoir_phase: str,
+    block: Mapping[str, object],
+) -> EnginePrediction:
+    """Static-equilibrium pure-Na P_sat from the one saturation owner."""
+
+    from engines.builtin.sodium_saturation import (
+        SodiumSaturationError,
+        sodium_saturation_pressure,
+    )
+
+    try:
+        saturation = sodium_saturation_pressure(block, temperature)
+    except SodiumSaturationError as exc:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=(),
+            lineage_complete=False,
+            refusal_reason=RefusalReason.INVALID_IDENTITY,
+            refusal_detail={
+                "reason": "static_equilibrium_pressure_invalid",
+                "detail": str(exc),
+                "formula": formula,
+            },
+            identity=identity,
+        )
+    if saturation.reservoir_phase != reservoir_phase:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=(),
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_MISMATCH,
+            refusal_detail={
+                "reason": "saturation-reservoir-phase-mismatch",
+                "observation_reservoir_basis": f"{formula}({reservoir_phase})",
+                "segment_basis": f"pure_component_saturation({saturation.reservoir_phase})",
+                "formula": formula,
+                "phase": saturation.phase,
+            },
+            identity=identity,
+        )
+    low, high = saturation.certified_range_K
+    authority = Authority.CERTIFIED
+    notices: tuple[Notice, ...] = ()
+    if saturation.authority != "certified":
+        authority = Authority.EXTRAPOLATED
+        notices = (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.P_SAT,),
+                reason=saturation.notice or "pure_component_saturation_extrapolated",
+                origin=observation.observation_id,
+                band=f"[{low:g}, {high:g}] K",
+                authority=Authority.EXTRAPOLATED,
+            ),
+        )
+    sources = expand_coefficient_sources(("ANL/RE-95/2",))
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence=f"{engine.value}:static-pure-pressure:{formula}",
+        ),
+        value=as_decimal(str(saturation.pressure_pa)),
+        unit="Pa",
+        coefficient_basis="pure_component_saturation",
+        authority=authority,
+        notices=notices,
+        coefficient_sources=sources,
+        lineage_complete=lineage_complete_for(sources),
+        certified_band={
+            "temperature_K": (Decimal(str(low)), Decimal(str(high)))
+        },
+        identity=identity,
+        version="builtin-vapor-pressure",
+    )
+
+
 def _predict_named_fe_valence(
     engine: Engine,
     observation: Observation,
@@ -13863,6 +13961,22 @@ def _predict_with_engine(
                 load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
             )
             row = vapor_pressure_data.get("metals", {}).get(formula)
+            from engines.builtin.sodium_saturation import sodium_saturation_block
+
+            saturation_block = (
+                sodium_saturation_block(row) if isinstance(row, Mapping) else None
+            )
+            if saturation_block is not None:
+                return _predict_static_sodium_saturation(
+                    engine=engine,
+                    channel=channel,
+                    identity=identity,
+                    observation=observation,
+                    formula=formula,
+                    temperature=T,
+                    reservoir_phase=reservoir[1],
+                    block=saturation_block,
+                )
             try:
                 coefficients, coefficient_block = wall_condensation_antoine_coefficients(
                     row, float(T)
@@ -18903,7 +19017,7 @@ def load_score_context(
                 **observations,
                 **{
                     observation_id: all_observations[observation_id]
-                    for observation_id in unresolved_reference_ids
+                    for observation_id in sorted(unresolved_reference_ids, key=str)
                     if observation_id in all_observations
                 },
             }

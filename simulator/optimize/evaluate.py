@@ -27,7 +27,6 @@ from simulator.furnace_materials import (
 )
 from simulator.thermal_window import resolve_thermal_preheat_interval
 from simulator.accounting import OverdraftError, resolve_species_formula
-from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
@@ -99,6 +98,11 @@ from simulator.optimize.objective import (
     ObjectiveProfileError,
     ObjectiveVector,
     _campaigns_elapsed,
+    _book_wall_deposits_at_vapour_supply,
+    _coating_authority_status,
+    _coating_lifetime_projection,
+    _wall_supply_booking_fields,
+    UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT,
     _merged_run_for_fidelity,
     admit_executed_objective_weight,
     composition_target_eval_metadata,
@@ -1914,7 +1918,7 @@ def _trace_with_optimizer_coating_report(
         by_species[str(key[1])] = by_species.get(str(key[1]), 0.0) + normalized_kg
     charge_mass_kg = _optimizer_feedstock_charge_mass(run_execution, spec)
     wall_authority = getattr(trace, "wall_deposit_sticking_authority", {}) or {}
-    refusal_sources = [wall_authority]
+    refusal_sources = [_coating_authority_status(raw_deposit, run_execution)]
     if isinstance(wall_authority, MappingABC):
         nested_authority = wall_authority.get("sticking_alpha_authority")
         if isinstance(nested_authority, MappingABC):
@@ -2091,6 +2095,27 @@ def _trace_with_optimizer_coating_report(
             status="warning",
             verdict="non-authoritative",
         )
+    booked = _book_wall_deposits_at_vapour_supply(
+        raw_deposit,
+        refusal_sources[0],
+        run_execution,
+        campaigns_elapsed=campaigns_elapsed,
+    )
+    booking_fields = _wall_supply_booking_fields(booked)
+    if UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT in booking_fields:
+        lifetime = _coating_lifetime_projection(
+            booked["deposit"],
+            campaigns_elapsed=campaigns_elapsed,
+            authority=booked["availability_authority"],
+        )
+        report.update(booking_fields)
+        for key in (
+            "campaigns_to_resinter",
+            "aggregate_campaigns_to_resinter",
+            "campaigns_to_resinter_worst_segment",
+        ):
+            report[key] = lifetime[key]
+        report["campaigns_to_resinter_total"] = lifetime["aggregate_campaigns_to_resinter"]
     return _TraceAttributeOverlay(trace, {"wall_fouling_report": report})
 
 
@@ -4847,6 +4872,19 @@ def _notes_for_executed_campaign_score(
     return existing + (note,)
 
 
+def _with_infeasible_furnace_amortization_status(
+    run_reference: RunReference,
+) -> RunReference:
+    product_summary = dict(run_reference.product_summary)
+    product_summary.update(
+        {
+            "furnace_amortization_status": "not_evaluated_infeasible",
+            "furnace_amortization_cost_per_run_usd": None,
+        }
+    )
+    return replace(run_reference, product_summary=product_summary)
+
+
 def _infeasible_result(
     candidate_id: str | None,
     spec: EvalSpec,
@@ -4881,7 +4919,13 @@ def _infeasible_result(
         objectives=objectives,
         feasibility_margins=feasibility.margins,
         failing_gates=feasibility.failing_gates,
-        run_reference=_run_reference(run_execution, profile, trace_payload=trace_payload),
+        run_reference=_with_infeasible_furnace_amortization_status(
+            _run_reference(
+                run_execution,
+                profile,
+                trace_payload=trace_payload,
+            )
+        ),
         notes=notes,
     )
 
@@ -4923,10 +4967,12 @@ def _target_infeasible_result(
         failure_category=FailureCategory.INFEASIBLE_RECIPE,
         feasibility_margins={gate: margin},
         failing_gates=(gate,),
-        run_reference=_run_reference(
-            run_execution,
-            profile,
-            trace_payload=trace_payload,
+        run_reference=_with_infeasible_furnace_amortization_status(
+            _run_reference(
+                run_execution,
+                profile,
+                trace_payload=trace_payload,
+            )
         ),
         notes=notes,
     )
@@ -5328,10 +5374,12 @@ def _pumping_infeasible_result(
         ),
         feasibility_margins={PUMPING_FEASIBILITY_GATE: margin},
         failing_gates=(PUMPING_FEASIBILITY_GATE,),
-        run_reference=_run_reference(
-            run_execution,
-            profile,
-            trace_payload=trace_payload,
+        run_reference=_with_infeasible_furnace_amortization_status(
+            _run_reference(
+                run_execution,
+                profile,
+                trace_payload=trace_payload,
+            )
         ),
         notes=(margin.detail,),
     )
@@ -5555,19 +5603,21 @@ def _out_of_domain_result(
             )
         },
         failing_gates=("backend_domain",),
-        run_reference=_run_reference(
-            run_execution,
-            profile,
-            trace_payload=_trace_payload_with_backend_status_reason(
+        run_reference=_with_infeasible_furnace_amortization_status(
+            _run_reference(
                 run_execution,
-                assessment.trace_payload,
-            ),
-            # The gate reached this verdict; the stored artifact must say so.
-            # Without it an explicit `ok` carrying a crash point persists as
-            # `ok` -- and then canonicalises to authoritative, certifiable and
-            # a green operator badge for a candidate this very result is
-            # pruning as out of domain.
-            decided_backend_status="out_of_domain",
+                profile,
+                trace_payload=_trace_payload_with_backend_status_reason(
+                    run_execution,
+                    assessment.trace_payload,
+                ),
+                # The gate reached this verdict; the stored artifact must say so.
+                # Without it an explicit `ok` carrying a crash point persists as
+                # `ok` -- and then canonicalises to authoritative, certifiable and
+                # a green operator badge for a candidate this very result is
+                # pruning as out of domain.
+                decided_backend_status="out_of_domain",
+            )
         ),
         notes=(
             *assessment.notes,
@@ -5596,12 +5646,14 @@ def _preflight_out_of_domain_result(
         failure_category=FailureCategory.OUT_OF_DOMAIN,
         feasibility_margins={"backend_domain": _out_of_domain_margin(reason)},
         failing_gates=("backend_domain",),
-        run_reference=RunReference(
-            status="failed",
-            reason=reason,
-            trace=trace,
-            backend_status="out_of_domain",
-            backend_status_reason=reason,
+        run_reference=_with_infeasible_furnace_amortization_status(
+            RunReference(
+                status="failed",
+                reason=reason,
+                trace=trace,
+                backend_status="out_of_domain",
+                backend_status_reason=reason,
+            )
         ),
         notes=(
             "backend_status=out_of_domain",
@@ -6750,7 +6802,6 @@ def _cache_trace_payload(
         compact_alpha_authority = {
             str(species): str(status)
             for species, status in alpha_authority_status_by_species.items()
-            if status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
         }
         if compact_alpha_authority:
             payload["alpha_authority_status_by_species"] = (

@@ -39,6 +39,7 @@ from simulator.vapour_rail.catalog import (
     validate_species_catalog,
 )
 from simulator.vapour_rail.channels import CHANNEL_O2, is_dioxygen_formula
+from simulator.vapour_rail.activity import ActivityVerdictKind, SourceReactionActivity
 from tests.git_history import require_git_history
 
 
@@ -1225,19 +1226,116 @@ def test_t609_feo_nio_exponents_are_stoichiometry_derived() -> None:
     assert catalog.species["FeO_gas"].family_id == "t583_status_feo_gas_family"
 
 
-def test_t609_feo_association_slope_and_1800k_ratio() -> None:
+def test_t609_feo_association_tracks_pure_fe_and_janaf_k() -> None:
+    """FeO(g) at fixed pO2 falls as T falls, on the pure-Fe saturation base.
+
+    The association constant is JANAF Fe-021 minus Fe-008. The pressure
+    base is metals.Fe.pure_component_antoine (a_Fe = 1, C = 0), not the
+    catalog Fe evaluator, which is still the C = 1000 effective fit.
+    """
+    from engines.antoine import _antoine_log10_pressure
+    from engines.builtin.vapor_pressure import (
+        COEFF_BLOCK_PURE_COMPONENT,
+        vapor_pressure_antoine_coefficients,
+    )
+
+    payload = _yaml("vapor_pressures.yaml")
+    catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+    feo = catalog.species["FeO_association_gas"].evaluator
+    assert feo is not None
+    fe_row = payload["families"]["metals_fe_family"]["physical_properties"][
+        "species"
+    ]["Fe"]
+    base = payload["families"]["oxide_vapors_feo_association_family"][
+        "physical_properties"
+    ]["species"]["FeO_association_gas"]["pressure_models"][0][
+        "base_reference_pressure_model"
+    ]["coefficients"]
+    pure = fe_row["pure_component_antoine"]
+    assert base["A"] == pytest.approx(pure["A"])
+    assert base["B"] == pytest.approx(pure["B"])
+    assert base["C"] == pytest.approx(pure["C"])
+    assert float(base["C"]) == pytest.approx(0.0, abs=1.0e-12)
+    assert float(base["A"]) != pytest.approx(9.408547)
+
+    antoine, block = vapor_pressure_antoine_coefficients(fe_row, 1800.0)
+    assert block == COEFF_BLOCK_PURE_COMPONENT
+    p_pure = 10.0 ** _antoine_log10_pressure(
+        float(antoine["A"]),
+        float(antoine["B"]),
+        float(antoine["C"]),
+        1800.0,
+    )
+    _assert_feo_association_matches_janaf_and_oxygen_power(feo, p_pure)
+
+    # 1500 K, pO2 = 1.5e-3 bar. Fe-021 log10 Kf = -3.492 and Fe-007
+    # log10 Kf = 0, so p_FeO = P° * Kf * (pO2/P°)^0.5 = 1.248 Pa.
+    # The liquid Antoine construction support starts at 1809 K, so this
+    # point lies above that solid-Fe value and below the activity-folded
+    # effective-curve answer (~99 Pa).
+    p_janaf = 1.0e5 * (10.0 ** -3.492) * math.sqrt(1.5e-3)
+    p_model = feo.evaluate(1500.0, pO2_bar=1.5e-3).pressure_pa
+    assert p_janaf < p_model < 10.0 * p_janaf
+
+    temperatures = (
+        348.15,
+        498.15,
+        748.15,
+        998.15,
+        1248.15,
+        1400.0,
+        1498.15,
+        1700.0,
+        1900.0,
+    )
+    evaluations = [
+        feo.evaluate(temperature, pO2_bar=1.5e-3) for temperature in temperatures
+    ]
+    pressures = [evaluation.pressure_pa for evaluation in evaluations]
+    assert pressures == sorted(pressures)
+    assert [evaluation.out_of_range for evaluation in evaluations] == [
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        False,
+    ]
+
+
+def test_physical_composite_ood_does_not_rise_as_temperature_falls() -> None:
+    """Every composite continuation falls as T falls at fixed activity and pO2.
+
+    FeO_association_gas was the row whose C = 1000 base inverted this sign.
+    The other composite bases are C ≤ 0 and already fell.
+    """
     catalog = compile_vapour_rail_catalog(
         _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
     )
-    fe = catalog.species["Fe"].evaluator
-    feo = catalog.species["FeO_association_gas"].evaluator
-    assert fe is not None and feo is not None
-
-    p_fe = fe.evaluate(1800.0).pressure_pa
-    p_feo_1bar = feo.evaluate(1800.0, pO2_bar=1.0).pressure_pa
-    p_feo_001bar = feo.evaluate(1800.0, pO2_bar=0.01).pressure_pa
-    assert p_feo_1bar / p_fe == pytest.approx(217.3144, rel=2.0e-5)
-    assert p_feo_1bar / p_feo_001bar == pytest.approx(10.0, rel=1.0e-12)
+    rising: list[str] = []
+    for species_id, compiled in catalog.species.items():
+        evaluator = compiled.evaluator
+        if evaluator is None or not evaluator.reference_model.physical_composite_ood:
+            continue
+        low, _high = evaluator.valid_temperature_K
+        kwargs: dict[str, float] = {}
+        if evaluator.activity_exponent:
+            kwargs["source_activity"] = 1.0
+        if evaluator.pO2_exponent or evaluator.o2_channel_term is not None:
+            kwargs["pO2_bar"] = 1.5e-3
+        cool = evaluator.evaluate(low - 80.0, **kwargs)
+        edge = evaluator.evaluate(low, **kwargs)
+        assert cool.out_of_range is True
+        assert edge.out_of_range is False
+        if cool.pressure_pa > edge.pressure_pa * 1.01:
+            rising.append(
+                f"{species_id}: P({low - 80.0:.1f} K)={cool.pressure_pa:.3e} "
+                f"> P({low:.1f} K)={edge.pressure_pa:.3e}"
+            )
+    assert not rising, "composite pressure rose as T fell:\n" + "\n".join(rising)
 
 
 def test_t609_positive_reaction_scaling_leaves_feo_exponent_unchanged() -> None:
@@ -2290,9 +2388,15 @@ def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:
                 "physical_properties"
             ]["species"][species_id]["pressure_models"][0]
             embedded = association_model["base_reference_pressure_model"]
-            assert embedded["coefficients"]["A"] == pytest.approx(9.408547)
-            assert embedded["coefficients"]["B"] == pytest.approx(23312.312336)
-            assert embedded["coefficients"]["C"] == pytest.approx(1000.0)
+            pure = payload["families"]["metals_fe_family"]["physical_properties"][
+                "species"
+            ]["Fe"]["pure_component_antoine"]
+            # The association executes the pure-Fe sidecar, not the C=1000
+            # catalog fit. The catalog fit stays the Fe species' own law.
+            assert embedded["coefficients"]["A"] == pytest.approx(pure["A"])
+            assert embedded["coefficients"]["B"] == pytest.approx(pure["B"])
+            assert embedded["coefficients"]["C"] == pytest.approx(pure["C"])
+            assert float(embedded["coefficients"]["A"]) != pytest.approx(9.408547)
             # The closure calls log10_pressure() and does not apply a base
             # oxygen multiplier. Live admission is the identity multiplier only.
             base_model = payload["families"]["metals_fe_family"][
@@ -2309,16 +2413,28 @@ def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:
                 base_model["provenance"][0]["source_id"]
                 == "pseudo_psat_backsolved_from_vaporock"
             )
-            for pO2_bar, expected_pa in _CITED_FEO_ASSOCIATION_PRESSURE_PA.items():
-                evaluation = evaluator.evaluate(1800.0, pO2_bar=pO2_bar)
-                assert evaluation.pressure_pa == pytest.approx(
-                    expected_pa, rel=1e-12, abs=0.0
-                )
-                _assert_fe_pseudo_law_disclosure(
-                    getattr(evaluation, "diagnostic_admission_notice", None)
-                )
-            _assert_fe_pseudo_law_disclosure(
-                getattr(evaluator, "diagnostic_admission_notice", None)
+            assert getattr(evaluator, "diagnostic_admission_notice", None) is None
+            from engines.antoine import _antoine_log10_pressure
+            from engines.builtin.vapor_pressure import (
+                COEFF_BLOCK_PURE_COMPONENT,
+                vapor_pressure_antoine_coefficients,
+            )
+
+            antoine, block = vapor_pressure_antoine_coefficients(
+                payload["families"]["metals_fe_family"]["physical_properties"][
+                    "species"
+                ]["Fe"],
+                1800.0,
+            )
+            assert block == COEFF_BLOCK_PURE_COMPONENT
+            p_pure = 10.0 ** _antoine_log10_pressure(
+                float(antoine["A"]),
+                float(antoine["B"]),
+                float(antoine["C"]),
+                1800.0,
+            )
+            _assert_feo_association_matches_janaf_and_oxygen_power(
+                evaluator, p_pure
             )
             continue
         row = payload["families"][compiled.family_id]["physical_properties"][
@@ -2413,7 +2529,10 @@ def test_diagnostic_admission_reaches_every_public_carrier() -> None:
                 species_id
             )
     assert "Fe" in noticed
-    assert "FeO_association_gas" in oxide_noticed
+    # The association executes the pure-Fe sidecar, so the folded-fit
+    # diagnostic notice stays on Fe and does not ride this oxide carrier.
+    assert "FeO_association_gas" not in noticed
+    assert "FeO_association_gas" not in oxide_noticed
     assert parents
 
     batch = catalog.resolve_batch(
@@ -2480,6 +2599,8 @@ def test_diagnostic_admission_reaches_every_public_carrier() -> None:
     provenance_by_species = provider_result.diagnostic[
         "vapor_pressure_numerator_provenance"
     ]
+    feo_provenance = provenance_by_species.get("FeO_association_gas") or {}
+    assert not feo_provenance.get("diagnostic_admission_notice")
     for species_id in oxide_noticed:
         evaluator = catalog.species[species_id].evaluator
         assert evaluator is not None
@@ -2674,11 +2795,25 @@ def _published_diagnostic_notice(surface: str) -> dict:
     if surface == "oxide_provenance":
         from simulator.vapour_rail.instrumentation import public_carrier_notices
 
-        # Live FeO association at 1600 C (1873.15 K), inside 1400-1900 K.
+        # The live association base is the pure-Fe sidecar and carries no
+        # folded-fit notice. This surface still has to copy a diagnostic
+        # admission, so the payload below points the association at the
+        # catalog Fe coefficients, which is the law that notice describes.
         # pO2 1e-9 bar is not the dissociation floor and the oxygen
-        # exponent is positive, so the evaluation's only notice is the
-        # diagnostic admission. Provider dispatch must copy it.
-        provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
+        # exponent is positive, so that evaluation's only notice is the
+        # diagnostic admission.
+        payload = deepcopy(_yaml("vapor_pressures.yaml"))
+        fe_coefficients = payload["families"]["metals_fe_family"][
+            "physical_properties"
+        ]["species"]["Fe"]["pressure_models"][0]["coefficients"]
+        embedded = payload["families"]["oxide_vapors_feo_association_family"][
+            "physical_properties"
+        ]["species"]["FeO_association_gas"]["pressure_models"][0][
+            "base_reference_pressure_model"
+        ]["coefficients"]
+        embedded.clear()
+        embedded.update(deepcopy(fe_coefficients))
+        provider = BuiltinVaporPressureProvider(payload)
         catalog = provider._vapour_rail_catalog
         assert catalog is not None
         evaluator = catalog.species["FeO_association_gas"].evaluator
@@ -3074,19 +3209,45 @@ def test_malformed_provenance_entry_refuses_compile(
 # temperature only: omitted exponent is 0, omitted reference is 1 bar, and
 # exponent 0 stores no channel. This is not read from the compiler.
 _ASSOCIATION_EXECUTED_BASE_OXYGEN = (0.0, 1.0, None)
-# FeO_association_gas at 1800 K when that identity law is the base.
-# data/vapor_pressures.yaml: Fe(g) + 0.5 O2(g) -> FeO(g), so the outer
-# exponent is +0.5. Off the 1 bar reference the closure already baked in:
-#   P(pO2) = P(1 bar) * (pO2 / 1 bar) ** 0.5
-#   P(1e-9 bar) = 2629.115392552568 * 10 ** (-4.5) = 0.08313992871873806
-#   P(0.01 bar) = 2629.115392552568 * 10 ** (-1) = 262.91153925525686
-# P(1 bar) is the landed CEA composition of the cited Fe curve
-# (12.098211309846041 Pa). These expectations are not recomputed from A, B, C.
-_CITED_FEO_ASSOCIATION_PRESSURE_PA = {
-    1.0: 2629.115392552568,
-    1.0e-9: 0.08313992871873806,
-    0.01: 262.91153925525686,
-}
+# NIST-JANAF 4th, 1800 K, delta-f G as published. Fe-021 is FeO(g),
+# Fe-008 is Fe(g). O2 is the element reference, so
+# K = exp(-(ΔfG(FeO,g) - ΔfG(Fe,g)) / RT).
+# The outer association is Fe(g) + 0.5 O2(g) -> FeO(g), so
+# P(pO2) = K * p_pure(Fe) * (pO2 / 1 bar) ** 0.5.
+# p_pure comes from the production pure-component selector, not from
+# re-evaluating the catalog Antoine. 1e-9 ** 0.5 = 10**(-4.5);
+# 0.01 ** 0.5 = 10**(-1).
+_JANAF_1800K_FEO_G_KJ_MOL = 75.293
+_JANAF_1800K_FE_G_KJ_MOL = 155.837
+_GAS_CONSTANT_J_PER_MOL_K = 8.314462618
+
+
+def _janaf_feo_k_1800() -> float:
+    return math.exp(
+        -(
+            (_JANAF_1800K_FEO_G_KJ_MOL - _JANAF_1800K_FE_G_KJ_MOL) * 1000.0
+        )
+        / (_GAS_CONSTANT_J_PER_MOL_K * 1800.0)
+    )
+
+
+def _assert_feo_association_matches_janaf_and_oxygen_power(
+    evaluator: object, p_pure_1800_pa: float
+) -> None:
+    """Association pressure is JANAF K times pure-Fe saturation, times pO2^0.5."""
+
+    evaluate = getattr(evaluator, "evaluate")
+    p_1bar = evaluate(1800.0, pO2_bar=1.0).pressure_pa
+    assert p_1bar / p_pure_1800_pa == pytest.approx(_janaf_feo_k_1800(), rel=1.0e-3)
+    assert getattr(evaluate(1800.0, pO2_bar=1.0), "diagnostic_admission_notice", None) is None
+    for pO2_bar, log10_scale in ((1.0e-9, -4.5), (0.01, -1.0)):
+        got = evaluate(1800.0, pO2_bar=pO2_bar).pressure_pa
+        assert got / p_1bar == pytest.approx(10.0 ** log10_scale, rel=1.0e-12, abs=0.0)
+        assert getattr(
+            evaluate(1800.0, pO2_bar=pO2_bar),
+            "diagnostic_admission_notice",
+            None,
+        ) is None
 _CITATION_CASES = (
     ("singular", {"observation_id": "fit-grid"}, True),
     ("singular-blank", {"observation_id": ""}, False),
@@ -3365,20 +3526,24 @@ def _assert_cited_executed_law(case: dict) -> None:
         assert fe_evaluator is not None
         assert getattr(fe_evaluator, "diagnostic_admission_notice", None) is None
     else:
-        _assert_fe_pseudo_law_disclosure(
-            getattr(evaluator, "diagnostic_admission_notice", None)
-        )
-    for pO2_bar, expected_pa in _CITED_FEO_ASSOCIATION_PRESSURE_PA.items():
-        evaluation = evaluator.evaluate(1800.0, pO2_bar=pO2_bar)
-        assert evaluation.pressure_pa == pytest.approx(
-            expected_pa, rel=1e-12, abs=0.0
-        )
-        if case["kind"] == "association-citation":
-            assert getattr(evaluation, "diagnostic_admission_notice", None) is None
-        else:
-            _assert_fe_pseudo_law_disclosure(
-                getattr(evaluation, "diagnostic_admission_notice", None)
-            )
+        # Live captured coefficients are the pure-Fe sidecar, so this
+        # admission does not carry the catalog Fe diagnostic notice.
+        assert getattr(evaluator, "diagnostic_admission_notice", None) is None
+    from engines.antoine import _antoine_log10_pressure
+    from engines.builtin.vapor_pressure import (
+        COEFF_BLOCK_PURE_COMPONENT,
+        vapor_pressure_antoine_coefficients,
+    )
+
+    antoine, block = vapor_pressure_antoine_coefficients(fe_row, 1800.0)
+    assert block == COEFF_BLOCK_PURE_COMPONENT
+    p_pure = 10.0 ** _antoine_log10_pressure(
+        float(antoine["A"]),
+        float(antoine["B"]),
+        float(antoine["C"]),
+        1800.0,
+    )
+    _assert_feo_association_matches_janaf_and_oxygen_power(evaluator, p_pure)
 
 
 @pytest.mark.parametrize(
@@ -4424,3 +4589,124 @@ def test_validated_row_rejects_junk_anchor_refs(anchor_refs) -> None:
         match=r"validation\.anchor_refs",
     ):
         compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+
+
+@pytest.mark.parametrize(('species_id', 'temperature_K'), [
+    ('CrO', 199.), ('SiO2_gas', 199.), ('MnO_gas', 900.),
+])
+def test_composite_constituent_domain_uses_flagged_continuation(species_id, temperature_K):
+    catalog = compile_vapour_rail_catalog(yaml.safe_load((DATA_DIR / 'vapor_pressures.yaml').read_text()))
+    evaluator = catalog.species[species_id].evaluator
+    result = evaluator.evaluate(temperature_K, source_activity=1., pO2_bar=1.)
+    assert result.pressure_pa > 0.
+    assert result.out_of_range
+    notice = result.extrapolation_notice
+    assert 'outside domain' in notice['reason']
+    assert notice['authority_level'] == 'extrapolated'
+    assert notice['certified_band']['temperature_K'] == evaluator.valid_temperature_K
+
+
+@pytest.mark.parametrize("species_id,expected_hex", [
+    ("CrO", "0x1.779fd6a9b87c6p-15"),
+    ("SiO2_gas", "0x1.df74e85d7b664p-10"),
+    ("MnO_gas", "0x1.1b126f54b6035p-10"),
+])
+def test_composite_direct_pressure_refactor_pin(species_id, expected_hex):
+    # Executable 3d11c8fc6 output; refactor identity, not a physical anchor.
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    result = catalog.species[species_id].evaluator.evaluate(
+        1800.0, source_activity=1.0, pO2_bar=1.0,
+    )
+    assert result.pressure_pa.hex() == expected_hex
+
+
+@pytest.mark.parametrize("species_id,boundary_K", [
+    ("CrO", 300.0), ("CrO", 20000.0),
+    ("SiO2_gas", 300.0), ("SiO2_gas", 6000.0),
+    ("MnO_gas", 1000.0), ("MnO_gas", 3000.0),
+])
+def test_composite_constituent_boundary_is_continuous(species_id, boundary_K):
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    evaluator = catalog.species[species_id].evaluator
+    below, above = (
+        evaluator.evaluate(t, source_activity=1.0, pO2_bar=1.0).pressure_pa
+        for t in (boundary_K - 1e-5, boundary_K + 1e-5)
+    )
+    # A coverage boundary is not a phase change: compare the two public
+    # values independently of the continuation helper or its chosen slope.
+    assert below > 0.0 and above > 0.0
+    assert math.log10(below) == pytest.approx(math.log10(above), abs=1e-4, rel=0)
+
+
+@pytest.mark.parametrize("species_id,temperature_K", [
+    ("CrO", 500.0), ("CrO", 5000.0),
+    ("SiO2_gas", 500.0), ("SiO2_gas", 5000.0),
+    ("MnO_gas", 1100.0), ("MnO_gas", 2900.0),
+])
+def test_composite_keeps_direct_values_within_constituent_support(
+    species_id, temperature_K,
+):
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    evaluator = catalog.species[species_id].evaluator
+    result = evaluator.evaluate(temperature_K, source_activity=1.0, pO2_bar=1.0)
+    assert math.log10(result.pressure_pa) == pytest.approx(
+        evaluator.reference_model.log10_pressure(temperature_K)
+    )
+
+
+@pytest.mark.parametrize("species_id,temperature_K", [
+    ("CrO", 199.0), ("CrO", 20001.0),
+    ("SiO2_gas", 199.0), ("SiO2_gas", 6001.0),
+    ("MnO_gas", 900.0), ("MnO_gas", 3001.0),
+])
+def test_composite_constituent_continuation_reaches_typed_shadow(
+    species_id, temperature_K,
+):
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    species = catalog.species[species_id]
+    declaration = species.source_reaction_activity
+    activity = SourceReactionActivity(
+        component_id=declaration.component_id,
+        value=1.0,
+        ln_value=0.0,
+        ln_band=(-0.2, 0.2),
+        verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+        bound_direction=None,
+        reason="explicit_test_activity",
+        standard_state=declaration.standard_state,
+        phase_assemblage_ref="test:liquid_melt",
+        chemical_potential_ref="test:mu",
+        state_fingerprint="state:test",
+        solve_group_id=None,
+        provider="test",
+    )
+    evaluator = species.evaluator
+    scalar = evaluator.evaluate(temperature_K, source_activity=1.0, pO2_bar=1.0)
+    shadow = evaluator.evaluate_typed_shadow(
+        temperature_K,
+        activity=activity,
+        pO2_bar=1.0,
+        expected_component_id=declaration.component_id,
+        expected_standard_state=declaration.standard_state,
+        expected_state_fingerprint="state:test",
+    )
+    assert shadow["status"] == "shadow_only_no_behavior_authority"
+    assert shadow["out_of_range"]
+    assert shadow["extrapolation_notice"] == scalar.extrapolation_notice
+    minimum_positive_pa = math.nextafter(0.0, math.inf)
+    if scalar.pressure_pa == minimum_positive_pa:
+        # The scalar projection floors at IEEE-754's minimum; ln space
+        # retains the finite estimate below that numerical endpoint.
+        assert math.isfinite(shadow["ln_pressure_Pa"])
+        assert shadow["ln_pressure_Pa"] < math.log(minimum_positive_pa)
+    else:
+        assert shadow["ln_pressure_Pa"] == pytest.approx(math.log(scalar.pressure_pa))
+    assert shadow["ln_pressure_band_offsets"] == pytest.approx(
+        (-0.2 * evaluator.activity_exponent, 0.2 * evaluator.activity_exponent)
+    )
+
+
+def test_composite_continuation_still_refuses_missing_activity():
+    catalog = compile_vapour_rail_catalog(yaml.safe_load((DATA_DIR / 'vapor_pressures.yaml').read_text()))
+    with pytest.raises(CatalogCompileError, match='explicit source_activity'):
+        catalog.species['CrO'].evaluator.evaluate(199., pO2_bar=1.)

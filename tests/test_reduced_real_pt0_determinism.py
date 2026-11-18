@@ -1274,23 +1274,20 @@ def test_magemin_freeze_gate_memo_key_preserves_domain_boundary_identity() -> No
     # at that precision while sharing the quantized cache composition key.
     outside, outside_reason, outside_composition = key_for(29.999)
 
-    from simulator.melt_backend.magemin import MAGEMinBackend
+    from engines.magemin.domain import MAGEMinDomainGate
 
-    live_gate = MAGEMinBackend().equilibrate(
-        1500.0,
-        composition_kg=outside_composition,
-        fO2_log=-9.0,
-        pressure_bar=1.0,
-        species_formula_registry=sim.species_formula_registry,
+    # 29.999 wt% SiO2 is below the certified band but still a silicate.
+    # The gate predicts it and does not refuse, so the quantized cache key
+    # is shared with the 30 wt% cell and neither side carries a domain reason.
+    valid, warnings, reason = MAGEMinDomainGate.validate_with_reason(
+        outside_composition
     )
-
     assert inside.composition_mol_fractions == outside.composition_mol_fractions
     assert inside_reason is None
-    assert outside_reason == "silicate_window"
-    assert live_gate.status == "out_of_domain"
-    assert (
-        live_gate.diagnostics["backend_status_reason"] == outside_reason
-    )
+    assert outside_reason is None
+    assert valid is True
+    assert reason is None
+    assert any("authority=extrapolated" in warning for warning in warnings)
     assert inside == outside
 
 

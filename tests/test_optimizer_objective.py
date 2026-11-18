@@ -59,6 +59,7 @@ from simulator.optimize.physics import (
     _optimizer_refused_flux_bounds,
 )
 from simulator.optimize.objective import (
+    _captured_products_mol,
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     FURNACE_AMORTIZATION_STATUS_UNGROUNDED,
@@ -934,7 +935,9 @@ def test_multisegment_lifespan_and_economics_normalize_cumulative_campaign_load(
         ("hot_duct", "SiO"): 8.0,
         ("cold_duct", "Na"): 0.8,
     }
-    sim = SimpleNamespace()
+    sim = SimpleNamespace(
+        energy_cumulative_breakdown_kWh={"electrical": 0.0, "evaporation_thermal": 0.0},
+    )
     run_execution = SimpleNamespace(
         simulator=sim,
         campaigns_elapsed=4.0,
@@ -980,6 +983,14 @@ def test_multisegment_lifespan_and_economics_normalize_cumulative_campaign_load(
     assert depreciation["depreciation_expense_per_run_usd"].hex() == (
         "0x1.6000000000001p+4"
     )
+    # Baseline before consolidating lifetime consumers: no bound, 8 / 4 =
+    # 2 kg/campaign on the worst wall, versus 8.8 / 4 = 2.2 kg/campaign total.
+    lifetime = objective_module._coating_lifetime_projection(deposits, campaigns_elapsed=4.0)
+    assert lifetime["campaigns_to_resinter_worst_segment"].hex() == "0x1.4000000000000p+2"
+    marginal = objective_module._marginal_extraction_cost_summary(
+        sim, {}, run_execution=run_execution, cost_parameters=cost_parameters,
+    )
+    assert marginal["marginal_cost_usd"].hex() == "0x1.6000000000001p+4"
 
 
 def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() -> None:
@@ -1384,7 +1395,7 @@ def test_refused_wall_evidence_is_unavailable_not_zero_cost() -> None:
         )
 
 
-def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> None:
+def test_refused_empty_wall_deposit_is_unpriced_and_ranks_on_physical_objectives() -> None:
     run_execution = _refused_empty_wall_deposit_execution()
     reference = _run_reference(
         run_execution,
@@ -1398,14 +1409,14 @@ def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> 
     assert summary["campaigns_to_resinter_worst_segment"] is None
     assert summary["has_positive_qualified_fouling"] is None
     assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
-    assert "furnace_amortization_cost_per_run_usd" not in summary
+    assert "furnace_amortization_cost_per_run_usd" in summary
+    assert summary["furnace_amortization_cost_per_run_usd"] is None
     assert summary["furnace_amortization_batch_cost_equivalents"] is None
-    with pytest.raises(ObjectiveComputationError, match="batch_cost_unavailable"):
-        cost_adjusted_objective_scores(
-            {"oxygen_kg": 10.0, "energy_kWh": 1.0},
-            DEFINITIONS,
-            product_summary=summary,
-        )
+    assert cost_adjusted_objective_scores(
+        {"oxygen_kg": 10.0, "energy_kWh": 1.0},
+        DEFINITIONS,
+        product_summary=summary,
+    ) == (10.0, -1.0)
 
     # StudyRecord.search_provenance is a dataclass field. __post_init__ always
     # materializes it, and _to_record always sets it. _rank_key reads that
@@ -1424,14 +1435,67 @@ def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> 
         product_summary=_available_furnace_summary(0.0),
         search_provenance={},
     )
-    assert study._record_objective_scores(refused_record, DEFINITIONS) == (
-        None,
-        None,
+    comparison = study._record_cost_comparison((refused_record, clean_record))
+    assert comparison["flag"] == "furnace cost excluded: 1 of 2 unpriced"
+    assert comparison["candidates"]["refused"]["unpriced_reason"] == (
+        summary["lifespan_cost_status"]
     )
-    assert study._rank_key(refused_record, DEFINITIONS) > study._rank_key(
-        clean_record,
-        DEFINITIONS,
+    assert comparison["candidates"]["refused"]["applied"] is False
+    assert study._record_objective_scores(
+        refused_record, DEFINITIONS, comparison=comparison,
+    ) == (10.0, -1.0)
+    assert study._rank_records(
+        (clean_record, refused_record), DEFINITIONS, comparison=comparison,
+    ) == (refused_record, clean_record)
+
+
+@pytest.mark.parametrize(
+    "metric",
+    ("furnace_lifespan_consumed_fraction", "throughput_cost_owner_ratify_usd"),
+)
+def test_refused_empty_wall_deposit_cannot_rank_a_requested_lifespan_cost(metric) -> None:
+    execution = _refused_empty_wall_deposit_execution()
+    sim = execution.simulator
+    sim.energy_cumulative_breakdown_kWh = {
+        "electrical": 0.0,
+        "evaporation_thermal": 0.0,
+    }
+    costs = _furnace_test_cost_parameters()
+    reference = _run_reference(
+        execution,
+        {},
+        cost_parameters=costs,
     )
+    value = _metric_value(
+        metric,
+        sim,
+        objective_module._product_ledger(sim),
+        {},
+        run_execution=execution,
+        cost_parameters=costs,
+    )
+    assert value is None
+    definitions = (ObjectiveDefinition(metric, "minimize"),)
+    summary = reference.product_summary
+    record = SimpleNamespace(
+        candidate_id="refused",
+        objectives={metric: value},
+        product_summary=summary,
+    )
+    comparison = study._record_cost_comparison((record,))
+
+    assert comparison["flag"] == "furnace cost excluded: 1 of 1 unpriced"
+    assert cost_adjusted_objective_scores(
+        record.objectives,
+        definitions,
+        product_summary=summary,
+        comparison=comparison,
+    ) == (None,)
+    assert study._record_objective_scores(
+        record,
+        definitions,
+        comparison=comparison,
+    ) == (None,)
 
 
 def test_nonnegligible_refused_wall_species_uses_supply_bound_and_stays_ranked(
@@ -8516,17 +8580,98 @@ def _furnace_summary(status: str) -> dict[str, object]:
 def _call_ranker(
     ranker: str,
     scored: SimpleNamespace,
+    comparison=None,
 ) -> tuple[float, ...] | tuple[None, ...] | None:
     if ranker == "study":
-        return study._record_objective_scores(scored, DEFINITIONS)
+        return study._record_objective_scores(scored, DEFINITIONS, comparison=comparison)
     if ranker == "bayesian":
         return bayesian_strategy._objective_values_for_definitions(
             scored,
             DEFINITIONS,
+            comparison=comparison,
         )
     if ranker == "staged":
-        return staged_strategy._scored_objective_scores(scored, DEFINITIONS)
+        return staged_strategy._scored_objective_scores(scored, DEFINITIONS, comparison=comparison)
     raise AssertionError(ranker)
+
+
+@pytest.mark.parametrize("ranker", _RANKER_NAMES)
+@pytest.mark.parametrize("unpriced", (False, True))
+def test_furnace_homogeneous_population_numeric_pin(ranker, unpriced):
+    """Pre-d-429 pins: identical physical points, penalties one and three."""
+    summaries = [
+        {
+            "furnace_amortization_status": "batch_cost_unavailable" if unpriced else "available",
+            "furnace_amortization_batch_cost_equivalents": None if unpriced else penalty,
+            "lifespan_cost_status": "wall_deposit_unavailable" if unpriced else "available",
+        }
+        for penalty in (1.0, 3.0)
+    ]
+    comparison = objective_module.furnace_cost_comparison(dict(zip(("A", "B"), summaries)))
+    scores = [_call_ranker(ranker, _ranker_scored(True, summary), comparison) for summary in summaries]
+    # Exact binary values from the shipped transform: 10/2, 10/4;
+    # minimize energy 1 costs 2 and 4. Unpriced points retain 10 and 1.
+    expected = [(10.0, -1.0), (10.0, -1.0)] if unpriced else [(5.0, -2.0), (2.5, -4.0)]
+    if ranker == "bayesian":
+        expected = [(oxygen, -energy) for oxygen, energy in expected]
+    assert scores == expected
+    native = [(row[0], -row[1] if ranker == "bayesian" else row[1]) for row in scores]
+    assert sorted(range(2), key=lambda index: tuple(-v for v in native[index])) == [0, 1]
+    assert comparison["flag"] == ("furnace cost excluded: 2 of 2 unpriced" if unpriced else None)
+
+
+@pytest.mark.parametrize("ranker", _RANKER_NAMES)
+@pytest.mark.parametrize("unpriced_oxygen", (10.0, 9.0))
+@pytest.mark.parametrize("reason", ("wall_deposit_unavailable", "threshold_unavailable"))
+def test_furnace_mixed_population_uses_raw_scores_and_reports_penalty(ranker, unpriced_oxygen, reason):
+    priced_summary = _furnace_summary("available")
+    unpriced_summary = {
+        "furnace_amortization_status": "batch_cost_unavailable",
+        "lifespan_cost_status": reason,
+        "furnace_amortization_batch_cost_equivalents": None,
+    }
+    comparison = objective_module.furnace_cost_comparison({"A": priced_summary, "B": unpriced_summary})
+    priced = _ranker_scored(True, priced_summary)
+    unpriced = _ranker_scored(True, unpriced_summary)
+    unpriced.objectives = SimpleNamespace(as_mapping=lambda: {"oxygen_kg": unpriced_oxygen, "energy_kWh": 1.0})
+    a = _call_ranker(ranker, priced, comparison)
+    b = _call_ranker(ranker, unpriced, comparison)
+    assert a == ((10.0, 1.0) if ranker == "bayesian" else (10.0, -1.0))
+    assert a[0] >= b[0]
+    assert (a == b) == (unpriced_oxygen == 10.0)
+    assert comparison["flag"] == "furnace cost excluded: 1 of 2 unpriced"
+    assert comparison["candidates"]["B"]["unpriced_reason"] == reason
+    assert comparison["candidates"]["A"] == {"unpriced_reason": None, "penalty": 1.0, "applied": False}
+    # Exclusion belongs to this set, not to the candidate or a global latch.
+    priced_only = objective_module.furnace_cost_comparison({"A": priced_summary})
+    assert _call_ranker(ranker, priced, priced_only)[0] == 5.0
+    assert priced_only["candidates"]["A"]["applied"] is True
+    assert cost_adjusted_objective_scores(
+        {"furnace_lifespan_consumed_fraction": None},
+        (ObjectiveDefinition("furnace_lifespan_consumed_fraction", "minimize"),),
+        product_summary=unpriced_summary,
+        comparison=comparison,
+    ) == (None,)
+
+
+@pytest.mark.parametrize("ranker", _RANKER_NAMES)
+@pytest.mark.parametrize("lifespan_status", ["threshold_unavailable", "wall_deposit_unavailable"])
+def test_unpriced_lifespan_keeps_other_objectives_rankable(ranker, lifespan_status):
+    summary = {
+        "furnace_amortization_status": "batch_cost_unavailable",
+        "furnace_amortization_batch_cost_equivalents": None,
+        "lifespan_cost_status": lifespan_status,
+        "furnace_lifespan_consumed_fraction": None,
+    }
+    scored = _ranker_scored(True, summary)
+    expected = (10.0, 1.0) if ranker == "bayesian" else (10.0, -1.0)
+    assert _call_ranker(ranker, scored) == expected
+    lifespan = "furnace_lifespan_consumed_fraction"
+    assert cost_adjusted_objective_scores(
+        {lifespan: None},
+        (ObjectiveDefinition(metric=lifespan, sense="minimize"),),
+        product_summary=summary,
+    ) == (None,)
 
 
 def _oracle_ranker_scores(
@@ -10730,7 +10875,7 @@ def test_ungrounded_resinter_lifetime_returns_typed_amortization_status(
         "resinter_threshold_kg is not qualified"
     )
     assert summary["furnace_amortization_cost_per_run_usd"] is None
-    assert summary["campaigns_to_resinter"] == campaigns_to_resinter
+    assert "campaigns_to_resinter" not in summary
 
 
 def test_instant_death_furnace_cost_stays_finite_through_pareto_scoring() -> None:
@@ -11226,12 +11371,7 @@ def test_sso2_owner_recipe_patch_is_named_allowlisted_fe_then_sio() -> None:
 
 
 def _sso2_sim_alpha_fallback_disabled(*, hours: int = 3):
-    """Same SSO-2 owner recipe with the prototype alpha fallback left at its
-    production default (disabled) — the refusal-direction leg of the b-314
-    both-directions pin. Steps hour by hour and collects each hour's
-    missing-alpha refusal records, because the last-diagnostic slot is
-    volatile (later pipeline stages overwrite it) and a species only appears
-    in an hour where its pressure is positive."""
+    """Run the SSO-2 recipe without the legacy alpha opt-in controls."""
     from simulator.optimize import sso2_evidence as _sso2
     from simulator.runner import PyrolysisRun
     from simulator.session import SimSession
@@ -11306,70 +11446,42 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert evidence["metal_product_path"]["Fe_kg"] == pytest.approx(0.0)
     assert evidence["metal_product_path"]["product_ledger_Fe_kg"] > 0.0
     fallback = evidence["prototype_alpha_fallback_provenance"]
-    # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4) made the typed VapourBatch
-    # the eligibility authority: CrO2's policy-only alpha row is a missing
-    # channel contract, not an executable alpha value.
-    # 0c6d9811 (b-314) then wired the broad_proxy_not_intrinsic predicate into
-    # flux admission: CrO2's tier-2 proxy (inherited from Cr metal) no longer
-    # satisfies the measured-alpha requirement, so the explicitly gated
-    # alpha=1.0 prototype fallback — which SSO-2 opts into for exactly this
-    # trace species — now engages instead of the proxy silently driving flux
-    # as if it were a measurement.  The engagement is the designed visible
-    # signal; the evidence surface must report it, not hide it.
+    # CrO2 is predicted using the Cr proxy, but 0.5 Cr2O3 + 0.25 O2 -> CrO2
+    # consumes overhead O2. With no O2 inventory, depletion commits no CrO2;
+    # provider fallback warnings and committed-run authority have distinct scopes.
+    assert "CrO2" not in execution.simulator._alpha_authority_status_by_species_engaged
+    assert not any(
+        transition.reason == "evaporate_CrO2"
+        for transition in execution.simulator.atom_ledger.transitions
+    )
+    assert fallback["total_engagement_count"] > 0
     assert fallback == {
         "severity": "warning",
         "status": "engaged",
-        "policy": "alpha=1.0 prototype fallback",
+        "policy": "proxy/bridge or alpha=1 upper bound",
         "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
         "permitted_species": ["CrO2"],
         "engaged_species": ["CrO2"],
-        "total_engagement_count": 9,
+        "total_engagement_count": execution.simulator._degraded_path_engagement_summary()[
+            "unmeasured_alpha_evaporation_fallback"
+        ]["total_count"],
     }
     report = _markdown_report(evidence, execution)
     assert "WARNING prototype_alpha_fallback" in report
-    assert "alpha=1.0 prototype fallback" in report
+    assert "proxy/bridge or alpha=1 upper bound" in report
     assert "status=`engaged`" in report
     assert "permitted_species=`CrO2`" in report
     assert "engaged_species=`CrO2`" in report
-    assert "engagement_count=`9`" in report
+    assert f"engagement_count=`{fallback['total_engagement_count']}`" in report
 
-    # Refusal direction of the same b-314 pin: with the fallback control at
-    # its production default (disabled), the same recipe must NOT engage the
-    # prototype path and must NOT flux CrO2 on the strength of an unmeasured
-    # alpha — the SC-67 fail-loud refusal names CrO2 in missing_alpha. The
-    # engagement pinned above is therefore strictly the deliberate,
-    # allowlisted, evidence-reported opt-in, never absence resolving toward
-    # the confident answer. (Allowlist boundedness is pinned on the engaged
-    # side by _unmeasured_alpha_fallback_notice itself: it raises if any
-    # non-permitted species engages, and the engaged run's own diagnostic
-    # still records CrO — unmeasured but NOT allowlisted — in missing_alpha.)
-    refusal_sim, refusal_missing_by_hour = _sso2_sim_alpha_fallback_disabled(
-        hours=3
-    )
-    refusal_sim.setpoints.setdefault("chemistry_kernel", {})[
-        "unmeasured_alpha_fallback_species"
-    ] = ["CrO2"]
-    refusal_missing = {}
-    for hourly in refusal_missing_by_hour:
-        refusal_missing.update(hourly)
-    assert "CrO2" in refusal_missing
-    assert refusal_missing["CrO2"]["policy"] == "fail_loud_missing_alpha"
-    # No CrO2 flux transition may exist anywhere in the refusal run.
+    # Legacy opt-in controls cannot remove a flagged CrO2 prediction.
+    default_sim, missing_by_hour = _sso2_sim_alpha_fallback_disabled(hours=3)
+    assert all("CrO2" not in hourly for hourly in missing_by_hour)
     assert not any(
         transition.reason == "evaporate_CrO2"
-        for transition in refusal_sim.atom_ledger.transitions
+        for transition in default_sim.atom_ledger.transitions
     )
-    from simulator.optimize.sso2_evidence import _unmeasured_alpha_fallback_notice
-
-    assert _unmeasured_alpha_fallback_notice(refusal_sim) == {
-        "severity": "warning",
-        "status": "not_engaged",
-        "policy": "alpha=1.0 prototype fallback",
-        "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
-        "permitted_species": ["CrO2"],
-        "engaged_species": [],
-        "total_engagement_count": 0,
-    }
+    assert "CrO2" not in default_sim._alpha_authority_status_by_species_engaged
 
 
 def test_sso2_owner_gate_timeout_uses_flagged_floor_and_completes(monkeypatch):
@@ -11429,7 +11541,7 @@ def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:
     assert _unmeasured_alpha_fallback_notice(generic_sim) == {
         "severity": "warning",
         "status": "not_engaged",
-        "policy": "alpha=1.0 prototype fallback",
+        "policy": "proxy/bridge or alpha=1 upper bound",
         "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
         "permitted_species": ["CrO2"],
         "engaged_species": [],
@@ -11447,8 +11559,9 @@ def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:
             "unmeasured_alpha_evaporation_fallback": {"total_count": 1}
         },
     )
-    with pytest.raises(RuntimeError, match="escaped its trace-species scope: CrO"):
-        _unmeasured_alpha_fallback_notice(scoped_sim)
+    notice = _unmeasured_alpha_fallback_notice(scoped_sim)
+    assert notice["engaged_species"] == []
+    assert notice["status"] == "not_engaged"
 
 
 def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:
@@ -11845,6 +11958,45 @@ def test_product_summary_includes_input_output_yield_table_and_mass_closure() ->
     assert "product_summary.target_species_yield_report" in target_yield["consumer"]
     assert target_yield["targets"]["K"]["status"] == "not-applicable"
     assert target_yield["targets"]["Fe"]["yield_fraction"] is not None
+
+
+def test_captured_products_mol_counts_residue_once() -> None:
+    from simulator.account_ids import (
+        ALKALI_CARTRIDGE_ACCOUNT,
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+        CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    )
+
+    accounts = {
+        "process.metal_phase": {"Fe": 0.1},
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT: {
+            "Fe": 0.2,
+            "SiO2": 0.3,
+            "MgO": 0.05,
+        },
+        ALKALI_CARTRIDGE_ACCOUNT: {"K": 0.04},
+        CHROMIUM_CONDENSED_OXIDE_ACCOUNT: {"Cr2O3": 0.4},
+        "terminal.oxygen_melt_offgas_vented_to_vacuum": {"O2": 1.0},
+        "process.cleaned_melt": {"MgO": 9.0},
+    }
+
+    class Ledger:
+        def mol_by_account(self):
+            return accounts
+
+        def project_account_mol(self, account):
+            return dict(accounts.get(account, {}))
+
+    captured = _captured_products_mol(
+        SimpleNamespace(simulator=SimpleNamespace(atom_ledger=Ledger()))
+    )
+
+    assert captured["Fe"] == pytest.approx(0.3)
+    assert captured["SiO2"] == pytest.approx(0.3)
+    assert captured["MgO"] == pytest.approx(0.05)
+    assert captured["K"] == pytest.approx(0.04)
+    assert captured["Cr2O3"] == pytest.approx(0.4)
+    assert "O2" not in captured
 
 
 def test_product_summary_preserves_high_t_melt_activity_notice() -> None:
@@ -13506,3 +13658,396 @@ def test_skipping_the_publication_cap_books_the_computed_overdraw(
     assert bounds["K2O_gas"] == _approx_kg(1.5)
     assert bounds["K2O_gas"] > 1.0
     assert bounds.computed_exceeds_inventory == {}
+
+
+@pytest.mark.parametrize("deposit_kg, expected_fraction_hex", [
+    (0.0, "0x0.0p+0"),
+    (1.0, "0x1.0000000000000p-2"),
+])
+def test_booked_wall_availability_numeric_refactor_pin(
+    monkeypatch, deposit_kg, expected_fraction_hex,
+) -> None:
+    """Pin the numeric consumer before moving the booking/refusal rule."""
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 4.0)
+    authority = {
+        "code": "wall_deposit_saturation_pressure_refused",
+        "wall_saturation_pressure_refused_species": ["SiO"],
+        "wall_saturation_pressure_refusals_by_species": {
+            "SiO": {"hot_wall": {"reason": "missing wall pressure"}},
+        },
+        "status_bearing_refusal_count": 1,
+    }
+    authority = objective_module._authority_without_booked_refusals(authority, {"SiO"})
+    summary = objective_module._furnace_lifespan_cost_summary_from_raw(
+        {("hot_wall", "SiO"): deposit_kg}, authority=authority,
+    )
+    assert summary["lifespan_cost_status"] == "available"
+    # 1 kg/campaign / 4 kg/resinter = 0.25 resinter/campaign; zero stays zero.
+    assert summary["furnace_lifespan_consumed_fraction"].hex() == expected_fraction_hex
+
+
+@pytest.mark.parametrize("species", ["CrO2", "CrO3"])
+@pytest.mark.parametrize("pressure_pa", [None, 0.0, 1.0])
+def test_source_carrier_refusal_requires_a_complete_supply_booking(
+    monkeypatch, species, pressure_pa,
+) -> None:
+    """No wall-pressure refusal is needed; no P_sat cannot become zero."""
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: None)
+    snapshot = _activity_one_refusal_snapshot(species, hour=1, pressure_pa=pressure_pa)
+    execution = _refused_supply_execution((snapshot,), ())
+    execution.trace.wall_zone_by_segment = {
+        segment: "Hot" for segment in objective_module.PIPE_SEGMENT_NAMES
+    }
+    execution.trace.wall_deposit_sticking_authority = {
+        "vapour_carrier_authority_by_species": {
+            species: snapshot.evap_flux.carrier_authority_by_species[species],
+        },
+    }
+    summary = objective_module._coating_product_summary(execution)
+    authority = summary["wall_deposit_sticking_authority"]
+    assert species in authority["refused_carrier_species"]
+    assert authority["output_status"] == "status_bearing"
+    assert authority["authoritative_for_resinter"] is False
+    assert not authority.get("wall_saturation_pressure_refused_species")
+    if pressure_pa is None:
+        assert not summary.get("wall_supply_bound_bookings")
+        assert objective_module.UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT not in summary
+        assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
+        assert summary["wall_deposit_total_kg"] is None
+        assert species in summary["wall_deposit_refusal"]["authority"]["refused_carrier_species"]
+        assert authority[SUPPLY_UNAVAILABLE][species] == ["no_flux_law_and_no_psat"]
+        constraints = physics_module.PhysicsConstraintSet(active_gates=("coating",))
+        margin = constraints.coating(_trace_with_optimizer_coating_report(execution, constraints))
+        assert margin.status == "unavailable"
+        assert margin.observed is None
+        assert objective_module.UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT not in margin.status_payload
+    else:
+        bound = _optimizer_refused_flux_bounds((snapshot,), (species,), campaigns_elapsed=1.0)
+        booking, = summary["wall_supply_bound_bookings"]
+        assert booking["species"] == species
+        assert booking["supply_upper_bound_kg"] == pytest.approx(bound[species])
+        assert booking[SUPPLY_INTERVAL_UPPER_BOUND_USED] == 1
+        assert summary["wall_deposit_total_kg"] == 0.0
+        assert summary["wall_deposit_cumulative_total_kg"] == 0.0
+        assert summary["wall_deposit_kg_by_species"] == {}
+        assert summary["wall_deposit_cumulative_kg_by_species"] == {}
+        assert summary["lifespan_cost_status"] == "threshold_unavailable"
+        assert "wall_deposit_refusal" not in summary
+        assert not summary["wall_deposit_kg_by_segment_species"]
+        if booking["deposit_kg"] > 0.0:
+            flag = summary[objective_module.UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT]
+            assert flag["bound_kg"] == pytest.approx(bound[species])
+            assert flag["governing_segment"] in objective_module.PIPE_SEGMENT_NAMES
+            assert flag["governing_zone"] == execution.trace.wall_zone_by_segment[flag["governing_segment"]]
+            # A qualified capacity must price a bound-only scenario even
+            # though its ordinary booked map and total are both empty.
+            monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 4.0)
+            priced = objective_module._furnace_lifespan_cost_summary(execution, execution.simulator)
+            depreciation = objective_module._depreciation_expense_per_run_summary(
+                execution, execution.simulator, cost_parameters=_furnace_test_cost_parameters(),
+            )
+            assert priced["wall_deposit_total_kg"] == 0.0
+            assert priced["lifespan_cost_status"] == "available"
+            assert priced["aggregate_campaigns_to_resinter"] == pytest.approx(4.0 / bound[species])
+            assert depreciation["status"] == "campaigns_to_resinter"
+            assert depreciation["campaigns_to_resinter"] == priced["aggregate_campaigns_to_resinter"]
+            assert depreciation["depreciation_expense_per_run_usd"] > 0.0
+            assert depreciation[objective_module.UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT] == flag
+
+
+@pytest.mark.parametrize("with_cost_parameters", [False, True])
+def test_product_summary_keeps_generic_resinter_lifetime_per_segment(
+    monkeypatch, with_cost_parameters,
+) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: None)
+    first_segment, second_segment = objective_module.PIPE_SEGMENT_NAMES[:2]
+    sim = _FakeProductSim()
+    sim.record.cost_rollup = {
+        "run_input_cost": {"owner_ratify_money_projection": 20.0},
+    }
+    execution = SimpleNamespace(
+        simulator=sim,
+        campaigns_elapsed=1.0,
+        trace=SimpleNamespace(
+            wall_deposit_by_segment_species_kg={
+                (first_segment, "Fe"): 1.0,
+                (second_segment, "Fe"): 0.1,
+            },
+            wall_zone_by_segment={first_segment: "Hot", second_segment: "Rest"},
+            wall_deposit_sticking_authority={},
+        ),
+    )
+
+    kwargs = (
+        {"cost_parameters": _furnace_test_cost_parameters()}
+        if with_cost_parameters
+        else {}
+    )
+    summary = product_summary(
+        execution,
+        {"feedstock": "lunar_mare_low_ti"},
+        **kwargs,
+    )
+
+    assert summary["campaigns_to_resinter"] == "resinter_threshold_kg / 1"
+    assert summary["campaigns_to_resinter_worst_segment"] == (
+        "resinter_threshold_kg / 1"
+    )
+    assert summary["aggregate_campaigns_to_resinter"] == (
+        "resinter_threshold_kg / 1.1"
+    )
+    assert summary["lifespan_cost_status"] == "threshold_unavailable"
+    assert summary["furnace_lifespan_consumed_fraction"] is None
+    if with_cost_parameters:
+        assert summary["furnace_amortization_status"] == (
+            objective_module.FURNACE_AMORTIZATION_STATUS_UNGROUNDED
+        )
+        assert summary["furnace_amortization_cost_per_run_usd"] is None
+        assert summary["furnace_amortization_batch_cost_equivalents"] is None
+
+
+@pytest.mark.parametrize("campaigns_elapsed", [1.0, 2.0])
+def test_unlocated_supply_bounds_the_worst_physical_wall_without_booking_zones(
+    monkeypatch, campaigns_elapsed,
+) -> None:
+    from simulator.condensation_routing import pipe_segment_name
+
+    threshold_kg = 4.0
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: threshold_kg)
+    species, bound_kg, retained_kg, other_kg = "CrO2", 0.25, 1.0, 0.1
+    snapshot = _activity_one_refusal_snapshot(species, hour=1)
+    baseline = _optimizer_refused_flux_bounds((snapshot,), (species,), campaigns_elapsed=1.0)
+    snapshot.duration_h = bound_kg / baseline[species]
+    execution = _refused_supply_execution((snapshot,), ())
+    execution.campaigns_elapsed = campaigns_elapsed
+    duct, cooler = pipe_segment_name(0, 1), pipe_segment_name(1, 2)
+    deposit = {(duct, "Fe"): retained_kg, (cooler, "Fe"): other_kg}
+    execution.trace.wall_deposit_by_segment_species_kg = deposit
+    execution.trace.wall_zone_by_segment = {
+        segment: "Hot" for segment in objective_module.PIPE_SEGMENT_NAMES
+    }
+    execution.trace.wall_zone_by_segment.update({duct: "Hottest", cooler: "Rest"})
+    execution.trace.wall_deposit_sticking_authority = {
+        "vapour_carrier_authority_by_species": {
+            species: snapshot.evap_flux.carrier_authority_by_species[species],
+        },
+    }
+    summary = objective_module._coating_product_summary(execution)
+    flag_key = objective_module.UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT
+    flag = summary[flag_key]
+    # Hand-built oracle: booked mass = 1.0 + 0.1 = 1.1 kg; the alternative
+    # worst-wall scenario = max(1.0 + 0.25, 0.1 + 0.25, 0 + 0.25) = 1.25 kg.
+    potential_kg = 1.25
+    assert flag["bound_kg"] == pytest.approx(bound_kg)
+    assert flag["governing_segment"] == duct
+    assert flag["governing_zone"] == execution.trace.wall_zone_by_segment[duct]
+    assert flag["potential_load_kg"] == pytest.approx(1.25)
+    assert summary["wall_deposit_kg_by_segment_species"] == {
+        duct: {"Fe": retained_kg}, cooler: {"Fe": other_kg},
+    }
+    zones = summary["wall_deposit_kg_by_zone_species"]
+    assert zones["Hottest"] == {"Fe": retained_kg}
+    assert zones["Rest"] == {"Fe": other_kg}
+    assert all(species not in by_species for by_species in zones.values())
+    assert summary["wall_deposit_cumulative_total_kg"] == pytest.approx(1.1)
+    assert summary["wall_deposit_cumulative_total_kg"] == pytest.approx(
+        sum(sum(by_species.values()) for by_species in zones.values())
+    )
+    assert summary["wall_deposit_total_kg"] == pytest.approx(1.1 / campaigns_elapsed)
+    assert summary["wall_deposit_cumulative_kg_by_species"] == {"Fe": pytest.approx(1.1)}
+    assert summary["wall_deposit_kg_by_species"] == {"Fe": pytest.approx(1.1 / campaigns_elapsed)}
+    # The furnace-wide scenario is 1.0 + 0.1 + 0.25 = 1.35 kg, distinct
+    # from the 1.25 kg per-segment alternative and the 1.1 kg booked mass.
+    assert flag["aggregate_potential_load_kg"] == pytest.approx(1.35)
+    # 4 kg capacity / 1.25 kg per campaign = 3.2 campaigns. At elapsed=2
+    # the same cumulative mass has half the campaign rate and twice the life.
+    assert summary["campaigns_to_resinter"] == pytest.approx(3.2 * campaigns_elapsed)
+    assert summary["campaigns_to_resinter_worst_segment"] == summary["campaigns_to_resinter"]
+    assert summary["aggregate_campaigns_to_resinter"] == pytest.approx(2.962962962962963 * campaigns_elapsed)
+    assert summary["furnace_lifespan_consumed_fraction"] == pytest.approx(
+        0.3375 / campaigns_elapsed
+    )
+    sim = execution.simulator
+    sim.energy_cumulative_breakdown_kWh = {"electrical": 0.0, "evaporation_thermal": 0.0}
+    costs = replace(
+        _furnace_test_cost_parameters(), furnace_resinter_cost_usd=100.0,
+        generic_reagent_cost_per_kg=0.0,
+    )
+    marginal = objective_module._marginal_extraction_cost_summary(
+        sim, {}, run_execution=execution, cost_parameters=costs,
+    )
+    depreciation = marginal["depreciation"]
+    assert depreciation["campaigns_to_resinter"] == pytest.approx(2.962962962962963 * campaigns_elapsed)
+    # d-431 aggregate capacity: 4 / 1.35 = 2.962962962962963 campaigns;
+    # 100 USD/resinter / that lifetime = 33.75 USD/campaign. The booked-only
+    # 1.1 kg or per-segment 1.25 kg would underprice this at 27.5 or 31.25 USD.
+    assert depreciation["depreciation_expense_per_run_usd"] == pytest.approx(33.75 / campaigns_elapsed)
+    assert marginal["marginal_cost_usd"] == pytest.approx(33.75 / campaigns_elapsed)
+    assert depreciation[flag_key] == flag
+    sim.record.cost_rollup = {"run_input_cost": {"owner_ratify_money_projection": 20.0}}
+    full_summary = product_summary(execution, {}, cost_parameters=costs)
+    assert full_summary["campaigns_to_resinter_worst_segment"] == pytest.approx(3.2 * campaigns_elapsed)
+    assert full_summary["aggregate_campaigns_to_resinter"] == pytest.approx(2.962962962962963 * campaigns_elapsed)
+    assert full_summary["furnace_amortization_cost_per_run_usd"] == pytest.approx(
+        furnace_amortization_cost_per_run(
+            20.0, 2.962962962962963 * campaigns_elapsed,
+            costs.furnace_lifetime_cost_multiplier, costs.min_fouling_penalty,
+            has_positive_fouling=True,
+        )
+    )
+
+    # Scope guard through the real consumers: the per-segment coating check
+    # reads 1.25, while every furnace-wide cost above reads aggregate 1.35.
+    constraints = physics_module.PhysicsConstraintSet(active_gates=("coating",))
+    overlay = _trace_with_optimizer_coating_report(execution, constraints)
+    report = overlay.wall_fouling_report
+    assert report["campaigns_to_resinter_worst_segment"] == pytest.approx(3.2 * campaigns_elapsed)
+    assert report["aggregate_campaigns_to_resinter"] == pytest.approx(2.962962962962963 * campaigns_elapsed)
+    assert report["campaigns_to_resinter_total"] == report["aggregate_campaigns_to_resinter"]
+    margin = constraints.coating(overlay)
+    assert margin.status_payload[flag_key] == flag
+    assert margin.status_payload["upstream_wall_deposit_upper_bound_kg_per_campaign"] == pytest.approx(
+        potential_kg / campaigns_elapsed
+    )
+    assert any(item["reason"] == flag_key for item in margin.status_payload["coating_warning_flags"])
+
+
+def test_unlocated_bound_closed_form_limits_and_declared_universe() -> None:
+    segments = objective_module.PIPE_SEGMENT_NAMES
+    existing = {segments[0]: 1.0}
+    zero = objective_module._assign_refused_supplies_at_binding_load(
+        existing, {"CrO2": 0.0}, {},
+    )
+    assert set(zero["closed_form_kg"]) == set(segments)
+    assert zero["worst_max_load_kg"] == max(existing.values())
+    bound = 0.25
+    one = objective_module._assign_refused_supplies_at_binding_load(
+        existing, {"CrO2": bound}, {}, unlocated_segments=(segments[0],),
+    )
+    assert one["worst_max_load_kg"] == existing[segments[0]] + bound
+    assert one["segment_loads_kg"] == existing
+    assert one["segment_by_species"] == {}
+    for segment in segments:
+        assignment = objective_module._assign_refused_supplies_at_binding_load(
+            {segment: existing[segments[0]]}, {"CrO2": bound}, {},
+        )
+        assert set(assignment["closed_form_kg"]) == set(segments)
+        assert assignment["binding_segment"] == segment
+        assert assignment["worst_max_load_kg"] == one["worst_max_load_kg"]
+
+
+@pytest.fixture(scope="module")
+def _d424_real_catalog():
+    """Exercise every shipped source reaction, including elemental/suboxide gas."""
+    from pathlib import Path
+    import yaml
+    from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+
+    payload = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "data/vapor_pressures.yaml").read_text()
+    )
+    return compile_vapour_rail_catalog(payload)
+
+
+@pytest.mark.parametrize("temperature_K", [313.15, 1773.15])
+@pytest.mark.parametrize("oxygen_bar", [None, 1.0e-8])
+def test_d424_every_source_reaction_carrier_uses_the_existing_supply_owner(
+    _d424_real_catalog, temperature_K, oxygen_bar,
+) -> None:
+    from simulator.vapour_rail.catalog import CatalogCompileError
+
+    catalog = _d424_real_catalog
+    source_species = {
+        species: compiled
+        for species, compiled in catalog.species.items()
+        if compiled.source_reaction_id is not None
+        and compiled.code_metadata.source_account == "process.cleaned_melt"
+    }
+    assert {"Na", "K", "Mg", "SiO", "Al", "Ca", "Ti", "Cr"} <= set(source_species)
+    outcomes = {}
+    computable = set()
+    refused = set()
+    # Catalog admission/evaluation owns which source reactions can supply
+    # an activity-1 pressure. A source_reaction_id alone is not a pressure
+    # law (d-424); do not maintain a second hand-written species allowlist.
+    for species in source_species:
+        try:
+            evaluator = catalog.evaluator_for_hot_train(species)
+            evaluator.evaluate(
+                temperature_K, source_activity=1.0,
+                pO2_bar=oxygen_bar if oxygen_bar is not None else evaluator.pO2_reference_bar,
+            )
+        except (CatalogCompileError, ValueError):
+            refused.add(species)
+        else:
+            computable.add(species)
+    assert computable | refused == set(source_species)
+    assert not computable & refused
+    print(f"D424_CATALOG computable={sorted(computable)} refused={sorted(refused)}")
+    for species, compiled in source_species.items():
+        snapshot = SimpleNamespace(
+            hour=1, duration_h=1.0, temperature_C=temperature_K - physics_module.CELSIUS_TO_KELVIN_OFFSET,
+            transport_pO2_bar=oxygen_bar,
+            evap_flux=SimpleNamespace(
+                published_species_kg_hr={}, melt_surface_area_m2=1.0,
+                carrier_authority_by_species={
+                    species: {"species_id": species, "is_refused": True},
+                },
+            ),
+        )
+        interval = _classify_wall_supply_interval(snapshot, species, catalog)
+        evaluator = compiled.evaluator
+        if oxygen_bar is None and species == "FeO_association_gas":
+            from simulator.optimize.physics import (
+                _catalog_activity_one_ceiling_pa,
+            )
+            from simulator.vapour_rail.wall_saturation import (
+                resolve_wall_saturation,
+            )
+
+            row = physics_module._legacy_vapour_row(catalog, species)
+            wall_pressure = resolve_wall_saturation(
+                row,
+                species_id=species,
+                T_K=temperature_K,
+            )
+            pressure_Pa, evidence = _catalog_activity_one_ceiling_pa(
+                catalog,
+                species,
+                temperature_K,
+                hour_pO2_bar=None,
+                recorded_pO2_bar=(),
+            )
+            assert wall_pressure.reaction_id == "congruent"
+            assert [(part.role, part.record_id) for part in wall_pressure.participants] == [
+                ("vapour", "Fe-021"),
+                ("product", "Fe-018"),
+            ]
+            assert all(
+                participant.authority_level == "authoritative"
+                for participant in wall_pressure.participants
+            )
+            assert pressure_Pa == pytest.approx(
+                wall_pressure.pressure_Pa, rel=1e-12, abs=0.0,
+            )
+            assert evidence == ""
+            assert interval.kind == "supply_interval_upper_bound"
+            assert interval.evidence == SUPPLY_INTERVAL_UPPER_BOUND_USED
+            assert math.isfinite(interval.rate_kg_hr) and interval.rate_kg_hr >= 0.0
+        elif species in refused:
+            assert interval.kind == "unavailable", (species, interval)
+            assert interval.evidence == "no_flux_law_and_no_psat", (species, interval)
+            assert interval.rate_kg_hr is None, (species, interval)
+        elif oxygen_bar is None and evaluator.pO2_exponent != 0.0:
+            assert interval.kind == "unavailable", (species, interval)
+            assert interval.evidence == "missing_recorded_pO2", (species, interval)
+        else:
+            assert interval.kind == "supply_interval_upper_bound", (species, interval)
+            assert interval.evidence == SUPPLY_INTERVAL_UPPER_BOUND_USED
+            assert math.isfinite(interval.rate_kg_hr) and interval.rate_kg_hr >= 0.0
+        outcomes[species] = interval.kind
+    if oxygen_bar is not None:
+        assert {species for species, kind in outcomes.items()
+                if kind == "supply_interval_upper_bound"} == computable
+        assert {species for species, kind in outcomes.items()
+                if kind == "unavailable"} == refused

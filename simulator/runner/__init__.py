@@ -65,6 +65,7 @@ from simulator.campaigns import (
     CampaignPressureSetpointRefusal,
     CampaignSetpointMissingRefusal,
     c0_exit_run_notice,
+    parse_campaign_override_value,
 )
 from simulator.condensation_routing import (
     COLLECTOR_STAGE_KEY_BY_NUMBER,
@@ -2917,6 +2918,9 @@ def build_per_hour_summary(
         **_mre_ellingham_ladder_diagnostic_observables(snapshot),
         **fe_redox_split_observables,
     }
+    voltage_status = snapshot.mre_decomposition_voltage_status_by_oxide
+    if voltage_status:
+        summary["mre_decomposition_voltage_status_by_oxide"] = dict(voltage_status)
     if fe_redox_split_observables and hasattr(sim, "_stage3_fe_wt_pct_diagnostic"):
         stage3 = sim._stage3_fe_wt_pct_diagnostic()
         summary["stage_3_capture"] = {
@@ -4824,8 +4828,18 @@ def build_sio_yield_report(
                 ),
             )
         return report
+    from simulator.account_ids import STAGE_COLLECTION_BACKING_ACCOUNTS
+
     cleaned_melt = final_state.get("process.cleaned_melt", {})
-    condensation_train = final_state.get("process.condensation_train", {})
+    # Condensed SiO sits on every account that backs the condenser train,
+    # including the Stage-4 cartridge and its melt-out solid residue, not
+    # only on process.condensation_train.
+    condensation_train: dict[str, float] = {}
+    for account_name in STAGE_COLLECTION_BACKING_ACCOUNTS:
+        for species, mol in final_state.get(account_name, {}).items():
+            condensation_train[species] = (
+                condensation_train.get(species, 0.0) + float(mol)
+            )
     wall_deposit = _wall_deposit_mol_by_species(final_state)
     terminal_offgas: dict[str, float] = {}
     for account_name in ("process.overhead_gas", "terminal.offgas"):
@@ -5822,7 +5836,7 @@ def _parse_runtime_campaign_overrides_json(
     raw_json: str | None,
     *,
     flag_name: str,
-) -> dict[str, dict[str, float]] | None:
+) -> dict[str, dict[str, Any]] | None:
     if raw_json is None:
         return None
     loaded = json.loads(raw_json)
@@ -5837,11 +5851,14 @@ def _parse_runtime_campaign_overrides_json(
         parsed[str(campaign)] = {}
         for field, value in fields.items():
             field_name = str(field)
-            parsed[str(campaign)][field_name] = (
-                value
-                if field_name in {"p_total_mbar", "pO2_mbar"}
-                else float(value)
-            )
+            if field_name in {"p_total_mbar", "pO2_mbar"}:
+                # Same owner as the web boundary: the pressure validator
+                # refuses a non-numeric value. Do not float() it first.
+                parsed[str(campaign)][field_name] = value
+            else:
+                parsed[str(campaign)][field_name] = parse_campaign_override_value(
+                    field_name, value,
+                )
     return parsed
 
 
@@ -6755,7 +6772,12 @@ def main(argv: Optional[list[str]] = None) -> int:
             )
             f.write("\n")
 
-    return 0 if result["status"] not in {"failed", "refused"} else 1
+    exit_code = 0 if result["status"] not in {"failed", "refused"} else 1
+    if exit_code:
+        message = str(result.get("error_message") or result.get("reason") or "")
+        message = " ".join(message.splitlines())
+        print(f"{result['status']}: {message}", file=sys.stderr)
+    return exit_code
 
 
 def build_sio_yield_arg_parser() -> argparse.ArgumentParser:

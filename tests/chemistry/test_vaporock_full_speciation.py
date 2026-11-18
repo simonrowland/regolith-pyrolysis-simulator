@@ -48,7 +48,7 @@ def _vaporock_po2_request(pO2_bar):
     )
 
 
-@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0, 1e-12])
+@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0])
 def test_vaporock_provider_rejects_invalid_explicit_transport_po2(pO2_bar):
     request = _vaporock_po2_request(pO2_bar)
 
@@ -58,7 +58,7 @@ def test_vaporock_provider_rejects_invalid_explicit_transport_po2(pO2_bar):
         VapoRockProvider._resolve_fO2_log(request)
 
 
-def test_vaporock_provider_rejects_subfloor_request_level_fo2():
+def test_vaporock_provider_predicts_and_flags_subfloor_transport_oxygen():
     request = IntentRequest(
         intent=ChemistryIntent.VAPOR_PRESSURE,
         account_view=ProviderAccountView(
@@ -71,10 +71,37 @@ def test_vaporock_provider_rejects_subfloor_request_level_fo2():
         control_inputs={},
     )
 
-    with pytest.raises(ValueError, match="fO2_log=-20.*transport model floor"):
-        VapoRockProvider._resolve_pO2_bar(request)
-    with pytest.raises(ValueError, match="fO2_log=-20.*transport model floor"):
-        VapoRockProvider._resolve_fO2_log(request)
+    class FakeBackend:
+        def is_available(self):
+            return True
+
+        def get_engine_version(self):
+            return "test"
+
+        def equilibrate(self, **_kwargs):
+            return types.SimpleNamespace(
+                vapor_pressures_Pa={"SiO": 1.0},
+                vaporock_full_speciation_Pa={"SiO": 1.0},
+                warnings=(),
+                status="ok",
+            )
+
+    provider = VapoRockProvider(backend=FakeBackend())
+    requests = (
+        (request, 1e-20, "fO2_log=-20"),
+        (_vaporock_po2_request(1e-12), 1e-12, "explicit pO2_bar=1e-12"),
+    )
+    for request, expected_pO2_bar, reason in requests:
+        result = provider.dispatch(request)
+        audit = result.control_audit
+
+        assert result.status == "non_authoritative"
+        assert result.diagnostic["pO2_bar"] == expected_pO2_bar
+        assert audit is not None
+        notice = next(note for note in audit.notes if "authority_level=extrapolated" in note)
+        assert reason in notice
+        assert "certified_band=none" in notice
+        assert "actual pO2 retained" in notice
 
 
 def test_adapter_attaches_unfiltered_full_speciation(monkeypatch):

@@ -84,7 +84,10 @@ from simulator.optimize.objective import (
     scoring_profile_for_executed_spec,
     unrenormalized_study_scalar_weights,
 )
-from simulator.optimize.physics import PhysicsConstraintSet
+from simulator.optimize.physics import (
+    PhysicsConstraintSet,
+    _catalog_activity_one_ceiling_pa,
+)
 from simulator.optimize.product_pools import forbidden_gates_for_pool
 from simulator.optimize.profiles import ProfileValidationError, load_profile
 from simulator.optimize.recipe import (
@@ -113,6 +116,8 @@ from simulator.state import (
     HourSnapshot,
     TERMINAL_OXYGEN_ROUTE_PHASES,
 )
+from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+from simulator.vapour_rail.wall_saturation import resolve_wall_saturation
 from simulator.transport_regime import TransportRegimeRefusal
 from optimizer_fixtures import StubSmokeConstraintSet
 
@@ -4587,7 +4592,11 @@ def test_optimizer_overlay_null_refused_species_stays_flux_bounded() -> None:
     )
     assert summary["coating_status"] == "warning"
     assert "coating_unavailable_reason" not in summary
-    assert summary["furnace_amortization_cost_per_run_usd"] is not None
+    # d-429: the flux bound keeps coating status known, but this run's
+    # qualified-fouling lifetime is unpriced. Exclude its furnace-cost term;
+    # the population comparison flags the exclusion instead of scoring zero.
+    assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
+    assert summary["furnace_amortization_cost_per_run_usd"] is None
 
 
 def test_parametric_null_campaign_deposit_is_unavailable(
@@ -8770,3 +8779,74 @@ def test_check_endpoint_is_the_only_phase_end_list() -> None:
     assert CampaignManager.endpoint_can_end(CampaignPhase.IDLE) is False
     assert CampaignManager.endpoint_can_end(CampaignPhase.COMPLETE) is False
     assert "CampaignEndCapMissing" in source
+
+
+def test_activity_one_supply_uses_each_direct_congruent_wall_reaction() -> None:
+    payload = yaml.safe_load(
+        (DEFAULT_DATA_DIR / "vapor_pressures.yaml").read_text()
+    )
+    catalog = compile_vapour_rail_catalog(
+        payload,
+        emit_u0_request_rules=False,
+    )
+    direct_congruent_rows = []
+    for family in payload["families"].values():
+        for species, row in family["physical_properties"]["species"].items():
+            wall_block = row.get("wall_reactions") or {}
+            reactions = wall_block.get("reactions") or []
+            if len(reactions) != 1:
+                continue
+            reaction = reactions[0]
+            vapor = reaction.get("vapour") or {}
+            products = reaction.get("products") or []
+            if (
+                reaction.get("vapour_stoichiometry") == 1
+                and reaction.get("oxygen_stoichiometry") == 0
+                and row.get("formula") == vapor.get("formula")
+                and len(products) == 1
+                and products[0].get("stoichiometry") == 1
+                and products[0].get("formula") == vapor.get("formula")
+            ):
+                direct_congruent_rows.append((species, row))
+
+    assert "FeO_association_gas" in {
+        species for species, _row in direct_congruent_rows
+    }
+    for species, row in direct_congruent_rows:
+        evaluator = catalog.evaluator_for_hot_train(species)
+        for temperature_K in (1000.0, 1500.0):
+            expected = resolve_wall_saturation(
+                row,
+                species_id=species,
+                T_K=temperature_K,
+            )
+            assert all(
+                participant.authority_level == "authoritative"
+                for participant in expected.participants
+            )
+            pressure_Pa, evidence = _catalog_activity_one_ceiling_pa(
+                catalog,
+                species,
+                temperature_K,
+                hour_pO2_bar=None,
+                recorded_pO2_bar=(),
+                source_activity=1.0,
+            )
+            assert evidence == ""
+            assert pressure_Pa == pytest.approx(
+                expected.pressure_Pa, rel=1e-12, abs=0.0,
+            ), species
+            if evaluator.activity_exponent > 0.0:
+                pressure_at_half_activity, _ = _catalog_activity_one_ceiling_pa(
+                    catalog,
+                    species,
+                    temperature_K,
+                    hour_pO2_bar=None,
+                    recorded_pO2_bar=(),
+                    source_activity=0.5,
+                )
+                assert pressure_at_half_activity == pytest.approx(
+                    expected.pressure_Pa * 0.5 ** evaluator.activity_exponent,
+                    rel=1e-12,
+                    abs=0.0,
+                ), species

@@ -308,11 +308,11 @@ def cacheable_refusal(result) -> bool:
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
-    "internal-analytical": 3,
+    "internal-analytical": 5,
     "vaporock": 1,
-    "magemin": 4,
-    "alphamelts": 4,
-    "thermoengine": 4,
+    "magemin": 5,
+    "alphamelts": 5,
+    "thermoengine": 5,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
@@ -335,6 +335,11 @@ ENGINE_CHEMISTRY_VERSION = {
 # internal-analytical v3: 2026-11-17 simulator code at b267 bugs stack - b-906 d-412 Langmuir surface-pO2 root changes evaporation_flux.py and vapor_pressure.py outputs
 # alphamelts v4: 2026-11-17 alphaMELTS binary pin unchanged, b267 bugs stack - engine-cache disclosure wrapper for b-119 executed-law replay (stored engine result and disclosure set)
 # thermoengine v4: 2026-11-17 ThermoEngine pin unchanged, b267 bugs stack - engine-cache disclosure wrapper for b-119 executed-law replay (stored engine result and disclosure set)
+# internal-analytical v4: reserved by b-1124; not used by this landing
+# internal-analytical v5: 2026-11-18 b265 e7fbd4c052 onto b268r - vapour-rail catalog, wall-saturation thermo and evaporation drive (52ef5760c0, 8fa1e3d69c, e7fbd4c052, bbb1e46b66)
+# magemin v5: 2026-11-18 MAGEMin pin unchanged, b265 e7fbd4c052 onto b268r - positive SiO2 outside [30, 80] wt% is predicted and flagged (c6aa18c641); Fe-free cells leave fO2 indeterminate (feb8efbea7, 8542f3da58)
+# alphamelts v5: 2026-11-18 alphaMELTS binary pin unchanged, b265 e7fbd4c052 onto b268r - shared MELTS support stores the subfloor oxygen extrapolation notice on the result (1e1fd49f24) and adds the declared freeze-gate cooling path (b56619a8f8)
+# thermoengine v5: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b268r - same shared MELTS support stores the subfloor oxygen extrapolation notice on the result (1e1fd49f24)
 
 
 @dataclass(frozen=True)

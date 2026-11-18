@@ -7,13 +7,17 @@ import math
 from types import MappingProxyType
 from typing import Any, Mapping
 
+from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
 from simulator.accounting.queries import AccountingQueries, stage_purity
 from simulator.accounting.yield_disposition import (
     build_yield_disposition,
     ledger_snapshots_from_sim,
 )
 from simulator.diagnostics import wall_deposit_sticking_authority_status
-from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX, HourSnapshot
+from simulator.state import (
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX,
+    HourSnapshot,
+)
 
 
 def _freeze_mapping(values: Mapping[Any, Any]) -> Mapping[Any, Any]:
@@ -81,6 +85,13 @@ class PhysicsTrace:
     extraction_completeness_by_target: Mapping[str, Mapping[str, Any]] = field(
         default_factory=dict
     )
+    # Species kilograms on process.alkali_cartridge_solid_residue.
+    # Not part of product_ledger_kg: that map is separated products, and
+    # merging residue metal into it made readers treat it as an ingot.
+    # Extraction completeness adds this map when it counts captured mass.
+    alkali_cartridge_solid_residue_kg: Mapping[str, float] = field(
+        default_factory=dict
+    )
     yield_disposition_fraction_table_rows: tuple[Mapping[str, Any], ...] = ()
     yield_disposition_fraction_table_error: str = ""
 
@@ -128,6 +139,9 @@ class PhysicsTrace:
             for target, entry in extraction_by_target.items()
             if isinstance(entry, Mapping)
         }
+        residue_kg = queries.species_kg_by_accounts(
+            (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,)
+        )
         try:
             yield_disposition = build_yield_disposition(
                 sim,
@@ -180,6 +194,7 @@ class PhysicsTrace:
             extraction_completeness_by_target=_freeze_nested_mapping(
                 extraction_by_target
             ),
+            alkali_cartridge_solid_residue_kg=_freeze_mapping(residue_kg),
             yield_disposition_fraction_table_rows=fraction_rows,
             yield_disposition_fraction_table_error=fraction_table_error,
         )
@@ -202,6 +217,7 @@ class PhysicsTrace:
                 _thaw_value(self.wall_deposit_by_segment_species_delta),
                 _thaw_value(self.impurity_delta),
                 _thaw_value(self.extraction_completeness_by_target),
+                _thaw_value(self.alkali_cartridge_solid_residue_kg),
                 _thaw_value(self.yield_disposition_fraction_table_rows),
                 self.yield_disposition_fraction_table_error,
             ),
@@ -277,6 +293,16 @@ def wall_temperature_by_segment_C(sim: Any) -> dict[str, float]:
             continue
         if math.isfinite(temperature):
             temperatures[name] = temperature
+    # An isolated bypass is still a declared possible wall for an unlocated
+    # supply bound. Its own configured temperature is evidence, not a duct alias.
+    if model is not None and getattr(model, "lab_geometry", None) is None:
+        from simulator.condensation_routing import STAGE3_BYPASS_SEGMENT_NAME
+
+        bypass = getattr(model, "stage3_bypass", {})
+        if STAGE3_BYPASS_SEGMENT_NAME not in temperatures and bypass:
+            temperatures[STAGE3_BYPASS_SEGMENT_NAME] = float(
+                bypass["wall_temperature_C"]
+            )
     return temperatures
 
 

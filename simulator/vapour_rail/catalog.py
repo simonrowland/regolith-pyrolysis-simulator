@@ -767,7 +767,7 @@ _LEGACY_FIELD_ORDER: Mapping[str, tuple[str, ...]] = {
         "fit_target", "authority_class", "residual_dex", "confidence_tier",
         "gamma_domain_K", "gamma_authority", "coherent_pair", "shadow_bracket",
         "pseudo_antoine_status", "backsolve", "reaction",
-        "pure_component_antoine", "oxide_activity_exponent", "pO2_exponent",
+        "pure_component_saturation", "oxide_activity_exponent", "pO2_exponent",
         "pO2_reference_bar", "evaporation_alpha", "antoine",
         "valid_range_K", "boiling_point_C", "condensation_T_C_at_1mbar", "notes",
     ),
@@ -1058,6 +1058,7 @@ class CompiledPressureEvaluator:
         low, high = self.valid_temperature_K
         out_of_range = temperature_K < low or temperature_K > high
 
+        temperature_notice: dict[str, Any] = {}
         if out_of_range:
             if self.extrapolation_policy != DEFAULT_EXTRAPOLATION_POLICY:
                 raise CatalogCompileError(
@@ -1071,7 +1072,7 @@ class CompiledPressureEvaluator:
             # composite thermo) — never attenuated linear-T slope invention
             # (b-145 composites; t-538 all non-composite families).
             log10_reference = self._out_of_domain_log10_continuation(
-                temperature_K
+                temperature_K, temperature_notice=temperature_notice,
             )
         else:
             log10_reference = self.reference_model.log10_pressure(temperature_K)
@@ -1250,12 +1251,12 @@ class CompiledPressureEvaluator:
         # The attribute stays one dict when the carrier has one notice.
         # Publication lists are applied by the request/provider surfaces.
         extrapolation_items = receipt_notices.get("extrapolation_notice") or ()
-        object.__setattr__(
-            evaluation,
-            "extrapolation_notice",
-            notice_attribute(extrapolation_items)
-            if extrapolation_items
-            else _pO2_floor_inversion_notice(
+        if extrapolation_items:
+            extrapolation_value = notice_attribute(extrapolation_items)
+        elif temperature_notice:
+            extrapolation_value = dict(temperature_notice)
+        else:
+            extrapolation_value = _pO2_floor_inversion_notice(
                 species_id=self.species_id,
                 pressure_pa=pressure_pa,
                 pO2_exponent=self.pO2_exponent,
@@ -1264,7 +1265,11 @@ class CompiledPressureEvaluator:
                     pO2_bar=pO2_bar_raw,
                 ),
                 was_clamped=False,
-            ),
+            )
+        object.__setattr__(
+            evaluation,
+            "extrapolation_notice",
+            extrapolation_value,
         )
         # Receipt notices and evaluator notices share a key. Assigning the
         # evaluator last used to drop a distinct notice on the oxygen receipt.
@@ -1393,8 +1398,11 @@ class CompiledPressureEvaluator:
         temperature = _finite_positive(temperature_K, "temperature_K")
         low, high = self.valid_temperature_K
         out_of_range = temperature < low or temperature > high
+        temperature_notice: dict[str, Any] = {}
         reference_log10 = (
-            self._out_of_domain_log10_continuation(temperature)
+            self._out_of_domain_log10_continuation(
+                temperature, temperature_notice=temperature_notice,
+            )
             if out_of_range
             else self.reference_model.log10_pressure(temperature)
         )
@@ -1459,6 +1467,8 @@ class CompiledPressureEvaluator:
 
         # Shadow has no behavior authority and is not a second registration
         # site. Notices on this typed payload are still a list.
+        if temperature_notice:
+            payload["extrapolation_notice"] = [dict(temperature_notice)]
         if self.pO2_exponent and math.isfinite(ln_pressure):
             pressure_pa = math.exp(float(ln_pressure))
             receipt = o2_potential.observation_or_setpoint_receipt
@@ -1468,7 +1478,7 @@ class CompiledPressureEvaluator:
                 else {}
             )
             extrapolation_items = receipt_notices.get("extrapolation_notice") or ()
-            if not extrapolation_items:
+            if not extrapolation_items and "extrapolation_notice" not in payload:
                 floor = _pO2_floor_inversion_notice(
                     species_id=self.species_id,
                     pressure_pa=pressure_pa,
@@ -1492,7 +1502,9 @@ class CompiledPressureEvaluator:
         apply_public_carrier_notices(payload, self)
         return MappingProxyType(payload)
 
-    def _out_of_domain_log10_continuation(self, temperature_K: float) -> float:
+    def _out_of_domain_log10_continuation(
+        self, temperature_K: float, *, temperature_notice: dict[str, Any] | None = None,
+    ) -> float:
         """Continuous out-of-domain estimate (anti-cliff; not claim authority).
 
         Owner-ratified anti-cliff policy: never drop to silent zero at the
@@ -1520,27 +1532,20 @@ class CompiledPressureEvaluator:
            attenuated linear-T slope that invented multi-dex low-T pressure.
         """
         if self.reference_model.physical_composite_ood:
-            # Premise: for composite carrier V, log10 P_V°(T) =
-            #   (1/ν) log10 K_ex(T) + (m/ν) log10 P_base°(T) + O2 term
-            # (see _log10_from_composite). Algebra: K_ex(T)=exp(-ΔG_ex°/RT)
-            # from whatever gas polynomials this row compiled — NASA CEA
-            # segments for some carriers (TiO2_gas), IVTAN-derived Shomate
-            # for others (MnO_gas / CoO_gas target gas). This branch does
-            # not first intersect those constituent domains, so "CEA
-            # 300–6000 K at any campaign T" is not a property of the
-            # branch. P_base° is the liquid-reservoir Antoine
-            #   log10 P_base = A − B/(T+C)
-            # which is van't Hoff / Clausius–Clapeyron in 1/(T+C) with the
-            # fitted reaction dH (B ∝ ΔH/R ln10). Composing at the requested
-            # T therefore evaluates each compiled factor at that T.
-            # Unit check: K_ex and every p/P° ratio are dimensionless;
-            # log10 P is log10(Pa). Sanity: at T=T_low the composite
-            # reproduces the in-domain edge value when every constituent
-            # polynomial accepts T_low (no cliff). MnO_gas / CoO_gas target
-            # Shomate cover [1000, 3000] K; T below that floor raises
-            # ShomateDomainError from the polynomial module rather than a
-            # typed catalog continuation.
-            return float(self.reference_model.log10_pressure(temperature_K))
+            # Compose the landed exchange and base-pressure models while their
+            # constituents accept T. Both scalar and typed consumers share the
+            # fallback and its original constituent-domain reason here.
+            try:
+                return float(self.reference_model.log10_pressure(temperature_K))
+            except (NasaCeaDomainError, ShomateDomainError) as exc:
+                if temperature_notice is not None:
+                    temperature_notice.update({
+                        "reason": str(exc),
+                        "authority_level": "extrapolated",
+                        "certified_band": {"temperature_K": self.valid_temperature_K},
+                        "continuation": "reciprocal_T_tangent",
+                    })
+                return self._reciprocal_T_tangent_log10(temperature_K)
 
         mode = self._physical_oor_continuation_mode()
         if mode == "direct":
@@ -1600,7 +1605,7 @@ class CompiledPressureEvaluator:
         return "reciprocal_T_tangent"
 
     def _reciprocal_T_tangent_log10(self, temperature_K: float) -> float:
-        """Continue log10 P as linear in 1/T from the fit-domain edge.
+        """Continue log10 P as linear in 1/T from the supported domain edge.
 
         Premise (Clausius–Clapeyron / van 't Hoff): near a local temperature
         where reaction ΔH is slowly varying,
@@ -1641,6 +1646,24 @@ class CompiledPressureEvaluator:
             )
 
         ref = self.reference_model
+
+        if ref.physical_composite_ood:
+            # The fit edge is inside every constituent's contiguous cover
+            # (checked at compile time). Bracket the actual support edge
+            # between that accepted T and the rejected request. Stop at
+            # adjacent floats so the join is the last supported temperature,
+            # not an arbitrary tolerance or the unrelated catalog fit edge.
+            rejected = temperature_K
+            while True:
+                probe = boundary + (rejected - boundary) * 0.5
+                if probe == boundary or probe == rejected:
+                    break
+                try:
+                    ref.log10_pressure(probe)
+                except (NasaCeaDomainError, ShomateDomainError):
+                    rejected = probe
+                else:
+                    boundary = probe
 
         if ref.evaluator_family == "antoine":
             try:
@@ -1699,7 +1722,7 @@ class CompiledPressureEvaluator:
         # reference surface is smooth.
         span = max(high - low, 1.0)
         step = min(max(span * 1.0e-4, 1.0e-3), 1.0)
-        inside = boundary + step if boundary == low else boundary - step
+        inside = boundary + step if temperature_K < low else boundary - step
         if inside <= 0.0:
             inside = boundary + step  # force positive probe
         boundary_log = float(ref.log10_pressure(boundary))
@@ -3613,6 +3636,57 @@ def _effective_pressure_reference_fit_is_evidenced(
     )
 
 
+def _antoine_abc(
+    coefficients: Mapping[str, Any],
+) -> tuple[float, float, float] | None:
+    """Finite Antoine ``(A, B, C)``. Booleans are not numbers."""
+
+    if any(isinstance(coefficients.get(name), bool) for name in ("A", "B", "C")):
+        return None
+    try:
+        triple = tuple(float(coefficients[name]) for name in ("A", "B", "C"))
+    except (KeyError, TypeError, ValueError):
+        return None
+    if not all(math.isfinite(item) for item in triple):
+        return None
+    return triple
+
+
+def _pure_component_sidecar_abc(
+    row: Mapping[str, Any],
+) -> tuple[float, float, float] | None:
+    """Cited pure-component Antoine on a species row, or None.
+
+    The sidecar is a law only when ``source`` is a nonblank citation.
+    A numeric block with no source is not evidence.
+    """
+
+    sidecar = row.get("pure_component_antoine")
+    if not isinstance(sidecar, Mapping):
+        return None
+    source = sidecar.get("source")
+    if not isinstance(source, str) or not source.strip():
+        return None
+    return _antoine_abc(sidecar)
+
+
+def _captured_matches_pure_component_sidecar(
+    captured: _ReferencePressureModel,
+    row: Mapping[str, Any],
+) -> bool:
+    """True when the closure's Antoine triple is the row's cited sidecar.
+
+    Float comparison, not mapping equality: the sidecar may store ``C: 0``
+    while the captured reference stores ``C: 0.0``.
+    """
+
+    if captured.evaluator_family != "antoine" or captured.points:
+        return False
+    sidecar = _pure_component_sidecar_abc(row)
+    captured_abc = _antoine_abc(captured.coefficients)
+    return sidecar is not None and captured_abc == sidecar
+
+
 def _captured_association_base(
     evaluator: CompiledPressureEvaluator,
 ) -> _ReferencePressureModel | None:
@@ -3710,10 +3784,19 @@ def _verified_gas_association_base_has_fit_evidence(
         base_oxygen = _stored_oxygen_executable_law(base_species_id, base_model)
     except CatalogCompileError:
         return False
-    return bool(
+    # Two cited curves live on the base row. The catalog pressure model is
+    # one. The pure-component Antoine sidecar is the other, and it is the
+    # curve FeO(g) association evaluates (a_Fe = 1, C = 0). A third triple
+    # matches neither and is refused. Oxygen on both stored laws stays the
+    # identity multiplier the closure actually calls.
+    catalog_match = (
         captured.evaluator_family == evidenced_base.evaluator_family
         and captured.coefficients == evidenced_base.coefficients
         and captured.points == evidenced_base.points
+    )
+    sidecar_match = _captured_matches_pure_component_sidecar(captured, base_row)
+    return bool(
+        (catalog_match or sidecar_match)
         and captured_oxygen == executed_oxygen
         and base_oxygen == executed_oxygen
     )
@@ -3765,8 +3848,10 @@ def _association_executed_law_notice(
 ) -> tuple[bool, Mapping[str, Any] | None]:
     """Notice for the base curve the association closure evaluates.
 
-    The caller has already verified that closure. A diagnostic base must
-    carry its notice. A historic base takes the notice from the bound
+    The caller has already verified that closure. A diagnostic catalog
+    model carries its notice only when the closure evaluates that model.
+    The pure-component sidecar is a different law and does not inherit the
+    catalog disagreement. A historic base takes the notice from the bound
     record. A certified base has no notice. A diagnostic base whose notice
     cannot be built is refused rather than certified.
     """
@@ -3788,6 +3873,23 @@ def _association_executed_law_notice(
         return False, None
     base_model = base_models[0]
     if _claims_diagnostic_only(base_species_id, base_model):
+        try:
+            evidenced = _compile_reference_model(base_species_id, base_model)
+            executes_catalog = (
+                captured.evaluator_family == evidenced.evaluator_family
+                and captured.coefficients == evidenced.coefficients
+                and captured.points == evidenced.points
+            )
+        except CatalogCompileError:
+            executes_catalog = False
+        if (
+            not executes_catalog
+            and _captured_matches_pure_component_sidecar(captured, base_row)
+        ):
+            # The disagreement anchor belongs to the catalog fit. Publishing
+            # it on the sidecar curve would attribute that gap to a law the
+            # closure does not run.
+            return True, None
         notice = _diagnostic_notice_from_model_coefficients(
             executed_species_id=base_species_id,
             model=base_model,
@@ -3855,10 +3957,14 @@ def _zero_activity_melt_executable_is_evidenced(
     A gas-association composite calls ``base_reference.log10_pressure()``.
     That call applies no base oxygen multiplier, so it executes only the
     identity law (exponent 0, reference 1 bar, no channel) on the captured
-    curve. The notice is the base law's notice. Own-row provenance on the
-    association does not evidence that call and cannot admit the composite.
-    A non-mapping entry in that provenance still refuses compilation; the
-    association branch must not return before that check.
+    curve. The notice is the base law's notice when that curve is the
+    catalog pressure model. The pure-component Antoine sidecar on the same
+    base row is a different executed law: matching its A, B, and C admits
+    the composite and does not copy the catalog model's diagnostic notice.
+    Own-row provenance on the association does not evidence that call and
+    cannot admit the composite. A non-mapping entry in that provenance
+    still refuses compilation; the association branch must not return
+    before that check.
     """
 
     # Before any branch, including the association return below. That return

@@ -837,6 +837,18 @@ def _catalog_activity_one_ceiling_pa(
 ) -> tuple[float | None, str]:
     """Ceiling pressure at ``source_activity``, or ``(None, evidence)``.
 
+    d-424: this is a source-reaction ceiling for every carrier, including
+    elemental and suboxide gases; it is not restricted to congruent oxide
+    saturation. The catalog compiles the declared reaction/thermochemistry:
+    for Na2O(l) <-> 2 Na(g) + 1/2 O2(g), K(T) = exp(-dG_rxn/(R*T))
+    and P_Na/P_std = (K * a_Na2O / (pO2/P_std)**0.5)**0.5. The catalog's
+    NaO0.5 basis is the same reaction divided by two. At activity 1 this
+    returns the maximum reaction pressure, in Pa after multiplying the
+    dimensionless pressure ratio by P_std. Reuse that compiled owner except
+    when the row's sole wall reaction is a direct, pO2-free congruent
+    gas/condensed transfer: that reaction is the pressure ceiling, while a
+    separate association pressure model may describe different chemistry.
+
     ``P = P_unit(T) * a^n * (pO2 / p_ref)^e``. ``source_activity`` is 1
     unless the interval still has a computed activity (d-401 amendment
     2). For ``n >= 0`` that activity is at most 1, so it cannot raise
@@ -888,6 +900,88 @@ def _catalog_activity_one_ceiling_pa(
         return 0.0, ""
     if activity_exponent == 0.0:
         source_activity = 1.0
+
+    # A sole 1:1, pO2-free wall reaction for the same formula defines this
+    # carrier's pure-component activity-1 pressure. Use the wall owner rather
+    # than a distinct source gas-association model (the FeO row is one real
+    # example of that mismatch). Premise: A(condensed) = A(g) at unit
+    # condensed activity. Algebra: ΔfG_r = ΔfG_g − ΔfG_cond and
+    # p/P° = exp(−ΔfG_r/RT).
+    # Units: JANAF ΔfG is kJ/mol, multiplied by 1000 J/kJ; RT is J/mol and
+    # P° = 1e5 Pa. Sanity: Fe JANAF at 1500 K gives ΔfG_r =
+    # 100.278 − (−175.415) = 275.693 kJ/mol, so p =
+    # 1e5 exp(−275693/(8.314462618 × 1500)) = 2.51018e−5 Pa.
+    # Limit: for positive sublimation ΔH, Psat → 0 as T → 0 and rises with T.
+    row = _legacy_vapour_row(catalog, species)
+    wall_block = row.get("wall_reactions") if row is not None else None
+    wall_reactions = (
+        wall_block.get("reactions")
+        if isinstance(wall_block, MappingABC)
+        else None
+    )
+    if (
+        isinstance(wall_reactions, Sequence)
+        and not isinstance(wall_reactions, (str, bytes))
+        and len(wall_reactions) == 1
+    ):
+        wall_reaction = wall_reactions[0]
+        vapor = (
+            wall_reaction.get("vapour")
+            if isinstance(wall_reaction, MappingABC)
+            else None
+        )
+        products = (
+            wall_reaction.get("products")
+            if isinstance(wall_reaction, MappingABC)
+            else None
+        )
+        vapor_formula = (
+            vapor.get("formula") if isinstance(vapor, MappingABC) else None
+        )
+        if (
+            isinstance(wall_reaction, MappingABC)
+            and wall_reaction.get("vapour_stoichiometry") == 1
+            and wall_reaction.get("oxygen_stoichiometry") == 0
+            and row.get("formula") == vapor_formula
+            and isinstance(products, Sequence)
+            and not isinstance(products, (str, bytes))
+            and len(products) == 1
+            and isinstance(products[0], MappingABC)
+            and products[0].get("stoichiometry") == 1
+            and products[0].get("formula") == vapor_formula
+        ):
+            from simulator.vapour_rail.nasa_cea import (
+                NasaCeaError,
+                WallSaturationLawRefusal,
+            )
+            from simulator.vapour_rail.wall_saturation import (
+                resolve_wall_saturation,
+            )
+
+            try:
+                wall_pressure = resolve_wall_saturation(
+                    row,
+                    species_id=species,
+                    T_K=temperature_K,
+                )
+            except WallSaturationLawRefusal as exc:
+                return None, exc.reason
+            except NasaCeaError:
+                return None, "wall_saturation_law_refused"
+            # When the wall Gibbs records are out of range, retain the
+            # catalog's existing predict-and-flag continuation below.
+            if all(
+                participant.authority_level == "authoritative"
+                for participant in wall_pressure.participants
+            ):
+                pressure_pa = (
+                    wall_pressure.pressure_Pa
+                    * float(source_activity) ** activity_exponent
+                )
+                if not math.isfinite(pressure_pa) or pressure_pa < 0.0:
+                    return None, "activity_one_ceiling_not_finite"
+                return pressure_pa, ""
+
     oxygen_bar, oxygen_evidence = _oxygen_bar_for_activity_one_ceiling(
         oxygen_exponent=oxygen_exponent,
         reference_pO2_bar=reference_pO2_bar,
@@ -1011,7 +1105,15 @@ def _activity_one_bound_rate_kg_hr(
         J_max_kg_hr = alpha_ub * P_sat * k_HK * area_m2 * 3600.
 
     Unit check. ``k_HK`` is kg/(m^2 Pa s) because Pa = kg/(m s^2).
-    Times Pa * m^2 * s/h gives kg/h.
+    Times Pa * m^2 * s/h gives kg/h. The integral multiplies by hours,
+    and the existing parent-oxide allocator caps that mass by the shared
+    element inventory, flagging inventory_capped. No second booking path.
+
+    Limits (d-424). At 313 K the source-reaction pressures give negligible
+    supply, rather than an assumed zero. Congruent oxide reactions (e=0)
+    need no pO2. Reductive elemental/suboxide reactions (e<0) grow as pO2
+    tends to zero and require a committed positive pO2; missing oxygen
+    remains missing_recorded_pO2, never a reference-pressure substitute.
 
     Sanity value, not a lunar fit. At 1500 K, M = 0.068 kg/mol,
     P_sat = 1e-3 Pa, alpha = 1, area = 0.2 m^2, and R = 8.314462618
@@ -3910,7 +4012,7 @@ def _target_species_yield_payload(
         status = "not-applicable"
     elif result.yield_fraction is None:
         status = "insufficient-evidence"
-    return MappingProxyType({
+    payload = {
         "status": status,
         "conclusion": "reported" if has_denominator else status,
         "applicable": has_denominator,
@@ -3949,7 +4051,10 @@ def _target_species_yield_payload(
             else None
         ),
         "reason": result.reason,
-    })
+    }
+    if result.notices:
+        payload["notices"] = result.notices
+    return MappingProxyType(payload)
 
 
 def _target_species_yield_insufficient_payload(
@@ -4136,6 +4241,8 @@ def _coating_runtime_diagnostics(value: Any) -> dict[str, Any]:
         if isinstance(owner, Mapping):
             add_source(owner.get("coating_diagnostics"))
             add_source(owner.get("stage3_route_diagnostic"))
+            add_source(owner.get("shadow_trace"))
+        add_source(getattr(owner, "shadow_trace", None))
         add_source(getattr(owner, "coating_diagnostics", None))
         for attr in ("condensation_model", "_condensation_model"):
             model = getattr(owner, attr, None)
@@ -4206,7 +4313,8 @@ def _coating_runtime_diagnostics(value: Any) -> dict[str, Any]:
         elif isinstance(source, (tuple, list)):
             for item in source:
                 if isinstance(item, Mapping):
-                    if item.get("key") == "silica_exposed_to_alkali":
+                    if (item.get("key") == "silica_exposed_to_alkali"
+                            or item.get("event") == "stage3_opening_refused"):
                         silica_exposed_to_alkali_findings.append(dict(item))
                     if item.get("stage3_route_diagnostic"):
                         add_source(item["stage3_route_diagnostic"])
@@ -4350,7 +4458,10 @@ def _coating_from_upstream_deposit_fraction_report(
     # Product costing books the same species through
     # the same run-total cutoff classifier: measured mass of a bounded
     # species is replaced, not added.
-    from simulator.optimize.objective import _mass_balance_ledger_resolution_kg
+    from simulator.optimize.objective import (
+        UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT,
+        _mass_balance_ledger_resolution_kg,
+    )
 
     resolution_kg = _mass_balance_ledger_resolution_kg(charge_mass_kg)
     classified_supply = _classify_refused_wall_supply_window(
@@ -4368,6 +4479,15 @@ def _coating_from_upstream_deposit_fraction_report(
     )
     warning_flags: list[dict[str, Any]] = []
     violation_reasons: list[dict[str, Any]] = []
+    unlocated = report.get(UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT)
+    if isinstance(unlocated, Mapping):
+        # The segment assignment owner has maximized the alternative loads.
+        # Consume its result without booking the bound in any zone or wall.
+        bound = _non_negative_number(unlocated["bound_kg"], "unlocated supply kg")
+        potential = _non_negative_number(unlocated["potential_load_kg"], "potential wall load kg")
+        priced_certain_kg = (potential - bound) / campaigns_elapsed
+        booked_supply_kg = bound / campaigns_elapsed
+        warning_flags.append({"reason": UNLOCATED_SUPPLY_BOUND_WORST_SEGMENT, **_plain_value(unlocated)})
 
     for record in certain_records:
         amount = float(record["deposit_kg_per_campaign"])
@@ -4821,6 +4941,9 @@ def _coating_wall_refused_species(
         raw_map = source.get("wall_saturation_pressure_refusals_by_species")
         if isinstance(raw_map, Mapping):
             species.update(str(item) for item in raw_map if str(item))
+        carriers = source.get("refused_carrier_species", ())
+        if isinstance(carriers, (tuple, list, set, frozenset)):
+            species.update(str(item) for item in carriers if str(item))
     return tuple(sorted(species))
 
 

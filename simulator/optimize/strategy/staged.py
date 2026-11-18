@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, fields, replace
 import math
 from types import MappingProxyType
-from typing import Any, Mapping, Sequence
+from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.optimize.doe import (
@@ -25,6 +25,7 @@ from simulator.optimize.objective import (
     ask_time_objective_definitions,
     candidate_rank_key,
     cost_adjusted_objective_scores,
+    furnace_cost_comparison,
     executed_objective_definitions,
     objective_scores,
     pareto_front,
@@ -351,6 +352,7 @@ class StagedStrategy:
         self._stage_joint_refine_trace_signals: dict[str, tuple[str, ...]] = {}
         self._asked_by_id: dict[str, Candidate] = {}
         self._results: list[tuple[Candidate, ScoredResult]] = []
+        self.furnace_cost_comparisons: list[Mapping[str, Any]] = []
         self._recorded_ids: set[str] = set()
         self._archive: tuple[_ArchiveMember, ...] = ()
         self._mode = "forward"
@@ -656,6 +658,8 @@ class StagedStrategy:
         if self._mode in {"backward", "joint_refine"}:
             self._advance_completed_backward_pass()
             return
+        comparison = _stage_cost_comparison(self._stage_results.values())
+        self.furnace_cost_comparisons.append(comparison)
         ranked = _rank_stage_results(
             self._stage_results.values(),
             self._definitions,
@@ -665,6 +669,7 @@ class StagedStrategy:
                 else self.beam_width
             ),
             profile=self.objective_profile,
+            comparison=comparison,
         )
         if self._stage_index == 0:
             ranked = _apply_stage0_seed_exploration_floor(ranked, self.beam_width)
@@ -675,16 +680,22 @@ class StagedStrategy:
             next_frontier.append(_node_from_candidate(candidate, scored, score_key, self.schema))
         self._frontier = tuple(next_frontier)
         if self._stage_index == len(self._stages) - 1:
+            members = _archive_members_from_results(
+                self._stage_results.values(),
+                self._definitions,
+                self.schema,
+                joint_refine_trace_signals=self._stage_joint_refine_trace_signals,
+                profile=self.objective_profile,
+            )
+            archive_comparison = _stage_cost_comparison(
+                (member.candidate, member.scored) for member in members
+            )
+            self.furnace_cost_comparisons.append(archive_comparison)
             self._archive = _pareto_archive(
-                _archive_members_from_results(
-                    self._stage_results.values(),
-                    self._definitions,
-                    self.schema,
-                    joint_refine_trace_signals=self._stage_joint_refine_trace_signals,
-                    profile=self.objective_profile,
-                ),
+                members,
                 self._definitions,
                 profile=self.objective_profile,
+                comparison=archive_comparison,
             )
             if self._archive:
                 self._frontier = tuple(member.node for member in self._archive)
@@ -692,11 +703,14 @@ class StagedStrategy:
         self._build_stage_candidates()
 
     def _advance_completed_backward_pass(self) -> None:
+        comparison = _stage_cost_comparison(self._stage_results.values())
+        self.furnace_cost_comparisons.append(comparison)
         ranked = _rank_stage_results(
             self._stage_results.values(),
             self._definitions,
             beam_width=len(self._stage_results),
             profile=self.objective_profile,
+            comparison=comparison,
         )
         children = tuple(
             _ArchiveMember(
@@ -711,10 +725,14 @@ class StagedStrategy:
             for score_key, candidate, scored in ranked
             if scored.objectives is not None
         )
+        members = (*self._archive, *children)
+        archive_comparison = _stage_cost_comparison((member.candidate, member.scored) for member in members)
+        self.furnace_cost_comparisons.append(archive_comparison)
         self._archive = _pareto_archive(
-            (*self._archive, *children),
+            members,
             self._definitions,
             profile=self.objective_profile,
+            comparison=archive_comparison,
         )
         self._frontier = tuple(member.node for member in self._archive)
         self._expected_stage_ids = set()
@@ -911,15 +929,27 @@ class StagedStrategy:
         )
 
 
+def _stage_cost_comparison(
+    results: Iterable[tuple[Candidate, ScoredResult]],
+) -> Mapping[str, Any]:
+    return furnace_cost_comparison({
+        candidate.id: scored.run_reference.product_summary if scored.run_reference else {}
+        for candidate, scored in results
+    })
+
+
 def _rank_stage_results(
     results: Sequence[tuple[Candidate, ScoredResult]],
     definitions: Sequence[ObjectiveDefinition],
     *,
     beam_width: int,
     profile: Mapping[str, Any] | None = None,
+    comparison: Mapping[str, Any] | None = None,
 ) -> tuple[tuple[tuple[Any, ...], Candidate, ScoredResult], ...]:
     seen_keys: dict[str, str] = {}
     ranked: list[tuple[tuple[Any, ...], Candidate, ScoredResult]] = []
+    if comparison is None:
+        comparison = _stage_cost_comparison(results)
     for candidate, scored in results:
         key = scored.cache_key
         if not isinstance(key, str) or not key:
@@ -930,7 +960,7 @@ def _rank_stage_results(
                 f"duplicate staged cache_key {key!r}: {prior!r} and {candidate.id!r}"
             )
         seen_keys[key] = candidate.id
-        score_key = _score_key(candidate, scored, definitions, profile=profile)
+        score_key = _score_key(candidate, scored, definitions, profile=profile, comparison=comparison)
         ranked.append((score_key, candidate, scored))
     ranked.sort(key=lambda item: item[0])
     return tuple(ranked[:beam_width])
@@ -964,10 +994,11 @@ def _archive_members_from_results(
     profile: Mapping[str, Any] | None = None,
 ) -> tuple[_ArchiveMember, ...]:
     members: list[_ArchiveMember] = []
+    comparison = _stage_cost_comparison(results)
     for candidate, scored in results:
         if not scored.feasible or scored.objectives is None:
             continue
-        score_key = _score_key(candidate, scored, definitions, profile=profile)
+        score_key = _score_key(candidate, scored, definitions, profile=profile, comparison=comparison)
         trace_signals = (
             ()
             if joint_refine_trace_signals is None
@@ -989,12 +1020,15 @@ def _pareto_archive(
     definitions: Sequence[ObjectiveDefinition],
     *,
     profile: Mapping[str, Any] | None = None,
+    comparison: Mapping[str, Any] | None = None,
 ) -> tuple[_ArchiveMember, ...]:
     scoreable = tuple(
         member
         for member in members
         if member.scored.objectives is not None
     )
+    if comparison is None:
+        comparison = _stage_cost_comparison((member.candidate, member.scored) for member in scoreable)
     if profile is not None and not _members_share_definitions(
         scoreable,
         definitions,
@@ -1010,7 +1044,7 @@ def _pareto_archive(
         front_members: list[_ArchiveMember] = []
         for group in grouped.values():
             active = _active_definitions(group[0].scored, definitions, profile)
-            front_members.extend(_pareto_archive(tuple(group), active))
+            front_members.extend(_pareto_archive(tuple(group), active, comparison=comparison))
         return tuple(
             sorted(
                 front_members,
@@ -1019,6 +1053,7 @@ def _pareto_archive(
                     member.scored,
                     definitions,
                     profile=profile,
+                    comparison=comparison,
                 ),
             )
         )
@@ -1029,6 +1064,7 @@ def _pareto_archive(
         score_getter=lambda member: _scored_objective_scores(
             member.scored,
             definitions,
+            comparison=comparison,
         ),
     )
     seen_keys: dict[str, str] = {}
@@ -1046,7 +1082,7 @@ def _pareto_archive(
             )
         seen_keys[key] = member.candidate.id
     return tuple(
-        sorted(front, key=lambda member: _score_key(member.candidate, member.scored, definitions))
+        sorted(front, key=lambda member: _score_key(member.candidate, member.scored, definitions, comparison=comparison))
     )
 
 
@@ -1118,10 +1154,11 @@ def _score_key(
     definitions: Sequence[ObjectiveDefinition],
     *,
     profile: Mapping[str, Any] | None = None,
+    comparison: Mapping[str, Any] | None = None,
 ) -> tuple[Any, ...]:
     active = _active_definitions(scored, definitions, profile)
     scores = (
-        _scored_objective_scores(scored, active)
+        _scored_objective_scores(scored, active, comparison=comparison)
         if scored.objectives is not None
         else (None,) * len(active)
     )
@@ -1140,6 +1177,8 @@ def _score_key(
 def _scored_objective_scores(
     scored: ScoredResult,
     definitions: Sequence[ObjectiveDefinition],
+    *,
+    comparison: Mapping[str, Any] | None = None,
 ) -> tuple[float | None, ...]:
     reference = scored.run_reference
     product_summary = reference.product_summary if reference is not None else {}
@@ -1153,6 +1192,7 @@ def _scored_objective_scores(
             scored.objectives,
             definitions,
             product_summary=product_summary,
+            comparison=comparison,
         )
     except ObjectiveComputationError:
         return (None,) * len(definitions)

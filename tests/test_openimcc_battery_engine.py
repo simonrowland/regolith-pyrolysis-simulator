@@ -1471,13 +1471,15 @@ def test_vapor_engine_labels_magemin_silicate_window_start_refusals() -> None:
         _solve_vapor_engine_cell_oxygen_balance,
     )
 
+    # SiO2=20 wt% is a flagged prediction. A missing silicate network
+    # (SiO2<=0) is still the refusal this label consumes.
     valid, warnings, engine_reason = MAGEMinDomainGate.validate_with_reason(
-        {"SiO2": 20.0, "MgO": 80.0}
+        {"Al2O3": 100.0}
     )
     assert not valid
     assert engine_reason == "silicate_window"
     assert any(
-        "SiO2 = 20.00 wt% is outside MELTS calibration window "
+        "SiO2 = 0.00 wt% is outside MELTS calibration window "
         "[30.0, 80.0] wt% (below the window)." in warning
         for warning in warnings
     )
