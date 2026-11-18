@@ -2003,6 +2003,65 @@ class _CompositionRefusal:
     closure_refusal: bool = False
 
 
+class _CompositionInputClassification(Enum):
+    NOT_PRINTED = "not_printed"
+    INVALID = "invalid"
+
+
+def _classify_composition_input(
+    identity_composition: State[Composition] | None,
+    point_composition: Located[Any] | None,
+    *,
+    refusal_reasons: Sequence[str] = (),
+    refusal_classifications: Sequence[_CompositionRefusal] = (),
+    declared_map: bool = False,
+) -> tuple[_CompositionInputClassification, str | None]:
+    """Classify whether the run composition is absent or contains invalid input.
+
+    Under ``initial_charge_only``, a value composition is the printed starting
+    charge. Unknown composition states are eligible for that proxy only when
+    they explicitly represent an absent field; invalid and ambiguous inputs
+    remain terminal.
+    """
+
+    if refusal_reasons:
+        return _CompositionInputClassification.INVALID, refusal_reasons[0]
+    if refusal_classifications:
+        return (
+            _CompositionInputClassification.INVALID,
+            refusal_classifications[0].reason,
+        )
+
+    states = (
+        point_composition.state if isinstance(point_composition, Located) else None,
+        identity_composition,
+    )
+    has_value = False
+    for state in states:
+        if state is None:
+            continue
+        if state.is_value:
+            has_value = True
+            continue
+        if state.is_not_applicable:
+            return (
+                _CompositionInputClassification.INVALID,
+                state.reason or "composition input is not applicable",
+            )
+        reason = state.reason or "composition input is ambiguous"
+        if reason == "no composition mapped from source" or reason.startswith(
+            "no composition field under keys "
+        ):
+            continue
+        return _CompositionInputClassification.INVALID, reason
+    if declared_map and not has_value:
+        return (
+            _CompositionInputClassification.INVALID,
+            "explicit printed point composition map is unusable",
+        )
+    return _CompositionInputClassification.NOT_PRINTED, None
+
+
 @dataclass(frozen=True)
 class _MassPercentClosureResult:
     composition: Composition | None
@@ -9299,6 +9358,7 @@ def _initial_charge_only_composition_proxy(
     origin: str,
     initial_charge_context: Mapping[str, Any] | None = None,
     point_composition_refusal: Sequence[str] = (),
+    point_composition_refusal_classifications: Sequence[_CompositionRefusal] = (),
     point_composition_context: Mapping[str, Any] | None = None,
     point_oxide_map: Mapping[str, Decimal] | None = None,
     point_declared_component_map: Mapping[str, Any] | None = None,
@@ -9306,28 +9366,19 @@ def _initial_charge_only_composition_proxy(
 ) -> tuple[Identity, Mapping[str, Located[Any]] | None, list[Notice]]:
     conditions = dict(point_conditions or {})
     point_composition = conditions.get("composition")
-    malformed_composition_reason = None
-    # A declared but malformed composition is present invalid input, never a
-    # missing run composition eligible for the initial-charge proxy.
-    incoming_compositions = (
-        point_composition.state
-        if isinstance(point_composition, Located)
-        else None,
+    classification, invalid_reason = _classify_composition_input(
         identity.composition,
+        point_composition if isinstance(point_composition, Located) else None,
+        refusal_reasons=point_composition_refusal,
+        refusal_classifications=point_composition_refusal_classifications,
+        declared_map=point_composition_map_declared,
     )
-    for incoming in incoming_compositions:
-        if (
-            incoming is not None
-            and incoming.is_unknown
-            and (incoming.reason or "").startswith(
-                f"{_MALFORMED_DECLARED_AMOUNT_PREFIX}:"
-            )
-        ):
-            malformed_composition_reason = incoming.reason
-            break
-    if malformed_composition_reason is not None:
+    if classification is _CompositionInputClassification.INVALID:
         invalid = Located(
-            State.unknown(malformed_composition_reason), locator=locator
+            State.unknown(
+                invalid_reason or "explicit printed point composition map is unusable"
+            ),
+            locator=locator,
         )
         conditions["composition"] = invalid
         return replace(identity, composition=invalid.state), conditions, list(notices)
@@ -9362,18 +9413,6 @@ def _initial_charge_only_composition_proxy(
         return identity, point_conditions, list(notices)
 
     refusal_reasons = list(point_composition_refusal)
-    if isinstance(point_composition, Located) and point_composition.state.is_unknown:
-        point_reason = point_composition.state.reason
-        if point_reason and any(
-            marker in point_reason.casefold()
-            for marker in (
-                "unsupported component",
-                "malformed printed component amount",
-                "mass-percent composition",
-                "partial_composition:",
-            )
-        ):
-            refusal_reasons.append(point_reason)
     composition = None
     composition_locator = locator
     if point_composition_map_declared:
@@ -29098,6 +29137,7 @@ class Migrator:
                 quantity_as_printed=values.get("quantity"),
                 locator=locator,
                 origin=obs_id,
+                point_composition_refusal=composition_refusal,
             )
         )
         if total_iron_notice is not None:
@@ -29902,7 +29942,7 @@ class Migrator:
                     or locator
                 )
             try:
-                point_composition, _point_omitted = (
+                point_composition, point_omitted = (
                     _mole_fraction_composition_from_values(raw_item)
                 )
             except ValueError as exc:
@@ -29911,6 +29951,13 @@ class Migrator:
                 )
                 point_composition = None
                 malformed_composition_amount = detail
+                point_omitted = ()
+            if point_omitted:
+                reason = partial_composition_unknown_reason(point_omitted)
+                point_composition_refusal.append(reason)
+                point_composition_refusal_classifications.append(
+                    _CompositionRefusal(reason)
+                )
             point_composition_located = (
                 None
                 if point_composition is None
@@ -31360,6 +31407,9 @@ class Migrator:
                 locator=point_locator,
                 origin=point_id,
                 point_composition_refusal=point_composition_refusal,
+                point_composition_refusal_classifications=(
+                    point_composition_refusal_classifications
+                ),
                 point_composition_context=(
                     raw_item if isinstance(raw_item, Mapping) else None
                 ),

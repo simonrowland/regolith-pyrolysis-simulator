@@ -14096,35 +14096,89 @@ def test_activity_without_row_composition_uses_sample_numeric_pin(tmp_path: Path
     }
 
 
-def _score_initial_charge_malformed_composition_path(
-    tmp_path: Path, *, path: str, malformed: bool
+def _score_initial_charge_invalid_composition_path(
+    tmp_path: Path, *, path: str, invalid_kind: str | None
 ):
+    layout = {
+        "scalar-row": ("activity", "dimensionless", "activity_coefficient", None),
+        "child-point": ("activity", "dimensionless", "activity_coefficient", "points"),
+        "exploded-child": ("activity", "dimensionless", "activity_coefficient", "rows"),
+        "series": ("activity", "dimensionless", "activity_coefficient", "series"),
+        "tests": ("activity", "dimensionless", "activity_coefficient", "tests"),
+        "yield-series": ("mass_loss_fraction", "fraction", "mass_loss", "tests"),
+        "rows_as_printed": (
+            "activity_coefficient_temperature_fit",
+            "dimensionless",
+            "activity_coefficient_temperature_fit",
+            "rows_as_printed",
+        ),
+        "tabulated_delta_fG": (
+            "delta_fG",
+            "kJ_per_mol",
+            "gibbs_table",
+            "tabulated_delta_fG_kJ_mol",
+        ),
+    }
+    quantity, units, obs_type, container = layout[path]
     values = {
-        "quantity": "activity",
-        "activity": 0.2,
+        "quantity": quantity,
         "method_class": "measured_direct",
         "admission_status": "admitted",
         "composition_role": "initial_charge_only",
         "composition_wt_pct": {"SiO2": 50, "MgO": 50},
     }
-    malformed_map = {
-        "SiO2": "0.5",
-        "MgO": "not-a-number",
-        "CaO": "0.4",
+    item_by_quantity = {
+        "activity": {"T_K": 1773.15, "activity": 0.2},
+        "mass_loss_fraction": {"T_K": 1773.15, "mass_loss_fraction": 0.2},
+        "activity_coefficient_temperature_fit": {
+            "oxide": "MgO",
+            "A_printed": "0.2",
+            "B_printed": "100",
+            "notes_printed": "liquid standard state 1773–1773 K",
+        },
+        "delta_fG": {"T_K": 1773.15, "delta_fG": -10},
     }
-    if path == "scalar-row":
-        if malformed:
-            values["composition_mol"] = malformed_map
-    else:
-        item = {"T_K": 1773.15, "activity": 0.2}
-        if malformed:
-            item["composition_mol"] = malformed_map
-        values[path] = [item]
+    if quantity in {"activity", "mass_loss_fraction"}:
+        values[quantity] = 0.2
+    elif quantity == "activity_coefficient_temperature_fit":
+        values.update({"A_printed": "0.2", "B_printed": "100"})
+    invalid_fields = {
+        "malformed-mole": {
+            "composition_mol": {
+                "SiO2": "0.5",
+                "MgO": "not-a-number",
+                "CaO": "0.4",
+            }
+        },
+        "partial-mole": {
+            "composition_mol": {
+                "SiO2": "0.5",
+                "MgO": "0.4",
+                "unidentified slag": "0.1",
+            }
+        },
+        "wt-percent-map-refusal": {
+            "composition_wt_pct": {"SiO2": "49", "MgO": "49", "XxO": "2"}
+        },
+        "malformed-mole-and-wt-map-refusal": {
+            "composition_mol": {
+                "SiO2": "0.5",
+                "MgO": "not-a-number",
+                "CaO": "0.4",
+            },
+            "composition_wt_pct": {"SiO2": "49", "MgO": "49", "XxO": "2"},
+        },
+    }
+    item = item_by_quantity[quantity]
+    if invalid_kind is not None:
+        (values if container is None else item).update(invalid_fields[invalid_kind])
+    if container is not None:
+        values[container] = [item]
     extract = _scalar_extract(
-        quantity="activity",
-        units="dimensionless",
+        quantity=quantity,
+        units=units,
         values=values,
-        obs_type="activity_coefficient",
+        obs_type=obs_type,
     )
     row = extract["species"]["Na"]["observations"][0]
     row.update(
@@ -14134,6 +14188,8 @@ def _score_initial_charge_malformed_composition_path(
             "standard_state": "Raoultian pure liquid MgO",
         }
     )
+    if quantity == "delta_fG":
+        row["phase"] = "g"
     extract["species"] = {"MgO": {"observations": [row]}}
     extract["experiments"] = [
         {
@@ -14151,7 +14207,7 @@ def _score_initial_charge_malformed_composition_path(
     ]
     result = migrate(_write_min_tree(tmp_path, extract), write=False)
     observations = tuple(result.observations.values())
-    assert len(observations) == 1, (path, malformed, observations)
+    assert len(observations) == 1, (path, invalid_kind, observations)
     observation = observations[0]
     validation = result.validation
     context = ScoreContext(
@@ -14166,57 +14222,163 @@ def _score_initial_charge_malformed_composition_path(
     residuals, _candidates = score_store(
         context,
         engines=(Engine.OPENIMCC,),
-        rail=Rail.MELT_ACTIVITY,
         include_diagnostics=False,
     )
     return observation, tuple(
         residual
         for residual in residuals
         if residual.reference == observation.observation_id
-    )
+    ), result
 
 
 @pytest.mark.parametrize(
     "path",
-    ["scalar-row", "points", "rows", "series"],
-    ids=["scalar-row", "child-point", "exploded-child", "series"],
+    [
+        "scalar-row",
+        "child-point",
+        "exploded-child",
+        "series",
+        "tests",
+        "yield-series",
+        "rows_as_printed",
+        "tabulated_delta_fG",
+    ],
+    ids=[
+        "scalar-row",
+        "child-point",
+        "exploded-child",
+        "series",
+        "tests",
+        "yield-series",
+        "rows_as_printed",
+        "tabulated_delta_fG",
+    ],
 )
-def test_initial_charge_proxy_owner_preserves_malformed_input_across_all_call_paths(
+def test_initial_charge_proxy_preserves_invalid_input_across_all_container_paths(
     tmp_path: Path, path: str
 ) -> None:
-    malformed, refused = _score_initial_charge_malformed_composition_path(
-        tmp_path / "malformed", path=path, malformed=True
+    malformed, refused, _malformed_result = (
+        _score_initial_charge_invalid_composition_path(
+            tmp_path / "malformed", path=path, invalid_kind="malformed-mole"
+        )
     )
     assert malformed.identity.composition is not None
     assert malformed.identity.composition.is_unknown
-    assert refused
-    assert all(row.status is ResidualStatus.REFUSED for row in refused)
-    assert all(
-        row.refusal is not None
-        and row.refusal.reason is RefusalReason.INVALID_SOURCE
-        for row in refused
-    )
-
-    valid, scored = _score_initial_charge_malformed_composition_path(
-        tmp_path / "valid", path=path, malformed=False
-    )
-    composition_states = [valid.identity.composition]
-    point_composition = (valid.point_conditions or {}).get("composition")
+    composition_states = [malformed.identity.composition]
+    point_composition = (malformed.point_conditions or {}).get("composition")
     if isinstance(point_composition, Located):
         composition_states.append(point_composition.state)
-    assert any(
+    assert not any(
         state is not None
         and state.is_value
         and isinstance(state.value, Composition)
         and state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
         for state in composition_states
+    ), (path, malformed)
+    if quantity_token(malformed.identity) is Quantity.ACTIVITY:
+        assert refused
+        assert all(row.status is ResidualStatus.REFUSED for row in refused)
+        assert all(
+            row.refusal is not None
+            and row.refusal.reason is RefusalReason.INVALID_SOURCE
+            for row in refused
+        )
+
+    valid, scored, _valid_result = _score_initial_charge_invalid_composition_path(
+        tmp_path / "valid", path=path, invalid_kind=None
+    )
+    valid_states = [valid.identity.composition]
+    valid_point_composition = (valid.point_conditions or {}).get("composition")
+    if isinstance(valid_point_composition, Located):
+        valid_states.append(valid_point_composition.state)
+    assert any(
+        state is not None
+        and state.is_value
+        and isinstance(state.value, Composition)
+        and state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        for state in valid_states
     ), (path, valid)
-    assert scored, path
     assert all(
         row.refusal is None
         or row.refusal.reason is not RefusalReason.INVALID_SOURCE
         for row in scored
     ), (path, scored)
+
+
+@pytest.mark.parametrize(
+    ("path", "invalid_kind"),
+    (
+        ("scalar-row", "partial-mole"),
+        ("child-point", "partial-mole"),
+        ("tests", "partial-mole"),
+        ("scalar-row", "wt-percent-map-refusal"),
+        ("child-point", "wt-percent-map-refusal"),
+        ("tests", "wt-percent-map-refusal"),
+    ),
+)
+def test_initial_charge_proxy_refuses_partial_and_wt_map_compositions(
+    tmp_path: Path, path: str, invalid_kind: str
+) -> None:
+    observation, residuals, result = _score_initial_charge_invalid_composition_path(
+        tmp_path, path=path, invalid_kind=invalid_kind
+    )
+    composition_states = [observation.identity.composition]
+    point_composition = (observation.point_conditions or {}).get("composition")
+    if isinstance(point_composition, Located):
+        composition_states.append(point_composition.state)
+    assert not any(
+        state is not None
+        and state.is_value
+        and isinstance(state.value, Composition)
+        and state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        for state in composition_states
+    ), (path, invalid_kind, observation)
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown, (
+        path,
+        invalid_kind,
+        observation.identity.composition,
+    )
+    if path == "scalar-row" or quantity_token(observation.identity) is Quantity.ACTIVITY:
+        assert residuals
+        assert all(row.status is ResidualStatus.REFUSED for row in residuals)
+        assert all(
+            row.refusal is not None
+            and row.refusal.reason is RefusalReason.INVALID_SOURCE
+            for row in residuals
+        ), (path, invalid_kind, residuals)
+    assert result.validation is not None
+
+
+@pytest.mark.parametrize("path", ("exploded-child", "series"))
+def test_exploded_malformed_mole_and_wt_map_refusal_stays_invalid(
+    tmp_path: Path, path: str
+) -> None:
+    observation, residuals, _result = _score_initial_charge_invalid_composition_path(
+        tmp_path,
+        path=path,
+        invalid_kind="malformed-mole-and-wt-map-refusal",
+    )
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    composition_states = [observation.identity.composition]
+    point_composition = (observation.point_conditions or {}).get("composition")
+    if isinstance(point_composition, Located):
+        composition_states.append(point_composition.state)
+    assert not any(
+        state is not None
+        and state.is_value
+        and isinstance(state.value, Composition)
+        and state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        for state in composition_states
+    ), (path, observation)
+    assert residuals
+    assert all(row.status is ResidualStatus.REFUSED for row in residuals)
+    assert all(
+        row.refusal is not None
+        and row.refusal.reason is RefusalReason.INVALID_SOURCE
+        for row in residuals
+    ), (path, residuals)
 
 
 @pytest.mark.parametrize("printed_marker", ["<0.01", "tr."])
