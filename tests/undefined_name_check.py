@@ -34,25 +34,36 @@ def undefined_names(path: Path) -> tuple[tuple[str, int], ...]:
         and any(alias.name == "annotations" for alias in statement.names)
         for statement in tree.body
     )
-    runtime_loads = _runtime_loads(tree, top, postponed_annotations)
-    type_checking_imports, runtime_imports = _module_imports(tree)
+    runtime_loads, comprehension_targets = _runtime_loads(
+        tree, top, postponed_annotations
+    )
+    type_checking_imports, runtime_bindings = _scope_bindings(tree)
+    module_scope = _scope_key(top)
     defined = {
         symbol.get_name()
         for symbol in top.get_symbols()
         if symbol.is_assigned() or symbol.is_imported() or symbol.is_namespace()
     }
-    runtime_namespaces = {
-        symbol.get_name()
-        for symbol in top.get_symbols()
-        if symbol.is_namespace()
-    }
     defined.difference_update(
-        type_checking_imports - runtime_imports - runtime_namespaces
+        type_checking_imports.get(module_scope, set())
+        - runtime_bindings.get(module_scope, set())
+    )
+    defined.difference_update(
+        comprehension_targets.get(module_scope, set())
+        - runtime_bindings.get(module_scope, set())
     )
     missing: set[tuple[str, int]] = set()
 
     def walk(table: symtable.SymbolTable) -> None:
         table_loads = runtime_loads.get(_scope_key(table), {})
+        if table.get_type() == "class":
+            type_only_class_names = (
+                type_checking_imports.get(_scope_key(table), set())
+                - runtime_bindings.get(_scope_key(table), set())
+                - defined
+            )
+            for name in type_only_class_names & table_loads.keys():
+                missing.add((name, table_loads[name]))
         for symbol in table.get_symbols():
             name = symbol.get_name()
             is_unbound_global = symbol.is_global() or (
@@ -84,9 +95,11 @@ def _runtime_loads(
     tree: ast.Module,
     top: symtable.SymbolTable,
     postponed_annotations: bool,
-) -> dict[_ScopeKey, dict[str, int]]:
+) -> tuple[dict[_ScopeKey, dict[str, int]], dict[_ScopeKey, set[str]]]:
     loads: dict[_ScopeKey, dict[str, int]] = {}
+    comprehension_targets: dict[_ScopeKey, set[str]] = {}
     symbol_scopes: set[_ScopeKey] = set()
+    variable_annotation_scopes: dict[_ScopeKey, _ScopeKey] = {}
 
     def collect_scopes(table: symtable.SymbolTable) -> None:
         symbol_scopes.add(_scope_key(table))
@@ -95,10 +108,20 @@ def _runtime_loads(
 
     collect_scopes(top)
 
-    def annotation_scope(outer_scope: _ScopeKey, line: int) -> _ScopeKey:
+    def annotation_scope(
+        outer_scope: _ScopeKey,
+        line: int,
+        *,
+        variable: bool = False,
+    ) -> _ScopeKey:
         # Python 3.14 reports eager annotations in an annotation child table.
+        if variable and outer_scope in variable_annotation_scopes:
+            return variable_annotation_scopes[outer_scope]
         candidate = ("annotation", "__annotate__", line)
-        return candidate if candidate in symbol_scopes else outer_scope
+        result = candidate if candidate in symbol_scopes else outer_scope
+        if variable:
+            variable_annotation_scopes[outer_scope] = result
+        return result
 
     def record(node: ast.Name, scope: _ScopeKey) -> None:
         if isinstance(node.ctx, ast.Load):
@@ -156,20 +179,29 @@ def _runtime_loads(
         if isinstance(node, ast.AnnAssign):
             visit(node.target, scope)
             if not postponed_annotations and scope[0] != "function":
-                visit(node.annotation, annotation_scope(scope, node.lineno))
+                visit(
+                    node.annotation,
+                    annotation_scope(scope, node.lineno, variable=True),
+                )
             if node.value is not None:
                 visit(node.value, scope)
             return
         if isinstance(node, ast.arg):
             return
         if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
-            _visit_comprehension(node, scope, visit, symbol_scopes)
+            _visit_comprehension(
+                node,
+                scope,
+                visit,
+                symbol_scopes,
+                comprehension_targets,
+            )
             return
         for child in ast.iter_child_nodes(node):
             visit(child, scope)
 
     visit(tree, _scope_key(top))
-    return loads
+    return loads, comprehension_targets
 
 
 def _visit_comprehension(
@@ -177,6 +209,7 @@ def _visit_comprehension(
     outer_scope: _ScopeKey,
     visit,
     symbol_scopes: set[_ScopeKey],
+    comprehension_targets: dict[_ScopeKey, set[str]],
 ) -> None:
     if not node.generators:
         return
@@ -190,6 +223,15 @@ def _visit_comprehension(
     }
     child_scope = ("function", names[type(node)], node.lineno)
     inner_scope = child_scope if child_scope in symbol_scopes else outer_scope
+    if inner_scope == outer_scope:
+        targets = comprehension_targets.setdefault(outer_scope, set())
+        for generator in node.generators:
+            targets.update(
+                target.id
+                for target in ast.walk(generator.target)
+                if isinstance(target, ast.Name)
+                and isinstance(target.ctx, ast.Store)
+            )
     for index, generator in enumerate(node.generators):
         if index:
             visit(generator.iter, inner_scope)
@@ -203,7 +245,9 @@ def _visit_comprehension(
         visit(node.elt, inner_scope)
 
 
-def _module_imports(tree: ast.Module) -> tuple[set[str], set[str]]:
+def _scope_bindings(
+    tree: ast.Module,
+) -> tuple[dict[_ScopeKey, set[str]], dict[_ScopeKey, set[str]]]:
     typing_modules = {"typing"}
     type_checking_names = {"TYPE_CHECKING"}
     for node in ast.walk(tree):
@@ -216,11 +260,11 @@ def _module_imports(tree: ast.Module) -> tuple[set[str], set[str]]:
                 if alias.name == "TYPE_CHECKING":
                     type_checking_names.add(alias.asname or alias.name)
 
-    type_only: set[str] = set()
-    runtime: set[str] = set()
+    type_only: dict[_ScopeKey, set[str]] = {}
+    runtime: dict[_ScopeKey, set[str]] = {}
 
     def import_bindings(node: ast.Import | ast.ImportFrom) -> set[str]:
-        bindings = set()
+        bindings: set[str] = set()
         for alias in node.names:
             if alias.name == "*":
                 continue
@@ -242,31 +286,72 @@ def _module_imports(tree: ast.Module) -> tuple[set[str], set[str]]:
             and test.value.id in typing_modules
         )
 
-    def visit_statements(statements: list[ast.stmt], under_type_checking: bool) -> None:
+    def bind_names(
+        scope: _ScopeKey,
+        names: set[str],
+        under_type_checking: bool,
+    ) -> None:
+        destination = type_only if under_type_checking else runtime
+        destination.setdefault(scope, set()).update(names)
+
+    def visit_statements(
+        statements: list[ast.stmt],
+        scope: _ScopeKey,
+        under_type_checking: bool,
+    ) -> None:
         for statement in statements:
-            if isinstance(
-                statement,
-                (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef),
-            ):
+            if isinstance(statement, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                bind_names(scope, {statement.name}, under_type_checking)
+                continue
+            if isinstance(statement, ast.ClassDef):
+                bind_names(scope, {statement.name}, under_type_checking)
+                visit_statements(
+                    statement.body,
+                    ("class", statement.name, statement.lineno),
+                    under_type_checking,
+                )
                 continue
             if isinstance(statement, ast.If):
                 visit_statements(
                     statement.body,
+                    scope,
                     under_type_checking or is_type_checking(statement.test),
                 )
-                visit_statements(statement.orelse, under_type_checking)
+                visit_statements(statement.orelse, scope, under_type_checking)
                 continue
             if isinstance(statement, (ast.Import, ast.ImportFrom)):
-                destination = type_only if under_type_checking else runtime
-                destination.update(import_bindings(statement))
+                bind_names(scope, import_bindings(statement), under_type_checking)
                 continue
+            if isinstance(statement, ast.Assign):
+                bind_names(
+                    scope,
+                    {
+                        target.id
+                        for assignment_target in statement.targets
+                        for target in ast.walk(assignment_target)
+                        if isinstance(target, ast.Name)
+                        and isinstance(target.ctx, ast.Store)
+                    },
+                    under_type_checking,
+                )
+            elif isinstance(statement, (ast.AnnAssign, ast.AugAssign)):
+                bind_names(
+                    scope,
+                    {
+                        target.id
+                        for target in ast.walk(statement.target)
+                        if isinstance(target, ast.Name)
+                        and isinstance(target.ctx, ast.Store)
+                    },
+                    under_type_checking,
+                )
             for child in ast.iter_child_nodes(statement):
                 if isinstance(child, ast.stmt):
-                    visit_statements([child], under_type_checking)
+                    visit_statements([child], scope, under_type_checking)
                 elif isinstance(child, ast.ExceptHandler):
-                    visit_statements(child.body, under_type_checking)
+                    visit_statements(child.body, scope, under_type_checking)
                 elif isinstance(child, ast.match_case):
-                    visit_statements(child.body, under_type_checking)
+                    visit_statements(child.body, scope, under_type_checking)
 
-    visit_statements(tree.body, False)
+    visit_statements(tree.body, ("module", "top", 0), False)
     return type_only, runtime

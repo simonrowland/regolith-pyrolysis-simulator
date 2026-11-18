@@ -150,6 +150,58 @@ def test_undefined_names_in_comprehensions_are_reported(
     assert undefined_names(path) == (("missing", 2),)
 
 
+def test_comprehension_target_does_not_bind_module_name(tmp_path: Path) -> None:
+    path = tmp_path / "comprehension_target.py"
+    path.write_text(
+        "values = [leaked for leaked in (1,)]\n"
+        "def read():\n"
+        "    return leaked\n"
+    )
+
+    assert undefined_names(path) == (("leaked", 3),)
+
+
+def test_later_variable_annotation_uses_shared_annotation_scope(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "shared_annotations.py"
+    path.write_text("first: int\nsecond: MissingType\n")
+
+    assert undefined_names(path) == (("MissingType", 2),)
+
+
+def test_runtime_assignment_after_type_checking_import_is_a_binding(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "runtime_rebinding.py"
+    path.write_text(
+        "from typing import TYPE_CHECKING\n"
+        "if TYPE_CHECKING:\n"
+        "    from somewhere import T\n"
+        "T = object()\n"
+        "def read():\n"
+        "    return T\n"
+    )
+
+    assert undefined_names(path) == ()
+
+
+def test_class_type_checking_import_is_not_runtime_annotation_binding(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "class_type_checking_annotation.py"
+    path.write_text(
+        "from typing import TYPE_CHECKING\n"
+        "class Box:\n"
+        "    if TYPE_CHECKING:\n"
+        "        from somewhere import T\n"
+        "    def read(self, value: T):\n"
+        "        return None\n"
+    )
+
+    assert undefined_names(path) == (("T", 5),)
+
+
 def test_undefined_load_line_comes_from_its_own_scope(tmp_path: Path) -> None:
     path = tmp_path / "scope_line.py"
     path.write_text(
