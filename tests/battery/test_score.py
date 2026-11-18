@@ -2213,7 +2213,8 @@ def test_kems_printed_pressure_envelope_excludes_validation_flagged_rows() -> No
     from simulator.battery.score import derive_kems_partial_pressure_band
     from simulator.battery.validity import run_validity_gates
 
-    experiment = F.kems_experiment("initial-charge-proxy-band", kn=20)
+    # Without a printed orifice Kn, the lone pressure cannot verify the regime.
+    experiment = F.kems_experiment("initial-charge-proxy-band", kn=None)
     composition = Composition(
         basis="printed_mole_fraction",
         components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
@@ -2241,6 +2242,7 @@ def test_kems_printed_pressure_envelope_excludes_validation_flagged_rows() -> No
     )
 
     assert not gates.passed
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
     assert band is None
 
 
