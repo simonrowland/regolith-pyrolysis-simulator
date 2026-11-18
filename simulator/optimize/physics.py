@@ -4985,6 +4985,8 @@ def _coating_missing_refused_flux_bounds(
 def _unique_coating_records(
     records: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
+    from simulator.optimize.results_store import _jsonable
+
     unique: list[dict[str, Any]] = []
     seen: set[tuple[Any, ...]] = set()
     for record in records:
@@ -4999,9 +5001,9 @@ def _unique_coating_records(
                 value_key = (float, value.hex())
             else:
                 # Only the large shared trees above use identity. Other nested
-                # reason details are small JSON values and keep their prior
-                # content-based deduplication behavior.
-                value_key = ("payload", canonical_json_dumps(value))
+                # reason details are small values; use the store's conversion
+                # so the dedupe key matches what can be persisted.
+                value_key = ("payload", canonical_json_dumps(_jsonable(value)))
             fields.append((key, value_key))
         key = tuple(sorted(fields, key=lambda item: item[0]))
         if key in seen:

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import math
 import pickle
+from dataclasses import dataclass
+from enum import Enum
 from types import SimpleNamespace
 
 import pytest
@@ -1024,6 +1026,13 @@ def test_d045_silica_exposure_fails_at_zero_wall_deposit_mass() -> None:
 
 
 def test_equal_nested_coating_reasons_keep_content_based_deduplication() -> None:
+    class DetailKind(Enum):
+        SOURCE = "source"
+
+    @dataclass(frozen=True)
+    class DetailRecord:
+        source: str
+
     finding = {
         "key": "silica_exposed_to_alkali",
         "stage_number": 3,
@@ -1037,13 +1046,29 @@ def test_equal_nested_coating_reasons_keep_content_based_deduplication() -> None
         "reason": "explicit_coating_violation",
         "detail": {"segment": "hot_wall", "species": "SiO"},
     }
+    equivalent_details = (
+        ("positive_infinity", float("inf"), float("inf")),
+        ("nan", float("nan"), float("nan")),
+        ("negative_zero", -0.0, -0.0),
+        ("set", {"wall", "source"}, {"source", "wall"}),
+        ("tuple", tuple(["wall", 3]), tuple(["wall", 3])),
+        ("enum", DetailKind.SOURCE, DetailKind.SOURCE),
+        ("dataclass", DetailRecord("wall"), DetailRecord("wall")),
+    )
+    explicit_reasons = [explicit_reason_a, explicit_reason_b]
+    for name, first_value, second_value in equivalent_details:
+        reason_name = f"explicit_{name}"
+        explicit_reasons.extend((
+            {"reason": reason_name, "detail": {"value": first_value}},
+            {"reason": reason_name, "detail": {"value": second_value}},
+        ))
 
     reasons = physics_module._coating_violation_reasons(
         authority={"code": "test-authority"},
         diagnostics={
             "silica_exposed_to_alkali_findings": [dict(finding), dict(finding)],
         },
-        explicit_reasons=[explicit_reason_a, explicit_reason_b],
+        explicit_reasons=explicit_reasons,
     )
 
     assert sum(
@@ -1052,6 +1077,9 @@ def test_equal_nested_coating_reasons_keep_content_based_deduplication() -> None
     assert sum(
         reason["reason"] == "explicit_coating_violation" for reason in reasons
     ) == 1
+    for name, _first_value, _second_value in equivalent_details:
+        reason_name = f"explicit_{name}"
+        assert sum(reason["reason"] == reason_name for reason in reasons) == 1
 
 
 def test_d045_dew_point_finding_below_threshold_is_a_warning() -> None:
