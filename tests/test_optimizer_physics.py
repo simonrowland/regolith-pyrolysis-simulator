@@ -1023,6 +1023,37 @@ def test_d045_silica_exposure_fails_at_zero_wall_deposit_mass() -> None:
     )
 
 
+def test_equal_nested_coating_reasons_keep_content_based_deduplication() -> None:
+    finding = {
+        "key": "silica_exposed_to_alkali",
+        "stage_number": 3,
+        "evidence": {"excess": 0.1, "source": "wall"},
+    }
+    explicit_reason_a = {
+        "reason": "explicit_coating_violation",
+        "detail": {"species": "SiO", "segment": "hot_wall"},
+    }
+    explicit_reason_b = {
+        "reason": "explicit_coating_violation",
+        "detail": {"segment": "hot_wall", "species": "SiO"},
+    }
+
+    reasons = physics_module._coating_violation_reasons(
+        authority={"code": "test-authority"},
+        diagnostics={
+            "silica_exposed_to_alkali_findings": [dict(finding), dict(finding)],
+        },
+        explicit_reasons=[explicit_reason_a, explicit_reason_b],
+    )
+
+    assert sum(
+        reason["reason"] == "silica_exposed_to_alkali" for reason in reasons
+    ) == 1
+    assert sum(
+        reason["reason"] == "explicit_coating_violation" for reason in reasons
+    ) == 1
+
+
 def test_d045_dew_point_finding_below_threshold_is_a_warning() -> None:
     report = _d045_report(
         coating_diagnostics={

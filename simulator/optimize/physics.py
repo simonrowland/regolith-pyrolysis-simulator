@@ -4998,9 +4998,10 @@ def _unique_coating_records(
             elif type(value) is float:
                 value_key = (float, value.hex())
             else:
-                # Nested findings and diagnostics are never traversed or
-                # stringified while comparing records.
-                value_key = ("payload", id(value))
+                # Only the large shared trees above use identity. Other nested
+                # reason details are small JSON values and keep their prior
+                # content-based deduplication behavior.
+                value_key = ("payload", canonical_json_dumps(value))
             fields.append((key, value_key))
         key = tuple(sorted(fields, key=lambda item: item[0]))
         if key in seen:
