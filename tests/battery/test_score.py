@@ -2413,69 +2413,118 @@ def test_malformed_candidate_composition_is_skipped_after_point_filters(
         assert "skipped_composition_candidates" not in pressure_check.detail
 
 
-@pytest.mark.parametrize("raw_amount", ("<0.03", "tr"))
-def test_malformed_candidate_identity_composition_cannot_fall_back_to_point_composition(
-    raw_amount: str,
+# The resolver reads identity then point-condition aliases in this order. Keep
+# the old sample-start fallback as a final negative probe; validity excludes it.
+_COMPOSITION_SOURCE_ORDER = (
+    "identity.composition",
+    *(
+        f"point_conditions.{alias}"
+        for alias in validity_mod._POINT_COMPOSITION_CONDITION_ALIASES
+    ),
+    "experiment.sample.initial_composition",
+)
+_MALFORMED_LATER_COMPOSITION_SOURCE_PAIRS = tuple(
+    (_COMPOSITION_SOURCE_ORDER[earlier], _COMPOSITION_SOURCE_ORDER[later])
+    for earlier in range(len(_COMPOSITION_SOURCE_ORDER))
+    for later in range(earlier + 1, len(_COMPOSITION_SOURCE_ORDER))
+)
+
+
+@pytest.mark.parametrize(
+    ("malformed_source", "valid_later_source"),
+    _MALFORMED_LATER_COMPOSITION_SOURCE_PAIRS,
+    ids=[
+        f"{earlier}-before-{later}"
+        for earlier, later in _MALFORMED_LATER_COMPOSITION_SOURCE_PAIRS
+    ],
+)
+def test_first_declared_composition_source_controls_pressure_candidate_matching(
+    malformed_source: str,
+    valid_later_source: str,
 ) -> None:
-    experiment = F.kems_experiment("malformed-identity-composition-fallback", kn=None)
     composition = Composition(
         basis="printed_mole_fraction",
         components=(("Na2O", Decimal("1")),),
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
-    identity = replace(
-        _partial_identity(),
-        temperature_K=State.of(Decimal("1500")),
-        composition=State.of(composition),
-    )
-    valid_observation = F.observation(
-        "valid-one-pascal-reading",
-        experiment.experiment_id,
-        identity,
-        Decimal("1"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
-    point_conditions = {
-        **valid_observation.point_conditions,
-        "sample_composition": F.located(composition),
-    }
-    valid_observation = replace(
-        valid_observation, point_conditions=point_conditions
-    )
-
     malformed_composition = Composition(
         basis="printed_mole_fraction",
         components=(("Na2O", Decimal("1")),),
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
     # Raw legacy extract data can bypass Composition's typed constructor.
-    object.__setattr__(
-        malformed_composition,
-        "components",
-        (("Na2O", raw_amount),),
-    )
-    malformed_candidate = F.observation(
-        f"malformed-eleven-pascal-reading-{raw_amount}",
-        experiment.experiment_id,
-        replace(identity, composition=State.of(malformed_composition)),
-        Decimal("11"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
-    malformed_candidate = replace(
-        malformed_candidate, point_conditions=point_conditions
-    )
+    object.__setattr__(malformed_composition, "components", (("Na2O", "tr"),))
 
-    gates = effusion_regime_unverified(
-        experiment,
-        Quantity.P_PARTIAL,
-        observation=valid_observation,
-        point_observations=(valid_observation, malformed_candidate),
-    )
+    def score_candidate(*, include_malformed_source: bool):
+        experiment = F.kems_experiment(
+            f"composition-source-order-{include_malformed_source}", kn=None
+        )
+        experiment = replace(
+            experiment,
+            sample=replace(
+                experiment.sample,
+                initial_composition=F.located(composition),
+            ),
+        )
+        identity = replace(
+            _partial_identity(),
+            temperature_K=State.of(Decimal("1500")),
+            composition=State.of(composition),
+        )
+        valid_observation = F.observation(
+            "valid-one-pascal-reading",
+            experiment.experiment_id,
+            identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        candidate_identity = replace(identity, composition=None)
+        if include_malformed_source and malformed_source == "identity.composition":
+            candidate_identity = replace(
+                candidate_identity,
+                composition=State.of(malformed_composition),
+            )
 
+        target_conditions = dict(valid_observation.point_conditions or {})
+        candidate_conditions = dict(target_conditions)
+        for alias in validity_mod._POINT_COMPOSITION_CONDITION_ALIASES:
+            source = f"point_conditions.{alias}"
+            if source == valid_later_source:
+                target_conditions[alias] = F.located(composition)
+                candidate_conditions[alias] = F.located(composition)
+            elif include_malformed_source and source == malformed_source:
+                target_conditions[alias] = F.located(composition)
+                candidate_conditions[alias] = F.located(malformed_composition)
+        valid_observation = replace(
+            valid_observation, point_conditions=target_conditions
+        )
+        malformed_candidate = F.observation(
+            f"eleven-pascal-reading-{include_malformed_source}",
+            experiment.experiment_id,
+            candidate_identity,
+            Decimal("11"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        malformed_candidate = replace(
+            malformed_candidate, point_conditions=candidate_conditions
+        )
+        gates = effusion_regime_unverified(
+            experiment,
+            Quantity.P_PARTIAL,
+            observation=valid_observation,
+            point_observations=(valid_observation, malformed_candidate),
+        )
+        pressure_check = next(
+            check
+            for check in gates.checks
+            if check.name == "in_cell_partial_pressure_sum"
+        )
+        return valid_observation, malformed_candidate, gates, pressure_check
+
+    valid_observation, malformed_candidate, gates, pressure_check = score_candidate(
+        include_malformed_source=True
+    )
     assert gates.passed is True
-    pressure_check = next(
-        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
-    )
     assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "1"
     assert pressure_check.detail["included_observation_ids"] == [
         valid_observation.observation_id
@@ -2487,6 +2536,26 @@ def test_malformed_candidate_identity_composition_cannot_fall_back_to_point_comp
             "detail": "composition component amount is not a decimal",
         }
     ]
+
+    valid_observation, candidate, gates, pressure_check = score_candidate(
+        include_malformed_source=False
+    )
+    if valid_later_source == "experiment.sample.initial_composition":
+        # The initial charge is not a run-composition source for this gate.
+        assert gates.passed is True
+        assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "1"
+        assert pressure_check.detail["included_observation_ids"] == [
+            valid_observation.observation_id
+        ]
+        assert "skipped_composition_candidates" not in pressure_check.detail
+    else:
+        # An absent earlier source permits the later declared alias to match.
+        assert gates.passed is False
+        assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+        assert pressure_check.detail["included_observation_ids"] == [
+            candidate.observation_id
+        ]
 
 
 def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(

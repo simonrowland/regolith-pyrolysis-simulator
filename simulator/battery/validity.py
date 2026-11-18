@@ -966,10 +966,13 @@ def _composition_components(
     return tuple(sorted(components))
 
 
+_POINT_COMPOSITION_CONDITION_ALIASES = ("composition", "sample_composition")
+
+
 def _observation_composition(
     observation: Observation,
     *,
-    invalid_amount_details: list[str] | None = None,
+    composition_failure_details: list[str] | None = None,
 ) -> tuple[tuple[str, Decimal], ...] | None:
     discovered_details: list[str] = []
     identity = observation.identity
@@ -980,24 +983,38 @@ def _observation_composition(
         )
         if components is not None:
             return components
-        if discovered_details:
-            if invalid_amount_details is not None:
-                invalid_amount_details.extend(discovered_details)
-            return None
+        if composition_failure_details is not None:
+            composition_failure_details.extend(discovered_details)
+        return None
     if observation.point_conditions:
         for key, located in observation.point_conditions.items():
-            if key.lower() in {"composition", "sample_composition"}:
-                components = _composition_components(
-                    located,
-                    invalid_amount_details=discovered_details,
-                )
-                if components is not None:
-                    return components
-    if invalid_amount_details is not None:
-        invalid_amount_details.extend(discovered_details)
-    # Sample.initial_composition describes the starting charge. It cannot
-    # establish species coverage for a measured in-cell pressure point.
+            if key.lower() not in _POINT_COMPOSITION_CONDITION_ALIASES:
+                continue
+            components = _composition_components(
+                located,
+                invalid_amount_details=discovered_details,
+            )
+            if components is not None:
+                return components
+            if composition_failure_details is not None:
+                composition_failure_details.extend(discovered_details)
+            return None
+    if composition_failure_details is not None:
+        composition_failure_details.extend(discovered_details)
+    # Sample.initial_composition describes the starting charge. It is not a
+    # run-composition source for measured in-cell pressure coverage.
     return None
+
+
+def _skipped_composition_candidate_detail(
+    observation_id: str,
+    details: list[str],
+) -> dict[str, str]:
+    return {
+        "observation_id": observation_id,
+        "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+        "detail": "; ".join(details),
+    }
 
 
 def _point_temperature(observation: Observation) -> Decimal | None:
@@ -1071,10 +1088,10 @@ def _printed_in_cell_pressure_sum(
     point_observations: Iterable[Observation],
 ) -> tuple[Decimal | None, dict[str, Any]]:
     temperature = _point_temperature(observation)
-    composition_amount_details: list[str] = []
+    composition_failure_details: list[str] = []
     composition = _observation_composition(
         observation,
-        invalid_amount_details=composition_amount_details,
+        composition_failure_details=composition_failure_details,
     )
     conditions = observation.point_conditions
     if temperature is None or not conditions:
@@ -1099,29 +1116,27 @@ def _printed_in_cell_pressure_sum(
         if composition is None:
             if candidate.observation_id != observation.observation_id:
                 continue
-            if composition_amount_details:
+            if composition_failure_details:
                 skipped_composition_candidates.append(
-                    {
-                        "observation_id": candidate.observation_id,
-                        "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
-                        "detail": "; ".join(composition_amount_details),
-                    }
+                    _skipped_composition_candidate_detail(
+                        candidate.observation_id,
+                        composition_failure_details,
+                    )
                 )
                 continue
         else:
             candidate_composition_details: list[str] = []
             candidate_composition = _observation_composition(
                 candidate,
-                invalid_amount_details=candidate_composition_details,
+                composition_failure_details=candidate_composition_details,
             )
             if candidate_composition != composition:
                 if candidate_composition_details:
                     skipped_composition_candidates.append(
-                        {
-                            "observation_id": candidate.observation_id,
-                            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
-                            "detail": "; ".join(candidate_composition_details),
-                        }
+                        _skipped_composition_candidate_detail(
+                            candidate.observation_id,
+                            candidate_composition_details,
+                        )
                     )
                 continue
         if (
@@ -1153,9 +1168,9 @@ def _printed_in_cell_pressure_sum(
         if skipped_pressure_candidates:
             detail["typed_reason"] = RefusalReason.EFFUSION_REGIME_UNVERIFIED.value
             detail["skipped_pressure_candidates"] = skipped_pressure_candidates
-        if composition_amount_details:
+        if composition_failure_details:
             detail["typed_reason"] = RefusalReason.EFFUSION_REGIME_UNVERIFIED.value
-            detail["composition_scope_details"] = composition_amount_details
+            detail["composition_scope_details"] = composition_failure_details
         if skipped_composition_candidates:
             detail["typed_reason"] = RefusalReason.EFFUSION_REGIME_UNVERIFIED.value
             detail["skipped_composition_candidates"] = skipped_composition_candidates
@@ -1177,8 +1192,8 @@ def _printed_in_cell_pressure_sum(
     }
     if skipped_pressure_candidates:
         sum_detail["skipped_pressure_candidates"] = skipped_pressure_candidates
-    if composition_amount_details:
-        sum_detail["composition_scope_details"] = composition_amount_details
+    if composition_failure_details:
+        sum_detail["composition_scope_details"] = composition_failure_details
     if skipped_composition_candidates:
         sum_detail["skipped_composition_candidates"] = skipped_composition_candidates
     lower_bound_detail = {
