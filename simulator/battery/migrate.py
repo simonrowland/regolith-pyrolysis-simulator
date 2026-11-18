@@ -2014,6 +2014,11 @@ class _CompositionRefusal:
     closure_refusal: bool = False
 
 
+class _CompositionProxyInputClass(Enum):
+    INVALID = "invalid"
+    NOT_PRINTED = "not_printed"
+
+
 @dataclass(frozen=True)
 class _MassPercentClosureResult:
     composition: Composition | None
@@ -8268,17 +8273,21 @@ def _declared_composition_mol_basis(values: Mapping[str, object], raw: object) -
     return None
 
 
+def _mole_fraction_composition_source_key(values: Mapping[str, object]) -> str:
+    return (
+        "composition_mol"
+        if isinstance(values.get("composition_mol"), Mapping)
+        else "composition_mole_fraction"
+    )
+
+
 def _mole_fraction_composition_error(
     exc: ValueError, values: Mapping[str, object]
 ) -> tuple[str, str]:
     detail = str(exc)
     if not detail.startswith(_MALFORMED_DECLARED_AMOUNT_PREFIX):
         raise exc
-    composition_key = (
-        "composition_mol"
-        if isinstance(values.get("composition_mol"), Mapping)
-        else "composition_mole_fraction"
-    )
+    composition_key = _mole_fraction_composition_source_key(values)
     return detail, composition_key
 
 
@@ -9336,7 +9345,10 @@ def _initial_charge_only_composition_proxy(
     locator: Locator | None,
     origin: str,
     initial_charge_context: Mapping[str, Any] | None = None,
-    point_composition_refusal: Sequence[str] = (),
+    composition_refusal_reasons: Sequence[str] = (),
+    malformed_composition_reason: str | None = None,
+    omitted_composition_components: Sequence[str] = (),
+    declared_composition_state: State[Any] | None = None,
     point_composition_context: Mapping[str, Any] | None = None,
     point_oxide_map: Mapping[str, Decimal] | None = None,
     point_declared_component_map: Mapping[str, Any] | None = None,
@@ -9344,32 +9356,6 @@ def _initial_charge_only_composition_proxy(
 ) -> tuple[Identity, Mapping[str, Located[Any]] | None, list[Notice]]:
     conditions = dict(point_conditions or {})
     point_composition = conditions.get("composition")
-    malformed_composition_reason = None
-    # A declared but malformed composition is present invalid input, never a
-    # missing run composition eligible for the initial-charge proxy.
-    incoming_compositions = (
-        point_composition.state
-        if isinstance(point_composition, Located)
-        else None,
-        identity.composition,
-    )
-    for incoming in incoming_compositions:
-        if (
-            incoming is not None
-            and incoming.is_unknown
-            and (incoming.reason or "").startswith(
-                f"{_MALFORMED_DECLARED_AMOUNT_PREFIX}:"
-            )
-        ):
-            malformed_composition_reason = incoming.reason
-            break
-    if malformed_composition_reason is not None:
-        invalid = Located(
-            State.unknown(malformed_composition_reason), locator=locator
-        )
-        conditions["composition"] = invalid
-        return replace(identity, composition=invalid.state), conditions, list(notices)
-
     existing_initial_charge_proxy = (
         identity.composition is not None
         and identity.composition.is_value
@@ -9399,19 +9385,97 @@ def _initial_charge_only_composition_proxy(
     ):
         return identity, point_conditions, list(notices)
 
-    refusal_reasons = list(point_composition_refusal)
-    if isinstance(point_composition, Located) and point_composition.state.is_unknown:
-        point_reason = point_composition.state.reason
-        if point_reason and any(
-            marker in point_reason.casefold()
-            for marker in (
+    point_composition_state = (
+        point_composition.state if isinstance(point_composition, Located) else None
+    )
+    identity_composition_state = identity.composition
+    if any(
+        state is not None and state.is_not_applicable
+        for state in (point_composition_state, identity_composition_state)
+    ):
+        return identity, point_conditions, list(notices)
+
+    identity_invalid_reason = None
+    if identity_composition_state is not None and identity_composition_state.is_unknown:
+        identity_reason = identity_composition_state.reason or ""
+        folded_identity_reason = identity_reason.casefold()
+        if identity_reason.startswith(_MALFORMED_DECLARED_AMOUNT_PREFIX) or any(
+            folded_identity_reason.startswith(prefix)
+            for prefix in (
                 "unsupported component",
                 "malformed printed component amount",
                 "mass-percent composition",
                 "partial_composition:",
             )
         ):
-            refusal_reasons.append(point_reason)
+            identity_invalid_reason = identity_reason
+
+    refusal_reasons = list(composition_refusal_reasons)
+    if malformed_composition_reason is not None:
+        refusal_reasons.insert(0, malformed_composition_reason)
+    elif omitted_composition_components:
+        refusal_reasons.insert(
+            0, partial_composition_unknown_reason(omitted_composition_components)
+        )
+    elif (
+        point_composition_state is not None
+        and point_composition_state.is_unknown
+        and point_composition_state.reason
+    ):
+        refusal_reasons.insert(0, point_composition_state.reason)
+    elif (
+        declared_composition_state is not None
+        and declared_composition_state.is_unknown
+        and declared_composition_state.reason
+    ):
+        refusal_reasons.insert(0, declared_composition_state.reason)
+    elif identity_invalid_reason is not None:
+        refusal_reasons.insert(0, identity_invalid_reason)
+    invalid_input = bool(refusal_reasons) or any(
+        state is not None and state.is_unknown
+        for state in (point_composition_state, declared_composition_state)
+    )
+    classification = (
+        _CompositionProxyInputClass.INVALID
+        if invalid_input
+        else _CompositionProxyInputClass.NOT_PRINTED
+    )
+    if classification is _CompositionProxyInputClass.INVALID:
+        reason = refusal_reasons[0] if refusal_reasons else None
+        if (
+            reason is None
+            and point_composition_state is not None
+            and point_composition_state.is_unknown
+        ):
+            reason = point_composition_state.reason
+        if (
+            reason is None
+            and declared_composition_state is not None
+            and declared_composition_state.is_unknown
+        ):
+            reason = declared_composition_state.reason
+        reason = reason or composition_unknown_reason()
+        invalid = Located(State.unknown(reason), locator=locator)
+        preserved_value = next(
+            (
+                state
+                for state in (identity_composition_state, point_composition_state)
+                if state is not None
+                and state.is_value
+                and isinstance(state.value, Composition)
+                and state.value.proxy_flag != INITIAL_CHARGE_ONLY_PROXY_FLAG
+            ),
+            None,
+        )
+        updated_identity = replace(
+            identity,
+            composition=(
+                preserved_value if preserved_value is not None else invalid.state
+            ),
+        )
+        conditions["composition"] = invalid
+        return updated_identity, conditions, list(notices)
+
     composition = None
     composition_locator = locator
     if point_composition_map_declared:
@@ -26499,12 +26563,20 @@ class Migrator:
         else:
             initial_composition, omitted_components = None, ()
         if omitted_components:
+            detail = partial_composition_unknown_reason(omitted_components)
+            partial_composition_key = _mole_fraction_composition_source_key(values)
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observations.{obs_id}.values.{partial_composition_key}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=detail,
+                )
+            )
             self.result.add_queue(
                 work.work_id,
                 locator,
                 ["composition"],
-                "unusable composition component(s): "
-                + ", ".join(omitted_components),
+                detail,
                 source=source_key,
                 observation_id=obs_id,
             )
@@ -29201,6 +29273,14 @@ class Migrator:
                 initial_charge_context=(
                     values if isinstance(values, Mapping) else None
                 ),
+                composition_refusal_reasons=composition_refusal,
+                malformed_composition_reason=malformed_composition_amount,
+                omitted_composition_components=omitted_components,
+                declared_composition_state=(
+                    source_composition_located.state
+                    if source_composition_located is not None
+                    else None
+                ),
                 quantity=q_token,
                 quantity_as_printed=values.get("quantity"),
                 locator=locator,
@@ -29781,6 +29861,7 @@ class Migrator:
         point_composition_refusal: list[str] = []
         point_composition_refusal_classifications: list[_CompositionRefusal] = []
         point_composition_located: Located[Composition] | None = None
+        point_composition_omitted_components: tuple[str, ...] = ()
         point_printed_composition: Located[Mapping[str, Any]] | None = None
         point_catalogue: Located[Composition] | None = None
         malformed_composition_amount: str | None = None
@@ -30009,7 +30090,7 @@ class Migrator:
                     or locator
                 )
             try:
-                point_composition, _point_omitted = (
+                point_composition, point_composition_omitted_components = (
                     _mole_fraction_composition_from_values(raw_item)
                 )
             except ValueError as exc:
@@ -30138,6 +30219,22 @@ class Migrator:
                     detail=malformed_composition_amount,
                 )
             )
+        if point_composition_omitted_components:
+            point_composition_source_key = _mole_fraction_composition_source_key(
+                raw_item if isinstance(raw_item, Mapping) else {}
+            )
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=(
+                        f"observations.{point_id}.values."
+                        f"{point_composition_source_key}"
+                    ),
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=partial_composition_unknown_reason(
+                        point_composition_omitted_components
+                    ),
+                )
+            )
         if point_catalogue is not None:
             ident_kwargs["composition"] = point_catalogue.state
             point_composition_located = point_catalogue
@@ -30250,7 +30347,6 @@ class Migrator:
             )
             else ()
         )
-        preserve_initial_charge_identity = bool(missing_major_for_initial_charge)
         if q_token_point is Quantity.P_PARTIAL and point_oxide_map:
             ident_kwargs["composition"] = _wt_percent_conversion_state(
                 point_oxide_map,
@@ -30306,23 +30402,7 @@ class Migrator:
                 )
             )
             and not (
-                preserve_initial_charge_identity
-                and isinstance(ident_kwargs.get("composition"), State)
-                and ident_kwargs["composition"].is_value
-                and isinstance(ident_kwargs["composition"].value, Composition)
-                and ident_kwargs["composition"].value.proxy_flag
-                == INITIAL_CHARGE_ONLY_PROXY_FLAG
-            )
-            and not (
-                point_mass_closure_refused
-                and q_token_point
-                in {
-                    Quantity.ACTIVITY,
-                    Quantity.ACTIVITY_COEFFICIENT,
-                    Quantity.DENSITY,
-                    Quantity.VALENCE_RATIO,
-                }
-                and isinstance(ident_kwargs.get("composition"), State)
+                isinstance(ident_kwargs.get("composition"), State)
                 and ident_kwargs["composition"].is_value
             )
         ):
@@ -31237,6 +31317,21 @@ class Migrator:
                         identity, total_pressure_Pa=pressure_state
                     )
         if point_composition_refusal:
+            refused_point_composition = (point_conditions or {}).get("composition")
+            preserved_composition = (
+                point_composition_located.state
+                if point_composition_located is not None
+                and point_composition_located.state.is_value
+                else refused_point_composition.state
+                if isinstance(refused_point_composition, Located)
+                and refused_point_composition.state.is_value
+                else None
+            )
+            if (
+                preserved_composition is not None
+                and (identity.composition is None or identity.composition.is_unknown)
+            ):
+                identity = replace(identity, composition=preserved_composition)
             composition_reason = composition_unknown_reason(
                 point_composition_refusal
             )
@@ -31461,6 +31556,17 @@ class Migrator:
                 initial_charge_context=(
                     parent_values if isinstance(parent_values, Mapping) else None
                 ),
+                composition_refusal_reasons=point_composition_refusal,
+                malformed_composition_reason=malformed_composition_amount,
+                omitted_composition_components=point_composition_omitted_components,
+                declared_composition_state=(
+                    point_composition_located.state
+                    if point_composition_located is not None
+                    else point_conditions["composition"].state
+                    if isinstance(point_conditions, Mapping)
+                    and isinstance(point_conditions.get("composition"), Located)
+                    else None
+                ),
                 quantity=q_token_point,
                 quantity_as_printed=(
                     raw_item.get("quantity")
@@ -31471,7 +31577,6 @@ class Migrator:
                 ),
                 locator=point_locator,
                 origin=point_id,
-                point_composition_refusal=point_composition_refusal,
                 point_composition_context=(
                     raw_item if isinstance(raw_item, Mapping) else None
                 ),
