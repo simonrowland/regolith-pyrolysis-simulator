@@ -9381,6 +9381,7 @@ def _initial_charge_only_composition_proxy(
     point_oxide_map: Mapping[str, Decimal] | None = None,
     point_declared_component_map: Mapping[str, Any] | None = None,
     point_composition_map_declared: bool = False,
+    fallback_printed_charge: Located[Any] | None = None,
 ) -> tuple[Identity, Mapping[str, Located[Any]] | None, list[Notice]]:
     conditions = dict(point_conditions or {})
     point_composition = conditions.get("composition")
@@ -9486,6 +9487,36 @@ def _initial_charge_only_composition_proxy(
             ),
             None,
         )
+        # A partial-pressure point that declares its own mole map refuses
+        # that map before a printed charge can stand in for it.
+        point_mole_refuses_charge = quantity is Quantity.P_PARTIAL and any(
+            (reason or "").startswith(_MALFORMED_DECLARED_AMOUNT_PREFIX)
+            for reason in refusal_reasons
+        )
+        if (
+            point_mole_refuses_charge
+            and preserved_value is not None
+            and isinstance(preserved_value.value, Composition)
+            and preserved_value.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        ):
+            preserved_value = None
+        if preserved_value is None and not point_mole_refuses_charge:
+            initial = _owner_initial_from_printed(
+                fallback_printed_charge,
+                proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            )
+            if (
+                initial is not None
+                and initial.state.is_value
+                and isinstance(initial.state.value, Composition)
+            ):
+                preserved_value = State.of(
+                    replace(
+                        initial.state.value,
+                        proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                        input_provenance=PRINTED_STARTING_BULK,
+                    )
+                )
         updated_identity = replace(
             identity,
             composition=(
@@ -27156,6 +27187,18 @@ class Migrator:
             # In particular, a typed refusal here cannot be replaced by a
             # secondary supplementary mole-fraction table on the same row.
             ident_kwargs["composition"] = source_composition_located.state
+        elif (
+            composition_located is not None
+            and composition_located.state.is_value
+            and isinstance(composition_located.state.value, Composition)
+            and composition_located.state.value.proxy_flag
+            == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        ):
+            # The printed initial charge stays when a parallel mole amount
+            # is malformed. The point condition still carries that refusal.
+            # Rows without this stamp (Kume bound/trace, untyped maps) keep
+            # the malformed unknown.
+            ident_kwargs["composition"] = composition_located.state
         elif malformed_composition_amount is not None:
             ident_kwargs["composition"] = State.unknown(malformed_composition_amount)
         elif omitted_components:
@@ -29291,6 +29334,7 @@ class Migrator:
                 uncertainty = _standard_pressure_ambiguity_uncertainty(
                     row_temperature_K, uncertainty, observation_id=obs_id
                 )
+        charge_experiment = self.result.experiments.get(experiment_id)
         identity, point_conditions, observation_notices = (
             _initial_charge_only_composition_proxy(
                 identity,
@@ -29317,6 +29361,11 @@ class Migrator:
                 quantity_as_printed=values.get("quantity"),
                 locator=locator,
                 origin=obs_id,
+                fallback_printed_charge=(
+                    charge_experiment.sample.printed_composition
+                    if charge_experiment is not None
+                    else None
+                ),
             )
         )
         if total_iron_notice is not None:
@@ -30386,6 +30435,7 @@ class Migrator:
             )
             else ()
         )
+        preserve_initial_charge_identity = bool(missing_major_for_initial_charge)
         if q_token_point is Quantity.P_PARTIAL and point_oxide_map:
             ident_kwargs["composition"] = _wt_percent_conversion_state(
                 point_oxide_map,
@@ -30441,7 +30491,23 @@ class Migrator:
                 )
             )
             and not (
-                isinstance(ident_kwargs.get("composition"), State)
+                preserve_initial_charge_identity
+                and isinstance(ident_kwargs.get("composition"), State)
+                and ident_kwargs["composition"].is_value
+                and isinstance(ident_kwargs["composition"].value, Composition)
+                and ident_kwargs["composition"].value.proxy_flag
+                == INITIAL_CHARGE_ONLY_PROXY_FLAG
+            )
+            and not (
+                point_mass_closure_refused
+                and q_token_point
+                in {
+                    Quantity.ACTIVITY,
+                    Quantity.ACTIVITY_COEFFICIENT,
+                    Quantity.DENSITY,
+                    Quantity.VALENCE_RATIO,
+                }
+                and isinstance(ident_kwargs.get("composition"), State)
                 and ident_kwargs["composition"].is_value
             )
         ):
@@ -31610,7 +31676,18 @@ class Migrator:
                 ),
                 point_oxide_map=point_oxide_map,
                 point_declared_component_map=point_declared_component_map,
-                point_composition_map_declared=point_map_explicit,
+                # A bare component column is not a declared run map. Fig. 5's
+                # Na2O_wt_pct range is the caption's start-to-end depletion,
+                # while the parent still holds glass_initial_wt_pct. Named
+                # maps and composition quantities stay declared.
+                point_composition_map_declared=_declared_wt_composition_point_map(
+                    raw_item, units
+                ),
+                fallback_printed_charge=(
+                    experiment.sample.printed_composition
+                    if experiment is not None
+                    else None
+                ),
             )
         )
         if notice_composition_located is None:
