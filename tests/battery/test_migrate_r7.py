@@ -1114,9 +1114,11 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     # unavailable windows, p089/p115's one unavailable window, plus the
     # restored p274/p367 formula rows; reference p005-05/p005-11/p006-05/
     # p007-13 are typed unavailable. These are source-page grounded changes.
+    # d-413 admits the positively identified literature rows; only their
+    # serialized admission state, reason, and decision evidence change.
     assert _b2131_formation_observation_serialization(tmp_path) == (
         945,
-        "13187d096dd3ffcc4079d147484c31edbfb8e432be9f2def01393a4cf1a2c2d7",
+        "bf062b5860bc2f5ac3e1980a6d42e85ac9d10539c26b06449705a40a1234dda7",
     )
 
 
