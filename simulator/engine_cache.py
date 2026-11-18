@@ -308,7 +308,7 @@ def cacheable_refusal(result) -> bool:
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
-    "internal-analytical": 4,
+    "internal-analytical": 5,
     "vaporock": 1,
     "magemin": 4,
     "alphamelts": 4,
@@ -329,6 +329,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # internal-analytical v2: 2026-11-17 b-1244 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 # internal-analytical v3: 2026-11-17 b-906 d-412 Langmuir surface-pO2 root changes evaporation_flux.py and vapor_pressure.py outputs
 # internal-analytical v4: 2026-11-17 b-1124 d-339 Holzheid FeO gamma continuation changes analytical Fe vapour predictions, on top of the b-906 surface-pO2 change
+# internal-analytical v5: 2026-11-18 b-1124 reserves a distinct cache generation after the concurrent b265 IA v4 change
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
 # magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
