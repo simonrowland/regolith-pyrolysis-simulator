@@ -1308,6 +1308,10 @@ def _site_tables() -> tuple[
         by_path.setdefault(path, []).append((name, site_id))
         if row["kind"] == "lru":
             by_function[(path, name)] = site_id
+    # Physics threads shared_authority_cache through the shared_cache parameter.
+    by_path.setdefault("simulator/optimize/physics.py", []).append(
+        ("shared_cache", "store:simulator/optimize/physics.py:shared_authority_cache")
+    )
     for names in by_path.values():
         names.sort(key=lambda item: len(item[0]), reverse=True)
     return by_function, by_path
