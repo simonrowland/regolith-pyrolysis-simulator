@@ -166,10 +166,10 @@ def _without_engine_versions(value):
 @pytest.mark.xdist_group("magemin_fullrun_c")
 @pytest.mark.timeout(5400)
 def test_green_full_lunar_capture_pin(route_totals, tmp_path):
-    # full_lunar Fe capture totals are the studio-3 actuals (pins2 log, tree
-    # 9666fc129 plus the de32c69ca runner regen); Cr and SiO are the studio-3
-    # actuals at 16fcc5985, identical across two isolated runs. Lunar full runs
-    # diverge between the laptop and studio-3, so this pin is not a laptop re-run.
+    # Re-derived on b268+b-1124 at Studio: b-906's Langmuir surface-pO2
+    # closure moves routed vapour totals, while b-1124's Holzheid continuation
+    # changes native-Fe predictions and adds extrapolation notices. Lunar full
+    # runs diverge between the laptop and Studio, so these are remote actuals.
     # The production band pin records the controller's intended area-weighted
     # cutoff: 33 equal strips span 900-1200 C, and only 17 strips at/below the
     # inclusive 1050 C SiO reactive-product cutoff capture. The other 16 pass
@@ -188,9 +188,12 @@ def test_green_full_lunar_capture_pin(route_totals, tmp_path):
 @pytest.mark.parametrize("staged", [False, True], ids=["lunar_24h", "c2a_staged"])
 def test_green_runner_capture_pin(staged, route_totals, tmp_path):
     # lunar_24h and c2a_staged runner_sha256 are the studio-3 actuals (pins2
-    # log, tree 9666fc129 plus the de32c69ca runner regen). Lunar and Mars
-    # full runs diverge between the laptop and studio-3, so these digests are
-    # not a laptop re-run.
+    # log, tree 9666fc129 plus the de32c69ca runner regen). Re-derived on
+    # b268+b-1124 at Studio: b-906's Langmuir surface-pO2 closure moves routed
+    # vapour totals; b-1124's d-339 continuation changes native-Fe predictions
+    # and its extrapolation notices change runner metadata above 1600 C.
+    # Lunar and Mars full runs diverge between laptop and Studio, so these are
+    # remote actuals.
     patch = (load_recipe_patch(Path("data/recipes/c2a_staged_temperature_ladder.yaml"))
              if staged else {})
     run = PyrolysisRun(

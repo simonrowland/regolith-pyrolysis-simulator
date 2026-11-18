@@ -116,14 +116,18 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # 9666fc129 plus the de32c69ca runner regen). The runner regen script
         # does not update these pins. Lunar full runs diverge between the
         # laptop and studio-3, so these digests are not a laptop re-run.
-        "flux_maps_sha256": "87508c1755a8c9521e7396ca37168f20c55088b6464763cea51514ce6443767d",
-        "ledger_sha256": "d40bc5f8c7d221c2ba7216a43448cb2139e7d3039b59d9bd5f0f42b9aa39a5db",
+        # b-906's Langmuir surface-pO2 change and b-1124's Holzheid FeO
+        # continuation both move native-Fe fluxes and the ledger on this tree.
+        "flux_maps_sha256": "409b4e9683d726e5165e9911659d69dd67bc671c0cd6a0386bda02cbc7ea6517",
+        "ledger_sha256": "080dab31dc94cf0e77d6045c669edd14df2b6132c4594ffa81c0cc7e0e506ca5",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
         # 9666fc129 plus the de32c69ca runner regen). flux_maps_sha256 did
         # not move. Mars full runs diverge between the laptop and studio-3,
         # so this digest is not a laptop re-run.
+        # b-906 and b-1124's native-Fe chemistry plus the Holzheid notices
+        # change the per-hour metadata pin; regenerated on this merged tree.
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
         "ledger_sha256": "12d2bd219387ab9e6df5d1016845f1f926319f7913693f9202385db65e771337",
     },
@@ -2194,6 +2198,11 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     # after repair: melt_redox_gate_floor_fallback_engagement = {engaged:
     # false, total_count: 0}. ci_carbonaceous_chondrite_C2B_12h.json was
     # unchanged. docs-private/research/2026-08-02-train13-adjudication.md
+    # d-339 changes lunar row 15's native Fe activity and Kress91 FeO seam
+    # comparator at 2023.15 K; OpenIMCC's FeO activity remains 0.14324692359108157.
+    # b-1124 adds Holzheid out-of-certified-band notices to extrapolated
+    # native-Fe hours, with b-906's surface-pO2 change affecting the same
+    # merged runner outputs.
     actual, capture, expected_text = runner_golden_loader(scenario)
     expected = json.loads(expected_text)
 
@@ -2215,7 +2224,8 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     assert pins == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
     if scenario["name"] == "mars_basalt_C2A_12h":
         # Pin the merged d-137 envelope while keeping t-423's default carrier
-        # covered. d-137 adds wall-deposit authority metadata to each row.
+        # covered. d-137 adds wall-deposit authority metadata to each row;
+        # b-1124 adds the Holzheid extrapolation notice to affected rows.
         canonical_hours = json.dumps(
             actual["per_hour_summary"],
             sort_keys=True,
@@ -2230,7 +2240,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         ).encode("utf-8")
         assert canonical_hours == expected_hours
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "665da64c22e002174f2dd792d3621ffe2707687e3240b6e746724d810edd6b16"
+            "05f6cded5ad74d3391d93e5bef632f7c59c0fdabd966bbf7182a4a66714a32bb"
         )
 
 

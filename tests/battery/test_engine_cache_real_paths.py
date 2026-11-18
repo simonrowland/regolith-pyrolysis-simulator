@@ -625,6 +625,7 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
         lambda *_args, **_kwargs: (_ for _ in ()).throw(FileNotFoundError()),
     )
     snapshots = (
+        # The current internal-analytical version 2 header is part of this pinned key.
         (
             "internal-analytical default",
             "internal-analytical",
