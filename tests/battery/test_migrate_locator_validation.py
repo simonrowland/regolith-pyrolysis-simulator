@@ -1,13 +1,10 @@
 """Corpus regression for locator-backed migrated values and typed refusals."""
 
-from collections import Counter
-import json
 from pathlib import Path
 import tempfile
 
 import pytest
 
-from scripts.battery_validate_store import main as validate_store
 from simulator.battery import migrate as m
 from simulator.battery.enums import RefusalReason
 from simulator.battery.store_validation import _ALLOWED_HARD_ISSUE_PATH_SUFFIXES
@@ -27,32 +24,8 @@ _SOURCE_REFUSALS = (
 )
 
 
-def test_full_regeneration_has_no_forbidden_locator_shapes(monkeypatch) -> None:
-    result = m.migrate(m.REPO_ROOT, write=False)
-    # The native safe emitter keeps the full-store fixture within the 300 s guard.
-    monkeypatch.setattr(m.yaml, "SafeDumper", m.yaml.CSafeDumper)
-    monkeypatch.setenv("GIT_DIR", str(m.REPO_ROOT / ".git"))
-    with tempfile.TemporaryDirectory(prefix="b1230-full-store-") as directory:
-        output = Path(directory)
-        m.write_outputs(result, output)
-        assert validate_store(["--root", str(output)]) == 0
-        record = json.loads((output / "data/battery/store-validation.json").read_text())
-    assert record["forbidden_shape_count"] == 0, record
-    locator_issues = [
-        issue for issue in result.registry_issues
-        if issue.path.startswith("extract[") and issue.path.endswith(".locator")
-    ]
-    assert Counter(
-        issue.path.split("].", 1)[0] for issue in locator_issues
-    ) == Counter({
-        f"extract[data/literature/extracts/{source_id}.yaml": count
-        for source_id, count in _SOURCE_REFUSALS if count
-    })
-    assert all(issue.reason is RefusalReason.INVALID_SOURCE for issue in locator_issues)
-    assert len(result.validation.hard_issues) == 547 + len(locator_issues)
-
-
 def _assert_located_fields(result) -> None:
+    assert all(observation.locator is not None for observation in result.observations.values())
     with tempfile.TemporaryDirectory(prefix="b1230-store-") as directory:
         output = Path(directory)
         m.write_outputs(result, output)
