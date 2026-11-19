@@ -3308,28 +3308,17 @@ class _OpenImccBatteryBackend:
                 }
             )
 
-        gas_parent_oxide_activities = {
-            name: result.parent_oxide_activities[name]
-            for name in result.parent_oxides
-            if name in result.parent_oxide_activities
-        }
-        gas_parent_oxides = tuple(result.parent_oxides)
-        trace_activity_models = (
-            self._bridge._trace_activity_models_for_components(
-                result.parent_oxide_activities
-            )
+        (
+            gas_parent_oxide_activities,
+            gas_parent_oxides,
+            trace_activity_models,
+            trace_parent_notices,
+        ) = self._bridge._openimcc_gas_parent_inputs(
+            result.parent_oxide_activities,
+            result.parent_oxides,
+            stated_reservoir_activity=_gas_parent_activity,
         )
-        for parent in trace_activity_models:
-            gas_parent_oxide_activities[parent] = (
-                result.parent_oxide_activities[parent]
-            )
-            if parent not in gas_parent_oxides:
-                gas_parent_oxides += (parent,)
-        if _gas_parent_activity is not None:
-            parent, activity = _gas_parent_activity
-            gas_parent_oxide_activities[parent] = activity
-            if parent not in gas_parent_oxides:
-                gas_parent_oxides += (parent,)
+        notices.extend(trace_parent_notices)
         pressures: dict[str, float] = {}
         vapor_sources: dict[str, str] = {}
         gas_diagnostics: dict[str, Any] = {}

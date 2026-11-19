@@ -3003,6 +3003,30 @@ def test_openimcc_modelled_trace_parent_predicts_and_reaches_residual_provenance
     }
 
 
+@pytest.mark.parametrize(
+    ("trace_oxide", "vapour_formula"), (("Ga2O3", "Ga"), ("In2O3", "In"))
+)
+def test_openimcc_kems_standard_trace_parent_is_not_applied_to_gas(
+    trace_oxide: str, vapour_formula: str
+) -> None:
+    _require_openimcc()
+    observation = _openimcc_vapour_observation(
+        vapour_formula=vapour_formula,
+        reservoir=None,
+        composition=_openimcc_trace_gas_melt_composition(trace_oxide),
+        temperature_K=Decimal("1800"),
+    )
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+
+
 def test_openimcc_unmodelled_trace_parent_still_refuses() -> None:
     _require_openimcc()
     from simulator.melt_backend.openimcc_bridge import (
@@ -3052,6 +3076,25 @@ def test_openimcc_side_gas_reaction_refuses_with_one_parent_unsupplied() -> None
     assert prediction.refusal_detail["reason"] == (
         RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value
     )
+
+
+def test_openimcc_reservoir_side_parent_reads_pinned_tuple_metadata() -> None:
+    _require_openimcc()
+    from openimcc import gas as openimcc_gas
+    from simulator.melt_backend import openimcc_bridge
+
+    reaction = openimcc_gas._GAS_REACTIONS["PS"]
+    side_parent = openimcc_gas._side_parent("PS")
+    assert isinstance(reaction, tuple)
+    assert reaction[0] == "P2O5"
+    assert side_parent == "S2"
+
+    with pytest.raises(openimcc_bridge.OpenImccGasParentActivityRefusal) as error:
+        openimcc_bridge.openimcc_reservoir_gas_parent_activity(
+            "PS", (reaction[0], "l"), 1800.0
+        )
+
+    assert error.value.code == "openimcc_gas_side_parent_activity_missing"
 
 
 @pytest.mark.parametrize(

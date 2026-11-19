@@ -277,7 +277,11 @@ def openimcc_reservoir_gas_parent_activity(
         return None
     _require_openimcc()
     try:
-        from openimcc.gas import _GAS_REACTIONS, _parent_standard_row
+        from openimcc import gas as gas_module
+
+        gas_reactions = gas_module._GAS_REACTIONS
+        parent_standard_row = gas_module._parent_standard_row
+        side_parent_for_species = gas_module._side_parent
     except (AttributeError, ImportError) as exc:
         raise OpenImccGasParentActivityRefusal(
             "openimcc_gas_parent_metadata_unavailable",
@@ -285,11 +289,38 @@ def openimcc_reservoir_gas_parent_activity(
             refusal_reason="outside_supported_species",
         ) from exc
 
-    reaction = _GAS_REACTIONS.get(str(channel))
+    reaction = gas_reactions.get(str(channel))
     if reaction is None:
         return None
-    parent = getattr(reaction, "parent", None)
-    side_parent = getattr(reaction, "side_parent", None)
+    # Pin 979adb2 stores reaction metadata as (parent, exponent, oxygen)
+    # tuples. Its private _side_parent helper resolves the separate side-oxide
+    # table; neither value is an attribute on the reaction tuple.
+    if (
+        not isinstance(reaction, tuple)
+        or len(reaction) != 3
+        or not isinstance(reaction[0], str)
+        or not reaction[0]
+    ):
+        raise OpenImccGasParentActivityRefusal(
+            "openimcc_gas_parent_metadata_unavailable",
+            f"OpenIMCC reaction metadata for {channel!r} is not a parent tuple",
+            refusal_reason="outside_supported_species",
+        )
+    parent = reaction[0]
+    try:
+        side_parent = side_parent_for_species(str(channel))
+    except (KeyError, TypeError, ValueError) as exc:
+        raise OpenImccGasParentActivityRefusal(
+            "openimcc_gas_parent_metadata_unavailable",
+            f"cannot resolve OpenIMCC side parent for {channel!r}: {exc}",
+            refusal_reason="outside_supported_species",
+        ) from exc
+    if side_parent is not None and not isinstance(side_parent, str):
+        raise OpenImccGasParentActivityRefusal(
+            "openimcc_gas_parent_metadata_unavailable",
+            f"OpenIMCC side parent for {channel!r} is not a species string",
+            refusal_reason="outside_supported_species",
+        )
     if not isinstance(parent, str) or not parent:
         return None
     if parent in OPENIMCC_PARENT_OXIDES:
@@ -309,7 +340,7 @@ def openimcc_reservoir_gas_parent_activity(
         )
 
     try:
-        standard_row = _parent_standard_row(parent, float(temperature_K))
+        standard_row = parent_standard_row(parent, float(temperature_K))
     except (KeyError, TypeError, ValueError) as exc:
         raise OpenImccGasParentActivityRefusal(
             "openimcc_gas_parent_reference_unresolved",
@@ -1544,6 +1575,123 @@ def _activities_for_gas_parents(
         for name, value in activities.items()
         if name in selected
     }
+
+
+_OPENIMCC_TRACE_GAS_PARENT_STANDARD_NOTICE = (
+    "openimcc_trace_gas_parent_standard_unverified",
+    "Bischof KEMS liquid activity uses a different standard from the "
+    "NASA gas-parent row; composition-scoped conversion was not qualified "
+    "against the other gas authorities",
+)
+_OPENIMCC_TRACE_GAS_PARENT_FRAGMENT_NOTICE = (
+    "openimcc_trace_gas_parent_engine_parent_mismatch",
+    "the fragment gamma is not the OpenIMCC gas-parent activity",
+)
+_OPENIMCC_TRACE_GAS_PARENT_NOTICES: Mapping[str, tuple[str, str]] = MappingProxyType(
+    {
+        "Ga2O3": _OPENIMCC_TRACE_GAS_PARENT_STANDARD_NOTICE,
+        "In2O3": _OPENIMCC_TRACE_GAS_PARENT_STANDARD_NOTICE,
+        "Ag2O": _OPENIMCC_TRACE_GAS_PARENT_FRAGMENT_NOTICE,
+        "Sb2O3": _OPENIMCC_TRACE_GAS_PARENT_FRAGMENT_NOTICE,
+        "Tl2O": _OPENIMCC_TRACE_GAS_PARENT_FRAGMENT_NOTICE,
+        "S": (
+            "openimcc_trace_gas_carrier_mismatch",
+            "the melt activity is not the S2(g) gas fugacity",
+        ),
+        "SO3": (
+            "openimcc_trace_gas_carrier_mismatch",
+            "the melt activity is not the S2(g) gas fugacity",
+        ),
+        "Cl": (
+            "openimcc_trace_gas_carrier_mismatch",
+            "the melt activity is not the Cl2(g) gas fugacity",
+        ),
+        "F": (
+            "openimcc_trace_gas_carrier_mismatch",
+            "the melt activity is not the F2(g) gas fugacity",
+        ),
+    }
+)
+
+
+def _openimcc_gas_parent_inputs(
+    activities: Mapping[str, float],
+    parent_oxides: Sequence[str],
+    *,
+    stated_reservoir_activity: tuple[str, float] | None = None,
+) -> tuple[
+    dict[str, float],
+    tuple[str, ...],
+    dict[str, str],
+    tuple[dict[str, Any], ...],
+]:
+    """Assemble gas parents and typed trace exclusions from bridge evidence."""
+
+    gas_activities = {
+        name: activities[name]
+        for name in parent_oxides
+        if name in activities
+    }
+    gas_parents = list(parent_oxides)
+    selected = set(gas_parents)
+    available_trace_models = _trace_activity_models_for_components(activities)
+    trace_models: dict[str, str] = {}
+    trace_notices: list[dict[str, Any]] = []
+    for parent, activity_model in available_trace_models.items():
+        try:
+            activity = float(activities[parent])
+        except (OverflowError, TypeError, ValueError) as exc:
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_trace_activity_invalid",
+                f"OpenIMCC returned an invalid gas-parent activity for {parent!r}",
+            ) from exc
+        if not math.isfinite(activity) or activity < 0.0:
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_trace_activity_invalid",
+                f"OpenIMCC returned an invalid gas-parent activity for {parent!r}",
+            )
+        if parent in selected:
+            trace_models[parent] = activity_model
+            continue
+        if activity == 0.0:
+            trace_notices.append(
+                {
+                    "kind": "openimcc_trace_gas_parent_absent",
+                    "species": parent,
+                    "activity": activity,
+                    "activity_model": activity_model,
+                    "reason": "zero trace activity is absent, not a gas parent",
+                }
+            )
+            continue
+        exclusion = _OPENIMCC_TRACE_GAS_PARENT_NOTICES.get(parent)
+        if exclusion is not None:
+            code, reason = exclusion
+            trace_notices.append(
+                {
+                    "kind": code,
+                    "species": parent,
+                    "activity": activity,
+                    "activity_model": activity_model,
+                    "reason": reason,
+                }
+            )
+            continue
+        gas_activities[parent] = activity
+        gas_parents.append(parent)
+        selected.add(parent)
+        trace_models[parent] = activity_model
+    if stated_reservoir_activity is not None:
+        parent, activity = stated_reservoir_activity
+        gas_activities[parent] = activity
+        if parent not in gas_parents:
+            gas_parents.append(parent)
+    return (
+        gas_activities,
+        tuple(gas_parents),
+        trace_models,
+        tuple(trace_notices),
+    )
 
 
 def species_thermo(
