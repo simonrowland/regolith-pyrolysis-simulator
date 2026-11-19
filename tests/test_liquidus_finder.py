@@ -117,30 +117,118 @@ def test_liquidus_transition_selector_uses_exact_subtype_in_kelvin():
     ) is None
 
 
-@pytest.mark.parametrize(
-    ("anchors", "missing_bracket"),
-    (
-        (
-            {800.0: 0.0, 900.0: 0.001, 1000.0: 0.2, 1100.0: 0.5, 1200.0: 1.0},
-            "solidus bracket absent",
-        ),
-        (
-            {800.0: 0.0, 900.0: 0.1, 1000.0: 0.5, 1100.0: 0.999, 1200.0: 1.0},
-            "liquidus bracket absent",
-        ),
-    ),
-)
-def test_liquidus_finder_does_not_treat_threshold_endpoint_as_crossing(
-    anchors: dict[float, float],
-    missing_bracket: str,
-):
-    result = find_liquidus_solidus_by_fraction(
+def _scan_transition(anchors: dict[float, float]):
+    return find_liquidus_solidus_by_fraction(
         _piecewise_fraction(anchors),
         min_T_C=800.0,
         max_T_C=1200.0,
         scan_step_C=100.0,
         tolerance_C=1.0,
     )
+
+
+def _assert_interior_threshold_equality(anchors, field, anchor_C):
+    result = _scan_transition(anchors)
+    assert result.status == "ok"
+    found = getattr(result, field)
+    assert found == pytest.approx(anchor_C, abs=1.0)
+    if field == "solidus_T_C":
+        assert _piecewise_fraction(anchors)(found) <= 1.0e-3
+    else:
+        assert _piecewise_fraction(anchors)(found) >= 1.0 - 1.0e-3
+
+
+@pytest.mark.parametrize(
+    ("anchors", "field", "anchor_C"),
+    (
+        (
+            {800.0: 0.0, 900.0: 0.001, 1000.0: 0.2, 1100.0: 0.5, 1200.0: 1.0},
+            "solidus_T_C",
+            900.0,
+        ),
+        (
+            {800.0: 0.0, 900.0: 0.1, 1000.0: 0.5, 1100.0: 0.999, 1200.0: 1.0},
+            "liquidus_T_C",
+            1100.0,
+        ),
+        (
+            {800.0: 0.0, 900.0: 0.001, 1000.0: 0.5, 1100.0: 0.999, 1200.0: 1.0},
+            "solidus_T_C",
+            900.0,
+        ),
+        (
+            {800.0: 0.0, 900.0: 0.001, 1000.0: 0.5, 1100.0: 0.999, 1200.0: 1.0},
+            "liquidus_T_C",
+            1100.0,
+        ),
+    ),
+)
+def test_interior_threshold_equality_keeps_a_one_step_bracket(
+    anchors: dict[float, float],
+    field: str,
+    anchor_C: float,
+):
+    _assert_interior_threshold_equality(anchors, field, anchor_C)
+
+
+def test_interior_threshold_equality_dies_without_both_side_evidence(monkeypatch):
+    """Restoring a strict-only crossing erases the interior equal sample."""
+
+    examples = (
+        (
+            {800.0: 0.0, 900.0: 0.001, 1000.0: 0.2, 1100.0: 0.5, 1200.0: 1.0},
+            "solidus_T_C",
+            900.0,
+        ),
+        (
+            {800.0: 0.0, 900.0: 0.1, 1000.0: 0.5, 1100.0: 0.999, 1200.0: 1.0},
+            "liquidus_T_C",
+            1100.0,
+        ),
+    )
+    for anchors, field, anchor_C in examples:
+        _assert_interior_threshold_equality(anchors, field, anchor_C)
+
+    def strict_only(points, threshold):
+        for index in range(1, len(points)):
+            previous = points[index - 1]
+            current = points[index]
+            if previous.frac_M < threshold < current.frac_M:
+                return previous, current
+        return None
+
+    monkeypatch.setattr(liquidus_module, "_threshold_bracket", strict_only)
+    for anchors, field, anchor_C in examples:
+        with pytest.raises(AssertionError):
+            _assert_interior_threshold_equality(anchors, field, anchor_C)
+
+
+@pytest.mark.parametrize(
+    ("anchors", "missing_bracket"),
+    (
+        (
+            {800.0: 0.001, 900.0: 0.2, 1000.0: 0.5, 1100.0: 0.8, 1200.0: 1.0},
+            "solidus bracket absent",
+        ),
+        (
+            {800.0: 0.0, 900.0: 0.0, 1000.0: 0.0, 1100.0: 0.0, 1200.0: 0.001},
+            "solidus bracket absent",
+        ),
+        (
+            {800.0: 0.999, 900.0: 1.0, 1000.0: 1.0, 1100.0: 1.0, 1200.0: 1.0},
+            "liquidus bracket absent",
+        ),
+        (
+            {800.0: 0.0, 900.0: 0.1, 1000.0: 0.5, 1100.0: 0.8, 1200.0: 0.999},
+            "liquidus bracket absent",
+        ),
+    ),
+)
+def test_threshold_equality_at_an_outer_boundary_is_not_a_crossing(
+    anchors: dict[float, float],
+    missing_bracket: str,
+):
+    result = _scan_transition(anchors)
 
     assert result.status == "not_converged"
     assert any(missing_bracket in warning for warning in result.warnings)

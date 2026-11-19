@@ -379,14 +379,36 @@ class EquilibriumCrystallizationPathResult:
                 raise ValueError('EC status=ok requires liquid_fraction')
 
 
-def _fraction_strictly_crosses(
-    previous: float,
-    current: float,
+def _threshold_bracket(
+    points: Tuple[MeltFractionSample, ...],
     threshold: float,
-) -> bool:
-    """A sampled threshold endpoint is not an interior bracket crossing."""
+) -> tuple[MeltFractionSample, MeltFractionSample] | None:
+    """First one-step bracket with strict evidence on both sides.
 
-    return previous < threshold and current > threshold
+    An interior sample exactly at the threshold keeps the adjacent pair
+    when another sample is strictly on the far side. Equality at an
+    outer scan boundary, with no sample beyond it, is not a crossing.
+    Comparison is exact: a near miss is not equality.
+    """
+
+    for index in range(1, len(points)):
+        previous = points[index - 1]
+        current = points[index]
+        if previous.frac_M < threshold < current.frac_M:
+            return previous, current
+        if (
+            previous.frac_M < threshold
+            and current.frac_M == threshold
+            and any(point.frac_M > threshold for point in points[index + 1:])
+        ):
+            return previous, current
+        if (
+            previous.frac_M == threshold
+            and threshold < current.frac_M
+            and any(point.frac_M < threshold for point in points[:index - 1])
+        ):
+            return previous, current
+    return None
 
 
 def find_liquidus_solidus_by_fraction(
@@ -568,43 +590,24 @@ def find_liquidus_solidus_by_fraction(
     try:
         grid_points = [sample(T) for T in grid]
 
-        solidus_bracket = None
-        liquidus_bracket = None
-        previous = grid_points[0]
-        for current in grid_points[1:]:
-            if (
-                solidus_bracket is None
-                and _fraction_strictly_crosses(
-                    previous.frac_M,
-                    current.frac_M,
-                    solid_threshold,
-                )
-            ):
-                solidus_bracket = (previous, current)
-                _annotate_renormalised_threshold(
-                    (previous, current),
-                    previous,
-                    current,
-                    tolerance,
-                    closure_notices,
-                )
-            if (
-                liquidus_bracket is None
-                and _fraction_strictly_crosses(
-                    previous.frac_M,
-                    current.frac_M,
-                    liquid_threshold,
-                )
-            ):
-                liquidus_bracket = (previous, current)
-                _annotate_renormalised_threshold(
-                    (previous, current),
-                    previous,
-                    current,
-                    tolerance,
-                    closure_notices,
-                )
-            previous = current
+        solidus_bracket = _threshold_bracket(
+            tuple(grid_points),
+            solid_threshold,
+        )
+        liquidus_bracket = _threshold_bracket(
+            tuple(grid_points),
+            liquid_threshold,
+        )
+        for bracket in (solidus_bracket, liquidus_bracket):
+            if bracket is None:
+                continue
+            _annotate_renormalised_threshold(
+                bracket,
+                bracket[0],
+                bracket[1],
+                tolerance,
+                closure_notices,
+            )
 
         missing = []
         if solidus_bracket is None:
