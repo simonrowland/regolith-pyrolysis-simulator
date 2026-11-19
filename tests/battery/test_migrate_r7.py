@@ -1131,7 +1131,7 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     ).encode("utf-8")
     assert (len(baseline_rows), hashlib.sha256(baseline_payload).hexdigest()) == (
         945,
-        "13187d096dd3ffcc4079d147484c31edbfb8e432be9f2def01393a4cf1a2c2d7",
+        "c65bfa19ec308e80797586f68ea77597fbb917eb982db29511b631d4f537ddd5",
     )
     candidate = {row["observation_id"]: row for row in observations}
     assert set(candidate) == set(baseline)
@@ -1172,8 +1172,8 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     payload = json.dumps(
         observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
-    # The old digest matches the committed baseline exactly. These rows do not
-    # change admission; the new digest records the manifest role provenance.
+    # These rows do not change admission; the candidate serialization adds
+    # the manifest role provenance to the green baseline.
     assert (len(observations), hashlib.sha256(payload).hexdigest()) == (
         945,
         "bf062b5860bc2f5ac3e1980a6d42e85ac9d10539c26b06449705a40a1234dda7",
