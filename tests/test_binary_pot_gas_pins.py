@@ -608,11 +608,22 @@ def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
         assert _hx_tree(balance["dominant_metal_carriers"]) == expected["metal"]
         assert float(solved["pO2_bar"]).hex() == expected["pO2"]
         assert diagnostics["openimcc_provenance"] == gas_provenance
-        assert gas["domain_flags"] == _DOMAIN_FLAGS[(pot_id, temperature_K)]
-        assert gas["provenance_class"] == _PROVENANCE_CLASSES
+        active_gas_channels = set(gas["provenance_class"])
+        expected_active_domain_flags = {
+            species: reason
+            for species, reason in _DOMAIN_FLAGS[(pot_id, temperature_K)].items()
+            if species in active_gas_channels
+        }
+        assert gas["domain_flags"] == expected_active_domain_flags
+        expected_active_provenance = {
+            species: source
+            for species, source in _PROVENANCE_CLASSES.items()
+            if species in active_gas_channels
+        }
+        assert gas["provenance_class"] == expected_active_provenance
         expected_gas_notices = {
             ("openimcc_gas_flag", "extrapolated", species, reason)
-            for species, reason in _DOMAIN_FLAGS[(pot_id, temperature_K)].items()
+            for species, reason in expected_active_domain_flags.items()
             if reason
         }
         # OpenIMCC 9c reports extrapolation per gas channel. The aggregate

@@ -4,6 +4,11 @@ Notable changes to the regolith-pyrolysis-simulator. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); the project is research-stage (pre-1.0),
 so minor versions may carry significant changes.
 
+## [Unreleased] — 2026-11-19
+
+- OpenIMCC 979adb2 with the DG46 pack: bump the engine cache version because
+  absent-parent filtering and Cr₂O₃/MnO trace admission change OpenIMCC outputs.
+
 ## [0.6.8] — 2026-11-12
 
 - Every campaign-scoped C6 refusal is priced unavailable. The executor
