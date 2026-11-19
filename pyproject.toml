@@ -79,11 +79,13 @@ sulfur = []
 # addopts depends on (`-n auto` needs pytest-xdist; `--timeout=1800` needs
 # pytest-timeout). Without these declared, a clean checkout doing
 # `pip install -e .[dev]` would let pytest abort during argument parsing
-# before any test runs. Per autoreview 2026-05-27 finding.
+# before any test runs. Keep versions aligned with the studio base venv: the
+# layered remote-CI venv must match it; bump deliberately. Per autoreview
+# 2026-05-27 finding.
 dev = [
-    "pytest>=8.0",
-    "pytest-xdist>=3.8",
-    "pytest-timeout>=2.4",
+    "pytest==9.0.3",
+    "pytest-xdist==3.8.0",
+    "pytest-timeout==2.4.0",
 ]
 
 [tool.pytest.ini_options]
