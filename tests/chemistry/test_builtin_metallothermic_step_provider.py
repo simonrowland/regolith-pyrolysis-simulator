@@ -3227,6 +3227,7 @@ def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
     setpoints_data,
 ):
     from simulator.chemistry.ellingham_graph import (
+        dissociation_pO2_threshold,
         metal_saturation_pressure_Pa,
     )
 
@@ -3271,10 +3272,19 @@ def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
     diagnostic = sim._last_vapor_pressure_diagnostic
     source_fO2_log = diagnostic["source_reaction_fO2_log10"]
     temperature_K = sim.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
-    saturation_floor = sim._last_redox_source_metal_saturation_floor
+    saturation_floor = diagnostic["source_metal_saturation_floor"]
     assert saturation_floor is not None
     assert saturation_floor["binding_oxide"] == "FeO"
-    assert source_fO2_log >= saturation_floor["log10_fO2_bar"]
+    binding_activity = float(saturation_floor["binding_oxide_activity"])
+    independently_resolved_floor_log = math.log10(
+        dissociation_pO2_threshold(
+            "Fe",
+            temperature_K,
+            a_oxide=binding_activity,
+        )
+    )
+    assert saturation_floor["log10_fO2_bar"] == independently_resolved_floor_log
+    assert source_fO2_log >= independently_resolved_floor_log
 
     vapor_pressures = diagnostic["vapor_pressures_Pa"]
     for species in ("Mg", "Si", "Cr", "Mn"):

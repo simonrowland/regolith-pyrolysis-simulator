@@ -5822,7 +5822,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _melt_metal_saturation_fO2_floor_log(
         self,
         temperature_K: float,
-    ) -> tuple[float, str] | None:
+    ) -> tuple[float, str, float] | None:
         """Return the highest supported oxide/metal saturation floor."""
 
         from simulator.chemistry.ellingham_graph import (
@@ -5838,7 +5838,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         T_K = float(temperature_K)
         composition = self.atom_ledger.mol_by_account("process.cleaned_melt")
-        floors: list[tuple[float, str]] = []
+        floors: list[tuple[float, str, float]] = []
         for oxide, (metal, _, _) in OXIDE_TO_METAL.items():
             if float(composition.get(oxide, 0.0) or 0.0) <= 0.0:
                 continue
@@ -5882,8 +5882,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     "metal-saturation fO2 floor is invalid for "
                     f"{oxide}: pO2_bar={threshold_bar!r}"
                 )
-            floors.append((math.log10(threshold_bar), oxide))
-        return max(floors, default=None)
+            floors.append((math.log10(threshold_bar), oxide, parent_activity))
+        floor = max(floors, key=lambda row: row[0], default=None)
+        if floor is not None:
+            floor_log, binding_oxide, _ = floor
+            upper_bound = self._melt_redox_fO2_upper_bound_log()
+            if floor_log > upper_bound:
+                raise AccountingError(
+                    'melt metal-saturation fO2 floor exceeds the '
+                    f'pressure ceiling for {binding_oxide}: '
+                    f'floor={floor_log:.12g}, ceiling={upper_bound:.12g}'
+                )
+        return floor
 
     def _melt_fO2_reference_state_at_temperature(
         self,
@@ -6139,24 +6149,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 saturation_floor = self._melt_metal_saturation_fO2_floor_log(
                     T_K
                 )
-                if terms:
-                    self._last_redox_source_metal_saturation_floor = (
-                        None
-                        if saturation_floor is None
-                        else {
-                            'log10_fO2_bar': saturation_floor[0],
-                            'binding_oxide': saturation_floor[1],
-                        }
-                    )
                 if saturation_floor is not None:
-                    floor_fO2_log, binding_oxide = saturation_floor
-                    if floor_fO2_log > upper_bound:
-                        raise AccountingError(
-                            'melt metal-saturation fO2 floor exceeds the '
-                            f'pressure ceiling for {binding_oxide}: '
-                            f'floor={floor_fO2_log:.12g}, '
-                            f'ceiling={upper_bound:.12g}'
-                        )
+                    floor_fO2_log, _, _ = saturation_floor
                     candidate_fO2_log = max(candidate_fO2_log, floor_fO2_log)
                 applied_delta_ln = (
                     candidate_fO2_log - base_fO2_log
@@ -10568,6 +10562,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     getattr(self.melt, 'fO2_log', -9.0),
                 )
         intrinsic_fO2_log = float(intrinsic_fO2_log)
+        source_metal_saturation_floor = None
+        saturation_floor = self._melt_metal_saturation_fO2_floor_log(
+            T_C + 273.15
+        )
+        if saturation_floor is not None:
+            floor_fO2_log, binding_oxide, binding_activity = saturation_floor
+            if intrinsic_fO2_log < floor_fO2_log:
+                intrinsic_fO2_log = floor_fO2_log
+                if reservoir is not None:
+                    reservoir.melt_intrinsic_fO2_log = intrinsic_fO2_log
+                    self._sync_oxygen_reservoir_mirror()
+                else:
+                    self.melt.fO2_log = intrinsic_fO2_log
+                    self.melt.melt_fO2_log = intrinsic_fO2_log
+            source_metal_saturation_floor = {
+                'log10_fO2_bar': floor_fO2_log,
+                'binding_oxide': binding_oxide,
+                'binding_oxide_activity': binding_activity,
+            }
         vacuum_floor = (
             float(self._oxygen_numerical_floor_bar())
             if callable(getattr(self, '_oxygen_numerical_floor_bar', None))
@@ -10625,6 +10638,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             **dispatch_kwargs,
         )
         diagnostic = dict(kernel_result.diagnostic or {})
+        diagnostic['source_metal_saturation_floor'] = (
+            source_metal_saturation_floor
+        )
         diagnostic['phase_basis_detail'] = (
             dict(phase_basis_detail)
             if isinstance(phase_basis_detail, Mapping)
