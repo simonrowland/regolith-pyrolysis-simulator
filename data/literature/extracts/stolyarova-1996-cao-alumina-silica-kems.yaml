@@ -102,6 +102,13 @@ experiments:
       reference_substance:
         state: {tag: value, value: silver vapor}
         locator: {page: 4, published_page: 18, pdf_page_index: 3, section: Results, note: 'The paper says “The vapor pressure of silver was used as a standard.”'}
+      technique:
+        state: {tag: value, value: mass_spectrometry}
+        locator:
+          page: 3
+          published_page: 17
+          pdf_page_index: 2
+          section: Experimental
     geometry:
       orifice_diameter_m:
         state: {tag: unknown, reason: not_published}

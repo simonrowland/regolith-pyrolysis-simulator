@@ -14,6 +14,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
 )
+from simulator.battery.method_class_bands import _located_fact
 from simulator.battery.score import (
     _e15_residual_point,
     _reference_has_measured_evidence,
@@ -371,6 +372,10 @@ def test_kems_rows_use_the_published_method_and_keep_unpublished_regime_unknown(
         item
         for experiment_id, item in migrated.experiments.items()
         if experiment_id.endswith("stolyarova-1996-mi1201-1933k")
+    )
+    assert any(
+        _located_fact(row, experiment, "technique") == "mass_spectrometry"
+        for row in kems_rows
     )
     assert experiment.pressure_environment.regime.regime_class.is_unknown
     assert experiment.pressure_environment.total_pressure_Pa.state.is_unknown
