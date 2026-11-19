@@ -5608,6 +5608,16 @@ def test_ordering_publishes_one_disclosure_per_rank_evaluation(monkeypatch) -> N
         "_engine_species_rank_metric",
         lambda *_args: (1.0, None, {"law_disclosures": [disclosure]}),
     )
+    compared_runtimes = []
+    compare_point = extract_reproduction._compare_point
+
+    def capture_compare_point(**kwargs):
+        compared_runtimes.append(dict(kwargs["runtime"]))
+        return compare_point(**kwargs)
+
+    monkeypatch.setattr(
+        extract_reproduction, "_compare_point", capture_compare_point,
+    )
 
     evaluation = extract_reproduction.ObservationEvaluation(observation)
     ranked = extract_reproduction._evaluate_ordering(
@@ -5617,7 +5627,7 @@ def test_ordering_publishes_one_disclosure_per_rank_evaluation(monkeypatch) -> N
         pO2=1.0e-8,
     )
 
-    assert ranked.records[0].runtime["law_disclosures"] == [
+    assert compared_runtimes[0]["law_disclosures"] == [
         {"law_id": "test:one-rank", "evaluation_count": 2}
     ]
 
