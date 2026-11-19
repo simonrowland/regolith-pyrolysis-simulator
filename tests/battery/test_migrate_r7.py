@@ -1157,10 +1157,60 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     baseline_payload = json.dumps(
         baseline_rows, ensure_ascii=False, sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
+    # In these 945 delta_fG rows, 2a481f89c8 adds manifest compilation_role
+    # provenance, and 572d31a2e2 moves 81 absent locator IDs from note to
+    # record (covered by its record-locator test). d303dde055 binds read_from
+    # to the ingested record; b602ceb013 keeps that record in source_path.
+    # Those read_from changes and the preserved Table 1 prose locators are
+    # outside this delta_fG subset. The full-row digest moves from
+    # c65bfa19ec308e80797586f68ea77597fbb917eb982db29511b631d4f537ddd5 to
+    # 09450d7aeebf33a2add56e736eab469a41ad89cb8c7ba947565b9c8fad14f524;
+    # value, T, and unit remain pinned separately below.
     assert (len(baseline_rows), hashlib.sha256(baseline_payload).hexdigest()) == (
         945,
-        "c65bfa19ec308e80797586f68ea77597fbb917eb982db29511b631d4f537ddd5",
+        "09450d7aeebf33a2add56e736eab469a41ad89cb8c7ba947565b9c8fad14f524",
     )
+
+    numeric_tuples = []
+    for row in baseline_rows:
+        value = row["value"]
+        unit = (row.get("derivation") or {}).get("output_unit")
+        if value["kind"] == "point":
+            temperature_state = (
+                (row.get("point_conditions") or {})
+                .get("temperature_K", {})
+                .get("state")
+            )
+            if not isinstance(temperature_state, dict) or temperature_state.get(
+                "tag"
+            ) != "value":
+                temperature_state = row["identity"].get("temperature_K", {})
+            temperature = (
+                temperature_state.get("value")
+                if temperature_state.get("tag") == "value"
+                else None
+            )
+            numeric_tuples.append((temperature, value["point"], unit))
+        elif value["kind"] == "series":
+            numeric_tuples.extend(
+                (temperature, amount, unit)
+                for temperature, amount in value["series"]
+            )
+        elif value["kind"] != "unavailable":
+            raise AssertionError(f"unexpected delta_fG value kind: {value['kind']}")
+    numeric_payload = json.dumps(
+        numeric_tuples, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    assert (
+        len(baseline_rows),
+        len(numeric_tuples),
+        hashlib.sha256(numeric_payload).hexdigest(),
+    ) == (
+        945,
+        4039,
+        "3d7966603b0e31bbaf1d68fff358c80cfaba5b862473f80b4c48e69a219a3779",
+    )
+
     candidate = {row["observation_id"]: row for row in observations}
     assert set(candidate) == set(baseline)
     non_admission_diffs = {
@@ -1180,7 +1230,7 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     changed_fields = {
         field for fields in non_admission_diffs.values() for field in fields
     }
-    assert changed_fields == {"experiment_id", "locator", "provenance"}
+    assert changed_fields == {"experiment_id"}
     assert all(
         candidate[observation_id].get("read_from")
         == baseline[observation_id].get("read_from")
@@ -1198,7 +1248,10 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
         ).read_text(encoding="utf-8")
     )
     expected_role = manifest["compilation_role"]
-    assert all(row.get("provenance") is None for row in baseline_rows)
+    assert all(
+        row["provenance"]["compilation_role"] == expected_role
+        for row in baseline_rows
+    )
     assert all(
         row["provenance"]["compilation_role"] == expected_role
         for row in candidate.values()
