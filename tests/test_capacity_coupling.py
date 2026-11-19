@@ -2979,3 +2979,228 @@ def test_molecular_mixture_separates_by_effusion_speed():
         rel=1.0e-6,
     )
     assert abs(ratio - 1.0) > 1.0e-3
+
+
+def _rk4_partials(
+    moles: dict[str, float],
+    source_kg_hr: dict[str, float],
+    dt_s: float,
+    steps: int,
+) -> dict[str, float]:
+    """Fixed-step RK4 of dn_i/dt = S_i − Q_i(pipe_species_outflow_mol_s).
+
+    No Jacobian. A solver that differences across the x = 0.5 Knudsen
+    tie chatters; this oracle only evaluates the pipe. The band against
+    ``steps // 4`` is the oracle's own truncation, and it has to sit
+    under the 1e-6 Pa floor or the comparison is not a reference.
+    """
+
+    species = tuple(moles)
+    masses = {"O2": _o2_molar_mass_kg(), "N2": MOLAR_MASS["N2"] / 1000.0}
+    source_mol_s = {
+        name: source_kg_hr.get(name, 0.0) / masses[name] / 3600.0
+        for name in species
+    }
+    state = [moles[name] for name in species]
+    step = dt_s / steps
+
+    def rates(hold: list[float]) -> list[float]:
+        inventory = {}
+        pressure = 0.0
+        for index, name in enumerate(species):
+            amount = hold[index] if hold[index] > 0.0 else 0.0
+            pressure += amount * _HS_PA_PER_MOL
+            if amount > 0.0:
+                inventory[name] = amount
+        if pressure <= 0.0 or not inventory:
+            return [source_mol_s[name] for name in species]
+        outflow = pipe_species_outflow_mol_s(
+            pressure,
+            0.0,
+            _HS_T_K,
+            inventory,
+            _HS_D_M,
+            _HS_L_M,
+        )
+        return [
+            source_mol_s[name] - float(outflow.species_mol_s.get(name, 0.0))
+            for name in species
+        ]
+
+    for _ in range(steps):
+        k1 = rates(state)
+        k2 = rates([state[i] + 0.5 * step * k1[i] for i in range(len(state))])
+        k3 = rates([state[i] + 0.5 * step * k2[i] for i in range(len(state))])
+        k4 = rates([state[i] + step * k3[i] for i in range(len(state))])
+        state = [
+            state[i] + (step / 6.0) * (k1[i] + 2.0 * k2[i] + 2.0 * k3[i] + k4[i])
+            for i in range(len(state))
+        ]
+    return {
+        name: state[index] * _HS_PA_PER_MOL
+        for index, name in enumerate(species)
+    }
+
+
+def _assert_each_partial_near_rk4(
+    partials: dict[str, float],
+    moles: dict[str, float],
+    source_kg_hr: dict[str, float],
+    dt_s: float,
+    steps: int,
+) -> None:
+    fine = _rk4_partials(moles, source_kg_hr, dt_s, steps)
+    coarse = _rk4_partials(moles, source_kg_hr, dt_s, steps // 4)
+    band = max(abs(fine[name] - coarse[name]) for name in moles)
+    # The oracle's own truncation has to be under the floor. A band
+    # wider than that is not a reference, whatever the commit did.
+    assert band < 1.0e-6
+    for name in moles:
+        assert partials[name] == pytest.approx(fine[name], abs=1.0e-6)
+
+
+def test_roundoff_majority_keeps_the_tie_break_outflow():
+    # A 1 ulp split of an equal pair is the tie. The earlier name wins,
+    # and the Beskok jump on the other side of 0.5 does not apply.
+    # Fraction 0.500001 is a real majority and does jump.
+    total = 90.0 / _HS_PA_PER_MOL
+
+    def outflow(o2_fraction: float) -> float:
+        moles = {"O2": total * o2_fraction, "N2": total * (1.0 - o2_fraction)}
+        return _outflow_at(moles).species_mol_s["O2"]
+
+    tied = outflow(0.5)
+    assert outflow(0.5 + 1.0e-15) == pytest.approx(tied, abs=1.0e-12)
+    assert abs(outflow(0.500001) - tied) > 1.0e-8
+
+
+@pytest.mark.parametrize(
+    ("total_pa", "n2_fraction", "dt_s", "steps"),
+    [
+        (2.0, 0.499, 0.05, 4000),
+        (2.0, 0.5, 0.05, 32000),
+        (2.0, 0.500001, 0.05, 8000),
+        (2.0, 0.501, 0.05, 4000),
+        (60.0, 0.499, 0.01, 2000),
+        (60.0, 0.5, 0.01, 2000),
+        (60.0, 0.500001, 0.01, 2000),
+        (60.0, 0.501, 0.01, 2000),
+    ],
+)
+def test_equal_mole_neighborhood_matches_rk4_per_species(
+    total_pa: float,
+    n2_fraction: float,
+    dt_s: float,
+    steps: int,
+):
+    # x = 0.5 is the Knudsen test-species tie. The old sweep refused
+    # here. Continuum (60 Pa) keeps the partials equal. The 2 Pa blend
+    # has an effusion part, so the partials separate and the check is
+    # still per species.
+    moles = {
+        "O2": total_pa * (1.0 - n2_fraction) / _HS_PA_PER_MOL,
+        "N2": total_pa * n2_fraction / _HS_PA_PER_MOL,
+    }
+    result = _as_result(
+        _commit_o2_n2(
+            moles["O2"] * _o2_molar_mass_kg(),
+            moles["N2"],
+            0.0,
+            dt_s / 3600.0,
+        )
+    )
+    _assert_each_partial_near_rk4(
+        result.partial_pressures_Pa,
+        moles,
+        {},
+        dt_s,
+        steps,
+    )
+    if _outflow_at(moles).blend_weight == 0.0 and n2_fraction == 0.5:
+        assert result.partial_pressures_Pa["O2"] == pytest.approx(
+            result.partial_pressures_Pa["N2"],
+            abs=1.0e-9,
+        )
+
+
+def test_choked_equal_moles_leave_the_throat_on_the_rk4():
+    # 150 Pa each starts choked and ends on the pipe. Two commits agree,
+    # and each partial matches the RK4, not their sum.
+    moles = {"O2": 150.0 / _HS_PA_PER_MOL, "N2": 150.0 / _HS_PA_PER_MOL}
+    dt_s = 0.05
+    first = _as_result(
+        _commit_o2_n2(
+            moles["O2"] * _o2_molar_mass_kg(),
+            moles["N2"],
+            0.0,
+            dt_s / 3600.0,
+        )
+    )
+    second = _as_result(
+        _commit_o2_n2(
+            moles["O2"] * _o2_molar_mass_kg(),
+            moles["N2"],
+            0.0,
+            dt_s / 3600.0,
+        )
+    )
+    for species in moles:
+        assert first.partial_pressures_Pa[species] == pytest.approx(
+            second.partial_pressures_Pa[species],
+            abs=1.0e-9,
+        )
+        n_end = first.partial_pressures_Pa[species] / _HS_PA_PER_MOL
+        assert first.bled_species_mol[species] == pytest.approx(
+            moles[species] - n_end,
+            abs=1.0e-12,
+        )
+    assert first.partial_pressures_Pa["O2"] == pytest.approx(
+        first.partial_pressures_Pa["N2"],
+        abs=1.0e-9,
+    )
+    _assert_each_partial_near_rk4(
+        first.partial_pressures_Pa,
+        moles,
+        {},
+        dt_s,
+        16000,
+    )
+
+
+@pytest.mark.parametrize("dt_s", [0.02, 0.05, 0.1])
+def test_cancelling_partials_are_each_inside_the_floor(dt_s: float):
+    # 1000 Pa, 10 % O2 / 90 % N2, O2 source 8.83 kg/h, still choked.
+    # The source moves the mean molar mass. The two partial errors have
+    # opposite signs, so a total-pressure check accepts a miss.
+    moles = {"O2": 100.0 / _HS_PA_PER_MOL, "N2": 900.0 / _HS_PA_PER_MOL}
+    result = _as_result(
+        _commit_o2_n2(
+            moles["O2"] * _o2_molar_mass_kg(),
+            moles["N2"],
+            _CREDIT_KG_H,
+            dt_s / 3600.0,
+        )
+    )
+    _assert_each_partial_near_rk4(
+        result.partial_pressures_Pa,
+        moles,
+        {"O2": _CREDIT_KG_H},
+        dt_s,
+        2000,
+    )
+
+
+def test_two_kinks_stay_inside_the_partial_floor():
+    # Pure O2 at 200 Pa over 0.4 s crosses the sonic edge and then the
+    # blend knot. The commit is the integral of that path.
+    moles = {"O2": 200.0 / _HS_PA_PER_MOL}
+    dt_s = 0.4
+    result = _as_result(_commit_o2(_holdup_kg(200.0), 0.0, dt_s / 3600.0))
+    _assert_each_partial_near_rk4(
+        result.partial_pressures_Pa,
+        moles,
+        {},
+        dt_s,
+        8000,
+    )
+    assert result.saturation.binding_cause == "pipe"

@@ -264,6 +264,43 @@ def _pipe_transmission(diameter_m: float, length_m: float) -> float:
     return short_tube_dushman_transmission(diameter_m, length_m)
 
 
+# Mole-fraction half-width of a majority tie. An implicit stage splits an
+# equal pair by a few units in the last place. That flip changes the
+# Beskok factor. On the canonical pipe at 90 Pa an O2/N2 flip is
+# 1.09e-5 mol/s on each species, about 2 Pa/s, and a short step of that
+# jump exceeds the 1e-6 Pa floor. 1e-7 covers that split and the headspace
+# Jacobian probe (a relative mole step of 1e-8 moves the fraction by
+# about 5e-9). A real majority of 0.500001 sits twenty bands away and
+# still switches. Unit: dimensionless. Limit: one species has no band.
+_KNUDSEN_TIE_FRACTION = 1.0e-7
+
+
+def _knudsen_test_species(fractions: Mapping[str, float]) -> str:
+    """Species whose collision diameter sets a mixture Knudsen number.
+
+    The majority mole fraction. A tie, and any gap inside
+    ``_KNUDSEN_TIE_FRACTION``, breaks to the earlier name. One species
+    returns that species. Amounts may be moles or fractions: the band
+    is a fraction of their sum. The headspace Jacobian uses the same
+    choice, so a difference that stays in the band does not step across
+    the Knudsen kink.
+    """
+
+    if len(fractions) == 1:
+        return next(iter(fractions))
+    total = math.fsum(fractions.values())
+    if not math.isfinite(total) or total <= 0.0:
+        return min(fractions)
+    leader = max(fractions.values())
+    band = _KNUDSEN_TIE_FRACTION * total
+    tied = [
+        species
+        for species, amount in fractions.items()
+        if leader - amount <= band
+    ]
+    return min(tied)
+
+
 def _pipe_knudsen(
     fractions: Mapping[str, float],
     pressure_pa: float,
@@ -275,9 +312,8 @@ def _pipe_knudsen(
     One species calls single_species_mean_free_path. More than one calls
     carrier_mixture_mean_free_path, which is mixture_mean_free_path_m of
     the majority species divided by the diameter. The mixture helper
-    requires one test species; the majority mole fraction is that species,
-    and a tie breaks to the earlier name. A missing collision diameter or
-    molar mass is that helper's typed refusal.
+    requires one test species; ``_knudsen_test_species`` is that species.
+    A missing collision diameter or molar mass is that helper's typed refusal.
     """
 
     if len(fractions) == 1:
@@ -288,12 +324,8 @@ def _pipe_knudsen(
             temperature_K,
             diameter_m,
         )
-    test_species = min(
-        fractions,
-        key=lambda species: (-fractions[species], species),
-    )
     return carrier_mixture_mean_free_path(
-        test_species,
+        _knudsen_test_species(fractions),
         fractions,
         pressure_pa,
         temperature_K,
