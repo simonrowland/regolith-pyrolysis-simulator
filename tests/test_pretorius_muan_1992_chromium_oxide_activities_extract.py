@@ -217,7 +217,11 @@ def test_isolated_migration_has_no_hard_issues_and_reaches_temperature_and_fugac
         "pretorius_muan_1992_chromium_oxide_activities_tii_r01_cro1_5_gamma"
     ]
     assert ccrs1.identity.fO2_Pa is not None and ccrs1.identity.fO2_Pa.is_value
-    assert ccrs1.identity.fO2_Pa.value == Decimal("2.7542287033381663E-5")
+    # The reference product is quoted to 17 significant digits; Decimal's
+    # power operation retains its additional working precision.
+    assert abs(
+        ccrs1.identity.fO2_Pa.value - Decimal("2.7542287033381663E-5")
+    ) < Decimal("2E-21")
     ccrs1_source = source_observations[
         "pretorius_muan_1992_chromium_oxide_activities_tii_r01_cro1_5_gamma"
     ]
