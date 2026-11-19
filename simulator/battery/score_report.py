@@ -23,6 +23,33 @@ from simulator.battery.score_report_data import (
 REPORT_HEADING = "# Battery score report (schema v2.1)"
 
 
+def format_assumed_band_report(report: str, data: Mapping[str, object]) -> str:
+    lines = [
+        "", "## Assumed band", "", str(data["label"]), "",
+        "Separate diagnostics; existing headline counts and bands are unchanged.", "",
+        "| rail | engine | quantity | metric | unit | class | evidence | n | observations | inside band | eligible | citation |",
+        "|---|---|---|---|---|---|---|---:|---:|---:|---:|---|",
+    ]
+    for row in data["records"]:
+        citation = row["citation"]
+        lines.append(
+            f"| {row['rail']} | {row['engine']} | {row['quantity']} | "
+            f"{row['operation']} | {row['unit']} | {row['class_id']} | "
+            f"{row['evidence_class']} | "
+            f"{row['n']} | {row['n_observations']} | {row['n_inside_band']} | "
+            f"{row['n_eligible']} | {citation['source_id']} p.{citation['printed_page']} "
+            f"(PDF {citation['pdf_page']}) |"
+        )
+    if not data["records"]:
+        lines.append("| (none) | — | — | — | — | — | — | 0 | 0 | 0 | 0 | — |")
+    lines.extend(["", "Applicability / conversion refusals:", ""])
+    for reason, n in data["refusal_counts"].items():
+        lines.append(f"- {reason}: {n}")
+    if not data["refusal_counts"]:
+        lines.append("None.")
+    return report.rstrip() + "\n" + "\n".join(lines) + "\n"
+
+
 class _ConditionHullView(Protocol):
     """Prepared hull cells. The accumulator that fills them stays in score.py."""
 
