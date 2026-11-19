@@ -14340,10 +14340,18 @@ def test_invalid_run_composition_refuses_vapour_prediction(
     for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
         prediction = predict_with_engine(engine, invalid, experiment=experiment)
         assert prediction.value is None
-        assert prediction.refusal_reason is not None
+        assert prediction.refusal_reason is RefusalReason.INVALID_SOURCE
+        assert prediction.refusal_detail["reason"] == point_composition.state.reason
+        assert prediction.refusal_detail["consumer"] == "vapour"
     assert refused
     assert all(row.status is ResidualStatus.REFUSED and row.numeric is None for row in refused)
-    assert all(row.refusal is not None for row in refused)
+    assert all(
+        row.refusal is not None
+        and row.refusal.reason is RefusalReason.INVALID_SOURCE
+        and row.refusal.detail["reason"] == point_composition.state.reason
+        and row.refusal.detail["consumer"] == "vapour"
+        for row in refused
+    )
 
 
 def _migrate_flat_run_columns(
