@@ -23,6 +23,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Quantity,
+    ReferenceStateConvention,
     RefusalReason,
     ValueKind,
 )
@@ -8883,6 +8884,68 @@ def test_holzheid_v69_activity_does_not_gain_printed_composition(
     ]
     assert len(matches) == 1
     assert "printed_composition" not in (matches[0].point_conditions or {})
+
+
+def test_holzheid_table3_nio_coo_keep_the_printed_liquid_reference(
+    tmp_path: Path,
+) -> None:
+    name = "holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml"
+    stem = name.removesuffix(".yaml")
+    source_path = REPO_ROOT / "data/literature/extracts" / name
+    source = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+
+    def assert_references(document: dict, observations: dict) -> None:
+        expected = {"CoO": 12, "NiO": 14}
+        for formula, count in expected.items():
+            rows = [
+                row
+                for row in document["species"][formula]["observations"]
+                if str(row.get("locator", {}).get("table", "")).startswith("3")
+            ]
+            assert len(rows) == count
+            for raw in rows:
+                standard = raw["standard_state"]
+                assert standard["inferred"] is False
+                assert standard["locator"]["page"] == 29
+                assert standard["locator"]["equation"] == "4"
+                prefix = f"{stem}::{raw['observation_id']}"
+                migrated = [
+                    observation
+                    for observation_id, observation in observations.items()
+                    if observation_id == prefix
+                    or observation_id.startswith(prefix + "::")
+                ]
+                assert len(migrated) == 1
+                reference = migrated[0].identity.reference_state
+                assert reference.is_value
+                assert (
+                    reference.value.convention
+                    is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+                )
+                assert reference.value.endmember.formula == formula
+                assert reference.value.endmember.phase.value is Phase.L
+                assert reference.value.reference_pressure_bar == Decimal("1.01325")
+
+    result = _migrate_real_extract(
+        tmp_path / "original",
+        name,
+        use_repository_index_row=True,
+        extract_doc=source,
+    )
+    assert_references(source, result.observations)
+
+    mutated = deepcopy(source)
+    mutated["species"]["CoO"]["observations"][0]["standard_state"]["state"][
+        "value"
+    ]["endmember"]["phase"]["value"] = "supercooled_l"
+    mutated_result = _migrate_real_extract(
+        tmp_path / "mutated",
+        name,
+        use_repository_index_row=True,
+        extract_doc=mutated,
+    )
+    with pytest.raises(AssertionError):
+        assert_references(mutated, mutated_result.observations)
 
 
 def test_bulk_property_rows_do_not_use_sample_code_as_formula() -> None:
