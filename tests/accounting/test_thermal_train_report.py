@@ -18,11 +18,17 @@ from simulator.session import SimSession, SimSessionConfig
 from simulator.state import BatchRecord, EvaporationFlux, HourSnapshot, OverheadGas
 from simulator.thermal_train import (
     HOT_RADIATOR_SPLIT_K,
+    knudsen_anchor,
     mass_rate_kg_hr_to_molar_rate_mol_s,
     report_from_recorded_series,
     thermal_train_parameters_from_mapping,
     thermal_train_section_ownership,
     vapor_cp_j_per_mol_k,
+)
+from simulator.transport_regime import (
+    carrier_mixture_mean_free_path,
+    mole_fraction_mean_free_path,
+    single_species_mean_free_path,
 )
 
 
@@ -453,6 +459,91 @@ def test_mre_anode_o2_is_an_antagonist_not_a_cold_train_input() -> None:
     second = AccountingQueries(_sim(BatchRecord(snapshots=[antagonist]))).thermal_train_report()
     assert first["peaks"]["cold_o2_mol_hr"] == second["peaks"]["cold_o2_mol_hr"]
     assert first["sections"]["cryo_tail"] == second["sections"]["cryo_tail"]
+
+
+def test_throat_and_duct_use_the_mole_fraction_mean_free_path() -> None:
+    # Equal O2/N2. λ of O2 is not the mixture length. No O2: the
+    # largest fraction is not the mixture length either.
+    pressure_pa = 90.0
+    temperature_K = 1904.7700354769336
+    length_m = 0.12
+    equal = {"N2": 0.5, "O2": 0.5}
+    owner = mole_fraction_mean_free_path(
+        equal, pressure_pa, temperature_K, length_m
+    )
+    o2_only = carrier_mixture_mean_free_path(
+        "O2", equal, pressure_pa, temperature_K, length_m
+    )
+    for location in ("throat", "duct"):
+        anchor = knudsen_anchor(
+            location=location,
+            pressure_pa=pressure_pa,
+            temperature_K=temperature_K,
+            characteristic_length_m=length_m,
+            threshold=0.01,
+            carrier_mole_fractions=equal,
+        )
+        assert anchor["lambda_m"] == owner.lambda_m
+        assert anchor["Kn"] == owner.knudsen_number
+        assert anchor["formula_id"] == owner.formula_id
+        assert anchor["basis"] == "mixture"
+        assert abs(anchor["Kn"] - o2_only.knudsen_number) > 1.0e-5
+
+    no_oxygen = {"Ar": 0.2, "N2": 0.8}
+    mixed = mole_fraction_mean_free_path(
+        no_oxygen, pressure_pa, temperature_K, length_m
+    )
+    nitrogen = carrier_mixture_mean_free_path(
+        "N2", no_oxygen, pressure_pa, temperature_K, length_m
+    )
+    anchor = knudsen_anchor(
+        location="duct",
+        pressure_pa=pressure_pa,
+        temperature_K=temperature_K,
+        characteristic_length_m=length_m,
+        threshold=0.01,
+        carrier_mole_fractions=no_oxygen,
+    )
+    assert anchor["Kn"] == mixed.knudsen_number
+    assert anchor["formula_id"] == mixed.formula_id
+    assert abs(anchor["Kn"] - nitrogen.knudsen_number) > 1.0e-6
+
+    cavern = knudsen_anchor(
+        location="cavern",
+        pressure_pa=pressure_pa,
+        temperature_K=temperature_K,
+        characteristic_length_m=length_m,
+        threshold=0.01,
+        carrier_mole_fractions=equal,
+    )
+    pure = single_species_mean_free_path(
+        "O2", pressure_pa, temperature_K, length_m
+    )
+    assert cavern["Kn"] == pure.knudsen_number
+    assert cavern["basis"] == "pure_O2_post_separator"
+
+    report = report_from_recorded_series(
+        [{}],
+        [0.0],
+        [1000.0],
+        setpoints=_setpoints(),
+        overhead_state_series=[{
+            "pressure_Pa": pressure_pa,
+            "temperature_K": temperature_K,
+            "composition_mbar": {"O2": 1.0, "N2": 1.0},
+            "throat_diameter_m": length_m,
+        }],
+    )
+    throat = report["knudsen_anchors"]["anchors"]["throat"]
+    assert throat["Kn"] == owner.knudsen_number
+    assert throat["formula_id"] == owner.formula_id
+    duct_length_m = thermal_train_parameters_from_mapping().knudsen_locations["duct"]["L_m"]
+    duct_owner = mole_fraction_mean_free_path(
+        equal, pressure_pa, temperature_K, duct_length_m
+    )
+    duct = report["knudsen_anchors"]["anchors"]["duct"]
+    assert duct["Kn"] == duct_owner.knudsen_number
+    assert duct["formula_id"] == duct_owner.formula_id
 
 
 def test_report_computes_recorded_throat_and_duct_knudsen_anchors() -> None:

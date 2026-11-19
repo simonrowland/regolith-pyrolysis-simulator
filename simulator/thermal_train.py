@@ -38,7 +38,7 @@ from simulator.physical_constants import (
 )
 from simulator.thermal_budget import latent_vaporization_kj_per_mol
 from simulator.transport_regime import (
-    carrier_mixture_mean_free_path,
+    mole_fraction_mean_free_path,
     single_species_mean_free_path,
 )
 
@@ -1252,7 +1252,6 @@ def knudsen_anchor(
     characteristic_length_m: float,
     threshold: float,
     carrier_mole_fractions: Mapping[str, float] | None = None,
-    test_species: str = "O2",
 ) -> dict[str, Any]:
     if location == "cavern":
         result = single_species_mean_free_path(
@@ -1262,8 +1261,10 @@ def knudsen_anchor(
     else:
         if not carrier_mole_fractions:
             raise ValueError("furnace/throat Knudsen anchors require carrier_mole_fractions")
-        result = carrier_mixture_mean_free_path(
-            test_species,
+        # One mixture length: the mole-fraction mean of each species'
+        # hard-sphere path. λ of O2, or of the largest fraction, jumps
+        # at equal moles and is not this anchor.
+        result = mole_fraction_mean_free_path(
             carrier_mole_fractions,
             pressure_pa,
             temperature_K,
@@ -1340,7 +1341,6 @@ def _knudsen_report(
             if total <= 0.0:
                 raise ValueError("overhead composition has no positive partial pressures")
             fractions = {species: value / total for species, value in positive.items()}
-            test_species = "O2" if "O2" in fractions else max(fractions, key=fractions.get)
             throat_recorded_m = float(state.get("throat_diameter_m") or 0.0)
             for location in ("throat", "duct"):
                 config = params.knudsen_locations[location]
@@ -1353,7 +1353,6 @@ def _knudsen_report(
                         characteristic_length_m=length,
                         threshold=config["Kn_threshold"],
                         carrier_mole_fractions=fractions,
-                        test_species=test_species,
                     )
                 )
         except (KeyError, TypeError, ValueError) as exc:
