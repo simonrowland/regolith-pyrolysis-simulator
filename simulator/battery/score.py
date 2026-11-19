@@ -355,9 +355,6 @@ _SPECIES_FORMULA_INDEPENDENT_QUANTITIES = frozenset(
 )
 
 
-# Equilibrium partial pressures from these two predictors are independent of
-# total pressure. The evaluation proof is in test_score's pressure-axis test;
-# unknown total-pressure provenance does not block p_partial eligibility here.
 def _pressure_independent_comparison(
     reference: Observation, prediction: EnginePrediction
 ) -> bool:

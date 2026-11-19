@@ -21,7 +21,8 @@ Ambiguity resolutions:
   ``score_eligible`` cannot be true when status is refused, admission is
   not admitted, evidence is not measured_*, identity_equal is not
   equal, or a vapour-equilibrium residual carries a blocking pressure
-  qualification (floor_inversion / fallback / pressure_provenance_unknown
+  qualification (floor_inversion / fallback / pressure_provenance_unknown /
+  imcc_complex_saturation
   on p_sat, p_partial, or p_reference). Independent scoring requires
   complete resolved observation/table lineage with no overlap; incomplete
   or unresolvable sources imply unknown, never independence; same work
@@ -151,6 +152,8 @@ _OBSERVATION_ISSUE_PATH = re.compile(r"^observation\[(.+?)\](?:\.(.*))?$")
 _VAPOUR_EQUILIBRIUM = frozenset(
     {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE}
 )
+# Only PRESSURE_PROVENANCE_UNKNOWN notices naming total_pressure_Pa are ignored
+# for p_partial eligibility on the pressure-independent prediction paths.
 _PRESSURE_BLOCKING_NOTICES = frozenset(
     {
         NoticeKind.FLOOR_INVERSION,
@@ -2787,7 +2790,8 @@ def _validate_residual_with_indexes(
                             f"{path}.score_eligible",
                             RefusalReason.CONDITIONAL_FIELD,
                             "vapour-equilibrium score_eligible cannot be true with "
-                            "floor_inversion/fallback/pressure_provenance_unknown; "
+                            "floor_inversion/fallback/pressure_provenance_unknown/"
+                            "imcc_complex_saturation; "
                             "diagnostic numeric residuals keep score_eligible=false",
                         )
                     )
