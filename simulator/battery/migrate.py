@@ -23169,17 +23169,31 @@ def compilation_record_locator(
     """Bind a compilation observation to the ingested record file.
 
     ``source_path`` is that record. Readers open it as the record. An
-    upstream ``path`` or ``file`` inside ``source_locator`` names the text
-    the record quotes; the schema has no separate field for it, so it stays
-    in the note with the other non-field keys. Promoting those aliases to
-    ``source_path`` replaces the record with a raw file that is not the
-    evidence.
+    upstream ``path`` or ``file`` inside a ``source_locator`` mapping names
+    the text the record quotes. The schema has no separate field for it, so
+    it stays in the note with the other non-field keys. Promoting those
+    aliases to ``source_path`` replaces the record with a raw file that is
+    not the evidence.
+
+    An absent locator keeps ``record_id`` on ``record``. A prose string
+    stays the note. USGS B2131 rows the generator does not own have no
+    ``source_locator``; moving their id onto ``note`` rewrites the
+    formation-Gibbs serialization without changing the file.
     """
 
     if not isinstance(raw, Mapping) or not any(
         value is not None and value != "" for value in raw.values()
     ):
-        return Locator(note=record_id, source_path=record_path)
+        # Empty mapping decodes as absent. A prose string is not absent.
+        locator = _locator_from_plain(
+            None if isinstance(raw, Mapping) else raw,
+            refuse_invalid=True,
+        )
+        if locator is None:
+            locator = Locator(record=record_id)
+        if not locator.source_path:
+            locator = replace(locator, source_path=record_path)
+        return locator
     address: dict[str, object] = {"source_path": record_path}
     provenance: list[str] = []
     for key, value in raw.items():

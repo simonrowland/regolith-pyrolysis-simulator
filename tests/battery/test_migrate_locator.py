@@ -122,6 +122,60 @@ def test_compilation_record_binding_detects_upstream_path_winning(
             )
 
 
+def test_absent_compilation_locator_keeps_record_id_on_record() -> None:
+    """A missing source_locator is the record field, not a note.
+
+    high-temperature-p336 has formation Gibbs and no published formula, so
+    the B2131 generator leaves it on the generic path. It also has no
+    source_locator. The formation-Gibbs pin serializes that id on ``record``.
+    """
+
+    from simulator.battery.migrate import compilation_record_locator
+
+    relative_path = (
+        "data/literature/compilations/robie-hemingway-1995-usgs-b2131/"
+        "records/high-temperature-p336.json"
+    )
+    record_id = "high-temperature-p336"
+    absent = compilation_record_locator(
+        None, record_path=relative_path, record_id=record_id
+    )
+    assert absent.source_path == relative_path
+    assert absent.record == record_id
+    assert absent.note is None
+    assert (
+        compilation_record_locator(
+            {}, record_path=relative_path, record_id=record_id
+        )
+        == absent
+    )
+    prose = "Table 1, printed page 4, PDF page 10"
+    located = compilation_record_locator(
+        prose, record_path=relative_path, record_id=record_id
+    )
+    assert located.source_path == relative_path
+    assert located.record is None
+    assert located.note == prose
+
+    path = REPO_ROOT / relative_path
+    document = json.loads(path.read_text(encoding="utf-8"))
+    assert document["record_id"] == record_id
+    assert "source_locator" not in document
+    assert not str(document.get("formula_as_published") or "").strip()
+    migrator = Migrator(REPO_ROOT)
+    migrator._migrate_compilation_file(path)
+    migrator.finalize()
+    observations = list(migrator.result.observations.values())
+    assert observations
+    for observation in observations:
+        locator = observation.locator
+        assert locator.source_path == relative_path
+        assert (REPO_ROOT / locator.source_path).is_file()
+        assert locator.record == record_id
+        assert locator.note is None
+        assert locator.table is None
+
+
 def test_printed_labels_and_grid_aliases_survive_extract_migration(
     tmp_path: Path,
 ) -> None:
