@@ -460,10 +460,18 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             if not self._backend_initialised:
                 self._backend_initialization_error = None
                 try:
-                    self._backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
+                    initialized = self._backend.initialize(
+                        dict(_SHADOW_BACKEND_CONFIG)
+                    )
+                    if initialized is False:
+                        self._backend_initialization_error = RuntimeError(
+                            "MAGEMin backend initialization reported unavailable"
+                        )
                 except Exception as exc:
                     self._backend_initialization_error = exc
                 self._backend_initialised = True
+            if self._backend_initialization_error is not None:
+                return None
             return self._backend
         backend = None
         backend_finalizer = None
@@ -476,7 +484,10 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 backend_finalizer = weakref.finalize(
                     self, _enqueue_backend_close, close, os.getpid()
                 )
-            backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
+            if backend.initialize(dict(_SHADOW_BACKEND_CONFIG)) is False:
+                raise RuntimeError(
+                    "MAGEMin backend initialization reported unavailable"
+                )
         except Exception as exc:
             self._backend_initialization_error = exc
             if backend_finalizer is not None:
