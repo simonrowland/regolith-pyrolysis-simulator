@@ -1140,9 +1140,9 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     observations = _b2131_formation_observations(
         tmp_path / "with-repository-index"
     )
-    # p007-13 are typed unavailable. The shared phase parser also resolves
-    # printed glass windows; these source-page grounded identities affect the
-    # serialization digest. Keep both paths so the test pins the generator's
+    # p007-13 are typed unavailable. The second parent's shared USGS phase
+    # parser now resolves printed glass windows as Phase.GLASS; those identities
+    # affect the serialization digest. Keep both paths so the test pins the generator's
     # output without and with B-1230's repository-index locator resolution.
     stored = yaml.safe_load(
         (
@@ -1231,7 +1231,7 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
         945,
         "73519c446e2d3fa506d25757c45f78b61b5aabe8a159259bceef1441846ba444",
         945,
-        "de617332cd3318fd7e7adeda5418f9ab73f991872e360ffbc81eed932739f623",
+        "951cbb4382e3ddaab8a383759f4bd191050bafc4fbeb2b3191fb05c853f92acd",
     )
 
 
