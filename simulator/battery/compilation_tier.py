@@ -2785,7 +2785,12 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
             RefusalReason.UNSUPPORTED, "pure-phase-property-absent",
             {"engine": Engine.OPENIMCC.value, "property": "H"}, evidence=evidence,
         )
-    if float(t_ref_K) < low or float(t_ref_K) > high:
+    reference_call_required = (
+        phase is not Phase.G or t_ref_K != _ENGINE_ENTHALPY_ANCHOR_K
+    )
+    if reference_call_required and (
+        float(t_ref_K) < low or float(t_ref_K) > high
+    ):
         return refuse(
             RefusalReason.UNSUPPORTED,
             "openimcc_reference_temperature_not_covered",
@@ -2812,7 +2817,7 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
         else as_decimal(str(dfh298)) / Decimal(1000)
     )
     h_reference_increment = Decimal(0)
-    if phase is not Phase.G or t_ref_K != _ENGINE_ENTHALPY_ANCHOR_K:
+    if reference_call_required:
         reference = native_call(t_ref_K)
         if isinstance(reference, ThermoAttempt):
             return reference
