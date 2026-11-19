@@ -436,9 +436,20 @@ def charge_moles_by_species(
             )
             if key in conditions
         }
-        # Point composition is the run state at the scored point, not the
-        # starting charge loaded into the apparatus. Keep charge selection on
-        # the experiment sample's initial/printed starting composition.
+        row_composition = conditions.get("composition")
+        # An unknown run composition cannot replace the loaded charge.
+        if (
+            isinstance(row_composition, Located)
+            and not row_composition.state.is_unknown
+        ):
+            if row_composition.state.is_value:
+                if not isinstance(row_composition.state.value, Composition):
+                    return SpeciesWaypoints({}, WaypointAbsence(
+                        "charge_moles_by_species",
+                        GapReason.UNSUPPORTED_PRINT_FORM,
+                        (f"observation[{observation.observation_id}].point_conditions.composition",),
+                    ))
+            fields["initial_composition"] = row_composition
         if fields:
             scoped = replace(experiment, sample=replace(experiment.sample, **fields))
             result = charge_moles_by_species(scoped, bench)
