@@ -60,6 +60,20 @@ def test_type_checking_import_used_only_in_annotation_is_allowed(
     assert undefined_names(path) == ()
 
 
+def test_loads_inside_type_checking_guard_are_not_runtime_loads(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "type_checking_guard_loads.py"
+    path.write_text(
+        "from typing import TYPE_CHECKING\n"
+        "if TYPE_CHECKING:\n"
+        "    from math import sqrt\n"
+        "    alias = sqrt\n"
+    )
+
+    assert undefined_names(path) == ()
+
+
 @pytest.mark.parametrize(
     ("declaration", "line"),
     [
@@ -323,6 +337,41 @@ def test_scope_lookup_reports_unbound_augassign_and_type_checking_bindings(
     path.write_text(source)
 
     assert undefined_names(path) == expected
+
+
+def test_same_line_lambda_scopes_do_not_share_bindings(tmp_path: Path) -> None:
+    path = tmp_path / "same_line_lambdas.py"
+    path.write_text("pair = (lambda x: x, lambda: x)\n")
+
+    assert undefined_names(path) == (("x", 1),)
+
+
+def test_class_comprehensions_cannot_read_class_bindings(tmp_path: Path) -> None:
+    path = tmp_path / "class_comprehensions.py"
+    path.write_text(
+        "class Box:\n"
+        "    T = 1\n"
+        "    values = (1,)\n"
+        "    xs = [T for _ in values]\n"
+        "    ys = {T for _ in values}\n"
+        "    zs = {T: T for _ in values}\n"
+        "    gs = (T for _ in values)\n"
+    )
+
+    assert undefined_names(path) == tuple(("T", line) for line in range(4, 8))
+
+
+def test_class_annotations_can_read_class_bindings(tmp_path: Path) -> None:
+    path = tmp_path / "class_annotations.py"
+    path.write_text(
+        "class Box:\n"
+        "    T = int\n"
+        "    x: T\n"
+        "    def method(self, value: T):\n"
+        "        return value\n"
+    )
+
+    assert undefined_names(path) == ()
 
 
 def test_comprehension_target_subexpressions_are_loads(tmp_path: Path) -> None:

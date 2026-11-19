@@ -13,7 +13,7 @@ from pathlib import Path
 
 _IMPLICIT = {"__file__", "__name__", "__doc__", "__spec__", "__builtins__",
              "__annotations__", "__conditional_annotations__"}
-_ScopeKey = tuple[str, str, int]
+_ScopeKey = tuple[str, int]
 
 
 def undefined_names(path: Path) -> tuple[tuple[str, int], ...]:
@@ -26,19 +26,20 @@ def undefined_names(path: Path) -> tuple[tuple[str, int], ...]:
         and any(alias.name == "annotations" for alias in node.names)
         for node in tree.body
     )
-    loads = _runtime_loads(tree, top, postponed)
-    runtime = _scope_bindings(tree, top, postponed)
-    module = _scope_key(top)
+    scope_tables, annotation_tables = _scope_tables(tree, top)
+    runtime, type_checking_guards = _scope_bindings(
+        tree, postponed, scope_tables
+    )
+    loads, enclosing_functions, annotation_parents = _runtime_loads(
+        tree,
+        postponed,
+        scope_tables,
+        annotation_tables,
+        type_checking_guards,
+    )
+    module = ("module", id(tree))
     defined = runtime.get(module, set())
     missing: set[tuple[str, int]] = set()
-    tables: dict[_ScopeKey, symtable.SymbolTable] = {}
-
-    def collect_tables(table: symtable.SymbolTable) -> None:
-        tables[_scope_key(table)] = table
-        for child in table.get_children():
-            collect_tables(child)
-
-    collect_tables(top)
 
     def has_global_binding(name: str) -> bool:
         return (
@@ -47,176 +48,279 @@ def undefined_names(path: Path) -> tuple[tuple[str, int], ...]:
             or name in _IMPLICIT
         )
 
-    def unresolved(
-        name: str,
-        table: symtable.SymbolTable,
-        scope: _ScopeKey,
-        enclosing_functions: tuple[_ScopeKey, ...],
-    ) -> bool:
-        kind = table.get_type()
-        if kind == "module":
-            return not has_global_binding(name)
-
-        symbol = table.lookup(name) if name in table.get_identifiers() else None
-        if symbol is not None and symbol.is_local():
-            if name in runtime.get(scope, set()):
-                return False
-            # Function locals never fall back to an outer scope. Class bodies
-            # use their globals when a class-local name has no runtime value.
-            return kind == "function" or not has_global_binding(name)
-
-        if symbol is not None and symbol.is_free():
-            for enclosing in reversed(enclosing_functions):
-                outer = tables.get(enclosing)
-                if outer is None or name not in outer.get_identifiers():
-                    continue
-                if outer.lookup(name).is_local():
-                    return name not in runtime.get(enclosing, set())
-
+    def closure_unresolved(name: str, scope: _ScopeKey) -> bool:
+        for enclosing in reversed(enclosing_functions.get(scope, ())):
+            outer = scope_tables.get(enclosing)
+            if outer is None or name not in outer.get_identifiers():
+                continue
+            if outer.lookup(name).is_local():
+                return name not in runtime.get(enclosing, set())
         return not has_global_binding(name)
 
-    def walk(
-        table: symtable.SymbolTable,
-        enclosing_functions: tuple[_ScopeKey, ...] = (),
-    ) -> None:
-        scope = _scope_key(table)
-        scope_loads = loads.get(scope, {})
-        missing.update(
-            (name, line)
-            for name, line in scope_loads.items()
-            if name in table.get_identifiers()
-            and unresolved(name, table, scope, enclosing_functions)
-        )
-        for child in table.get_children():
-            walk(
-                child,
-                enclosing_functions
-                + ((scope,) if table.get_type() == "function" else ()),
+    def unresolved(name: str, scope: _ScopeKey) -> bool:
+        kind = scope[0]
+        table = scope_tables.get(scope)
+        parent = annotation_parents.get(scope)
+        if kind == "module":
+            return not has_global_binding(name)
+        if kind == "comprehension":
+            # A comprehension's outermost iterable was recorded in its
+            # surrounding scope. Its body closes over functions, never a
+            # class namespace, even when the interpreter inlines it.
+            return closure_unresolved(name, scope)
+        if kind == "annotation" and parent is not None:
+            return (
+                name not in runtime.get(parent, set())
+                and not has_global_binding(name)
             )
+        if table is not None and table.get_type() == "class":
+            symbol = table.lookup(name) if name in table.get_identifiers() else None
+            if symbol is not None and symbol.is_local():
+                return (
+                    name not in runtime.get(scope, set())
+                    and not has_global_binding(name)
+                )
+            if symbol is not None and symbol.is_free():
+                return closure_unresolved(name, scope)
+            return not has_global_binding(name)
+        if table is not None and table.get_type() == "function":
+            symbol = table.lookup(name) if name in table.get_identifiers() else None
+            if symbol is not None and symbol.is_local():
+                return name not in runtime.get(scope, set())
+            if symbol is not None and symbol.is_free():
+                return closure_unresolved(name, scope)
+        return not has_global_binding(name)
 
-    walk(top)
+    for scope, scope_loads in loads.items():
+        for name, line in scope_loads.items():
+            if unresolved(name, scope):
+                missing.add((name, line))
     return tuple(sorted(missing))
 
 
-def _scope_key(table: symtable.SymbolTable) -> _ScopeKey:
-    return table.get_type(), table.get_name(), table.get_lineno()
+def _scope_table_base(table: symtable.SymbolTable) -> tuple[str, str, int]:
+    kind = table.get_type()
+    return getattr(kind, "value", kind), table.get_name(), table.get_lineno()
+
+
+def _ast_scope_base(node: ast.AST) -> tuple[str, str, int] | None:
+    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return "function", node.name, node.lineno
+    if isinstance(node, ast.ClassDef):
+        return "class", node.name, node.lineno
+    if isinstance(node, ast.Lambda):
+        return "function", "lambda", node.lineno
+    labels = {
+        ast.ListComp: "listcomp",
+        ast.SetComp: "setcomp",
+        ast.DictComp: "dictcomp",
+        ast.GeneratorExp: "genexpr",
+    }
+    label = labels.get(type(node))
+    return ("function", label, node.lineno) if label else None
+
+
+def _ast_scope_key(node: ast.AST) -> _ScopeKey:
+    base = _ast_scope_base(node)
+    if isinstance(node, ast.ClassDef):
+        kind = "class"
+    elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
+        kind = "function"
+    else:
+        kind = "comprehension"
+    if base is None:
+        raise TypeError(f"not a scope node: {type(node).__name__}")
+    return kind, id(node)
+
+
+def _scope_tables(
+    tree: ast.Module, top: symtable.SymbolTable
+) -> tuple[dict[_ScopeKey, symtable.SymbolTable], dict[int, list[symtable.SymbolTable]]]:
+    by_base: dict[tuple[str, str, int], list[symtable.SymbolTable]] = {}
+    annotation_tables: dict[int, list[symtable.SymbolTable]] = {}
+
+    def collect_tables(table: symtable.SymbolTable) -> None:
+        base = _scope_table_base(table)
+        by_base.setdefault(base, []).append(table)
+        if base[:2] == ("annotation", "__annotate__"):
+            annotation_tables.setdefault(base[2], []).append(table)
+        for child in table.get_children():
+            collect_tables(child)
+
+    collect_tables(top)
+
+    nodes_by_base: dict[tuple[str, str, int], list[ast.AST]] = {}
+
+    def collect_nodes(node: ast.AST) -> None:
+        base = _ast_scope_base(node)
+        if base is not None:
+            nodes_by_base.setdefault(base, []).append(node)
+        for child in ast.iter_child_nodes(node):
+            collect_nodes(child)
+
+    collect_nodes(tree)
+    tables_by_scope = {("module", id(tree)): top}
+    for base, nodes in nodes_by_base.items():
+        nodes.sort(key=lambda item: (item.lineno, item.col_offset))
+        for node, table in zip(nodes, by_base.get(base, ())):
+            tables_by_scope[_ast_scope_key(node)] = table
+    return tables_by_scope, annotation_tables
 
 
 def _runtime_loads(
-    tree: ast.Module, top: symtable.SymbolTable, postponed: bool
-) -> dict[_ScopeKey, dict[str, int]]:
+    tree: ast.Module,
+    postponed: bool,
+    scope_tables: dict[_ScopeKey, symtable.SymbolTable],
+    annotation_tables: dict[int, list[symtable.SymbolTable]],
+    type_checking_guards: set[int],
+) -> tuple[
+    dict[_ScopeKey, dict[str, int]],
+    dict[_ScopeKey, tuple[_ScopeKey, ...]],
+    dict[_ScopeKey, _ScopeKey],
+]:
     loads: dict[_ScopeKey, dict[str, int]] = {}
-    tables: set[_ScopeKey] = set()
     variable_annotations: dict[_ScopeKey, _ScopeKey] = {}
+    scope_functions: dict[_ScopeKey, tuple[_ScopeKey, ...]] = {}
+    annotation_parents: dict[_ScopeKey, _ScopeKey] = {}
+    module = ("module", id(tree))
 
-    def collect(table: symtable.SymbolTable) -> None:
-        tables.add(_scope_key(table))
-        for child in table.get_children():
-            collect(child)
+    def annotation_scope(
+        parent: _ScopeKey,
+        owner: ast.AST,
+        enclosing_functions: tuple[_ScopeKey, ...],
+        variable: bool = False,
+    ) -> _ScopeKey:
+        if variable and parent in variable_annotations:
+            return variable_annotations[parent]
+        candidates = annotation_tables.get(owner.lineno, [])
+        if candidates:
+            table = candidates.pop(0)
+            key = ("annotation", id(table) if variable else id(owner))
+            scope_tables[key] = table
+            annotation_parents[key] = parent
+            scope_functions[key] = enclosing_functions
+            result = key
+        else:
+            result = parent
+        if variable:
+            variable_annotations[parent] = result
+        return result
 
-    collect(top)
-
-    def annotation_scope(scope: _ScopeKey, line: int, variable: bool = False) -> _ScopeKey:
-        candidate = ("annotation", "__annotate__", line)
-        result = candidate if candidate in tables else scope
-        return variable_annotations.setdefault(scope, result) if variable else result
-
-    def visit(node: ast.AST, scope: _ScopeKey, local: frozenset[str] = frozenset()) -> None:
+    def visit(
+        node: ast.AST,
+        scope: _ScopeKey,
+        local: frozenset[str] = frozenset(),
+        enclosing: tuple[_ScopeKey, ...] = (),
+    ) -> None:
+        scope_functions.setdefault(scope, enclosing)
         if isinstance(node, ast.Name):
             if isinstance(node.ctx, ast.Load) and node.id not in local:
                 names = loads.setdefault(scope, {})
                 names[node.id] = min(names.get(node.id, node.lineno), node.lineno)
             return
         if isinstance(node, ast.AugAssign):
-            visit(node.target, scope, local)
+            visit(node.target, scope, local, enclosing)
             if isinstance(node.target, ast.Name) and node.target.id not in local:
                 names = loads.setdefault(scope, {})
                 names[node.target.id] = min(
                     names.get(node.target.id, node.target.lineno), node.target.lineno
                 )
-            visit(node.value, scope, local)
+            visit(node.value, scope, local, enclosing)
+            return
+        if isinstance(node, ast.If):
+            visit(node.test, scope, local, enclosing)
+            if id(node) not in type_checking_guards:
+                for statement in node.body:
+                    visit(statement, scope, local, enclosing)
+            for statement in node.orelse:
+                visit(statement, scope, local, enclosing)
             return
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             for expr in (*node.decorator_list, *node.args.defaults, *node.args.kw_defaults):
                 if expr is not None:
-                    visit(expr, scope, local)
+                    visit(expr, scope, local, enclosing)
             if not postponed:
                 args = [*node.args.posonlyargs, *node.args.args, *node.args.kwonlyargs]
                 args.extend(arg for arg in (node.args.vararg, node.args.kwarg) if arg)
-                annotation_scope_key = annotation_scope(scope, node.lineno)
+                annotation_scope_key = annotation_scope(
+                    scope, node, enclosing
+                )
                 for arg in args:
                     if arg.annotation:
-                        visit(arg.annotation, annotation_scope_key, local)
+                        visit(arg.annotation, annotation_scope_key, local, enclosing)
                 if node.returns:
-                    visit(node.returns, annotation_scope_key, local)
-            child = ("function", node.name, node.lineno)
+                    visit(node.returns, annotation_scope_key, local, enclosing)
+            child = _ast_scope_key(node)
+            child_enclosing = (*enclosing, child)
+            scope_functions.setdefault(child, enclosing)
             for statement in node.body:
-                visit(statement, child)
+                visit(statement, child, enclosing=child_enclosing)
             return
         if isinstance(node, ast.ClassDef):
             for expr in (*node.decorator_list, *node.bases, *(kw.value for kw in node.keywords)):
-                visit(expr, scope, local)
-            child = ("class", node.name, node.lineno)
+                visit(expr, scope, local, enclosing)
+            child = _ast_scope_key(node)
+            scope_functions.setdefault(child, enclosing)
             for statement in node.body:
-                visit(statement, child)
+                visit(statement, child, enclosing=enclosing)
             return
         if isinstance(node, ast.Lambda):
             for expr in (*node.args.defaults, *node.args.kw_defaults):
                 if expr is not None:
-                    visit(expr, scope, local)
-            visit(node.body, ("function", "lambda", node.lineno), local)
+                    visit(expr, scope, local, enclosing)
+            child = _ast_scope_key(node)
+            child_enclosing = (*enclosing, child)
+            scope_functions.setdefault(child, enclosing)
+            visit(node.body, child, local, child_enclosing)
             return
         if isinstance(node, ast.AnnAssign):
-            visit(node.target, scope, local)
-            if not postponed and scope[0] != "function":
-                visit(node.annotation, annotation_scope(scope, node.lineno, True), local)
+            visit(node.target, scope, local, enclosing)
+            if not postponed and scope[0] not in {"function", "comprehension"}:
+                annotation_key = annotation_scope(
+                    scope, node, enclosing, variable=True
+                )
+                visit(node.annotation, annotation_key, local, enclosing)
             if node.value is not None:
-                visit(node.value, scope, local)
+                visit(node.value, scope, local, enclosing)
             return
         if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
             if not node.generators:
                 return
             first = node.generators[0]
-            visit(first.iter, scope, local)
-            labels = {ast.ListComp: "listcomp", ast.SetComp: "setcomp",
-                      ast.DictComp: "dictcomp", ast.GeneratorExp: "genexpr"}
-            candidate = ("function", labels[type(node)], node.lineno)
-            inner = candidate if candidate in tables else scope
+            visit(first.iter, scope, local, enclosing)
+            inner = _ast_scope_key(node)
+            scope_functions.setdefault(inner, enclosing)
             bound = set(local)
             for index, generator in enumerate(node.generators):
                 if index:
-                    visit(generator.iter, inner, frozenset(bound))
-                visit(generator.target, inner, frozenset(bound))
+                    visit(generator.iter, inner, frozenset(bound), enclosing)
+                visit(generator.target, inner, frozenset(bound), enclosing)
                 bound.update(
                     name.id for name in ast.walk(generator.target)
                     if isinstance(name, ast.Name) and isinstance(name.ctx, ast.Store)
                 )
                 for condition in generator.ifs:
-                    visit(condition, inner, frozenset(bound))
+                    visit(condition, inner, frozenset(bound), enclosing)
             values = (node.key, node.value) if isinstance(node, ast.DictComp) else (node.elt,)
             for value in values:
-                visit(value, inner, frozenset(bound))
+                visit(value, inner, frozenset(bound), enclosing)
             return
         for child in ast.iter_child_nodes(node):
-            visit(child, scope, local)
+            visit(child, scope, local, enclosing)
 
-    visit(tree, _scope_key(top))
-    return loads
+    scope_functions[module] = ()
+    visit(tree, module)
+    return loads, scope_functions, annotation_parents
 
 
 def _scope_bindings(
-    tree: ast.Module, top: symtable.SymbolTable, postponed: bool
-) -> dict[_ScopeKey, set[str]]:
-    module = _scope_key(top)
+    tree: ast.Module,
+    postponed: bool,
+    tables: dict[_ScopeKey, symtable.SymbolTable],
+) -> tuple[dict[_ScopeKey, set[str]], set[int]]:
+    module = ("module", id(tree))
     runtime: dict[_ScopeKey, set[str]] = {}
-    tables: dict[_ScopeKey, symtable.SymbolTable] = {}
-
-    def collect_tables(table: symtable.SymbolTable) -> None:
-        tables[_scope_key(table)] = table
-        for child in table.get_children():
-            collect_tables(child)
-
-    collect_tables(top)
+    type_checking_guards: set[int] = set()
 
     def scan_imports(nodes: list[ast.AST]) -> set[str]:
         imports: set[str] = set()
@@ -267,14 +371,12 @@ def _scope_bindings(
         class Bindings(ast.NodeVisitor):
             def __init__(self) -> None:
                 self.runtime: set[str] = {arg.arg for arg in arguments}
-                self.runtime_without_augassign: set[str] = set(self.runtime)
-                self.type_only: set[str] = set()
                 self.globals: set[str] = set()
                 self.nonlocals: set[str] = set()
                 self.guarded = False
 
-            def bind(self, name: str, augmented: bool = False) -> None:
-                if not self.guarded and not augmented:
+            def bind(self, name: str) -> None:
+                if not self.guarded:
                     self.runtime.add(name)
 
             def visit_Name(self, node: ast.Name) -> None:
@@ -282,10 +384,6 @@ def _scope_bindings(
                     self.bind(node.id)
 
             def visit_AugAssign(self, node: ast.AugAssign) -> None:
-                if isinstance(node.target, ast.Name):
-                    self.bind(node.target.id, augmented=True)
-                else:
-                    self.visit(node.target)
                 self.visit(node.value)
 
             def visit_Import(self, node: ast.Import) -> None:
@@ -301,7 +399,10 @@ def _scope_bindings(
             def visit_If(self, node: ast.If) -> None:
                 self.visit(node.test)
                 previous = self.guarded
-                self.guarded |= is_guard(node.test)
+                guarded = is_guard(node.test)
+                if guarded:
+                    type_checking_guards.add(id(node))
+                self.guarded |= guarded
                 for statement in node.body:
                     self.visit(statement)
                 self.guarded = previous
@@ -321,7 +422,7 @@ def _scope_bindings(
                     if expr is not None:
                         self.visit(expr)
                 inherited = outer_imports | imports if scope[0] != "class" else outer_imports
-                scan(node.body, ("function", node.name, node.lineno), True, tuple(args), inherited)
+                scan(node.body, _ast_scope_key(node), True, tuple(args), inherited)
 
             visit_AsyncFunctionDef = visit_FunctionDef
 
@@ -333,7 +434,7 @@ def _scope_bindings(
                 for expr in expressions:
                     self.visit(expr)
                 inherited = outer_imports | imports if scope[0] != "class" else outer_imports
-                scan(node.body, ("class", node.name, node.lineno), outer_imports=inherited)
+                scan(node.body, _ast_scope_key(node), outer_imports=inherited)
 
             def visit_Lambda(self, node: ast.Lambda) -> None:
                 for expr in (*node.args.defaults, *node.args.kw_defaults):
@@ -343,7 +444,7 @@ def _scope_bindings(
                 args.extend(arg for arg in (node.args.vararg, node.args.kwarg) if arg)
                 inherited = outer_imports | imports if scope[0] != "class" else outer_imports
                 scan(
-                    [node.body], ("function", "lambda", node.lineno), True,
+                    [node.body], _ast_scope_key(node), True,
                     tuple(args), inherited,
                 )
 
@@ -402,4 +503,4 @@ def _scope_bindings(
         runtime.setdefault(module, set()).update(global_runtime)
 
     scan(tree.body, module)
-    return runtime
+    return runtime, type_checking_guards

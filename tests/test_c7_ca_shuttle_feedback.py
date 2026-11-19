@@ -28,7 +28,7 @@ def test_c7_ca_shuttle_feedback_commits_surplus_from_real_profile() -> None:
             "extent_fraction": 0.1,
             "ca_shuttle": {
                 "enabled": True,
-                "rate_fraction": 1.0,
+                "rate_fraction": 0.5,
                 "reserve_ca_product_fraction": 0.7,
                 "targets": ["Al2O3"],
             },
