@@ -1409,6 +1409,16 @@ _MAGEMIN_EQUILIBRATE_FAILURE_EXIT_EXPECTATIONS = (
         'out_of_domain',
         'magemin_mode_vector_mass_deficit',
     ),
+    (
+        'clamped_mode_vector_deficit',
+        'out_of_domain',
+        'clamped_operating_point',
+    ),
+    (
+        'missing_fo2_mode_vector_deficit',
+        'not_converged',
+        'engine_not_converged',
+    ),
     ('native_activity_invalid', 'not_converged', 'engine_not_converged'),
     ('clamped_operating_point', 'out_of_domain', 'clamped_operating_point'),
     ('generic_parse_empty_output', 'not_converged', 'parse_empty_output'),
@@ -1610,12 +1620,20 @@ def _magemin_failure_exit_result(monkeypatch, failure_kind):
         monkeypatch.setattr(
             backend, '_call_magemin', lambda **_kwargs: {'converged': False},
         )
-    elif failure_kind == 'mode_vector_deficit':
+    elif failure_kind in {
+        'mode_vector_deficit',
+        'clamped_mode_vector_deficit',
+        'missing_fo2_mode_vector_deficit',
+    }:
+        raw_result = {
+            'mode_vector_mass_deficit': {'mode_sum': 0.5, 'deficit': 0.5},
+        }
+        if failure_kind == 'clamped_mode_vector_deficit':
+            raw_result.update({'fO2': -7.0, 'ph': ['qfm']})
+        elif failure_kind == 'missing_fo2_mode_vector_deficit':
+            raw_result['ph'] = ['qfm']
         monkeypatch.setattr(
-            backend, '_call_magemin',
-            lambda **_kwargs: {
-                'mode_vector_mass_deficit': {'mode_sum': 0.5, 'deficit': 0.5},
-            },
+            backend, '_call_magemin', lambda **_kwargs: raw_result,
         )
     elif failure_kind == 'native_activity_invalid':
         monkeypatch.setattr(
@@ -1667,6 +1685,12 @@ def test_magemin_equilibrate_failure_exits_have_literal_typed_expectations(
         assert result.diagnostics['backend_status_reason'] != (
             'magemin_untyped_failure'
         )
+    if failure_kind in {
+        'clamped_mode_vector_deficit',
+        'missing_fo2_mode_vector_deficit',
+    }:
+        assert result.diagnostics['magemin_mode_vector_mass_deficit'] is True
+        assert any('mass deficit=0.5' in warning for warning in result.warnings)
 
 
 def test_public_magemin_equilibrate_normalizes_bare_failure_result(monkeypatch):

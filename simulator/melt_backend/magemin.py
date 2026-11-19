@@ -2357,6 +2357,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             if isinstance(mode_deficit, Mapping):
                 mode_sum = float(mode_deficit['mode_sum'])
                 deficit = float(mode_deficit['deficit'])
+                mode_failure_reason = (
+                    result_diagnostics.get('backend_status_reason')
+                    if result_status != 'ok'
+                    else MAGEMIN_MODE_VECTOR_MASS_DEFICIT
+                )
                 # Native control failure takes precedence over incomplete Mode
                 # evidence: preserve its numerical reason for gate hold/floor.
                 # A deficit alone remains out_of_domain; record it in both cases.
@@ -2399,7 +2404,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     status=result_status,
                     warnings=[*all_warnings, message],
                     diagnostics=result_diagnostics,
-                ), reason=MAGEMIN_MODE_VECTOR_MASS_DEFICIT)
+                ), reason=(
+                    mode_failure_reason or MAGEMIN_MODE_VECTOR_MASS_DEFICIT
+                ))
         native_activities: Dict[str, float] = {}
         if native_activity_formula is not None:
             from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
