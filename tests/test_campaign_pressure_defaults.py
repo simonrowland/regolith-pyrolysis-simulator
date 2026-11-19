@@ -146,14 +146,7 @@ def test_c6_continuum_derivation_uses_selected_static_hold_temperature():
     assert campaign["default_hold_T_C"] == 1400
     assert campaign["temp_range_C"] == [1380, 1450]
 
-    expected_mbar = (
-        1.380649e-23 * (1400.0 + 273.15)
-        / (
-            math.sqrt(2.0) * math.pi * (3.798e-10) ** 2
-            * float(continuum["pipe_diameter_m"]) * 0.01
-        )
-        / 100.0
-    )
+    expected_mbar = _n2_continuum_floor_mbar(continuum)
     assert continuum["derived_pN2_floor_mbar"] == pytest.approx(
         expected_mbar, abs=5e-7
     )
