@@ -10914,17 +10914,56 @@ def _printed_fo2_log10_bar(identity: Identity) -> float | None:
     return float(pa.log10() - PA_PER_BAR_DEC.log10())
 
 
+def _is_liquid_phase_label(name: str) -> bool:
+    """True for a melt label, including PetThermoTools ``liquid1``.
+
+    ``liquidus`` shares the prefix and is not a phase. Names already in
+    ``_LIQUID_PHASE_NAMES`` (liq, liquid, melt, slag, glass) stay liquid
+    labels for the melt, slag, and glass roles.
+    """
+    folded = name.casefold()
+    if folded.startswith("liquidus"):
+        return False
+    if folded in _LIQUID_PHASE_NAMES:
+        return True
+    return folded.startswith("liq")
+
+
+def _phase_labels_for_role(names: object, role: PhaseRole) -> list[str]:
+    if not isinstance(names, (list, tuple)):
+        return []
+    if role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}:
+        return [str(name) for name in names if _is_liquid_phase_label(str(name))]
+    needles = ("metal", "alloy") if role is PhaseRole.METAL else ("matte", "sulfide")
+    return [
+        str(name)
+        for name in names
+        if any(needle in str(name).casefold() for needle in needles)
+    ]
+
+
 def _select_phase_composition(
     result: EquilibriumResult, role: PhaseRole
 ) -> tuple[Mapping[str, float] | None, str | None]:
+    """Pick one phase composition, or a typed reason it cannot be picked.
+
+    ``liquid_composition_wt_pct`` is the melt carrier already taken from
+    the phase table. It is not the bulk. ``bulk_composition_wt_pct`` is
+    never read: a missing predicted phase does not fall back to the input.
+    A name in ``phases_present`` with no composition output is
+    ``phase_present_composition_not_reported``. A name in neither map is
+    ``phase_not_in_assemblage``.
+    """
     comps = dict(result.phase_compositions or {})
-    exact = [name for name in comps if name.casefold() == role.value]
+    exact = [name for name in comps if name.casefold() == role.value and comps[name]]
     if len(exact) > 1:
         return None, "ambiguous_phase"
     if len(exact) == 1:
         return comps[exact[0]], None
     if role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}:
-        liquids = [name for name in comps if name.casefold() in _LIQUID_PHASE_NAMES]
+        liquids = [
+            name for name in comps if _is_liquid_phase_label(name) and comps[name]
+        ]
         if len(liquids) > 1:
             return None, "ambiguous_phase"
         if len(liquids) == 1:
@@ -10932,13 +10971,20 @@ def _select_phase_composition(
         liquid = dict(result.liquid_composition_wt_pct or {})
         if liquid:
             return liquid, None
-        return None, "phase_not_in_assemblage"
-    needles = ("metal", "alloy") if role is PhaseRole.METAL else ("matte", "sulfide")
-    hits = [name for name in comps if any(needle in name.casefold() for needle in needles)]
-    if len(hits) > 1:
-        return None, "ambiguous_phase"
-    if len(hits) == 1:
-        return comps[hits[0]], None
+    else:
+        hits = [
+            name
+            for name in _phase_labels_for_role(list(comps), role)
+            if comps[name]
+        ]
+        if len(hits) > 1:
+            return None, "ambiguous_phase"
+        if len(hits) == 1:
+            return comps[hits[0]], None
+    reported = _phase_labels_for_role(list(comps), role)
+    present = _phase_labels_for_role(result.phases_present, role)
+    if reported or present:
+        return None, "phase_present_composition_not_reported"
     return None, "phase_not_in_assemblage"
 
 

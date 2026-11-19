@@ -66,6 +66,7 @@ from simulator.melt_backend.magemin import (
     MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
     MAGEMIN_WARM_CALL_TIMEOUT_S,
     MAGEMinBackend,
+    _magemin_phase_maps_from_matlab,
     _magemin_subprocess_env,
     _magemin_subprocess_slot,
 )
@@ -3159,8 +3160,317 @@ def test_magemin_subprocess_argument_vector_matches_golden():
         '--Bulk=60.000000,0.000000,0.000000,40.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000',
         '--buffer=nno',
         '--buffer_n=0.000000',
+        '--out_matlab=1',
     ]
     assert (buffer_name, buffer_n) == ('nno', 0.0)
+    assert args[1] == '--Verb=0'
+
+
+_MAGEMIN_PROPERTY_HEADER = (
+    "phase fraction[wt] G[J] V_molar[cm3/mol] V_partial[cm3] "
+    "Cp[kJ/K] Rho[kg/m3] Alpha[1/K] Entropy[J/K] Enthalpy[J] "
+    "BulkMod[GPa] ShearMod[GPa] Vp[km/s] Vs[km/s]"
+)
+
+
+def _magemin_property_row(
+    name: str,
+    fraction: float,
+    rho: float,
+    v_partial: float,
+    *,
+    cp: float = 0.2,
+    gibbs: float = -1000.0,
+) -> str:
+    return (
+        f"{name} {fraction:+.5f} {gibbs:+.5f} {43.0:+.5f} {v_partial:+.5f} "
+        f"{cp:+.5f} {rho:+.5f} {0.00003:+.8f} {100.0:+.6f} {500.0:+.4f} "
+        f"{100.0:+.2f} {50.0:+.2f} {7.0:+.2f} {4.0:+.2f}"
+    )
+
+
+def _magemin_matlab_fixture() -> str:
+    return "\n".join([
+        "End-members fractions[wt fr]",
+        "      fo         fa         -",
+        "  ol   0.80000    0.20000    -",
+        "",
+        "Oxide compositions [wt fr]:",
+        "      SiO2       MgO       FeO         O",
+        " SYS   0.50000   0.40000   0.10000   0.02000",
+        "  ol   0.40000   0.50000   0.10000   0.00000",
+        " liq   0.55000   0.30000   0.10000   0.05000",
+        " qfm   0.00000   0.00000   0.00000   1.00000",
+        "",
+        "Stable mineral assemblage:",
+        _MAGEMIN_PROPERTY_HEADER,
+        _magemin_property_row("ol", 0.40, 3200.0, 10.0),
+        _magemin_property_row("liq", 0.60, 2700.0, 20.0, cp=0.25),
+        _magemin_property_row("qfm", 0.01, 5000.0, 1.0),
+        "",
+        "Gamma[J] (chemical potential of oxides):",
+        "  SiO2 +100.00000",
+        "   FeO +50.00000",
+        "     O -10.00000",
+        "",
+    ])
+
+
+def test_magemin_matlab_phase_maps_scale_weight_fraction_and_keep_feo_o():
+    maps = _magemin_phase_maps_from_matlab(_magemin_matlab_fixture())
+    assert maps is not None
+    assert maps["phase_compositions"]["ol"]["SiO2"] == pytest.approx(40.0)
+    assert maps["phase_compositions"]["liq"]["FeO"] == pytest.approx(10.0)
+    assert maps["phase_compositions"]["liq"]["O"] == pytest.approx(5.0)
+    assert "Fe2O3" not in maps["phase_compositions"]["liq"]
+    assert "qfm" not in maps["phase_compositions"]
+    # Printed 0 stays absent. Density is the header Rho, not Rho * fraction.
+    assert "O" not in maps["phase_compositions"]["ol"]
+    assert maps["phase_thermo"]["ol"]["density_kg_m3"] == pytest.approx(3200.0)
+    assert maps["phase_thermo"]["ol"]["density_kg_m3"] != pytest.approx(3200.0 * 0.40)
+    assert maps["phase_thermo"]["ol"]["volume_m3"] == pytest.approx(10.0 * 1.0e-6)
+    assert maps["phase_thermo"]["ol"]["heat_capacity_kJ_K"] == pytest.approx(0.2)
+    assert maps["phase_thermo"]["ol"]["reference_basis"] == "magemin_formula_amount"
+    assert maps["phase_instances"][0]["endmember_weight_fraction"] == {
+        "fo": pytest.approx(0.8),
+        "fa": pytest.approx(0.2),
+    }
+    assert maps["phase_instances"][0]["endmember_basis"] == "wt_fr"
+    gamma = maps["chem_potentials"]["system"]["components"]
+    assert gamma["FeO"] == pytest.approx(50.0)
+    assert gamma["O"] == pytest.approx(-10.0)
+    assert maps["chem_potentials"]["system"]["coordinate"] == "magemin_native_oxide"
+
+
+def test_magemin_matlab_duplicate_phases_are_fraction_weighted():
+    text = "\n".join([
+        "Oxide compositions [wt fr]:",
+        "      SiO2       MgO",
+        " SYS   0.50000   0.50000",
+        "  ol   0.20000   0.80000",
+        "  ol   0.60000   0.40000",
+        "",
+        "Stable mineral assemblage:",
+        _MAGEMIN_PROPERTY_HEADER,
+        _magemin_property_row("ol", 0.25, 3200.0, 10.0),
+        _magemin_property_row("ol", 0.75, 3300.0, 30.0),
+        "",
+    ])
+    maps = _magemin_phase_maps_from_matlab(text)
+    assert maps is not None
+    # (20*0.25 + 60*0.75) = 50. Last-write-wins would report 60.
+    assert maps["phase_compositions"]["ol"]["SiO2"] == pytest.approx(50.0)
+    assert maps["phase_thermo"]["ol"]["density_kg_m3"] == pytest.approx(3275.0)
+    assert maps["phase_thermo"]["ol"]["volume_m3"] == pytest.approx(40.0 * 1.0e-6)
+    assert [row["instance_id"] for row in maps["phase_instances"]] == ["ol", "ol#2"]
+
+
+def test_magemin_matlab_malformed_oxide_row_refuses():
+    text = "\n".join([
+        "Oxide compositions [wt fr]:",
+        "      SiO2       MgO",
+        " SYS   0.50000   0.50000",
+        "  ol   0.20000   nan",
+        "",
+    ])
+    with pytest.raises(magemin_module._MAGEMinEngineCallError) as excinfo:
+        _magemin_phase_maps_from_matlab(text)
+    assert excinfo.value.exception_type == "MAGEMinOutputError"
+
+
+def test_magemin_matlab_absent_oxide_block_is_not_a_failure():
+    assert _magemin_phase_maps_from_matlab("aMgO nan\naSiO2 +8.9e-1\n") is None
+    assert _magemin_phase_maps_from_matlab("captured matlab\n") is None
+
+
+def test_magemin_matlab_nonfinite_buffer_velocity_is_dropped():
+    """qfm Vp is +inf when its density is 0. That row is not a phase."""
+    lines = []
+    for line in _magemin_matlab_fixture().splitlines():
+        if line.startswith("qfm "):
+            line = line.replace("+7.00", "+inf", 1)
+        lines.append(line)
+    assert any("+inf" in line for line in lines)
+    maps = _magemin_phase_maps_from_matlab("\n".join(lines))
+    assert maps is not None
+    assert maps["phase_compositions"]["ol"]["SiO2"] == pytest.approx(40.0)
+    assert "qfm" not in maps["phase_compositions"]
+    assert "qfm" not in maps["phase_thermo"]
+
+
+def _equilibrate_fake_magemin_matlab(monkeypatch: pytest.MonkeyPatch):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._database = "ig"
+    backend._config = {"database": "ig", "timeout_s": 1.0, "fO2_buffer": "nno"}
+
+    def fake_run(_args, **kwargs):
+        # numpy's SVE probe calls subprocess.run("lscpu") while score.py
+        # imports. That call has no cwd; only the MAGEMin launch does.
+        cwd = kwargs.get("cwd")
+        if cwd is None:
+            return types.SimpleNamespace(
+                returncode=0, stdout="", stderr=""
+            )
+        output = Path(cwd) / "output"
+        output.mkdir()
+        (output / "_matlab_output.txt").write_text(
+            _magemin_matlab_fixture(),
+            encoding="utf-8",
+        )
+        return types.SimpleNamespace(
+            returncode=0,
+            stdout="Phase : ol liq qfm\nMode  : 0.400 0.600 0.000\n",
+            stderr="",
+        )
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.magemin.subprocess.run", fake_run
+    )
+    return backend.equilibrate(
+        1100.0,
+        composition_kg={"SiO2": 50.0, "MgO": 40.0, "FeO": 10.0},
+        pressure_bar=2000.0,
+        fO2_log=-8.0,
+        call_timeout_s=1.0,
+    )
+
+
+def test_magemin_subprocess_attaches_matlab_composition_without_verb1(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    result = _equilibrate_fake_magemin_matlab(monkeypatch)
+    assert result.phase_compositions["ol"]["SiO2"] == pytest.approx(40.0)
+    assert result.phase_compositions["liq"]["O"] == pytest.approx(5.0)
+    assert result.liquid_composition_wt_pct["SiO2"] == pytest.approx(55.0)
+    assert result.phase_thermo["liq"]["density_kg_m3"] == pytest.approx(2700.0)
+    assert "qfm" not in result.phase_compositions
+    assert result.chem_potentials["system"]["components"]["FeO"] == pytest.approx(50.0)
+
+
+def _score_magemin_melt_silica(result):
+    from decimal import Decimal
+
+    from simulator.battery.enums import Engine, EvidenceClass, PhaseRole, Quantity
+    from simulator.battery.score import predict_with_engine
+    from tests.battery import factories as F
+    from tests.battery.test_phase_composition_rows import _phase_identity
+
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    observation = F.observation(
+        "magemin-mutant-phase",
+        "sample-1",
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="magemin-mutant-phase",
+    )
+
+    def hook(*_args, **_kwargs):
+        return result
+
+    return predict_with_engine, Engine, observation, hook
+
+
+def test_mutant_discarded_magemin_composition_fails_the_oxide_row(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Dropping the composition payload must fail the 40 wt% row contract."""
+    from simulator.melt_backend.base import EquilibriumResult
+
+    real = magemin_module._magemin_phase_maps_from_matlab
+
+    def discard(text):
+        maps = real(text)
+        if not isinstance(maps, dict):
+            return maps
+        blank = dict(maps)
+        blank["phase_compositions"] = {}
+        return blank
+
+    monkeypatch.setattr(
+        magemin_module, "_magemin_phase_maps_from_matlab", discard
+    )
+    result = _equilibrate_fake_magemin_matlab(monkeypatch)
+    assert "liq" in result.phases_present
+    assert result.phase_compositions.get("ol", {}).get("SiO2") != pytest.approx(40.0)
+    predict_with_engine, engine, observation, hook = _score_magemin_melt_silica(result)
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", hook
+    )
+    scored = predict_with_engine(engine.MAGEMIN, observation)
+    assert scored.value is None
+    assert scored.refusal_detail["reason"] == "phase_present_composition_not_reported"
+    absent_hook_result = EquilibriumResult(
+        liquid_fraction=1.0,
+        phases_present=["olivine"],
+        bulk_composition_wt_pct={"SiO2": 40.0},
+    )
+    _predict, _engine, absent_observation, _hook = _score_magemin_melt_silica(
+        absent_hook_result
+    )
+
+    def absent_hook(*_args, **_kwargs):
+        return absent_hook_result
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", absent_hook
+    )
+    absent = predict_with_engine(engine.MAGEMIN, absent_observation)
+    assert absent.value is None
+    assert absent.refusal_detail["reason"] == "phase_not_in_assemblage"
+
+
+def test_mutant_omitted_weight_fraction_scale_fails_the_wt_percent_row(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Omitting ×100 must fail the 40 wt% row and report the raw fraction."""
+
+    def omit_scale(weight_fractions):
+        return {
+            str(oxide): float(value)
+            for oxide, value in weight_fractions.items()
+            if float(value) > 0.0
+        }
+
+    monkeypatch.setattr(magemin_module, "_magemin_positive_wt_pct", omit_scale)
+    maps = _magemin_phase_maps_from_matlab(_magemin_matlab_fixture())
+    assert maps is not None
+    silica = maps["phase_compositions"]["ol"]["SiO2"]
+    assert silica == pytest.approx(0.40)
+    assert silica != pytest.approx(40.0)
+
+
+def test_mutant_swapped_phase_labels_fail_the_olivine_row(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Swapping ol and liq must fail the olivine 40 wt% SiO2 contract."""
+    real = magemin_module._magemin_phase_maps_from_matlab
+
+    def swap(text):
+        maps = real(text)
+        if not isinstance(maps, dict):
+            return maps
+        compositions = dict(maps["phase_compositions"])
+        compositions["ol"], compositions["liq"] = (
+            compositions["liq"],
+            compositions["ol"],
+        )
+        swapped = dict(maps)
+        swapped["phase_compositions"] = compositions
+        return swapped
+
+    monkeypatch.setattr(magemin_module, "_magemin_phase_maps_from_matlab", swap)
+    maps = magemin_module._magemin_phase_maps_from_matlab(
+        _magemin_matlab_fixture()
+    )
+    assert maps is not None
+    assert maps["phase_compositions"]["ol"]["SiO2"] == pytest.approx(55.0)
+    assert maps["phase_compositions"]["ol"]["SiO2"] != pytest.approx(40.0)
 
 
 def test_magemin_pure_phase_probe_argument_vector_is_preserved(
@@ -4158,6 +4468,326 @@ def test_magemin_live_subliquidus_run_reports_crystalline_phases(request):
     ]
     assert crystalline, result.phases_present
     assert result.ledger_transition is None
+
+
+def _independent_magemin_oxide_wt_pct(matlab_text: str) -> dict[str, dict[str, float]]:
+    """Test-local oxide reader. Not the production parser.
+
+    Comp_wt is a weight fraction. wt% = fraction * 100. Duplicate names
+    are the fraction-weighted mean of the printed rows, using the
+    stable-assemblage ``fraction[wt]`` column read here.
+    """
+    lines = matlab_text.splitlines()
+    start = next(
+        index for index, line in enumerate(lines)
+        if line.startswith("Oxide compositions")
+    )
+    header = lines[start + 1].split()
+    grouped: dict[str, list[dict[str, float]]] = {}
+    sys_row: dict[str, float] | None = None
+    for line in lines[start + 2:]:
+        if not line.strip():
+            break
+        tokens = line.split()
+        name = tokens[0]
+        row = {
+            oxide: float(value) * 100.0
+            for oxide, value in zip(header, tokens[1:])
+        }
+        if name == "SYS":
+            sys_row = row
+            continue
+        grouped.setdefault(name, []).append(row)
+    fractions = _independent_magemin_fraction_rows(matlab_text)
+    phases: dict[str, dict[str, float]] = {}
+    if sys_row is not None:
+        phases["SYS"] = sys_row
+    for name, rows in grouped.items():
+        weights = fractions.get(name, [])
+        if len(weights) != len(rows) or not any(weight > 0.0 for weight in weights):
+            weights = [1.0] * len(rows)
+        total = sum(weight for weight in weights if weight > 0.0)
+        oxides = {oxide for row in rows for oxide in row}
+        combined: dict[str, float] = {}
+        for oxide in oxides:
+            value = sum(
+                row.get(oxide, 0.0) * weight
+                for row, weight in zip(rows, weights)
+                if weight > 0.0
+            ) / total
+            if value > 0.0:
+                combined[oxide] = value
+        phases[name] = combined
+    return phases
+
+
+def _independent_magemin_fraction_rows(matlab_text: str) -> dict[str, list[float]]:
+    """Test-local ``fraction[wt]`` list per phase name, in dump order."""
+    lines = matlab_text.splitlines()
+    try:
+        start = next(
+            index for index, line in enumerate(lines)
+            if line.strip().startswith("Stable mineral assemblage")
+        )
+    except StopIteration:
+        return {}
+    header = lines[start + 1].split()
+    if "fraction[wt]" not in header:
+        return {}
+    fraction_index = header.index("fraction[wt]")
+    grouped: dict[str, list[float]] = {}
+    for line in lines[start + 2:]:
+        tokens = line.split()
+        if not tokens:
+            break
+        if tokens[0] == "SYS" or len(tokens) != len(header):
+            continue
+        grouped.setdefault(tokens[0], []).append(float(tokens[fraction_index]))
+    return grouped
+
+
+def _independent_magemin_rho(matlab_text: str) -> dict[str, float]:
+    """Test-local Rho[kg/m3]. Duplicate names are fraction-weighted means."""
+    lines = matlab_text.splitlines()
+    start = next(
+        index for index, line in enumerate(lines)
+        if line.strip().startswith("Stable mineral assemblage")
+    )
+    header = lines[start + 1].split()
+    rho_index = header.index("Rho[kg/m3]")
+    fraction_index = header.index("fraction[wt]")
+    grouped: dict[str, list[tuple[float, float]]] = {}
+    for line in lines[start + 2:]:
+        tokens = line.split()
+        if not tokens:
+            break
+        if tokens[0] == "SYS" or len(tokens) != len(header):
+            continue
+        grouped.setdefault(tokens[0], []).append(
+            (float(tokens[fraction_index]), float(tokens[rho_index]))
+        )
+    parsed: dict[str, float] = {}
+    for name, rows in grouped.items():
+        total = sum(fraction for fraction, _rho in rows if fraction > 0.0)
+        if total <= 0.0:
+            parsed[name] = rows[-1][1]
+            continue
+        parsed[name] = sum(
+            fraction * rho for fraction, rho in rows if fraction > 0.0
+        ) / total
+    return parsed
+
+
+def _independent_magemin_modes(stdout: str) -> dict[str, float]:
+    """Test-local Phase/Mode reader. Not ``_parse_subprocess_stdout``."""
+    phase_line = None
+    mode_line = None
+    for line in stdout.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("Phase"):
+            phase_line = stripped.split(":", 1)[1]
+        elif stripped.startswith("Mode"):
+            mode_line = stripped.split(":", 1)[1]
+    if phase_line is None or mode_line is None:
+        return {}
+    names = phase_line.split()
+    values = mode_line.split()
+    if len(names) != len(values):
+        return {}
+    return {name: float(value) for name, value in zip(names, values)}
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_subliquidus_phase_maps_match_matlab_dump(request):
+    """Ordinary Verb=0 solve carries the matlab oxide table into the scorer."""
+    from decimal import Decimal
+
+    from simulator.battery.enums import Engine, EvidenceClass, PhaseRole, Quantity
+    from simulator.battery.score import predict_with_engine
+    from simulator.melt_backend.alphamelts import _run_alphamelts_subprocess
+    from tests.battery import factories as F
+    from tests.battery.test_phase_composition_rows import _phase_identity
+
+    backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
+    assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
+
+    composition = {
+        "SiO2": 49.0,
+        "TiO2": 1.5,
+        "Al2O3": 14.0,
+        "FeO": 10.0,
+        "Fe2O3": 1.0,
+        "MgO": 9.0,
+        "CaO": 11.0,
+        "Na2O": 2.5,
+        "K2O": 0.8,
+        "Cr2O3": 0.2,
+    }
+    # The 1200 C smoke point on this analog is superliquidus. 1120 C is
+    # the two-phase probe: liquid plus at least one crystal.
+    temperature_C = 1120.0
+    pressure_bar = 2000.0
+    fO2_log = -8.0
+    result = backend.equilibrate(
+        temperature_C,
+        composition_kg=composition,
+        fO2_log=fO2_log,
+        pressure_bar=pressure_bar,
+    )
+    assert result.phases_present
+    assert len(result.phases_present) >= 2, result.phases_present
+    assert result.phase_compositions, result.phases_present
+
+    melt_projection = project_melt_to_oxide_projection(
+        composition_kg=composition,
+        composition_mol=None,
+        oxide_basis=backend._MAGEMIN_INPUT_BASIS,
+    )
+    projection = backend._build_db_bulk_projection(melt_projection.oxide_wt_pct)
+    pressure_kbar = backend._GPa_to_kbar(backend._pressure_bar_to_GPa(pressure_bar))
+    direct_args, _buffer_name, _buffer_n, _warnings = (
+        backend._build_magemin_subprocess_args(
+            bulk_projection=projection,
+            temperature_C=temperature_C,
+            pressure_kbar=pressure_kbar,
+            fO2_log=fO2_log,
+        )
+    )
+    assert "--Verb=0" in direct_args
+    assert "--out_matlab=1" in direct_args
+    with _magemin_subprocess_slot(60.0):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            completed = _run_alphamelts_subprocess(
+                direct_args,
+                cwd=tmpdir,
+                capture_output=True,
+                text=True,
+                timeout=60.0,
+                env=_magemin_subprocess_env(),
+            )
+            assert completed.returncode == 0, completed.stderr
+            matlab_text = (
+                Path(tmpdir) / "output" / "_matlab_output.txt"
+            ).read_text()
+            direct_stdout = completed.stdout or ""
+
+    direct = _independent_magemin_oxide_wt_pct(matlab_text)
+    assert "SYS" in direct
+    buffers = MAGEMinBackend._BUFFER_CHOICES
+    for name, composition_wt in direct.items():
+        if name == "SYS" or name.lower() in buffers:
+            continue
+        assert name in result.phase_compositions, name
+        for oxide, wt_pct in composition_wt.items():
+            if wt_pct <= 0.0:
+                continue
+            assert result.phase_compositions[name][oxide] == pytest.approx(wt_pct)
+    direct_rho = _independent_magemin_rho(matlab_text)
+    for name, rho in direct_rho.items():
+        if name.lower() in buffers or name not in result.phase_thermo:
+            continue
+        assert result.phase_thermo[name]["density_kg_m3"] == pytest.approx(rho)
+        fraction = result.phase_thermo[name].get("reference_mass_fraction")
+        if fraction not in (None, 0.0, 1.0):
+            assert result.phase_thermo[name]["density_kg_m3"] != pytest.approx(
+                rho * float(fraction)
+            )
+
+    direct_modes = _independent_magemin_modes(direct_stdout)
+    assert direct_modes, direct_stdout
+    total_fraction = 0.0
+    reconstructed: dict[str, float] = {}
+    for name, composition_wt in direct.items():
+        if name == "SYS" or name.lower() in buffers:
+            continue
+        fraction = float(direct_modes.get(name, 0.0))
+        total_fraction += fraction
+        for oxide, wt_pct in composition_wt.items():
+            if oxide == "O":
+                continue
+            reconstructed[oxide] = reconstructed.get(oxide, 0.0) + fraction * wt_pct
+    assert total_fraction > 0.0
+    for oxide, sys_wt_pct in direct["SYS"].items():
+        if oxide == "O" or sys_wt_pct <= 0.0:
+            continue
+        assert reconstructed.get(oxide, 0.0) / total_fraction == pytest.approx(
+            sys_wt_pct, abs=1.0
+        )
+
+    crystal_names = [
+        name for name in result.phase_compositions
+        if not str(name).lower().startswith("liq")
+    ]
+    assert crystal_names, result.phases_present
+    liquid_names = [
+        name for name in result.phase_compositions
+        if str(name).lower().startswith("liq")
+    ]
+    if not liquid_names:
+        pytest.fail(f"subliquidus solve has no liquid composition: {result.phases_present}")
+    liquid = result.phase_compositions[liquid_names[0]]
+    oxide = "SiO2" if "SiO2" in liquid else next(iter(liquid))
+
+    def hook(*_args, **_kwargs):
+        return result
+
+    request.getfixturevalue("monkeypatch").setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage",
+        hook,
+    )
+    identity = _phase_identity(
+        oxide, Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    observation = F.observation(
+        "magemin-live-phase",
+        "sample-1",
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="magemin-live-phase",
+    )
+    wt_prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    assert wt_prediction.value == pytest.approx(Decimal(str(liquid[oxide])))
+    mole_identity = _phase_identity(
+        oxide,
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="mole_fraction",
+    )
+    mole_observation = F.observation(
+        "magemin-live-mole",
+        "sample-1",
+        mole_identity,
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="magemin-live-phase",
+    )
+    mole_prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        mole_observation,
+        phase_siblings={oxide: Decimal("0.5"), "MgO": Decimal("0.5")},
+    )
+    assert mole_prediction.value == pytest.approx(Decimal(str(liquid[oxide])))
+    ppm_identity = _phase_identity(
+        oxide,
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="ppm_mass",
+    )
+    ppm_observation = F.observation(
+        "magemin-live-ppm",
+        "sample-1",
+        ppm_identity,
+        Decimal("10000"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="magemin-live-phase",
+    )
+    ppm_prediction = predict_with_engine(Engine.MAGEMIN, ppm_observation)
+    assert ppm_prediction.value == pytest.approx(Decimal(str(liquid[oxide])))
 
 
 @pytest.mark.skipif(
