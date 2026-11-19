@@ -106,10 +106,10 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # Studio-3 actual for this Mars C2A 2 h payload (pins2 log, tree
     # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
     # the laptop and studio-3, so this digest is not a laptop re-run. Re-derived
-    # on b268+b-1124 at Studio: b-906's Langmuir surface-pO2 closure and b-1124's
-    # Holzheid continuation/notice propagation both affect this runner payload.
+    # on b269+b-1124 at Studio. The b-1124 Holzheid continuation and consumed
+    # activity notice propagation affect this runner payload; b-906 is absent.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "5e7a226778bd2d5a8b69dcbb8fb1702adf24744123d1f32ad99ae0254b7532f5"
+        "db9b5ffda079b4886252281c2fabad6413ac60c76a29f175b799188fb8696e3a"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"

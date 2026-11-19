@@ -639,11 +639,10 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         # seam baseline at 2023.15 K; OpenIMCC activity is unchanged.
         # IA stateless: the 7 hour-16 certified-gamma certificates carry hour/window_K/composition_window_L1 = null (21 leaves);
         # the history-dependent cap-step seam notice is gone (1 notice); 2 keys reordered; 0 numeric leaves changed. Payload = runner C0 fixture bytes.
-        # b-1124: out-of-band native-Fe values now carry the Holzheid extrapolation notice and flags.
-        # Re-derived on b268+b-1124 at Studio: b-906's Langmuir surface-pO2
-        # closure and b-1124's d-339 continuation/notice propagation are both
-        # present in this 24-hour runner payload.
-        "2930f2d4282a624e02fc8694cfc53f7059324aac88a304eec498435f7ff64326"
+        # b-1124's Holzheid continuation and consumed-activity notice
+        # propagation are reflected in the Studio payload; b-906 is absent.
+        # Mac-Studio-256-2, assembled b269+b-1124, 2026-11-19.
+        "db959cabe076bfab884983b4e59e36673337009fcb325572f3590a95eb7df71b"
     )
 
 

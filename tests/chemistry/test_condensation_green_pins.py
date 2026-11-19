@@ -166,9 +166,8 @@ def _without_engine_versions(value):
 @pytest.mark.xdist_group("magemin_fullrun_c")
 @pytest.mark.timeout(5400)
 def test_green_full_lunar_capture_pin(route_totals, tmp_path):
-    # Re-derived on b268+b-1124 at Studio: b-906's Langmuir surface-pO2
-    # closure moves routed vapour totals, while b-1124's Holzheid continuation
-    # changes native-Fe predictions and adds extrapolation notices. Lunar full
+    # Re-derived on the assembled b269+b-1124 tree at Studio: b-1124's
+    # Holzheid continuation changes native-Fe predictions. Lunar full
     # runs diverge between the laptop and Studio, so these are remote actuals.
     # The production band pin records the controller's intended area-weighted
     # cutoff: 33 equal strips span 900-1200 C, and only 17 strips at/below the
@@ -189,9 +188,9 @@ def test_green_full_lunar_capture_pin(route_totals, tmp_path):
 def test_green_runner_capture_pin(staged, route_totals, tmp_path):
     # lunar_24h and c2a_staged runner_sha256 are the studio-3 actuals (pins2
     # log, tree 9666fc129 plus the de32c69ca runner regen). Re-derived on
-    # b268+b-1124 at Studio: b-906's Langmuir surface-pO2 closure moves routed
-    # vapour totals; b-1124's d-339 continuation changes native-Fe predictions
-    # and its extrapolation notices change runner metadata above 1600 C.
+    # b269+b-1124 at Studio: b-1124's Holzheid continuation changes native-Fe
+    # predictions and its extrapolation notices change runner metadata above
+    # 1600 C. The ejected b-906 Langmuir car is absent from this assembled tree.
     # Lunar and Mars full runs diverge between laptop and Studio, so these are
     # remote actuals.
     patch = (load_recipe_patch(Path("data/recipes/c2a_staged_temperature_ladder.yaml"))

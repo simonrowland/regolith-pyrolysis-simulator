@@ -116,8 +116,8 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # 9666fc129 plus the de32c69ca runner regen). The runner regen script
         # does not update these pins. Lunar full runs diverge between the
         # laptop and studio-3, so these digests are not a laptop re-run.
-        # b-906's Langmuir surface-pO2 change and b-1124's Holzheid FeO
-        # continuation both move native-Fe fluxes and the ledger on this tree.
+        # These Studio values must be regenerated on the assembled tree: the
+        # b-1124 Holzheid continuation changes out-of-band Fe activity and flux.
         "flux_maps_sha256": "409b4e9683d726e5165e9911659d69dd67bc671c0cd6a0386bda02cbc7ea6517",
         "ledger_sha256": "080dab31dc94cf0e77d6045c669edd14df2b6132c4594ffa81c0cc7e0e506ca5",
     },
@@ -126,8 +126,8 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # 9666fc129 plus the de32c69ca runner regen). flux_maps_sha256 did
         # not move. Mars full runs diverge between the laptop and studio-3,
         # so this digest is not a laptop re-run.
-        # b-906 and b-1124's native-Fe chemistry plus the Holzheid notices
-        # change the per-hour metadata pin; regenerated on this merged tree.
+        # The b-1124 Holzheid continuation changes out-of-band Fe activity;
+        # regenerated on this assembled tree, without the ejected b-906 car.
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
         "ledger_sha256": "12d2bd219387ab9e6df5d1016845f1f926319f7913693f9202385db65e771337",
     },
@@ -2200,9 +2200,8 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     # unchanged. docs-private/research/2026-08-02-train13-adjudication.md
     # d-339 changes lunar row 15's native Fe activity and Kress91 FeO seam
     # comparator at 2023.15 K; OpenIMCC's FeO activity remains 0.14324692359108157.
-    # b-1124 adds Holzheid out-of-certified-band notices to extrapolated
-    # native-Fe hours, with b-906's surface-pO2 change affecting the same
-    # merged runner outputs.
+    # b-1124 adds Holzheid out-of-certified-band notices where its activity
+    # contributes to native-Fe hours. This tree excludes the ejected b-906 car.
     actual, capture, expected_text = runner_golden_loader(scenario)
     expected = json.loads(expected_text)
 
