@@ -20,6 +20,7 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.records import State
+from simulator.battery.method_class_bands import _located_fact
 from simulator.battery.validity import run_validity_gates
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
@@ -409,6 +410,18 @@ def test_isolated_migration_keeps_conditions_and_only_refuses_fit_coefficients()
     activities = [
         observation for observation in rows if observation.identity.quantity.is_value
     ]
+    assert len(activities) == sum(
+        len(points) for points in _EXPECTED_TABLE5_ACTIVITIES.values()
+    ) == 40
+    for observation in activities:
+        assert _located_fact(observation, experiment, "technique") == "mass_spectrometry"
+        assert _located_fact(observation, experiment, "comparison") == (
+            "multiple_cell_or_successive_pure_reference_sample"
+        )
+        assert _located_fact(observation, experiment, "activity_method") == (
+            "direct_comparison"
+        )
+        assert _located_fact(observation, experiment, "sensitivity") == "stable"
     _assert_activity_evidence_is_measured(rows)
     for observation in activities:
         identity = observation.identity

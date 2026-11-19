@@ -211,6 +211,48 @@ experiments:
   locator: *id001
   apparatus:
     calibration:
+      technique:
+        state:
+          tag: value
+          value: mass_spectrometry
+        locator:
+          page: 3
+          published_page: 2235
+          pdf_page_index: 2
+          section: Experimental
+          note: "The paper says composition, vapor pressures and Cr2O3 activities were measured using an MS-1301 mass spectrometer."
+      comparison:
+        state:
+          tag: value
+          value: multiple_cell_or_successive_pure_reference_sample
+        locator:
+          page: 3
+          published_page: 2235
+          pdf_page_index: 2
+          section: Experimental
+          note: "One tungsten cell held the slag sample and the other held the standard, individual Cr2O3; activity measurements alternated between them."
+      activity_method:
+        state:
+          tag: value
+          value: direct_comparison
+        locator:
+          page: 3
+          published_page: 2235
+          pdf_page_index: 2
+          equation: '21'
+          section: Experimental
+          note: "Equation (21) gives Cr2O3 activity as the ratio of sample to pure-Cr2O3 ion-current products."
+      sensitivity:
+        state:
+          tag: value
+          value: stable
+        locator:
+          page: 3
+          published_page: 2235
+          pdf_page_index: 2
+          equation: '21'
+          section: Experimental
+          note: "The paper says sample and pure-Cr2O3 ion-current intensities were measured alternately to obtain activity."
       method:
         state: {tag: value, value: 'Installation calibrated using the vapor pressure of gold as the standard, recommended by IUPAC.'}
         locator: {page: 4, published_page: 2236, pdf_page_index: 3, section: Experimental, equation: '23'}
