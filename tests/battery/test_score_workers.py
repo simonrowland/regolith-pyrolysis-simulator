@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import threading
 import time
 from types import SimpleNamespace
 
@@ -262,6 +263,162 @@ def test_parallel_score_shards_reuse_parent_store_stamp(
     assert derive_calls == 1
     header = path.with_name(path.name + ".partial").read_bytes().splitlines()[0]
     assert json.loads(header) == parent_stamp
+
+
+def test_parallel_workers_inherit_prepared_run_and_reference_ids(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+    from simulator.battery import score_run
+    from simulator.battery.score_run import _PreparedScoreRun
+
+    context = _worker_fixture(experiment_count=4)
+    captured: dict[str, object] = {}
+
+    def run_workers_in_process(tasks, worker, *, initializer, initargs, mp_context, **_kwargs):
+        captured["tasks"] = tasks
+        captured["initargs"] = initargs
+        captured["method"] = mp_context.get_start_method()
+        captured["inherited"] = score_run._INHERITED_SCORE_RUN is not None
+        initializer(*initargs)
+        return [worker(task) for task in tasks]
+
+    monkeypatch.setattr(score_run, "_score_fork_blockers", lambda **_kwargs: ())
+    monkeypatch.setattr(score_mod, "supervised_process_map", run_workers_in_process)
+    written, _metadata = _score_store_to_jsonl(
+        context,
+        tmp_path / "inherited-prepared.jsonl",
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=_worker_test_predict,
+        workers=2,
+    )
+
+    initargs = captured["initargs"]
+    tasks = captured["tasks"]
+    assert written > 0
+    assert captured["method"] == "fork"
+    assert captured["inherited"] is True
+    assert isinstance(initargs, tuple)
+    assert initargs
+    assert all(not isinstance(arg, _PreparedScoreRun) for arg in initargs)
+    assert initargs[-2] is None
+    assert isinstance(initargs[-1], dict)
+    assert tasks
+    assert all(isinstance(ref_id, str) for task in tasks for ref_id in task[2])
+    assert score_run._INHERITED_SCORE_RUN is None
+
+
+def test_dirty_process_pickles_the_prepared_run_once_and_spawns(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import pickle
+
+    import simulator.battery.score as score_mod
+    from simulator.battery import score_run
+
+    context = _worker_fixture(experiment_count=4)
+    captured: dict[str, object] = {}
+    dumped: list[str] = []
+    original_dump = pickle.dump
+
+    def counting_dump(value, handle, *args, **kwargs):
+        dumped.append(type(value).__name__)
+        return original_dump(value, handle, *args, **kwargs)
+
+    def run_workers_in_process(tasks, worker, *, initializer, initargs, mp_context, **_kwargs):
+        captured["initargs"] = initargs
+        captured["method"] = mp_context.get_start_method()
+        captured["inherited"] = score_run._INHERITED_SCORE_RUN
+        initializer(*initargs)
+        loaded_ids = tuple(score_run._SCORE_WORKER_REFS)
+        captured["loaded_ids"] = loaded_ids
+        return [worker(task) for task in tasks]
+
+    monkeypatch.setattr(
+        score_run,
+        "_score_fork_blockers",
+        lambda **_kwargs: ("threads:score-fork-blocker",),
+    )
+    monkeypatch.setattr(pickle, "dump", counting_dump)
+    monkeypatch.setattr(score_mod, "supervised_process_map", run_workers_in_process)
+    written, _metadata = _score_store_to_jsonl(
+        context,
+        tmp_path / "spawn-prepared.jsonl",
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=_worker_test_predict,
+        workers=2,
+    )
+
+    initargs = captured["initargs"]
+    assert written > 0
+    assert captured["method"] == "spawn"
+    assert captured["inherited"] is None
+    assert dumped == ["_PreparedScoreRun"]
+    assert isinstance(initargs, tuple)
+    assert isinstance(initargs[-2], str)
+    assert isinstance(initargs[-1], dict)
+    assert captured["loaded_ids"]
+    assert score_run._INHERITED_SCORE_RUN is None
+
+
+def test_score_fork_blockers_name_threads_modules_and_cache_connections() -> None:
+    import sys
+    import types
+
+    from simulator import engine_cache
+    from simulator.battery.score_run import _score_fork_blockers
+
+    release = threading.Event()
+    started = threading.Event()
+
+    def _hold() -> None:
+        started.set()
+        release.wait(5)
+
+    thread = threading.Thread(target=_hold, name="score-fork-blocker")
+    thread.start()
+    assert started.wait(5)
+    try:
+        reasons = _score_fork_blockers()
+    finally:
+        release.set()
+        thread.join(5)
+    assert any(
+        reason.startswith("threads:") and "score-fork-blocker" in reason
+        for reason in reasons
+    )
+
+    inserted_module = "rubicon.objc" not in sys.modules
+    if inserted_module:
+        sys.modules["rubicon.objc"] = types.ModuleType("rubicon.objc")
+    try:
+        reasons = _score_fork_blockers()
+    finally:
+        if inserted_module:
+            del sys.modules["rubicon.objc"]
+    assert any(
+        reason.startswith("modules:") and "rubicon.objc" in reason
+        for reason in reasons
+    )
+
+    before = _score_fork_blockers()
+    sentinel = object()
+    engine_cache._CONNECTIONS[("score-fork-blocker", False)] = sentinel
+    try:
+        after = _score_fork_blockers()
+    finally:
+        del engine_cache._CONNECTIONS[("score-fork-blocker", False)]
+
+    def _connection_count(reasons: tuple[str, ...]) -> int:
+        for reason in reasons:
+            if reason.startswith("cache_connections:"):
+                return int(reason.removeprefix("cache_connections:"))
+        return 0
+
+    assert _connection_count(after) == _connection_count(before) + 1
+    assert _score_fork_blockers(residual_sqlite_open=True)[-1] == (
+        "residual sqlite is open"
+    )
 
 
 @pytest.mark.parametrize("workers", (1, 2), ids=("serial", "worker"))

@@ -5,8 +5,10 @@ from __future__ import annotations
 import hashlib
 import json
 import multiprocessing as mp
+import pickle
 import sys
 import tempfile
+import threading
 import time
 from dataclasses import dataclass, replace
 from functools import partial
@@ -753,6 +755,9 @@ _SCORE_WORKER_SETUP: (
         Mapping[str, object],
     ]
 ) | None = None
+# Forked workers inherit this. It is set only while their pool is alive.
+_INHERITED_SCORE_RUN: _PreparedScoreRun | None = None
+_SCORE_WORKER_REFS: Mapping[str, Observation] | None = None
 
 
 @dataclass(frozen=True)
@@ -884,8 +889,54 @@ def _score_failed_shard_residual(
     )
 
 
+def _score_fork_blockers(*, residual_sqlite_open: bool = False) -> tuple[str, ...]:
+    """Why this process must not fork a score worker.
+
+    A fresh ``--workers N`` process can inherit the prepared run. Forking
+    after an in-process score deadlocks: engine threads and the Objective-C
+    runtime are already alive (measured on the cache-equivalence script,
+    which scores with one worker and then with several in the same process).
+    An open sqlite connection would also be inherited.
+    """
+
+    reasons: list[str] = []
+    names = [thread.name for thread in threading.enumerate()]
+    if names != ["MainThread"]:
+        reasons.append("threads:" + ",".join(names))
+    dangerous = sorted(
+        name
+        for name in sys.modules
+        if name in {"objc", "Foundation"}
+        or name.startswith(("objc.", "Foundation.", "rubicon"))
+        or name == "thermoengine"
+        or name.startswith("thermoengine.")
+    )
+    if dangerous:
+        reasons.append("modules:" + ",".join(dangerous))
+    from simulator.engine_cache import _CONNECTIONS
+
+    if _CONNECTIONS:
+        reasons.append(f"cache_connections:{len(_CONNECTIONS)}")
+    if residual_sqlite_open:
+        reasons.append("residual sqlite is open")
+    return tuple(reasons)
+
+
+def _resolve_score_ref_ids(
+    ref_ids: Sequence[str],
+    refs: Mapping[str, Observation],
+) -> tuple[Observation, ...]:
+    missing = [ref_id for ref_id in ref_ids if ref_id not in refs]
+    if missing:
+        raise ValueError(
+            "score shard reference is not in the prepared run: "
+            + ", ".join(missing)
+        )
+    return tuple(refs[ref_id] for ref_id in ref_ids)
+
+
 def _score_shard_worker_error_result(
-    _task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
+    _task: tuple[int, Engine, tuple[str, ...], str, str | None],
     error: BaseException,
 ) -> _ScoreShardResult:
     return _ScoreShardResult(
@@ -894,14 +945,29 @@ def _score_shard_worker_error_result(
 
 
 def _initialize_score_worker(
-    prepared: _PreparedScoreRun,
     predict: Callable[..., EnginePrediction] | None,
     engine_cache_path_scope_state: tuple[bool, str | None] = (False, None),
+    prepared_path: str | None = None,
     store_stamp: Mapping[str, object] | None = None,
 ) -> None:
-    global _SCORE_WORKER_SETUP
+    global _SCORE_WORKER_SETUP, _SCORE_WORKER_REFS
+    prepared = _INHERITED_SCORE_RUN
+    if prepared is None:
+        if not prepared_path:
+            raise RuntimeError("battery score worker inherited no prepared run")
+        with open(prepared_path, "rb") as handle:
+            prepared = pickle.load(handle)
     if store_stamp is None:
         raise ValueError("score worker requires the parent store stamp")
+    refs: dict[str, Observation] = {}
+    for observation in prepared.refs:
+        if observation.observation_id in refs:
+            raise ValueError(
+                "prepared score run repeats observation id "
+                f"{observation.observation_id}"
+            )
+        refs[observation.observation_id] = observation
+    _SCORE_WORKER_REFS = refs
     _SCORE_WORKER_SETUP = (prepared, predict, store_stamp)
     from simulator.engine_cache import _set_engine_cache_path_scope_state
 
@@ -909,7 +975,7 @@ def _initialize_score_worker(
 
 
 def _score_group_shard(
-    task: tuple[int, Engine, tuple[Observation, ...], str, str | None]
+    task: tuple[int, Engine, tuple[str, ...], str, str | None]
 ) -> _ScoreShardResult:
     from simulator.battery.score import (
         _ResidualJsonlStream,
@@ -920,7 +986,10 @@ def _score_group_shard(
         raise RuntimeError("battery score worker was not initialized")
     if store_stamp is None:
         raise RuntimeError("battery score worker has no parent store stamp")
-    _shard_index, engine, refs, path_text, root_text = task
+    _shard_index, engine, ref_ids, path_text, root_text = task
+    if _SCORE_WORKER_REFS is None:
+        raise RuntimeError("battery score worker has no reference table")
+    refs = _resolve_score_ref_ids(ref_ids, _SCORE_WORKER_REFS)
     stream = _ResidualJsonlStream(
         Path(path_text),
         root=None if root_text is None else Path(root_text),
@@ -960,7 +1029,7 @@ def _score_group_shard(
 
 
 def _materialize_failed_score_shard(
-    task: tuple[int, Engine, tuple[Observation, ...], str, str | None],
+    task: tuple[int, Engine, tuple[str, ...], str, str | None],
     result: _ScoreShardResult,
     prepared: _PreparedScoreRun,
     *,
@@ -1036,7 +1105,10 @@ def _materialize_failed_score_shard(
             prepared.context,
             _prepared=prepared,
             _engine_set=(task[1],),
-            _refs=task[2],
+            _refs=_resolve_score_ref_ids(
+                task[2],
+                {observation.observation_id: observation for observation in prepared.refs},
+            ),
             _stream=recovered_stream,
             predict=predict,
             _shard_failure_reason=result.failure,
@@ -1160,27 +1232,63 @@ def _score_store_to_jsonl(
                                 f"shard-{index:04d}-{engine.value}.jsonl"
                             )
                             tasks.append(
-                                (index, engine, chunk, str(shard_path), root_text)
+                                (
+                                    index,
+                                    engine,
+                                    tuple(
+                                        observation.observation_id
+                                        for observation in chunk
+                                    ),
+                                    str(shard_path),
+                                    root_text,
+                                )
                             )
                     engine_cache_counters(reset=True)
-                    shard_results = supervised_process_map(
-                        tasks,
-                        _score_group_shard,
-                        max_workers=min(workers, len(tasks)),
-                        initializer=_initialize_score_worker,
-                        initargs=(
-                            prepared,
-                            predict,
-                            cache_path_scope_state,
-                            # The parent-derived stamp is this run's identity.
-                            # Shards must carry it because a concurrent Git write
-                            # can change the abbreviation length of a fresh %h.
-                            stream.store_stamp,
-                        ),
-                        mp_context=mp.get_context("spawn"),
-                        timeout_seconds=None,
-                        handle_worker_error=_score_shard_worker_error_result,
+                    fork_blockers = _score_fork_blockers(
+                        residual_sqlite_open=stream._database is not None
                     )
+                    global _INHERITED_SCORE_RUN
+                    if fork_blockers:
+                        prepared_path = str(
+                            Path(temporary_dir) / "prepared-score-run.pkl"
+                        )
+                        with open(prepared_path, "wb") as handle:
+                            pickle.dump(
+                                prepared,
+                                handle,
+                                protocol=pickle.HIGHEST_PROTOCOL,
+                            )
+                        # Spawn children load this one file. Fork is unsafe
+                        # once engine threads or the Objective-C runtime exist.
+                        _INHERITED_SCORE_RUN = None
+                        worker_context = mp.get_context("spawn")
+                    else:
+                        prepared_path = None
+                        # Fork inherits the prepared run. Spawn would pickle
+                        # it once per child, which is the supervisor's cost.
+                        _INHERITED_SCORE_RUN = prepared
+                        worker_context = mp.get_context("fork")
+                    try:
+                        shard_results = supervised_process_map(
+                            tasks,
+                            _score_group_shard,
+                            max_workers=min(workers, len(tasks)),
+                            initializer=_initialize_score_worker,
+                            initargs=(
+                                predict,
+                                cache_path_scope_state,
+                                prepared_path,
+                                # The parent-derived stamp is this run's identity.
+                                # Shards must carry it because a concurrent Git write
+                                # can change the abbreviation length of a fresh %h.
+                                stream.store_stamp,
+                            ),
+                            mp_context=worker_context,
+                            timeout_seconds=None,
+                            handle_worker_error=_score_shard_worker_error_result,
+                        )
+                    finally:
+                        _INHERITED_SCORE_RUN = None
                     with stream.partial_path.open("rb") as output:
                         header = output.readline()
                     shard_count = 0
