@@ -596,7 +596,9 @@ def test_openimcc_species_thermo_scores_native_gas_cp_and_s(
 
     prediction = predict_with_engine(Engine.OPENIMCC, observation)
 
-    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.execution.state is ExecutionState.PRODUCED, (
+        prediction.refusal_detail
+    )
     assert prediction.value == Decimal(str(getattr(native, field)))
     assert prediction.unit == QUANTITY_UNITS[quantity]
     assert prediction.execution.call_evidence is not None
@@ -629,7 +631,9 @@ def test_openimcc_species_thermo_scores_native_condensate_derivatives() -> None:
 
         prediction = predict_with_engine(Engine.OPENIMCC, observation)
 
-        assert prediction.execution.state is ExecutionState.PRODUCED
+        assert prediction.execution.state is ExecutionState.PRODUCED, (
+            prediction.refusal_detail
+        )
         assert prediction.value == Decimal(str(getattr(native, field)))
         assert prediction.execution.call_evidence is not None
         assert f"source_row_id={native.source_row_id}" in prediction.execution.call_evidence
@@ -671,7 +675,9 @@ def test_openimcc_species_thermo_uses_source_dfh298_for_enthalpy_increment() -> 
     prediction = predict_with_engine(Engine.OPENIMCC, observation)
 
     expected_kJ_mol = Decimal(str(native.H_app_kJ_mol)) - dfh298_J_mol / Decimal(1000)
-    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.execution.state is ExecutionState.PRODUCED, (
+        prediction.refusal_detail
+    )
     assert prediction.value == expected_kJ_mol
     assert prediction.unit == QUANTITY_UNITS[Quantity.H_MINUS_H298]
     assert prediction.execution.call_evidence is not None
@@ -697,7 +703,9 @@ def test_openimcc_species_thermo_out_of_interval_is_typed_with_source_detail() -
     prediction = predict_with_engine(Engine.OPENIMCC, observation)
 
     assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN, (
+        prediction.refusal_detail
+    )
     assert prediction.refusal_detail["reason"] == "openimcc_species_thermo_outside_interval"
     assert prediction.refusal_detail["species"] == "FeO"
     assert prediction.refusal_detail["phase"] == "g"
@@ -728,7 +736,9 @@ def test_openimcc_species_missing_upstream_stays_typed() -> None:
     prediction = predict_with_engine(Engine.OPENIMCC, observation)
 
     assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED, (
+        prediction.refusal_detail
+    )
     assert prediction.refusal_detail["reason"] == "openimcc_species_missing"
     assert prediction.refusal_detail["species"] == "CuO"
     assert prediction.refusal_detail["phase"] == "l"
