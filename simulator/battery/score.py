@@ -7440,6 +7440,17 @@ def cell_notices(
                     origin=f"engine:{engine.value}",
                 )
             )
+        elif engine is Engine.OPENIMCC and kind.startswith(
+            "openimcc_trace_gas_"
+        ):
+            notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(quantity,),
+                    reason=f"{kind}: {row.get('reason') or kind}",
+                    origin=f"engine:{engine.value}",
+                )
+            )
         elif kind in {"openimcc_flag", "openimcc_notice"}:
             notices.append(
                 Notice(
@@ -15733,6 +15744,19 @@ def _predict_with_engine(
             refusal_reason = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
             detail["reason"] = RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value
             detail["engine"] = "openimcc gas tables"
+            trace_notice = next(
+                (
+                    notice.reason
+                    for notice in notices
+                    if notice.reason.startswith("openimcc_trace_gas_")
+                ),
+                None,
+            )
+            if trace_notice is not None:
+                reason_code, _, explanation = trace_notice.partition(":")
+                detail["reason"] = reason_code
+                if explanation.strip():
+                    detail["explanation"] = explanation.strip()
         return EnginePrediction(
             engine=engine,
             channel=channel,

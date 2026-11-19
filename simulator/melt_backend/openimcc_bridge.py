@@ -796,8 +796,8 @@ def _canonical_composition(composition: Mapping[str, float]) -> dict[str, float]
 
 
 @lru_cache(maxsize=1)
-def _openimcc_trace_activity_models() -> Mapping[str, str]:
-    """Read accepted trace names and activity kinds from the installed pin."""
+def _openimcc_trace_component_rules() -> Mapping[str, Any]:
+    """Read accepted trace rules from the installed pin's public resolver."""
 
     package = _openimcc
     if package is None:
@@ -805,43 +805,47 @@ def _openimcc_trace_activity_models() -> Mapping[str, str]:
 
     try:
         trace_module = import_module("openimcc.trace_components")
-        trace_rules = getattr(trace_module, "_TRACE_COMPONENT_RULES")
-    except (AttributeError, ImportError) as exc:
+        trace_component_rule = getattr(trace_module, "trace_component_rule")
+        accepted_trace_oxides = getattr(package, "supported_trace_oxides")
+        if not callable(trace_component_rule) or not callable(accepted_trace_oxides):
+            raise TypeError("trace metadata resolver is not callable")
+        accepted = {
+            str(component.oxide) for component in accepted_trace_oxides()
+        }
+        rules = {
+            name: trace_component_rule(name)
+            for name in sorted(accepted)
+        }
+    except (AttributeError, ImportError, TypeError, ValueError) as exc:
         raise OpenImccCompositionPolicyRefusal(
             "openimcc_trace_metadata_unavailable",
-            "installed openimcc does not expose its trace-component rules",
+            "installed openimcc does not expose valid public trace-component "
+            f"rules: {exc}",
         ) from exc
-    if not isinstance(trace_rules, Mapping):
+
+    invalid_rules = {
+        name
+        for name, rule in rules.items()
+        if getattr(rule, "activity_model", None) is None
+        or not isinstance(getattr(rule, "gas_parent_oxide", None), str)
+    }
+    if invalid_rules:
         raise OpenImccCompositionPolicyRefusal(
             "openimcc_trace_metadata_unavailable",
-            "installed openimcc trace-component rules are not a mapping",
+            "installed openimcc returned trace rules without activity and gas "
+            f"parent metadata: {', '.join(sorted(invalid_rules))}",
         )
+    return MappingProxyType(rules)
 
-    accepted_trace_oxides = getattr(package, "supported_trace_oxides", None)
-    if callable(accepted_trace_oxides):
-        try:
-            accepted = {
-                str(component.oxide) for component in accepted_trace_oxides()
-            }
-        except (AttributeError, TypeError) as exc:
-            raise OpenImccCompositionPolicyRefusal(
-                "openimcc_trace_metadata_unavailable",
-                "installed openimcc returned invalid supported trace metadata",
-            ) from exc
-    else:
-        accepted = {str(name) for name in trace_rules}
 
-    missing_rules = accepted.difference(trace_rules)
-    if missing_rules:
-        raise OpenImccCompositionPolicyRefusal(
-            "openimcc_trace_metadata_unavailable",
-            "installed openimcc accepted trace components without activity "
-            f"rules: {', '.join(sorted(missing_rules))}",
-        )
+@lru_cache(maxsize=1)
+def _openimcc_trace_activity_models() -> Mapping[str, str]:
+    """Project activity-model labels from the installed trace-rule owner."""
+
     return MappingProxyType(
         {
-            name: str(trace_rules[name].activity_model)
-            for name in sorted(accepted)
+            name: str(rule.activity_model)
+            for name, rule in _openimcc_trace_component_rules().items()
         }
     )
 
@@ -1577,40 +1581,25 @@ def _activities_for_gas_parents(
     }
 
 
-_OPENIMCC_TRACE_GAS_PARENT_STANDARD_NOTICE = (
-    "openimcc_trace_gas_parent_standard_unverified",
+_OPENIMCC_TRACE_GAS_PARENT_STANDARD_UNVERIFIED = (
+    "openimcc_trace_gas_parent_standard_unverified"
+)
+_OPENIMCC_TRACE_GAS_PARENT_ENGINE_MISMATCH = (
+    "openimcc_trace_gas_parent_engine_parent_mismatch"
+)
+_OPENIMCC_TRACE_GAS_CARRIER_MISMATCH = "openimcc_trace_gas_carrier_mismatch"
+_OPENIMCC_TRACE_GAS_PARENT_ABSENT = "openimcc_trace_gas_parent_absent"
+_OPENIMCC_TRACE_GAS_STANDARD_MISMATCH_SPECIES = frozenset({"Ga2O3", "In2O3"})
+_OPENIMCC_TRACE_GAS_ENGINE_PARENT_MISMATCH_SPECIES = frozenset(
+    {"Ag2O", "Sb2O3", "Tl2O"}
+)
+_OPENIMCC_TRACE_GAS_PARENT_STANDARD_REASON = (
     "Bischof KEMS liquid activity uses a different standard from the "
     "NASA gas-parent row; composition-scoped conversion was not qualified "
-    "against the other gas authorities",
+    "against the other gas authorities"
 )
-_OPENIMCC_TRACE_GAS_PARENT_FRAGMENT_NOTICE = (
-    "openimcc_trace_gas_parent_engine_parent_mismatch",
-    "the fragment gamma is not the OpenIMCC gas-parent activity",
-)
-_OPENIMCC_TRACE_GAS_PARENT_NOTICES: Mapping[str, tuple[str, str]] = MappingProxyType(
-    {
-        "Ga2O3": _OPENIMCC_TRACE_GAS_PARENT_STANDARD_NOTICE,
-        "In2O3": _OPENIMCC_TRACE_GAS_PARENT_STANDARD_NOTICE,
-        "Ag2O": _OPENIMCC_TRACE_GAS_PARENT_FRAGMENT_NOTICE,
-        "Sb2O3": _OPENIMCC_TRACE_GAS_PARENT_FRAGMENT_NOTICE,
-        "Tl2O": _OPENIMCC_TRACE_GAS_PARENT_FRAGMENT_NOTICE,
-        "S": (
-            "openimcc_trace_gas_carrier_mismatch",
-            "the melt activity is not the S2(g) gas fugacity",
-        ),
-        "SO3": (
-            "openimcc_trace_gas_carrier_mismatch",
-            "the melt activity is not the S2(g) gas fugacity",
-        ),
-        "Cl": (
-            "openimcc_trace_gas_carrier_mismatch",
-            "the melt activity is not the Cl2(g) gas fugacity",
-        ),
-        "F": (
-            "openimcc_trace_gas_carrier_mismatch",
-            "the melt activity is not the F2(g) gas fugacity",
-        ),
-    }
+_OPENIMCC_TRACE_GAS_PARENT_ENGINE_MISMATCH_REASON = (
+    "the fragment gamma is not the OpenIMCC gas-parent activity"
 )
 
 
@@ -1634,10 +1623,15 @@ def _openimcc_gas_parent_inputs(
     }
     gas_parents = list(parent_oxides)
     selected = set(gas_parents)
-    available_trace_models = _trace_activity_models_for_components(activities)
+    available_trace_rules = {
+        name: rule
+        for name, rule in _openimcc_trace_component_rules().items()
+        if name in activities
+    }
     trace_models: dict[str, str] = {}
     trace_notices: list[dict[str, Any]] = []
-    for parent, activity_model in available_trace_models.items():
+    for parent, trace_rule in available_trace_rules.items():
+        activity_model = str(trace_rule.activity_model)
         try:
             activity = float(activities[parent])
         except (OverflowError, TypeError, ValueError) as exc:
@@ -1656,7 +1650,7 @@ def _openimcc_gas_parent_inputs(
         if activity == 0.0:
             trace_notices.append(
                 {
-                    "kind": "openimcc_trace_gas_parent_absent",
+                    "kind": _OPENIMCC_TRACE_GAS_PARENT_ABSENT,
                     "species": parent,
                     "activity": activity,
                     "activity_model": activity_model,
@@ -1664,16 +1658,39 @@ def _openimcc_gas_parent_inputs(
                 }
             )
             continue
-        exclusion = _OPENIMCC_TRACE_GAS_PARENT_NOTICES.get(parent)
-        if exclusion is not None:
-            code, reason = exclusion
+        if parent in _OPENIMCC_TRACE_GAS_STANDARD_MISMATCH_SPECIES:
             trace_notices.append(
                 {
-                    "kind": code,
+                    "kind": _OPENIMCC_TRACE_GAS_PARENT_STANDARD_UNVERIFIED,
                     "species": parent,
                     "activity": activity,
                     "activity_model": activity_model,
-                    "reason": reason,
+                    "reason": _OPENIMCC_TRACE_GAS_PARENT_STANDARD_REASON,
+                }
+            )
+            continue
+        if parent in _OPENIMCC_TRACE_GAS_ENGINE_PARENT_MISMATCH_SPECIES:
+            trace_notices.append(
+                {
+                    "kind": _OPENIMCC_TRACE_GAS_PARENT_ENGINE_MISMATCH,
+                    "species": parent,
+                    "activity": activity,
+                    "activity_model": activity_model,
+                    "reason": _OPENIMCC_TRACE_GAS_PARENT_ENGINE_MISMATCH_REASON,
+                }
+            )
+            continue
+        if parent != str(trace_rule.gas_parent_oxide):
+            trace_notices.append(
+                {
+                    "kind": _OPENIMCC_TRACE_GAS_CARRIER_MISMATCH,
+                    "species": parent,
+                    "activity": activity,
+                    "activity_model": activity_model,
+                    "reason": (
+                        f"the melt activity for {parent} is not the "
+                        f"{trace_rule.gas_parent_oxide} gas-parent activity"
+                    ),
                 }
             )
             continue

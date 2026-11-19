@@ -103,6 +103,15 @@ ENGINE_CACHE_NOTICE_CODE_TABLE = (
     ('internal-analytical', 3, 'fo2_oxygen_balance_effusion_solved', 'Analytical input used the solved effusion oxygen condition.'),
     ('internal-analytical', 90, 'warning_text', 'Analytical warning used by cell classification.'),
     ('internal-analytical', 4, 'openimcc_notice', 'OpenIMCC emitted a d-207 vapour notice.'),
+    ('openimcc', 14, 'openimcc_trace_gas_parent_standard_unverified', 'Trace activity uses an unverified gas-parent standard.'),
+    ('openimcc', 15, 'openimcc_trace_gas_parent_engine_parent_mismatch', 'Trace activity does not match the engine gas-parent activity.'),
+    ('openimcc', 16, 'openimcc_trace_gas_carrier_mismatch', 'Trace activity is not the gas-parent carrier activity.'),
+    ('openimcc', 17, 'openimcc_trace_gas_parent_absent', 'Zero trace activity does not select a gas parent.'),
+    ('openimcc', 18, 'openimcc_gas_parent_metadata_unavailable', 'OpenIMCC gas-parent metadata could not be resolved.'),
+    ('openimcc', 19, 'openimcc_gas_side_parent_activity_missing', 'An OpenIMCC gas reaction requires an unsupplied side parent.'),
+    ('openimcc', 20, 'openimcc_gas_parent_reference_unresolved', 'OpenIMCC gas-parent reference state could not be resolved.'),
+    ('openimcc', 21, 'openimcc_gas_parent_not_condensed', 'OpenIMCC gas parent uses a gas-phase reference.'),
+    ('openimcc', 22, 'openimcc_gas_parent_phase_mismatch', 'Stated reservoir phase differs from the OpenIMCC reference phase.'),
 )
 _ENGINE_NOTICE_BY_CODE = {
     (engine, code): number

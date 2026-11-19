@@ -3025,6 +3025,9 @@ def test_openimcc_kems_standard_trace_parent_is_not_applied_to_gas(
 
     assert prediction.value is None
     assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert prediction.refusal_detail["reason"] == (
+        "openimcc_trace_gas_parent_standard_unverified"
+    )
 
 
 def test_openimcc_unmodelled_trace_parent_still_refuses() -> None:
@@ -3149,6 +3152,59 @@ def test_openimcc_trace_carrier_activity_is_not_a_gas_fugacity_notice(
         notice["kind"] == "openimcc_trace_gas_carrier_mismatch"
         and notice["species"] == trace_oxide
         for notice in notices
+    )
+
+
+def test_openimcc_gas_carrier_refusal_covers_all_pin_trace_rules() -> None:
+    _require_openimcc()
+    from openimcc import supported_trace_oxides
+    from openimcc.trace_components import trace_component_rule
+    from simulator.melt_backend import openimcc_bridge
+
+    carrier_mismatches = {}
+    for component in supported_trace_oxides():
+        trace_oxide = str(component.oxide)
+        gas_parent_oxide = str(trace_component_rule(trace_oxide).gas_parent_oxide)
+        if trace_oxide != gas_parent_oxide:
+            carrier_mismatches[trace_oxide] = gas_parent_oxide
+    assert {"Li", "Zn"} <= carrier_mismatches.keys()
+    for trace_oxide in carrier_mismatches:
+        activities, parents, _, notices = (
+            openimcc_bridge._openimcc_gas_parent_inputs(
+                {trace_oxide: 0.25}, ()
+            )
+        )
+        assert trace_oxide not in activities
+        assert trace_oxide not in parents
+        assert any(
+            notice["kind"] == "openimcc_trace_gas_carrier_mismatch"
+            and notice["species"] == trace_oxide
+            for notice in notices
+        )
+
+
+@pytest.mark.parametrize("trace_oxide", ("S", "Cl", "F"))
+def test_openimcc_trace_carrier_mismatch_has_typed_vapour_refusal(
+    trace_oxide: str,
+) -> None:
+    _require_openimcc()
+    observation = _openimcc_vapour_observation(
+        vapour_formula=trace_oxide,
+        reservoir=None,
+        composition=_openimcc_trace_gas_melt_composition(trace_oxide),
+        temperature_K=Decimal("1800"),
+    )
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert prediction.refusal_detail["reason"] == (
+        "openimcc_trace_gas_carrier_mismatch"
     )
 
 
