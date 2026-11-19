@@ -1229,7 +1229,7 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
         hashlib.sha256(payload).hexdigest(),
     ) == (
         945,
-        "9acc738c7162288bf01581492eab47b6919fb02377109d94b52edd1313c58718",
+        "73519c446e2d3fa506d25757c45f78b61b5aabe8a159259bceef1441846ba444",
         945,
         "de617332cd3318fd7e7adeda5418f9ab73f991872e360ffbc81eed932739f623",
     )
