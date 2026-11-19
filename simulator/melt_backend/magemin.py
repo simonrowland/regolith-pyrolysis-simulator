@@ -1769,6 +1769,56 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 warnings=['MAGEMin backend not initialized'],
             )
 
+        if native_activity_formula is not None:
+            from engines.magemin.domain import (
+                MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW,
+            )
+
+            pressure_min_bar, pressure_max_bar = (
+                MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+            )
+            try:
+                native_activity_pressure_bar = float(pressure_bar)
+            except (TypeError, ValueError, OverflowError):
+                native_activity_pressure_bar = math.nan
+            if (
+                not math.isfinite(native_activity_pressure_bar)
+                or not pressure_min_bar
+                <= native_activity_pressure_bar
+                <= pressure_max_bar
+            ):
+                reason = (
+                    "magemin_native_activity_pressure_out_of_domain: "
+                    f"pressure_bar={native_activity_pressure_bar!r} outside "
+                    "inclusive verified window "
+                    f"[{pressure_min_bar:g}, {pressure_max_bar:g}] bar"
+                )
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=(
+                        native_activity_pressure_bar
+                        if math.isfinite(native_activity_pressure_bar)
+                        else None
+                    ),
+                    fO2_log=fO2_log,
+                    status='out_of_domain',
+                    warnings=[reason],
+                    diagnostics={
+                        'backend_status': 'out_of_domain',
+                        'backend_status_reason': reason,
+                        'magemin_native_formula': native_activity_formula,
+                        'magemin_native_activity_pressure_bar': (
+                            native_activity_pressure_bar
+                            if math.isfinite(native_activity_pressure_bar)
+                            else repr(pressure_bar)
+                        ),
+                        'magemin_native_activity_pressure_window_bar': (
+                            pressure_min_bar,
+                            pressure_max_bar,
+                        ),
+                    },
+                )
+
         prior_warnings: List[str] = []
         dropped_accounts: List[str] = []
         dropped_account_species: Dict[str, Tuple[str, ...]] = {}

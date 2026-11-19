@@ -14455,6 +14455,33 @@ def _predict_with_engine(
         # printed pressure when it is available. Other activity engines keep
         # their existing condensed-phase pressure omission.
         pressure_bar = activity_payload.get("pressure_bar")
+        if quantity is Quantity.ACTIVITY and pressure_bar is None:
+            from engines.magemin.domain import (
+                MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW,
+            )
+
+            pressure_min_bar, pressure_max_bar = (
+                MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+            )
+            # equilibrate_cell retains its 1e-6 bar default for a missing
+            # point. At 1 bar and 1600 K, (ΔV·ΔP)/(RT) with a typical
+            # ΔV=1e-5 m³/mol is (1e-5·1e5)/(8.314·1600)=7.5e-5 in ln(a),
+            # about 1e-4. The default is inside the verified pressure window.
+            extra_notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        "row printed no total pressure; MAGEMin native "
+                        f"activity evaluated at its {pressure_min_bar:g} bar "
+                        "default inside verified inclusive pressure window "
+                        f"[{pressure_min_bar:g}, {pressure_max_bar:g}] bar; "
+                        "condensed-phase pressure correction is estimated "
+                        "at about 1e-4 in ln(a) at 1 bar and 1600 K"
+                    ),
+                    origin="engine:magemin",
+                )
+            )
 
     printed_fo2 = _has_printed_fo2(observation, identity)
     source_pressure = (

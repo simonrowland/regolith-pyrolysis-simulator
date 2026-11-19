@@ -396,6 +396,46 @@ def test_requirement_tuple_does_not_include_pressure_or_oxygen():
     assert "oxygen_condition" not in REQUIREMENTS["melt_activity"]
 
 
+def _magemin_native_alumina_activity_row(*, pressure_pa: Decimal | None):
+    experiment, _bench, observation = _case(
+        composition=_composition(("SiO2", "0.5"), ("Al2O3", "0.5")),
+        formula="Al2O3",
+        basis="Al2O3",
+        phase=Phase.CR,
+    )
+    from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+    identity = observation.identity
+    reference_state = identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert reference_state.value is not None
+    native_polymorph = MAGEMIN_NATIVE_MELT_ACTIVITIES["Al2O3"][1]
+    observation = replace(
+        observation,
+        identity=replace(
+            identity,
+            reference_state=State.of(
+                replace(
+                    reference_state.value,
+                    endmember=replace(
+                        reference_state.value.endmember,
+                        polymorph=State.of(native_polymorph),
+                    ),
+                )
+            ),
+        ),
+    )
+    if pressure_pa is not None:
+        observation = replace(
+            observation,
+            point_conditions={
+                **observation.point_conditions,
+                "total_pressure_Pa": f.located(pressure_pa),
+            },
+        )
+    return experiment, observation
+
+
 def test_magemin_activity_score_passes_printed_row_pressure(monkeypatch):
     from simulator.battery.enums import Engine
     from simulator.battery.score import predict_with_engine
@@ -435,40 +475,8 @@ def test_magemin_activity_score_passes_printed_row_pressure(monkeypatch):
         "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
         _cell,
     )
-    experiment, _bench, observation = _case(
-        composition=_composition(("SiO2", "0.5"), ("Al2O3", "0.5")),
-        formula="Al2O3",
-        basis="Al2O3",
-        phase=Phase.CR,
-    )
-    from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
-
-    identity = observation.identity
-    reference_state = identity.reference_state
-    assert reference_state is not None and reference_state.is_value
-    assert reference_state.value is not None
-    native_polymorph = MAGEMIN_NATIVE_MELT_ACTIVITIES["Al2O3"][1]
-    observation = replace(
-        observation,
-        identity=replace(
-            identity,
-            reference_state=State.of(
-                replace(
-                    reference_state.value,
-                    endmember=replace(
-                        reference_state.value.endmember,
-                        polymorph=State.of(native_polymorph),
-                    ),
-                )
-            ),
-        ),
-    )
-    observation = replace(
-        observation,
-        point_conditions={
-            **observation.point_conditions,
-            "total_pressure_Pa": f.located(Decimal("100000")),
-        },
+    experiment, observation = _magemin_native_alumina_activity_row(
+        pressure_pa=Decimal("100000")
     )
 
     prediction = predict_with_engine(
@@ -477,6 +485,113 @@ def test_magemin_activity_score_passes_printed_row_pressure(monkeypatch):
 
     assert prediction.value is not None, prediction.refusal_detail
     assert seen["pressure_bar"] == pytest.approx(1.0)
+
+
+def test_magemin_activity_without_row_pressure_uses_default_and_flags_it(
+    monkeypatch,
+):
+    from simulator.battery.enums import Engine, NoticeKind
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    seen = {}
+
+    class _Backend:
+        def equilibrate(self, *, pressure_bar, **_kwargs):
+            seen["pressure_bar"] = pressure_bar
+            return SimpleNamespace(
+                status="ok",
+                diagnostics={},
+                warnings=[],
+                activity_coefficients={"Al2O3": 0.8},
+                vapor_pressures_Pa={},
+                liquid_fraction=None,
+                phase_assemblage_available=False,
+            )
+
+    handle = EngineHandle(
+        name="magemin",
+        backend=_Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    monkeypatch.setattr(
+        binary_pot_battery, "open_battery_engine", lambda _name: handle
+    )
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_call_cached_backend_equilibrate",
+        lambda _handle, _kwargs, solve, **_options: solve(),
+    )
+    experiment, observation = _magemin_native_alumina_activity_row(
+        pressure_pa=None
+    )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN, observation, experiment=experiment, isolated=False,
+    )
+
+    assert prediction.value == Decimal("0.8")
+    assert seen["pressure_bar"] == pytest.approx(1.0e-6)
+    pressure_notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and "row printed no total pressure" in notice.reason
+    )
+    assert "inside verified inclusive pressure window [1e-06, 1] bar" in (
+        pressure_notice.reason
+    )
+    assert "about 1e-4 in ln(a) at 1 bar and 1600 K" in pressure_notice.reason
+
+
+def test_magemin_activity_score_refuses_pressure_outside_verified_window(
+    monkeypatch,
+):
+    from simulator.battery.enums import Engine, RefusalReason
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._database = "ig"
+    backend._config = {}
+    backend._subprocess_pool = None
+    handle = SimpleNamespace(
+        name="magemin",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        supports_intrinsic_fO2=False,
+        engine_settings={},
+    )
+    monkeypatch.setattr(
+        binary_pot_battery, "open_battery_engine", lambda _name: handle
+    )
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_call_cached_backend_equilibrate",
+        lambda _handle, _kwargs, solve, **_options: solve(),
+    )
+    experiment, observation = _magemin_native_alumina_activity_row(
+        pressure_pa=Decimal("200000")
+    )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN, observation, experiment=experiment, isolated=False,
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_detail["reason"] == "out_of_domain"
+    assert "inclusive verified window [1e-06, 1] bar" in (
+        prediction.refusal_detail["engine_reason"]
+    )
 
 
 def test_no_iron_without_oxygen_is_ready_and_engine_point_stays_gap():

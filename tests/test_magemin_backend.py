@@ -4278,6 +4278,67 @@ def test_magemin_live_native_feo_activity_refuses_iron_free_projected_bulk(
     assert result.diagnostics["magemin_native_bulk_component"] == "FeOt"
 
 
+def _native_activity_pressure_test_backend():
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._database = "ig"
+    backend._config = {}
+    backend._subprocess_pool = None
+    return backend
+
+
+@pytest.mark.parametrize("pressure_bar", [1.0e-6, 1.0])
+def test_magemin_native_activity_pressure_admits_verified_window_endpoints(
+    pressure_bar,
+):
+    backend = _native_activity_pressure_test_backend()
+    solve_pressures = []
+
+    def reached_solve(*, pressure_bar, **_kwargs):
+        solve_pressures.append(pressure_bar)
+        raise RuntimeError("test solve reached")
+
+    backend._call_magemin = reached_solve
+
+    with pytest.raises(RuntimeError, match="test solve reached"):
+        backend.equilibrate(
+            1429.85,
+            composition_kg={"SiO2": 60.0, "MgO": 40.0},
+            pressure_bar=pressure_bar,
+            native_activity_formula="MgO",
+        )
+
+    assert solve_pressures == [pressure_bar]
+
+
+@pytest.mark.parametrize("pressure_bar", [1.0e-7, 2.0])
+def test_magemin_native_activity_pressure_outside_window_is_typed(
+    pressure_bar,
+):
+    backend = _native_activity_pressure_test_backend()
+    solve_calls = []
+    backend._call_magemin = lambda **kwargs: solve_calls.append(kwargs)
+
+    result = backend.equilibrate(
+        1429.85,
+        composition_kg={"SiO2": 60.0, "MgO": 40.0},
+        pressure_bar=pressure_bar,
+        native_activity_formula="MgO",
+    )
+
+    assert result.status == "out_of_domain"
+    assert solve_calls == []
+    reason = result.diagnostics["backend_status_reason"]
+    assert "magemin_native_activity_pressure_out_of_domain" in reason
+    assert "inclusive verified window [1e-06, 1] bar" in reason
+    assert result.diagnostics["magemin_native_activity_pressure_window_bar"] == (
+        1.0e-6,
+        1.0,
+    )
+
+
 def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
     monkeypatch,
 ):
