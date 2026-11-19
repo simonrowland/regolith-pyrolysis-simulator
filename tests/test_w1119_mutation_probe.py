@@ -8,8 +8,16 @@ import pytest
 def test_native_feot_coordinate_regression_kills_source_label_mutant(
     request, monkeypatch
 ):
+    from importlib.util import module_from_spec, spec_from_file_location
+    from pathlib import Path
+
     from engines.magemin import domain
-    from tests import test_magemin_backend as backend_tests
+
+    test_path = Path(__file__).with_name("test_magemin_backend.py")
+    spec = spec_from_file_location("w1119_backend_test_module", test_path)
+    assert spec is not None and spec.loader is not None
+    backend_tests = module_from_spec(spec)
+    spec.loader.exec_module(backend_tests)
 
     mutant = dict(domain.MAGEMIN_NATIVE_MELT_ACTIVITIES)
     field, polymorph, _component = mutant["FeO"]
