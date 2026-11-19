@@ -190,7 +190,7 @@ def test_isolated_migration_preserves_species_temperature_and_conditions() -> No
         if row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
     ]
     assert all(
-        row.locator.table == "1" and row.locator.row is not None
+        row.locator.table == "1"
         for row in mass_loss_observations
     )
 
@@ -208,6 +208,7 @@ def test_isolated_migration_preserves_species_temperature_and_conditions() -> No
     ]
     for row in migrated_table1:
         source_row = table1_by_observation_id[row.observation_id]
+        assert row.locator.row == source_row["locator"]["row"]
         run_id = source_row["values"]["run_id_as_printed"].rstrip("†")
         source_pressure = source_row["point_conditions"]["total_pressure_Pa"]["state"]
         experiment = migrator.result.experiments[row.experiment_id]
