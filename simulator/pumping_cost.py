@@ -30,7 +30,12 @@ import math
 from typing import Any
 
 from simulator.cost_energy import json_safe_number, unavailable_quantity
-from simulator.physical_constants import GAS_CONSTANT_10SIG, PA_PER_BAR, PA_PER_MBAR
+from simulator.physical_constants import (
+    DIATOMIC_HEAT_CAPACITY_RATIO,
+    GAS_CONSTANT_10SIG,
+    PA_PER_BAR,
+    PA_PER_MBAR,
+)
 from simulator.environment import (
     ASTEROID_VACUUM_FLOOR_BAR,
     MARS_DATUM_PRESSURE_BAR,
@@ -292,7 +297,7 @@ def estimate_subambient_pump_cost(
     ),
     motor_drive_efficiency: float = DEFAULT_PUMP_MOTOR_DRIVE_EFFICIENCY.value,
     max_stage_pressure_ratio: float = DEFAULT_MAX_STAGE_PRESSURE_RATIO.value,
-    heat_capacity_ratio: float = 1.40,
+    heat_capacity_ratio: float = DIATOMIC_HEAT_CAPACITY_RATIO,
     max_pump_speed_m3_s: float = DEFAULT_MAX_PUMP_SPEED_M3_S.value,
     validated_line_conductance_m3_s: float | None = None,
 ) -> SubambientPumpCost:

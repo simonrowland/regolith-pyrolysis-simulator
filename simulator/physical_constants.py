@@ -58,6 +58,15 @@ ATM_PA = STANDARD_ATMOSPHERE_PA
 # Exact decimal. 101325 is an integer below 2^53, so the float is exact.
 ATM_PA_DECIMAL = Decimal(101325)
 
+# Ideal-diatomic heat-capacity ratio. Premise: vibration frozen, so five
+# active degrees of freedom (three translational, two rotational).
+# Algebra: gamma = 1 + 2/f = 7/5 = 1.40. Unit check: dimensionless.
+# Limit: fully excited vibration (f = 7) would be 9/7; this constant is
+# not that correction. The pump-cost default and the pipe sonic cap are
+# the two callers. A hot sonic branch flags the ideal-diatomic value
+# rather than retuning it.
+DIATOMIC_HEAT_CAPACITY_RATIO = 1.40
+
 # Printed-precision table self-check floor shared by battery validity and
 # compilation diagnostics. This is a policy scalar, not a physical constant.
 TABLE_SELF_CHECK_FINDING_DEX = Decimal("0.1")
@@ -92,6 +101,7 @@ __all__ = (
     "BOLTZMANN",
     "CATALOG_PHYSICAL_PRESSURE_CEILING_PA",
     "CELSIUS_TO_KELVIN_OFFSET",
+    "DIATOMIC_HEAT_CAPACITY_RATIO",
     "ELEMENTARY_CHARGE",
     "FARADAY",
     "FARADAY_10SIG",
