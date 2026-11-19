@@ -769,7 +769,6 @@ def test_magemin_silica_notice_survives_provider_dispatch(monkeypatch):
 
     provider = MAGEMinShadowProvider(backend=object())
     monkeypatch.setattr(provider, '_composition_wt_pct', lambda *_: {'SiO2': 85., 'Al2O3': 10., 'CaO': 5.})
-    monkeypatch.setattr(provider, '_backend_available', lambda _: True)
     monkeypatch.setattr(provider, '_run_backend', lambda *a, **kw: EquilibriumResult(
         temperature_C=1500., pressure_bar=0.001, liquid_fraction=1., status='ok',
     ))

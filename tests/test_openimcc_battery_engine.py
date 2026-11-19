@@ -1477,8 +1477,9 @@ def test_vapor_engine_labels_magemin_silicate_window_start_refusals() -> None:
     assert not valid
     assert engine_reason == "silicate_window"
     assert any(
-        "SiO2 = 20.00 wt% is outside MELTS calibration window "
-        "[30.0, 80.0] wt% (below the window)." in warning
+        "SiO2 = 0.00 wt% outside MELTS calibration range "
+        "[30.0, 80.0] wt%; reason=silicate_window; positive SiO2 is required."
+        in warning
         for warning in warnings
     )
 

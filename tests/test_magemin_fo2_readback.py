@@ -381,7 +381,9 @@ def test_control_failure_reaches_existing_gate_hold_or_floor(
     curve = sim._melt_redox_liquidus_gate_curve()
     notice = curve['gate_provider_refusal']
     assert notice['outcome'] == (
-        'failed' if native == '-inf' else 'numerical_failure'
+        'failed' if native == '-inf' else (
+            'stable_refusal' if native is not None else 'numerical_failure'
+        )
     )
     assert notice['qualification'] == (
         'held_last_good_curve' if prior_good else 'first_call_kress91_floor_prediction'
