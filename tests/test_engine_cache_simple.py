@@ -605,6 +605,71 @@ def test_openimcc_chemistry_version_change_with_same_pack_name_is_a_miss(
     assert calls == 2
 
 
+def test_vaporock_v2_out_of_basis_refusal_is_not_served_at_v3(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A v2 out_of_basis row stays in the same database and is not replayed at v3."""
+    assert engine_cache.ENGINE_CHEMISTRY_VERSION["vaporock"] == 3
+    refusal = {
+        "status": "refusal",
+        "refusal_reason": "out_of_basis",
+        "engine_status": "out_of_domain",
+    }
+    activity = {"status": "ok", "activity": 0.4}
+    request = {"temperature_K": 1873.15, "native_activity_formula": "SiO2"}
+    generation = {"n": 0}
+
+    def contract() -> None:
+        generation["n"] += 1
+        database = tmp_path / f"vaporock-v3-{generation['n']}.sqlite"
+        monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+        monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+        engine_cache._MEMORY_CACHE.clear()
+        calls = {"n": 0}
+
+        def solve_refusal() -> dict[str, str]:
+            calls["n"] += 1
+            return refusal
+
+        monkeypatch.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, "vaporock", 2)
+        stored = engine_cache.cached_engine_call("vaporock", request, solve_refusal)
+        assert stored == refusal
+        assert calls["n"] == 1
+
+        def solve_activity() -> dict[str, object]:
+            calls["n"] += 1
+            return activity
+
+        monkeypatch.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, "vaporock", 3)
+        engine_cache._MEMORY_CACHE.clear()
+        served = engine_cache.cached_engine_call("vaporock", request, solve_activity)
+        assert served == activity
+        assert served != refusal
+        assert calls["n"] == 2
+        with sqlite3.connect(database) as connection:
+            rows = connection.execute(
+                "SELECT chem_version, value FROM engine_outputs WHERE engine = ?",
+                ("vaporock",),
+            ).fetchall()
+        assert len(rows) == 2
+        by_version = {row[0]: engine_cache._decode_hot(row[1]) for row in rows}
+        assert set(by_version) == {"2", "3"}
+        assert by_version["2"] == refusal
+
+    contract()
+    real_key = engine_cache.engine_cache_key
+
+    def _stamp_vaporock_as_v2(engine_id, chem_version, request):
+        if engine_id == "vaporock":
+            chem_version = 2
+        return real_key(engine_id, chem_version, request)
+
+    monkeypatch.setattr(engine_cache, "engine_cache_key", _stamp_vaporock_as_v2)
+    with pytest.raises(AssertionError):
+        contract()
+
+
 def test_alphamelts_parent_environment_does_not_change_adapter_request_key(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
