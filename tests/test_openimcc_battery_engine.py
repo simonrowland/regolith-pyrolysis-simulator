@@ -933,32 +933,80 @@ def test_openimcc_gas_formation_anchors_match_every_regolith_janaf_table() -> No
     _require_openimcc()
     from openimcc import load_gas_datapack, species_thermo
     from simulator.battery.generators.janaf import (
-        _janaf_gas_dfh298_kJ_per_mol,
+        _checked_fusion_table_rows,
         _janaf_gas_table_ids,
     )
 
-    table_ids_by_formula = _janaf_gas_table_ids()
-    assert sum(len(table_ids) for table_ids in table_ids_by_formula.values()) == 238
     datapack = load_gas_datapack()
-    compared = 0
-    for formula, table_ids in table_ids_by_formula.items():
-        assert len(table_ids) == 1, (formula, table_ids)
-        table_id = table_ids[0]
-        janaf_anchor = _janaf_gas_dfh298_kJ_per_mol(formula, table_id)
-        assert janaf_anchor is not None, (formula, table_id)
+    gas_species = {
+        str(row_name)[: -len("(g)")]
+        for row_name in datapack.gas_df.index
+        if str(row_name).endswith("(g)")
+    }
+    anchors_by_table_id: dict[str, tuple[str, Decimal]] = {}
+    for species in sorted(gas_species):
         native = species_thermo(
-            formula,
+            species,
             "g",
             298.15,
             datapack=datapack,
             allow_extrapolation=True,
         )
-        assert native.source_table_id == table_id, (formula, native.source_table_id)
-        assert native.formation_enthalpy_source_id == table_id
-        assert native.formation_enthalpy_298_kJ_mol is not None
-        assert Decimal(str(native.formation_enthalpy_298_kJ_mol)) == janaf_anchor
-        compared += 1
-    assert compared == 238
+        anchor = native.formation_enthalpy_298_kJ_mol
+        if anchor is None:
+            continue
+        table_id = native.formation_enthalpy_source_id
+        assert isinstance(table_id, str) and table_id, (species, table_id)
+        assert table_id not in anchors_by_table_id, (
+            table_id,
+            anchors_by_table_id.get(table_id),
+            species,
+        )
+        anchors_by_table_id[table_id] = (species, Decimal(str(anchor)))
+
+    assert len(anchors_by_table_id) == 240
+    regolith_table_ids = {
+        table_id
+        for table_ids in _janaf_gas_table_ids().values()
+        for table_id in table_ids
+    }
+    unmatched = {
+        (species, table_id)
+        for table_id, (species, _anchor) in anchors_by_table_id.items()
+        if table_id not in regolith_table_ids
+    }
+    assert unmatched == {("e-", "D-020"), ("Hg+", "Hg-004")}
+
+    compared_table_ids = set(anchors_by_table_id) & regolith_table_ids
+    assert len(compared_table_ids) == 238
+    for table_id in sorted(compared_table_ids):
+        species, openimcc_anchor = anchors_by_table_id[table_id]
+        rows, _digest = _checked_fusion_table_rows(table_id)
+        janaf_anchors = []
+        for row in rows:
+            if not isinstance(row, Mapping):
+                continue
+            temperature = row.get("temperature")
+            enthalpy = row.get("formation_enthalpy")
+            temperature_value = (
+                temperature.get("value") if isinstance(temperature, Mapping) else None
+            )
+            enthalpy_value = (
+                enthalpy.get("value") if isinstance(enthalpy, Mapping) else None
+            )
+            if (
+                temperature_value is not None
+                and Decimal(str(temperature_value)) == Decimal("298.15")
+                and enthalpy_value is not None
+            ):
+                janaf_anchors.append(Decimal(str(enthalpy_value)))
+        assert len(janaf_anchors) == 1, (species, table_id, janaf_anchors)
+        assert openimcc_anchor == janaf_anchors[0], (
+            species,
+            table_id,
+            openimcc_anchor,
+            janaf_anchors[0],
+        )
 
 
 def test_openimcc_enthalpy_source_anchor_is_resolved_after_native_cache_hit(
