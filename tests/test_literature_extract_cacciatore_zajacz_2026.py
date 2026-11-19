@@ -13,7 +13,6 @@ import yaml
 from simulator.battery.enums import PhaseRole, ValueKind
 from simulator.battery.migrate import migrate
 from literature_extract_test_utils import isolated_root
-from tests.helpers.corpus_paths import regolith_corpus_root
 
 ROOT = Path(__file__).resolve().parents[1]
 SID = "cacciatore-zajacz-2026-v-sc-oxybarometer"
@@ -195,10 +194,6 @@ def test_total_pressure_note_uses_printed_uncertainty() -> None:
 
 
 def test_table3_glass_rows_migrate_with_sample_conditions(tmp_path: Path) -> None:
-    corpus = regolith_corpus_root()
-    if not (corpus / f"raw/{SID}/{SID}.pdf").is_file():
-        pytest.skip("Cacciatore and Zajacz source PDF is absent")
-
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     with GRID.open(encoding="utf-8", newline="") as handle:
         grid = list(csv.DictReader(handle))
@@ -221,13 +216,16 @@ def test_table3_glass_rows_migrate_with_sample_conditions(tmp_path: Path) -> Non
         assert row.identity.temperature_K.value == Decimal(expected["T_C"]) + Decimal("273.15")
         assert row.point_conditions["fO2_log"].state.value == Decimal(expected["logfO2_bar"])
         assert row.point_conditions["total_pressure_Pa"].state.value == Decimal(expected["P_bar"]) * Decimal("100000")
+        composition = row.point_conditions["composition"]
+        assert composition.state.is_value
+        initial_composition = result.experiments[
+            row.experiment_id
+        ].sample.initial_composition
+        assert initial_composition.state.is_value
+        assert composition.state.value == initial_composition.state.value
+        assert composition.locator == initial_composition.locator
+        assert composition.locator.table == "1"
         assert row.value.point == Decimal(expected["value"])
         assert row.uncertainty.kind.value == "printed"
         assert row.uncertainty.verbatim["sigma"] == expected["sigma"]
         assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
-
-
-def test_table3_source_test_skips_when_corpus_is_absent(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path / "absent-corpus"))
-    with pytest.raises(pytest.skip.Exception):
-        test_table3_glass_rows_migrate_with_sample_conditions(tmp_path)
