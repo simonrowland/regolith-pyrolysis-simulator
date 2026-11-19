@@ -34,6 +34,7 @@ import yaml
 from simulator.state_types import StateTag
 from simulator.yaml_cache import load_cached_safe_yaml
 from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.literature_extract_test_helpers import iter_locators
 from tests.helpers.regression import assert_regression_raises_assertion_without_skip
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -5441,6 +5442,57 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 def test_aithala_s5_preserves_all_61_row_addressable_series_summaries():
     extract_path = EXTRACTS / "aithala-2026-magmatic-iron-redox-to-2100c.yaml"
     doc = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
+    si_path = (
+        "raw/aithala-2026-magmatic-iron-redox-to-2100c/"
+        "aithala-2026-magmatic-iron-redox-to-2100c-si.pdf"
+    )
+    si_sha256 = "ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa"
+    article_path = (
+        "raw/aithala-2026-magmatic-iron-redox-to-2100c/"
+        "aithala-2026-magmatic-iron-redox-to-2100c.pdf"
+    )
+    s5_locators = [
+        locator for locator in iter_locators(doc) if locator.get("table") == "S-5"
+    ]
+    assert len(s5_locators) == 187
+
+    def points_to_si(locator):
+        return (
+            locator.get("source_path") == si_path
+            and locator.get("source_sha256") == si_sha256
+            and (locator.get("page"), locator.get("pdf_page_index"))
+            in {(16, 15), (17, 16)}
+        )
+
+    assert all(points_to_si(locator) for locator in s5_locators)
+    mutated = copy.deepcopy(doc)
+    mutated_s5 = next(
+        locator
+        for locator in iter_locators(mutated)
+        if locator.get("table") == "S-5"
+    )
+    mutated_s5["source_path"] = article_path
+    assert not points_to_si(mutated_s5)
+
+    source_pdf = regolith_corpus_root() / si_path
+    assert hashlib.sha256(source_pdf.read_bytes()).hexdigest() == si_sha256
+    import subprocess
+
+    page16 = subprocess.run(
+        ["pdftotext", "-f", "16", "-l", "16", "-layout", str(source_pdf), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    page17 = subprocess.run(
+        ["pdftotext", "-f", "17", "-l", "17", "-layout", str(source_pdf), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    assert "Table S-5" in page16 and "SI-10" in page16
+    assert "HAFS" in page17 and "SI-11" in page17
+
     observations = doc["species"]["Fe"]["observations"]
     rows = [
         row for row in observations
