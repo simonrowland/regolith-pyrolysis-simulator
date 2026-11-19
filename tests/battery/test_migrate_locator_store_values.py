@@ -1,4 +1,4 @@
-"""Prove the locator rekey leaves migrated observation values unchanged."""
+"""Check that locator validation does not alter migrated observation values."""
 
 from collections import Counter
 from collections.abc import Mapping
@@ -75,7 +75,7 @@ def _value_signature_digest(
 
 
 @pytest.mark.parametrize("shard", range(_VALUE_SIGNATURE_SHARD_COUNT))
-def test_locator_rekey_preserves_extract_values(shard: int) -> None:
+def test_locator_validation_purity_preserves_extract_values(shard: int) -> None:
     paths = discover_extracts(REPO_ROOT / "data" / "literature" / "extracts")
     shard_paths = [
         path
