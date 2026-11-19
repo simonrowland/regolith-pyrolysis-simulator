@@ -17,6 +17,7 @@ from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
     LiquidusSolidusResult,
     MeltFractionSample,
+    _liquidus_transition_temperature_K,
     build_equilibrium_crystallization_path,
     find_liquidus_solidus_by_fraction,
 )
@@ -88,6 +89,32 @@ def test_equilibrium_crystallization_temperature_conversion_is_pinned():
 
     assert at_zero_celsius.liquidus_T_K == pytest.approx(273.15)
     assert at_zero_celsius_kelvin.liquidus_T_C == pytest.approx(0.0)
+
+
+def test_liquidus_transition_selector_uses_exact_subtype_in_kelvin():
+    # USGS Professional Paper 440-L, Fig. 8: CaO-SiO2 eutectic at 1436 °C.
+    result = LiquidusSolidusResult(
+        liquidus_T_C=1436.0,
+        solidus_T_C=1400.0,
+        liquid_fraction=1.0,
+        status="ok",
+    )
+
+    assert _liquidus_transition_temperature_K(result, "liquidus") == pytest.approx(
+        1709.15
+    )
+    assert _liquidus_transition_temperature_K(result, "solidus") == pytest.approx(
+        1673.15
+    )
+    assert _liquidus_transition_temperature_K(result, "glass_transition") is None
+    assert _liquidus_transition_temperature_K(
+        LiquidusSolidusResult(
+            liquidus_T_C=1000.0,
+            liquid_fraction=1.0,
+            status="not_converged",
+        ),
+        "liquidus",
+    ) is None
 
 
 @pytest.mark.parametrize(
@@ -1050,13 +1077,13 @@ def test_renormalised_sample_on_flat_bracket_is_flagged():
         if temperature_C <= 1050.0:
             return 0.5 * (temperature_C - 1000.0) / 50.0
         if temperature_C <= 1100.0:
-            return 0.5 + 0.498 * (temperature_C - 1050.0) / 50.0
-        return 0.998 + 0.002 * (temperature_C - 1100.0) / 500.0
+            return 0.5 + 0.4979 * (temperature_C - 1050.0) / 50.0
+        return 0.9979 + 0.002 * (temperature_C - 1100.0) / 500.0
 
     def sample(temperature_C: float):
         temperature_C = float(temperature_C)
         frac = fraction(temperature_C)
-        if temperature_C == 1350.0:
+        if temperature_C == 1375.0:
             return frac, notice
         return frac
 
@@ -1069,7 +1096,7 @@ def test_renormalised_sample_on_flat_bracket_is_flagged():
     )
 
     assert result.status == 'ok'
-    assert result.liquidus_T_C == pytest.approx(1350.0, abs=2.0)
+    assert result.liquidus_T_C == pytest.approx(1375.0, abs=2.0)
     assert notice['delta_T_bound'] == pytest.approx(250.0)
     assert notice['renormalisation_may_shift_bracket'] is True
 

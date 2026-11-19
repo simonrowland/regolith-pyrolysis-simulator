@@ -28,6 +28,7 @@ MAX_LIQUIDUS_SCAN_POINTS = 100_000
 # liquidus fraction to 1 only inside this band. One owner: do not copy
 # the literal. The solid threshold is a different rule and stays separate.
 LIQUIDUS_LIQUID_EPSILON = 1.0e-3
+_LIQUIDUS_TRANSITION_SUBTYPES = frozenset({'liquidus', 'solidus'})
 # The statuses a SAMPLE may refuse with and still be carried out through the
 # finder, so the caller learns WHICH refusal occurred rather than a generic
 # solver failure.
@@ -252,6 +253,36 @@ class LiquidusSolidusResult:
                 raise ValueError('status=ok requires liquid_fraction')
 
 
+def _liquidus_transition_temperature_K(
+    result: object,
+    subtype: str,
+) -> float | None:
+    """Return only the exact requested transition field in kelvin."""
+
+    if (
+        not isinstance(result, LiquidusSolidusResult)
+        or result.status != 'ok'
+        or subtype not in _LIQUIDUS_TRANSITION_SUBTYPES
+    ):
+        return None
+    if subtype == 'liquidus':
+        temperature_K = result.liquidus_T_K
+    elif result.solidus_T_C is not None:
+        # Premise: the solidus field is degrees Celsius and the physical
+        # offset is 273.15 K. T_K = t_C + offset; Celsius and kelvin have the
+        # same interval unit. At 0 °C this gives the limiting value 273.15 K.
+        temperature_K = result.solidus_T_C + CELSIUS_TO_KELVIN_OFFSET
+    else:
+        temperature_K = None
+    if (
+        temperature_K is None
+        or not math.isfinite(temperature_K)
+        or temperature_K <= 0.0
+    ):
+        return None
+    return temperature_K
+
+
 @dataclass(frozen=True)
 class LiquidFractionPathPoint:
     temperature_C: float
@@ -346,6 +377,16 @@ class EquilibriumCrystallizationPathResult:
                 )
             if self.liquid_fraction is None:
                 raise ValueError('EC status=ok requires liquid_fraction')
+
+
+def _fraction_strictly_crosses(
+    previous: float,
+    current: float,
+    threshold: float,
+) -> bool:
+    """A sampled threshold endpoint is not an interior bracket crossing."""
+
+    return previous < threshold and current > threshold
 
 
 def find_liquidus_solidus_by_fraction(
@@ -533,8 +574,11 @@ def find_liquidus_solidus_by_fraction(
         for current in grid_points[1:]:
             if (
                 solidus_bracket is None
-                and previous.frac_M <= solid_threshold
-                and current.frac_M > solid_threshold
+                and _fraction_strictly_crosses(
+                    previous.frac_M,
+                    current.frac_M,
+                    solid_threshold,
+                )
             ):
                 solidus_bracket = (previous, current)
                 _annotate_renormalised_threshold(
@@ -546,8 +590,11 @@ def find_liquidus_solidus_by_fraction(
                 )
             if (
                 liquidus_bracket is None
-                and previous.frac_M < liquid_threshold
-                and current.frac_M >= liquid_threshold
+                and _fraction_strictly_crosses(
+                    previous.frac_M,
+                    current.frac_M,
+                    liquid_threshold,
+                )
             ):
                 liquidus_bracket = (previous, current)
                 _annotate_renormalised_threshold(

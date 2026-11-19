@@ -2116,8 +2116,8 @@ def test_magemin_liquidus_flags_flat_renormalised_bracket(monkeypatch):
         if temperature_C <= 1050.0:
             return 0.5 * (temperature_C - 1000.0) / 50.0
         if temperature_C <= 1100.0:
-            return 0.5 + 0.498 * (temperature_C - 1050.0) / 50.0
-        return 0.998 + 0.002 * (temperature_C - 1100.0) / 500.0
+            return 0.5 + 0.4979 * (temperature_C - 1050.0) / 50.0
+        return 0.9979 + 0.002 * (temperature_C - 1100.0) / 500.0
 
     def fake_equilibrate(temperature_C, **_kwargs):
         temperature_C = float(temperature_C)
@@ -2154,7 +2154,7 @@ def test_magemin_liquidus_flags_flat_renormalised_bracket(monkeypatch):
     )
 
     assert result.status == 'ok'
-    assert result.liquidus_T_C == pytest.approx(1350.0, abs=2.0)
+    assert result.liquidus_T_C == pytest.approx(1375.0, abs=2.0)
     notices = result.diagnostics['magemin_mode_token_notices']
     assert len(notices) == 1
     assert notices[0]['delta_T_bound'] == pytest.approx(250.0)
