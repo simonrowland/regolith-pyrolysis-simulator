@@ -1374,7 +1374,7 @@ def test_oneill_feo_activity_coefficient_refusal_is_typed_per_engine():
     assert magemin.refusal_reason is RefusalReason.UNSUPPORTED
     assert magemin.refusal_detail["reason"] == "reference_state_mismatch"
     assert magemin.refusal_detail["engine_convention"] == (
-        "typed-refusal:magemin_no_native_activity:FeO"
+        "raoultian_native_crystal_activity"
     )
 
 

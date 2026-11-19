@@ -4826,7 +4826,7 @@ def fusion_comparison_reference(
         magemin_target_polymorph = Polymorph(native[1])
         magemin_source_polymorph = polymorph_token(standard_state.endmember)
         if magemin_source_polymorph is magemin_target_polymorph:
-            # Guo's MgO measurement is already on the periclase standard.
+            # The observation is already on MAGEMin's mapped native standard.
             return reference
 
     def fusion_missing_input_notice(reason: str) -> Notice | None:
@@ -4958,9 +4958,8 @@ def fusion_comparison_reference(
             )
             return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
-        # MAGEMin's native ig activities use periclase for MgO and quartz for
-        # SiO2 (the low-pressure basis used by this scorer; the official API
-        # also names coesite at high pressure). At equal chemical potential,
+        # MAGEMin's native crystal standards come from the domain map. At
+        # equal chemical potential,
         # mu=G°+RT ln(a), so a_target=a_source*exp((G_source-G_target)/RT).
         # With ΔG_fus=G_liquid-G_crystal, G_source-G_target is
         # ΔG_fus(target)-ΔG_fus(source), fixing the conversion sign. The
@@ -5011,10 +5010,10 @@ def fusion_comparison_reference(
         )
 
     if engine is not Engine.MAGEMIN and magemin_native_reference:
-        # The prior MAGEMin conversion explicitly established a quartz solid
-        # basis. Resolve that same JANAF table when the next owner request is
-        # for a liquid-reference engine; the generic stable-solid choice can
-        # be a different SiO2 polymorph at this temperature.
+        # The prior MAGEMin conversion explicitly established its mapped
+        # crystal basis. Resolve that same JANAF table when the next owner
+        # request is for a liquid-reference engine; the generic stable-solid
+        # choice can be a different polymorph at this temperature.
         source_polymorph = polymorph_token(standard_state.endmember)
         try:
             eligible = _janaf_eligible_pure_crystal_tables(formula, temperature_K)

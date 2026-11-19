@@ -21,13 +21,18 @@ from engines.domain_reason import OutOfDomainReason, reason_value
 from simulator.scalar_boundary import is_finite
 from simulator.state import OXIDE_SPECIES
 
-# Native melt activities exposed by the ig database. These are standard
-# states, not liquid-endmember activities: periclase for MgO and quartz for
-# SiO2 at the scorer's low-pressure default. Other formulas have no native
-# activity/reference pair in this adapter.
+# Native activities exposed by the patched MAGEMin build. These are solid
+# endmember standards, not liquid-endmember activities. The scorer's existing
+# low-pressure silica path uses quartz; higher-pressure quartz/coesite (and
+# database-dependent stishovite) selection is not represented by this map.
+# H2O is deliberately absent: the MAGEMin input gate admits only the MELTS
+# 14-oxide basis, which excludes its native fluid endmember.
 MAGEMIN_NATIVE_MELT_ACTIVITIES = {
     'MgO': ('aMgO', 'periclase'),
     'SiO2': ('aSiO2', 'quartz'),
+    'FeO': ('aFeO', 'wustite'),
+    'Al2O3': ('aAl2O3', 'corundum'),
+    'TiO2': ('aTiO2', 'rutile'),
 }
 
 # Canonical MELTS 14-oxide basis, sourced from

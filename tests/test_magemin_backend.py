@@ -3990,7 +3990,9 @@ def test_magemin_live_smoke_runs_real_binary(request):
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_native_activity_matches_direct_same_point_output(request):
+def test_magemin_live_native_activity_matches_direct_same_point_output(
+    request, monkeypatch,
+):
     backend = MAGEMinBackend()
     request.addfinalizer(backend.close)
     assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
@@ -4061,14 +4063,143 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
             ).read_text()
 
     direct_fields = backend._parse_subprocess_native_activities(matlab_text)
-    assert {"MgO", "SiO2"} <= set(MAGEMIN_NATIVE_MELT_ACTIVITIES)
+    expected_native = {
+        "MgO": ("aMgO", "periclase"),
+        "SiO2": ("aSiO2", "quartz"),
+        "FeO": ("aFeO", "wustite"),
+        "Al2O3": ("aAl2O3", "corundum"),
+        "TiO2": ("aTiO2", "rutile"),
+    }
+    import engines.magemin.domain as magemin_domain
+
+    assert magemin_domain.MAGEMIN_NATIVE_MELT_ACTIVITIES == expected_native
     for formula, (field, _polymorph) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
         direct_activity = direct_fields[field]
         adapted_activity = result.activity_coefficients[formula]
         assert adapted_activity == direct_activity
+
+    def assert_native_map_and_parser_match_dump():
+        native_map = magemin_domain.MAGEMIN_NATIVE_MELT_ACTIVITIES
+        assert native_map == expected_native
+        parsed = backend._parse_subprocess_native_activities(matlab_text)
+        assert set(parsed) == {field for field, _ in native_map.values()}
+        for field in parsed:
+            assert parsed[field] == direct_fields[field]
+
+    assert_native_map_and_parser_match_dump()
+
+    # These process-local mutants restore the old omissions one at a time.
+    # The real pinned dump contract must reject each missing map entry and
+    # parser field, as well as the original two-entry map.
+    for formula in ("FeO", "Al2O3", "TiO2"):
+        with monkeypatch.context() as mutation:
+            dropped_map = dict(expected_native)
+            del dropped_map[formula]
+            mutation.setattr(
+                magemin_domain, "MAGEMIN_NATIVE_MELT_ACTIVITIES", dropped_map
+            )
+            with pytest.raises(AssertionError):
+                assert_native_map_and_parser_match_dump()
+
+    original_parser = backend._parse_subprocess_native_activities
+    for formula in ("FeO", "Al2O3", "TiO2"):
+        field = expected_native[formula][0]
+
+        def parser_without_field(text, *, omitted=field):
+            parsed = original_parser(text)
+            parsed.pop(omitted, None)
+            return parsed
+
+        with monkeypatch.context() as mutation:
+            mutation.setattr(
+                MAGEMinBackend,
+                "_parse_subprocess_native_activities",
+                staticmethod(parser_without_field),
+            )
+            with pytest.raises(AssertionError):
+                assert_native_map_and_parser_match_dump()
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            magemin_domain,
+            "MAGEMIN_NATIVE_MELT_ACTIVITIES",
+            {"MgO": expected_native["MgO"], "SiO2": expected_native["SiO2"]},
+        )
+        with pytest.raises(AssertionError):
+            assert_native_map_and_parser_match_dump()
+
     assert result.diagnostics["magemin_solver_status"] == 0
     assert result.diagnostics["magemin_native_phase"]
     assert result.diagnostics["magemin_iterations"] > 0
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_corundum_saturation_sets_native_alumina_activity_to_one(
+    request,
+):
+    """Kume sample 305 coexists with corundum, the pure Al2O3 standard."""
+    backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
+    assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
+
+    # Kume (2000), sample 305, Table 4. The independent phase-equilibrium
+    # limit is a_Al2O3 = 1 when liquid coexists with pure corundum.
+    result = backend.equilibrate(
+        1599.85,
+        composition_kg={
+            "SiO2": 34.6,
+            "Al2O3": 39.0,
+            "CaO": 19.6,
+            "MgO": 6.8,
+        },
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+        native_activity_formula="Al2O3",
+        call_timeout_s=20.0,
+    )
+
+    assert result.status == "ok", result.warnings
+    assert any(name.lower().startswith("cor") for name in result.phases_present)
+    assert result.activity_coefficients["Al2O3"] == pytest.approx(1.0, abs=1e-6)
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_absent_native_activity_component_is_typed_out_of_domain(
+    request,
+):
+    backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
+    assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
+
+    result = backend.equilibrate(
+        1429.85,
+        composition_kg={
+            "SiO2": 49.0,
+            "Al2O3": 14.0,
+            "FeO": 10.0,
+            "Fe2O3": 1.0,
+            "MgO": 9.0,
+            "CaO": 11.0,
+            "Na2O": 2.5,
+            "K2O": 0.8,
+            "Cr2O3": 0.2,
+        },
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        native_activity_formula="TiO2",
+    )
+
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        "magemin_native_activity_component_absent"
+    )
+    assert result.diagnostics["magemin_native_formula"] == "TiO2"
 
 
 def test_magemin_nonfinite_requested_native_activity_returns_not_converged(

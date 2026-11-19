@@ -1912,6 +1912,35 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 diagnostics=diagnostics,
             )
 
+        if native_activity_formula is not None:
+            from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+            if (
+                native_activity_formula in MAGEMIN_NATIVE_MELT_ACTIVITIES
+                and comp_wt.get(native_activity_formula, 0.0) <= 0.0
+            ):
+                diagnostics = dict(result_diagnostics)
+                diagnostics.update({
+                    'backend_status': 'out_of_domain',
+                    'backend_status_reason': (
+                        'magemin_native_activity_component_absent'
+                    ),
+                    'magemin_native_formula': native_activity_formula,
+                })
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=fO2_log,
+                    status='out_of_domain',
+                    warnings=[
+                        *prior_warnings,
+                        *bulk_projection.warnings,
+                        'MAGEMin native activity component is absent from input: '
+                        f'{native_activity_formula}',
+                    ],
+                    diagnostics=diagnostics,
+                )
+
         try:
             raw = self._call_magemin(
                 bulk_projection=bulk_projection,
@@ -2071,8 +2100,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 )
         native_activities: Dict[str, float] = {}
         if native_activity_formula is not None:
-            from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
-
             native = raw.get('native_activities') if isinstance(raw, Mapping) else None
             solver_status = raw.get('solver_status') if isinstance(raw, Mapping) else None
             raw_activity = (

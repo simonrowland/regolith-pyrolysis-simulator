@@ -17100,6 +17100,91 @@ def test_guo_mgo_periclase_reference_matches_magemin_native_basis() -> None:
     ) == (True, "raoultian_native_crystal_activity")
 
 
+@pytest.mark.parametrize(
+    ("formula", "native_polymorph", "wrong_polymorph", "field"),
+    (
+        ("FeO", Polymorph.WUSTITE, Polymorph.HEMATITE, "aFeO"),
+        ("Al2O3", Polymorph.CORUNDUM, Polymorph.KYANITE, "aAl2O3"),
+        ("TiO2", Polymorph.RUTILE, Polymorph.ANATASE, "aTiO2"),
+    ),
+)
+def test_magemin_native_activity_requires_its_exact_mapped_crystal_reference(
+    formula: str,
+    native_polymorph: Polymorph,
+    wrong_polymorph: Polymorph,
+    field: str,
+) -> None:
+    from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+    from simulator.battery.generators.bench import (
+        _ENGINE_REPORTED_ACTIVITY,
+        _engine_reports_formula,
+        _reference_matches,
+    )
+
+    assert MAGEMIN_NATIVE_MELT_ACTIVITIES[formula] == (
+        field,
+        native_polymorph.value,
+    )
+    assert _engine_reports_formula("magemin", formula) == (
+        True,
+        "raoultian_native_crystal_activity",
+    )
+
+    identity = F.activity_identity(
+        formula=formula,
+        T_K=Decimal("1873"),
+        endmember_phase=Phase.CR,
+        component_basis=formula,
+    )
+    native_identity = _with_activity_reference_polymorph(
+        identity, native_polymorph.value
+    )
+    native_state = native_identity.reference_state.value
+    assert _reference_matches(
+        native_state, _ENGINE_REPORTED_ACTIVITY["magemin"], "magemin"
+    ) == (True, "raoultian_native_crystal_activity")
+
+    wrong_identity = _with_activity_reference_polymorph(
+        identity, wrong_polymorph.value
+    )
+    wrong_state = wrong_identity.reference_state.value
+    assert _reference_matches(
+        wrong_state, _ENGINE_REPORTED_ACTIVITY["magemin"], "magemin"
+    ) == (False, "raoultian_native_crystal_activity")
+
+
+def test_magemin_liquid_feo_reference_without_wustite_bridge_stays_typed() -> None:
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(
+        formula="FeO",
+        T_K=Decimal("1823"),
+        endmember_phase=Phase.L,
+        component_basis="FeO",
+    )
+    reference = F.observation(
+        "magemin-liquid-feo-without-native-bridge",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="magemin-liquid-feo-reference",
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.MAGEMIN,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == (
+        "magemin_native_reference_conversion_missing_input"
+    )
+    assert "FeO" in residual.refusal.detail["notice"]
+
+
 def _raw_janaf_formation_gibbs_at(table_id: str, temperature_K: Decimal) -> Decimal:
     """Interpolate checked-in JANAF rows without the scorer's converter."""
     table_path = (
