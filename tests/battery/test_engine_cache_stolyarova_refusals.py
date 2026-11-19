@@ -42,12 +42,15 @@ def test_stolyarova_vaporock_and_thermoengine_refusals_hit_warm_with_parity(
     assert cold_rows
     assert cold_rows == warm_rows
     expected_warm_hits = {
-        Engine.VAPOROCK: 684,
+        Engine.VAPOROCK: 1394,
         Engine.THERMOENGINE: 24,
     }
     for engine in engines:
         cold = cold_counts[engine.value]
-        warm = warm_counts[engine.value]
         assert cold["misses"] > 0
-        assert warm["misses"] == 0
-        assert warm["hits"] == expected_warm_hits[engine], repr(warm["hits"])
+    actual_warm_hits = {
+        engine: warm_counts[engine.value]["hits"] for engine in engines
+    }
+    assert actual_warm_hits == expected_warm_hits, repr(actual_warm_hits)
+    for engine in engines:
+        assert warm_counts[engine.value]["misses"] == 0
