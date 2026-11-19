@@ -864,6 +864,21 @@ def _normalize_subprocess_run_mode(
         ) from exc
 
 
+def _subprocess_native_liquidus_C(
+    parsed_liquidus_C: float | None,
+    *,
+    executed_temperature_C: float | None = None,
+) -> float | None:
+    """Native ``Found the liquidus`` temperature, never the executed setpoint.
+
+    ``executed_temperature_C`` is the assemblage temperature. Liquidus mode
+    must not report it when stdout has no parsed crossing.
+    """
+
+    del executed_temperature_C
+    return parsed_liquidus_C
+
+
 def _run_petthermotools_worker(
     connection,
     operation: str,
@@ -2021,9 +2036,31 @@ class _MELTSBackendSupport(MeltBackend):
                     AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER
                 ),
             )
-            liquidus_C = result.liquidus_T_C
+            liquidus_C = _subprocess_native_liquidus_C(
+                result.liquidus_T_C,
+                executed_temperature_C=result.temperature_C,
+            )
             if liquidus_C is None and result.status == 'ok':
-                liquidus_C = result.temperature_C
+                diagnostics = dict(result.diagnostics or {})
+                diagnostics['reason'] = 'native_liquidus_missing'
+                warnings_out = [
+                    warning
+                    for warning in result.warnings
+                    if 'CommissioningNotice' not in warning
+                ]
+                warnings_out.append(
+                    'AlphaMELTS liquidus mode has no native liquidus temperature'
+                )
+                warnings_out.extend(
+                    notice for notice in composition_repair_notices
+                    if notice not in warnings_out
+                )
+                return LiquidusSolidusResult(
+                    status='unavailable',
+                    liquid_fraction=result.liquid_fraction,
+                    warnings=tuple(warnings_out),
+                    diagnostics=diagnostics,
+                )
             diagnostics = dict(result.diagnostics or {})
             for key in (
                 'commissioning_notice',
@@ -4972,6 +5009,38 @@ class _MELTSBackendSupport(MeltBackend):
                 f'system_table={float(table_temperature_C):.9g} C; '
                 f'table_tolerance={ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C:g} C',
             )
+        reported_liquidus_C = _subprocess_native_liquidus_C(
+            liquidus_C,
+            executed_temperature_C=executed_temperature_C,
+        )
+        if (
+            run_mode is AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER
+            and reported_liquidus_C is None
+        ):
+            refusal_diagnostics = self._diagnostics_with_backend_status_reason(
+                diagnostics,
+                backend_status='unavailable',
+                reason='native_liquidus_missing',
+            )
+            refusal_diagnostics['executed_temperature_C'] = (
+                executed_temperature_C
+            )
+            refusal_diagnostics['subprocess_run_mode'] = run_mode.value
+            refusal_diagnostics['reason'] = 'native_liquidus_missing'
+            result_warnings.append(
+                'AlphaMELTS liquidus mode has no native liquidus temperature'
+            )
+            return self._emit_equilibrium_result(
+                temperature_C=executed_temperature_C,
+                requested_temperature_C=requested_temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                phases_present=phases_present,
+                liquid_fraction=liquid_fraction,
+                warnings=result_warnings,
+                status='unavailable',
+                diagnostics=refusal_diagnostics,
+            )
         property_diagnostics = {
             key: system_values[key]
             for key in (
@@ -5286,8 +5355,8 @@ class _MELTSBackendSupport(MeltBackend):
             status='ok',
             diagnostics=result_diagnostics,
         )
-        if liquidus_C is not None:
-            eq.liquidus_T_C = float(liquidus_C)
+        if reported_liquidus_C is not None:
+            eq.liquidus_T_C = float(reported_liquidus_C)
         return eq
 
     def _subprocess_failure_reason(self, output: str) -> Optional[str]:

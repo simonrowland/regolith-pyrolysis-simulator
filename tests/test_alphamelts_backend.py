@@ -1771,6 +1771,126 @@ def test_alphamelts_subprocess_liquidus_finder_selects_native_mode():
     assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
 
 
+_ASSEMBLAGE_WITHOUT_NATIVE_LIQUIDUS = """
+<> Stable solid assemblage achieved.
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1100.000000 (C)
+olivine: 90.3451 g, composition (Ca0.01Mg0.80Fe''0.20Mn0.00Co0.00Ni0.00)2SiO4
+"""
+
+
+def _parse_liquidus_mode_stdout(
+    backend,
+    output,
+    *,
+    run_mode,
+    temperature_C,
+    system_mass_g=90.3451,
+):
+    return backend._parse_single_point_stdout(
+        output,
+        requested_temperature_C=temperature_C,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        total_input_kg=1000.0,
+        run_mode=run_mode,
+        system_output=_system_main_fixture(
+            temperature_C=temperature_C,
+            system_mass_g=system_mass_g,
+        ),
+        fO2_constraint={"path": "Absolute", "offset": -9.0},
+    )
+
+
+def _assert_missing_native_liquidus_refused(backend):
+    parsed = _parse_liquidus_mode_stdout(
+        backend,
+        _ASSEMBLAGE_WITHOUT_NATIVE_LIQUIDUS,
+        run_mode=AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER,
+        temperature_C=1100.0,
+    )
+    assert parsed.status == "unavailable"
+    assert parsed.liquidus_T_C is None
+    assert parsed.temperature_C == pytest.approx(1100.0)
+    assert parsed.diagnostics["reason"] == "native_liquidus_missing"
+
+    class FakeFinderBackend(AlphaMELTSBackend):
+        def __init__(self):
+            super().__init__()
+            self._mode = "subprocess"
+
+        def equilibrate(self, temperature_C, **kwargs):
+            assert kwargs["subprocess_run_mode"] is (
+                AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER
+            )
+            return EquilibriumResult(
+                temperature_C=1100.0,
+                pressure_bar=1.0,
+                liquid_fraction=0.0,
+                phases_present=["olivine"],
+                phase_masses_kg={"olivine": 1.0},
+                status="ok",
+            )
+
+    found = FakeFinderBackend().find_liquidus_solidus(
+        composition_kg={"SiO2": 50.0, "Al2O3": 15.0, "MgO": 15.0, "CaO": 20.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+    assert found.status == "unavailable"
+    assert found.liquidus_T_C is None
+    assert found.diagnostics["reason"] == "native_liquidus_missing"
+
+
+def test_alphamelts_liquidus_mode_requires_native_crossing(monkeypatch):
+    backend = AlphaMELTSBackend()
+    isothermal = _parse_liquidus_mode_stdout(
+        backend,
+        _ASSEMBLAGE_WITHOUT_NATIVE_LIQUIDUS,
+        run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+        temperature_C=1100.0,
+    )
+    assert isothermal.status == "ok"
+    assert isothermal.liquidus_T_C is None
+
+    native = """
+<> Stable liquid solid assemblage achieved.
+<> Found the liquidus at T = 1220.31 (C).
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1200.000000 (C)
+liquid:    SiO2 TiO2 Al2O3 Fe2O3 Cr2O3   FeO  MnO  MgO  NiO  CoO   CaO Na2O  K2O P2O5  H2O
+90.3451 g 46.49 2.21 16.60  0.00  0.00 11.71 0.00 7.54 0.00 0.00 11.02 3.32 1.11 0.00 0.00
+Activity of H2O = 0  Melt fraction = 0.921889
+olivine: 7.654887 g, composition (Ca0.01Mg0.80Fe''0.20Mn0.00Co0.00Ni0.00)2SiO4
+"""
+    located = _parse_liquidus_mode_stdout(
+        backend,
+        native,
+        run_mode=AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER,
+        temperature_C=1200.0,
+        system_mass_g=97.999987,
+    )
+    assert located.status == "ok"
+    assert located.liquidus_T_C == pytest.approx(1220.31)
+
+    _assert_missing_native_liquidus_refused(backend)
+
+    def substitute_executed_temperature(parsed_liquidus_C, *, executed_temperature_C=None):
+        if parsed_liquidus_C is None and executed_temperature_C is not None:
+            return executed_temperature_C
+        return parsed_liquidus_C
+
+    monkeypatch.setattr(
+        alphamelts_module,
+        "_subprocess_native_liquidus_C",
+        substitute_executed_temperature,
+    )
+    with pytest.raises(AssertionError):
+        _assert_missing_native_liquidus_refused(AlphaMELTSBackend())
+
+
 def test_alphamelts_subprocess_liquidus_pins_single_absolute_melts_request(
     monkeypatch,
 ):
