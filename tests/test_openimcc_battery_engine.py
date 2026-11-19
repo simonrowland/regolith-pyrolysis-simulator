@@ -648,6 +648,9 @@ def test_openimcc_species_thermo_scores_native_condensate_derivatives() -> None:
         assert "derivatives_fit_implied=True" in prediction.execution.call_evidence
 
 
+# This pin has no positive named-polymorph case to test: native crystal rows
+# expose generic ``state="s"`` plus source ids, but no named solid form. A
+# mocked polymorph would not test whether the selected OpenIMCC row matches.
 def test_openimcc_named_crystal_refuses_unmatched_source_polymorph() -> None:
     _require_openimcc()
     from openimcc import load_gas_datapack, species_thermo
