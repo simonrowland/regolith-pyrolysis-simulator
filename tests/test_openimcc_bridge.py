@@ -1075,26 +1075,56 @@ def test_openimcc_measured_ferric_split_keeps_feo_equivalent_projection_notice()
     }
 
 
+def _pyproject_openimcc_dependency() -> tuple[dict, str]:
+    import tomllib
+
+    project = tomllib.loads(
+        (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text()
+    )["project"]
+    requirements = [
+        requirement
+        for requirement in project["dependencies"]
+        if requirement.split("@", 1)[0].strip() == "openimcc"
+    ]
+    assert len(requirements) == 1
+    return project, requirements[0]
+
+
 def test_recorded_openimcc_pin_matches_pyproject_dependency() -> None:
     # The refusal remedies cite OPENIMCC_RECORDED_PIN; it must name the same openimcc
     # commit that pyproject installs, so a remedy can never point at a revision that
     # lacks the features the code requires. openimcc is a core dependency, and the
     # `imcc` extra is kept empty only so existing ".[imcc]" installs still resolve.
-    import tomllib
-    from pathlib import Path
-
     from simulator.melt_backend.openimcc_bridge import OPENIMCC_RECORDED_PIN
 
-    pyproject = tomllib.loads(
-        (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text()
-    )["project"]
-    openimcc_requirements = [
-        requirement
-        for requirement in pyproject["dependencies"]
-        if requirement.split("@", 1)[0].strip() == "openimcc"
-    ]
-    assert openimcc_requirements == [OPENIMCC_RECORDED_PIN]
+    pyproject, openimcc_requirement = _pyproject_openimcc_dependency()
+    assert openimcc_requirement == OPENIMCC_RECORDED_PIN
     assert pyproject["optional-dependencies"]["imcc"] == []
+
+
+def test_imported_openimcc_is_the_pyproject_pin() -> None:
+    from importlib import metadata
+
+    import openimcc
+
+    _project, dependency = _pyproject_openimcc_dependency()
+    pinned_commit = dependency.rsplit("@", 1)[-1]
+    assert len(pinned_commit) == 40
+
+    distribution = metadata.distribution("openimcc")
+    direct_url = distribution.read_text("direct_url.json")
+    assert direct_url is not None, "openimcc direct_url.json is required to verify the pin"
+    installation = json.loads(direct_url)
+    assert isinstance(installation, dict)
+    vcs_info = installation.get("vcs_info")
+    assert isinstance(vcs_info, dict)
+    assert vcs_info.get("commit_id") == pinned_commit
+
+    distribution_root = Path(distribution.locate_file("")).resolve()
+    imported_path = Path(openimcc.__file__).resolve()
+    assert imported_path.is_relative_to(distribution_root), (
+        f"imported openimcc at {imported_path} is outside {distribution_root}"
+    )
 
 
 def test_imported_openimcc_commit_comes_from_its_distribution(monkeypatch, tmp_path) -> None:
