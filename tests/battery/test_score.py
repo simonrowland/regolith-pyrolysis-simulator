@@ -20244,7 +20244,27 @@ def _assert_kushiro_po2_reaches_the_scorer(monkeypatch) -> None:
             identity, row
         )
         assert received["pressure_bar"] == pytest.approx(1.01325)
-        assert received["composition_kg"]["SiO2"] == pytest.approx(0.46)
+        # Table 3 Mixture B sums to 100.08 wt%. The identity stores mole
+        # fractions, so the finder receives that bulk closed to 1 kg.
+        printed_wt = {
+            "SiO2": Decimal("46.0"),
+            "Al2O3": Decimal("9.7"),
+            "TiO2": Decimal("3.0"),
+            "Cr2O3": Decimal("0.6"),
+            "FeO": Decimal("20.0"),
+            "MnO": Decimal("0.25"),
+            "MgO": Decimal("10.2"),
+            "CaO": Decimal("10.0"),
+            "Na2O": Decimal("0.27"),
+            "K2O": Decimal("0.06"),
+        }
+        printed_total = sum(printed_wt.values(), Decimal("0"))
+        composition_kg = received["composition_kg"]
+        assert set(composition_kg) == set(printed_wt)
+        for oxide, weight in printed_wt.items():
+            assert composition_kg[oxide] == pytest.approx(
+                float(weight / printed_total)
+            )
         assert prediction.refusal_reason is None
         assert prediction.value is not None
 
