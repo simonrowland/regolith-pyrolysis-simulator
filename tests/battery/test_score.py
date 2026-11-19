@@ -20703,7 +20703,10 @@ def _assert_ambient_transition_scores(monkeypatch, engine: Engine, subtype: str)
     assert assumed.value == BAR_PA_DECIMAL
 
 
-@pytest.mark.parametrize("engine", tuple(score_mod.MELTS_ENGINES))
+@pytest.mark.parametrize(
+    "engine",
+    tuple(sorted(score_mod.MELTS_ENGINES, key=lambda engine: engine.value)),
+)
 @pytest.mark.parametrize("subtype", ("liquidus", "solidus"))
 def test_unprinted_ambient_transition_scores_at_one_bar(
     monkeypatch: pytest.MonkeyPatch,
@@ -20755,7 +20758,10 @@ def _unprinted_transition_reference(experiment):
     )
 
 
-@pytest.mark.parametrize("engine", tuple(score_mod.MELTS_ENGINES))
+@pytest.mark.parametrize(
+    "engine",
+    tuple(sorted(score_mod.MELTS_ENGINES, key=lambda engine: engine.value)),
+)
 def test_high_pressure_token_without_pressure_still_refuses(
     monkeypatch: pytest.MonkeyPatch,
     engine: Engine,

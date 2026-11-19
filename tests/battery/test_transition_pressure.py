@@ -193,9 +193,8 @@ def test_knudsen_token_does_not_assume_one_bar() -> None:
     observation = replace(observation, experiment_id=experiment.experiment_id)
     # The effusion cell's stored total pressure is a vacuum seed. The owner
     # must not adopt it and must not replace it with 1 bar.
-    assert experiment.pressure_environment.total_pressure_Pa.state.value == Decimal(
-        "1e-6"
-    )
+    stored = experiment.pressure_environment.total_pressure_Pa.state.value
+    assert stored.point == Decimal("1e-6")
     block = unprinted_liquidus_pressure_block(observation, experiment, None)
     decision = unprinted_liquidus_solidus_pressure(observation, experiment, None)
     assert block == "knudsen_closed_cell"
