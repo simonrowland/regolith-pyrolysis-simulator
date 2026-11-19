@@ -158,6 +158,80 @@ def test_distinct_locator_extras_round_trip_without_becoming_note() -> None:
     assert decoded == locator
 
 
+@pytest.mark.parametrize("raw", [
+    {"table": "571", "table_key": "p438-t571"},
+    {"section": "Experimental", "subsection": "Procedure"},
+    {"published_page": [63, 64], "pdf_page_index": [98, 99]},
+    {"pdf_page": [121, 122], "pdf_page_index": [120, 121]},
+])
+def test_distinct_and_multiple_source_addresses_are_not_alias_conflicts(raw) -> None:
+    from simulator.battery.migrate import _locator_from_plain
+
+    locator = _locator_from_plain(raw, refuse_invalid=True)
+    assert locator is not None
+    for name, value in raw.items():
+        if name in {"table_key", "subsection"} or isinstance(value, list):
+            assert locator.extras[name] == value
+        else:
+            assert getattr(locator, name) == value
+    assert _locator_from_plain(to_plain(locator), refuse_invalid=True) == locator
+
+
+@pytest.mark.parametrize("pages", [[], [1, "page two"], [True], [[1, 2]]])
+def test_invalid_multiple_page_indexes_still_refuse(pages) -> None:
+    from simulator.battery.migrate import _locator_from_plain
+
+    with pytest.raises(ValueError):
+        _locator_from_plain({"pdf_page_index": pages}, refuse_invalid=True)
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+def test_native_page_list_does_not_overwrite_conflicting_extras(reverse) -> None:
+    from simulator.battery.migrate import _locator_from_plain
+
+    raw = {"pdf_page_index": [1, 2], "extras": {"pdf_page_index": [2, 3]}}
+    if reverse:
+        raw = dict(reversed(list(raw.items())))
+    with pytest.raises(ValueError, match="conflicting locator fields"):
+        _locator_from_plain(raw, refuse_invalid=True)
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+def test_multiple_pages_still_refuse_conflicting_page_aliases(reverse) -> None:
+    from simulator.battery.migrate import _locator_from_plain
+
+    raw = {"page": [1, 2], "pdf_page": [2, 3]}
+    if reverse:
+        raw = dict(reversed(list(raw.items())))
+    with pytest.raises(ValueError, match="conflicting locator fields"):
+        _locator_from_plain(raw, refuse_invalid=True)
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+def test_multiple_page_aliases_compare_normalized_addresses_without_coercing_extras(reverse) -> None:
+    from simulator.battery.migrate import _locator_from_plain
+
+    raw = {"page": ["1", "2"], "pdf_page": [1, 2]}
+    if reverse:
+        raw = dict(reversed(list(raw.items())))
+    locator = _locator_from_plain(raw, refuse_invalid=True)
+    assert locator.page is None
+    assert locator.extras == raw
+    assert _locator_from_plain(to_plain(locator), refuse_invalid=True) == locator
+
+
+def test_multiple_page_alias_guard_detects_disabled_comparison(monkeypatch) -> None:
+    from simulator.battery import migrate as migrate_module
+
+    compare = migrate_module._locator_compare_value
+    monkeypatch.setattr(
+        migrate_module, "_locator_compare_value",
+        lambda name, value: None if name == "page" else compare(name, value),
+    )
+    with pytest.raises(pytest.fail.Exception):
+        test_multiple_pages_still_refuse_conflicting_page_aliases(False)
+
+
 def test_shornikov_pixel_read_extras_keep_numeric_types_through_yaml() -> None:
     from simulator.battery.migrate import _locator_from_plain
 
@@ -623,7 +697,12 @@ def test_printed_labels_and_table_grid_indexes_are_distinct_locator_facts() -> N
     assert locator.table_column_number == 2
     assert same_grid_aliases is not None
     assert same_grid_aliases.table_row_number == 1
-    assert conflicting_grid_aliases is None
+    assert conflicting_grid_aliases == Locator(table="I")
+    with pytest.raises(ValueError, match="conflicting locator fields"):
+        _locator_from_plain(
+            {"table_row": 1, "table_row_number": 2, "table": "I"},
+            refuse_invalid=True,
+        )
     with pytest.raises(ValueError) as exc_info:
         _locator_from_plain(
             {"table_row_number": 0, "table": "I"}, refuse_invalid=True
@@ -891,7 +970,7 @@ def test_conflicting_locator_aliases_are_listed_as_invalid_source(
         )
     )
     migrated = next(iter(result.observations.values()))
-    assert migrated.locator is None
+    assert migrated.locator == Locator(page=2, table="I")
     assert migrated.value == expected.value
 
 
