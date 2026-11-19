@@ -1625,16 +1625,40 @@ def _magemin_failure_exit_result(monkeypatch, failure_kind):
         'clamped_mode_vector_deficit',
         'missing_fo2_mode_vector_deficit',
     }:
+        composition = {'SiO2': 60.0, 'MgO': 25.0, 'FeO': 15.0}
         raw_result = {
             'mode_vector_mass_deficit': {'mode_sum': 0.5, 'deficit': 0.5},
         }
-        if failure_kind == 'clamped_mode_vector_deficit':
-            raw_result.update({'fO2': -7.0, 'ph': ['qfm']})
-        elif failure_kind == 'missing_fo2_mode_vector_deficit':
-            raw_result['ph'] = ['qfm']
-        monkeypatch.setattr(
-            backend, '_call_magemin', lambda **_kwargs: raw_result,
-        )
+
+        def subprocess_mode_deficit(**kwargs):
+            projection = kwargs['bulk_projection']
+            native_fO2 = (
+                -7.0
+                if failure_kind == 'clamped_mode_vector_deficit'
+                else (
+                    kwargs['fO2_log']
+                    if failure_kind == 'mode_vector_deficit'
+                    else None
+                )
+            )
+            operating_point = backend._fo2_operating_point(
+                kwargs['fO2_log'],
+                native_fO2,
+                True,
+                database=projection.database,
+                bulk_components=projection.composition_wt_pct,
+            )
+            operating_point.update({
+                'applied_fO2_buffer': 'qfm',
+                'applied_fO2_buffer_n': 0.0,
+            })
+            return {
+                **raw_result,
+                'buffer_warnings': (),
+                'operating_point_diagnostics': operating_point,
+            }
+
+        monkeypatch.setattr(backend, '_call_magemin', subprocess_mode_deficit)
     elif failure_kind == 'native_activity_invalid':
         monkeypatch.setattr(
             backend, '_call_magemin',
