@@ -1734,11 +1734,9 @@ def test_fingerprint_traffic_light_cells_have_no_count_text() -> None:
             x_limits=(0, len(fills) * 0.05),
             temperature_limits=(1000, 1100),
         )
-        facecolors = [patch.get_facecolor() for patch in axis.patches]
-        expected_facecolors = [to_rgba(fill) for fill in fills]
-        assert len(facecolors) == len(expected_facecolors)
-        for facecolor, expected in zip(facecolors, expected_facecolors, strict=True):
-            assert facecolor == pytest.approx(expected)
+        assert [patch.get_facecolor() for patch in axis.patches] == [
+            to_rgba(fill) for fill in fills
+        ]
         assert not axis.texts
         assert all(patch.get_hatch() is None for patch in axis.patches)
     finally:
