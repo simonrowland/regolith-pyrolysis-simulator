@@ -4558,11 +4558,13 @@ def test_phase_gap_underflowing_preferred_flank_uses_the_other_flank() -> None:
 _GAS_MAP_PARTIAL_PA = Decimal("1234.5")
 
 
-def test_condensed_partial_pressure_is_not_read_from_the_gas_map(monkeypatch) -> None:
-    """A condensed P_PARTIAL identity is not a gas-map partial pressure.
+def test_gas_pressure_and_fugacity_use_only_the_matching_gas_map_species(
+    monkeypatch,
+) -> None:
+    """Pressure-like predictions only read gas species from the gas map.
 
-    Gas and an undeclared species phase still read gas_partial_pressures_Pa.
-    The condensed identity refuses before equilibrate_cell.
+    Fugacity additionally requires an explicitly gas-phase identity; the
+    condensed or unqualified fugacity refuses before equilibrate_cell.
     """
 
     from simulator.diagnostic_helpers import binary_pot_battery as battery
@@ -4582,12 +4584,13 @@ def test_condensed_partial_pressure_is_not_read_from_the_gas_map(monkeypatch) ->
         composition=composition,
     )
     calls = {"n": 0}
+    reported_pressures = {"H2O": float(_GAS_MAP_PARTIAL_PA)}
 
     def fake_equilibrate(_handle, pot, *, temperature_K, po2, **_kwargs):
         calls["n"] += 1
         return EquilibrateCell(
             pot_id=pot.pot_id,
-            engine=Engine.VAPOROCK.value,
+            engine=_handle.name,
             temperature_K=temperature_K,
             po2=po2,
             status="ok",
@@ -4595,7 +4598,7 @@ def test_condensed_partial_pressure_is_not_read_from_the_gas_map(monkeypatch) ->
             engine_status="ok",
             engine_reason=None,
             melt_activities={},
-            gas_partial_pressures_Pa={"H2O": 1234.5},
+            gas_partial_pressures_Pa=dict(reported_pressures),
             liquid_fraction=1.0,
             wall_s=0.0,
             cpu_s=0.0,
@@ -4603,28 +4606,31 @@ def test_condensed_partial_pressure_is_not_read_from_the_gas_map(monkeypatch) ->
         )
 
     monkeypatch.setattr(battery, "equilibrate_cell", fake_equilibrate)
-    handle = EngineHandle(
-        name=Engine.VAPOROCK.value,
-        backend=object(),
-        available=True,
-        unavailable_reason=None,
-        takes_fo2=True,
-        supports_intrinsic_fo2=False,
-    )
-
-    def predict(species: Species):
-        identity = replace(base, quantity=Quantity.P_PARTIAL, species=species)
+    def predict(
+        species: Species,
+        quantity: Quantity = Quantity.P_PARTIAL,
+        engine: Engine = Engine.VAPOROCK,
+    ):
+        identity = replace(base, quantity=quantity, species=species)
         observation = F.observation(
-            f"partial-{species.formula}-{calls['n']}",
+            f"{quantity.value}-{species.formula}-{calls['n']}",
             "exp-1",
             identity,
             Decimal("0"),
             source_id="partial-pin",
         )
+        handle = EngineHandle(
+            name=engine.value,
+            backend=object(),
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=True,
+            supports_intrinsic_fo2=False,
+        )
         return predict_with_engine(
-            Engine.VAPOROCK,
+            engine,
             observation,
-            handles={Engine.VAPOROCK.value: handle},
+            handles={engine.value: handle},
             isolated=False,
         )
 
@@ -4653,6 +4659,47 @@ def test_condensed_partial_pressure_is_not_read_from_the_gas_map(monkeypatch) ->
     assert unknown.refusal_reason is None
     assert unknown.value == _GAS_MAP_PARTIAL_PA
     assert calls["n"] == 2
+
+    for engine in (Engine.VAPOROCK, Engine.OPENIMCC):
+        fugacity = predict(Species("H2O", Phase.G), Quantity.FUGACITY, engine)
+        assert fugacity.refusal_reason is None
+        assert fugacity.value == _GAS_MAP_PARTIAL_PA
+        assert fugacity.unit == "Pa"
+        assert any(
+            notice.reason == (
+                "ideal-gas assumption: fugacity coefficient phi_i=1, "
+                "therefore f_i=p_i"
+            )
+            for notice in fugacity.notices
+        )
+
+    for species in (
+        Species("H2O", Phase.CR),
+        Species("H2O", State.unknown("phase not printed")),
+    ):
+        before = calls["n"]
+        refused = predict(species, Quantity.FUGACITY)
+        assert refused.value is None
+        assert refused.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+        assert refused.refusal_detail["reason"] == (
+            "fugacity_requires_gas_phase_species"
+        )
+        assert calls["n"] == before
+
+    unsupported = predict(
+        Species("H2O", Phase.G), Quantity.FUGACITY, Engine.THERMOENGINE
+    )
+    assert unsupported.value is None
+    assert unsupported.refusal_reason is RefusalReason.UNSUPPORTED
+    assert unsupported.refusal_detail["reason"] == (
+        "engine_has_no_ideal_gas_fugacity_source"
+    )
+
+    # Perturb the emitted p_i independently; the prediction follows it exactly.
+    reported_pressures["H2O"] = 2469.0
+    for engine in (Engine.VAPOROCK, Engine.OPENIMCC):
+        mutated = predict(Species("H2O", Phase.G), Quantity.FUGACITY, engine)
+        assert mutated.value == Decimal("2469.0")
 
 
 def test_static_equilibrium_pressure_refuses_missing_reservoir_or_engine_total(
@@ -9696,6 +9743,8 @@ def test_vapour_rail_is_only_vapour_pressures() -> None:
         assert rail_for_quantity(quantity, species_formula="Na") is Rail.VAPOUR
         assert rail_for_quantity(quantity, species_formula="SiO") is Rail.SIO_EVOLUTION
         assert rail_for_quantity(quantity, species_formula="SiO2") is Rail.SIO_EVOLUTION
+    assert rail_for_quantity(Quantity.FUGACITY, species_formula="SiO") is Rail.VAPOUR
+    assert rail_for_quantity(Quantity.PARTIAL_MOLAR_ENTHALPY) is Rail.THERMOCHEMISTRY
     assert rail_for_quantity(None) is None
     assert no_headline_rail_reason(None) == "quantity_unknown"
     for quantity in (
@@ -9729,6 +9778,51 @@ def test_vapour_rail_is_only_vapour_pressures() -> None:
     assert rail_for_quantity(Quantity.MASS_LOSS_RATE, species_formula="Zn") is None
     assert rail_for_quantity(Quantity.VISCOSITY) is None
     assert no_headline_rail_reason(Quantity.VISCOSITY) == "no_headline_rail:viscosity"
+
+
+@pytest.mark.parametrize(
+    ("engine", "reason"),
+    (
+        (
+            Engine.MAGEMIN,
+            "partial_enthalpy_requires_fixed_phase_model",
+        ),
+        (
+            Engine.ALPHAMELTS,
+            "partial_enthalpy_requires_fixed_phase_model",
+        ),
+        (Engine.VAPOROCK, "partial_enthalpy_no_liquid_route"),
+        (Engine.OPENIMCC, "partial_enthalpy_no_liquid_route"),
+    ),
+)
+def test_partial_molar_enthalpy_refuses_engines_without_fixed_phase_route(
+    engine: Engine, reason: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda *_args, **_kwargs: pytest.fail("unsupported engine was opened"),
+    )
+    identity = replace(
+        F.activity_identity(formula="SiO2", component_basis="SiO2"),
+        quantity=Quantity.PARTIAL_MOLAR_ENTHALPY,
+        species=Species("SiO2", Phase.L),
+    )
+    observation = F.observation(
+        f"partial-enthalpy-{engine.value}",
+        "partial-enthalpy-exp",
+        identity,
+        Decimal("0"),
+        source_id="partial-enthalpy-refusal",
+    )
+
+    prediction = predict_with_engine(engine, observation)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == reason
 
 
 _SAMPLE_PHASE_NOT_MELT_OBSERVABLE = "sample_phase_not_melt_activity_observable"

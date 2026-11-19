@@ -148,7 +148,7 @@ _OBSERVATION_ISSUE_PATH = re.compile(r"^observation\[(.+?)\](?:\.(.*))?$")
 # v2.1 vapour-equilibrium blocking qualifications. Sibling activity is
 # not blocked by a pressure-only floor (quantity-scoped affected_quantities).
 _VAPOUR_EQUILIBRIUM = frozenset(
-    {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE}
+    {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE, Quantity.FUGACITY}
 )
 _PRESSURE_BLOCKING_NOTICES = frozenset(
     {
