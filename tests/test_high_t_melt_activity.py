@@ -338,13 +338,14 @@ def _projected_weights(*, over_threshold: bool = False) -> dict[str, float]:
         "Cr2O3": 0.41,
         "MnO": 0.24,
         "P2O5": 0.12,
-        "NiO": 2.0 if over_threshold else 0.10,
+        "NiO": 0.10,
+        "B2O3": 2.0 if over_threshold else 0.10,
     }
 
 
-def _cr_mn_projection_weights(
+def _cr_mn_trace_weights(
     *,
-    p2o5_wt_pct: float = 0.0,
+    b2o3_wt_pct: float = 0.0,
     include_cr_mn: bool = True,
 ) -> dict[str, float]:
     cr2o3_wt_pct = 1.0 if include_cr_mn else 0.0
@@ -352,7 +353,7 @@ def _cr_mn_projection_weights(
     return {
         "Na2O": 5.0,
         "K2O": 1.0,
-        "SiO2": 50.5 - cr2o3_wt_pct - mno_wt_pct - p2o5_wt_pct,
+        "SiO2": 50.5 - cr2o3_wt_pct - mno_wt_pct - b2o3_wt_pct,
         "FeO": 10.0,
         "MgO": 10.0,
         "CaO": 15.0,
@@ -360,7 +361,7 @@ def _cr_mn_projection_weights(
         "TiO2": 0.5,
         "Cr2O3": cr2o3_wt_pct,
         "MnO": mno_wt_pct,
-        "P2O5": p2o5_wt_pct,
+        "B2O3": b2o3_wt_pct,
     }
 
 
@@ -906,7 +907,6 @@ def test_selected_parent_activities_have_matching_mixed_provenance(temperature_K
     values = high_t["selected_parent_activities"]
     provenance = high_t["selected_parent_activity_provenance"]
 
-    assert set(provenance) == set(values) == set(composition)
     assert high_t["selected_parent_activities_provider"] == "mixed"
     assert high_t["selected_parent_activities_standard_state"]["component_basis"] == "parent_oxide_formula"
     for parent, value in values.items():
@@ -917,7 +917,16 @@ def test_selected_parent_activities_have_matching_mixed_provenance(temperature_K
     assert provenance["SiO2"]["provider"] == "openimcc"
     assert provenance["K2O"]["provider"] == "internal-analytical"
     assert provenance["K2O"]["reason"] == "openimcc_authority_excluded"
+    dropped = set(
+        high_t["composition_policy"]["composition_projection_classification"][
+            "dropped_components"
+        ]
+    )
+    assert set(provenance) == set(values) == set(composition) - dropped
     for parent in ("Cr2O3", "MnO", "P2O5"):
+        if parent in dropped:
+            assert parent not in provenance
+            continue
         assert provenance[parent]["provider"] == "internal-analytical"
         assert provenance[parent]["reason"] == "outside_openimcc_activity_coverage"
         assert values[parent] == melt_oxide_activity(
@@ -1719,7 +1728,20 @@ def test_above_cap_openimcc_provenance_carries_complex_saturation_notice() -> No
 
 
 def test_relaxed_openimcc_preserves_constant_gamma_carrier_set() -> None:
-    composition = _moles_from_wt(_cr_mn_projection_weights())
+    composition = _moles_from_wt(_cr_mn_trace_weights())
+    cleaned = evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
+    classifier = cleaned.policy["composition_projection_classification"]
+    relaxed = cleaned.policy["openimcc_projection_crmn_relaxed"]
+
+    assert classifier["projection_verdict"] == "within_threshold"
+    assert classifier["dropped_total_wt_pct"] == pytest.approx(1.5)
+    assert classifier["thresholded_dropped_total_wt_pct"] == pytest.approx(0.0)
+    assert set(classifier["dropped_components"]) == {"Cr2O3", "MnO"}
+    assert relaxed["wt_pct"] == pytest.approx({"Cr2O3": 1.0, "MnO": 0.5})
+    assert relaxed["ruling"] == "owner 2026-09-27"
+    assert "Cr2O3" not in cleaned.bridge.parent_oxide_activities
+    assert "MnO" not in cleaned.bridge.parent_oxide_activities
+
     provider = _provider()
     regression_temperature_K = 1700.0 + 273.15
     request_options = {
@@ -1759,6 +1781,9 @@ def test_relaxed_openimcc_preserves_constant_gamma_carrier_set() -> None:
         ]
         == "openimcc"
     )
+    assert openimcc.diagnostic["vapor_pressure_numerator_provenance"]["Ti"][
+        "openimcc_projection_crmn_relaxed"
+    ]["code"] == "openimcc_projection_crmn_relaxed"
 
 
 def test_above_cap_k2o_keeps_constant_gamma_with_exclusion_provenance() -> None:
@@ -2693,84 +2718,119 @@ def test_projected_bulk_within_one_percent_has_notice_and_classifier_record() ->
 
     assert policy["status"] == "projected"
     assert classifier["projection_verdict"] == "within_threshold"
-    assert 0.0 < classifier["dropped_total_wt_pct"] <= 1.0
+    assert 0.0 < classifier["thresholded_dropped_total_wt_pct"] <= 1.0
+    assert set(classifier["dropped_components"]) == {
+        "B2O3",
+        "Cr2O3",
+        "MnO",
+    }
     assert policy["notice"]["code"] == "openimcc_projected_bulk"
 
 
-def test_cr_mn_projection_relaxes_threshold_and_reaches_provenance() -> None:
-    composition = _moles_from_wt(_cr_mn_projection_weights())
+def test_parent_only_openimcc_melt_keeps_its_direct_result() -> None:
+    composition = dict(BASE_MELT_MOL)
+    direct = openimcc_bridge_module.evaluate(
+        composition_mol=composition,
+        temperature_K=CAP_PLUS_T_K,
+    )
     cleaned = evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
-    classifier = cleaned.policy["composition_projection_classification"]
 
-    assert classifier["projection_verdict"] == "within_threshold"
-    assert classifier["dropped_total_wt_pct"] == pytest.approx(1.5)
-    assert classifier["thresholded_dropped_total_wt_pct"] == pytest.approx(0.0)
-    assert set(classifier["dropped_components"]) == {"Cr2O3", "MnO"}
-    relaxed = cleaned.policy["openimcc_projection_crmn_relaxed"]
-    assert relaxed["code"] == "openimcc_projection_crmn_relaxed"
-    assert relaxed["wt_pct"] == pytest.approx({"Cr2O3": 1.0, "MnO": 0.5})
-    assert relaxed["ruling"] == "owner 2026-09-27"
+    assert cleaned.policy["status"] == "direct"
+    assert cleaned.policy["trace_activity_models"] == {}
+    assert cleaned.bridge.parent_oxide_activities == direct.parent_oxide_activities
+
+
+def test_modelled_trace_components_are_evaluated_and_provenanced() -> None:
+    openimcc = pytest.importorskip("openimcc")
+    supported_trace_oxides = getattr(openimcc, "supported_trace_oxides", None)
+    if not callable(supported_trace_oxides):
+        pytest.skip("installed OpenIMCC pin has no trace-component API")
+
+    weights = {
+        "Na2O": 5.0,
+        "K2O": 1.0,
+        "SiO2": 50.34,
+        "FeO": 10.0,
+        "MgO": 10.0,
+        "CaO": 15.0,
+        "Al2O3": 8.0,
+        "TiO2": 0.5,
+        "SrO": 0.04,
+        "NiO": 0.04,
+        "WO3": 0.04,
+        "SO3": 0.04,
+    }
+    composition = _moles_from_wt(weights)
+    installed_models = (
+        openimcc_bridge_module.openimcc_trace_activity_models()
+    )
+    expected_models = {
+        name: installed_models[name]
+        for name in ("SrO", "NiO", "WO3", "SO3")
+    }
+    cleaned = evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
+
+    assert set(cleaned.composition_wt_pct) == set(weights)
+    assert set(expected_models) <= set(cleaned.bridge.parent_oxide_activities)
+    assert all(
+        math.isfinite(cleaned.bridge.parent_oxide_activities[name])
+        and cleaned.bridge.parent_oxide_activities[name] >= 0.0
+        for name in expected_models
+    )
+    assert cleaned.policy["trace_activity_models"] == expected_models
+    assert cleaned.policy["status"] == "direct"
 
     result = _provider().dispatch(
         _request(composition, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
     )
     high_t = result.diagnostic["high_t_melt_activity"]
     assert high_t["provider"] == "openimcc"
-    assert high_t["openimcc_projection_crmn_relaxed"] == relaxed
-    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]
+    assert high_t["composition_policy"]["trace_activity_models"] == expected_models
     openimcc_rows = [
         row
-        for row in provenance.values()
+        for row in result.diagnostic["vapor_pressure_numerator_provenance"].values()
         if row.get("melt_activity_authority") == "openimcc"
     ]
     assert openimcc_rows
     assert all(
-        row["openimcc_projection_crmn_relaxed"] == relaxed
+        row["openimcc_trace_activity_models"] == expected_models
         for row in openimcc_rows
     )
 
-
-def test_non_cr_mn_projection_still_uses_one_percent_threshold() -> None:
-    composition = _moles_from_wt(
-        _cr_mn_projection_weights(p2o5_wt_pct=1.5, include_cr_mn=False)
-    )
-
-    with pytest.raises(OpenImccCompositionPolicyRefusal) as refusal:
-        evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
-
-    assert refusal.value.code == "openimcc_projection_over_threshold"
-    classifier = refusal.value.diagnostics["composition_projection_classification"]
-    assert classifier["projection_verdict"] == "over_threshold"
-    assert classifier["dropped_total_wt_pct"] == pytest.approx(1.5)
-    result = _provider().dispatch(
-        _request(composition, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
-    )
-    high_t = result.diagnostic["high_t_melt_activity"]
-    assert high_t["provider"] == "openimcc"
-    assert high_t["fallback_reason"]["code"] == (
-        "openimcc_projection_over_threshold"
-    )
-
-
 @pytest.mark.parametrize(
-    ("p2o5_wt_pct", "should_project"),
+    ("b2o3_wt_pct", "should_project"),
     ((0.8, True), (1.2, False)),
 )
-def test_cr_mn_relaxation_does_not_change_other_projection_gate(
-    p2o5_wt_pct: float,
+def test_unmodelled_extra_keeps_one_percent_projection_gate(
+    b2o3_wt_pct: float,
     should_project: bool,
 ) -> None:
     composition = _moles_from_wt(
-        _cr_mn_projection_weights(p2o5_wt_pct=p2o5_wt_pct)
+        _cr_mn_trace_weights(
+            b2o3_wt_pct=b2o3_wt_pct,
+            include_cr_mn=False,
+        )
     )
 
     if should_project:
         result = evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
         classifier = result.policy["composition_projection_classification"]
         assert classifier["projection_verdict"] == "within_threshold"
-        assert classifier["thresholded_dropped_total_wt_pct"] == pytest.approx(
-            p2o5_wt_pct
+        assert classifier["dropped_total_wt_pct"] == pytest.approx(b2o3_wt_pct)
+        assert set(classifier["dropped_components"]) == {"B2O3"}
+        assert result.policy["notice"]["code"] == "openimcc_projected_bulk"
+        provider_result = _provider().dispatch(
+            _request(composition, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
         )
+        provider_policy = provider_result.diagnostic["high_t_melt_activity"][
+            "composition_policy"
+        ]
+        assert provider_policy["notice"]["code"] == "openimcc_projected_bulk"
+        assert set(
+            provider_policy["composition_projection_classification"][
+                "dropped_components"
+            ]
+        ) == {"B2O3"}
         return
 
     with pytest.raises(OpenImccCompositionPolicyRefusal) as refusal:
@@ -2843,13 +2903,13 @@ def test_projected_solve_warns_above_five_percent_without_a_ceiling(
     omitted_wt_pct, high_omission,
 ) -> None:
     # Preserve the retained oxide ratios while allocating the specified
-    # wt% to P2O5. The original weights sum to 100 wt%; scaling them by
-    # the dimensionless retained fraction leaves 100 - omitted wt%.
+    # wt% to unsupported B2O3. The original weights sum to 100 wt%; scaling
+    # them by the retained fraction leaves 100 - omitted wt%.
     weights = {
         parent: wt * (100.0 - omitted_wt_pct) / 100.0
-        for parent, wt in _cr_mn_projection_weights(include_cr_mn=False).items()
+        for parent, wt in _cr_mn_trace_weights(include_cr_mn=False).items()
     }
-    weights["P2O5"] = omitted_wt_pct
+    weights["B2O3"] = omitted_wt_pct
     result = _provider().dispatch(_request(_moles_from_wt(weights), CAP_PLUS_T_K))
     authority = result.diagnostic["high_t_melt_activity"]
     assert authority["provider"] == "openimcc"
