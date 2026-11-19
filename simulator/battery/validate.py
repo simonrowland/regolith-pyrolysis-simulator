@@ -2048,6 +2048,8 @@ class _ValidationIndexes:
         tuple[str, ...], tuple[bool, Ancestry | None]
     ] = field(default_factory=dict)
     work_inputs: dict[str, Ancestry] | None = None
+    observations_by_work: dict[str, tuple[Observation, ...]] | None = None
+    work_membership_failure: Ancestry | None = None
 
     def matches(
         self,
@@ -2113,7 +2115,7 @@ def _inputs_for_work(
     asset_ids: set[str] | None = None,
     lineage_cache: dict[str, Ancestry] | None = None,
 ) -> Ancestry:
-    # A supplied grouping is the validated result built by _index_work_inputs.
+    # A supplied grouping reuses the validated index's membership pass.
     if obs_by_work is None:
         obs_by_work, membership = _observations_by_work(observations, experiments)
         if membership is not None:
@@ -2152,30 +2154,6 @@ def _inputs_for_work(
     return Ancestry.of(ids)
 
 
-def _index_work_inputs(
-    works: Mapping[str, Work],
-    observations: Mapping[str, Observation],
-    experiments: Mapping[str, Experiment] | None,
-    indexes: _ValidationIndexes,
-) -> dict[str, Ancestry]:
-    # Build membership and the work grouping in one pass for this store index.
-    grouped, membership = _observations_by_work(observations, experiments)
-    if membership is not None:
-        return {work.work_id: membership for work in works.values()}
-    return {
-        work.work_id: _inputs_for_work(
-            work,
-            observations,
-            experiments,
-            indexes.table_ids,
-            grouped,
-            indexes.asset_ids,
-            indexes.observation_lineages,
-        )
-        for work in works.values()
-    }
-
-
 @contextmanager
 def bound_work_inputs(
     works: Mapping[str, Work],
@@ -2204,9 +2182,9 @@ def _bound_work_inputs(
     if indexes is None or not indexes.matches(works, observations, experiments):
         indexes = _build_validation_indexes(works, observations, experiments)
     if indexes.work_inputs is None:
-        indexes.work_inputs = _index_work_inputs(
-            works, observations, experiments, indexes
-        )
+        # Resolve only requested work ancestry; an eager all-work pass walks
+        # unrelated source rows during a single candidate resolution.
+        indexes.work_inputs = {}
     _BOUND_WORK_INPUTS[key] = indexes
     try:
         yield
@@ -2240,13 +2218,8 @@ def _inputs_registered_under_work(
             and bound.asset_ids == asset_ids
         ):
             indexes = bound
-    if indexes is not None and indexes.work_inputs is None and indexes.works is not None:
-        indexes.work_inputs = _index_work_inputs(
-            indexes.works, observations, experiments, indexes
-        )
     if (
         indexes is not None
-        and indexes.work_inputs is not None
         and indexes.works is not None
         and indexes.works.get(work.work_id) is work
         and indexes.observations is observations
@@ -2255,9 +2228,31 @@ def _inputs_registered_under_work(
         and asset_ids is not None
         and indexes.asset_ids == asset_ids
     ):
-        found_map = indexes.work_inputs
-        if work.work_id in found_map:
-            return found_map[work.work_id]
+        if indexes.work_inputs is None:
+            indexes.work_inputs = {}
+        found = indexes.work_inputs.get(work.work_id)
+        if found is not None:
+            return found
+        if indexes.observations_by_work is None:
+            (
+                indexes.observations_by_work,
+                indexes.work_membership_failure,
+            ) = _observations_by_work(observations, experiments)
+        if indexes.work_membership_failure is not None:
+            found = indexes.work_membership_failure
+        else:
+            assert indexes.observations_by_work is not None
+            found = _inputs_for_work(
+                work,
+                observations,
+                experiments,
+                table_ids,
+                indexes.observations_by_work,
+                asset_ids,
+                indexes.observation_lineages,
+            )
+        indexes.work_inputs[work.work_id] = found
+        return found
     return _inputs_for_work(
         work, observations, experiments, table_ids, asset_ids=asset_ids
     )
@@ -2298,9 +2293,9 @@ def _observation_lineage(
     """COMPLETE observation/table ids, or INCOMPLETE with one reason.
 
     A shared ancestor is returned from the cache. An id still on the
-    active stack is a cycle. A derivation input that is neither an
-    observation, a table, nor a registered source asset is unresolvable
-    and is not dropped. Citation links are traversed as scoring ancestry
+    active stack is a cycle. An unknown derivation input is unresolvable and
+    is not dropped; same-source context references on model-derived rows
+    resolve at work scope. Citation links are traversed as scoring ancestry
     without changing ``derived_from``. read_from is a work asset, not an
     observation edge: a table is an ancestor, a registered non-table asset
     stays out of the id set, and any other nonempty value is unresolvable.
@@ -2330,6 +2325,37 @@ def _observation_lineage(
         result = Ancestry.incomplete(AncestryFailure.PRINTED_UNRESOLVED)
     else:
         ids: set[str] = {observation_id}
+        derivation_inputs = (
+            obs.derivation.inputs if obs.derivation is not None else ()
+        )
+        lineage_inputs = (obs.derived_from or ()) + derivation_inputs
+        evidence_class = obs.evidence.class_
+        model_derived = (
+            evidence_class.is_value
+            and evidence_class.value is EvidenceClass.MODEL_DERIVED
+        )
+        context_prefix = (
+            None
+            if (
+                not model_derived
+                or not obs.source_id
+                or obs.derivation is not None
+                and obs.derivation.declares_unprinted_raw_inputs
+            )
+            else f"{obs.source_id}::context::"
+        )
+        local_context_inputs = {
+            input_id
+            for input_id in lineage_inputs
+            if context_prefix is not None
+            and input_id.startswith(context_prefix)
+            and input_id not in observations
+        }
+        # An in-paper model_derived observation with no external inputs is
+        # complete at its own work. Same-source context IDs describe inputs
+        # recorded within that work, not missing Observation edges; the work
+        # resolver already supplies the work ID. Foreign or missing inputs
+        # still have to resolve below.
         unresolved_read_from = False
         if obs.read_from:
             if obs.read_from in table_ids:
@@ -2342,9 +2368,18 @@ def _observation_lineage(
             result = Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
         else:
             result = Ancestry.of(ids)
-            for parent in obs.derived_from or ():
+            for input_id in lineage_inputs:
+                if input_id in local_context_inputs:
+                    continue
+                if input_id not in observations and input_id not in table_ids:
+                    if _is_registered_non_table(input_id, table_ids, asset_ids):
+                        continue
+                    result = Ancestry.incomplete(
+                        AncestryFailure.UNRESOLVABLE_INPUT
+                    )
+                    break
                 nested = _observation_lineage(
-                    parent,
+                    input_id,
                     observations,
                     table_ids,
                     experiments=experiments,
@@ -2358,31 +2393,6 @@ def _observation_lineage(
                 assert nested.ids is not None and result.ids is not None
                 ids |= set(nested.ids)
                 result = Ancestry.of(ids)
-            else:
-                if obs.derivation is not None:
-                    for inp in obs.derivation.inputs:
-                        if inp not in observations and inp not in table_ids:
-                            if _is_registered_non_table(inp, table_ids, asset_ids):
-                                continue
-                            result = Ancestry.incomplete(
-                                AncestryFailure.UNRESOLVABLE_INPUT
-                            )
-                            break
-                        nested = _observation_lineage(
-                            inp,
-                            observations,
-                            table_ids,
-                            experiments=experiments,
-                            asset_ids=asset_ids,
-                            _cache=_cache,
-                            _stack=_stack,
-                        )
-                        if not nested.complete:
-                            result = nested
-                            break
-                        assert nested.ids is not None and result.ids is not None
-                        ids |= set(nested.ids)
-                        result = Ancestry.of(ids)
             if result.complete and experiments is not None:
                 experiment = experiments.get(obs.experiment_id)
                 if experiment is not None and experiment.quoted_from is not None:
