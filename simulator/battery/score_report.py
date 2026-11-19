@@ -16,11 +16,41 @@ from simulator.battery.records import Observation
 from simulator.battery.score_report_data import (
     ElementRetentionReportData,
     EligibilityFailureCensus,
+    EligibleSourceRelationCount,
     Nasa9FitComparisonData,
+    SUSPECTED_CALIBRATION_OVERLAP,
+    SuspectedCalibrationOverlap,
 )
 
 
 REPORT_HEADING = "# Battery score report (schema v2.1)"
+
+
+def format_assumed_band_report(report: str, data: Mapping[str, object]) -> str:
+    lines = [
+        "", "## Assumed band", "", str(data["label"]), "",
+        "Separate diagnostics; existing headline counts and bands are unchanged.", "",
+        "| rail | engine | quantity | metric | unit | class | evidence | n | observations | inside band | eligible | citation |",
+        "|---|---|---|---|---|---|---|---:|---:|---:|---:|---|",
+    ]
+    for row in data["records"]:
+        citation = row["citation"]
+        lines.append(
+            f"| {row['rail']} | {row['engine']} | {row['quantity']} | "
+            f"{row['operation']} | {row['unit']} | {row['class_id']} | "
+            f"{row['evidence_class']} | "
+            f"{row['n']} | {row['n_observations']} | {row['n_inside_band']} | "
+            f"{row['n_eligible']} | {citation['source_id']} p.{citation['printed_page']} "
+            f"(PDF {citation['pdf_page']}) |"
+        )
+    if not data["records"]:
+        lines.append("| (none) | — | — | — | — | — | — | 0 | 0 | 0 | 0 | — |")
+    lines.extend(["", "Applicability / conversion refusals:", ""])
+    for reason, n in data["refusal_counts"].items():
+        lines.append(f"- {reason}: {n}")
+    if not data["refusal_counts"]:
+        lines.append("None.")
+    return report.rstrip() + "\n" + "\n".join(lines) + "\n"
 
 
 class _ConditionHullView(Protocol):
@@ -335,6 +365,94 @@ def format_element_retention_diagnostics(
     )
     lines.extend(f"| {label} | {count} |" for label, count in loss_bin_counts)
     section = "\n".join(lines)
+    return f"{report.rstrip()}\n\n{section}\n"
+
+
+def _markdown_cell(value: object) -> str:
+    return str(value).replace("|", "\\|").replace("\n", " ")
+
+
+def format_source_relation_diagnostics(
+    breakdown: Sequence[EligibleSourceRelationCount],
+    overlaps: Sequence[SuspectedCalibrationOverlap],
+) -> str:
+    """Markdown for the d-445 breakdown and the overlap diagnostic.
+
+    Formatting only. The counts and flags are already decided.
+    """
+
+    lines = [
+        "## Eligible rows by source relation",
+        "",
+        "d-445 counts of score_eligible rows. Unknown stays unknown and "
+        "stays visible. This section does not change eligibility.",
+        "",
+        "| engine | n eligible independent | n eligible unknown | n same-input pending lineage |",
+        "|---|---:|---:|---:|",
+    ]
+    n_independent = 0
+    n_unknown = 0
+    n_pending = 0
+    if not breakdown:
+        lines.append("| (none) | 0 | 0 | 0 |")
+    else:
+        for row in breakdown:
+            n_independent += row.n_independent
+            n_unknown += row.n_unknown
+            n_pending += row.n_same_input_pending_lineage
+            lines.append(
+                f"| {_markdown_cell(row.engine)} | {row.n_independent} | "
+                f"{row.n_unknown} | {row.n_same_input_pending_lineage} |"
+            )
+    lines.extend(
+        [
+            "",
+            "Total score_eligible rows in this breakdown: "
+            f"independent {n_independent}, unknown {n_unknown}. "
+            "Same-input pending lineage is the interim openimcc population "
+            f"(t-1874) and is not eligible: {n_pending}.",
+            "",
+            "## Suspected calibration overlap",
+            "",
+            (
+                "Diagnostic only. `SUSPECTED_CALIBRATION_OVERLAP` requires at least "
+                f"{SUSPECTED_CALIBRATION_OVERLAP.minimum_rows} eligible numeric "
+                "residuals, a median absolute residual below "
+                f"{SUSPECTED_CALIBRATION_OVERLAP.median_abs_residual_fraction_of_band} "
+                "of the median decision-band half-width, and at least "
+                f"{SUSPECTED_CALIBRATION_OVERLAP.rows_inside_tight_band_fraction} of "
+                "those rows inside "
+                f"{SUSPECTED_CALIBRATION_OVERLAP.tight_band_fraction} of their own "
+                "band. Diagnostic heuristic; no physics claim. Does not change "
+                "eligibility. A pair with a missing band is not flagged."
+            ),
+            "",
+        ]
+    )
+    if not overlaps:
+        lines.append("None.")
+    else:
+        lines.extend(
+            [
+                "| source | engine | n | median abs residual | median band half-width | fraction inside tight band |",
+                "|---|---|---:|---:|---:|---:|",
+            ]
+        )
+        for row in overlaps:
+            lines.append(
+                f"| {_markdown_cell(row.source_id)} | {_markdown_cell(row.engine)} | "
+                f"{row.n} | {row.median_abs_residual} | "
+                f"{row.median_band_half_width} | {row.fraction_inside_tight_band} |"
+            )
+    return "\n".join(lines)
+
+
+def append_source_relation_diagnostics(
+    report: str,
+    breakdown: Sequence[EligibleSourceRelationCount],
+    overlaps: Sequence[SuspectedCalibrationOverlap],
+) -> str:
+    section = format_source_relation_diagnostics(breakdown, overlaps)
     return f"{report.rstrip()}\n\n{section}\n"
 
 

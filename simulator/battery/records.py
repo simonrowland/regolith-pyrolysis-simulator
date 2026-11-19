@@ -1911,6 +1911,7 @@ class DecisionBand:
             "fusion_combined_row_printed",
             "fusion_combined_source_method",
             "derived_scatter",
+            "method_class_assumed",  # d-443: separate literature-precision diagnostics.
         }:
             raise ValueError(f"unsupported DecisionBand.band_basis {self.band_basis!r}")
 
@@ -1954,6 +1955,8 @@ class Residual:
     refusal: ResidualRefusal | None = None
     quench_state: QuenchState | None = None
     fo2_mode: Fo2Mode | None = None
+    assumed_band: bool | None = None
+    assumed_band_details: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         if not self.key:

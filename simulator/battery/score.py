@@ -58,6 +58,8 @@ from simulator.battery.source_declarations import (
 )
 from simulator.source_ids import (
     HASHIMOTO_SOURCE_ID as _HASHIMOTO_SOURCE_ID,
+    KRESS_CARMICHAEL_1988_WORK_ID,
+    KRESS_CARMICHAEL_1991_WORK_ID,
     SF04_WORKBOOK_SOURCE_ID,
     SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
 )
@@ -197,6 +199,7 @@ from simulator.battery.migrate import (
     evaporation_alpha_family_key,
 )
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
+from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
     SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
@@ -240,15 +243,20 @@ from simulator.battery.score_report import (
     _e15_markdown_lines,
     _e15_number,
     _score_shard_failure_report_lines,
+    append_source_relation_diagnostics,
     format_element_retention_diagnostics,
+    format_assumed_band_report,
     format_store_stamp_report_lines,
     render_legacy_score_report_markdown,
     render_payload_score_report_markdown,
     store_stamp_has_known_revision,
 )
 from simulator.battery.score_report_data import (
+    AssumedBandReport,
     eligibility_failure_census,
     element_retention_report_data,
+    eligible_source_relation_breakdown,
+    suspected_calibration_overlaps,
 )
 from simulator.battery.score_run import (
     _ScoreShardResult,
@@ -533,8 +541,11 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.NASA_CEA_9: ("nasa-glenn",),
     Engine.PROPRIETARY_REMOTE: (),
     # Empty: a catalog row is not an Antoine or Ellingham coefficient source.
-    # lineage_complete stays false, so the numeric residual is not labelled
-    # independent of the catalogue it was read from.
+    # The relation stays unknown. Eligibility does not follow from that
+    # token. catalog_evaluator reads the catalogue compiled from our own
+    # measured rows, so its circularity is known by construction and an
+    # unknown relation stays ineligible. See
+    # ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE.
     Engine.CATALOG_EVALUATOR: (),
 }
 
@@ -572,10 +583,92 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "openimcc-v1.0.3-d066-v1": (SF04_WORKBOOK_SOURCE_ID,),
     "openimcc-v1.0.3-d066-ext-v1": (SF04_WORKBOOK_SOURCE_ID,),
     "openimcc-v1.0.3-d066-v1-kcaalsi2o7": (SF04_WORKBOOK_SOURCE_ID,),
+    # Kress & Carmichael 1991 Eq. (7) / Table 7 natural-liquid regression
+    # (the formula internal-analytical evaluates; a = 0.196). Published
+    # p. 87, PDF page index 5: 228 quench data from Kennedy (1948),
+    # Fudali (1965), Thornber et al. (1980), Sack et al. (1980), Kilinc
+    # et al. (1983), Kress and Carmichael (1988), and this study.
+    # Kennedy, Fudali, Thornber, Sack 1980 and Kilinc are not store works.
+    # Stebbins et al. (1984) supplied the fixed e and is not one of the
+    # 228. Table 6 CAFS/NAFS (this study + Kress & Carmichael 1989; this
+    # study + Lange & Carmichael 1989) is a different fit.
+    "Kress and Carmichael 1991, doi:10.1007/BF00307328": (
+        KRESS_CARMICHAEL_1991_WORK_ID,
+        KRESS_CARMICHAEL_1988_WORK_ID,
+    ),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
 )
+
+# d-445. These engines read a catalogue compiled from our own measured
+# rows, so an unknown relation is known circularity, not an unmapped
+# external calibration database. Their residuals stay ineligible unless
+# the relation resolves independent.
+ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE: frozenset[Engine] = frozenset({
+    Engine.CATALOG_EVALUATOR,
+})
+
+# Interim (t-1874). openimcc packs are fitted to sources that are in this
+# corpus, and openimcc ships per-row coefficient ancestry, so an unknown
+# relation is known-likely-in-sample rather than an unmapped external
+# calibration database. The imported pin only knows SF04-era aliases;
+# resolving that ancestry needs an openimcc pin >= 979adb2. Until t-1874
+# wires that pin, unknown openimcc residuals stay ineligible and carry
+# SOURCE_RELATION_SAME_INPUT_PENDING_LINEAGE. Delete this rule when
+# t-1874 lands; openimcc then follows d-445 with real lineage.
+ENGINES_SAME_INPUT_PENDING_LINEAGE: frozenset[Engine] = frozenset({
+    Engine.OPENIMCC,
+})
+SOURCE_RELATION_SAME_INPUT_PENDING_LINEAGE = (
+    "source_relation_same_input_pending_lineage"
+)
+
+
+def source_relation_not_same_input(
+    relation: SourceRelation,
+    *,
+    engine: Engine | None = None,
+) -> bool:
+    """Whether this relation may enter score_eligible (d-445).
+
+    Unknown origin does not block. A resolved ``same_input`` does.
+    ``training``, ``quoted_overlap``, and ``correlated`` are resolved
+    relations other than independent, so they stay out. The relation
+    token itself is unchanged. ``catalog_evaluator`` stays ineligible
+    unless the relation resolves independent.
+    ``ENGINES_SAME_INPUT_PENDING_LINEAGE`` is the interim openimcc rule
+    (t-1874): unknown stays ineligible there too.
+    """
+
+    if engine in ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE:
+        return relation is SourceRelation.INDEPENDENT
+    if engine in ENGINES_SAME_INPUT_PENDING_LINEAGE:
+        return relation is SourceRelation.INDEPENDENT
+    return relation in {SourceRelation.INDEPENDENT, SourceRelation.UNKNOWN}
+
+
+def label_source_relation_exclusions(
+    exclusions: tuple[str, ...],
+    *,
+    engine: Engine,
+    source_relation: SourceRelation,
+) -> tuple[str, ...]:
+    """Add the interim openimcc pending-lineage label (t-1874).
+
+    The conjunct token stays, so the failure census still sees it. The
+    extra token is the typed reason and does not change eligibility.
+    """
+
+    if (
+        engine in ENGINES_SAME_INPUT_PENDING_LINEAGE
+        and source_relation is SourceRelation.UNKNOWN
+        and "source_relation_not_same_input" in exclusions
+        and SOURCE_RELATION_SAME_INPUT_PENDING_LINEAGE not in exclusions
+    ):
+        return (*exclusions, SOURCE_RELATION_SAME_INPUT_PENDING_LINEAGE)
+    return exclusions
+
 
 # score_eligible conjuncts (v2.1 YAML score_eligible). Tests mutate each.
 SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
@@ -587,7 +680,7 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
     "extract_review_permits_use",
     "validity_gates_pass",
     "identity_equal",
-    "source_relation_independent_complete_ancestry",
+    "source_relation_not_same_input",
     "candidate_engine_prediction_authority_allowed",
     "no_blocking_qualification",
     "selected_independent_lineage_level",
@@ -1067,7 +1160,7 @@ class EligibleConjuncts:
     extract_review_permits_use: bool
     validity_gates_pass: bool
     identity_equal: bool
-    source_relation_independent_complete_ancestry: bool
+    source_relation_not_same_input: bool
     candidate_engine_prediction_authority_allowed: bool
     no_blocking_qualification: bool
     selected_independent_lineage_level: bool
@@ -1087,9 +1180,7 @@ class EligibleConjuncts:
             "extract_review_permits_use": self.extract_review_permits_use,
             "validity_gates_pass": self.validity_gates_pass,
             "identity_equal": self.identity_equal,
-            "source_relation_independent_complete_ancestry": (
-                self.source_relation_independent_complete_ancestry
-            ),
+            "source_relation_not_same_input": self.source_relation_not_same_input,
             "candidate_engine_prediction_authority_allowed": (
                 self.candidate_engine_prediction_authority_allowed
             ),
@@ -5760,6 +5851,7 @@ def build_conjuncts(
     extract_review_status: str | None,
     comparison_ids: set[str],
     notices: Sequence[Notice],
+    engine: Engine,
     oxygen_balance_effusion_solved: bool = False,
 ) -> EligibleConjuncts:
     quantity = quantity_token(reference.identity) if isinstance(reference.identity, Identity) else None
@@ -5786,8 +5878,11 @@ def build_conjuncts(
             and cev.value is EvidenceClass.ENGINE_PREDICTION
             and authority_allowed(quantity, candidate.authority)
         )
-    independent = (
-        source_relation is SourceRelation.INDEPENDENT and lineage_complete
+    # lineage_complete is the resolver input that produced source_relation.
+    # d-445 reads that token and does not re-impose completeness on unknown.
+    _ = lineage_complete
+    not_same_input = source_relation_not_same_input(
+        source_relation, engine=engine
     )
     # Engine band notices remain visible to the measured report's flagged
     # population. Prediction authority is already gated separately.
@@ -5801,7 +5896,7 @@ def build_conjuncts(
         extract_review_permits_use=extract_review_permits(extract_review_status),
         validity_gates_pass=gates.passed,
         identity_equal=identity_ok,
-        source_relation_independent_complete_ancestry=independent,
+        source_relation_not_same_input=not_same_input,
         candidate_engine_prediction_authority_allowed=cand_ok,
         no_blocking_qualification=not blocking_qualifications(
             quantity,
@@ -6619,6 +6714,67 @@ def _metric_uncertainty_width(
             abs((Decimal(1) - fraction).ln() / ln10),
         )
     return None
+
+
+def _assumed_method_class_band(
+    observation: Observation, experiment: Experiment | None, reference: Decimal,
+) -> dict[str, object]:
+    selected = select_method_class_band(observation, experiment)
+    if "refusal" in selected:
+        return selected
+    quantity = quantity_token(observation.identity)
+    operation = _residual_metric_operation(quantity, observation)
+    precision = selected["precision"]
+    amount = Decimal(precision["value"])
+    amount_unit = "fraction"
+    if precision["basis"] == "ferric_fraction":
+        fraction_form = (
+            quantity is Quantity.VALENCE_RATIO
+            and _fe_valence_named_form(observation.identity) == "fraction"
+        )
+        if quantity is Quantity.VALENCE_RATIO and _fe_valence_named_form(
+            observation.identity
+        ) not in {"fraction", "ratio"}:
+            return {"refusal": {"reason": "method_class_fe_observable_unmatched"}}
+        fraction = reference if fraction_form else next(
+            (
+                condition.state.value
+                for name, condition in (observation.point_conditions or {}).items()
+                if name in FERRIC_FRACTION_FIELDS
+                and condition.locator is not None and condition.state.is_value
+            ),
+            None,
+        )
+        if not isinstance(fraction, Decimal) or (
+            not fraction_form
+            and fe3_fe2_ratio_from_ferric_fraction(fraction) != reference
+        ):
+            return {"refusal": {"reason": "method_class_ferric_fraction_unknown"}}
+        propagated, reason = _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+            fraction, amount
+        )
+        if propagated is None:
+            return {"refusal": {"reason": reason}}
+        amount, amount_unit = (
+            (amount, "dimensionless") if fraction_form else (propagated, "dex")
+        )
+    width = _metric_uncertainty_width(
+        operation, quantity, reference, amount, amount_unit
+    )
+    if width is None or not width.is_finite() or width <= 0:
+        return {"refusal": {"reason": "method_class_metric_domain"}}
+    return {
+        "class_id": selected["class_id"],
+        "version": selected["version"],
+        "citation": selected["citation"],
+        "precision": precision,
+        "band": DecisionBand(
+            width,
+            "dimensionless" if operation is not MetricOperation.ABSOLUTE else QUANTITY_UNITS[quantity],
+            f"assumed_band: {selected['class_id']}; confidence unstated",
+            band_basis="method_class_assumed",
+        ),
+    }
 
 
 def _combine_independent_standard_uncertainties(
@@ -18110,6 +18266,10 @@ def _compile_residual_with_lineage(
         rail is Rail.REDOX
         and engine is Engine.INTERNAL_ANALYTICAL
         and quantity is Quantity.FE3_FE2_RATIO
+        # A completed id walk that already shares a calibration work is
+        # SAME_INPUT. The attribution labels below are a separate citation
+        # list and must not relabel that walk as independent.
+        and source_relation is not SourceRelation.SAME_INPUT
     ):
         # The attribution split applies only when both walks are COMPLETE.
         # An unresolved Kress citation, a printed-unresolved coefficient,
@@ -18828,6 +18988,7 @@ def _compile_residual_with_lineage(
         oxygen_balance_effusion_solved=has_own_engine_solved_oxygen_balance(
             prediction.engine, prediction.notices
         ),
+        engine=engine,
     )
     if is_internal_consistency(origin) or compilation:
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
@@ -18837,6 +18998,33 @@ def _compile_residual_with_lineage(
     if is_sf04_workbook(reference):
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
     eligible = conjuncts.eligible()
+    assumed_details = None
+    # d-443 controller clarification: keep NO_BAND, eligibility and all old
+    # headline contributions intact. A literature band is additive metadata.
+    if (
+        not implied_alpha
+        and evidence_class.is_value and evidence_class.value in MEASURED_EVIDENCE
+        and numeric.decision_band is None
+        and printed.band is None
+        and derived_band is None
+        and printed.refusal is None
+        and source_method_uncertainty is None
+        and (
+            source_reference.uncertainty.kind is UncertaintyKind.NONE
+            or _verbatim_denies_printed_uncertainty(source_reference.uncertainty)
+        )
+    ):
+        assumed_details = _assumed_method_class_band(
+            source_reference, experiment, ref_point
+        )
+        assumed_details["eligible"] = (
+            "band" in assumed_details and eligible and not has_no_band_flag
+        )
+        if "band" in assumed_details:
+            assumed_details["inside_band"] = match_status(
+                replace(numeric, decision_band=assumed_details["band"])
+            ) is ResidualStatus.MATCH
+        assumed_details["evidence_class"] = evidence_class.value.value
     return (
         Residual(
             key=_key_for_fo2_mode(key, result_mode),
@@ -18846,7 +19034,13 @@ def _compile_residual_with_lineage(
             status=status,
             source_relation=source_relation,
             score_eligible=eligible,
-            exclusions=conjuncts.exclusions(),
+            assumed_band=True if assumed_details is not None and "band" in assumed_details else None,
+            assumed_band_details=assumed_details,
+            exclusions=label_source_relation_exclusions(
+                conjuncts.exclusions(),
+                engine=engine,
+                source_relation=source_relation,
+            ),
             notices=notices,
             candidate=candidate.observation_id,
             candidate_request=None,
@@ -23062,6 +23256,21 @@ def all_numeric_payload_records(
 HEADLINE_SUMMARY_KIND = "battery_headline_summary"
 
 
+def _assumed_band_summary(
+    rows: Iterable[Mapping[str, object]],
+    observations: Mapping[str, Observation] | None = None,
+) -> dict[str, object]:
+    report = AssumedBandReport()
+    for row in rows:
+        observation = (observations or {}).get(str(row.get("reference") or ""))
+        quantity = None if observation is None else quantity_token(observation.identity)
+        report.add(
+            row, engine=_engine_from_payload(row),
+            quantity=quantity.value if quantity is not None else _residual_key_quantity(row.get("key")),
+        )
+    return report.payload()
+
+
 def headline_summary_payload(
     records: Sequence[Mapping[str, object]],
     *,
@@ -23093,6 +23302,9 @@ def write_headline_summary_json(
     payload = headline_summary_payload(
         headline_records(residuals, context=context, engines=engines),
         store_stamp=stamp,
+    )
+    payload["assumed_band"] = _assumed_band_summary(
+        (to_plain(row) for row in residuals), context.observations
     )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -23542,7 +23754,36 @@ def _render_score_report_from_payloads_legacy(
             + "\n".join(_score_shard_failure_report_lines(shard_failures))
             + "\n"
         )
-    return report
+    # Relation breakdown first, assumed-band stratum second. The band
+    # section is not part of the eligibility count.
+    report = _append_source_relation_diagnostics(report, rows, context.observations)
+    return format_assumed_band_report(report, aggregate.assumed_bands.payload())
+
+
+def _append_source_relation_diagnostics(
+    report: str,
+    rows: Iterable[Mapping[str, object]],
+    observations: Mapping[str, Observation] | None,
+) -> str:
+    """Append the d-445 breakdown and the overlap diagnostic.
+
+    Both terminal report builders call this once. ``render_score_report``
+    does not call it again: the legacy builder already has.
+    """
+
+    return append_source_relation_diagnostics(
+        report,
+        eligible_source_relation_breakdown(
+            rows,
+            engine_for_row=_engine_from_payload,
+            pending_exclusion=SOURCE_RELATION_SAME_INPUT_PENDING_LINEAGE,
+        ),
+        suspected_calibration_overlaps(
+            rows,
+            observations,
+            engine_for_row=_engine_from_payload,
+        ),
+    )
 
 
 def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
@@ -24562,6 +24803,7 @@ class _ScorePayloadAccumulator:
             str, dict[tuple[str, str, str], dict[str, object]]
         ] = {"measured": {}, "compilation": {}}
         self.all_numeric = _AllNumericHeadline()
+        self.assumed_bands = AssumedBandReport()
         self.e15_points: list[_E15ResidualPoint] = []
         self.headline_hulls: dict[tuple[str, str, str], _ConditionHull] = {}
         self.report_engine_names: set[str] = set()
@@ -24839,6 +25081,14 @@ class _ScorePayloadAccumulator:
         from simulator.battery.compilation_tier import _tier_cell_from_payload_fields
 
         metadata = row_metadata or self._row_metadata(row)
+        assumed_quantity = (
+            None if metadata.observation is None
+            else quantity_token(metadata.observation.identity)
+        )
+        self.assumed_bands.add(
+            row, engine=metadata.engine,
+            quantity=assumed_quantity.value if assumed_quantity is not None else _residual_key_quantity(row.get("key")),
+        )
         self.count += 1
         if row.get("score_eligible"):
             self.scored_count += 1
@@ -25136,11 +25386,13 @@ class _ScorePayloadAccumulator:
         )
 
     def summary_payload(self, store_stamp: Mapping[str, object] | None) -> dict[str, object]:
-        return headline_summary_payload(
+        payload = headline_summary_payload(
             self.headline_records(),
             store_stamp=store_stamp,
             static_refusals=self.static_refusals,
         )
+        payload["assumed_band"] = self.assumed_bands.payload()
+        return payload
 
 
 def write_headline_summary_from_payloads_json(
@@ -25152,6 +25404,7 @@ def write_headline_summary_from_payloads_json(
     origins: Mapping[str, str] | None = None,
     store_stamp: Mapping[str, object] | None = None,
 ) -> None:
+    rows = tuple(rows)
     payload = headline_summary_payload(
         headline_payload_records(
             rows,
@@ -25161,6 +25414,7 @@ def write_headline_summary_from_payloads_json(
         ),
         store_stamp=store_stamp,
     )
+    payload["assumed_band"] = _assumed_band_summary(rows, observations)
     _write_headline_summary_payload_json(payload, path)
 
 
@@ -25360,6 +25614,10 @@ def render_score_report_from_payloads(
         status_diff=status_diff,
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
+    )
+    report = _append_source_relation_diagnostics(report, rows, observations)
+    report = format_assumed_band_report(
+        report, _assumed_band_summary(rows, observations)
     )
     if observations is None:
         return report

@@ -139,7 +139,7 @@ def _green_conjuncts() -> EligibleConjuncts:
         extract_review_permits_use=True,
         validity_gates_pass=True,
         identity_equal=True,
-        source_relation_independent_complete_ancestry=True,
+        source_relation_not_same_input=True,
         candidate_engine_prediction_authority_allowed=True,
         no_blocking_qualification=True,
         selected_independent_lineage_level=True,
@@ -165,6 +165,134 @@ def test_score_eligible_conjunct_red_then_green(conjunct: str) -> None:
     assert score_eligible_from_conjuncts(red) is False
     assert conjunct in red.exclusions()
     assert score_eligible_from_conjuncts(green) is True
+
+
+def _d445_o2(coefficient_sources, *, engine=Engine.INTERNAL_ANALYTICAL):
+    experiment = F.tabulation_experiment()
+    identity = F.o2_identity()
+    reference = F.observation(
+        "d445-o2",
+        experiment.experiment_id,
+        identity,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="d445-source",
+    )
+    prediction = replace(
+        _predict(Decimal("0"), identity, coefficient_sources=coefficient_sources),
+        engine=engine,
+        channel=engine.value,
+    )
+    residual, candidate = compile_residual(
+        reference,
+        engine,
+        context=_context(F.work(), experiment, reference),
+        prediction=prediction,
+        comparison_ids={reference.observation_id},
+    )
+    return residual, candidate, reference, experiment
+
+
+def test_unknown_source_relation_is_eligible_when_other_conjuncts_pass() -> None:
+    """d-445: an unmapped coefficient alias stays unknown and can score."""
+
+    from simulator.battery.score import (
+        ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE,
+        source_relation_not_same_input,
+    )
+
+    residual, _candidate, reference, experiment = _d445_o2(("alphamelts",))
+    assert residual.source_relation is SourceRelation.UNKNOWN
+    assert residual.score_eligible is True
+    assert "source_relation_not_same_input" not in residual.exclusions
+    before = residual.score_eligible
+
+    control, *_rest = _d445_o2(("nasa-cea-thermo",))
+    assert control.source_relation is SourceRelation.INDEPENDENT
+    assert control.score_eligible is True
+
+    same, *_rest = _d445_o2((reference.observation_id,))
+    assert same.source_relation is SourceRelation.SAME_INPUT
+    assert same.score_eligible is False
+    assert "source_relation_not_same_input" in same.exclusions
+
+    catalog, *_rest = _d445_o2((), engine=Engine.CATALOG_EVALUATOR)
+    assert catalog.source_relation is SourceRelation.UNKNOWN
+    assert catalog.score_eligible is False
+    assert catalog.exclusions == ("source_relation_not_same_input",)
+
+    catalog_independent, *_rest = _d445_o2(
+        ("nasa-cea-thermo",), engine=Engine.CATALOG_EVALUATOR
+    )
+    assert catalog_independent.source_relation is SourceRelation.INDEPENDENT
+    assert catalog_independent.score_eligible is True
+
+    assert source_relation_not_same_input(
+        SourceRelation.UNKNOWN, engine=Engine.ALPHAMELTS
+    ) is True
+    for melts_engine in (
+        Engine.ALPHAMELTS,
+        Engine.THERMOENGINE,
+        Engine.MAGEMIN,
+    ):
+        melts, *_rest = _d445_o2((melts_engine.value,), engine=melts_engine)
+        assert melts.source_relation is SourceRelation.UNKNOWN
+        assert melts.score_eligible is True
+        assert "source_relation_same_input_pending_lineage" not in melts.exclusions
+    openimcc_unknown, *_rest = _d445_o2((), engine=Engine.OPENIMCC)
+    assert openimcc_unknown.source_relation is SourceRelation.UNKNOWN
+    assert openimcc_unknown.score_eligible is False
+    assert (
+        "source_relation_same_input_pending_lineage"
+        in openimcc_unknown.exclusions
+    )
+    assert "source_relation_not_same_input" in openimcc_unknown.exclusions
+    openimcc_independent, *_rest = _d445_o2(
+        ("nasa-cea-thermo",), engine=Engine.OPENIMCC
+    )
+    assert openimcc_independent.source_relation is SourceRelation.INDEPENDENT
+    assert openimcc_independent.score_eligible is True
+    assert (
+        "source_relation_same_input_pending_lineage"
+        not in openimcc_independent.exclusions
+    )
+    assert source_relation_not_same_input(
+        SourceRelation.TRAINING, engine=Engine.THERMOENGINE
+    ) is False
+    assert source_relation_not_same_input(
+        SourceRelation.QUOTED_OVERLAP, engine=Engine.MAGEMIN
+    ) is False
+    assert source_relation_not_same_input(
+        SourceRelation.CORRELATED, engine=Engine.ALPHAMELTS
+    ) is False
+    assert source_relation_not_same_input(
+        SourceRelation.UNKNOWN, engine=Engine.CATALOG_EVALUATOR
+    ) is False
+    assert source_relation_not_same_input(
+        SourceRelation.INDEPENDENT, engine=Engine.CATALOG_EVALUATOR
+    ) is True
+    assert Engine.CATALOG_EVALUATOR in ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE
+    assert Engine.ALPHAMELTS not in ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE
+
+    from simulator.battery.score import render_score_report
+
+    report = render_score_report(
+        (residual, control, same, catalog, openimcc_unknown),
+        context=_context(F.work(), experiment, reference),
+        engines=(
+            Engine.INTERNAL_ANALYTICAL,
+            Engine.CATALOG_EVALUATOR,
+            Engine.OPENIMCC,
+        ),
+    )
+    assert residual.score_eligible is before
+    assert "## Eligible rows by source relation" in report
+    assert "## Suspected calibration overlap" in report
+    assert "| internal-analytical | 1 | 1 | 0 |" in report
+    assert "| openimcc | 0 | 0 | 1 |" in report
+    assert "catalog_evaluator" not in report.split(
+        "## Eligible rows by source relation", 1
+    )[1].split("## Suspected calibration overlap", 1)[0]
 
 
 def test_retired_imcc_engines_are_excluded_from_score_set() -> None:
@@ -3836,7 +3964,19 @@ def test_compile_mutates_each_conjunct_off() -> None:
             lineage_complete=False,
         ),
     )
-    assert residual.score_eligible is False
+    # d-445: an unmapped incomplete coefficient walk is unknown, and unknown
+    # no longer blocks. A proven same input still does.
+    assert residual.source_relation is SourceRelation.UNKNOWN
+    assert residual.score_eligible is True
+    assert "source_relation_not_same_input" not in residual.exclusions
+    same_input, _ = _compile(
+        ref,
+        exp,
+        _predict(Decimal("0"), ident, coefficient_sources=(ref.observation_id,)),
+    )
+    assert same_input.source_relation is SourceRelation.SAME_INPUT
+    assert same_input.score_eligible is False
+    assert "source_relation_not_same_input" in same_input.exclusions
 
     residual, _ = _compile(
         ref, exp, _predict(Decimal("0"), ident, authority=Authority.REFUSED)
@@ -11410,8 +11550,10 @@ def test_printed_unresolved_redox_reference_stays_unknown() -> None:
     )
     residual, _candidate = _compile_redox(printed)
     assert residual.source_relation is SourceRelation.UNKNOWN
+    # The source-relation conjunct now passes. Another conjunct still excludes
+    # this row, so eligibility stays false (w1118d445-score).
     assert residual.score_eligible is False
-    assert "source_relation_independent_complete_ancestry" in residual.exclusions
+    assert "source_relation_not_same_input" not in residual.exclusions
 
     complete = F.observation(
         "redox-complete",
@@ -12526,10 +12668,10 @@ def test_unresolved_read_from_is_incomplete() -> None:
     )
     redox_residual, redox_candidate = _compile_redox(redox)
     assert redox_residual.source_relation is SourceRelation.UNKNOWN
+    # The source-relation conjunct now passes. Another conjunct still excludes
+    # this redox row (w1118d445-score).
     assert redox_residual.score_eligible is False
-    assert (
-        "source_relation_independent_complete_ancestry" in redox_residual.exclusions
-    )
+    assert "source_relation_not_same_input" not in redox_residual.exclusions
     assert redox_candidate is not None and redox_candidate.engine is not None
     assert redox_candidate.engine.lineage_complete is True
 
@@ -12567,7 +12709,10 @@ def test_unresolved_read_from_is_incomplete() -> None:
         ),
     )
     assert plain_residual.source_relation is SourceRelation.UNKNOWN
+    # The source-relation conjunct now passes. Another conjunct still
+    # excludes this dangling-read row (w1118d445-score2).
     assert plain_residual.score_eligible is False
+    assert "source_relation_not_same_input" not in plain_residual.exclusions
     assert plain_candidate is not None and plain_candidate.engine is not None
     assert plain_candidate.engine.lineage_complete is True
 
@@ -12635,6 +12780,80 @@ def test_registered_read_from_stays_out_of_the_lineage() -> None:
     check()
     with bound_work_inputs(works, observations, experiments):
         check()
+
+
+def test_registered_asset_derived_from_stays_out_of_the_lineage() -> None:
+    """A registered non-table derived_from parent is not an observation edge.
+
+    Store validation accepts the asset. The scoring walk keeps the row
+    complete and out of the overlap set, so a coefficient work that owns
+    the row still intersects on the row id. An unregistered parent stays
+    unresolvable.
+    """
+
+    from simulator.battery.validate import (
+        AncestryFailure,
+        _asset_ids,
+        _observation_lineage,
+        _table_ids,
+    )
+
+    work = F.work("registered-derived-work")
+    experiment = F.tabulation_experiment(
+        experiment_id="registered-derived-exp", work_id=work.work_id
+    )
+    asset_edge = Derivation(
+        relation="read from the source pdf",
+        inputs=("pdf-1",),
+        parameters=(),
+        output_unit="dimensionless",
+    )
+    row = F.observation(
+        "registered-derived-row",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id=work.work_id,
+        derived_from=("pdf-1",),
+        derivation=asset_edge,
+    )
+    observations = {row.observation_id: row}
+    experiments = {experiment.experiment_id: experiment}
+    works = {work.work_id: work}
+    table_ids = _table_ids(works)
+    corpus = _asset_ids(works)
+    direct = _observation_lineage(
+        row.observation_id, observations, table_ids, asset_ids=corpus
+    )
+    assert direct.complete and direct.ids == frozenset({row.observation_id})
+    assert "pdf-1" not in direct.ids
+    assert (
+        resolve_source_relation(
+            row,
+            (work.work_id,),
+            True,
+            works=works,
+            observations=observations,
+            experiments=experiments,
+        )
+        is SourceRelation.SAME_INPUT
+    )
+    missing = replace(
+        row,
+        observation_id="unregistered-derived-row",
+        derived_from=("pdf:not-a-work-asset",),
+        derivation=replace(asset_edge, inputs=("pdf:not-a-work-asset",)),
+    )
+    assert (
+        _observation_lineage(
+            missing.observation_id,
+            {missing.observation_id: missing},
+            table_ids,
+            asset_ids=corpus,
+        ).failure
+        is AncestryFailure.UNRESOLVABLE_INPUT
+    )
 
 
 def test_cross_work_registered_asset_resolves_on_both_paths() -> None:
@@ -12813,7 +13032,10 @@ def test_printed_unresolved_redox_coefficient_stays_unknown() -> None:
                 ),
             )
             assert residual.source_relation is SourceRelation.UNKNOWN
+            # The source-relation conjunct now passes. Another conjunct still
+            # excludes these redox rows (w1118d445-score).
             assert residual.score_eligible is False
+            assert "source_relation_not_same_input" not in residual.exclusions
             assert candidate is not None
             assert candidate.engine is not None
             assert candidate.engine.lineage_complete is False
