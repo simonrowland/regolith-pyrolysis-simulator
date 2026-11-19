@@ -459,37 +459,202 @@ def kress91_furnace_activity_pressure_bar(
     return floor_vacuum_pressure_bar(0.0, floor_bar=floor_bar)
 
 
-def _linear_interpolate_or_clamp(
-    points: tuple[tuple[float, float], ...],
-    x: float,
-) -> tuple[float, str]:
-    if x <= points[0][0]:
-        return points[0][1], 'clamped_below_verified_range'
-    if x >= points[-1][0]:
-        return points[-1][1], 'clamped_above_verified_range'
-    for (x0, y0), (x1, y1) in zip(points, points[1:]):
-        if x0 <= x <= x1:
-            frac = (x - x0) / (x1 - x0)
-            return y0 + frac * (y1 - y0), 'interpolated_verified_range'
-    return points[-1][1], 'clamped_above_verified_range'
-
-
 def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
-    T_C = float(T_K) - CELSIUS_TO_KELVIN_OFFSET
-    multiplier, status = _linear_interpolate_or_clamp(
-        HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C,
-        T_C,
-    )
-    central = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * multiplier
-    sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * multiplier
+    try:
+        temperature_K = float(T_K)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise Kress91InvalidControls(
+            'Holzheid stoichiometric FeO gamma invalid control T_K: expected '
+            f'finite positive value, got {T_K!r}'
+        ) from exc
+    if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+        raise Kress91InvalidControls(
+            'Holzheid stoichiometric FeO gamma invalid control T_K: expected '
+            f'finite positive value, got {T_K!r}'
+        )
+
+    def representable_prediction(exponent: float) -> float:
+        try:
+            result = math.exp(exponent)
+        except OverflowError as exc:
+            raise Kress91InvalidControls(
+                'Holzheid stoichiometric FeO gamma invalid control T_K: '
+                f'prediction is unrepresentable at {T_K!r}'
+            ) from exc
+        if not math.isfinite(result) or result <= 0.0:
+            raise Kress91InvalidControls(
+                'Holzheid stoichiometric FeO gamma invalid control T_K: '
+                f'prediction is unrepresentable at {T_K!r}'
+            )
+        return result
+
+    T_C = temperature_K - CELSIUS_TO_KELVIN_OFFSET
+    points = HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C
+    first_C, last_C = points[0][0], points[-1][0]
+    span_C = last_C - first_C
+    notice = None
+    authority_level = 'certified'
+    status = 'interpolated_verified_range'
+
+    if T_C < first_C or T_C > last_C:
+        below = T_C < first_C
+        edge_C, edge_multiplier = points[0] if below else points[-1]
+        edge_T_K = edge_C + CELSIUS_TO_KELVIN_OFFSET
+        edge_gamma = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * edge_multiplier
+        edge_sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * edge_multiplier
+        # Premise: regular-solution RT ln(gamma) = W with T-independent excess
+        # enthalpy. Holding W at the nearest edge gives
+        # ln(gamma(T)) = ln(gamma(T_edge)) * T_edge/T; W is J/mol, R is
+        # J/(mol K), and both temperatures are K. The 1300 C edge gives
+        # W=16.137 kJ/mol and predicts gamma(1600 C)=2.818 versus printed
+        # 2.822; the 1600 C edge gives W=16.157 kJ/mol. Since the ratio
+        # T_edge/T is one at the edge, this joins continuously to the
+        # unchanged linear interpolation over 1300-1600 C.
+        central = representable_prediction(
+            math.log(edge_gamma) * edge_T_K / temperature_K
+        )
+        multiplier = central / HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
+
+        # Carry the nearest edge's printed uncertainty limits through the same
+        # regular-solution relation and preserve the adjacent printed spread.
+        scaled_low = representable_prediction(
+            math.log(edge_gamma - edge_sigma) * edge_T_K / temperature_K
+        )
+        scaled_high = representable_prediction(
+            math.log(edge_gamma + edge_sigma) * edge_T_K / temperature_K
+        )
+        edge_points = points[:2] if below else points[-2:]
+        edge_segment_spread = abs(
+            HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
+            * (edge_points[1][1] - edge_points[0][1])
+        )
+        # Premise: ln(gamma(T)) = ln(gamma_edge) * T_edge / T, so a band in
+        # ln(gamma_edge) scales by T_edge / T. For positive transported bounds,
+        # d_low = (T_edge/T) * log10(edge_gamma/(edge_gamma-edge_sigma))
+        #       = log10(central/scaled_low), and
+        # d_high = (T_edge/T) * log10((edge_gamma+edge_sigma)/edge_gamma)
+        #        = log10(scaled_high/central); keep them separate when
+        # asymmetric.
+        # Preserve the adjacent-point spread as a floor by converting its
+        # positive central +/- spread bounds to the same one-sided distances.
+        # Each side retains the reviewed quadrature with model scatter below.
+        # Unit check: T_edge/T is K/K and all logarithm arguments are ratios.
+        # At 273.15 K, central is 1218.510097 and transported bounds are
+        # 548.521396 / 2455.957715: both bounds stay positive while their
+        # lower/upper log distances remain distinct.
+        sigma_band_low_log10 = max(
+            math.log10(central / scaled_low),
+            math.log10(central / (central - edge_segment_spread)),
+        )
+        sigma_band_high_log10 = max(
+            math.log10(scaled_high / central),
+            math.log10((central + edge_segment_spread) / central),
+        )
+
+        # The printed 1400 C point is scatter around the constant-W curve, not
+        # a fit target. Derive the larger edge residual from the printed data;
+        # combine it with the transported band in log10 space, in quadrature.
+        target_1400_T_K = points[1][0] + CELSIUS_TO_KELVIN_OFFSET
+        printed_1400_multiplier = points[1][1]
+        model_scatter_log10 = 0.0
+        for scatter_edge_C, scatter_edge_multiplier in (points[0], points[-1]):
+            scatter_edge_gamma = (
+                HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
+                * scatter_edge_multiplier
+            )
+            curve_1400_gamma = representable_prediction(
+                math.log(scatter_edge_gamma)
+                * (scatter_edge_C + CELSIUS_TO_KELVIN_OFFSET)
+                / target_1400_T_K
+            )
+            curve_1400_multiplier = (
+                curve_1400_gamma / HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
+            )
+            model_scatter_log10 = max(
+                model_scatter_log10,
+                abs(math.log10(printed_1400_multiplier / curve_1400_multiplier)),
+            )
+        uncertainty_band_low_log10 = math.sqrt(
+            sigma_band_low_log10**2 + model_scatter_log10**2
+        )
+        uncertainty_band_high_log10 = math.sqrt(
+            sigma_band_high_log10**2 + model_scatter_log10**2
+        )
+        uncertainty_band_log10 = max(
+            uncertainty_band_low_log10,
+            uncertainty_band_high_log10,
+        )
+        measurement_low = representable_prediction(
+            math.log(10.0)
+            * (math.log10(central) - uncertainty_band_low_log10)
+        )
+        measurement_high = representable_prediction(
+            math.log(10.0)
+            * (math.log10(central) + uncertainty_band_high_log10)
+        )
+        sigma = max(central - measurement_low, measurement_high - central)
+        excess_enthalpy_J_mol = GAS_CONSTANT * edge_T_K * math.log(edge_gamma)
+        distance_outside_span_widths = abs(T_C - edge_C) / span_C
+        authority_level = 'extrapolated'
+        status = (
+            'extrapolated_below_verified_range'
+            if below
+            else 'extrapolated_above_verified_range'
+        )
+        notice = {
+            'type': 'typed_notice',
+            'kind': 'out_of_certified_band',
+            'reason': (
+                'Holzheid stoichiometric FeO gamma conversion extrapolated'
+            ),
+            'authority_level': authority_level,
+            'side': 'below' if below else 'above',
+            'certified_band': {'temperature_C': (first_C, last_C)},
+            'edge_used': {
+                'temperature_C': edge_C,
+                'temperature_K': edge_T_K,
+            },
+            'W_J_mol': excess_enthalpy_J_mol,
+            'distance_outside_span_widths': distance_outside_span_widths,
+            'sigma_band_log10': max(
+                sigma_band_low_log10,
+                sigma_band_high_log10,
+            ),
+            'model_scatter_log10': model_scatter_log10,
+            'uncertainty_band_log10': uncertainty_band_log10,
+            'uncertainty_band': sigma,
+            'edge_segment_spread': edge_segment_spread,
+        }
+    else:
+        # Keep each printed point exact, including the high edge whose clamp
+        # previously returned the source value without interpolation arithmetic.
+        for point_C, point_multiplier in points:
+            if T_C == point_C:
+                multiplier = point_multiplier
+                break
+        else:
+            for (x0, y0), (x1, y1) in zip(points, points[1:]):
+                if x0 <= T_C <= x1:
+                    frac = (T_C - x0) / (x1 - x0)
+                    multiplier = y0 + frac * (y1 - y0)
+                    break
+            else:
+                multiplier = points[-1][1]
+        central = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * multiplier
+        sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * multiplier
+        measurement_low = max(0.0, central - sigma)
+        measurement_high = central + sigma
+
     return {
         'basis': 'stoichiometric_FeO_l',
         'temperature_C': T_C,
         'conversion_multiplier': multiplier,
         'conversion_status': status,
+        'authority_level': authority_level,
+        'notice': notice,
         'central': central,
-        'measurement_low': max(0.0, central - sigma),
-        'measurement_high': central + sigma,
+        'measurement_low': measurement_low,
+        'measurement_high': measurement_high,
         'measurement_sigma': sigma,
         'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['holzheid_gamma'],
         'conversion_source': (
@@ -1073,17 +1238,19 @@ def _with_liquid_model_below_liquidus_notice(
 
     if liquid_domain is None or liquid_domain.below_liquidus is False:
         return components
-    components["notices"] = [
-        {
-            "type": "typed_notice",
-            "kind": LIQUID_MODEL_BELOW_LIQUIDUS_KIND,
-            "temperature_K": liquid_domain.temperature_K,
-            "liquidus_T_C": liquid_domain.liquidus_T_C,
-            "solidus_T_C": liquid_domain.solidus_T_C,
-            "source": liquid_domain.source,
-            "authority": "extrapolated",
-        }
-    ]
+    notice = {
+        "type": "typed_notice",
+        "kind": LIQUID_MODEL_BELOW_LIQUIDUS_KIND,
+        "temperature_K": liquid_domain.temperature_K,
+        "liquidus_T_C": liquid_domain.liquidus_T_C,
+        "solidus_T_C": liquid_domain.solidus_T_C,
+        "source": liquid_domain.source,
+        "authority": "extrapolated",
+    }
+    notices = list(components.get("notices", []))
+    if notice not in notices:
+        notices.append(notice)
+    components["notices"] = notices
     return components
 
 
@@ -1196,6 +1363,25 @@ def _calphad_feo_activity_components(
     delta_iw_pure_feo = delta_iw_log10(float(fO2_log), pure_feo_iw)
     calphad_weight = _calphad_authority_weight(delta_iw_pure_feo)
     kress91_weight = 1.0 - calphad_weight
+    holzheid_notice = holzheid.get('notice')
+    holzheid_extrapolation = (
+        isinstance(holzheid_notice, Mapping)
+        and holzheid.get('authority_level') == 'extrapolated'
+    )
+    kress91_extrapolation = bool(
+        split and split.get('extrapolation', False)
+    )
+    consumed_extrapolation = (
+        (calphad_weight > 0.0 and holzheid_extrapolation)
+        or (kress91_weight > 0.0 and kress91_extrapolation)
+    )
+    consumed_authoritative = (
+        (calphad_weight <= 0.0 or not holzheid_extrapolation)
+        and (
+            kress91_weight <= 0.0
+            or bool(split and split.get('authoritative', False))
+        )
+    )
     authoritative_unclamped = calphad_weight * central + kress91_weight * kress91_activity
     # Premise: the pure-liquid-FeO standard state has a_FeO = 1 at metal
     # saturation, so greater activities are unphysical supersaturation.  The
@@ -1223,7 +1409,7 @@ def _calphad_feo_activity_components(
     else:
         regime = 'iw_pure_feo_to_iw_pure_feo_plus_1_smooth_blend'
 
-    return _with_liquid_model_below_liquidus_notice({
+    components: dict[str, object] = {
         'status': 'ok',
         'diagnostic_only': False,
         'consumed_by_behavior': True,
@@ -1256,6 +1442,11 @@ def _calphad_feo_activity_components(
         },
         'authority': {
             'regime': regime,
+            'authority_level': (
+                'extrapolated' if consumed_extrapolation else 'certified'
+            ),
+            'authoritative': consumed_authoritative,
+            'extrapolation': consumed_extrapolation,
             'iw_basis': 'IW(pure-FeO)',
             'relative_to_iw_pure_feo_log10': delta_iw_pure_feo,
             'calphad_weight': calphad_weight,
@@ -1322,7 +1513,10 @@ def _calphad_feo_activity_components(
         },
         'cation_fractions': cation_fractions,
         'sources': FEO_ACTIVITY_DIAGNOSTIC_SOURCES,
-    }, liquid_domain)
+    }
+    if calphad_weight > 0.0 and isinstance(holzheid_notice, Mapping):
+        components['notices'] = [dict(holzheid_notice)]
+    return _with_liquid_model_below_liquidus_notice(components, liquid_domain)
 
 
 def calphad_ferrous_feo_activity_diagnostic(

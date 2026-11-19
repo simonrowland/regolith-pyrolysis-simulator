@@ -3949,6 +3949,21 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     else:
                         provenance["activity_basis"] = fe_activity_basis
                         provenance["degraded_activity_basis"] = None
+                    if (
+                        fe_activity_basis == "kress91_ferrous"
+                        and isinstance(feo_activity_diagnostic, Mapping)
+                    ):
+                        activity_authority = dict(
+                            feo_activity_diagnostic.get("authority") or {}
+                        )
+                        provenance["activity_authority"] = activity_authority
+                        activity_notices = feo_activity_diagnostic.get("notices")
+                        if activity_notices:
+                            provenance["activity_notices"] = [
+                                dict(notice)
+                                for notice in activity_notices
+                                if isinstance(notice, Mapping)
+                            ]
                 vapor_pressure_provenance[species] = provenance
                 if oxide_activity is not None:
                     vapor_pressure_provenance[species].update(

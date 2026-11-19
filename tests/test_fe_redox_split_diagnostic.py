@@ -13,6 +13,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import CampaignPhase
+from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -205,6 +206,67 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
         0.0,
         abs=5e-12,
     )
+
+
+def test_native_fe_holzheid_extrapolation_is_flagged_at_1610_c(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.fe_redox import LiquidFeODomain
+
+    sim = _make_sim("lunar_mare_low_ti", temperature_C=1610.0)
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.fO2_log = -10.0
+    sim.melt.melt_fO2_log = -10.0
+    liquid_domain = LiquidFeODomain(
+        below_liquidus=True,
+        temperature_K=1610.0 + 273.15,
+        liquidus_T_C=1650.0,
+        solidus_T_C=1050.0,
+        source="gate_liquid_fraction",
+    )
+    monkeypatch.setattr(
+        sim,
+        "liquid_feo_domain_at",
+        lambda _temperature_K: liquid_domain,
+    )
+
+    split = sim._compute_fe_redox_split_diagnostic()
+
+    assert split["native_fe_frac"] > 0.0
+    notices = split["notices"]
+    assert {notice["kind"] for notice in notices} == {
+        "liquid_model_below_liquidus",
+        "out_of_certified_band",
+    }
+    holzheid_notice = next(
+        notice for notice in notices if notice["kind"] == "out_of_certified_band"
+    )
+    assert holzheid_notice["authority_level"] == "extrapolated"
+    assert holzheid_notice["certified_band"] == {"temperature_C": (1300.0, 1600.0)}
+    assert split["authoritative"] is False
+    assert split["extrapolation"] is True
+
+
+@pytest.mark.parametrize(
+    ("delta_iw", "expected_extrapolation"),
+    [(2.0, False), (-0.25, True)],
+)
+def test_runtime_fe_authority_tracks_the_activity_blend(
+    delta_iw: float,
+    expected_extrapolation: bool,
+) -> None:
+    temperature_K = 1610.0 + 273.15
+    fO2_log = feo_iw_log10_fO2_bar(temperature_K) + delta_iw
+    sim = _make_sim("lunar_mare_low_ti", temperature_C=1610.0)
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log
+    sim.melt.fO2_log = fO2_log
+    sim.melt.melt_fO2_log = fO2_log
+
+    split = sim._compute_fe_redox_split_diagnostic()
+
+    assert split["extrapolation"] is expected_extrapolation
+    assert split["authoritative"] is (not expected_extrapolation)
+    assert ("notices" in split) is expected_extrapolation
 
 
 def test_native_fe_authoritative_extent_ignores_diagnostic_payload(

@@ -105,7 +105,9 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     assert len(execution.snapshots) == 2
     # Studio-3 actual for this Mars C2A 2 h payload (pins2 log, tree
     # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
-    # the laptop and studio-3, so this digest is not a laptop re-run.
+    # the laptop and studio-3, so this digest is not a laptop re-run. Re-derived
+    # on b269+b-1124 at Studio. The b-1124 Holzheid continuation and consumed
+    # activity notice propagation affect this runner payload; b-906 is absent.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
         "db9b5ffda079b4886252281c2fabad6413ac60c76a29f175b799188fb8696e3a"
     )
@@ -1187,28 +1189,31 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     # B582_RUNTIME_ENFORCEMENT=0 ... b582_identity_probe.py.
     # b-850: alkali composite vapour rows use parent-oxide activity; K2O_gas is below the existing 1e-12 kg/hr cutoff.
     # b-858: atomic Si now uses the sourced Svehla 1962 Table I transport row.
+    # d-339 at 1670 C changes authoritative FeO activity and native-Fe
+    # saturation through the extrapolated Holzheid gamma band. Fe removal
+    # changes the melt composition used by these activity-based rates.
     expected_rates = {
-        "Al": 1.776974630811854e-10,
-        "AlO": 2.622990526227972e-10,
-        "Ca": 6.00143229355403e-09,
-        "CaO_gas": 2.067737447801073e-11,
-        "Cr": 4.355218555260953e-05,
-        "CrO": 9.136286575214734e-06,
-        "CrO2": 3.1730720722299763e-06,
-        "CrO3": 9.294384109563237e-10,
-        "K": 1.8395070246088384e-04,
-        "K2": 1.6813544178336032e-11,
-        "Mg": 7.23266209617007e-05,
-        "MgO_gas": 1.0307259466430569e-07,
-        "Mn": 2.2585292315558916e-05,
-        "Na": 5.142690508092712e-03,
-        "Na2": 3.013634463408095e-08,
-        "Na2O_gas": 3.0031933641137976e-11,
-        "Si": 1.2046947950628297e-10,
-        "SiO": 7.769179203709372e-09,
-        "SiO2_gas": 4.598894711291365e-06,
-        "TiO": 2.8635316467141483e-09,
-        "TiO2_gas": 4.788176871001818e-08,
+        "Al": 1.782831024965498e-10,
+        "AlO": 2.6204244179880487e-10,
+        "Ca": 6.008372455211351e-09,
+        "CaO_gas": 2.0613098990519227e-11,
+        "Cr": 4.369560859071835e-05,
+        "CrO": 9.12732494786571e-06,
+        "CrO2": 3.1564555220594096e-06,
+        "CrO3": 9.206325253306289e-10,
+        "K": 1.837726942686529e-04,
+        "K2": 1.6780840786747765e-11,
+        "Mg": 7.241025531653482e-05,
+        "MgO_gas": 1.02752186467007e-07,
+        "Mn": 2.261139177573956e-05,
+        "Na": 5.1381094788219474e-03,
+        "Na2": 3.008004310004602e-08,
+        "Na2O_gas": 2.984813059960125e-11,
+        "Si": 1.2112478245644465e-10,
+        "SiO": 7.960372351564379e-09,
+        "SiO2_gas": 4.584599083161846e-06,
+        "TiO": 2.8668430863371424e-09,
+        "TiO2_gas": 4.773292855812262e-08,
     }
     actual_rates = {
         str(species): float(rate)

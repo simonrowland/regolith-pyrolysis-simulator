@@ -635,9 +635,14 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     assert hashlib.sha256(actual_bytes).hexdigest() == (
         # b-244: Al/Ti operator T_cond overrides removed (report-only); 14 text/audit leaves, 0 numeric; Al crossing authority -> capture_threshold_fallback.
         # b-1174: wall-report species = positive vapour supply; +20 zero-valued species keys, 0 changed/numeric leaves (train leaf diff).
+        # d-339: lunar row 15 changes native Fe activity and the Kress91 FeO
+        # seam baseline at 2023.15 K; OpenIMCC activity is unchanged.
         # IA stateless: the 7 hour-16 certified-gamma certificates carry hour/window_K/composition_window_L1 = null (21 leaves);
         # the history-dependent cap-step seam notice is gone (1 notice); 2 keys reordered; 0 numeric leaves changed. Payload = runner C0 fixture bytes.
-        "14387e1e0fe81b14d7557d4da279a8d62b9f6e5cab2d8a449931e958860db7de"
+        # b-1124's Holzheid continuation and consumed-activity notice
+        # propagation are reflected in the Studio payload; b-906 is absent.
+        # Mac-Studio-256-2, assembled b269+b-1124, 2026-11-19.
+        "db959cabe076bfab884983b4e59e36673337009fcb325572f3590a95eb7df71b"
     )
 
 

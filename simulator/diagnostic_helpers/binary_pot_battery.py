@@ -3793,6 +3793,31 @@ def _internal_analytical_vapor_pressure_adapter(
                 }
             )
 
+    for row in dict(
+        core_diagnostic.get("vapor_pressure_numerator_provenance") or {}
+    ).values():
+        if not isinstance(row, Mapping):
+            continue
+        if row.get("activity_basis") != "kress91_ferrous":
+            continue
+        activity_authority = row.get("activity_authority")
+        if not isinstance(activity_authority, Mapping):
+            continue
+        if not activity_authority.get("extrapolation"):
+            continue
+        for notice in row.get("activity_notices", ()) or ():
+            if not isinstance(notice, Mapping):
+                continue
+            core_flags.append(
+                {
+                    **dict(notice),
+                    "authority": AUTHORITY_EXTRAPOLATED,
+                    "activity_authority": dict(activity_authority),
+                    "band": notice.get("certified_band"),
+                    "source": "consumed_fe_vapor_activity",
+                }
+            )
+
     imcc_notices = [*oxygen_notices]
     imcc_notices.extend(core_flags)
     vapor_authority = core_diagnostic.get("vapor_pressure_authority")

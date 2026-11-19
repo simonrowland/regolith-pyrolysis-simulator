@@ -226925,7 +226925,7 @@
         "ferrous_frac": 0.9625036232188363,
         "high_uncertainty": false,
         "iw_log": -6.8817954674641015,
-        "native_fe_activity": "0.22340912061117918",
+        "native_fe_activity": "0.21410205542000205",
         "native_fe_activity_source": "Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 FeO(l)=Fe+0.5O2 saturation",
         "native_fe_frac": 0.0,
         "native_fe_pure_feo_iw_log": "-7.27205904713499",
@@ -226937,6 +226937,7 @@
           "native_fe_event_status": "ok"
         },
         "native_fe_threshold": "FeO_activity_saturation",
+        "notices": "[{'type': 'typed_notice', 'kind': 'out_of_certified_band', 'reason': 'Holzheid stoichiometric FeO gamma conversion extrapolated', 'authority_level': 'extrapolated', 'side': 'above', 'certified_band': {'temperature_C': (1300.0, 1600.0)}, 'edge_used': {'temperature_C': 1600.0, 'temperature_K': 1873.15}, 'W_J_mol': 16157.426198757204, 'distance_outside_span_widths': 0.5, 'sigma_band_log10': 0.08733210597446989, 'model_scatter_log10': 0.014473806727208426, 'uncertainty_band_log10': 0.08852337439971786, 'uncertainty_band': 0.48616846686215354, 'edge_segment_spread': 0.47600000000000003}]",
         "pressure_bar": 0.01,
         "reference": "Kress and Carmichael 1991 Contrib Mineral Petrol 108:82-92 doi:10.1007/BF00307328",
         "source": "simulator.fe_redox:kress91_split",
@@ -260270,14 +260271,14 @@
             "authority_exclusion": null
           },
           "FeO": {
-            "below_cap_activity": 0.2416125849183696,
+            "below_cap_activity": 0.23025617634710815,
             "below_cap_activity_basis": "kress91_ferrous",
             "openimcc_activity": 0.14324692359108157,
-            "ratio_dex_openimcc_over_below_cap": -0.22703424799728855,
+            "ratio_dex_openimcc_over_below_cap": -0.20612598474013719,
             "selected_activity": 0.14324692359108157,
             "selected_activity_basis": "openimcc_single_cation",
-            "ratio_dex_selected_over_below_cap": -0.22703424799728855,
-            "would_be_openimcc_step_dex": -0.22703424799728855,
+            "ratio_dex_selected_over_below_cap": -0.20612598474013719,
+            "would_be_openimcc_step_dex": -0.20612598474013719,
             "authority_exclusion": null
           },
           "MgO": {

@@ -7877,6 +7877,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             native_extent.get('native_fe_frac', 0.0) or 0.0,
         )))
         ferrous = max(0.0, 1.0 - fe3 - native)
+        native_fe_extrapolation = any(
+            isinstance(notice, Mapping)
+            and notice.get('kind') == 'out_of_certified_band'
+            and notice.get('authority_level') == 'extrapolated'
+            for notice in native_state.get('notices', ()) or ()
+        )
         return {
             **base,
             **native_state,
@@ -7896,8 +7902,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'temperature_band_case': split.get('temperature_band_case'),
             'temperature_band_status': split.get('temperature_band_status'),
             'temperature_band_source': split.get('temperature_band_source'),
-            'authoritative': bool(split.get('authoritative', False)),
-            'extrapolation': bool(split.get('extrapolation', False)),
+            'authoritative': (
+                bool(split.get('authoritative', False))
+                and not native_fe_extrapolation
+            ),
+            'extrapolation': (
+                bool(split.get('extrapolation', False))
+                or native_fe_extrapolation
+            ),
             'high_uncertainty': bool(split.get('high_uncertainty', False)),
             **(
                 {'native_fe_partition': dict(
