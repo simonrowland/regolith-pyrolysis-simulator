@@ -1370,6 +1370,16 @@ def test_evaluate_default_tracks_runtime_backend_pack(monkeypatch) -> None:
     assert result.pack_digest == openimcc_bridge._pack_digest(expected_pack)
 
 
+def test_evaluate_still_refuses_unmodelled_composition_components() -> None:
+    package = _openimcc_or_skip()
+
+    with pytest.raises(package.ImccComponentOutsideDomainError, match="B2O3"):
+        bridge_evaluate(
+            composition_mol={"SiO2": 0.9, "B2O3": 0.1},
+            temperature_K=1800.0,
+        )
+
+
 def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None:
     from simulator import engine_cache
     from simulator.melt_backend import openimcc_bridge
@@ -1401,6 +1411,7 @@ def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None
     assert result == {"ok": True}
     assert requests[0][0] == "openimcc"
     assert requests[0][1]["pack"] == "published-ext"
+    assert requests[0][1]["trace_activity_results"] == "with-traces-v1"
 
 
 def test_evaluate_preserves_boolean_temperature_for_openimcc_refusal(

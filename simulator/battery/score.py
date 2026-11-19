@@ -11277,9 +11277,12 @@ def _engine_bulk_component_names(engine: Engine) -> tuple[str, ...]:
 
         return tuple(MAGEMinBackend._MAGEMIN_INPUT_BASIS)
     if engine is Engine.OPENIMCC:
-        from simulator.melt_backend.openimcc_bridge import OPENIMCC_PARENT_OXIDES
+        from simulator.melt_backend.openimcc_bridge import (
+            OPENIMCC_PARENT_OXIDES,
+            _openimcc_trace_activity_models,
+        )
 
-        return tuple(OPENIMCC_PARENT_OXIDES)
+        return (*OPENIMCC_PARENT_OXIDES, *_openimcc_trace_activity_models())
     return ()
 
 

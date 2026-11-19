@@ -548,6 +548,50 @@ def test_openimcc_engine_is_registered() -> None:
     assert "openimcc" in MELT_ACTIVITY_ENGINES
 
 
+def test_openimcc_input_basis_tracks_installed_trace_rules() -> None:
+    _require_openimcc()
+    from simulator.battery.score import _engine_bulk_component_names
+    from simulator.melt_backend.openimcc_bridge import (
+        OPENIMCC_PARENT_OXIDES,
+        _openimcc_trace_activity_models,
+    )
+
+    expected = set(OPENIMCC_PARENT_OXIDES) | set(
+        _openimcc_trace_activity_models()
+    )
+    assert set(_engine_bulk_component_names(Engine.OPENIMCC)) == expected
+
+
+def test_openimcc_battery_returns_modeled_trace_activity() -> None:
+    _require_openimcc()
+    from openimcc.trace_components import _TRACE_COMPONENT_RULES
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    result = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_mol={
+            "Na2O": 0.08,
+            "K2O": 0.01,
+            "SiO2": 0.60,
+            "FeO": 0.12,
+            "MgO": 0.12,
+            "CaO": 0.04,
+            "Al2O3": 0.02,
+            "TiO2": 0.005,
+            "NiO": 0.001,
+        },
+    )
+
+    assert result.status == "ok"
+    assert result.activity_coefficients["NiO"] >= 0.0
+    assert result.diagnostics["openimcc_provenance"]["trace_activity_models"] == {
+        "NiO": str(_TRACE_COMPONENT_RULES["NiO"].activity_model)
+    }
+
+
 def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     _require_openimcc()
     handle = open_battery_engine("openimcc")

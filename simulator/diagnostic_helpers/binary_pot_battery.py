@@ -3315,6 +3315,11 @@ class _OpenImccBatteryBackend:
                 }
             )
 
+        gas_parent_oxide_activities = {
+            name: result.parent_oxide_activities[name]
+            for name in result.parent_oxides
+            if name in result.parent_oxide_activities
+        }
         pressures: dict[str, float] = {}
         vapor_sources: dict[str, str] = {}
         gas_diagnostics: dict[str, Any] = {}
@@ -3522,6 +3527,13 @@ class _OpenImccBatteryBackend:
             "pack": result.pack_version,
             "pack_digest": result.pack_digest,
         }
+        trace_activity_models = (
+            self._bridge._trace_activity_models_for_components(
+                result.parent_oxide_activities
+            )
+        )
+        if trace_activity_models:
+            provenance["trace_activity_models"] = trace_activity_models
         if "engine_binding_identity" in self._identity:
             provenance["engine_binding_identity"] = self._identity[
                 "engine_binding_identity"

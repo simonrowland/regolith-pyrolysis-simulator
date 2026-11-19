@@ -1247,13 +1247,6 @@ def _build_high_t_melt_activity_authority(
                 ),
             }
         )
-        relaxed_projection = (
-            classification.get("openimcc_projection_crmn_relaxed")
-            if isinstance(classification, Mapping)
-            else None
-        )
-        if isinstance(relaxed_projection, Mapping):
-            base["openimcc_projection_crmn_relaxed"] = dict(relaxed_projection)
         held = {}
         # A numerical nonconvergence uses the nearest successful probe on
         # each side when both exist; otherwise it holds the nearest one-sided
@@ -1369,9 +1362,6 @@ def _build_high_t_melt_activity_authority(
         policy_notices.append(dict(cleaned.policy["notice"]))
     if cleaned.policy.get("fe2o3_fold"):
         policy_notices.append(dict(cleaned.policy["fe2o3_fold"]))
-    relaxed_projection = cleaned.policy.get("openimcc_projection_crmn_relaxed")
-    if isinstance(relaxed_projection, Mapping):
-        policy_notices.append(dict(relaxed_projection))
     from simulator.melt_backend.openimcc_bridge import (
         imcc_complex_saturation_notices,
     )
@@ -1415,9 +1405,6 @@ def _build_high_t_melt_activity_authority(
             ),
         }
     )
-    if isinstance(relaxed_projection, Mapping):
-        base["openimcc_projection_crmn_relaxed"] = dict(relaxed_projection)
-
     if projection_notice is not None:
         base.update({
             "fallback": True,
@@ -1885,14 +1872,14 @@ def _attach_high_t_activity_provenance(
             provenance["composition_projection_classification"] = dict(
                 classification
             )
-            relaxed_projection = (
-                classification.get("openimcc_projection_crmn_relaxed")
-                if isinstance(classification, Mapping)
-                else None
+        composition_policy = authority.get("composition_policy")
+        if isinstance(composition_policy, Mapping):
+            trace_activity_models = composition_policy.get(
+                "trace_activity_models"
             )
-            if isinstance(relaxed_projection, Mapping):
-                provenance["openimcc_projection_crmn_relaxed"] = dict(
-                    relaxed_projection
+            if isinstance(trace_activity_models, Mapping) and trace_activity_models:
+                provenance["openimcc_trace_activity_models"] = dict(
+                    trace_activity_models
                 )
         source = str(vapor_pressure_sources.get(species) or "")
         if source and token not in source.split(":"):
