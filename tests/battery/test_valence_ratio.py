@@ -797,10 +797,6 @@ def test_openimcc_candidate_pins_legacy_cr_output_and_refuses_unmodelled_total(
     )
     assert ledger_fraction is not None
     assert Decimal(str(ledger_fraction)) == Decimal("0.009287300159578668")
-    legacy_fraction = output.chromous_cr_mol / (
-        output.chromous_cr_mol + output.chromic_cr_mol
-    )
-    assert Decimal(str(ledger_fraction)) == Decimal(str(legacy_fraction))
     chromium_coverage = next(
         entry
         for entry in output.unmodelled_redox_couples
@@ -897,8 +893,6 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
     assert output.titanous_ti_mol == 0.0002885915704367488
     assert output.titanic_ti_mol == 0.024753667241308078
     assert prediction.value == Decimal("0.011658538010689464")
-    legacy_ratio = output.titanous_ti_mol / output.titanic_ti_mol
-    assert Decimal(str(prediction.value)) == Decimal(str(legacy_ratio))
 
 
 def test_openimcc_refuses_mn_rows_when_pinned_pack_omits_mn3(

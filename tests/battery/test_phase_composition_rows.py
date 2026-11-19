@@ -2874,6 +2874,27 @@ def test_openimcc_reports_missing_non_fe_redox_couples() -> None:
     for index, (formula, basis, expected_couple) in enumerate(missing_bases):
         identity = _valence_identity(formula, basis)
         if formula == "Mn":
+            incomplete_observation = F.observation(
+                f"missing-openimcc-couple-{index}-missing-iron",
+                "sample-1",
+                identity,
+                Decimal("0.5"),
+                evidence=EvidenceClass.MEASURED_DIRECT,
+                source_id="fixture-phase-source",
+            )
+            incomplete_prediction = predict_with_engine(
+                Engine.OPENIMCC, incomplete_observation
+            )
+            assert incomplete_prediction.value is None
+            assert (
+                incomplete_prediction.refusal_reason
+                is RefusalReason.IDENTITY_INCOMPLETE
+            )
+            assert incomplete_prediction.refusal_detail == {
+                "reason": "missing_input",
+                "input": "total_iron",
+            }
+
             # The candidate route requires total Fe before checking pinned
             # Mn coverage. Supply both elements so this asserts coverage.
             composition = Composition(
