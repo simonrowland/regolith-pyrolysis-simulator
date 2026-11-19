@@ -34,15 +34,60 @@ def test_every_shipped_vacuum_pyrolysis_preset_loads() -> None:
         runner_module._load_preset_run_spec(preset_path, "faithful")
 
 
+def _assert_subhour_preset_refuses(preset_path: Path) -> None:
+    try:
+        runner_module._load_preset_run_spec(preset_path, "faithful")
+    except runner_module.PresetRunnerError as exc:
+        message = str(exc)
+        assert message.startswith("malformed_preset:")
+        assert "duration_h=0.25" in message
+        assert "1-hour simulator timestep" in message
+    else:
+        raise AssertionError("sub-hour preset was accepted by the hourly runner")
+
+
+def test_quarter_hour_preset_refuses_with_hourly_timestep_reason(
+    tmp_path: Path,
+) -> None:
+    preset_path = _write_bridge_preset(
+        tmp_path,
+        feedstock_id="lunar_mare_low_ti",
+        duration_h=0.25,
+    )
+
+    _assert_subhour_preset_refuses(preset_path)
+
+
+def test_quarter_hour_refusal_detects_lossy_guard_mutation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    preset_path = _write_bridge_preset(
+        tmp_path,
+        feedstock_id="lunar_mare_low_ti",
+        duration_h=0.25,
+    )
+    monkeypatch.setattr(
+        runner_module.math,
+        "isclose",
+        lambda *_args, **_kwargs: True,
+    )
+
+    with pytest.raises(AssertionError, match="sub-hour preset was accepted"):
+        _assert_subhour_preset_refuses(preset_path)
+
+
 def _write_bridge_preset(
     tmp_path: Path,
     *,
     feedstock_id: str,
+    duration_h: float = 1.0,
     scale: str = "gram_lab",
     exposed_melt_area_m2: float | None = None,
     comparison_sidecar_path: Path | None = None,
 ) -> Path:
     preset_path = tmp_path / "bridge_preset.yaml"
+    duration_literal = repr(float(duration_h))
     exposed_area_line = (
         ""
         if exposed_melt_area_m2 is None
@@ -75,7 +120,7 @@ def _write_bridge_preset(
             preset_kind: faithful_with_remediation_twin
             lab_schedule:
               id: bridge_schedule
-              duration_h: 1.0
+              duration_h: {duration_literal}
               interpolation: piecewise_linear
               interpolation_source_class: assumption_with_sensitivity_marker
               interpolation_citation_id: bridge_test
@@ -83,10 +128,10 @@ def _write_bridge_preset(
               furnace_ceiling_C: 1600.0
               melt_temperature_C:
                 - {{t_h: 0.0, value: 25.0, unit: C}}
-                - {{t_h: 1.0, value: 1500.0, unit: C}}
+                - {{t_h: {duration_literal}, value: 1500.0, unit: C}}
               chamber_pressure_mbar:
                 - {{t_h: 0.0, value: 13.0, unit: mbar}}
-                - {{t_h: 1.0, value: 13.0, unit: mbar}}
+                - {{t_h: {duration_literal}, value: 13.0, unit: mbar}}
               gas_boundary:
                 background_gas:
                   species: Ar
@@ -108,7 +153,7 @@ def _write_bridge_preset(
               surface_temperature_C:
                 witness:
                   - {{t_h: 0.0, value: 25.0, unit: C}}
-                  - {{t_h: 1.0, value: 300.0, unit: C}}
+                  - {{t_h: {duration_literal}, value: 300.0, unit: C}}
             lab_geometry:
               id: bridge_geometry
               scale: {scale}
@@ -130,13 +175,13 @@ def _write_bridge_preset(
                 feedstock_id: {feedstock_id}
                 schedule_id: bridge_schedule
                 geometry_id: bridge_geometry
-                duration_h: 1.0
+                duration_h: {duration_literal}
                 mitigation: none
               remediation:
                 feedstock_id: {feedstock_id}
                 schedule_id: bridge_schedule
                 geometry_id: bridge_geometry
-                duration_h: 1.0
+                duration_h: {duration_literal}
                 mitigation:
                   pO2_cover:
                     enabled: true
