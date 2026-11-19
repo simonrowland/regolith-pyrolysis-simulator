@@ -4,13 +4,13 @@ from pathlib import Path
 
 import yaml
 
-from literature_extract_assertions import assert_all_physical_locators
 from simulator.battery.enums import NoticeKind, Phase
 from simulator.battery.migrate import (
     Migrator,
     _printed_fO2_identity_state,
     collect_printed_oxygen,
 )
+from tests.literature_extract_test_helpers import assert_all_physical_locators
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 

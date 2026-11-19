@@ -4,11 +4,13 @@ from pathlib import Path
 
 import yaml
 
-from literature_extract_assertions import assert_all_physical_locators
 from simulator.battery.enums import Phase, Quantity, ValueKind
 from simulator.battery.identity import _format_enthalpy_increment_subtype
 from simulator.battery.migrate import Migrator, _enthalpy_increment_subtype
-from tests.literature_extract_test_helpers import iter_locators
+from tests.literature_extract_test_helpers import (
+    assert_all_physical_locators,
+    iter_locators,
+)
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 

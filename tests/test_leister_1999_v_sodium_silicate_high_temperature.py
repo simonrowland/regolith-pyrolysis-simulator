@@ -15,7 +15,10 @@ from simulator.battery.enums import (
 )
 from simulator.battery.migrate import Migrator
 from simulator.battery.score import _printed_uncertainty_band
-from tests.literature_extract_test_helpers import iter_locators
+from tests.literature_extract_test_helpers import (
+    assert_all_physical_locators,
+    iter_locators,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -54,11 +57,8 @@ def test_table2_valence_cells_render_pins_and_migrate_with_conditions() -> None:
 
     locators = list(iter_locators(document))
     assert len(locators) == 184
-    assert all(
-        locator["page"] == locator["pdf_page_index"] + 1
-        and "published_page" in locator
-        for locator in locators
-    )
+    assert_all_physical_locators(document)
+    assert all("published_page" in locator for locator in locators)
     assert all(
         (point["point_conditions"]["atmosphere"]["state"]["value"] == "N2")
         == (point["quench_status"]["state"]["value"] == "not_stated")

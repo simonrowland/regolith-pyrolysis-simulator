@@ -6,7 +6,10 @@ from collections import Counter
 
 from simulator.battery.enums import CellMaterial, MethodToken, Phase, Quantity
 from simulator.battery.migrate import Migrator
-from tests.literature_extract_test_helpers import iter_locators
+from tests.literature_extract_test_helpers import (
+    assert_all_physical_locators,
+    iter_locators,
+)
 from simulator.yaml_cache import YAML12SafeLoader, yaml_mapping_source_issues
 import yaml
 
@@ -145,11 +148,8 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     # The merged document keeps the two Table 9 NaAlSi_6 points and Na Table
     # 10a row 8, each with a row locator and a condition locator.
     assert len(locators) == 2235
-    assert all(
-        locator["page"] == locator["pdf_page_index"] + 1
-        and "published_page" in locator
-        for locator in locators
-    )
+    assert_all_physical_locators(document)
+    assert all("published_page" in locator for locator in locators)
 
     appendix_rows = Counter()
     for species in document["species"].values():
