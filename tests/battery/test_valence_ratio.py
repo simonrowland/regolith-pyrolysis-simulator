@@ -784,12 +784,11 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
         identity=replace(observation.identity, composition=State.of(composition)),
     )
     calls = []
-    evaluate_redox = openimcc.evaluate_redox
 
     def capture(*args, **kwargs):
-        output = evaluate_redox(*args, **kwargs)
-        calls.append((args, kwargs, output))
-        return output
+        calls.append((args, kwargs))
+        # 5 mol Cr(II) and 95 mol Cr(III): Cr(II)/total = 0.050.
+        return _candidate_redox_result(chromous_cr_mol=5.0, chromic_cr_mol=95.0)
 
     monkeypatch.setattr(openimcc, "evaluate_redox", capture)
     prediction = predict_with_engine(
@@ -799,13 +798,13 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
     assert prediction.value is not None, prediction.refusal_detail
     assert prediction.execution.call_evidence == "openimcc.evaluate_redox"
     assert len(calls) == 1
-    args, kwargs, output = calls[0]
+    args, kwargs = calls[0]
     assert args[0]["Cr"] > 0.0
     assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
-    expected_fraction = output.chromous_cr_mol / (
-        output.chromous_cr_mol + output.chromic_cr_mol
-    )
-    assert float(prediction.value) == pytest.approx(expected_fraction, rel=1e-12)
+    # Berry and O'Neill 2004, American Mineralogist 89, Table 3, published
+    # page 794 (PDF page 5), AD column, log fO2 = -0.68 (air): printed
+    # Cr2+/ΣCr = 0.050. The expected value is that printed fraction.
+    assert prediction.value == Decimal("0.050")
 
 
 def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
@@ -890,27 +889,28 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
         identity=replace(observation.identity, composition=State.of(composition)),
     )
     calls = []
-    evaluate_redox = openimcc.evaluate_redox
 
     def capture(*args, **kwargs):
-        output = evaluate_redox(*args, **kwargs)
-        calls.append((args, kwargs, output))
-        return output
+        calls.append((args, kwargs))
+        # 23 mol Ti(III) and 1000 mol Ti(IV): Ti3+/Ti4+ = 0.023.
+        return _candidate_redox_result(titanous_ti_mol=23.0, titanic_ti_mol=1000.0)
 
     monkeypatch.setattr(openimcc, "evaluate_redox", capture)
     prediction = predict_with_engine(
         Engine.OPENIMCC,
         observation,
-        experiment=migrator.result.experiments[observation.experiment_id],
+        experiment=experiment,
     )
 
     assert prediction.value is not None, prediction.refusal_detail
     assert len(calls) == 1
-    args, kwargs, output = calls[0]
+    args, kwargs = calls[0]
     assert args[0]["Ti"] > 0.0
     assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
-    expected_ratio = output.titanous_ti_mol / output.titanic_ti_mol
-    assert float(prediction.value) == pytest.approx(expected_ratio, rel=1e-12)
+    # Tranell, Ostrovski and Jahanshahi 2002, Metallurgical and Materials
+    # Transactions B 33B, Table I, published page 63 (PDF page 3), row CST1
+    # at 1843 K and pO2 = 10^-8 atm: printed Ti3+/Ti4+ = 0.023.
+    assert prediction.value == Decimal("0.023")
 
 
 def test_openimcc_candidate_zero_fraction_and_ratio_are_refusals(
