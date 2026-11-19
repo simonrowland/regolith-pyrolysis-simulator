@@ -966,98 +966,110 @@ gaps:
   sidecars_missing_fields:
   - source_id: ivtan-cro2-g
     sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-cro2-g.md
-    missing_fields:
+    missing_fields: &id001
     - doi
   - source_id: kems-003-pound-1972
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.md
-    missing_fields:
+    missing_fields: &id002
     - retrieval_url
   - source_id: kems-005-fedkin-2006
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-005-fedkin-2006.md
-    missing_fields:
+    missing_fields: &id003
     - retrieval_url
   - source_id: kems-011-wetzel-gail-2013
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-011-wetzel-gail-2013.md
-    missing_fields:
+    missing_fields: &id004
     - retrieved_date
     - retrieval_url
   - source_id: kems-012-sossi-2019
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.md
-    missing_fields:
+    missing_fields: &id005
     - sha256
     - retrieved_date
   - source_id: kems-014-drowart-2005
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-014-drowart-2005.md
-    missing_fields:
+    missing_fields: &id006
     - sha256
     - retrieval_url
   - source_id: kems-022-demaria-1971
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.md
-    missing_fields:
+    missing_fields: &id007
     - doi
   - source_id: kems-035-sauerborn-2005
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-035-sauerborn-2005.md
-    missing_fields:
+    missing_fields: &id008
     - doi
   - source_id: kems-036-sesko-2024
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md
-    missing_fields:
+    missing_fields: &id009
     - sha256
     - retrieval_url
   - source_id: kems-041-sossi-fegley-2018
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.md
-    missing_fields:
+    missing_fields: &id010
     - retrieval_url
   - source_id: kems-042-plante-1979
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-042-plante-1979.md
-    missing_fields:
+    missing_fields: &id011
     - sha256
   - source_id: kems-050-gorokhov-1977
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-050-gorokhov-1977.md
-    missing_fields:
+    missing_fields: &id012
     - doi
     - sha256
   - source_id: kems-093-piacente-1975
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-093-piacente-1975.md
-    missing_fields:
+    missing_fields: &id013
     - doi
   - source_id: kems-103-fraser-1983
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-103-fraser-1983.md
-    missing_fields:
+    missing_fields: &id014
     - sha256
   - source_id: kems-114-nichols-1995
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-114-nichols-1995.md
-    missing_fields:
+    missing_fields: &id015
     - doi
   - source_id: kems-133-costa-2017
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-133-costa-2017.md
-    missing_fields:
+    missing_fields: &id016
     - sha256
   - source_id: kems-140-heck-2025
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-140-heck-2025.md
-    missing_fields:
+    missing_fields: &id017
     - sha256
   - source_id: kems-184-behrens-1979
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.md
-    missing_fields:
+    missing_fields: &id018
     - doi
     - sha256
   - source_id: kems-ms2000-044
     sidecar_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.md
-    missing_fields:
+    missing_fields: &id019
     - doi
     - retrieval_url
   - source_id: smales-1971-lpsc-12022
     sidecar_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md
-    missing_fields:
+    missing_fields: &id020
     - doi
     - retrieved_date
   - source_id: stebbins-carmichael-weill-1983
     sidecar_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md
-    missing_fields:
+    missing_fields: &id021
     - doi
     - retrieved_date
   source_id_collisions:
+  - type: filename_stem_mismatch
+    key: kems-ms2000-044
+    source_ids:
+    - kems-ms2000-044
+    - ms2000-044
+    resolution: owner/controller
+  - type: pdf_stem_vs_extract
+    key: kems-042-plante-1979
+    source_ids:
+    - kems-042-nbs-sp561-v1-hastie-1979
+    - kems-042-plante-1979
+    resolution: owner/controller
   - type: same_doi
     key: 10.1007/s11663-024-02995-6
     source_ids:
@@ -1330,18 +1342,6 @@ gaps:
     source_ids:
     - kassis-frischat-1981-mixed-alkali-vapor-pressures
     - kassis-frischat-1981-silicate-glass-vapour
-    resolution: owner/controller
-  - type: pdf_stem_vs_extract
-    key: kems-042-plante-1979
-    source_ids:
-    - kems-042-nbs-sp561-v1-hastie-1979
-    - kems-042-plante-1979
-    resolution: owner/controller
-  - type: filename_stem_mismatch
-    key: kems-ms2000-044
-    source_ids:
-    - kems-ms2000-044
-    - ms2000-044
     resolution: owner/controller
   - type: source_id_alias
     key: khedim-2010
@@ -2121,7 +2121,7 @@ sources:
   extracts:
   - path: data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml
     review_status: draft
-    rows: 28
+    rows: 89
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -14855,8 +14855,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-cro2-g.md
-  sidecar_missing_fields:
-  - doi
+  sidecar_missing_fields: *id001
   access_status: OA
   extracts:
   - path: data/literature/extracts/ivtan-cro2-g.yaml
@@ -16725,8 +16724,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.md
-  sidecar_missing_fields:
-  - retrieval_url
+  sidecar_missing_fields: *id002
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-003-pound-1972.yaml
@@ -16783,8 +16781,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-005-fedkin-2006.md
-  sidecar_missing_fields:
-  - retrieval_url
+  sidecar_missing_fields: *id003
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-005-fedkin-2006.yaml
@@ -17133,9 +17130,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-011-wetzel-gail-2013.md
-  sidecar_missing_fields:
-  - retrieved_date
-  - retrieval_url
+  sidecar_missing_fields: *id004
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-011-wetzel-gail-2013.yaml
@@ -17189,9 +17184,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.md
-  sidecar_missing_fields:
-  - sha256
-  - retrieved_date
+  sidecar_missing_fields: *id005
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-012-sossi-2019.yaml
@@ -17246,9 +17239,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-014-drowart-2005.md
-  sidecar_missing_fields:
-  - sha256
-  - retrieval_url
+  sidecar_missing_fields: *id006
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-014-drowart-2005.yaml
@@ -17690,8 +17681,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.md
-  sidecar_missing_fields:
-  - doi
+  sidecar_missing_fields: *id007
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-022-demaria-1971.yaml
@@ -18331,8 +18321,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-035-sauerborn-2005.md
-  sidecar_missing_fields:
-  - doi
+  sidecar_missing_fields: *id008
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-035-sauerborn-2005.yaml
@@ -18388,9 +18377,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md
-  sidecar_missing_fields:
-  - sha256
-  - retrieval_url
+  sidecar_missing_fields: *id009
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-036-sesko-2024.yaml
@@ -18684,8 +18671,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.md
-  sidecar_missing_fields:
-  - retrieval_url
+  sidecar_missing_fields: *id010
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-041-sossi-fegley-2018.yaml
@@ -18742,8 +18728,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-042-plante-1979.md
-  sidecar_missing_fields:
-  - sha256
+  sidecar_missing_fields: *id011
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-042-plante-1979.yaml
@@ -19157,9 +19142,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-050-gorokhov-1977.md
-  sidecar_missing_fields:
-  - doi
-  - sha256
+  sidecar_missing_fields: *id012
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-050-gorokhov-1977.yaml
@@ -19796,8 +19779,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-093-piacente-1975.md
-  sidecar_missing_fields:
-  - doi
+  sidecar_missing_fields: *id013
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-093-piacente-1975.yaml
@@ -19961,8 +19943,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-103-fraser-1983.md
-  sidecar_missing_fields:
-  - sha256
+  sidecar_missing_fields: *id014
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-103-fraser-1983.yaml
@@ -20191,8 +20172,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-114-nichols-1995.md
-  sidecar_missing_fields:
-  - doi
+  sidecar_missing_fields: *id015
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-114-nichols-1995.yaml
@@ -20589,8 +20569,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-133-costa-2017.md
-  sidecar_missing_fields:
-  - sha256
+  sidecar_missing_fields: *id016
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-133-costa-2017.yaml
@@ -20802,8 +20781,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-140-heck-2025.md
-  sidecar_missing_fields:
-  - sha256
+  sidecar_missing_fields: *id017
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-140-heck-2025.yaml
@@ -20915,9 +20893,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.md
-  sidecar_missing_fields:
-  - doi
-  - sha256
+  sidecar_missing_fields: *id018
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-184-behrens-1979.yaml
@@ -21901,9 +21877,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.md
-  sidecar_missing_fields:
-  - doi
-  - retrieval_url
+  sidecar_missing_fields: *id019
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-ms2000-044.yaml
@@ -43664,9 +43638,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md
-  sidecar_missing_fields:
-  - doi
-  - retrieved_date
+  sidecar_missing_fields: *id020
   access_status: OA
   extracts:
   - path: data/literature/extracts/smales-1971-lpsc-12022.yaml
@@ -44135,9 +44107,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md
-  sidecar_missing_fields:
-  - doi
-  - retrieved_date
+  sidecar_missing_fields: *id021
   access_status: OA
   extracts:
   - path: data/literature/extracts/stebbins-carmichael-weill-1983.yaml
