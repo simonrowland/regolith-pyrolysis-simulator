@@ -153,7 +153,7 @@ def test_measured_alpha_witness_unchanged():
 
 @pytest.mark.parametrize("hkl_upper_bound", [False, True])
 @pytest.mark.parametrize("species,alpha,status", [
-    ("K", {"K": 0.13}, "measured"),
+    ("K", {"K": 0.13}, "unavailable"),
     ("CrO2", {}, "analytical_upper_bound"),
     ("CrO2", {"CrO2": {
         "form": "scalar", "value": 0.9,

@@ -3230,8 +3230,13 @@ def test_magemin_pure_phase_probe_argument_vector_is_preserved(
         f'--buffer_n={buffer_n:.6f}',
         '--out_matlab=1',
     ]
+    expected_control = backend._fo2_operating_point(-9.0, None, False)
+    expected_warnings = [
+        *buffer_warnings,
+        f'MAGEMin pure-phase native fO2 readback: {expected_control}',
+    ]
     assert (stdout, matlab_text, warnings) == (
-        'probe stdout', 'matlab output', list(buffer_warnings)
+        'probe stdout', 'matlab output', expected_warnings
     )
 
 
@@ -3385,7 +3390,9 @@ def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):
                 "liq": {"mass_kg": 0.8},
                 "ol": {"mass_kg": 0.15},
                 "spl": {"mass_kg": 0.05},
-            }
+            },
+            "fO2": kwargs["log_fO2"],
+            "ph": ["qfm"],
         }
 
     fake_module = types.SimpleNamespace(minimize=minimize)
@@ -3419,7 +3426,9 @@ def test_magemin_ok_result_with_nonfinite_phase_mass_raises(monkeypatch):
             "phases": {
                 "liq": {"mass_kg": float("nan")},
                 "ol": {"mass_kg": 0.2},
-            }
+            },
+            "fO2": kwargs["log_fO2"],
+            "ph": ["qfm"],
         }
 
     fake_module = types.SimpleNamespace(minimize=minimize)

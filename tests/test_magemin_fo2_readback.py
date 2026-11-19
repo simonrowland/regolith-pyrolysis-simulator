@@ -236,6 +236,52 @@ def test_optional_bridge_uses_native_struct_fields(bridge, native):
     ))
 
 
+@pytest.mark.parametrize('bridge', ['pymagemin', 'julia'])
+@pytest.mark.parametrize(
+    ('bulk', 'expected_status'),
+    [
+        pytest.param(_BASALT, 'not_converged', id='fe-bearing'),
+        pytest.param({'SiO2': 50.0, 'MgO': 50.0}, 'ok', id='fe-free'),
+    ],
+)
+def test_optional_bridge_without_native_fields_still_validates_redox_control(
+    bridge, bulk, expected_status,
+):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = bridge
+    phases = {'liq': {'mass_kg': 1.0}}
+    if bridge == 'pymagemin':
+        backend._magemin_module = SimpleNamespace(
+            minimize=lambda **kwargs: {'phases': phases},
+        )
+    else:
+        backend._magemin_module = SimpleNamespace(Main=SimpleNamespace(
+            MAGEMin=SimpleNamespace(
+                single_point_minimization=lambda *args: SimpleNamespace(
+                    phases=phases,
+                ),
+            ),
+        ))
+
+    result = _solve(backend, bulk, -9.0)
+
+    assert result.status == expected_status
+    if expected_status == 'ok':
+        assert result.fO2_log is None
+        assert result.diagnostics['fo2_indeterminate_no_redox_carrier'] == {
+            'database': 'ig',
+            'requested_fO2_log': -9.0,
+            'native_readback_fO2_log': None,
+            'buffer_phase_present': False,
+        }
+    else:
+        assert result.diagnostics['backend_status_reason'] == 'engine_not_converged'
+        assert result.diagnostics['backend_failure_disposition'] == 'numerical'
+        assert result.diagnostics['solved_fO2_log'] is None
+        assert result.diagnostics['authoritative_for_requested_conditions'] is False
+
+
 @pytest.mark.parametrize('second_readback', [-9.0, None])
 def test_corrective_resolve_shares_budget_and_requires_fresh_output(
     monkeypatch, second_readback,

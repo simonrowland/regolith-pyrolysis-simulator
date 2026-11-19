@@ -1115,6 +1115,20 @@ def test_t609_positive_reaction_scaling_leaves_feo_exponent_unchanged() -> None:
     assert evaluator.o2_channel_term.signed_nu == pytest.approx(-0.5)
 
 
+def test_antoine_reference_rejects_unrepresentable_coefficient() -> None:
+    payload = _yaml("vapor_pressures.yaml")
+    iron = payload["families"]["metals_fe_family"][
+        "physical_properties"
+    ]["species"]["Fe"]
+    iron["pressure_models"][0]["coefficients"]["A"] = 10**400
+
+    with pytest.raises(
+        CatalogCompileError,
+        match="invalid_antoine_coefficient: coefficient=A",
+    ):
+        compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+
+
 def test_t609_nio_congruent_limit_is_activity_linear_and_po2_neutral() -> None:
     evaluator = compile_vapour_rail_catalog(
         _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
@@ -2416,7 +2430,7 @@ def test_composite_constituent_continuation_reaches_typed_shadow(
     )
     assert shadow["status"] == "shadow_only_no_behavior_authority"
     assert shadow["out_of_range"]
-    assert shadow["extrapolation_notice"] == scalar.extrapolation_notice
+    assert shadow["extrapolation_notice"] == [scalar.extrapolation_notice]
     minimum_positive_pa = math.nextafter(0.0, math.inf)
     if scalar.pressure_pa == minimum_positive_pa:
         # The scalar projection floors at IEEE-754's minimum; ln space

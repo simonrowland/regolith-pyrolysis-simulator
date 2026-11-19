@@ -53,7 +53,11 @@ from simulator.vapour_rail.channels import (
     is_dioxygen_formula,
     o2_potential_from_pO2_bar,
 )
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
 from simulator.vapour_rail.nasa_cea import (
     Nasa7Segment,
     Nasa9Segment,
@@ -929,7 +933,7 @@ class _ReferencePressureModel:
                 A = float(self.coefficients["A"])
                 B = float(self.coefficients["B"])
                 C = float(self.coefficients["C"])
-            except (KeyError, TypeError, ValueError) as exc:
+            except (KeyError, TypeError, ValueError, OverflowError) as exc:
                 raise CatalogCompileError(
                     "Antoine reference model requires numeric A, B, and C"
                 ) from exc
@@ -1385,8 +1389,10 @@ class CompiledPressureEvaluator:
             "activity_verdict": activity.verdict.value,
             "flux_disposition": "instrumented_not_selected",
         }
+        # The scalar attribute stays one dict. This typed payload is a list
+        # of notice records: a dict would be iterated as its keys.
         if temperature_notice:
-            payload["extrapolation_notice"] = dict(temperature_notice)
+            payload["extrapolation_notice"] = [dict(temperature_notice)]
         if self.pO2_exponent and math.isfinite(ln_pressure):
             pressure_pa = math.exp(float(ln_pressure))
             notice = (o2_potential.observation_or_setpoint_receipt or {}).get(
@@ -1398,8 +1404,10 @@ class CompiledPressureEvaluator:
                 pO2_bar_used=oxygen,
                 was_clamped=False,
             )
-            if notice is not None:
-                payload["extrapolation_notice"] = dict(notice)
+            if isinstance(notice, Mapping):
+                payload["extrapolation_notice"] = [dict(notice)]
+            elif notice:
+                payload["extrapolation_notice"] = [dict(item) for item in notice]
         return MappingProxyType(payload)
 
     def _out_of_domain_log10_continuation(
@@ -2948,13 +2956,12 @@ def _compile_reference_model(
         coefficients = _mapping(
             model.get("coefficients"), f"{species_id}.reference.coefficients"
         )
-        for key in ("A", "B", "C"):
-            try:
-                float(coefficients[key])
-            except (KeyError, TypeError, ValueError) as exc:
-                raise CatalogCompileError(
-                    f"{species_id}: Antoine reference requires numeric {key}"
-                ) from exc
+        try:
+            _read_antoine_coefficients(coefficients)
+        except _AntoineCoefficientRefusal as exc:
+            raise CatalogCompileError(
+                f"{species_id}.reference.coefficients: {exc}"
+            ) from exc
     elif family == "tabulated_equilibrium":
         raw_points = model.get("points")
         if not isinstance(raw_points, list) or len(raw_points) < 2:
