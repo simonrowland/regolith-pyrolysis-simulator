@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from simulator.battery.enums import Phase
+from simulator.battery.enums import Phase, Quantity
+from simulator.battery.method_class_bands import _located_fact
 
 
 def test_shornikov_2020_extract_migrates_and_pins_printed_values(tmp_path) -> None:
@@ -28,6 +29,21 @@ def test_shornikov_2020_extract_migrates_and_pins_printed_values(tmp_path) -> No
         row.point_conditions["temperature_K"].state.is_value
         and row.point_conditions["temperature_K"].locator is not None
         for row in rows.values()
+    )
+    activity_rows = [
+        row
+        for row in rows.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.ACTIVITY
+        and row.observation_id.split("::", 1)[-1].startswith(
+            "shornikov_2020_table5_"
+        )
+    ]
+    assert len(activity_rows) == 60
+    assert all(
+        _located_fact(row, result.experiments[row.experiment_id], "technique")
+        == "mass_spectrometry"
+        for row in activity_rows
     )
     # Table 3, p. 1295: pCa = 2.33 × 10^-5 atm, converted to Pa by migration.
     assert rows["shornikov_2020_table3_ca_partial_pressure_2278k"].value.point == Decimal(
