@@ -13024,6 +13024,31 @@ def test_openimcc_pack_alias_is_only_used_without_a_manifest() -> None:
     assert lineage_complete_for(legacy_sources) is True
 
 
+def _openimcc_lineage_debug(
+    context: ScoreContext,
+    reference: Observation | None,
+    coefficient_sources: tuple[str, ...],
+    resolver: score_mod._ScoringLineageResolver,
+    *,
+    species_formula: str | None = None,
+    manifest_identity: str | None = None,
+    manifest_work_ids: tuple[str, ...] = (),
+    scopes: tuple[str, ...] | None = None,
+) -> str:
+    from analysis.lineage_probe import describe_openimcc_lineage
+
+    return describe_openimcc_lineage(
+        context,
+        reference,
+        coefficient_sources,
+        resolver,
+        species_formula=species_formula,
+        manifest_identity=manifest_identity,
+        manifest_work_ids=manifest_work_ids,
+        scopes=scopes,
+    )
+
+
 def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
     openimcc = pytest.importorskip("openimcc")
     from openimcc.gas_data import IMCC_PARENT_OXIDES
@@ -13032,6 +13057,7 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
         OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX,
         OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
         OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+        OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX,
         OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE,
         _locator_scope_from_citation,
         _species_fragment_artifact,
@@ -13044,7 +13070,21 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
     from types import SimpleNamespace
 
     artifacts = openimcc.coefficient_ancestry()
-    context = load_score_context()
+    manifest_work_ids = {
+        str(source["work_id"])
+        for artifact in artifacts
+        for row in artifact.get("rows", ())
+        if isinstance(row, Mapping)
+        for source in row.get("sources", ())
+        if isinstance(source, Mapping)
+        and isinstance(source.get("work_id"), str)
+    } | {
+        str(work_id)
+        for artifact in artifacts
+        for work_id in artifact.get("work_ids", ())
+        if isinstance(work_id, str)
+    }
+    context = load_score_context(sources=tuple(sorted(manifest_work_ids)))
     resolver = score_mod._ScoringLineageResolver(context)
     observations_by_work: dict[str, list[Observation]] = {}
     for observation in context.observations.values():
@@ -13083,6 +13123,34 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
                 if selected is not None and selected.get("identity") == wanted_identity:
                     return species.formula
         return None
+
+    def fragment_observations(work_id: str, identity: str) -> list[Observation]:
+        matches: list[Observation] = []
+        for reference in observations_by_work.get(canonical_work_id(work_id), ()):
+            species = reference.identity.species
+            if species is None:
+                continue
+            selected = _species_fragment_artifact(artifacts, species.formula)
+            if selected is None or selected.get("identity") != identity:
+                continue
+            matches.append(reference)
+        return matches
+
+    def fragment_references(
+        work_id: str,
+        identity: str,
+        scopes: tuple[str, ...],
+    ) -> list[tuple[Observation, bool | None]]:
+        return [
+            (reference, scope_match)
+            for reference in fragment_observations(work_id, identity)
+            if (
+                scope_match := openimcc_source_locator_matches(
+                    scopes, reference.locator
+                )
+            )
+            is not False
+        ]
 
     pack = openimcc.load_datapack()
     pack_artifact = next(
@@ -13145,7 +13213,12 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
                 and ancestry is not None
                 and ancestry.ids is not None
                 and indexed_work_id in ancestry.ids
-            ), (identity, work_id)
+            ), _openimcc_lineage_debug(
+                context, None, (work_id,), resolver,
+                species_formula=None if not fragment else fragment_formula(artifact, work_ids),
+                manifest_identity=identity,
+                manifest_work_ids=(work_id,),
+            )
         if fragment and not work_ids:
             continue
         formula = (
@@ -13159,6 +13232,106 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
         elif fragment:
             assert formula is not None, identity
             sources = current_pack_sources(formula)
+            for manifest_row in artifact.get("rows", ()):
+                if not isinstance(manifest_row, Mapping):
+                    continue
+                source_row_id = manifest_row.get("id")
+                assert isinstance(source_row_id, str) and source_row_id, identity
+                selected_row_work_ids = {
+                    str(source["work_id"])
+                    for source in manifest_row.get("sources", ())
+                    if isinstance(source, Mapping)
+                    and isinstance(source.get("work_id"), str)
+                }
+                row_sources = openimcc_pack_coefficient_sources(
+                    pack.version,
+                    pack.binding_digest,
+                    species_formula=formula,
+                    source_row_id=source_row_id,
+                )
+                assert (
+                    set(coefficient_lineage_sources(row_sources))
+                    == selected_row_work_ids
+                ), (
+                    identity,
+                    source_row_id,
+                    row_sources,
+                )
+                assert (
+                    f"{OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX}{source_row_id}"
+                    in row_sources
+                ), (identity, source_row_id)
+                assert any(
+                    source.startswith(OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX)
+                    for source in row_sources
+                ), (identity, source_row_id)
+                assert not any(
+                    source.startswith(OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX)
+                    for source in row_sources
+                ), (identity, source_row_id)
+                row_scopes_by_work = openimcc_species_source_locator_scopes(
+                    formula, source_row_id=source_row_id
+                )
+                assert set(row_scopes_by_work) == selected_row_work_ids, (
+                    identity,
+                    source_row_id,
+                    row_scopes_by_work,
+                )
+                for work_id in sorted(selected_row_work_ids):
+                    scopes = row_scopes_by_work[work_id]
+                    scoped_references = fragment_references(
+                        work_id, identity, scopes
+                    )
+                    candidate_references = fragment_observations(
+                        work_id, identity
+                    )
+                    assert scoped_references, (
+                        _openimcc_lineage_debug(
+                            context,
+                            candidate_references[0]
+                            if candidate_references
+                            else None,
+                            row_sources,
+                            resolver,
+                            species_formula=formula,
+                            manifest_identity=identity,
+                            manifest_work_ids=(work_id,),
+                            scopes=scopes,
+                        )
+                    )
+                    for reference, scope_match in scoped_references:
+                        complete, relation = resolver.for_reference(
+                            reference,
+                            row_sources,
+                            coefficient_species_formula=formula,
+                        )
+                        assert complete, _openimcc_lineage_debug(
+                            context,
+                            reference,
+                            row_sources,
+                            resolver,
+                            species_formula=formula,
+                            manifest_identity=identity,
+                            manifest_work_ids=(work_id,),
+                            scopes=scopes,
+                        )
+                        expected_relation = (
+                            SourceRelation.SAME_INPUT
+                            if scope_match is True
+                            else SourceRelation.UNKNOWN
+                        )
+                        assert relation is expected_relation, (
+                            _openimcc_lineage_debug(
+                                context,
+                                reference,
+                                row_sources,
+                                resolver,
+                                species_formula=formula,
+                                manifest_identity=identity,
+                                manifest_work_ids=(work_id,),
+                                scopes=scopes,
+                            )
+                        )
             per_row_work_ids = [
                 {
                     str(source["work_id"])
@@ -13196,7 +13369,15 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
         for work_id in tested_work_ids:
             assert work_id in sources, (identity, work_id, sources)
             references = observations_by_work.get(canonical_work_id(work_id), ())
-            assert references, (identity, work_id, "no in-sample rows")
+            assert references, _openimcc_lineage_debug(
+                context,
+                None,
+                sources,
+                resolver,
+                species_formula=formula,
+                manifest_identity=identity,
+                manifest_work_ids=(work_id,),
+            )
             scopes_by_work = (
                 openimcc_species_source_locator_scopes(formula)
                 if fragment
@@ -13207,38 +13388,42 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
                     "unparsed" not in scopes
                     for scopes in scopes_by_work.values()
                 ), (identity, scopes_by_work)
-            scopes = scopes_by_work.get(work_id)
-            if scopes:
-                references = [
-                    reference
-                    for reference in references
-                    if openimcc_source_locator_matches(scopes, reference.locator)
-                    is True
-                ]
+            scopes: tuple[str, ...] | None = None
             if fragment and formula is not None:
+                scopes = scopes_by_work.get(work_id)
+                assert scopes is not None, (identity, work_id, scopes_by_work)
                 references = [
                     reference
-                    for reference in references
-                    if reference.identity.species is not None
-                    and (
-                        selected := _species_fragment_artifact(
-                            artifacts, reference.identity.species.formula
-                        )
-                    ) is not None
-                    and selected.get("identity") == identity
+                    for reference, scope_match in fragment_references(
+                        work_id, identity, scopes
+                    )
+                    if scope_match is True
                 ]
-            assert references, (identity, work_id, formula, scopes)
+            assert references, _openimcc_lineage_debug(
+                context,
+                None,
+                sources,
+                resolver,
+                species_formula=formula,
+                manifest_identity=identity,
+                manifest_work_ids=(work_id,),
+                scopes=scopes,
+            )
             for reference in references:
                 complete, relation = resolver.for_reference(
                     reference,
                     sources,
                     coefficient_species_formula=formula,
                 )
-                assert complete
+                assert complete, _openimcc_lineage_debug(
+                    context, reference, sources, resolver,
+                    species_formula=formula, manifest_identity=identity,
+                )
                 assert relation is SourceRelation.SAME_INPUT, (
-                    identity,
-                    work_id,
-                    reference.observation_id,
+                    _openimcc_lineage_debug(
+                        context, reference, sources, resolver,
+                        species_formula=formula, manifest_identity=identity,
+                    )
                 )
         if fragment:
             assert formula is not None, identity
@@ -13251,39 +13436,37 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
                     for scope in scopes
                     if scope != OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE
                 )
-                references = [
-                    reference
-                    for reference in observations_by_work.get(
-                        canonical_work_id(work_id), ()
-                    )
-                    if reference.identity.species is not None
-                    and (
-                        selected := _species_fragment_artifact(
-                            artifacts, reference.identity.species.formula
-                        )
-                    ) is not None
-                    and selected.get("identity") == identity
-                    and openimcc_source_locator_matches(
-                        row_scopes, reference.locator
-                    ) is not False
-                ]
-                assert references, (identity, work_id, formula)
+                references = fragment_references(work_id, identity, row_scopes)
+                candidate_references = fragment_observations(work_id, identity)
+                assert references, _openimcc_lineage_debug(
+                    context,
+                    candidate_references[0] if candidate_references else None,
+                    sources,
+                    resolver,
+                    species_formula=formula,
+                    manifest_identity=identity,
+                    manifest_work_ids=(work_id,),
+                    scopes=row_scopes,
+                )
                 assert any(
                     source.startswith(OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX)
                     for source in sources
                 ), identity
-                for reference in references:
+                for reference, _scope_match in references:
                     complete, relation = resolver.for_reference(
                         reference,
                         sources,
                         coefficient_species_formula=formula,
                     )
-                    assert complete
+                    assert complete, _openimcc_lineage_debug(
+                        context, reference, sources, resolver,
+                        species_formula=formula, manifest_identity=identity,
+                    )
                     assert relation is SourceRelation.UNKNOWN, (
-                        identity,
-                        work_id,
-                        reference.observation_id,
-                        relation,
+                        _openimcc_lineage_debug(
+                            context, reference, sources, resolver,
+                            species_formula=formula, manifest_identity=identity,
+                        )
                     )
 
     mo_sources = current_pack_sources("MoO3")
@@ -13405,15 +13588,31 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
             sources,
             coefficient_species_formula=reference.identity.species.formula,
         )
-        assert complete
-        assert relation is SourceRelation.SAME_INPUT
+        assert complete, _openimcc_lineage_debug(
+            context,
+            reference,
+            sources,
+            resolver,
+            species_formula=reference.identity.species.formula,
+        )
+        assert relation is SourceRelation.SAME_INPUT, _openimcc_lineage_debug(
+            context,
+            reference,
+            sources,
+            resolver,
+            species_formula=reference.identity.species.formula,
+        )
     complete, relation = resolver.for_reference(
         table5,
         scoped_as_sources,
         coefficient_species_formula="AsO1.5",
     )
-    assert complete
-    assert relation is SourceRelation.INDEPENDENT
+    assert complete, _openimcc_lineage_debug(
+        context, table5, scoped_as_sources, resolver, species_formula="AsO1.5"
+    )
+    assert relation is SourceRelation.INDEPENDENT, _openimcc_lineage_debug(
+        context, table5, scoped_as_sources, resolver, species_formula="AsO1.5"
+    )
 
     for formula, fragment in (
         ("CeO2", "ce"),
@@ -13459,154 +13658,426 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
     ) == ()
 
 
-def test_openimcc_trace_lineage_for_real_kems_and_holzheid_rows_through_score_store() -> None:
-    pytest.importorskip("openimcc")
+def test_openimcc_holzheid_copper_row_resolves_through_lineage_resolver() -> None:
+    openimcc = pytest.importorskip("openimcc")
+
     from simulator.battery.source_lineage import (
-        OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+        OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX,
+        openimcc_pack_coefficient_sources,
     )
 
-    for source_id, formulas in (
-        ("kems-041-sossi-fegley-2018", ("AsO1.5", "CuO0.5")),
-        (
-            "holzheid-1997-feo-nio-coo-activity-metal-saturated",
-            ("NiO", "CoO"),
-        ),
-    ):
-        context = load_score_context(sources=(source_id,))
-        references_by_formula: dict[str, Observation] = {}
-        for observation in context.observations.values():
-            species = observation.identity.species
-            if (
-                observation.source_id == source_id
-                and species is not None
-                and species.formula in formulas
-                and observation.admission.status
-                in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}
-                and (
-                    source_id != "kems-041-sossi-fegley-2018"
-                    or observation.locator is not None
-                    and observation.locator.table == "2"
-                )
-            ):
-                references_by_formula.setdefault(species.formula, observation)
-        assert set(references_by_formula) == set(formulas), source_id
+    source_id = "holzheid-lodders-2001-copper-solubility"
+    pack = openimcc.load_datapack()
+    context = load_score_context(sources=(source_id,))
+    resolver = score_mod._ScoringLineageResolver(context)
+    references = [
+        observation
+        for observation in context.observations.values()
+        if observation.source_id == source_id
+        and observation.observation_id.endswith("hl01_g_cuo05_recommended")
+        and observation.identity.species is not None
+        and observation.identity.species.formula == "CuO0.5"
+        and observation.admission.status
+        in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}
+    ]
+    assert len(references) == 1, _openimcc_lineage_debug(
+        context,
+        references[0] if references else None,
+        (),
+        resolver,
+        species_formula="CuO0.5",
+    )
+    reference = references[0]
+    temperature = reference.identity.temperature_K
+    assert (
+        temperature is not None
+        and temperature.is_value
+        and temperature.value == Decimal("1573.15")
+    ), (
+        _openimcc_lineage_debug(context, reference, (), resolver)
+    )
 
-        residuals, _candidates = score_store(
+    # Holzheid's row has no fully printed melt composition, so it exercises
+    # the production lineage resolver without requiring a score_store fit.
+    source_row_id = "CuO0.5-1573K"
+    row_sources = openimcc_pack_coefficient_sources(
+        pack.version,
+        pack.binding_digest,
+        species_formula="CuO0.5",
+        source_row_id=source_row_id,
+    )
+    assert (
+        f"{OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX}{source_row_id}"
+        in row_sources
+    ), _openimcc_lineage_debug(
+        context, reference, row_sources, resolver, species_formula="CuO0.5"
+    )
+    complete, relation = resolver.for_reference(
+        reference,
+        row_sources,
+        coefficient_species_formula="CuO0.5",
+    )
+    assert complete, _openimcc_lineage_debug(
+        context, reference, row_sources, resolver, species_formula="CuO0.5"
+    )
+    assert relation is SourceRelation.SAME_INPUT, _openimcc_lineage_debug(
+        context, reference, row_sources, resolver, species_formula="CuO0.5"
+    )
+
+    wrong_row_sources = openimcc_pack_coefficient_sources(
+        pack.version,
+        pack.binding_digest,
+        species_formula="CuO0.5",
+        source_row_id="CuO0.5-1923K",
+    )
+    complete, relation = resolver.for_reference(
+        reference,
+        wrong_row_sources,
+        coefficient_species_formula="CuO0.5",
+    )
+    assert complete, _openimcc_lineage_debug(
+        context, reference, wrong_row_sources, resolver, species_formula="CuO0.5"
+    )
+    assert relation is SourceRelation.INDEPENDENT, _openimcc_lineage_debug(
+        context, reference, wrong_row_sources, resolver, species_formula="CuO0.5"
+    )
+
+
+@pytest.mark.parametrize(
+    (
+        "source_id",
+        "observation_suffix",
+        "formula",
+        "source_row_id",
+        "expected_temperature",
+    ),
+    (
+        (
+            "wood-wade-2013-trace-activities",
+            "wood_wade_2013_cuo05_activity_coefficient",
+            "CuO0.5",
+            "CuO0.5-1923K",
+            Decimal("1923"),
+        ),
+        (
+            "chen-2020-ce2o3-cmas-activity-phase-equilibria",
+            "chen20_t2_101_ce2o3_activity",
+            "Ce2O3",
+            "Ce2O3-Chen-2020-CMAS-1873K",
+            Decimal("1873"),
+        ),
+    ),
+)
+def test_openimcc_activity_row_identity_flows_through_score_store(
+    source_id: str,
+    observation_suffix: str,
+    formula: str,
+    source_row_id: str,
+    expected_temperature: Decimal,
+) -> None:
+    openimcc = pytest.importorskip("openimcc")
+    from simulator.battery.source_lineage import (
+        OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX,
+        openimcc_pack_coefficient_sources,
+    )
+
+    context = load_score_context(sources=(source_id,))
+    references = [
+        observation
+        for observation in context.observations.values()
+        if observation.source_id == source_id
+        and observation.observation_id.endswith(observation_suffix)
+        and observation.identity.species is not None
+        and observation.identity.species.formula == formula
+    ]
+    resolver = score_mod._ScoringLineageResolver(context)
+    assert len(references) == 1, _openimcc_lineage_debug(
+        context,
+        references[0] if references else None,
+        (),
+        resolver,
+        species_formula=formula,
+        manifest_work_ids=(source_id,),
+    )
+    reference = references[0]
+    temperature = reference.identity.temperature_K
+    assert (
+        temperature is not None
+        and temperature.is_value
+        and temperature.value == expected_temperature
+    ), _openimcc_lineage_debug(
+        context, reference, (), resolver, species_formula=formula
+    )
+    context = replace(context, observations={reference.observation_id: reference})
+    resolver = score_mod._ScoringLineageResolver(context)
+
+    residuals, candidates = score_store(
+        context, engines=(Engine.OPENIMCC,), include_diagnostics=False
+    )
+
+    scored = [
+        residual
+        for residual in residuals
+        if residual.reference == reference.observation_id
+        and residual.candidate_request is not None
+        and residual.candidate_request.engine is Engine.OPENIMCC
+    ]
+    first_scored = scored[0] if scored else None
+    first_candidate = (
+        None
+        if first_scored is None or first_scored.candidate is None
+        else candidates.get(first_scored.candidate)
+    )
+    first_engine = None if first_candidate is None else first_candidate.engine
+    assert len(scored) == 1, _openimcc_lineage_debug(
+        context,
+        reference,
+        () if first_engine is None else tuple(first_engine.coefficient_sources),
+        resolver,
+        species_formula=formula,
+        score_relation=(
+            None if first_scored is None else first_scored.source_relation.value
+        ),
+    )
+    residual = scored[0]
+    assert residual.candidate is not None, _openimcc_lineage_debug(
+        context,
+        reference,
+        (),
+        resolver,
+        score_relation=residual.source_relation.value,
+    )
+    candidate = candidates[residual.candidate]
+    assert candidate.engine is not None, _openimcc_lineage_debug(
+        context,
+        reference,
+        (),
+        resolver,
+        score_relation=residual.source_relation.value,
+    )
+    candidate_sources = tuple(candidate.engine.coefficient_sources)
+    assert residual.source_relation is SourceRelation.SAME_INPUT, (
+        _openimcc_lineage_debug(
             context,
-            engines=(Engine.OPENIMCC,),
-            work_id=source_id,
+            reference,
+            candidate_sources,
+            resolver,
+            species_formula=formula,
+            score_relation=residual.source_relation.value,
         )
-        for formula, reference in references_by_formula.items():
-            scored = next(
-                (
-                    residual
-                    for residual in residuals
-                    if residual.reference == reference.observation_id
-                    and residual.candidate_request is not None
-                    and residual.candidate_request.engine is Engine.OPENIMCC
-                ),
-                None,
-            )
-            assert scored is not None, (source_id, formula)
-            assert scored.source_relation is SourceRelation.SAME_INPUT, (
-                source_id,
-                formula,
-                scored.source_relation,
-            )
-
-        if source_id == "kems-041-sossi-fegley-2018":
-            backlog = score_mod.notice_backlog(residuals)
-            assert any(
-                key.startswith(
-                    f"{NoticeKind.ENGINE_MODEL_CAVEAT.value}:"
-                    f"{OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX}"
-                )
-                and count > 0
-                for key, count in backlog.items()
-            )
-
-
-def test_openimcc_partial_copper_lineage_stays_unknown_through_score_store() -> None:
-    pytest.importorskip("openimcc")
-    from simulator.battery.source_lineage import (
-        OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+    )
+    source_rows = tuple(
+        source
+        for source in candidate_sources
+        if source.startswith(OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX)
+    )
+    assert source_rows == (
+        f"{OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX}{source_row_id}",
+    ), _openimcc_lineage_debug(
+        context,
+        reference,
+        candidate_sources,
+        resolver,
+        species_formula=formula,
+        score_relation=residual.source_relation.value,
     )
 
-    for source_id, expected_relation in (
+    if source_row_id == "CuO0.5-1923K":
+        pack = openimcc.load_datapack()
+        wrong_row_sources = openimcc_pack_coefficient_sources(
+            pack.version,
+            pack.binding_digest,
+            species_formula=formula,
+            source_row_id="CuO0.5-1573K",
+        )
+        resolver = score_mod._ScoringLineageResolver(context)
+        complete, relation = resolver.for_reference(
+            reference,
+            wrong_row_sources,
+            coefficient_species_formula=formula,
+        )
+        assert complete, _openimcc_lineage_debug(
+            context, reference, wrong_row_sources, resolver, species_formula=formula
+        )
+        assert relation is SourceRelation.INDEPENDENT, _openimcc_lineage_debug(
+            context, reference, wrong_row_sources, resolver, species_formula=formula
+        )
+
+
+def test_openimcc_selected_tin_ce_rows_resolve_through_lineage_resolver() -> None:
+    openimcc = pytest.importorskip("openimcc")
+
+    from simulator.battery.source_lineage import (
+        OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX,
+        openimcc_pack_coefficient_sources,
+    )
+
+    cases = (
         (
-            "holzheid-lodders-2001-copper-solubility",
-            SourceRelation.UNKNOWN,
+            "kems-041-sossi-fegley-2018",
+            "SnO",
+            Decimal("1573"),
+            "SnO-FCS-1573K",
+            "2",
+            None,
         ),
-        ("wood-wade-2013-trace-activities", SourceRelation.UNKNOWN),
-        ("kems-012-sossi-2019", SourceRelation.INDEPENDENT),
-    ):
+    )
+    pack = openimcc.load_datapack()
+    for source_id, formula, temperature, expected_row_id, table, locator_note in cases:
         context = load_score_context(sources=(source_id,))
+        resolver = score_mod._ScoringLineageResolver(context)
         references = [
             observation
             for observation in context.observations.values()
             if observation.source_id == source_id
             and observation.identity.species is not None
-            and observation.identity.species.formula == "CuO0.5"
-            and observation.admission.status
-            in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}
+            and observation.identity.species.formula == formula
+            and observation.identity.temperature_K is not None
+            and observation.identity.temperature_K.is_value
+            and observation.identity.temperature_K.value == temperature
+            and observation.locator is not None
+            and observation.locator.table == table
+            and (
+                locator_note is None
+                or locator_note in (observation.locator.note or "")
+            )
         ]
-        assert references, f"{source_id}: missing CuO0.5 observation"
-        residuals, _candidates = score_store(
+        assert references, _openimcc_lineage_debug(
             context,
-            engines=(Engine.OPENIMCC,),
-            work_id=source_id,
+            None,
+            (),
+            resolver,
+            species_formula=formula,
+            manifest_identity="openimcc-review-gamma-activity.v1:sn",
+            manifest_work_ids=(source_id,),
         )
-        for reference in references:
-            scored = next(
-                (
-                    residual
-                    for residual in residuals
-                    if residual.reference == reference.observation_id
-                    and residual.candidate_request is not None
-                    and residual.candidate_request.engine is Engine.OPENIMCC
-                ),
-                None,
+        reference = references[0]
+        row_sources = openimcc_pack_coefficient_sources(
+            pack.version,
+            pack.binding_digest,
+            species_formula=formula,
+            source_row_id=expected_row_id,
+        )
+        assert (
+            f"{OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX}{expected_row_id}"
+            in row_sources
+        ), _openimcc_lineage_debug(
+            context,
+            reference,
+            row_sources,
+            resolver,
+            species_formula=formula,
+            manifest_identity="openimcc-review-gamma-activity.v1:sn",
+        )
+        complete, relation = resolver.for_reference(
+            reference,
+            row_sources,
+            coefficient_species_formula=formula,
+        )
+        assert complete, _openimcc_lineage_debug(
+            context,
+            reference,
+            row_sources,
+            resolver,
+            species_formula=formula,
+        )
+        assert relation is SourceRelation.SAME_INPUT, (
+            _openimcc_lineage_debug(
+                context,
+                reference,
+                row_sources,
+                resolver,
+                species_formula=formula,
             )
-            assert scored is not None, (source_id, reference.observation_id)
-            assert scored.source_relation is expected_relation, (
-                source_id,
-                reference.observation_id,
-                scored.source_relation,
-            )
-            if expected_relation is SourceRelation.UNKNOWN:
-                assert scored.score_eligible is True
-                assert any(
-                    notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
-                    and notice.reason.startswith(
-                        OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX
-                    )
-                    for notice in scored.notices
-                ), (source_id, reference.observation_id, scored.notices)
+        )
 
 
 def test_openimcc_mo_o3_score_path_resolves_oneill_fragment() -> None:
     pytest.importorskip("openimcc")
+    from simulator.battery.source_lineage import (
+        OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX,
+    )
+
     source_id = "oneill-2002-feo-activity-coefficients-cmas"
     context = load_score_context(sources=(source_id,))
-    reference = next(
+    references = [
         observation
         for observation in context.observations.values()
         if observation.source_id == source_id
         and isinstance(observation.identity, Identity)
         and observation.identity.species is not None
         and observation.identity.species.formula == "MoO3"
+        and observation.locator is not None
+        and observation.locator.table == "7"
+        and "row=A" in (observation.locator.note or "")
+    ]
+    resolver = score_mod._ScoringLineageResolver(context)
+    assert references, _openimcc_lineage_debug(
+        context, None, (), resolver, species_formula="MoO3"
+    )
+    reference = references[0]
+    context = replace(context, observations={reference.observation_id: reference})
+
+    residuals, candidates = score_store(
+        context, engines=(Engine.OPENIMCC,), include_diagnostics=False
     )
 
-    residuals, _candidates = score_store(context, engines=(Engine.OPENIMCC,))
-
-    scored = next(
+    scored_candidates = [
         residual
         for residual in residuals
         if residual.reference == reference.observation_id
         and residual.candidate_request is not None
         and residual.candidate_request.engine is Engine.OPENIMCC
+    ]
+    resolver = score_mod._ScoringLineageResolver(context)
+    if not scored_candidates:
+        raise AssertionError(
+            _openimcc_lineage_debug(
+                context, reference, (), resolver, species_formula="MoO3"
+            )
+        )
+    scored = scored_candidates[0]
+    assert scored.candidate is not None, _openimcc_lineage_debug(
+        context,
+        reference,
+        (),
+        resolver,
+        species_formula="MoO3",
+        score_relation=scored.source_relation.value,
     )
-    assert scored.source_relation is SourceRelation.SAME_INPUT
+    candidate = candidates[scored.candidate]
+    assert candidate.engine is not None, _openimcc_lineage_debug(
+        context,
+        reference,
+        (),
+        resolver,
+        species_formula="MoO3",
+        score_relation=scored.source_relation.value,
+    )
+    candidate_sources = tuple(candidate.engine.coefficient_sources)
+    assert scored.source_relation is SourceRelation.SAME_INPUT, (
+        _openimcc_lineage_debug(
+            context,
+            reference,
+            candidate_sources,
+            resolver,
+            species_formula="MoO3",
+            score_relation=scored.source_relation.value,
+        )
+    )
+    source_rows = tuple(
+        source
+        for source in candidate_sources
+        if source.startswith(OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX)
+    )
+    assert len(source_rows) == 1, _openimcc_lineage_debug(
+        context,
+        reference,
+        candidate_sources,
+        resolver,
+        species_formula="MoO3",
+        score_relation=scored.source_relation.value,
+    )
 
 
 def test_openimcc_manifest_work_id_lineage_resolves_in_full_and_filtered_contexts() -> None:
