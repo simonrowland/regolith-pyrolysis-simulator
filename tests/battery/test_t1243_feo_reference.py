@@ -868,9 +868,12 @@ def test_distin_closed_solver_refuses_off_fe_metal_segment(migration, monkeypatc
 def test_pinned_openimcc_closed_redox_is_invariant_to_added_fe(migration) -> None:
     """Engine-level +0.5/+1/+2 invariance; the scorer route pins fixed +1 mol."""
     redox = pytest.importorskip("openimcc.redox")
-    from simulator.melt_backend.openimcc_bridge import imported_openimcc_commit
+    from simulator.melt_backend.openimcc_bridge import (
+        OPENIMCC_RECORDED_PIN,
+        imported_openimcc_commit,
+    )
 
-    assert imported_openimcc_commit() == "a13801f6d3e19de96aa7e5bf370e6ceecfb0316e"
+    assert imported_openimcc_commit() == OPENIMCC_RECORDED_PIN.rsplit("@", 1)[-1]
     observation = next(
         row
         for row in _feo_rows(migration)
