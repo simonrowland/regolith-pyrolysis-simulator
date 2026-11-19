@@ -1324,6 +1324,42 @@ def _w3_result_with_controls(stir_control, **control_overrides):
     ))
 
 
+@pytest.mark.xdist_group("serial")
+def test_provider_uses_configured_source_film_length_independently_of_throat():
+    def dispatch(pipe_diameter_m, source_film_length_m):
+        return _w3_result_with_controls(
+            1.0,
+            overhead_pressure_pa=1000.0,
+            pipe_diameter_m=pipe_diameter_m,
+            gas_temperature_K=1773.15,
+            evaporation_series_resistance={
+                "gas_resistance_enabled": True,
+                "source_film_characteristic_length_m": source_film_length_m,
+            },
+        )
+
+    nominal = dispatch(0.12, 0.12)
+    wider_throat = dispatch(0.5, 0.12)
+    longer_film = dispatch(0.12, 0.24)
+
+    nominal_series = nominal.diagnostic["evaporation_series_resistance"]["Na"]
+    wider_series = wider_throat.diagnostic["evaporation_series_resistance"]["Na"]
+    longer_series = longer_film.diagnostic["evaporation_series_resistance"]["Na"]
+    assert nominal.status == wider_throat.status == longer_film.status == "ok"
+    assert nominal_series["k_mt_kg_s_m2_pa"] == pytest.approx(
+        wider_series["k_mt_kg_s_m2_pa"], rel=1e-15
+    )
+    assert nominal_series["r_gas"] == pytest.approx(
+        wider_series["r_gas"], rel=1e-15
+    )
+    assert nominal.diagnostic["evaporation_flux_kg_hr"]["Na"] == pytest.approx(
+        wider_throat.diagnostic["evaporation_flux_kg_hr"]["Na"], rel=1e-15
+    )
+    assert nominal_series["r_gas"] == pytest.approx(
+        0.5 * longer_series["r_gas"], rel=1e-15
+    )
+
+
 def _w3_dispatch_with_stir(stir_control) -> dict:
     """Dispatch with custom stir control and return series diagnostics."""
 

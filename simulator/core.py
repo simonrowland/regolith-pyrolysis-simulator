@@ -8157,6 +8157,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from engines.builtin.evaporation_flux import (
             DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
             DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
+            DEFAULT_SOURCE_FILM_CHARACTERISTIC_LENGTH_M,
             EvaporationFluxConfigurationError,
             _evaluate_alpha_control,
             _series_resistance_evaporation_flux_kg_m2_s,
@@ -8265,6 +8266,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pipe_diameter_m = float(
             getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
         )
+        source_film_characteristic_length_m = series_config.get(
+            'source_film_characteristic_length_m',
+            DEFAULT_SOURCE_FILM_CHARACTERISTIC_LENGTH_M,
+        )
         try:
             series_flux = _series_resistance_evaporation_flux_kg_m2_s(
                 species='Fe',
@@ -8281,6 +8286,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 T_gas_K=gas_temperature_K,
                 melt_resistance_enabled=melt_resistance_enabled,
                 gas_resistance_enabled=gas_resistance_enabled,
+                source_film_characteristic_length_m=(
+                    source_film_characteristic_length_m
+                ),
                 melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
                 melt_surface_renewal_source=melt_surface_renewal_source,
             )

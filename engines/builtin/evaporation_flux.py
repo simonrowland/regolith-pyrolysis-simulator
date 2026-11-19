@@ -74,6 +74,9 @@ from simulator.scalar_boundary import is_declared_real_scalar
 
 
 _DEFAULT_EVAPORATION_ALPHA = 1.0
+DEFAULT_SOURCE_FILM_CHARACTERISTIC_LENGTH_M = (
+    0.12  # m — provisional source-film length, independent of collection-duct throat
+)
 _NONTRIVIAL_FLUX_KG_HR = 1.0e-12
 DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA = 0.0
 DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
@@ -522,6 +525,9 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     melt_surface_renewal_source: str = DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
     gas_resistance_enabled: bool = True,
     extrapolate_continuum: bool = False,
+    source_film_characteristic_length_m: float = (
+        DEFAULT_SOURCE_FILM_CHARACTERISTIC_LENGTH_M
+    ),
 ) -> SeriesEvaporationFlux:
     """Series-resistance evaporation source in kg/(m^2*s).
 
@@ -546,6 +552,15 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     T_surface = _finite_float(T_surface_K, 0.0)
     M_kg_mol = _finite_float(molar_mass_kg_mol, 0.0)
     diameter_m = _finite_float(pipe_diameter_m, 0.12)
+    if not is_declared_real_scalar(source_film_characteristic_length_m):
+        raise EvaporationFluxConfigurationError(
+            "source_film_characteristic_length_m must be a finite positive number"
+        )
+    source_film_length_m = float(source_film_characteristic_length_m)
+    if not math.isfinite(source_film_length_m) or source_film_length_m <= 0.0:
+        raise EvaporationFluxConfigurationError(
+            "source_film_characteristic_length_m must be a finite positive number"
+        )
     overhead_pa = _finite_float(overhead_pressure_pa, 0.0)
     effective_T_gas_K = _finite_float(T_gas_K, T_surface)
 
@@ -698,10 +713,19 @@ def _series_resistance_evaporation_flux_kg_m2_s(
                 "missing Chapman-Enskog transport parameters for "
                 f"species={species!r} carrier_gas={carrier_gas!r}"
             )
+        # The source-side film has its own characteristic length L. Its
+        # Sherwood transfer coefficient is Sh*D_AB/L [m/s], then division
+        # by R*T gives mol/(m²·s·Pa); multiplying by M gives kg-based units.
+        # Keep L independent of the collection throat: at fixed L, changing
+        # the duct diameter changes Kn/transport validity but not source flux.
         k_mt_mol_s_m2_pa = (
             sherwood_eff
             * d_ab_m2_s
-            / (diameter_m * GAS_CONSTANT_J_MOL_K * max(effective_T_gas_K, 1.0))
+            / (
+                source_film_length_m
+                * GAS_CONSTANT_J_MOL_K
+                * max(effective_T_gas_K, 1.0)
+            )
         )
         k_mt_kg_s_m2_pa = k_mt_mol_s_m2_pa * M_kg_mol
         if not math.isfinite(k_mt_kg_s_m2_pa) or k_mt_kg_s_m2_pa <= 0.0:
@@ -1415,6 +1439,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         if not isinstance(series_config, Mapping):
             series_config = {}
         pipe_diameter_m = _finite_float(controls.get("pipe_diameter_m"), 0.12)
+        source_film_characteristic_length_m = series_config.get(
+            "source_film_characteristic_length_m",
+            DEFAULT_SOURCE_FILM_CHARACTERISTIC_LENGTH_M,
+        )
         overhead_pressure_pa = _finite_float(
             controls.get("overhead_pressure_pa"),
             max(0.0, float(request.pressure_bar) * PA_PER_BAR),
@@ -1757,6 +1785,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 cold_skull_envelope=cold_skull_envelope,
                 carrier_gas=carrier_gas,
                 T_gas_K=gas_temperature_K,
+                source_film_characteristic_length_m=(
+                    source_film_characteristic_length_m
+                ),
                 gas_resistance_enabled=False,
                 melt_resistance_enabled=False,
             )
@@ -1812,6 +1843,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     melt_resistance_enabled=melt_resistance_enabled,
                     gas_resistance_enabled=uses_gas_resistance,
                     extrapolate_continuum=continuum_extrapolation is not None,
+                    source_film_characteristic_length_m=(
+                        source_film_characteristic_length_m
+                    ),
                     melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
                     melt_surface_renewal_source=melt_surface_renewal_source,
                 )

@@ -134,6 +134,40 @@ def test_helium_carrier_changes_chapman_enskog_gas_resistance():
     assert helium.r_gas < nitrogen.r_gas
 
 
+def test_source_film_length_is_independent_of_collection_pipe_diameter():
+    throat_12cm = _evap(
+        knudsen_number=1.0e-7,
+        pipe_diameter_m=0.12,
+        source_film_characteristic_length_m=0.12,
+    )
+    throat_50cm = _evap(
+        knudsen_number=1.0e-7,
+        pipe_diameter_m=0.5,
+        source_film_characteristic_length_m=0.12,
+    )
+    default_length = _evap(knudsen_number=1.0e-7, pipe_diameter_m=0.12)
+
+    assert throat_12cm.k_mt_kg_s_m2_pa == pytest.approx(
+        throat_50cm.k_mt_kg_s_m2_pa, rel=1e-15
+    )
+    assert throat_12cm.r_gas == pytest.approx(throat_50cm.r_gas, rel=1e-15)
+    assert throat_12cm.flux_kg_s_m2 == pytest.approx(
+        throat_50cm.flux_kg_s_m2, rel=1e-15
+    )
+    assert default_length.flux_kg_s_m2 == throat_12cm.flux_kg_s_m2
+
+
+@pytest.mark.parametrize(
+    "length_m", (0.0, -0.12, math.nan, math.inf, True, "invalid")
+)
+def test_source_film_characteristic_length_must_be_finite_and_positive(length_m):
+    with pytest.raises(
+        EvaporationFluxConfigurationError,
+        match="source_film_characteristic_length_m must be a finite positive number",
+    ):
+        _evap(source_film_characteristic_length_m=length_m)
+
+
 def test_alpha_effective_never_exceeds_intrinsic_alpha_across_kn_and_stir():
     kn_values = [0.0, 1.0e-7, 0.01, 0.1, 1.0, 10.0, math.inf]
     stir_values = [0.0, 1.0, MAX_STIR_FACTOR, 1000.0]

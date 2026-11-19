@@ -2009,6 +2009,12 @@ chemistry_kernel:
   # the placeholder policy.
   allow_unmeasured_alpha_fallback: false
   evaporation_series_resistance:
+    # FLAGGED b-1001: retain the prior 0.12 m source-film length while
+    # decoupling it from the collection throat. k_g = Sh·D_AB/L; at fixed
+    # L, changing the throat leaves source flux unchanged. A melt-surface
+    # boundary-layer correlation is b-1001's follow-up.
+    source_film_characteristic_length_m: 0.12
+    source_film_characteristic_length_source: "FLAGGED b-1001 (d-452): provisional 0.12 m source-film length; boundary-layer correlation belongs to b-1001"
     # J=M_i*k_L,i*Delta-C and Delta-p=H_i*Delta-C imply
     # k_m,i=M_i*k_L,i/H_i [s/m], R_m,i=H_i/(M_i*k_L,i) [m/s]. Runtime has
     # neither species/composition-specific D_i -> k_L,i nor H_i=dp_eq/dC_i;
