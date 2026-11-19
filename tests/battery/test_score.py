@@ -20053,7 +20053,23 @@ def test_transition_temperature_dispatches_exact_native_result_and_inputs(
         assert mutated.refusal_reason is None
 
 
-def _assert_located_transition_residual(monkeypatch) -> None:
+def _transition_pressure_state(form: str) -> State:
+    point = Decimal("100000")
+    if form == "decimal":
+        return State.of(point)
+    if form == "exact":
+        return State.of(Value(ValueKind.POINT, point=point, approximate=False))
+    if form == "approximate":
+        return State.of(Value(ValueKind.POINT, point=point, approximate=True))
+    raise AssertionError(form)
+
+
+def _assert_located_transition_residual(
+    monkeypatch,
+    *,
+    form: str = "decimal",
+    identities: list | None = None,
+) -> None:
     from types import SimpleNamespace
 
     from simulator.melt_backend.liquidus import LiquidusSolidusResult
@@ -20091,7 +20107,7 @@ def _assert_located_transition_residual(monkeypatch) -> None:
         ),
         point_conditions={
             "composition": Located(State.of(composition)),
-            "total_pressure_Pa": Located(State.of(Decimal("100000"))),
+            "total_pressure_Pa": Located(_transition_pressure_state(form)),
             "oxygen_partial_pressure_Pa": Located(State.of(Decimal("1e-4"))),
         },
     )
@@ -20118,6 +20134,15 @@ def _assert_located_transition_residual(monkeypatch) -> None:
         "_open_cached_battery_handle",
         lambda *_args: (handle, False),
     )
+    if identities is not None:
+        real_comparison = score_mod._comparison_identity
+
+        def remember(identity, reference, prediction):
+            compared = real_comparison(identity, reference, prediction)
+            identities.append(compared)
+            return compared
+
+        monkeypatch.setattr(score_mod, "_comparison_identity", remember)
     residuals, _candidates = score_store(
         _context(
             F.work(),
@@ -20148,6 +20173,54 @@ def test_located_transition_point_scores_a_numeric_residual(
     monkeypatch.setattr(score_mod, "_comparison_identity", unchanged)
     with pytest.raises(AssertionError):
         _assert_located_transition_residual(monkeypatch)
+
+
+def _assert_same_half_decade_band(compared: Identity) -> None:
+    from simulator.battery.records import ApproxPressure, BandBasis
+
+    pressure = compared.total_pressure_Pa
+    assert pressure is not None and pressure.is_value
+    band = pressure.value
+    assert isinstance(band, ApproxPressure)
+    assert band.band_basis is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
+    assert band.point == Decimal("100000")
+    assert band.low < band.point < band.high
+    assert band.high / band.low == Decimal(10)
+    assert band.low * band.high == band.point ** 2
+    assert compared.fO2_Pa is None or not compared.fO2_Pa.is_value
+
+
+@pytest.mark.parametrize("form", ("exact", "approximate"))
+def test_located_value_pressure_scores_without_dropping_the_band(
+    monkeypatch: pytest.MonkeyPatch,
+    form: str,
+) -> None:
+    from simulator.battery.identity import IdentityRefusal
+
+    identities: list[Identity] = []
+    _assert_located_transition_residual(
+        monkeypatch,
+        form=form,
+        identities=identities,
+    )
+    assert len(identities) == 2
+    if form == "exact":
+        for compared in identities:
+            pressure = compared.total_pressure_Pa
+            assert pressure is not None and pressure.is_value
+            assert pressure.value == Decimal("100000")
+            assert type(pressure.value) is Decimal
+            assert compared.fO2_Pa is None or not compared.fO2_Pa.is_value
+    else:
+        _assert_same_half_decade_band(identities[0])
+        assert identities[0].total_pressure_Pa == identities[1].total_pressure_Pa
+
+    def copy_the_raw_state(value):
+        return value if isinstance(value, State) else None
+
+    monkeypatch.setattr(score_mod, "identity_pressure_state", copy_the_raw_state)
+    with pytest.raises(IdentityRefusal):
+        _assert_located_transition_residual(monkeypatch, form=form)
 
 
 def _kushiro_transition_rows(migrator_cls):

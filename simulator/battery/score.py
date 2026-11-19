@@ -207,6 +207,7 @@ from simulator.battery.records import (
     ApproxPressure,
     approximate_pressure_band_reason,
     as_decimal,
+    identity_pressure_state,
     nominal_pressure_pa,
     charge_value,
     phase_token,
@@ -8348,8 +8349,11 @@ def _comparison_identity(
         or not identity.total_pressure_Pa.is_value
     ):
         # The located point is the pressure both sides were solved at.
-        # Copy that state. Do not convert it again, and do not put the
-        # oxygen command on the identity: the transition profile forbids it.
+        # identity_pressure_state is that axis: an exact point stays a
+        # decimal, and an approximate point becomes the band. Copying the
+        # raw State[Value] raises IdentityRefusal after a successful solve.
+        # Do not convert the point again, and do not put the oxygen command
+        # on the identity: the transition profile forbids it.
         located_pressure = (reference.point_conditions or {}).get(
             "total_pressure_Pa"
         )
@@ -8358,7 +8362,9 @@ def _comparison_identity(
             and located_pressure.inference is None
             and located_pressure.state.is_value
         ):
-            updates["total_pressure_Pa"] = located_pressure.state
+            bound = identity_pressure_state(located_pressure.state)
+            if bound is not None:
+                updates["total_pressure_Pa"] = bound
     if (
         selected_oxygen is not None
         and selected_oxygen[0] is not None
