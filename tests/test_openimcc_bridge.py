@@ -1456,6 +1456,74 @@ def test_gas_oxygen_balance_preserves_boolean_temperature_for_openimcc_refusal(
     assert observed == [True]
 
 
+def test_species_thermo_cache_request_covers_native_inputs(monkeypatch) -> None:
+    from simulator import engine_cache
+    from simulator.melt_backend import openimcc_bridge
+
+    calls = []
+    props = SimpleNamespace(
+        Cp_J_molK=42.0,
+        S_J_molK=20.0,
+        H_app_kJ_mol=3.0,
+        G_J_mol=400.0,
+        source_row_id="JANAF-FeO-gas",
+        source_table_id="gas-janaf-4th",
+        T_interval=(298.15, 6000.0),
+        T_min=298.15,
+        T_max=6000.0,
+        derivatives_fit_implied=False,
+        extrapolated=True,
+        declared_interval_K=(298.15, 6000.0),
+        continuation="Shomate fit continued above its declared interval",
+        authority="JANAF source row",
+    )
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_openimcc",
+        SimpleNamespace(
+            load_gas_datapack=lambda: "default-gas-datapack",
+            species_thermo=lambda species, phase, temperature_K, datapack, *, allow_extrapolation: (
+                calls.append(
+                    (species, phase, temperature_K, datapack, allow_extrapolation)
+                )
+                or props
+            ),
+        ),
+    )
+    monkeypatch.setattr(engine_cache, "record_engine_open", lambda *_args: None)
+    requests = []
+
+    def cache_call(engine, request, solve):
+        requests.append((engine, request))
+        return solve()
+
+    monkeypatch.setattr(engine_cache, "cached_engine_call", cache_call)
+
+    result = openimcc_bridge.species_thermo(
+        "FeO", "g", 6001.0, allow_extrapolation=True
+    )
+
+    assert result["source_row_id"] == "JANAF-FeO-gas"
+    assert result["extrapolated"] is True
+    assert result["declared_interval_K"] == (298.15, 6000.0)
+    assert result["continuation"] == "Shomate fit continued above its declared interval"
+    assert result["authority"] == "JANAF source row"
+    assert calls == [("FeO", "g", 6001.0, "default-gas-datapack", True)]
+    assert requests == [
+        (
+            "openimcc",
+            {
+                "call": "species_thermo",
+                "species": "FeO",
+                "phase": "g",
+                "T_K": 6001.0,
+                "datapack": "default",
+                "allow_extrapolation": True,
+            },
+        )
+    ]
+
+
 def test_redox_result_keeps_its_type_across_cache_round_trip(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -1591,7 +1659,12 @@ def test_openimcc_canonical_predictions_match_chemistry_version_pin(
         canonical_json_dumps(predictions).encode("ascii")
     ).hexdigest()
 
-    # Measured 2026-11-16 on Mac-Studio-256-3 with OpenIMCC 9c327c2.
+    # Pin-port comparison: 38,482 values at 9c327c2 versus 979adb2 had zero
+    # numeric changes. Digest moved
+    # 95491c859bfde965707a441e0598bdd38bee327b2099229dbf3ead253f750547
+    # -> 2bec587e444805a7bd6ec091308c00c88840357191d2e3d27dfee37fc99581af.
+    # OpenIMCC's 9c327c2..979adb2 bisect found zero numeric changes across
+    # four text/identity commits, including c75456f's default redox-pack reissue.
     assert digest == engine_cache.OPENIMCC_CANONICAL_OUTPUT_SHA256, (
         "OpenIMCC predictions changed: bump ENGINE_CHEMISTRY_VERSION[openimcc] "
         "and re-pin"
