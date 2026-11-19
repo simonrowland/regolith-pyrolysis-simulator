@@ -53,7 +53,16 @@ _UPSTREAM_COMPILATION_RECORDS = (
 
 
 @pytest.mark.parametrize("relative_path", _UPSTREAM_COMPILATION_RECORDS)
-def test_compilation_record_binding_retains_upstream_locator_fact(relative_path: str) -> None:
+def test_compilation_observation_source_path_is_the_ingested_record(
+    relative_path: str,
+) -> None:
+    """Canonicalization must not replace the ingested JSON with the raw source.
+
+    atct's ``path`` and burcat's ``path`` (and the same shape on fastchem,
+    nasa-glenn, and pankratz b677) name the upstream text. That fact stays
+    in the note. ``source_path`` stays the record file, which exists.
+    """
+
     from simulator.battery.migrate import compilation_record_asset_id
 
     path = REPO_ROOT / relative_path
@@ -68,7 +77,12 @@ def test_compilation_record_binding_retains_upstream_locator_fact(relative_path:
     assert observations
     asset_id = compilation_record_asset_id(relative_path)
     for observation in observations:
-        assert observation.locator.source_path == upstream_path
+        locator = observation.locator
+        assert locator.source_path == relative_path
+        assert (REPO_ROOT / locator.source_path).is_file()
+        assert upstream_path in (locator.note or "")
+        extras = locator.extras or {}
+        assert all(value != upstream_path for value in extras.values())
         assert observation.read_from == asset_id
         if observation.derivation is not None:
             assert observation.derivation.inputs[0] == asset_id
@@ -83,16 +97,83 @@ def test_compilation_record_binding_retains_upstream_locator_fact(relative_path:
 def test_compilation_record_binding_detects_upstream_path_winning(
     relative_path: str, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    from dataclasses import replace
+
     from simulator.battery import migrate as migrate_module
 
-    choose = migrate_module.choose_read_from
+    def canonicalize_upstream_into_source_path(
+        raw: object, *, record_path: str, record_id: str
+    ):
+        locator = migrate_module._locator_from_plain(raw, refuse_invalid=True)
+        locator = locator or Locator(record=record_id)
+        if not locator.source_path:
+            locator = replace(locator, source_path=record_path)
+        return locator
+
     with monkeypatch.context() as mutation:
         mutation.setattr(
-            migrate_module, "choose_read_from",
-            lambda work, locator, **_context: choose(work, locator),
+            migrate_module,
+            "compilation_record_locator",
+            canonicalize_upstream_into_source_path,
         )
         with pytest.raises(AssertionError):
-            test_compilation_record_binding_retains_upstream_locator_fact(relative_path)
+            test_compilation_observation_source_path_is_the_ingested_record(
+                relative_path
+            )
+
+
+def test_absent_compilation_locator_keeps_record_id_on_record() -> None:
+    """A missing source_locator is the record field, not a note.
+
+    high-temperature-p336 has formation Gibbs and no published formula, so
+    the B2131 generator leaves it on the generic path. It also has no
+    source_locator. The formation-Gibbs pin serializes that id on ``record``.
+    """
+
+    from simulator.battery.migrate import compilation_record_locator
+
+    relative_path = (
+        "data/literature/compilations/robie-hemingway-1995-usgs-b2131/"
+        "records/high-temperature-p336.json"
+    )
+    record_id = "high-temperature-p336"
+    absent = compilation_record_locator(
+        None, record_path=relative_path, record_id=record_id
+    )
+    assert absent.source_path == relative_path
+    assert absent.record == record_id
+    assert absent.note is None
+    assert (
+        compilation_record_locator(
+            {}, record_path=relative_path, record_id=record_id
+        )
+        == absent
+    )
+    prose = "Table 1, printed page 4, PDF page 10"
+    located = compilation_record_locator(
+        prose, record_path=relative_path, record_id=record_id
+    )
+    assert located.source_path == relative_path
+    assert located.record is None
+    assert located.note == prose
+
+    path = REPO_ROOT / relative_path
+    document = json.loads(path.read_text(encoding="utf-8"))
+    assert document["record_id"] == record_id
+    assert "source_locator" not in document
+    assert not str(document.get("formula_as_published") or "").strip()
+    migrator = Migrator(REPO_ROOT)
+    migrator._migrate_compilation_file(path)
+    migrator.finalize()
+    observations = list(migrator.result.observations.values())
+    assert observations
+    for observation in observations:
+        locator = observation.locator
+        assert locator.source_path == relative_path
+        assert (REPO_ROOT / locator.source_path).is_file()
+        assert locator.record == record_id
+        assert locator.note is None
+        assert locator.table is None
 
 
 def test_printed_labels_and_grid_aliases_survive_extract_migration(
