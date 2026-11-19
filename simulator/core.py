@@ -5708,16 +5708,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # The step establishes the gate before these callers. Read the curve
         # that call already resolved, or the redox pin. Do not dispatch a
         # liquidus solve from inside the activity diagnostic.
-        pinned_hour = getattr(
-            self,
-            "_melt_redox_gate_authority_tick_hour",
-            None,
-        )
-        pinned = getattr(
-            self,
-            "_melt_redox_gate_authority_this_tick",
-            _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
-        )
         retained_hour = getattr(self, "_liquid_feo_resolved_curve_hour", None)
         retained = getattr(
             self,
@@ -5728,17 +5718,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             hour = int(self.melt.hour)
         except (TypeError, ValueError, AttributeError):
             hour = None
+        has_current_hour_pin, pinned = (
+            self._melt_redox_gate_authority_pin_for_current_hour()
+            if hour is not None
+            else (False, _RESOLVE_MELT_REDOX_GATE_AUTHORITY)
+        )
         if (
             hour is not None
             and retained_hour == hour
             and retained is not _LIQUID_FEO_GATE_NOT_ESTABLISHED
         ):
             curve = retained
-        elif (
-            hour is None
-            or pinned_hour != hour
-            or pinned is _RESOLVE_MELT_REDOX_GATE_AUTHORITY
-        ):
+        elif hour is None or not has_current_hour_pin:
             curve = _LIQUID_FEO_GATE_NOT_ESTABLISHED
         else:
             curve = self._resolved_melt_redox_gate_authority(pinned)
@@ -5827,6 +5818,72 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             float(self.melt.p_total_mbar) / 1000.0,
             floor_bar=self._vacuum_floor_bar(),
         ))
+
+    def _melt_metal_saturation_fO2_floor_log(
+        self,
+        temperature_K: float,
+    ) -> tuple[float, str] | None:
+        """Return the highest supported oxide/metal saturation floor."""
+
+        from simulator.chemistry.ellingham_graph import (
+            dissociation_pO2_threshold,
+            ellingham_oxide_stoichiometry_for_formula,
+        )
+        from simulator.chemistry.ellingham_thermo import (
+            ELLINGHAM_THERMO,
+            ellingham_stoichiometry,
+        )
+        from simulator.chemistry.melt_activity import melt_oxide_activity
+        from simulator.state import OXIDE_TO_METAL
+
+        T_K = float(temperature_K)
+        composition = self.atom_ledger.mol_by_account("process.cleaned_melt")
+        floors: list[tuple[float, str]] = []
+        for oxide, (metal, _, _) in OXIDE_TO_METAL.items():
+            if float(composition.get(oxide, 0.0) or 0.0) <= 0.0:
+                continue
+            if metal not in ELLINGHAM_THERMO:
+                continue
+            # The JANAF resolver only applies when its metal/oxide reaction
+            # has the same stoichiometry as the ledger oxide being examined.
+            expected = ellingham_oxide_stoichiometry_for_formula(oxide)
+            if expected is None:
+                continue
+            actual = ellingham_stoichiometry(metal)
+            if not all(
+                math.isclose(left, right, rel_tol=0.0, abs_tol=1e-9)
+                for left, right in zip(expected, actual)
+            ):
+                continue
+            activity = melt_oxide_activity(
+                oxide,
+                composition,
+                temperature_K=T_K,
+            )
+            if activity is None:
+                continue
+            parent_activity = activity.thermodynamic_parent_activity()
+            if parent_activity <= 0.0:
+                continue
+            # For MOx(melt) <-> M(metal) + x/2 O2, K =
+            # a_M * (fO2/bar)^(x/2) / a_MOx. Since a_M <= 1,
+            # fO2/bar >= (K*a_MOx)^(2/x), the unit-metal-activity
+            # dissociation threshold at the actual parent-oxide activity.
+            # The resolver returns bar; fO2/bar is dimensionless before
+            # taking log10. a_MOx=1 recovers the pure-oxide buffer, and a
+            # smaller a_MOx lowers the floor monotonically.
+            threshold_bar = dissociation_pO2_threshold(
+                metal,
+                T_K,
+                a_oxide=parent_activity,
+            )
+            if not math.isfinite(threshold_bar) or threshold_bar <= 0.0:
+                raise AccountingError(
+                    "metal-saturation fO2 floor is invalid for "
+                    f"{oxide}: pO2_bar={threshold_bar!r}"
+                )
+            floors.append((math.log10(threshold_bar), oxide))
+        return max(floors, default=None)
 
     def _melt_fO2_reference_state_at_temperature(
         self,
@@ -6079,51 +6136,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 candidate_fO2_log = min(
                     candidate_fO2_log, self._melt_redox_fO2_upper_bound_log(),
                 )
-                if (
-                    float(
-                        terms.get('redox_source:c3_na_shuttle_reduction', 0.0)
-                        or 0.0
-                    ) < -OXYGEN_RESERVOIR_NOOP_MOL
-                    and float(
-                        self.atom_ledger.mol_by_account(
-                            'process.reagent_inventory'
-                        ).get('Na', 0.0)
-                        or 0.0
-                    ) > OXYGEN_RESERVOIR_NOOP_MOL
-                    and float(
-                        self.atom_ledger.mol_by_account(
-                            'process.spent_reductant_residue'
-                        ).get('Na2O', 0.0)
-                        or 0.0
-                    ) > OXYGEN_RESERVOIR_NOOP_MOL
-                ):
-                    # A remaining Na reagent coexisting with its Na2O
-                    # product is the independent 4 Na + O2 <-> 2 Na2O
-                    # buffer. Its equilibrium pO2 comes from the repository's
-                    # JANAF-backed Ellingham resolver; a local Kress capacity
-                    # tangent must not step the melt below that coexistence
-                    # potential. The resolver returns bar, so log10 is the
-                    # dimensionless fO2/bar value consumed by this reservoir.
-                    from simulator.chemistry.ellingham_graph import (
-                        dissociation_pO2_threshold,
+                saturation_floor = self._melt_metal_saturation_fO2_floor_log(
+                    T_K
+                )
+                if terms:
+                    self._last_redox_source_metal_saturation_floor = (
+                        None
+                        if saturation_floor is None
+                        else {
+                            'log10_fO2_bar': saturation_floor[0],
+                            'binding_oxide': saturation_floor[1],
+                        }
                     )
-
-                    buffer_pO2_bar = dissociation_pO2_threshold(
-                        'Na',
-                        T_K,
-                        a_oxide=1.0,
-                    )
-                    buffer_fO2_log = math.log10(buffer_pO2_bar)
-                    if buffer_fO2_log > upper_bound:
+                if saturation_floor is not None:
+                    floor_fO2_log, binding_oxide = saturation_floor
+                    if floor_fO2_log > upper_bound:
                         raise AccountingError(
-                            'active Na/Na2O redox buffer exceeds the melt fO2 '
-                            f'pressure ceiling: buffer={buffer_fO2_log:.12g}, '
+                            'melt metal-saturation fO2 floor exceeds the '
+                            f'pressure ceiling for {binding_oxide}: '
+                            f'floor={floor_fO2_log:.12g}, '
                             f'ceiling={upper_bound:.12g}'
                         )
-                    candidate_fO2_log = max(
-                        candidate_fO2_log,
-                        buffer_fO2_log,
-                    )
+                    candidate_fO2_log = max(candidate_fO2_log, floor_fO2_log)
                 applied_delta_ln = (
                     candidate_fO2_log - base_fO2_log
                 ) * math.log(10.0)

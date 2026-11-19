@@ -156,6 +156,25 @@ def dissociation_pO2_threshold(
     return K * (max(float(a_oxide), 0.0) ** n_ox)
 
 
+def ellingham_oxide_stoichiometry_for_formula(
+    oxide: str,
+) -> tuple[float, float] | None:
+    """Return Ellingham ``(n_M, n_ox)`` for a ledger oxide formula."""
+
+    from simulator.state import OXIDE_TO_METAL
+
+    stoich = OXIDE_TO_METAL.get(str(oxide))
+    if stoich is None:
+        return None
+    _metal, n_metal, n_oxygen = stoich
+    if n_oxygen <= 0:
+        return None
+    return (
+        2.0 * float(n_metal) / float(n_oxygen),
+        2.0 / float(n_oxygen),
+    )
+
+
 def metal_activity_factor(
     species: str,
     temperature_K: float,
