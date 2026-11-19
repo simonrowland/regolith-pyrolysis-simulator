@@ -1664,6 +1664,46 @@ def _liquidus_inputs_on_feo_total_iron_basis(
     return kg, mol, accounts
 
 
+def _liquidus_evaluated_bulk_silica_diagnostic(
+    composition_mol_by_account: Mapping[str, Mapping[str, float]],
+    *,
+    species_formula_registry: Optional[Mapping[str, Any]] = None,
+) -> Dict[str, object] | None:
+    """Return the silica verdict for the bulk the liquidus finder evaluates."""
+    from engines.magemin.domain import MAGEMinDomainGate
+
+    _kg, _mol, folded_accounts = _liquidus_inputs_on_feo_total_iron_basis(
+        composition_kg=None,
+        composition_mol=None,
+        composition_mol_by_account=composition_mol_by_account,
+    )
+    if folded_accounts is None:
+        return None
+    source_projection = project_melt_to_oxide_projection(
+        composition_kg=None,
+        composition_mol=None,
+        composition_mol_by_account=folded_accounts,
+        oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
+        species_formula_registry=species_formula_registry,
+    )
+    backend = MAGEMinBackend()
+    bulk_projection = backend._build_db_bulk_projection(
+        source_projection.oxide_wt_pct
+    )
+    evaluated_oxides = backend._domain_gate_oxide_composition(
+        bulk_projection.composition_wt_pct
+    )
+    evaluated_projection = project_melt_to_oxide_projection(
+        composition_kg=evaluated_oxides,
+        composition_mol=None,
+        oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
+        species_formula_registry=species_formula_registry,
+    )
+    return MAGEMinDomainGate.silica_extrapolation_diagnostic(
+        evaluated_projection.oxide_wt_pct
+    )
+
+
 class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     """
     MAGEMin silicate phase equilibrium adapter.
@@ -2155,6 +2195,23 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 bulk_projection
             ),
         )
+        from engines.magemin.domain import MAGEMinDomainGate
+
+        evaluated_domain_projection = project_melt_to_oxide_projection(
+            composition_kg=self._domain_gate_oxide_composition(
+                bulk_projection.composition_wt_pct
+            ),
+            composition_mol=None,
+            oxide_basis=self._MAGEMIN_INPUT_BASIS,
+            species_formula_registry=species_formula_registry,
+        )
+        evaluated_silica_diagnostic = (
+            MAGEMinDomainGate.silica_extrapolation_diagnostic(
+                evaluated_domain_projection.oxide_wt_pct
+            )
+        )
+        if evaluated_silica_diagnostic is not None:
+            result_diagnostics.update(evaluated_silica_diagnostic)
         if bulk_projection.dropped_components:
             # A result for a different (projected) bulk is not a result for
             # this one. Do not call MAGEMin on the truncated vector.
@@ -2545,6 +2602,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
         sample_warnings: list[str] = []
         renormalised_notices: list[dict] = []
+        evaluated_domain_diagnostic: dict[str, object] = {}
 
         # MAGEMin uses a finite hang guard; sample count, not wall time,
         # bounds the search work. A per-call engine timeout remains separate.
@@ -2621,6 +2679,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 species_formula_registry=species_formula_registry,
                 projected_oxide_wt_pct=projected_oxide_wt_pct,
             )
+            if isinstance(result.diagnostics, Mapping):
+                evaluated_domain_diagnostic.update({
+                    field: result.diagnostics[field]
+                    for field in ('authority', 'certified_band')
+                    if field in result.diagnostics
+                })
             if result.status != 'ok':
                 warning = '; '.join(result.warnings) or result.status
                 # Raise the TYPED sample error so the finder preserves which
@@ -2678,6 +2742,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
         warnings_out = [*result.warnings, *sample_warnings[:6]]
         diagnostics = dict(result.diagnostics or {})
+        diagnostics.update(evaluated_domain_diagnostic)
         _record_mode_bracket_notices(
             diagnostics,
             warnings_out,

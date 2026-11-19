@@ -1694,6 +1694,61 @@ def test_magemin_freeze_gate_curve_keeps_provider_warning_and_flags(
     )
 
 
+def test_magemin_ferric_fold_flags_the_evaluated_freeze_gate_bulk(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    composition_wt_pct = {
+        'SiO2': 79.9,
+        'MgO': 10.1,
+        'Fe2O3': 10.0,
+    }
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    ledger.load_external_mol(
+        _CLEANED_MELT_ACCOUNT,
+        composition_mol,
+        source='d-447 ferric-fold evaluated-bulk regression',
+        material_origin='feedstock',
+    )
+    sim.atom_ledger = ledger
+    trace = _install_magemin_subprocess_gate(sim, monkeypatch)
+
+    curve = sim._freeze_gate_curve_record()['curve']
+
+    expected_band = {'sio2_wt_pct': [30.0, 80.0]}
+    assert any(
+        evaluated.get('SiO2', 0.0) > 80.0
+        for evaluated in trace['evaluated_compositions']
+    )
+    assert curve['authority'] == 'extrapolated'
+    assert curve['certified_band'] == expected_band
+    provider_diagnostic = trace['provider_diagnostics'][0]
+    assert provider_diagnostic['authority'] == 'extrapolated'
+    assert provider_diagnostic['certified_band'] == expected_band
+    assert provider_diagnostic['backend_diagnostics']['authority'] == (
+        'extrapolated'
+    )
+    assert provider_diagnostic['backend_diagnostics']['certified_band'] == (
+        expected_band
+    )
+
+
 def test_freeze_gate_enabled_refuses_instead_of_using_backend_liquidus(
     monkeypatch,
     vapor_pressure_data,

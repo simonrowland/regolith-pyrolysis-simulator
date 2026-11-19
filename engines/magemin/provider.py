@@ -330,6 +330,14 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         equilibrium_diagnostics = dict(
             getattr(equilibrium, 'diagnostics', {}) or {}
         )
+        if request.intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            backend_domain_diagnostic = {
+                field: equilibrium_diagnostics[field]
+                for field in ('authority', 'certified_band')
+                if field in equilibrium_diagnostics
+            }
+            if backend_domain_diagnostic:
+                evaluated_domain_diagnostic = backend_domain_diagnostic
         projected_diagnostics = equilibrium_diagnostics.get(
             'projected_liquidus_diagnostics'
         )
