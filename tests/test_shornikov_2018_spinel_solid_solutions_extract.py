@@ -7,6 +7,7 @@ import yaml
 
 from simulator.battery.enums import Phase, ValueKind
 from simulator.battery.identity import profile_for
+from simulator.battery.method_class_bands import _located_fact
 from tests.battery.factories import migrate_one_extract
 
 
@@ -137,6 +138,11 @@ def test_shornikov_2018_tables_and_conditions_migrate_with_page_coordinates() ->
 
     experiment = next(iter(migrator.result.experiments.values()))
     assert experiment.method.value.value == "knudsen_effusion"
+    assert len(by_quantity["activity"]) == 60
+    assert all(
+        _located_fact(row, experiment, "technique") == "mass_spectrometry"
+        for row in by_quantity["activity"]
+    )
     assert experiment.sample.container.state.value == "molybdenum cell"
     assert experiment.sample.container.locator.page == 4
     assert experiment.sample.initial_composition.state.is_value
