@@ -14,6 +14,7 @@ import yaml
 
 from simulator.battery.enums import (
     AmountBasis,
+    MethodToken,
     NoticeKind,
     Phase,
     PhaseRole,
@@ -422,6 +423,62 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
     changed_projection = dict(mutated_row.identity.composition.value.components)
     assert changed_projection["Cl"] > base_projection["Cl"]
     assert changed_projection["SiO2"] < base_projection["SiO2"]
+
+
+def test_this_study_experiments_migrate_with_reported_method(tmp_path: Path) -> None:
+    doc = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
+    result = _migrate_real_extract(tmp_path / "method-migration", EXTRACT_NAME)
+    rows = range(81, 97)
+    experiments = {
+        experiment_id.rsplit("::", 1)[-1]: experiment
+        for experiment_id, experiment in result.experiments.items()
+    }
+    source_experiments = {
+        experiment["experiment_id"]: experiment for experiment in doc["experiments"]
+    }
+
+    for row in rows:
+        experiment_id = f"worksheet-row-{row}"
+        experiment = experiments[experiment_id]
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.PISTON_CYLINDER
+        assert experiment.locator.source_path == (
+            "corpus/raw/rusiecka-2026-chlorine-data/"
+            "rusiecka-2026-chlorine-data.xlsx"
+        )
+        assert experiment.locator.record == f"sheet data, cell AC{row}"
+        assert source_experiments[experiment_id]["locator"] == {
+            "source_path": (
+                "corpus/raw/rusiecka-2026-chlorine-data/"
+                "rusiecka-2026-chlorine-data.xlsx"
+            ),
+            "record": f"sheet data, cell AC{row}",
+        }
+        assert source_experiments[experiment_id]["method_locator"] == {
+            "source_path": (
+                "corpus/raw/rusiecka-wood-2026-chlorine-hcl/"
+                "rusiecka-wood-2026-chlorine-hcl.pdf"
+            ),
+            "page": 3,
+            "section": "Experimental procedure",
+        }
+
+    mutated_doc = deepcopy(doc)
+    experiment = next(
+        item
+        for item in mutated_doc["experiments"]
+        if item["experiment_id"] == "worksheet-row-81"
+    )
+    experiment["method"] = {"tag": "unknown", "reason": "not_published"}
+    mutated_result = _migrate_real_extract(
+        tmp_path / "method-mutated", EXTRACT_NAME, extract_doc=mutated_doc
+    )
+    mutated = next(
+        item
+        for experiment_id, item in mutated_result.experiments.items()
+        if experiment_id.endswith("::experiment::worksheet-row-81")
+    )
+    assert mutated.method.is_unknown
 
 
 def test_companion_table2_locator_and_sample_list_disagreement() -> None:
