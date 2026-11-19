@@ -2697,7 +2697,7 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
                 # later species_thermo(..., allow_extrapolation=True) API can
                 # replace this refusal with its native flagged continuation.
                 return refuse(
-                    RefusalReason.METRIC_DOMAIN,
+                    RefusalReason.UNSUPPORTED,
                     "openimcc_species_thermo_outside_interval",
                     {"species": formula, "phase": phase_label,
                      "requested_T_K": str(call_temperature_K),
@@ -2765,6 +2765,22 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
         f"derivatives_fit_implied={derivatives_fit}"
     )
 
+    identity_poly = _poly_name(identity)
+    if phase is Phase.CR and identity_poly is not None:
+        # This pinned SpeciesThermo source reports only a generic crystal
+        # phase, not a named polymorph. Keep named crystals off that row until
+        # the selected OpenIMCC source identity explicitly names its form.
+        source_polymorph = None
+        if not _same_mineral(source_polymorph, identity_poly):
+            return refuse(
+                RefusalReason.UNSUPPORTED,
+                "pure-phase-polymorph-unresolved",
+                {"engine": Engine.OPENIMCC.value, "formula": formula,
+                 "polymorph": identity_poly, "source_row_id": row_id,
+                 "source_table_id": table_id},
+                evidence=evidence,
+            )
+
     field = {Quantity.CP: "Cp_J_molK", Quantity.S: "S_J_molK"}.get(quantity)
     if field is not None:
         value = _finite_number(props.get(field))
@@ -2773,8 +2789,20 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
                 RefusalReason.UNSUPPORTED, "pure-phase-property-absent",
                 {"engine": Engine.OPENIMCC.value, "property": field}, evidence=evidence,
             )
+        value = as_decimal(str(value))
+        if quantity is Quantity.S and phase is Phase.G:
+            value, refusal = _apply_printed_entropy_shift(
+                value,
+                identity,
+                quantity=quantity,
+                origin=origin,
+                call_evidence=evidence,
+                engine=Engine.OPENIMCC,
+            )
+            if refusal is not None:
+                return refusal
         return ThermoAttempt(
-            value=as_decimal(str(value)), unit=QUANTITY_UNITS[quantity],
+            value=value, unit=QUANTITY_UNITS[quantity],
             authority=Authority.BRIDGE, notices=(), refusal_reason=None,
             refusal_detail={}, call_evidence=evidence,
         )
@@ -2897,6 +2925,7 @@ def _apply_printed_entropy_shift(
     quantity: Quantity,
     origin: str,
     call_evidence: str,
+    engine: Engine = Engine.VAPOROCK,
 ) -> tuple[Decimal, ThermoAttempt | None]:
     """S on the printed pressure, or a refusal. Other quantities are unchanged.
 
@@ -2920,7 +2949,7 @@ def _apply_printed_entropy_shift(
             why or "standard-pressure-unknown",
             quantity=quantity,
             origin=origin,
-            extra={"engine": Engine.VAPOROCK.value},
+            extra={"engine": engine.value},
             call_evidence=call_evidence,
         )
     if shift == 0:
@@ -2932,7 +2961,7 @@ def _apply_printed_entropy_shift(
             "nonfinite-engine-value",
             quantity=quantity,
             origin=origin,
-            extra={"engine": Engine.VAPOROCK.value},
+            extra={"engine": engine.value},
             call_evidence=call_evidence,
         )
     return shifted, None
