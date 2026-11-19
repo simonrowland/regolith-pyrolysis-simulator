@@ -121,8 +121,9 @@ SCENARIO_FLUX_LEDGER_PINS = {
         "ledger_sha256": "12d2bd219387ab9e6df5d1016845f1f926319f7913693f9202385db65e771337",
     },
     "ci_carbonaceous_chondrite_C2B_12h": {
-        # Regenerated on Mac-Studio-256-3 at cd7e98709; the payload and pins
-        # match green, so this scenario has no serialized b-1124 output delta.
+        # Flux and ledger pins match the cd7e98709 regeneration. eA's MAGEMin
+        # curve moves only the repeated non-monotone frac_M warning to the
+        # 750 C / 700 C pair measured on Mac-Studio-256-1.
         "flux_maps_sha256": "d827049039f82a8b65a9b0f52e637cf3bc5d1e0dec7d6198edf901a5e3dcae7d",
         "ledger_sha256": "fe7c19dbc6195a7f115e8cac385d539f84cf0a3670c35415ee058a5f41a56348",
     },
