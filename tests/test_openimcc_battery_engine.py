@@ -560,7 +560,6 @@ def test_openimcc_input_basis_tracks_installed_trace_rules() -> None:
         _openimcc_trace_activity_models()
     )
     assert set(_engine_bulk_component_names(Engine.OPENIMCC)) == expected
-    assert {"Cr2O3", "MnO"}.isdisjoint(expected)
 
 
 def test_openimcc_battery_returns_modeled_trace_activity() -> None:

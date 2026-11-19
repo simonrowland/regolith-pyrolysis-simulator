@@ -1719,21 +1719,10 @@ def test_above_cap_openimcc_provenance_carries_complex_saturation_notice() -> No
     assert result["openimcc_extrapolated"] is False
 
 
-def test_relaxed_openimcc_preserves_constant_gamma_carrier_set() -> None:
+def test_supported_cr_mn_preserves_constant_gamma_carrier_set() -> None:
+    from openimcc.trace_components import _TRACE_COMPONENT_RULES
+
     composition = _moles_from_wt(_cr_mn_trace_weights())
-    cleaned = evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
-    classifier = cleaned.policy["composition_projection_classification"]
-    relaxed = cleaned.policy["openimcc_projection_crmn_relaxed"]
-
-    assert classifier["projection_verdict"] == "within_threshold"
-    assert classifier["dropped_total_wt_pct"] == pytest.approx(1.5)
-    assert classifier["thresholded_dropped_total_wt_pct"] == pytest.approx(0.0)
-    assert set(classifier["dropped_components"]) == {"Cr2O3", "MnO"}
-    assert relaxed["wt_pct"] == pytest.approx({"Cr2O3": 1.0, "MnO": 0.5})
-    assert relaxed["ruling"] == "owner 2026-09-27"
-    assert "Cr2O3" not in cleaned.bridge.parent_oxide_activities
-    assert "MnO" not in cleaned.bridge.parent_oxide_activities
-
     provider = _provider()
     regression_temperature_K = 1700.0 + 273.15
     request_options = {
@@ -1763,19 +1752,20 @@ def test_relaxed_openimcc_preserves_constant_gamma_carrier_set() -> None:
     )
     openimcc_species = set(openimcc.diagnostic["vapor_pressures_Pa"])
     assert openimcc_species == constant_gamma_species
-    assert openimcc.diagnostic["high_t_melt_activity"][
-        "openimcc_projection_crmn_relaxed"
-    ]["code"] == "openimcc_projection_crmn_relaxed"
+    expected_models = {
+        name: str(_TRACE_COMPONENT_RULES[name].activity_model)
+        for name in ("Cr2O3", "MnO")
+    }
+    assert openimcc.diagnostic["high_t_melt_activity"]["composition_policy"][
+        "trace_activity_models"
+    ] == expected_models
     assert openimcc.diagnostic["vapor_pressures_Pa"]["Ti"] > 0.0
     assert (
         openimcc.diagnostic["vapor_pressure_numerator_provenance"]["Ti"][
-            "melt_activity_authority"
+            "openimcc_trace_activity_models"
         ]
-        == "openimcc"
+        == expected_models
     )
-    assert openimcc.diagnostic["vapor_pressure_numerator_provenance"]["Ti"][
-        "openimcc_projection_crmn_relaxed"
-    ]["code"] == "openimcc_projection_crmn_relaxed"
 
 
 def test_above_cap_k2o_keeps_constant_gamma_with_exclusion_provenance() -> None:
@@ -2711,11 +2701,7 @@ def test_projected_bulk_within_one_percent_has_notice_and_classifier_record() ->
     assert policy["status"] == "projected"
     assert classifier["projection_verdict"] == "within_threshold"
     assert 0.0 < classifier["dropped_total_wt_pct"] <= 1.0
-    assert set(classifier["dropped_components"]) == {
-        "B2O3",
-        "Cr2O3",
-        "MnO",
-    }
+    assert set(classifier["dropped_components"]) == {"B2O3"}
     assert policy["notice"]["code"] == "openimcc_projected_bulk"
 
 
@@ -2738,13 +2724,14 @@ def test_modelled_trace_components_are_evaluated_and_provenanced() -> None:
     weights = {
         "Na2O": 5.0,
         "K2O": 1.0,
-        "SiO2": 50.34,
+        "SiO2": 50.3,
         "FeO": 10.0,
         "MgO": 10.0,
         "CaO": 15.0,
         "Al2O3": 8.0,
         "TiO2": 0.5,
-        "SrO": 0.04,
+        "Cr2O3": 0.04,
+        "MnO": 0.04,
         "NiO": 0.04,
         "WO3": 0.04,
         "SO3": 0.04,
@@ -2752,7 +2739,7 @@ def test_modelled_trace_components_are_evaluated_and_provenanced() -> None:
     composition = _moles_from_wt(weights)
     expected_models = {
         name: str(_TRACE_COMPONENT_RULES[name].activity_model)
-        for name in ("SrO", "NiO", "WO3", "SO3")
+        for name in ("Cr2O3", "MnO", "NiO", "WO3", "SO3")
     }
     cleaned = evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
 
@@ -2792,10 +2779,7 @@ def test_unmodelled_extra_keeps_one_percent_projection_gate(
     should_project: bool,
 ) -> None:
     composition = _moles_from_wt(
-        _cr_mn_trace_weights(
-            b2o3_wt_pct=b2o3_wt_pct,
-            include_cr_mn=False,
-        )
+        _cr_mn_trace_weights(b2o3_wt_pct=b2o3_wt_pct)
     )
 
     if should_project:
