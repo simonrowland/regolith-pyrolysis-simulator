@@ -72,7 +72,9 @@ def select_method_class_band(
                 break
         if matches:
             candidates.append((class_id, entry))
-    if len(candidates) != 1:
+    if not candidates:
         return unknown
+    if len(candidates) > 1:
+        return {"refusal": {"reason": "method_class_ambiguous"}}
     class_id, entry = candidates[0]
     return {"class_id": class_id, "version": "method_class_bands.v1", **entry}

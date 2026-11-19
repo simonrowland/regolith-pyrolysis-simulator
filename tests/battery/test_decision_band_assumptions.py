@@ -11,6 +11,7 @@ from simulator.battery import score
 from simulator.battery.enums import EvidenceClass, MethodToken, Quantity, UncertaintyKind
 from simulator.battery.migrate import to_plain
 from simulator.battery.records import State, Uncertainty
+from simulator.battery.score_metrics import metric_operation_for_identity
 from tests.battery import factories as F
 from tests.battery.test_score import _compile, _context, _predict
 
@@ -66,12 +67,41 @@ def _fixture(class_id="kems_absolute_pressure_weight_loss_calibrated"):
 ])
 def test_each_cited_class_uses_existing_metric_owner(class_id, reference, width):
     observation, experiment = _fixture(class_id)
+    assert "operation" not in owner.method_class_bands()[class_id]
+    assert metric_operation_for_identity(observation.identity) is not None
     resolved = score._assumed_method_class_band(observation, experiment, Decimal(reference))
     assert resolved["class_id"] == class_id
     assert resolved["band"].value.quantize(Decimal("1e-9")) == Decimal(width)
     assert resolved["band"].band_basis == "method_class_assumed"
     assert resolved["precision"]["confidence"] == "unstated"
     assert resolved["citation"]["printed_page"]
+
+
+def test_weight_loss_band_requires_controlled_parasitic_phenomena():
+    observation, experiment = _fixture("knudsen_weight_loss_collection_torsion_pressure")
+    conditions = dict(observation.point_conditions)
+    conditions.pop("parasitic_phenomena")
+    resolved = score._assumed_method_class_band(
+        replace(observation, point_conditions=conditions), experiment, Decimal("1")
+    )
+    assert "band" not in resolved
+    assert resolved["refusal"]["reason"] == "method_class_applicability_unknown"
+
+
+def test_multiple_matching_classes_have_typed_refusal_and_census(monkeypatch):
+    observation, experiment = _fixture()
+    table = dict(owner.method_class_bands())
+    table["duplicate"] = dict(table["kems_absolute_pressure_weight_loss_calibrated"])
+    monkeypatch.setattr(owner, "method_class_bands", lambda: table)
+    resolved = score._assumed_method_class_band(observation, experiment, Decimal("1"))
+    assert "band" not in resolved
+    assert resolved["refusal"]["reason"] == "method_class_ambiguous"
+    row = {
+        "assumed_band_details": resolved,
+        "reference": observation.observation_id,
+    }
+    summary = score._assumed_band_summary([row])
+    assert summary["refusal_counts"] == {"method_class_ambiguous": 1}
 
 
 @pytest.mark.parametrize("change", ["unknown_method", "missing", "failed", "unlocated", "ambiguous", "quantity"])
