@@ -17,7 +17,9 @@ D(T) for Na and Cu are the literature expressions Su and Zhang print
 no printed tracer diffusivity, so a potassium call refuses.
 
 Cooling time is the bead's own heat-loss half-time, not a fitted plume
-timescale. Zhang's 2008 law then uses that half-time as tau.
+timescale. Zhang's 2008 law then uses that half-time as tau. The sodium
+surface flux is the catalog NaO0.5 equilibrium pressure at a stated
+ambient fO2 and fNa, converted with the Hertz–Knudsen–Langmuir owner.
 
 This module does not read the paper's fitted tau, a0 or b0.
 """
@@ -27,6 +29,7 @@ from __future__ import annotations
 import math
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from functools import lru_cache
 
 from simulator.physical_constants import STEFAN_BOLTZMANN
 
@@ -808,3 +811,611 @@ def diffusivity_along_zhang_cooling(
         return diffusivity_m2_s_at_temperature(temperature)
 
     return at_time
+
+
+@dataclass(frozen=True)
+class SodiumSurfaceFlux:
+    """One evaluation of the sodium oxide surface mass flux.
+
+    ``na2o_mass_flux_kg_m2_s`` is positive when Na2O leaves the bead.
+    """
+
+    na2o_mass_flux_kg_m2_s: float
+    equilibrium_p_na_pa: float
+    activity_nao0_5: float
+    evaporation_alpha: float
+    alpha_authority_status: str
+    gamma_authority_status: str
+    vapour_pressure_out_of_range: bool
+    vapour_pressure_status: str | None
+    evaporation_alpha_outside_stated_band: bool
+
+
+@dataclass(frozen=True)
+class BeadProfilePrediction:
+    """A radial profile and the assumptions that produced it.
+
+    ``flags`` carries the ambient pressures, the volatility authority, and
+    any caller-supplied property labels. Ambient is never a hidden default.
+    """
+
+    component: str
+    grid: SphericalBeadGrid
+    mass_fraction: tuple[float, ...]
+    wt_percent: tuple[float, ...]
+    tau_s: float
+    t_end_s: float
+    initial_temperature_K: float
+    end_temperature_K: float
+    flags: tuple[str, ...]
+    oxide_mass_initial_kg: float
+    oxide_mass_final_kg: float
+    boundary_mass_out_kg: float
+    step_count: int
+
+
+def _absent_or_finite(value: float | None, *, missing: str, invalid: str) -> float:
+    if value is None:
+        raise BeadDiffusionRefusal(missing, missing)
+    return _finite_number(value, invalid)
+
+
+@lru_cache(maxsize=1)
+def _vapour_catalog():
+    """Compile the vapour-rail catalog once.
+
+    The pressure evaluator and the evaporation-alpha contract are what the
+    bead reads. Request rules are part of that same compile.
+    """
+
+    from pathlib import Path
+
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    path = Path(__file__).resolve().parents[1] / "data" / "vapor_pressures.yaml"
+    try:
+        payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise BeadDiffusionRefusal(
+            "vapour_catalog_unreadable",
+            f"could not read {path}",
+        ) from exc
+    if not isinstance(payload, dict):
+        raise BeadDiffusionRefusal(
+            "vapour_catalog_unreadable",
+            "vapor_pressures.yaml did not load as a mapping",
+        )
+    from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+
+    return compile_vapour_rail_catalog(payload)
+
+
+def _sodium_alpha(temperature_K: float) -> tuple[float, str, bool]:
+    """Return alpha, its authority status, and whether ``T`` is outside the stated band."""
+
+    from simulator.alpha_kinetics import parse_alpha_contract
+
+    try:
+        species = _vapour_catalog().species["Na"]
+    except KeyError as exc:
+        raise BeadDiffusionRefusal(
+            "evaporation_alpha_absent",
+            "no compiled Na species",
+        ) from exc
+    contract = species.vaporisation_coefficients.evaporation_alpha
+    parsed = parse_alpha_contract(contract)
+    if parsed is None:
+        raise BeadDiffusionRefusal(
+            "evaporation_alpha_absent",
+            "Na evaporation_alpha is no_data",
+        )
+    if isinstance(parsed, bool) or isinstance(parsed, (int, float)):
+        if isinstance(parsed, bool):
+            raise BeadDiffusionRefusal(
+                "evaporation_alpha_form_unsupported",
+                "Na evaporation_alpha was a boolean",
+            )
+        alpha = float(parsed)
+        authority = "unspecified"
+    elif isinstance(parsed, Mapping):
+        form = str(parsed.get("form") or "scalar")
+        if form != "scalar":
+            raise BeadDiffusionRefusal(
+                "evaporation_alpha_form_unsupported",
+                f"Na evaporation_alpha form {form!r} is not scalar",
+            )
+        try:
+            alpha = float(parsed["value"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise BeadDiffusionRefusal(
+                "evaporation_alpha_absent",
+                "Na evaporation_alpha scalar value is missing",
+            ) from exc
+        authority = str(parsed.get("alpha_authority_status") or "unspecified")
+    else:
+        raise BeadDiffusionRefusal(
+            "evaporation_alpha_form_unsupported",
+            f"Na evaporation_alpha parsed as {type(parsed).__name__}",
+        )
+    if not math.isfinite(alpha) or not 0.0 <= alpha <= 1.0:
+        raise BeadDiffusionRefusal(
+            "evaporation_alpha_out_of_range",
+            f"Na evaporation alpha was {alpha!r}",
+        )
+    band = contract.get("T_band_K") if isinstance(contract, Mapping) else None
+    outside = False
+    if isinstance(band, (list, tuple)) and len(band) == 2:
+        low = float(band[0])
+        high = float(band[1])
+        outside = temperature_K < low or temperature_K > high
+    return alpha, authority, outside
+
+
+def na2o_relative_moles(
+    na2o_mass_fraction: float,
+    host_oxide_wt_percent: Mapping[str, float],
+) -> dict[str, float]:
+    """Relative moles of host oxides plus Na2O on a 100 mass-unit basis.
+
+    Premise: density is constant and only Na2O mass fraction ``c`` changes.
+    The host oxides keep the ratios of the printed weight percentages and
+    together occupy mass fraction ``1 - c``. The printed weights are not
+    rescaled to a 100% analytical total first.
+    Algebra: ``m_Na2O = 100 c``, ``m_i = 100 (1-c) w_i / sum(w)``,
+    ``n = m / M`` with ``M`` from :func:`oxide_molar_mass_g_mol`.
+    Units: the 100 is a mass-unit choice; only ratios enter the activity.
+    Sanity: ``c = 0`` contributes no Na2O moles. An oxide with no cation
+    count in the melt-activity table refuses rather than disappearing.
+    """
+
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
+    from simulator.chemistry.melt_activity import MELT_OXIDE_CATIONS_PER_FORMULA
+
+    fraction = _finite_number(na2o_mass_fraction, "mass_fraction_invalid")
+    if fraction < 0.0 or fraction > 1.0:
+        raise BeadDiffusionRefusal(
+            "mass_fraction_invalid",
+            f"Na2O mass fraction must lie in [0, 1], got {na2o_mass_fraction!r}",
+        )
+    if not isinstance(host_oxide_wt_percent, Mapping):
+        raise BeadDiffusionRefusal(
+            "host_oxides_missing",
+            "host_oxide_wt_percent must be a mapping of oxide to wt%",
+        )
+    weights: dict[str, float] = {}
+    for name, raw in host_oxide_wt_percent.items():
+        oxide = str(name)
+        if oxide in {"Na2O", "NaO0.5"}:
+            raise BeadDiffusionRefusal(
+                "host_na2o_not_separated",
+                "pass initial Na2O separately from the host oxides",
+            )
+        if oxide not in MELT_OXIDE_CATIONS_PER_FORMULA:
+            raise BeadDiffusionRefusal(
+                "host_oxide_unsupported",
+                f"{oxide} has no melt cation count",
+            )
+        weight = _finite_number(raw, "host_oxide_wt_percent_invalid")
+        if weight < 0.0:
+            raise BeadDiffusionRefusal(
+                "host_oxide_wt_percent_invalid",
+                f"{oxide} wt% was {raw!r}",
+            )
+        if weight == 0.0:
+            continue
+        weights[oxide] = weight
+    total = sum(weights.values())
+    if total <= 0.0:
+        raise BeadDiffusionRefusal(
+            "host_oxides_missing",
+            "host oxides need a positive weight-percent sum",
+        )
+    remaining = 1.0 - fraction
+    moles: dict[str, float] = {}
+    for oxide, weight in weights.items():
+        grams = 100.0 * remaining * weight / total
+        try:
+            molar_mass = oxide_molar_mass_g_mol(oxide)
+        except UnparseableCompositionComponent as exc:
+            raise BeadDiffusionRefusal(
+                "host_oxide_unparseable",
+                f"{oxide} has no molar mass",
+            ) from exc
+        moles[oxide] = grams / molar_mass
+    if fraction > 0.0:
+        na_grams = 100.0 * fraction
+        moles["Na2O"] = na_grams / oxide_molar_mass_g_mol("Na2O")
+    return moles
+
+
+def na2o_surface_mass_flux(
+    temperature_K: float,
+    na2o_mass_fraction: float,
+    *,
+    host_oxide_wt_percent: Mapping[str, float],
+    ambient_p_na_pa: float,
+    ambient_p_o2_bar: float,
+) -> SodiumSurfaceFlux:
+    """Na2O mass flux from the catalogue sodium volatility, kg/(m^2 s).
+
+    Premise: the compiled reaction is NaO0.5(l) = Na(g) + 1/4 O2. The
+    equilibrium Na pressure comes from that catalogue row at the surface
+    activity and the stated ambient oxygen pressure. Ambient Na pressure
+    is an input. The paper's a0 and b0 are not.
+    Algebra: the Hertz–Knudsen–Langmuir owner clamps to evaporation, so
+    the net molar flux is ``langmuir(T, p_eq, p_amb) - langmuir(T, p_amb, p_eq)``.
+    One mole of Na(g) removes one mole of NaO0.5, hence half a mole of
+    Na2O: ``J_Na2O = J_Na * M_Na2O / 2``.
+    Units: molar flux times kg/mol is kg/(m^2 s), positive outward.
+    Sanity: ``p_amb = 0`` does not condense. ``p_amb > p_eq`` returns a
+    negative flux. ``c = 0`` does not call the activity-dependent evaluator.
+    """
+
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
+    from simulator.chemistry.langmuir_knudsen import (
+        langmuir_molar_flux,
+        species_molar_mass_kg_mol,
+    )
+    from simulator.chemistry.melt_activity import melt_oxide_activity
+    from simulator.vapour_rail.catalog import CatalogCompileError
+
+    temperature = _positive_temperature_K(temperature_K)
+    ambient_na = _absent_or_finite(
+        ambient_p_na_pa,
+        missing="ambient_p_na_missing",
+        invalid="ambient_p_na_invalid",
+    )
+    if ambient_na < 0.0:
+        raise BeadDiffusionRefusal(
+            "ambient_p_na_invalid",
+            f"ambient_p_na_pa must be >= 0, got {ambient_p_na_pa!r}",
+        )
+    if ambient_p_o2_bar is None:
+        raise BeadDiffusionRefusal("ambient_p_o2_missing", "ambient_p_o2_missing")
+    ambient_o2 = _finite_number(ambient_p_o2_bar, "ambient_p_o2_invalid")
+    if ambient_o2 <= 0.0:
+        raise BeadDiffusionRefusal(
+            "ambient_p_o2_invalid",
+            f"ambient_p_o2_bar must be positive, got {ambient_p_o2_bar!r}",
+        )
+    fraction = _finite_number(na2o_mass_fraction, "mass_fraction_invalid")
+    # The diffusion step keeps dust at or above -1e-12 instead of clamping
+    # it to zero. That dust is an empty shell, not a negative inventory.
+    if -1e-12 <= fraction < 0.0:
+        fraction = 0.0
+    alpha, authority, alpha_outside = _sodium_alpha(temperature)
+    account = na2o_relative_moles(fraction, host_oxide_wt_percent)
+    activity_row = melt_oxide_activity(
+        "Na2O",
+        account,
+        temperature_K=temperature,
+    )
+    if activity_row is None:
+        raise BeadDiffusionRefusal(
+            "melt_activity_unavailable",
+            "Na2O melt activity returned no row",
+        )
+    activity = float(activity_row.activity)
+    if not math.isfinite(activity) or activity < 0.0:
+        raise BeadDiffusionRefusal(
+            "melt_activity_unavailable",
+            f"Na2O activity was {activity!r}",
+        )
+    vapour_status: str | None = None
+    out_of_range = False
+    if activity == 0.0:
+        pressure = 0.0
+    else:
+        try:
+            species = _vapour_catalog().species["Na"]
+        except KeyError as exc:
+            raise BeadDiffusionRefusal(
+                "volatility_absent",
+                "no compiled Na vapour species",
+            ) from exc
+        if species.evaluator is None:
+            raise BeadDiffusionRefusal(
+                "volatility_absent",
+                "Na vapour pressure evaluator is absent",
+            )
+        try:
+            evaluation = species.evaluator.evaluate(
+                temperature,
+                source_activity=activity,
+                pO2_bar=ambient_o2,
+            )
+        except CatalogCompileError as exc:
+            raise BeadDiffusionRefusal(
+                "ambient_p_o2_invalid",
+                str(exc),
+            ) from exc
+        pressure = float(evaluation.pressure_pa)
+        out_of_range = bool(evaluation.out_of_range)
+        vapour_status = evaluation.status
+    if not math.isfinite(pressure) or pressure < 0.0:
+        raise BeadDiffusionRefusal(
+            "equilibrium_pressure_invalid",
+            f"Na equilibrium pressure was {pressure!r}",
+        )
+    molar_mass = species_molar_mass_kg_mol("Na")
+    outward = langmuir_molar_flux(
+        temperature,
+        pressure,
+        ambient_na,
+        alpha,
+        molar_mass_kg_mol=molar_mass,
+    )
+    inward = langmuir_molar_flux(
+        temperature,
+        ambient_na,
+        pressure,
+        alpha,
+        molar_mass_kg_mol=molar_mass,
+    )
+    net_mol = outward - inward
+    na2o_molar_mass = oxide_molar_mass_g_mol("Na2O") / 1000.0
+    mass_flux = net_mol * na2o_molar_mass / 2.0
+    if not math.isfinite(mass_flux):
+        raise BeadDiffusionRefusal(
+            "surface_flux_not_finite",
+            f"Na2O surface flux was {mass_flux!r}",
+        )
+    return SodiumSurfaceFlux(
+        na2o_mass_flux_kg_m2_s=mass_flux,
+        equilibrium_p_na_pa=pressure,
+        activity_nao0_5=activity,
+        evaporation_alpha=alpha,
+        alpha_authority_status=authority,
+        gamma_authority_status=str(activity_row.authority_status),
+        vapour_pressure_out_of_range=out_of_range,
+        vapour_pressure_status=vapour_status,
+        evaporation_alpha_outside_stated_band=alpha_outside,
+    )
+
+
+def _format_flag(name: str, value: float) -> str:
+    return f"{name}={format(value, '.12g')}"
+
+
+def _property_flags(property_flags: Sequence[str] | None) -> tuple[str, ...]:
+    if property_flags is None:
+        raise BeadDiffusionRefusal("property_flags_missing", "property_flags_missing")
+    if isinstance(property_flags, (str, bytes)) or not isinstance(
+        property_flags, Sequence
+    ):
+        raise BeadDiffusionRefusal(
+            "property_flag_invalid",
+            "property_flags must be a sequence of strings",
+        )
+    cleaned: list[str] = []
+    for flag in property_flags:
+        if not isinstance(flag, str) or not flag.strip():
+            raise BeadDiffusionRefusal(
+                "property_flag_invalid",
+                f"property flag was {flag!r}",
+            )
+        cleaned.append(flag)
+    return tuple(cleaned)
+
+
+def _require_positive(value: float, reason: str) -> float:
+    number = _finite_number(value, reason)
+    if number <= 0.0:
+        raise BeadDiffusionRefusal(reason, f"{reason}: {value!r}")
+    return number
+
+
+def predict_bead_profile(
+    *,
+    component: str,
+    diameter_m: float,
+    host_oxide_wt_percent: Mapping[str, float],
+    initial_wt_percent: float,
+    initial_temperature_K: float,
+    end_temperature_K: float,
+    density_kg_m3: float,
+    heat_capacity_j_kg_k: float,
+    emissivity: float,
+    environment_temperature_K: float,
+    convection_coefficient_w_m2_k: float,
+    ambient_p_na_pa: float,
+    ambient_p_o2_bar: float,
+    n_cells: int,
+    n_steps: int,
+    property_flags: Sequence[str],
+) -> BeadProfilePrediction:
+    """Predict one radial profile. Tau, a0 and b0 are not arguments.
+
+    Sodium uses Lowry diffusivity along Zhang cooling whose tau is
+    :func:`cooling_half_time_s`, and :func:`na2o_surface_mass_flux` at the
+    stated ambient. Potassium refuses: no tracer diffusivity is printed.
+    Copper refuses: the compiled Cu row is not a silicate-melt carrier.
+    """
+
+    if not isinstance(component, str) or not component:
+        raise BeadDiffusionRefusal(
+            "component_unsupported",
+            f"component was {component!r}",
+        )
+    diameter = _require_positive(diameter_m, "diameter_not_positive")
+    initial_wt = _finite_number(initial_wt_percent, "initial_wt_percent_invalid")
+    if initial_wt < 0.0 or initial_wt > 100.0:
+        raise BeadDiffusionRefusal(
+            "initial_wt_percent_invalid",
+            f"initial_wt_percent was {initial_wt_percent!r}",
+        )
+    initial_temperature = _positive_temperature_K(initial_temperature_K)
+    end_temperature = _positive_temperature_K(end_temperature_K)
+    density = _require_positive(density_kg_m3, "density_not_positive")
+    heat_capacity = _require_positive(
+        heat_capacity_j_kg_k, "heat_capacity_not_positive"
+    )
+    caller_flags = _property_flags(property_flags)
+    # Ambient is validated even for components that then refuse, so a missing
+    # atmosphere is not hidden behind the component refusal.
+    if ambient_p_na_pa is None:
+        raise BeadDiffusionRefusal("ambient_p_na_missing", "ambient_p_na_missing")
+    if ambient_p_o2_bar is None:
+        raise BeadDiffusionRefusal("ambient_p_o2_missing", "ambient_p_o2_missing")
+    _finite_number(ambient_p_na_pa, "ambient_p_na_invalid")
+    _finite_number(ambient_p_o2_bar, "ambient_p_o2_invalid")
+    if component == "K2O":
+        potassium_tracer_diffusivity_m2_s(initial_temperature)
+    if component == "Cu":
+        try:
+            copper = _vapour_catalog().species["Cu"]
+        except KeyError as exc:
+            raise BeadDiffusionRefusal(
+                "cu_melt_volatility_not_a_silicate_carrier",
+                "no compiled Cu vapour species",
+            ) from exc
+        evaluator = copper.evaluator
+        if evaluator is None or evaluator.activity_exponent == 0.0:
+            raise BeadDiffusionRefusal(
+                "cu_melt_volatility_not_a_silicate_carrier",
+                "compiled Cu pressure does not depend on a dissolved-oxide activity",
+            )
+        raise BeadDiffusionRefusal(
+            "component_not_wired",
+            "a dissolved Cu carrier is compiled and this predictor does not use it",
+        )
+    if component != "Na2O":
+        raise BeadDiffusionRefusal(
+            "component_unsupported",
+            f"component {component!r} has no bead profile",
+        )
+
+    radius = 0.5 * diameter
+    tau = cooling_half_time_s(
+        radius_m=radius,
+        density_kg_m3=density,
+        heat_capacity_j_kg_k=heat_capacity,
+        emissivity=emissivity,
+        environment_temperature_K=environment_temperature_K,
+        convection_coefficient_w_m2_k=convection_coefficient_w_m2_k,
+        initial_temperature_K=initial_temperature,
+    )
+    duration = zhang_2008_duration_until_s(
+        end_temperature,
+        initial_temperature_K=initial_temperature,
+        cooling_half_time_s=tau,
+    )
+    initial_fraction = initial_wt / 100.0
+    # Reject a bad host before stepping, including a measured Na2O left in it.
+    na2o_relative_moles(initial_fraction, host_oxide_wt_percent)
+    host_total = 0.0
+    for raw in host_oxide_wt_percent.values():
+        host_total += float(raw)
+    diffusivity = diffusivity_along_zhang_cooling(
+        lowry_1982_na_diffusivity_m2_s,
+        initial_temperature_K=initial_temperature,
+        cooling_half_time_s=tau,
+    )
+    gamma_status: list[str] = []
+    vapour_status: list[str] = []
+    vapour_out = False
+    vapour_inside = False
+    alpha_outside = False
+    alpha_value: float | None = None
+    alpha_authority: str | None = None
+
+    def surface_flux(t_s: float, mass_fraction: float) -> float:
+        nonlocal alpha_outside, alpha_value, alpha_authority, vapour_out, vapour_inside
+        temperature = zhang_2008_temperature_K(
+            t_s,
+            initial_temperature_K=initial_temperature,
+            cooling_half_time_s=tau,
+        )
+        report = na2o_surface_mass_flux(
+            temperature,
+            mass_fraction,
+            host_oxide_wt_percent=host_oxide_wt_percent,
+            ambient_p_na_pa=ambient_p_na_pa,
+            ambient_p_o2_bar=ambient_p_o2_bar,
+        )
+        alpha_value = report.evaporation_alpha
+        alpha_authority = report.alpha_authority_status
+        if report.evaporation_alpha_outside_stated_band:
+            alpha_outside = True
+        if report.gamma_authority_status not in gamma_status:
+            gamma_status.append(report.gamma_authority_status)
+        if report.vapour_pressure_out_of_range:
+            vapour_out = True
+            if (
+                report.vapour_pressure_status
+                and report.vapour_pressure_status not in vapour_status
+            ):
+                vapour_status.append(report.vapour_pressure_status)
+        else:
+            vapour_inside = True
+        return report.na2o_mass_flux_kg_m2_s
+
+    result = integrate_spherical_diffusion(
+        radius_m=radius,
+        density_kg_m3=density,
+        initial_mass_fraction=initial_fraction,
+        diffusivity_m2_s=diffusivity,
+        surface_mass_flux_kg_m2_s=surface_flux,
+        t_end_s=duration,
+        n_steps=n_steps,
+        n_cells=n_cells,
+    )
+    if alpha_value is None or alpha_authority is None:
+        raise BeadDiffusionRefusal(
+            "evaporation_alpha_absent",
+            "the cooling path did not evaluate an evaporation alpha",
+        )
+    flags = [
+        "not_fitted_to_su_zhang_profiles",
+        "thermal_history:zhang_2008_with_heat_loss_half_time",
+        _format_flag("ambient_p_na_pa", float(ambient_p_na_pa)),
+        _format_flag("ambient_p_o2_bar", float(ambient_p_o2_bar)),
+        _format_flag("diameter_m", diameter),
+        _format_flag("density_kg_m3", density),
+        _format_flag("heat_capacity_j_kg_k", heat_capacity),
+        _format_flag("emissivity", float(emissivity)),
+        _format_flag("environment_temperature_K", float(environment_temperature_K)),
+        _format_flag(
+            "convection_coefficient_w_m2_k",
+            float(convection_coefficient_w_m2_k),
+        ),
+        _format_flag("initial_temperature_K", initial_temperature),
+        _format_flag("end_temperature_K", end_temperature),
+        _format_flag("tau_s", tau),
+        _format_flag("evaporation_alpha", alpha_value),
+        f"alpha_authority_status:{alpha_authority}",
+        _format_flag("host_analytical_total_wt_percent", host_total + initial_wt),
+    ]
+    for status in gamma_status:
+        flags.append(f"gamma_authority_status:{status}")
+    if vapour_out:
+        flags.append("vapour_pressure_out_of_range")
+    for status in vapour_status:
+        flags.append(f"vapour_pressure_status:{status}")
+    if vapour_inside:
+        flags.append("vapour_pressure_evaluated_inside_domain")
+    if alpha_outside:
+        flags.append("evaporation_alpha_outside_stated_band")
+    flags.extend(caller_flags)
+    final_mass = result.oxide_mass_kg(density)
+    initial_mass = oxide_mass_kg(
+        [initial_fraction] * result.grid.n_cells,
+        result.grid,
+        density,
+    )
+    return BeadProfilePrediction(
+        component="Na2O",
+        grid=result.grid,
+        mass_fraction=result.mass_fraction,
+        wt_percent=tuple(100.0 * value for value in result.mass_fraction),
+        tau_s=tau,
+        t_end_s=result.t_end_s,
+        initial_temperature_K=initial_temperature,
+        end_temperature_K=end_temperature,
+        flags=tuple(flags),
+        oxide_mass_initial_kg=initial_mass,
+        oxide_mass_final_kg=final_mass,
+        boundary_mass_out_kg=result.boundary_mass_out_kg,
+        step_count=result.step_count,
+    )

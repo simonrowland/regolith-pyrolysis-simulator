@@ -8,6 +8,7 @@ from the solver's running output.
 from __future__ import annotations
 
 import math
+from pathlib import Path
 
 import pytest
 
@@ -21,13 +22,22 @@ from simulator.bead_diffusion import (
     diffusivity_along_zhang_cooling,
     integrate_spherical_diffusion,
     lowry_1982_na_diffusivity_m2_s,
+    na2o_relative_moles,
+    na2o_surface_mass_flux,
     ni_zhang_2016_cu_diffusivity_m2_s,
     oxide_mass_kg,
     potassium_tracer_diffusivity_m2_s,
+    predict_bead_profile,
     spherical_bead_grid,
     zhang_2008_duration_until_s,
     zhang_2008_temperature_K,
 )
+from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
+from simulator.chemistry.langmuir_knudsen import (
+    langmuir_molar_flux,
+    species_molar_mass_kg_mol,
+)
+from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.physical_constants import STEFAN_BOLTZMANN
 
 _DENSITY = 3000.0
@@ -575,3 +585,179 @@ def test_slow_cooling_relaxes_a_profile_toward_its_conserved_mean() -> None:
         max(initial) - min(initial)
     )
     assert result.mass_fraction == pytest.approx([mean] * cells, rel=0.0, abs=0.01)
+
+
+_HOST = {
+    "SiO2": 45.0,
+    "TiO2": 8.0,
+    "Al2O3": 7.0,
+    "FeO": 22.0,
+    "MgO": 12.0,
+    "CaO": 6.0,
+}
+
+
+def _predict_sodium(**overrides: object):
+    arguments = dict(
+        component="Na2O",
+        diameter_m=2.0e-4,
+        host_oxide_wt_percent=_HOST,
+        initial_wt_percent=0.35,
+        initial_temperature_K=1640.0,
+        end_temperature_K=940.0,
+        density_kg_m3=2862.0,
+        heat_capacity_j_kg_k=1522.0,
+        emissivity=1.0,
+        environment_temperature_K=0.0,
+        convection_coefficient_w_m2_k=0.0,
+        ambient_p_na_pa=0.0,
+        ambient_p_o2_bar=1.0e-10,
+        n_cells=6,
+        n_steps=8,
+        property_flags=("density_sfb_room_temperature_glass_proxy",),
+    )
+    arguments.update(overrides)
+    return predict_bead_profile(**arguments)
+
+
+def test_sodium_flux_matches_catalog_pressure_and_langmuir_difference() -> None:
+    """The expected flux is the catalog pressure through the Langmuir owner.
+
+    The factor 1/2 is the NaO0.5 stoichiometry: one mole of Na(g) removes
+    half a mole of Na2O. The test does not re-type the Antoine coefficients.
+    """
+
+    from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    temperature = 1500.0
+    fraction = 0.0035
+    oxygen = 1.0e-10
+    vacuum = na2o_surface_mass_flux(
+        temperature,
+        fraction,
+        host_oxide_wt_percent=_HOST,
+        ambient_p_na_pa=0.0,
+        ambient_p_o2_bar=oxygen,
+    )
+    account = na2o_relative_moles(fraction, _HOST)
+    activity = melt_oxide_activity("Na2O", account, temperature_K=temperature)
+    assert activity is not None
+    payload = load_cached_safe_yaml(
+        (Path(__file__).resolve().parents[1] / "data" / "vapor_pressures.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    catalog = compile_vapour_rail_catalog(payload)
+    evaluation = catalog.species["Na"].evaluator.evaluate(
+        temperature,
+        source_activity=activity.activity,
+        pO2_bar=oxygen,
+    )
+    assert vacuum.equilibrium_p_na_pa == pytest.approx(evaluation.pressure_pa)
+    assert vacuum.vapour_pressure_out_of_range is False
+    molar_mass = species_molar_mass_kg_mol("Na")
+    outward = langmuir_molar_flux(
+        temperature,
+        evaluation.pressure_pa,
+        0.0,
+        vacuum.evaporation_alpha,
+        molar_mass_kg_mol=molar_mass,
+    )
+    inward = langmuir_molar_flux(
+        temperature,
+        0.0,
+        evaluation.pressure_pa,
+        vacuum.evaporation_alpha,
+        molar_mass_kg_mol=molar_mass,
+    )
+    expected = (outward - inward) * (oxide_molar_mass_g_mol("Na2O") / 1000.0) / 2.0
+    assert vacuum.na2o_mass_flux_kg_m2_s == pytest.approx(expected)
+    assert vacuum.na2o_mass_flux_kg_m2_s > 0.0
+    rich = na2o_surface_mass_flux(
+        temperature,
+        fraction,
+        host_oxide_wt_percent=_HOST,
+        ambient_p_na_pa=evaluation.pressure_pa * 10.0,
+        ambient_p_o2_bar=oxygen,
+    )
+    assert rich.na2o_mass_flux_kg_m2_s < 0.0
+    dry = na2o_surface_mass_flux(
+        temperature,
+        0.0,
+        host_oxide_wt_percent=_HOST,
+        ambient_p_na_pa=0.0,
+        ambient_p_o2_bar=oxygen,
+    )
+    assert dry.equilibrium_p_na_pa == 0.0
+    assert dry.na2o_mass_flux_kg_m2_s == 0.0
+    hot = na2o_surface_mass_flux(
+        1640.0,
+        fraction,
+        host_oxide_wt_percent=_HOST,
+        ambient_p_na_pa=0.0,
+        ambient_p_o2_bar=oxygen,
+    )
+    assert hot.vapour_pressure_out_of_range is True
+    assert hot.evaporation_alpha_outside_stated_band is True
+    assert "out_of_gamma_domain" in hot.gamma_authority_status
+
+
+def test_missing_ambient_and_potassium_and_copper_refuse() -> None:
+    with pytest.raises(BeadDiffusionRefusal) as caught:
+        _predict_sodium(ambient_p_na_pa=None)
+    assert caught.value.reason == "ambient_p_na_missing"
+    with pytest.raises(BeadDiffusionRefusal) as caught:
+        _predict_sodium(ambient_p_o2_bar=0.0)
+    assert caught.value.reason == "ambient_p_o2_invalid"
+    with pytest.raises(BeadDiffusionRefusal) as caught:
+        _predict_sodium(component="K2O")
+    assert caught.value.reason == "tracer_diffusivity_absent"
+    with pytest.raises(BeadDiffusionRefusal) as caught:
+        _predict_sodium(component="Cu")
+    assert caught.value.reason == "cu_melt_volatility_not_a_silicate_carrier"
+    with pytest.raises(BeadDiffusionRefusal) as caught:
+        _predict_sodium(host_oxide_wt_percent={**_HOST, "Na2O": 0.35})
+    assert caught.value.reason == "host_na2o_not_separated"
+    with pytest.raises(TypeError):
+        predict_bead_profile(  # type: ignore[call-arg]
+            component="Na2O",
+            diameter_m=2.0e-4,
+            host_oxide_wt_percent=_HOST,
+            initial_wt_percent=0.35,
+            initial_temperature_K=1640.0,
+            end_temperature_K=940.0,
+            density_kg_m3=2862.0,
+            heat_capacity_j_kg_k=1522.0,
+            emissivity=1.0,
+            environment_temperature_K=0.0,
+            ambient_p_na_pa=0.0,
+            ambient_p_o2_bar=1.0e-10,
+            n_cells=4,
+            n_steps=4,
+            property_flags=(),
+        )
+
+
+def test_prediction_flags_ambient_and_loses_more_sodium_at_lower_fO2() -> None:
+    low = _predict_sodium(ambient_p_o2_bar=1.0e-12)
+    high = _predict_sodium(ambient_p_o2_bar=1.0e-8)
+    assert "not_fitted_to_su_zhang_profiles" in low.flags
+    assert "thermal_history:zhang_2008_with_heat_loss_half_time" in low.flags
+    assert "ambient_p_na_pa=0" in low.flags
+    assert "ambient_p_o2_bar=1e-12" in low.flags
+    assert "alpha_authority_status:analytical_upper_bound" in low.flags
+    assert "vapour_pressure_out_of_range" in low.flags
+    assert "density_sfb_room_temperature_glass_proxy" in low.flags
+    assert any(flag.startswith("gamma_authority_status:") for flag in low.flags)
+    assert low.tau_s > 0.0
+    assert low.oxide_mass_initial_kg - low.oxide_mass_final_kg == pytest.approx(
+        low.boundary_mass_out_kg,
+        rel=1e-9,
+    )
+    assert low.boundary_mass_out_kg > high.boundary_mass_out_kg > 0.0
+    source = (
+        Path(__file__).resolve().parents[1] / "simulator" / "bead_diffusion.py"
+    ).read_text(encoding="utf-8")
+    for token in ("0.145", "1183", "6001"):
+        assert token not in source
