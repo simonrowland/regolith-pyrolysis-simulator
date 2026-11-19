@@ -9516,19 +9516,28 @@ def _initial_charge_only_composition_proxy(
         and point_composition.state.value.proxy_flag
         == INITIAL_CHARGE_ONLY_PROXY_FLAG
     )
+    outside_initial_charge_proxy_scope = (
+        role != INITIAL_CHARGE_ONLY_PROXY_FLAG
+        and not existing_initial_charge_proxy
+    )
     if (
         (
-            role != INITIAL_CHARGE_ONLY_PROXY_FLAG
-            and not existing_initial_charge_proxy
+            outside_initial_charge_proxy_scope
+            and malformed_composition_reason is None
         )
-        or quantity
-        in {
-            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
-            Quantity.RESIDUE_COMPONENT_COMPOSITION,
-        }
         or (
-            isinstance(quantity_as_printed, str)
-            and "composition" in quantity_as_printed.casefold()
+            not outside_initial_charge_proxy_scope
+            and (
+                quantity
+                in {
+                    Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+                    Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                }
+                or (
+                    isinstance(quantity_as_printed, str)
+                    and "composition" in quantity_as_printed.casefold()
+                )
+            )
         )
     ):
         return identity, point_conditions, list(notices)
@@ -9540,6 +9549,9 @@ def _initial_charge_only_composition_proxy(
     if any(
         state is not None and state.is_not_applicable
         for state in (point_composition_state, identity_composition_state)
+    ) and not (
+        outside_initial_charge_proxy_scope
+        and malformed_composition_reason is not None
     ):
         return identity, point_conditions, list(notices)
 
