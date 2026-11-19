@@ -11,14 +11,21 @@ import pytest
 import yaml
 
 from tests.helpers.corpus_paths import regolith_corpus_root
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import PerBasis, ValueKind
 from simulator.battery.migrate import Migrator
 from tests.literature_extract_test_helpers import iter_locators
 from tools.validate_literature_extracts import validate_extract_document
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EXTRACT = ROOT / "data/literature/extracts/klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity.yaml"
+EXTRACT = (
+    ROOT
+    / "data/literature/extracts/klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity.yaml"
+)
+EXTRACT_V2 = (
+    ROOT
+    / "data/literature/extracts-v2/klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity.yaml"
+)
 SOURCE_ID = "klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity"
 CORPUS_ROOT = regolith_corpus_root()
 PDF = CORPUS_ROOT / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
@@ -147,7 +154,7 @@ def test_isolated_migration_keeps_species_values_and_temperatures() -> None:
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
-    observations = migrator.result.observations.values()
+    observations = list(migrator.result.observations.values())
     assert len(migrator.result.observations) == 827
     assert not migrator.result.validation.hard_issues
     assert not migrator.result.registry_issues
@@ -161,6 +168,60 @@ def test_isolated_migration_keeps_species_values_and_temperatures() -> None:
         observation.identity.temperature_K.tag.value == "value"
         for observation in observations
     )
+    typed_per = [
+        observation
+        for observation in observations
+        if observation.identity.per.tag.value == "value"
+    ]
+    assert len(typed_per) == 824
+    assert all(
+        observation.identity.per.value is PerBasis.MOL_SPECIES
+        for observation in typed_per
+    )
+    unknown_per = [
+        observation
+        for observation in observations
+        if observation.identity.per.tag.value == "unknown"
+    ]
+    assert {
+        observation.observation_id.split("::")[1] for observation in unknown_per
+    } == {
+        "klemme_2011_nitio3_s298_quote_38",
+        "klemme_2011_cotio3_s298_quote_38",
+        "klemme_2011_coco3_s298_quote_37",
+    }
+    migrated_v2 = yaml.safe_load(EXTRACT_V2.read_text(encoding="utf-8"))[
+        "observations"
+    ]
+    migrated_v2_by_id = {
+        observation["observation_id"]: observation for observation in migrated_v2
+    }
+    assert len(migrated_v2_by_id) == len(observations)
+    for observation in observations:
+        per = migrated_v2_by_id[observation.observation_id]["identity"]["per"]
+        if observation.identity.per.tag.value == "value":
+            assert per == {"tag": "value", "value": PerBasis.MOL_SPECIES.value}
+        else:
+            assert per["tag"] == "unknown"
+    table2_second_scan = [
+        observation
+        for observation in migrated_v2
+        if "::klemme_2011_cotio3_table2_series2_cp::"
+        in observation["observation_id"]
+    ]
+    assert len(table2_second_scan) == 90
+    assert all(
+        observation["locator"]["page"] == 5
+        and observation["point_conditions"]["temperature_K"]["locator"]["page"]
+        == 5
+        for observation in table2_second_scan
+    )
+    assert all(
+        (condition := (observation.point_conditions or {}).get("temperature_K"))
+        and condition.state.tag.value == "value"
+        and condition.locator is not None
+        for observation in observations
+    )
     assert {
         formula: sum(
             observation.identity.species.formula == formula
@@ -168,6 +229,30 @@ def test_isolated_migration_keeps_species_values_and_temperatures() -> None:
         )
         for formula in ("NiTiO3", "CoTiO3", "CoCO3")
     } == {"NiTiO3": 289, "CoTiO3": 334, "CoCO3": 204}
+
+
+def test_removing_a_source_basis_leaves_that_series_unknown(tmp_path: Path) -> None:
+    mutated = _document()
+    series_id = "klemme_2011_nitio3_table1_series1_cp"
+    _observations_by_id(mutated)[series_id].pop("per")
+    mutated_extract = tmp_path / EXTRACT.name
+    mutated_extract.write_text(
+        yaml.safe_dump(mutated, sort_keys=False, allow_unicode=True), encoding="utf-8"
+    )
+
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(mutated_extract)
+    migrator.finalize()
+    series = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.startswith(f"{SOURCE_ID}::{series_id}::")
+    ]
+
+    assert len(series) == 180
+    assert all(
+        observation.identity.per.tag.value == "unknown" for observation in series
+    )
 
 
 def test_all_locators_match_physical_pdf_pages() -> None:

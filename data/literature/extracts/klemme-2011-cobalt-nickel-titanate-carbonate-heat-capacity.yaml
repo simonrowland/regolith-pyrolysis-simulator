@@ -104,6 +104,7 @@ species:
       - 303.1
       units: J/mol K
       published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_direct
@@ -847,6 +848,7 @@ species:
       - 40.8
       units: J/mol K
       published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_direct
@@ -1171,6 +1173,7 @@ species:
       - 300
       units: J/mol K
       published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      per: mol_species
       derived_from: &id001
       - klemme_2011_nitio3_table1_series1_cp
       - klemme_2011_nitio3_table1_series2_cp
@@ -1364,6 +1367,7 @@ species:
       - 298.15
       units: J/mol K
       published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      per: mol_species
       derived_from: *id001
       derivation:
         relation: The authors calculate the standard molar entropy from their measured Cp data, using a T^3 extrapolation
@@ -1602,6 +1606,7 @@ species:
       - 304.3
       units: J/mol K
       published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_direct
@@ -2454,11 +2459,11 @@ species:
     - observation_id: klemme_2011_cotio3_table2_series2_cp
       type: heat_capacity_and_heat_content_series
       locator:
-        page: 4
-        published_page: 4
-        pdf_page_index: 3
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
         table: '2'
-        note: The second scan is printed across physical pages 4 and 5.
+        note: Series 2 header on physical page 5 gives Cp in J mol-1 K-1.
       phase: cr
       phase_as_published: synthetic polycrystalline sample
       T_range_K:
@@ -2466,6 +2471,7 @@ species:
       - 61.2
       units: J/mol K
       published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_direct
@@ -2850,6 +2856,7 @@ species:
       - 300
       units: J/mol K
       published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      per: mol_species
       derived_from: &id002
       - klemme_2011_cotio3_table2_series1_cp
       - klemme_2011_cotio3_table2_series2_cp
@@ -3043,6 +3050,7 @@ species:
       - 298.15
       units: J/mol K
       published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      per: mol_species
       derived_from: *id002
       derivation:
         relation: The authors calculate the standard molar entropy from their measured Cp data, using a T^3 extrapolation
@@ -3280,6 +3288,7 @@ species:
       - 304
       units: J/mol K
       published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      per: mol_species
       values:
         quantity: cp
         method_class: measured_direct
@@ -3983,6 +3992,7 @@ species:
       - 300
       units: J/mol K
       published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      per: mol_species
       derived_from: &id003
       - klemme_2011_coco3_table3_series1_cp
       derivation:
@@ -4175,6 +4185,7 @@ species:
       - 298.15
       units: J/mol K
       published_unit_and_molar_basis: J mol-1 K-1, per mole of formula unit
+      per: mol_species
       derived_from: *id003
       derivation:
         relation: The authors calculate the standard molar entropy from their measured Cp data, using a T^3 extrapolation
