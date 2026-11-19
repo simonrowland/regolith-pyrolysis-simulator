@@ -3358,6 +3358,74 @@ def test_pt0_replay_miss_fails_loudly() -> None:
         )
 
 
+def test_gate_replay_uses_evaluated_silica_verdict_for_flag_requirement():
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.accounting.ledger import AtomLedger
+
+    store = PT0DeterminismStore("replay")
+    sim = _build_pt0_sim(store)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim._liquid_fraction_provider = "magemin"
+    composition_wt_pct = {
+        "SiO2": 29.999,
+        "MgO": 69.501,
+        "MnO": 0.5,
+    }
+    composition_mol = {
+        species: amount
+        / resolve_species_formula(
+            species,
+            sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    ledger.load_external_mol(
+        "process.cleaned_melt",
+        composition_mol,
+        source="d-447 evaluated-bulk replay regression",
+        material_origin="feedstock",
+    )
+    sim.atom_ledger = ledger
+    sim.inventory.inert_melt_components_kg.clear()
+    sim._project_cleaned_melt_from_atom_ledger()
+    key, _reason = sim._freeze_gate_cache_key_and_domain(
+        pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
+        fO2_log=sim._freeze_gate_redox_key_fO2_log(
+            fO2_log=sim._compute_intrinsic_melt_fO2(),
+        ),
+    )
+    assert any(
+        "authority=extrapolated" in str(warning)
+        for warning in key.magemin_domain_verdict[1]
+    )
+    store._authorize_cached_real_replay = lambda *_args, **_kwargs: None
+    lookup = {}
+    curve_payload = {
+        "source": "gate_liquid_fraction:test-replay",
+        "solidus_T_C": 1000.0,
+        "liquidus_T_C": 1300.0,
+        "path": (
+            {"temperature_C": 1000.0, "liquid_fraction": 0.0},
+            {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+        ),
+    }
+
+    def capture_lookup(_artifact, _keys, **kwargs):
+        lookup.update(kwargs)
+        return {"curve": curve_payload}
+
+    store._lookup_first_available = capture_lookup
+
+    replayed = store.replay_gate_curve(
+        sim,
+        fO2_log=sim._compute_intrinsic_melt_fO2(),
+    )
+    assert replayed["source"] == curve_payload["source"]
+    assert replayed["path"] == ((1000.0, 0.0), (1300.0, 1.0))
+    assert lookup["require_gate_curve_domain_diagnostic"] is False
+
+
 def test_pt1_persistent_store_round_trips_exact_payload(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

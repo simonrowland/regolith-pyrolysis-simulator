@@ -49,6 +49,7 @@ from simulator.fidelity_vocabulary import EvidenceClass
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.melt_backend.base import (
     EquilibriumResult,
+    MeltCompositionError,
     RealBackendAuthority,
     RealBackendFamily,
     project_melt_to_oxide_projection,
@@ -993,25 +994,48 @@ class PT0DeterminismStore:
             None,
         )
         if callable(domain_key_builder) and callable(redox_key_builder):
-            domain_key, _domain_reason = domain_key_builder(
+            domain_key_builder(
                 pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
                 fO2_log=redox_key_builder(fO2_log=fO2_log),
                 **redox_state_kwargs,
             )
-            domain_verdict = getattr(
-                domain_key,
-                "magemin_domain_verdict",
-                None,
-            )
-            domain_warnings = (
-                domain_verdict[1]
-                if isinstance(domain_verdict, tuple) and len(domain_verdict) > 1
-                else ()
-            )
-            require_domain_diagnostic = any(
-                "authority=extrapolated" in str(warning)
-                for warning in domain_warnings
-            )
+            if getattr(sim, "_liquid_fraction_provider", None) == "magemin":
+                provider_input_builder = getattr(
+                    sim,
+                    "_silicate_provider_melt_inputs",
+                    None,
+                )
+                provider_inputs = (
+                    provider_input_builder(ChemistryIntent.GATE_LIQUID_FRACTION)
+                    if callable(provider_input_builder)
+                    else None
+                )
+                if provider_inputs is None:
+                    require_domain_diagnostic = True
+                else:
+                    from simulator.melt_backend.magemin import (
+                        _liquidus_evaluated_bulk_silica_diagnostic,
+                    )
+
+                    try:
+                        evaluated_domain_diagnostic = (
+                            _liquidus_evaluated_bulk_silica_diagnostic(
+                                {
+                                    "process.cleaned_melt": (
+                                        provider_inputs.composition_mol
+                                    ),
+                                },
+                                species_formula_registry=(
+                                    sim.species_formula_registry
+                                ),
+                            )
+                        )
+                    except (MeltCompositionError, TypeError, ValueError):
+                        require_domain_diagnostic = True
+                    else:
+                        require_domain_diagnostic = bool(
+                            evaluated_domain_diagnostic
+                        )
         keys = tuple(
             canonical_replay_key(
                 sim,
