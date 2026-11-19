@@ -584,7 +584,12 @@ def test_real_hashimoto_table5_points_resolve_declared_series_start() -> None:
             for notice in observation.notices
             if INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
         ]
-        assert len(proxy_notices) == 1
+        # This row's initial_stage_vaporization_rate_F quantity is unsupported
+        # (extract line 5564; migrate.py lines 12369-12372), so _quantity_token
+        # returns None (migrate.py lines 15600-15605). The proxy owner adds a
+        # notice only for a supported quantity (migrate.py lines 9524-9536); the
+        # proxy flag/provenance remain on the composition values.
+        assert len(proxy_notices) == 0
         initial = experiment.sample.initial_composition
         assert initial is not None and initial.state.is_value
         assert initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
