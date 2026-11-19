@@ -486,7 +486,7 @@ def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
         "barin-1989",
         "ivtan-nio-thermo",
         "ivtan-zno-thermo",
-        "robie-huebner-hemingway-1995-braunite-rhodonite",
+        "robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics",
     } <= indexed_source_ids
     assert counts["sources"] == 855
     # PDF status of every source with extracts, compared by source id against

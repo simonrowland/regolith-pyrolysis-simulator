@@ -1056,8 +1056,8 @@ gaps:
     missing_fields: &id019
     - doi
     - retrieval_url
-  - source_id: robie-huebner-hemingway-1995-braunite-rhodonite
-    sidecar_path: docs/references/pdfs/02-thermochemistry/robie-huebner-hemingway-1995-braunite-rhodonite.md
+  - source_id: robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics
+    sidecar_path: docs/references/pdfs/02-thermochemistry/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics.md
     missing_fields:
     - license_or_oa_basis
     - sha256
@@ -34720,20 +34720,20 @@ sources:
       last_stage: extracted
       date: '2026-10-03'
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
-- source_id: robie-huebner-hemingway-1995-braunite-rhodonite
+- source_id: robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics
   aliases: []
   citation: 'Robie, R. A., Huebner, J. S. & Hemingway, B. S. (1995). “Heat capacities and thermodynamic
     properties of braunite (Mn7SiO12) and rhodonite (MnSiO3).” *American Mineralogist*, 80(5–6), 560–575.
-    DOI: 10.2138/am-1995-5-615.'
-  doi: 10.2138/am-1995-5-615
+    DOI: 10.2138/am-1995-5-616.'
+  doi: 10.2138/am-1995-5-616
   report_number: null
-  identifier: 10.2138/am-1995-5-615
+  identifier: 10.2138/am-1995-5-616
   pdf_status: ABSENT
   pdf_path: null
   pdf_last_seen: []
   pdf_sha256: null
   pdf_tracked: null
-  sidecar_path: docs/references/pdfs/02-thermochemistry/robie-huebner-hemingway-1995-braunite-rhodonite.md
+  sidecar_path: docs/references/pdfs/02-thermochemistry/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics.md
   sidecar_missing_fields: [license_or_oa_basis, sha256, retrieved_date]
   access_status: unknown
   extracts: []
@@ -34744,27 +34744,27 @@ sources:
   corpus_status: available
   corpus:
     raw:
-      path: raw/robie-huebner-hemingway-1995-braunite-rhodonite/robie-huebner-hemingway-1995-braunite-rhodonite.pdf
-      present: false
-      sha256: null
+      path: raw/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics.pdf
+      present: true
+      sha256: 8e8798268f9ffa06fa345ee9bd8f2a23e3b82b7896744e24b809ff81756b4c2b
       matches_simulator: null
     sidecar:
-      path: raw/robie-huebner-hemingway-1995-braunite-rhodonite/sidecar.yaml
-      present: false
+      path: raw/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics/sidecar.yaml
+      present: true
     text:
-      path: text/robie-huebner-hemingway-1995-braunite-rhodonite
-      exists: false
-      file_count: 0
+      path: text/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics
+      exists: true
+      file_count: 55
     tables:
-      path: tables/robie-huebner-hemingway-1995-braunite-rhodonite
+      path: tables/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics
       exists: false
       file_count: 0
     extract:
-      path: extracts/robie-huebner-hemingway-1995-braunite-rhodonite.yaml
+      path: extracts/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics.yaml
       present: false
       matches_simulator: null
     ledger:
-      path: ledger/robie-huebner-hemingway-1995-braunite-rhodonite.yaml
+      path: ledger/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics.yaml
       present: false
       error: null
       last_stage: null
