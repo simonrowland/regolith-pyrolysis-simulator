@@ -19,11 +19,13 @@ from simulator.battery.enums import (
     AmountBasis,
     Authority,
     Engine,
+    ExecutionState,
     NoticeKind,
     Phase,
     PerBasis,
     MetricOperation,
     Quantity,
+    QUANTITY_UNITS,
     Rail,
     RefusalReason,
     ResidualStatus,
@@ -81,6 +83,29 @@ VAPOROCK_ROOT = _vaporock_root()
 
 def _require_openimcc() -> None:
     pytest.importorskip("openimcc", reason="openimcc is not importable")
+
+
+def _openimcc_thermo_observation(
+    observation_id: str,
+    formula: str,
+    phase: Phase,
+    quantity: Quantity,
+    temperature_K: Decimal,
+    *,
+    per: PerBasis = PerBasis.MOL_SPECIES,
+    subtype: str | None = None,
+):
+    identity = F.o2_identity(temperature_K)
+    identity = replace(
+        identity,
+        quantity=quantity,
+        species=Species(formula, phase),
+        per=State.of(per),
+        reaction=State.not_applicable("pure standard-state thermo"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+        subtype=State.of(subtype) if subtype is not None else identity.subtype,
+    )
+    return F.observation(observation_id, "exp-1", identity, Decimal("1"))
 
 
 def _openimcc_pack_temperature_band() -> tuple[float, float]:
@@ -542,6 +567,171 @@ def test_openimcc_engine_is_registered() -> None:
     assert "openimcc" in BATTERY_ENGINE_NAMES
     assert "openimcc" in ENGINE_POINT_CONSUMERS
     assert "openimcc" in MELT_ACTIVITY_ENGINES
+
+
+@pytest.mark.parametrize(
+    ("quantity", "field"),
+    [
+        (Quantity.CP, "Cp_J_molK"),
+        (Quantity.S, "S_J_molK"),
+    ],
+)
+def test_openimcc_species_thermo_scores_native_gas_cp_and_s(
+    quantity: Quantity,
+    field: str,
+) -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack, species_thermo
+
+    temperature_K = Decimal("2000")
+    datapack = load_gas_datapack()
+    native = species_thermo("FeO", "g", float(temperature_K), datapack=datapack)
+    observation = _openimcc_thermo_observation(
+        f"openimcc-feo-g-{quantity.value}",
+        "FeO",
+        Phase.G,
+        quantity,
+        temperature_K,
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == Decimal(str(getattr(native, field)))
+    assert prediction.unit == QUANTITY_UNITS[quantity]
+    assert prediction.execution.call_evidence is not None
+    assert f"source_row_id={native.source_row_id}" in prediction.execution.call_evidence
+    assert f"source_table_id={native.source_table_id}" in prediction.execution.call_evidence
+    assert "phase=g" in prediction.execution.call_evidence
+    assert f"interval=[{native.T_min},{native.T_max}]" in prediction.execution.call_evidence
+    assert "derivatives_fit_implied=False" in prediction.execution.call_evidence
+
+
+def test_openimcc_species_thermo_scores_native_condensate_derivatives() -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack, species_thermo
+
+    temperature_K = Decimal("2000")
+    datapack = load_gas_datapack()
+    native = species_thermo("FeO", "l", float(temperature_K), datapack=datapack)
+    assert native.derivatives_fit_implied is True
+    for quantity, field in (
+        (Quantity.CP, "Cp_J_molK"),
+        (Quantity.S, "S_J_molK"),
+    ):
+        observation = _openimcc_thermo_observation(
+            f"openimcc-feo-l-{quantity.value}",
+            "FeO",
+            Phase.L,
+            quantity,
+            temperature_K,
+        )
+
+        prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+        assert prediction.execution.state is ExecutionState.PRODUCED
+        assert prediction.value == Decimal(str(getattr(native, field)))
+        assert prediction.execution.call_evidence is not None
+        assert f"source_row_id={native.source_row_id}" in prediction.execution.call_evidence
+        assert f"source_table_id={native.source_table_id}" in prediction.execution.call_evidence
+        assert "phase=l" in prediction.execution.call_evidence
+        assert "derivatives_fit_implied=True" in prediction.execution.call_evidence
+
+
+def test_openimcc_species_thermo_uses_source_dfh298_for_enthalpy_increment() -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack, species_thermo
+
+    temperature_K = Decimal("2000")
+    datapack = load_gas_datapack()
+    native = species_thermo("FeO", "g", float(temperature_K), datapack=datapack)
+    reference = species_thermo("FeO", "g", 298.15, datapack=datapack)
+    assert native.source_row_id == reference.source_row_id
+    assert native.source_table_id == reference.source_table_id
+    selected = datapack.gas_df.loc["FeO(g)"]
+    rows = (
+        (row for _index, row in selected.iterrows())
+        if hasattr(selected, "iterrows")
+        else iter((selected,))
+    )
+    source = next(row for row in rows if str(row["Ref"]) == native.source_row_id)
+    dfh298_J_mol = Decimal(str(source["dfH298"]))
+    assert Decimal(str(reference.H_app_kJ_mol)) * Decimal(1000) == pytest.approx(
+        dfh298_J_mol
+    )
+    observation = _openimcc_thermo_observation(
+        "openimcc-feo-g-h-minus-h298",
+        "FeO",
+        Phase.G,
+        Quantity.H_MINUS_H298,
+        temperature_K,
+        subtype="H(T)-H(298.15 K); reference phase: gas",
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    expected_kJ_mol = Decimal(str(native.H_app_kJ_mol)) - dfh298_J_mol / Decimal(1000)
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == expected_kJ_mol
+    assert prediction.unit == QUANTITY_UNITS[Quantity.H_MINUS_H298]
+    assert prediction.execution.call_evidence is not None
+    assert f"source_row_id={native.source_row_id}" in prediction.execution.call_evidence
+    assert "H(T)-H(T_ref)" in prediction.execution.call_evidence
+
+
+def test_openimcc_species_thermo_out_of_interval_is_typed_with_source_detail() -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack, species_thermo
+
+    datapack = load_gas_datapack()
+    inside = species_thermo("FeO", "g", 2000.0, datapack=datapack)
+    outside_temperature = Decimal(str(inside.T_max)) + Decimal("1")
+    observation = _openimcc_thermo_observation(
+        "openimcc-feo-g-outside-interval",
+        "FeO",
+        Phase.G,
+        Quantity.CP,
+        outside_temperature,
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_detail["reason"] == "openimcc_species_thermo_outside_interval"
+    assert prediction.refusal_detail["species"] == "FeO"
+    assert prediction.refusal_detail["phase"] == "g"
+    assert prediction.refusal_detail["requested_T_K"] == str(outside_temperature)
+    assert prediction.refusal_detail["declared_interval_K"] == [
+        inside.T_min,
+        inside.T_max,
+    ]
+    assert prediction.refusal_detail["source_row_id"] == inside.source_row_id
+    assert prediction.refusal_detail["upstream_error"]
+    assert prediction.refusal_detail["certification_backlog"] is True
+
+
+def test_openimcc_species_missing_upstream_stays_typed() -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack
+
+    datapack = load_gas_datapack()
+    assert "CuO(l)" not in datapack.oxide_df.index
+    observation = _openimcc_thermo_observation(
+        "openimcc-cuo-l-missing",
+        "CuO",
+        Phase.L,
+        Quantity.CP,
+        Decimal("2000"),
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == "openimcc_species_missing"
+    assert prediction.refusal_detail["species"] == "CuO"
+    assert prediction.refusal_detail["phase"] == "l"
 
 
 def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:

@@ -1403,6 +1403,60 @@ def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None
     assert requests[0][1]["pack"] == "published-ext"
 
 
+def test_species_thermo_cache_request_covers_native_inputs(monkeypatch) -> None:
+    from simulator import engine_cache
+    from simulator.melt_backend import openimcc_bridge
+
+    calls = []
+    props = SimpleNamespace(
+        Cp_J_molK=42.0,
+        S_J_molK=20.0,
+        H_app_kJ_mol=3.0,
+        G_J_mol=400.0,
+        source_row_id="JANAF-FeO-gas",
+        source_table_id="gas-janaf-4th",
+        T_interval=(298.15, 6000.0),
+        T_min=298.15,
+        T_max=6000.0,
+        derivatives_fit_implied=False,
+    )
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_openimcc",
+        SimpleNamespace(
+            load_gas_datapack=lambda: "default-gas-datapack",
+            species_thermo=lambda species, phase, temperature_K, datapack: (
+                calls.append((species, phase, temperature_K, datapack)) or props
+            ),
+        ),
+    )
+    monkeypatch.setattr(engine_cache, "record_engine_open", lambda *_args: None)
+    requests = []
+
+    def cache_call(engine, request, solve):
+        requests.append((engine, request))
+        return solve()
+
+    monkeypatch.setattr(engine_cache, "cached_engine_call", cache_call)
+
+    result = openimcc_bridge.species_thermo("FeO", "g", 2000.0)
+
+    assert result["source_row_id"] == "JANAF-FeO-gas"
+    assert calls == [("FeO", "g", 2000.0, "default-gas-datapack")]
+    assert requests == [
+        (
+            "openimcc",
+            {
+                "call": "species_thermo",
+                "species": "FeO",
+                "phase": "g",
+                "T_K": 2000.0,
+                "datapack": "default",
+            },
+        )
+    ]
+
+
 def test_redox_result_keeps_its_type_across_cache_round_trip(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
