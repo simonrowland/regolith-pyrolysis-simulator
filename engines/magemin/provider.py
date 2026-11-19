@@ -480,6 +480,40 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             }
         return result
 
+    def _composition_wt_pct(
+        self,
+        species_mol: Mapping[str, float],
+        species_formula_registry: Mapping[str, Any],
+    ) -> dict:
+        """Project mol -> wt% for the domain gate."""
+        if not species_mol:
+            return {}
+        from simulator.accounting.formulas import resolve_species_formula
+
+        kg_by_species: dict = {}
+        total_kg = 0.0
+        for species, mol in species_mol.items():
+            mol_val = float(mol)
+            if mol_val <= 0.0:
+                continue
+            try:
+                formula = resolve_species_formula(species, species_formula_registry)
+            except Exception:
+                continue
+            mass_kg = mol_val * formula.molar_mass_kg_per_mol()
+            if mass_kg <= 0.0:
+                continue
+            kg_by_species[str(species)] = (
+                kg_by_species.get(str(species), 0.0) + mass_kg
+            )
+            total_kg += mass_kg
+        if total_kg <= 0.0:
+            return {}
+        return {
+            species: kg / total_kg * 100.0
+            for species, kg in kg_by_species.items()
+        }
+
     def _ensure_backend(self) -> Optional[Any]:
         """Return the live adapter, lazily constructing it on first use.
 
