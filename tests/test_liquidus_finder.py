@@ -368,7 +368,7 @@ def test_threshold_equality_at_an_outer_boundary_is_not_a_crossing(
 ):
     result = _scan_transition(anchors)
 
-    assert result.status == "not_converged"
+    assert result.status == "out_of_domain"
     assert any(missing_bracket in warning for warning in result.warnings)
 
 
@@ -719,9 +719,36 @@ def test_liquidus_finder_reports_missing_bracket_without_crashing():
         tolerance_C=1.0,
     )
 
-    assert result.status == 'not_converged'
+    assert result.status == 'out_of_domain'
     assert any('solidus bracket absent' in warning for warning in result.warnings)
     assert any('liquidus bracket absent' in warning for warning in result.warnings)
+    assert result.diagnostics == {
+        'reason': 'out_of_domain',
+        'original_search_bracket_C': (800.0, 1200.0),
+        'bounded_search_interval_C': (500.0, 2500.0),
+    }
+
+
+def test_liquidus_finder_expands_bracket_and_names_original_window():
+    result = find_liquidus_solidus_by_fraction(
+        lambda temperature_C: max(
+            0.0,
+            min(1.0, (temperature_C - 1300.0) / 300.0),
+        ),
+        min_T_C=800.0,
+        max_T_C=1200.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == 'ok'
+    assert result.solidus_T_C == pytest.approx(1300.3, abs=1.0)
+    assert result.liquidus_T_C == pytest.approx(1599.7, abs=1.0)
+    assert any(
+        'original search bracket [800, 1200] C' in warning
+        and 'extended' in warning
+        for warning in result.warnings
+    )
 
 
 def test_liquidus_finder_default_budget_is_unbounded():
@@ -730,7 +757,7 @@ def test_liquidus_finder_default_budget_is_unbounded():
 
     def sample(temperature_C: float) -> float:
         calls['n'] += 1
-        # Fully solid everywhere -> missing brackets after full grid, not budget.
+        # Fully solid everywhere -> missing brackets after the bounded grid.
         return 0.0
 
     result = find_liquidus_solidus_by_fraction(
@@ -739,8 +766,8 @@ def test_liquidus_finder_default_budget_is_unbounded():
         max_T_C=1000.0,
         scan_step_C=100.0,
     )
-    assert result.status == 'not_converged'
-    assert calls['n'] == 3  # 800, 900, 1000
+    assert result.status == 'out_of_domain'
+    assert calls['n'] == 21  # 500 through 2500 C at 100 C steps
     assert result.diagnostics.get('reason') != 'aggregate_budget_exceeded'
 
 

@@ -20929,7 +20929,7 @@ def test_transition_temperature_out_of_domain_bracket_is_typed_refusal(
 
     reference = _transition_temperature_observation()
     unavailable_result = LiquidusSolidusResult(
-        status="not_converged",
+        status="out_of_domain",
         warnings=("liquidus bracket absent: frac_M never reached 0.999",),
     )
     handle = SimpleNamespace(
@@ -20952,8 +20952,8 @@ def test_transition_temperature_out_of_domain_bracket_is_typed_refusal(
     assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
     assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
     assert prediction.refusal_detail == {
-        "reason": "liquidus_finder_not_converged",
-        "status": "not_converged",
+        "reason": "liquidus_finder_out_of_domain",
+        "status": "out_of_domain",
         "warnings": ["liquidus bracket absent: frac_M never reached 0.999"],
     }
 

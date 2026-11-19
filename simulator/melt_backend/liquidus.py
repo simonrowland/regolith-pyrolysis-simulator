@@ -23,6 +23,11 @@ from simulator.melt_regime import liquid_fraction_invalidity
 # leave normal runs ample headroom. Unit check: 163 s * 10 is seconds.
 DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 1800.0
 MAX_LIQUIDUS_SCAN_POINTS = 100_000
+# Expand a missing silicate transition only inside this temperature envelope.
+# 500 C remains below typical silicate solidus temperatures; 2500 C covers
+# typical high-temperature silicate melting ranges while keeping the scan finite.
+LIQUIDUS_SEARCH_MIN_T_C = 500.0
+LIQUIDUS_SEARCH_MAX_T_C = 2500.0
 # frac_M >= 1 - LIQUIDUS_LIQUID_EPSILON is liquid. This is the finder's
 # declaration tolerance. The freeze-gate consumer may snap a supplied
 # liquidus fraction to 1 only inside this band. One owner: do not copy
@@ -528,24 +533,45 @@ def find_liquidus_solidus_by_fraction(
             'invalid finder budget_s: must be finite and positive'
         )
 
+    expansion_min_T = min(min_T, LIQUIDUS_SEARCH_MIN_T_C)
+    expansion_max_T = max(max_T, LIQUIDUS_SEARCH_MAX_T_C)
     try:
         grid = _bounded_scan_grid(min_T, max_T, step)
+        _bounded_scan_grid(
+            expansion_min_T,
+            expansion_max_T,
+            step,
+        )
     except RuntimeError as exc:
         return _refused_input(str(exc))
 
     # Each bisection starts with a bracket no wider than scan_step_C and halves
-    # its Celsius width until it reaches tolerance_C. At the defaults,
-    # ceil(log2(50 C / 2 C)) = 5 steps; one extra step covers endpoint rounding.
-    # The 32-step cap is therefore sufficient, and the deterministic sample
-    # bound is 37 grid samples + 2 * 6 bisection samples = 49 evaluations.
-    # The ratio is dimensionless and the bound counts evaluations, not seconds.
+    # its Celsius width. ceil(log2(step / tolerance)) steps reach the requested
+    # width, with one extra step for endpoint rounding. The deterministic
+    # evaluation cap is the maximum expanded-grid count plus two capped
+    # bisections. Both the temperature ratio and logarithm argument are
+    # dimensionless; this bounds calls, not seconds.
     iteration_cap = max(0, math.ceil(max_bisection_iterations))
     tolerance_steps = (
         0
         if step <= tolerance
         else max(1, math.ceil(math.log2(step) - math.log2(tolerance)) + 1)
     )
-    max_sample_evaluations = len(grid) + 2 * min(
+    # Expansion adds one sample for each clipped scan step beyond the
+    # original endpoints. Count both lattices separately because an arbitrary
+    # original minimum need not align with the 500 C envelope's grid.
+    maximum_grid_samples = (
+        len(grid)
+        + math.ceil((min_T - expansion_min_T) / step)
+        + math.ceil((expansion_max_T - max_T) / step)
+    )
+    if maximum_grid_samples > MAX_LIQUIDUS_SCAN_POINTS:
+        return _refused_input(
+            'invalid finder expanded scan grid: '
+            f'{maximum_grid_samples} points exceeds cap '
+            f'{MAX_LIQUIDUS_SCAN_POINTS}'
+        )
+    max_sample_evaluations = maximum_grid_samples + 2 * min(
         iteration_cap,
         tolerance_steps,
     )
@@ -638,18 +664,61 @@ def find_liquidus_solidus_by_fraction(
         return point
 
     try:
-        grid_points = [sample(T) for T in grid]
+        for temperature_C in grid:
+            sample(temperature_C)
+        search_min_T = min_T
+        search_max_T = max_T
 
-        solidus_bracket = _threshold_bracket(
-            tuple(grid_points),
-            solid_threshold,
-            edge="warm",
-        )
-        liquidus_bracket = _threshold_bracket(
-            tuple(grid_points),
-            liquid_threshold,
-            edge="cold",
-        )
+        def threshold_brackets() -> tuple[
+            tuple[MeltFractionSample, MeltFractionSample] | None,
+            tuple[MeltFractionSample, MeltFractionSample] | None,
+        ]:
+            points = tuple(samples)
+            return (
+                _threshold_bracket(
+                    points,
+                    solid_threshold,
+                    edge="warm",
+                ),
+                _threshold_bracket(
+                    points,
+                    liquid_threshold,
+                    edge="cold",
+                ),
+            )
+
+        solidus_bracket, liquidus_bracket = threshold_brackets()
+        while (
+            (solidus_bracket is None or liquidus_bracket is None)
+            and (
+                search_min_T > expansion_min_T
+                or search_max_T < expansion_max_T
+            )
+        ):
+            # Expand each edge by one existing scan step. The bounded outer
+            # interval is computed from the requested bracket and the
+            # 500-2500 C extension envelope above; the step is clipped at an
+            # endpoint so the final sample never exceeds that interval.
+            next_min_T = max(expansion_min_T, search_min_T - step)
+            next_max_T = min(expansion_max_T, search_max_T + step)
+            if next_min_T < search_min_T:
+                sample(next_min_T)
+            if next_max_T > search_max_T:
+                sample(next_max_T)
+            search_min_T = next_min_T
+            search_max_T = next_max_T
+            solidus_bracket, liquidus_bracket = threshold_brackets()
+
+        extended_notice = None
+        if (
+            search_min_T < min_T
+            or search_max_T > max_T
+        ):
+            extended_notice = (
+                'liquidus finder extended beyond original search bracket '
+                f'[{min_T:g}, {max_T:g}] C to '
+                f'[{search_min_T:g}, {search_max_T:g}] C'
+            )
         for bracket in (solidus_bracket, liquidus_bracket):
             if bracket is None:
                 continue
@@ -672,10 +741,24 @@ def find_liquidus_solidus_by_fraction(
             )
         if missing:
             return LiquidusSolidusResult(
-                status='not_converged',
-                warnings=tuple([*smoothing_warnings, *missing]),
+                status='out_of_domain',
+                warnings=tuple([
+                    *smoothing_warnings,
+                    *missing,
+                    'no threshold crossing within bounded search interval '
+                    f'[{search_min_T:g}, {search_max_T:g}] C; original '
+                    f'bracket was [{min_T:g}, {max_T:g}] C',
+                ]),
                 samples=tuple(samples),
                 iterations=iterations,
+                diagnostics={
+                    'reason': 'out_of_domain',
+                    'original_search_bracket_C': (min_T, max_T),
+                    'bounded_search_interval_C': (
+                        search_min_T,
+                        search_max_T,
+                    ),
+                },
             )
 
         solidus, solidus_iterations = _bisect_solidus(
@@ -740,7 +823,20 @@ def find_liquidus_solidus_by_fraction(
         solidus_T_C=solidus.temperature_C,
         liquid_fraction=1.0,
         status='ok',
-        warnings=tuple(smoothing_warnings),
+        warnings=tuple([
+            *smoothing_warnings,
+            *(
+                [extended_notice]
+                if extended_notice is not None
+                and (
+                    solidus.temperature_C < min_T
+                    or solidus.temperature_C > max_T
+                    or liquidus.temperature_C < min_T
+                    or liquidus.temperature_C > max_T
+                )
+                else []
+            ),
+        ]),
         samples=tuple(samples),
         iterations=iterations,
     )
