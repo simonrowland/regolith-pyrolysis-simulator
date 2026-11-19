@@ -64,15 +64,14 @@ _HIGH_PRESSURE_APPARATUS = re.compile(
     r"|\bautoclaves?\b",
     re.IGNORECASE,
 )
-_EXCLUDED_HIGH_PRESSURE_APPARATUS = re.compile(
-    r"(?:\bnot\s+(?:used|employed|utilized)\b|"
-    r"\b(?:did\s+not\s+use|excluded|not\s+used)\b)",
+_AMBIENT_FURNACE_RUN = re.compile(
+    r"\b(?:run|runs|experiment|experiments)\b.{0,100}"
+    r"\b(?:1\s*(?:atm|atmosphere|bar)|ambient)\b.{0,50}"
+    r"\bfurnaces?\b",
     re.IGNORECASE,
 )
-_AMBIENT_FURNACE_RUN = re.compile(
-    r"\b(?:run|runs|experiment|experiments)\b.{0,40}"
-    r"\b(?:in|using|with)\b.{0,24}"
-    r"\b(?:1\s*(?:atm|atmosphere|bar)|ambient)\b.{0,20}\bfurnaces?\b",
+_ACTIVE_USE_AFTER_EXCLUSION = re.compile(
+    r"\bbut\b[^.!?;]*\b(?:used|employed|utilized)\b",
     re.IGNORECASE,
 )
 # Migrator boilerplate names the keys it did not find, including P_GPa.
@@ -193,15 +192,54 @@ def _high_pressure_apparatus_assigned_to_run(text: str) -> bool:
 
     if _PRESSURE_KEY_LIST in text.casefold():
         return False
-    apparatus = _HIGH_PRESSURE_APPARATUS.search(text)
-    if apparatus is None:
+    apparatus_mentions = tuple(_HIGH_PRESSURE_APPARATUS.finditer(text))
+    if not apparatus_mentions:
         return False
-    excluded = _EXCLUDED_HIGH_PRESSURE_APPARATUS.search(
-        text[apparatus.end() : apparatus.end() + 100]
+    if _AMBIENT_FURNACE_RUN.search(text) is None:
+        return True
+    return any(
+        not _apparatus_is_explicitly_excluded(text, apparatus)
+        for apparatus in apparatus_mentions
     )
-    if excluded is not None and _AMBIENT_FURNACE_RUN.search(text) is not None:
+
+
+def _apparatus_is_explicitly_excluded(
+    text: str,
+    apparatus: re.Match[str],
+) -> bool:
+    """An apparatus exclusion must name that mention in the same sentence."""
+
+    sentence_start = max(
+        (text.rfind(mark, 0, apparatus.start()) for mark in ".!?;"),
+        default=-1,
+    ) + 1
+    sentence_end = min(
+        (
+            index
+            for mark in ".!?;"
+            if (index := text.find(mark, apparatus.end())) >= 0
+        ),
+        default=len(text),
+    )
+    sentence = text[sentence_start:sentence_end]
+    apparatus_end = apparatus.end() - sentence_start
+    after = sentence[apparatus_end:]
+    if _ACTIVE_USE_AFTER_EXCLUSION.search(after) is not None:
         return False
-    return True
+    apparatus_phrase = re.escape(apparatus.group())
+    before_exclusion = re.search(
+        rf"\b(?:did\s+not\s+(?:use|employ)|excluded)\s+"
+        rf"(?:(?:the|a|an)\s+)?{apparatus_phrase}\s*$",
+        sentence[:apparatus_end],
+        re.IGNORECASE,
+    )
+    after_exclusion = re.match(
+        r"^\s*(?:(?:was|were)\s+)?not\s+(?:used|employed|utilized)\b|"
+        r"^\s*(?:was|were)?\s+excluded\b",
+        after,
+        re.IGNORECASE,
+    )
+    return before_exclusion is not None or after_exclusion is not None
 
 
 def _locator_prose(locator: Locator | None) -> Iterator[str]:

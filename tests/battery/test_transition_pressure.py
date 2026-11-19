@@ -435,6 +435,60 @@ def test_apparatus_exclusion_without_ambient_run_context_still_refuses() -> None
     assert decision is None
 
 
+@pytest.mark.parametrize(
+    "note",
+    (
+        "Run in a 1 atm furnace. The autoclave was not used. "
+        "The sample was then run in a belt apparatus.",
+        "Run in a 1 atm furnace. The sample was then run in an autoclave. "
+        "Water was not used.",
+        "Run in a 1 atm furnace. The autoclave was not used for calibration "
+        "but was used for these runs.",
+        "Run in a 1 atm furnace. The autoclave was excluded, but belt "
+        "apparatus was used for these runs.",
+    ),
+)
+def test_unexcluded_or_positively_used_apparatus_still_refuses(note: str) -> None:
+    experiment, observation, bench = _row()
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            cell_internal_pressure_note=F.located(note),
+        ),
+    )
+    block = unprinted_liquidus_pressure_block(observation, experiment, bench)
+    decision = unprinted_liquidus_solidus_pressure(observation, experiment, bench)
+    assert block == "high_pressure_apparatus"
+    assert decision is None
+
+
+@pytest.mark.parametrize(
+    "note",
+    (
+        "The runs did not use the autoclave. They were run in a 1 atm furnace.",
+        "Experiments were run at 1 atm in a vertical tube furnace. "
+        "The autoclave was not used.",
+    ),
+)
+def test_explicitly_ambient_run_with_excluded_apparatus_assumes_one_bar(
+    note: str,
+) -> None:
+    experiment, observation, bench = _row()
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            cell_internal_pressure_note=F.located(note),
+        ),
+    )
+    block = unprinted_liquidus_pressure_block(observation, experiment, bench)
+    decision = unprinted_liquidus_solidus_pressure(observation, experiment, bench)
+    assert block is None
+    assert decision is not None
+    assert decision.pressure_bar == 1.0
+
+
 def test_pressure_key_list_in_the_note_is_not_an_apparatus() -> None:
     experiment, observation, bench = _row()
     experiment = replace(

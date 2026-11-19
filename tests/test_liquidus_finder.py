@@ -842,6 +842,52 @@ def test_fractional_expansion_reaches_both_default_envelope_endpoints():
     assert len(calls) == len(set(calls))
 
 
+def test_fractional_expansion_clamps_decimal_multiple_to_exact_endpoint():
+    calls = []
+
+    def sample(temperature_C: float) -> float:
+        calls.append(float(temperature_C))
+        return 0.2
+
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=512.07,
+        max_T_C=2487.93,
+        scan_step_C=12.07,
+        tolerance_C=12.07,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics == {
+        'reason': 'not_converged',
+        'original_search_bracket_C': (512.07, 2487.93),
+        'bounded_search_interval_C': (500.0, 2500.0),
+    }
+    assert calls[-2:] == [500.0, 2500.0]
+
+
+def test_expansion_count_is_capped_before_extreme_finite_ratio(monkeypatch):
+    monkeypatch.setattr(liquidus_module, 'MAX_LIQUIDUS_SCAN_POINTS', 10)
+    calls = []
+
+    def sample(temperature_C: float) -> float:
+        calls.append(float(temperature_C))
+        return 0.2
+
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=0.0,
+        max_T_C=1e-30,
+        scan_step_C=1e-30,
+        tolerance_C=1e-30,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['reason'] == 'not_converged'
+    assert len(calls) <= 10
+    assert len(calls) == len(set(calls))
+
+
 def test_expansion_step_cap_stops_without_rejecting_the_original_grid(
     monkeypatch,
 ):

@@ -5,7 +5,6 @@ from __future__ import annotations
 import math
 import time
 from dataclasses import dataclass, field
-from decimal import Decimal
 from typing import Any, Callable, Mapping, Optional, Tuple
 
 from simulator.melt_backend.base import (
@@ -748,12 +747,26 @@ def find_liquidus_solidus_by_fraction(
             # 500-2500 C extension envelope above; the step is clipped at an
             # endpoint so the final sample never exceeds that interval.
             next_min_T = (
-                max(expansion_min_T, min_T - (cold_expansion_index + 1) * step)
+                _indexed_expansion_point(
+                    min_T,
+                    expansion_min_T,
+                    step,
+                    cold_expansion_index + 1,
+                    cold_expansion_points,
+                    direction=-1,
+                )
                 if search_min_T > expansion_min_T
                 else search_min_T
             )
             next_max_T = (
-                min(expansion_max_T, max_T + (warm_expansion_index + 1) * step)
+                _indexed_expansion_point(
+                    max_T,
+                    expansion_max_T,
+                    step,
+                    warm_expansion_index + 1,
+                    warm_expansion_points,
+                    direction=1,
+                )
                 if search_max_T < expansion_max_T
                 else search_max_T
             )
@@ -1357,16 +1370,48 @@ def _expansion_point_count(
     endpoint_T_C: float,
     step_C: float,
 ) -> int:
-    """Number of indexed, endpoint-clamped samples on one expansion edge."""
+    """Count indexed samples, returning a bounded sentinel above scan cap."""
 
-    distance = abs(Decimal(str(endpoint_T_C)) - Decimal(str(start_T_C)))
-    step = Decimal(str(step_C))
+    distance = abs(endpoint_T_C - start_T_C)
     if distance == 0:
         return 0
-    intervals = int(distance // step)
-    if Decimal(intervals) * step < distance:
-        intervals += 1
-    return intervals
+    if step_C < distance / MAX_LIQUIDUS_SCAN_POINTS:
+        return MAX_LIQUIDUS_SCAN_POINTS + 1
+    interval_count = distance / step_C
+    if not math.isfinite(interval_count):
+        return MAX_LIQUIDUS_SCAN_POINTS + 1
+    nearest_interval = round(interval_count)
+    rounding_bound = 2 * max(
+        math.ulp(start_T_C),
+        math.ulp(endpoint_T_C),
+        math.ulp(distance),
+        math.ulp(nearest_interval * step_C),
+    )
+    if abs(distance - nearest_interval * step_C) <= rounding_bound:
+        interval_count = float(nearest_interval)
+    return max(
+        1,
+        min(MAX_LIQUIDUS_SCAN_POINTS + 1, math.ceil(interval_count)),
+    )
+
+
+def _indexed_expansion_point(
+    start_T_C: float,
+    endpoint_T_C: float,
+    step_C: float,
+    index: int,
+    point_count: int,
+    *,
+    direction: int,
+) -> float:
+    """Generate one expansion point from its index and exact final endpoint."""
+
+    if index >= point_count:
+        return endpoint_T_C
+    candidate = start_T_C + direction * index * step_C
+    if direction < 0:
+        return max(endpoint_T_C, candidate)
+    return min(endpoint_T_C, candidate)
 
 
 def _bounded_scan_grid(

@@ -20859,7 +20859,7 @@ def test_high_pressure_prose_without_pressure_still_refuses(
     reference = _unprinted_transition_reference(experiment)
 
     def unexpected_open(*_args):
-        pytest.fail("piston-cylinder prose must refuse before opening an engine")
+        pytest.fail("high-pressure apparatus prose must refuse before engine open")
 
     monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
     prediction = predict_with_engine(
@@ -20873,6 +20873,38 @@ def test_high_pressure_prose_without_pressure_still_refuses(
         "input": "total_pressure_Pa",
     }
     assert reference.identity.total_pressure_Pa.is_unknown
+
+
+def test_positive_high_pressure_mention_after_exclusion_refuses_before_engine(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    experiment = F.tabulation_experiment()
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            cell_internal_pressure_note=F.located(
+                "Run in a 1 atm furnace. The autoclave was not used. "
+                "The sample was then run in a belt apparatus."
+            ),
+        ),
+    )
+    reference = _unprinted_transition_reference(experiment)
+
+    def unexpected_open(*_args):
+        pytest.fail("positive high-pressure evidence must refuse before engine open")
+
+    monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE, reference, experiment=experiment
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {
+        "reason": "missing_input",
+        "input": "total_pressure_Pa",
+    }
 
 
 def test_bench_high_pressure_phrase_reaches_the_liquidus_route(
