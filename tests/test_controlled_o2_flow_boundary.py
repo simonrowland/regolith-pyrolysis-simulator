@@ -70,6 +70,12 @@ def test_retained_holdup_drains_and_throttle_clears_only_after_evacuation():
     assert first_tick.demand_flux_kg_hr == pytest.approx(1.0)
     assert first_tick.swallowed_flux_kg_hr == pytest.approx(1.0)
     assert first_tick.saturation == pytest.approx(0.1)
+    # Tests-only pin before d-452 adds run diagnostics and changes the
+    # configured throat. Keep the existing one-tick numerical boundary exact.
+    assert first_tick.pipe_capacity_kg_hr.hex() == "0x1.4000000000000p+3"
+    assert first_tick.demand_flux_kg_hr.hex() == "0x1.0000000000000p+0"
+    assert first_tick.swallowed_flux_kg_hr.hex() == "0x1.0000000000000p+0"
+    assert first_tick.saturation.hex() == "0x1.999999999999ap-4"
     assert _bled_kg(first_tick, holdup_kg=1.0) == pytest.approx(1.0)
 
     recovered = controlled_flow_capacity(
@@ -82,6 +88,13 @@ def test_retained_holdup_drains_and_throttle_clears_only_after_evacuation():
     )
     assert recovered.swallowed_flux_kg_hr == 0.0
     assert recovered.saturation == 0.0
+
+
+def test_d452_numeric_pin_for_original_fixed_throat_anchor():
+    model = OverheadGasModel()
+
+    assert model.initial_throat_area_m2 == 0.011309733552923255
+    assert model.pipe_diameter_m == pytest.approx(0.12)
 
 
 def test_explicit_zero_conductance_closes_controlled_line():
