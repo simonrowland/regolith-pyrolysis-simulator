@@ -3,6 +3,7 @@ from collections import Counter
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -702,6 +703,21 @@ def _with_composition(observation, composition: Composition):
     )
 
 
+def _candidate_redox_result(**moles: float):
+    payload = {
+        "chromous_cr_mol": 0.0,
+        "chromic_cr_mol": 0.0,
+        "titanous_ti_mol": 0.0,
+        "titanic_ti_mol": 0.0,
+        "extrapolated_redox_rows": (),
+        "active_row_band_intersection_K": (1673.0, 1674.0),
+        "flags": (),
+        "redox_pack_digest": "pinned-candidate-test",
+    }
+    payload.update(moles)
+    return SimpleNamespace(**payload)
+
+
 def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
     monkeypatch: pytest.MonkeyPatch,
 ):
@@ -895,6 +911,126 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
     assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
     expected_ratio = output.titanous_ti_mol / output.titanic_ti_mol
     assert float(prediction.value) == pytest.approx(expected_ratio, rel=1e-12)
+
+
+def test_openimcc_candidate_zero_fraction_and_ratio_are_refusals(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    pytest.importorskip("openimcc")
+    import openimcc
+
+    berry = _migrate_berry_cr()
+    chromium = next(
+        row
+        for observation_id, row in berry.observations.items()
+        if observation_id.startswith(
+            "berry-oneill-2004-chromium-xanes::"
+            "berry_2004_table3_ad_en_r01::"
+        )
+    )
+    chromium_experiment = berry.experiments[chromium.experiment_id]
+    chromium = _with_composition(
+        chromium,
+        _candidate_oxide_composition(
+            ("CaO", "34"),
+            ("SiO2", "34"),
+            ("Al2O3", "10"),
+            ("MgO", "10"),
+            ("FeO", "10"),
+            ("Cr2O3", "2"),
+        ),
+    )
+
+    def chromous_absent(*args, **kwargs):
+        return _candidate_redox_result(chromous_cr_mol=0.0, chromic_cr_mol=1.0)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", chromous_absent)
+    chromium_prediction = predict_with_engine(
+        Engine.OPENIMCC, chromium, experiment=chromium_experiment
+    )
+    assert chromium_prediction.value is None
+    assert chromium_prediction.execution.state is not ExecutionState.PRODUCED
+    assert chromium_prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert chromium_prediction.refusal_detail == {
+        "reason": "predicted_valence_nonpositive",
+    }
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(TRANELL_TI)
+    migrator.finalize()
+    titanium = next(
+        row
+        for row in migrator.result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.VALENCE_RATIO
+    )
+    titanium_experiment = migrator.result.experiments[titanium.experiment_id]
+    titanium = _with_composition(
+        titanium,
+        _candidate_oxide_composition(
+            ("CaO", "33"),
+            ("SiO2", "35"),
+            ("Al2O3", "10"),
+            ("MgO", "10"),
+            ("FeO", "10"),
+            ("TiO2", "2"),
+        ),
+    )
+
+    def titanous_absent(*args, **kwargs):
+        return _candidate_redox_result(titanous_ti_mol=0.0, titanic_ti_mol=1.0)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", titanous_absent)
+    titanium_prediction = predict_with_engine(
+        Engine.OPENIMCC, titanium, experiment=titanium_experiment
+    )
+    assert titanium_prediction.value is None
+    assert titanium_prediction.execution.state is not ExecutionState.PRODUCED
+    assert titanium_prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert titanium_prediction.refusal_detail == {
+        "reason": "predicted_valence_nonpositive",
+    }
+
+
+def test_openimcc_candidate_negative_log10_ratio_stays_a_score(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    pytest.importorskip("openimcc")
+    import openimcc
+
+    result = _migrate_berry_cr()
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.identity.valence_basis.is_value
+        and row.identity.valence_basis.value.value_form is ValenceValueForm.LOG10_RATIO
+    )
+    observation = _with_composition(
+        observation,
+        _candidate_oxide_composition(
+            ("CaO", "34"),
+            ("SiO2", "34"),
+            ("Al2O3", "10"),
+            ("MgO", "10"),
+            ("FeO", "10"),
+            ("Cr2O3", "2"),
+        ),
+    )
+
+    def reduced(*args, **kwargs):
+        # 1 mol Cr(III) and 10 mol Cr(II): log10(Cr3+/Cr2+) = -1.
+        return _candidate_redox_result(chromous_cr_mol=10.0, chromic_cr_mol=1.0)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", reduced)
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        experiment=result.experiments[observation.experiment_id],
+    )
+
+    assert prediction.refusal_reason is None
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == Decimal("-1")
 
 
 def test_refused_printed_valence_forms_do_not_select_scalar(tmp_path: Path):
