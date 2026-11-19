@@ -18,6 +18,7 @@ OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX = (
 OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX = (
     "openimcc-review-gamma-row-withheld;"
 )
+OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX = "openimcc-review-gamma-source-row:"
 OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE = "withheld"
 OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX = (
     "openimcc-coefficient-lineage-unmatched;"
@@ -37,6 +38,7 @@ OPENIMCC_PROVENANCE_PREFIXES: tuple[str, ...] = (
     "openimcc-gas-table:",
     "openimcc-index-vocabulary:",
     OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+    OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX,
     OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX,
 )
 
@@ -124,6 +126,15 @@ def _openimcc_index_vocabulary_flag() -> str | None:
     )
 
 
+def openimcc_index_vocabulary_caveat_flag() -> str | None:
+    """Return the vocabulary mismatch as a caveat, never as ancestry input."""
+
+    flag = _openimcc_index_vocabulary_flag()
+    if flag is not None and flag.startswith(OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX):
+        return flag
+    return None
+
+
 def _work_ids_from_rows(rows: object) -> tuple[str, ...]:
     if not isinstance(rows, Sequence) or isinstance(rows, str):
         return ()
@@ -135,6 +146,22 @@ def _work_ids_from_rows(rows: object) -> tuple[str, ...]:
         if isinstance(source, Mapping)
         if isinstance((work_id := source.get("work_id")), str) and work_id
     }))
+
+
+def _fragment_row_by_id(
+    artifact: Mapping[str, object] | None, source_row_id: str
+) -> Mapping[str, object] | None:
+    rows = artifact.get("rows") if artifact is not None else None
+    if not isinstance(rows, Sequence) or isinstance(rows, str):
+        return None
+    return next(
+        (
+            row
+            for row in rows
+            if isinstance(row, Mapping) and row.get("id") == source_row_id
+        ),
+        None,
+    )
 
 
 @lru_cache(maxsize=128)
@@ -314,7 +341,10 @@ def _page_ranges(
 
 
 def _locator_scope_from_citation(
-    citation: object, *, row_id: object = None
+    citation: object,
+    *,
+    row_id: object = None,
+    source_work_id: str | None = None,
 ) -> tuple[str, ...] | None:
     """Parse locator tokens, treating citations without them as work-wide."""
 
@@ -323,6 +353,14 @@ def _locator_scope_from_citation(
     _head, marker, locator = citation.partition("locator:")
     if not marker:
         locator = citation
+    elif (
+        re.search(r"\bsummari[sz]ed\s+in\b", locator, re.I)
+        and source_work_id != "kems-041-sossi-fegley-2018"
+    ):
+        # A table/page named as a secondary summary locates the summary work,
+        # not this source's own fitted row. The Sossi-Fegley entry is the
+        # summary work in the current Cu rows, so its Table 2 scope is retained.
+        locator = ""
     locator_segments = (locator,)
     row_table = (
         re.search(
@@ -373,7 +411,9 @@ def _row_source_scopes(row: Mapping[str, object]) -> dict[str, tuple[str, ...] |
         if not isinstance(work_id, str) or not work_id:
             continue
         scope = _locator_scope_from_citation(
-            source.get("citation"), row_id=row.get("id")
+            source.get("citation"),
+            row_id=row.get("id"),
+            source_work_id=work_id,
         )
         if work_id not in scopes:
             scopes[work_id] = scope
@@ -387,11 +427,20 @@ def _row_source_scopes(row: Mapping[str, object]) -> dict[str, tuple[str, ...] |
 @lru_cache(maxsize=32)
 def openimcc_species_source_locator_scopes(
     species_formula: str | None,
+    source_row_id: str | None = None,
 ) -> Mapping[str, tuple[str, ...]]:
-    """Return candidate-row scopes, marking work IDs withheld from some rows."""
+    """Return selected-row scopes or candidate scopes with withheld work IDs."""
 
     artifacts = _openimcc_coefficient_ancestry()
     artifact = _species_fragment_artifact(artifacts, species_formula)
+    if source_row_id is not None:
+        row = _fragment_row_by_id(artifact, source_row_id)
+        if row is None:
+            return {}
+        return {
+            work_id: scopes if scopes is not None else ("unparsed",)
+            for work_id, scopes in _row_source_scopes(row).items()
+        }
     rows = artifact.get("rows") if artifact is not None else None
     return {
         work_id: scopes
@@ -458,13 +507,14 @@ def openimcc_pack_coefficient_sources(
     pack_digest: object = None,
     *,
     species_formula: str | None = None,
+    source_row_id: str | None = None,
 ) -> tuple[str, ...]:
     """Resolve manifest work IDs, retaining a version alias only for legacy packs.
 
     The active OpenIMCC evaluator does not expose the D066 interaction rows
     used by a major-oxide output, so that artifact's work-ID union is the
-    pack-level fallback for its major oxides. Trace fragments use only work
-    IDs shared by every candidate manifest row until row identity is exposed.
+    pack-level fallback for its major oxides. Trace fragments use a selected
+    row when supplied and use the work-ID intersection only as a fallback.
     """
 
     version = pack_version if isinstance(pack_version, str) and pack_version else None
@@ -526,6 +576,16 @@ def openimcc_pack_coefficient_sources(
         is_major_oxide = species_formula in parent_oxides
 
     flags: set[str] = set()
+    if source_row_id is not None:
+        row = _fragment_row_by_id(fragment, source_row_id)
+        sources = set(_work_ids_from_rows((row,))) if row is not None else set()
+        if not sources:
+            flags.add(
+                f"{OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX}"
+                f"formula={species_formula or 'missing'};row={source_row_id}"
+            )
+        sources.add(f"{OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX}{source_row_id}")
+        return tuple(sorted(sources | flags))
     if fragment_matches and fragment is not None:
         withheld_flag = _withheld_fragment_flag(fragment, fragment_rows)
         if withheld_flag is not None:
@@ -569,10 +629,61 @@ def openimcc_pack_coefficient_sources(
                 f"formula={species_formula}"
             )
     sources.update(flags)
-    flag = _openimcc_index_vocabulary_flag()
-    if flag is not None:
-        sources.add(flag)
     return tuple(sorted(sources))
+
+
+def openimcc_sources_with_activity_row_identity(
+    coefficient_sources: Sequence[str],
+    pack_version: object | None,
+    pack_digest: object,
+    *,
+    species_formula: str | None,
+    activity_coefficient_details: object,
+) -> tuple[str, ...]:
+    """Replace fallback fragment lineage with the evaluated row's works."""
+
+    if not isinstance(activity_coefficient_details, Mapping):
+        return tuple(coefficient_sources)
+    element = _single_cation_element(species_formula)
+    if element is None:
+        return tuple(coefficient_sources)
+    row_ids = {
+        str(detail["source_row_id"])
+        for component, detail in activity_coefficient_details.items()
+        if isinstance(detail, Mapping)
+        and isinstance(detail.get("source_row_id"), str)
+        and detail.get("source_row_id")
+        and _single_cation_element(str(component)) == element
+    }
+    if not row_ids:
+        return tuple(coefficient_sources)
+
+    base_sources = openimcc_pack_coefficient_sources(
+        pack_version,
+        pack_digest,
+        species_formula=species_formula,
+    )
+    preserved_sources = tuple(
+        source for source in coefficient_sources if source not in base_sources
+    )
+    if len(row_ids) == 1:
+        row_sources = openimcc_pack_coefficient_sources(
+            pack_version,
+            pack_digest,
+            species_formula=species_formula,
+            source_row_id=next(iter(row_ids)),
+        )
+    else:
+        row_sources = (
+            f"{OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX}"
+            f"formula={species_formula};ambiguous_source_rows="
+            f"{','.join(sorted(row_ids))}",
+            *(
+                f"{OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX}{row_id}"
+                for row_id in sorted(row_ids)
+            ),
+        )
+    return tuple(dict.fromkeys((*preserved_sources, *row_sources)))
 
 
 def openimcc_redox_coefficient_sources(

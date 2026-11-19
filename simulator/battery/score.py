@@ -291,11 +291,14 @@ from simulator.battery.source_lineage import (
     OPENIMCC_LINEAGE_CAVEAT_PREFIXES,
     OPENIMCC_PROVENANCE_PREFIXES,
     OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+    OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX,
     OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE,
     coefficient_lineage_sources,
     openimcc_engine_identity_sources,
+    openimcc_index_vocabulary_caveat_flag,
     openimcc_pack_coefficient_sources,
     openimcc_redox_coefficient_sources,
+    openimcc_sources_with_activity_row_identity,
     openimcc_source_locator_matches,
     openimcc_species_source_locator_scopes,
 )
@@ -5419,7 +5422,19 @@ def _coefficient_sources_in_reference_scope(
     species_formula = coefficient_species_formula or _openimcc_identity_species_formula(
         reference.identity
     )
-    scopes_by_work = openimcc_species_source_locator_scopes(species_formula)
+    selected_rows = tuple(
+        source[len(OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX) :]
+        for source in coefficient_sources
+        if source.startswith(OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX)
+    )
+    if len(selected_rows) > 1:
+        return (), True
+    selected_row_id = selected_rows[0] if selected_rows else None
+    scopes_by_work = openimcc_species_source_locator_scopes(
+        species_formula, source_row_id=selected_row_id
+    )
+    if selected_row_id is not None and not scopes_by_work:
+        return (), True
     if not scopes_by_work:
         return lineage_sources, False
     canonical_scopes_by_work: dict[str, tuple[str, ...]] = {}
@@ -15121,6 +15136,15 @@ def _predict_with_engine(
             )
         except Exception as exc:
             return engine_call_failure(exc)
+    if engine is Engine.OPENIMCC and melt_pack_identity is not None:
+        details = getattr(cell, "melt_activity_coefficient_details", None)
+        sources = openimcc_sources_with_activity_row_identity(
+            sources,
+            melt_pack_identity.get("pack_version"),
+            melt_pack_identity.get("binding_digest"),
+            species_formula=formula,
+            activity_coefficient_details=details,
+        )
     notices = union_notices(tuple(extra_notices), cell_notices(quantity, engine, cell))
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
     refusal = getattr(cell, "refusal_reason", None)
@@ -17973,6 +17997,22 @@ def _compile_residual_with_lineage(
             (_pressure_independent_comparison_notice(quantity, prediction),),
         )
     prediction_sources = tuple(prediction.coefficient_sources)
+    lineage_caveat_sources = list(
+        source
+        for source in dict.fromkeys(prediction_sources)
+        if source.startswith(OPENIMCC_LINEAGE_CAVEAT_PREFIXES)
+    )
+    vocabulary_caveat = (
+        openimcc_index_vocabulary_caveat_flag()
+        if engine is Engine.OPENIMCC
+        and any(
+            source.startswith(OPENIMCC_PROVENANCE_PREFIXES)
+            for source in prediction_sources
+        )
+        else None
+    )
+    if vocabulary_caveat is not None:
+        lineage_caveat_sources.append(vocabulary_caveat)
     lineage_caveat_notices = tuple(
         Notice(
             kind=NoticeKind.ENGINE_MODEL_CAVEAT,
@@ -17980,9 +18020,8 @@ def _compile_residual_with_lineage(
             reason=source,
             origin="openimcc.coefficient_ancestry",
         )
-        for source in dict.fromkeys(prediction_sources)
+        for source in dict.fromkeys(lineage_caveat_sources)
         if quantity is not None
-        and source.startswith(OPENIMCC_LINEAGE_CAVEAT_PREFIXES)
     )
     if lineage_caveat_notices:
         prediction = replace(

@@ -3548,18 +3548,45 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
 
 
 
-def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures() -> None:
+def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """The 14 Allibert rows produce numeric, flagged OpenIMCC results."""
 
     import tempfile
     from pathlib import Path
 
+    openimcc = pytest.importorskip("openimcc")
     from simulator.battery.enums import NoticeKind, RefusalReason
     from simulator.battery.identity import quantity_token
+    import simulator.battery.source_lineage as source_lineage
+    from simulator.battery.source_lineage import (
+        OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
+    )
     from tests.battery.test_migrate import _migrate_real_extract
+
+    from openimcc.gas_data import IMCC_PARENT_OXIDES
+
+    vocabulary_mismatch = (
+        OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX
+        + "manifest=3645e2c2bb;current=56a27a9249"
+    )
+    monkeypatch.setattr(
+        source_lineage,
+        "_openimcc_index_vocabulary_flag",
+        lambda: vocabulary_mismatch,
+    )
 
     with tempfile.TemporaryDirectory() as tmp:
         result = _migrate_real_extract(Path(tmp), "kems-051-allibert-1981.yaml")
+    d066_artifact = next(
+        artifact
+        for artifact in openimcc.coefficient_ancestry()
+        if str(artifact.get("identity", "")).startswith("IMCC-SF04-D066@")
+    )
+    d066_work_ids = tuple(sorted(d066_artifact.get("work_ids", ())))
+    index_context = load_score_context(sources=d066_work_ids)
+    assert set(d066_work_ids).issubset(index_context.works)
     rows = []
     for observation in result.observations.values():
         if observation.source_id != "kems-051-allibert-1981":
@@ -3581,12 +3608,14 @@ def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures
         rows.append(observation)
     assert len(rows) == 14
     context = ScoreContext(
-        works=result.works,
+        works={**index_context.works, **result.works},
         experiments=result.experiments,
         observations={observation.observation_id: observation for observation in rows},
         extract_review={"kems-051-allibert-1981": "reviewed"},
+        hostname="test",
     )
-    residuals, _candidates = score_store(
+    assert set(d066_work_ids).issubset(context.works)
+    residuals, candidates = score_store(
         context,
         engines=(Engine.OPENIMCC,),
         include_diagnostics=True,
@@ -3616,6 +3645,30 @@ def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures
         )
         for residual in scored
     )
+    d066_major_oxide_rows = []
+    for residual in scored:
+        reference = context.observations[residual.reference]
+        species = reference.identity.species
+        if species is None or species.formula not in IMCC_PARENT_OXIDES:
+            continue
+        assert residual.candidate is not None
+        candidate = candidates[residual.candidate]
+        assert candidate.engine is not None
+        assert "kems-051-allibert-1981" in candidate.engine.coefficient_sources
+        assert vocabulary_mismatch not in candidate.engine.coefficient_sources
+        assert residual.source_relation is SourceRelation.SAME_INPUT
+        assert any(
+            notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and notice.reason == vocabulary_mismatch
+            for notice in residual.notices
+        )
+        d066_major_oxide_rows.append(residual.reference)
+    assert d066_major_oxide_rows
+    from simulator.battery.score_report_data import notice_backlog_data
+
+    assert notice_backlog_data(scored).get(
+        f"{NoticeKind.ENGINE_MODEL_CAVEAT.value}:{vocabulary_mismatch}", 0
+    ) >= len(d066_major_oxide_rows)
 
 
 def _fe2o3_partial_observation():
