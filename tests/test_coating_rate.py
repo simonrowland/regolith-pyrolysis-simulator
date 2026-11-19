@@ -20,6 +20,7 @@ from simulator.accounting.queries import wall_deposit_candidate_for_surface_kg
 from simulator.coating_rate import continuous_wall_deposition_flux
 from simulator.condensation import (
     CondensationModel,
+    DepositionInputRefusal,
     VAPOR_PRESSURE_DATA,
     WallSaturationPressureRefusal,
     _series_resistance_deposition_flux_mol_m2_s,
@@ -109,6 +110,21 @@ def test_hot_wall_na_alpha_one_without_zero_equilibrium_pressure_still_has_no_fl
 
     assert inert_surface == 0.0
     assert reactive_upper_bound > 0.0
+
+
+def test_wall_surface_boolean_equilibrium_pressure_is_typed_refusal():
+    with pytest.raises(
+        DepositionInputRefusal,
+        match='wall_surface_state.P_eq_Pa',
+    ):
+        _series_resistance_deposition_flux_mol_m2_s(
+            'Na',
+            0.5,
+            1500.0,
+            1.0,
+            regime_factor=1.0,
+            wall_surface_state={'alpha_s': 1.0, 'P_eq_Pa': True},
+        )
 
 
 def test_continuous_rate_accepts_distinct_reevaporation_flux() -> None:

@@ -9818,20 +9818,18 @@ def _wall_deposition_driving_pressure_pa(
                 "wall_surface_state.P_eq_Pa", None,
                 "the liner corrosion override requires declared P_eq_Pa",
             )
+        raw_equilibrium_pressure = wall_surface_state["P_eq_Pa"]
         try:
-            equilibrium_pressure = float(wall_surface_state["P_eq_Pa"])
-        except (TypeError, ValueError) as exc:
-            raise DepositionInputRefusal(
-                "wall_surface_state.P_eq_Pa",
-                wall_surface_state["P_eq_Pa"],
-                "must be numeric",
-            ) from exc
-        if not math.isfinite(equilibrium_pressure) or equilibrium_pressure < 0.0:
-            raise DepositionInputRefusal(
-                "wall_surface_state.P_eq_Pa",
-                equilibrium_pressure,
-                "must be finite and non-negative",
+            equilibrium_pressure = _finite_nonnegative_value(
+                raw_equilibrium_pressure,
+                label='wall_surface_state.P_eq_Pa',
             )
+        except ValueError as exc:
+            raise DepositionInputRefusal(
+                "wall_surface_state.P_eq_Pa",
+                raw_equilibrium_pressure,
+                "must be finite and non-negative",
+            ) from exc
     else:
         equilibrium_pressure = None
 
