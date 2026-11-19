@@ -9883,9 +9883,10 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # components plus 21 isotope deltas), moving n_numeric to 12,505. They also
     # add 60 null Su & Zhang Table S2 cells and Richter's printed <0.01 Na2O
     # cell to the unavailable tally: 949->1,010. These cells are not numeric.
-    # t-1781 retypes Su & Zhang's numeric profile cells as typed absences; the
-    # unavailable total is a regenerated-store pin and remains at green's value
-    # here until the controller returns the updated census.
+    # car-1114d retypes 3435 numeric Su & Zhang Table S2 residue cells as a
+    # typed schema gap, moving them from numeric to unavailable; b-1209 adds 36
+    # numeric Mendybaev 2017 residue cells. Net numeric delta: -3435 + 36 =
+    # -3399 (12,505->9,106); unavailable rises by 3,435 (1,010->4,445).
     # The old 8818 total also
     # counted 93 Beyer cells from the Table 6 glass-S and Tables 8/10/12
     # simple-oxide-formation schema-gap rows. SC-475 keeps those rows typed
@@ -9897,7 +9898,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(
         "H_minus_H298": 74,
         "cp": 12,
     }
-    assert n_unavailable == 1010
+    assert n_unavailable == 4445
     assert per_source.get("schumm-1981-alkali-aluminosilicate-thermochemical-tables") == {
         "cp": 123,
         "H_minus_H298": 123,
@@ -9942,8 +9943,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    # Green's starting numeric total is retained pending the regenerated pin.
-    assert n_numeric == 12505, (n_numeric, census, n_unavailable)
+    assert n_numeric == 9106, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
