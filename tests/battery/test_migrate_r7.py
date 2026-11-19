@@ -1129,9 +1129,10 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     baseline_payload = json.dumps(
         baseline_rows, ensure_ascii=False, sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
+    # Digest is from the store regenerated at this tree (b268 regen + b2131idx + t-1832).
     assert (len(baseline_rows), hashlib.sha256(baseline_payload).hexdigest()) == (
         945,
-        "c65bfa19ec308e80797586f68ea77597fbb917eb982db29511b631d4f537ddd5",
+        "c9757b1ff2c48f5714e55982577ca0a7448e7c68bd7f2b671bcbe4354815607c",
     )
     candidate = {row["observation_id"]: row for row in observations}
     assert set(candidate) == set(baseline)
