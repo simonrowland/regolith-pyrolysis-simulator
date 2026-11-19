@@ -928,15 +928,18 @@ def test_openimcc_species_thermo_liquid_extrapolation_is_predicted_and_flagged()
 
 def test_openimcc_species_thermo_crystal_outside_interval_stays_typed() -> None:
     _require_openimcc()
-    from openimcc import load_gas_datapack, species_thermo
-    from simulator.melt_backend import openimcc_bridge
+    from openimcc import (
+        ImccGasTemperatureOutsideDomainError,
+        load_gas_datapack,
+        species_thermo,
+    )
 
     datapack = load_gas_datapack()
     inside = species_thermo("SiO2", "cr", 1500.0, datapack=datapack)
     outside_temperature = Decimal(str(inside.T_max)) + Decimal("1")
-    selected_interval = openimcc_bridge._species_thermo_crystal_declared_interval(
-        "SiO2", float(outside_temperature)
-    )
+    with pytest.raises(ImccGasTemperatureOutsideDomainError) as refusal:
+        species_thermo("SiO2", "cr", float(outside_temperature), datapack=datapack)
+    selected_interval = refusal.value.declared_interval_K
     assert selected_interval == (inside.T_min, inside.T_max)
     observation = _openimcc_thermo_observation(
         "openimcc-sio2-quartz-outside-interval",
@@ -960,7 +963,7 @@ def test_openimcc_species_thermo_crystal_outside_interval_stays_typed() -> None:
     )
 
 
-def test_openimcc_crystal_interval_lookup_failure_keeps_typed_refusal(
+def test_openimcc_crystal_missing_interval_attribute_keeps_typed_refusal(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     _require_openimcc()
@@ -971,15 +974,7 @@ def test_openimcc_crystal_interval_lookup_failure_keeps_typed_refusal(
     def refuse_crystal(*_args, **_kwargs):
         raise outside_domain("crystal continuation is unavailable")
 
-    def fail_interval_lookup(*_args, **_kwargs):
-        raise AttributeError("OpenIMCC crystal selector is unavailable")
-
     monkeypatch.setattr(openimcc_bridge, "species_thermo", refuse_crystal)
-    monkeypatch.setattr(
-        openimcc_bridge,
-        "_species_thermo_crystal_declared_interval",
-        fail_interval_lookup,
-    )
     observation = _openimcc_thermo_observation(
         "openimcc-sio2-quartz-outside-interval-no-row",
         "SiO2",
@@ -997,9 +992,15 @@ def test_openimcc_crystal_interval_lookup_failure_keeps_typed_refusal(
         "openimcc_species_thermo_outside_interval"
     )
     assert prediction.refusal_detail["declared_interval_K"] is None
-    assert prediction.refusal_detail["declared_interval_lookup_error"].startswith(
-        "AttributeError:"
-    )
+    assert set(prediction.refusal_detail) == {
+        "reason",
+        "species",
+        "phase",
+        "requested_T_K",
+        "declared_interval_K",
+        "source_row_id",
+        "upstream_error",
+    }
 
 
 def test_openimcc_species_thermo_entropy_uses_printed_pressure_only_for_gas() -> None:

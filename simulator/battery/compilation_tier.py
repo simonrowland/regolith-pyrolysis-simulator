@@ -2676,33 +2676,6 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
                 "ImccTOutsideDatapackDomainError",
             }:
                 interval = getattr(exc, "declared_interval_K", None)
-                if not isinstance(interval, (tuple, list)):
-                    interval = getattr(exc, "T_interval", None)
-                if not isinstance(interval, (tuple, list)):
-                    low = getattr(exc, "T_min", None)
-                    high = getattr(exc, "T_max", None)
-                    interval = None if low is None or high is None else (low, high)
-                interval_lookup_error = None
-                if phase is Phase.CR and not isinstance(interval, (tuple, list)):
-                    try:
-                        interval = (
-                            openimcc_bridge._species_thermo_crystal_declared_interval(
-                                formula, float(call_temperature_K)
-                            )
-                        )
-                    except Exception as lookup_exc:  # preserve typed refusal below
-                        interval_lookup_error = (
-                            f"{type(lookup_exc).__name__}: {lookup_exc}"
-                        )
-                if (
-                    phase is not Phase.CR
-                    and not isinstance(interval, (tuple, list))
-                ):
-                    bounds = re.search(r"\[([^,\]]+),\s*([^\]]+)\]", str(exc))
-                    if bounds is not None:
-                        low = _finite_number(bounds.group(1))
-                        high = _finite_number(bounds.group(2))
-                        interval = None if low is None or high is None else (low, high)
                 row_id = getattr(exc, "source_row_id", getattr(exc, "row_id", None))
                 detail = {
                     "species": formula,
@@ -2712,8 +2685,6 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
                     "source_row_id": row_id,
                     "upstream_error": f"{type(exc).__name__}: {exc}",
                 }
-                if interval_lookup_error is not None:
-                    detail["declared_interval_lookup_error"] = interval_lookup_error
                 return refuse(
                     RefusalReason.UNSUPPORTED,
                     "openimcc_species_thermo_outside_interval",
