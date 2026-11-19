@@ -14467,7 +14467,7 @@ def _predict_with_engine(
             # point. At 1 bar and 1600 K, (ΔV·ΔP)/(RT) with a typical
             # ΔV=1e-5 m³/mol is (1e-5·1e5)/(8.314·1600)=7.5e-5 in ln(a),
             # about 1e-4. The default is inside the verified pressure window.
-            extra_notices.append(
+            input_notices.append(
                 Notice(
                     kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                     affected_quantities=(quantity,),
