@@ -723,7 +723,7 @@ def test_openimcc_non_janaf_crystal_source_refuses_named_polymorph() -> None:
     _require_openimcc()
     from openimcc import load_gas_datapack, species_thermo
 
-    temperature_K = Decimal("1000")
+    temperature_K = Decimal("1500")
     native = species_thermo(
         "C", "cr", float(temperature_K), datapack=load_gas_datapack()
     )
