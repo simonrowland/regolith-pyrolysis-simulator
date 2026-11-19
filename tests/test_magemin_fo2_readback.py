@@ -330,6 +330,7 @@ def test_control_failure_reaches_existing_gate_hold_or_floor(
     from tests.chemistry.test_declared_liquid_fraction_provider import _sim
     from tests.binding_admission_fixtures import register_synthetic_gate_curve_producer
     from engines.magemin.provider import MAGEMinShadowProvider
+    from simulator.evaporation import EvaporationFluxRefusal
 
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     register_synthetic_gate_curve_producer(sim)
@@ -362,13 +363,26 @@ def test_control_failure_reaches_existing_gate_hold_or_floor(
 
     monkeypatch.setattr(sim, '_dispatch_only', dispatch)
     if prior_good:
-        assert sim._melt_redox_liquidus_gate_curve()['source'] == 'gate_liquid_fraction'
+        assert (
+            sim._freeze_gate_curve_record()['curve']['source']
+            == 'gate_liquid_fraction'
+        )
         good = False
         sim.melt.hour += 1
         sim.melt.p_total_mbar += 100.0
+    if native == '-inf' and not prior_good:
+        with pytest.raises(
+            EvaporationFluxRefusal,
+            match='liquid_fraction_provider_failed',
+        ):
+            sim._melt_redox_liquidus_gate_curve()
+        assert sim._freeze_gate_provider_outcome == 'failed'
+        return
     curve = sim._melt_redox_liquidus_gate_curve()
     notice = curve['gate_provider_refusal']
-    assert notice['outcome'] == 'numerical_failure'
+    assert notice['outcome'] == (
+        'failed' if native == '-inf' else 'numerical_failure'
+    )
     assert notice['qualification'] == (
         'held_last_good_curve' if prior_good else 'first_call_kress91_floor_prediction'
     )

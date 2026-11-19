@@ -3189,6 +3189,18 @@ def gate_curve_provider_outcome_for_status(
     magemin_bridge_numerical_failure = (
         "magemin_bridge_numerical_failure" in reasons
     )
+    backend_diagnostic = (
+        diagnostic.get("backend_diagnostics")
+        if isinstance(diagnostic, Mapping)
+        else None
+    )
+    solved_fo2_log = (
+        diagnostic.get("solved_fO2_log")
+        if isinstance(diagnostic, Mapping)
+        else None
+    )
+    if solved_fo2_log is None and isinstance(backend_diagnostic, Mapping):
+        solved_fo2_log = backend_diagnostic.get("solved_fO2_log")
     if "environment" in reasons:
         return GateCurveProviderOutcome.FAILED
     if gate_curve_provider_has_terminal_input(reasons):
@@ -3203,6 +3215,7 @@ def gate_curve_provider_outcome_for_status(
         and "engine_not_converged" in reasons
         and isinstance(diagnostic, Mapping)
         and diagnostic.get("magemin_mode_vector_mass_deficit") is True
+        and solved_fo2_log is None
     ):
         return GateCurveProviderOutcome.FAILED
     numerical_reasons = {

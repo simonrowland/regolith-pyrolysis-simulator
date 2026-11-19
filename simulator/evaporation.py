@@ -4706,6 +4706,7 @@ class EvaporationMixin:
                 curve['gate_provider_refusal'] = {
                     'provider': self._liquid_fraction_provider,
                     'status': status,
+                    'outcome': status_outcome.value,
                     'reason': diagnostic.get('backend_status_reason'),
                     'qualification': 'out_of_domain_kress91_floor_prediction',
                     'authority': 'extrapolated',
