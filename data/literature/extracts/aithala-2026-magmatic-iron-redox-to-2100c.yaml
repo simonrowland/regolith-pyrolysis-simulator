@@ -9,10 +9,11 @@ source:
   year: 2026
 extraction:
   method: Manual extraction from publisher PDFs decoded with pdftotext -layout; all five supplementary data tables
-    transcribed to CSV and checked against page renders.
+    transcribed to CSV and checked against page renders. Tables II and III print log pO2 in atm; article p. 1 defines
+    1 atm = 1 × 10^5 Pa, the exact 1-bar scale used for conversion.
   date: '2026-10-03'
   worker: t1107-aithala
-  provenance_path: extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml
+  provenance_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
 review_status: draft
 fidelity_samples:
 - path: species.Fe.observations[aithala_2026_vf271_xanes].values.Fe3_over_FeT
@@ -188,6 +189,9 @@ experiments:
       state: {tag: value, value: {kind: point, point: '100000'}}
       locator:
         page: 2
+        pdf_page_index: 1
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+        source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
         published_page: '19'
         section: 'Pressure'
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
@@ -278,6 +282,9 @@ experiments:
       state: {tag: value, value: {kind: point, point: '100000'}}
       locator:
         page: 2
+        pdf_page_index: 1
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+        source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
         published_page: '19'
         section: 'Pressure'
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
@@ -368,6 +375,9 @@ experiments:
       state: {tag: value, value: {kind: point, point: '100000'}}
       locator:
         page: 2
+        pdf_page_index: 1
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+        source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
         published_page: '19'
         section: 'Pressure'
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
@@ -458,6 +468,9 @@ experiments:
       state: {tag: value, value: {kind: point, point: '100000'}}
       locator:
         page: 2
+        pdf_page_index: 1
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+        source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
         published_page: '19'
         section: 'Pressure'
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
@@ -548,6 +561,9 @@ experiments:
       state: {tag: value, value: {kind: point, point: '100000'}}
       locator:
         page: 2
+        pdf_page_index: 1
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+        source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
         published_page: '19'
         section: 'Pressure'
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
@@ -638,6 +654,9 @@ experiments:
       state: {tag: value, value: {kind: point, point: '100000'}}
       locator:
         page: 2
+        pdf_page_index: 1
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+        source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
         published_page: '19'
         section: 'Pressure'
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
@@ -725,6 +744,9 @@ experiments:
       state: {tag: value, value: {kind: point, point: '100000'}}
       locator:
         page: 2
+        pdf_page_index: 1
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+        source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
         published_page: '19'
         section: 'Pressure'
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
@@ -817,6 +839,9 @@ experiments:
       state: {tag: value, value: {kind: point, point: '100000'}}
       locator:
         page: 2
+        pdf_page_index: 1
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+        source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
         published_page: '19'
         section: 'Pressure'
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
@@ -909,6 +934,9 @@ experiments:
       state: {tag: value, value: {kind: point, point: '100000'}}
       locator:
         page: 2
+        pdf_page_index: 1
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+        source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
         published_page: '19'
         section: 'Pressure'
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
@@ -1001,6 +1029,9 @@ experiments:
       state: {tag: value, value: {kind: point, point: '100000'}}
       locator:
         page: 2
+        pdf_page_index: 1
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+        source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
         published_page: '19'
         section: 'Pressure'
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
@@ -1093,6 +1124,9 @@ experiments:
       state: {tag: value, value: {kind: point, point: '100000'}}
       locator:
         page: 2
+        pdf_page_index: 1
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+        source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
         published_page: '19'
         section: 'Pressure'
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
@@ -1185,6 +1219,9 @@ experiments:
       state: {tag: value, value: {kind: point, point: '100000'}}
       locator:
         page: 2
+        pdf_page_index: 1
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+        source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
         published_page: '19'
         section: 'Pressure'
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
@@ -5172,6 +5209,9 @@ species:
       - type: interpretation
         locator:
           page: 3
+          pdf_page_index: 2
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+          source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
           published_page: 20
           section: Discussion
           note: Article discussion preferring Eq. 8 and discussing composition independence.
@@ -5223,6 +5263,9 @@ species:
         type: study_description
         locator:
           page: 1
+          pdf_page_index: 0
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+          source_sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
           published_page: 18
           section: Abstract
         units: as stated

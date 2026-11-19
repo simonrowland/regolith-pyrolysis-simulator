@@ -187,7 +187,7 @@ def test_isolated_migration_has_no_hard_issues_and_reaches_temperature_and_fugac
             assert condition.locator is not None
         source = source_observations[observation.observation_id.split("::", 1)[1]]
         printed_fo2 = source["point_conditions"]["fO2_log"]
-        assert printed_fo2["units"] == "log10(atm)"
+        assert printed_fo2["units"] == "log10(bar)"
         assert printed_fo2["locator"]["column"] == "log pO2"
         assert observation.point_conditions["fO2_log"].state.value == Decimal(
             printed_fo2["state"]["value"]
@@ -201,29 +201,36 @@ def test_isolated_migration_has_no_hard_issues_and_reaches_temperature_and_fugac
             and observation.identity.fO2_Pa.is_value
         ):
             assert _printed_fO2_identity_state(facts) == observation.identity.fO2_Pa
+            # Premise: the article's page 1 definition is 1 atm = 1 × 10^5 Pa.
+            # Algebra: pO2 = 10^(−9.56) atm × 10^5 Pa/atm.
+            # Unit check: the printed atm cancels, leaving Pa.
+            # Sanity: the result is 2.7542 × 10^-5 Pa, below 1 Pa as −9.56 implies.
+            log_value = Decimal(printed_fo2["state"]["value"])
+            assert observation.identity.fO2_Pa.value == (
+                Decimal(10) ** log_value * Decimal("100000")
+            )
             converted_fo2_observations.append(observation)
     assert converted_fo2_observations
 
-    first_source = next(iter(source_observations.values()))
-    condition = first_source["point_conditions"]["fO2_log"]
-    fallback = result.observations[
-        f"{document['source_id']}::{first_source['observation_id']}"
-    ].point_conditions["fO2_log"].locator
-    atm_state = _printed_fO2_identity_state(
+    ccrs1 = result.observations[
+        "pretorius-muan-1992-chromium-oxide-activities::"
+        "pretorius_muan_1992_chromium_oxide_activities_tii_r01_cro1_5_gamma"
+    ]
+    assert ccrs1.identity.fO2_Pa is not None and ccrs1.identity.fO2_Pa.is_value
+    assert ccrs1.identity.fO2_Pa.value == Decimal("2.7542287033381663E-5")
+    ccrs1_source = source_observations[
+        "pretorius_muan_1992_chromium_oxide_activities_tii_r01_cro1_5_gamma"
+    ]
+    mutated_log = deepcopy(ccrs1_source["point_conditions"]["fO2_log"])
+    mutated_log["units"] = "log10(atm)"
+    wrong_atm_state = _printed_fO2_identity_state(
         collect_printed_oxygen(
-            ({"point_conditions": {"fO2_log": condition}},), fallback
+            ({"point_conditions": {"fO2_log": mutated_log}},),
+            ccrs1.point_conditions["fO2_log"].locator,
         )
     )
-    mutated_condition = deepcopy(condition)
-    mutated_condition["units"] = "log10(bar)"
-    bar_state = _printed_fO2_identity_state(
-        collect_printed_oxygen(
-            ({"point_conditions": {"fO2_log": mutated_condition}},), fallback
-        )
-    )
-    assert atm_state is not None and atm_state.is_value
-    assert bar_state is not None and bar_state.is_value
-    assert atm_state.value == Decimal("1.01325") * bar_state.value
+    assert wrong_atm_state is not None and wrong_atm_state.is_value
+    assert wrong_atm_state.value != ccrs1.identity.fO2_Pa.value
     metal = result.observations[
         "pretorius-muan-1992-chromium-oxide-activities::"
         "pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_12_metal_cr"

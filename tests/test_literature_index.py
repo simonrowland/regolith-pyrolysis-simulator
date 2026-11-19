@@ -87,6 +87,21 @@ def test_robie_hemingway_compilation_is_citable_with_published_doi() -> None:
     assert source["report_number"] == "USGS Bulletin 2131"
 
 
+def test_aithala_index_keeps_article_primary_and_supplementary_locators() -> None:
+    index = yaml.safe_load(COMMITTED_YAML.read_text(encoding="utf-8"))
+    source = next(
+        row for row in index["sources"]
+        if row["source_id"] == "aithala-2026-magmatic-iron-redox-to-2100c"
+    )
+    assert source["corpus"]["raw"]["path"] == (
+        "raw/aithala-2026-magmatic-iron-redox-to-2100c/"
+        "aithala-2026-magmatic-iron-redox-to-2100c.pdf"
+    )
+    assert source["corpus"]["raw"]["sha256"] == (
+        "4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261"
+    )
+
+
 def test_robie_hemingway_compilation_work_retains_index_doi() -> None:
     from simulator.battery.migrate import Migrator
 

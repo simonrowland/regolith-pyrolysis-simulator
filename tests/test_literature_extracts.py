@@ -5465,6 +5465,21 @@ def test_aithala_s5_preserves_all_61_row_addressable_series_summaries():
         )
 
     assert all(points_to_si(locator) for locator in s5_locators)
+
+    article_sha256 = "4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261"
+    article_locators = [
+        locator
+        for locator in iter_locators(doc)
+        if str(locator.get("published_page")) in {"18", "19", "20"}
+    ]
+    assert len(article_locators) == 14
+    assert all(
+        locator.get("source_path") == article_path
+        and locator.get("source_sha256") == article_sha256
+        and locator.get("pdf_page_index") == locator.get("page") - 1
+        for locator in article_locators
+    )
+
     mutated = copy.deepcopy(doc)
     mutated_s5 = next(
         locator
