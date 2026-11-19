@@ -5,8 +5,40 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
+import pytest
+
 from simulator.battery.score import SCORE_ENGINE_SET
+from simulator.engine_cache import _engine_cache_path_scope
 from scripts import battery_cache_equivalence as gate
+from scripts import battery_score
+
+
+@pytest.mark.parametrize(
+    ("scoped_path", "flag_path", "expected_path"),
+    [
+        ("scoped.sqlite", None, "scoped.sqlite"),
+        (None, None, None),
+        (None, "explicit.sqlite", "explicit.sqlite"),
+    ],
+)
+def test_scorer_resolves_engine_cache_scope(
+    monkeypatch: pytest.MonkeyPatch,
+    scoped_path: str | None,
+    flag_path: str | None,
+    expected_path: str | None,
+) -> None:
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", "ambient.sqlite")
+
+    def record_path(_root, _engines, *, workers, engine_cache_path):
+        assert engine_cache_path == (Path(expected_path) if expected_path else None)
+        return 0
+
+    monkeypatch.setattr(battery_score, "_run_measured_headline", record_path)
+    args = ["--measured-headline"]
+    if flag_path:
+        args.extend(["--engine-cache", flag_path])
+    with _engine_cache_path_scope(scoped_path):
+        assert battery_score.main(args) == 0
 
 
 def test_canonical_rows_ignore_traceback_text_but_preserve_the_failure():

@@ -66,11 +66,11 @@ from simulator.battery.score import (  # noqa: E402
     _write_headline_summary_from_accumulator_json,
     measured_engine_rail_records,
 )
-from simulator.engine_cache import _engine_cache_path_scope  # noqa: E402
-from scripts.battery_cache_equivalence import (  # noqa: E402
-    _engine_cache_path,
-    _studio_host,
+from simulator.engine_cache import (  # noqa: E402
+    _configured_engine_cache_path,
+    _engine_cache_path_scope,
 )
+from scripts.battery_cache_equivalence import _studio_host  # noqa: E402
 from simulator.battery.score_report import (  # noqa: E402
     _score_shard_failure_report_lines,
     format_nasa9_fit_comparison_stratum,
@@ -654,7 +654,7 @@ def main(argv: list[str] | None = None) -> int:
     cache_path_value = (
         str(args.engine_cache.expanduser())
         if args.engine_cache is not None
-        else _engine_cache_path()
+        else _configured_engine_cache_path()
     )
     engine_cache_path = (
         None if not cache_path_value else Path(cache_path_value).expanduser()
