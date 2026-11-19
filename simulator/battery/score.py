@@ -122,6 +122,7 @@ from simulator.battery.source_oxygen import (
     SourceOxygenCondition,
     linked_source_pressure,
     oxygen_pressure_point,
+    persisted_printed_oxygen_located,
     printed_source_pressure,
     resolve_source_oxygen,
     source_oxygen_closure_notice,
@@ -13840,6 +13841,18 @@ def _predict_liquidus_transition_temperature(
             detail={"reason": "invalid_input", "input": "total_pressure_Pa"},
             notices=tuple(notices),
         )
+
+    if printed_source_pressure(observation) is None:
+        # The persisted store dropped the printed unit. The extract still
+        # has it, and the migration collector converts that boundary.
+        # Splice the converted pascal pressure onto this scoring copy.
+        # Do not write it onto the identity: the transition profile
+        # forbids oxygen there. Other rails still read the store as it is.
+        recovered = persisted_printed_oxygen_located(observation)
+        if recovered is not None:
+            recovered_points = dict(observation.point_conditions or {})
+            recovered_points["oxygen_partial_pressure_Pa"] = recovered
+            observation = replace(observation, point_conditions=recovered_points)
 
     if not _has_printed_fo2(observation, identity):
         identity_fo2 = identity.fO2_Pa

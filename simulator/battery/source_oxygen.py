@@ -71,6 +71,101 @@ def printed_source_pressure(row: Observation) -> Decimal | None:
     return None
 
 
+def _extract_observation_nodes(
+    document: object,
+    local_id: str,
+    full_id: str,
+) -> list[Mapping]:
+    found: list[Mapping] = []
+
+    def walk(node: object) -> None:
+        if isinstance(node, Mapping):
+            raw_id = node.get("observation_id")
+            points = node.get("point_conditions")
+            if (
+                raw_id is not None
+                and str(raw_id) in {local_id, full_id}
+                and isinstance(points, Mapping)
+            ):
+                found.append(node)
+            for value in node.values():
+                walk(value)
+        elif isinstance(node, list):
+            for item in node:
+                walk(item)
+
+    walk(document)
+    return found
+
+
+def persisted_printed_oxygen_located(row: Observation) -> Located | None:
+    """Pascal pressure for a persisted print whose unit was dropped.
+
+    Named failure: the ordinary store keeps the printed oxygen token and
+    an unknown fugacity, and it does not store ``oxygen_partial_pressure_Pa``.
+    Fresh migration converts the extract node that still carries the unit.
+    A transition scored from the persisted row then refuses missing fO2.
+    This opens that extract and returns the collector's converted pressure.
+    It does not guess a unit from the token or from the locator prose.
+
+    An unknown token, a missing extract, an already-valued oxygen pressure,
+    or two observation nodes with the same id returns None. The caller
+    refuses missing fO2. The extract wins when the token and the extract
+    disagree, because that is the unit-bearing source migration converts.
+    """
+
+    points = row.point_conditions or {}
+    printed = points.get("oxygen_partial_pressure")
+    if not isinstance(printed, Located) or not printed.state.is_value:
+        return None
+    for key in ("oxygen_partial_pressure_Pa", "fO2_Pa"):
+        existing = points.get(key)
+        if isinstance(existing, Located) and existing.state.is_value:
+            return None
+    identity = row.identity
+    if (
+        isinstance(identity, Identity)
+        and identity.fO2_Pa is not None
+        and identity.fO2_Pa.is_value
+    ):
+        return None
+    source_id = row.source_id
+    if not source_id and "::" in row.observation_id:
+        source_id = row.observation_id.split("::", 1)[0]
+    if (
+        not isinstance(source_id, str)
+        or not source_id
+        or "/" in source_id
+        or "\\" in source_id
+        or source_id.startswith(".")
+    ):
+        return None
+    from simulator.battery.migrate import (
+        EXTRACTS_DIR,
+        collect_printed_oxygen,
+        load_yaml,
+        locator_from_mapping,
+    )
+
+    path = EXTRACTS_DIR / f"{source_id}.yaml"
+    if not path.is_file():
+        return None
+    local_id = row.observation_id.rsplit("::", 1)[-1]
+    matches = _extract_observation_nodes(
+        load_yaml(path),
+        local_id,
+        row.observation_id,
+    )
+    if len(matches) != 1:
+        return None
+    node = matches[0]
+    fallback = locator_from_mapping(node.get("locator")) or row.locator
+    located = collect_printed_oxygen((node,), fallback).oxygen_partial_pressure_Pa
+    if not isinstance(located, Located) or not located.state.is_value:
+        return None
+    return located
+
+
 @dataclass(frozen=True)
 class SourceOxygenCondition:
     observation: Observation

@@ -20361,6 +20361,156 @@ def test_kushiro_printed_po2_lands_beside_unknown_fugacity(
         _assert_kushiro_po2_reaches_the_scorer(monkeypatch)
 
 
+_KUSHIRO_PERSISTED_TRANSITIONS = frozenset({
+    "kushiro_1971_mixture_b_chromite_liquidus",
+    "kushiro_1971_mixture_b_solidus",
+})
+_KUSHIRO_PERSISTED_APPEARANCE = frozenset({
+    "kushiro_1971_mixture_b_augite_plagioclase_first_appearance",
+    "kushiro_1971_mixture_b_ca_poor_pyroxene_first_appearance",
+    "kushiro_1971_mixture_b_ilmenite_first_appearance",
+    "kushiro_1971_mixture_b_olivine_first_appearance",
+})
+_KUSHIRO_PERSISTED_UNKNOWN_OXYGEN = frozenset({
+    "kushiro_1971_mixture_a_chromite_first_appearance_bracket",
+    "kushiro_1971_mixture_a_pigeonite_first_appearance_near_1170",
+})
+
+
+def _kushiro_suffix(observation: Observation) -> str:
+    return observation.observation_id.rsplit("::", 1)[-1]
+
+
+def _persisted_kushiro_observations() -> list[Observation]:
+    from simulator.battery.migrate import load_yaml, observation_from_plain
+
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "data/literature/extracts-v2"
+        / "kushiro-1971-apollo12-phase-equilibria.yaml"
+    )
+    document = load_yaml(path)
+    assert isinstance(document, dict)
+    return [observation_from_plain(raw) for raw in document["observations"]]
+
+
+def _stub_transition_finder(monkeypatch, calls: list[dict[str, object]]):
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    def find_liquidus_solidus(**kwargs):
+        calls.append(dict(kwargs))
+        return LiquidusSolidusResult(
+            liquidus_T_C=1330.0,
+            solidus_T_C=1070.0,
+            liquid_fraction=1.0,
+            status="ok",
+        )
+
+    handle = SimpleNamespace(
+        name=Engine.MAGEMIN.value,
+        backend=SimpleNamespace(find_liquidus_solidus=find_liquidus_solidus),
+        available=True,
+        unavailable_reason=None,
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_open_cached_battery_handle",
+        lambda *_args: (handle, False),
+    )
+
+
+def _assert_persisted_kushiro_transitions_score(monkeypatch) -> dict[str, Observation]:
+    from simulator.battery.migrate import Migrator
+    from simulator.battery.source_oxygen import persisted_printed_oxygen_located
+    from simulator.physical_constants import ATM_PA_DECIMAL, BAR_PA_DECIMAL
+
+    rows = _persisted_kushiro_observations()
+    by_suffix = {_kushiro_suffix(row): row for row in rows}
+    assert set(by_suffix) == (
+        _KUSHIRO_PERSISTED_TRANSITIONS
+        | _KUSHIRO_PERSISTED_APPEARANCE
+        | _KUSHIRO_PERSISTED_UNKNOWN_OXYGEN
+    )
+    printed_pa = Decimal("1e-13") * ATM_PA_DECIMAL
+    expected_log = float(printed_pa.log10() - BAR_PA_DECIMAL.log10())
+    fresh = _kushiro_transition_rows(Migrator)
+    for suffix in _KUSHIRO_PERSISTED_TRANSITIONS:
+        row = by_suffix[suffix]
+        points = row.point_conditions or {}
+        printed = points["oxygen_partial_pressure"]
+        assert isinstance(printed, Located) and printed.state.is_value
+        stored = points.get("oxygen_partial_pressure_Pa")
+        assert stored is None or not (
+            isinstance(stored, Located) and stored.state.is_value
+        )
+        assert points["fO2_Pa"].state.is_unknown
+        recovered = persisted_printed_oxygen_located(row)
+        assert isinstance(recovered, Located) and recovered.state.is_value
+        amount = recovered.state.value
+        amount = amount.point if isinstance(amount, Value) else amount
+        assert amount == printed_pa
+        calls: list[dict[str, object]] = []
+        _stub_transition_finder(monkeypatch, calls)
+        prediction = predict_with_engine(Engine.MAGEMIN, row)
+        assert len(calls) == 1, prediction.refusal_detail
+        fresh_row, _temperature_K = fresh[suffix]
+        fresh_log = score_mod._printed_fo2_log10_bar(fresh_row.identity, fresh_row)
+        assert calls[0]["fO2_log"] == fresh_log
+        assert calls[0]["fO2_log"] == pytest.approx(expected_log)
+        assert calls[0]["pressure_bar"] == pytest.approx(
+            float(score_mod._printed_total_pressure_bar(fresh_row.identity, fresh_row))
+        )
+        assert prediction.refusal_reason is None
+        assert prediction.value is not None
+        scored_identity = prediction.identity
+        assert isinstance(scored_identity, Identity)
+        assert scored_identity.fO2_Pa is None or not scored_identity.fO2_Pa.is_value
+    for suffix in _KUSHIRO_PERSISTED_UNKNOWN_OXYGEN:
+        row = by_suffix[suffix]
+        printed = (row.point_conditions or {})["oxygen_partial_pressure"]
+        assert isinstance(printed, Located) and printed.state.is_unknown
+        assert persisted_printed_oxygen_located(row) is None
+    missing = replace(
+        by_suffix["kushiro_1971_mixture_b_solidus"],
+        source_id="no-such-extract-w1119",
+    )
+    assert persisted_printed_oxygen_located(missing) is None
+    for suffix in _KUSHIRO_PERSISTED_APPEARANCE:
+        row = by_suffix[suffix]
+        printed = (row.point_conditions or {})["oxygen_partial_pressure"]
+        assert isinstance(printed, Located) and printed.state.is_value
+        calls = []
+        _stub_transition_finder(monkeypatch, calls)
+        prediction = predict_with_engine(Engine.MAGEMIN, row)
+        assert calls == []
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
+    return by_suffix
+
+
+def test_persisted_kushiro_transitions_score_from_the_extract_unit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rows = _assert_persisted_kushiro_transitions_score(monkeypatch)
+
+    def drop_recovery(_row):
+        return None
+
+    monkeypatch.setattr(score_mod, "persisted_printed_oxygen_located", drop_recovery)
+    calls: list[dict[str, object]] = []
+    _stub_transition_finder(monkeypatch, calls)
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        rows["kushiro_1971_mixture_b_chromite_liquidus"],
+    )
+    assert calls == []
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {"reason": "missing_input", "input": "fO2_Pa"}
+
+
 @pytest.mark.parametrize(
     ("missing", "identity_field"),
     (
