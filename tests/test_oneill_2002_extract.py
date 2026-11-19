@@ -1,14 +1,22 @@
 """Regression pin for O'Neill & Eggins (2002) printed FeO uncertainties."""
 
 from collections import Counter
+import copy
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 import re
 
+import pytest
 import yaml
 
-from simulator.battery.enums import Quantity, UncertaintyKind
+from simulator.battery.enums import (
+    AdmissionStatus,
+    Phase,
+    Quantity,
+    ReferenceStateConvention,
+    UncertaintyKind,
+)
 from simulator.battery.score import _printed_uncertainty_band
 from tests.battery.factories import migrate_one_extract
 
@@ -36,6 +44,57 @@ TABLE5_MO_COUNTS = {
     "CAS2": 6,
     "CAS4": 5,
 }
+
+TABLE7_MOO3_PRINTED = {
+    "AD eutectic": "0.303 (25)",
+    "AD+Fo": "0.290 (33)",
+    "AD+En": "0.433 (38)",
+    "AD+Wo": "0.094 (7)",
+    "AD+Qz": "0.793 (78)",
+    "AD+TiO2": "0.325 (36)",
+    "A": "0.692 (51)",
+    "B": "0.814 (61)",
+    "C": "0.463 (32)",
+    "D": "0.569 (39)",
+    "E": "0.240 (15)",
+    "F": "0.496 (35)",
+    "MAS1": "1.37 (24)",
+    "MAS2": "1.64 (23)",
+    "CAS1": "0.079 (6)",
+    "CAS2": "0.027 (2)",
+    "CAS4": "0.201 (18)",
+}
+
+
+def _assert_table7_state_source_pins(document):
+    for formula in ("NiO", "CoO", "MoO3"):
+        observation = document["species"][formula]["observations"][0]
+        standard_state = observation["standard_state"]
+        state = standard_state["state"]
+        assert state["tag"] == "value"
+        value = state["value"]
+        assert value["convention"] == "raoultian_pure_endmember"
+        assert value["endmember"]["formula"] == formula
+        assert value["endmember"]["phase"] == {"tag": "value", "value": "l"}
+        assert value["component_basis"] == formula
+        assert value["reference_pressure_bar"] == "1"
+        assert standard_state["inferred"] is False
+        assert standard_state["locator"]["page"] == 13
+        assert standard_state["locator"]["published_page"] == 163
+        assert standard_state["locator"]["table"] == "6"
+
+    moo3 = document["species"]["MoO3"]["observations"][0]
+    assert {
+        row["melt"]: row["gamma_as_printed"] for row in moo3["values"]["series"]
+    } == TABLE7_MOO3_PRINTED
+    assert all(
+        row["admission_status"] == "admitted" for row in moo3["values"]["series"]
+    )
+
+    moo2 = document["species"]["MoO2"]["observations"][0]
+    assert moo2["standard_state"]["state"]["tag"] == "unknown"
+    assert moo2["values"]["admission_status"] == "typed_refusal"
+    assert "hypothetical" in moo2["values"]["reason"]
 
 
 def test_feo_table_7_rows_keep_their_own_printed_one_sigma():
@@ -237,3 +296,54 @@ def test_mo_fit_links_match_table5_and_pressure_locator_page():
             "p. 156 oil-trap vent" in source
             for source in pressure_provenance["inference"]["inputs"]
         )
+
+
+def test_table7_moo3_values_and_reference_states_are_source_pinned():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_table7_state_source_pins(document)
+
+    mutated = copy.deepcopy(document)
+    mutated["species"]["NiO"]["observations"][0]["standard_state"]["state"][
+        "value"
+    ]["reference_pressure_bar"] = "2"
+    with pytest.raises(AssertionError):
+        _assert_table7_state_source_pins(mutated)
+
+    migrator = migrate_one_extract(ROOT, EXTRACT, index=None, aliases={})
+    migrator.finalize()
+    by_formula = {
+        formula: [
+            observation
+            for observation in migrator.result.observations.values()
+            if observation.identity.quantity.is_value
+            and observation.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+            and observation.identity.species is not None
+            and observation.identity.species.formula == formula
+        ]
+        for formula in ("NiO", "CoO", "MoO2", "MoO3")
+    }
+    assert {formula: len(rows) for formula, rows in by_formula.items()} == {
+        "NiO": 19,
+        "CoO": 19,
+        "MoO2": 17,
+        "MoO3": 17,
+    }
+    for formula in ("NiO", "CoO", "MoO3"):
+        for observation in by_formula[formula]:
+            reference_state = observation.identity.reference_state
+            assert reference_state.is_value
+            standard_state = reference_state.value
+            assert (
+                standard_state.convention
+                is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+            )
+            assert standard_state.endmember.formula == formula
+            assert standard_state.endmember.phase.value is Phase.L
+            assert standard_state.component_basis == formula
+            assert standard_state.reference_pressure_bar == Decimal("1")
+    assert all(
+        observation.admission.status is AdmissionStatus.REJECTED
+        and "hypothetical" in observation.admission.reason
+        and observation.identity.reference_state.is_unknown
+        for observation in by_formula["MoO2"]
+    )
