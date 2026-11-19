@@ -87,6 +87,16 @@ experiments:
 - experiment_id: stolyarova-1991-w-cell
   bench_id: stolyarova-kems
   method: knudsen_effusion
+  apparatus:
+    calibration:
+      technique:
+        state: {tag: value, value: mass_spectrometry}
+        locator:
+          page: 1
+          published_page: 3710
+          pdf_page_index: 0
+          section: Experimental
+          note: "The paper states that the work was done using the MS-1301 mass spectrometer."
   locator:
     published_page: 3710
     section: Experimental
@@ -2121,6 +2131,10 @@ species:
       phase_as_printed: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711: "The integration limits were taken from the pure components up to corresponding compositions." The condensed phase of the pure CaO reference for the Gibbs-Duhem comparison is not stated.'
       experiment: stolyarova-1991-w-cell
+      point_conditions:
+        activity_method:
+          state: {tag: value, value: gibbs_duhem_integration}
+          locator: {page: 2, published_page: 3711, pdf_page_index: 1, table: IIa, equation: '[5]', note: "Table IIa labels these CaO activities as obtained using Eq. [5], the Gibbs-Duhem equation printed on this page."}
       regime: kems_effusion
       units: dimensionless activity as printed
       values:
@@ -2295,6 +2309,10 @@ species:
       phase_as_printed: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711: "The integration limits were taken from the pure components up to corresponding compositions." The condensed phase of the pure CaO reference for the Belton-Fruehan comparison is not stated.'
       experiment: stolyarova-1991-w-cell
+      point_conditions:
+        activity_method:
+          state: {tag: value, value: belton_fruehan_integration}
+          locator: {page: 2, published_page: 3711, pdf_page_index: 1, table: IIa, equation: '[7]', note: "The paper identifies Eq. [7] as the Belton-Fruehan equation and uses it for the tabulated CaO activities."}
       regime: kems_effusion
       units: dimensionless activity as printed
       values:
@@ -2683,6 +2701,10 @@ species:
       phase_as_printed: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711: "The integration limits were taken from the pure components up to corresponding compositions." The condensed phase of the pure SiO2 reference for the Gibbs-Duhem comparison is not stated.'
       experiment: stolyarova-1991-w-cell
+      point_conditions:
+        activity_method:
+          state: {tag: value, value: gibbs_duhem_integration}
+          locator: {page: 2, published_page: 3711, pdf_page_index: 1, table: IIb, equation: '[6]', note: "Table IIb marks Eq. [6] as evaluated values; the paper identifies Eq. [6] as its Gibbs-Duhem equation."}
       regime: kems_effusion
       units: dimensionless activity as printed
       values:
@@ -2858,6 +2880,10 @@ species:
       phase_as_printed: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711: "The integration limits were taken from the pure components up to corresponding compositions." The condensed phase of the pure SiO2 reference for the Belton-Fruehan comparison is not stated.'
       experiment: stolyarova-1991-w-cell
+      point_conditions:
+        activity_method:
+          state: {tag: value, value: belton_fruehan_integration}
+          locator: {page: 2, published_page: 3711, pdf_page_index: 1, table: IIb, equation: '[8]', note: "The paper identifies Eq. [8] as the Belton-Fruehan equation and uses it for the tabulated SiO2 activities."}
       regime: kems_effusion
       units: dimensionless activity as printed
       values:

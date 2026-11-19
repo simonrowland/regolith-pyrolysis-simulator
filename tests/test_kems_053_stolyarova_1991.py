@@ -7,6 +7,10 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.enums import Phase, Quantity, UncertaintyKind
+from simulator.battery.method_class_bands import (
+    _located_fact,
+    select_method_class_band,
+)
 from simulator.battery.score import _printed_uncertainty_band
 from tests.battery.test_migrate import _migrate_real_extract
 
@@ -247,3 +251,33 @@ def test_printed_caosio2_melt_phase_maps_on_all_59_observations(
         (2, "IIb", None),
         (4, None, "3"),
     } <= phase_locators
+
+
+def test_kems_applicability_facts_migrate_for_all_36_integrated_activity_rows(
+    tmp_path: Path,
+) -> None:
+    methods = {
+        "stolyarova_1991_cao_activity_eq5_1933k": "gibbs_duhem_integration",
+        "stolyarova_1991_cao_activity_eq7_1933k": "belton_fruehan_integration",
+        "stolyarova_1991_sio2_activity_eq6_1933k": "gibbs_duhem_integration",
+        "stolyarova_1991_sio2_activity_eq8_1933k": "belton_fruehan_integration",
+    }
+    result = _migrate_real_extract(tmp_path / "applicability", EXTRACT_NAME)
+    activity_observations = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.partition("::")[2].split("::", 1)[0]
+        in methods
+    ]
+    assert len(activity_observations) == 36
+
+    for observation in activity_observations:
+        series_id = observation.observation_id.partition("::")[2].split("::", 1)[0]
+        experiment = result.experiments[observation.experiment_id]
+        assert _located_fact(observation, experiment, "technique") == "mass_spectrometry"
+        assert _located_fact(observation, experiment, "activity_method") == methods[series_id]
+        assert _located_fact(observation, experiment, "comparison") is None
+        assert _located_fact(observation, experiment, "sensitivity") is None
+        assert select_method_class_band(observation, experiment) == {
+            "refusal": {"reason": "method_class_applicability_unknown"}
+        }
