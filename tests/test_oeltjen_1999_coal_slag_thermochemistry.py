@@ -15,6 +15,7 @@ from simulator.battery.enums import (
     ReferenceStateConvention,
 )
 from simulator.battery.identity import celsius_to_kelvin
+from simulator.battery.method_class_bands import _located_fact
 from tools import validate_literature_extracts as vle
 
 
@@ -393,9 +394,14 @@ def _assert_digitized_activities(document: dict, contexts: list, result) -> None
         components = row["point_conditions"]["composition"]["state"]["value"]["components"]
         assert components == _TABLE_5_1_MOLE_PERCENT[numeral]
         observation = migrated[row["observation_id"]]
+        experiment = result.experiments[observation.experiment_id]
         assert observation.value.kind.value == "point"
         assert observation.value.point == Decimal(row["values"]["activity"])
         assert observation.identity.quantity.value is Quantity.ACTIVITY
+        assert _located_fact(observation, experiment, "technique") == "mass_spectrometry"
+        assert _located_fact(observation, experiment, "sensitivity") == "stable"
+        assert _located_fact(observation, experiment, "comparison") is None
+        assert _located_fact(observation, experiment, "activity_method") is None
         assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         assert observation.identity.temperature_K.is_value
         temperature_c = Decimal(row["point_conditions"]["T_C"]["state"]["value"]["point"])
