@@ -13,6 +13,7 @@ from engines.alphamelts.thermoengine import (
     ThermoEngineNonFiniteField,
 )
 from simulator.melt_backend.liquidus import (
+    EquilibriumCrystallizationPathResult,
     LiquidusSampleError,
     LiquidusSolidusResult,
     MeltFractionSample,
@@ -66,6 +67,24 @@ def test_liquidus_finder_bisects_monotone_fraction_curve():
 def test_liquidus_result_celsius_kelvin_conversion_is_pinned():
     at_zero_celsius = LiquidusSolidusResult(liquidus_T_C=0.0)
     at_zero_celsius_kelvin = LiquidusSolidusResult(liquidus_T_K=273.15)
+
+    assert at_zero_celsius.liquidus_T_K == pytest.approx(273.15)
+    assert at_zero_celsius_kelvin.liquidus_T_C == pytest.approx(0.0)
+
+
+def test_equilibrium_crystallization_temperature_conversion_is_pinned():
+    at_zero_celsius = EquilibriumCrystallizationPathResult(
+        liquidus_T_C=0.0,
+        solidus_T_C=0.0,
+        liquid_fraction=1.0,
+        status="ok",
+    )
+    at_zero_celsius_kelvin = EquilibriumCrystallizationPathResult(
+        liquidus_T_K=273.15,
+        solidus_T_C=0.0,
+        liquid_fraction=1.0,
+        status="ok",
+    )
 
     assert at_zero_celsius.liquidus_T_K == pytest.approx(273.15)
     assert at_zero_celsius_kelvin.liquidus_T_C == pytest.approx(0.0)
