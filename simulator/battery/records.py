@@ -106,7 +106,6 @@ _LOCATOR_FIELD_ALIASES = {
     "pdf_page": "page",
     "journal_page": "published_page",
     "printed_page": "published_page",
-    "continuation_pdf_page_index": "pdf_page_index",
     "appendix": "section",
     "heading": "section",
     "section_header_as_printed": "section",
@@ -150,6 +149,7 @@ _LOCATOR_EXTRA_KEYS = frozenset(
         "continued_page",
         "continuation_from_locator",
         "continuation_locator",
+        "continuation_pdf_page_index",
         "curve",
         "derivation",
         "draft_row",
@@ -631,8 +631,8 @@ class Locator:
     table: str | None = None
     row: str | None = field(default=None, repr=False)
     column: str | None = field(default=None, repr=False)
-    table_row_number: int | None = None
-    table_column_number: int | None = None
+    table_row_number: int | None = field(default=None, repr=False)
+    table_column_number: int | None = field(default=None, repr=False)
     figure: str | None = None
     paragraph: str | None = None
     section: str | None = None

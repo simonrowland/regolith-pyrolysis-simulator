@@ -23,6 +23,7 @@ from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+pytestmark = pytest.mark.timeout(300)
 _COMPILATION_GENERATOR_RECORDS = (
     ("data/literature/compilations/janaf/tables/Na-014.yaml", 33),
     (
@@ -105,6 +106,120 @@ def test_distinct_locator_extras_round_trip_without_becoming_note() -> None:
     assert encoded["extras"] == extras
     decoded = _locator_from_plain(encoded, refuse_invalid=True)
     assert decoded == locator
+
+
+def test_shornikov_pixel_read_extras_keep_numeric_types_through_yaml() -> None:
+    from simulator.battery.migrate import _locator_from_plain
+
+    document = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/shornikov-2020-mgo-feo-melts.yaml")
+        .read_text(encoding="utf-8")
+    )
+    raw = document["species"]["MgO-FeO_melt"]["observations"][36]["locator"]
+    assert raw["pixel_read_1_page"] == [4230.5, 4073.5]
+    locator = _locator_from_plain(raw, refuse_invalid=True)
+    encoded = yaml.safe_load(yaml.safe_dump(to_plain(locator)))
+    decoded = _locator_from_plain(encoded, refuse_invalid=True)
+    assert decoded.extras == locator.extras
+    assert all(type(value) is float for value in decoded.extras["pixel_read_1_page"])
+
+
+@pytest.mark.parametrize("shard", range(16))
+def test_live_corpus_structured_locator_extras_round_trip(shard: int) -> None:
+    from simulator.battery.migrate import _locator_from_plain, discover_extracts
+
+    paths = discover_extracts(REPO_ROOT / "data/literature/extracts")[shard::16]
+    for path in paths:
+        pending = [yaml.safe_load(path.read_text(encoding="utf-8"))]
+        while pending:
+            node = pending.pop()
+            if isinstance(node, dict):
+                for key, value in node.items():
+                    if key in {"locator", "source_locator"} and isinstance(value, dict):
+                        try:
+                            locator = _locator_from_plain(value, refuse_invalid=True)
+                        except ValueError:
+                            continue  # Invalid extracts have separate typed-refusal guards.
+                        if locator is not None and locator.extras:
+                            encoded = to_plain(locator)
+                            decoded = _locator_from_plain(encoded, refuse_invalid=True)
+                            assert decoded.extras == locator.extras, (path, value, encoded)
+                    pending.append(value)
+            elif isinstance(node, list):
+                pending.extend(node)
+
+
+def test_gibbons_continuation_page_is_a_distinct_extra_fact() -> None:
+    from simulator.battery.migrate import _locator_from_plain
+
+    document = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/gibbons-1963-thesis-cas-slags-cas.yaml")
+        .read_text(encoding="utf-8")
+    )
+    raw = next(
+        row["locator"] for row in document["species"]["CaO"]["context"]
+        if row["observation_id"] == "gibbons_1963_table_iii_lime_alumina_silica_runs"
+    )
+    assert raw["pdf_page_index"] == 57
+    assert raw["continuation_pdf_page_index"] == 58
+    locator = _locator_from_plain(raw, refuse_invalid=True)
+    assert locator.pdf_page_index == 57
+    assert locator.extras["continuation_pdf_page_index"] == 58
+    assert _locator_from_plain(to_plain(locator), refuse_invalid=True) == locator
+
+
+def test_unset_grid_indexes_preserve_engine_point_locator_repr() -> None:
+    assert repr(Locator(page=2, table="I")) == (
+        "Locator(page=2, published_page=None, pdf_page_index=None, "
+        "page_verification=None, table_caption_page=None, table_continued=None, "
+        "table='I', figure=None, paragraph=None, section=None, equation=None, "
+        "line_range=None, note=None, source_path=None, record=None)"
+    )
+
+
+@pytest.mark.parametrize("finding", ["extras", "continuation", "persisted", "repr"])
+def test_locator_fix_regressions_detect_reverted_mechanisms(
+    finding: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery import migrate as migrate_module
+    from simulator.battery import records
+
+    with monkeypatch.context() as mutation:
+        if finding == "extras":
+            original = to_plain
+
+            def lossy(value):
+                encoded = original(value)
+                if isinstance(value, Locator) and value.extras:
+                    encoded["extras"] = original(value.extras)
+                return encoded
+
+            mutation.setitem(globals(), "to_plain", lossy)
+            with pytest.raises(AssertionError):
+                test_shornikov_pixel_read_extras_keep_numeric_types_through_yaml()
+        elif finding == "continuation":
+            mutation.setitem(records._LOCATOR_FIELD_ALIASES, "continuation_pdf_page_index", "pdf_page_index")
+            mutation.setattr(migrate_module, "_LOCATOR_EXTRA_KEYS", records._LOCATOR_EXTRA_KEYS - {"continuation_pdf_page_index"})
+            with pytest.raises(ValueError, match="conflicting locator fields"):
+                test_gibbons_continuation_page_is_a_distinct_extra_fact()
+        elif finding == "persisted":
+            result = migrate(_write_min_tree(tmp_path), write=False)
+            payload = to_plain(next(iter(result.observations.values())))
+            payload["locator"].update({"row": "A", "row_label": "B"})
+            with pytest.raises(ValueError):
+                observation_from_plain(payload)
+            mutation.setattr(migrate_module, "_validate_persisted_locator_mappings", lambda _payload: None)
+            with pytest.raises(pytest.fail.Exception):
+                with pytest.raises(ValueError):
+                    observation_from_plain(payload)
+        else:
+            original_repr = Locator.__repr__
+            mutation.setattr(
+                Locator, "__repr__",
+                lambda value: original_repr(value)[:-1] + ", table_row_number=None, table_column_number=None)",
+            )
+            with pytest.raises(AssertionError):
+                test_unset_grid_indexes_preserve_engine_point_locator_repr()
 
 
 @pytest.mark.parametrize(
@@ -415,31 +530,18 @@ def test_canonical_and_alias_page_indexes_normalize_before_conflict_check() -> N
     canonical = locator_from_mapping(
         {"pdf_page_index": "1", "section": "Methods"}
     )
-    same_value_alias = locator_from_mapping(
-        {
-            "pdf_page_index": "1",
-            "continuation_pdf_page_index": 1,
-            "section": "Methods",
-        }
-    )
     invalid = locator_from_mapping(
         {"pdf_page_index": "page one", "section": "Methods"}
-    )
-    invalid_alias = locator_from_mapping(
-        {"continuation_pdf_page_index": "page one", "section": "Methods"}
     )
     legacy_range = locator_from_mapping(
         {"pdf_page_index": "14–15", "section": "Methods"}
     )
 
     assert canonical is not None and canonical.pdf_page_index == 1
-    assert same_value_alias == canonical
     assert invalid is None
-    assert invalid_alias is None
     assert legacy_range is not None and legacy_range.pdf_page_index == "14–15"
     for bad_locator in (
         {"pdf_page_index": "page one", "section": "Methods"},
-        {"continuation_pdf_page_index": "page one", "section": "Methods"},
     ):
         with pytest.raises(ValueError) as exc_info:
             _locator_from_plain(bad_locator, refuse_invalid=True)
@@ -490,6 +592,28 @@ def test_persisted_observation_refuses_unknown_locator_keys(tmp_path: Path) -> N
 
     assert getattr(exc_info.value, "reason", None) is RefusalReason.INVALID_SOURCE
     assert "unreviewed_locator_axis" in str(exc_info.value)
+
+
+@pytest.mark.parametrize("decoder_name", [
+    "work_from_plain", "bench_from_plain", "experiment_from_plain", "observation_from_plain",
+])
+@pytest.mark.parametrize("location_path", ["locator", "source_locator", "admission_evidence"])
+def test_persisted_boundaries_refuse_conflicting_aliases(
+    decoder_name: str, location_path: str,
+) -> None:
+    from simulator.battery import migrate as migrate_module
+
+    conflict = {"page": 2, "row": "A", "row_label": "B"}
+    payload = (
+        {"admission": {"decided_by": {"evidence": conflict}}}
+        if location_path == "admission_evidence"
+        else {location_path: conflict}
+    )
+    with pytest.raises(ValueError) as exc_info:
+        getattr(migrate_module, decoder_name)(payload)
+    assert exc_info.value.reason is RefusalReason.INVALID_SOURCE
+    assert "conflicting locator fields" in str(exc_info.value)
+    assert "row_label" in str(exc_info.value)
 
 
 def test_persisted_admission_decision_evidence_refuses_unknown_locator_keys(
