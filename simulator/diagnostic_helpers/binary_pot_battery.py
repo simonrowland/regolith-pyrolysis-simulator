@@ -3307,6 +3307,11 @@ class _OpenImccBatteryBackend:
                 }
             )
 
+        gas_parent_oxide_activities = {
+            name: result.parent_oxide_activities[name]
+            for name in result.parent_oxides
+            if name in result.parent_oxide_activities
+        }
         pressures: dict[str, float] = {}
         vapor_sources: dict[str, str] = {}
         gas_diagnostics: dict[str, Any] = {}
@@ -3332,7 +3337,7 @@ class _OpenImccBatteryBackend:
                 )
 
                 po2_bar, gas_result, balance = evaluate_gas_oxygen_balance(
-                    result.parent_oxide_activities,
+                    gas_parent_oxide_activities,
                     temperature_K,
                     self._gas,
                     parent_oxides=result.parent_oxides,
@@ -3364,7 +3369,7 @@ class _OpenImccBatteryBackend:
                     )
                 )
                 base_species = _openimcc_oxygen_balance_species_metadata(
-                    result.parent_oxide_activities,
+                    gas_parent_oxide_activities,
                     temperature_K,
                     self._gas,
                     channels,
@@ -3373,7 +3378,7 @@ class _OpenImccBatteryBackend:
 
                 def pressure_model(pO2_bar: float) -> Mapping[str, float]:
                     return evaluate_gas(
-                        result.parent_oxide_activities,
+                        gas_parent_oxide_activities,
                         temperature_K,
                         pO2_bar,
                         self._gas,
@@ -3393,7 +3398,7 @@ class _OpenImccBatteryBackend:
                     )
                 )
                 gas_result = evaluate_gas(
-                    result.parent_oxide_activities,
+                    gas_parent_oxide_activities,
                     temperature_K,
                     po2_bar,
                     self._gas,
@@ -3474,7 +3479,7 @@ class _OpenImccBatteryBackend:
 
                 fo2_bar = 10.0 ** float(fO2_log)
                 gas_result = evaluate_gas(
-                    result.parent_oxide_activities,
+                    gas_parent_oxide_activities,
                     temperature_K,
                     fo2_bar,
                     self._gas,
@@ -3514,6 +3519,13 @@ class _OpenImccBatteryBackend:
             "pack": result.pack_version,
             "pack_digest": result.pack_digest,
         }
+        trace_activity_models = (
+            self._bridge._trace_activity_models_for_components(
+                result.parent_oxide_activities
+            )
+        )
+        if trace_activity_models:
+            provenance["trace_activity_models"] = trace_activity_models
         if "engine_binding_identity" in self._identity:
             provenance["engine_binding_identity"] = self._identity[
                 "engine_binding_identity"
