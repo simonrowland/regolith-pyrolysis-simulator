@@ -3119,6 +3119,16 @@ def gate_curve_provider_outcome_for_status(
         return GateCurveProviderOutcome.FAILED
     if "parse_empty_output" in reasons and not magemin_invalid_output:
         return GateCurveProviderOutcome.FAILED
+    # A deficient MAGEMin Mode vector plus missing fO2 readback is the
+    # reviewed combined failure: keep it fail-closed even though the
+    # fO2-specific reason is normally classified as numerical.
+    if (
+        normalized_status == "not_converged"
+        and "engine_not_converged" in reasons
+        and isinstance(diagnostic, Mapping)
+        and diagnostic.get("magemin_mode_vector_mass_deficit") is True
+    ):
+        return GateCurveProviderOutcome.FAILED
     numerical_reasons = {
         "not_converged", "engine_not_converged", "negative_convergence_evidence",
         "no_convergence", "phase_mass_incomplete",
