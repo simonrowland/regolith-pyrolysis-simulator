@@ -1058,6 +1058,45 @@ class OverheadGas:
     # Evaporation rate as % of pipe conductance (0-100+)
     # >100% triggers ΔT/dt throttling
 
+    required_throat_diameter_m: float | None = None
+    # Circular-equivalent diameter needed to carry this tick's transport demand
+
+    required_throat_diameter_peak_m: float = 0.0
+    # Largest finite required diameter during this run
+
+    required_throat_diameter_status: str = "unavailable_not_computed"
+    # Typed status for the required-diameter diagnostic
+
+    train_mass_flow_kg_hr: float = 0.0
+    # Process demand entering the shared condenser train this tick
+
+    train_peak_mass_flow_kg_hr: float = 0.0
+    # Highest per-tick demand entering the train during this run
+
+    train_time_averaged_mass_flow_kg_hr: float = 0.0
+    # Cumulative demanded mass divided by elapsed simulation time
+
+    train_mass_flow_integral_kg: float = 0.0
+    # Internal cumulative sum of demand [kg/hr] × tick duration [hr]
+
+    train_flow_elapsed_hr: float = 0.0
+    # Internal duration represented by the train-flow integral
+
+    fixed_pressure_holdup_nonphysical: bool = False
+    # This tick retained gas at a commanded fixed pressure without a buffer model
+
+    fixed_pressure_holdup_kg: float = 0.0
+    # Retained gas mass at the pinned pressure for this tick
+
+    fixed_pressure_holdup_pinned_pressure_mbar: float = 0.0
+    # Commanded total pressure associated with this tick's retained gas
+
+    fixed_pressure_holdup_observed: bool = False
+    # At least one tick retained gas at pinned pressure during this run
+
+    fixed_pressure_holdup_peak_kg: float = 0.0
+    # Largest observed fixed-pressure holdup during this run
+
 
 ENERGY_SCOPE_ELECTRICAL_PLUS_KNOWN_EVAPORATION = (
     "electrical_plus_known_evaporation_enthalpy"

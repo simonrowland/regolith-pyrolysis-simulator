@@ -1433,6 +1433,34 @@ class PyrolysisRun:
             "liquid_fraction_provider": sim.record.liquid_fraction_provider,
             "kernel_commit_sha": kernel_commit_sha,
         }
+        overhead_gas = sim.overhead
+        drain_diagnostics = {
+            "required_throat_diameter_peak_m": float(
+                overhead_gas.required_throat_diameter_peak_m
+            ),
+            "train_peak_mass_flow_kg_hr": float(
+                overhead_gas.train_peak_mass_flow_kg_hr
+            ),
+            "train_time_averaged_mass_flow_kg_hr": float(
+                overhead_gas.train_time_averaged_mass_flow_kg_hr
+            ),
+            "fixed_pressure_holdup_nonphysical_observed": bool(
+                overhead_gas.fixed_pressure_holdup_observed
+            ),
+            "fixed_pressure_holdup_peak_kg": float(
+                overhead_gas.fixed_pressure_holdup_peak_kg
+            ),
+            "fixed_pressure_holdup_pinned_pressure_mbar": float(
+                overhead_gas.fixed_pressure_holdup_pinned_pressure_mbar
+            ),
+        }
+        if overhead_gas.fixed_pressure_holdup_observed:
+            drain_diagnostics["notice"] = (
+                "non-physical fixed-pressure holdup was present at a pinned "
+                f"pressure of {overhead_gas.fixed_pressure_holdup_pinned_pressure_mbar:.6g} mbar; "
+                "no physical buffer volume or pressure is modeled"
+            )
+        run_metadata["overhead_drain_diagnostics"] = drain_diagnostics
         c3_credit_dose_kg = _c3_alkali_dosing_kg_by_species(
             session_config.setpoints
         )
@@ -2859,6 +2887,27 @@ def build_per_hour_summary(
         "condensation_train_kg_cumulative": condensation_train_kg_cumulative,
         "recycled_to_reagent_kg_cumulative": recycled_to_reagent_kg_cumulative,
         "vapor_species_kg_hr": _vapor_species_kg_hr(snapshot),
+        "required_throat_diameter_m": (
+            snapshot.overhead.required_throat_diameter_m
+        ),
+        "required_throat_diameter_status": (
+            snapshot.overhead.required_throat_diameter_status
+        ),
+        "train_mass_flow_kg_hr": float(
+            snapshot.overhead.train_mass_flow_kg_hr
+        ),
+        "train_peak_mass_flow_kg_hr": float(
+            snapshot.overhead.train_peak_mass_flow_kg_hr
+        ),
+        "train_time_averaged_mass_flow_kg_hr": float(
+            snapshot.overhead.train_time_averaged_mass_flow_kg_hr
+        ),
+        "fixed_pressure_holdup_nonphysical": bool(
+            snapshot.overhead.fixed_pressure_holdup_nonphysical
+        ),
+        "fixed_pressure_holdup_kg": float(
+            snapshot.overhead.fixed_pressure_holdup_kg
+        ),
         "wall_deposit_delta_kg": _nested_species_kg_from_segment_species(
             snapshot.wall_deposit_by_segment_species_delta,
         ),
@@ -2873,6 +2922,13 @@ def build_per_hour_summary(
         **_mre_ellingham_ladder_diagnostic_observables(snapshot),
         **fe_redox_split_observables,
     }
+    if snapshot.overhead.fixed_pressure_holdup_nonphysical:
+        summary["fixed_pressure_holdup_notice"] = (
+            "non-physical fixed-pressure holdup: "
+            f"{snapshot.overhead.fixed_pressure_holdup_kg:.6g} kg at "
+            f"p_total={snapshot.overhead.fixed_pressure_holdup_pinned_pressure_mbar:.6g} mbar; "
+            "no physical buffer volume or pressure is modeled"
+        )
     if fe_redox_split_observables and hasattr(sim, "_stage3_fe_wt_pct_diagnostic"):
         stage3 = sim._stage3_fe_wt_pct_diagnostic()
         summary["stage_3_capture"] = {

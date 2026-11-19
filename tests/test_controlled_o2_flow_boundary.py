@@ -13,7 +13,10 @@ from engines.builtin.overhead_bleed import (
     controlled_flow_capacity,
 )
 from simulator.core import PyrolysisSimulator
-from simulator.overhead import OverheadGasModel
+from simulator.overhead import (
+    OverheadGasModel,
+    required_throat_diameter_for_flow,
+)
 from simulator.state import Atmosphere, EvaporationFlux
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
 
@@ -88,6 +91,40 @@ def test_retained_holdup_drains_and_throttle_clears_only_after_evacuation():
     )
     assert recovered.swallowed_flux_kg_hr == 0.0
     assert recovered.saturation == 0.0
+
+
+def test_required_throat_diameter_inverts_poiseuille_fourth_power_scaling():
+    same_load, same_status = required_throat_diameter_for_flow(
+        0.12, 10.0, 10.0
+    )
+    sixteenfold_load, scaled_status = required_throat_diameter_for_flow(
+        0.12, 160.0, 10.0
+    )
+
+    assert same_status == "ok"
+    assert same_load == pytest.approx(0.12)
+    assert scaled_status == "ok"
+    assert sixteenfold_load == pytest.approx(0.24)
+
+
+def test_required_throat_diameter_reports_zero_capacity_as_unavailable():
+    diameter, status = required_throat_diameter_for_flow(0.12, 1.0, 0.0)
+
+    assert diameter is None
+    assert status == "unavailable_zero_pipe_capacity"
+
+
+def test_controlled_flow_reports_holdup_remaining_after_tick():
+    flow = controlled_flow_capacity(
+        pipe_capacity_kg_hr=0.25,
+        equipment_capacity_kg_hr=0.25,
+        evolved_flux_kg_hr=1.0,
+        retained_holdup_kg=0.0,
+        dt_hr=1.0,
+        upstream_pressure_bar=0.001,
+    )
+
+    assert flow.retained_holdup_after_tick_kg == pytest.approx(0.75)
 
 
 def test_d452_numeric_pin_for_original_fixed_throat_anchor():

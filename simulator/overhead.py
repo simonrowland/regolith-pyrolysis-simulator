@@ -50,7 +50,7 @@ populate; turbine speed/capacity is not an input to this model.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Mapping, Optional
 
 from simulator.environment import (
@@ -263,6 +263,37 @@ def _required_finite_nonnegative_float(value: Any, field_name: str) -> float:
             f'{field_name} values must be finite and >= 0'
         )
     return result
+
+
+def required_throat_diameter_for_flow(
+    current_diameter_m: float,
+    demand_kg_hr: float,
+    pipe_capacity_kg_hr: float,
+) -> tuple[float | None, str]:
+    """Return the diameter needed for a demand at the current setpoint pressure.
+
+    Premise: at the same pressure, temperature, gas mix and pipe length,
+    compressible Poiseuille capacity is proportional to d⁴. If the current
+    diameter carries ``pipe_capacity``, solving demand / capacity =
+    (d_required / d_current)⁴ gives d_required = d_current ×
+    (demand / pipe_capacity)^(1/4). The ratio is dimensionless, so the result
+    remains metres. Sanity: demand == capacity returns the current diameter.
+    """
+
+    diameter = _required_finite_nonnegative_float(
+        current_diameter_m, "current_diameter_m"
+    )
+    demand = _required_finite_nonnegative_float(demand_kg_hr, "demand_kg_hr")
+    capacity = _required_finite_nonnegative_float(
+        pipe_capacity_kg_hr, "pipe_capacity_kg_hr"
+    )
+    if demand == 0.0:
+        return 0.0, "no_demand"
+    if capacity <= 0.0:
+        return None, "unavailable_zero_pipe_capacity"
+    if diameter <= 0.0:
+        return None, "unavailable_zero_current_diameter"
+    return diameter * (demand / capacity) ** 0.25, "ok"
 
 
 def validate_condenser_geometry_config(config: Mapping | None) -> dict[str, Any]:
@@ -764,7 +795,7 @@ class OverheadGasModel:
         melt: MeltState,
         p_downstream_bar: Optional[float] = None,
         effective_transport_capacity: Optional[EffectiveTransportCapacity] = None,
-    ) -> dict[str, float]:
+    ) -> dict[str, Any]:
         """Estimate pipe pressure/capacity with the existing Poiseuille model."""
 
         conductance_temperature_C = _required_finite_float(
@@ -811,6 +842,12 @@ class OverheadGasModel:
             )
             conductance = pipe_conductance_kg_hr / 3600.0
             vapor_pressure_mbar = allowed_pressure_Pa / 100.0
+            required_diameter_m = (
+                effective_transport_capacity.required_throat_diameter_m
+            )
+            required_diameter_status = (
+                effective_transport_capacity.required_throat_diameter_status
+            )
         else:
             conductance = self._pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream/downstream pressures
                 allowed_pressure_Pa,
@@ -819,6 +856,13 @@ class OverheadGasModel:
                 species_kg_for_M_avg=evap_flux.species_kg_hr,  # kg/hr by species — composition basis for M_avg
             )
             pipe_conductance_kg_hr = conductance * 3600.0  # kg/hr — capacity at allowed pressure; kg/s -> kg/hr
+            required_diameter_m, required_diameter_status = (
+                required_throat_diameter_for_flow(
+                    self.pipe_diameter_m,
+                    total_evap_kg_hr,
+                    pipe_conductance_kg_hr,
+                )
+            )
         if not controlled_flow and conductance > 0.0:
             vapor_pressure_mbar = self._vapor_pressure_mbar_from_flux(  # mbar — steady-state throughput pressure, sqrt(Poiseuille balance)
                 total_evap_kg_hr / 3600.0,  # kg/s — evaporation mass flow
@@ -876,6 +920,8 @@ class OverheadGasModel:
             'conductance_kg_s': conductance,  # kg/s — PIPE-1 capacity at allowed upstream and downstream pressures, not at the arithmetic mean
             'conductance_kg_s_per_bar': conductance,  # kg/s — deprecated compatibility alias; not per-bar
             'pipe_conductance_kg_hr': pipe_conductance_kg_hr,  # kg/hr — pipe mass-flow capacity
+            'required_throat_diameter_m': required_diameter_m,
+            'required_throat_diameter_status': required_diameter_status,
             'pipe_capacity_used_pct': pipe_capacity_used_pct,  # percent — capacity used
             'vapor_pressure_mbar': vapor_pressure_mbar,  # mbar — steady-state vapor partial pressure
             'pressure_mbar': pressure_mbar,  # mbar — reported total overhead pressure
@@ -928,7 +974,7 @@ class OverheadGasModel:
             isinstance(cold_train_capacity, NoColdTrain)
             and cold_train_capacity.reason == "runtime_enforcement_disabled"
         )
-        return controlled_flow_capacity(
+        flow = controlled_flow_capacity(
             pipe_capacity_kg_hr=pipe_capacity_kg_hr,
             equipment_capacity_kg_hr=equipment_capacity,
             evolved_flux_kg_hr=evap_flux.total_kg_hr,
@@ -936,6 +982,18 @@ class OverheadGasModel:
             dt_hr=dt_hr,
             equipment_capacity_required=equipment_capacity_required,
             upstream_pressure_bar=allowed_pressure_Pa / PA_PER_BAR,
+        )
+        required_diameter_m, required_diameter_status = (
+            required_throat_diameter_for_flow(
+                self.pipe_diameter_m,
+                flow.demand_flux_kg_hr,
+                flow.pipe_capacity_kg_hr,
+            )
+        )
+        return replace(
+            flow,
+            required_throat_diameter_m=required_diameter_m,
+            required_throat_diameter_status=required_diameter_status,
         )
 
     def _resolve_liner_temperature_value(
@@ -1163,6 +1221,72 @@ class OverheadGasModel:
         # >100% means evaporation exceeds transport → triggers ΔT/dt throttle.
         gas.transport_saturation_pct = transport_state['pipe_capacity_used_pct']  # percent — pipe capacity used
         gas.transport_binding_cause = transport_state['transport_binding_cause']
+        gas.required_throat_diameter_m = transport_state[
+            'required_throat_diameter_m'
+        ]
+        gas.required_throat_diameter_status = transport_state[
+            'required_throat_diameter_status'
+        ]
+        if gas.required_throat_diameter_m is not None:
+            gas.required_throat_diameter_peak_m = max(
+                gas.required_throat_diameter_peak_m,
+                gas.required_throat_diameter_m,
+            )
+
+        # Train sizing follows the current process source rate. Historical
+        # holdup contributes to required throat diameter, but is not counted
+        # again as newly evolved train load. Updates occur once per simulation
+        # hour, matching HourSnapshot.duration_h.
+        gas.train_mass_flow_kg_hr = max(
+            0.0,
+            float(
+                transport_inlet_kg_hr
+                if transport_inlet_kg_hr is not None
+                else upstream_flux.total_kg_hr
+            ),
+        )
+        gas.train_peak_mass_flow_kg_hr = max(
+            gas.train_peak_mass_flow_kg_hr,
+            gas.train_mass_flow_kg_hr,
+        )
+        gas.train_mass_flow_integral_kg += gas.train_mass_flow_kg_hr
+        gas.train_flow_elapsed_hr += 1.0
+        gas.train_time_averaged_mass_flow_kg_hr = (
+            gas.train_mass_flow_integral_kg / gas.train_flow_elapsed_hr
+        )
+
+        retained_before_tick = (
+            effective_transport_capacity.retained_holdup_kg
+            if (
+                effective_transport_capacity is not None
+                and self._finite_headspace_enabled
+            )
+            else 0.0
+        )
+        retained_after_tick = (
+            effective_transport_capacity.retained_holdup_after_tick_kg
+            if (
+                effective_transport_capacity is not None
+                and self._finite_headspace_enabled
+            )
+            else 0.0
+        )
+        gas.fixed_pressure_holdup_nonphysical = (
+            retained_before_tick > 0.0 or retained_after_tick > 0.0
+        )
+        gas.fixed_pressure_holdup_kg = max(
+            retained_before_tick, retained_after_tick
+        )
+        if retained_before_tick > 0.0 or retained_after_tick > 0.0:
+            gas.fixed_pressure_holdup_pinned_pressure_mbar = max(
+                0.0, float(melt.p_total_mbar)
+            )
+            gas.fixed_pressure_holdup_observed = True
+            gas.fixed_pressure_holdup_peak_kg = max(
+                gas.fixed_pressure_holdup_peak_kg,
+                retained_before_tick,
+                retained_after_tick,
+            )
 
         gas.evap_exceeds_transport = gas.transport_saturation_pct > 100.0  # dimensionless bool — transport over-capacity flag
 
