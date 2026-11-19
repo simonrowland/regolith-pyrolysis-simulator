@@ -687,11 +687,12 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
     }
 
 
-def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
+def test_openimcc_candidate_pins_legacy_cr_output_and_refuses_unmodelled_total(
     monkeypatch: pytest.MonkeyPatch,
 ):
     pytest.importorskip("openimcc")
     import openimcc
+    from simulator.battery import score as score_module
 
     result = _migrate_berry_cr()
     observation = next(
@@ -744,16 +745,31 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
         Engine.OPENIMCC, observation, experiment=experiment
     )
 
-    assert prediction.value is not None, prediction.refusal_detail
     assert prediction.execution.call_evidence == "openimcc.evaluate_redox"
     assert len(calls) == 1
     args, kwargs, output = calls[0]
     assert args[0]["Cr"] > 0.0
     assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
-    expected_fraction = output.chromous_cr_mol / (
-        output.chromous_cr_mol + output.chromic_cr_mol
+    assert output.chromous_cr_mol == 0.0002444200024627717
+    assert output.chromic_cr_mol == 0.026073239410179725
+    ledger_fraction = score_module._openimcc_candidate_valence_value(
+        observation.identity, output, (2, 3)
     )
-    assert float(prediction.value) == pytest.approx(expected_fraction, rel=1e-12)
+    assert ledger_fraction is not None
+    assert Decimal(str(ledger_fraction)) == Decimal("0.009287300159578668")
+    chromium_coverage = next(
+        entry
+        for entry in output.unmodelled_redox_couples
+        if entry["element"] == "Cr"
+    )
+    assert tuple(chromium_coverage["modelled_states"]) == (2, 3)
+    assert tuple(chromium_coverage["unmodelled_states"]) == (6,)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == (
+        "openimcc_redox_couple_not_in_pinned_pack"
+    )
+    assert prediction.refusal_detail["unmodelled_states"] == (6,)
 
 
 def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
@@ -820,16 +836,16 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
     args, kwargs, output = calls[0]
     assert args[0]["Ti"] > 0.0
     assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
-    expected_ratio = output.titanous_ti_mol / output.titanic_ti_mol
-    assert float(prediction.value) == pytest.approx(expected_ratio, rel=1e-12)
+    assert output.titanous_ti_mol == 0.0002885915704367488
+    assert output.titanic_ti_mol == 0.024753667241308078
+    assert prediction.value == Decimal("0.011658538010689464")
 
 
-def test_openimcc_candidate_projects_mn_from_generic_state_ledger(
+def test_openimcc_refuses_mn_rows_when_pinned_pack_omits_mn3(
     monkeypatch: pytest.MonkeyPatch,
 ):
     pytest.importorskip("openimcc")
     import openimcc
-    from simulator.battery import score as score_module
 
     lee_mn = Migrator(ROOT)
     lee_mn._migrate_extract(LEE_BRUCKNER_MN)
@@ -846,17 +862,22 @@ def test_openimcc_candidate_projects_mn_from_generic_state_ledger(
     # (physical PDF page 2), checked against the 180 dpi page render.
     assert printed.value.point == Decimal("0.0567")
     assert printed.locator.published_page == 8
+    printed_basis = printed.identity.valence_basis.value
+    assert printed_basis.numerator_oxidation_states == (3,)
+    assert printed_basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+    assert printed_basis.value_form is ValenceValueForm.FRACTION
 
-    berry = _migrate_berry_cr()
-    template = next(
-        row
-        for observation_id, row in berry.observations.items()
-        if observation_id.startswith(
-            "berry-oneill-2004-chromium-xanes::"
-            "berry_2004_table3_ad_en_r01::"
-        )
+    # Lee and Brückner report both Mn3+/sumMn and Mn3+/Mn2+. The first needs
+    # every Mn valence in the total-element denominator; the second needs its
+    # explicit Mn2+ denominator. Neither is scoreable when Mn3+ is unmodelled.
+    mn3_over_mn2 = parse_valence_basis(
+        "Mn3plus_over_Mn2plus", species_formula="Mn"
     )
-    experiment = berry.experiments[template.experiment_id]
+    assert mn3_over_mn2.numerator_oxidation_states == (3,)
+    assert mn3_over_mn2.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
+    assert mn3_over_mn2.denominator_oxidation_state == 2
+    assert mn3_over_mn2.value_form is ValenceValueForm.RATIO
+
     composition = Composition(
         basis="test_candidate_oxide_mass_percent",
         components=(
@@ -870,15 +891,20 @@ def test_openimcc_candidate_projects_mn_from_generic_state_ledger(
         amount_basis=AmountBasis.MASS_PERCENT,
         input_provenance=PRINTED_STARTING_BULK,
     )
-    mn_identity = replace(
-        template.identity,
-        species=Species("Mn", Phase.L),
-        valence_basis=State.of(
-            parse_valence_basis("Mn3plus_over_total_Mn", species_formula="Mn")
+    observation = replace(
+        printed,
+        identity=replace(
+            printed.identity,
+            species=Species("Mn", Phase.L),
+            # The published row has no temperature or fO2. Supply explicit
+            # fixture inputs so this assertion reaches the candidate pack,
+            # while retaining the printed value and valence basis on the row.
+            temperature_K=State.of(Decimal("1700")),
+            fO2_Pa=State.of(Decimal("0.00001")),
+            composition=State.of(composition),
         ),
-        composition=State.of(composition),
     )
-    observation = replace(template, identity=mn_identity)
+    experiment = lee_mn.result.experiments[printed.experiment_id]
     calls = []
     evaluate_redox = openimcc.evaluate_redox
 
@@ -888,61 +914,59 @@ def test_openimcc_candidate_projects_mn_from_generic_state_ledger(
         return output
 
     monkeypatch.setattr(openimcc, "evaluate_redox", capture)
-    prediction = predict_with_engine(
+    fraction_prediction = predict_with_engine(
         Engine.OPENIMCC, observation, experiment=experiment
     )
-
-    assert prediction.value is not None, prediction.refusal_detail
-    assert float(prediction.value) == 0.0
-    assert len(calls) == 1
-    args, kwargs, output = calls[0]
-    assert args[0]["Mn"] > 0.0
-    assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
-    mn_states = output.element_moles_by_oxidation_state["Mn"]
-    assert mn_states.get(2, 0.0) > 0.0
-    assert mn_states.get(3, 0.0) == 0.0
-
-    # With no denominator state in the process-local engine result, the same
-    # candidate path must refuse instead of dividing by zero or inventing 0.
-    ratio_identity = replace(
-        observation.identity,
-        valence_basis=State.of(
-            parse_valence_basis("Mn3plus_over_Mn2plus", species_formula="Mn")
+    ratio_observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            valence_basis=State.of(mn3_over_mn2),
         ),
     )
-    ratio_observation = replace(observation, identity=ratio_identity)
+    ratio_prediction = predict_with_engine(
+        Engine.OPENIMCC, ratio_observation, experiment=experiment
+    )
+
+    assert len(calls) == 2
+    for prediction in (fraction_prediction, ratio_prediction):
+        assert prediction.value is None
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.execution.state is ExecutionState.UNSUPPORTED
+        assert prediction.refusal_detail["reason"] == (
+            "openimcc_redox_couple_not_in_pinned_pack"
+        )
+        assert prediction.refusal_detail["species"] == "Mn"
+        assert prediction.refusal_detail["modelled_states"] == (2,)
+        assert prediction.refusal_detail["unmodelled_states"] == (3,)
+
+    for args, kwargs, output in calls:
+        assert args[0]["Mn"] > 0.0
+        assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
+        manganese_coverage = next(
+            entry
+            for entry in output.unmodelled_redox_couples
+            if entry["element"] == "Mn"
+        )
+        assert tuple(manganese_coverage["modelled_states"]) == (2,)
+        assert tuple(manganese_coverage["unmodelled_states"]) == (3,)
+
     empty_denominator_output = replace(
-        output, element_moles_by_oxidation_state={"Mn": {3: 1.0}}
+        calls[0][2],
+        element_moles_by_oxidation_state={"Mn": {3: 1.0}},
+        unmodelled_redox_couples=(),
     )
     monkeypatch.setattr(
         openimcc,
         "evaluate_redox",
         lambda *_args, **_kwargs: empty_denominator_output,
     )
-    refused = predict_with_engine(
+    empty_denominator = predict_with_engine(
         Engine.OPENIMCC, ratio_observation, experiment=experiment
     )
-    assert refused.refusal_reason is RefusalReason.METRIC_DOMAIN
-    assert refused.refusal_detail["reason"] == "openimcc_valence_abundance_undefined"
-
-    # Removing Mn from candidate dispatch in this process restores the prior
-    # typed unsupported result, proving the test exercises the new gate.
-    candidate_states = score_module._openimcc_candidate_valence_states
-
-    def without_mn(identity):
-        if identity.species is not None and identity.species.formula == "Mn":
-            return None
-        return candidate_states(identity)
-
-    monkeypatch.setattr(
-        score_module, "_openimcc_candidate_valence_states", without_mn
-    )
-    unsupported = predict_with_engine(
-        Engine.OPENIMCC, observation, experiment=experiment
-    )
-    assert unsupported.refusal_reason is RefusalReason.UNSUPPORTED
-    assert unsupported.refusal_detail["reason"] == (
-        "openimcc_redox_couple_not_in_pinned_pack"
+    assert empty_denominator.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert empty_denominator.refusal_detail["reason"] == (
+        "openimcc_valence_abundance_undefined"
     )
 
 
