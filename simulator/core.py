@@ -5277,7 +5277,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return None
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.melt_backend.magemin import (
-            _liquidus_evaluated_bulk_silica_diagnostic,
+            MAGEMinBackend,
+            evaluated_silica_verdict,
         )
 
         provider_inputs = self._silicate_provider_melt_inputs(
@@ -5285,12 +5286,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if provider_inputs is None:
             return None
-        evaluated_diagnostic = _liquidus_evaluated_bulk_silica_diagnostic(
+        evaluated_diagnostic = evaluated_silica_verdict(
             {'process.cleaned_melt': provider_inputs.composition_mol},
+            MAGEMinBackend._DEFAULT_DATABASE,
             species_formula_registry=self.species_formula_registry,
-            projected_retry=str(curve.get('source') or '').endswith(
-                ':composition_projected'
-            ),
+            composition_mol_by_account=True,
         )
         return bool(evaluated_diagnostic)
 

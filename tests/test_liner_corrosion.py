@@ -396,6 +396,90 @@ def test_magemin_phi_curve_brackets_valid_request_near_silica_domain_edge():
     assert any(call[3]["SiO2"] < 30.0 for call in backend.calls)
 
 
+def test_magemin_liner_curve_and_state_keep_evaluated_silica_notice():
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._database = "ig"
+    backend._config = {}
+    backend.initialize = lambda _config: True
+    backend.get_engine_version = lambda: "magemin-test-subprocess"
+
+    def subprocess_result(**kwargs):
+        projection = kwargs["bulk_projection"]
+        fraction = min(
+            1.0,
+            max(0.0, (float(kwargs["temperature_C"]) - 1000.0) / 200.0),
+        )
+        composition = dict(projection.composition_wt_pct)
+        phases = {
+            "liq": {
+                "mass_kg": fraction,
+                "composition_wt_pct": composition,
+            },
+            "ol": {
+                "mass_kg": 1.0 - fraction,
+                "composition_wt_pct": composition,
+            },
+        }
+        return {
+            "phases": phases,
+            "operating_point_diagnostics": {
+                "backend_status": "ok",
+                "solved_fO2_log": kwargs["fO2_log"],
+                "authoritative_for_requested_conditions": True,
+                "authoritative_for_solved_conditions": True,
+                "fO2_clamped": False,
+            },
+        }
+
+    backend._call_magemin = subprocess_result
+    sampler = MageminLinerSampler(backend)
+    liner = {"SiO2": 29.9, "MgO": 70.1}
+    curve = sampler.curve(
+        liner,
+        {"Na": 0.01},
+        temperature_C=1500.0,
+        pressure_bar=1.0e-6,
+    )
+    cached_curve, cached_metadata = next(iter(sampler._curve_cache.values()))
+
+    assert cached_curve is curve
+    assert cached_metadata["authority"] == "extrapolated"
+    assert cached_metadata["certified_band"] == {
+        "sio2_wt_pct": [30.0, 80.0],
+    }
+    assert cached_metadata["gate_warnings"]
+
+    state = build_liner_state_segment(
+        {
+            "composition": liner,
+            "criterion_tier": "B",
+            "density_kg_m3": 1000.0,
+            "reacted_layer_depth_m": 0.001,
+            "margin_C": 0.0,
+            "horizon_campaigns": 0,
+            "porosity_fraction": 0.0,
+        },
+        {"Na": 0.01},
+        area_m2=1.0,
+        service_temperature_C=1500.0,
+        pressure_bar=1.0e-6,
+        sampler=sampler,
+        deposit_inert_kg_by_species={"Na": 0.0},
+        deposit_reactive_kg_by_species={"Na": 0.0},
+    )
+    assert liner_corrosion.MAGEMIN_SILICA_EXTRAPOLATED_FLAG in state["flags"]
+    assert any(
+        "certified_band=SiO2 [30, 80] wt%" in flag
+        and "warnings=" in flag
+        for flag in state["flags"]
+    )
+    sampler.close()
+
+
 @pytest.mark.live_engine
 @pytest.mark.xdist_group("magemin_fullrun_a")
 def test_anorthite_first_liquid_anchor_requires_live_magemin():

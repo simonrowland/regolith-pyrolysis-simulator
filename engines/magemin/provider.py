@@ -263,13 +263,13 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         valid, gate_warnings, gate_reason = (
             MAGEMinDomainGate.validate_with_reason(composition_wt_pct)
         )
-        domain_diagnostic = (
-            MAGEMinDomainGate.silica_extrapolation_diagnostic(
-                composition_wt_pct
-            )
-            or {}
-        )
         if not valid:
+            domain_diagnostic = (
+                MAGEMinDomainGate.silica_extrapolation_diagnostic(
+                    composition_wt_pct
+                )
+                or {}
+            )
             return IntentResult(
                 intent=request.intent,
                 status='out_of_domain',
@@ -285,6 +285,39 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 ).as_diagnostic(),
                 warnings=tuple(gate_warnings),
             )
+
+        from simulator.melt_backend.magemin import (
+            MAGEMinBackend,
+            evaluated_silica_verdict,
+        )
+
+        liquidus_intent = request.intent in (
+            ChemistryIntent.SILICATE_LIQUIDUS,
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+        )
+        domain_diagnostic = evaluated_silica_verdict(
+            (
+                composition_mol_by_account
+                if liquidus_intent
+                else composition_wt_pct
+            ),
+            str(_SHADOW_BACKEND_CONFIG.get(
+                'database', MAGEMinBackend._DEFAULT_DATABASE,
+            )),
+            species_formula_registry=(
+                request.account_view.species_formula_registry
+            ),
+            composition_mol_by_account=liquidus_intent,
+        ) or {}
+        if not domain_diagnostic:
+            gate_warnings = [
+                warning
+                for warning in gate_warnings
+                if not (
+                    'authority=extrapolated' in warning
+                    and 'SiO2' in warning
+                )
+            ]
 
         backend = self._ensure_backend()
         if backend is None:

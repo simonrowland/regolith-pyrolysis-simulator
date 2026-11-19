@@ -1772,12 +1772,14 @@ def test_magemin_ferric_fold_flags_the_evaluated_freeze_gate_bulk(
 
 def test_same_hour_magemin_pin_redispatches_after_char_crosses_silica_band(
     monkeypatch,
+    tmp_path,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
 ):
     from simulator.account_ids import SOLID_CHAR_CARBON_ACCOUNT
     from simulator.core import CHAR_SPECIES, FEO_CHAR_REDUCTION_MIN_T_C
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
 
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
@@ -1785,6 +1787,25 @@ def test_same_hour_magemin_pin_redispatches_after_char_crosses_silica_band(
         setpoints_data,
         enabled=True,
         liquid_fraction_provider='magemin',
+    )
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+        identity_override=admission_module.BindingIdentity(
+            'magemin', 'ig', 'magemin-ig-r1', 'subprocess'
+        ),
+        provenance_override={
+            'binding_provenance_verifiable': True,
+            'runtime_version': {
+                'tag': 'value',
+                'value': 'MAGEMin fixture runtime',
+                'reason': None,
+            },
+            'runtime_artifacts': {
+                'magemin_selected_binary': {'sha256': 'a' * 64},
+            },
+        },
     )
     ledger = AtomLedger(registry=sim.atom_ledger.registry)
     ledger.load_external(
@@ -1806,53 +1827,130 @@ def test_same_hour_magemin_pin_redispatches_after_char_crosses_silica_band(
     sim._chem_kernel = sim._build_chemistry_kernel()
     sim._project_cleaned_melt_from_atom_ledger()
     sim.melt.temperature_C = FEO_CHAR_REDUCTION_MIN_T_C + 100.0
+    trace = _install_magemin_subprocess_gate(sim, monkeypatch)
 
-    pinned_curve = {
-        'source': 'gate_liquid_fraction:test-pin',
-        'solidus_T_C': 800.0,
-        'liquidus_T_C': 1200.0,
-        'path': ((800.0, 0.0), (1200.0, 1.0)),
-    }
-    pinned_record = gate_curve_memo_record(
-        pinned_curve,
-        None,
-        (),
-        'live',
-    )
-    monkeypatch.setattr(
-        sim,
-        '_melt_redox_liquidus_gate_record',
-        lambda **_kwargs: pinned_record,
-    )
-    monkeypatch.setattr(
-        sim,
-        '_melt_redox_gate_record_is_admitted',
-        lambda *_args, **_kwargs: True,
-    )
+    first_record = sim._freeze_gate_curve_record()
+    assert first_record['curve']['source'].startswith('gate_liquid_fraction')
     sim._establish_melt_redox_gate_authority_for_current_hour()
-
-    dispatched_curve = {
-        **pinned_curve,
-        'authority': 'extrapolated',
-        'certified_band': {'sio2_wt_pct': [30.0, 80.0]},
-    }
-    dispatches = []
-
-    def redispatch(**_kwargs):
-        dispatches.append(True)
-        return dispatched_curve
-
-    monkeypatch.setattr(sim, '_melt_redox_liquidus_gate_curve', redispatch)
-    sim.melt.temperature_C = 1400.0
-    assert sim._freeze_gate_liquid_fraction_factor() == pytest.approx(1.0)
-    assert dispatches == []
+    dispatches_before_reduction = len(trace['provider_diagnostics'])
+    assert dispatches_before_reduction == 1
 
     reduction = sim._apply_char_feo_reduction()
     assert reduction['extent_mol'] > 0.0
     assert sim.melt.composition_wt_pct()['SiO2'] > 80.0
 
-    assert sim._freeze_gate_liquid_fraction_factor() == pytest.approx(1.0)
-    assert dispatches == [True]
+    # The fixture is at 800 °C, below its mocked 1000 °C solidus; resolving
+    # the crossed bulk must still redispatch while the liquid fraction is 0.
+    assert sim._freeze_gate_liquid_fraction_factor() == pytest.approx(0.0)
+    assert len(trace['provider_diagnostics']) > dispatches_before_reduction
+    curve = sim._freeze_gate_liquid_fraction_cache['curve']
+    assert curve['authority'] == 'extrapolated'
+    assert curve['certified_band'] == {'sio2_wt_pct': [30.0, 80.0]}
+
+
+def test_magemin_ferric_fold_clears_request_silica_flag_when_evaluated_in_band(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    composition_wt_pct = {
+        'SiO2': 29.999,
+        'MgO': 60.001,
+        'Fe2O3': 10.0,
+    }
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    ledger.load_external_mol(
+        _CLEANED_MELT_ACCOUNT,
+        composition_mol,
+        source='d-447 ferric-fold in-band regression',
+        material_origin='feedstock',
+    )
+    sim.atom_ledger = ledger
+    trace = _install_magemin_subprocess_gate(sim, monkeypatch)
+
+    curve = sim._freeze_gate_curve_record()['curve']
+
+    assert any(
+        30.0 <= evaluated.get('SiO2', 0.0) <= 80.0
+        for evaluated in trace['evaluated_compositions']
+    )
+    assert 'authority' not in curve
+    assert 'certified_band' not in curve
+    provider_diagnostic = trace['provider_diagnostics'][0]
+    assert 'authority' not in provider_diagnostic
+    assert 'certified_band' not in provider_diagnostic
+
+
+def test_ferric_fold_silica_boundary_splits_the_real_freeze_gate_memo_key(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.accounting.formulas import resolve_species_formula
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+
+    def key_for(silica_wt_pct):
+        composition_wt_pct = {
+            'SiO2': silica_wt_pct,
+            'MgO': 90.0 - silica_wt_pct,
+            'Fe2O3': 10.0,
+        }
+        composition_mol = {
+            species: amount / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            _CLEANED_MELT_ACCOUNT,
+            composition_mol,
+            source='d-447 ferric-fold memo boundary regression',
+            material_origin='feedstock',
+        )
+        sim.atom_ledger = ledger
+        return sim._freeze_gate_cache_key_and_domain(
+            pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
+            fO2_log=sim._freeze_gate_redox_key_fO2_log(
+                fO2_log=sim._compute_intrinsic_melt_fO2(),
+            ),
+        )[0]
+
+    below = key_for(79.19845)
+    above = key_for(79.19851)
+
+    assert below != above
+    assert getattr(below, 'magemin_domain_verdict', None) in (
+        None,
+        (True, (), None),
+    )
+    assert any(
+        'authority=extrapolated' in str(warning)
+        for warning in above.magemin_domain_verdict[1]
+    )
 
 
 def test_freeze_gate_enabled_refuses_instead_of_using_backend_liquidus(

@@ -4228,7 +4228,10 @@ class EvaporationMixin:
                 project_melt_to_oxide_projection,
             )
             from simulator.melt_backend import magemin as magemin_module
-            from simulator.melt_backend.magemin import MAGEMinBackend
+            from simulator.melt_backend.magemin import (
+                MAGEMinBackend,
+                evaluated_silica_verdict,
+            )
             from simulator.composition_projection import (
                 _projected_liquidus_refusal_reason,
             )
@@ -4306,10 +4309,34 @@ class EvaporationMixin:
             projected_valid, projected_warnings, projected_reason = (
                 projected_verdict
             )
-            verdict_warnings = list(exact_warnings)
+            evaluated_silica = evaluated_silica_verdict(
+                {'process.cleaned_melt': provider_mol},
+                MAGEMinBackend._DEFAULT_DATABASE,
+                species_formula_registry=formula_registry,
+                composition_mol_by_account=True,
+            )
+            verdict_warnings = [
+                warning
+                for warning in exact_warnings
+                if not (
+                    'authority=extrapolated' in warning
+                    and 'SiO2' in warning
+                )
+            ]
             for warning in projected_warnings:
-                if warning not in verdict_warnings:
+                if (
+                    not (
+                        'authority=extrapolated' in warning
+                        and 'SiO2' in warning
+                    )
+                    and warning not in verdict_warnings
+                ):
                     verdict_warnings.append(warning)
+            if evaluated_silica is not None:
+                verdict_warnings.append(
+                    'MAGEMin evaluated bulk: authority=extrapolated; '
+                    'certified_band=SiO2 [30, 80] wt%.'
+                )
             if projection_reason is not None:
                 verdict_warnings.append(projection_reason)
             magemin_domain_reason = exact_reason or projected_reason

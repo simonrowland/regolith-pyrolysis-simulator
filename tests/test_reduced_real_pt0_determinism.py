@@ -3358,72 +3358,84 @@ def test_pt0_replay_miss_fails_loudly() -> None:
         )
 
 
-def test_gate_replay_uses_evaluated_silica_verdict_for_flag_requirement():
+def test_gate_replay_uses_evaluated_silica_verdict_for_flag_requirement(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
     from simulator.accounting.formulas import resolve_species_formula
     from simulator.accounting.ledger import AtomLedger
 
-    store = PT0DeterminismStore("replay")
-    sim = _build_pt0_sim(store)
-    sim.start_campaign(CampaignPhase.C2A_STAGED)
-    sim._liquid_fraction_provider = "magemin"
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
+    db_path = tmp_path / "evaluated-silica-gate-replay.db"
     composition_wt_pct = {
         "SiO2": 29.999,
-        "MgO": 69.501,
-        "MnO": 0.5,
+        "MgO": 60.001,
+        "Fe2O3": 10.0,
     }
-    composition_mol = {
-        species: amount
-        / resolve_species_formula(
-            species,
-            sim.species_formula_registry,
-        ).molar_mass_kg_per_mol()
-        for species, amount in composition_wt_pct.items()
-    }
-    ledger = AtomLedger(registry=sim.atom_ledger.registry)
-    ledger.load_external_mol(
-        "process.cleaned_melt",
-        composition_mol,
-        source="d-447 evaluated-bulk replay regression",
-        material_origin="feedstock",
-    )
-    sim.atom_ledger = ledger
-    sim.inventory.inert_melt_components_kg.clear()
-    sim._project_cleaned_melt_from_atom_ledger()
-    key, _reason = sim._freeze_gate_cache_key_and_domain(
-        pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
-        fO2_log=sim._freeze_gate_redox_key_fO2_log(
-            fO2_log=sim._compute_intrinsic_melt_fO2(),
-        ),
-    )
-    assert any(
-        "authority=extrapolated" in str(warning)
-        for warning in key.magemin_domain_verdict[1]
-    )
-    store._authorize_cached_real_replay = lambda *_args, **_kwargs: None
-    lookup = {}
     curve_payload = {
-        "source": "gate_liquid_fraction:test-replay",
+        "source": "gate_liquid_fraction:fallback:magemin-shadow",
+        "status": "ok",
         "solidus_T_C": 1000.0,
         "liquidus_T_C": 1300.0,
-        "path": (
-            {"temperature_C": 1000.0, "liquid_fraction": 0.0},
-            {"temperature_C": 1300.0, "liquid_fraction": 1.0},
-        ),
+        "path": ((1000.0, 0.0), (1300.0, 1.0)),
     }
 
-    def capture_lookup(_artifact, _keys, **kwargs):
-        lookup.update(kwargs)
-        return {"curve": curve_payload}
+    def configure_sim(store):
+        sim = _build_pt0_sim(store)
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        sim._liquid_fraction_provider = "magemin"
+        register_synthetic_gate_curve_producer(sim)
+        composition_mol = {
+            species: amount
+            / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            "process.cleaned_melt",
+            composition_mol,
+            source="d-447 evaluated-bulk replay regression",
+            material_origin="feedstock",
+        )
+        sim.atom_ledger = ledger
+        sim._chem_kernel = sim._build_chemistry_kernel()
+        sim.inventory.inert_melt_components_kg.clear()
+        sim._project_cleaned_melt_from_atom_ledger()
+        return sim
 
-    store._lookup_first_available = capture_lookup
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture_sim = configure_sim(capture)
+    capture_fO2_log = capture_sim._compute_intrinsic_melt_fO2()
+    key, _reason = capture_sim._freeze_gate_cache_key_and_domain(
+        pressure_bar=float(capture_sim.melt.p_total_mbar) / 1000.0,
+        fO2_log=capture_sim._freeze_gate_redox_key_fO2_log(
+            fO2_log=capture_fO2_log,
+        ),
+    )
+    assert getattr(key, "magemin_domain_verdict", None) in (
+        None,
+        (True, (), None),
+    )
+    seed_gate_curve_memo_record(capture_sim, curve_payload)
+    capture.capture_gate_curve(
+        capture_sim,
+        fO2_log=capture_fO2_log,
+        curve=curve_payload,
+    )
+    assert capture.last_cache_state == "live_fill"
 
-    replayed = store.replay_gate_curve(
-        sim,
-        fO2_log=sim._compute_intrinsic_melt_fO2(),
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim = configure_sim(replay)
+    replayed = replay.replay_gate_curve(
+        replay_sim,
+        fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
     )
     assert replayed["source"] == curve_payload["source"]
     assert replayed["path"] == ((1000.0, 0.0), (1300.0, 1.0))
-    assert lookup["require_gate_curve_domain_diagnostic"] is False
+    assert replay.last_cache_state == "cached_exact"
 
 
 def test_pt1_persistent_store_round_trips_exact_payload(

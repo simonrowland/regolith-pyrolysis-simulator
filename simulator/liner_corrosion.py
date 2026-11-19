@@ -56,6 +56,7 @@ REACTIVE_STICKING_FLAG = "reactive_wall_sticking_upper_bound"
 ENGINE_OUT_OF_DOMAIN_FLAG = "liner_first_melt_engine_out_of_domain"
 ELEMENT_CLOSURE_FLAG = "engine_phase_closure_failed"
 ELEMENT_CLOSURE_UNVERIFIED_FLAG = "engine_phase_closure_unverified"
+MAGEMIN_SILICA_EXTRAPOLATED_FLAG = "magemin_silica_extrapolated"
 
 MAGEMIN_ENGINE_ID = "magemin:ig"
 MAGEMIN_REQUEST_CACHE_VERSION = 1  # Hand-bump when adapter-visible settings change.
@@ -878,6 +879,12 @@ def _tier_b_reference_profile_single(
         )
     ):
         flags.append(PHASE_CLOSURE_UNVERIFIED_FLAG)
+    flags.extend(
+        str(flag)
+        for flag in getattr(sampler, "flags", ()) or ()
+        if str(flag).startswith(MAGEMIN_SILICA_EXTRAPOLATED_FLAG)
+        and str(flag) not in flags
+    )
     first_liquid_bracket: list[float | None] | None = None
     for index, temperature in enumerate(temperatures):
         if liquid_by_temperature[temperature] > LIQUIDUS_SOLID_EPSILON:
@@ -4063,7 +4070,10 @@ class MageminLinerSampler:
         self._initialized = False
         self._point_cache: dict[tuple[Any, ...], float] = {}
         self._sample_diagnostics: dict[tuple[Any, ...], dict[str, Any]] = {}
-        self._curve_cache: dict[tuple[Any, ...], TabulatedLiquidFractionCurve] = {}
+        self._curve_cache: dict[
+            tuple[Any, ...],
+            tuple[TabulatedLiquidFractionCurve, dict[str, Any]],
+        ] = {}
         self.flags: list[str] = []
         self.authority_level = "verified"
 
@@ -4099,6 +4109,12 @@ class MageminLinerSampler:
         )
         if key in self._point_cache:
             return self._point_cache[key]
+        from simulator.melt_backend.magemin import evaluated_silica_verdict
+
+        silica_diagnostic = evaluated_silica_verdict(
+            composition,
+            "ig",
+        ) or {}
         if not self._initialized:
             if not self._backend.initialize({"database": "ig"}):
                 raise LinerCorrosionRefusal("engine_unavailable", MAGEMIN_ENGINE_ID)
@@ -4130,15 +4146,44 @@ class MageminLinerSampler:
         if fraction is None:
             raise LinerCorrosionRefusal("engine_liquid_fraction_missing")
         liquid_fraction = _checked_liquid_fraction(fraction)
+        gate_warnings = [str(warning) for warning in warnings]
+        for warning in getattr(result, "warnings", ()) or ():
+            warning = str(warning)
+            if warning not in gate_warnings:
+                gate_warnings.append(warning)
+        if not silica_diagnostic:
+            gate_warnings = [
+                warning
+                for warning in gate_warnings
+                if not (
+                    "authority=extrapolated" in warning
+                    and "SiO2" in warning
+                )
+            ]
+        if silica_diagnostic:
+            self.authority_level = "extrapolated"
+            if MAGEMIN_SILICA_EXTRAPOLATED_FLAG not in self.flags:
+                self.flags.append(MAGEMIN_SILICA_EXTRAPOLATED_FLAG)
+            metadata_flag = (
+                f"{MAGEMIN_SILICA_EXTRAPOLATED_FLAG}: "
+                "authority=extrapolated; certified_band=SiO2 [30, 80] wt%"
+            )
+            if gate_warnings:
+                metadata_flag += "; warnings=" + " | ".join(gate_warnings)
+            if metadata_flag not in self.flags:
+                self.flags.append(metadata_flag)
         phases = getattr(result, "phases_present", ()) or ()
-        self._sample_diagnostics[key] = {
+        sample_diagnostic = {
             "phases": [str(phase) for phase in phases],
             "element_closure_verified": closure_verified,
             "phase_compositions_available": bool(
                 getattr(result, "phase_compositions", None)
                 or getattr(result, "liquid_composition_wt_pct", None)
             ),
+            "gate_warnings": gate_warnings,
         }
+        sample_diagnostic.update(silica_diagnostic)
+        self._sample_diagnostics[key] = sample_diagnostic
         self._point_cache[key] = liquid_fraction
         return liquid_fraction
 
@@ -4185,15 +4230,27 @@ class MageminLinerSampler:
             round(MAGEMIN_FO2_LOG, MAGEMIN_CACHE_DECIMAL_PLACES),
         )
         if key in self._curve_cache:
-            return self._curve_cache[key]
+            return self._curve_cache[key][0]
 
         points: list[tuple[float, float]] = []
+        sample_diagnostics: list[Mapping[str, Any]] = []
         last_valid_fraction = 0.0
+
+        def remember_sample(composition: Mapping[str, float]) -> None:
+            detail = self.sample_diagnostics(
+                composition,
+                temperature,
+                pressure,
+            )
+            if detail:
+                sample_diagnostics.append(detail)
+
         for index in range(MAGEMIN_PHI_CURVE_INTERVALS + 1):
             deposit_fraction = index / MAGEMIN_PHI_CURVE_INTERVALS
             composition = _composition_at_fraction(liner, deposit, deposit_fraction)
             try:
                 liquid_fraction = self(composition, temperature, pressure)
+                remember_sample(composition)
             except LinerCorrosionRefusal as exc:
                 # The table ends at the first domain boundary. No extrapolation
                 # or result from outside the MAGEMin gate is used.
@@ -4217,6 +4274,7 @@ class MageminLinerSampler:
                         boundary_fraction = self(
                             boundary_composition, temperature, pressure
                         )
+                        remember_sample(boundary_composition)
                         points.append((admissible_fraction, boundary_fraction))
                     break
                 raise
@@ -4229,7 +4287,28 @@ class MageminLinerSampler:
             pressure_bar=pressure,
             points=tuple(points),
         )
-        self._curve_cache[key] = curve
+        curve_warnings = list(dict.fromkeys(
+            warning
+            for detail in sample_diagnostics
+            for warning in detail.get("gate_warnings", ())
+        ))
+        curve_metadata: dict[str, Any] = {}
+        extrapolated = next(
+            (
+                detail
+                for detail in sample_diagnostics
+                if detail.get("authority") == "extrapolated"
+            ),
+            None,
+        )
+        if extrapolated is not None:
+            curve_metadata["authority"] = "extrapolated"
+            curve_metadata["certified_band"] = dict(
+                extrapolated.get("certified_band") or {}
+            )
+        if curve_warnings:
+            curve_metadata["gate_warnings"] = curve_warnings
+        self._curve_cache[key] = (curve, curve_metadata)
         return curve
 
     def close(self) -> None:

@@ -1664,36 +1664,46 @@ def _liquidus_inputs_on_feo_total_iron_basis(
     return kg, mol, accounts
 
 
-def _liquidus_evaluated_bulk_silica_diagnostic(
-    composition_mol_by_account: Mapping[str, Mapping[str, float]],
+def evaluated_silica_verdict(
+    bulk: Mapping[str, Any],
+    database: str,
     *,
     species_formula_registry: Optional[Mapping[str, Any]] = None,
-    projected_retry: bool = False,
+    composition_mol_by_account: bool = False,
 ) -> Dict[str, object] | None:
-    """Return the silica verdict for the bulk the liquidus finder evaluates."""
+    """Classify SiO2 on the exact projected bulk MAGEMin evaluates.
+
+    ``bulk`` is either the submitted oxide wt% mapping or, when
+    ``composition_mol_by_account`` is true, the liquidus finder's account
+    mapping. The latter follows the same Fe2O3-to-FeO_T mole fold as the live
+    liquidus path before applying the database projection. This is a pure
+    projection: it does not initialize or call the engine.
+    """
     from engines.magemin.domain import MAGEMinDomainGate
 
-    _kg, _mol, folded_accounts = _liquidus_inputs_on_feo_total_iron_basis(
-        composition_kg=None,
-        composition_mol=None,
-        composition_mol_by_account=composition_mol_by_account,
-    )
-    if folded_accounts is None:
-        return None
-    source_projection = project_melt_to_oxide_projection(
-        composition_kg=None,
-        composition_mol=folded_accounts.get(CLEANED_MELT_ACCOUNT),
-        oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
-        species_formula_registry=species_formula_registry,
-    )
+    if composition_mol_by_account:
+        _kg, _mol, folded_accounts = _liquidus_inputs_on_feo_total_iron_basis(
+            composition_kg=None,
+            composition_mol=None,
+            composition_mol_by_account=bulk,
+        )
+        if folded_accounts is None:
+            return None
+        source_projection = project_melt_to_oxide_projection(
+            composition_kg=None,
+            composition_mol=folded_accounts.get(CLEANED_MELT_ACCOUNT),
+            oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
+            species_formula_registry=species_formula_registry,
+        )
+        oxide_bulk = source_projection.oxide_wt_pct
+    else:
+        oxide_bulk = bulk
+
     backend = MAGEMinBackend()
     bulk_projection = backend._build_db_bulk_projection(
-        source_projection.oxide_wt_pct
+        oxide_bulk,
+        database=database,
     )
-    if projected_retry:
-        bulk_projection = backend._build_db_bulk_projection(
-            bulk_projection.composition_wt_pct
-        )
     evaluated_oxides = backend._domain_gate_oxide_composition(
         bulk_projection.composition_wt_pct
     )
@@ -2199,20 +2209,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 bulk_projection
             ),
         )
-        from engines.magemin.domain import MAGEMinDomainGate
-
-        evaluated_domain_projection = project_melt_to_oxide_projection(
-            composition_kg=self._domain_gate_oxide_composition(
-                bulk_projection.composition_wt_pct
-            ),
-            composition_mol=None,
-            oxide_basis=self._MAGEMIN_INPUT_BASIS,
+        evaluated_silica_diagnostic = evaluated_silica_verdict(
+            bulk_projection.composition_wt_pct,
+            bulk_projection.database,
             species_formula_registry=species_formula_registry,
-        )
-        evaluated_silica_diagnostic = (
-            MAGEMinDomainGate.silica_extrapolation_diagnostic(
-                evaluated_domain_projection.oxide_wt_pct
-            )
         )
         if evaluated_silica_diagnostic is not None:
             result_diagnostics.update(evaluated_silica_diagnostic)
@@ -2440,14 +2440,21 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     if result_status != 'ok'
                     else MAGEMIN_MODE_VECTOR_MASS_DEFICIT
                 )
-                # Native control failure takes precedence over incomplete Mode
-                # evidence: preserve its numerical reason for gate hold/floor.
-                # A deficit alone remains out_of_domain; record it in both cases.
+                # A deficient Mode vector cannot establish a stable control
+                # refusal. Keep the solve on the numerical-failure path so the
+                # freeze gate holds a prior curve or uses its first-call floor.
                 if result_status == 'ok':
                     result_status = 'out_of_domain'
                     result_diagnostics.update({
                         'backend_status': result_status,
                         'backend_status_reason': MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
+                    })
+                else:
+                    result_status = 'not_converged'
+                    mode_failure_reason = 'engine_not_converged'
+                    result_diagnostics.update({
+                        'backend_status': result_status,
+                        'backend_status_reason': mode_failure_reason,
                     })
                 result_diagnostics.update({
                     MAGEMIN_MODE_VECTOR_MASS_DEFICIT: True,
@@ -2811,31 +2818,16 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 projected.status == 'ok'
                 and isinstance(projected_bulk_wt_pct, Mapping)
             ):
-                from engines.magemin.domain import MAGEMinDomainGate
-
-                evaluated_bulk = self._build_db_bulk_projection(
-                    projected_bulk_wt_pct
-                )
-                evaluated_domain_source = self._domain_gate_oxide_composition(
-                    evaluated_bulk.composition_wt_pct
-                )
-                evaluated_domain_projection = project_melt_to_oxide_projection(
-                    composition_kg=evaluated_domain_source,
-                    composition_mol=None,
-                    oxide_basis=self._MAGEMIN_INPUT_BASIS,
+                projected_domain = evaluated_silica_verdict(
+                    projected_bulk_wt_pct,
+                    str(self._effective_database()),
                     species_formula_registry=species_formula_registry,
-                )
-                projected_domain = (
-                    MAGEMinDomainGate.silica_extrapolation_diagnostic(
-                        evaluated_domain_projection.oxide_wt_pct
-                    )
-                    or {}
                 )
                 projected = replace(
                     projected,
                     diagnostics={
                         **dict(projected.diagnostics or {}),
-                        **projected_domain,
+                        **(projected_domain or {}),
                     },
                 )
             diagnostics['projected_liquidus_status'] = projected.status

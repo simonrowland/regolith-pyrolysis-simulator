@@ -1014,21 +1014,20 @@ class PT0DeterminismStore:
                     require_domain_diagnostic = True
                 else:
                     from simulator.melt_backend.magemin import (
-                        _liquidus_evaluated_bulk_silica_diagnostic,
+                        MAGEMinBackend,
+                        evaluated_silica_verdict,
                     )
 
                     try:
-                        evaluated_domain_diagnostic = (
-                            _liquidus_evaluated_bulk_silica_diagnostic(
-                                {
-                                    "process.cleaned_melt": (
-                                        provider_inputs.composition_mol
-                                    ),
-                                },
-                                species_formula_registry=(
-                                    sim.species_formula_registry
+                        evaluated_domain_diagnostic = evaluated_silica_verdict(
+                            {
+                                "process.cleaned_melt": (
+                                    provider_inputs.composition_mol
                                 ),
-                            )
+                            },
+                            MAGEMinBackend._DEFAULT_DATABASE,
+                            species_formula_registry=sim.species_formula_registry,
+                            composition_mol_by_account=True,
                         )
                     except (MeltCompositionError, TypeError, ValueError):
                         require_domain_diagnostic = True
@@ -3189,34 +3188,11 @@ def gate_curve_provider_outcome_for_status(
     magemin_bridge_numerical_failure = (
         "magemin_bridge_numerical_failure" in reasons
     )
-    backend_diagnostic = (
-        diagnostic.get("backend_diagnostics")
-        if isinstance(diagnostic, Mapping)
-        else None
-    )
-    solved_fo2_log = (
-        diagnostic.get("solved_fO2_log")
-        if isinstance(diagnostic, Mapping)
-        else None
-    )
-    if solved_fo2_log is None and isinstance(backend_diagnostic, Mapping):
-        solved_fo2_log = backend_diagnostic.get("solved_fO2_log")
     if "environment" in reasons:
         return GateCurveProviderOutcome.FAILED
     if gate_curve_provider_has_terminal_input(reasons):
         return GateCurveProviderOutcome.FAILED
     if "parse_empty_output" in reasons and not magemin_invalid_output:
-        return GateCurveProviderOutcome.FAILED
-    # A deficient MAGEMin Mode vector plus missing fO2 readback is the
-    # reviewed combined failure: keep it fail-closed even though the
-    # fO2-specific reason is normally classified as numerical.
-    if (
-        normalized_status == "not_converged"
-        and "engine_not_converged" in reasons
-        and isinstance(diagnostic, Mapping)
-        and diagnostic.get("magemin_mode_vector_mass_deficit") is True
-        and solved_fo2_log is None
-    ):
         return GateCurveProviderOutcome.FAILED
     numerical_reasons = {
         "not_converged", "engine_not_converged", "negative_convergence_evidence",
