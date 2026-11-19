@@ -4303,11 +4303,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             'authoritative_for_solved_conditions': solved is not None and buffer_present,
         }
         if not honoured:
+            engine_not_converged = solved is None or not buffer_present
             diagnostics.update({
                 'operating_point_clamped': True,
-                'backend_status': ('not_converged' if solved is None or not buffer_present
-                                   else 'out_of_domain'),
-                'backend_status_reason': 'engine_not_converged',
+                'backend_status': (
+                    'not_converged' if engine_not_converged else 'out_of_domain'
+                ),
+                'backend_status_reason': (
+                    'engine_not_converged'
+                    if engine_not_converged
+                    else 'clamped_operating_point'
+                ),
                 'backend_failure_disposition': 'numerical',
                 'fO2_control_notice': {
                     'requested_fO2_log': requested, 'native_fO2_log': solved,

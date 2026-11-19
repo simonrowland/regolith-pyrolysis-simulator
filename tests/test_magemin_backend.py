@@ -1623,13 +1623,13 @@ def _magemin_failure_exit_result(monkeypatch, failure_kind):
             lambda **_kwargs: {'solver_status': 0, 'native_activities': {}},
         )
     elif failure_kind == 'clamped_operating_point':
+        composition = {'SiO2': 1.0, 'MgO': 1.0, 'FeO': 1.0}
         monkeypatch.setattr(
             backend, '_call_magemin',
             lambda **_kwargs: {
                 'phases': {'liq': {'mass_kg': 1.0}},
-                'operating_point_diagnostics': {
-                    'operating_point_clamped': True,
-                },
+                'fO2': -7.0,
+                'ph': ['qfm'],
             },
         )
     else:
@@ -2893,7 +2893,11 @@ def _magemin_backend_with_spied_engine_call(monkeypatch):
 
     def fake_call(**kwargs):
         calls.append(kwargs)
-        return {'phases': {'liq': 1.0}}
+        return {
+            'phases': {'liq': 1.0},
+            'fO2': kwargs['fO2_log'],
+            'ph': ['qfm'],
+        }
 
     monkeypatch.setattr(backend, '_call_magemin', fake_call)
     return backend, calls
@@ -3150,9 +3154,13 @@ def test_magemin_projected_gate_input_matches_submitted_bulk(
     monkeypatch.setattr(backend, '_build_db_bulk_projection', capture_bulk)
     engine_submissions = []
 
-    def submit(*, bulk_projection, **_kwargs):
+    def submit(*, bulk_projection, **kwargs):
         engine_submissions.append(bulk_projection)
-        return {'phases': {'liq': {'mass_kg': 1.0}}}
+        return {
+            'phases': {'liq': {'mass_kg': 1.0}},
+            'fO2': kwargs['fO2_log'],
+            'ph': ['qfm'],
+        }
 
     monkeypatch.setattr(backend, '_call_magemin', submit)
     gate_inputs = []
