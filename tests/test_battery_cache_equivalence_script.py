@@ -58,6 +58,24 @@ def test_canonical_rows_ignore_traceback_text_but_preserve_the_failure():
     }
 
 
+def test_scorer_prints_cache_failure_counters(capsys: pytest.CaptureFixture[str]) -> None:
+    summary = battery_score._engine_cache_summary(
+        Path("engine.sqlite"),
+        local_counters={
+            "alphamelts": {
+                "hits": 0, "misses": 682, "stores": 0,
+                "read_error": 1, "store_error": 2, "conflicts": 0,
+                "uncacheable:list": 3,
+            },
+        },
+    )
+
+    assert summary["by_engine"]["alphamelts"] == {"hits": 0, "misses": 682, "stores": 0}
+    assert capsys.readouterr().err.splitlines() == [
+        "engine cache alphamelts: read_error=1 store_error=2 uncacheable:list=3",
+    ]
+
+
 def test_default_slice_uses_all_engines_and_all_rails(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
