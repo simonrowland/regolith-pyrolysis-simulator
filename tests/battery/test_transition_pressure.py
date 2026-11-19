@@ -446,6 +446,19 @@ def test_apparatus_exclusion_without_ambient_run_context_still_refuses() -> None
         "but was used for these runs.",
         "Run in a 1 atm furnace. The autoclave was excluded, but belt "
         "apparatus was used for these runs.",
+        "Run in a 1 atm furnace. The autoclave was not used for calibration "
+        "and was used for these runs.",
+        "Run in a 1 atm furnace. The autoclave was not used for calibration; "
+        "it was used for these runs.",
+        "Experiments were run at 1 atm in a furnace. A piston-cylinder not "
+        "used below 5 GPa was used for these runs.",
+        "Experiments were run at 1 atm in a vertical tube furnace. The "
+        "reported liquidus was measured in a piston-cylinder not used for "
+        "the ambient series.",
+        "Experiments were run at 1 atm in a furnace. The belt apparatus not "
+        "employed for calibration produced these data.",
+        "Experiments were run at 1 atm in a furnace. We excluded the belt "
+        "apparatus from the ambient set and used it for the liquidus.",
     ),
 )
 def test_unexcluded_or_positively_used_apparatus_still_refuses(note: str) -> None:

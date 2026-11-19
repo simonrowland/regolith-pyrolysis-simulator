@@ -70,8 +70,23 @@ _AMBIENT_FURNACE_RUN = re.compile(
     r"\bfurnaces?\b",
     re.IGNORECASE,
 )
-_ACTIVE_USE_AFTER_EXCLUSION = re.compile(
-    r"\bbut\b[^.!?;]*\b(?:used|employed|utilized)\b",
+_APPARATUS_ASSIGNMENT_VERB = (
+    r"used|employed|utilized|measured|produced|generated|collected|obtained|"
+    r"processed|heated|equilibrated|operated|prepared|treated|performed|"
+    r"conducted|run|ran"
+)
+_APPARATUS_ACTIVE_ASSIGNMENT = re.compile(
+    rf"(?<!not )\b(?:{_APPARATUS_ASSIGNMENT_VERB})\b",
+    re.IGNORECASE,
+)
+_APPARATUS_ASSIGNMENT_BEFORE = re.compile(
+    rf"(?<!not )\b(?:{_APPARATUS_ASSIGNMENT_VERB})\b[^.!?;]{{0,60}}"
+    r"\b(?:in|using|with)\s+(?:(?:the|a|an)\s+)?$",
+    re.IGNORECASE,
+)
+_ANAPHORIC_APPARATUS_ASSIGNMENT = re.compile(
+    rf"(?:^|[.!?;])\s*(?:it|this apparatus|that apparatus|this press|that press)\b"
+    rf"[^.!?;]*(?<!not )\b(?:{_APPARATUS_ASSIGNMENT_VERB})\b",
     re.IGNORECASE,
 )
 # Migrator boilerplate names the keys it did not find, including P_GPa.
@@ -222,10 +237,9 @@ def _apparatus_is_explicitly_excluded(
         default=len(text),
     )
     sentence = text[sentence_start:sentence_end]
+    apparatus_start = apparatus.start() - sentence_start
     apparatus_end = apparatus.end() - sentence_start
     after = sentence[apparatus_end:]
-    if _ACTIVE_USE_AFTER_EXCLUSION.search(after) is not None:
-        return False
     apparatus_phrase = re.escape(apparatus.group())
     before_exclusion = re.search(
         rf"\b(?:did\s+not\s+(?:use|employ)|excluded)\s+"
@@ -239,7 +253,24 @@ def _apparatus_is_explicitly_excluded(
         after,
         re.IGNORECASE,
     )
-    return before_exclusion is not None or after_exclusion is not None
+    if before_exclusion is None and after_exclusion is None:
+        return False
+
+    before = sentence[:apparatus_start]
+    if _APPARATUS_ASSIGNMENT_BEFORE.search(before) is not None:
+        return False
+    if after_exclusion is not None:
+        after_exclusion_tail = after[after_exclusion.end():]
+        if _APPARATUS_ACTIVE_ASSIGNMENT.search(after_exclusion_tail) is not None:
+            return False
+    elif before_exclusion is not None:
+        if _APPARATUS_ACTIVE_ASSIGNMENT.search(after) is not None:
+            return False
+
+    continuation = text[apparatus.end():]
+    if _ANAPHORIC_APPARATUS_ASSIGNMENT.search(continuation) is not None:
+        return False
+    return True
 
 
 def _locator_prose(locator: Locator | None) -> Iterator[str]:

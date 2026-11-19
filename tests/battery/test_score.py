@@ -20884,8 +20884,8 @@ def test_positive_high_pressure_mention_after_exclusion_refuses_before_engine(
         pressure_environment=replace(
             experiment.pressure_environment,
             cell_internal_pressure_note=F.located(
-                "Run in a 1 atm furnace. The autoclave was not used. "
-                "The sample was then run in a belt apparatus."
+                "Experiments were run at 1 atm in a furnace. A "
+                "piston-cylinder not used below 5 GPa was used for these runs."
             ),
         ),
     )
