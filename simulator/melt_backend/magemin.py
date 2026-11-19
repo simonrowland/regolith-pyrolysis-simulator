@@ -1668,6 +1668,7 @@ def _liquidus_evaluated_bulk_silica_diagnostic(
     composition_mol_by_account: Mapping[str, Mapping[str, float]],
     *,
     species_formula_registry: Optional[Mapping[str, Any]] = None,
+    projected_retry: bool = False,
 ) -> Dict[str, object] | None:
     """Return the silica verdict for the bulk the liquidus finder evaluates."""
     from engines.magemin.domain import MAGEMinDomainGate
@@ -1689,6 +1690,10 @@ def _liquidus_evaluated_bulk_silica_diagnostic(
     bulk_projection = backend._build_db_bulk_projection(
         source_projection.oxide_wt_pct
     )
+    if projected_retry:
+        bulk_projection = backend._build_db_bulk_projection(
+            bulk_projection.composition_wt_pct
+        )
     evaluated_oxides = backend._domain_gate_oxide_composition(
         bulk_projection.composition_wt_pct
     )

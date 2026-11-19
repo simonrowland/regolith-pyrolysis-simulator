@@ -885,6 +885,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     }
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}
+    freeze_gate_dispatch_counts: dict[str, int] = {}
     current_scenario = [None]
     equilibrium_count = [0]
     original_record = PyrolysisSimulator._freeze_gate_curve_record
@@ -898,6 +899,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         PyrolysisSimulator._melt_redox_temperature_shift_is_liquid
     )
     original_equilibrate = MAGEMinBackend.equilibrate
+    original_dispatch_only = PyrolysisSimulator._dispatch_only
     logical_gate_reads: dict[tuple[str, int], list[tuple]] = {}
     resolved_curves = []
     current_read_scope = [None]
@@ -1050,6 +1052,17 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         equilibrium_count[0] += 1
         return original_equilibrate(self, *args, **kwargs)
 
+    def count_freeze_gate_dispatch(sim, intent, *args, **kwargs):
+        if (
+            intent is ChemistryIntent.GATE_LIQUID_FRACTION
+            and not getattr(sim, '_c0_forecast_context', False)
+        ):
+            name = current_scenario[0]
+            freeze_gate_dispatch_counts[name] = (
+                freeze_gate_dispatch_counts.get(name, 0) + 1
+            )
+        return original_dispatch_only(sim, intent, *args, **kwargs)
+
     monkeypatch.setattr(
         PyrolysisSimulator,
         '_freeze_gate_curve_record',
@@ -1071,6 +1084,11 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         record_resolved_temperature_shift_read,
     )
     monkeypatch.setattr(MAGEMinBackend, 'equilibrate', count_equilibrium)
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        '_dispatch_only',
+        count_freeze_gate_dispatch,
+    )
 
     for scenario in SCENARIOS:
         name = scenario['name']
@@ -1104,6 +1122,9 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         for curves in logical_gate_reads.values()
         for curve in curves
     )
+    # r10's lunar run had one real provider dispatch for each of its seven
+    # committed curve records. The hourly verdict check must stay replay-neutral.
+    assert freeze_gate_dispatch_counts['lunar_mare_low_ti_C0_24h'] == 7
     assert observed == expected
 
 
@@ -1772,9 +1793,9 @@ def test_same_hour_magemin_pin_redispatches_after_char_crosses_silica_band(
         source='d-447 current-hour pin regression melt',
         material_origin='feedstock',
     )
-    # From a 100 kg melt, removing >0.125 kg FeO crosses 80 wt% SiO2.
-    # 0.10 kg C can reduce 0.10*(71.844/12.011)=0.598 kg FeO by
-    # FeO + C -> Fe + CO, so the committed char covers that crossing.
+    # From 100 kg, 79.9 kg SiO2 exceeds 80 wt% after the melt loses 0.125 kg.
+    # FeO + C -> Fe + CO removes 28.010 g of CO per mol extent; 0.10 kg C
+    # supplies 8.326 mol and removes 0.233 kg CO, enough to cross the band.
     ledger.load_external(
         SOLID_CHAR_CARBON_ACCOUNT,
         {CHAR_SPECIES: 0.10},
@@ -1782,6 +1803,7 @@ def test_same_hour_magemin_pin_redispatches_after_char_crosses_silica_band(
         material_origin='reagent',
     )
     sim.atom_ledger = ledger
+    sim._chem_kernel = sim._build_chemistry_kernel()
     sim._project_cleaned_melt_from_atom_ledger()
     sim.melt.temperature_C = FEO_CHAR_REDUCTION_MIN_T_C + 100.0
 

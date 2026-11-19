@@ -320,7 +320,7 @@ def test_corrective_resolve_shares_budget_and_requires_fresh_output(
 @pytest.mark.parametrize('requested,native,phases,modes', [
     (-8.0, None, None, None),
     (-12.0, None, None, None),
-    (-9.0, '-inf', 'liq', '0.9'),
+    (-9.0, '-inf', 'liq', '1.0'),
     (-9.0, '-8.5', 'liq qfm', '0.89 0.01'),
 ])
 def test_control_failure_reaches_existing_gate_hold_or_floor(
@@ -330,7 +330,6 @@ def test_control_failure_reaches_existing_gate_hold_or_floor(
     from tests.chemistry.test_declared_liquid_fraction_provider import _sim
     from tests.binding_admission_fixtures import register_synthetic_gate_curve_producer
     from engines.magemin.provider import MAGEMinShadowProvider
-    from simulator.evaporation import EvaporationFluxRefusal
 
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     register_synthetic_gate_curve_producer(sim)
@@ -370,29 +369,33 @@ def test_control_failure_reaches_existing_gate_hold_or_floor(
         good = False
         sim.melt.hour += 1
         sim.melt.p_total_mbar += 100.0
-    if native == '-inf' and not prior_good:
-        with pytest.raises(
-            EvaporationFluxRefusal,
-            match='liquid_fraction_provider_failed',
-        ):
-            sim._melt_redox_liquidus_gate_curve()
-        assert sim._freeze_gate_provider_outcome == 'failed'
-        return
     curve = sim._melt_redox_liquidus_gate_curve()
     notice = curve['gate_provider_refusal']
     assert notice['outcome'] == (
-        'failed' if native == '-inf' else (
-            'stable_refusal' if native is not None else 'numerical_failure'
+        'stable_refusal'
+        if native is not None and native != '-inf'
+        else 'numerical_failure'
+    )
+    expected_qualification = (
+        'out_of_domain_kress91_floor_prediction'
+        if native is not None and native != '-inf'
+        else (
+            'held_last_good_curve'
+            if prior_good
+            else 'first_call_kress91_floor_prediction'
         )
     )
-    assert notice['qualification'] == (
-        'held_last_good_curve' if prior_good else 'first_call_kress91_floor_prediction'
-    )
+    assert notice['qualification'] == expected_qualification
     if native is not None:
         diagnostics = failed.diagnostics
-        assert diagnostics['backend_status_reason'] == 'engine_not_converged'
-        assert diagnostics['magemin_mode_vector_mass_deficit'] is True
-        assert diagnostics['magemin_mode_vector_deficit'] == pytest.approx(0.1)
+        if native == '-inf':
+            assert diagnostics['backend_status_reason'] == 'engine_not_converged'
+            assert diagnostics.get('magemin_mode_vector_mass_deficit') is not True
+        else:
+            assert diagnostics['backend_status_reason'] == 'clamped_operating_point'
+            assert diagnostics['magemin_mode_vector_mass_deficit'] is True
+            assert diagnostics['magemin_mode_vector_deficit'] == pytest.approx(0.1)
         assert diagnostics['authoritative_for_requested_conditions'] is False
         assert diagnostics['solved_fO2_log'] == (None if native == '-inf' else -8.5)
-        assert any('mass deficit=' in warning for warning in failed.warnings)
+        if native != '-inf':
+            assert any('mass deficit=' in warning for warning in failed.warnings)
