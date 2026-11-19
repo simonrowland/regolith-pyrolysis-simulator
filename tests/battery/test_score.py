@@ -20113,25 +20113,16 @@ def test_unsupported_transition_kind_refuses_before_engine_open(
     }
 
 
-@pytest.mark.parametrize(
-    ("engine", "subtype"),
-    (
-        (Engine.OPENIMCC, "liquidus"),
-        (Engine.ALPHAMELTS, "solidus"),
-    ),
-)
-def test_transition_temperature_unsupported_native_route_refuses_before_open(
+def test_openimcc_liquidus_refuses_before_engine_open(
     monkeypatch: pytest.MonkeyPatch,
-    engine: Engine,
-    subtype: str,
 ) -> None:
-    reference = _transition_temperature_observation(subtype=subtype)
+    reference = _transition_temperature_observation(subtype="liquidus")
 
     def unexpected_open(*_args):
-        pytest.fail("unsupported native transition must refuse before engine open")
+        pytest.fail("OpenIMCC has no liquidus finder and must not open")
 
     monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
-    prediction = predict_with_engine(engine, reference)
+    prediction = predict_with_engine(Engine.OPENIMCC, reference)
 
     assert prediction.value is None
     assert prediction.execution.state is ExecutionState.UNSUPPORTED
@@ -20140,6 +20131,182 @@ def test_transition_temperature_unsupported_native_route_refuses_before_open(
         "reason": "quantity_not_predicted",
         "quantity": Quantity.TRANSITION_TEMPERATURE.value,
     }
+
+
+def _assert_subprocess_solidus_refuses_without_finder(monkeypatch) -> None:
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    reference = _transition_temperature_observation(subtype="solidus")
+    calls: list[dict[str, object]] = []
+
+    def find_liquidus_solidus(**kwargs):
+        calls.append(kwargs)
+        return LiquidusSolidusResult(
+            liquidus_T_C=1450.0,
+            solidus_T_C=1400.0,
+            liquid_fraction=0.0,
+            status="ok",
+        )
+
+    handle = SimpleNamespace(
+        name=Engine.ALPHAMELTS.value,
+        backend=SimpleNamespace(
+            find_liquidus_solidus=find_liquidus_solidus,
+            _mode="subprocess",
+        ),
+        available=True,
+        unavailable_reason=None,
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_open_cached_battery_handle",
+        lambda *_args: (handle, False),
+    )
+    prediction = predict_with_engine(Engine.ALPHAMELTS, reference)
+    assert calls == []
+    assert prediction.value is None
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.refusal_detail == {
+        "reason": "liquidus_only_transport",
+        "transport": "subprocess",
+    }
+
+
+def test_alphamelts_subprocess_solidus_refuses_without_the_finder(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _assert_subprocess_solidus_refuses_without_finder(monkeypatch)
+
+    def legacy_support(engine: Engine, phase_basis: str | None) -> bool:
+        from simulator.melt_backend.base import battery_adapter_class
+        from simulator.melt_backend.liquidus import _LIQUIDUS_TRANSITION_SUBTYPES
+
+        if phase_basis not in _LIQUIDUS_TRANSITION_SUBTYPES:
+            return False
+        if engine is Engine.ALPHAMELTS and phase_basis != "liquidus":
+            return False
+        adapter = battery_adapter_class(engine.value)
+        return callable(getattr(adapter, "find_liquidus_solidus", None))
+
+    monkeypatch.setattr(
+        score_mod,
+        "_engine_supports_liquidus_transition",
+        legacy_support,
+    )
+    with pytest.raises(AssertionError):
+        _assert_subprocess_solidus_refuses_without_finder(monkeypatch)
+
+
+@pytest.mark.parametrize("mode", ("python_api", None))
+def test_alphamelts_fraction_finder_solidus_runs_when_transport_can(
+    monkeypatch: pytest.MonkeyPatch,
+    mode: str | None,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    reference = _transition_temperature_observation(subtype="solidus")
+    calls: list[dict[str, object]] = []
+
+    def find_liquidus_solidus(**kwargs):
+        calls.append(kwargs)
+        return LiquidusSolidusResult(
+            liquidus_T_C=1450.0,
+            solidus_T_C=1400.0,
+            liquid_fraction=0.0,
+            status="ok",
+        )
+
+    backend_fields: dict[str, object] = {
+        "find_liquidus_solidus": find_liquidus_solidus,
+    }
+    if mode is not None:
+        backend_fields["_mode"] = mode
+    handle = SimpleNamespace(
+        name=Engine.ALPHAMELTS.value,
+        backend=SimpleNamespace(**backend_fields),
+        available=True,
+        unavailable_reason=None,
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_open_cached_battery_handle",
+        lambda *_args: (handle, False),
+    )
+    prediction = predict_with_engine(Engine.ALPHAMELTS, reference)
+    assert len(calls) == 1
+    assert prediction.value == Decimal("1673.15")
+    assert prediction.refusal_reason is None
+
+
+def _dew_point_observation() -> Observation:
+    na = "dew point is not a melt-transition identity"
+    identity = Identity(
+        quantity=Quantity.TRANSITION_TEMPERATURE,
+        species=Species("Na2SO4", Phase.G),
+        subtype=State.of("dew_point"),
+        temperature_K=State.not_applicable(na),
+        per=State.not_applicable(na),
+        reference_state=State.not_applicable(na),
+        fO2_Pa=State.not_applicable(na),
+        standard_pressure_Pa=State.not_applicable(na),
+        reaction=State.not_applicable(na),
+        formation_elements=State.not_applicable(na),
+        reservoir=State.not_applicable(na),
+        sweep_gas=State.not_applicable(na),
+        exposure=State.not_applicable(na),
+        sample_mass_kg=State.not_applicable(na),
+        wall=State.not_applicable(na),
+    )
+    return F.observation(
+        "beerkens-dew-na2so4",
+        F.tabulation_experiment().experiment_id,
+        identity,
+        Decimal("900"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+
+def _assert_dew_point_keeps_gas_thermo(monkeypatch) -> None:
+    def unexpected_open(*_args):
+        pytest.fail("dew point must not open a liquidus engine")
+
+    monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        _dew_point_observation(),
+    )
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == "antoine_data_unavailable"
+    assert prediction.refusal_detail["species"] == ("Na2SO4", "NaOH")
+
+
+def test_dew_point_keeps_the_gas_thermo_route(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _assert_dew_point_keeps_gas_thermo(monkeypatch)
+
+    original = score_mod._engine_lacks_quantity_capability
+
+    def legacy_gate(engine, quantity, phase_basis):
+        if (
+            quantity is Quantity.TRANSITION_TEMPERATURE
+            and phase_basis == "dew_point"
+        ):
+            return True
+        return original(engine, quantity, phase_basis)
+
+    monkeypatch.setattr(
+        score_mod,
+        "_engine_lacks_quantity_capability",
+        legacy_gate,
+    )
+    with pytest.raises(AssertionError):
+        _assert_dew_point_keeps_gas_thermo(monkeypatch)
 
 
 def test_transition_temperature_out_of_domain_bracket_is_typed_refusal(

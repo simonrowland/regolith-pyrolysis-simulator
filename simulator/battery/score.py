@@ -879,10 +879,9 @@ def _engine_supports_liquidus_transition(
 
     if phase_basis not in _LIQUIDUS_TRANSITION_SUBTYPES:
         return False
-    # The AlphaMELTS subprocess route exposes its native liquidus-start result;
-    # this scoring route does not infer a solidus from that liquidus scalar.
-    if engine is Engine.ALPHAMELTS and phase_basis != "liquidus":
-        return False
+    # Solidus support depends on the opened transport. The subprocess
+    # liquidus-start route refuses after that handle exists; the Python
+    # API runs the fraction finder and can return a solidus.
     adapter = battery_adapter_class(engine.value)
     return callable(getattr(adapter, "find_liquidus_solidus", None))
 
@@ -897,6 +896,9 @@ def _engine_lacks_quantity_capability(
     if _is_quantity_not_predicted(quantity):
         return True
     if quantity is Quantity.TRANSITION_TEMPERATURE:
+        # Dew point is the wall-deposition route, not a liquidus capability.
+        if phase_basis == "dew_point":
+            return False
         return not _engine_supports_liquidus_transition(engine, phase_basis)
     if (
         quantity in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
@@ -13896,6 +13898,26 @@ def _predict_liquidus_transition_temperature(
                 identity=identity,
                 requested_composition=requested,
             )
+        if (
+            subtype == "solidus"
+            and getattr(backend, "_mode", None) == "subprocess"
+        ):
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.UNSUPPORTED),
+                authority=Authority.REFUSED,
+                notices=tuple(notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={
+                    "reason": "liquidus_only_transport",
+                    "transport": "subprocess",
+                },
+                identity=identity,
+                requested_composition=requested,
+            )
         result = finder(
             composition_kg=composition_kg,
             fO2_log=fO2_log,
@@ -14040,15 +14062,18 @@ def _predict_with_engine(
             refusal_detail={"reason": "quantity_unknown"},
         )
     if quantity is Quantity.TRANSITION_TEMPERATURE:
-        return _predict_liquidus_transition_temperature(
-            engine,
-            observation,
-            identity,
-            channel,
-            sources,
-            handles=handles,
-            experiment=experiment,
-        )
+        from simulator.melt_backend.liquidus import _LIQUIDUS_TRANSITION_SUBTYPES
+
+        if _subtype_text(identity) in _LIQUIDUS_TRANSITION_SUBTYPES:
+            return _predict_liquidus_transition_temperature(
+                engine,
+                observation,
+                identity,
+                channel,
+                sources,
+                handles=handles,
+                experiment=experiment,
+            )
     if quantity in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES:
         return _predict_mass_loss_with_residue(
             engine,
