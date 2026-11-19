@@ -393,10 +393,6 @@ def test_rys_source_oxygen_requires_row_level_independence_evidence() -> None:
     assert refused.reason is SourceOxygenFallbackReason.UNTYPED_LINEAGE
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Rego pCO=P_total-pNa_obs; physics b-1195/d-405 owns the fix",
-)
 def test_rego_na_oxygen_condition_is_independent_of_observed_target() -> None:
     experiment = F.tabulation_experiment(
         "rego-target-mutation",
