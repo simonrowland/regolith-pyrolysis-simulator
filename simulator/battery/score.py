@@ -8552,7 +8552,7 @@ class _FeRedoxRefusal:
 def _openimcc_candidate_valence_states(
     identity: Identity,
 ) -> tuple[int, ...] | None:
-    """Return the pinned candidate pack's modeled states for this basis."""
+    """Return the candidate couple state labels for an eligible basis."""
 
     formula = identity.species.formula if identity.species is not None else ""
     states_by_element = {"Cr": (2, 3), "Ti": (3, 4), "Mn": (2, 3)}
@@ -8599,8 +8599,8 @@ def _openimcc_candidate_valence_value(
     element_amounts = by_element.get(formula)
     if not isinstance(element_amounts, Mapping):
         return None
-    # OpenIMCC omits zero-amount states from this ledger. A missing supported
-    # state is therefore a computed zero; a missing element ledger is not.
+    # OpenIMCC omits zero-amount states from this ledger. The caller checks
+    # the engine's coverage record before treating an omitted state as zero.
     amounts = {
         state: float(element_amounts.get(state, 0.0))
         for state in states
@@ -8610,8 +8610,8 @@ def _openimcc_candidate_valence_value(
     numerator_state = basis.numerator_oxidation_states[0]
     numerator = amounts[numerator_state]
     if basis.value_form is ValenceValueForm.FRACTION:
-        # These candidate rows model only the supported pair, which is the
-        # full element denominator for the Cr, Ti, and Mn bases.
+        # The caller has already verified that the engine models the complete
+        # total-element denominator for this basis.
         denominator = math.fsum(amounts.values())
     else:
         assert basis.denominator_oxidation_state is not None
@@ -9369,6 +9369,74 @@ def _predict_redox(
                 RefusalReason.METRIC_DOMAIN,
                 {"reason": "openimcc_redox_refused", "detail": str(exc)},
             )
+        if candidate_states is not None:
+            coverage = getattr(result, "unmodelled_redox_couples", None)
+            if not isinstance(coverage, tuple):
+                return refused(
+                    RefusalReason.UNSUPPORTED,
+                    {
+                        "reason": "openimcc_redox_coverage_unavailable",
+                        "species": redox_element,
+                    },
+                    execution_state=ExecutionState.UNSUPPORTED,
+                    call_evidence="openimcc.evaluate_redox",
+                )
+            coverage_entry = next(
+                (
+                    couple
+                    for couple in coverage
+                    if isinstance(couple, Mapping)
+                    and couple.get("element") == redox_element
+                ),
+                None,
+            )
+            if coverage_entry is None:
+                modelled_states: tuple[int, ...] = ()
+                unmodelled_states: tuple[int, ...] = ()
+            else:
+                raw_modelled = coverage_entry.get("modelled_states")
+                raw_unmodelled = coverage_entry.get("unmodelled_states")
+                if (
+                    not isinstance(raw_modelled, tuple)
+                    or not isinstance(raw_unmodelled, tuple)
+                    or any(type(state) is not int for state in raw_modelled)
+                    or any(type(state) is not int for state in raw_unmodelled)
+                ):
+                    return refused(
+                        RefusalReason.UNSUPPORTED,
+                        {
+                            "reason": "openimcc_redox_coverage_unavailable",
+                            "species": redox_element,
+                        },
+                        execution_state=ExecutionState.UNSUPPORTED,
+                        call_evidence="openimcc.evaluate_redox",
+                    )
+                modelled_states = raw_modelled
+                unmodelled_states = raw_unmodelled
+            basis_state = identity.valence_basis
+            assert basis_state is not None and basis_state.is_value
+            basis = basis_state.value
+            missing_states = (
+                unmodelled_states
+                if basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+                else tuple(
+                    state
+                    for state in unmodelled_states
+                    if state in candidate_states
+                )
+            )
+            if missing_states:
+                return refused(
+                    RefusalReason.UNSUPPORTED,
+                    {
+                        "reason": "openimcc_redox_couple_not_in_pinned_pack",
+                        "species": redox_element,
+                        "modelled_states": modelled_states,
+                        "unmodelled_states": unmodelled_states,
+                    },
+                    execution_state=ExecutionState.UNSUPPORTED,
+                    call_evidence="openimcc.evaluate_redox",
+                )
         prediction_value = (
             result.ferric_fe_mol / result.ferrous_fe_mol
             if candidate_states is None
