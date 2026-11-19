@@ -1,8 +1,21 @@
-"""Re-run the review of record's seven independent mutation detectors."""
+"""Re-run cache regression mutation detectors, including refusal admissions."""
 
 import pytest
 
 from simulator import engine_cache
+
+
+def _marker_only_admission(result):
+    if not isinstance(result, dict) or result.get("status") != "refusal":
+        return False
+    detail = " ".join(
+        str(result.get(name) or "")
+        for name in ("refusal_reason", "engine_status", "reason", "engine_reason")
+    ).lower()
+    return (
+        engine_cache._has_deterministic_engine_refusal(detail)
+        or "thermoengine_nonfinite_field" in detail
+    )
 
 
 def test_dropped_temperature_is_detected(monkeypatch):
@@ -32,16 +45,76 @@ def test_signed_zero_loss_is_detected(tmp_path, monkeypatch):
 
 
 def test_timeout_admission_is_detected(tmp_path, monkeypatch):
-    from tests.test_engine_cache_refusals import test_transient_and_unknown_refusals_are_never_stored
+    from tests.test_engine_cache_refusals import (
+        test_timeout_and_crash_markers_never_admit_a_refusal,
+    )
 
-    monkeypatch.setattr(engine_cache, "CACHEABLE_REFUSAL_CODES", engine_cache.CACHEABLE_REFUSAL_CODES | {"engine_timeout"})
+    monkeypatch.setattr(engine_cache, "cacheable_refusal", _marker_only_admission)
     with pytest.raises(AssertionError):
-        test_transient_and_unknown_refusals_are_never_stored("engine_timeout", tmp_path, monkeypatch)
+        test_timeout_and_crash_markers_never_admit_a_refusal(
+            "engine_timeout", "speciation_no_finite_values no_finite_values",
+            tmp_path, monkeypatch,
+        )
+
+
+def test_thermoengine_nonfinite_admission_is_detected():
+    from tests.test_engine_cache_refusals import (
+        test_thermoengine_nonfinite_marker_does_not_admit_unavailable,
+    )
+
+    original = engine_cache.cacheable_refusal
+    engine_cache.cacheable_refusal = _marker_only_admission
+    try:
+        with pytest.raises(AssertionError):
+            test_thermoengine_nonfinite_marker_does_not_admit_unavailable()
+    finally:
+        engine_cache.cacheable_refusal = original
+
+
+def test_missing_engine_marker_admission_is_detected(tmp_path, monkeypatch):
+    from tests.test_engine_cache_refusals import (
+        test_unavailable_with_deterministic_markers_is_never_cached,
+    )
+
+    original = engine_cache.cacheable_refusal
+    engine_cache.cacheable_refusal = _marker_only_admission
+    try:
+        with pytest.raises(AssertionError):
+            test_unavailable_with_deterministic_markers_is_never_cached(
+                "engine install missing; speciation_no_finite_values no_finite_values",
+                None,
+                tmp_path,
+                monkeypatch,
+            )
+    finally:
+        engine_cache.cacheable_refusal = original
+
+
+def test_stolyarova_absolute_population_pin_is_detected(tmp_path, monkeypatch):
+    from tests.battery import test_engine_cache_stolyarova_refusals as battery_test
+
+    monkeypatch.setattr(battery_test, "load_score_context", lambda *_args, **_kwargs: object())
+    calls = []
+
+    def short_slice(*_args, engines, **_kwargs):
+        calls.append(1)
+        hits = 0 if len(calls) == 1 else 1
+        misses = 1 if len(calls) == 1 else 0
+        counts = {
+            engine.value: {"hits": hits, "misses": misses}
+            for engine in engines
+        }
+        return ["same row"], counts
+
+    monkeypatch.setattr(battery_test, "_run_slice", short_slice)
+    with pytest.raises(AssertionError):
+        battery_test.test_stolyarova_vaporock_and_thermoengine_refusals_hit_warm_with_parity(
+            tmp_path
+        )
 
 
 @pytest.mark.parametrize("marker", [
     "speciation_no_finite_values", "no_finite_values",
-    "thermoengine_nonfinite_field",
 ])
 def test_deterministic_engine_refusal_marker_removal_is_detected(marker, monkeypatch):
     original = engine_cache._DETERMINISTIC_ENGINE_REFUSAL_MARKER_GROUPS
@@ -54,18 +127,11 @@ def test_deterministic_engine_refusal_marker_removal_is_detected(marker, monkeyp
             if (filtered := tuple(item for item in group if item != marker))
         ),
     )
-    if marker == "thermoengine_nonfinite_field":
-        from tests.test_engine_cache_refusals import (
-            test_thermoengine_refusal_requires_its_typed_field_code,
-        )
-        with pytest.raises(AssertionError):
-            test_thermoengine_refusal_requires_its_typed_field_code()
-    else:
-        from tests.test_engine_cache_refusals import (
-            test_vaporock_refusal_requires_both_empty_speciation_codes,
-        )
-        with pytest.raises(AssertionError):
-            test_vaporock_refusal_requires_both_empty_speciation_codes()
+    from tests.test_engine_cache_refusals import (
+        test_vaporock_refusal_requires_both_empty_speciation_codes,
+    )
+    with pytest.raises(AssertionError):
+        test_vaporock_refusal_requires_both_empty_speciation_codes()
 
 
 def test_sequence_reuse_is_detected(tmp_path, monkeypatch):

@@ -1,9 +1,8 @@
 """One process-local HOT SQLite cache for engine outputs.
 
-When an engine or adapter change can alter predictions, increment that
-engine's ``ENGINE_CHEMISTRY_VERSION`` entry by hand and append a dated
-history entry below the version map. Runtime identity is diagnostic metadata
-only; it never changes or expires cache keys.
+Code-side numeric changes require a chemistry-version bump. The key also
+contains the selected engine pin and bytes of its runtime data files, so those
+input edits miss old rows without expiring or deleting them.
 """
 
 from __future__ import annotations
@@ -20,6 +19,7 @@ import os
 import sqlite3
 import threading
 import time
+import tomllib
 import zlib
 from collections import OrderedDict
 from collections.abc import Iterable, Iterator, Mapping
@@ -288,21 +288,20 @@ REFUSAL_TIMEOUT = "engine_timeout"
 REFUSAL_ENGINE_CRASH = "engine_crash"
 REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
 REFUSAL_UNAVAILABLE = "unavailable"
+REFUSAL_NOT_CONVERGED = "not_converged"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
 
 CACHEABLE_REFUSAL_CODES = frozenset({
     REFUSAL_OUT_OF_BASIS, REFUSAL_COMPOSITION_PROJECTED, REFUSAL_MAJOR_SUM,
-    REFUSAL_NO_LIQUID,
+    REFUSAL_NO_LIQUID, REFUSAL_NOT_CONVERGED,
 })
 
-# These are solver outcomes for a fixed, exact request, rather than transport
-# or installation failures. VapoRock classifies an empty finite speciation
-# after conversion, and ThermoEngine classifies a row-local non-finite Gibbs
-# field; neither can change without changing the request or engine version.
-# Keep timeouts, crashes, unavailable engines, and unknown failures uncached.
+# VapoRock classifies an empty finite speciation after conversion. This marker
+# can confirm the typed not_converged code, but cannot admit another code.
+# ThermoEngine's non-finite field may come from a child that is already dead,
+# so it stays uncached until the adapter distinguishes that from a live result.
 _DETERMINISTIC_ENGINE_REFUSAL_MARKER_GROUPS = (
     ("speciation_no_finite_values", "no_finite_values"),
-    ("thermoengine_nonfinite_field",),
 )
 
 
@@ -322,6 +321,12 @@ def cacheable_refusal(result) -> bool:
         if diagnostics.get("backend_failure_disposition"):
             return False
         status = getattr(result, "status", None)
+        # Missing engines and transient failures are explicit exclusions;
+        # marker text cannot reclassify them as deterministic solver results.
+        if status in {REFUSAL_UNAVAILABLE, REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH}:
+            return False
+        if status not in CACHEABLE_REFUSAL_CODES:
+            return False
         reason = " ".join(
             str(diagnostics.get(name) or "").lower()
             for name in (
@@ -329,46 +334,51 @@ def cacheable_refusal(result) -> bool:
                 "empty_speciation_cause", "engine_reason",
             )
         )
-        if (
-            status == "not_converged"
+        return (
+            status == REFUSAL_NOT_CONVERGED
             and _has_deterministic_engine_refusal(reason)
-        ):
-            return True
-        # ThermoEngineNonFiniteField is emitted only for a row-local numeric
-        # field validation failure. Missing engines and transport failures
-        # have distinct statuses/dispositions and remain excluded.
-        if _has_deterministic_engine_refusal(reason):
-            return True
+        )
     if (
         isinstance(result, Mapping)
         and result.get("status") == "refusal"
         and not result.get("exit_signal")
         and not result.get("exit_code")
+        and not result.get("backend_failure_disposition")
     ):
-        if result.get("refusal_reason") in CACHEABLE_REFUSAL_CODES:
-            return result.get("engine_status") in {
-                None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok",
-            }
-        detail = " ".join(str(result.get(name) or "") for name in (
-            "refusal_reason", "engine_status", "reason", "engine_reason",
-        )).lower()
-        # These are the engine-level failure labels emitted by VapoRock and
-        # ThermoEngine. Exact marker matching leaves generic not_converged and
-        # unavailable outcomes on the existing non-cacheable path.
-        return _has_deterministic_engine_refusal(detail)
+        refusal_code = result.get("refusal_reason")
+        engine_status = result.get("engine_status")
+        if refusal_code in {
+            REFUSAL_UNAVAILABLE, REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH,
+        } or engine_status in {
+            "unavailable", "not_attempted", REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH,
+        }:
+            return False
+        if refusal_code not in CACHEABLE_REFUSAL_CODES:
+            return False
+        if refusal_code == REFUSAL_NOT_CONVERGED:
+            if engine_status != REFUSAL_NOT_CONVERGED:
+                return False
+            detail = " ".join(str(result.get(name) or "") for name in (
+                "refusal_reason", "engine_status", "reason", "engine_reason",
+            )).lower()
+            return _has_deterministic_engine_refusal(detail)
+        return engine_status in {
+            None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok",
+        }
     return False
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
-    "internal-analytical": 1,
+    "internal-analytical": 2,
     "vaporock": 1,
-    "magemin": 2,
-    "alphamelts": 2,
-    "thermoengine": 2,
+    "magemin": 3,
+    "alphamelts": 3,
+    "thermoengine": 3,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
-# diagnostic and never participates in the cache key.
+# diagnostic; the declared engine pin and runtime data bytes are separate key
+# material because they can change outputs without a code-side version bump.
 # alphamelts v1: 2026-11-08 alphaMELTS 2.3.1 Darwin arm64 binary - initial cache version
 # alphamelts v2: 2026-11-11 alphaMELTS 2.3.1, b257r landing 982a8d9fa - canonical activity labels, oxide-vapour projection and typed missing-pO2 refusal (18be4a5cd, b4e6e0dda, 959731207)
 # thermoengine v1: 2026-11-08 ThermoEngine df7a5f4609116a83bf40a5a352a19e3826a822d9 - initial cache version
@@ -378,6 +388,221 @@ ENGINE_CHEMISTRY_VERSION = {
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
+# magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
+# alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
+# thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
+# internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
+
+
+@dataclass(frozen=True)
+class EngineCacheInput:
+    path: str
+    kind: str
+    selector: str | None
+
+
+_ENGINE_CACHE_ROOT = Path(__file__).resolve().parents[1]
+
+# Only inputs read by a numeric engine path belong here. Package code/data
+# selected by each lock or OpenIMCC pin are covered by that immutable pin;
+# code-side tables stay under the versioned live-probe guard.
+# PySulfSat runs after cached equilibrium, and Thermobar has no cached-engine
+# caller, so neither lock entry can affect the value stored by this cache.
+ENGINE_CACHE_INPUTS = {
+    "openimcc": (
+        EngineCacheInput(
+            "pyproject.toml", "pyproject-dependency", "openimcc"
+        ),  # This pin selects OpenIMCC's solver and packaged datapacks.
+    ),
+    "internal-analytical": (
+        EngineCacheInput(
+            "pyproject.toml", "pyproject-dependency", "openimcc"
+        ),  # The oxygen-balance branch delegates to OpenIMCC.
+        EngineCacheInput(
+            "data/vapor_pressures.yaml", "data", None
+        ),  # The builtin vapor-pressure provider reads these coefficients.
+        EngineCacheInput(
+            "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
+        ),  # The builtin catalog reads these executable NASA thermo rows.
+        EngineCacheInput(
+            "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
+        ),  # The builtin catalog reads these executable IVTAN thermo rows.
+        EngineCacheInput(
+            "data/setpoints.yaml", "data", None
+        ),  # The core reads fallback and activity settings from this file.
+        EngineCacheInput(
+            "data/species_catalog.yaml", "data", None
+        ),  # The core's formula registry supplies formula masses for this path.
+    ),
+    "vaporock": (
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.vaporock"
+        ),  # VapoRock supplies the cached vapor result.
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.thermoengine"
+        ),  # The VapoRock package loads ThermoEngine native libraries.
+    ),
+    "magemin": (
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.magemin"
+        ),  # This entry selects MAGEMin source, patches and built artifact.
+    ),
+    "alphamelts": (
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.alphamelts"
+        ),  # This entry selects the alphaMELTS runtime artifact.
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.petthermotools"
+        ),  # The alternate Python transport runs PetThermoTools.
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.vaporock"
+        ),  # The Python transport delegates vapor equilibrium to VapoRock.
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.thermoengine"
+        ),  # VapoRock loads ThermoEngine native libraries.
+        EngineCacheInput(
+            "pyproject.toml", "pyproject-dependency", "openimcc"
+        ),  # Builtin subprocess projection may evaluate melt activity with OpenIMCC.
+        EngineCacheInput(
+            "data/vapor_pressures.yaml", "data", None
+        ),  # Shared MELTS support reads coefficients for oxide vapor projection.
+        EngineCacheInput(
+            "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
+        ),  # Shared MELTS support reads CEA rows for O2 dissociation.
+        EngineCacheInput(
+            "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
+        ),  # Catalog fallback reads this executable IVTAN extract.
+    ),
+    "thermoengine": (
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.thermoengine"
+        ),  # This entry selects ThermoEngine source, patches and native libraries.
+        EngineCacheInput(
+            "engines/engines.lock.toml", "engine-lock", "engines.vaporock"
+        ),  # ThermoEngine delegates its vapor path to VapoRock.
+        EngineCacheInput(
+            "data/vapor_pressures.yaml", "data", None
+        ),  # Shared MELTS support reads coefficients for oxide vapor projection.
+        EngineCacheInput(
+            "data/literature/extracts/nasa-cea-thermo.yaml", "data", None
+        ),  # Shared MELTS support reads CEA rows for O2 dissociation.
+        EngineCacheInput(
+            "data/literature/extracts/ivtan-mno-coo-thermo.yaml", "data", None
+        ),  # Catalog-backed vapor fallback reads this executable IVTAN extract.
+    ),
+}
+_ENGINE_CACHE_INPUT_IDENTITY_BYTES = 16
+_ENGINE_CACHE_KEY_PREFIX_BYTES = 4 + _ENGINE_CACHE_INPUT_IDENTITY_BYTES
+
+
+class EngineCacheInputIdentityError(ValueError):
+    """A declared engine pin or runtime data input cannot be identified."""
+
+    def __init__(self, engine_id: str, path: str, reason: str) -> None:
+        self.engine_id = engine_id
+        self.path = path
+        self.reason = reason
+        super().__init__(
+            f"engine cache input identity unavailable for {engine_id!r} at "
+            f"{path!r}: {reason}"
+        )
+
+
+def _cache_input_component(engine_id: str, input_ref: EngineCacheInput) -> bytes:
+    path = _ENGINE_CACHE_ROOT / input_ref.path
+    try:
+        source = path.read_bytes()
+    except OSError as exc:
+        raise EngineCacheInputIdentityError(
+            engine_id, input_ref.path, f"cannot read declared input ({exc})"
+        ) from exc
+
+    if input_ref.kind == "data":
+        return source
+
+    try:
+        document = tomllib.loads(source.decode("utf-8"))
+    except (UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
+        raise EngineCacheInputIdentityError(
+            engine_id, input_ref.path, f"invalid TOML input ({exc})"
+        ) from exc
+
+    if input_ref.kind == "engine-lock":
+        try:
+            selector_root, selector_name = (input_ref.selector or "").split(".", 1)
+            value = document[selector_root][selector_name]
+        except (KeyError, ValueError, TypeError) as exc:
+            raise EngineCacheInputIdentityError(
+                engine_id,
+                input_ref.path,
+                f"missing lock entry {input_ref.selector!r}",
+            ) from exc
+    elif input_ref.kind == "pyproject-dependency":
+        dependency_name = (input_ref.selector or "").replace("_", "-").lower()
+        project = document.get("project")
+        if not isinstance(project, Mapping):
+            raise EngineCacheInputIdentityError(
+                engine_id, input_ref.path, "project is not a TOML table"
+            )
+        dependencies = project.get("dependencies", ())
+        if not isinstance(dependencies, list):
+            raise EngineCacheInputIdentityError(
+                engine_id, input_ref.path, "project.dependencies is not a list"
+            )
+        matches = []
+        for dependency in dependencies:
+            if not isinstance(dependency, str):
+                continue
+            match = re.match(r"\s*([A-Za-z0-9._-]+)", dependency)
+            if match and match.group(1).replace("_", "-").lower() == dependency_name:
+                matches.append(dependency)
+        if len(matches) != 1:
+            raise EngineCacheInputIdentityError(
+                engine_id,
+                input_ref.path,
+                f"expected one {dependency_name!r} dependency, found {len(matches)}",
+            )
+        value = matches[0]
+    else:
+        raise EngineCacheInputIdentityError(
+            engine_id, input_ref.path, f"unknown input kind {input_ref.kind!r}"
+        )
+
+    try:
+        return json.dumps(
+            value, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+        ).encode("ascii")
+    except (TypeError, ValueError) as exc:
+        raise EngineCacheInputIdentityError(
+            engine_id, input_ref.path, f"input is not canonicalizable ({exc})"
+        ) from exc
+
+
+@lru_cache(maxsize=len(ENGINE_CHEMISTRY_VERSION))
+def _engine_cache_input_identity_digest(engine_id: str) -> bytes:
+    try:
+        inputs = ENGINE_CACHE_INPUTS[engine_id]
+    except KeyError as exc:
+        raise EngineCacheInputIdentityError(
+            engine_id, "ENGINE_CACHE_INPUTS", "engine has no declared inputs"
+        ) from exc
+
+    digest = hashlib.blake2b(digest_size=_ENGINE_CACHE_INPUT_IDENTITY_BYTES)
+    digest.update(b"engine-cache-input-identity-v1\0")
+    digest.update(engine_id.encode("utf-8"))
+    for input_ref in inputs:
+        label = json.dumps(
+            (input_ref.path, input_ref.kind, input_ref.selector),
+            separators=(",", ":"),
+        ).encode("utf-8")
+        component = _cache_input_component(engine_id, input_ref)
+        digest.update(len(label).to_bytes(4, "big"))
+        digest.update(label)
+        digest.update(len(component).to_bytes(8, "big"))
+        digest.update(component)
+    return digest.digest()
+
+
 ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     "openimcc": {
         "identity": "commit:66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84",
@@ -621,8 +846,12 @@ def engine_cache_key(engine_id: str, chem_version: str | int, request: Any) -> b
         payload = pack(request, key=True)
     except (TypeError, ValueError) as exc:
         raise ValueError("engine request must contain finite canonical scalars") from exc
-    header = bytes((_ENGINE_NUMBERS[engine_id],)) + version.to_bytes(2, "big")
-    if len(payload) + 4 > _NATURAL_KEY_LIMIT:
+    header = (
+        bytes((_ENGINE_NUMBERS[engine_id],))
+        + version.to_bytes(2, "big")
+        + _engine_cache_input_identity_digest(engine_id)
+    )
+    if len(payload) + _ENGINE_CACHE_KEY_PREFIX_BYTES > _NATURAL_KEY_LIMIT:
         return header + b"\xff" + hashlib.blake2b(payload, digest_size=16).digest()
     return header + b"\x00" + payload
 
