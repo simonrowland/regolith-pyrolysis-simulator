@@ -174,6 +174,11 @@ def _forecast_gate_parent_state_bytes(sim):
             "provider_outcome": getattr(
                 sim, "_freeze_gate_provider_outcome", None
             ),
+            "pinned_silica_verdict": getattr(
+                sim,
+                "_melt_redox_gate_authority_tick_silica_out_of_band",
+                None,
+            ),
             "replay_reasons": getattr(
                 sim, "_reduced_real_uncacheable_reasons", None
             ),
@@ -456,6 +461,25 @@ def test_c0_forecast_reuses_current_validated_gate_pin_without_resolution():
     assert context._resolved_melt_redox_gate_authority() is gate_record["curve"]
     assert backend.engine_calls == engine_calls_before
     assert _forecast_gate_parent_state_bytes(sim) == state_before
+
+
+def test_missing_pinned_silica_verdict_check_is_read_only(monkeypatch):
+    sim = _sim(
+        {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
+    )
+    sim.load_batch("lunar")
+    sim._liquid_fraction_provider = "magemin"
+    sim._melt_redox_gate_authority_tick_silica_out_of_band = None
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_gate_record_current_silica_verdict",
+        lambda _value: False,
+    )
+
+    assert sim._melt_redox_gate_record_silica_verdict_matches_current(
+        {"curve": {}}
+    )
+    assert sim._melt_redox_gate_authority_tick_silica_out_of_band is None
 
 
 def test_c0_forecast_without_registered_gate_provider_does_not_register(

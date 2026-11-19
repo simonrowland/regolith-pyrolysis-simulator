@@ -5311,12 +5311,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             None,
         )
         if pinned_verdict is None:
-            # Curves may carry a verdict for a projected solver bulk. Establish
-            # the pin on this same cheap input representation so later checks
-            # compare like with like without dispatching the solver.
-            self._melt_redox_gate_authority_tick_silica_out_of_band = (
-                current_verdict
-            )
+            # A missing baseline is not evidence of a band change. Keep this
+            # check side-effect-free; admitted live records set the pin when
+            # the hour's authority is established.
             return True
         return current_verdict == pinned_verdict
 
