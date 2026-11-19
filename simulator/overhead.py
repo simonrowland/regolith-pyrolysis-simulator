@@ -416,6 +416,7 @@ def _effusion_species_mol_s(
     length_m: float,
     temperature_K: float,
     upstream_pa: float,
+    downstream_pa: float,
     transmission: float,
 ) -> dict[str, float]:
     """Per-species effusion. Not a mole-fraction split of one total.
@@ -424,11 +425,14 @@ def _effusion_species_mol_s(
     not depend on pressure; that Kn is the helper's domain assertion, and
     the Dushman W of the canonical pipe is inside it. The same C_i is
     the molar conductance at every pressure.
-    Algebra: Q_i = C_i * max(p_i, 0) / (R T), p_i = x_i * P_up, vacuum
-    downstream so p_down,i = 0. R is the CODATA leaf, the same constant
-    mean_molecular_speed_m_s uses inside the conductance helper.
+    Algebra: Q_i = C_i * max(p_i - p_down,i, 0) / (R T).
+    p_i = x_i * P_up. The call has one downstream total, and the only
+    composition it has is the upstream holdup, so p_down,i = x_i * P_down.
+    That is the same split that forms p_i. Pure gas: p_down,i = P_down,
+    and Q = C * (P_up - P_down) / (R T). R is the CODATA leaf, the same
+    constant mean_molecular_speed_m_s uses inside the conductance helper.
     Unit check: (m^3/s) * Pa / (J/(mol·K) * K) = mol/s.
-    Limit: P_up = 0 gives zero.
+    Limit: P_down = 0 is vacuum effusion. P_down = P_up gives zero.
     """
 
     rates: dict[str, float] = {}
@@ -441,8 +445,12 @@ def _effusion_species_mol_s(
             transmission_probability=transmission,
             knudsen_number=FREE_MOLECULAR_KNUDSEN_MIN,
         )
-        partial_pa = fraction * upstream_pa
-        throughput_pa_m3 = throughput_pa_m3_s(conductance_m3_s, partial_pa)
+        # Δp_i = x_i * (P_up - P_down). See the docstring for the split.
+        partial_delta_pa = fraction * max(upstream_pa - downstream_pa, 0.0)
+        throughput_pa_m3 = throughput_pa_m3_s(
+            conductance_m3_s,
+            partial_delta_pa,
+        )
         rates[species] = throughput_pa_m3 / (
             GAS_CONSTANT_CODATA * temperature_K
         )
@@ -481,9 +489,8 @@ def pipe_species_outflow_mol_s(
     each species' own effusion. Between Kn = 0.05 and Kn = 10 the two
     rates mix with the smoothstep weight, and that mix is not split
     again. P_down >= P_up is zero forward flow. A positive downstream
-    pressure on a branch that still has an effusion term refuses: the
-    free-molecular law needs p_down,i, and this function is given one
-    total downstream pressure, not a downstream composition.
+    pressure on the free-molecular end is net effusion, p_down,i =
+    x_i * P_down, not a refusal. §1 writes Q_i = C_i * max(p_i - p_down,i, 0) / (R T).
     """
 
     upstream_pa = _pipe_scalar(
@@ -521,6 +528,16 @@ def pipe_species_outflow_mol_s(
     state = _pipe_knudsen(fractions, upstream_pa, temperature_K, diameter)
     knudsen_number = state.knudsen_number
     blend_weight = _molecular_blend_weight(knudsen_number)
+    # Printed Kn = 10 is 0.041036662569 Pa. binary64 Kn there is just
+    # under 10, so classify_knudsen_regime still says transitional, while
+    # the smoothstep has rounded to 1 and the molar flow is already the
+    # free-molecular end-member. The enum names that law, which is also
+    # what binding_cause says. Kn >= 10 is already free-molecular.
+    reported_regime = (
+        KnudsenRegime.FREE_MOLECULAR
+        if blend_weight == 1.0
+        else state.regime
+    )
     masses = {
         carrier.species: carrier.molar_mass_kg_mol
         for carrier in state.carriers
@@ -542,16 +559,10 @@ def pipe_species_outflow_mol_s(
         )
         return _pipe_outflow_result(
             {species: 0.0 for species in fractions},
-            regime=state.regime,
+            regime=reported_regime,
             blend_weight=blend_weight,
             binding_cause=binding,
             notices=notice_tuple,
-        )
-    if downstream_pa > 0.0 and blend_weight > 0.0:
-        raise TransportRegimeRefusal(
-            "downstream_composition_unspecified",
-            "free-molecular outflow needs a per-species downstream "
-            "pressure; one total P_down is not a composition",
         )
 
     choked = False
@@ -580,6 +591,7 @@ def pipe_species_outflow_mol_s(
             length_m=length,
             temperature_K=temperature_K,
             upstream_pa=upstream_pa,
+            downstream_pa=downstream_pa,
             transmission=transmission,
         )
 
@@ -600,7 +612,7 @@ def pipe_species_outflow_mol_s(
         binding = "pipe"
     return _pipe_outflow_result(
         blended,
-        regime=state.regime,
+        regime=reported_regime,
         blend_weight=blend_weight,
         binding_cause=binding,
         notices=notice_tuple,

@@ -1160,6 +1160,10 @@ def test_canonical_pipe_does_not_use_long_tube_clausing():
     expected_mol_s = dushman * pressure / (GAS_CONSTANT_CODATA * _CANONICAL_T_K)
     assert result.blend_weight == 1.0
     assert result.binding_cause == "molecular_conductance"
+    # binary64 Kn at this printed pressure is just under 10, so the
+    # classifier alone would say transitional. The weight is already 1
+    # and the flow is the free-molecular end, so the enum matches both.
+    assert result.regime is KnudsenRegime.FREE_MOLECULAR
     assert result.species_mol_s["O2"] == pytest.approx(expected_mol_s, rel=1e-9)
     asymptote = molecular_tube_conductance_m3_s(
         _CANONICAL_D_M,
@@ -1320,6 +1324,37 @@ def test_vacuum_downstream_zero_when_P_down_ge_P_up():
         assert result.species_mol_s["O2"] == 0.0
     vacuum = _o2_outflow(20.0, 0.0)
     assert _kg_per_h(vacuum) == pytest.approx(0.1236271233, abs=5e-11)
-    with pytest.raises(TransportRegimeRefusal) as refused:
-        _o2_outflow(0.02, 0.01)
-    assert refused.value.category == "downstream_composition_unspecified"
+    # Free-molecular end, pure O2. §1 is net effusion, not a refusal:
+    # Q = C * (P_up - P_down) / (R T). P_down = P_up / 2 is half the
+    # vacuum rate. The ratio is the proof; it does not re-derive C.
+    molecular = _o2_outflow(0.02, 0.0)
+    assert molecular.blend_weight == 1.0
+    backed = _o2_outflow(0.02, 0.01)
+    assert backed.blend_weight == 1.0
+    assert backed.regime is KnudsenRegime.FREE_MOLECULAR
+    assert backed.species_mol_s["O2"] == pytest.approx(
+        0.5 * molecular.species_mol_s["O2"],
+        rel=1e-12,
+    )
+    mixture_vacuum = pipe_species_outflow_mol_s(
+        0.02,
+        0.0,
+        _CANONICAL_T_K,
+        {"O2": 0.7, "N2": 0.3},
+        _CANONICAL_D_M,
+        _CANONICAL_L_M,
+    )
+    mixture_backed = pipe_species_outflow_mol_s(
+        0.02,
+        0.01,
+        _CANONICAL_T_K,
+        {"O2": 0.7, "N2": 0.3},
+        _CANONICAL_D_M,
+        _CANONICAL_L_M,
+    )
+    assert mixture_vacuum.blend_weight == 1.0
+    for species in ("O2", "N2"):
+        assert mixture_backed.species_mol_s[species] == pytest.approx(
+            0.5 * mixture_vacuum.species_mol_s[species],
+            rel=1e-12,
+        )
