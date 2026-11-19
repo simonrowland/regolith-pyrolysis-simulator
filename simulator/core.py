@@ -6079,6 +6079,51 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 candidate_fO2_log = min(
                     candidate_fO2_log, self._melt_redox_fO2_upper_bound_log(),
                 )
+                if (
+                    float(
+                        terms.get('redox_source:c3_na_shuttle_reduction', 0.0)
+                        or 0.0
+                    ) < -OXYGEN_RESERVOIR_NOOP_MOL
+                    and float(
+                        self.atom_ledger.mol_by_account(
+                            'process.reagent_inventory'
+                        ).get('Na', 0.0)
+                        or 0.0
+                    ) > OXYGEN_RESERVOIR_NOOP_MOL
+                    and float(
+                        self.atom_ledger.mol_by_account(
+                            'process.spent_reductant_residue'
+                        ).get('Na2O', 0.0)
+                        or 0.0
+                    ) > OXYGEN_RESERVOIR_NOOP_MOL
+                ):
+                    # A remaining Na reagent coexisting with its Na2O
+                    # product is the independent 4 Na + O2 <-> 2 Na2O
+                    # buffer. Its equilibrium pO2 comes from the repository's
+                    # JANAF-backed Ellingham resolver; a local Kress capacity
+                    # tangent must not step the melt below that coexistence
+                    # potential. The resolver returns bar, so log10 is the
+                    # dimensionless fO2/bar value consumed by this reservoir.
+                    from simulator.chemistry.ellingham_graph import (
+                        dissociation_pO2_threshold,
+                    )
+
+                    buffer_pO2_bar = dissociation_pO2_threshold(
+                        'Na',
+                        T_K,
+                        a_oxide=1.0,
+                    )
+                    buffer_fO2_log = math.log10(buffer_pO2_bar)
+                    if buffer_fO2_log > upper_bound:
+                        raise AccountingError(
+                            'active Na/Na2O redox buffer exceeds the melt fO2 '
+                            f'pressure ceiling: buffer={buffer_fO2_log:.12g}, '
+                            f'ceiling={upper_bound:.12g}'
+                        )
+                    candidate_fO2_log = max(
+                        candidate_fO2_log,
+                        buffer_fO2_log,
+                    )
                 applied_delta_ln = (
                     candidate_fO2_log - base_fO2_log
                 ) * math.log(10.0)

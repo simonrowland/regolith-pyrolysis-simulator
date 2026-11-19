@@ -115,8 +115,22 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
     # SiO2 -> SiO + 1/2 O2 gives exponent -1/2; SiO2 -> Si + O2 gives -1.
     # Fixed T/activity cancels the equilibrium constant in P/P_ref, leaving
     # (pO2/p_ref)**exponent (bar/bar dimensionless), continuous through p_ref.
+    # The Si elemental rail also cannot exceed its pure-component saturation
+    # pressure: the source reaction's implied metal activity is at most unity.
+    saturation_Pa = (
+        ellingham_graph.metal_saturation_pressure_Pa(
+            species, 1873.15, vapor_pressure_data=vapor_pressure_data,
+        )
+        if species in vapor_pressure_data["metals"]
+        else math.inf
+    )
+    assert answers[1000.0] < saturation_Pa
     for oxygen, pressure in answers.items():
-        assert pressure / answers[1e-9] == pytest.approx((oxygen / 1e-9) ** exponent)
+        expected = min(
+            answers[1000.0] * (oxygen / 1000.0) ** exponent,
+            saturation_Pa,
+        )
+        assert pressure == pytest.approx(expected)
     if route == "fallback":
         for oxygen in (1e-31, 1000.0):
             notice = receipts[oxygen]
@@ -124,6 +138,40 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
             assert notice["pO2_bar_used"] == oxygen
             assert notice["certified_band"]["pO2_bar"] == (1e-30, 100.0)
             assert notice["was_clamped"] is False
+
+
+@pytest.mark.parametrize("species", ("Cr", "Mg"))
+def test_elemental_metal_pressure_is_capped_at_pure_saturation(
+    vapor_pressure_data,
+    species,
+) -> None:
+    from engines.builtin.vapor_pressure import (
+        COEFF_BLOCK_PURE_COMPONENT,
+        wall_condensation_antoine_coefficients,
+    )
+
+    temperature_K = 1423.15
+    pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
+        species,
+        temperature_K,
+        1e-28,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    pure_metal_saturation = ellingham_graph.metal_saturation_pressure_Pa(
+        species,
+        temperature_K,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    pure_antoine, coefficient_block = wall_condensation_antoine_coefficients(
+        vapor_pressure_data["metals"][species], temperature_K,
+    )
+
+    assert coefficient_block == COEFF_BLOCK_PURE_COMPONENT
+    assert pure_metal_saturation == ellingham_graph._antoine_reference_pressure_Pa(
+        pure_antoine,
+        temperature_K,
+    )
+    assert pressure == pytest.approx(pure_metal_saturation)
 
 
 def test_evolves_uses_builtin_pressure_floor(vapor_pressure_data) -> None:

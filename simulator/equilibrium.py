@@ -371,6 +371,9 @@ class EquilibriumMixin:
         (see the shared SiO pressure owner).  [THERMO-8]
         """
         from simulator.melt_backend.base import EquilibriumResult
+        from simulator.chemistry.ellingham_graph import (
+            _cap_elemental_metal_pressure_at_saturation_Pa,
+        )
         from engines.builtin.vapor_pressure import (
             COEFF_BLOCK_ANTOINE,
             FIT_TARGET_PSEUDO_VAPOROCK,
@@ -919,6 +922,12 @@ class EquilibriumMixin:
                         species=species,
                         field="P_effective_pO2",
                     )
+                P_effective_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_effective_Pa,
+                    vapor_pressure_data=self.vapor_pressures,
+                )
                 if P_effective_Pa > 1e-15:
                     vapor_pressures[species] = P_effective_Pa
                     source_label = vapor_pressure_source_label(
@@ -1032,6 +1041,12 @@ class EquilibriumMixin:
                     P_eq_raw,
                     species=species,
                     field="P_effective_liquid_oxide_standard_reaction",
+                )
+                P_effective_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_effective_Pa,
+                    vapor_pressure_data=self.vapor_pressures,
                 )
                 if P_effective_Pa > 1e-15:
                     vapor_pressures[species] = P_effective_Pa
@@ -1163,6 +1178,12 @@ class EquilibriumMixin:
                     P_eq_raw,
                     species=species,
                     field="P_effective_gas_rail_standard_reaction",
+                )
+                P_effective_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_effective_Pa,
+                    vapor_pressure_data=self.vapor_pressures,
                 )
                 if P_effective_Pa > 1e-15:
                     vapor_pressures[species] = P_effective_Pa
@@ -1327,14 +1348,21 @@ class EquilibriumMixin:
             # --- Effective vapor pressure ---                     [ELLI-4]
             #
             # Condensed-basis rows produce a Raoultian activity against the
-            # pure-component vapor pressure and may saturate at a metal pool.
-            # Gas-basis rows already produce f_M/p°; multiplying by P_sat again
-            # would double-count the vaporization equilibrium.
+            # pure-component vapor pressure. Gas-basis rows already produce
+            # f_M/p° and convert directly to Pa. The shared cap below is only
+            # the pure-metal coexistence ceiling for either pressure rail.
             if metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS:
                 P_effective_Pa = metal_activity_root * _ELLINGHAM_STANDARD_PRESSURE_PA
             else:
                 assert P_reference_Pa is not None
                 P_effective_Pa = min(metal_activity_root, 1.0) * P_reference_Pa
+
+            P_effective_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                species,
+                T_K,
+                P_effective_Pa,
+                vapor_pressure_data=self.vapor_pressures,
+            )
 
             P_effective_Pa = _require_finite_vapor_value(
                 P_effective_Pa,

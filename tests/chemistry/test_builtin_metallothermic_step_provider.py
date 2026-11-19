@@ -3209,6 +3209,94 @@ def test_full_run_mass_balance_holds_with_kernel_committed_metallothermic(
         f"{snapshot.mass_balance_error_pct:.3e} % exceeds the "
         "5e-12 % kernel-path bound"
     )
+    if feedstock_key == "lunar_mare_low_ti":
+        assert any(
+            transition.name == "c6_mg_thermite_primary"
+            for transition in metallothermic_transitions
+        ), "lunar C0-C6 run did not reach the C6 thermite step"
+        assert sim.atom_ledger.project_account_kg("process.metal_phase").get(
+            "Fe", 0.0
+        ) > 0.0, "lunar C0-C6 run lost its extracted Fe metal"
+
+
+@pytest.mark.nightly
+@pytest.mark.xdist_group("magemin_fullrun_b")
+@pytest.mark.cpu_budget(1800)
+def test_c3_na_source_redox_and_elemental_vapor_respect_coexisting_buffers(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.chemistry.ellingham_graph import (
+        dissociation_pO2_threshold,
+        metal_saturation_pressure_Pa,
+    )
+
+    patched_setpoints = _hkl_only_setpoints(copy.deepcopy(setpoints_data))
+    c6 = patched_setpoints["campaigns"]["C6"]
+    c6["default_hold_T_C"] = 1400.0
+    c6["hold_temp_C"] = 1400.0
+    c6["kinetic_driven_above_crossover"] = False
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        patched_setpoints,
+        additives_kg={"K": 30.0, "Na": 25.0, "Mg": 60.0},
+    )
+    sim.start_campaign(CampaignPhase.C0)
+    decision_choice = {
+        DecisionType.ROOT_BRANCH: "pyrolysis",
+        DecisionType.PATH_AB: "A_staged",
+        DecisionType.BRANCH_ONE_TWO: "two",
+        DecisionType.C6_PROCEED: "yes",
+    }
+    steps = 0
+    while not sim.is_complete() and steps < 5000:
+        if sim.paused_for_decision:
+            decision = sim.pending_decision
+            choice = decision_choice.get(decision.decision_type)
+            if choice not in (decision.options or []):
+                choice = (decision.options or [None])[0]
+            sim.apply_decision(decision.decision_type, choice)
+            continue
+        sim.step()
+        steps += 1
+        if (
+            sim.melt.campaign == CampaignPhase.C3_NA
+            and sim.melt.campaign_hour == 3
+        ):
+            break
+
+    assert sim.melt.campaign == CampaignPhase.C3_NA
+    assert sim.melt.campaign_hour == 3, "run did not reach C3_NA hour 3"
+    reagent_inventory = sim.atom_ledger.mol_by_account(
+        "process.reagent_inventory"
+    )
+    spent_residue = sim.atom_ledger.mol_by_account(
+        "process.spent_reductant_residue"
+    )
+    assert reagent_inventory.get("Na", 0.0) > 0.0
+    assert spent_residue.get("Na2O", 0.0) > 0.0
+
+    diagnostic = sim._last_vapor_pressure_diagnostic
+    source_fO2_log = diagnostic["source_reaction_fO2_log10"]
+    temperature_K = sim.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
+    na_na2o_buffer_bar = dissociation_pO2_threshold(
+        "Na",
+        temperature_K,
+        a_oxide=1.0,
+    )
+    assert source_fO2_log >= math.log10(na_na2o_buffer_bar)
+
+    vapor_pressures = diagnostic["vapor_pressures_Pa"]
+    for species in ("Mg", "Si", "Cr", "Mn"):
+        pure_metal_saturation_Pa = metal_saturation_pressure_Pa(
+            species,
+            temperature_K,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        assert vapor_pressures[species] <= pure_metal_saturation_Pa
 
 
 def test_mars_basalt_c3_shuttle_conserves_total_elemental_fe(

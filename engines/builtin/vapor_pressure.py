@@ -3005,6 +3005,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         # re-enters this module during package init -- see
         # engines/builtin/__init__.py for the cycle description.
         from simulator.state import GAS_CONSTANT as STATE_GAS_CONSTANT
+        from simulator.chemistry.ellingham_graph import (
+            _cap_elemental_metal_pressure_at_saturation_Pa,
+        )
         from simulator.vapour_rail.channels import (
             REACTION_PLANE_MELT_INTERFACE,
             REACTION_PLANE_TRANSPORT_HEADSPACE,
@@ -3476,6 +3479,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_standard_reaction",
                 )
+                P_eq_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_eq_Pa,
+                    vapor_pressure_data=self._vapor_pressure_data,
+                )
                 gamma_auth = _gamma_domain_authority(
                     parent_oxide, T_K, oxide_activity
                 )
@@ -3649,6 +3658,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_liquid_oxide_standard_reaction",
                 )
+                P_eq_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_eq_Pa,
+                    vapor_pressure_data=self._vapor_pressure_data,
+                )
                 if _publishes_vapor_pressure(
                     P_eq_Pa,
                     retain_subthreshold=retain_high_t_openimcc_carriers,
@@ -3816,6 +3831,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     P_eq_raw,
                     species=species,
                     field="P_eq_gas_rail_standard_reaction",
+                )
+                P_eq_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_eq_Pa,
+                    vapor_pressure_data=self._vapor_pressure_data,
                 )
                 if _publishes_vapor_pressure(
                     P_eq_Pa,
@@ -4033,8 +4054,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
             if metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS:
                 # Gas-standard rows solve for f_M/p0, so P_M = root * p0.
-                # Pairing this root with condensed Antoine P_sat would count
-                # vaporization twice: P_wrong/P_right = P_sat/p0.
+                # Convert that fugacity directly to Pa. The shared elemental
+                # saturation cap below is only an upper bound; it does not
+                # multiply by P_sat and double-count vaporization.
                 activity_factor = metal_activity_root
                 pressure_reference_Pa = ELLINGHAM_STANDARD_PRESSURE_PA
                 pressure_rail = "gas_fugacity"
@@ -4050,6 +4072,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 activity_factor * pressure_reference_Pa,
                 species=species,
                 field="P_eq_Pa",
+            )
+            P_eq_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                species,
+                T_K,
+                P_eq_Pa,
+                vapor_pressure_data=self._vapor_pressure_data,
             )
             if _publishes_vapor_pressure(
                 P_eq_Pa,

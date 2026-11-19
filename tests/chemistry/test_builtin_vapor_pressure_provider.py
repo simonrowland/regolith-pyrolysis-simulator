@@ -3404,6 +3404,42 @@ def test_legacy_fallback_grounds_mn_liquid_oxide_standard_reaction(
     assert "liquid_oxide_standard_reaction" in result.vapor_pressures_source["Mn"]
 
 
+def test_internal_source_reaction_metal_pressure_respects_pure_saturation(
+    vapor_pressure_data,
+):
+    class _CrOnlyMelt:
+        temperature_C = 1423.15 - 273.15
+        p_total_mbar = 1e-3
+
+        def composition_wt_pct(self):
+            return {"Cr2O3": 100.0}
+
+    class _LowFO2InternalModel(_LegacyInternalAnalyticalModel):
+        def _compute_intrinsic_melt_fO2(self):
+            return -28.0
+
+    temperature_K = 1423.15
+    for species, melt in (
+        ("Cr", _CrOnlyMelt()),
+        ("Mg", _MgOnlyMelt(temperature_K)),
+    ):
+        result = _LowFO2InternalModel(
+            vapor_pressure_data,
+            melt=melt,
+        )._internal_analytical_equilibrium()
+        pure_metal_saturation_Pa = (
+            ellingham_graph.metal_saturation_pressure_Pa(
+                species,
+                temperature_K,
+                vapor_pressure_data=vapor_pressure_data,
+            )
+        )
+
+        assert result.vapor_pressures_Pa[species] == pytest.approx(
+            pure_metal_saturation_Pa
+        )
+
+
 def test_legacy_and_provider_al_liquid_oxide_antoine_pins(vapor_pressure_data):
     legacy = _LegacyInternalAnalyticalModel(
         vapor_pressure_data,
