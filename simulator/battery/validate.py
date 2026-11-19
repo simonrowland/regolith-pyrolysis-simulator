@@ -21,7 +21,8 @@ Ambiguity resolutions:
   ``score_eligible`` cannot be true when status is refused, admission is
   not admitted, evidence is not measured_*, identity_equal is not
   equal, or a vapour-equilibrium residual carries a blocking pressure
-  qualification (floor_inversion / fallback / pressure_provenance_unknown
+  qualification (floor_inversion / fallback / pressure_provenance_unknown /
+  imcc_complex_saturation
   on p_sat, p_partial, or p_reference). A score_eligible row's source
   relation is independent or unknown. Proven same_input, training,
   quoted_overlap, and correlated stay out. catalog_evaluator stays out
@@ -59,6 +60,7 @@ from simulator.battery.enums import (
     AdmissionStatus,
     AssetRole,
     Authority,
+    Engine,
     EvidenceClass,
     ExecutionState,
     ExperimentKind,
@@ -156,12 +158,21 @@ _OBSERVATION_ISSUE_PATH = re.compile(r"^observation\[(.+?)\](?:\.(.*))?$")
 _VAPOUR_EQUILIBRIUM = frozenset(
     {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE}
 )
+# Only PRESSURE_PROVENANCE_UNKNOWN notices naming total_pressure_Pa are ignored
+# for p_partial eligibility on the pressure-independent prediction paths.
 _PRESSURE_BLOCKING_NOTICES = frozenset(
     {
         NoticeKind.FLOOR_INVERSION,
         NoticeKind.FALLBACK,
         NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
         NoticeKind.UNVERIFIED_APPARATUS,
+        NoticeKind.IMCC_COMPLEX_SATURATION,
+    }
+)
+_TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS = frozenset(
+    {
+        (Engine.OPENIMCC, Quantity.P_PARTIAL),
+        (Engine.INTERNAL_ANALYTICAL, Quantity.P_PARTIAL),
     }
 )
 _CERTIFICATION_DOWNGRADE_NOTICES = frozenset(
@@ -487,6 +498,7 @@ def _table_payloads(
 def _pressure_blocking_notices(
     *groups: tuple[Notice, ...] | None,
     oxygen_balance_effusion_solved: bool = False,
+    engine: Engine | None = None,
 ) -> tuple[Notice, ...]:
     notices = tuple(notice for group in groups if group for notice in group)
     found: list[Notice] = []
@@ -497,6 +509,15 @@ def _pressure_blocking_notices(
             oxygen_balance_effusion_solved
             and notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
             and notice.reason.startswith("fO2_Pa is a DERIVED condition")
+        ):
+            continue
+        if (
+            engine is not None
+            and (engine, Quantity.P_PARTIAL)
+            in _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS
+            and notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+            and Quantity.P_PARTIAL in notice.affected_quantities
+            and "total_pressure_Pa" in notice.reason
         ):
             continue
         if any(q in _VAPOUR_EQUILIBRIUM for q in notice.affected_quantities):
@@ -2803,6 +2824,11 @@ def _validate_residual_with_indexes(
                     reference.notices,
                     None if candidate is None else candidate.notices,
                     oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
+                    engine=(
+                        None
+                        if candidate is None or candidate.engine is None
+                        else candidate.engine.name
+                    ),
                 )
                 if blocking:
                     issues.append(
@@ -2810,7 +2836,8 @@ def _validate_residual_with_indexes(
                             f"{path}.score_eligible",
                             RefusalReason.CONDITIONAL_FIELD,
                             "vapour-equilibrium score_eligible cannot be true with "
-                            "floor_inversion/fallback/pressure_provenance_unknown; "
+                            "floor_inversion/fallback/pressure_provenance_unknown/"
+                            "imcc_complex_saturation; "
                             "diagnostic numeric residuals keep score_eligible=false",
                         )
                     )

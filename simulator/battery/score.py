@@ -316,6 +316,7 @@ from simulator.battery.validate import (
     _ValidationIndexes,
     ValidationIssue,
     _BOUND_WORK_INPUTS,
+    _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS,
     _asset_ids,
     _observation_lineage,
     observation_issue_location,
@@ -370,14 +371,6 @@ _ENGINE_CELL_PREDICTED_QUANTITIES = frozenset(
 # quantity, including activity, is a typed refusal from this engine.
 _CATALOG_PREDICTED_QUANTITIES = frozenset(
     {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE}
-)
-# Equilibrium partial pressures from these two predictors are independent of
-# total pressure. The evaluation proof is in test_score's pressure-axis test.
-_TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS = frozenset(
-    {
-        (Engine.OPENIMCC, Quantity.P_PARTIAL),
-        (Engine.INTERNAL_ANALYTICAL, Quantity.P_PARTIAL),
-    }
 )
 _KNUDSEN_TOTAL_PRESSURE_SEED_BAR = 1.0e-3
 _KNUDSEN_TOTAL_PRESSURE_NOTICE_ORIGIN = "score:knudsen_total_pressure"
@@ -5535,21 +5528,26 @@ def blocking_qualifications(
     quantity: Quantity | None,
     notices: Sequence[Notice],
     *,
+    engine: Engine,
     oxygen_balance_effusion_solved: bool = False,
 ) -> tuple[Notice, ...]:
+    qualification_notices = tuple(notices)
     flagged = tuple(
-        notice for notice in notices if _is_flagged_stratum_notice(notice)
+        notice
+        for notice in qualification_notices
+        if _is_flagged_stratum_notice(notice)
     )
     if flagged:
         return flagged
     if quantity in _VAPOUR_EQUILIBRIUM:
         return _pressure_blocking_notices(
-            tuple(notices),
+            qualification_notices,
             oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
+            engine=engine,
         )
     if quantity in MELT_ACTIVITY_QUANTITIES:
         found: list[Notice] = []
-        for notice in notices:
+        for notice in qualification_notices:
             if notice.kind in {
                 NoticeKind.FLOOR_INVERSION,
                 NoticeKind.FALLBACK,
@@ -5901,6 +5899,7 @@ def build_conjuncts(
         no_blocking_qualification=not blocking_qualifications(
             quantity,
             eligibility_notices,
+            engine=engine,
             oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
         ),
         not_flagged_stratum=not any(

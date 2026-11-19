@@ -74,6 +74,7 @@ from simulator.battery.records import (
     Value,
     union_notices,
 )
+import simulator.battery.validate as validate_mod
 from simulator.battery.validate import validate_corpus
 from simulator.battery.validity import (
     background_pressure_high,
@@ -2141,6 +2142,148 @@ def test_r03_pressure_provenance_unknown_blocks_vapour_score_eligible() -> None:
         score_eligible=True,
     )
     assert validate_corpus([w], [exp], [ref, clean], [control]).ok
+
+
+@pytest.mark.parametrize(
+    ("engine", "reason"),
+    (
+        (engine, reason)
+        for engine in (Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC)
+        for reason in (
+            "observation does not carry total_pressure_Pa "
+            "(unknown: not printed); residual assumes 1e-06 bar",
+            "identity comparison does not require total_pressure_Pa: "
+            f"{engine.value} equilibrium p_partial is total-pressure-independent",
+        )
+    ),
+)
+def test_r03_independent_partial_pressure_provenance_is_valid_for_score_eligible(
+    engine, reason, monkeypatch
+) -> None:
+    ident = replace(
+        F.pref_identity(),
+        quantity=Quantity.P_PARTIAL,
+        composition=F.activity_identity().composition,
+        total_pressure_Pa=State.of(Decimal("0.1")),
+    )
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        f"r03-partial-ref-{engine.value}",
+        exp.experiment_id,
+        ident,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    notice = Notice(
+        kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason=reason,
+        origin="score",
+    )
+    cand = F.engine_obs(
+        f"r03-partial-cand-{engine.value}",
+        exp.experiment_id,
+        ident,
+        Decimal("2"),
+        notices=(notice,),
+    )
+    cand = replace(cand, engine=replace(cand.engine, name=engine))
+    scored = F.residual(
+        f"r03-partial-scored-{engine.value}",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MISMATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=True,
+        notices=(notice,),
+        quantity=Quantity.P_PARTIAL,
+    )
+    assert validate_corpus([w], [exp], [ref, cand], [scored]).ok
+    monkeypatch.setattr(
+        validate_mod,
+        "_TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS",
+        frozenset(),
+    )
+    assert not validate_corpus([w], [exp], [ref, cand], [scored]).ok
+
+
+@pytest.mark.parametrize(
+    ("engine", "quantity", "kind", "reason"),
+    (
+        (
+            Engine.VAPOROCK,
+            Quantity.P_PARTIAL,
+            NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+            "observation does not carry total_pressure_Pa; assumes 1e-06 bar",
+        ),
+        (
+            Engine.INTERNAL_ANALYTICAL,
+            Quantity.P_SAT,
+            NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+            "observation does not carry total_pressure_Pa; assumes 1e-06 bar",
+        ),
+        (
+            Engine.OPENIMCC,
+            Quantity.P_PARTIAL,
+            NoticeKind.IMCC_COMPLEX_SATURATION,
+            "imcc_complex_saturation still blocks",
+        ),
+        (
+            Engine.OPENIMCC,
+            Quantity.P_PARTIAL,
+            NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+            "fO2_Pa is a DERIVED condition",
+        ),
+    ),
+)
+def test_r03_pressure_provenance_exception_rejects_other_paths(
+    engine, quantity, kind, reason
+) -> None:
+    ident = (
+        F.psat_identity("Na")
+        if quantity is Quantity.P_SAT
+        else replace(
+            F.pref_identity(),
+            quantity=Quantity.P_PARTIAL,
+            composition=F.activity_identity().composition,
+            total_pressure_Pa=State.of(Decimal("0.1")),
+        )
+    )
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        f"r03-other-ref-{engine.value}-{quantity.value}",
+        exp.experiment_id,
+        ident,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    notice = Notice(
+        kind=kind,
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin="score",
+    )
+    cand = F.engine_obs(
+        f"r03-other-cand-{engine.value}-{quantity.value}",
+        exp.experiment_id,
+        ident,
+        Decimal("2"),
+        notices=(notice,),
+    )
+    cand = replace(cand, engine=replace(cand.engine, name=engine))
+    scored = F.residual(
+        f"r03-other-scored-{engine.value}-{quantity.value}",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MISMATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=True,
+        notices=(notice,),
+        quantity=quantity,
+    )
+    assert not validate_corpus([w], [exp], [ref, cand], [scored]).ok
 
 
 def test_r03_floor_inversion_blocks_regardless_of_original_magnitude() -> None:
