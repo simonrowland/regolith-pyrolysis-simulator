@@ -6,7 +6,11 @@ import yaml
 
 from literature_extract_assertions import assert_all_physical_locators
 from simulator.battery.enums import NoticeKind, Phase
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import (
+    Migrator,
+    _printed_fO2_identity_state,
+    collect_printed_oxygen,
+)
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 
@@ -127,6 +131,11 @@ def test_activity_tables_and_appendix_compositions_are_typed_and_located():
 
 def test_isolated_migration_has_no_hard_issues_and_reaches_temperature_and_fugacity():
     document = _document()
+    source_observations = {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for row in species["observations"]
+    }
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -146,6 +155,36 @@ def test_isolated_migration_has_no_hard_issues_and_reaches_temperature_and_fugac
             condition = observation.point_conditions[name]
             assert condition.state.is_value
             assert condition.locator is not None
+        source = source_observations[observation.observation_id.split("::", 1)[1]]
+        printed_fo2 = source["point_conditions"]["fO2_log"]
+        assert printed_fo2["units"] == "log10(atm)"
+        assert printed_fo2["locator"]["column"] == "log pO2"
+        facts = collect_printed_oxygen(
+            ({"point_conditions": {"fO2_log": printed_fo2}},),
+            observation.point_conditions["fO2_log"].locator,
+        )
+        assert _printed_fO2_identity_state(facts) == observation.identity.fO2_Pa
+
+    first_source = next(iter(source_observations.values()))
+    condition = first_source["point_conditions"]["fO2_log"]
+    fallback = result.observations[
+        f"{document['source_id']}::{first_source['observation_id']}"
+    ].point_conditions["fO2_log"].locator
+    atm_state = _printed_fO2_identity_state(
+        collect_printed_oxygen(
+            ({"point_conditions": {"fO2_log": condition}},), fallback
+        )
+    )
+    mutated_condition = deepcopy(condition)
+    mutated_condition["units"] = "log10(bar)"
+    bar_state = _printed_fO2_identity_state(
+        collect_printed_oxygen(
+            ({"point_conditions": {"fO2_log": mutated_condition}},), fallback
+        )
+    )
+    assert atm_state is not None and atm_state.is_value
+    assert bar_state is not None and bar_state.is_value
+    assert atm_state.value == Decimal("1.01325") * bar_state.value
     metal = result.observations[
         "pretorius-muan-1992-chromium-oxide-activities::"
         "pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_12_metal_cr"
