@@ -2349,8 +2349,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     all_warnings.append(line)
         result_diagnostics.update(operating_point)
         result_fO2_log = operating_point.get('solved_fO2_log')
+        operating_status = operating_point.get('backend_status')
+        if operating_status not in (None, 'ok'):
+            result_status = str(operating_status)
         if operating_point.get('authoritative_for_requested_conditions') is False:
-            result_status = operating_point['backend_status']
             all_warnings.append(str(operating_point['fO2_control_notice']))
         if isinstance(raw, Mapping):
             mode_deficit = raw.get('mode_vector_mass_deficit')

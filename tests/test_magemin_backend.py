@@ -1794,6 +1794,8 @@ _MAGEMIN_GATE_OUTCOME_EXPECTATIONS = (
     ('missing_bulk_projection', 'out_of_domain', 'stable_refusal', 'stable_refusal', None),
     ('dropped_bulk_component', 'composition_projected', 'stable_refusal', 'stable_refusal', None),
     ('mode_vector_deficit', 'magemin_mode_vector_mass_deficit', 'stable_refusal', 'stable_refusal', None),
+    ('clamped_mode_vector_deficit', 'clamped_operating_point', 'stable_refusal', 'stable_refusal', None),
+    ('missing_fo2_mode_vector_deficit', 'engine_not_converged', 'failed', 'failed', None),
     ('clamped_operating_point', 'clamped_operating_point', 'stable_refusal', 'stable_refusal', None),
     ('unavailable_without_binary', 'missing_binary', 'failed', 'failed', None),
     ('unavailable_with_binary', 'magemin_engine_worker_unavailable', 'failed', 'failed', None),
