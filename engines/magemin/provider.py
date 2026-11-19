@@ -54,6 +54,7 @@ from dataclasses import replace
 from typing import Any, Mapping, Optional
 
 from engines.magemin.parity import MAGEMinParityComparator, ParityReport
+from engines.magemin.domain import MAGEMinDomainGate
 from engines.magemin.result import MAGEMinShadowDiagnostics
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
@@ -251,6 +252,33 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         control_audit = self._build_control_audit(request)
 
         composition_mol_by_account = self._composition_from_view(request)
+        composition_wt_pct = self._composition_wt_pct(
+            composition_mol_by_account.get(self.DECLARED_ACCOUNT, {}),
+            request.account_view.species_formula_registry,
+        )
+
+        # Check the provider input even when no adapter is available. This is
+        # the request-level gate; the backend repeats it on the exact submitted
+        # bulk immediately before its cache lookup.
+        valid, gate_warnings, gate_reason = (
+            MAGEMinDomainGate.validate_with_reason(composition_wt_pct)
+        )
+        if not valid:
+            return IntentResult(
+                intent=request.intent,
+                status='out_of_domain',
+                transition=None,
+                control_audit=control_audit,
+                diagnostic=MAGEMinShadowDiagnostics(
+                    mode='unavailable',
+                    engine_version=self._engine_version(),
+                    backend_status='out_of_domain',
+                    backend_status_reason=gate_reason,
+                    backend_warnings=tuple(gate_warnings),
+                ).as_diagnostic(),
+                warnings=tuple(gate_warnings),
+            )
+
         backend = self._ensure_backend()
         if backend is None:
             return IntentResult(
