@@ -2989,10 +2989,10 @@ def _rk4_partials(
 ) -> dict[str, float]:
     """Fixed-step RK4 of dn_i/dt = S_i − Q_i(pipe_species_outflow_mol_s).
 
-    No Jacobian. A solver that differences across the x = 0.5 Knudsen
-    tie chatters; this oracle only evaluates the pipe. The band against
-    ``steps // 4`` is the oracle's own truncation, and it has to sit
-    under the 1e-6 Pa floor or the comparison is not a reference.
+    The oracle evaluates the pipe. It does not use the production
+    Jacobian. The band against ``steps // 4`` is the oracle's own
+    truncation, and it has to sit under the 1e-6 Pa floor or the
+    comparison is not a reference.
     """
 
     species = tuple(moles)
@@ -3059,19 +3059,32 @@ def _assert_each_partial_near_rk4(
         assert partials[name] == pytest.approx(fine[name], abs=1.0e-6)
 
 
-def test_roundoff_majority_keeps_the_tie_break_outflow():
-    # A 1 ulp split of an equal pair is the tie. The earlier name wins,
-    # and the Beskok jump on the other side of 0.5 does not apply.
-    # Fraction 0.500001 is a real majority and does jump.
+def test_outflow_is_continuous_across_equal_mole_fraction():
+    # 90 Pa, unchoked, blend weight 0. The Knudsen length is the
+    # mole-fraction mean free path, so Q is smooth in x. A majority
+    # switch jumped each species by about 1e-5 mol/s here; that step
+    # would split the two slopes by ~0.1 per unit fraction.
     total = 90.0 / _HS_PA_PER_MOL
+    window = 1.0e-4
 
-    def outflow(o2_fraction: float) -> float:
-        moles = {"O2": total * o2_fraction, "N2": total * (1.0 - o2_fraction)}
-        return _outflow_at(moles).species_mol_s["O2"]
+    def outflow(n2_fraction: float) -> dict[str, float]:
+        moles = {
+            "O2": total * (1.0 - n2_fraction),
+            "N2": total * n2_fraction,
+        }
+        return _outflow_at(moles).species_mol_s
 
-    tied = outflow(0.5)
-    assert outflow(0.5 + 1.0e-15) == pytest.approx(tied, abs=1.0e-12)
-    assert abs(outflow(0.500001) - tied) > 1.0e-8
+    centre = outflow(0.5)
+    left = outflow(0.5 - window)
+    right = outflow(0.5 + window)
+    near_left = outflow(0.5 - 1.0e-6)
+    near_right = outflow(0.5 + 1.0e-6)
+    for species in ("O2", "N2"):
+        slope_left = (centre[species] - left[species]) / window
+        slope_right = (right[species] - centre[species]) / window
+        assert slope_left == pytest.approx(slope_right, rel=1.0e-3, abs=1.0e-6)
+        assert abs(slope_left - slope_right) < 1.0e-4
+        assert abs(near_right[species] - near_left[species]) < 1.0e-6
 
 
 @pytest.mark.parametrize(
@@ -3093,10 +3106,10 @@ def test_equal_mole_neighborhood_matches_rk4_per_species(
     dt_s: float,
     steps: int,
 ):
-    # x = 0.5 is the Knudsen test-species tie. The old sweep refused
-    # here. Continuum (60 Pa) keeps the partials equal. The 2 Pa blend
-    # has an effusion part, so the partials separate and the check is
-    # still per species.
+    # Equal moles used to refuse: the Knudsen length jumped with the
+    # majority species. Continuum (60 Pa) keeps the partials equal.
+    # The 2 Pa blend has an effusion part, so the partials separate
+    # and the check is still per species.
     moles = {
         "O2": total_pa * (1.0 - n2_fraction) / _HS_PA_PER_MOL,
         "N2": total_pa * n2_fraction / _HS_PA_PER_MOL,

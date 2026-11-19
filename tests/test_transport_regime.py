@@ -346,6 +346,31 @@ def test_mixture_mean_free_path_fixture_m3():
     assert result.carriers[1].collision_diameter_m == pytest.approx(3.542e-10)
 
 
+def test_mole_fraction_mean_free_path_matches_the_pure_gas():
+    # x_k = 1. d_kj = d_k and sqrt(1 + m_k/m_k) = sqrt(2), so
+    # sum_i x_i λ_i is kT / (√2 π d_k² P). That is the single-species
+    # path, not a nearby value.
+    pressure_pa = 90.0
+    for species in ("O2", "N2"):
+        pure = tr.single_species_mean_free_path(
+            species,
+            pressure_pa,
+            HOT_TEMPERATURE_K,
+            DIAMETER_M,
+        )
+        mixed = tr.mole_fraction_mean_free_path(
+            {species: 1.0},
+            pressure_pa,
+            HOT_TEMPERATURE_K,
+            DIAMETER_M,
+        )
+        assert mixed.lambda_m == pure.lambda_m
+        assert mixed.knudsen_number == pure.knudsen_number
+        assert mixed.formula_id == tr.FORMULA_MOLE_FRACTION_MFP
+        assert mixed.test_species == ""
+        assert mixed.regime is pure.regime
+
+
 @pytest.mark.parametrize(
     ("species", "sigma_m", "molar_mass"),
     [

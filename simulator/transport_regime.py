@@ -47,6 +47,7 @@ FORMULA_BESKOK_KARNIADAKIS_CIVAN = (
 )
 FORMULA_SINGLE_SPECIES_MFP = "single_species_hard_sphere_mean_free_path"
 FORMULA_MIXTURE_MFP = "carrier_mixture_hard_sphere_mean_free_path"
+FORMULA_MOLE_FRACTION_MFP = "mole_fraction_hard_sphere_mean_free_path"
 
 MOLAR_MASSES_KG_PER_MOL: Mapping[str, float] = MappingProxyType(
     {
@@ -1079,6 +1080,96 @@ def mixture_mean_free_path_m(
     )
 
 
+def _carrier_collisions(
+    carrier_mole_fractions: Mapping[str, float],
+) -> tuple[CarrierCollision, ...]:
+    return tuple(
+        CarrierCollision(
+            species=species,
+            mole_fraction=float(fraction),
+            collision_diameter_m=_require_collision_diameter(species),
+            molar_mass_kg_mol=_require_molar_mass(species),
+        )
+        for species, fraction in carrier_mole_fractions.items()
+    )
+
+
+def mole_fraction_mean_free_path_m(
+    carrier_mole_fractions: Mapping[str, float],
+    pressure_pa: float,
+    temperature_K: float,
+) -> float:
+    """Mole-fraction average of each species' hard-sphere mean free path.
+
+    Premise: hard-sphere collisions. Species i has
+    λ_i = 1 / sum_j (n_j π d_ij² sqrt(1 + m_i/m_j)),
+    with d_ij = (d_i + d_j) / 2 and n_j = x_j P / (k T).
+    That λ_i is ``mixture_mean_free_path_m`` for test species i.
+    One mixture length is λ = sum_i x_i λ_i. Picking λ from the
+    majority species jumps at equal mole fraction; this average
+    does not.
+
+    Pure-gas limit: x_k = 1. Then d_kj = d_k and
+    sqrt(1 + m_k/m_k) = sqrt(2), so
+    λ = k T / (√2 π d_k² P), which is
+    ``single_species_mean_free_path_m``. Unit check: x is
+    dimensionless and λ_i is metres, so λ is metres.
+    Limit: P = 0 returns +inf, the vacuum limit of every λ_i.
+    """
+
+    if not carrier_mole_fractions:
+        _refuse(
+            "missing_carrier_state",
+            "carrier mole fractions are required",
+        )
+    total = 0.0
+    for species, fraction in carrier_mole_fractions.items():
+        species_lambda_m = mixture_mean_free_path_m(
+            species,
+            carrier_mole_fractions,
+            pressure_pa,
+            temperature_K,
+        )
+        if math.isinf(species_lambda_m):
+            return math.inf
+        total += float(fraction) * species_lambda_m
+    return total
+
+
+def mole_fraction_mean_free_path(
+    carrier_mole_fractions: Mapping[str, float],
+    pressure_pa: float,
+    temperature_K: float,
+    characteristic_length_m: float,
+) -> MeanFreePathResult:
+    """Knudsen state from the mole-fraction mean free path.
+
+    ``test_species`` is empty. This formula has no test species.
+    """
+
+    characteristic_length_m = _require_positive(
+        characteristic_length_m,
+        name="characteristic_length_m",
+        category="invalid_characteristic_length",
+    )
+    lambda_m = mole_fraction_mean_free_path_m(
+        carrier_mole_fractions,
+        pressure_pa,
+        temperature_K,
+    )
+    carriers = _carrier_collisions(carrier_mole_fractions)
+    knudsen_number = lambda_m / characteristic_length_m
+    return MeanFreePathResult(
+        lambda_m=lambda_m,
+        knudsen_number=knudsen_number,
+        regime=classify_knudsen_regime(knudsen_number),
+        formula_id=FORMULA_MOLE_FRACTION_MFP,
+        test_species="",
+        carriers=carriers,
+        collision_diameter_source=COLLISION_DIAMETER_SOURCE,
+    )
+
+
 def carrier_mixture_mean_free_path(
     test_species: str,
     carrier_mole_fractions: Mapping[str, float],
@@ -1097,15 +1188,7 @@ def carrier_mixture_mean_free_path(
         pressure_pa,
         temperature_K,
     )
-    carriers = tuple(
-        CarrierCollision(
-            species=species,
-            mole_fraction=float(fraction),
-            collision_diameter_m=_require_collision_diameter(species),
-            molar_mass_kg_mol=_require_molar_mass(species),
-        )
-        for species, fraction in carrier_mole_fractions.items()
-    )
+    carriers = _carrier_collisions(carrier_mole_fractions)
     knudsen_number = lambda_m / characteristic_length_m
     return MeanFreePathResult(
         lambda_m=lambda_m,

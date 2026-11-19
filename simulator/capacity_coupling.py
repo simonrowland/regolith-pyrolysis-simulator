@@ -12,7 +12,7 @@ from engines.builtin.overhead_bleed import (
     compressible_pressure_capacity_fraction,
     controlled_flow_capacity,
 )
-from simulator.overhead import _knudsen_test_species, pipe_species_outflow_mol_s
+from simulator.overhead import pipe_species_outflow_mol_s
 from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
 from simulator.transport_regime import TransportRegimeRefusal
@@ -1274,12 +1274,12 @@ def _slow_converge(
     floor and the multistep does not beat it there. Radau at rtol 1e-12
     does. The achieved gap is the per-species partial, not the total.
 
-    The Jacobian is a difference that stays on the current pipe piece
-    and on the current Knudsen test species. The tie band keeps a
-    probe of relative width 1e-8 on the tie-break species. A probe
-    that leaves the piece or that species shrinks until it does not,
-    then takes the one-sided difference. Error control crosses a
-    sonic edge or a blend knot; this difference does not have to.
+    The Jacobian is a difference that stays on the current pipe piece.
+    The mixture mean free path is continuous in mole fraction, so a
+    step across equal moles is not a kink. A probe that leaves the
+    piece shrinks until it does not, then takes the one-sided
+    difference. Error control crosses a sonic edge or a blend knot;
+    this difference does not have to.
 
     atol_i = 1e-7 Pa * V / (R T). Unit check: Pa * m^3 / (J/(mol·K) * K)
     = mol. Limit: Q = 0 and constant q gives n = n0 + (q + S) dt, a
@@ -1305,7 +1305,7 @@ def _slow_converge(
             for index, name in enumerate(species)
         }
 
-    def rates_of(moles: Mapping[str, float]) -> tuple[list[float], tuple, str | None]:
+    def rates_of(moles: Mapping[str, float]) -> tuple[list[float], tuple]:
         source, outflow, _binding, piece = law._flows(law.partials_of(moles))
         rates: list[float] = []
         for name in species:
@@ -1313,23 +1313,22 @@ def _slow_converge(
             if not math.isfinite(rate):
                 raise _BalanceRefused("headspace_balance_nonconvergence")
             rates.append(rate)
-        positive = {name: moles[name] for name in species if moles[name] > 0.0}
-        majority = _knudsen_test_species(positive) if len(positive) >= 2 else None
         # Binding, blend bucket, cap. The empty-holdup flag is not a
-        # kink a fill is forbidden to leave.
-        return rates, piece[:3], majority
+        # kink a fill is forbidden to leave. Mole fraction is not a
+        # piece: the mean free path is continuous across equal moles.
+        return rates, piece[:3]
 
     def rhs(_time: float, state) -> list[float]:
-        rates, _piece, _majority = rates_of(moles_of(state))
+        rates, _piece = rates_of(moles_of(state))
         return rates
 
     def jacobian(_time: float, state):
         # |dn| starts at |n| * 1e-8 and shrinks until the sample stays
-        # on this piece and this majority species. A column of zeros is
-        # not the fallback: that is the flat update a crossed stencil
-        # returned on the free-molecular piece.
+        # on this piece. A column of zeros is not the fallback: that
+        # is the flat update a crossed stencil returned on the
+        # free-molecular piece.
         moles = moles_of(state)
-        base, piece, majority = rates_of(moles)
+        base, piece = rates_of(moles)
         count = len(species)
         matrix = np.zeros((count, count))
         for column, name in enumerate(species):
@@ -1339,15 +1338,15 @@ def _slow_converge(
             for _shrink in range(24):
                 up_moles = dict(moles)
                 up_moles[name] = amount + width
-                up, up_piece, up_majority = rates_of(up_moles)
-                up_ok = up_piece == piece and up_majority == majority
+                up, up_piece = rates_of(up_moles)
+                up_ok = up_piece == piece
                 down = None
                 down_ok = False
                 if amount > width:
                     down_moles = dict(moles)
                     down_moles[name] = amount - width
-                    down, down_piece, down_majority = rates_of(down_moles)
-                    down_ok = down_piece == piece and down_majority == majority
+                    down, down_piece = rates_of(down_moles)
+                    down_ok = down_piece == piece
                 if up_ok and down_ok and down is not None:
                     span = 2.0 * width
                     chosen = [(up[index] - down[index]) / span for index in range(count)]
