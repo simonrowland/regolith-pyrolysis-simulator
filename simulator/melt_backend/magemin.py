@@ -1915,9 +1915,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if native_activity_formula is not None:
             from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
 
+            native_spec = MAGEMIN_NATIVE_MELT_ACTIVITIES.get(
+                native_activity_formula
+            )
+            native_bulk_component = (
+                None if native_spec is None else native_spec[2]
+            )
             if (
-                native_activity_formula in MAGEMIN_NATIVE_MELT_ACTIVITIES
-                and comp_wt.get(native_activity_formula, 0.0) <= 0.0
+                native_bulk_component is not None
+                and bulk_projection.composition_wt_pct.get(
+                    native_bulk_component, 0.0
+                ) <= 0.0
             ):
                 diagnostics = dict(result_diagnostics)
                 diagnostics.update({
@@ -1926,6 +1934,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         'magemin_native_activity_component_absent'
                     ),
                     'magemin_native_formula': native_activity_formula,
+                    'magemin_native_bulk_component': native_bulk_component,
                 })
                 return EquilibriumResult(
                     temperature_C=temperature_C,
@@ -1935,8 +1944,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     warnings=[
                         *prior_warnings,
                         *bulk_projection.warnings,
-                        'MAGEMin native activity component is absent from input: '
-                        f'{native_activity_formula}',
+                        'MAGEMin native activity component is absent from '
+                        f'projected bulk: {native_bulk_component}',
                     ],
                     diagnostics=diagnostics,
                 )
@@ -2148,7 +2157,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     ],
                     diagnostics=result_diagnostics,
                 )
-            for formula, (field, _polymorph) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
+            for formula, (field, _polymorph, _bulk_component) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
                 try:
                     value = float(native.get(formula))
                 except (TypeError, ValueError, OverflowError):
@@ -3569,7 +3578,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             result.update({
                 'native_activities': {
                     formula: native_fields[field]
-                    for formula, (field, _polymorph)
+                    for formula, (field, _polymorph, _bulk_component)
                     in MAGEMIN_NATIVE_MELT_ACTIVITIES.items()
                     if field in native_fields
                 },
@@ -3909,7 +3918,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
 
         parsed: Dict[str, float] = {}
-        for field, _polymorph in MAGEMIN_NATIVE_MELT_ACTIVITIES.values():
+        for field, _polymorph, _bulk_component in MAGEMIN_NATIVE_MELT_ACTIVITIES.values():
             match = re.search(
                 rf'^\s*{re.escape(field)}\s+([^\s,;]+)',
                 matlab_text,

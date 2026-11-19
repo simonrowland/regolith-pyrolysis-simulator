@@ -14450,6 +14450,11 @@ def _predict_with_engine(
                 )
             if pressure_notice is not None:
                 input_notices.append(pressure_notice)
+    elif engine is Engine.MAGEMIN:
+        # MAGEMin's native crystal activities are evaluated at the row's
+        # printed pressure when it is available. Other activity engines keep
+        # their existing condensed-phase pressure omission.
+        pressure_bar = activity_payload.get("pressure_bar")
 
     printed_fo2 = _has_printed_fo2(observation, identity)
     source_pressure = (

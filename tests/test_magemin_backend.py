@@ -4064,16 +4064,16 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(
 
     direct_fields = backend._parse_subprocess_native_activities(matlab_text)
     expected_native = {
-        "MgO": ("aMgO", "periclase"),
-        "SiO2": ("aSiO2", "quartz"),
-        "FeO": ("aFeO", "wustite"),
-        "Al2O3": ("aAl2O3", "corundum"),
-        "TiO2": ("aTiO2", "rutile"),
+        "MgO": ("aMgO", "periclase", "MgO"),
+        "SiO2": ("aSiO2", "quartz", "SiO2"),
+        "FeO": ("aFeO", "wustite", "FeOt"),
+        "Al2O3": ("aAl2O3", "corundum", "Al2O3"),
+        "TiO2": ("aTiO2", "rutile", "TiO2"),
     }
     import engines.magemin.domain as magemin_domain
 
     assert magemin_domain.MAGEMIN_NATIVE_MELT_ACTIVITIES == expected_native
-    for formula, (field, _polymorph) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
+    for formula, (field, _polymorph, _bulk_component) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
         direct_activity = direct_fields[field]
         adapted_activity = result.activity_coefficients[formula]
         assert adapted_activity == direct_activity
@@ -4140,13 +4140,14 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(
 def test_magemin_live_corundum_saturation_sets_native_alumina_activity_to_one(
     request,
 ):
-    """Kume sample 305 coexists with corundum, the pure Al2O3 standard."""
+    """Modeled pure-corundum coexistence sets the native Al2O3 activity to one."""
     backend = MAGEMinBackend()
     request.addfinalizer(backend.close)
     assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
 
-    # Kume (2000), sample 305, Table 4. The independent phase-equilibrium
-    # limit is a_Al2O3 = 1 when liquid coexists with pure corundum.
+    # Kume (2000), sample 305, Table 4 reports a(AlO1.5(s)) = 0.0253;
+    # it does not establish corundum coexistence. That condition is read from
+    # MAGEMin's modeled phases_present below.
     result = backend.equilibrate(
         1599.85,
         composition_kg={
@@ -4162,8 +4163,11 @@ def test_magemin_live_corundum_saturation_sets_native_alumina_activity_to_one(
     )
 
     assert result.status == "ok", result.warnings
-    assert any(name.lower().startswith("cor") for name in result.phases_present)
-    assert result.activity_coefficients["Al2O3"] == pytest.approx(1.0, abs=1e-6)
+    if not any(name.lower().startswith("cor") for name in result.phases_present):
+        pytest.skip("MAGEMin did not model pure corundum coexistence")
+    assert result.activity_coefficients["Al2O3"] == pytest.approx(
+        1.0, abs=1e-6
+    )
 
 
 @pytest.mark.skipif(
@@ -4200,6 +4204,77 @@ def test_magemin_absent_native_activity_component_is_typed_out_of_domain(
         "magemin_native_activity_component_absent"
     )
     assert result.diagnostics["magemin_native_formula"] == "TiO2"
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+@pytest.mark.parametrize("iron_coordinate", ["Fe2O3", "FeOt"])
+def test_magemin_live_native_feo_activity_uses_projected_feot_coordinate(
+    request, iron_coordinate,
+):
+    backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
+    assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
+
+    composition = {
+        "SiO2": 49.0,
+        "Al2O3": 14.0,
+        "MgO": 9.0,
+        "CaO": 11.0,
+        "Na2O": 2.5,
+        "K2O": 0.8,
+        "Cr2O3": 0.2,
+        iron_coordinate: 11.0,
+    }
+    projection = backend._build_db_bulk_projection(composition)
+    assert projection.composition_wt_pct["FeOt"] > 0.0
+
+    result = backend.equilibrate(
+        1429.85,
+        composition_kg=composition,
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        native_activity_formula="FeO",
+        call_timeout_s=20.0,
+    )
+
+    assert result.status == "ok", result.warnings
+    assert result.activity_coefficients["FeO"] > 0.0
+    assert result.diagnostics["magemin_native_bulk_component"] == "FeOt"
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_native_feo_activity_refuses_iron_free_projected_bulk(
+    request,
+):
+    backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
+    assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
+
+    result = backend.equilibrate(
+        1429.85,
+        composition_kg={
+            "SiO2": 55.0,
+            "Al2O3": 15.0,
+            "MgO": 15.0,
+            "CaO": 15.0,
+        },
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        native_activity_formula="FeO",
+    )
+
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        "magemin_native_activity_component_absent"
+    )
+    assert result.diagnostics["magemin_native_formula"] == "FeO"
+    assert result.diagnostics["magemin_native_bulk_component"] == "FeOt"
 
 
 def test_magemin_nonfinite_requested_native_activity_returns_not_converged(

@@ -17124,6 +17124,7 @@ def test_magemin_native_activity_requires_its_exact_mapped_crystal_reference(
     assert MAGEMIN_NATIVE_MELT_ACTIVITIES[formula] == (
         field,
         native_polymorph.value,
+        "FeOt" if formula == "FeO" else formula,
     )
     assert _engine_reports_formula("magemin", formula) == (
         True,

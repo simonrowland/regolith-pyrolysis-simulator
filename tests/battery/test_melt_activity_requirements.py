@@ -5,8 +5,9 @@ point temperature, and a reference state that matches the engine. For melt
 activity, oxygen is required when the composition or measured species holds
 a multivalent element. That oxygen is one fO2 from the row ladder, the same
 value on every engine. Other quantities follow their identity input profile.
-Pressure is not an input, and a missing required input is refused rather than
-defaulted.
+Pressure is not required; MAGEMin receives an optional printed point pressure
+for its native-crystal activity path. A missing required input is refused
+rather than defaulted.
 """
 
 from dataclasses import replace
@@ -393,6 +394,66 @@ def test_requirement_tuple_does_not_include_pressure_or_oxygen():
     assert REQUIREMENTS["melt_activity"] == ("normalized_composition", "temperature_K")
     assert "pressure_boundary" not in REQUIREMENTS["melt_activity"]
     assert "oxygen_condition" not in REQUIREMENTS["melt_activity"]
+
+
+def test_magemin_activity_score_passes_printed_row_pressure(monkeypatch):
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    seen = {}
+
+    def _open(name):
+        return SimpleNamespace(
+            name=name,
+            available=True,
+            unavailable_reason=None,
+            supports_intrinsic_fO2=False,
+            backend=object(),
+        )
+
+    def _cell(_handle, _pot, *, physical_pressure_bar, **_kwargs):
+        seen["pressure_bar"] = physical_pressure_bar
+        return SimpleNamespace(
+            status="ok",
+            refusal_reason=None,
+            melt_activities={"Al2O3": 0.8},
+            melt_activity_coefficients={},
+            gas_partial_pressures_Pa={},
+            hostname="test",
+            exit_code=0,
+            exit_signal=None,
+            notices=[],
+            authority=None,
+            certified_band=None,
+        )
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    experiment, _bench, observation = _case(
+        composition=_composition(("SiO2", "0.5"), ("Al2O3", "0.5")),
+        formula="Al2O3",
+        phase=Phase.CR,
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            **observation.point_conditions,
+            "total_pressure_Pa": f.located(Decimal("100000")),
+        },
+    )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN, observation, experiment=experiment, isolated=False,
+    )
+
+    assert prediction.value is not None
+    assert seen["pressure_bar"] == pytest.approx(1.0)
 
 
 def test_no_iron_without_oxygen_is_ready_and_engine_point_stays_gap():

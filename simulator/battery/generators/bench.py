@@ -443,8 +443,10 @@ def melt_activity_requests(
     the composition or measured species holds a multivalent element, every
     engine receives the same fO2 from the row ladder, or the same oxygen gap
     when no tier resolves. A printed fO2 is attached for every engine even
-    when oxygen is not otherwise an input. Pressure and the gas boundary are
-    not inputs. ``engine_intrinsic`` omits fO2 only for internal-analytical;
+    when oxygen is not otherwise an input. Pressure is optional; MAGEMin
+    receives a printed point pressure for its native-crystal activity path,
+    while other engines omit it. The gas boundary is not an input.
+    ``engine_intrinsic`` omits fO2 only for internal-analytical;
     all other engines retain the shared-ladder requirement. A missing required
     input is a typed gap, and a missing oxygen point is never filled from the
     engine default.
@@ -658,13 +660,41 @@ def melt_activity_requests(
                     "authority": composition.selected.authority.value,
                     "route": composition.selected.route,
                 },
-                "pressure_bar": {"authority": "not_an_input", "reason": "condensed-phase activity; PV term omitted"},
                 "quantity": {"waypoint": "identity.quantity"},
                 "reference_state": {
                     "waypoint": "identity.reference_state",
                     "engine_reports": reported,
                 },
             }
+            if engine == "magemin":
+                pressure = _prediction_pressure_waypoint(
+                    inputs.waypoints["pressure_boundary"], inputs.method
+                )
+                pressure_value = None if pressure is None else pressure.value
+                if (
+                    isinstance(pressure_value, Value)
+                    and pressure_value.kind is ValueKind.POINT
+                ):
+                    payload["pressure_bar"] = float(
+                        pressure_value.point / BAR_PA_DECIMAL
+                    )
+                    routes["pressure_bar"] = {
+                        "waypoint": "pressure_boundary",
+                        "authority": pressure.authority.value,
+                        "route": pressure.route,
+                        "formula": "Pa / 100000",
+                    }
+                else:
+                    routes["pressure_bar"] = {
+                        "waypoint": "pressure_boundary",
+                        "authority": "not_provided",
+                        "reason": "no printed point pressure",
+                    }
+            else:
+                routes["pressure_bar"] = {
+                    "authority": "not_an_input",
+                    "reason": "condensed-phase activity; PV term omitted",
+                }
             if shared is not None:
                 payload["fO2_log"] = shared.log10_fO2_bar
                 payload["fO2_tier"] = shared.tier
