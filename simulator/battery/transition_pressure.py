@@ -48,12 +48,31 @@ AMBIENT_PRESSURE_ASSUMED_REASON = "ambient pressure assumed, not printed"
 # Bare "cylinder", "press", "GPa", "kbar", and "IHPV" are not this class.
 # Internally heated pressure vessels are the same class: an unprinted
 # run in one is not an ambient 1 bar experiment.
+# Externally heated pressure vessels are a distinct high-pressure design.
+# Cold-seal pressure vessels are another common high-pressure design.
+# Gas-medium apparatus and presses use a confining gas as the pressure medium.
+# Belt apparatus includes belt and belt-type spellings used in petrology.
 _HIGH_PRESSURE_APPARATUS = re.compile(
     r"piston[\s_-]*cylinders?"
     r"|multi[\s_-]*anvils?"
     r"|diamond[\s_-]*anvils?"
     r"|internally[\s_-]*heated[\s_-]*pressure[\s_-]*vessels?"
+    r"|externally[\s_-]*heated[\s_-]*pressure[\s_-]*vessels?"
+    r"|cold[\s_-]*seal[\s_-]*pressure[\s_-]*vessels?"
+    r"|gas[\s_-]*medium[\s_-]*(?:apparatus|press(?:es)?)"
+    r"|belt[\s_-]*(?:type[\s_-]*)?apparatus"
     r"|\bautoclaves?\b",
+    re.IGNORECASE,
+)
+_EXCLUDED_HIGH_PRESSURE_APPARATUS = re.compile(
+    r"(?:\bnot\s+(?:used|employed|utilized)\b|"
+    r"\b(?:did\s+not\s+use|excluded|not\s+used)\b)",
+    re.IGNORECASE,
+)
+_AMBIENT_FURNACE_RUN = re.compile(
+    r"\b(?:run|runs|experiment|experiments)\b.{0,40}"
+    r"\b(?:in|using|with)\b.{0,24}"
+    r"\b(?:1\s*(?:atm|atmosphere|bar)|ambient)\b.{0,20}\bfurnaces?\b",
     re.IGNORECASE,
 )
 # Migrator boilerplate names the keys it did not find, including P_GPa.
@@ -89,7 +108,7 @@ def unprinted_liquidus_pressure_block(
     if _piston_cylinder_token(experiment):
         return "high_pressure_apparatus"
     if any(
-        _names_high_pressure_apparatus(text)
+        _high_pressure_apparatus_assigned_to_run(text)
         for text in _method_texts(observation, experiment, bench)
     ):
         return "high_pressure_apparatus"
@@ -164,10 +183,25 @@ def _piston_cylinder_token(experiment: Experiment | None) -> bool:
     )
 
 
-def _names_high_pressure_apparatus(text: str) -> bool:
+def _high_pressure_apparatus_assigned_to_run(text: str) -> bool:
+    """Fail closed on apparatus mentions except an explicitly excluded one.
+
+    An exclusion only permits the ambient route when this same note assigns
+    an ambient furnace to the run. Other negative or unclear contexts remain
+    ambiguous and therefore keep the high-pressure refusal.
+    """
+
     if _PRESSURE_KEY_LIST in text.casefold():
         return False
-    return _HIGH_PRESSURE_APPARATUS.search(text) is not None
+    apparatus = _HIGH_PRESSURE_APPARATUS.search(text)
+    if apparatus is None:
+        return False
+    excluded = _EXCLUDED_HIGH_PRESSURE_APPARATUS.search(
+        text[apparatus.end() : apparatus.end() + 100]
+    )
+    if excluded is not None and _AMBIENT_FURNACE_RUN.search(text) is not None:
+        return False
+    return True
 
 
 def _locator_prose(locator: Locator | None) -> Iterator[str]:

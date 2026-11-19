@@ -812,6 +812,36 @@ def test_fine_original_bracket_is_searched_before_the_expansion_cap():
     assert not any('exceeds cap' in warning for warning in result.warnings)
 
 
+def test_fractional_expansion_reaches_both_default_envelope_endpoints():
+    calls = []
+
+    def sample(temperature_C: float) -> float:
+        calls.append(float(temperature_C))
+        return 0.2
+
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=900.02,
+        max_T_C=1033.36,
+        scan_step_C=66.67,
+        tolerance_C=66.67,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics == {
+        'reason': 'not_converged',
+        'original_search_bracket_C': (900.02, 1033.36),
+        'bounded_search_interval_C': (500.0, 2500.0),
+    }
+    assert calls[0] == 900.02
+    assert calls[1] == pytest.approx(966.69)
+    assert calls[2] == 1033.36
+    assert 500.0 in calls
+    assert 2500.0 in calls
+    assert len(calls) == 31
+    assert len(calls) == len(set(calls))
+
+
 def test_expansion_step_cap_stops_without_rejecting_the_original_grid(
     monkeypatch,
 ):

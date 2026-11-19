@@ -20831,13 +20831,30 @@ def test_cell_internal_pressure_note_without_pressure_still_refuses(
     assert stored is not None and stored.is_unknown
 
 
+@pytest.mark.parametrize(
+    "apparatus",
+    (
+        "belt apparatus",
+        "belt-type apparatus",
+        "externally heated pressure vessel",
+        "externally-heated pressure vessels",
+        "cold-seal pressure vessel",
+        "cold seal pressure vessels",
+        "gas-medium apparatus",
+        "gas medium presses",
+    ),
+)
 def test_high_pressure_prose_without_pressure_still_refuses(
     monkeypatch: pytest.MonkeyPatch,
+    apparatus: str,
 ) -> None:
     experiment = F.tabulation_experiment()
     experiment = replace(
         experiment,
-        sample=replace(experiment.sample, form=F.located("piston-cylinder quench")),
+        sample=replace(
+            experiment.sample,
+            form=F.located(f"Run in a {apparatus} quench"),
+        ),
     )
     reference = _unprinted_transition_reference(experiment)
 
@@ -20849,6 +20866,8 @@ def test_high_pressure_prose_without_pressure_still_refuses(
         Engine.THERMOENGINE, reference, experiment=experiment
     )
 
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert prediction.refusal_detail == {
         "reason": "missing_input",
         "input": "total_pressure_Pa",

@@ -147,6 +147,14 @@ def test_absent_experiment_still_assumes_one_bar() -> None:
         "diamond anvil cell",
         "internally heated pressure vessel",
         "internally-heated pressure vessels",
+        "externally heated pressure vessel",
+        "externally-heated pressure vessels",
+        "cold-seal pressure vessel",
+        "cold seal pressure vessels",
+        "gas-medium apparatus",
+        "gas medium presses",
+        "belt apparatus",
+        "belt-type apparatus",
         "Autoclave",
         "cold-seal autoclaves",
     ),
@@ -373,6 +381,58 @@ def test_pressure_note_without_apparatus_still_assumes_one_bar() -> None:
     assert block is None
     assert decision is not None
     assert decision.pressure_bar == 1.0
+
+
+def test_ambient_furnace_run_excludes_autoclave_mention() -> None:
+    experiment, observation, bench = _row()
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            cell_internal_pressure_note=F.located(
+                "Run in a 1 atm furnace. The autoclave was not used for these runs."
+            ),
+        ),
+    )
+    block = unprinted_liquidus_pressure_block(observation, experiment, bench)
+    decision = unprinted_liquidus_solidus_pressure(observation, experiment, bench)
+    assert block is None
+    assert decision is not None
+    assert decision.pressure_bar == 1.0
+
+
+def test_positive_high_pressure_apparatus_assignment_refuses() -> None:
+    experiment, observation, bench = _row()
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            cell_internal_pressure_note=F.located(
+                "Run in an externally heated pressure vessel."
+            ),
+        ),
+    )
+    block = unprinted_liquidus_pressure_block(observation, experiment, bench)
+    decision = unprinted_liquidus_solidus_pressure(observation, experiment, bench)
+    assert block == "high_pressure_apparatus"
+    assert decision is None
+
+
+def test_apparatus_exclusion_without_ambient_run_context_still_refuses() -> None:
+    experiment, observation, bench = _row()
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            cell_internal_pressure_note=F.located(
+                "The autoclave was not used for these runs."
+            ),
+        ),
+    )
+    block = unprinted_liquidus_pressure_block(observation, experiment, bench)
+    decision = unprinted_liquidus_solidus_pressure(observation, experiment, bench)
+    assert block == "high_pressure_apparatus"
+    assert decision is None
 
 
 def test_pressure_key_list_in_the_note_is_not_an_apparatus() -> None:

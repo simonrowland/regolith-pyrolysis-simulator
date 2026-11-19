@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 import time
 from dataclasses import dataclass, field
+from decimal import Decimal
 from typing import Any, Callable, Mapping, Optional, Tuple
 
 from simulator.melt_backend.base import (
@@ -600,10 +601,17 @@ def find_liquidus_solidus_by_fraction(
     # Expansion adds one sample for each clipped scan step beyond the
     # original endpoints. Count both lattices separately because an arbitrary
     # original minimum need not align with the 500 C envelope's grid.
-    theoretical_expansion_points = (
-        math.ceil(max(0.0, min_T - expansion_min_T) / step)
-        + math.ceil(max(0.0, expansion_max_T - max_T) / step)
+    cold_expansion_points = _expansion_point_count(
+        min_T,
+        expansion_min_T,
+        step,
     )
+    warm_expansion_points = _expansion_point_count(
+        max_T,
+        expansion_max_T,
+        step,
+    )
+    theoretical_expansion_points = cold_expansion_points + warm_expansion_points
     remaining_scan_points = max(0, MAX_LIQUIDUS_SCAN_POINTS - len(grid))
     maximum_grid_samples = len(grid) + min(
         theoretical_expansion_points,
@@ -625,6 +633,8 @@ def find_liquidus_solidus_by_fraction(
     start_time = time.monotonic()
     deadline = start_time + budget if budget is not None else None
     last_T_C: Optional[float] = None
+    cold_expansion_index = 0
+    warm_expansion_index = 0
 
     def _elapsed_s() -> float:
         return max(0.0, time.monotonic() - start_time)
@@ -737,8 +747,16 @@ def find_liquidus_solidus_by_fraction(
             # interval is computed from the requested bracket and the
             # 500-2500 C extension envelope above; the step is clipped at an
             # endpoint so the final sample never exceeds that interval.
-            next_min_T = max(expansion_min_T, search_min_T - step)
-            next_max_T = min(expansion_max_T, search_max_T + step)
+            next_min_T = (
+                max(expansion_min_T, min_T - (cold_expansion_index + 1) * step)
+                if search_min_T > expansion_min_T
+                else search_min_T
+            )
+            next_max_T = (
+                min(expansion_max_T, max_T + (warm_expansion_index + 1) * step)
+                if search_max_T < expansion_max_T
+                else search_max_T
+            )
             step_temperatures: list[float] = []
             if next_min_T < search_min_T:
                 step_temperatures.append(next_min_T)
@@ -754,6 +772,10 @@ def find_liquidus_solidus_by_fraction(
                 break
             for temperature_C in step_temperatures:
                 sample(temperature_C)
+            if next_min_T < search_min_T:
+                cold_expansion_index += 1
+            if next_max_T > search_max_T:
+                warm_expansion_index += 1
             search_min_T = next_min_T
             search_max_T = next_max_T
             solidus_bracket, liquidus_bracket = threshold_brackets()
@@ -1328,6 +1350,23 @@ def _expansion_step_within_scan_cap(
     if step_point_count > MAX_LIQUIDUS_SCAN_POINTS:
         return False
     return scanned_point_count + step_point_count <= MAX_LIQUIDUS_SCAN_POINTS
+
+
+def _expansion_point_count(
+    start_T_C: float,
+    endpoint_T_C: float,
+    step_C: float,
+) -> int:
+    """Number of indexed, endpoint-clamped samples on one expansion edge."""
+
+    distance = abs(Decimal(str(endpoint_T_C)) - Decimal(str(start_T_C)))
+    step = Decimal(str(step_C))
+    if distance == 0:
+        return 0
+    intervals = int(distance // step)
+    if Decimal(intervals) * step < distance:
+        intervals += 1
+    return intervals
 
 
 def _bounded_scan_grid(
