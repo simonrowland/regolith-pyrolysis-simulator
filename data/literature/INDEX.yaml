@@ -9,7 +9,7 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 850
+  sources: 851
   extracts: 848
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 81
@@ -34432,6 +34432,61 @@ sources:
       last_stage: null
       date: null
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: robie-hemingway-1995-usgs-b2131
+  aliases: []
+  citation: Robie & Hemingway (1995), Thermodynamic properties of minerals and related substances at 298.15
+    K and 1 bar pressure and at higher temperatures, U.S. Geological Survey Bulletin 2131. https://pubs.usgs.gov/bul/2131/report.pdf
+  doi: 10.3133/b2131
+  report_number: USGS Bulletin 2131
+  identifier: 10.3133/b2131
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/robie-hemingway-1995-usgs-b2131/robie-hemingway-1995-usgs-b2131.pdf
+      present: true
+      sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
+      matches_simulator: null
+    sidecar:
+      path: raw/robie-hemingway-1995-usgs-b2131/sidecar.yaml
+      present: true
+    text:
+      path: text/robie-hemingway-1995-usgs-b2131
+      exists: true
+      file_count: 636
+    tables:
+      path: tables/robie-hemingway-1995-usgs-b2131
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/robie-hemingway-1995-usgs-b2131.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/robie-hemingway-1995-usgs-b2131.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-07'
+    commit: d984f46a9453f36d01a51ea1960fcdbc8657ae6d
 - source_id: robie-hemingway-wilson-1980-usgs-of-80-908
   aliases: []
   citation: Robie, R. A., Hemingway, B. S., and Wilson, W. H. (1980), Thermodynamic properties of minerals

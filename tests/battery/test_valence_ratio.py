@@ -35,6 +35,7 @@ from simulator.battery.identity import (
     parse_valence_basis,
     profile_for,
 )
+from simulator.battery.input_provenance import PRINTED_STARTING_BULK
 from simulator.battery.migrate import (
     Migrator,
     _band_text,
@@ -68,6 +69,7 @@ from simulator.battery.score import (
     render_score_report,
     residual_to_plain,
     render_score_report_from_payloads,
+    predict_with_engine,
     selected_lineage_level,
     score_store,
 )
@@ -684,6 +686,143 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
     }
 
 
+def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    pytest.importorskip("openimcc")
+    import openimcc
+
+    result = _migrate_berry_cr()
+    observation = next(
+        row
+        for observation_id, row in result.observations.items()
+        if observation_id.startswith(
+            "berry-oneill-2004-chromium-xanes::"
+            "berry_2004_table3_ad_en_r01::"
+        )
+    )
+    experiment = result.experiments[observation.experiment_id]
+    missing_iron = predict_with_engine(
+        Engine.OPENIMCC, observation, experiment=experiment
+    )
+    assert missing_iron.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert missing_iron.refusal_detail == {
+        "reason": "missing_input",
+        "input": "total_iron",
+    }
+
+    # The extracted Berry bulk is Fe-free. This fixture supplies Fe because
+    # the pinned OpenIMCC solver requires it even for its Cr candidate row.
+    composition = Composition(
+        basis="test_candidate_oxide_mass_percent",
+        components=(
+            ("CaO", Decimal("34")),
+            ("SiO2", Decimal("34")),
+            ("Al2O3", Decimal("10")),
+            ("MgO", Decimal("10")),
+            ("FeO", Decimal("10")),
+            ("Cr2O3", Decimal("2")),
+        ),
+        amount_basis=AmountBasis.MASS_PERCENT,
+        input_provenance=PRINTED_STARTING_BULK,
+    )
+    observation = replace(
+        observation,
+        identity=replace(observation.identity, composition=State.of(composition)),
+    )
+    calls = []
+    evaluate_redox = openimcc.evaluate_redox
+
+    def capture(*args, **kwargs):
+        output = evaluate_redox(*args, **kwargs)
+        calls.append((args, kwargs, output))
+        return output
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", capture)
+    prediction = predict_with_engine(
+        Engine.OPENIMCC, observation, experiment=experiment
+    )
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.execution.call_evidence == "openimcc.evaluate_redox"
+    assert len(calls) == 1
+    args, kwargs, output = calls[0]
+    assert args[0]["Cr"] > 0.0
+    assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
+    expected_fraction = output.chromous_cr_mol / (
+        output.chromous_cr_mol + output.chromic_cr_mol
+    )
+    assert float(prediction.value) == pytest.approx(expected_fraction, rel=1e-12)
+
+
+def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    pytest.importorskip("openimcc")
+    import openimcc
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(TRANELL_TI)
+    migrator.finalize()
+    observation = next(
+        row
+        for row in migrator.result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.VALENCE_RATIO
+    )
+    missing_composition = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        experiment=migrator.result.experiments[observation.experiment_id],
+    )
+    assert missing_composition.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert missing_composition.refusal_detail == {
+        "reason": "missing_input",
+        "input": "composition",
+    }
+
+    composition = Composition(
+        basis="test_candidate_oxide_mass_percent",
+        components=(
+            ("CaO", Decimal("33")),
+            ("SiO2", Decimal("35")),
+            ("Al2O3", Decimal("10")),
+            ("MgO", Decimal("10")),
+            ("FeO", Decimal("10")),
+            ("TiO2", Decimal("2")),
+        ),
+        amount_basis=AmountBasis.MASS_PERCENT,
+        input_provenance=PRINTED_STARTING_BULK,
+    )
+    observation = replace(
+        observation,
+        source_id="candidate-valence-fixture",
+        identity=replace(observation.identity, composition=State.of(composition)),
+    )
+    calls = []
+    evaluate_redox = openimcc.evaluate_redox
+
+    def capture(*args, **kwargs):
+        output = evaluate_redox(*args, **kwargs)
+        calls.append((args, kwargs, output))
+        return output
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", capture)
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        experiment=migrator.result.experiments[observation.experiment_id],
+    )
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert len(calls) == 1
+    args, kwargs, output = calls[0]
+    assert args[0]["Ti"] > 0.0
+    assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
+    expected_ratio = output.titanous_ti_mol / output.titanic_ti_mol
+    assert float(prediction.value) == pytest.approx(expected_ratio, rel=1e-12)
+
+
 def test_refused_printed_valence_forms_do_not_select_scalar(tmp_path: Path):
     doc = yaml.safe_load(SOSSI_CR.read_text(encoding="utf-8"))
     template = doc["species"]["Cr"]["observations"][0]
@@ -1223,7 +1362,11 @@ def test_valence_ratio_scores_redox_and_counts_each_engine_refusal():
         assert residual.rail is Rail.REDOX
         assert residual.numeric is None
         assert residual.refusal is not None
-        assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+        if residual.key.endswith(Engine.OPENIMCC.value):
+            assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+            assert residual.refusal.detail["reason"] == "missing_input"
+        else:
+            assert residual.refusal.reason is RefusalReason.UNSUPPORTED
 
 
 def test_glass_valence_rows_keep_quench_labels_on_counted_refusals():
@@ -1250,7 +1393,11 @@ def test_glass_valence_rows_keep_quench_labels_on_counted_refusals():
     for residual in residuals:
         assert residual.numeric is None
         assert residual.refusal is not None
-        assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+        if residual.key.endswith(Engine.OPENIMCC.value):
+            assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+            assert residual.refusal.detail["reason"] == "missing_input"
+        else:
+            assert residual.refusal.reason is RefusalReason.UNSUPPORTED
         assert residual.quench_state is QuenchState.ASSERTED_PRESERVED
         assert residual_to_plain(residual)["quench_state"] == "asserted_preserved"
 
