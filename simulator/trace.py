@@ -301,7 +301,7 @@ def wall_temperature_by_segment_C(sim: Any) -> dict[str, float]:
         bypass = getattr(model, "stage3_bypass", {})
         if STAGE3_BYPASS_SEGMENT_NAME not in temperatures and bypass:
             temperatures[STAGE3_BYPASS_SEGMENT_NAME] = float(bypass["wall_temperature_C"])
-    return bucket_wall_segments_by_temperature(temperatures)
+    return temperatures
 
 
 def nested_wall_deposit_by_segment_species(
