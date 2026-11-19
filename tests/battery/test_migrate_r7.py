@@ -1151,7 +1151,9 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     assert non_admission_diffs
     assert {
         field for fields in non_admission_diffs.values() for field in fields
-    } == {"provenance"}, json.dumps(non_admission_diffs, sort_keys=True)
+    } == {"derivation", "provenance", "read_from"}, json.dumps(
+        non_admission_diffs, sort_keys=True
+    )
     manifest = yaml.safe_load(
         (
             REPO_ROOT
@@ -1172,8 +1174,9 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     payload = json.dumps(
         observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
-    # These rows do not change admission; the candidate serialization adds
-    # the manifest role provenance to the green baseline.
+    # Green's B2131 index changes read_from to the PDF and updates its
+    # derivation input; t-1832 adds the manifest role provenance. Admissions
+    # stay unchanged across these serialization changes.
     assert (len(observations), hashlib.sha256(payload).hexdigest()) == (
         945,
         "bf062b5860bc2f5ac3e1980a6d42e85ac9d10539c26b06449705a40a1234dda7",
