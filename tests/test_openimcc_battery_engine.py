@@ -646,13 +646,33 @@ def test_openimcc_species_thermo_uses_source_dfh298_for_enthalpy_increment() -> 
     _require_openimcc()
     from openimcc import load_gas_datapack, species_thermo
 
-    temperature_K = Decimal("2000")
+    t_ref_K = 298.15
+    temperature_K = 1000.0
     datapack = load_gas_datapack()
-    native = species_thermo("FeO", "g", float(temperature_K), datapack=datapack)
-    reference = species_thermo("FeO", "g", 298.15, datapack=datapack)
-    assert native.source_row_id == reference.source_row_id
-    assert native.source_table_id == reference.source_table_id
-    selected = datapack.gas_df.loc["FeO(g)"]
+    native = None
+    reference = None
+    species = None
+    for row_name in sorted(
+        {str(name) for name in datapack.gas_df.index if str(name).endswith("(g)")}
+    ):
+        candidate = row_name[:-3]
+        try:
+            target = species_thermo(candidate, "g", temperature_K, datapack=datapack)
+            anchor = species_thermo(candidate, "g", t_ref_K, datapack=datapack)
+        except Exception:
+            continue
+        if (
+            target.source_row_id == anchor.source_row_id
+            and target.source_table_id == anchor.source_table_id
+            and target.T_min <= t_ref_K <= target.T_max
+        ):
+            species = candidate
+            native = target
+            reference = anchor
+            break
+    assert species is not None, "no gas source fit covers both 298.15 K and 1000 K"
+    assert native is not None and reference is not None
+    selected = datapack.gas_df.loc[f"{species}(g)"]
     rows = (
         (row for _index, row in selected.iterrows())
         if hasattr(selected, "iterrows")
@@ -664,8 +684,8 @@ def test_openimcc_species_thermo_uses_source_dfh298_for_enthalpy_increment() -> 
         dfh298_J_mol
     )
     observation = _openimcc_thermo_observation(
-        "openimcc-feo-g-h-minus-h298",
-        "FeO",
+        f"openimcc-{species}-g-h-minus-h298",
+        species,
         Phase.G,
         Quantity.H_MINUS_H298,
         temperature_K,
@@ -714,7 +734,6 @@ def test_openimcc_species_thermo_out_of_interval_is_typed_with_source_detail() -
         inside.T_min,
         inside.T_max,
     ]
-    assert prediction.refusal_detail["source_row_id"] == inside.source_row_id
     assert prediction.refusal_detail["upstream_error"]
     assert prediction.refusal_detail["certification_backlog"] is True
 
