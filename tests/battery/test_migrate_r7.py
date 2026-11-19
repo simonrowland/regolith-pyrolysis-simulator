@@ -1110,7 +1110,9 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     # changes. The new page-level rows are p069/p075/p085/p099/p102's two
     # unavailable windows, p089/p115's one unavailable window, plus the
     # restored p274/p367 formula rows; reference p005-05/p005-11/p006-05/
-    # p007-13 are typed unavailable. These are source-page grounded changes.
+    # p007-13 are typed unavailable. The shared phase parser also resolves
+    # printed glass windows; these source-page grounded identities affect the
+    # serialization digest.
     observations = _b2131_formation_observations(tmp_path)
     stored = yaml.safe_load(
         (
@@ -1151,7 +1153,7 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     assert non_admission_diffs
     assert {
         field for fields in non_admission_diffs.values() for field in fields
-    } == {"provenance"}, json.dumps(non_admission_diffs, sort_keys=True)
+    } == {"identity", "provenance"}, json.dumps(non_admission_diffs, sort_keys=True)
     manifest = yaml.safe_load(
         (
             REPO_ROOT
@@ -1173,10 +1175,11 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
         observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
     # The old digest matches the committed baseline exactly. These rows do not
-    # change admission; the new digest records the manifest role provenance.
+    # change admission; the combined digest records phase-parser identity and
+    # manifest-role provenance changes.
     assert (len(observations), hashlib.sha256(payload).hexdigest()) == (
         945,
-        "bf062b5860bc2f5ac3e1980a6d42e85ac9d10539c26b06449705a40a1234dda7",
+        "5cfaf7bb0c51c310c8b424d7c18ff6bfc6e562e6e95c004f66703e3e3c4ed6aa",
     )
 
 
