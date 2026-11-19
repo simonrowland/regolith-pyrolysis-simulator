@@ -14708,7 +14708,8 @@ def _predict_with_engine(
     # engine_not_converged refusal without adding runtime timing to the row.
     native_activity_formula = (
         formula
-        if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY
+        if engine in {Engine.MAGEMIN, Engine.VAPOROCK}
+        and quantity is Quantity.ACTIVITY
         else None
     )
     if (
@@ -17755,9 +17756,9 @@ def _compile_residual_with_lineage(
         else None
     )
     refusal_detail = prediction.refusal_detail
-    # VapoRock's melt-activity contract is generated-is-None. It stamps
-    # identity.composition and refuses before any composition is consumed.
-    # When that State is the printed point, the equality is an echo.
+    # A generated-is-None melt-activity refusal can stamp identity.composition
+    # and return it as an echo. When that State is the printed point, the
+    # equality is not an independent prediction.
     oxide_identity_echo = (
         point_composition_notice is not None
         and point_composition_notice.kind

@@ -179,6 +179,12 @@ _ENGINE_REPORTED_ACTIVITY["internal-analytical"] = EngineReportedActivity(
     Phase.L,
     _PARENT_OXIDE_COMPONENT_BASES,
 )
+_ENGINE_REPORTED_ACTIVITY["vaporock"] = EngineReportedActivity(
+    "raoultian_pure_liquid_endmember",
+    ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+    Phase.L,
+    _PARENT_OXIDE_COMPONENT_BASES,
+)
 _ENGINE_REPORTED_ACTIVITY["magemin"] = EngineReportedActivity(
     "raoultian_native_crystal_activity",
     ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
@@ -242,7 +248,7 @@ def _engine_reports_formula(engine: str, formula: str) -> tuple[bool, str]:
         if formula in MAGEMIN_NATIVE_MELT_ACTIVITIES:
             return True, "raoultian_native_crystal_activity"
         return False, f"typed-refusal:magemin_no_native_activity:{formula}"
-    if engine in ("alphamelts", "thermoengine"):
+    if engine in ("alphamelts", "thermoengine", "vaporock"):
         return _melts_reports_oxide_endmember(formula)
     if engine == "openimcc":
         return _imcc_reports_parent_oxide(formula)
@@ -555,6 +561,9 @@ def melt_activity_requests(
     gap_tuple = tuple(dict.fromkeys(gaps))
     results = []
     for engine in MELT_ACTIVITY_ENGINES:
+        if engine == "vaporock" and inputs.activity_quantity != "activity":
+            results.append(_not_applicable(provenance, engine))
+            continue
         if engine == "magemin" and inputs.activity_quantity != "activity":
             if (
                 inputs.activity_quantity == "activity_coefficient"

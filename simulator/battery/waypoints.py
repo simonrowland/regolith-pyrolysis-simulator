@@ -213,6 +213,7 @@ ENGINE_POINT_CONSUMERS = (
 # does not imply gamma support; coefficients stay on their separate result map.
 MELT_ACTIVITY_ENGINES = (
     "alphamelts",
+    "vaporock",
     "thermoengine",
     "openimcc",
     "internal-analytical",

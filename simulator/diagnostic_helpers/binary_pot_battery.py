@@ -1498,8 +1498,22 @@ def extract_reported_quantities(
     Extra attributes are not invented.
     """
 
+    raw_activities = getattr(result, "activity_coefficients", None) or {}
+    if not raw_activities:
+        diagnostics = getattr(result, "diagnostics", None) or {}
+        if isinstance(diagnostics, Mapping):
+            oxide_activity = diagnostics.get("oxide_activity")
+            standard_state = diagnostics.get("oxide_activity_standard_state")
+            if isinstance(oxide_activity, Mapping):
+                from simulator.melt_backend.vaporock import (
+                    _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
+                )
+
+                if standard_state == _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE:
+                    raw_activities = oxide_activity
+
     activities: dict[str, float] = {}
-    for name, value in dict(getattr(result, "activity_coefficients", None) or {}).items():
+    for name, value in dict(raw_activities).items():
         number = finite_float(value)
         if number is not None and number > 0.0:
             activities[str(name)] = number
@@ -4333,6 +4347,7 @@ def run_isolated_cell_worker(
                 if payload.get("physical_pressure_bar") is None
                 else float(payload["physical_pressure_bar"])
             ),
+            native_activity_formula=payload.get("native_activity_formula"),
             qualification=bool(payload.get("qualification")),
             isolated=False,
             arm=str(payload.get("arm") or ARM_HEADLINE),
@@ -4691,6 +4706,7 @@ def _run_cell_in_subprocess(
     certified_band: Mapping[str, Any] | None,
     simulate_crash: str | None = None,
     physical_pressure_bar: float | None = None,
+    native_activity_formula: str | None = None,
     defer_qualification_decoration: bool = False,
     engine_settings: Mapping[str, Any] | None = None,
 ) -> EquilibrateCell:
@@ -4714,6 +4730,8 @@ def _run_cell_in_subprocess(
     }
     if physical_pressure_bar is not None:
         payload["physical_pressure_bar"] = float(physical_pressure_bar)
+    if native_activity_formula is not None:
+        payload["native_activity_formula"] = native_activity_formula
     worker = _isolated_cell_worker(handle.name, engine_settings)
     try:
         raw = worker.request(
@@ -5306,6 +5324,7 @@ def _equilibrate_cell_uncached(
             certified_band=certified_band,
             simulate_crash=simulate_crash,
             physical_pressure_bar=physical_pressure_bar,
+            native_activity_formula=native_activity_formula,
             defer_qualification_decoration=True,
             engine_settings=handle.engine_settings or None,
         ))
@@ -5377,6 +5396,12 @@ def _equilibrate_cell_uncached(
         kwargs["call_timeout_s"] = timeout
     if "native_activity_formula" in parameters:
         kwargs["native_activity_formula"] = native_activity_formula
+    if (
+        handle.name == "vaporock"
+        and native_activity_formula is not None
+        and "include_oxide_activities" in parameters
+    ):
+        kwargs["include_oxide_activities"] = True
     from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
 
     kwargs.update(isothermal_run_kwargs(handle.name, parameters))
