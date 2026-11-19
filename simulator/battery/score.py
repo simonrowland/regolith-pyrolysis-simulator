@@ -348,7 +348,8 @@ _CATALOG_PREDICTED_QUANTITIES = frozenset(
     {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE}
 )
 # Equilibrium partial pressures from these two predictors are independent of
-# total pressure. The evaluation proof is in test_score's pressure-axis test.
+# total pressure. The evaluation proof is in test_score's pressure-axis test;
+# unknown total-pressure provenance does not block p_partial eligibility here.
 _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS = frozenset(
     {
         (Engine.OPENIMCC, Quantity.P_PARTIAL),
@@ -5266,21 +5267,34 @@ def blocking_qualifications(
     quantity: Quantity | None,
     notices: Sequence[Notice],
     *,
+    engine: Engine,
     oxygen_balance_effusion_solved: bool = False,
 ) -> tuple[Notice, ...]:
+    qualification_notices = tuple(notices)
+    if (engine, quantity) in _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS:
+        qualification_notices = tuple(
+            notice
+            for notice in qualification_notices
+            if not (
+                notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+                and "total_pressure_Pa" in notice.reason
+            )
+        )
     flagged = tuple(
-        notice for notice in notices if _is_flagged_stratum_notice(notice)
+        notice
+        for notice in qualification_notices
+        if _is_flagged_stratum_notice(notice)
     )
     if flagged:
         return flagged
     if quantity in _VAPOUR_EQUILIBRIUM:
         return _pressure_blocking_notices(
-            tuple(notices),
+            qualification_notices,
             oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
         )
     if quantity in MELT_ACTIVITY_QUANTITIES:
         found: list[Notice] = []
-        for notice in notices:
+        for notice in qualification_notices:
             if notice.kind in {
                 NoticeKind.FLOOR_INVERSION,
                 NoticeKind.FALLBACK,
@@ -5572,6 +5586,7 @@ def _reference_has_measured_evidence(
 
 def build_conjuncts(
     *,
+    engine: Engine,
     status: ResidualStatus,
     reference: Observation,
     candidate: Observation | None,
@@ -5628,6 +5643,7 @@ def build_conjuncts(
         no_blocking_qualification=not blocking_qualifications(
             quantity,
             eligibility_notices,
+            engine=engine,
             oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
         ),
         not_flagged_stratum=not any(
@@ -18547,6 +18563,7 @@ def _compile_residual_with_lineage(
         eligibility_reference = replace(reference, identity=compared_reference)
         eligibility_candidate = replace(candidate, identity=compared_candidate)
     conjuncts = build_conjuncts(
+        engine=prediction.engine,
         status=status,
         reference=eligibility_reference,
         candidate=eligibility_candidate,

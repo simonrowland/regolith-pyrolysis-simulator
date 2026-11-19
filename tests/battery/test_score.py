@@ -88,6 +88,7 @@ from simulator.battery.records import (
     Value,
 )
 from simulator.battery.validity import (
+    GateOutcome,
     apparatus_geometry_interval_notice,
     effusion_regime_unverified,
     knudsen_effusion_pressure_from_mass_rate,
@@ -800,6 +801,105 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         and "total-pressure-independent" in notice.reason
         for notice in residual.notices
     )
+
+
+def _pressure_notice_eligibility(engine, quantity, notices):
+    identity = replace(
+        _partial_identity(),
+        quantity=quantity,
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.unknown("not printed"),
+    )
+    experiment = F.kems_experiment()
+    reference = F.observation(
+        "pressure-eligibility-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="other-source",
+    )
+    comparison_identity = replace(
+        identity, total_pressure_Pa=State.of(Decimal("0.1"))
+    )
+    compared_reference = replace(reference, identity=comparison_identity)
+    candidate = F.engine_obs(
+        "pressure-eligibility-candidate",
+        experiment.experiment_id,
+        comparison_identity,
+        Decimal("1"),
+        notices=notices,
+    )
+    numeric = ResidualNumeric(
+        MetricOperation.DEX,
+        "dex",
+        Decimal("0"),
+        None,
+    )
+    return score_mod.build_conjuncts(
+        engine=engine,
+        status=ResidualStatus.MATCH,
+        reference=compared_reference,
+        candidate=candidate,
+        numeric=numeric,
+        source_relation=SourceRelation.INDEPENDENT,
+        lineage_complete=True,
+        gates=GateOutcome(passed=True),
+        extract_review_status="reviewed",
+        comparison_ids={reference.observation_id},
+        notices=notices,
+    )
+
+
+def test_pressure_provenance_unknown_only_does_not_block_independent_partial_path(
+    monkeypatch,
+) -> None:
+    notice = Notice(
+        kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason=(
+            "observation does not carry total_pressure_Pa "
+            "(unknown: not printed); residual assumes 1e-06 bar"
+        ),
+        origin="test",
+    )
+    eligible = _pressure_notice_eligibility(
+        Engine.INTERNAL_ANALYTICAL, Quantity.P_PARTIAL, (notice,)
+    )
+    assert eligible.eligible()
+
+    monkeypatch.setattr(
+        score_mod,
+        "_TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS",
+        frozenset(),
+    )
+    mutated = _pressure_notice_eligibility(
+        Engine.INTERNAL_ANALYTICAL, Quantity.P_PARTIAL, (notice,)
+    )
+    assert not mutated.eligible()
+    assert "no_blocking_qualification" in mutated.exclusions()
+
+
+@pytest.mark.parametrize(
+    ("engine", "quantity", "notice_kind"),
+    (
+        (Engine.VAPOROCK, Quantity.P_PARTIAL, NoticeKind.PRESSURE_PROVENANCE_UNKNOWN),
+        (Engine.INTERNAL_ANALYTICAL, Quantity.P_SAT, NoticeKind.PRESSURE_PROVENANCE_UNKNOWN),
+        (Engine.OPENIMCC, Quantity.P_PARTIAL, NoticeKind.IMCC_COMPLEX_SATURATION),
+    ),
+)
+def test_pressure_eligibility_exception_keeps_other_blockers(
+    engine, quantity, notice_kind
+) -> None:
+    notice = Notice(
+        kind=notice_kind,
+        affected_quantities=(quantity,),
+        reason="still blocks eligibility",
+        origin="test",
+    )
+    blocked = _pressure_notice_eligibility(engine, quantity, (notice,))
+    assert not blocked.eligible()
+    assert "no_blocking_qualification" in blocked.exclusions()
 
 
 def _partial_prediction(engine, observation, **_kwargs):
