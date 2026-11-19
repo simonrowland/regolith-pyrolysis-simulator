@@ -6,7 +6,8 @@ import yaml
 
 from literature_extract_assertions import assert_all_physical_locators
 from simulator.battery.enums import Phase, Quantity, ValueKind
-from simulator.battery.migrate import Migrator
+from simulator.battery.identity import _format_enthalpy_increment_subtype
+from simulator.battery.migrate import Migrator, _enthalpy_increment_subtype
 from tests.literature_extract_test_helpers import iter_locators
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -46,6 +47,26 @@ def test_table1_extrema_are_render_checked_and_table_text_is_in_corpus():
     assert tables["1"]["locator"]["page"] == 5
     assert tables["2"]["locator"]["page"] == 9
     assert all("printed_table_text" not in row["values"] for row in tables.values())
+
+    declarations = [
+        row
+        for species in document["species"].values()
+        for row in species.get("observations", [])
+        if row.get("values", {}).get("quantity") == "H_minus_H298"
+    ]
+    assert len(declarations) == 50
+    assert all(
+        row["values"]["reference_temperature_K"] == "298.15"
+        and row["values"]["printed_relation"] == "H(T) - H(298.15 K)"
+        for row in declarations
+    )
+
+    mutated = deepcopy(document)
+    mutated_observation = mutated["species"]["K2O"]["observations"][0]
+    mutated_values = mutated_observation["values"]
+    mutated_values.pop("reference_temperature_K")
+    mutated_values["printed_relation"] = "H°(T) - H°(25 °C)"
+    assert _enthalpy_increment_subtype(mutated_observation, mutated_values) is None
 
     table_locators = [
         locator for locator in iter_locators(document) if "table" in locator
@@ -87,6 +108,10 @@ def test_isolated_migration_carries_temperature_to_every_heat_content_point():
     for row in result.observations.values():
         assert row.value.kind is ValueKind.POINT
         assert row.identity.quantity.value is Quantity.H_MINUS_H298
+        assert row.identity.subtype is not None and row.identity.subtype.is_value
+        assert row.identity.subtype.value == _format_enthalpy_increment_subtype(
+            Decimal("298.15")
+        )
         assert row.identity.temperature_K.value in temperatures
         assert row.identity.species.phase.value in {Phase.CR, Phase.L, Phase.G}
         condition = row.point_conditions["temperature_K"]
