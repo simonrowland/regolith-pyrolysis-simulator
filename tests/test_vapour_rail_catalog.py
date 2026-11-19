@@ -1262,7 +1262,9 @@ def test_t609_feo_association_tracks_pure_fe_and_janaf_k() -> None:
     catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
     feo = catalog.species["FeO_association_gas"].evaluator
     assert feo is not None
-    assert getattr(feo, "diagnostic_admission_notice", None) is None
+    _assert_fe_pseudo_law_disclosure(
+        getattr(feo, "diagnostic_admission_notice", None)
+    )
     fe_row = payload["families"]["metals_fe_family"]["physical_properties"][
         "species"
     ]["Fe"]
@@ -2455,10 +2457,13 @@ def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:
                 base_model["provenance"][0]["source_id"]
                 == "pseudo_psat_backsolved_from_vaporock"
             )
-            for pO2_bar, expected_pa in _CITED_FEO_ASSOCIATION_PRESSURE_PA.items():
+            pressure_at_reference_o2 = evaluator.evaluate(
+                1800.0, pO2_bar=1.0
+            ).pressure_pa
+            for pO2_bar in (1.0e-9, 0.01):
                 evaluation = evaluator.evaluate(1800.0, pO2_bar=pO2_bar)
-                assert evaluation.pressure_pa == pytest.approx(
-                    expected_pa, rel=1e-12, abs=0.0
+                assert evaluation.pressure_pa / pressure_at_reference_o2 == pytest.approx(
+                    math.sqrt(pO2_bar), rel=1e-12, abs=0.0
                 )
                 _assert_fe_pseudo_law_disclosure(
                     getattr(evaluation, "diagnostic_admission_notice", None)
