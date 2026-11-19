@@ -1060,8 +1060,9 @@ def test_t622_frozen_fe_law_compiles_without_rewriting_the_fixture() -> None:
         emit_u0_request_rules=False,
         bound_effective_fits=fits,
     )
+    live_payload = _yaml("vapor_pressures.yaml")
     live = compile_vapour_rail_catalog(
-        _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
+        live_payload, emit_u0_request_rules=False
     )
     for species_id, kwargs in (
         ("Fe", {}),
@@ -1072,8 +1073,8 @@ def test_t622_frozen_fe_law_compiles_without_rewriting_the_fixture() -> None:
         assert historic_evaluator is not None and live_evaluator is not None
         historic_evaluation = historic_evaluator.evaluate(1800.0, **kwargs)
         live_evaluation = live_evaluator.evaluate(1800.0, **kwargs)
-        assert historic_evaluation.pressure_pa == live_evaluation.pressure_pa
         if species_id == "Fe":
+            assert historic_evaluation.pressure_pa == live_evaluation.pressure_pa
             assert historic_evaluation.pressure_pa == pytest.approx(
                 _FE_PSEUDO_LAW_1800_PA, rel=1e-12, abs=0.0
             )
@@ -1089,6 +1090,24 @@ def test_t622_frozen_fe_law_compiles_without_rewriting_the_fixture() -> None:
                     getattr(pinned_evaluator, "diagnostic_admission_notice", None)
                 )
         else:
+            # b265's T-609 model deliberately moved FeO association from the
+            # frozen activity-folded Fe curve to Fe's pure-component sidecar.
+            # The historical and live pressure paths now differ by design;
+            # the live sidecar relation is also checked by the T-609 test.
+            association_model = live_payload["families"][
+                "oxide_vapors_feo_association_family"
+            ]["physical_properties"]["species"]["FeO_association_gas"]
+            fe_row = live_payload["families"]["metals_fe_family"][
+                "physical_properties"
+            ]["species"]["Fe"]
+            assert historic_evaluation.pressure_pa != live_evaluation.pressure_pa
+            assert association_model["pressure_models"][0][
+                "base_reference_pressure_model"
+            ]["coefficients"] == {
+                key: fe_row["pure_component_antoine"][key]
+                for key in ("A", "B", "C")
+            }
+            # Both paths still disclose Fe's primary diagnostic law.
             _assert_fe_pseudo_law_disclosure(
                 getattr(historic_evaluation, "diagnostic_admission_notice", None)
             )
@@ -2413,14 +2432,18 @@ def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:
                 "physical_properties"
             ]["species"][species_id]["pressure_models"][0]
             embedded = association_model["base_reference_pressure_model"]
-            assert embedded["coefficients"]["A"] == pytest.approx(9.408547)
-            assert embedded["coefficients"]["B"] == pytest.approx(23312.312336)
-            assert embedded["coefficients"]["C"] == pytest.approx(1000.0)
+            fe_row = payload["families"]["metals_fe_family"][
+                "physical_properties"
+            ]["species"]["Fe"]
+            pure_sidecar = fe_row["pure_component_antoine"]
+            for key in ("A", "B", "C"):
+                assert embedded["coefficients"][key] == pytest.approx(
+                    pure_sidecar[key]
+                )
             # The closure calls log10_pressure() and does not apply a base
             # oxygen multiplier. Live admission is the identity multiplier only.
-            base_model = payload["families"]["metals_fe_family"][
-                "physical_properties"
-            ]["species"]["Fe"]["pressure_models"][0]
+            base_model = fe_row["pressure_models"][0]
+            assert base_model["coefficients"] != embedded["coefficients"]
             assert _oracle_stored_oxygen_law(base_model) == (0.0, 1.0, None)
             assert _oracle_stored_oxygen_law(embedded) == (0.0, 1.0, None)
             assert base_model["provenance"][0]["status"] == "diagnostic_only"
