@@ -8,6 +8,10 @@ import yaml
 
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import Migrator, REPO_ROOT
+from simulator.battery.method_class_bands import (
+    _located_fact,
+    select_method_class_band,
+)
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -36,6 +40,7 @@ def test_extract_covers_table_values_and_migrates_every_typed_row_as_a_point() -
             migrated = migrator.result.observations[
                 f"{EXTRACT.stem}::{row['observation_id']}"
             ]
+            experiment = migrator.result.experiments[migrated.experiment_id]
             quantity = Quantity(row["values"]["quantity"])
             field = {
                 Quantity.ION_INTENSITY: "ion_intensity",
@@ -45,6 +50,7 @@ def test_extract_covers_table_values_and_migrates_every_typed_row_as_a_point() -
             assert migrated.value.kind is ValueKind.POINT, row["observation_id"]
             assert migrated.value.point == Decimal(str(row["values"][field]))
             assert migrated.identity.species.formula == formula
+            assert _located_fact(migrated, experiment, "technique") == "mass_spectrometry"
             assert migrated.identity.temperature_K.is_value
             assert migrated.point_conditions is not None
             source_conditions = row["point_conditions"]
@@ -67,6 +73,17 @@ def test_extract_covers_table_values_and_migrates_every_typed_row_as_a_point() -
             temperature = migrated.point_conditions["temperature_K"]
             assert temperature.state.is_value
             assert temperature.state.value == migrated.identity.temperature_K.value
+            if (
+                row["observation_id"].startswith("kambayashi_1983_table2_")
+                and quantity is Quantity.ACTIVITY
+            ):
+                assert _located_fact(migrated, experiment, "activity_method") == (
+                    "gibbs_duhem_integration"
+                )
+                assert migrated.point_conditions["activity_method"].locator is not None
+                assert select_method_class_band(migrated, experiment) == {
+                    "refusal": {"reason": "method_class_applicability_unknown"}
+                }
 
     # Endpoints and the low-silica activity are fidelity pins from the page-6 render.
     assert migrator.result.observations[

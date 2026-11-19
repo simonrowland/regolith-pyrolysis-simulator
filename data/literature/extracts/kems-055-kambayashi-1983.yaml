@@ -54,6 +54,11 @@ experiments:
       published_page: 701
       pdf_page_index: 0
       note: Experimental Procedure
+    apparatus:
+      calibration:
+        technique:
+          state: {tag: value, value: mass_spectrometry}
+          locator: {page: 2, published_page: 702, pdf_page_index: 1, section: 'Experimental Procedure', note: 'The experiment records ion currents from the effusion cell and the paper identifies the work as mass spectrometry.'}
     conditions:
       temperature_K:
         state:
@@ -791,6 +796,9 @@ species:
           locator: *id001
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: &kambayashi_sio2_activity_method
+          state: {tag: value, value: gibbs_duhem_integration}
+          locator: {page: 2, published_page: 702, pdf_page_index: 1, equation: '(2)', note: 'Equation (2) obtains silica activity from the Gibbs-Duhem relation.'}
         phase_assemblage:
           state:
             tag: value
@@ -892,6 +900,7 @@ species:
           locator: *id003
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_sio2_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -993,6 +1002,7 @@ species:
           locator: *id005
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_sio2_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -1094,6 +1104,7 @@ species:
           locator: *id007
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_sio2_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -1195,6 +1206,7 @@ species:
           locator: *id009
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_sio2_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -1296,6 +1308,7 @@ species:
           locator: *id011
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_sio2_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -1397,6 +1410,7 @@ species:
           locator: *id013
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_sio2_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -1498,6 +1512,7 @@ species:
           locator: *id015
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_sio2_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -1599,6 +1614,7 @@ species:
           locator: *id017
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_sio2_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -1700,6 +1716,7 @@ species:
           locator: *id019
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_sio2_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -2040,6 +2057,9 @@ species:
           locator: *id021
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: &kambayashi_mgo_activity_method
+          state: {tag: value, value: gibbs_duhem_integration}
+          locator: {page: 4, published_page: 704, pdf_page_index: 3, equation: '(5)', note: 'Equation (5) computes MgO activity by the similar integration.'}
         phase_assemblage:
           state:
             tag: value
@@ -2130,6 +2150,7 @@ species:
           locator: *id022
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_mgo_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -2220,6 +2241,7 @@ species:
           locator: *id023
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_mgo_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -2310,6 +2332,7 @@ species:
           locator: *id024
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_mgo_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -2400,6 +2423,7 @@ species:
           locator: *id025
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_mgo_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -2490,6 +2514,7 @@ species:
           locator: *id026
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_mgo_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -2580,6 +2605,7 @@ species:
           locator: *id027
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_mgo_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -2670,6 +2696,7 @@ species:
           locator: *id028
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_mgo_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -2760,6 +2787,7 @@ species:
           locator: *id029
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_mgo_activity_method
         phase_assemblage:
           state:
             tag: value
@@ -2850,6 +2878,7 @@ species:
           locator: *id030
           note: x is the printed binary oxide-mixture composition; in two-phase fields it is the prepared sample
             composition.
+        activity_method: *kambayashi_mgo_activity_method
         phase_assemblage:
           state:
             tag: value
