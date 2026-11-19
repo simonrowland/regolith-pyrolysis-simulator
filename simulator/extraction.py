@@ -3803,8 +3803,8 @@ class ExtractionMixin:
         gas_temperature_K = float(
             getattr(self.overhead, 'headspace_temperature_K', 0.0) or hold_temp_K
         )
-        pipe_diameter_m = float(
-            getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
+        pipe_diameter_m = self.overhead_model.effective_throat_diameter_m(
+            self.melt
         )
         if cf7_ca_shell_route_active and (
             C7_MIN_TOTAL_PRESSURE_MBAR <= p_total_mbar <= C7_MAX_TOTAL_PRESSURE_MBAR
@@ -4243,6 +4243,8 @@ class ExtractionMixin:
         captured_ca_mol: float,
         diagnostics: list[dict],
     ) -> None:
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+
         ca_shuttle = self._c7_nested(cfg.get('ca_shuttle'))
         if not self._c7_bool(ca_shuttle.get('enabled'), False):
             return

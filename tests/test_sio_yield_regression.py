@@ -123,6 +123,7 @@ def test_sio_wall_sweep_keeps_bulk_gas_temperature_distinct_from_liner():
         melt=SimpleNamespace(temperature_C=1450.0),
         overhead_model=SimpleNamespace(
             pipe_diameter_m=0.12,
+            effective_throat_diameter_m=lambda _melt: 0.12,
             stage_area_m2_by_stage=lambda: {1: 2.0},
             stage_hydraulic_diameter_m={1: 0.02},
             stage_area_geometry_provenance_notice=lambda: {"status": "test"},

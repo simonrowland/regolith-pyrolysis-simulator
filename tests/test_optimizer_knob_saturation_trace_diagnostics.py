@@ -59,3 +59,45 @@ def test_c2a_depletion_log_slope_trace_labels_requested_and_applied_values() -> 
         C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR
     )
     assert row["pinned"] == "none"
+
+
+def test_d452_bound_saturation_reports_max_throat_hardware() -> None:
+    schema = RecipeSchema()
+    path = ("condenser_geometry", "initial_throat_area_m2")
+    spec = schema.spec_for(path)
+    patch = RecipePatch({path: spec.high}).validated(schema)
+
+    report = compute_knob_saturation(
+        patch,
+        schema,
+        active_objective_metrics=("duration_h", "throughput_cost_owner_ratify_usd"),
+    )
+    row = _row(report, "condenser_geometry.initial_throat_area_m2")
+
+    assert row["source"] == "patched"
+    assert row["value"] == pytest.approx(spec.high)
+    assert row["pinned"] == "high"
+
+
+def test_d452_bound_saturation_reports_fully_open_stage_vane() -> None:
+    schema = RecipeSchema()
+    path = (
+        "campaigns", "C2A_staged", "stages", "sio_window",
+        "slider_vane_open_fraction",
+    )
+    spec = schema.spec_for(path)
+    patch = RecipePatch({path: spec.high}).validated(schema)
+
+    report = compute_knob_saturation(
+        patch,
+        schema,
+        active_objective_metrics=("duration_h",),
+    )
+    row = _row(
+        report,
+        "campaigns.C2A_staged.stages.sio_window.slider_vane_open_fraction",
+    )
+
+    assert row["source"] == "patched"
+    assert row["value"] == pytest.approx(spec.high)
+    assert row["pinned"] == "high"

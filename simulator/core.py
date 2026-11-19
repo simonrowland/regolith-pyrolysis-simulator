@@ -3932,7 +3932,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             species_partial_pressures_mbar=(
                 self.overhead_model.species_partial_pressures(*partial_pressure_args)
             ),
-            pipe_diameter_m=self.overhead_model.pipe_diameter_m,
+            pipe_diameter_m=transport['throat_diameter_m'],
             # The upstream vapor is evaluated at the melt-side temperature used
             # by the conductance model; the independently scheduled pipe and
             # segment temperatures are liner-wall states, not gas states.
@@ -4012,7 +4012,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # Knudsen conductance evaluates the vapor at the melt-side gas
             # temperature; the scheduled pipe temperature is a wall state.
             gas_temperature_C=float(self.melt.temperature_C),
-            pipe_diameter_m=self.overhead_model.pipe_diameter_m,
+            pipe_diameter_m=self.overhead_model.effective_throat_diameter_m(
+                self.melt
+            ),
             pN2_min_mbar=C2A_STAGED_PN2_SWEEP_MIN_MBAR,
             pN2_max_mbar=C2A_STAGED_PN2_SWEEP_MAX_MBAR,
             carrier_gas=carrier_gas,
@@ -8262,8 +8264,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
             )
         )
-        pipe_diameter_m = float(
-            getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
+        pipe_diameter_m = self.overhead_model.effective_throat_diameter_m(
+            self.melt
         )
         try:
             series_flux = _series_resistance_evaporation_flux_kg_m2_s(

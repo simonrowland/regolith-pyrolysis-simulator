@@ -109,8 +109,11 @@ STAGE_SIO_GAS_MODE = (
 # fingerprint-neutral optimizer identity.
 # b-1043: regenerated with the declared gate input in canonical identity.
 # t-1720 fold: N2 and Ar zero Earth prices now participate in cost identity.
+# d-452: provisional hot-duct and shared-condenser hardware prices enter the
+# same cost identity so candidates with different installed sizing cannot share
+# cached objective results.
 PINNED_EVALSPEC_JSON = (
-    b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor":false,"backend_name":"internal-analytical","c5_enabled":false,"campaign":"C0","chemistry_kernel":{"allow_builtin_fallback":false,"engine":"builtin","liquid_fraction_provider":"magemin","pressure_Pa":"0.001000000"},"corpus_version":"corpus-version-digest","cost_parameters":{"parameters":{"carrier_gas_earth_price_per_kg":{"Ar":"0.000000000","Kr":"290.000000000","N2":"0.000000000"},"carrier_makeup_loss_fraction_per_run":"0.010000000","depreciation_expense_per_run":"50.000000000","electricity_cost_per_kWh":"0.150000000","furnace_resinter_cost_usd":"5000.000000000","generic_reagent_cost_per_kg":"10.000000000","import_delivery_cost_per_kg":"10000.000000000","shuttle_reagent_replacement_cost_per_kg":{"Ca":"0.500000000","K":"1.000000000","Mg":"0.750000000","Na":"0.500000000"},"solar_heat_cost_per_kWh":"0.050000000"}},"feedstock_id":"lunar_mare_low_ti","fidelity":"fast","force_builtin_vapor_pressure":false,"hours":24,"mass_kg":"1000.000000000","mre_max_voltage_V":"0.000000000","mre_target_species":"","profile_id":"oxygen-yield-v1","recipe_id":"recipe-id","runtime_campaign_overrides":{"C0":{"hold_time_h":"1.000000000"}},"track":"pyrolysis","vapor_pressure_provider_id":"builtin-vapor-pressure"}'
+    b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor":false,"backend_name":"internal-analytical","c5_enabled":false,"campaign":"C0","chemistry_kernel":{"allow_builtin_fallback":false,"engine":"builtin","liquid_fraction_provider":"magemin","pressure_Pa":"0.001000000"},"corpus_version":"corpus-version-digest","cost_parameters":{"parameters":{"carrier_gas_earth_price_per_kg":{"Ar":"0.000000000","Kr":"290.000000000","N2":"0.000000000"},"carrier_makeup_loss_fraction_per_run":"0.010000000","depreciation_expense_per_run":"50.000000000","electricity_cost_per_kWh":"0.150000000","furnace_resinter_cost_usd":"5000.000000000","furnaces_per_shared_train":"10.000000000","generic_reagent_cost_per_kg":"10.000000000","hot_duct_cost_per_m2_usd":"25000.000000000","import_delivery_cost_per_kg":"10000.000000000","shared_condenser_train_cost_per_kg_hr_usd":"2000.000000000","shuttle_reagent_replacement_cost_per_kg":{"Ca":"0.500000000","K":"1.000000000","Mg":"0.750000000","Na":"0.500000000"},"solar_heat_cost_per_kWh":"0.050000000"}},"feedstock_id":"lunar_mare_low_ti","fidelity":"fast","force_builtin_vapor_pressure":false,"hours":24,"mass_kg":"1000.000000000","mre_max_voltage_V":"0.000000000","mre_target_species":"","profile_id":"oxygen-yield-v1","recipe_id":"recipe-id","runtime_campaign_overrides":{"C0":{"hold_time_h":"1.000000000"}},"track":"pyrolysis","vapor_pressure_provider_id":"builtin-vapor-pressure"}'
 )
 PINNED_FEEDSTOCK_JSON = (
     b'[["Al2O3","13.500000000"],["FeO","16.500000000"],["SiO2","44.500000000"]]'
@@ -207,6 +210,31 @@ def _mre_cap_profile(**run_overrides: object) -> dict[str, object]:
         "run": run,
         "fidelities": {"internal-analytical": {"backend_name": "internal-analytical"}},
     }
+
+
+def test_until_campaign_complete_reaches_runner_and_partitions_eval_cache() -> None:
+    schema = RecipeSchema()
+    bounded = _mre_cap_profile(until_campaign_complete=False)
+    complete = _mre_cap_profile(until_campaign_complete=True)
+
+    bounded_spec, bounded_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        bounded,
+        schema,
+    )
+    complete_spec, complete_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        complete,
+        schema,
+    )
+
+    assert bounded_config.until_campaign_complete is False
+    assert complete_config.until_campaign_complete is True
+    assert cache_key(bounded_spec) != cache_key(complete_spec)
 
 
 def test_canonical_evalspec_json_and_cache_key_are_byte_stable_cross_run() -> None:

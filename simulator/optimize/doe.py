@@ -83,6 +83,24 @@ PHASE_ORDER_CONTINUOUS_KNOBS: tuple[KeyPath, ...] = (
     ("campaigns", "C0", "stage0_phase_temperature_C"),
     ("campaigns", "C0", "stage0_phase_pressure_mbar"),
     ("campaigns", "C0", "stage0_phase_pO2_mbar"),
+    ("condenser_geometry", "initial_throat_area_m2"),
+    ("campaigns", "C2A_continuous", "slider_vane_open_fraction"),
+    (
+        "campaigns", "C2A_staged", "stages", "alkali_early_fe",
+        "slider_vane_open_fraction",
+    ),
+    (
+        "campaigns", "C2A_staged", "stages", "sio_window",
+        "slider_vane_open_fraction",
+    ),
+    (
+        "campaigns", "C2A_staged", "stages", "fe_hot_hold",
+        "slider_vane_open_fraction",
+    ),
+    (
+        "campaigns", "C2A_staged", "stages", "cool_for_na_shuttle",
+        "slider_vane_open_fraction",
+    ),
 )
 
 

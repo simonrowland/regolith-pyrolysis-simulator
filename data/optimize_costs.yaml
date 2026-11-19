@@ -57,6 +57,24 @@ parameters:
     rationale: "Advanced edge-case exploration control: furnace lifetime value as a multiple of one typical batch process cost; lower only to surface qualified fouling recipes when extraction is otherwise intractable."
     source_tag: "owner final ratification 2026-07-19: furnace capital value equals 500 typical batch process costs by default; advanced users may relax for edge-case exploration"
 
+  hot_duct_cost_per_m2_usd:
+    value: 25000.0
+    units: USD/m2
+    rationale: "FLAGGED design-study placeholder for hot-duct shell and refractory area; no vendor quote is available. Applied to lateral area pi*d*L."
+    source_tag: "FLAGGED provisional (d-452): controller placeholder pending owner/vendor ratification"
+
+  shared_condenser_train_cost_per_kg_hr_usd:
+    value: 2000.0
+    units: "USD/(kg/hr)"
+    rationale: "FLAGGED design-study placeholder for condenser-train installed capacity; no vendor quote is available."
+    source_tag: "FLAGGED provisional (d-452): controller placeholder pending owner/vendor ratification"
+
+  furnaces_per_shared_train:
+    value: 10
+    units: furnaces/train
+    rationale: "FLAGGED sharing assumption; total train capacity is max(n times average flow, one-furnace peak flow)."
+    source_tag: "FLAGGED provisional (d-452): ten furnaces share a train pending owner ratification"
+
   min_fouling_penalty:
     value: 1.0
     units: batch-cost multiples

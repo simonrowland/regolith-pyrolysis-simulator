@@ -27,6 +27,9 @@ DEFAULT_MIN_FOULING_PENALTY = 1.0
 DEFAULT_IMPORT_DELIVERY_COST_PER_KG = 10000.0
 DEFAULT_CARRIER_GAS_EARTH_PRICE_PER_KG = {"Ar": 0.0, "Kr": 290.0, "N2": 0.0}
 DEFAULT_CARRIER_MAKEUP_LOSS_FRACTION_PER_RUN = 0.01
+DEFAULT_HOT_DUCT_COST_PER_M2_USD = 25000.0
+DEFAULT_SHARED_CONDENSER_TRAIN_COST_PER_KG_HR_USD = 2000.0
+DEFAULT_FURNACES_PER_SHARED_TRAIN = 10
 ENERGY_COST_DEFAULT_SOURCE = "owner-t7-two-price-energy-v1"
 PAYLOAD_ABSENT_COST_PROVENANCE = (
     "canonical defaults; payload carried no cost parameters"
@@ -42,6 +45,9 @@ _REQUIRED_SCALAR_PARAMETERS = (
     "min_fouling_penalty",
     "import_delivery_cost_per_kg",
     "carrier_makeup_loss_fraction_per_run",
+    "hot_duct_cost_per_m2_usd",
+    "shared_condenser_train_cost_per_kg_hr_usd",
+    "furnaces_per_shared_train",
 )
 _SHUTTLE_PARAMETER = "shuttle_reagent_replacement_cost_per_kg"
 _CARRIER_PRICE_PARAMETER = "carrier_gas_earth_price_per_kg"
@@ -65,6 +71,11 @@ class CostParameters:
     carrier_makeup_loss_fraction_per_run: float = (
         DEFAULT_CARRIER_MAKEUP_LOSS_FRACTION_PER_RUN
     )
+    hot_duct_cost_per_m2_usd: float = DEFAULT_HOT_DUCT_COST_PER_M2_USD
+    shared_condenser_train_cost_per_kg_hr_usd: float = (
+        DEFAULT_SHARED_CONDENSER_TRAIN_COST_PER_KG_HR_USD
+    )
+    furnaces_per_shared_train: float = DEFAULT_FURNACES_PER_SHARED_TRAIN
 
     def __post_init__(self) -> None:
         for field_name in _REQUIRED_SCALAR_PARAMETERS:
@@ -181,8 +192,10 @@ def normalize_cost_parameters(
     raw_parameters = payload.get("parameters")
     if not isinstance(raw_parameters, Mapping):
         raise ValueError("cost parameter payload missing parameters mapping")
-    raw_parameters = _with_missing_carrier_cost_defaults(
-        _with_missing_solar_heat_default(raw_parameters)
+    raw_parameters = _with_missing_hardware_cost_defaults(
+        _with_missing_carrier_cost_defaults(
+            _with_missing_solar_heat_default(raw_parameters)
+        )
     )
 
     parameters: dict[str, Any] = {}
@@ -316,6 +329,11 @@ def cost_parameters_from_mapping(payload: Mapping[str, Any] | None = None) -> Co
             "carrier_makeup_loss_fraction_per_run"
         ],
         shuttle_reagent_replacement_cost_per_kg=values[_SHUTTLE_PARAMETER],
+        hot_duct_cost_per_m2_usd=values["hot_duct_cost_per_m2_usd"],
+        shared_condenser_train_cost_per_kg_hr_usd=values[
+            "shared_condenser_train_cost_per_kg_hr_usd"
+        ],
+        furnaces_per_shared_train=values["furnaces_per_shared_train"],
     )
 
 
@@ -451,6 +469,48 @@ def _with_missing_carrier_cost_defaults(
     return result
 
 
+def _with_missing_hardware_cost_defaults(
+    parameters: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Keep saved v1 recipe cost blocks usable as hardware pricing lands."""
+
+    result = dict(parameters)
+    result.setdefault(
+        "hot_duct_cost_per_m2_usd",
+        {
+            "value": DEFAULT_HOT_DUCT_COST_PER_M2_USD,
+            "units": "USD/m2",
+            "source_tag": (
+                "FLAGGED provisional (d-452): controller placeholder "
+                "pending owner/vendor ratification"
+            ),
+        },
+    )
+    result.setdefault(
+        "shared_condenser_train_cost_per_kg_hr_usd",
+        {
+            "value": DEFAULT_SHARED_CONDENSER_TRAIN_COST_PER_KG_HR_USD,
+            "units": "USD/(kg/hr)",
+            "source_tag": (
+                "FLAGGED provisional (d-452): controller placeholder "
+                "pending owner/vendor ratification"
+            ),
+        },
+    )
+    result.setdefault(
+        "furnaces_per_shared_train",
+        {
+            "value": DEFAULT_FURNACES_PER_SHARED_TRAIN,
+            "units": "furnaces/train",
+            "source_tag": (
+                "FLAGGED provisional (d-452): ten furnaces share a train "
+                "pending owner ratification"
+            ),
+        },
+    )
+    return result
+
+
 def _parameter_entry(parameters: Mapping[str, Any], name: str) -> Mapping[str, Any]:
     raw = parameters.get(name)
     if isinstance(raw, Mapping):
@@ -470,6 +530,10 @@ def _validated_scalar_parameter(value: Any, name: str) -> float:
         number = _finite_nonnegative(value, name)
         if name == "carrier_makeup_loss_fraction_per_run" and number > 1.0:
             raise ValueError(f"{name} must be at most 1.0")
+        if name == "furnaces_per_shared_train" and (
+            number <= 0.0 or not number.is_integer()
+        ):
+            raise ValueError(f"{name} must be a positive whole number")
         return number
     if isinstance(value, bool):
         raise TypeError(f"{name} must be numeric")

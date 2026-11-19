@@ -280,7 +280,10 @@ def test_c7_ca_partial_antoine_block_is_omitted_with_notice(monkeypatch):
             }
             self.campaign_mgr = CampaignManager(self.setpoints)
             self.overhead = SimpleNamespace(headspace_temperature_K=0.0)
-            self.overhead_model = SimpleNamespace(pipe_diameter_m=0.12)
+            self.overhead_model = SimpleNamespace(
+                pipe_diameter_m=0.12,
+                effective_throat_diameter_m=lambda _melt: 0.12,
+            )
 
         def _evaporation_bulk_partial_pressure_pa(self, species):
             return 0.0

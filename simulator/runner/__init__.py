@@ -1435,8 +1435,20 @@ class PyrolysisRun:
         }
         overhead_gas = sim.overhead
         drain_diagnostics = {
+            "maximum_throat_diameter_m": float(
+                overhead_gas.maximum_throat_diameter_m
+            ),
+            "slider_vane_open_fraction": float(
+                overhead_gas.slider_vane_open_fraction
+            ),
             "required_throat_diameter_peak_m": float(
                 overhead_gas.required_throat_diameter_peak_m
+            ),
+            "required_slider_vane_open_fraction_peak": (
+                overhead_gas.required_slider_vane_open_fraction_peak
+            ),
+            "required_slider_vane_open_fraction_status": (
+                overhead_gas.required_slider_vane_open_fraction_status
             ),
             "train_peak_mass_flow_kg_hr": float(
                 overhead_gas.train_peak_mass_flow_kg_hr
@@ -2892,6 +2904,18 @@ def build_per_hour_summary(
         ),
         "required_throat_diameter_status": (
             snapshot.overhead.required_throat_diameter_status
+        ),
+        "maximum_throat_diameter_m": (
+            snapshot.overhead.maximum_throat_diameter_m
+        ),
+        "slider_vane_open_fraction": (
+            snapshot.overhead.slider_vane_open_fraction
+        ),
+        "required_slider_vane_open_fraction": (
+            snapshot.overhead.required_slider_vane_open_fraction
+        ),
+        "required_slider_vane_open_fraction_status": (
+            snapshot.overhead.required_slider_vane_open_fraction_status
         ),
         "train_mass_flow_kg_hr": float(
             snapshot.overhead.train_mass_flow_kg_hr
@@ -4658,7 +4682,9 @@ def _apply_sio_wall_sweep_controls(
     if sim._condensation_model is not None:
         sim.condensation_model.configure_operating_conditions(
             wall_temperature_C=float(liner_temperature_c),
-            pipe_diameter_m=sim.overhead_model.pipe_diameter_m,
+            pipe_diameter_m=sim.overhead_model.effective_throat_diameter_m(
+                sim.melt
+            ),
             gas_temperature_C=float(sim.melt.temperature_C),
             stage_area_m2_by_stage=sim.overhead_model.stage_area_m2_by_stage(),
             stage_hydraulic_diameter_m_by_stage=dict(
