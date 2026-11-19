@@ -84,6 +84,8 @@ def _counts(
 def test_openimcc_vocabulary_mismatch_is_visible_in_report() -> None:
     from simulator.battery.source_lineage import (
         OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
+        OPENIMCC_INDEX_VOCABULARY_UNVERIFIED_PREFIX,
+        OPENIMCC_LINEAGE_GAP_PREFIX,
         OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
     )
 
@@ -95,12 +97,22 @@ def test_openimcc_vocabulary_mismatch_is_visible_in_report() -> None:
         f"{OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX}"
         "fragment=cu;candidate_rows=CuO0.5-1573K,CuO0.5-1923K"
     )
+    unverified_reason = (
+        f"{OPENIMCC_INDEX_VOCABULARY_UNVERIFIED_PREFIX}"
+        "reason=current_commit_unavailable;manifest=3645e2c2bb"
+    )
+    lineage_gap_reason = (
+        f"{OPENIMCC_LINEAGE_GAP_PREFIX}"
+        "missing_work_id=darken-gurry-1946-iron-oxygen-ii"
+    )
     notice_counts = notice_backlog_data(
         [
             {
                 "notices": [
                     {"kind": "engine_model_caveat", "reason": reason},
                     {"kind": "engine_model_caveat", "reason": withheld_reason},
+                    {"kind": "engine_model_caveat", "reason": unverified_reason},
+                    {"kind": "engine_model_caveat", "reason": lineage_gap_reason},
                 ]
             }
         ]
@@ -138,9 +150,13 @@ def test_openimcc_vocabulary_mismatch_is_visible_in_report() -> None:
     assert notice_counts == {
         f"engine_model_caveat:{reason}": 1,
         f"engine_model_caveat:{withheld_reason}": 1,
+        f"engine_model_caveat:{unverified_reason}": 1,
+        f"engine_model_caveat:{lineage_gap_reason}": 1,
     }
     assert f"`engine_model_caveat:{reason}` | 1" in report
     assert f"`engine_model_caveat:{withheld_reason}` | 1" in report
+    assert f"`engine_model_caveat:{unverified_reason}` | 1" in report
+    assert f"`engine_model_caveat:{lineage_gap_reason}` | 1" in report
 
 
 def test_eligibility_census_counts_events_observations_and_first_failures() -> None:
