@@ -13600,6 +13600,99 @@ def _predict_catalog_evaluator(observation: Observation) -> EnginePrediction:
     )
 
 
+_LIQUIDUS_SCORE_AUTHORITY = {
+    Authority.CERTIFIED.value: Authority.CERTIFIED,
+    Authority.BRIDGE.value: Authority.BRIDGE,
+    Authority.EXTRAPOLATED.value: Authority.EXTRAPOLATED,
+}
+
+
+def _decimal_certified_band(
+    band: object,
+) -> dict[str, tuple[Decimal, Decimal]] | None:
+    intervals = _interval_certified_band(band)
+    if not intervals:
+        return None
+    return {
+        str(key): (as_decimal(low), as_decimal(high))
+        for key, (low, high) in intervals.items()
+    }
+
+
+def _liquidus_native_score(
+    result: object,
+    engine: Engine,
+) -> tuple[
+    Authority,
+    dict[str, tuple[Decimal, Decimal]] | None,
+    tuple[Notice, ...],
+    dict[str, object] | None,
+]:
+    """Map finder diagnostics onto existing authority and notice kinds.
+
+    Absent authority stays bridge. A present token that is not certified,
+    bridge, or extrapolated stays bridge and keeps the token as a caveat.
+    Empty diagnostics contribute no refusal payload.
+    """
+
+    raw_diagnostics = getattr(result, "diagnostics", None)
+    diagnostics = raw_diagnostics if isinstance(raw_diagnostics, Mapping) else {}
+    raw_authority = diagnostics.get("authority")
+    if raw_authority is None:
+        authority = Authority.BRIDGE
+        unrecognized = False
+    else:
+        token = str(raw_authority)
+        authority = _LIQUIDUS_SCORE_AUTHORITY.get(token, Authority.BRIDGE)
+        unrecognized = token not in _LIQUIDUS_SCORE_AUTHORITY
+    certified_band = _decimal_certified_band(diagnostics.get("certified_band"))
+    rows: list[Mapping[str, object]] = []
+    commissioning = diagnostics.get("commissioning_notice")
+    if isinstance(commissioning, Mapping):
+        rows.append(commissioning)
+    mode_notices = diagnostics.get("magemin_mode_token_notices")
+    if isinstance(mode_notices, (list, tuple)):
+        for notice in mode_notices:
+            if not isinstance(notice, Mapping):
+                continue
+            row = dict(notice)
+            if row.get("kind") == "mode_vector_renormalised":
+                row["kind"] = NoticeKind.ENGINE_MODEL_CAVEAT.value
+                row.setdefault("reason", "mode_vector_renormalised")
+            rows.append(row)
+    from types import SimpleNamespace
+
+    notices = list(
+        cell_notices(
+            Quantity.TRANSITION_TEMPERATURE,
+            engine,
+            SimpleNamespace(notices=rows),
+        )
+    )
+    if authority is Authority.EXTRAPOLATED and not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND for notice in notices
+    ):
+        notices.append(
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.TRANSITION_TEMPERATURE,),
+                reason="native authority extrapolated",
+                origin=f"engine:{engine.value}",
+            )
+        )
+    if unrecognized:
+        notices.append(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.TRANSITION_TEMPERATURE,),
+                reason=str(raw_authority),
+                origin=f"engine:{engine.value}",
+            )
+        )
+    carried = dict(diagnostics) if diagnostics else None
+    return authority, certified_band, tuple(notices), carried
+
+
 def _predict_liquidus_transition_temperature(
     engine: Engine,
     observation: Observation,
@@ -13938,6 +14031,10 @@ def _predict_liquidus_transition_temperature(
     from simulator.melt_backend.liquidus import liquidus_transition_decision
 
     temperature_K, decision_reason = liquidus_transition_decision(result, subtype)
+    authority, certified_band, native_notices, carried = _liquidus_native_score(
+        result, engine
+    )
+    notices.extend(native_notices)
     if temperature_K is None:
         detail: dict[str, object] = {"reason": decision_reason}
         if decision_reason == "liquidus_finder_requested_transition_missing":
@@ -13949,6 +14046,8 @@ def _predict_liquidus_transition_temperature(
         }:
             detail["status"] = result.status
             detail["warnings"] = list(result.warnings)
+        if carried:
+            detail["diagnostics"] = carried
         return unavailable(detail)
     return EnginePrediction(
         engine=engine,
@@ -13959,10 +14058,11 @@ def _predict_liquidus_transition_temperature(
         ),
         value=Decimal(str(temperature_K)),
         unit=QUANTITY_UNITS[Quantity.TRANSITION_TEMPERATURE],
-        authority=Authority.BRIDGE,
+        authority=authority,
         notices=tuple(notices),
         coefficient_sources=sources,
         lineage_complete=False,
+        certified_band=certified_band,
         identity=identity,
         requested_composition=requested,
     )

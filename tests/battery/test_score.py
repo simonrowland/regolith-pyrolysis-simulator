@@ -20321,6 +20321,127 @@ def test_dew_point_keeps_the_gas_thermo_route(
         _assert_dew_point_keeps_gas_thermo(monkeypatch)
 
 
+def _native_transition_prediction(monkeypatch, diagnostics, *, status="ok"):
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    reference = _transition_temperature_observation()
+    result = LiquidusSolidusResult(
+        liquidus_T_C=None if status != "ok" else 1400.0,
+        liquid_fraction=None if status != "ok" else 1.0,
+        status=status,
+        warnings=() if status == "ok" else ("bracket absent",),
+        diagnostics=diagnostics,
+    )
+    handle = SimpleNamespace(
+        name=Engine.MAGEMIN.value,
+        backend=SimpleNamespace(
+            find_liquidus_solidus=lambda **_kwargs: result
+        ),
+        available=True,
+        unavailable_reason=None,
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_open_cached_battery_handle",
+        lambda *_args: (handle, False),
+    )
+    return predict_with_engine(Engine.MAGEMIN, reference)
+
+
+def _assert_extrapolated_success_keeps_native_authority(monkeypatch) -> None:
+    band = {"temperature_K": (1000.0, 1500.0), "sio2_wt_pct": (35.0, 55.0)}
+    commissioning = {
+        "kind": "engine_commissioning",
+        "reason": "silicate_window",
+        "authority": "extrapolated",
+        "certified_band": band,
+    }
+    prediction = _native_transition_prediction(
+        monkeypatch,
+        {
+            "authority": "extrapolated",
+            "certified_band": band,
+            "commissioning_notice": commissioning,
+        },
+    )
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert prediction.certified_band is not None
+    assert prediction.certified_band["temperature_K"] == (
+        Decimal("1000.0"),
+        Decimal("1500.0"),
+    )
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.reason == "silicate_window"
+        for notice in prediction.notices
+    )
+    bare = _native_transition_prediction(
+        monkeypatch,
+        {"authority": "extrapolated"},
+    )
+    assert bare.authority is Authority.EXTRAPOLATED
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in bare.notices
+    )
+    certified = _native_transition_prediction(
+        monkeypatch,
+        {"authority": "certified"},
+    )
+    assert certified.authority is Authority.CERTIFIED
+    mode = _native_transition_prediction(
+        monkeypatch,
+        {
+            "magemin_mode_token_notices": (
+                {"kind": "mode_vector_renormalised", "raw_sum": 1.001},
+            ),
+        },
+    )
+    assert mode.authority is Authority.BRIDGE
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason == "mode_vector_renormalised"
+        for notice in mode.notices
+    )
+    unknown = _native_transition_prediction(
+        monkeypatch,
+        {"authority": "guessed"},
+    )
+    assert unknown.authority is Authority.BRIDGE
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason == "guessed"
+        for notice in unknown.notices
+    )
+    refused = _native_transition_prediction(
+        monkeypatch,
+        {"authority": "extrapolated", "reason": "out_of_domain"},
+        status="out_of_domain",
+    )
+    assert refused.authority is Authority.REFUSED
+    assert refused.refusal_detail["reason"] == "liquidus_finder_out_of_domain"
+    assert refused.refusal_detail["diagnostics"] == {
+        "authority": "extrapolated",
+        "reason": "out_of_domain",
+    }
+
+
+def test_liquidus_success_keeps_native_authority_and_diagnostics(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _assert_extrapolated_success_keeps_native_authority(monkeypatch)
+
+    def stamp_bridge(_result, _engine):
+        return Authority.BRIDGE, None, (), None
+
+    monkeypatch.setattr(score_mod, "_liquidus_native_score", stamp_bridge)
+    with pytest.raises(AssertionError):
+        _assert_extrapolated_success_keeps_native_authority(monkeypatch)
+
+
 def test_transition_temperature_out_of_domain_bracket_is_typed_refusal(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -20388,8 +20509,9 @@ def test_transition_temperature_real_engine_matches_source_anchor_and_library(
         ),
         amount_basis=AmountBasis.MASS_PERCENT,
     )
-    # Walker et al. (1971), Apollo 12 sample 12009: crystallization begins
-    # near 1230 °C. This lunar mare analog admits model spread around that anchor.
+    # Green, Ware, Hibberson and Major (1971), Apollo 12 sample 12009:
+    # crystallization begins near 1230 °C. This lunar mare analog admits
+    # model spread around that anchor.
     reference = _transition_temperature_observation(
         composition=lunar_mare_low_ti
     )
@@ -20445,17 +20567,42 @@ def test_transition_temperature_real_engine_matches_source_anchor_and_library(
         assert prediction.value is None
         assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
         assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
-        assert prediction.refusal_detail == {
+        expected_detail = {
             "reason": f"liquidus_finder_{native_result.status}",
             "status": native_result.status,
             "warnings": list(native_result.warnings),
         }
+        if native_result.diagnostics:
+            expected_detail["diagnostics"] = dict(native_result.diagnostics)
+        assert prediction.refusal_detail == expected_detail
         return
     assert native_result.liquidus_T_C is not None
     assert 1100.0 <= native_result.liquidus_T_C <= 1450.0
     assert prediction.value == Decimal(str(native_result.liquidus_T_K))
     assert prediction.unit == "K"
     assert prediction.execution.state is ExecutionState.PRODUCED
+    native_authority = (
+        native_result.diagnostics.get("authority")
+        if isinstance(native_result.diagnostics, Mapping)
+        else None
+    )
+    if native_authority == "extrapolated":
+        assert prediction.authority is Authority.EXTRAPOLATED
+        assert any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            for notice in prediction.notices
+        )
+    elif native_authority == "certified":
+        assert prediction.authority is Authority.CERTIFIED
+    elif native_authority in (None, "bridge"):
+        assert prediction.authority is Authority.BRIDGE
+    else:
+        assert prediction.authority is Authority.BRIDGE
+        assert any(
+            notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and notice.reason == str(native_authority)
+            for notice in prediction.notices
+        )
 
 
 @pytest.mark.parametrize(
