@@ -14507,19 +14507,40 @@ def test_initial_charge_proxy_is_used_only_when_composition_is_not_printed(
 
 
 @pytest.mark.parametrize(
-    "charge_source",
-    ["initial", "printed", "invalid", "absent", "not_printed"],
-    ids=["sample-initial", "sample-printed", "invalid-charge", "absent-charge", "not-printed-proxy"],
+    ("charge_source", "invalid_kind"),
+    [
+        ("initial", "malformed_amount"),
+        ("initial", "partial_component"),
+        ("initial", "printed_wt_refusal"),
+        ("initial", "malformed_amount_with_wt_refusal"),
+        ("initial", "valid_mole_with_wt_refusal"),
+        ("initial", "unsupported_map"),
+        ("printed", "malformed_amount"),
+        ("invalid", "malformed_amount"),
+        ("absent", "malformed_amount"),
+        ("not_printed", None),
+    ],
+    ids=[
+        "initial-malformed-amount",
+        "initial-partial-component",
+        "initial-printed-wt-refusal",
+        "initial-malformed-plus-wt-refusal",
+        "initial-valid-mole-plus-wt-refusal",
+        "initial-unsupported-map",
+        "printed-charge",
+        "invalid-charge",
+        "absent-charge",
+        "not-printed-proxy",
+    ],
 )
 def test_migrated_point_run_composition_does_not_replace_kems_charge(
-    tmp_path: Path, charge_source: str
+    tmp_path: Path, charge_source: str, invalid_kind: str | None
 ) -> None:
     from simulator.battery.consumer_inputs import collect_consumer_inputs
     from simulator.battery.generators import kems_case
     from simulator.battery.waypoints import GapReason, ReadinessStatus
     from tests.battery.test_bench_generators import complete_kems
 
-    invalid_kind = None if charge_source == "not_printed" else "malformed_amount"
     migrated, _refused, migrated_result = _score_initial_charge_composition_path(
         tmp_path / "migrated",
         path="points",
@@ -14529,7 +14550,7 @@ def test_migrated_point_run_composition_does_not_replace_kems_charge(
     )
     migrated_point_composition = (migrated.point_conditions or {}).get("composition")
     assert isinstance(migrated_point_composition, Located)
-    if charge_source == "not_printed":
+    if invalid_kind is None:
         assert migrated.identity.composition is not None
         assert migrated.identity.composition.is_value
         assert migrated.identity.composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
