@@ -11,6 +11,7 @@ import math
 from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator.bead_diffusion import (
     LOWRY_1982_NA_LN_D_INTERCEPT,
@@ -18,6 +19,8 @@ from simulator.bead_diffusion import (
     NI_ZHANG_2016_CU_LN_D_INTERCEPT,
     NI_ZHANG_2016_CU_LN_D_SLOPE_K,
     BeadDiffusionRefusal,
+    BeadProfilePrediction,
+    compare_profile_point,
     cooling_half_time_s,
     diffusivity_along_zhang_cooling,
     integrate_spherical_diffusion,
@@ -28,7 +31,9 @@ from simulator.bead_diffusion import (
     oxide_mass_kg,
     potassium_tracer_diffusivity_m2_s,
     predict_bead_profile,
+    radius_from_surface_traverse,
     spherical_bead_grid,
+    wt_percent_at_radius,
     zhang_2008_duration_until_s,
     zhang_2008_temperature_K,
 )
@@ -761,3 +766,253 @@ def test_prediction_flags_ambient_and_loses_more_sodium_at_lower_fO2() -> None:
     ).read_text(encoding="utf-8")
     for token in ("0.145", "1183", "6001"):
         assert token not in source
+
+
+def test_traverse_coordinate_is_distance_from_the_centre() -> None:
+    """Printed distance is measured from one surface. r = |x - D/2|."""
+
+    located = radius_from_surface_traverse(
+        1.2,
+        232.0,
+        distance_uncertainty_um=1.0,
+    )
+    assert located.radius_m == pytest.approx(114.8e-6)
+    assert located.clipped_to_surface is False
+    centre = radius_from_surface_traverse(
+        116.0,
+        232.0,
+        distance_uncertainty_um=1.0,
+    )
+    assert centre.radius_m == pytest.approx(0.0)
+    clipped = radius_from_surface_traverse(
+        -0.4,
+        232.0,
+        distance_uncertainty_um=1.0,
+    )
+    assert clipped.clipped_to_surface is True
+    assert clipped.radius_m == pytest.approx(116.0e-6)
+    with pytest.raises(BeadDiffusionRefusal) as caught:
+        radius_from_surface_traverse(
+            300.0,
+            232.0,
+            distance_uncertainty_um=1.0,
+        )
+    assert caught.value.reason == "radial_position_outside_bead"
+
+
+def test_profile_interpolation_holds_the_end_cells() -> None:
+    grid = spherical_bead_grid(1.0, 4)
+    values = list(grid.centroid_radius_m)
+    midpoint = 0.5 * (values[1] + values[2])
+    assert wt_percent_at_radius(grid, values, midpoint) == pytest.approx(midpoint)
+    assert wt_percent_at_radius(grid, values, 0.0) == pytest.approx(values[0])
+    assert wt_percent_at_radius(grid, values, grid.radius_m) == pytest.approx(values[-1])
+
+
+def test_profile_point_residual_uses_the_bead_diameter() -> None:
+    grid = spherical_bead_grid(116.0e-6, 4)
+    built = BeadProfilePrediction(
+        component="Na2O",
+        grid=grid,
+        mass_fraction=(0.0035, 0.0035, 0.0035, 0.0035),
+        wt_percent=(0.35, 0.35, 0.35, 0.35),
+        tau_s=1.0,
+        t_end_s=1.0,
+        initial_temperature_K=1640.0,
+        end_temperature_K=940.0,
+        flags=("not_fitted_to_su_zhang_profiles", "ambient_p_na_pa=0"),
+        oxide_mass_initial_kg=1.0,
+        oxide_mass_final_kg=1.0,
+        boundary_mass_out_kg=0.0,
+        step_count=1,
+    )
+    comparison = compare_profile_point(
+        built,
+        radial_distance_um=1.2,
+        sample_diameter_um=232.0,
+        printed_wt_percent=0.381,
+        distance_uncertainty_um=1.0,
+    )
+    assert comparison.radius_m == pytest.approx(114.8e-6)
+    assert comparison.predicted_wt_percent == pytest.approx(0.35)
+    assert comparison.residual_wt_percent == pytest.approx(0.35 - 0.381)
+    with pytest.raises(BeadDiffusionRefusal) as caught:
+        compare_profile_point(
+            built,
+            radial_distance_um=1.2,
+            sample_diameter_um=210.0,
+            printed_wt_percent=0.381,
+            distance_uncertainty_um=1.0,
+        )
+    assert caught.value.reason == "bead_diameter_mismatch"
+
+
+_EXTRACT = (
+    Path(__file__).resolve().parents[1]
+    / "data/literature/extracts/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing.yaml"
+)
+_EMPA_HOST_OXIDES = (
+    "SiO2",
+    "TiO2",
+    "Al2O3",
+    "Cr2O3",
+    "FeO",
+    "MnO",
+    "MgO",
+    "CaO",
+    "K2O",
+)
+_DRY_RUN_BEADS = ("GB-B", "GB-G1", "GB-S6")
+_DRY_RUN_FLAGS = (
+    "heat_capacity_sfb_basalt_proxy",
+    "density_sfb_room_temperature_glass_proxy",
+    "emissivity_blackbody_upper_bound",
+    "environment_temperature_cold_space",
+    "convection_absent",
+    "end_temperature_hui_2018_average_tg",
+)
+
+
+def _extract_document() -> dict:
+    return yaml.safe_load(_EXTRACT.read_text(encoding="utf-8"))
+
+
+def _table_s2_series(document: dict, oxide: str) -> list[dict]:
+    observation_id = f"su_zhang_2023_table_s2_empa_{oxide.lower()}_profile"
+    observations = document["species"][oxide]["observations"]
+    row = next(item for item in observations if item["observation_id"] == observation_id)
+    return row["values"]["series"]
+
+
+def table_s2_bead(document: dict, sample: str) -> dict:
+    """Interior EMPA host and the printed Na2O traverse for one bead.
+
+    The interior point is the analysis closest to the traverse centre.
+    Measured Na2O is not copied into the host. The initial sodium used by
+    the predictor stays a separate argument.
+    """
+
+    series = {
+        oxide: [
+            point
+            for point in _table_s2_series(document, oxide)
+            if point["sample"] == sample
+        ]
+        for oxide in _EMPA_HOST_OXIDES
+    }
+    na_points = [
+        point
+        for point in _table_s2_series(document, "Na2O")
+        if point["sample"] == sample
+    ]
+    if not na_points or any(not points for points in series.values()):
+        raise BeadDiffusionRefusal(
+            "profile_points_missing",
+            f"Table S2 is missing an EMPA series for {sample}",
+        )
+    diameter = float(na_points[0]["sample_diameter_um"])
+    if any(float(point["sample_diameter_um"]) != diameter for point in na_points):
+        raise BeadDiffusionRefusal(
+            "bead_diameter_mismatch",
+            f"{sample} Na2O points do not share one diameter",
+        )
+    host: dict[str, float] = {}
+    unmeasured: list[str] = []
+    for oxide, points in series.items():
+        interior = min(
+            points,
+            key=lambda point: (
+                abs(float(point["radial_distance_um"]) - diameter / 2.0),
+                float(point["radial_distance_um"]),
+            ),
+        )
+        raw = interior[f"{oxide}_wt_pct"]
+        # A blank EMPA cell is an unmeasured oxide. It is reported and left
+        # out of the host. It is not stored as zero.
+        if raw is None:
+            unmeasured.append(oxide)
+            continue
+        host[oxide] = float(raw)
+    printed = []
+    for point in na_points:
+        raw_na = point["Na2O_wt_pct"]
+        if raw_na is None:
+            raise BeadDiffusionRefusal(
+                "printed_wt_percent_invalid",
+                f"{sample} Na2O at {point['radial_distance_um']} µm is blank",
+            )
+        printed.append(
+            {
+                "radial_distance_um": float(point["radial_distance_um"]),
+                "na2o_wt_pct": float(raw_na),
+                "sample_diameter_um": float(point["sample_diameter_um"]),
+            }
+        )
+    return {
+        "sample": sample,
+        "diameter_um": diameter,
+        "host": host,
+        "unmeasured_oxides": unmeasured,
+        "points": printed,
+    }
+
+
+def test_three_bead_dry_run_residuals_are_finite_and_flagged() -> None:
+    """GB-B, GB-G1 and GB-S6 at one stated ambient. Residuals are not a score.
+
+    The grid here is coarser than the reported dry run. It checks that every
+    printed Table S2 point gets a finite residual and that the ambient and
+    property flags are on the prediction.
+    """
+
+    document = _extract_document()
+    expected_counts = {"GB-B": 20, "GB-G1": 36, "GB-S6": 10}
+    expected_diameters = {"GB-B": 210.0, "GB-G1": 232.0, "GB-S6": 127.0}
+    g1 = table_s2_bead(document, "GB-G1")
+    first = g1["points"][0]
+    assert first["radial_distance_um"] == pytest.approx(1.2)
+    assert first["na2o_wt_pct"] == pytest.approx(0.381)
+    for sample in _DRY_RUN_BEADS:
+        bead = table_s2_bead(document, sample)
+        assert len(bead["points"]) == expected_counts[sample]
+        assert bead["diameter_um"] == pytest.approx(expected_diameters[sample])
+        notices = tuple(
+            f"host_oxide_unmeasured:{oxide}" for oxide in bead["unmeasured_oxides"]
+        )
+        prediction = predict_bead_profile(
+            component="Na2O",
+            diameter_m=bead["diameter_um"] * 1.0e-6,
+            host_oxide_wt_percent=bead["host"],
+            initial_wt_percent=0.35,
+            initial_temperature_K=1640.0,
+            end_temperature_K=940.0,
+            density_kg_m3=2862.0,
+            heat_capacity_j_kg_k=1522.0,
+            emissivity=1.0,
+            environment_temperature_K=0.0,
+            convection_coefficient_w_m2_k=0.0,
+            ambient_p_na_pa=0.0,
+            ambient_p_o2_bar=1.0e-10,
+            n_cells=8,
+            n_steps=6,
+            property_flags=_DRY_RUN_FLAGS + notices,
+        )
+        assert "ambient_p_na_pa=0" in prediction.flags
+        assert "ambient_p_o2_bar=1e-10" in prediction.flags
+        assert "not_fitted_to_su_zhang_profiles" in prediction.flags
+        for flag in _DRY_RUN_FLAGS + notices:
+            assert flag in prediction.flags
+        if sample == "GB-S6":
+            assert bead["unmeasured_oxides"] == ["Cr2O3", "MnO"]
+        else:
+            assert bead["unmeasured_oxides"] == []
+        for point in bead["points"]:
+            comparison = compare_profile_point(
+                prediction,
+                radial_distance_um=point["radial_distance_um"],
+                sample_diameter_um=point["sample_diameter_um"],
+                printed_wt_percent=point["na2o_wt_pct"],
+                distance_uncertainty_um=1.0,
+            )
+            assert math.isfinite(comparison.residual_wt_percent)
+            assert comparison.clipped_to_surface is False

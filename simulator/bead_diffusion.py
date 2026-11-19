@@ -20,6 +20,8 @@ Cooling time is the bead's own heat-loss half-time, not a fitted plume
 timescale. Zhang's 2008 law then uses that half-time as tau. The sodium
 surface flux is the catalog NaO0.5 equilibrium pressure at a stated
 ambient fO2 and fNa, converted with the Hertz–Knudsen–Langmuir owner.
+A printed traverse is a distance from one surface; the comparison radius
+is its distance from the bead centre.
 
 This module does not read the paper's fitted tau, a0 or b0.
 """
@@ -1418,4 +1420,162 @@ def predict_bead_profile(
         oxide_mass_final_kg=final_mass,
         boundary_mass_out_kg=result.boundary_mass_out_kg,
         step_count=result.step_count,
+    )
+
+
+@dataclass(frozen=True)
+class TraverseRadius:
+    """Distance from the bead centre for one surface-referenced traverse point.
+
+    ``clipped_to_surface`` is true only when the point lies outside the
+    bead by no more than the stated distance uncertainty. A larger miss
+    refuses. The clip is therefore not silent.
+    """
+
+    radius_m: float
+    clipped_to_surface: bool
+
+
+def radius_from_surface_traverse(
+    radial_distance_um: float,
+    sample_diameter_um: float,
+    *,
+    distance_uncertainty_um: float,
+) -> TraverseRadius:
+    """Map a rim-to-rim traverse coordinate onto distance from the centre.
+
+    Premise: the printed coordinate is the distance from one bead surface
+    along a traverse through the centre, not a radial coordinate. The
+    values run from about 0 to about the diameter.
+    Algebra: ``r = |x - D/2|``. ``r > R`` only when ``x`` is outside
+    ``[0, D]``.
+    Units: inputs are micrometres; ``radius_m`` is metres.
+    Sanity: a point more than the stated uncertainty outside the bead
+    refuses with ``radial_position_outside_bead``.
+    """
+
+    distance = _finite_number(radial_distance_um, "radial_distance_invalid")
+    diameter = _require_positive(sample_diameter_um, "diameter_not_positive")
+    uncertainty = _non_negative_number(
+        distance_uncertainty_um, "distance_uncertainty_negative"
+    )
+    bead_radius_um = 0.5 * diameter
+    radius_um = abs(distance - bead_radius_um)
+    excess_um = radius_um - bead_radius_um
+    if excess_um > uncertainty:
+        raise BeadDiffusionRefusal(
+            "radial_position_outside_bead",
+            f"traverse radius {radius_um} µm is outside the bead radius "
+            f"{bead_radius_um} µm by more than {uncertainty} µm",
+        )
+    clipped = excess_um > 0.0
+    if clipped:
+        radius_um = bead_radius_um
+    return TraverseRadius(
+        radius_m=radius_um * 1.0e-6,
+        clipped_to_surface=clipped,
+    )
+
+
+def wt_percent_at_radius(
+    grid: SphericalBeadGrid,
+    wt_percent: Sequence[float],
+    radius_m: float,
+) -> float:
+    """Piecewise-linear wt% on cell centroids.
+
+    Inside the innermost centroid the inner cell is held. Outside the
+    outermost centroid, and still inside the bead, the outer cell is held.
+    That matches the finite-volume unknown, which is the cell average.
+    """
+
+    if len(wt_percent) != grid.n_cells:
+        raise BeadDiffusionRefusal(
+            "profile_length",
+            "wt_percent length must equal the number of shells",
+        )
+    radius = _non_negative_number(radius_m, "radius_not_positive")
+    if radius > grid.radius_m:
+        raise BeadDiffusionRefusal(
+            "radial_position_outside_bead",
+            f"radius {radius} m is outside the bead radius {grid.radius_m} m",
+        )
+    values = [float(value) for value in wt_percent]
+    centroids = grid.centroid_radius_m
+    if radius <= centroids[0]:
+        return values[0]
+    if radius >= centroids[-1]:
+        return values[-1]
+    for index in range(grid.n_cells - 1):
+        left = centroids[index]
+        right = centroids[index + 1]
+        if left <= radius <= right:
+            span = right - left
+            if span <= 0.0:
+                raise BeadDiffusionRefusal(
+                    "centroid_gap_not_positive",
+                    f"centroid gap at shell {index} was {span}",
+                )
+            weight = (radius - left) / span
+            return values[index] * (1.0 - weight) + values[index + 1] * weight
+    raise BeadDiffusionRefusal(
+        "radial_position_outside_bead",
+        f"radius {radius} m fell between no centroids",
+    )
+
+
+@dataclass(frozen=True)
+class ProfilePointComparison:
+    """Predicted minus printed wt% at one traverse point."""
+
+    radius_m: float
+    predicted_wt_percent: float
+    printed_wt_percent: float
+    residual_wt_percent: float
+    clipped_to_surface: bool
+
+
+def compare_profile_point(
+    prediction: BeadProfilePrediction,
+    *,
+    radial_distance_um: float,
+    sample_diameter_um: float,
+    printed_wt_percent: float,
+    distance_uncertainty_um: float,
+) -> ProfilePointComparison:
+    """Compare one printed traverse point with the predicted profile.
+
+    The prediction must have been built for this bead's diameter. A
+    mismatch larger than the distance uncertainty refuses
+    (``bead_diameter_mismatch``) instead of stretching one bead onto another.
+    """
+
+    diameter = _require_positive(sample_diameter_um, "diameter_not_positive")
+    uncertainty = _non_negative_number(
+        distance_uncertainty_um, "distance_uncertainty_negative"
+    )
+    predicted_diameter_um = prediction.grid.radius_m * 2.0e6
+    if abs(predicted_diameter_um - diameter) > uncertainty:
+        raise BeadDiffusionRefusal(
+            "bead_diameter_mismatch",
+            f"prediction diameter {predicted_diameter_um} µm does not match "
+            f"sample diameter {diameter} µm",
+        )
+    located = radius_from_surface_traverse(
+        radial_distance_um,
+        diameter,
+        distance_uncertainty_um=uncertainty,
+    )
+    printed = _finite_number(printed_wt_percent, "printed_wt_percent_invalid")
+    predicted = wt_percent_at_radius(
+        prediction.grid,
+        prediction.wt_percent,
+        located.radius_m,
+    )
+    return ProfilePointComparison(
+        radius_m=located.radius_m,
+        predicted_wt_percent=predicted,
+        printed_wt_percent=printed,
+        residual_wt_percent=predicted - printed,
+        clipped_to_surface=located.clipped_to_surface,
     )
