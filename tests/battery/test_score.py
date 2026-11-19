@@ -4655,6 +4655,82 @@ def test_condensed_partial_pressure_is_not_read_from_the_gas_map(monkeypatch) ->
     assert calls["n"] == 2
 
 
+def test_vaporock_scores_native_activity_with_diagnostic_pressure():
+    from simulator.battery.enums import EvidenceClass
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        close_battery_engine_handle,
+    )
+    from tests.battery.cache_test_support import open_available_engine
+
+    temperature_K = Decimal("1600")
+    requested_pressure_Pa = Decimal("100000")
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(
+            ("SiO2", Decimal("0.5")),
+            ("FeO", Decimal("0.2")),
+            ("Al2O3", Decimal("0.3")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = F.tabulation_experiment(
+        T_K=temperature_K,
+        total_P=requested_pressure_Pa,
+    )
+
+    def observation_for(formula: str, observation_id: str):
+        return F.observation(
+            observation_id,
+            experiment.experiment_id,
+            F.activity_identity(
+                formula=formula,
+                T_K=temperature_K,
+                component_basis="oxide",
+                composition=composition,
+                fO2_Pa=Decimal("1e-3"),
+                total_P=requested_pressure_Pa,
+            ),
+            Decimal("0.5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="vaporock-activity-contract",
+        )
+
+    observation = observation_for("SiO2", "vaporock-native-silica-activity")
+    zero_inventory_observation = observation_for(
+        "Fe2O3", "vaporock-zero-inventory-ferric-activity"
+    )
+    handle = open_available_engine(
+        Engine.VAPOROCK,
+        nodeid="tests/battery/test_score.py::test_vaporock_scores_native_activity_with_diagnostic_pressure",
+    )
+    try:
+        prediction = predict_with_engine(
+            Engine.VAPOROCK,
+            observation,
+            handles={Engine.VAPOROCK.value: handle},
+            experiment=experiment,
+            isolated=True,
+        )
+        zero_inventory_prediction = predict_with_engine(
+            Engine.VAPOROCK,
+            zero_inventory_observation,
+            handles={Engine.VAPOROCK.value: handle},
+            experiment=experiment,
+            isolated=True,
+        )
+    finally:
+        close_battery_engine_handle(handle)
+
+    assert prediction.refusal_reason is None, prediction.refusal_detail
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value is not None and prediction.value > 0
+    assert zero_inventory_prediction.value is None
+    assert zero_inventory_prediction.refusal_reason is not None
+    assert zero_inventory_prediction.refusal_detail["reason"] == (
+        "species_unmatched_in_engine_output"
+    )
+
+
 def test_static_equilibrium_pressure_refuses_missing_reservoir_or_engine_total(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

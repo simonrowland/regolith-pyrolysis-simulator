@@ -555,11 +555,18 @@ def test_activity_coefficient_uses_the_same_contract():
     assert all(
         item.readiness.status is ReadinessStatus.READY
         for item in results
-        if item.readiness.engine not in {"internal-analytical", "magemin"}
+        if item.readiness.engine not in {
+            "internal-analytical", "magemin", "vaporock"
+        }
     )
     assert next(
         item for item in results if item.readiness.engine == "magemin"
     ).readiness.status is ReadinessStatus.NOT_APPLICABLE
+    vaporock = next(
+        item for item in results if item.readiness.engine == "vaporock"
+    )
+    assert vaporock.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert vaporock.payload is None
     assert results[0].payload["quantity"] == "activity_coefficient"
     assert results[0].payload["reference_state"] == "raoultian_pure_liquid_endmember"
     activity = _melt(*_case(
@@ -741,6 +748,29 @@ def test_accepted_reference_is_named_on_the_payload():
     assert results[0].payload["reference_state"] == "raoultian_pure_liquid_endmember"
     assert results[0].payload["quantity"] == "activity"
     assert "fO2_log" not in results[0].payload
+    vaporock = next(
+        item for item in results if item.readiness.engine == "vaporock"
+    )
+    assert vaporock.readiness.status is ReadinessStatus.READY
+    assert vaporock.payload["reference_state"] == (
+        "raoultian_pure_liquid_endmember"
+    )
+    assert vaporock.payload["quantity"] == "activity"
+
+
+def test_vaporock_refuses_transformed_compound_oxide_reference():
+    experiment, bench, observation = _case(
+        composition=_composition(("CaO", "0.4"), ("SiO2", "0.6")),
+        formula="CaO",
+    )
+    vaporock = next(
+        item for item in _melt(experiment, bench, observation)
+        if item.readiness.engine == "vaporock"
+    )
+    assert vaporock.payload is None
+    assert vaporock.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert vaporock.readiness.gaps[0].waypoint == "reference_state"
+    assert vaporock.readiness.gaps[0].reason is GapReason.REFERENCE_STATE_MISMATCH
 
 
 def test_internal_analytical_reports_activity_but_not_coefficient():

@@ -151,6 +151,44 @@ def test_hot_round_trip_preserves_real_engine_consumer_view(
         close_battery_engine_handle(handle)
 
 
+def test_vaporock_activity_diagnostics_survive_engine_cache_hit(
+    tmp_path, monkeypatch, request
+) -> None:
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "vaporock.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    handle = open_available_engine(
+        Engine.VAPOROCK, nodeid=request.node.nodeid
+    )
+    kwargs = {
+        "temperature_K": 1600.0,
+        "po2": Po2Request(mode="commanded", po2_bar=1e-8),
+        "timeout_s": 90.0,
+        "isolated": False,
+        "native_activity_formula": "SiO2",
+        "physical_pressure_bar": 1e-6,
+    }
+    try:
+        engine_cache.engine_cache_counters(reset=True)
+        cold = equilibrate_cell(handle, _REAL_POTS[0], **kwargs)
+        assert cold.status == "ok", cold.as_payload()
+        assert cold.engine_status == "non_authoritative"
+        assert cold.authoritative_for_requested_vapor_pressure is False
+        assert cold.melt_activities["SiO2"] > 0.0
+        expected = dict(cold.melt_activities)
+
+        engine_cache._MEMORY_CACHE.clear()
+
+        def unexpected_solve(*_args, **_kwargs):
+            pytest.fail("VapoRock activity result should come from the cache")
+
+        monkeypatch.setattr(handle.backend, "equilibrate", unexpected_solve)
+        warm = equilibrate_cell(handle, _REAL_POTS[0], **kwargs)
+        assert warm.melt_activities == expected
+        assert engine_cache.engine_cache_counters()["vaporock"]["hits"] >= 1
+    finally:
+        close_battery_engine_handle(handle)
+
+
 @pytest.mark.parametrize("field,value", (
     ("vapor_pressure_backend_status_reason", '{"source":"antoine_fallback","version":"record"}'),
     ("engine_reason", "liquid reference with the complete engine warning"),

@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import asdict
 import importlib
 import json
+import math
 import types
 import warnings
 
@@ -279,7 +280,7 @@ def test_installed_vaporock_full_speciation_has_structural_tail():
         fO2_log=-8.0,
         pressure_bar=1e-6,
     )
-    if result.status != "ok":
+    if result.status not in {"ok", "non_authoritative"}:
         pytest.skip(f"VapoRock did not converge: {result.status}")
 
     full = getattr(result, "vaporock_full_speciation_Pa", {})
@@ -287,3 +288,80 @@ def test_installed_vaporock_full_speciation_has_structural_tail():
     assert "O2" in full
     assert "SiO2_gas" in full
     assert any(species in full for species in ("Si2", "Al2O2", "Na2", "K2"))
+
+
+def test_installed_vaporock_oxide_activity_matches_native_lna_and_pure_limit():
+    if importlib.util.find_spec("vaporock") is None:
+        pytest.skip("VapoRock optional dependency unavailable")
+
+    native = importlib.import_module("vaporock")
+    composition = {
+        "SiO2": 50.0,
+        "TiO2": 2.0,
+        "Al2O3": 15.0,
+        "FeO": 10.0,
+        "Fe2O3": 2.0,
+        "MgO": 8.0,
+        "CaO": 10.0,
+        "Na2O": 3.0,
+        "K2O": 0.0,
+    }
+    backend = VapoRockBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        available = backend.initialize({"warm_worker": False})
+    if not available:
+        pytest.skip("VapoRock optional dependency unavailable")
+
+    result = backend.equilibrate(
+        1600.0,
+        composition_kg=composition,
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        include_oxide_activities=True,
+    )
+    assert result.status == "non_authoritative"
+    assert result.pressure_bar == pytest.approx(1e-6)
+    assert result.vapor_pressures_Pa == {}
+    assert result.diagnostics["pressure_control_authoritative"] is False
+    assert result.diagnostics["requested_pressure_bar"] == pytest.approx(1e-6)
+    assert "P=1e-10 bar" in result.diagnostics["pressure_control_reason"]
+
+    activities = result.diagnostics["oxide_activity"]
+    assert activities
+    assert "O2" not in activities
+    assert "K2O" not in activities
+    assert result.diagnostics["oxide_activity_standard_state"] == (
+        vaporock_module._VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
+    )
+
+    system = native.System()
+    system.set_melt_comp(composition)
+    _log_pressure, _ln_k, ln_activity = system.eval_gas_abundances(
+        1600.0,
+        -8.0,
+        full_output=True,
+    )
+    columns = list(system.vapor.rxn_coefs.columns)
+    assert columns[0] == "O2"
+    for oxide, activity in activities.items():
+        # The library reports ln(a); exponentiation gives its dimensionless a.
+        expected = math.exp(float(ln_activity[columns.index(oxide)][0]))
+        assert activity == pytest.approx(expected, rel=1e-12)
+
+    # These are precisely the parent oxides that the existing MELTS domain
+    # owner admits as liquid oxide endmembers (H2O is outside VapoRock's
+    # battery input basis). Their own Raoultian pure limits must be unity.
+    for oxide in ("SiO2", "TiO2", "Al2O3", "Fe2O3"):
+        pure = native.System()
+        pure.set_melt_comp({oxide: 100.0})
+        _log_pressure, _ln_k, pure_ln_activity = pure.eval_gas_abundances(
+            1600.0,
+            -8.0,
+            full_output=True,
+        )
+        pure_columns = list(pure.vapor.rxn_coefs.columns)
+        pure_activity = math.exp(
+            float(pure_ln_activity[pure_columns.index(oxide)][0])
+        )
+        assert abs(math.log10(pure_activity)) < 2e-5, oxide
