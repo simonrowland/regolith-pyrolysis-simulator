@@ -782,6 +782,60 @@ def test_liquidus_finder_default_budget_is_unbounded():
     assert result.diagnostics.get('reason') != 'aggregate_budget_exceeded'
 
 
+def test_fine_original_bracket_is_searched_before_the_expansion_cap():
+    """1000–1002 °C at 0.015 °C is 135 points. The 500–2500 °C envelope is not.
+
+    ceil((1002 - 1000) / 0.015) + 1 = 135. The same step across 500–2500 °C
+    is 133335 points and would exceed the scan cap. Both crossings sit inside
+    the caller's bracket, so the search must not consult that envelope.
+    """
+
+    calls = []
+
+    def sample(temperature_C: float) -> float:
+        calls.append(float(temperature_C))
+        return max(0.0, min(1.0, (float(temperature_C) - 1000.0) / 2.0))
+
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=1000.0,
+        max_T_C=1002.0,
+        scan_step_C=0.015,
+    )
+
+    assert result.status == 'ok'
+    assert len(calls) == 135
+    assert result.diagnostics == {}
+    assert 1000.0 <= result.solidus_T_C <= 1002.0
+    assert 1000.0 <= result.liquidus_T_C <= 1002.0
+    assert result.solidus_T_C < result.liquidus_T_C
+    assert not any('exceeds cap' in warning for warning in result.warnings)
+
+
+def test_expansion_step_cap_stops_without_rejecting_the_original_grid(
+    monkeypatch,
+):
+    monkeypatch.setattr(liquidus_module, 'MAX_LIQUIDUS_SCAN_POINTS', 6)
+    calls = []
+
+    def sample(temperature_C: float) -> float:
+        calls.append(float(temperature_C))
+        return 0.2
+
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=1000.0,
+        max_T_C=1003.0,
+        scan_step_C=1.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert calls == [1000.0, 1001.0, 1002.0, 1003.0, 999.0, 1004.0]
+    assert result.diagnostics['reason'] == 'not_converged'
+    assert result.diagnostics['original_search_bracket_C'] == (1000.0, 1003.0)
+    assert result.diagnostics['bounded_search_interval_C'] == (999.0, 1004.0)
+
+
 def test_liquidus_finder_rejects_non_advancing_scan_step_without_sampling():
     calls = 0
 

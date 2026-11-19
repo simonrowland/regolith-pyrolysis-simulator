@@ -579,19 +579,17 @@ def find_liquidus_solidus_by_fraction(
     expansion_max_T = max(max_T, LIQUIDUS_SEARCH_MAX_T_C)
     try:
         grid = _bounded_scan_grid(min_T, max_T, step)
-        _bounded_scan_grid(
-            expansion_min_T,
-            expansion_max_T,
-            step,
-        )
     except RuntimeError as exc:
         return _refused_input(str(exc))
 
     # Each bisection starts with a bracket no wider than scan_step_C and halves
     # its Celsius width. ceil(log2(step / tolerance)) steps reach the requested
     # width, with one extra step for endpoint rounding. The deterministic
-    # evaluation cap is the maximum expanded-grid count plus two capped
-    # bisections. Both the temperature ratio and logarithm argument are
+    # evaluation cap is the original grid, plus expansion steps that
+    # themselves fit under the scan cap, plus two capped bisections. The
+    # untouched 500–2500 °C envelope is not added to the original count:
+    # a fine bracket is searched first, and each expansion step is capped
+    # on its own. Both the temperature ratio and logarithm argument are
     # dimensionless; this bounds calls, not seconds.
     iteration_cap = max(0, math.ceil(max_bisection_iterations))
     tolerance_steps = (
@@ -602,17 +600,15 @@ def find_liquidus_solidus_by_fraction(
     # Expansion adds one sample for each clipped scan step beyond the
     # original endpoints. Count both lattices separately because an arbitrary
     # original minimum need not align with the 500 C envelope's grid.
-    maximum_grid_samples = (
-        len(grid)
-        + math.ceil((min_T - expansion_min_T) / step)
-        + math.ceil((expansion_max_T - max_T) / step)
+    theoretical_expansion_points = (
+        math.ceil(max(0.0, min_T - expansion_min_T) / step)
+        + math.ceil(max(0.0, expansion_max_T - max_T) / step)
     )
-    if maximum_grid_samples > MAX_LIQUIDUS_SCAN_POINTS:
-        return _refused_input(
-            'invalid finder expanded scan grid: '
-            f'{maximum_grid_samples} points exceeds cap '
-            f'{MAX_LIQUIDUS_SCAN_POINTS}'
-        )
+    remaining_scan_points = max(0, MAX_LIQUIDUS_SCAN_POINTS - len(grid))
+    maximum_grid_samples = len(grid) + min(
+        theoretical_expansion_points,
+        remaining_scan_points,
+    )
     max_sample_evaluations = maximum_grid_samples + 2 * min(
         iteration_cap,
         tolerance_steps,
@@ -743,10 +739,21 @@ def find_liquidus_solidus_by_fraction(
             # endpoint so the final sample never exceeds that interval.
             next_min_T = max(expansion_min_T, search_min_T - step)
             next_max_T = min(expansion_max_T, search_max_T + step)
+            step_temperatures: list[float] = []
             if next_min_T < search_min_T:
-                sample(next_min_T)
+                step_temperatures.append(next_min_T)
             if next_max_T > search_max_T:
-                sample(next_max_T)
+                step_temperatures.append(next_max_T)
+            # A step that adds no point is already on the envelope. A step
+            # whose own count, or the scan after it, exceeds the cap is not
+            # taken: the original bracket has already been searched.
+            if not step_temperatures or not _expansion_step_within_scan_cap(
+                len(step_temperatures),
+                len(samples),
+            ):
+                break
+            for temperature_C in step_temperatures:
+                sample(temperature_C)
             search_min_T = next_min_T
             search_max_T = next_max_T
             solidus_bracket, liquidus_bracket = threshold_brackets()
@@ -1306,6 +1313,21 @@ def _clamp_fraction(value: float) -> float:
             f'invalid frac_M value outside [0, 1]: {value!r}'
         )
     return max(0.0, min(1.0, frac))
+
+
+def _expansion_step_within_scan_cap(
+    step_point_count: int,
+    scanned_point_count: int,
+) -> bool:
+    """Whether one expansion step fits the scan cap on its own.
+
+    The original bracket is validated by ``_bounded_scan_grid`` before any
+    sample. This does not add the untouched envelope to that count.
+    """
+
+    if step_point_count > MAX_LIQUIDUS_SCAN_POINTS:
+        return False
+    return scanned_point_count + step_point_count <= MAX_LIQUIDUS_SCAN_POINTS
 
 
 def _bounded_scan_grid(
