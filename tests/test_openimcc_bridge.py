@@ -637,26 +637,46 @@ def test_composition_helpers_do_not_launder_local_errors(monkeypatch) -> None:
     monkeypatch.setattr(openimcc_bridge, '_canonical_composition', canonicalize)
     monkeypatch.setattr(
         openimcc_bridge,
-        'resolve_species_formula',
+        'oxide_molar_mass_g_mol',
         lambda _name: (_ for _ in ()).throw(KeyError('formula registry bug')),
     )
     with pytest.raises(KeyError, match='formula registry bug'):
         _cleaned_melt_projection({'SiO2': 1.0})
 
 
-def test_unknown_composition_formula_refusal_keeps_exception_diagnostic(monkeypatch) -> None:
-    from simulator.accounting.exceptions import UnknownSpeciesError
+def test_unknown_composition_formula_refusal_keeps_exception_diagnostic() -> None:
     from simulator.melt_backend import openimcc_bridge
 
-    monkeypatch.setattr(
-        openimcc_bridge,
-        'resolve_species_formula',
-        lambda _name: (_ for _ in ()).throw(UnknownSpeciesError('unknown test oxide')),
-    )
     with pytest.raises(OpenImccCompositionPolicyRefusal) as exc_info:
         _cleaned_melt_projection({'BadOxide': 1.0})
-    assert 'UnknownSpeciesError' in str(exc_info.value)
-    assert 'unknown test oxide' in str(exc_info.value)
+    assert exc_info.value.code == 'openimcc_composition_formula_unavailable'
+    assert 'BadOxide' in str(exc_info.value)
+
+
+def test_every_supported_trace_component_converts_to_wt_percent() -> None:
+    openimcc = pytest.importorskip("openimcc")
+    supported_trace_oxides = getattr(openimcc, "supported_trace_oxides", None)
+    if not callable(supported_trace_oxides):
+        pytest.skip("installed OpenIMCC pin has no trace-component API")
+    from simulator.melt_backend import openimcc_bridge
+
+    supported = {
+        str(component.oxide)
+        for component in supported_trace_oxides()
+    }
+    assert supported
+    for oxide in supported:
+        assert openimcc_bridge._composition_wt_pct_from_moles(
+            {oxide: 1.0}
+        )[oxide] == pytest.approx(100.0)
+
+
+def test_unresolvable_molar_mass_is_a_typed_composition_refusal() -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as exc_info:
+        openimcc_bridge._composition_wt_pct_from_moles({"BadOxide": 1.0})
+    assert exc_info.value.code == "openimcc_composition_formula_unavailable"
 
 
 def test_gas_solver_missing_binding_carries_attribute_error_detail(monkeypatch) -> None:
@@ -1370,6 +1390,16 @@ def test_evaluate_default_tracks_runtime_backend_pack(monkeypatch) -> None:
     assert result.pack_digest == openimcc_bridge._pack_digest(expected_pack)
 
 
+def test_evaluate_still_refuses_unmodelled_composition_components() -> None:
+    package = _openimcc_or_skip()
+
+    with pytest.raises(package.ImccComponentOutsideDomainError, match="B2O3"):
+        bridge_evaluate(
+            composition_mol={"SiO2": 0.9, "B2O3": 0.1},
+            temperature_K=1800.0,
+        )
+
+
 def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None:
     from simulator import engine_cache
     from simulator.melt_backend import openimcc_bridge
@@ -1401,6 +1431,7 @@ def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None
     assert result == {"ok": True}
     assert requests[0][0] == "openimcc"
     assert requests[0][1]["pack"] == "published-ext"
+    assert requests[0][1]["trace_activity_results"] == "with-traces-v1"
 
 
 def test_evaluate_preserves_boolean_temperature_for_openimcc_refusal(
