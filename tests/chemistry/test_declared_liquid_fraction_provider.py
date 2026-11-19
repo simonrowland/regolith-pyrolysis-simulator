@@ -848,8 +848,7 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     monkeypatch.setattr(sim.melt, 'composition_wt_pct', lambda: dict(composition))
 
     def dispatch(intent, **kwargs):
-        if intent is not ChemistryIntent.GATE_LIQUID_FRACTION:
-            return SimpleNamespace(status='ok', diagnostic={}, warnings=())
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
         calls.append(sim.melt.hour)
         if phase['good']:
             return SimpleNamespace(status='ok', diagnostic={
