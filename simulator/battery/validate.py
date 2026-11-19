@@ -53,6 +53,7 @@ from simulator.battery.enums import (
     AdmissionStatus,
     AssetRole,
     Authority,
+    Engine,
     EvidenceClass,
     ExecutionState,
     ExperimentKind,
@@ -156,6 +157,13 @@ _PRESSURE_BLOCKING_NOTICES = frozenset(
         NoticeKind.FALLBACK,
         NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
         NoticeKind.UNVERIFIED_APPARATUS,
+        NoticeKind.IMCC_COMPLEX_SATURATION,
+    }
+)
+_TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS = frozenset(
+    {
+        (Engine.OPENIMCC, Quantity.P_PARTIAL),
+        (Engine.INTERNAL_ANALYTICAL, Quantity.P_PARTIAL),
     }
 )
 _CERTIFICATION_DOWNGRADE_NOTICES = frozenset(
@@ -481,6 +489,7 @@ def _table_payloads(
 def _pressure_blocking_notices(
     *groups: tuple[Notice, ...] | None,
     oxygen_balance_effusion_solved: bool = False,
+    engine: Engine | None = None,
 ) -> tuple[Notice, ...]:
     notices = tuple(notice for group in groups if group for notice in group)
     found: list[Notice] = []
@@ -491,6 +500,15 @@ def _pressure_blocking_notices(
             oxygen_balance_effusion_solved
             and notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
             and notice.reason.startswith("fO2_Pa is a DERIVED condition")
+        ):
+            continue
+        if (
+            engine is not None
+            and (engine, Quantity.P_PARTIAL)
+            in _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS
+            and notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+            and Quantity.P_PARTIAL in notice.affected_quantities
+            and "total_pressure_Pa" in notice.reason
         ):
             continue
         if any(q in _VAPOUR_EQUILIBRIUM for q in notice.affected_quantities):
@@ -2757,6 +2775,11 @@ def _validate_residual_with_indexes(
                     reference.notices,
                     None if candidate is None else candidate.notices,
                     oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
+                    engine=(
+                        None
+                        if candidate is None or candidate.engine is None
+                        else candidate.engine.name
+                    ),
                 )
                 if blocking:
                     issues.append(

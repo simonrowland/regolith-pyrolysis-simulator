@@ -96,6 +96,7 @@ from simulator.battery.validity import (
     underdetermined_apparatus,
 )
 import simulator.battery.score as score_mod
+import simulator.battery.validate as validate_mod
 from simulator.battery.score import (
     SCORE_ELIGIBLE_CONJUNCTS,
     SCORE_ENGINE_SET,
@@ -851,33 +852,42 @@ def _pressure_notice_eligibility(engine, quantity, notices):
     )
 
 
+@pytest.mark.parametrize(
+    "engine", (Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC)
+)
 def test_pressure_provenance_unknown_only_does_not_block_independent_partial_path(
-    monkeypatch,
+    engine, monkeypatch,
 ) -> None:
-    notice = Notice(
-        kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
-        affected_quantities=(Quantity.P_PARTIAL,),
-        reason=(
-            "observation does not carry total_pressure_Pa "
-            "(unknown: not printed); residual assumes 1e-06 bar"
-        ),
-        origin="test",
+    prediction_paths = validate_mod._TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS
+    reasons = (
+        "observation does not carry total_pressure_Pa "
+        "(unknown: not printed); residual assumes 1e-06 bar",
+        "identity comparison does not require total_pressure_Pa: "
+        f"{engine.value} equilibrium p_partial is total-pressure-independent",
     )
-    eligible = _pressure_notice_eligibility(
-        Engine.INTERNAL_ANALYTICAL, Quantity.P_PARTIAL, (notice,)
-    )
-    assert eligible.eligible()
+    for reason in reasons:
+        notice = Notice(
+            kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+            affected_quantities=(Quantity.P_PARTIAL,),
+            reason=reason,
+            origin="test",
+        )
+        eligible = _pressure_notice_eligibility(engine, Quantity.P_PARTIAL, (notice,))
+        assert eligible.eligible()
 
-    monkeypatch.setattr(
-        score_mod,
-        "_TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS",
-        frozenset(),
-    )
-    mutated = _pressure_notice_eligibility(
-        Engine.INTERNAL_ANALYTICAL, Quantity.P_PARTIAL, (notice,)
-    )
-    assert not mutated.eligible()
-    assert "no_blocking_qualification" in mutated.exclusions()
+        monkeypatch.setattr(
+            validate_mod,
+            "_TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS",
+            frozenset(),
+        )
+        mutated = _pressure_notice_eligibility(engine, Quantity.P_PARTIAL, (notice,))
+        assert not mutated.eligible()
+        assert "no_blocking_qualification" in mutated.exclusions()
+        monkeypatch.setattr(
+            validate_mod,
+            "_TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS",
+            prediction_paths,
+        )
 
 
 @pytest.mark.parametrize(
@@ -894,7 +904,7 @@ def test_pressure_eligibility_exception_keeps_other_blockers(
     notice = Notice(
         kind=notice_kind,
         affected_quantities=(quantity,),
-        reason="still blocks eligibility",
+        reason="total_pressure_Pa still blocks eligibility",
         origin="test",
     )
     blocked = _pressure_notice_eligibility(engine, quantity, (notice,))

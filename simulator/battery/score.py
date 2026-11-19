@@ -292,6 +292,7 @@ from simulator.battery.validate import (
     _ValidationIndexes,
     ValidationIssue,
     _BOUND_WORK_INPUTS,
+    _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS,
     _asset_ids,
     _observation_lineage,
     observation_issue_location,
@@ -347,15 +348,6 @@ _ENGINE_CELL_PREDICTED_QUANTITIES = frozenset(
 _CATALOG_PREDICTED_QUANTITIES = frozenset(
     {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE}
 )
-# Equilibrium partial pressures from these two predictors are independent of
-# total pressure. The evaluation proof is in test_score's pressure-axis test;
-# unknown total-pressure provenance does not block p_partial eligibility here.
-_TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS = frozenset(
-    {
-        (Engine.OPENIMCC, Quantity.P_PARTIAL),
-        (Engine.INTERNAL_ANALYTICAL, Quantity.P_PARTIAL),
-    }
-)
 _KNUDSEN_TOTAL_PRESSURE_SEED_BAR = 1.0e-3
 _KNUDSEN_TOTAL_PRESSURE_NOTICE_ORIGIN = "score:knudsen_total_pressure"
 _SPECIES_FORMULA_INDEPENDENT_QUANTITIES = frozenset(
@@ -363,6 +355,9 @@ _SPECIES_FORMULA_INDEPENDENT_QUANTITIES = frozenset(
 )
 
 
+# Equilibrium partial pressures from these two predictors are independent of
+# total pressure. The evaluation proof is in test_score's pressure-axis test;
+# unknown total-pressure provenance does not block p_partial eligibility here.
 def _pressure_independent_comparison(
     reference: Observation, prediction: EnginePrediction
 ) -> bool:
@@ -5271,15 +5266,6 @@ def blocking_qualifications(
     oxygen_balance_effusion_solved: bool = False,
 ) -> tuple[Notice, ...]:
     qualification_notices = tuple(notices)
-    if (engine, quantity) in _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS:
-        qualification_notices = tuple(
-            notice
-            for notice in qualification_notices
-            if not (
-                notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
-                and "total_pressure_Pa" in notice.reason
-            )
-        )
     flagged = tuple(
         notice
         for notice in qualification_notices
@@ -5291,6 +5277,7 @@ def blocking_qualifications(
         return _pressure_blocking_notices(
             qualification_notices,
             oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
+            engine=engine,
         )
     if quantity in MELT_ACTIVITY_QUANTITIES:
         found: list[Notice] = []
