@@ -8425,6 +8425,9 @@ def _source_oxygen_pressure_for_score(observation: Observation) -> Decimal | Non
 _FE_REDOX_RATIO_UNDEFINED = object()
 _KRESS91_SOURCES = ("Kress and Carmichael 1991, doi:10.1007/BF00307328",)
 _MELTS_FE_REDOX_ENGINES = (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+# MAGEMin is not a MELTS buffer path. It reports a verified liquid
+# endmember split and still requires a printed fO2.
+_REPORTED_SPLIT_FE_REDOX_ENGINES = (*_MELTS_FE_REDOX_ENGINES, Engine.MAGEMIN)
 _FE_REDOX_NO_SPLIT_DETAIL = (
     "no fixed-T/fO2/composition ferric output without phase-equilibrium execution"
 )
@@ -8885,10 +8888,14 @@ def _oxide_weight_fe_ratio(
 def _reported_engine_fe3_fe2_ratio(cell: object) -> Decimal | object | None:
     """Fe3+/Fe2+ from the cell. None means the engine reported no ferric split.
 
-    Prefer ``fe_redox_split`` weights, else liquid ``Fe2O3`` and ``FeO``.
-    ``Fe3Fet_Liq`` is Fe3+/Fe total and is used only when neither map has
-    both weights. ``_fe_redox_split`` remains the ThermoEngine emitter.
+    Prefer ``fe_redox_split`` weights, else a verified atom ratio on that
+    same map, else liquid ``Fe2O3`` and ``FeO``. ``Fe3Fet_Liq`` is
+    Fe3+/Fe total and is used only when neither map has both weights.
+    ``_fe_redox_split`` remains the ThermoEngine emitter. The atom ratio
+    is already computed by the redox owner; zero is all ferrous.
     """
+
+    from simulator.fe_redox import FE3_FE2_ATOM_RATIO_KEY
 
     split = getattr(cell, "fe_redox_split", None) or {}
     if not isinstance(split, Mapping):
@@ -8901,6 +8908,14 @@ def _reported_engine_fe3_fe2_ratio(cell: object) -> Decimal | object | None:
     )
     if from_split is not None:
         return from_split
+    if FE3_FE2_ATOM_RATIO_KEY in split:
+        try:
+            ratio = as_decimal(split[FE3_FE2_ATOM_RATIO_KEY])
+        except (TypeError, ValueError, ArithmeticError):
+            return _FE_REDOX_RATIO_UNDEFINED
+        if not ratio.is_finite() or ratio < 0:
+            return _FE_REDOX_RATIO_UNDEFINED
+        return ratio
     from_liquid = _oxide_weight_fe_ratio(liquid, fe2o3_key="Fe2O3", feo_key="FeO")
     if from_liquid is not None:
         return from_liquid
@@ -9175,13 +9190,15 @@ def _predict_redox(
     does not apply the Kress FeOt gate.
     AlphaMELTS and ThermoEngine report the split they already compute; the
     battery ratio is ``fe3_fe2_ratio_from_oxide_wt_pct`` or
-    ``fe3_fe2_ratio_from_ferric_fraction``. Other engines stay refused.
+    ``fe3_fe2_ratio_from_ferric_fraction``. MAGEMin reports the liquid
+    endmember atom ratio already stored on the cell. Other engines stay
+    refused.
     """
 
     if engine not in (
         Engine.INTERNAL_ANALYTICAL,
         Engine.OPENIMCC,
-        *_MELTS_FE_REDOX_ENGINES,
+        *_REPORTED_SPLIT_FE_REDOX_ENGINES,
     ):
         return EnginePrediction(
             engine=engine,
@@ -9223,7 +9240,10 @@ def _predict_redox(
             notices=tuple(material_notices) + tuple(notices),
             coefficient_sources=sources if sources is not None else (
                 melts_sources
-                if melts or engine is Engine.OPENIMCC
+                if (
+                    engine in _REPORTED_SPLIT_FE_REDOX_ENGINES
+                    or engine is Engine.OPENIMCC
+                )
                 else _KRESS91_SOURCES
             ),
             lineage_complete=False,
@@ -9426,7 +9446,7 @@ def _predict_redox(
         return refused(pressure.reason, pressure.detail)
     pressure_bar, pressure_pa = pressure
 
-    if not melts:
+    if engine is Engine.INTERNAL_ANALYTICAL:
         assert kress_basis is not None
         from simulator.fe_redox import (
             KRESS91_LIQUID_CALIBRATION_MAX_T_C,
@@ -14828,6 +14848,16 @@ def _predict_with_engine(
 
     solve_oxygen_balance_at_current_pressure = None
     oxygen_balance_notice: Notice | None = None
+    # VapoRock gamma exists only when the adapter was asked for oxide
+    # activities. Other engines ignore the flag. Pressure calls omit it.
+    vaporock_coefficient_kw = (
+        {"include_oxide_activities": True}
+        if (
+            engine is Engine.VAPOROCK
+            and quantity is Quantity.ACTIVITY_COEFFICIENT
+        )
+        else {}
+    )
     if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION and engine in {
         Engine.VAPOROCK,
         Engine.ALPHAMELTS,
@@ -14949,6 +14979,7 @@ def _predict_with_engine(
                     arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                     physical_pressure_bar=pressure_bar,
                     native_activity_formula=native_activity_formula,
+                    **vaporock_coefficient_kw,
                 )
             except Exception as exc:
                 return engine_call_failure(exc)
@@ -14964,6 +14995,7 @@ def _predict_with_engine(
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
                 native_activity_formula=native_activity_formula,
+                **vaporock_coefficient_kw,
             )
         except Exception as exc:
             return engine_call_failure(exc)
@@ -15249,6 +15281,7 @@ def _predict_with_engine(
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
                 native_activity_formula=native_activity_formula,
+                **vaporock_coefficient_kw,
             )
         except Exception as exc:
             return engine_call_failure(exc)

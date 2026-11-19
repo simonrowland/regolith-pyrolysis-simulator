@@ -1379,3 +1379,215 @@ def _kress91_fe3_fe2_ratio(fe2o3_over_feo_molar: float) -> float:
     # One Fe2O3 formula unit contains two Fe3+ cations; FeO contains one
     # Fe2+ cation, so Fe3+/Fe2+ = 2*n(Fe2O3)/n(FeO) = 2*ratio.
     return 2.0 * float(fe2o3_over_feo_molar)
+
+
+# Cache and scorer key for an owner-computed atom ratio. Not an oxide weight.
+FE3_FE2_ATOM_RATIO_KEY = "fe3_fe2_atom_ratio"
+
+# ig liquid endmembers of G_SS_ig_liq_function (liq_G25w), MAGEMin
+# src/TC_database/tc_gss_function.c. Oxide order is TC_endmembers.c:
+# SiO2, Al2O3, CaO, MgO, FeO, K2O, Na2O, TiO2, O, MnO, Cr2O3, H2O.
+# Comp vectors, verified on every ds copy of those pure-liquid endmembers:
+#   q4L = 4 qL = 4 SiO2
+#   slL = silL = SiO2 + Al2O3
+#   wo1L = woL = SiO2 + CaO
+#   fo2L = 2 foL = 2 SiO2 + 4 MgO
+#   fa2L = 2 faL = 2 SiO2 + 4 FeO + 0 O  -> 4 Fe(II)
+#   jdL = abL - qL = 2 SiO2 + 0.5 Al2O3 + 0.5 Na2O
+#   hmL = 0.5 hemL; hemL = 2 FeO + 1 O = Fe2O3, so hmL = FeO + 0.5 O
+#         -> 1 Fe(III), 0 Fe(II)
+#   ekL = 0.5 eskL = 0.5 Cr2O3
+#   tiL = ruL = TiO2
+#   kjL = kspL - qL = 2 SiO2 + 0.5 Al2O3 + 0.5 K2O
+#   ctL = -qL + silL + woL = SiO2 + Al2O3 + CaO
+#   h2o1L = h2oL = H2O
+# Excess O oxidizes two Fe(II) because 2 FeO + O = Fe2O3, and only hemL/hmL
+# carries both Fe and excess O. No other ig-liquid endmember has Fe.
+# fa2L and hmL are the only Fe-bearing names. Other databases are not this
+# table. Bulk oxygen is not an input.
+_IG_LIQUID_FE_VALENCE: dict[str, tuple[float, float, Mapping[str, float]]] = {
+    "q4L": (0.0, 0.0, {"SiO2": 4.0}),
+    "slL": (0.0, 0.0, {"SiO2": 1.0, "Al2O3": 1.0}),
+    "wo1L": (0.0, 0.0, {"SiO2": 1.0, "CaO": 1.0}),
+    "fo2L": (0.0, 0.0, {"SiO2": 2.0, "MgO": 4.0}),
+    "fa2L": (4.0, 0.0, {"SiO2": 2.0, "FeO": 4.0}),
+    "jdL": (0.0, 0.0, {"SiO2": 2.0, "Al2O3": 0.5, "Na2O": 0.5}),
+    "hmL": (0.0, 1.0, {"FeO": 1.0, "O": 0.5}),
+    "ekL": (0.0, 0.0, {"Cr2O3": 0.5}),
+    "tiL": (0.0, 0.0, {"TiO2": 1.0}),
+    "kjL": (0.0, 0.0, {"SiO2": 2.0, "Al2O3": 0.5, "K2O": 0.5}),
+    "ctL": (0.0, 0.0, {"SiO2": 1.0, "Al2O3": 1.0, "CaO": 1.0}),
+    "h2o1L": (0.0, 0.0, {"H2O": 1.0}),
+}
+
+
+@dataclass(frozen=True)
+class PhaseFe3Fe2:
+    """n_Fe(III) / n_Fe(II) for one phase. Zero is all ferrous, not absent."""
+
+    ratio: float
+    n_fe3: float
+    n_fe2: float
+
+
+@dataclass(frozen=True)
+class PhaseFe3Fe2Refusal:
+    """Valence that cannot be verified. Not zero and not infinity."""
+
+    reason: str
+    detail: str
+
+
+def ig_liquid_endmember_formula_mass_g_mol(name: str) -> float:
+    """Formula mass from the verified Comp vector and the molar-mass owner."""
+
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
+
+    row = _IG_LIQUID_FE_VALENCE.get(str(name))
+    if row is None:
+        raise KeyError(name)
+    total = 0.0
+    for oxide, count in row[2].items():
+        total += float(count) * oxide_molar_mass_g_mol(oxide)
+    if not math.isfinite(total) or total <= 0.0:
+        raise ValueError(f"formula mass of {name!r} is not positive")
+    return total
+
+
+def phase_fe3_fe2_from_endmember_moles(
+    endmember_moles: Mapping[str, float],
+    *,
+    database: str,
+) -> PhaseFe3Fe2 | PhaseFe3Fe2Refusal:
+    """Fe3+/Fe2+ = n_Fe(III) / n_Fe(II) from verified ig-liquid endmembers.
+
+    Premise: each endmember's Fe valence is the Comp vector above, not the
+    bulk O coordinate and not the input FeO/Fe2O3 split. Algebra: sum
+    moles_i * Fe(III)_i over the phase, likewise Fe(II), then divide.
+    Units: moles cancel, so the ratio is dimensionless. Sanity: 1 mol fa2L
+    (4 Fe II) plus 1 mol hmL (1 Fe III) is 1/4. Pure fa2L is 0. Pure hmL
+    has no Fe(II); that ratio is undefined, not infinity. A positive amount
+    of any name that is not in the ig-liquid table refuses the whole phase.
+    No iron is a refusal, not a reported zero.
+    """
+
+    if str(database).lower().strip() != "ig":
+        return PhaseFe3Fe2Refusal(
+            reason="unverified_database",
+            detail=(
+                "Fe valence is verified for MAGEMin database ig only; "
+                f"got {database!r}"
+            ),
+        )
+    n_fe2 = 0.0
+    n_fe3 = 0.0
+    saw_positive = False
+    for raw_name, raw_amount in endmember_moles.items():
+        name = str(raw_name)
+        try:
+            amount = float(raw_amount)
+        except (TypeError, ValueError):
+            return PhaseFe3Fe2Refusal(
+                reason="amount_invalid",
+                detail=f"{name} amount is not a real number",
+            )
+        if amount == 0.0:
+            continue
+        if not math.isfinite(amount) or amount < 0.0:
+            return PhaseFe3Fe2Refusal(
+                reason="amount_invalid",
+                detail=f"{name} amount {raw_amount!r} is not finite and non-negative",
+            )
+        row = _IG_LIQUID_FE_VALENCE.get(name)
+        if row is None:
+            return PhaseFe3Fe2Refusal(
+                reason="unverified_endmember",
+                detail=f"{name} has no verified ig-liquid Fe valence",
+            )
+        saw_positive = True
+        fe2, fe3, _oxides = row
+        n_fe2 += amount * fe2
+        n_fe3 += amount * fe3
+    if not saw_positive or (n_fe2 == 0.0 and n_fe3 == 0.0):
+        return PhaseFe3Fe2Refusal(
+            reason="no_iron",
+            detail="the phase has no verified Fe-bearing endmember amount",
+        )
+    if not math.isfinite(n_fe2) or not math.isfinite(n_fe3):
+        return PhaseFe3Fe2Refusal(
+            reason="amount_invalid",
+            detail="Fe atom totals are not finite",
+        )
+    if n_fe2 == 0.0:
+        return PhaseFe3Fe2Refusal(
+            reason="ferrous_absent",
+            detail=(
+                "n_Fe(II) is zero while n_Fe(III) is positive; "
+                "Fe3+/Fe2+ is undefined"
+            ),
+        )
+    if n_fe3 < 0.0 or n_fe2 < 0.0:
+        return PhaseFe3Fe2Refusal(
+            reason="amount_invalid",
+            detail="Fe atom totals are negative",
+        )
+    ratio = n_fe3 / n_fe2
+    if not math.isfinite(ratio) or ratio < 0.0:
+        return PhaseFe3Fe2Refusal(
+            reason="amount_invalid",
+            detail="Fe3+/Fe2+ is not a finite non-negative number",
+        )
+    return PhaseFe3Fe2(ratio=ratio, n_fe3=n_fe3, n_fe2=n_fe2)
+
+
+def phase_fe3_fe2_from_endmember_wt_fraction(
+    endmember_wt_fraction: Mapping[str, float],
+    *,
+    database: str,
+) -> PhaseFe3Fe2 | PhaseFe3Fe2Refusal:
+    """Convert weight fractions to moles, then use the mole ratio.
+
+    n_i = w_i / M_i with M_i from the verified Comp vector. A common scale
+    cancels in the ratio. Treating the weight fraction as a mole amount
+    does not: formula masses of fa2L and hmL differ.
+    """
+
+    if str(database).lower().strip() != "ig":
+        return PhaseFe3Fe2Refusal(
+            reason="unverified_database",
+            detail=(
+                "Fe valence is verified for MAGEMin database ig only; "
+                f"got {database!r}"
+            ),
+        )
+    moles: dict[str, float] = {}
+    for raw_name, raw_weight in endmember_wt_fraction.items():
+        name = str(raw_name)
+        try:
+            weight = float(raw_weight)
+        except (TypeError, ValueError):
+            return PhaseFe3Fe2Refusal(
+                reason="amount_invalid",
+                detail=f"{name} weight fraction is not a real number",
+            )
+        if weight == 0.0:
+            continue
+        if not math.isfinite(weight) or weight < 0.0:
+            return PhaseFe3Fe2Refusal(
+                reason="amount_invalid",
+                detail=f"{name} weight fraction {raw_weight!r} is not usable",
+            )
+        if name not in _IG_LIQUID_FE_VALENCE:
+            return PhaseFe3Fe2Refusal(
+                reason="unverified_endmember",
+                detail=f"{name} has no verified ig-liquid Fe valence",
+            )
+        try:
+            mass = ig_liquid_endmember_formula_mass_g_mol(name)
+        except (KeyError, ValueError) as exc:
+            return PhaseFe3Fe2Refusal(
+                reason="unverified_endmember",
+                detail=f"{name} formula mass is unverified: {exc}",
+            )
+        moles[name] = weight / mass
+    return phase_fe3_fe2_from_endmember_moles(moles, database=database)

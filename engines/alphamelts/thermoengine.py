@@ -1027,6 +1027,55 @@ class ThermoEnginePayload:
     solver_converged: Optional[bool] = None
     solver_iterations: Optional[int] = None
     warnings: tuple[str, ...] = ()
+    # Same-component gamma. Empty unless a_i and X_i were both reported
+    # for that endmember. Defaults keep older constructors valid.
+    reported_activity_coefficients: Mapping[str, float] = field(
+        default_factory=dict
+    )
+    activity_coefficient_details: Mapping[str, Mapping[str, Any]] = field(
+        default_factory=dict
+    )
+
+
+def endmember_same_component_coefficients(
+    activities: Mapping[str, float],
+    mole_fractions: Mapping[str, float],
+) -> tuple[dict[str, float], dict[str, dict[str, Any]]]:
+    """gamma of each MELTS endmember from that endmember's own a and X.
+
+    The mole fraction is the normalized liquid endmember fraction passed
+    to chem_potential, not an oxide mole fraction. Mg2SiO4 is not MgO.
+    """
+
+    from simulator.chemistry.melt_activity import (
+        SAME_COMPONENT_MOLE_FRACTION,
+        SAME_COMPONENT_REFERENCE_CONVENTION,
+        SAME_COMPONENT_REFERENCE_PHASE,
+        SameComponentActivityCoefficient,
+        same_component_activity_coefficient,
+    )
+
+    gammas: dict[str, float] = {}
+    details: dict[str, dict[str, Any]] = {}
+    for name, activity in activities.items():
+        component = str(name)
+        if component not in mole_fractions:
+            continue
+        decided = same_component_activity_coefficient(
+            activity_component=component,
+            activity=activity,
+            mole_fraction_component=component,
+            mole_fraction=mole_fractions[component],
+            normalization=SAME_COMPONENT_MOLE_FRACTION,
+            reference_convention=SAME_COMPONENT_REFERENCE_CONVENTION,
+            reference_phase=SAME_COMPONENT_REFERENCE_PHASE,
+            reference_component_basis=component,
+        )
+        if not isinstance(decided, SameComponentActivityCoefficient):
+            continue
+        gammas[component] = decided.gamma
+        details[component] = decided.detail()
+    return gammas, details
 
 
 class ThermoEngineTransport:
@@ -1837,6 +1886,8 @@ print('ok')
             liquid_comp = {}
             liquid_components = {}
 
+        self._reported_activity_coefficients = {}
+        self._activity_coefficient_details = {}
         if liquid_phase and liquid_comp:
             activities = self._activities_from_chemical_potentials(
                 temperature_C=float(temperature_C),
@@ -1873,6 +1924,13 @@ print('ok')
             liquid_composition_wt_pct=liquid_comp,
             activity_coefficients=activities,
             fe_redox_split=fe_redox_split,
+            reported_activity_coefficients=dict(
+                self._reported_activity_coefficients
+            ),
+            activity_coefficient_details={
+                name: dict(detail)
+                for name, detail in self._activity_coefficient_details.items()
+            },
             solved_fO2_log=solved_fO2_log,
             solved_fO2_reason=solved_fO2_reason,
             phase_universe_size=len(_thermoengine_native_call(
@@ -2469,6 +2527,18 @@ print('ok')
                         else 'nonpositive_computed_activity'
                     ),
                 ))
+        # X_i is the normalized endmember mole already used for mu_i.
+        # Same name, same pure-liquid-endmember reference. A missing X
+        # omits gamma; it is not replaced by the activity.
+        fractions = {
+            endmember_names[idx]: mol[idx]
+            for idx in range(min(len(endmember_names), len(mol)))
+        }
+        gammas, details = endmember_same_component_coefficients(
+            activities, fractions
+        )
+        self._reported_activity_coefficients = gammas
+        self._activity_coefficient_details = details
         return activities
 
     def _endmember_moles_from_wt(

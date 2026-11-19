@@ -3159,6 +3159,7 @@ def test_magemin_subprocess_argument_vector_matches_golden():
         '--Bulk=60.000000,0.000000,0.000000,40.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000',
         '--buffer=nno',
         '--buffer_n=0.000000',
+        '--out_matlab=1',
     ]
     assert (buffer_name, buffer_n) == ('nno', 0.0)
 

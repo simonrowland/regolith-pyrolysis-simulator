@@ -942,6 +942,53 @@ def _call_system_eval_gas_abundances(
     return logP
 
 
+def vaporock_oxide_same_component_coefficients(
+    oxide_activity: Mapping[str, float],
+    composition_wt_pct: Mapping[str, float],
+) -> tuple[dict[str, float], dict[str, dict[str, Any]]]:
+    """gamma_i = a_i / X_i on the oxides whose activities were reported.
+
+    Premise: VapoRock's ln a is the liquid-oxide activity relative to the
+    pure oxide, and the composition weight is that same oxide. Algebra:
+    n_i = w_i / M_i, X_i = n_i / sum(n) over exactly those oxides, then
+    gamma_i = a_i / X_i. Units: g / (g/mol) is mol; the ratio is
+    dimensionless. Sanity: one oxide with a = X has gamma 1. mol_liq
+    endmember fractions are a different basis and are not used. A missing
+    mass or a mismatched component set yields no gamma.
+    """
+
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
+    from simulator.chemistry.melt_activity import (
+        SAME_COMPONENT_REFERENCE_CONVENTION,
+        SAME_COMPONENT_REFERENCE_PHASE,
+        same_component_activity_coefficients_from_moles,
+    )
+
+    moles: dict[str, float] = {}
+    for oxide in oxide_activity:
+        name = str(oxide)
+        try:
+            weight = float(composition_wt_pct.get(name, 0.0) or 0.0)
+        except (TypeError, ValueError):
+            return {}, {}
+        if weight <= 0.0:
+            continue
+        try:
+            mass = oxide_molar_mass_g_mol(name)
+        except (KeyError, TypeError, ValueError):
+            return {}, {}
+        if not math.isfinite(mass) or mass <= 0.0:
+            return {}, {}
+        moles[name] = weight / mass
+    gammas, details, _refusals = same_component_activity_coefficients_from_moles(
+        oxide_activity,
+        moles,
+        reference_convention=SAME_COMPONENT_REFERENCE_CONVENTION,
+        reference_phase=SAME_COMPONENT_REFERENCE_PHASE,
+    )
+    return gammas, details
+
+
 def _oxide_activities_from_full_output(
     system: Any,
     ln_activity: Any,
@@ -2300,6 +2347,18 @@ class VapoRockBackend(MeltBackend):
             'vaporock_full_speciation_Pa',
             dict(vaporock_full_speciation_Pa),
         )
+        if (
+            result_status == 'ok'
+            and include_oxide_activities
+            and oxide_activity
+        ):
+            gammas, details = vaporock_oxide_same_component_coefficients(
+                oxide_activity,
+                comp_wt,
+            )
+            if gammas:
+                result.reported_activity_coefficients = gammas
+                result.activity_coefficient_details = details
         return result
 
     # ------------------------------------------------------------------

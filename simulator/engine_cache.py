@@ -310,9 +310,9 @@ ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
     "internal-analytical": 2,
     "vaporock": 1,
-    "magemin": 3,
+    "magemin": 4,
     "alphamelts": 3,
-    "thermoengine": 3,
+    "thermoengine": 4,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
@@ -331,6 +331,8 @@ ENGINE_CHEMISTRY_VERSION = {
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
+# magemin v4: 2026-11-19 liquid ig endmember Fe3+/Fe2+ is stored on fe_redox_split when every Fe valence verifies (d-446 D-F)
+# thermoengine v4: 2026-11-19 same-component liquid activity coefficients are stored beside the endmember activities (d-446 D-E)
 
 
 @dataclass(frozen=True)

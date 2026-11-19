@@ -185,6 +185,12 @@ _ENGINE_REPORTED_ACTIVITY["magemin"] = EngineReportedActivity(
     Phase.CR,
     _PARENT_OXIDE_COMPONENT_BASES,
 )
+_ENGINE_REPORTED_ACTIVITY["vaporock"] = EngineReportedActivity(
+    "raoultian_pure_liquid_oxide",
+    ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+    Phase.L,
+    _PARENT_OXIDE_COMPONENT_BASES,
+)
 
 
 def _melts_reports_oxide_endmember(formula: str) -> tuple[bool, str]:
@@ -252,6 +258,12 @@ def _engine_reports_formula(engine: str, formula: str) -> tuple[bool, str]:
         if formula in MELT_OXIDE_CATIONS_PER_FORMULA:
             return True, "raoultian_pure_liquid_endmember"
         return False, f"typed-refusal:unsupported_internal_analytical_oxide:{formula}"
+    if engine == "vaporock":
+        from simulator.state import OXIDE_SPECIES
+
+        if formula in OXIDE_SPECIES or formula in {"H2O", "CO2"}:
+            return True, "raoultian_pure_liquid_oxide"
+        return False, f"typed-refusal:vaporock_no_oxide_activity:{formula}"
     return False, "typed-refusal:engine_does_not_report_parent_oxide_activity"
 
 
@@ -554,7 +566,12 @@ def melt_activity_requests(
         ))
     gap_tuple = tuple(dict.fromkeys(gaps))
     results = []
-    for engine in MELT_ACTIVITY_ENGINES:
+    # VapoRock reports oxide activities, not the ACTIVITY observable. It is
+    # admitted only for a coefficient whose component is one of those oxides.
+    activity_engines = MELT_ACTIVITY_ENGINES
+    if inputs.activity_quantity == "activity_coefficient":
+        activity_engines = (*MELT_ACTIVITY_ENGINES, "vaporock")
+    for engine in activity_engines:
         if engine == "magemin" and inputs.activity_quantity != "activity":
             if (
                 inputs.activity_quantity == "activity_coefficient"

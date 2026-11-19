@@ -115,7 +115,14 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
-from simulator.fe_redox import RedoxState, normalize_redox_state
+from simulator.fe_redox import (
+    FE3_FE2_ATOM_RATIO_KEY,
+    PhaseFe3Fe2,
+    PhaseFe3Fe2Refusal,
+    RedoxState,
+    normalize_redox_state,
+    phase_fe3_fe2_from_endmember_wt_fraction,
+)
 from simulator.oxygen_buffers import oneill_qfm_log10_fO2_bar
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
@@ -302,6 +309,92 @@ class _MAGEMinBulkProjection:
     merged_components: Tuple[str, ...] = ()
     source_sum_wt_pct: float = 0.0
     projected_sum_wt_pct: float = 0.0
+
+
+_MATLAB_ENDMEMBER_HEADER = "End-members fractions[wt fr]"
+
+
+def _magemin_liquid_phase_token(token: str) -> bool:
+    name = str(token).casefold()
+    return name == "liq" or name.startswith("liquid")
+
+
+def liquid_endmember_wt_fraction_from_matlab(
+    text: str,
+) -> dict[str, float] | None:
+    """Single liquid row of a MAGEMin ``_matlab_output.txt`` dump.
+
+    The C writer prints a name line then a value line per solution phase
+    (``dump_function.c``: ``%10s`` endmember names, ``%10.5f`` emFrac_wt).
+    Values are weight fractions, not moles. Dashes are unused slots.
+    None means the table is missing, malformed, has no liquid row, or has
+    more than one liquid row. Those cases are not a guessed ratio.
+    """
+
+    lines = str(text or "").splitlines()
+    headers = [
+        index
+        for index, line in enumerate(lines)
+        if line.strip() == _MATLAB_ENDMEMBER_HEADER
+    ]
+    if not headers:
+        return None
+    index = headers[-1] + 1
+    liquid_rows: list[dict[str, float]] = []
+    while index < len(lines):
+        name_line = lines[index]
+        stripped = name_line.strip()
+        if not stripped or stripped.startswith("Site fractions"):
+            break
+        if index + 1 >= len(lines):
+            return None
+        value_line = lines[index + 1]
+        value_stripped = value_line.strip()
+        if not value_stripped or value_stripped.startswith("Site fractions"):
+            return None
+        names = name_line.split()
+        values = value_line.split()
+        if not values or len(names) != len(values) - 1:
+            return None
+        weights: dict[str, float] = {}
+        for name, raw in zip(names, values[1:]):
+            if name == "-" and raw == "-":
+                continue
+            if name == "-" or raw == "-":
+                return None
+            try:
+                number = float(raw)
+            except ValueError:
+                return None
+            if not math.isfinite(number):
+                return None
+            weights[name] = number
+        if _magemin_liquid_phase_token(values[0]):
+            liquid_rows.append(weights)
+        index += 2
+    if len(liquid_rows) != 1:
+        return None
+    return liquid_rows[0]
+
+
+def magemin_liquid_fe3_fe2_from_matlab(
+    text: str,
+    *,
+    database: str,
+) -> PhaseFe3Fe2 | PhaseFe3Fe2Refusal | None:
+    """Liquid Fe3+/Fe2+ from one matlab dump, or None when no liquid row.
+
+    The ratio is ``phase_fe3_fe2_from_endmember_wt_fraction``. A refusal
+    from that owner is returned as the refusal. Bulk oxygen is not read.
+    """
+
+    weights = liquid_endmember_wt_fraction_from_matlab(text)
+    if weights is None:
+        return None
+    return phase_fe3_fe2_from_endmember_wt_fraction(
+        weights,
+        database=database,
+    )
 
 
 def _bootstrap_magemin_subprocess_worker(
@@ -2154,6 +2247,29 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             warnings=all_warnings,
             diagnostics=result_diagnostics,
         )
+        liquid_wt = (
+            raw.get('liquid_endmember_wt_fraction')
+            if isinstance(raw, Mapping)
+            else None
+        )
+        if isinstance(liquid_wt, Mapping):
+            parsed_wt: dict[str, float] = {}
+            wt_usable = True
+            for name, value in liquid_wt.items():
+                try:
+                    parsed_wt[str(name)] = float(value)
+                except (TypeError, ValueError):
+                    wt_usable = False
+                    break
+            if wt_usable:
+                decided = phase_fe3_fe2_from_endmember_wt_fraction(
+                    parsed_wt,
+                    database=self._effective_database(),
+                )
+                if isinstance(decided, PhaseFe3Fe2):
+                    result.fe_redox_split = {
+                        FE3_FE2_ATOM_RATIO_KEY: float(decided.ratio),
+                    }
         return result
 
     def find_liquidus_solidus(
@@ -3350,7 +3466,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 '--Verb=1' if item == '--Verb=0' else item
                 for item in args
             ]
-            args.append('--out_matlab=1')
+        # End-member weight fractions are the Fe-valence inventory.
+        # Verb stays 0 unless native activities already requested Verb=1,
+        # so the Phase/Mode stdout of an ordinary solve is unchanged.
+        args.append('--out_matlab=1')
         return args, buffer_name, buffer_n, tuple(buffer_warnings)
 
     def _call_magemin_subprocess(
@@ -3477,13 +3596,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         f'MAGEMin binary could not be executed: {exc}',
                         failure_disposition='environment',
                     ) from exc
-                if capture_native_activities:
-                    matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
-                    matlab_text = (
-                        matlab_path.read_text()
-                        if matlab_path.exists()
-                        else ''
-                    )
+                matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
+                matlab_text = (
+                    matlab_path.read_text()
+                    if matlab_path.exists()
+                    else ''
+                )
 
         if completed.returncode != 0:
             stderr = (completed.stderr or '').strip()
@@ -3535,6 +3653,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             ),
             'operating_point_diagnostics': operating_point_diagnostics,
         }
+        liquid_wt = liquid_endmember_wt_fraction_from_matlab(matlab_text)
+        if liquid_wt is not None:
+            result['liquid_endmember_wt_fraction'] = liquid_wt
         if capture_native_activities:
             from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
 

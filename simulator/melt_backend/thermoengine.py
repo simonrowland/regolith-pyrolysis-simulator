@@ -618,6 +618,13 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 ),
             )
             eq.fe_redox_split = dict(payload.fe_redox_split)
+            reported = dict(payload.reported_activity_coefficients)
+            if reported:
+                eq.reported_activity_coefficients = reported
+                eq.activity_coefficient_details = {
+                    name: dict(detail)
+                    for name, detail in payload.activity_coefficient_details.items()
+                }
             return self._fail_closed_on_clamped_operating_point(eq)
         except EngineWorkerTimeout as exc:
             # Warm-call wall: unfinished computation, not absence and

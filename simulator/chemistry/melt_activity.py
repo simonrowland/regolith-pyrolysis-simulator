@@ -921,3 +921,220 @@ def na_reductant_activity_shift_kj_per_mol_o2(
     # For 4 Na + O2 -> 2 Na2O = 4 NaO0.5, the product activity term is
     # RT ln(a^4) = 4 RT ln(a) on the per-mol-O2 Ellingham basis.
     return 4.0 * R_KJ_PER_MOL_K * temperature * math.log(activity)
+
+
+# Same-component activity coefficient. gamma_i = a_i / X_i on the engine's
+# own component, mole-fraction normalization, and reference. This is not
+# the single-cation projection above and not the shipped table gamma.
+SAME_COMPONENT_MOLE_FRACTION = "mole_fraction"
+SAME_COMPONENT_REFERENCE_CONVENTION = "raoultian_pure_endmember"
+SAME_COMPONENT_REFERENCE_PHASE = "l"
+
+
+@dataclass(frozen=True)
+class SameComponentActivityCoefficient:
+    """One gamma that used the same component for a_i and X_i."""
+
+    component: str
+    gamma: float
+    activity: float
+    mole_fraction: float
+    coefficient_basis: str
+    convention: str
+    phase: str
+    component_basis: str
+    normalization: str
+
+    def detail(self) -> dict[str, Any]:
+        """Scorer detail. The cache keeps basis and standard state only."""
+
+        return {
+            "value": self.gamma,
+            "coefficient_basis": self.coefficient_basis,
+            "standard_state": {
+                "convention": self.convention,
+                "phase": self.phase,
+                "component_basis": self.component_basis,
+            },
+            "activity": self.activity,
+            "mole_fraction": self.mole_fraction,
+            "normalization": self.normalization,
+        }
+
+
+@dataclass(frozen=True)
+class SameComponentActivityRefusal:
+    """Typed refusal. Activity is never returned in place of gamma."""
+
+    reason: str
+    component: str
+    detail: str
+
+
+def same_component_activity_coefficient(
+    *,
+    activity_component: str,
+    activity: float,
+    mole_fraction_component: str,
+    mole_fraction: float | None,
+    normalization: str,
+    reference_convention: str,
+    reference_phase: str,
+    reference_component_basis: str,
+) -> SameComponentActivityCoefficient | SameComponentActivityRefusal:
+    """gamma_i = a_i / X_i on one component, one normalization, one reference.
+
+    Premise: the engine's activity is the Raoultian (or other stated)
+    activity of a named model component, and X_i is that same component's
+    mole fraction in the same normalization. For a pure-endmember reference,
+    mu_i = mu_i0 + RT ln(a_i) and mu_i^excess = RT ln(a_i / X_i), so
+    gamma_i = a_i / X_i = exp(mu_i^excess / RT).
+
+    Algebra: divide the two dimensionless numbers. Units: gamma is
+    dimensionless. Sanity: an ideal component has a_i = X_i, so gamma = 1.
+    Returning a_i itself is not this result (a worked nonideal point is
+    a = 0.5, X = 0.25, gamma = 2). A different component, a missing or
+    nonpositive X, or a different normalization refuses. MELTS X_Mg2SiO4
+    is not oxide X_MgO.
+    """
+
+    component = str(activity_component)
+    fraction_component = str(mole_fraction_component)
+    basis = str(reference_component_basis)
+    if component != fraction_component or component != basis:
+        return SameComponentActivityRefusal(
+            reason="component_basis_mismatch",
+            component=component,
+            detail=(
+                f"activity component {component!r}, mole-fraction component "
+                f"{fraction_component!r}, reference component {basis!r}"
+            ),
+        )
+    if str(normalization) != SAME_COMPONENT_MOLE_FRACTION:
+        return SameComponentActivityRefusal(
+            reason="normalization_mismatch",
+            component=component,
+            detail=(
+                "gamma = a/X requires mole_fraction normalization; "
+                f"got {normalization!r}"
+            ),
+        )
+    convention = str(reference_convention).strip()
+    phase = str(reference_phase).strip()
+    if not convention or not phase:
+        return SameComponentActivityRefusal(
+            reason="reference_incomplete",
+            component=component,
+            detail="reference convention and phase are required",
+        )
+    if mole_fraction is None:
+        return SameComponentActivityRefusal(
+            reason="mole_fraction_missing",
+            component=component,
+            detail="same-component mole fraction was not reported",
+        )
+    try:
+        fraction = float(mole_fraction)
+        value = float(activity)
+    except (TypeError, ValueError):
+        return SameComponentActivityRefusal(
+            reason="mole_fraction_not_positive",
+            component=component,
+            detail="activity or mole fraction is not a real number",
+        )
+    if not math.isfinite(fraction) or fraction <= 0.0:
+        return SameComponentActivityRefusal(
+            reason="mole_fraction_not_positive",
+            component=component,
+            detail=f"mole fraction {mole_fraction!r} is not finite and positive",
+        )
+    if not math.isfinite(value) or value <= 0.0:
+        return SameComponentActivityRefusal(
+            reason="activity_not_positive",
+            component=component,
+            detail=f"activity {activity!r} is not finite and positive",
+        )
+    gamma = value / fraction
+    if not math.isfinite(gamma) or gamma <= 0.0:
+        return SameComponentActivityRefusal(
+            reason="activity_not_positive",
+            component=component,
+            detail="a/X is not a finite positive activity coefficient",
+        )
+    return SameComponentActivityCoefficient(
+        component=component,
+        gamma=gamma,
+        activity=value,
+        mole_fraction=fraction,
+        coefficient_basis=SAME_COMPONENT_MOLE_FRACTION,
+        convention=convention,
+        phase=phase,
+        component_basis=component,
+        normalization=SAME_COMPONENT_MOLE_FRACTION,
+    )
+
+
+def same_component_activity_coefficients_from_moles(
+    activities: Mapping[str, float],
+    moles: Mapping[str, float],
+    *,
+    reference_convention: str,
+    reference_phase: str,
+) -> tuple[
+    dict[str, float],
+    dict[str, dict[str, Any]],
+    tuple[SameComponentActivityRefusal, ...],
+]:
+    """Normalize moles on the activity's component set, then divide.
+
+    X_i = n_i / sum(n_j) over exactly the components that have an activity.
+    An extra positive mole, or a missing mole, is a different normalization
+    and refuses every component. Zero moles do not change the sum; they are
+    simply absent.
+    """
+
+    activity_map = {str(name): value for name, value in activities.items()}
+    mole_map: dict[str, float] = {}
+    for name, amount in moles.items():
+        try:
+            number = float(amount)
+        except (TypeError, ValueError):
+            number = math.nan
+        if number == 0.0:
+            continue
+        mole_map[str(name)] = number
+    if set(mole_map) != set(activity_map):
+        refusal = SameComponentActivityRefusal(
+            reason="normalization_mismatch",
+            component="",
+            detail=(
+                "mole components "
+                f"{sorted(mole_map)!r} are not the activity components "
+                f"{sorted(activity_map)!r}"
+            ),
+        )
+        return {}, {}, (refusal,)
+    total = math.fsum(mole_map.values())
+    gammas: dict[str, float] = {}
+    details: dict[str, dict[str, Any]] = {}
+    refusals: list[SameComponentActivityRefusal] = []
+    for component, activity in activity_map.items():
+        fraction = None if not math.isfinite(total) or total <= 0.0 else (
+            mole_map[component] / total
+        )
+        decided = same_component_activity_coefficient(
+            activity_component=component,
+            activity=activity,
+            mole_fraction_component=component,
+            mole_fraction=fraction,
+            normalization=SAME_COMPONENT_MOLE_FRACTION,
+            reference_convention=reference_convention,
+            reference_phase=reference_phase,
+            reference_component_basis=component,
+        )
+        if isinstance(decided, SameComponentActivityRefusal):
+            refusals.append(decided)
+            continue
+        gammas[component] = decided.gamma
+        details[component] = decided.detail()
+    return gammas, details, tuple(refusals)

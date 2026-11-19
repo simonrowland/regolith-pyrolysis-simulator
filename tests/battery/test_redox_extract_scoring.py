@@ -16,6 +16,7 @@ from simulator.battery.enums import (
     AmountBasis,
     Authority,
     Engine,
+    ExecutionState,
     MetricOperation,
     NoticeKind,
     Phase,
@@ -1036,9 +1037,16 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
         "input": "printed_fO2",
     }
 
-    unsupported = predict_with_engine(Engine.MAGEMIN, row4)
-    assert unsupported.value is None
-    assert unsupported.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
+    # MAGEMin reports the liquid endmember Fe3+/Fe2+. It is not the Kress
+    # value pinned above, and it is not the old blanket refusal.
+    magemin = predict_with_engine(Engine.MAGEMIN, row4)
+    assert magemin.refusal_reason is None
+    assert magemin.value is not None
+    assert magemin.value.is_finite()
+    assert magemin.value >= 0
+    assert magemin.value != prediction4.value
+    assert magemin.coefficient_sources == ("magemin",)
+    assert magemin.execution.state is ExecutionState.PRODUCED
 
     residuals, _ = score_store(
         context,
@@ -1608,9 +1616,10 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
                 notice.reason == "uncertainty_confidence_level_assumed_1sigma"
                 for notice in residual.notices
             )
-        elif engine in {"alphamelts", "thermoengine"}:
-            # Composition is printed, so these engines attempt a ferric split.
-            # The unsupported-engine refusal is the one from before that path.
+        elif engine in {"alphamelts", "thermoengine", "magemin"}:
+            # These engines attempt a liquid ferric split. A refusal is that
+            # attempt's own reason (MAGEMin refuses a projected oxide such as
+            # P2O5). It is not the blanket no-output refusal.
             if (
                 residual.refusal is not None
                 and residual.refusal.reason
@@ -2051,7 +2060,7 @@ def test_engines_without_a_ferric_split_do_not_equilibrate(monkeypatch):
         "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
         _boom,
     )
-    for engine in (Engine.MAGEMIN, Engine.VAPOROCK, Engine.NASA_CEA_9):
+    for engine in (Engine.VAPOROCK, Engine.NASA_CEA_9):
         prediction = predict_with_engine(engine, row4)
         assert prediction.value is None
         assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX

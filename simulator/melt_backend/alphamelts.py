@@ -1100,6 +1100,74 @@ def activity_from_chem_potential(mu: float, mu0: float, T_K: float) -> float:
     return math.exp((mu_val - mu0_val) / (GAS_CONSTANT_J_PER_MOL_K * T_val))
 
 
+def liquid_phase_same_component_coefficients(
+    fields: Mapping[str, object],
+) -> tuple[dict[str, float], dict[str, dict[str, Any]]]:
+    """Pair activity_<E> with X_<E> on one liquid property row.
+
+    PetThermoTools prints both for the same endmember formula. X of a
+    different formula is not used. A missing X omits gamma.
+    """
+
+    from simulator.chemistry.melt_activity import (
+        SAME_COMPONENT_MOLE_FRACTION,
+        SAME_COMPONENT_REFERENCE_CONVENTION,
+        SAME_COMPONENT_REFERENCE_PHASE,
+        SameComponentActivityCoefficient,
+        same_component_activity_coefficient,
+    )
+
+    activities: dict[str, float] = {}
+    fractions: dict[str, float] = {}
+    for raw_name, raw_value in dict(fields or {}).items():
+        prop = str(raw_name)
+        lower = prop.lower()
+        try:
+            number = float(raw_value)
+        except (TypeError, ValueError):
+            continue
+        if lower.startswith("activity_"):
+            species = prop[len("activity_"):]
+            kind = "activity"
+        elif lower.endswith("_activity"):
+            species = prop[: -len("_activity")]
+            kind = "activity"
+        elif lower.startswith("x_"):
+            species = prop[2:]
+            kind = "fraction"
+        elif lower.endswith("_x"):
+            species = prop[:-2]
+            kind = "fraction"
+        else:
+            continue
+        if not species or not math.isfinite(number):
+            continue
+        if kind == "activity":
+            activities[species] = number
+        else:
+            fractions[species] = number
+    gammas: dict[str, float] = {}
+    details: dict[str, dict[str, Any]] = {}
+    for species, activity in activities.items():
+        if species not in fractions:
+            continue
+        decided = same_component_activity_coefficient(
+            activity_component=species,
+            activity=activity,
+            mole_fraction_component=species,
+            mole_fraction=fractions[species],
+            normalization=SAME_COMPONENT_MOLE_FRACTION,
+            reference_convention=SAME_COMPONENT_REFERENCE_CONVENTION,
+            reference_phase=SAME_COMPONENT_REFERENCE_PHASE,
+            reference_component_basis=species,
+        )
+        if not isinstance(decided, SameComponentActivityCoefficient):
+            continue
+        gammas[species] = decided.gamma
+        details[species] = decided.detail()
+    return gammas, details
+
+
 class _MELTSBackendSupport(MeltBackend):
     """
     AlphaMELTS thermodynamic backend.
@@ -5452,7 +5520,7 @@ class _MELTSBackendSupport(MeltBackend):
             for issue in activity_repair_issues
             if issue.get('site') != 'uncacheable_conversion'
         )
-        return self._emit_equilibrium_result(
+        eq = self._emit_equilibrium_result(
             temperature_C=temperature_C,
             pressure_bar=solved_pressure_bar,
             fO2_log=result_fO2_log,
@@ -5469,6 +5537,23 @@ class _MELTSBackendSupport(MeltBackend):
                 activity_diagnostics,
             ),
         )
+        # Promote only a same-component pair. The oxide-weight gamma that
+        # recovers activity stays in diagnostics and is not this coefficient.
+        gammas = activity_diagnostics.get('reported_activity_coefficients')
+        details = activity_diagnostics.get('activity_coefficient_details')
+        if (
+            isinstance(gammas, Mapping)
+            and gammas
+            and isinstance(details, Mapping)
+            and details
+        ):
+            eq.reported_activity_coefficients = dict(gammas)
+            eq.activity_coefficient_details = {
+                str(name): dict(detail)
+                for name, detail in details.items()
+                if isinstance(detail, Mapping)
+            }
+        return eq
 
     def _select_petthermotools_run(self, results) -> dict:
         if isinstance(results, tuple) and results:
@@ -5641,6 +5726,8 @@ class _MELTSBackendSupport(MeltBackend):
             skipped_sources.append(coefficient_source)
 
         activities: Dict[str, float] = {}
+        paired_gammas: Dict[str, float] = {}
+        paired_details: Dict[str, dict[str, Any]] = {}
         for key, value in results.items():
             name = str(key)
             if not name.endswith('_prop'):
@@ -5649,6 +5736,12 @@ class _MELTSBackendSupport(MeltBackend):
             if not self._is_liquid_activity_phase(phase_name):
                 continue
             row = self._first_row_mapping(value)
+            # activity_<E> with X_<E> only. Oxide wt% is a different basis.
+            phase_gammas, phase_details = (
+                liquid_phase_same_component_coefficients(row)
+            )
+            paired_gammas.update(phase_gammas)
+            paired_details.update(phase_details)
             for prop_name, prop_value in row.items():
                 prop = str(prop_name)
                 prop_lower = prop.lower()
@@ -5690,6 +5783,13 @@ class _MELTSBackendSupport(MeltBackend):
             source_diagnostics = {
                 'diagnostic_activity_source': 'phase_activity_fields'
             }
+            if paired_gammas:
+                source_diagnostics['reported_activity_coefficients'] = (
+                    paired_gammas
+                )
+                source_diagnostics['activity_coefficient_details'] = (
+                    paired_details
+                )
             self._record_skipped_activity_sources(
                 skipped_sources,
                 'phase_activity_fields',

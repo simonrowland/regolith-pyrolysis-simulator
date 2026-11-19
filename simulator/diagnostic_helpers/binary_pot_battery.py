@@ -5192,6 +5192,7 @@ def equilibrate_cell(
     physical_pressure_bar: float | None = None,
     native_activity_formula: str | None = None,
     _defer_qualification_decoration: bool = False,
+    include_oxide_activities: bool = False,
 ) -> EquilibrateCell:
     return _equilibrate_cell_uncached(
         handle,
@@ -5206,6 +5207,7 @@ def equilibrate_cell(
         physical_pressure_bar=physical_pressure_bar,
         native_activity_formula=native_activity_formula,
         _defer_qualification_decoration=_defer_qualification_decoration,
+        include_oxide_activities=include_oxide_activities,
     )
 
 
@@ -5224,6 +5226,7 @@ def _equilibrate_cell_uncached(
     native_activity_formula: str | None = None,
     _defer_qualification_decoration: bool = False,
     _cache_engine_call: bool = True,
+    include_oxide_activities: bool = False,
 ) -> EquilibrateCell:
     """One pot × engine × T × pO2 call. Refusals are rows, never exceptions."""
 
@@ -5377,6 +5380,11 @@ def _equilibrate_cell_uncached(
         kwargs["call_timeout_s"] = timeout
     if "native_activity_formula" in parameters:
         kwargs["native_activity_formula"] = native_activity_formula
+    # Only a True flag is a new cache key. The default path is unchanged.
+    # The isolated payload does not carry this flag; a missing gamma there
+    # is absence, not a number from a different basis.
+    if include_oxide_activities and "include_oxide_activities" in parameters:
+        kwargs["include_oxide_activities"] = True
     from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
 
     kwargs.update(isothermal_run_kwargs(handle.name, parameters))

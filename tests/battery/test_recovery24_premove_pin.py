@@ -109,23 +109,14 @@ def test_kress_fe_redox_output_is_bit_identical():
         "input": "composition",
     }
 
-    refused = predict_with_engine(Engine.MAGEMIN, rows["row4"])
-    assert refused.value is None
-    assert refused.authority is Authority.REFUSED
-    assert refused.execution.state is ExecutionState.UNSUPPORTED
-    assert refused.execution.call_evidence is None
-    assert refused.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
-    assert refused.refusal_detail == {
-        "reason": "engine_does_not_report_fe_redox",
-        "engine": "magemin",
-        "detail": (
-            "no fixed-T/fO2/composition ferric output without "
-            "phase-equilibrium execution"
-        ),
-    }
-    assert refused.coefficient_sources == _KRESS_SOURCES
-    assert refused.lineage_complete is False
-    assert refused.version is None
+    from simulator.battery.score import _REPORTED_SPLIT_FE_REDOX_ENGINES
+
+    # MAGEMin no longer takes the Kress blanket refusal. It is a reported
+    # liquid-endmember split. VapoRock stays outside that set. The Kress
+    # number above is unchanged.
+    assert Engine.MAGEMIN in _REPORTED_SPLIT_FE_REDOX_ENGINES
+    assert Engine.VAPOROCK not in _REPORTED_SPLIT_FE_REDOX_ENGINES
+    assert Engine.INTERNAL_ANALYTICAL not in _REPORTED_SPLIT_FE_REDOX_ENGINES
 
     conditions = dict(rows["row4"].point_conditions or {})
     conditions.pop("fO2_log", None)
