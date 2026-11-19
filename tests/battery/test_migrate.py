@@ -9834,7 +9834,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # 4110->4319.
     # Yakovlev 2017 (fc7c11533, merge F20 23a54e9b3) adds 34 printed residue
     # cells: 4319->4353.
-    # These are green's pre-t-1781 census pins. The Su & Zhang source-specific
+    # These are green's starting census pins. The Su & Zhang source-specific
     # result below is fresh-migrated; the controller will repin the totals from
     # the regenerated store.
     assert census.get("residue_component_composition") == 8112
@@ -9936,7 +9936,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    # Green's pre-t-1781 numeric total is retained pending the regenerated pin.
+    # Green's starting numeric total is retained pending the regenerated pin.
     assert n_numeric == 12505, (n_numeric, census, n_unavailable)
 
 

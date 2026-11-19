@@ -264,6 +264,7 @@ from tools.mineru_table_draft import (
     parse_table_html,
     printed_formula_tokens,
 )
+from simulator.corpus_paths import regolith_corpus_root
 
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
 SCHEMA_VERSION = "literature_extract.v1"
@@ -4314,9 +4315,7 @@ def fidelity_source_warnings(
     source_blind_reason_codes: list[frozenset[str]] = []
     root = artifact_root if artifact_root is not None else ROOT
     configured_corpus_root = os.environ.get("REGOLITH_CORPUS_ROOT", "").strip()
-    corpus_root = (
-        Path(configured_corpus_root).expanduser() if configured_corpus_root else None
-    )
+    corpus_root = regolith_corpus_root() if configured_corpus_root else None
     for index, sample in enumerate(samples):
         sample_label = f"{label}:fidelity_samples[{index}]"
         if not isinstance(sample, Mapping):
