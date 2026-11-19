@@ -6,7 +6,12 @@ import pytest
 import yaml
 
 from simulator.battery.enums import EvidenceClass, Phase, ValueKind
+from simulator.battery.input_provenance import PRINTED_STARTING_BULK
 from simulator.battery.migrate import Migrator
+from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -271,7 +276,17 @@ def test_isolated_migration_maps_conditions_values_and_schema_refusal():
         assert total_pressure is None or total_pressure.state.is_unknown
         assert row.locator.page == page and row.locator.table == table
     activity = _record(migrator, "shi2025_table6_row_1_mno_activity")
-    assert activity.identity.composition.is_unknown
+    identity_composition = activity.identity.composition
+    assert identity_composition is not None and identity_composition.is_value
+    assert identity_composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert identity_composition.value.input_provenance == PRINTED_STARTING_BULK
+    proxy_notices = [
+        notice
+        for notice in activity.notices
+        if INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+    ]
+    assert len(proxy_notices) == 1
+    assert activity.point_conditions["composition"].state.is_unknown
     assert _record(migrator, "shi2025_table3_row_5_al2o3_activity").identity.composition.is_unknown
     printed_start = activity.point_conditions["printed_composition"]
     assert printed_start.state.is_value
