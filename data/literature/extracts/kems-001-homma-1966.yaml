@@ -2365,10 +2365,7 @@ fidelity_samples:
     source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
     paragraph: K_Sn^S = 1.2e-3 ~ 1.6e-3 cm·sec^{-1}
     line_range: '7'
-- species: Mn
-  observable: rate_series
-  observation_id: homma_1966_crucible_area_numeric_b1
-  field: sample_surface_area_m2
+- path: species.Mn.context[homma_1966_crucible_area_numeric_b1].values.sample_surface_area_m2
   value: 0.0011341149
   locator:
     source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md

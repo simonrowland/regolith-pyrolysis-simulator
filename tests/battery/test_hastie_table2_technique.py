@@ -215,12 +215,19 @@ def test_existing_quantity_tokens_and_context_rows_migrate_by_role(hastie) -> No
         == "P_std_KCl_as_printed_on_figure"
     )
     assert reference_context["values"]["P_KCl_std_atm_as_printed"] == 0.005
+    orifice_id = "hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906"
+    assert orifice_id not in migrated
+    orifice_metadata = document["source_metadata"]["effusion_orifice"]
+    assert orifice_metadata["diameter_mm"] == 0.34
+    assert "0.34 mm" in orifice_metadata["quote"]
+    orifice_experiment = _experiment(hastie, "hastie-1981-pt-kms")
+    assert orifice_experiment.locator is not None
+    assert "0.34 mm" in (orifice_experiment.locator.note or "")
     non_observation_ids = {
         "hastie_1981_table2_17k2o_A_as_printed_note",
         "hastie_1981_k2_slag_orifice_0p34mm",
         "hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked",
         "hastie_1981_remaining_figures_ledger",
-        "hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906",
         "hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked_quoted_20260906",
         "hastie_1981_remaining_figures_ledger_quoted_20260906",
         "hastie_1981_fig15_kcl_std_pressure_printed_quoted_20260906",

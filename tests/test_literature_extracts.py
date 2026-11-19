@@ -14638,7 +14638,6 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     orifice = hastie_extract["source_metadata"]["effusion_orifice"]
     assert orifice["diameter_mm"] == 0.34
     assert "0.34 mm" in orifice["quote"]
-    assert "0.34 mm" in hastie_extract["experiments"][0]["locator"]["note"]
 
     gamma_id = "hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906"
     assert gamma_id in {
