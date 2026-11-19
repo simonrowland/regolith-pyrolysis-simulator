@@ -1623,6 +1623,21 @@ _VP_PROVIDER_CACHE: dict[int, BuiltinVaporPressureProvider] = {}
 _MELT_PSAT_CACHE: dict[tuple[Any, ...], dict[str, Any]] = {}
 
 
+def _melt_psat_cache_key(
+    T_K: float,
+    pO2_bar: float,
+    account_mol: Mapping[str, float],
+) -> tuple[Any, ...]:
+    return (
+        round(float(T_K), 6),
+        float(pO2_bar),
+        tuple(sorted(
+            (str(name), round(float(amount), 12))
+            for name, amount in account_mol.items()
+        )),
+    )
+
+
 def _builtin_vp_provider(
     vapor_pressure_data: Mapping[str, Any],
 ) -> BuiltinVaporPressureProvider:
@@ -1724,11 +1739,7 @@ def _engine_melt_psat_pa(
         if account_mol is not None
         else {oxide_formula: 100.0}
     )
-    cache_key = (
-        round(float(T_K), 6),
-        float(pO2_bar),
-        tuple(sorted((str(k), round(float(v), 12)) for k, v in account.items())),
-    )
+    cache_key = _melt_psat_cache_key(T_K, pO2_bar, account)
     cached_surface = _read_melt_psat_cache(cache_key)
     if cached_surface is None:
         from simulator.vapour_rail.run_disclosure import (
@@ -4558,17 +4569,10 @@ def _evaluate_ordering(
                 and isinstance(rank_runtime.get("account_mol"), Mapping)
             ):
                 try:
-                    evaluation_identity = (
-                        round(float(rank_runtime["temperature_K"]), 6),
-                        float(rank_runtime["pO2_bar"]),
-                        tuple(sorted(
-                            (
-                                str(name),
-                                round(float(amount), 12),
-                            )
-                            for name, amount
-                            in rank_runtime["account_mol"].items()
-                        )),
+                    evaluation_identity = _melt_psat_cache_key(
+                        rank_runtime["temperature_K"],
+                        rank_runtime["pO2_bar"],
+                        rank_runtime["account_mol"],
                     )
                 except (KeyError, TypeError, ValueError):
                     evaluation_identity = None
