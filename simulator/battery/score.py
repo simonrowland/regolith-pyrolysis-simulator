@@ -183,6 +183,7 @@ from simulator.battery.migrate import (
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
     SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     Bench,
     CandidateRequest,
@@ -2038,18 +2039,26 @@ def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
         for state in states
     ):
         return None
-    if reference.source_id == "kems-020-hastie-1981-nbsir":
-        reason = (
-            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-            "composition_role=initial_charge_only: composition = printed initial "
-            "charge; run composition evolves during vaporization"
-        )
-    else:
-        reason = (
-            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-            f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: the printed "
-            "composition is the starting charge, not the state of this datum"
-        )
+    existing_proxy_notice = next(
+        (
+            notice
+            for notice in reference.notices
+            if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+            and notice.reason.startswith(SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX)
+            and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+        ),
+        None,
+    )
+    if existing_proxy_notice is not None:
+        # The persisted notice is also the scoring flag that strips bands from
+        # this proxy-backed residual. Keep it in flagged_notices so the band
+        # policy sees it; union_notices deduplicates it in the final row.
+        return existing_proxy_notice
+    reason = (
+        f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+        f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
+        f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
+    )
     return Notice(
         kind=NoticeKind.SOURCE_DISAGREEMENT,
         affected_quantities=(quantity,),
@@ -17492,9 +17501,34 @@ def _compile_residual_with_lineage(
                 execution=Execution(state=ExecutionState.NOT_PROBED),
             )
     if not gates.passed and not apparatus_flagged:
+        refusal_detail: dict[str, object] = {
+            "primary_check": gates.primary_check,
+            "checks": [check.name for check in gates.checks],
+        }
+        pressure_check = next(
+            (
+                check
+                for check in gates.checks
+                if check.name == "in_cell_partial_pressure_sum" and not check.passed
+            ),
+            None,
+        )
+        if pressure_check is not None:
+            pressure_detail = pressure_check.detail
+            lower_bound = pressure_detail.get(
+                "printed_partial_pressure_lower_bound_Pa"
+            )
+            pressure_sum = pressure_detail.get("printed_partial_pressure_sum_Pa")
+            if lower_bound is not None:
+                refusal_detail["in_cell_pressure_lower_bound_Pa"] = lower_bound
+            elif pressure_sum is not None:
+                refusal_detail["in_cell_pressure_sum_Pa"] = pressure_sum
+            limit = pressure_detail.get("pressure_limit_Pa")
+            if limit is not None:
+                refusal_detail["limit_Pa"] = limit
         return _refused(
             gates.reason or RefusalReason.INVALID_SOURCE,
-            {"primary_check": gates.primary_check, "checks": [c.name for c in gates.checks]},
+            refusal_detail,
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("validity_gates_pass", "status_match_or_mismatch"),
         )
@@ -18521,6 +18555,21 @@ def _compile_residual_with_lineage(
         NoticeKind.FIGURE_ONLY,
         NoticeKind.REACTIVE_CELL_NOT_MODELLED,
     }
+    initial_charge_figure_band = (
+        numeric.decision_band is not None
+        and numeric.decision_band.band_basis == "row_printed"
+        and evidence_class.is_value
+        and evidence_class.value is EvidenceClass.FIGURE_ONLY
+        and reference.identity.composition is not None
+        and reference.identity.composition.is_value
+        and isinstance(reference.identity.composition.value, Composition)
+        and reference.identity.composition.value.proxy_flag
+        == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    )
+    if initial_charge_figure_band:
+        band_preserving_kinds.update(
+            {NoticeKind.SOURCE_DISAGREEMENT, NoticeKind.UNVERIFIED_APPARATUS}
+        )
     if (
         evidence_class.is_value
         and evidence_class.value is EvidenceClass.FIGURE_ONLY

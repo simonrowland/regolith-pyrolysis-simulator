@@ -51,9 +51,11 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.score import (
+    ScoreContext,
     liquid_model_subsolidus_sample_notice,
     parse_migration_headline,
     predict_with_engine,
+    score_store,
 )
 from simulator.battery.migrate import (
     REPO_ROOT,
@@ -366,8 +368,11 @@ def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_v
     assert decoded_legacy.certification is None
     assert to_plain(decoded_legacy) == legacy
 from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
     Bench,
     BenchIdentity,
+    Composition,
     Derivation,
     Located,
     Locator,
@@ -2472,7 +2477,7 @@ def test_model_derived_raw_input_method_rejects_non_string_values(
     )
 
 
-def test_hastie_initial_charges_stay_contextual_for_figure_points(
+def test_hastie_initial_charges_use_flagged_proxies_for_figure_points(
     tmp_path: Path,
 ) -> None:
     from simulator.battery.fo2_ladder import resolve_row_fo2
@@ -2502,23 +2507,20 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
             )
         for observation in rows:
             composition = observation.identity.composition
-            assert composition is not None and composition.is_unknown
-            assert "per-run composition is not published" in composition.reason
+            assert composition is not None and composition.is_value
+            assert composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
             point_composition = (observation.point_conditions or {}).get(
                 "composition"
             )
             assert point_composition is not None
-            assert point_composition.state.is_unknown
-            assert (
-                "per-run composition is not published"
-                in point_composition.state.reason
-            )
+            assert point_composition.state.is_value
+            assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
 
 
             role_notices = [
                 notice
                 for notice in observation.notices
-                if "composition_role=initial_charge_only" in notice.reason
+                if INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
             ]
             assert len(role_notices) == 1
             assert role_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
@@ -2588,12 +2590,12 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
     assert moved_observation.identity.temperature_K.is_value
     assert moved_observation.identity.temperature_K.value == Decimal("1575.0")
     moved_composition = moved_observation.identity.composition
-    assert moved_composition is not None and moved_composition.is_unknown
-    assert "per-run composition is not published" in moved_composition.reason
+    assert moved_composition is not None and moved_composition.is_value
+    assert moved_composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
     moved_notices = [
         notice
         for notice in moved_observation.notices
-        if "composition_role=initial_charge_only" in notice.reason
+        if INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
     ]
     assert len(moved_notices) == 1
     assert moved_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
@@ -2604,18 +2606,22 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
         moved_observation,
         quantity=Quantity.ACTIVITY_COEFFICIENT,
     )
-    assert moved_fo2 is None
+    assert moved_fo2 is not None
+    assert moved_fo2.route == "intrinsic_melt_fO2"
+    assert moved_fo2.tier == 4
+    assert moved_fo2.borrowed
     moved_prediction = predict_with_engine(
         Engine.OPENIMCC,
         moved_observation,
         experiment=moved_experiment,
     )
     assert moved_prediction.value is None
-    assert moved_prediction.refusal_reason is RefusalReason.INVALID_SOURCE
-    assert moved_prediction.refusal_detail["reason"] == "invalid_source"
-    gap, = moved_prediction.refusal_detail["gaps"]
-    assert gap["waypoint"] == "normalized_composition"
-    assert gap["reason"] == "unsupported_print_form"
+    assert moved_prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert (
+        moved_prediction.refusal_detail["reason"]
+        == "species_unmatched_in_engine_output"
+    )
+    assert moved_prediction.refusal_detail["formula"] == "K2O"
 
     na_kms = next(
         row
@@ -14088,6 +14094,129 @@ def test_activity_without_row_composition_uses_sample_numeric_pin(tmp_path: Path
         "SiO2": Decimal("0.40148624821939094"),
         "MgO": Decimal("0.5985137517806091"),
     }
+
+
+def _score_initial_charge_malformed_composition_path(
+    tmp_path: Path, *, path: str, malformed: bool
+):
+    values = {
+        "quantity": "activity",
+        "activity": 0.2,
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "composition_role": "initial_charge_only",
+        "composition_wt_pct": {"SiO2": 50, "MgO": 50},
+    }
+    malformed_map = {
+        "SiO2": "0.5",
+        "MgO": "not-a-number",
+        "CaO": "0.4",
+    }
+    if path == "scalar-row":
+        if malformed:
+            values["composition_mol"] = malformed_map
+    else:
+        item = {"T_K": 1773.15, "activity": 0.2}
+        if malformed:
+            item["composition_mol"] = malformed_map
+        values[path] = [item]
+    extract = _scalar_extract(
+        quantity="activity",
+        units="dimensionless",
+        values=values,
+        obs_type="activity_coefficient",
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "experiment": "sample",
+            "T_K": 1773.15,
+            "standard_state": "Raoultian pure liquid MgO",
+        }
+    )
+    extract["species"] = {"MgO": {"observations": [row]}}
+    extract["experiments"] = [
+        {
+            "experiment_id": "sample",
+            "sample": {
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {"SiO2": 50, "MgO": 50},
+                    },
+                    "locator": {"table": "1", "page": 1},
+                }
+            },
+        }
+    ]
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observations = tuple(result.observations.values())
+    assert len(observations) == 1, (path, malformed, observations)
+    observation = observations[0]
+    validation = result.validation
+    context = ScoreContext(
+        result.works,
+        result.experiments,
+        result.observations,
+        benches=result.benches,
+        hard_issues_by_observation=(
+            validation.hard_issues_by_observation if validation is not None else {}
+        ),
+    )
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.MELT_ACTIVITY,
+        include_diagnostics=False,
+    )
+    return observation, tuple(
+        residual
+        for residual in residuals
+        if residual.reference == observation.observation_id
+    )
+
+
+@pytest.mark.parametrize(
+    "path",
+    ["scalar-row", "points", "rows", "series"],
+    ids=["scalar-row", "child-point", "exploded-child", "series"],
+)
+def test_initial_charge_proxy_owner_preserves_malformed_input_across_all_call_paths(
+    tmp_path: Path, path: str
+) -> None:
+    malformed, refused = _score_initial_charge_malformed_composition_path(
+        tmp_path / "malformed", path=path, malformed=True
+    )
+    assert malformed.identity.composition is not None
+    assert malformed.identity.composition.is_unknown
+    assert refused
+    assert all(row.status is ResidualStatus.REFUSED for row in refused)
+    assert all(
+        row.refusal is not None
+        and row.refusal.reason is RefusalReason.INVALID_SOURCE
+        for row in refused
+    )
+
+    valid, scored = _score_initial_charge_malformed_composition_path(
+        tmp_path / "valid", path=path, malformed=False
+    )
+    composition_states = [valid.identity.composition]
+    point_composition = (valid.point_conditions or {}).get("composition")
+    if isinstance(point_composition, Located):
+        composition_states.append(point_composition.state)
+    assert any(
+        state is not None
+        and state.is_value
+        and isinstance(state.value, Composition)
+        and state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        for state in composition_states
+    ), (path, valid)
+    assert scored, path
+    assert all(
+        row.refusal is None
+        or row.refusal.reason is not RefusalReason.INVALID_SOURCE
+        for row in scored
+    ), (path, scored)
 
 
 @pytest.mark.parametrize("printed_marker", ["<0.01", "tr."])

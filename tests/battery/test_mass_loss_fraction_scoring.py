@@ -700,6 +700,13 @@ def test_hashimoto_table5_starting_composition_is_typed_on_each_point() -> None:
         for observation in observations
     } == {"1973.15", "2073.15", "2173.15", "2273.15"}
     for observation in observations:
+        assert observation.identity.quantity.is_unknown
+        identity_composition = observation.identity.composition
+        assert identity_composition is not None and identity_composition.is_value
+        assert (
+            identity_composition.value.proxy_flag
+            == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        )
         point_composition = (observation.point_conditions or {}).get("composition")
         assert point_composition is not None and point_composition.state.is_value
         point = point_composition.state.value

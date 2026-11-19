@@ -739,6 +739,9 @@ class Reaction:
 # datum describes a later (depleted) state; consumers may predict with it but
 # the residual is flagged (b-716).
 INITIAL_CHARGE_ONLY_PROXY_FLAG = "initial_charge_only"
+INITIAL_CHARGE_ONLY_PROXY_NOTICE = (
+    "composition = printed initial charge; run composition evolves during vaporization"
+)
 
 
 @dataclass(frozen=True)
