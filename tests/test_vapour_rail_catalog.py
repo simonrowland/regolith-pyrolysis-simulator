@@ -2457,9 +2457,19 @@ def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:
                 base_model["provenance"][0]["source_id"]
                 == "pseudo_psat_backsolved_from_vaporock"
             )
+            # Independent absolute pin: the pure-Fe Antoine sidecar gives
+            # p_Fe = 10**(10.670336 - 17759.430841/1800) = 6.367743083 Pa.
+            # NASA CEA Fe(g) + 0.5 O2(g) -> FeO(g) Gibbs rows at 1800 K give
+            # ΔG° = -80537.386803 J/mol, so Kp = exp(-ΔG°/(R*T)) = 217.3143885.
+            # Thus p_FeO = p_Fe*Kp*sqrt(pO2/1 bar), or 1383.802194 Pa at
+            # pO2=1 bar. Units: p is Pa, ΔG° is J/mol, and R is J/(mol K).
+            # Sanity: the 217-fold ratio drops tenfold when pO2 drops 100-fold.
             pressure_at_reference_o2 = evaluator.evaluate(
                 1800.0, pO2_bar=1.0
             ).pressure_pa
+            assert pressure_at_reference_o2 == pytest.approx(
+                1383.802194155564, rel=1e-12, abs=0.0
+            )
             for pO2_bar in (1.0e-9, 0.01):
                 evaluation = evaluator.evaluate(1800.0, pO2_bar=pO2_bar)
                 assert evaluation.pressure_pa / pressure_at_reference_o2 == pytest.approx(
