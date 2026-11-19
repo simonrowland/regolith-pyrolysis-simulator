@@ -8,6 +8,7 @@ import os
 import subprocess
 import sys
 import tempfile
+from collections.abc import Mapping
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -96,7 +97,15 @@ def _openimcc_thermo_observation(
     per: PerBasis = PerBasis.MOL_SPECIES,
     subtype: str | None = None,
     polymorph: Polymorph | None = None,
+    polymorph_spelling: str | None = None,
 ):
+    polymorph_state = State.of(polymorph) if polymorph is not None else None
+    if polymorph_spelling is not None:
+        from simulator.battery.polymorph_dictionary import (
+            unrecognised_polymorph_state,
+        )
+
+        polymorph_state = unrecognised_polymorph_state(polymorph_spelling)
     identity = F.o2_identity(temperature_K)
     identity = replace(
         identity,
@@ -104,7 +113,7 @@ def _openimcc_thermo_observation(
         species=Species(
             formula,
             phase,
-            polymorph=State.of(polymorph) if polymorph is not None else None,
+            polymorph=polymorph_state,
         ),
         per=State.of(per),
         reaction=State.not_applicable("pure standard-state thermo"),
@@ -700,6 +709,138 @@ def test_openimcc_named_crystal_refuses_unmatched_source_polymorph() -> None:
     assert f"source_table_id={native.source_table_id}" in prediction.execution.call_evidence
 
 
+def test_openimcc_phase_identity_matches_janaf_dictionary_for_default_crystals() -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack, species_thermo
+
+    from simulator.battery.polymorph_dictionary import (
+        _resolve_openimcc_phase_identity_polymorph,
+        polymorph_for_janaf_table_id,
+    )
+
+    datapack = load_gas_datapack()
+    crystal_rows = datapack.oxide_df[
+        datapack.oxide_df.index.astype(str).str.endswith("(cr)")
+    ]
+    assert not crystal_rows.empty
+    compared = 0
+    for species_name, row in crystal_rows.iterrows():
+        species_name = str(species_name)
+        formula = species_name.removesuffix("(cr)")
+        temperature_K = float(row["T_min"])
+        native = species_thermo(formula, "cr", temperature_K, datapack=datapack)
+        assert native.source_row_id == str(row["Ref"])
+        phase_identity = native.phase_identity
+        if not isinstance(phase_identity, Mapping):
+            continue
+        source_polymorph, subtype_unspecified = (
+            _resolve_openimcc_phase_identity_polymorph(
+                formula, phase_identity.get("polymorph")
+            )
+        )
+        assert not subtype_unspecified
+        janaf_polymorph = polymorph_for_janaf_table_id(
+            formula, native.source_row_id
+        )
+        if janaf_polymorph is None:
+            continue
+        assert source_polymorph is not None
+        assert source_polymorph is janaf_polymorph, (
+            formula,
+            native.source_row_id,
+            phase_identity.get("polymorph"),
+            source_polymorph,
+            janaf_polymorph,
+        )
+        compared += 1
+    assert compared > 0
+
+
+def test_openimcc_lam1987_phase_identity_does_not_use_enthalpy_reference_phase(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _require_openimcc()
+    from simulator.melt_backend import openimcc_bridge
+
+    common = {
+        "Cp_J_molK": 40.0,
+        "S_J_molK": 100.0,
+        "H_app_kJ_mol": -100.0,
+        "G_J_mol": -200000.0,
+        "source_row_id": "LAM1987",
+        "source_table_id": "LH87 Table 2",
+        "phase_identity": {
+            "polymorph": "cristobalite (low/high subtype not specified)",
+            "formation_enthalpy_reference_phase": "quartz (SiO2(QU))",
+            "formation_enthalpy_source_id": "LH87 Table 3",
+        },
+        "formation_enthalpy_source_id": "LH87 Table 3",
+        "T_min": 1000.0,
+        "T_max": 1996.0,
+        "derivatives_fit_implied": True,
+        "extrapolated": False,
+        "declared_interval_K": [1000.0, 1996.0],
+        "continuation": None,
+        "authority": "LH87 Table 2",
+    }
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "species_thermo",
+        lambda *_a, **_k: common,
+    )
+
+    generic = _openimcc_thermo_observation(
+        "openimcc-lam1987-generic-cristobalite",
+        "SiO2",
+        Phase.CR,
+        Quantity.CP,
+        Decimal("1500"),
+        polymorph_spelling="cristobalite",
+    )
+    quartz = _openimcc_thermo_observation(
+        "openimcc-lam1987-quartz-is-only-anchor-reference",
+        "SiO2",
+        Phase.CR,
+        Quantity.CP,
+        Decimal("1500"),
+        polymorph=Polymorph.QUARTZ,
+    )
+    named_high = _openimcc_thermo_observation(
+        "openimcc-lam1987-high-cristobalite-subtype-ambiguous",
+        "SiO2",
+        Phase.CR,
+        Quantity.CP,
+        Decimal("1500"),
+        polymorph=Polymorph.CRISTOBALITE_HIGH,
+    )
+
+    generic_prediction = predict_with_engine(Engine.OPENIMCC, generic)
+    quartz_prediction = predict_with_engine(Engine.OPENIMCC, quartz)
+    high_prediction = predict_with_engine(Engine.OPENIMCC, named_high)
+
+    assert generic_prediction.execution.state is ExecutionState.PRODUCED
+    assert generic_prediction.value == Decimal("40.0")
+    assert generic_prediction.execution.call_evidence is not None
+    assert "formation_enthalpy_source_id=LH87 Table 3" in (
+        generic_prediction.execution.call_evidence
+    )
+    assert "formation_enthalpy_reference_phase=quartz (SiO2(QU))" in (
+        generic_prediction.execution.call_evidence
+    )
+    assert quartz_prediction.refusal_detail["reason"] == (
+        "pure-phase-polymorph-unresolved"
+    )
+    assert high_prediction.refusal_detail["reason"] == (
+        "polymorph_subtype_unspecified"
+    )
+    assert high_prediction.refusal_detail["requested_polymorph"] == (
+        Polymorph.CRISTOBALITE_HIGH.value
+    )
+    assert high_prediction.refusal_detail["phase_identity_polymorph"] == (
+        "cristobalite (low/high subtype not specified)"
+    )
+
+
 def test_openimcc_missing_crystal_polymorph_keeps_typed_refusal() -> None:
     _require_openimcc()
 
@@ -748,14 +889,20 @@ def test_openimcc_non_janaf_crystal_source_refuses_named_polymorph() -> None:
 def test_openimcc_species_thermo_uses_source_dfh298_for_enthalpy_increment() -> None:
     _require_openimcc()
     from openimcc import load_gas_datapack, species_thermo
+    from simulator.battery.generators.janaf import _janaf_gas_dfh298_kJ_per_mol
 
     temperature_K = Decimal("2000")
     datapack = load_gas_datapack()
     native = species_thermo("FeO", "g", float(temperature_K), datapack=datapack)
     assert native.T_min > 298.15
     assert native.source_row_id == native.source_table_id == "Fe-021"
-    # NIST-JANAF Fe-021, row 298.15 K, delta-f H column (kJ/mol).
-    dfh298_kJ_mol = Decimal("251.040")
+    janaf_anchor = Decimal(
+        str(_janaf_gas_dfh298_kJ_per_mol("FeO", native.source_table_id))
+    )
+    engine_anchor = Decimal(str(native.formation_enthalpy_298_kJ_mol))
+    assert engine_anchor == janaf_anchor
+    assert native.formation_enthalpy_source_id == "Fe-021"
+    dfh298_kJ_mol = engine_anchor
     observation = _openimcc_thermo_observation(
         "openimcc-feo-g-h-minus-h298",
         "FeO",
@@ -775,6 +922,10 @@ def test_openimcc_species_thermo_uses_source_dfh298_for_enthalpy_increment() -> 
     assert prediction.unit == QUANTITY_UNITS[Quantity.H_MINUS_H298]
     assert prediction.execution.call_evidence is not None
     assert f"source_row_id={native.source_row_id}" in prediction.execution.call_evidence
+    assert (
+        "formation_enthalpy_source_id=Fe-021"
+        in prediction.execution.call_evidence
+    )
     assert "H(T)-H(T_ref)" in prediction.execution.call_evidence
 
 
@@ -792,7 +943,6 @@ def test_openimcc_enthalpy_source_anchor_is_resolved_after_native_cache_hit(
     engine_cache._close_connections()
     engine_cache._MEMORY_CACHE.clear()
     native_calls = []
-    anchors_kJ_mol = iter((Decimal("1.000"), Decimal("2.000")))
     props = SimpleNamespace(
         Cp_J_molK=42.0,
         S_J_molK=20.0,
@@ -800,6 +950,8 @@ def test_openimcc_enthalpy_source_anchor_is_resolved_after_native_cache_hit(
         G_J_mol=400.0,
         source_row_id="Fe-021",
         source_table_id="Fe-021",
+        formation_enthalpy_298_kJ_mol=1.0,
+        formation_enthalpy_source_id="Fe-021",
         T_interval=None,
         T_min=500.0,
         T_max=3000.0,
@@ -823,7 +975,7 @@ def test_openimcc_enthalpy_source_anchor_is_resolved_after_native_cache_hit(
     monkeypatch.setattr(
         janaf,
         "_janaf_gas_dfh298_kJ_per_mol",
-        lambda *_args: next(anchors_kJ_mol),
+        lambda *_args: pytest.fail("OpenIMCC anchor should own engine prediction"),
     )
     observation = _openimcc_thermo_observation(
         "openimcc-feo-g-h-minus-h298-cache-anchor",
@@ -843,7 +995,45 @@ def test_openimcc_enthalpy_source_anchor_is_resolved_after_native_cache_hit(
 
     assert native_calls == [True]
     assert first.value == Decimal("2.000")
-    assert second.value == Decimal("1.000")
+    assert second.value == Decimal("2.000")
+    assert first.execution.call_evidence is not None
+    assert "formation_enthalpy_source_id=Fe-021" in first.execution.call_evidence
+
+
+def test_openimcc_stable_crystal_continuation_is_predicted_and_flagged() -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack, species_thermo
+
+    datapack = load_gas_datapack()
+    native = species_thermo(
+        "Os", "cr", 3100.0, datapack=datapack, allow_extrapolation=True
+    )
+    assert native.extrapolated is True
+    assert native.declared_interval_K == (1200.0, 3000.0)
+    assert native.phase_identity is not None
+    observation = _openimcc_thermo_observation(
+        "openimcc-os-cr-stable-continuation",
+        "Os",
+        Phase.CR,
+        Quantity.CP,
+        Decimal("3100"),
+        polymorph=Polymorph.REFERENCE,
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    assert prediction.execution.state is ExecutionState.PRODUCED, (
+        prediction.refusal_detail
+    )
+    assert prediction.value == Decimal(str(native.Cp_J_molK))
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert len(prediction.notices) == 1
+    notice = prediction.notices[0]
+    assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert "declared_interval_K=[1200.0, 3000.0]" in notice.band
+    assert native.continuation in notice.reason
+    assert str(native.authority) in notice.reason
 
 
 def test_openimcc_species_thermo_gas_extrapolation_is_predicted_and_flagged() -> None:
@@ -936,18 +1126,24 @@ def test_openimcc_species_thermo_crystal_outside_interval_stays_typed() -> None:
 
     datapack = load_gas_datapack()
     inside = species_thermo("SiO2", "cr", 1500.0, datapack=datapack)
-    outside_temperature = Decimal(str(inside.T_max)) + Decimal("1")
+    outside_temperature = Decimal(str(inside.T_min)) - Decimal("1")
     with pytest.raises(ImccGasTemperatureOutsideDomainError) as refusal:
-        species_thermo("SiO2", "cr", float(outside_temperature), datapack=datapack)
+        species_thermo(
+            "SiO2",
+            "cr",
+            float(outside_temperature),
+            datapack=datapack,
+            allow_extrapolation=True,
+        )
     selected_interval = refusal.value.declared_interval_K
     assert selected_interval == (inside.T_min, inside.T_max)
     observation = _openimcc_thermo_observation(
-        "openimcc-sio2-quartz-outside-interval",
+        "openimcc-sio2-high-cristobalite-outside-stability",
         "SiO2",
         Phase.CR,
         Quantity.CP,
         outside_temperature,
-        polymorph=Polymorph.QUARTZ,
+        polymorph=Polymorph.CRISTOBALITE_HIGH,
     )
 
     prediction = predict_with_engine(Engine.OPENIMCC, observation)

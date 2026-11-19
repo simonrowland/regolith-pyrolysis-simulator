@@ -448,6 +448,30 @@ def polymorph_for_janaf_table_id(
     return None
 
 
+def _resolve_openimcc_phase_identity_polymorph(
+    formula: str, source_identity: object
+) -> tuple[Polymorph | None, bool]:
+    """Resolve a source phase label and report an unspecified cristobalite subtype."""
+
+    if not isinstance(source_identity, str) or not source_identity.strip():
+        return None, False
+    text = source_identity.strip()
+    folded = text.casefold()
+    if folded == "reference":
+        return Polymorph.REFERENCE, False
+    if folded == "cristobalite (low/high subtype not specified)":
+        return None, True
+    if folded == "high cristobalite":
+        return Polymorph.CRISTOBALITE_HIGH, False
+    if folded == "low cristobalite":
+        return Polymorph.CRISTOBALITE_LOW, False
+    if folded == "c1(ref)" or folded.endswith(
+        " elemental reference crystal (crystal structure not specified)"
+    ):
+        return Polymorph.REFERENCE, False
+    return resolve_formula_polymorph(formula, text), False
+
+
 def resolve_janaf_polymorph(
     *,
     formula: str,

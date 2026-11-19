@@ -71,6 +71,7 @@ from simulator.battery.identity import (
 from simulator.battery.polymorph_dictionary import (
     canonical_element_allotrope,
     polymorph_for_janaf_table_id,
+    _resolve_openimcc_phase_identity_polymorph,
     unrecognised_polymorph_spelling,
 )
 from simulator.battery.records import (
@@ -2635,7 +2636,12 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
             "pure-phase-phase-unsupported",
             {"engine": Engine.OPENIMCC.value, "phase": getattr(phase, "value", None)},
         )
-    if phase is Phase.CR and polymorph_token(identity.species) is None:
+    identity_poly = _poly_name(identity)
+    if (
+        phase is Phase.CR
+        and polymorph_token(identity.species) is None
+        and (identity_poly or "").strip().casefold() != "cristobalite"
+    ):
         return refuse(
             RefusalReason.UNSUPPORTED,
             "pure-phase-polymorph-unresolved",
@@ -2735,20 +2741,26 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
             RefusalReason.ATTEMPTED_UNAVAILABLE,
             "openimcc_species_thermo_provenance_missing",
         )
-    source_dfh298_J_mol = None
-    if phase is Phase.G and row_id == table_id:
-        try:
-            from simulator.battery.generators.janaf import (
-                _janaf_gas_dfh298_kJ_per_mol,
-            )
-
-            source_dfh298_kJ_mol = _janaf_gas_dfh298_kJ_per_mol(
-                formula, table_id
-            )
-            if source_dfh298_kJ_mol is not None:
-                source_dfh298_J_mol = float(source_dfh298_kJ_mol * 1000)
-        except (ImportError, OSError, ValueError):
-            source_dfh298_J_mol = None
+    source_dfh298_kJ_mol = _finite_number(
+        props.get("formation_enthalpy_298_kJ_mol")
+    )
+    source_dfh298_source_id = props.get("formation_enthalpy_source_id")
+    if (
+        not isinstance(source_dfh298_source_id, str)
+        or not source_dfh298_source_id.strip()
+    ):
+        source_dfh298_source_id = None
+    phase_identity = props.get("phase_identity")
+    formation_enthalpy_reference_phase = (
+        phase_identity.get("formation_enthalpy_reference_phase")
+        if isinstance(phase_identity, Mapping)
+        else None
+    )
+    if (
+        not isinstance(formation_enthalpy_reference_phase, str)
+        or not formation_enthalpy_reference_phase.strip()
+    ):
+        formation_enthalpy_reference_phase = None
     if (
         low is None
         or high is None
@@ -2782,11 +2794,25 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
                 "openimcc_species_thermo_extrapolation_notice_incomplete",
                 {"species": formula, "phase": phase_label, "source_row_id": row_id},
             )
+    enthalpy_metadata_evidence = (
+        f":formation_enthalpy_298_kJ_mol={source_dfh298_kJ_mol}"
+        if source_dfh298_kJ_mol is not None
+        else ""
+    )
+    if (
+        source_dfh298_source_id is not None
+        or formation_enthalpy_reference_phase is not None
+    ):
+        enthalpy_metadata_evidence += (
+            f":formation_enthalpy_source_id={source_dfh298_source_id}:"
+            f"formation_enthalpy_reference_phase={formation_enthalpy_reference_phase}"
+        )
     evidence = (
         f"openimcc.species_thermo:{formula}:source_row_id={row_id}:"
         f"source_table_id={table_id}:phase={phase_label}:"
         f"interval=[{props.get('T_min')},{props.get('T_max')}]:"
         f"derivatives_fit_implied={derivatives_fit}"
+        f"{enthalpy_metadata_evidence}"
     )
     extrapolation_notices: tuple[Notice, ...] = ()
     result_authority = Authority.BRIDGE
@@ -2807,19 +2833,82 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
         )
         result_authority = Authority.EXTRAPOLATED
 
-    identity_poly = _poly_name(identity)
     if phase is Phase.CR and identity_poly is not None:
-        # OpenIMCC's crystal rows identify the JANAF table rather than a
-        # polymorph label. Resolve that table through the canonical dictionary
-        # before comparing it with the requested named crystal.
-        source_polymorph = polymorph_for_janaf_table_id(formula, row_id)
-        if not _same_mineral(source_polymorph, identity_poly):
+        source_phase_name = (
+            phase_identity.get("polymorph")
+            if isinstance(phase_identity, Mapping)
+            else None
+        )
+        source_polymorph, cristobalite_subtype_unspecified = (
+            _resolve_openimcc_phase_identity_polymorph(formula, source_phase_name)
+        )
+        janaf_polymorph = polymorph_for_janaf_table_id(formula, row_id)
+        if (
+            isinstance(source_phase_name, str)
+            and janaf_polymorph is not None
+            and (
+                source_polymorph is None
+                or not _same_mineral(source_polymorph.value, janaf_polymorph.value)
+            )
+        ):
+            return refuse(
+                RefusalReason.UNSUPPORTED,
+                "openimcc_phase_identity_janaf_mismatch",
+                {
+                    "engine": Engine.OPENIMCC.value,
+                    "formula": formula,
+                    "phase_identity_polymorph": source_phase_name,
+                    "janaf_polymorph": janaf_polymorph.value,
+                    "source_row_id": row_id,
+                    "source_table_id": table_id,
+                },
+                evidence=evidence,
+            )
+        if cristobalite_subtype_unspecified:
+            requested_polymorph = str(identity_poly).strip().casefold()
+            if requested_polymorph == "cristobalite":
+                polymorph_matches = True
+            elif requested_polymorph in {
+                Polymorph.CRISTOBALITE_HIGH.value,
+                Polymorph.CRISTOBALITE_LOW.value,
+            }:
+                return refuse(
+                    RefusalReason.UNSUPPORTED,
+                    "polymorph_subtype_unspecified",
+                    {
+                        "engine": Engine.OPENIMCC.value,
+                        "formula": formula,
+                        "requested_polymorph": requested_polymorph,
+                        "phase_identity_polymorph": source_phase_name,
+                        "source_row_id": row_id,
+                        "source_table_id": table_id,
+                    },
+                    evidence=evidence,
+                )
+            else:
+                polymorph_matches = False
+        elif source_polymorph is not None:
+            polymorph_matches = _same_mineral(
+                source_polymorph.value, identity_poly
+            )
+        else:
+            polymorph_matches = (
+                isinstance(source_phase_name, str)
+                and source_phase_name.strip().casefold()
+                == str(identity_poly).casefold()
+            )
+        if not polymorph_matches:
             return refuse(
                 RefusalReason.UNSUPPORTED,
                 "pure-phase-polymorph-unresolved",
-                {"engine": Engine.OPENIMCC.value, "formula": formula,
-                 "polymorph": identity_poly, "source_row_id": row_id,
-                 "source_table_id": table_id},
+                {
+                    "engine": Engine.OPENIMCC.value,
+                    "formula": formula,
+                    "polymorph": identity_poly,
+                    "phase_identity_polymorph": source_phase_name,
+                    "source_row_id": row_id,
+                    "source_table_id": table_id,
+                },
                 evidence=evidence,
             )
 
@@ -2873,17 +2962,23 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
             evidence=evidence,
         )
 
-    dfh298 = _finite_number(source_dfh298_J_mol) if phase is Phase.G else None
-    if phase is Phase.G and dfh298 is None:
+    if phase is Phase.G and (
+        source_dfh298_kJ_mol is None or source_dfh298_source_id is None
+    ):
         return refuse(
             RefusalReason.UNSUPPORTED, "openimcc_source_enthalpy_anchor_missing",
-            {"species": formula, "phase": phase_label, "source_row_id": row_id},
+            {
+                "species": formula,
+                "phase": phase_label,
+                "source_row_id": row_id,
+                "formation_enthalpy_source_id": source_dfh298_source_id,
+            },
             evidence=evidence,
         )
     anchor_kJ = (
         Decimal(0)
-        if dfh298 is None
-        else as_decimal(str(dfh298)) / Decimal(1000)
+        if phase is not Phase.G or source_dfh298_kJ_mol is None
+        else as_decimal(str(source_dfh298_kJ_mol))
     )
     h_reference_increment = Decimal(0)
     if reference_call_required:
@@ -2915,8 +3010,8 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
     # same-phase H_app(T_ref) call within that row's interval. Algebra for
     # gas: H(T)-H(T_ref) = [H_app(T)-dfH298] - [H_app(T_ref)-dfH298]. For
     # condensates, subtract the same-source H_app(T_ref), so its stable-phase
-    # anchor cancels. Units: H_app is kJ/mol and dfH298 is J/mol; divide the
-    # gas anchor by 1000. Sanity: 3.0 kJ/mol - 1000 J/mol / 1000 = 2.0 kJ/mol.
+    # anchor cancels. Units: H_app and dfH298 are both kJ/mol. Sanity:
+    # 3.0 kJ/mol - 1.0 kJ/mol = 2.0 kJ/mol.
     value = as_decimal(str(h_target)) - anchor_kJ - h_reference_increment
     return ThermoAttempt(
         value=value, unit=QUANTITY_UNITS[quantity], authority=result_authority,

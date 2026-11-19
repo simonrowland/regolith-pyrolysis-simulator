@@ -1466,8 +1466,11 @@ def test_species_thermo_cache_request_covers_native_inputs(monkeypatch) -> None:
         S_J_molK=20.0,
         H_app_kJ_mol=3.0,
         G_J_mol=400.0,
-        source_row_id="JANAF-FeO-gas",
-        source_table_id="gas-janaf-4th",
+        source_row_id="Fe-021",
+        source_table_id="Fe-021",
+        phase_identity=None,
+        formation_enthalpy_298_kJ_mol=251.04,
+        formation_enthalpy_source_id="Fe-021",
         T_interval=(298.15, 6000.0),
         T_min=298.15,
         T_max=6000.0,
@@ -1502,27 +1505,35 @@ def test_species_thermo_cache_request_covers_native_inputs(monkeypatch) -> None:
     result = openimcc_bridge.species_thermo(
         "FeO", "g", 6001.0, allow_extrapolation=True
     )
+    strict_result = openimcc_bridge.species_thermo(
+        "FeO", "g", 6001.0, allow_extrapolation=False
+    )
 
-    assert result["source_row_id"] == "JANAF-FeO-gas"
+    assert result["source_row_id"] == "Fe-021"
+    assert result["phase_identity"] is None
+    assert result["formation_enthalpy_298_kJ_mol"] == 251.04
+    assert result["formation_enthalpy_source_id"] == "Fe-021"
     assert result["extrapolated"] is True
     assert result["T_interval"] == [298.15, 6000.0]
     assert result["declared_interval_K"] == [298.15, 6000.0]
     assert result["continuation"] == "Shomate fit continued above its declared interval"
     assert result["authority"] == "JANAF source row"
-    assert calls == [("FeO", "g", 6001.0, "default-gas-datapack", True)]
-    assert requests == [
-        (
-            "openimcc",
-            {
-                "call": "species_thermo",
-                "species": "FeO",
-                "phase": "g",
-                "T_K": 6001.0,
-                "datapack": "default",
-                "allow_extrapolation": True,
-            },
-        )
+    assert strict_result == result
+    assert calls == [
+        ("FeO", "g", 6001.0, "default-gas-datapack", True),
+        ("FeO", "g", 6001.0, "default-gas-datapack", False),
     ]
+    assert [engine for engine, _request in requests] == ["openimcc", "openimcc"]
+    assert requests[0][1]["allow_extrapolation"] is True
+    assert requests[1][1] == {
+        **requests[0][1],
+        "allow_extrapolation": False,
+    }
+    assert engine_cache.engine_cache_key(
+        "openimcc", engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"], requests[0][1]
+    ) != engine_cache.engine_cache_key(
+        "openimcc", engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"], requests[1][1]
+    )
 
 
 def test_species_thermo_hot_shape_is_cacheable(tmp_path, monkeypatch) -> None:
@@ -1539,17 +1550,23 @@ def test_species_thermo_hot_shape_is_cacheable(tmp_path, monkeypatch) -> None:
     props = SimpleNamespace(
         Cp_J_molK=42.0,
         S_J_molK=20.0,
-        H_app_kJ_mol=3.0,
+        H_app_kJ_mol=-500.0,
         G_J_mol=400.0,
-        source_row_id="JANAF-FeO-gas",
-        source_table_id="gas-janaf-4th",
-        T_interval=(298.15, 6000.0),
-        T_min=298.15,
-        T_max=6000.0,
-        derivatives_fit_implied=False,
-        extrapolated=True,
-        declared_interval_K=(298.15, 6000.0),
-        continuation="Shomate fit continued above its declared interval",
+        source_row_id="O-035",
+        source_table_id="O-035",
+        phase_identity={
+            "kind": "single_polymorph",
+            "polymorph": "high cristobalite",
+        },
+        formation_enthalpy_298_kJ_mol=-905.489,
+        formation_enthalpy_source_id="O-035",
+        T_interval=None,
+        T_min=1000.0,
+        T_max=1996.0,
+        derivatives_fit_implied=True,
+        extrapolated=False,
+        declared_interval_K=(1000.0, 1996.0),
+        continuation=None,
         authority="JANAF source row",
     )
     monkeypatch.setattr(
@@ -1566,10 +1583,10 @@ def test_species_thermo_hot_shape_is_cacheable(tmp_path, monkeypatch) -> None:
 
     try:
         cold = openimcc_bridge.species_thermo(
-            "FeO", "g", 6001.0, allow_extrapolation=True
+            "SiO2", "cr", 1500.0, allow_extrapolation=True
         )
         warm = openimcc_bridge.species_thermo(
-            "FeO", "g", 6001.0, allow_extrapolation=True
+            "SiO2", "cr", 1500.0, allow_extrapolation=True
         )
         counts = engine_cache.engine_cache_counters()["openimcc"]
     finally:
@@ -1577,8 +1594,14 @@ def test_species_thermo_hot_shape_is_cacheable(tmp_path, monkeypatch) -> None:
         engine_cache._MEMORY_CACHE.clear()
         engine_cache.engine_cache_counters(reset=True)
 
-    assert cold["T_interval"] == [298.15, 6000.0]
-    assert cold["declared_interval_K"] == [298.15, 6000.0]
+    assert cold["T_interval"] is None
+    assert cold["declared_interval_K"] == [1000.0, 1996.0]
+    assert cold["phase_identity"] == {
+        "kind": "single_polymorph",
+        "polymorph": "high cristobalite",
+    }
+    assert cold["formation_enthalpy_298_kJ_mol"] == -905.489
+    assert cold["formation_enthalpy_source_id"] == "O-035"
     assert warm == cold
     assert native_calls == [True]
     assert counts["stores"] == 1

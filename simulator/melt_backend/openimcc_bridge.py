@@ -1414,6 +1414,7 @@ def species_thermo(
         )
         source_row_id = getattr(props, "source_row_id", None)
         source_table_id = getattr(props, "source_table_id", None)
+        phase_identity = getattr(props, "phase_identity", None)
         interval = getattr(props, "T_interval", None)
         declared_interval = getattr(props, "declared_interval_K", None)
         return EngineCacheValue(
@@ -1424,6 +1425,17 @@ def species_thermo(
                 "G_J_mol": getattr(props, "G_J_mol", None),
                 "source_row_id": source_row_id,
                 "source_table_id": source_table_id,
+                "phase_identity": (
+                    dict(phase_identity)
+                    if isinstance(phase_identity, Mapping)
+                    else None
+                ),
+                "formation_enthalpy_298_kJ_mol": getattr(
+                    props, "formation_enthalpy_298_kJ_mol", None
+                ),
+                "formation_enthalpy_source_id": getattr(
+                    props, "formation_enthalpy_source_id", None
+                ),
                 "T_interval": (
                     list(interval)
                     if isinstance(interval, (tuple, list))
