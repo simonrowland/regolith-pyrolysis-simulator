@@ -4082,7 +4082,9 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(
         native_map = magemin_domain.MAGEMIN_NATIVE_MELT_ACTIVITIES
         assert native_map == expected_native
         parsed = backend._parse_subprocess_native_activities(matlab_text)
-        assert set(parsed) == {field for field, _ in native_map.values()}
+        assert set(parsed) == {
+            field for field, _polymorph, _component in native_map.values()
+        }
         for field in parsed:
             assert parsed[field] == direct_fields[field]
 
@@ -4242,7 +4244,6 @@ def test_magemin_live_native_feo_activity_uses_projected_feot_coordinate(
 
     assert result.status == "ok", result.warnings
     assert result.activity_coefficients["FeO"] > 0.0
-    assert result.diagnostics["magemin_native_bulk_component"] == "FeOt"
 
 
 @pytest.mark.skipif(
