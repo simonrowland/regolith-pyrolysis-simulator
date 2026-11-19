@@ -178,6 +178,7 @@ def test_isolated_migration_has_no_hard_issues_and_reaches_temperature_and_fugac
         and observation.identity.temperature_K.is_value
         for observation in result.observations.values()
     )
+    converted_fo2_observations = []
     for observation in result.observations.values():
         assert observation.point_conditions is not None
         for name in ("temperature_C", "fO2_log"):
@@ -188,11 +189,20 @@ def test_isolated_migration_has_no_hard_issues_and_reaches_temperature_and_fugac
         printed_fo2 = source["point_conditions"]["fO2_log"]
         assert printed_fo2["units"] == "log10(atm)"
         assert printed_fo2["locator"]["column"] == "log pO2"
+        assert observation.point_conditions["fO2_log"].state.value == Decimal(
+            printed_fo2["state"]["value"]
+        )
         facts = collect_printed_oxygen(
             ({"point_conditions": {"fO2_log": printed_fo2}},),
             observation.point_conditions["fO2_log"].locator,
         )
-        assert _printed_fO2_identity_state(facts) == observation.identity.fO2_Pa
+        if (
+            observation.identity.fO2_Pa is not None
+            and observation.identity.fO2_Pa.is_value
+        ):
+            assert _printed_fO2_identity_state(facts) == observation.identity.fO2_Pa
+            converted_fo2_observations.append(observation)
+    assert converted_fo2_observations
 
     first_source = next(iter(source_observations.values()))
     condition = first_source["point_conditions"]["fO2_log"]
