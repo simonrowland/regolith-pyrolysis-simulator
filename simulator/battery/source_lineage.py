@@ -15,15 +15,27 @@ from importlib import resources
 OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX = (
     "openimcc-index-vocabulary:mismatch;"
 )
+OPENIMCC_INDEX_VOCABULARY_UNVERIFIED_PREFIX = (
+    "openimcc-index-vocabulary:unverified;"
+)
+OPENIMCC_LINEAGE_GAP_PREFIX = "openimcc-lineage-gap:"
+OPENIMCC_LINEAGE_SUMMARY_SCOPE_UNRESOLVED_PREFIX = (
+    "openimcc-lineage:summary-scope-unresolved;"
+)
+_SUMMARY_SCOPE_UNRESOLVED = "summary-scope-unresolved"
 OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX = (
     "openimcc-review-gamma-row-withheld;"
 )
+OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX = "openimcc-review-gamma-source-row:"
 OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE = "withheld"
 OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX = (
     "openimcc-coefficient-lineage-unmatched;"
 )
 OPENIMCC_LINEAGE_CAVEAT_PREFIXES = (
     OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
+    OPENIMCC_INDEX_VOCABULARY_UNVERIFIED_PREFIX,
+    OPENIMCC_LINEAGE_GAP_PREFIX,
+    OPENIMCC_LINEAGE_SUMMARY_SCOPE_UNRESOLVED_PREFIX,
     OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
     OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX,
 )
@@ -36,7 +48,10 @@ OPENIMCC_PROVENANCE_PREFIXES: tuple[str, ...] = (
     "openimcc-condensate-table:",
     "openimcc-gas-table:",
     "openimcc-index-vocabulary:",
+    OPENIMCC_LINEAGE_GAP_PREFIX,
+    OPENIMCC_LINEAGE_SUMMARY_SCOPE_UNRESOLVED_PREFIX,
     OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+    OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX,
     OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX,
 )
 
@@ -45,6 +60,11 @@ _OPENIMCC_ENGINE_IDENTITY_FIELDS: tuple[tuple[str, str], ...] = (
     ("openimcc-melt-binding", "melt_binding_digest"),
     ("openimcc-condensate-table", "condensate_table_digest"),
     ("openimcc-gas-table", "gas_table_digest"),
+)
+_SUMMARY_CITATION_RE = re.compile(
+    r"\bsummari[sz]ed\s+in(?:\s+(?P<work>.*?))?"
+    r"(?=,\s*(?:tables?|pp?\.?)(?:\s|$)|$)",
+    re.I,
 )
 
 
@@ -96,11 +116,17 @@ def _openimcc_index_vocabulary_flag() -> str | None:
             .read_text(encoding="utf-8")
         )
     except (FileNotFoundError, ImportError, ModuleNotFoundError, OSError, ValueError):
-        return "openimcc-index-vocabulary:manifest-unavailable"
+        return (
+            OPENIMCC_INDEX_VOCABULARY_UNVERIFIED_PREFIX
+            + "reason=manifest_unavailable"
+        )
     snapshot = manifest.get("vocabulary_snapshot")
     pinned_commit = snapshot.get("commit") if isinstance(snapshot, Mapping) else None
     if not isinstance(pinned_commit, str) or not pinned_commit:
-        return "openimcc-index-vocabulary:manifest-commit-missing"
+        return (
+            OPENIMCC_INDEX_VOCABULARY_UNVERIFIED_PREFIX
+            + "reason=manifest_commit_missing"
+        )
 
     try:
         result = subprocess.run(
@@ -112,16 +138,36 @@ def _openimcc_index_vocabulary_flag() -> str | None:
             timeout=2,
         )
     except (OSError, subprocess.TimeoutExpired):
-        return f"openimcc-index-vocabulary:current-commit-unavailable;manifest={pinned_commit}"
+        return (
+            OPENIMCC_INDEX_VOCABULARY_UNVERIFIED_PREFIX
+            + f"reason=current_commit_unavailable;manifest={pinned_commit}"
+        )
     current_commit = result.stdout.strip()
     if result.returncode != 0 or not current_commit:
-        return f"openimcc-index-vocabulary:current-commit-unavailable;manifest={pinned_commit}"
+        return (
+            OPENIMCC_INDEX_VOCABULARY_UNVERIFIED_PREFIX
+            + f"reason=current_commit_unavailable;manifest={pinned_commit}"
+        )
     if current_commit.startswith(pinned_commit):
         return None
     return (
         OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX
         + f"manifest={pinned_commit};current={current_commit}"
     )
+
+
+def openimcc_index_vocabulary_caveat_flag() -> str | None:
+    """Return mismatch or failed-verification flags as caveats, not ancestry."""
+
+    flag = _openimcc_index_vocabulary_flag()
+    if flag is not None and flag.startswith(
+        (
+            OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
+            OPENIMCC_INDEX_VOCABULARY_UNVERIFIED_PREFIX,
+        )
+    ):
+        return flag
+    return None
 
 
 def _work_ids_from_rows(rows: object) -> tuple[str, ...]:
@@ -135,6 +181,22 @@ def _work_ids_from_rows(rows: object) -> tuple[str, ...]:
         if isinstance(source, Mapping)
         if isinstance((work_id := source.get("work_id")), str) and work_id
     }))
+
+
+def _fragment_row_by_id(
+    artifact: Mapping[str, object] | None, source_row_id: str
+) -> Mapping[str, object] | None:
+    rows = artifact.get("rows") if artifact is not None else None
+    if not isinstance(rows, Sequence) or isinstance(rows, str):
+        return None
+    return next(
+        (
+            row
+            for row in rows
+            if isinstance(row, Mapping) and row.get("id") == source_row_id
+        ),
+        None,
+    )
 
 
 @lru_cache(maxsize=128)
@@ -313,8 +375,39 @@ def _page_ranges(
     }
 
 
+def _summary_work_resolution(
+    citation: str,
+    source_work_ids: Sequence[str],
+) -> tuple[bool, str | None]:
+    """Resolve a summarized-in citation to one source work in the same row."""
+
+    _head, marker, locator = citation.partition("locator:")
+    if not marker:
+        return False, None
+    match = _SUMMARY_CITATION_RE.search(locator)
+    if match is None:
+        return False, None
+    cited_tokens = {
+        token.casefold()
+        for token in re.findall(r"[A-Za-z]+|\d{4}", match.group("work") or "")
+        if token.casefold() not in {"et", "al"}
+    }
+    if not cited_tokens:
+        return True, None
+    candidates = [
+        work_id
+        for work_id in source_work_ids
+        if cited_tokens.issubset(
+            {token.casefold() for token in re.findall(r"[A-Za-z]+|\d{4}", work_id)}
+        )
+    ]
+    return True, candidates[0] if len(candidates) == 1 else None
+
+
 def _locator_scope_from_citation(
-    citation: object, *, row_id: object = None
+    citation: object,
+    *,
+    row_id: object = None,
 ) -> tuple[str, ...] | None:
     """Parse locator tokens, treating citations without them as work-wide."""
 
@@ -361,20 +454,94 @@ def _locator_scope_from_citation(
     return ("work",)
 
 
+def _table_page_scopes(scopes: Sequence[str] | None) -> set[str]:
+    """Keep only locator tokens that establish a bounded record scope."""
+
+    return {
+        scope
+        for scope in scopes or ()
+        if scope.startswith(("table:", "page:"))
+    }
+
+
 def _row_source_scopes(row: Mapping[str, object]) -> dict[str, tuple[str, ...] | None]:
     scopes: dict[str, tuple[str, ...] | None] = {}
     sources = row.get("sources", ())
     if not isinstance(sources, Sequence) or isinstance(sources, str):
         return scopes
-    for source in sources:
-        if not isinstance(source, Mapping):
+    source_entries = tuple(source for source in sources if isinstance(source, Mapping))
+    source_work_ids = tuple(
+        sorted(
+            {
+                work_id
+                for source in source_entries
+                if isinstance((work_id := source.get("work_id")), str) and work_id
+            }
+        )
+    )
+    citations_by_work: dict[str, list[str]] = {}
+    for source in source_entries:
+        work_id = source.get("work_id")
+        citation = source.get("citation")
+        if isinstance(work_id, str) and work_id and isinstance(citation, str):
+            citations_by_work.setdefault(work_id, []).append(citation)
+    summaries = tuple(
+        _summary_work_resolution(citation, source_work_ids)
+        if isinstance((citation := source.get("citation")), str)
+        else (False, None)
+        for source in source_entries
+    )
+    unresolved_summary_targets: set[str] = set()
+    unresolved_summary_sources: set[str] = set()
+    for source, (is_summary, summary_work_id) in zip(source_entries, summaries):
+        if not is_summary:
             continue
+        source_work_id = source.get("work_id")
+        if not isinstance(source_work_id, str) or not source_work_id:
+            continue
+        if summary_work_id is None:
+            unresolved_summary_sources.add(source_work_id)
+            continue
+        if source_work_id == summary_work_id:
+            # The summarized-in citation is already filed on the work whose
+            # table/page it names, so its locator scopes that source directly.
+            continue
+        citation = source.get("citation")
+        cited_scopes = _locator_scope_from_citation(citation, row_id=row.get("id"))
+        cited_locator_scopes = _table_page_scopes(cited_scopes)
+        corroborating_scopes: set[str] = set()
+        for own_citation in citations_by_work.get(summary_work_id, ()):
+            own_is_summary, _own_summary_work_id = _summary_work_resolution(
+                own_citation, source_work_ids
+            )
+            if own_is_summary:
+                continue
+            own_scopes = _locator_scope_from_citation(
+                own_citation, row_id=row.get("id")
+            )
+            corroborating_scopes.update(_table_page_scopes(own_scopes))
+        if not cited_locator_scopes or not cited_locator_scopes.issubset(
+            corroborating_scopes
+        ):
+            unresolved_summary_targets.add(summary_work_id)
+
+    for source, (is_summary, summary_work_id) in zip(source_entries, summaries):
         work_id = source.get("work_id")
         if not isinstance(work_id, str) or not work_id:
             continue
-        scope = _locator_scope_from_citation(
-            source.get("citation"), row_id=row.get("id")
-        )
+        citation = source.get("citation")
+        if work_id in unresolved_summary_targets:
+            scope = ("unparsed", _SUMMARY_SCOPE_UNRESOLVED)
+        elif work_id in unresolved_summary_sources:
+            scope = ("work", _SUMMARY_SCOPE_UNRESOLVED)
+        elif (
+            is_summary
+            and summary_work_id is not None
+            and work_id != summary_work_id
+        ):
+            scope = ("work",)
+        else:
+            scope = _locator_scope_from_citation(citation, row_id=row.get("id"))
         if work_id not in scopes:
             scopes[work_id] = scope
         elif scopes[work_id] is None or scope is None:
@@ -384,14 +551,39 @@ def _row_source_scopes(row: Mapping[str, object]) -> dict[str, tuple[str, ...] |
     return scopes
 
 
+def _unresolved_summary_scope_flags(rows: object) -> tuple[str, ...]:
+    """Return prediction caveats for summary locators lacking row corroboration."""
+
+    if not isinstance(rows, Sequence) or isinstance(rows, str):
+        return ()
+    flags = {
+        f"{OPENIMCC_LINEAGE_SUMMARY_SCOPE_UNRESOLVED_PREFIX}"
+        f"row={row.get('id') or 'unknown'};work_id={work_id}"
+        for row in rows
+        if isinstance(row, Mapping)
+        for work_id, scopes in _row_source_scopes(row).items()
+        if scopes is not None and _SUMMARY_SCOPE_UNRESOLVED in scopes
+    }
+    return tuple(sorted(flags))
+
+
 @lru_cache(maxsize=32)
 def openimcc_species_source_locator_scopes(
     species_formula: str | None,
+    source_row_id: str | None = None,
 ) -> Mapping[str, tuple[str, ...]]:
-    """Return candidate-row scopes, marking work IDs withheld from some rows."""
+    """Return selected-row scopes or candidate scopes with withheld work IDs."""
 
     artifacts = _openimcc_coefficient_ancestry()
     artifact = _species_fragment_artifact(artifacts, species_formula)
+    if source_row_id is not None:
+        row = _fragment_row_by_id(artifact, source_row_id)
+        if row is None:
+            return {}
+        return {
+            work_id: scopes if scopes is not None else ("unparsed",)
+            for work_id, scopes in _row_source_scopes(row).items()
+        }
     rows = artifact.get("rows") if artifact is not None else None
     return {
         work_id: scopes
@@ -458,13 +650,14 @@ def openimcc_pack_coefficient_sources(
     pack_digest: object = None,
     *,
     species_formula: str | None = None,
+    source_row_id: str | None = None,
 ) -> tuple[str, ...]:
     """Resolve manifest work IDs, retaining a version alias only for legacy packs.
 
     The active OpenIMCC evaluator does not expose the D066 interaction rows
     used by a major-oxide output, so that artifact's work-ID union is the
-    pack-level fallback for its major oxides. Trace fragments use only work
-    IDs shared by every candidate manifest row until row identity is exposed.
+    pack-level fallback for its major oxides. Trace fragments use a selected
+    row when supplied and use the work-ID intersection only as a fallback.
     """
 
     version = pack_version if isinstance(pack_version, str) and pack_version else None
@@ -526,10 +719,24 @@ def openimcc_pack_coefficient_sources(
         is_major_oxide = species_formula in parent_oxides
 
     flags: set[str] = set()
+    if source_row_id is not None:
+        row = _fragment_row_by_id(fragment, source_row_id)
+        sources = set(_work_ids_from_rows((row,))) if row is not None else set()
+        flags.update(
+            _unresolved_summary_scope_flags((row,) if row is not None else ())
+        )
+        if not sources:
+            flags.add(
+                f"{OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX}"
+                f"formula={species_formula or 'missing'};row={source_row_id}"
+            )
+        sources.add(f"{OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX}{source_row_id}")
+        return tuple(sorted(sources | flags))
     if fragment_matches and fragment is not None:
         withheld_flag = _withheld_fragment_flag(fragment, fragment_rows)
         if withheld_flag is not None:
             flags.add(withheld_flag)
+        flags.update(_unresolved_summary_scope_flags(fragment_rows))
     if is_fragment and not fragment_matches:
         flags.add(
             f"{OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX}"
@@ -569,10 +776,61 @@ def openimcc_pack_coefficient_sources(
                 f"formula={species_formula}"
             )
     sources.update(flags)
-    flag = _openimcc_index_vocabulary_flag()
-    if flag is not None:
-        sources.add(flag)
     return tuple(sorted(sources))
+
+
+def openimcc_sources_with_activity_row_identity(
+    coefficient_sources: Sequence[str],
+    pack_version: object | None,
+    pack_digest: object,
+    *,
+    species_formula: str | None,
+    activity_coefficient_details: object,
+) -> tuple[str, ...]:
+    """Replace fallback fragment lineage with the evaluated row's works."""
+
+    if not isinstance(activity_coefficient_details, Mapping):
+        return tuple(coefficient_sources)
+    element = _single_cation_element(species_formula)
+    if element is None:
+        return tuple(coefficient_sources)
+    row_ids = {
+        str(detail["source_row_id"])
+        for component, detail in activity_coefficient_details.items()
+        if isinstance(detail, Mapping)
+        and isinstance(detail.get("source_row_id"), str)
+        and detail.get("source_row_id")
+        and _single_cation_element(str(component)) == element
+    }
+    if not row_ids:
+        return tuple(coefficient_sources)
+
+    base_sources = openimcc_pack_coefficient_sources(
+        pack_version,
+        pack_digest,
+        species_formula=species_formula,
+    )
+    preserved_sources = tuple(
+        source for source in coefficient_sources if source not in base_sources
+    )
+    if len(row_ids) == 1:
+        row_sources = openimcc_pack_coefficient_sources(
+            pack_version,
+            pack_digest,
+            species_formula=species_formula,
+            source_row_id=next(iter(row_ids)),
+        )
+    else:
+        row_sources = (
+            f"{OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX}"
+            f"formula={species_formula};ambiguous_source_rows="
+            f"{','.join(sorted(row_ids))}",
+            *(
+                f"{OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX}{row_id}"
+                for row_id in sorted(row_ids)
+            ),
+        )
+    return tuple(dict.fromkeys((*preserved_sources, *row_sources)))
 
 
 def openimcc_redox_coefficient_sources(
@@ -610,4 +868,40 @@ def coefficient_lineage_sources(sources: Sequence[str]) -> tuple[str, ...]:
         source
         for source in sources
         if not any(source.startswith(prefix) for prefix in OPENIMCC_PROVENANCE_PREFIXES)
+    )
+
+
+def _openimcc_has_lineage_provenance(sources: Sequence[str]) -> bool:
+    """Whether a source tuple includes OpenIMCC metadata or lineage markers."""
+
+    return any(
+        source.startswith(OPENIMCC_PROVENANCE_PREFIXES)
+        for source in sources
+    )
+
+
+def openimcc_missing_index_work_ids(
+    sources: Sequence[str],
+    indexed_works: Mapping[str, object],
+) -> tuple[str, ...]:
+    """Find manifest work sources absent from the INDEX used for scoring."""
+
+    candidate_sources = set(coefficient_lineage_sources(sources))
+    if not candidate_sources:
+        return ()
+    manifest_work_ids: set[str] = set()
+    for artifact in _openimcc_coefficient_ancestry():
+        work_ids = artifact.get("work_ids")
+        if isinstance(work_ids, Sequence) and not isinstance(work_ids, str):
+            manifest_work_ids.update(
+                work_id for work_id in work_ids
+                if isinstance(work_id, str) and work_id
+            )
+        manifest_work_ids.update(_work_ids_from_rows(artifact.get("rows")))
+    return tuple(
+        sorted(
+            work_id
+            for work_id in candidate_sources & manifest_work_ids
+            if work_id not in indexed_works
+        )
     )
