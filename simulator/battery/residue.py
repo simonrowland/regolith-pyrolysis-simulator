@@ -4327,7 +4327,10 @@ def _predict_sossi_residue_cohort(
                 if base is None:
                     try:
                         activity_composition, activity_input_policy = (
-                            openimcc_bridge._cleaned_melt_policy(composition)
+                            openimcc_bridge._cleaned_melt_policy(
+                                composition,
+                                pack=openimcc_bridge.DEFAULT_BACKEND_PACK_NAME,
+                            )
                         )
                         melt_activity_input_policy.update(activity_input_policy)
                         timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
@@ -4367,44 +4370,61 @@ def _predict_sossi_residue_cohort(
                     )
                     gas_parent_oxides = tuple(state.parent_oxides)
                     if mno_channel_active:
-                        from simulator.chemistry.melt_activity import (
-                            melt_oxide_activity,
+                        mno_parent_activity = gas_parent_oxide_activities.get(
+                            "MnO"
                         )
+                        if mno_parent_activity is not None:
+                            mno_parent_activity = float(mno_parent_activity)
+                            mno_activity = None
+                        else:
+                            from simulator.chemistry.melt_activity import (
+                                melt_oxide_activity,
+                            )
 
-                        mno_activity = melt_oxide_activity(
-                            "MnO", composition, temperature_K=temperature_K
-                        )
-                        if mno_activity is None:
-                            raise ResidueInventoryRefusal(
-                                "melt_activity_unavailable",
-                                "OpenIMCC Mn gas channel needs a caller-supplied MnO activity",
+                            mno_activity = melt_oxide_activity(
+                                "MnO", composition, temperature_K=temperature_K
                             )
-                        mno_parent_activity = (
-                            mno_activity.thermodynamic_parent_activity()
-                        )
-                        if (
-                            not math.isfinite(mno_parent_activity)
-                            or mno_parent_activity < 0.0
-                        ):
-                            raise ResidueInventoryRefusal(
-                                "melt_activity_invalid",
-                                f"MnO activity extension returned {mno_parent_activity!r}",
+                            if mno_activity is None:
+                                raise ResidueInventoryRefusal(
+                                    "melt_activity_unavailable",
+                                    "OpenIMCC Mn gas channel needs an MnO activity",
+                                )
+                            mno_parent_activity = (
+                                mno_activity.thermodynamic_parent_activity()
                             )
+                            if (
+                                not math.isfinite(mno_parent_activity)
+                                or mno_parent_activity < 0.0
+                            ):
+                                raise ResidueInventoryRefusal(
+                                    "melt_activity_invalid",
+                                    f"MnO activity extension returned {mno_parent_activity!r}",
+                                )
                         gas_parent_oxide_activities["MnO"] = mno_parent_activity
-                        gas_parent_oxides += ("MnO",)
-                        melt_activity_extensions.setdefault(
-                            "MnO",
-                            {
-                                "reason": (
-                                    "MnO is outside the IMCC-SF04 melt-activity domain; "
-                                    "the simulator constant-gamma extension supplies the "
-                                    "activity required by the new Mn gas channel"
-                                ),
-                                "authority_level": mno_activity.evidence_tier,
-                                "certified_band_K": mno_activity.valid_range_K,
-                                "activity_provenance": mno_activity.provenance(),
-                            },
-                        )
+                        if "MnO" not in gas_parent_oxides:
+                            gas_parent_oxides += ("MnO",)
+                        if mno_activity is not None:
+                            pack_name = openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+                            if pack_name == "published-core":
+                                reason = (
+                                    "pack_compatibility_fallback: MnO redox trace "
+                                    "activity is incompatible with the published-core "
+                                    "melt pack and installed redox pack"
+                                )
+                            else:
+                                reason = (
+                                    "OpenIMCC did not publish an MnO trace activity; "
+                                    "the simulator gamma extension supplies the gas input"
+                                )
+                            melt_activity_extensions.setdefault(
+                                "MnO",
+                                {
+                                    "reason": reason,
+                                    "authority_level": mno_activity.evidence_tier,
+                                    "certified_band_K": mno_activity.valid_range_K,
+                                    "activity_provenance": mno_activity.provenance(),
+                                },
+                            )
                     gas_result = openimcc_bridge.evaluate_gas(
                         gas_parent_oxide_activities,
                         temperature_K,
