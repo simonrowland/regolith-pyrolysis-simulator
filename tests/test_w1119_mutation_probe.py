@@ -8,8 +8,8 @@ import pytest
 def test_native_feot_coordinate_regression_kills_source_label_mutant(
     request, monkeypatch
 ):
-    import test_magemin_backend as backend_tests
     from engines.magemin import domain
+    from tests import test_magemin_backend as backend_tests
 
     mutant = dict(domain.MAGEMIN_NATIVE_MELT_ACTIVITIES)
     field, polymorph, _component = mutant["FeO"]
@@ -25,8 +25,10 @@ def test_native_feot_coordinate_regression_kills_source_label_mutant(
 def test_score_pressure_route_regression_kills_dropped_pressure_mutant(
     monkeypatch,
 ):
-    import test_melt_activity_requirements as activity_tests
     from simulator.battery.generators import bench as bench_module
+    from tests.battery import (
+        test_melt_activity_requirements as activity_tests,
+    )
 
     original = bench_module.activity_request_for_engine
 
