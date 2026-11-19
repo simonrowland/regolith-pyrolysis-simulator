@@ -2658,8 +2658,10 @@ def _solve_vapor_engine_cell_oxygen_balance(
                 and exc.reason_code == REFUSAL_ENGINE_CRASH
                 and engine_reason == ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH
             ):
-                # AlphaMELTS refuses this composition at any pO2. Keep the
-                # number of rejected grid points in the residual diagnostic.
+                # The guard is composition-wide. The first refusal implies the
+                # same outcome for every log10(pO2/bar) from -30 to 0 inclusive
+                # (0 - (-30) + 1 = 31). Count rejected grid points, including
+                # the first one, so the residual diagnostic is unchanged.
                 starting_refusal_counts[guard_reason] = len(starting_grid)
                 break
             starting_refusal_counts[guard_reason] = (
