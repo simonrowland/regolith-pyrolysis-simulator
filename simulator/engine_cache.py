@@ -307,7 +307,7 @@ def cacheable_refusal(result) -> bool:
     )
 
 ENGINE_CHEMISTRY_VERSION = {
-    "openimcc": 2,
+    "openimcc": 3,
     "internal-analytical": 3,
     "vaporock": 1,
     "magemin": 3,

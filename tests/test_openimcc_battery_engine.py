@@ -2978,14 +2978,8 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
         packaged_melt.parent_oxides, packaged._gas
     )
     assert packaged_omissions == {}
-    expected_omissions = {
-        "Na2O": "Na2O(g)",
-        "K2O": "K2O(g)",
-        "Ti": "TiO2(l)",
-        "TiO": "TiO2(l)",
-        "TiO2": "TiO2(l)",
-    }
-    assert set(expected_omissions) <= set(mutated_gas_result.omitted_channels)
+    expected_omissions = {"K2O": "K2O(g)"}
+    assert set(mutated_gas_result.omitted_channels) == set(expected_omissions)
     for channel, missing_row in expected_omissions.items():
         reason = mutated_gas_result.omitted_channels[channel]
         assert "missing from active table" in reason
