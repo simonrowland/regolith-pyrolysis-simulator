@@ -139,10 +139,16 @@ def test_tables_match_rendered_rows_and_migrate_all_typed_values_as_points() -> 
     ]
     assert len(ion_rows) == 45
     for _formula, row in ion_rows:
+        assert row["uncertainty"] is None
         migrated = migrator.result.observations[
             f"{EXTRACT.stem}::{row['observation_id']}"
         ]
-        assert migrated.uncertainty.kind is UncertaintyKind.PRINTED
+        assert migrated.uncertainty.kind is UncertaintyKind.NONE
+        assert migrated.locator is not None
+        assert row["locator"]["note"] == (
+            "No numeric uncertainty is printed for this ion-current or ratio cell."
+        )
+        assert row["locator"]["note"] in migrated.locator.note
 
     ratios = [
         (row["values"]["x_SiO2_as_printed"], row["values"]["ion_intensity_ratio"])
