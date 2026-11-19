@@ -27,6 +27,7 @@ from simulator.battery.migrate import (
     _printed_mass_percent_map_refusal,
     _printed_composition_map as _migration_printed_composition_map,
     _unrecognized_printed_chemical_components,
+    invalid_run_composition,
 )
 from simulator.battery.records import (
     Bench,
@@ -437,10 +438,10 @@ def charge_moles_by_species(
             if key in conditions
         }
         row_composition = conditions.get("composition")
-        # An unknown run composition cannot replace the loaded charge.
-        if (
-            isinstance(row_composition, Located)
-            and not row_composition.state.is_unknown
+        # Invalid run maps do not replace a charge; printed blanks still do.
+        if isinstance(row_composition, Located) and not (
+            row_composition.state.is_unknown
+            and invalid_run_composition(row_composition.state)
         ):
             if row_composition.state.is_value:
                 if not isinstance(row_composition.state.value, Composition):
