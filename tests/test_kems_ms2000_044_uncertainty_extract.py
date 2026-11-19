@@ -64,4 +64,14 @@ def test_admitted_table1_activities_migrate_with_no_printed_uncertainty() -> Non
         and row["values"].get("method_class") != "measured_direct"
     ]
     assert len(model_rows) == 24
-    assert all(row["uncertainty"] is not None for row in model_rows)
+    for _formula, source in model_rows:
+        assert source["uncertainty"] is None
+        migrated = migrator.result.observations[
+            f"{document['source_id']}::{source['observation_id']}"
+        ]
+        assert migrated.uncertainty.kind is UncertaintyKind.NONE
+        assert migrated.locator is not None
+        assert source["locator"]["note"] == (
+            "Table 1 states no uncertainty for this point."
+        )
+        assert source["locator"]["note"] in migrated.locator.note
