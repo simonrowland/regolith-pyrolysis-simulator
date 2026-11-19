@@ -25,7 +25,7 @@ def test_native_feot_coordinate_regression_kills_source_label_mutant(
     monkeypatch.setattr(domain, "MAGEMIN_NATIVE_MELT_ACTIVITIES", mutant)
 
     with pytest.raises(AssertionError):
-        backend_tests.test_magemin_live_native_feo_activity_uses_projected_feot(
+        backend_tests.test_magemin_live_native_feo_activity_uses_projected_feot_coordinate(
             request, "Fe2O3"
         )
 
