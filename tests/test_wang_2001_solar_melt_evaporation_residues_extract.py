@@ -4,7 +4,6 @@ from collections import Counter, defaultdict
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
-import re
 
 import pytest
 import yaml
@@ -253,10 +252,8 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         formula = row.identity.species.formula
         assert quantity in expected_by_quantity
         actual_by_quantity[quantity][formula] += 1
-        note = row.locator.note or ""
-        match = re.search(r"row=(SC\d+)(?!\d)", note)
-        sample = match.group(1) if match else None
-        assert sample is not None, note
+        sample = row.locator.row
+        assert sample in temperature_c, sample
         actual_by_sample[(quantity, sample)][formula] += 1
 
         expected_temperature = Decimal(temperature_c[sample]) + Decimal("273.15")

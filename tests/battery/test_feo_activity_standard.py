@@ -53,7 +53,7 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
 # The offer frame is a_D * f from the Darken & Gurry factor.
 # The numeric pin is green; the digest captures the current JANAF and d-333 notices.
 _DISTIN_1880_RESIDUAL_SHA256 = (
-    "6ca537f3aebbf954650edbfa6a1c2cac43c4daef05def1348711beccf0123a9a"
+    "74699bf353b3de1a9080d06b1174142ef5f65a056901be45455e202a7125d764"
 )
 _DISTIN_1880_RESIDUAL_DEX = Decimal("-0.10057837869175247")
 

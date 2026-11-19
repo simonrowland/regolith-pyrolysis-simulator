@@ -437,7 +437,7 @@ def test_isolated_migration_carries_each_species_and_pressure_condition() -> Non
         assert oxygen.state.is_value
         assert oxygen.state.value.kind is ValueKind.POINT
         assert oxygen.locator.table == "3"
-        assert "column_header=pO2" in oxygen.locator.note
+        assert oxygen.locator.column == "pO2"
         assert row.point_conditions["composition"].state.is_value
         assert row.uncertainty.kind is UncertaintyKind.PRINTED
         assert row.uncertainty.verbatim["bound_value"] == "7%"

@@ -21,7 +21,7 @@ def test_table_1_fun1_3_residue_composition_and_conditions_migrate() -> None:
     row = [
         observation
         for observation in migrator.result.observations.values()
-        if observation.locator.note == "row=FUN1-3"
+        if observation.locator.row == "FUN1-3"
     ]
     assert len(row) == 4
     assert all(o.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION for o in row)
@@ -71,7 +71,7 @@ def test_bounded_identity_conditions_stay_on_mendybaev_points(tmp_path: Path) ->
     row_points = [
         observation
         for observation in observations
-        if observation.locator.note == "row=FUN1-3"
+        if observation.locator.row == "FUN1-3"
     ]
     assert len(observations) == 96
     assert len(row_points) == 4
@@ -94,15 +94,15 @@ def test_table_1_fun2_residues_migrate_to_the_fun2_experiment() -> None:
     migrator.finalize()
 
     observations = tuple(migrator.result.observations.values())
-    fun1 = [o for o in observations if o.locator.note and o.locator.note.startswith("row=FUN1-")]
-    fun2 = [o for o in observations if o.locator.note and o.locator.note.startswith("row=FUN2-")]
+    fun1 = [o for o in observations if o.locator.row and o.locator.row.startswith("FUN1-")]
+    fun2 = [o for o in observations if o.locator.row and o.locator.row.startswith("FUN2-")]
     assert len(fun1) == 56
     assert len(fun2) == 40
     assert all(o.experiment_id.endswith("mendybaev-fun1-vacuum-evaporation") for o in fun1)
     assert all(o.experiment_id.endswith("mendybaev-fun2-vacuum-evaporation") for o in fun2)
     fun2_10_mgo = [
         o for o in fun2
-        if o.locator.note == "row=FUN2-10"
+        if o.locator.row == "FUN2-10"
         and o.identity.species.formula == "MgO"
     ]
     assert len(fun2_10_mgo) == 1
@@ -154,7 +154,7 @@ def test_table_1_residue_uncertainties_migrate_from_each_printed_sigma(
         observation = next(
             item
             for item in migrator.result.observations.values()
-            if item.locator.note == f"row={row}"
+            if item.locator.row == row
             and item.identity.species.formula == formula
         )
         assert observation.uncertainty.kind.value == "printed"

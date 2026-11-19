@@ -20,7 +20,7 @@ def test_table1_residue_concentrations_and_conditions_migrate() -> None:
     observations = tuple(migrator.result.observations.values())
     assert len(observations) == 36
     assert all(o.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION for o in observations)
-    db05 = [o for o in observations if "row=DB05" in o.locator.note]
+    db05 = [o for o in observations if o.locator.row == "DB05"]
     assert len(db05) == 1
     observation = db05[0]
     assert observation.value.point == Decimal("5874")
