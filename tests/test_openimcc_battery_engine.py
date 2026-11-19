@@ -24,6 +24,7 @@ from simulator.battery.enums import (
     Phase,
     PerBasis,
     MetricOperation,
+    Polymorph,
     Quantity,
     QUANTITY_UNITS,
     Rail,
@@ -94,12 +95,17 @@ def _openimcc_thermo_observation(
     *,
     per: PerBasis = PerBasis.MOL_SPECIES,
     subtype: str | None = None,
+    polymorph: Polymorph | None = None,
 ):
     identity = F.o2_identity(temperature_K)
     identity = replace(
         identity,
         quantity=quantity,
-        species=Species(formula, phase),
+        species=Species(
+            formula,
+            phase,
+            polymorph=State.of(polymorph) if polymorph is not None else None,
+        ),
         per=State.of(per),
         reaction=State.not_applicable("pure standard-state thermo"),
         formation_elements=State.not_applicable("not a formation quantity"),
@@ -642,6 +648,56 @@ def test_openimcc_species_thermo_scores_native_condensate_derivatives() -> None:
         assert "derivatives_fit_implied=True" in prediction.execution.call_evidence
 
 
+def test_openimcc_named_crystal_refuses_unmatched_source_polymorph() -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack, species_thermo
+
+    temperature_K = Decimal("1500")
+    native = species_thermo(
+        "SiO2", "cr", float(temperature_K), datapack=load_gas_datapack()
+    )
+    assert native.source_row_id == "LAM1987"
+    assert native.source_table_id == "LH87 Table 2"
+    observation = _openimcc_thermo_observation(
+        "openimcc-sio2-quartz-source-unresolved",
+        "SiO2",
+        Phase.CR,
+        Quantity.CP,
+        temperature_K,
+        polymorph=Polymorph.QUARTZ,
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
+    assert prediction.refusal_detail["polymorph"] == Polymorph.QUARTZ.value
+    assert prediction.refusal_detail["source_row_id"] == native.source_row_id
+    assert prediction.refusal_detail["source_table_id"] == native.source_table_id
+    assert prediction.execution.call_evidence is not None
+    assert f"source_table_id={native.source_table_id}" in prediction.execution.call_evidence
+
+
+def test_openimcc_missing_crystal_polymorph_keeps_typed_refusal() -> None:
+    _require_openimcc()
+
+    temperature_K = Decimal("1500")
+    observation = _openimcc_thermo_observation(
+        "openimcc-sio2-cr-no-polymorph",
+        "SiO2",
+        Phase.CR,
+        Quantity.CP,
+        temperature_K,
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
+
+
 def test_openimcc_species_thermo_uses_source_dfh298_for_enthalpy_increment() -> None:
     _require_openimcc()
     from openimcc import load_gas_datapack, species_thermo
@@ -693,9 +749,10 @@ def test_openimcc_species_thermo_out_of_interval_is_typed_with_source_detail() -
     prediction = predict_with_engine(Engine.OPENIMCC, observation)
 
     assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN, (
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED, (
         prediction.refusal_detail
     )
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prediction.refusal_detail["reason"] == "openimcc_species_thermo_outside_interval"
     assert prediction.refusal_detail["species"] == "FeO"
     assert prediction.refusal_detail["phase"] == "g"
@@ -706,6 +763,55 @@ def test_openimcc_species_thermo_out_of_interval_is_typed_with_source_detail() -
     ]
     assert prediction.refusal_detail["upstream_error"]
     assert prediction.refusal_detail["certification_backlog"] is True
+
+
+def test_openimcc_species_thermo_entropy_uses_printed_pressure_only_for_gas() -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack, species_thermo
+
+    from simulator.battery.compilation_tier import _printed_entropy_shift
+
+    datapack = load_gas_datapack()
+    pressure_Pa = Decimal("101325")
+    native_gas = species_thermo("FeO", "g", 2000.0, datapack=datapack)
+    gas = _openimcc_thermo_observation(
+        "openimcc-feo-g-s-atm",
+        "FeO",
+        Phase.G,
+        Quantity.S,
+        Decimal("2000"),
+    )
+    gas = replace(
+        gas,
+        identity=replace(gas.identity, standard_pressure_Pa=State.of(pressure_Pa)),
+    )
+    shift, why = _printed_entropy_shift(gas.identity)
+    assert why is None and shift is not None
+
+    prediction = predict_with_engine(Engine.OPENIMCC, gas)
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == Decimal(str(native_gas.S_J_molK)) + shift
+
+    native_liquid = species_thermo("FeO", "l", 2000.0, datapack=datapack)
+    liquid = _openimcc_thermo_observation(
+        "openimcc-feo-l-s-atm",
+        "FeO",
+        Phase.L,
+        Quantity.S,
+        Decimal("2000"),
+    )
+    liquid = replace(
+        liquid,
+        identity=replace(
+            liquid.identity, standard_pressure_Pa=State.of(pressure_Pa)
+        ),
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, liquid)
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == Decimal(str(native_liquid.S_J_molK))
 
 
 def test_openimcc_species_missing_upstream_stays_typed() -> None:

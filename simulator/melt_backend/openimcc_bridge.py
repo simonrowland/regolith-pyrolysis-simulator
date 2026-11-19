@@ -1398,12 +1398,13 @@ def species_thermo(species: str, phase: str, temperature_K: float) -> dict[str, 
             "derivatives_fit_implied": getattr(
                 props, "derivatives_fit_implied", None
             ),
-            "dfH298_J_mol": _species_thermo_source_dfh298(
-                species, phase, source_row_id, source_table_id
-            ),
         }
 
-    return cached_engine_call("openimcc", request, solve)
+    result = dict(cached_engine_call("openimcc", request, solve))
+    result["dfH298_J_mol"] = _species_thermo_source_dfh298(
+        species, phase, result.get("source_row_id"), result.get("source_table_id")
+    )
+    return result
 
 def evaluate_redox(
     inventory: Mapping[str, float],

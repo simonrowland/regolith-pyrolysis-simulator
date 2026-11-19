@@ -1442,6 +1442,7 @@ def test_species_thermo_cache_request_covers_native_inputs(monkeypatch) -> None:
     result = openimcc_bridge.species_thermo("FeO", "g", 2000.0)
 
     assert result["source_row_id"] == "JANAF-FeO-gas"
+    assert result["dfH298_J_mol"] is None
     assert calls == [("FeO", "g", 2000.0, "default-gas-datapack")]
     assert requests == [
         (
@@ -1455,6 +1456,60 @@ def test_species_thermo_cache_request_covers_native_inputs(monkeypatch) -> None:
             },
         )
     ]
+
+
+def test_species_thermo_recomputes_janaf_anchor_after_native_cache_hit(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_cache
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    native_calls = []
+    anchors = iter((1000.0, 2000.0))
+    props = SimpleNamespace(
+        Cp_J_molK=42.0,
+        S_J_molK=20.0,
+        H_app_kJ_mol=3.0,
+        G_J_mol=400.0,
+        source_row_id="Fe-021",
+        source_table_id="Fe-021",
+        T_interval=None,
+        T_min=500.0,
+        T_max=3000.0,
+        derivatives_fit_implied=False,
+    )
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_openimcc",
+        SimpleNamespace(
+            load_gas_datapack=lambda: "default-gas-datapack",
+            species_thermo=lambda *_args, **_kwargs: (
+                native_calls.append(True) or props
+            ),
+        ),
+    )
+    monkeypatch.setattr(engine_cache, "record_engine_open", lambda *_args: None)
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_species_thermo_source_dfh298",
+        lambda *_args: next(anchors),
+    )
+
+    try:
+        first = openimcc_bridge.species_thermo("FeO", "g", 2000.0)
+        second = openimcc_bridge.species_thermo("FeO", "g", 2000.0)
+    finally:
+        engine_cache._close_connections()
+        engine_cache._MEMORY_CACHE.clear()
+
+    assert native_calls == [True]
+    assert first["dfH298_J_mol"] == 1000.0
+    assert second["dfH298_J_mol"] == 2000.0
 
 
 def test_redox_result_keeps_its_type_across_cache_round_trip(
