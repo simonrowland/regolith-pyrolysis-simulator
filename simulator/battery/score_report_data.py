@@ -363,18 +363,6 @@ def _source_relation_token(row: Mapping[str, object]) -> str:
     return str(relation)
 
 
-def _finite_decimal(raw: object) -> Decimal | None:
-    if isinstance(raw, bool) or raw is None:
-        return None
-    try:
-        value = Decimal(str(raw))
-    except (ArithmeticError, TypeError, ValueError):
-        return None
-    if not value.is_finite():
-        return None
-    return value
-
-
 def eligible_source_relation_breakdown(
     rows: Iterable[Mapping[str, object]],
     *,
@@ -444,6 +432,7 @@ def suspected_calibration_overlaps(
     if observations is None:
         return ()
     from simulator.battery.compilation_tier import reference_observation
+    from simulator.battery.source_oxygen import _finite_decimal
 
     thresholds = SUSPECTED_CALIBRATION_OVERLAP
     grouped: dict[tuple[str, str], list[tuple[Decimal, str, Decimal | None, str | None]]] = defaultdict(list)
