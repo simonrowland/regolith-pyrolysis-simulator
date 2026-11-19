@@ -48,6 +48,15 @@ experiments:
   - experiment_id: rys-2007-kems-series
     bench_id: rys-2007-kems-cell
     method: knudsen_effusion
+    apparatus:
+      calibration:
+        technique:
+          state: {tag: value, value: mass_spectrometry}
+          locator:
+            page: 49
+            published_page: 37
+            pdf_page_index: 48
+            section: 4.1 Knudsen effusion mass spectrometry (KEMS)
     locator:
       page: 49
       published_page: 37

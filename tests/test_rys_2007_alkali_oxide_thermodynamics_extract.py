@@ -6,6 +6,7 @@ from collections import Counter
 
 from simulator.battery.enums import CellMaterial, MethodToken, Phase, Quantity
 from simulator.battery.migrate import Migrator
+from simulator.battery.method_class_bands import _located_fact
 from simulator.yaml_cache import YAML12SafeLoader, yaml_mapping_source_issues
 import yaml
 
@@ -152,10 +153,10 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
 
     collect_locators(document)
     # Typing Tables 7 and 9 adds 162 locators and 75 observations; the KEMS
-    # apparatus and experiment registry add three locators.
+    # apparatus and experiment registry add four locators.
     # The merged document keeps the two Table 9 NaAlSi_6 points and Na Table
     # 10a row 8, each with a row locator and a condition locator.
-    assert len(locators) == 2235
+    assert len(locators) == 2236
     assert all(
         locator["page"] == locator["pdf_page_index"] + 1
         and "published_page" in locator
@@ -248,6 +249,10 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     assert len(activity_rows) == 382
     assert all(
         row.experiment_id == rys_experiment.experiment_id for row in activity_rows
+    )
+    assert activity_rows
+    assert _located_fact(activity_rows[0], rys_experiment, "technique") == (
+        "mass_spectrometry"
     )
     assert rys_experiment.bench_id is not None
     rys_bench = result.benches[rys_experiment.bench_id]
