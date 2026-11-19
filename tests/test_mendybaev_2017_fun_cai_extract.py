@@ -437,7 +437,8 @@ def test_table_1_residues_migrate_with_run_charge_clock_and_conditions() -> None
     assert {row.identity.temperature_K.value for row in rows} == {Decimal("2173.15")}
     bench = next(iter(migrator.result.benches.values()))
     for row in rows:
-        run = row.locator.note.partition(";")[0].removeprefix("row=")
+        run = row.locator.row
+        assert run is not None
         experiment = migrator.result.experiments[row.experiment_id]
         assert row.experiment_id.endswith(f"::experiment::{run.casefold()}")
         assert row.identity.sample_mass_kg.is_value
