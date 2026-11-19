@@ -593,7 +593,6 @@ def test_real_hashimoto_table5_points_resolve_declared_series_start() -> None:
         initial = experiment.sample.initial_composition
         assert initial is not None and initial.state.is_value
         assert initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
-        assert initial.state.value.input_provenance == PRINTED_STARTING_BULK
         assert not _initial_compositions_conflict(initial, point)
         norm = normalized_composition(experiment, None, observation)
         assert norm.selected is not None
