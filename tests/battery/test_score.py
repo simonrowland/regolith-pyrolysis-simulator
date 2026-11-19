@@ -4556,6 +4556,7 @@ def test_phase_gap_underflowing_preferred_flank_uses_the_other_flank() -> None:
 
 
 _GAS_MAP_PARTIAL_PA = Decimal("1234.5")
+_GAS_MAP_CO_PA = Decimal("678.9")
 
 
 def test_gas_pressure_and_fugacity_use_only_the_matching_gas_map_species(
@@ -4584,7 +4585,10 @@ def test_gas_pressure_and_fugacity_use_only_the_matching_gas_map_species(
         composition=composition,
     )
     calls = {"n": 0}
-    reported_pressures = {"H2O": float(_GAS_MAP_PARTIAL_PA)}
+    reported_pressures = {
+        "H2O": float(_GAS_MAP_PARTIAL_PA),
+        "CO": float(_GAS_MAP_CO_PA),
+    }
 
     def fake_equilibrate(_handle, pot, *, temperature_K, po2, **_kwargs):
         calls["n"] += 1
@@ -4672,6 +4676,45 @@ def test_gas_pressure_and_fugacity_use_only_the_matching_gas_map_species(
             )
             for notice in fugacity.notices
         )
+
+        experiment = F.tabulation_experiment(
+            "fugacity-score-exp",
+            T_K=Decimal("1643.15"),
+            total_P=Decimal("100000"),
+        )
+        fugacity_identity = Identity(
+            quantity=Quantity.FUGACITY,
+            species=Species("H2O", Phase.G),
+        )
+        reference = F.observation(
+            "fugacity-score-reference",
+            experiment.experiment_id,
+            fugacity_identity,
+            _GAS_MAP_PARTIAL_PA,
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fugacity-score",
+        )
+        residual, _candidate = compile_residual(
+            reference,
+            engine,
+            context=_context(F.work(), experiment, reference),
+            prediction=replace(fugacity, identity=fugacity_identity),
+        )
+        assert residual.numeric is not None
+        assert residual.numeric.operation is MetricOperation.DEX
+        assert residual.numeric.value == Decimal("0.0")
+        assert residual.refusal is None
+        assert any(
+            notice.reason == (
+                "ideal-gas assumption: fugacity coefficient phi_i=1, "
+                "therefore f_i=p_i"
+            )
+            for notice in residual.notices
+        )
+
+        co_fugacity = predict(Species("CO", Phase.G), Quantity.FUGACITY, engine)
+        assert co_fugacity.refusal_reason is None
+        assert co_fugacity.value == _GAS_MAP_CO_PA
 
     for species in (
         Species("H2O", Phase.CR),
@@ -9734,8 +9777,8 @@ def test_pyrolysis_yield_keeps_residual_without_robinot_floor() -> None:
         assert detail == {}
 
 
-def test_vapour_rail_is_only_vapour_pressures() -> None:
-    """Isotope and ion ratios, and Zn/Cu/Mg alphas, do not borrow a rail."""
+def test_vapour_rail_includes_fugacity_and_only_vapour_quantities() -> None:
+    """Vapour rails include fugacity, not isotope/ion ratios or other alphas."""
 
     from simulator.battery.score import no_headline_rail_reason, rail_for_quantity
 
@@ -9744,6 +9787,7 @@ def test_vapour_rail_is_only_vapour_pressures() -> None:
         assert rail_for_quantity(quantity, species_formula="SiO") is Rail.SIO_EVOLUTION
         assert rail_for_quantity(quantity, species_formula="SiO2") is Rail.SIO_EVOLUTION
     assert rail_for_quantity(Quantity.FUGACITY, species_formula="SiO") is Rail.VAPOUR
+    assert "fugacity" in (rail_for_quantity.__doc__ or "").lower()
     assert rail_for_quantity(Quantity.PARTIAL_MOLAR_ENTHALPY) is Rail.THERMOCHEMISTRY
     assert rail_for_quantity(None) is None
     assert no_headline_rail_reason(None) == "quantity_unknown"

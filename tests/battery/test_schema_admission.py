@@ -875,8 +875,8 @@ def test_real_sample_volume_and_unadopted_fugacity_are_preserved():
             assert all(o.value.kind.value == "unavailable" for o in rows)
 
 
-def test_fugacity_storage_cannot_open_or_score_engine(monkeypatch):
-    from simulator.battery.enums import Engine, Phase, SourceRelation
+def test_fugacity_only_uses_supported_gas_map_engines(monkeypatch):
+    from simulator.battery.enums import Engine, MetricOperation, Phase, SourceRelation
     from simulator.battery.records import Species, State
     from simulator.battery.score import SCORE_ENGINE_SET, ScoreContext, populate_numeric, predict_with_engine, score_store
 
@@ -892,16 +892,29 @@ def test_fugacity_storage_cannot_open_or_score_engine(monkeypatch):
     for engine in SCORE_ENGINE_SET:
         prediction = predict_with_engine(engine, reference)
         assert prediction.value is None
-        assert prediction.refusal_detail == {
-            "reason": "quantity_not_predicted",
-            "quantity": Quantity.FUGACITY.value,
-        }
+        if engine in {Engine.VAPOROCK, Engine.OPENIMCC}:
+            assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+            assert prediction.refusal_detail["reason"] == (
+                "composition_not_stated_pure_reservoir"
+            )
+        elif engine is Engine.CATALOG_EVALUATOR:
+            assert prediction.refusal_detail == {
+                "reason": "quantity_not_predicted",
+                "quantity": Quantity.FUGACITY.value,
+            }
+        else:
+            assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+            assert prediction.refusal_detail["reason"] == (
+                "engine_has_no_ideal_gas_fugacity_source"
+            )
     residuals, _ = score_store(context, engines=(Engine.MAGEMIN,), include_diagnostics=False)
     assert residuals and all(not r.score_eligible and r.numeric is None for r in residuals)
     numeric, reason, _ = populate_numeric(quantity=Quantity.FUGACITY, candidate=Decimal("33.7"),
                                            reference=Decimal("33.7"), source_relation=SourceRelation.INDEPENDENT)
-    assert numeric is None
-    assert reason.value == "metric_domain"
+    assert numeric is not None
+    assert numeric.operation is MetricOperation.DEX
+    assert numeric.value == Decimal("0.0")
+    assert reason is None
 
 
 def test_geometry_context_keeps_original_source_record():

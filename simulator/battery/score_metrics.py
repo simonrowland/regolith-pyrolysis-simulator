@@ -46,6 +46,7 @@ from simulator.battery.records import (
 QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.P_SAT: MetricOperation.DEX,
     Quantity.P_PARTIAL: MetricOperation.DEX,
+    Quantity.FUGACITY: MetricOperation.DEX,
     Quantity.P_REFERENCE: MetricOperation.DEX,
     Quantity.ACTIVITY: MetricOperation.DEX,
     Quantity.ACTIVITY_COEFFICIENT: MetricOperation.DEX,

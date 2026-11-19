@@ -48,13 +48,13 @@ from simulator.battery.score import (
 
 
 # Quantity token → operation. Read off QUANTITY_METRIC. A quantity absent
-# from that table is None: fugacity, log10_K_reaction,
+# from that table is None: log10_K_reaction,
 # activity_coefficient_temperature_fit, mass_loss_areal_density, valence_ratio.
 # valence_ratio is chosen by identity, not here.
 EXPECTED_QUANTITY_METRIC: dict[str, str | None] = {
     "p_sat": "dex",
     "p_partial": "dex",
-    "fugacity": None,
+    "fugacity": "dex",
     "p_reference": "dex",
     "log10_Kf": "absolute",
     "log10_K_reaction": None,
@@ -603,14 +603,14 @@ def test_zero_reference_and_unmapped_quantity_refuse() -> None:
     assert detail == {"operation": "dex", "candidate": "0", "reference": "1"}
 
     numeric, reason, detail = populate_numeric(
-        quantity=Quantity.FUGACITY,
+        quantity=Quantity.LOG10_K_REACTION,
         candidate=Decimal("33.7"),
         reference=Decimal("1"),
         source_relation=SourceRelation.INDEPENDENT,
     )
     assert numeric is None
     assert reason is RefusalReason.METRIC_DOMAIN
-    assert detail == {"quantity": "fugacity"}
+    assert detail == {"quantity": "log10_K_reaction"}
 
 
 def test_dimension_mismatch_drops_the_band_and_refuses_if_forced(

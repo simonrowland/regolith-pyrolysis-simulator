@@ -1410,11 +1410,12 @@ def _oxide_projection_notices(
 def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -> Rail | None:
     """Headline rail, or None when the quantity is not on one.
 
-    Vapour is only p_sat, p_partial, or p_reference (SiO/SiO2 partial
-    pressures stay on SiO_evolution). Isotope ratios, ion ratios, and an
-    unknown quantity do not fall through onto vapour. A non-alkali kinetic
-    quantity (Zn, Cu, Mg evaporation coefficients, and the same else-branch)
-    does not fall through onto SiO_evolution.
+    Vapour includes p_sat, p_partial, p_reference, and fugacity
+    (SiO/SiO2 partial pressures stay on SiO_evolution; fugacity stays on
+    vapour). Isotope ratios, ion ratios, and an unknown quantity do not fall
+    through onto vapour. A non-alkali kinetic quantity (Zn, Cu, Mg evaporation
+    coefficients, and the same else-branch) does not fall through onto
+    SiO_evolution.
     """
 
     if quantity in {
