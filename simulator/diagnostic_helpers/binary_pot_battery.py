@@ -371,6 +371,8 @@ def _call_cached_backend_equilibrate(
         else engine_cache_settings(handle.name, handle.engine_settings)
     )
 
+    from simulator.vapour_rail import run_disclosure
+
     payload = cached_engine_call(
         handle.name,
         {
@@ -378,6 +380,7 @@ def _call_cached_backend_equilibrate(
             "engine_settings": adapter_settings,
         },
         solve_cache_value,
+        disclosure_runtime=run_disclosure,
     )
     if isinstance(payload, list):
         payload = equilibrium_cache_from_value(payload, engine_id=handle.name)
@@ -3952,7 +3955,14 @@ def internal_analytical_residue_vapor_pressure(
             "po2": po2_request.as_payload(),
             "engine_settings": _internal_analytical_cache_settings(core),
         }
-        result = cached_engine_call("internal-analytical", _internal_analytical_cache_inputs(request), solve)
+        from simulator.vapour_rail import run_disclosure
+
+        result = cached_engine_call(
+            "internal-analytical",
+            _internal_analytical_cache_inputs(request),
+            solve,
+            disclosure_runtime=run_disclosure,
+        )
     if isinstance(result, Mapping) and "_residue_pressure_equilibrium" in result:
         result = result["_residue_pressure_equilibrium"]
     if isinstance(result, list):
@@ -4664,7 +4674,14 @@ class _IsolatedCellWorker:
         request["engine_settings"] = engine_cache_settings(
             self.engine, normalize_engine_settings(self.engine, self.engine_settings),
         )
-        result = cached_engine_call(self.engine, request, solve)
+        from simulator.vapour_rail import run_disclosure
+
+        result = cached_engine_call(
+            self.engine,
+            request,
+            solve,
+            disclosure_runtime=run_disclosure,
+        )
         if isinstance(result, list) or (isinstance(result, Mapping) and ("refusal_cell" in result or "cell" in result)):
             result = EquilibrateCell.from_hot(result).as_payload()
         if not isinstance(result, dict):

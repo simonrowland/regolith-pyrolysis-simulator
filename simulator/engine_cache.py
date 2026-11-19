@@ -1174,22 +1174,20 @@ def _engine_carries_disclosures(engine_id: str) -> bool:
     return engine_id in ENGINE_CACHE_DISCLOSURE_ENGINES
 
 
-def _accept_cached_engine_disclosures(engine_id: str, value: Any) -> bool:
+def _accept_cached_engine_disclosures(
+    engine_id: str, value: Any, disclosure_runtime: Any | None
+) -> bool:
     """Replay a measured engine disclosure before returning a cache hit."""
 
-    if not _engine_carries_disclosures(engine_id):
+    if not _engine_carries_disclosures(engine_id) or disclosure_runtime is None:
         return True
     if not isinstance(value, Mapping) or _ENGINE_CACHE_VALUE_KEY not in value:
         return False
     disclosures = value.get("law_disclosures")
     if disclosures is None:
-        from simulator.vapour_rail.run_disclosure import active_registry
-
         # Unscoped values are explicitly unknown and cannot serve a scoped run.
-        return active_registry() is None
-    from simulator.vapour_rail.run_disclosure import accept_stored_memo
-
-    return accept_stored_memo(value) is not None
+        return disclosure_runtime.active_registry() is None
+    return disclosure_runtime.accept_stored_memo(value) is not None
 
 
 def _unwrap_engine_cache_value(engine_id: str, value: Any) -> Any:
@@ -1524,7 +1522,13 @@ def _store_cold(connection: sqlite3.Connection, path: Path, key: bytes, values: 
         connection.execute("DELETE FROM cold.engine_values WHERE key=?", (key,))
 
 
-def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
+def cached_engine_call(
+    engine_id: str,
+    request: Any,
+    solve: Any,
+    *,
+    disclosure_runtime: Any | None = None,
+) -> Any:
     if _CACHE_BYPASSED.get():
         return live_hot(solve())
     path_value = _configured_engine_cache_path()
@@ -1545,18 +1549,18 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     memory_key = (path_value, cache_key, readonly)
     disclosure_registry = None
     disclosure_before: tuple[dict[str, Any], ...] = ()
-    if _engine_carries_disclosures(engine_id):
-        from simulator.vapour_rail.run_disclosure import active_registry, active_snapshot
-
-        disclosure_registry = active_registry()
+    if _engine_carries_disclosures(engine_id) and disclosure_runtime is not None:
+        disclosure_registry = disclosure_runtime.active_registry()
         if disclosure_registry is not None:
-            disclosure_before = active_snapshot()
+            disclosure_before = disclosure_runtime.active_snapshot()
     with _LOCK:
         _prepare_memory_cache()
         counts = _counter_bucket(engine_id)
         if memory_key in _MEMORY_CACHE:
             result = _MEMORY_CACHE[memory_key]
-            if _accept_cached_engine_disclosures(engine_id, result):
+            if _accept_cached_engine_disclosures(
+                engine_id, result, disclosure_runtime
+            ):
                 _MEMORY_CACHE.move_to_end(memory_key)
                 counts["hits"] += 1
                 return _unwrap_engine_cache_value(engine_id, result)
@@ -1585,7 +1589,9 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 counts["read_error"] += 1
                 row = None
             else:
-                if _accept_cached_engine_disclosures(engine_id, result):
+                if _accept_cached_engine_disclosures(
+                    engine_id, result, disclosure_runtime
+                ):
                     counts["hits"] += 1
                     _remember_memory_value(memory_key, result)
                     return _unwrap_engine_cache_value(engine_id, result)
@@ -1608,18 +1614,16 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         return hot
     memory_value = hot
     storage_value = solved.hot if isinstance(solved, EngineCacheValue) else solved
-    if _engine_carries_disclosures(engine_id):
-        from simulator.vapour_rail.run_disclosure import active_registry, active_snapshot, disclosure_delta
-
+    if _engine_carries_disclosures(engine_id) and disclosure_runtime is not None:
         disclosures = None
         if (
             disclosure_registry is not None
-            and active_registry() is disclosure_registry
+            and disclosure_runtime.active_registry() is disclosure_registry
         ):
             disclosures = [
                 dict(item)
-                for item in disclosure_delta(
-                    disclosure_before, active_snapshot()
+                for item in disclosure_runtime.disclosure_delta(
+                    disclosure_before, disclosure_runtime.active_snapshot()
                 )
             ]
         storage_value = {

@@ -5010,6 +5010,7 @@ def _exercise_engine_cache(
 
     from simulator import engine_cache
     from simulator.engine_cache import _engine_cache_path_scope
+    from simulator.vapour_rail import run_disclosure as disclosure_runtime
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
@@ -5046,7 +5047,10 @@ def _exercise_engine_cache(
         with _engine_cache_path_scope(path):
             with disclosure_scope(inherit=False) as cold:
                 cold_value = engine_cache.cached_engine_call(
-                    "internal-analytical", request, solve_scoped(calls)
+                    "internal-analytical",
+                    request,
+                    solve_scoped(calls),
+                    disclosure_runtime=disclosure_runtime,
                 )
                 cold_disclosures = cold.snapshot()
             assert cold_disclosures
@@ -5059,6 +5063,7 @@ def _exercise_engine_cache(
                     "internal-analytical",
                     request,
                     lambda: pytest.fail(f"warm {label} cache call recomputed"),
+                    disclosure_runtime=disclosure_runtime,
                 )
                 assert warm.snapshot() == cold_disclosures
             assert warm_value == cold_value
@@ -5075,7 +5080,10 @@ def _exercise_engine_cache(
 
         with _engine_cache_path_scope(unknown_path):
             unscoped_value = engine_cache.cached_engine_call(
-                "internal-analytical", request, solve_unscoped
+                "internal-analytical",
+                request,
+                solve_unscoped,
+                disclosure_runtime=disclosure_runtime,
             )
             assert unscoped_value == {"pressure_Pa": 123.0}
             assert unknown_calls["n"] == 1
@@ -5084,7 +5092,10 @@ def _exercise_engine_cache(
                 engine_cache._MEMORY_CACHE.clear()
             with disclosure_scope(inherit=False) as recomputed:
                 scoped_value = engine_cache.cached_engine_call(
-                    "internal-analytical", request, solve_scoped(unknown_calls)
+                    "internal-analytical",
+                    request,
+                    solve_scoped(unknown_calls),
+                    disclosure_runtime=disclosure_runtime,
                 )
                 scoped_disclosures = recomputed.snapshot()
             assert unknown_calls["n"] == 2
@@ -5099,6 +5110,7 @@ def _exercise_engine_cache(
                     "internal-analytical",
                     request,
                     lambda: pytest.fail(f"measured {label} cache row recomputed"),
+                    disclosure_runtime=disclosure_runtime,
                 )
                 assert replayed.snapshot() == scoped_disclosures
             assert replayed_value == scoped_value
