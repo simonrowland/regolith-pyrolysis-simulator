@@ -231,6 +231,83 @@ def test_interior_threshold_equality_keeps_a_one_step_bracket(
     _assert_interior_threshold_equality(anchors, field, anchor_C)
 
 
+def _cold_plateau_residue_C() -> float:
+    """Highest temperature the equality-on-low bisection returns below 900 °C.
+
+    A 100 °C bracket that stays at or below the threshold until its warm
+    sample halves until the width is within the 1 °C tolerance. The
+    returned sample is the cold sample of that last step.
+    """
+
+    width = 100.0
+    while width > 1.0:
+        width /= 2.0
+    return 900.0 - width
+
+
+def test_threshold_plateau_uses_the_warm_solidus_and_the_cold_liquidus():
+    """A flat threshold is entered at one edge, not reported at the other."""
+
+    solidus_anchors = {
+        800.0: 0.0,
+        900.0: 0.001,
+        1000.0: 0.001,
+        1100.0: 0.5,
+        1200.0: 1.0,
+    }
+    liquidus_anchors = {
+        800.0: 0.0,
+        900.0: 0.5,
+        1000.0: 0.999,
+        1100.0: 0.999,
+        1200.0: 1.0,
+    }
+    solidus = _scan_transition(solidus_anchors)
+    assert solidus.status == "ok"
+    assert solidus.solidus_T_C == pytest.approx(1000.0, abs=1.0)
+    assert _piecewise_fraction(solidus_anchors)(solidus.solidus_T_C) <= 1.0e-3
+    liquidus = _scan_transition(liquidus_anchors)
+    assert liquidus.status == "ok"
+    assert liquidus.liquidus_T_C == pytest.approx(1000.0, abs=1.0)
+    assert _piecewise_fraction(liquidus_anchors)(liquidus.liquidus_T_C) >= (
+        1.0 - 1.0e-3
+    )
+
+
+def test_solidus_plateau_collapses_to_the_cold_edge_without_the_warm_pair(
+    monkeypatch,
+):
+    """Forcing the cold pair restores the cold residue of the same plateau."""
+
+    anchors = {
+        800.0: 0.0,
+        900.0: 0.001,
+        1000.0: 0.001,
+        1100.0: 0.5,
+        1200.0: 1.0,
+    }
+    produced = _scan_transition(anchors)
+    assert produced.solidus_T_C == pytest.approx(1000.0, abs=1.0)
+    original = liquidus_module._threshold_bracket
+
+    def cold_edge_only(points, threshold, *, edge):
+        del edge
+        return original(points, threshold, edge="cold")
+
+    monkeypatch.setattr(liquidus_module, "_threshold_bracket", cold_edge_only)
+    mutated = _scan_transition(anchors)
+    cold_edge = _cold_plateau_residue_C()
+    assert mutated.status == "ok"
+    assert mutated.solidus_T_C == pytest.approx(cold_edge, abs=1.0e-6)
+    assert mutated.solidus_T_C != pytest.approx(1000.0, abs=1.0)
+    assert _piecewise_fraction(anchors)(mutated.solidus_T_C) <= 1.0e-3
+
+
+def test_threshold_edge_refuses_an_unknown_name():
+    with pytest.raises(ValueError, match="cold"):
+        liquidus_module._threshold_bracket((), 0.001, edge="both")
+
+
 def test_interior_threshold_equality_dies_without_both_side_evidence(monkeypatch):
     """Restoring a strict-only crossing erases the interior equal sample."""
 
@@ -249,7 +326,8 @@ def test_interior_threshold_equality_dies_without_both_side_evidence(monkeypatch
     for anchors, field, anchor_C in examples:
         _assert_interior_threshold_equality(anchors, field, anchor_C)
 
-    def strict_only(points, threshold):
+    def strict_only(points, threshold, *, edge):
+        del edge
         for index in range(1, len(points)):
             previous = points[index - 1]
             current = points[index]

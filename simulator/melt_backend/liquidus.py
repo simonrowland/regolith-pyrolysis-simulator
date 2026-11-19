@@ -405,33 +405,60 @@ class EquilibriumCrystallizationPathResult:
 def _threshold_bracket(
     points: Tuple[MeltFractionSample, ...],
     threshold: float,
+    *,
+    edge: str,
 ) -> tuple[MeltFractionSample, MeltFractionSample] | None:
-    """First one-step bracket with strict evidence on both sides.
+    """One-step bracket at one edge of a threshold plateau.
 
-    An interior sample exactly at the threshold keeps the adjacent pair
-    when another sample is strictly on the far side. Equality at an
-    outer scan boundary, with no sample beyond it, is not a crossing.
-    Comparison is exact: a near miss is not equality.
+    Convention: a threshold plateau is entered at one edge. Liquidus is
+    the cold edge (the first temperature at or above the liquid
+    threshold): the transition into the all-liquid plateau on heating.
+    Solidus is the warm edge (the last temperature at or below the solid
+    threshold): the transition into the all-solid plateau on cooling.
+
+    Limiting case: frac_M equals the solid threshold from 900 °C to
+    1000 °C and is above it afterwards. The solidus bracket is the
+    equal-to-above pair at 1000 °C. Equality-on-the-low-side bisection
+    then returns that warm edge within tolerance. The liquidus of a
+    plateau sitting on the liquid threshold is the below-to-equal pair
+    at the cold edge. A one-point equality has both edges at that sample.
+
+    Equality only at an outer scan boundary, with no sample strictly on
+    the far side, is not a crossing. Comparison is exact: a near miss is
+    not equality. ``edge`` is ``cold`` or ``warm``; any other name raises.
     """
 
+    if edge not in {"cold", "warm"}:
+        raise ValueError(
+            f"threshold edge must be 'cold' or 'warm', not {edge!r}"
+        )
+    strict: tuple[MeltFractionSample, MeltFractionSample] | None = None
+    cold: tuple[MeltFractionSample, MeltFractionSample] | None = None
+    warm: tuple[MeltFractionSample, MeltFractionSample] | None = None
     for index in range(1, len(points)):
         previous = points[index - 1]
         current = points[index]
-        if previous.frac_M < threshold < current.frac_M:
-            return previous, current
         if (
-            previous.frac_M < threshold
+            strict is None
+            and previous.frac_M < threshold < current.frac_M
+        ):
+            strict = (previous, current)
+        if (
+            cold is None
+            and previous.frac_M < threshold
             and current.frac_M == threshold
             and any(point.frac_M > threshold for point in points[index + 1:])
         ):
-            return previous, current
+            cold = (previous, current)
         if (
             previous.frac_M == threshold
             and threshold < current.frac_M
             and any(point.frac_M < threshold for point in points[:index - 1])
         ):
-            return previous, current
-    return None
+            warm = (previous, current)
+    if edge == "cold":
+        return cold if cold is not None else strict
+    return warm if warm is not None else strict
 
 
 def find_liquidus_solidus_by_fraction(
@@ -616,10 +643,12 @@ def find_liquidus_solidus_by_fraction(
         solidus_bracket = _threshold_bracket(
             tuple(grid_points),
             solid_threshold,
+            edge="warm",
         )
         liquidus_bracket = _threshold_bracket(
             tuple(grid_points),
             liquid_threshold,
+            edge="cold",
         )
         for bracket in (solidus_bracket, liquidus_bracket):
             if bracket is None:
@@ -948,6 +977,11 @@ def _bisect_solidus(
     max_iterations: int,
     closure_notices: dict[float, dict] | None = None,
 ) -> tuple[MeltFractionSample, int]:
+    # Equality stays on the low side, so the returned sample is the highest
+    # temperature still at or below the threshold. The bracket must be the
+    # warm-edge pair from ``_threshold_bracket``; otherwise this is the cold
+    # edge of the same plateau. Do not flip the inequality: a sample above
+    # the solid threshold would break frac_M(solidus) <= solid_epsilon.
     iterations = 0
     while high.temperature_C - low.temperature_C > tolerance_C:
         if iterations >= max_iterations:
@@ -980,6 +1014,8 @@ def _bisect_liquidus(
     max_iterations: int,
     closure_notices: dict[float, dict] | None = None,
 ) -> tuple[MeltFractionSample, int]:
+    # Equality stays on the high side: the lowest temperature still at or
+    # above the liquid threshold. The bracket is the cold-edge pair.
     iterations = 0
     while high.temperature_C - low.temperature_C > tolerance_C:
         if iterations >= max_iterations:
