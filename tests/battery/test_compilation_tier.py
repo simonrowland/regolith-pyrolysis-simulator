@@ -1341,7 +1341,13 @@ def _assert_compilation_routing_retains_numeric_residuals() -> None:
         (
             na2o,
             Engine.INTERNAL_ANALYTICAL,
-            Decimal("0.183200000000032"),
+            # b-959: the analytical Na2O(l) path interpolates the printed JANAF
+            # liquid rows, so the 2200 K residual is float noise (was +0.1832
+            # kJ/mol under the old unconstrained fit). The pin still proves the
+            # routed residual equals the direct one; the near-zero value is not
+            # independent evidence (scoring an engine against the table it
+            # interpolates; see the scoring-independence ticket).
+            Decimal("-2.4E-14"),
             "kJ_per_declared_mol_basis",
         ),
         (
