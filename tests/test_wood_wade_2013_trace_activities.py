@@ -243,6 +243,8 @@ def _assert_source_value_pins(document: dict) -> None:
         if observation_id == "wood_wade_2013_ino15_activity_coefficient":
             assert "26.25 J.K-1 at 2,183 K" in row["derivation"]["relation"]
         assert row["experiment"] == "wood_wade_2013_bw1102"
+
+
         assert row["units"] == "dimensionless"
         assert row["standard_state"]["state"]["value"]["convention"] == (
             "raoultian_pure_endmember"
@@ -294,6 +296,22 @@ def _assert_source_value_pins(document: dict) -> None:
         assert row["point_conditions"]["T_C"]["state"]["value"] == "1650"
         assert row["derived_from"]
     assert all(row["values"]["evidence_class"] == "measured_direct" for row in measured)
+
+
+def _assert_moo2_bw1102_rows_typed_refused(document: dict) -> None:
+    rows = [
+        row
+        for block in document["species"].values()
+        for row in block.get("observations", [])
+        if row["observation_id"].startswith("wood_wade_2013_fig3_moo2_gamma_")
+    ]
+    assert len(rows) == 77
+    assert all(row["values"]["admission_status"] == "typed_refusal" for row in rows)
+    assert all(
+        row["values"]["reason"]
+        == "BW1102 starting-recipe basis is not printed so the initial composition cannot be resolved."
+        for row in rows
+    )
 
 
 def _assert_migrated_pins(result) -> None:
@@ -499,6 +517,18 @@ def test_wood_wade_2013_isolated_migration_reaches_required_identity_axes(
     tmp_path: Path,
 ) -> None:
     document = _document()
+    _assert_moo2_bw1102_rows_typed_refused(document)
+    mutated = copy.deepcopy(document)
+    mutated_row = next(
+        row
+        for block in mutated["species"].values()
+        for row in block.get("observations", [])
+        if row["observation_id"].startswith("wood_wade_2013_fig3_moo2_gamma_")
+    )
+    mutated_row["values"]["admission_status"] = "admitted"
+    with pytest.raises(AssertionError):
+        _assert_moo2_bw1102_rows_typed_refused(mutated)
+
     result = _migrate_real_extract(
         tmp_path / "original",
         EXTRACT.name,
@@ -506,6 +536,20 @@ def test_wood_wade_2013_isolated_migration_reaches_required_identity_axes(
         extract_doc=document,
     )
     _assert_migrated_pins(result)
+    refused_moo2 = [
+        row
+        for row in result.observations.values()
+        if row.observation_id.startswith(
+            f"{SOURCE_ID}::wood_wade_2013_fig3_moo2_gamma_"
+        )
+    ]
+    assert len(refused_moo2) == 77
+    assert all(row.admission.status.value == "rejected" for row in refused_moo2)
+    assert all(
+        row.admission.reason
+        == "BW1102 starting-recipe basis is not printed so the initial composition cannot be resolved."
+        for row in refused_moo2
+    )
 
     contexts = [
         row
