@@ -1186,6 +1186,40 @@ def test_projection_clamp_boundary_uses_relative_scale_with_absolute_floor() -> 
         ledger.project_account_kg("process.cleaned_melt")
 
 
+@pytest.mark.parametrize("signed_mol", [-1.1e-16, 1.1e-16, 0.0, 1.0])
+def test_physical_supply_projection_preserves_signed_accounting(signed_mol):
+    ledger = AtomLedger()
+    ledger._balances["process.overhead_gas"] = {"Na": signed_mol}
+    physical = ledger.physical_mol_by_account("process.overhead_gas")
+    expected = 1.0 if signed_mol == 1.0 else 0.0
+    assert physical == {"Na": expected}
+    assert ledger.mol_by_account("process.overhead_gas") == {"Na": signed_mol}
+    diagnostic = ledger.last_physical_mol_projection["roundoff_projected_mol"]
+    if signed_mol and expected == 0.0:
+        assert diagnostic["Na"]["signed_mol"] == signed_mol
+        assert diagnostic["Na"]["physical_mol"] == 0.0
+    else:
+        assert diagnostic == {}
+
+
+def test_physical_supply_projection_uses_owner_tolerance_and_refuses_below_it():
+    ledger = AtomLedger()
+    account = "process.overhead_gas"
+    ledger._balances[account] = {"Na": -1.1e-16}
+    ledger.physical_mol_by_account(account)
+    tolerance = ledger.last_physical_mol_projection[
+        "roundoff_projected_mol"]["Na"]["tolerance_mol"]
+    for value in (-tolerance, tolerance):
+        ledger._balances[account]["Na"] = value
+        assert ledger.physical_mol_by_account(account) == {"Na": 0.0}
+    value = math.nextafter(tolerance, math.inf)
+    ledger._balances[account]["Na"] = value
+    assert ledger.physical_mol_by_account(account)["Na"].hex() == value.hex()
+    ledger._balances[account]["Na"] = -value
+    with pytest.raises(AccountingError, match="negative physical supply"):
+        ledger.physical_mol_by_account(account)
+
+
 def test_policy_mapping_rejects_embedded_account_mismatch_before_mutation() -> None:
     ledger = _strict_ledger()
 

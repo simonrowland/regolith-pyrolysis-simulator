@@ -21,6 +21,11 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
+from simulator.account_ids import (
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
+)
+
 # Display order matches CLAUDE.md § 5 product class enumeration.
 _CLASS_DISPLAY_ORDER: tuple[tuple[str, str], ...] = (
     ('metals_plus_O2',
@@ -339,6 +344,26 @@ def format_three_product_markdown(
             lines.append("")
             lines.append("Source accounts:")
             lines.append(_source_accounts_block(source_accounts))
+        lines.append("")
+
+    # Own section, and only when the class holds mass. A zero residue
+    # must not change reports that predate the cartridge class.
+    residue = classification.get(ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS) or {}
+    raw_residue_total = residue.get('class_total_kg', 0.0)
+    try:
+        residue_total = float(raw_residue_total)
+    except (TypeError, ValueError):
+        residue_total = 0.0
+    if residue_total > 0.0:
+        header = str(residue.get('label') or ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL)
+        lines.append(f"## {header}")
+        lines.append(f"**Total**: {_format_kg(residue_total)} kg")
+        note = residue.get('note')
+        if note:
+            lines.append(str(note))
+        lines.append("")
+        lines.append("Composition:")
+        lines.append(_kg_by_species_block(residue.get('kg_by_species') or {}))
         lines.append("")
 
     # ----- Unclassified bin (only when non-empty) -----

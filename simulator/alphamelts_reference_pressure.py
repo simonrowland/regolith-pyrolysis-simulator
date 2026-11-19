@@ -9,8 +9,13 @@ from typing import Any
 # condensed phases are effectively incompressible, so d(mu)/dP = V_molar with
 # V_molar about 10-40 cm^3/mol = 1e-5-4e-5 m^3/mol.  Between 1 bar and
 # 1 mbar, delta P is about 1e5 Pa, hence V*delta P is about 1-4 J/mol: O(1)
-# J/mol versus RT about 15 kJ/mol at 1500 C.  Gas-phase chemistry is handled
-# separately by the simulator's vapor-pressure/Ellingham stack, not by
+# J/mol versus RT about 15 kJ/mol at 1500 C.
+# For gate requests at 0.05/0.009 bar, delta P=(1-P)*1e5 Pa is
+# 95000/99100 Pa. With the conservative 40 cm^3/mol condensed molar-volume
+# difference, |delta mu| <= 4e-5 m^3/mol * delta P = 3.8/3.964 J/mol.
+# Pa*m^3 = J; the correction vanishes as requested P approaches 1 bar.
+# Gas-phase chemistry is handled separately by the simulator's
+# vapor-pressure/Ellingham stack, not by
 # alphaMELTS.  The subprocess transport hard-refuses sub-bar input, so its
 # consumers evaluate condensed-phase speciation at the alphaMELTS 1-bar model
 # reference whenever the physical overhead is sub-bar.  Ordinary ThermoEngine

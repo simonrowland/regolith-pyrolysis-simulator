@@ -39,7 +39,7 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
-from simulator.campaigns import CampaignManager
+from simulator.campaigns import CampaignManager, parse_campaign_override_value
 from simulator.condensation import (
     KnudsenRegimeRefusal,
     minimum_pressure_mbar_for_knudsen,
@@ -697,6 +697,58 @@ _PER_HOUR_CARRIER_MAP_FIELDS = (
 )
 
 
+def _socket_rounded_term_map(raw: object, places: int) -> dict[str, object]:
+    """Round a term map to the tick's published precision and drop zeros.
+
+    The runner summary keeps full precision. The hourly socket row does
+    not. A sub-resolution term serialises as a long float the moment it
+    becomes non-zero, and that one-time width is what the tick slope
+    reads as per-hour growth. The same magnitude is already 0 at the
+    tick body's decimal places.
+    """
+
+    if not isinstance(raw, Mapping):
+        return {}
+    compact: dict[str, object] = {}
+    for key, value in raw.items():
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            compact[str(key)] = value
+            continue
+        rounded = round(float(value), places)
+        if rounded == 0.0:
+            continue
+        compact[str(key)] = rounded
+    return compact
+
+
+def _socket_rounded_number(value: object, places: int) -> object:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return value
+    return round(float(value), places)
+
+
+def _socket_selectivity(raw: object) -> object:
+    """Drop dust fractions from the hourly selectivity row.
+
+    The runner summary keeps full precision. On the socket, a species
+    fraction below 1e-4 serialises as a long float on the hours that
+    evaporate and is absent on the hours that do not. That one-time
+    width is the per-hour summary slope. Targets and the two fluxes
+    stay, at the row's published precision.
+    """
+
+    if not isinstance(raw, Mapping):
+        return raw
+    compact = dict(raw)
+    fractions = raw.get("per_species_fraction")
+    if isinstance(fractions, Mapping):
+        compact["per_species_fraction"] = _socket_rounded_term_map(fractions, 4)
+    for key in ("total_flux_kg_hr", "target_flux_kg_hr", "target_selectivity"):
+        if key in compact:
+            compact[key] = _socket_rounded_number(compact[key], 6)
+    return compact
+
+
 def _per_hour_summary_entry(
     summary: Mapping[str, object],
 ) -> dict[str, object]:
@@ -706,12 +758,33 @@ def _per_hour_summary_entry(
         entry.pop(key, None)
     for key in _PER_HOUR_CARRIER_MAP_FIELDS:
         entry.pop(key, None)
+    for key, places in (
+        ('energy_cumulative_breakdown_kWh', 4),
+        ('energy_evaporation_breakdown_kWh', 4),
+    ):
+        if key in entry:
+            entry[key] = _socket_rounded_term_map(entry.get(key), places)
+    if 'evap_plane_selectivity' in entry:
+        entry['evap_plane_selectivity'] = _socket_selectivity(
+            entry.get('evap_plane_selectivity')
+        )
     redox_breakdown = entry.get('redox_source_breakdown')
     if isinstance(redox_breakdown, Mapping):
         # The live redox panel consumes this projection; verbose diagnostics
         # remain available in the run capture and completion payload.
+        # Term maps use the same zero-drop as the energy breakdowns: a
+        # skipped evaporative term that rounds to 0 is not a per-hour row.
         entry['redox_source_breakdown'] = {
-            key: redox_breakdown[key]
+            key: (
+                _socket_rounded_term_map(redox_breakdown[key], 6)
+                if key in {
+                    'applied_terms_mol_o2_equiv_by_label',
+                    'skipped_terms_mol_o2_equiv_by_label',
+                }
+                else _socket_rounded_number(redox_breakdown[key], 6)
+                if key in {'net_mol_o2_equiv', 'delta_log10_fO2'}
+                else redox_breakdown[key]
+            )
             for key in (
                 'applied_terms_mol_o2_equiv_by_label',
                 'skipped_terms_mol_o2_equiv_by_label',
@@ -820,6 +893,23 @@ def _browser_socket_payload(event: str, payload):
                     wall_risk.get('operating_point')
                 ),
                 'tick_view': 'compact',
+            }
+        # The per-hour row already carries oxygen_reservoir. A second copy
+        # on the tick body doubles every exchange-label change.
+        delta = emitted.get('per_hour_summary_delta')
+        if isinstance(delta, Mapping) and 'oxygen_reservoir' in delta:
+            emitted.pop('oxygen_reservoir', None)
+        evap_species = emitted.get('evap_species')
+        if isinstance(evap_species, Mapping):
+            # A rate that rounds to 0 is not evaporating. Keeping the key
+            # adds a species slot on the hour the publisher first mentions
+            # it, which the slope window then reads as growth.
+            emitted['evap_species'] = {
+                str(species): rate
+                for species, rate in evap_species.items()
+                if isinstance(rate, bool)
+                or not isinstance(rate, (int, float))
+                or float(rate) != 0.0
             }
     return emitted
 
@@ -2007,12 +2097,12 @@ def _coerce_additives_kg(value) -> dict[str, float]:
     return additives_kg
 
 
-def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, object]]:
+def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, float | str]]:
     if value is None:
         return {}
     if not isinstance(value, Mapping):
         raise InputValidationError('runtime_campaign_overrides must be an object')
-    overrides: dict[str, dict[str, object]] = {}
+    overrides: dict[str, dict[str, float | str]] = {}
     for campaign, fields in value.items():
         campaign_name = str(campaign).strip()
         if not campaign_name:
@@ -2023,7 +2113,7 @@ def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, object]]:
             raise InputValidationError(
                 f'runtime_campaign_overrides.{campaign_name} must be an object'
             )
-        clean_fields: dict[str, object] = {}
+        clean_fields: dict[str, float | str] = {}
         for field_name, field_value in fields.items():
             field_key = str(field_name).strip()
             if not field_key:
@@ -2035,17 +2125,21 @@ def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, object]]:
                 clean_fields[field_key] = field_value
                 continue
             if field_key in {'p_total_mbar', 'pO2_mbar'}:
+                # Pressure sign and the pO2-above-total ceiling are owned by
+                # validate_runtime_campaign_overrides below. A raw value keeps
+                # a non-numeric override on that typed refusal.
                 clean_fields[field_key] = field_value
                 continue
-            clean_value = _coerce_bounded_float(
-                field_value,
-                field=f'runtime_campaign_overrides.{campaign_name}.{field_key}',
-            )
-            if field_key == 'pO2_mbar' and clean_value < 0.0:
-                raise InputValidationError(
-                    f'runtime_campaign_overrides.{campaign_name}.{field_key} '
-                    'must be >= 0'
-                )
+            label = f'runtime_campaign_overrides.{campaign_name}.{field_key}'
+            if field_value is None or field_value == '':
+                raise InputValidationError(f'{label} is required')
+            try:
+                clean_value = parse_campaign_override_value(field_key, field_value, label)
+            except (TypeError, ValueError) as exc:
+                message = str(exc)
+                if message.startswith(f'{field_key} '):
+                    message = f'{label}{message[len(field_key):]}'
+                raise InputValidationError(message) from exc
             clean_fields[field_key] = clean_value
         if clean_fields:
             overrides[campaign_name] = clean_fields

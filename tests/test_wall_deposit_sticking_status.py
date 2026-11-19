@@ -13,7 +13,10 @@ from simulator.diagnostics import _coating_wall_deposit_selection
 import simulator.condensation as condensation_module
 from simulator.condensation import CondensationModel
 from simulator.core import CondensationTrain, EvaporationFlux, MeltState
-from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.diagnostics import (
+    WALL_STICKING_ALPHA_UNCERTIFIED_CODE,
+    wall_deposit_sticking_authority_status,
+)
 from simulator.optimize.objective import _coating_product_summary
 from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.study import (
@@ -252,6 +255,68 @@ def _materials_with_liner_alpha(
     return materials
 
 
+def test_fused_silica_sio_stage_and_liner_share_uncertified_proxy() -> None:
+    materials = condensation_module.MATERIALS_DATA
+    owner_map = materials["fused_silica_alpha_s_by_species"]
+    owner_entry = owner_map["SiO"]
+    assert materials["stages"][3]["alpha_s_by_species"] == owner_map
+    assert (
+        materials["liner_materials"]["fused_silica_baffles"][
+            "alpha_s_by_species"
+        ]
+        == owner_map
+    )
+
+    stage = next(
+        stage
+        for stage in CondensationTrain.create_default().stages
+        if stage.stage_number == 3
+    )
+    temperature_K = condensation_module._stage_midpoint_temperature_K(stage)
+    stage_record = condensation_module._stage_alpha_record(
+        stage,
+        "SiO",
+        T_K=temperature_K,
+    )
+    sidecar_record = condensation_module._sidecar_alpha_record(
+        "SiO",
+        T_K=temperature_K,
+    )
+
+    assert stage_record["alpha_s"] == sidecar_record["alpha_s"]
+    assert stage_record["value_ref"] == sidecar_record["value_ref"]
+    assert stage_record["source_class"] == owner_entry["source_class"]
+    assert stage_record["citation_status"] == "UNCERTIFIED"
+    assert stage_record["output_status"] == "status_bearing"
+    assert stage_record["uncertainty_flag"] == owner_entry["uncertainty_flag"]
+
+    liner_record = condensation_module._wall_alpha_record(
+        "SiO",
+        segment=SimpleNamespace(
+            name="stage_2_to_stage_3",
+            liner_material="fused_silica_baffles",
+            wall_temperature_C=stage.temp_range_C[0],
+        ),
+        T_K=temperature_K,
+    )
+    assert liner_record["alpha_s"] == stage_record["alpha_s"]
+    assert liner_record["source_class"] == owner_entry["source_class"]
+    assert liner_record["citation_status"] == "UNCERTIFIED"
+    assert liner_record["output_status"] == "status_bearing"
+    assert liner_record["uncertainty_flag"] == owner_entry["uncertainty_flag"]
+
+    route, _ = _route_wall_deposit_authority(
+        "SiO", wall_temperature_C=1700.0, stage3_route="through"
+    )
+    route_provenance = route.sticking_alpha_provenance_notice[
+        "alpha_s_provenance_by_species"
+    ]["SiO"]
+    for surface in ("stage_3", "stage_2_to_stage_3"):
+        assert route_provenance[surface]["uncertainty_flag"] == (
+            owner_entry["uncertainty_flag"]
+        )
+
+
 @pytest.mark.parametrize("temperature_K", [1200.0, 1523.15])
 @pytest.mark.parametrize("entrypoint", ["stage", "wall"])
 @pytest.mark.parametrize(
@@ -344,9 +409,12 @@ def _route_wall_deposit_authority(
     *,
     materials: dict[str, object] | None = None,
     wall_temperature_C: float = 900.0,
+    stage3_route: str = "divert",
 ) -> tuple[object, dict[str, object]]:
+    train = CondensationTrain.create_default()
+    train.collection_route["stage3_route"] = stage3_route
     model = CondensationModel(
-        CondensationTrain.create_default(),
+        train,
         wall_temperature_C=wall_temperature_C,
         materials=materials,
     )
@@ -668,7 +736,7 @@ def test_cited_fe_collector_inference_cannot_certify_wall_deposit() -> None:
     assert route.wall_deposit_by_species["Fe"] > 0.0
     assert authority["authoritative_for_deposit_mass"] is False
     # wall_temperature_C sets the interstage wall, not the condenser's stage
-    # setpoints. Stage 1 stays at the shipped 1150 C (1423.15 K), just below
+    # setpoints. Stage 1 stays at the shipped 1100 C (1373.15 K), below
     # the Tachibana band; its production-resolved Arrhenius value is flagged
     # out of domain, and transfer to this collector remains an inference.
     assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
@@ -702,8 +770,12 @@ def test_out_of_domain_cited_fe_alpha_computes_but_marks_wall_non_authoritative(
     assert extrapolated
     assert all(record["output_status"] == "status_bearing" for record in extrapolated)
     assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
-    assert authority["uncertified_alpha_species"] == []
+    # b1113 evaluates Fe on every stage. Stage 2 is inside the cited
+    # domain and its record is status_bearing, which
+    # _uncertified_alpha_record ranks as uncertified. That outranks
+    # the out-of-domain code. Fe stays out of domain on the other stages.
+    assert authority["code"] == WALL_STICKING_ALPHA_UNCERTIFIED_CODE
+    assert authority["uncertified_alpha_species"] == ["Fe"]
     assert authority["out_of_domain_alpha_species"] == ["Fe"]
 
 
@@ -958,7 +1030,10 @@ def test_later_no_deposit_route_cannot_erase_prior_out_of_domain_authority(
 
     assert second.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
     assert cumulative["authoritative_for_deposit_mass"] is False
-    assert cumulative["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    # The later notice still carries the in-domain status-bearing stage-2
+    # record, so the fold stays uncertified. It does not become authoritative.
+    assert cumulative["code"] == WALL_STICKING_ALPHA_UNCERTIFIED_CODE
+    assert cumulative["uncertified_alpha_species"] == ["Fe"]
     assert cumulative["out_of_domain_alpha_species"] == ["Fe"]
 
 
@@ -1265,7 +1340,10 @@ def test_zero_deposit_out_of_domain_alpha_remains_non_authoritative() -> None:
 
     assert route.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
     assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    # Same fold as the depositing route: the in-domain status-bearing
+    # stage-2 record keeps the code uncertified when nothing deposits.
+    assert authority["code"] == WALL_STICKING_ALPHA_UNCERTIFIED_CODE
+    assert authority["uncertified_alpha_species"] == ["Fe"]
     assert authority["out_of_domain_alpha_species"] == ["Fe"]
     assert authority["deposited_species"] == []
 
@@ -1889,3 +1967,133 @@ def test_measured_zero_alias_conflicts_with_a_positive_alias() -> None:
         "wall_deposit_kg_by_zone_species": {"hot_wall": {"Fe": 0.0}},
     }
     assert not _coating_wall_deposit_selection(zero_vs_zero)[1]
+
+
+@pytest.mark.parametrize("species_list", [False, True])
+def test_species_only_wall_pressure_refusal_survives_normalization(species_list):
+    from simulator.config import DEFAULT_DATA_DIR
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    catalog = load_cached_safe_yaml(
+        (DEFAULT_DATA_DIR / "species_catalog.yaml").read_text(encoding="utf-8")
+    )
+    for row in catalog["species"]:
+        species = row["id"]
+        notice = {
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": (
+                [species] if species_list else species
+            ),
+        }
+        authority = wall_deposit_sticking_authority_status({}, notice)
+        if row.get("direct_vapour_flux") is False:
+            assert species not in authority.get(
+                "wall_saturation_pressure_refused_species", (),
+            )
+            continue
+        for _ in range(2):
+            assert authority["wall_saturation_pressure_refused_species"] == [species]
+            assert authority["wall_saturation_pressure_refusals_by_species"] == {
+                species: {},
+            }
+            assert authority["authoritative_for_deposit_mass"] is False
+            authority = wall_deposit_sticking_authority_status({}, authority)
+
+
+@pytest.mark.parametrize("species", ["Cr2O3_gas", "CrO"])
+def test_wall_supply_refusal_uses_catalog_direct_flux_declaration(species):
+    from simulator.config import DEFAULT_DATA_DIR
+    from simulator.optimize.physics import _classify_wall_supply_interval
+    from simulator.wall_deposit_availability import wall_deposit_figure_availability
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    catalog = load_cached_safe_yaml(
+        (DEFAULT_DATA_DIR / "species_catalog.yaml").read_text(encoding="utf-8")
+    )
+    declaration = next(row for row in catalog["species"] if row["id"] == species)
+    direct_flux = declaration["direct_vapour_flux"]
+    assert direct_flux is (species == "CrO")
+    carriers = _carrier_authority(species, status="refused")
+    for key in ("pressure", "flux"):
+        carriers[species][key] = {
+            "kind": "refusal", "code": "missing_channel_contract",
+            "detail": "no flux law or computable activity-1 pressure",
+        }
+    interval = _classify_wall_supply_interval(
+        SimpleNamespace(
+            temperature_C=1600.0, duration_h=1.0,
+            oxygen_reservoir={"headspace_transport_pO2_bar": 1.0e-3},
+            evap_flux=SimpleNamespace(
+                published_species_kg_hr={}, species_kg_hr={},
+                melt_surface_area_m2=0.2, carrier_authority_by_species=carriers,
+            ),
+        ),
+        species,
+    )
+    assert interval.kind == "unavailable"
+    assert interval.evidence == "no_flux_law_and_no_psat"
+    authority = wall_deposit_sticking_authority_status(
+        {"hot_wall": {"Fe": 0.1}},
+        {"vapour_carrier_authority_by_species": carriers},
+    )
+    assert (species in authority["refused_carrier_species"]) is direct_flux
+    # Keep the refusal audit even when the catalog declares no melt supply.
+    assert authority["vapour_carrier_authority_by_species"][species] == carriers[species]
+    figure = wall_deposit_figure_availability(
+        has_positive_deposit=True, authority=authority,
+    )
+    assert figure.status == ("refused" if direct_flux else "available")
+
+
+@pytest.mark.parametrize("has_positive_deposit", [False, True])
+@pytest.mark.parametrize("carrier_status", ["refused", "status_bearing", "authoritative"])
+def test_wall_figure_preserves_upstream_carrier_refusal(
+    has_positive_deposit, carrier_status,
+):
+    from simulator.wall_deposit_availability import wall_deposit_figure_availability
+
+    authority = wall_deposit_sticking_authority_status(
+        {"hot_wall": {"Fe": 0.1}} if has_positive_deposit else {},
+        {
+            **_alpha_notice("Fe", cited=True),
+            "vapour_carrier_authority_by_species": _carrier_authority(
+                "Fe", status=carrier_status,
+            ),
+        },
+    )
+    figure = wall_deposit_figure_availability(
+        has_positive_deposit=has_positive_deposit, authority=authority,
+    )
+    if carrier_status == "refused":
+        assert figure.status == "refused"
+        assert figure.refusal["authority"] == authority
+        assert figure.refusal["authority"]["refused_carrier_species"] == ["Fe"]
+    else:
+        assert figure.status == ("available" if has_positive_deposit else "measured_empty")
+        assert figure.refusal is None
+
+
+@pytest.mark.parametrize("has_positive_deposit", [False, True])
+@pytest.mark.parametrize("booked", [(), ("Fe",), ("Fe", "CrO2")])
+def test_wall_figure_only_prices_fully_booked_refused_carriers(has_positive_deposit, booked):
+    from simulator.wall_deposit_availability import wall_deposit_figure_availability
+
+    authority = {
+        "refused_carrier_species": ["Fe", "CrO2"],
+        "wall_supply_bound_bookings": [
+            {"species": species, "supply_upper_bound_kg": 0.0, "deposit_kg": 0.0}
+            for species in booked
+        ],
+        "output_status": "status_bearing",
+        "authoritative_for_resinter": False,
+    }
+    figure = wall_deposit_figure_availability(
+        has_positive_deposit=has_positive_deposit, authority=authority,
+    )
+    if len(booked) < 2:
+        assert figure.status == "refused"
+        assert figure.refusal["authority"] == authority
+    else:
+        assert figure.status == ("available" if has_positive_deposit else "measured_empty")
+        assert figure.refusal is None
+    assert authority["refused_carrier_species"] == ["Fe", "CrO2"]

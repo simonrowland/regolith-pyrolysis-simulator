@@ -1013,12 +1013,22 @@ def test_pending_validation_is_not_refusal() -> None:
 
 
 @pytest.mark.parametrize(
-    ("temperature_K", "expected_out_of_range"),
-    ((448.15, True), (1800.0, False), (2300.0, True)),
+    (
+        "temperature_K",
+        "expected_fe_out_of_range",
+        "expected_nio_out_of_range",
+    ),
+    (
+        (448.15, True, True),
+        # 1800 K is below FeO's 1809 K floor; NiO remains in-range.
+        (1800.0, True, False),
+        (2300.0, True, True),
+    ),
 )
 def test_t609_real_rows_stay_status_bearing_through_request_layer(
     temperature_K: float,
-    expected_out_of_range: bool,
+    expected_fe_out_of_range: bool,
+    expected_nio_out_of_range: bool,
 ) -> None:
     payload = _yaml("vapor_pressures.yaml")
     catalog = compile_vapour_rail_catalog(
@@ -1049,6 +1059,11 @@ def test_t609_real_rows_stay_status_bearing_through_request_layer(
     )
 
     for species_id in ("FeO_association_gas", "NiO_gas"):
+        expected_out_of_range = (
+            expected_fe_out_of_range
+            if species_id == "FeO_association_gas"
+            else expected_nio_out_of_range
+        )
         answer = batch.channel(species_id)
         assert answer.source_account == "process.cleaned_melt"
         assert answer.validation_status == "pending_validation"
@@ -1121,17 +1136,14 @@ def test_t622_real_rows_share_diagnostic_only_typed_ood_policy(
     assert answer.verdict_status == "status_bearing_non_authoritative"
     assert answer.certification_ceiling == "never"
     assert not answer.is_flux_active
+    assert isinstance(answer.pressure, PressureUpperBound)
+    assert isinstance(answer.flux, FluxDiagnosticUpperBound)
+    assert answer.pressure.pa > 0
+    assert answer.extra["out_of_range"] is expected_refusal
     if expected_refusal:
-        assert isinstance(answer.pressure, PressureRefusal)
-        assert answer.pressure.code == REFUSAL_OUTSIDE_DECLARED_DOMAIN
-        assert isinstance(answer.flux, FluxRefusal)
-    else:
-        assert isinstance(answer.pressure, PressureUpperBound)
-        assert isinstance(answer.flux, FluxDiagnosticUpperBound)
-        assert answer.extra["alpha_inventory_policy"] == (
-            "diagnostic_only_no_inventory_debit"
-        )
-        assert answer.extra["alpha_authority_status"] == "diagnostic_upper_bound"
+        assert "reason=outside_declared_evaluator_domain" in answer.extra["domain_notice"]
+        assert "authority_level=extrapolated" in answer.extra["domain_notice"]
+        assert "certified_band=" in answer.extra["domain_notice"]
 
 
 def test_t568_shadow_is_golden_neutral_and_fail_isolated(monkeypatch) -> None:
@@ -4464,3 +4476,11 @@ def test_legacy_view_production_warm_hit_budget() -> None:
     assert proj_loop < 0.005, (
         f"projected re-entry loop too slow: {proj_loop*1000:.2f} ms"
     )
+
+
+@pytest.mark.parametrize("temperature", [0., -1., float("nan")])
+def test_declared_domain_continuation_rejects_invalid_temperature(temperature):
+    from simulator.vapour_rail.domain_policy import declared_domain_transition, DomainPolicyError
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    with pytest.raises(DomainPolicyError, match="finite and positive"):
+        declared_domain_transition(catalog.species["MnO_gas"], temperature)

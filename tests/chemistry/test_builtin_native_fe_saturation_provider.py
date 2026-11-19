@@ -19,6 +19,7 @@ from simulator.chemistry.kernel.validation import (
 )
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _atom_check, _build_sim
+from tests.native_fe_test_support import NATIVE_FE_ROUTE_ACCOUNTS
 
 
 DECLARED_ACCOUNTS = frozenset({
@@ -285,6 +286,10 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         feedstocks_data,
         setpoints_data,
     )
+    before_routed_fe_kg = {
+        account: sim.atom_ledger.kg_by_account(account).get("Fe", 0.0)
+        for account in NATIVE_FE_ROUTE_ACCOUNTS
+    }
     before = {
         account: dict(sim.atom_ledger.mol_by_account(account))
         for account in DECLARED_ACCOUNTS
@@ -351,16 +356,15 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
     if feedstock_id == "lunar_mare_low_ti":
         accounts = {
             account: sim.atom_ledger.kg_by_account(account)
-            for account in (
-                "process.overhead_gas",
-                "process.condensation_train",
-                "process.wall_deposit_segment_stage_0_to_stage_1",
-                "process.wall_deposit_segment_stage_1_to_stage_2",
-            )
+            for account in NATIVE_FE_ROUTE_ACCOUNTS
         }
+        # d-402 solid-wall equilibrium can capture Fe into the Stage-4
+        # cartridge residue; include that explicit sink with gas, train,
+        # and segment deposits so this pin still measures the vapor pool.
         routed_fe_kg = sum(
             float(species_kg.get("Fe", 0.0) or 0.0)
-            for species_kg in accounts.values()
+            - before_routed_fe_kg[account]
+            for account, species_kg in accounts.items()
         )
         assert routed_fe_kg == pytest.approx(
             golden["native_vapor_Fe_kg"],

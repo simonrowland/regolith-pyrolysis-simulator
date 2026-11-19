@@ -25,9 +25,9 @@ thermochemistry:
 compositions:
   FeO_association_gas:
     pressure_reaction: Fe(g) + 0.5 O2(g) -> FeO(g)
-    base: metals_fe_family effective_pressure_reference_fit
-    base_system_class: silicate_melt_effective_fit
-    base_condensed_form: liquid_melt
+    base: metals_fe_family pure_component_antoine
+    base_system_class: pure_metal_saturation
+    base_condensed_form: pure_iron
     base_validation_use: computational_provenance_only
     derived_channel:
       channel_id: O2
@@ -39,9 +39,12 @@ compositions:
     ledger_parent_kg_per_kg_vapor: 1.0
     ledger_O2_kg_per_kg_vapor: 0.0
     caveat: >-
-      The Fe base is an activity-folded effective pressure fit. Association
-      therefore supplies an explicit high-fO2 status-bearing screen, not a
-      certified unit-activity FeO vaporization curve.
+      The Fe base is the pure-Fe saturation pressure (a_Fe = 1, C = 0), not
+      the VapoRock activity-folded effective fit. That fit remains the catalog
+      Fe pressure-model row; it is not this composite's base. Association
+      supplies p_FeO = K * p_sat(Fe) * (pO2/P°)^0.5, a metal-saturated screen,
+      not a certified a_FeO vaporization curve. The C = 1000 effective fit made
+      p_FeO rise as T fell because its low-T slope is flatter than |ΔH_assoc|.
     alternative_condensed_standard_state_check:
       source_observation_id: cea_Fe.947O(L)_gibbs
       reaction: Fe0.95O(l) -> 0.95 FeO(g) + 0.025 O2(g)

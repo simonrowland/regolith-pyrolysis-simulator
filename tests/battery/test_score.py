@@ -4175,15 +4175,15 @@ def test_unknown_method_on_vapour_is_typed_method_unknown() -> None:
     assert residual.refusal.reason is not RefusalReason.UNDERDETERMINED_APPARATUS
 
 
-@pytest.mark.parametrize(
-    ("temperature", "expected_pressure", "extrapolated"),
-    [
-        (Decimal("1056"), Decimal("33991.26"), False),
-        (Decimal("1200"), Decimal("117402.2"), True),
-    ],
-)
+def _browning_potter_pa(temperature_K: float) -> float:
+    # Fink & Leibowitz ANL/RE-95/2 §1.2 Eq. (1), written here.
+    ln_p_mpa = 11.9463 - 12633.73 / temperature_K - 0.4672 * math.log(temperature_K)
+    return 1.0e6 * math.exp(ln_p_mpa)
+
+
+@pytest.mark.parametrize("temperature", [Decimal("1056"), Decimal("1200")])
 def test_static_equilibrium_pressure_uses_pure_sodium_total_surface(
-    temperature: Decimal, expected_pressure: Decimal, extrapolated: bool
+    temperature: Decimal,
 ) -> None:
     experiment = F.tabulation_experiment(
         method=MethodToken.STATIC_EQUILIBRIUM, T_K=temperature
@@ -4196,28 +4196,23 @@ def test_static_equilibrium_pressure_uses_pure_sodium_total_surface(
         "static-pure-sodium",
         experiment.experiment_id,
         identity,
-        expected_pressure,
+        Decimal("0"),
         source_id="static-source",
     )
 
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL, reference, experiment=experiment
     )
+    expected_pressure = _browning_potter_pa(float(temperature))
 
     assert prediction.value is not None
-    assert abs(float(prediction.value) - float(expected_pressure)) <= (
-        float(expected_pressure) * 1e-6
-    )
+    assert float(prediction.value) == pytest.approx(expected_pressure, rel=1e-9)
     assert prediction.unit == "Pa"
+    assert prediction.coefficient_basis == "pure_component_saturation"
     assert prediction.identity is identity
     assert prediction.identity.species.phase.value is Phase.L
-    assert prediction.authority is (
-        Authority.EXTRAPOLATED if extrapolated else Authority.CERTIFIED
-    )
-    assert any(
-        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-        for notice in prediction.notices
-    ) is extrapolated
+    assert prediction.authority is Authority.CERTIFIED
+    assert prediction.notices == ()
 
 
 # Matching-basis pressures captured from predict_with_engine. The mismatched
@@ -4228,23 +4223,6 @@ _ANTOINE_MATCHING_CASES = (
     ("Si", Decimal("1800"), Phase.L, Decimal("0.320744894252916"), ()),
     ("Mn", Decimal("1400"), Phase.CR, Decimal("22.630450812668585"), ()),
     ("Mn", Decimal("1519"), Phase.CR, Decimal("135.85703758590856"), ()),
-    (
-        "Na",
-        Decimal("1056"),
-        Phase.L,
-        Decimal("33991.26166001457"),
-        ("antoine-segment-phase-undeclared",),
-    ),
-    (
-        "Na",
-        Decimal("1200"),
-        Phase.L,
-        Decimal("117402.20851973725"),
-        (
-            "pure_component_antoine_extrapolated",
-            "antoine-segment-phase-undeclared",
-        ),
-    ),
 )
 
 
@@ -4297,6 +4275,16 @@ def test_static_equilibrium_antoine_refuses_reservoir_phase_and_phase_boundary_g
         assert prediction.refusal_reason is None, (formula, temperature, phase)
         assert prediction.value == expected
         assert tuple(notice.reason for notice in prediction.notices) == notice_reasons
+
+    for temperature in (Decimal("1056"), Decimal("1200")):
+        prediction = _static_psat("Na", temperature, Phase.L)
+        assert prediction.refusal_reason is None
+        assert float(prediction.value) == pytest.approx(
+            _browning_potter_pa(float(temperature)),
+            rel=1e-9,
+        )
+        assert prediction.notices == ()
+        assert prediction.coefficient_basis == "pure_component_saturation"
 
     _assert_antoine_phase_refusal(
         "Si",
@@ -15647,6 +15635,7 @@ def _corrupt_o037_janaf_source_hash(monkeypatch: pytest.MonkeyPatch) -> None:
         return corrupted
 
     monkeypatch.setattr(janaf, "load_table_document", corrupt_o037_hash)
+    monkeypatch.setattr("simulator.reference_data.janaf.load_table_document", corrupt_o037_hash)
     janaf._fusion_table_points.cache_clear()
     janaf._janaf_pure_solid_table_temperature_range.cache_clear()
 
@@ -16619,6 +16608,7 @@ def test_missing_janaf_fusion_node_refuses_activity_residual(
         return incomplete
 
     monkeypatch.setattr(janaf, "load_table_document", missing_alumina_row)
+    monkeypatch.setattr("simulator.reference_data.janaf.load_table_document", missing_alumina_row)
     janaf._fusion_table_points.cache_clear()
     janaf._fusion_missing_gibbs_temperatures.cache_clear()
 
@@ -16673,7 +16663,9 @@ def test_absent_janaf_fusion_grid_node_refuses_interpolation(
         return points, digest
 
     monkeypatch.setattr(janaf, "_fusion_table_points", without_silica_1700)
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_table_points", without_silica_1700)
     monkeypatch.setattr(janaf, "_fusion_missing_gibbs_temperatures", lambda _table_id: ())
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_missing_gibbs_temperatures", lambda _table_id: ())
 
     with pytest.raises(ValueError, match="1700"):
         janaf.janaf_fusion_energy("SiO2", Decimal("1673"))
@@ -16694,7 +16686,9 @@ def test_fusion_comparison_skips_missing_node_outside_interpolation_bracket(
         return points, digest
 
     monkeypatch.setattr(janaf, "_fusion_table_points", without_silica_1700)
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_table_points", without_silica_1700)
     monkeypatch.setattr(janaf, "_fusion_missing_gibbs_temperatures", lambda _table_id: ())
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_missing_gibbs_temperatures", lambda _table_id: ())
     experiment = F.kems_experiment()
     reference = F.observation(
         "silica-activity-across-missing-janaf-node",
@@ -17558,7 +17552,9 @@ def test_magemin_composition_gate_is_a_typed_out_of_domain_refusal(
         bench_module,
         "activity_request_for_engine",
         lambda *_args, **_kwargs: SimpleNamespace(
-            payload={"composition_mol": {"SiO2": Decimal("0.1"), "MgO": Decimal("0.9")}}
+            # Positive SiO2 beyond the calibration window is extrapolated
+            # with a notice; zero silica remains a typed domain refusal.
+            payload={"composition_mol": {"SiO2": Decimal("0"), "MgO": Decimal("1")}}
         ),
     )
 
@@ -17646,7 +17642,7 @@ def test_fusion_conversion_without_unique_janaf_crossing_returns_typed_notice(
     ):
         raise ValueError(f"{formula}: expected one JANAF cr/l crossing, got []")
 
-    monkeypatch.setattr(janaf, "_janaf_fusion_energy_for_pair", no_unique_crossing)
+    monkeypatch.setattr("simulator.reference_data.janaf._janaf_fusion_energy_for_pair", no_unique_crossing)
     identity = _with_activity_reference_polymorph(identity, "lime")
     reference = replace(reference, identity=identity)
     result = fusion_comparison_reference(reference)

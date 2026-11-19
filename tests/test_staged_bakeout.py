@@ -317,7 +317,7 @@ def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():
     )
 
 
-def test_c2a_staged_pipework_has_no_upstream_cold_spot():
+def test_c2a_staged_pipework_flags_upstream_cold_spots():
     sim = _run_staged()
     cold_spot_history = list(
         getattr(sim.condensation_model, "cold_spot_history", []) or []
@@ -335,9 +335,12 @@ def test_c2a_staged_pipework_has_no_upstream_cold_spot():
         for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
     )
 
-    assert warnings == []
-    # No upstream cold spot is still the routing invariant. The 2026-06-29
-    # reactive SiO wall-product fix keeps the expected wall magnitude nonzero.
+    # d-402 evaluates pO2-free wall bounds for reactive vapours, so cold
+    # upstream surfaces are reported instead of being hidden by a refusal.
+    assert warnings
+    assert any("CrO sees 1800.0 C before stage 2" in warning for warning in warnings)
+    # The upstream cold-spot reports do not change the routed wall product.
+    # The 2026-06-29 reactive SiO wall-product fix keeps its magnitude nonzero.
     # 2026-06-30 cold-wall SiO uses the grounded Pound 1972 unity condensation
     # gate below the Wetzel/Gail evaporation-Arrhenius validity floor.
     # 2026-07-01 C4b stores the wall deposit as Si/SiO2/FeSi products, not SiO.

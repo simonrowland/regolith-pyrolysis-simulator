@@ -1509,8 +1509,8 @@ def test_c2_pressure_is_finite_over_required_grid(species_id: str) -> None:
 @pytest.mark.parametrize("species_id", STRUCTURAL_SPECIES)
 def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> None:
     # Runtime contract b-142: the anti-cliff continuation is normally the best
-    # available status-bearing point estimate. Rows whose source polynomials are
-    # narrower than the outer continuation declare a typed refusal instead.
+    # available status-bearing point estimate. Pending-validation carriers
+    # retain diagnostic upper bounds and never debit inventory.
     if CATALOG.species[species_id].code_metadata.source_account == "process.stage0_foulant":
         direct = _evaluate(species_id, 2300.0)
         split = chi_escape_salt(species_id, 2300.0 - 273.15, 1.0e-3)
@@ -1520,18 +1520,7 @@ def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> Non
         evaluator = CATALOG.evaluator_for(species_id)
         out_of_range_temperature_K = evaluator.valid_temperature_K[1] + 1.0
         batch, answer = _resolve_one(species_id, out_of_range_temperature_K)
-        typed_refusal = (
-            CATALOG.species[species_id].code_metadata.raw.get(
-                "out_of_domain_disposition"
-            )
-            == "typed_refusal"
-        )
-        if typed_refusal:
-            assert isinstance(answer.pressure, PressureRefusal)
-            assert answer.pressure.code == "outside_declared_evaluator_domain"
-            assert isinstance(answer.flux, FluxRefusal)
-            assert species_id not in batch.flux_active_species_ids
-        elif answer.extra.get("alpha_authority_status") == "diagnostic_upper_bound":
+        if answer.extra.get("alpha_authority_status") == "diagnostic_upper_bound":
             assert isinstance(answer.pressure, PressureUpperBound)
             assert isinstance(answer.flux, FluxDiagnosticUpperBound)
             assert species_id not in batch.flux_active_species_ids
@@ -1539,12 +1528,10 @@ def test_c2_out_of_domain_value_is_typed_diagnostic_flux(species_id: str) -> Non
             assert isinstance(answer.pressure, PressureValue)
             assert isinstance(answer.flux, FluxEligible)
             assert species_id in batch.flux_active_species_ids
-        if not typed_refusal:
-            assert answer.extra["out_of_range"] is True
-            assert answer.extra["status"]
-            assert answer.extra["acquisition_flag"]
-            assert answer.pressure.pa > 0.0
-
+        assert answer.extra["out_of_range"] is True
+        assert answer.extra["status"]
+        assert answer.extra["acquisition_flag"]
+        assert answer.pressure.pa > 0.0
 
 @pytest.mark.parametrize("species_id", STRUCTURAL_SPECIES)
 def test_c3_po2_exponent_is_stoichiometric_and_numerically_active(
@@ -2252,9 +2239,10 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
     # Premise: all seven carriers draw from one Al2O3 reservoir. Al atoms per
     # carrier are 1,2,2,2,2,1,1; O2 released per carrier is
     # 3/4,3/2,1,1/2,0,1/4,-1/4. Algebra: sum each applied carrier mole times
-    # its coefficient exactly once. Unit check: kg/(kg/mol)=mol. Sanity:
-    # AlO2 consumes O2 while every other oxidized carrier releases no more
-    # oxygen than its shared Al2O3 parent contains.
+    # its coefficient exactly once. Unit check: each kg/hr rate is applied for
+    # this one-hour route, so kg/(kg/mol)=mol. Sanity: AlO2 consumes O2 while
+    # every other oxidized carrier releases no more oxygen than its shared
+    # Al2O3 parent contains.
     carrier_mol = {
         species_id: rate_kg_hr
         / resolve_species_formula(
@@ -2288,6 +2276,18 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
         carrier_mol[species_id] * o2_per_carrier[species_id]
         for species_id in carrier_mol
     )
+    # Reverse the source reaction for the AlO2 that d-402 captures as a solid:
+    # AlO2(g) -> 1/2 Al2O3(s) + 1/4 O2(g). The production route supplies the
+    # captured mass; multiplying its moles by -the source O2 coefficient gives
+    # the returned O2. Units are (kg / kg mol-1) * mol O2 / mol AlO2 = mol O2;
+    # zero AlO2 capture reduces this to the source-only carrier sum above.
+    al_o2_capture = sim.condensation_model.last_condensation_authority_by_species[
+        "AlO2"
+    ]["condensed_mass_kg_hr"]
+    al_o2_capture_mol = al_o2_capture / resolve_species_formula(
+        "AlO2", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    returned_wall_o2_mol = -al_o2_capture_mol * o2_per_carrier["AlO2"]
 
     after_al = sim.atom_ledger.atom_moles_by_account("process.cleaned_melt")["Al"]
     after_o2 = sum(
@@ -2295,7 +2295,9 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
         for account in ("process.overhead_gas", "reservoir.fo2_buffer")
     )
     assert before_al - after_al == pytest.approx(expected_al_debit_mol, rel=1.0e-11)
-    assert after_o2 - before_o2 == pytest.approx(expected_o2_release_mol, rel=1.0e-11)
+    assert after_o2 - before_o2 == pytest.approx(
+        expected_o2_release_mol + returned_wall_o2_mol, rel=1.0e-11
+    )
     transition_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }

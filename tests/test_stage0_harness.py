@@ -186,7 +186,22 @@ def test_real_feedstock_stops_at_c0b_path_ab_pause(monkeypatch):
     )
 
 
-def test_debug_feedstock_stops_on_campaign_leave():
+def test_debug_feedstock_stops_on_campaign_leave(monkeypatch):
+    from simulator.evaporation import EvaporationMixin
+
+    blocked = []
+    original = EvaporationMixin._calculate_evaporation
+
+    def capture_nonpositive_drive(sim, equilibrium, **kwargs):
+        flux = original(sim, equilibrium, **kwargs)
+        diagnostic = sim._last_evaporation_flux_diagnostic
+        if sim.melt.temperature_C == 950.0:
+            forces = diagnostic.get("net_driving_force_by_species", {})
+            if "Fe" in forces:
+                blocked.append((dict(diagnostic), flux))
+        return flux
+
+    monkeypatch.setattr(EvaporationMixin, "_calculate_evaporation", capture_nonpositive_drive)
     session = SimSession().start(
         _session_config(
             "debug_pure_feo",
@@ -198,6 +213,15 @@ def test_debug_feedstock_stops_on_campaign_leave():
     assert result.stop_reason == "campaign_left_stage0"
     assert session.simulator.melt.campaign == CampaignPhase.C2A_STAGED
     assert result.total_hours < 150
+    assert blocked
+    diagnostic, flux = blocked[0]
+    assert flux.species_kg_hr == {}
+    assert diagnostic["batch_channel_states"]["Fe"] == "zero_by_physics"
+    force = diagnostic["net_driving_force_by_species"]["Fe"]
+    assert force["headspace_partial_pressure_Pa"] > force["capped_equilibrium_pressure_Pa"]
+    assert force["driving_force_Pa"] < 0.0
+    assert force["driving_force_sign"] == "non_positive"
+    assert "bracket=lower" in force["closure_bracket_state"]
 
 
 def test_max_stage0_hours_guard_fails_loud():

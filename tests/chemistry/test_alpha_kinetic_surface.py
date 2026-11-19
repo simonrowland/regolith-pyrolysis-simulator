@@ -200,7 +200,7 @@ def test_new_proxy_species_flux_scales_with_yaml_alpha():
     )
 
 
-def test_cro2_missing_alpha_refuses_only_cro2_and_retains_parent_oxide():
+def test_cro2_missing_alpha_predicts_flagged_upper_bound():
     request = IntentRequest(
         intent=ChemistryIntent.EVAPORATION_FLUX,
         account_view=ProviderAccountView(
@@ -240,21 +240,11 @@ def test_cro2_missing_alpha_refuses_only_cro2_and_retains_parent_oxide():
 
     assert result.status == "ok"
     assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] > 0.0
-    assert "CrO2" not in result.diagnostic["evaporation_flux_kg_hr"]
-    assert set(result.diagnostic["missing_alpha"]) == {"CrO2"}
-    refusal = result.diagnostic["species_refusals"]["CrO2"]
-    assert refusal["policy"] == "fail_loud_missing_alpha"
-    assert refusal["fallback_control"] == (
-        "chemistry_kernel.allow_unmeasured_alpha_fallback"
-    )
-    assert refusal["P_eq_Pa"] == 100.0
-    assert refusal["P_bulk_Pa"] == 0.0
-    assert refusal["baseline_alpha_1_rate_kg_hr"] > 1e-12
-    assert refusal["status"] == "refused"
-    assert refusal["reason"] == "missing_evaporation_alpha"
-    assert refusal["disposition"] == "retained_in_condensed_parent_oxide"
-    assert refusal["parent_oxide"] == "Cr2O3"
-    assert "per-species evaporation refusal" in result.warnings[0]
+    assert result.diagnostic["evaporation_flux_kg_hr"]["CrO2"] > 0.0
+    assert "missing_alpha" not in result.diagnostic
+    assert result.diagnostic["alpha_used_by_species"]["CrO2"] == 1.0
+    assert result.diagnostic["alpha_authority_status_by_species"]["CrO2"] == "analytical_upper_bound"
+    assert "upper bound" in result.warnings[0]
 
 
 def test_cro2_composite_refuses_missing_activity_evidence() -> None:
