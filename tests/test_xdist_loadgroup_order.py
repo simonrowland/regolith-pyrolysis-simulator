@@ -82,9 +82,9 @@ def test_a(): pass
 
     expected = [
         "test_b",
+        "test_serial",
         "test_a",
         "test_c",
-        "test_serial",
         "test_unknown",
         "test_unknown_2",
     ]
