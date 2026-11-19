@@ -289,15 +289,18 @@ def _make_absent_magemin(monkeypatch):
     )
 
 
-def _isolate_magemin_subprocess_slot(monkeypatch, tmp_path):
+def _isolate_magemin_subprocess_slot(monkeypatch, tmp_path, *, lock_dir=None):
     """Keep mocked subprocess tests independent of the host-wide flock."""
     import simulator.melt_backend.magemin as magemin_module
 
-    monkeypatch.setattr(magemin_module, "_MAGEMIN_SUBPROCESS_LOCK_DIR", tmp_path)
+    lock_dir = tmp_path if lock_dir is None else lock_dir
+    monkeypatch.setattr(
+        magemin_module, "_MAGEMIN_SUBPROCESS_LOCK_DIR", lock_dir
+    )
     monkeypatch.setattr(
         magemin_module,
         "_MAGEMIN_SUBPROCESS_LOCK",
-        tmp_path / "magemin-subprocess.lock",
+        lock_dir / "magemin-subprocess.lock",
     )
 
 
@@ -1243,11 +1246,7 @@ def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
     backend._bridge = 'subprocess'
     backend._binary_path = Path('/fake/MAGEMin')
     backend._config = {'timeout_s': 0.001}
-    lock_path = tmp_path / 'magemin.lock'
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path
-    )
-    monkeypatch.setattr(magemin_module, '_MAGEMIN_SUBPROCESS_LOCK', lock_path)
+    _isolate_magemin_subprocess_slot(monkeypatch, tmp_path)
     monkeypatch.setattr(
         magemin_module, '_magemin_subprocess_slot_count', lambda: 1
     )
@@ -1277,20 +1276,13 @@ def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
 def test_magemin_subprocess_slot_permission_error_returns_not_converged(
     monkeypatch, tmp_path,
 ):
-    from simulator.melt_backend import magemin as magemin_module
-
     backend = MAGEMinBackend()
     backend._available = True
     backend._bridge = 'subprocess'
     backend._binary_path = Path('/fake/MAGEMin')
     backend._config = {'timeout_s': 1.0}
     lock_dir = tmp_path / 'read-only'
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', lock_dir
-    )
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK', lock_dir / 'magemin.lock'
-    )
+    _isolate_magemin_subprocess_slot(monkeypatch, tmp_path, lock_dir=lock_dir)
     original_mkdir = Path.mkdir
 
     def deny_lock_dir(path, *args, **kwargs):
@@ -5130,13 +5122,7 @@ def test_magemin_subprocess_launches_are_serialized_across_callers(
     import simulator.melt_backend.magemin as magemin_module
 
     monkeypatch.setenv('REGOLITH_MAGEMIN_SLOTS', '1')
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK',
-        tmp_path / 'isolated-magemin.lock',
-    )
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path,
-    )
+    _isolate_magemin_subprocess_slot(monkeypatch, tmp_path)
 
     first_entered = threading.Event()
     release_first = threading.Event()
@@ -5214,13 +5200,7 @@ def test_magemin_subprocess_slots_bound_concurrency(monkeypatch, tmp_path):
     import simulator.melt_backend.magemin as magemin_module
 
     monkeypatch.setenv('REGOLITH_MAGEMIN_SLOTS', '3')
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK',
-        tmp_path / 'isolated-magemin.lock',
-    )
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path,
-    )
+    _isolate_magemin_subprocess_slot(monkeypatch, tmp_path)
     held = []
     waited = []
     # 4 parties: the 3 slot holders + the main thread (a 3-party barrier

@@ -2016,9 +2016,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
 
         if native_activity_formula is not None:
-            native_bulk_component = (
-                None if native_spec is None else native_spec[2]
-            )
+            native_bulk_component = native_spec[2]
             if (
                 native_bulk_component is not None
                 and bulk_projection.composition_wt_pct.get(
@@ -2232,8 +2230,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             except (TypeError, ValueError, OverflowError):
                 activity_value = math.nan
             if (
-                native_spec is None
-                or solver_status not in {0, 1, 2}
+                solver_status not in {0, 1, 2}
                 or not math.isfinite(activity_value)
                 or activity_value <= 0.0
             ):
