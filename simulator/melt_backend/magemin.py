@@ -3446,12 +3446,18 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             temperature_C=temperature_C,
             fO2_log=fO2_log,
         )
+        fixed_pressure = f'{pressure_kbar:.6f}'
+        pressure_argument = (
+            fixed_pressure
+            if float(fixed_pressure) == pressure_kbar
+            else f'{pressure_kbar:.6g}'
+        )
         args = [
             str(binary_path),
             '--Verb=0',
             f'--db={self._effective_database()}',
             f'--Temp={temperature_C:.6f}',
-            f'--Pres={pressure_kbar!r}',
+            f'--Pres={pressure_argument}',
             '--sys_in=wt',
             '--Bulk=' + ','.join(f'{value:.6f}' for value in bulk_projection.vector),
             f'--buffer={buffer_name}',
