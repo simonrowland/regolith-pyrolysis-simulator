@@ -11,6 +11,7 @@ from simulator.melt_backend.base import (
     LiquidFractionInvalidError,
     MeltBackendError,
 )
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.melt_regime import liquid_fraction_invalidity
 
@@ -201,9 +202,17 @@ class LiquidusSolidusResult:
         if self.liquidus_T_K is not None:
             object.__setattr__(self, 'liquidus_T_K', _declared_float(self.liquidus_T_K, 'liquidus_T_K'))
         if self.liquidus_T_K is None and self.liquidus_T_C is not None:
-            object.__setattr__(self, 'liquidus_T_K', self.liquidus_T_C + 273.15)
+            object.__setattr__(
+                self,
+                'liquidus_T_K',
+                self.liquidus_T_C + CELSIUS_TO_KELVIN_OFFSET,
+            )
         if self.liquidus_T_C is None and self.liquidus_T_K is not None:
-            object.__setattr__(self, 'liquidus_T_C', self.liquidus_T_K - 273.15)
+            object.__setattr__(
+                self,
+                'liquidus_T_C',
+                self.liquidus_T_K - CELSIUS_TO_KELVIN_OFFSET,
+            )
         if self.solidus_T_C is not None:
             object.__setattr__(self, 'solidus_T_C', _declared_float(self.solidus_T_C, 'solidus_T_C'))
         if self.liquid_fraction is not None:
@@ -282,9 +291,17 @@ class EquilibriumCrystallizationPathResult:
         if self.liquidus_T_K is not None:
             object.__setattr__(self, 'liquidus_T_K', _declared_float(self.liquidus_T_K, 'liquidus_T_K'))
         if self.liquidus_T_K is None and self.liquidus_T_C is not None:
-            object.__setattr__(self, 'liquidus_T_K', self.liquidus_T_C + 273.15)
+            object.__setattr__(
+                self,
+                'liquidus_T_K',
+                self.liquidus_T_C + CELSIUS_TO_KELVIN_OFFSET,
+            )
         if self.liquidus_T_C is None and self.liquidus_T_K is not None:
-            object.__setattr__(self, 'liquidus_T_C', self.liquidus_T_K - 273.15)
+            object.__setattr__(
+                self,
+                'liquidus_T_C',
+                self.liquidus_T_K - CELSIUS_TO_KELVIN_OFFSET,
+            )
         if self.solidus_T_C is not None:
             object.__setattr__(self, 'solidus_T_C', _declared_float(self.solidus_T_C, 'solidus_T_C'))
         if self.liquid_fraction is not None:
