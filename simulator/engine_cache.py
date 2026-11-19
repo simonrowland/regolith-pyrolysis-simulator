@@ -307,7 +307,7 @@ def cacheable_refusal(result) -> bool:
     )
 
 ENGINE_CHEMISTRY_VERSION = {
-    "openimcc": 4,
+    "openimcc": 5,
     "internal-analytical": 3,
     "vaporock": 1,
     "magemin": 3,
@@ -335,6 +335,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # internal-analytical v3: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f); d-207 - phase-basis liquidus authority can lower the adapter vapour switch
 # openimcc v3: 2026-11-19 OpenIMCC 979adb2 re-pin (text/identity only) and species_thermo scoring (d-446)
 # openimcc v4: 2026-11-19 OpenIMCC a13801f adds coefficient ancestry metadata; no numeric prediction change
+# openimcc v5: 2026-11-19 OpenIMCC 7e202a3 adds gas/crystal thermo identity and source-anchor metadata consumed by scoring; crystal continuation can now change scored rows
 
 
 @dataclass(frozen=True)
@@ -558,7 +559,7 @@ def _engine_cache_input_identity_digest(engine_id: str) -> bytes:
 
 ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     "openimcc": {
-        "identity": "commit:a13801f6d3e19de96aa7e5bf370e6ceecfb0316e",
+        "identity": "commit:7e202a3ad3631d1d08b22d59952b4d14e64aff51",
         "date": "2026-11-19",
     },
     "internal-analytical": {
