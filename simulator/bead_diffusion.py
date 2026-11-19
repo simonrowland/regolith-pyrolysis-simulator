@@ -16,6 +16,9 @@ D(T) for Na and Cu are the literature expressions Su and Zhang print
 ``D = exp(Da - Db/T)``). They are not fits to the 74220 profiles. K has
 no printed tracer diffusivity, so a potassium call refuses.
 
+Cooling time is the bead's own heat-loss half-time, not a fitted plume
+timescale. Zhang's 2008 law then uses that half-time as tau.
+
 This module does not read the paper's fitted tau, a0 or b0.
 """
 
@@ -24,6 +27,8 @@ from __future__ import annotations
 import math
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+
+from simulator.physical_constants import STEFAN_BOLTZMANN
 
 # Lowry et al. 1982, as printed by Su and Zhang, thesis Chapter 3 printed
 # page 61 (physical PDF page 76). Supplement DOCX: Da = -9.251, Db = 19628,
@@ -505,3 +510,301 @@ def oxide_mass_kg(
         density * fraction * volume
         for fraction, volume in zip(mass_fraction, grid.volume_m3)
     )
+
+
+def _non_negative_number(value: float, reason: str) -> float:
+    number = _finite_number(value, reason)
+    if number < 0.0:
+        raise BeadDiffusionRefusal(reason, f"{reason}: {value!r}")
+    return number
+
+
+def sphere_heat_loss_w_m2(
+    temperature_K: float,
+    *,
+    emissivity: float,
+    environment_temperature_K: float,
+    convection_coefficient_w_m2_k: float,
+) -> float:
+    """Outward heat flux from a lumped sphere, W/m^2.
+
+    Premise: the bead is isothermal (the same Bi << 1 premise Su and Zhang
+    cite) and loses heat by radiation to an environment at ``T_env`` plus
+    Newtonian convection to that same environment.
+    Algebra: ``q = ε σ (T^4 - T_env^4) + h (T - T_env)``.
+    Units: σ is W/(m^2 K^4), so both terms are W/m^2. σ is
+    :data:`simulator.physical_constants.STEFAN_BOLTZMANN`.
+    Sanity: ``q`` is zero when ``T = T_env`` and positive when the bead is
+    hotter than the environment. ``h = 0`` is an explicit input, not a
+    default. Emissivity outside ``[0, 1]`` refuses.
+    """
+
+    temperature = _positive_temperature_K(temperature_K)
+    emissivity_value = _finite_number(emissivity, "emissivity_out_of_range")
+    if not 0.0 <= emissivity_value <= 1.0:
+        raise BeadDiffusionRefusal(
+            "emissivity_out_of_range",
+            f"emissivity must lie in [0, 1], got {emissivity!r}",
+        )
+    environment = _non_negative_number(
+        environment_temperature_K, "environment_temperature_negative"
+    )
+    convection = _non_negative_number(
+        convection_coefficient_w_m2_k, "convection_coefficient_negative"
+    )
+    radiative = emissivity_value * STEFAN_BOLTZMANN * (
+        temperature**4 - environment**4
+    )
+    convective = convection * (temperature - environment)
+    flux = radiative + convective
+    if not math.isfinite(flux):
+        raise BeadDiffusionRefusal(
+            "heat_loss_not_finite",
+            f"sphere heat loss was {flux!r}",
+        )
+    return flux
+
+
+def cooling_half_time_s(
+    *,
+    radius_m: float,
+    density_kg_m3: float,
+    heat_capacity_j_kg_k: float,
+    emissivity: float,
+    environment_temperature_K: float,
+    convection_coefficient_w_m2_k: float,
+    initial_temperature_K: float,
+) -> float:
+    """Time for a bead's heat-loss ODE to fall from ``T0`` to ``T0/2``.
+
+    Premise: a sphere of radius ``R`` has heat capacity
+    ``ρ (4/3) π R^3 cp`` and surface area ``4 π R^2``. Every thermal
+    property is an argument. Nothing here is fitted to a 74220 bead.
+    Algebra: ``ρ cp R dT/dt = -3 q(T)``, with ``q`` from
+    :func:`sphere_heat_loss_w_m2`. Zhang 2008 defines τ as the time at
+    which ``T = T0/2``, so this function returns that time. It is not the
+    initial-slope time ``ρ cp R T0 / (3 q(T0))``. For radiation into cold
+    space (``T_env = 0``, ``h = 0``) the ODE is ``dT/dt = -β T^4`` with
+    ``β = 3 ε σ / (ρ cp R)``, and the integral from ``T0`` to ``T0/2`` is
+    ``7 / (3 β T0^3) = 7 ρ cp R / (9 ε σ T0^3)``, which is ``7/3`` times
+    the initial-slope time. The integrator below is RK4, so that closed
+    form is a check rather than the implementation.
+    Units: ``q`` in W/m^2 and ``ρ cp R`` in J/(m^2 K) give ``dT/dt`` in
+    K/s and the result in seconds.
+    Sanity: a bead that is not losing heat at ``T0`` refuses
+    (``bead_not_cooling``). If the loss shuts off before ``T0/2``, the
+    half-temperature is unreachable and that refuses too.
+    """
+
+    radius = _finite_number(radius_m, "radius_not_positive")
+    if radius <= 0.0:
+        raise BeadDiffusionRefusal(
+            "radius_not_positive",
+            f"radius_m must be finite and positive, got {radius_m!r}",
+        )
+    density = _finite_number(density_kg_m3, "density_not_positive")
+    if density <= 0.0:
+        raise BeadDiffusionRefusal(
+            "density_not_positive",
+            f"density_kg_m3 must be finite and positive, got {density_kg_m3!r}",
+        )
+    heat_capacity = _finite_number(heat_capacity_j_kg_k, "heat_capacity_not_positive")
+    if heat_capacity <= 0.0:
+        raise BeadDiffusionRefusal(
+            "heat_capacity_not_positive",
+            "heat_capacity_j_kg_k must be finite and positive, "
+            f"got {heat_capacity_j_kg_k!r}",
+        )
+    initial = _positive_temperature_K(initial_temperature_K)
+    # Reject a bad emissivity or convection coefficient before the ODE.
+    opening_flux = sphere_heat_loss_w_m2(
+        initial,
+        emissivity=emissivity,
+        environment_temperature_K=environment_temperature_K,
+        convection_coefficient_w_m2_k=convection_coefficient_w_m2_k,
+    )
+    if opening_flux <= 0.0:
+        raise BeadDiffusionRefusal(
+            "bead_not_cooling",
+            f"heat loss at the initial temperature was {opening_flux} W/m^2",
+        )
+
+    capacity_per_area = density * heat_capacity * radius / 3.0
+
+    def rate(temperature_K: float) -> float:
+        if temperature_K <= 0.0 or not math.isfinite(temperature_K):
+            raise BeadDiffusionRefusal(
+                "half_temperature_unreachable",
+                "the cooling step left the positive temperature axis",
+            )
+        flux = sphere_heat_loss_w_m2(
+            temperature_K,
+            emissivity=emissivity,
+            environment_temperature_K=environment_temperature_K,
+            convection_coefficient_w_m2_k=convection_coefficient_w_m2_k,
+        )
+        return -flux / capacity_per_area
+
+    target = 0.5 * initial
+    initial_rate = rate(initial)
+    if initial_rate >= 0.0:
+        raise BeadDiffusionRefusal(
+            "bead_not_cooling",
+            "temperature is not falling at the initial state",
+        )
+    # The initial-slope time is T0 / |dT/dt|. A few hundred RK4 steps across
+    # that interval resolve the drop to T0/2 (7/3 of the slope time for
+    # cold-space radiation; order-1 of it for convection).
+    step = (initial / -initial_rate) / 500.0
+    temperature = initial
+    elapsed = 0.0
+    for _ in range(200_000):
+        if step <= 0.0 or not math.isfinite(step):
+            raise BeadDiffusionRefusal(
+                "half_temperature_unreachable",
+                "the cooling step collapsed before T0/2",
+            )
+        accepted = False
+        for _attempt in range(40):
+            k1 = rate(temperature)
+            if k1 >= 0.0:
+                raise BeadDiffusionRefusal(
+                    "half_temperature_unreachable",
+                    "cooling stopped before the bead reached T0/2",
+                )
+            stage_a = temperature + 0.5 * step * k1
+            if stage_a <= 0.0:
+                step *= 0.5
+                continue
+            k2 = rate(stage_a)
+            stage_b = temperature + 0.5 * step * k2
+            if stage_b <= 0.0:
+                step *= 0.5
+                continue
+            k3 = rate(stage_b)
+            stage_c = temperature + step * k3
+            if stage_c <= 0.0:
+                step *= 0.5
+                continue
+            k4 = rate(stage_c)
+            updated = temperature + (step / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
+            if updated <= 0.0 or not math.isfinite(updated):
+                step *= 0.5
+                continue
+            accepted = True
+            break
+        if not accepted:
+            raise BeadDiffusionRefusal(
+                "half_temperature_unreachable",
+                "cooling stopped before the bead reached T0/2",
+            )
+        if updated <= target:
+            span = temperature - updated
+            if span <= 0.0:
+                raise BeadDiffusionRefusal(
+                    "half_temperature_unreachable",
+                    "the cooling step did not decrease temperature",
+                )
+            fraction = (temperature - target) / span
+            half_time = elapsed + fraction * step
+            if not math.isfinite(half_time) or half_time <= 0.0:
+                raise BeadDiffusionRefusal(
+                    "half_temperature_unreachable",
+                    f"half time was {half_time!r}",
+                )
+            return half_time
+        temperature = updated
+        elapsed += step
+    raise BeadDiffusionRefusal(
+        "half_temperature_unreachable",
+        "RK4 did not reach T0/2 within the step budget",
+    )
+
+
+def zhang_2008_temperature_K(
+    t_s: float,
+    *,
+    initial_temperature_K: float,
+    cooling_half_time_s: float,
+) -> float:
+    """Zhang 2008 asymptotic cooling, ``T = T0 / (1 + t/τ)``.
+
+    Premise: τ is the time at which ``T = T0/2``, supplied by the caller
+    (for a bead, :func:`cooling_half_time_s`). This hyperbola is not the
+    ``T^4`` heat-loss trajectory. It is the literature cooling law, pinned
+    to pass through that half-temperature time.
+    Algebra: direct evaluation of the printed formula.
+    Units: temperatures in kelvin, time and τ in seconds.
+    Sanity: ``t = 0`` returns ``T0`` and ``t = τ`` returns ``T0/2``.
+    """
+
+    time = _non_negative_number(t_s, "time_negative")
+    initial = _positive_temperature_K(initial_temperature_K)
+    tau = _finite_number(cooling_half_time_s, "cooling_half_time_not_positive")
+    if tau <= 0.0:
+        raise BeadDiffusionRefusal(
+            "cooling_half_time_not_positive",
+            "cooling_half_time_s must be finite and positive, "
+            f"got {cooling_half_time_s!r}",
+        )
+    temperature = initial / (1.0 + time / tau)
+    if not math.isfinite(temperature) or temperature <= 0.0:
+        raise BeadDiffusionRefusal(
+            "temperature_not_positive",
+            f"Zhang temperature was {temperature!r}",
+        )
+    return temperature
+
+
+def zhang_2008_duration_until_s(
+    end_temperature_K: float,
+    *,
+    initial_temperature_K: float,
+    cooling_half_time_s: float,
+) -> float:
+    """Time at which the Zhang law reaches ``end_temperature_K``.
+
+    Algebra: ``T = T0 / (1 + t/τ)`` inverts to ``t = τ (T0/T - 1)``.
+    A cutoff at or above ``T0`` refuses; the bead has not cooled.
+    """
+
+    end = _positive_temperature_K(end_temperature_K)
+    initial = _positive_temperature_K(initial_temperature_K)
+    tau = _finite_number(cooling_half_time_s, "cooling_half_time_not_positive")
+    if tau <= 0.0:
+        raise BeadDiffusionRefusal(
+            "cooling_half_time_not_positive",
+            "cooling_half_time_s must be finite and positive, "
+            f"got {cooling_half_time_s!r}",
+        )
+    if end >= initial:
+        raise BeadDiffusionRefusal(
+            "end_temperature_not_below_initial",
+            f"end temperature {end} K is not below initial {initial} K",
+        )
+    return tau * (initial / end - 1.0)
+
+
+def diffusivity_along_zhang_cooling(
+    diffusivity_m2_s_at_temperature: Diffusivity,
+    *,
+    initial_temperature_K: float,
+    cooling_half_time_s: float,
+) -> Diffusivity:
+    """``D(t) = D(T(t))`` on the Zhang 2008 hyperbola."""
+
+    if not callable(diffusivity_m2_s_at_temperature):
+        raise BeadDiffusionRefusal(
+            "diffusivity_missing",
+            "diffusivity must be a function of temperature",
+        )
+
+    def at_time(t_s: float) -> float:
+        temperature = zhang_2008_temperature_K(
+            t_s,
+            initial_temperature_K=initial_temperature_K,
+            cooling_half_time_s=cooling_half_time_s,
+        )
+        return diffusivity_m2_s_at_temperature(temperature)
+
+    return at_time

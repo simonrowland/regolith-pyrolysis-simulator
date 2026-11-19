@@ -17,13 +17,18 @@ from simulator.bead_diffusion import (
     NI_ZHANG_2016_CU_LN_D_INTERCEPT,
     NI_ZHANG_2016_CU_LN_D_SLOPE_K,
     BeadDiffusionRefusal,
+    cooling_half_time_s,
+    diffusivity_along_zhang_cooling,
     integrate_spherical_diffusion,
     lowry_1982_na_diffusivity_m2_s,
     ni_zhang_2016_cu_diffusivity_m2_s,
     oxide_mass_kg,
     potassium_tracer_diffusivity_m2_s,
     spherical_bead_grid,
+    zhang_2008_duration_until_s,
+    zhang_2008_temperature_K,
 )
+from simulator.physical_constants import STEFAN_BOLTZMANN
 
 _DENSITY = 3000.0
 _RADIUS = 1.0e-4
@@ -349,3 +354,224 @@ def test_printed_na_and_cu_diffusivities_and_the_potassium_refusal() -> None:
     with pytest.raises(BeadDiffusionRefusal) as caught:
         lowry_1982_na_diffusivity_m2_s(0.0)
     assert caught.value.reason == "temperature_not_positive"
+
+
+def _cold_space_radiative_half_time_s(
+    *,
+    radius_m: float,
+    density_kg_m3: float,
+    heat_capacity_j_kg_k: float,
+    emissivity: float,
+    initial_temperature_K: float,
+) -> float:
+    """Integral of dT/dt = -β T^4 from T0 to T0/2.
+
+    β = 3 ε σ / (ρ cp R). The antiderivative gives
+    t = 7 / (3 β T0^3). This is not the RK4 used by the solver.
+    """
+
+    beta = (
+        3.0
+        * emissivity
+        * STEFAN_BOLTZMANN
+        / (density_kg_m3 * heat_capacity_j_kg_k * radius_m)
+    )
+    return 7.0 / (3.0 * beta * initial_temperature_K**3)
+
+
+def test_radiative_half_time_matches_the_cold_space_integral() -> None:
+    radius = 1.16e-4
+    density = 2800.0
+    heat_capacity = 1400.0
+    emissivity = 0.8
+    initial = 1600.0
+    got = cooling_half_time_s(
+        radius_m=radius,
+        density_kg_m3=density,
+        heat_capacity_j_kg_k=heat_capacity,
+        emissivity=emissivity,
+        environment_temperature_K=0.0,
+        convection_coefficient_w_m2_k=0.0,
+        initial_temperature_K=initial,
+    )
+    expected = _cold_space_radiative_half_time_s(
+        radius_m=radius,
+        density_kg_m3=density,
+        heat_capacity_j_kg_k=heat_capacity,
+        emissivity=emissivity,
+        initial_temperature_K=initial,
+    )
+    assert got == pytest.approx(expected, rel=1e-6)
+    doubled = cooling_half_time_s(
+        radius_m=2.0 * radius,
+        density_kg_m3=density,
+        heat_capacity_j_kg_k=heat_capacity,
+        emissivity=emissivity,
+        environment_temperature_K=0.0,
+        convection_coefficient_w_m2_k=0.0,
+        initial_temperature_K=initial,
+    )
+    assert doubled == pytest.approx(2.0 * got, rel=1e-6)
+
+
+def test_convective_half_time_matches_the_newton_integral() -> None:
+    """ε = 0 leaves dT/dt = -γ (T - T_env), γ = 3 h / (ρ cp R)."""
+
+    radius = 2.0e-4
+    density = 3000.0
+    heat_capacity = 1200.0
+    convection = 40.0
+    initial = 1500.0
+    environment = 300.0
+    got = cooling_half_time_s(
+        radius_m=radius,
+        density_kg_m3=density,
+        heat_capacity_j_kg_k=heat_capacity,
+        emissivity=0.0,
+        environment_temperature_K=environment,
+        convection_coefficient_w_m2_k=convection,
+        initial_temperature_K=initial,
+    )
+    gamma = 3.0 * convection / (density * heat_capacity * radius)
+    expected = math.log((initial - environment) / (0.5 * initial - environment)) / gamma
+    assert got == pytest.approx(expected, rel=1e-6)
+
+
+def test_a_bead_that_is_not_cooling_refuses() -> None:
+    with pytest.raises(BeadDiffusionRefusal) as caught:
+        cooling_half_time_s(
+            radius_m=1.0e-4,
+            density_kg_m3=3000.0,
+            heat_capacity_j_kg_k=1000.0,
+            emissivity=1.0,
+            environment_temperature_K=1640.0,
+            convection_coefficient_w_m2_k=0.0,
+            initial_temperature_K=1640.0,
+        )
+    assert caught.value.reason == "bead_not_cooling"
+    with pytest.raises(BeadDiffusionRefusal) as caught:
+        cooling_half_time_s(
+            radius_m=1.0e-4,
+            density_kg_m3=3000.0,
+            heat_capacity_j_kg_k=1000.0,
+            emissivity=1.5,
+            environment_temperature_K=0.0,
+            convection_coefficient_w_m2_k=0.0,
+            initial_temperature_K=1640.0,
+        )
+    assert caught.value.reason == "emissivity_out_of_range"
+    with pytest.raises(BeadDiffusionRefusal) as caught:
+        cooling_half_time_s(
+            radius_m=1.0e-4,
+            density_kg_m3=3000.0,
+            heat_capacity_j_kg_k=1000.0,
+            emissivity=1.0,
+            environment_temperature_K=0.0,
+            convection_coefficient_w_m2_k=-1.0,
+            initial_temperature_K=1640.0,
+        )
+    assert caught.value.reason == "convection_coefficient_negative"
+    with pytest.raises(TypeError):
+        cooling_half_time_s(  # type: ignore[call-arg]
+            radius_m=1.0e-4,
+            density_kg_m3=3000.0,
+            heat_capacity_j_kg_k=1000.0,
+            emissivity=1.0,
+            environment_temperature_K=0.0,
+            initial_temperature_K=1640.0,
+        )
+
+
+def test_zhang_law_passes_through_the_half_temperature() -> None:
+    initial = 1640.0
+    tau = 12.5
+    assert zhang_2008_temperature_K(
+        0.0,
+        initial_temperature_K=initial,
+        cooling_half_time_s=tau,
+    ) == pytest.approx(initial)
+    assert zhang_2008_temperature_K(
+        tau,
+        initial_temperature_K=initial,
+        cooling_half_time_s=tau,
+    ) == pytest.approx(initial / 2.0)
+    end = 940.0
+    duration = zhang_2008_duration_until_s(
+        end,
+        initial_temperature_K=initial,
+        cooling_half_time_s=tau,
+    )
+    assert duration == pytest.approx(tau * (initial / end - 1.0))
+    assert zhang_2008_temperature_K(
+        duration,
+        initial_temperature_K=initial,
+        cooling_half_time_s=tau,
+    ) == pytest.approx(end)
+
+
+def test_fast_zhang_cooling_freezes_a_nonuniform_profile() -> None:
+    cells = 8
+    radius = 1.0e-4
+    grid = spherical_bead_grid(radius, cells)
+    initial = [0.01 * (1.0 - (r / radius) ** 2) for r in grid.centroid_radius_m]
+    tau = 1.0e-12
+    start = 1640.0
+    end = 940.0
+    duration = zhang_2008_duration_until_s(
+        end,
+        initial_temperature_K=start,
+        cooling_half_time_s=tau,
+    )
+    diffusivity = diffusivity_along_zhang_cooling(
+        lowry_1982_na_diffusivity_m2_s,
+        initial_temperature_K=start,
+        cooling_half_time_s=tau,
+    )
+    result = integrate_spherical_diffusion(
+        radius_m=radius,
+        density_kg_m3=_DENSITY,
+        initial_mass_fraction=initial,
+        diffusivity_m2_s=diffusivity,
+        surface_mass_flux_kg_m2_s=_zero_flux,
+        t_end_s=duration,
+        n_steps=4,
+        n_cells=cells,
+        theta=1.0,
+    )
+    contrast = max(initial) - min(initial)
+    thickness = radius / cells
+    fourier = lowry_1982_na_diffusivity_m2_s(start) * duration / thickness**2
+    moved = max(abs(got - start_c) for got, start_c in zip(result.mass_fraction, initial))
+    assert moved < 5.0 * fourier * contrast
+
+
+def test_slow_cooling_relaxes_a_profile_toward_its_conserved_mean() -> None:
+    cells = 12
+    radius = 1.0
+    grid = spherical_bead_grid(radius, cells)
+    initial = [0.2 + 0.1 * (index / (cells - 1)) for index in range(cells)]
+    diffusivity = diffusivity_along_zhang_cooling(
+        lambda _temperature: 0.2,
+        initial_temperature_K=1000.0,
+        cooling_half_time_s=1.0e6,
+    )
+    result = integrate_spherical_diffusion(
+        radius_m=radius,
+        density_kg_m3=1.0,
+        initial_mass_fraction=initial,
+        diffusivity_m2_s=diffusivity,
+        surface_mass_flux_kg_m2_s=_zero_flux,
+        t_end_s=3.0,
+        n_steps=30,
+        n_cells=cells,
+        theta=1.0,
+    )
+    mean = oxide_mass_kg(initial, grid, 1.0) / sum(grid.volume_m3)
+    assert result.oxide_mass_kg(1.0) == pytest.approx(
+        oxide_mass_kg(initial, grid, 1.0),
+        rel=1e-12,
+    )
+    assert max(result.mass_fraction) - min(result.mass_fraction) < 0.05 * (
+        max(initial) - min(initial)
+    )
+    assert result.mass_fraction == pytest.approx([mean] * cells, rel=0.0, abs=0.01)
