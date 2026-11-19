@@ -20150,6 +20150,124 @@ def test_located_transition_point_scores_a_numeric_residual(
         _assert_located_transition_residual(monkeypatch)
 
 
+def _kushiro_transition_rows(migrator_cls):
+    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+
+    root = Path(__file__).resolve().parents[2]
+    extract = (
+        root
+        / "data/literature/extracts"
+        / "kushiro-1971-apollo12-phase-equilibria.yaml"
+    )
+    migrator = migrator_cls(root=root)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    wanted = {
+        "kushiro_1971_mixture_b_chromite_liquidus": Decimal("1330"),
+        "kushiro_1971_mixture_b_solidus": Decimal("1070"),
+    }
+    found = {}
+    for row in migrator.result.observations.values():
+        for suffix, celsius in wanted.items():
+            if row.observation_id.endswith("::" + suffix):
+                found[suffix] = (
+                    row,
+                    celsius + Decimal(str(CELSIUS_TO_KELVIN_OFFSET)),
+                )
+    assert set(found) == set(wanted)
+    return found
+
+
+def _assert_kushiro_po2_reaches_the_scorer(monkeypatch) -> None:
+    from simulator.battery.migrate import Migrator
+    from simulator.physical_constants import ATM_PA_DECIMAL
+
+    rows = _kushiro_transition_rows(Migrator)
+    expected_pa = Decimal("1e-13") * ATM_PA_DECIMAL
+    for _suffix, (row, temperature_K) in rows.items():
+        points = row.point_conditions or {}
+        oxygen = points.get("oxygen_partial_pressure_Pa")
+        assert isinstance(oxygen, Located)
+        assert oxygen.state.is_value
+        amount = oxygen.state.value
+        amount = amount.point if isinstance(amount, Value) else amount
+        assert amount == expected_pa
+        fugacity = points["fO2_Pa"]
+        assert fugacity.state.is_unknown
+        assert "PO2" in (fugacity.state.reason or "")
+        identity = row.identity
+        assert isinstance(identity, Identity)
+        assert identity.fO2_Pa is None or not identity.fO2_Pa.is_value
+        assert row.value.point == temperature_K
+        assert identity.subtype is not None and identity.subtype.is_value
+        pressure = identity.total_pressure_Pa
+        point_pressure = points.get("total_pressure_Pa")
+        assert (pressure is not None and pressure.is_value) or (
+            isinstance(point_pressure, Located) and point_pressure.state.is_value
+        )
+        composition = identity.composition
+        point_composition = points.get("composition")
+        assert (composition is not None and composition.is_value) or (
+            isinstance(point_composition, Located)
+            and point_composition.state.is_value
+        )
+        received: dict[str, object] = {}
+
+        def find_liquidus_solidus(**kwargs):
+            received.clear()
+            received.update(kwargs)
+            from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+            return LiquidusSolidusResult(
+                liquidus_T_C=1330.0,
+                solidus_T_C=1070.0,
+                liquid_fraction=1.0,
+                status="ok",
+            )
+
+        from types import SimpleNamespace
+
+        handle = SimpleNamespace(
+            name=Engine.MAGEMIN.value,
+            backend=SimpleNamespace(find_liquidus_solidus=find_liquidus_solidus),
+            available=True,
+            unavailable_reason=None,
+        )
+        monkeypatch.setattr(
+            score_mod,
+            "_open_cached_battery_handle",
+            lambda *_args: (handle, False),
+        )
+        prediction = predict_with_engine(Engine.MAGEMIN, row)
+        assert received, prediction.refusal_detail
+        assert received["fO2_log"] == score_mod._printed_fo2_log10_bar(
+            identity, row
+        )
+        assert received["pressure_bar"] == pytest.approx(1.01325)
+        assert received["composition_kg"]["SiO2"] == pytest.approx(0.46)
+        assert prediction.refusal_reason is None
+        assert prediction.value is not None
+
+
+def test_kushiro_printed_po2_lands_beside_unknown_fugacity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.migrate import Migrator
+
+    _assert_kushiro_po2_reaches_the_scorer(monkeypatch)
+
+    def drop_partial_pressure(self, merged, partial):
+        return None
+
+    monkeypatch.setattr(
+        Migrator,
+        "_land_partial_pressure_beside_non_value_fugacity",
+        drop_partial_pressure,
+    )
+    with pytest.raises(AssertionError):
+        _assert_kushiro_po2_reaches_the_scorer(monkeypatch)
+
+
 @pytest.mark.parametrize(
     ("missing", "identity_field"),
     (

@@ -24271,6 +24271,27 @@ class Migrator:
             experiment, fO2_control=control
         )
 
+    def _land_partial_pressure_beside_non_value_fugacity(
+        self,
+        merged: dict[str, Located[Any]],
+        partial: Located[Any] | None,
+    ) -> None:
+        """Keep printed pO2 when fugacity is present but not a value.
+
+        The absent-key path still copies that pressure onto ``fO2_Pa``.
+        A typed unknown stays the fugacity result. Partial pressure is a
+        different point and is not written as an experiment control.
+        """
+
+        if partial is None or "oxygen_partial_pressure_Pa" in merged:
+            return
+        existing = merged.get("fO2_Pa")
+        if existing is None:
+            return
+        if isinstance(existing, Located) and existing.state.is_value:
+            return
+        merged["oxygen_partial_pressure_Pa"] = partial
+
     def _merge_printed_oxygen(
         self,
         experiment_id: str,
@@ -24364,6 +24385,10 @@ class Migrator:
             # Per-row derived products span orders of magnitude; never collapse
             # them onto experiment.fO2_control.oxygen_partial_pressure_Pa.
             merged["fO2_Pa"] = ratio_oxygen
+        self._land_partial_pressure_beside_non_value_fugacity(
+            merged,
+            facts.oxygen_partial_pressure_Pa,
+        )
         if ratio_oxygen is not None and not used_fallback:
             # The derived Pa is on this row's point conditions. Identity facts
             # stay empty so the decision copies that point, including a typed
