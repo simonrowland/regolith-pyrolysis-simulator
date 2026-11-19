@@ -695,18 +695,18 @@ _MAGEMIN_BULK_ECHO_TOL = 3.0e-3
 # endmember's property, not a noisy proxy.
 _MAGEMIN_FD_DELTA_K = 10.0
 
-# Tabulated Landau Tc of the mapped ig endmembers (TC_endmembers.c
-# input_3 flag 1, Tc at input_3[5]). The same three temperatures are in
-# arr_em_db_tc_ds62 through arr_em_db_tc_ds636: q 847 K, ne 467 K, sph
-# 485 K. Equilibrium Gibbs shifts Tc by P*Vmax/Smax; this flag uses the
-# tabulated Tc. The experimental quartz α–β point is 573 °C = 846.15 K,
-# inside the same ±δ window. A stencil that contains Tc mixes the two
-# branches and misattributes the lambda Cp spike; the result is still
-# returned, flagged.
-_MAGEMIN_LANDAU_TC_K: Mapping[str, tuple[float, str]] = {
-    'q': (847.0, 'the alpha-beta quartz'),
-    'ne': (467.0, 'the nepheline'),
-    'sph': (485.0, 'the titanite'),
+# ds636 Landau records for the mapped ig endmembers (TC_endmembers.c
+# arr_em_db_tc_ds636, input_3[4] == 1). The tuple is
+# (Tc0_K, Smax_kJ_per_K, Vmax_kJ_per_kbar, label), input_3[5..7].
+# The same Tc0 values are in ds62 and ds633. Equilibrium Tc(P) is
+# `_landau_equilibrium_tc_K`. The experimental quartz α–β point is
+# 573 °C = 846.15 K, inside the 1 bar ±δ window. A stencil that
+# contains Tc(P) mixes the two branches and misattributes the lambda
+# Cp spike; the result is still returned, flagged.
+_MAGEMIN_LANDAU: Mapping[str, tuple[float, float, float, str]] = {
+    'q': (847.0, 0.00535, 0.1267, 'the alpha-beta quartz'),
+    'ne': (467.0, 0.01, 0.08, 'the nepheline'),
+    'sph': (485.0, 0.0004, 0.005, 'the titanite'),
 }
 
 
@@ -1434,24 +1434,74 @@ def _magemin_endmember_gbase_kJ(
     return g_kJ
 
 
-def _lambda_stencil_warning(endmember: str, temperature_K: float) -> Optional[str]:
-    """Flag a finite-difference stencil straddling a known Landau Tc.
+def _landau_equilibrium_tc_K(
+    record: tuple[float, float, float, str],
+    pressure_kbar: float,
+) -> float:
+    """Equilibrium Landau Tc at the kbar pressure sent to MAGEMin.
 
-    Mapped ig endmembers with a Landau term are quartz (847 K), nepheline
-    (467 K) and titanite (485 K). The centred stencil across that
-    temperature mixes the two branches' G(T) and misattributes the lambda
-    Cp spike. The predicted value is still returned.
+    Premise. ``TC_gem_function.c`` (MAGEMin 40ed109), equilibrium state,
+    when ``input_3[4] == 1`` and ``Smax > 0``::
+
+        Tc = Tc0                        if Vmax == 0
+        Tc = Tc0 + P * Vmax / Smax      otherwise
+
+    ``P`` is that function's pressure argument. ``p0 = 0.001`` kbar is
+    the volume-integral reference and is not subtracted. The pure-phase
+    probe passes this same kbar value to ``--Pres``.
+
+    Algebra. ``Tc(P) = Tc0 + P_kbar * Vmax / Smax``.
+
+    Units. ``gbase`` is kJ (``R = 0.0083144`` kJ/K), so ``input_3[6]``
+    Smax is kJ/K and ``input_3[7]`` Vmax is kJ/kbar. ``Vmax/Smax`` is
+    K/kbar. ds636 nepheline: ``0.08 / 0.01 = 8`` K/kbar.
+
+    Sanity. ``P = 0``: nepheline Tc = 467 K. ``P = 2`` kbar:
+    ``467 + 16 = 483`` K. Quartz (847 K, 0.00535 kJ/K, 0.1267 kJ/kbar)
+    and titanite (485 K, 0.0004 kJ/K, 0.005 kJ/kbar) use the same rule.
     """
-    entry = _MAGEMIN_LANDAU_TC_K.get(endmember)
-    if entry is None:
+
+    tc0_K, smax_kJ_per_K, vmax_kJ_per_kbar, _label = record
+    if vmax_kJ_per_kbar == 0.0:
+        return tc0_K
+    return tc0_K + float(pressure_kbar) * vmax_kJ_per_kbar / smax_kJ_per_K
+
+
+_LANDAU_STENCIL_PREFIX = 'finite-difference stencil straddles '
+
+
+def _lambda_stencil_warning(
+    endmember: str,
+    temperature_K: float,
+    pressure_kbar: float,
+) -> Optional[str]:
+    """Flag a finite-difference stencil that contains the equilibrium Tc.
+
+    ``pressure_kbar`` is the pressure the pure-phase probe sends to
+    MAGEMin. The centred stencil mixes the two branches' G(T) when it
+    contains Tc(P) and misattributes the lambda Cp spike. The predicted
+    value is still returned.
+    """
+
+    record = _MAGEMIN_LANDAU.get(endmember)
+    if record is None:
         return None
-    transition_K, label = entry
+    transition_K = _landau_equilibrium_tc_K(record, pressure_kbar)
     if abs(temperature_K - transition_K) > _MAGEMIN_FD_DELTA_K:
         return None
+    label = record[3]
     return (
-        f'finite-difference stencil straddles {label} '
+        f'{_LANDAU_STENCIL_PREFIX}{label} '
         f'lambda transition ({transition_K:g} K); S/Cp/H '
         'mix the two branches and Cp is misattributed across the spike'
+    )
+
+
+def _landau_stencil_notes(warnings: Sequence[str]) -> Tuple[str, ...]:
+    """Accessor sentences for a stencil that straddles Tc(P)."""
+
+    return tuple(
+        item for item in warnings if item.startswith(_LANDAU_STENCIL_PREFIX)
     )
 
 
@@ -4046,7 +4096,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
         if derived not in notes:
             notes.append(derived)
-        lambda_note = _lambda_stencil_warning(spec.endmember, temperature_K)
+        lambda_note = _lambda_stencil_warning(
+            spec.endmember, temperature_K, pressure_kbar
+        )
         if lambda_note is not None and lambda_note not in notes:
             notes.append(lambda_note)
 

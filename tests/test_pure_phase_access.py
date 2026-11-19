@@ -768,20 +768,63 @@ def test_solver_status_success_is_silent_and_failure_refuses():
             _check_magemin_solver_status(text, [])
 
 
+def _probe_kbar(pressure_bar: float) -> float:
+    """The kbar value ``pure_phase`` sends to MAGEMin."""
+
+    return MAGEMinBackend._GPa_to_kbar(
+        MAGEMinBackend._pressure_bar_to_GPa(pressure_bar)
+    )
+
+
 def test_landau_stencil_is_flagged_only_when_straddled():
-    """q, ne, and sph warn only while the ±10 K stencil contains Tc."""
+    """The ±10 K window follows equilibrium Tc(P), for q, ne, and sph.
+
+    At 0 kbar the window is the tabulated Tc. At 1 bar nepheline stays
+    on 467.008 K. At 2 kbar it is 483 K, and 467 K is quiet. Quartz and
+    titanite move off their tabulated temperatures by the same rule.
+    """
+
+    zero = 0.0
+    one_bar = _probe_kbar(1.0)
+    two_kbar = _probe_kbar(2000.0)
 
     for endmember, transition_K in (("q", 847.0), ("ne", 467.0), ("sph", 485.0)):
-        note = _lambda_stencil_warning(endmember, transition_K)
+        note = _lambda_stencil_warning(endmember, transition_K, zero)
         assert note is not None
         assert "lambda" in note
         assert f"{transition_K:g} K" in note
-        assert _lambda_stencil_warning(endmember, 1000.0) is None
-        assert _lambda_stencil_warning("fo", transition_K) is None
-    assert _lambda_stencil_warning("ne", 477.0) is not None
-    assert _lambda_stencil_warning("ne", 457.0) is not None
-    assert _lambda_stencil_warning("ne", 478.0) is None
-    assert _lambda_stencil_warning("ne", 456.0) is None
+        assert _lambda_stencil_warning(endmember, 1000.0, zero) is None
+        assert _lambda_stencil_warning("fo", transition_K, zero) is None
+    assert _lambda_stencil_warning("ne", 477.0, zero) is not None
+    assert _lambda_stencil_warning("ne", 457.0, zero) is not None
+    assert _lambda_stencil_warning("ne", 478.0, zero) is None
+    assert _lambda_stencil_warning("ne", 456.0, zero) is None
+
+    shifted = _lambda_stencil_warning("ne", 480.0, two_kbar)
+    assert shifted is not None and "483 K" in shifted
+    assert _lambda_stencil_warning("ne", 473.0, two_kbar) is not None
+    assert _lambda_stencil_warning("ne", 493.0, two_kbar) is not None
+    assert _lambda_stencil_warning("ne", 472.0, two_kbar) is None
+    assert _lambda_stencil_warning("ne", 494.0, two_kbar) is None
+    assert _lambda_stencil_warning("ne", 467.0, two_kbar) is None
+
+    at_one_bar = _lambda_stencil_warning("ne", 467.0, one_bar)
+    assert at_one_bar is not None and "467.008 K" in at_one_bar
+    assert _lambda_stencil_warning("ne", 477.0, one_bar) is not None
+    assert _lambda_stencil_warning("ne", 457.0, one_bar) is None
+    assert _lambda_stencil_warning("ne", 483.0, one_bar) is None
+
+    quartz = _lambda_stencil_warning("q", 890.0, two_kbar)
+    assert quartz is not None and "894.364 K" in quartz
+    assert "890" not in quartz
+    assert _lambda_stencil_warning("q", 847.0, two_kbar) is None
+    titanite = _lambda_stencil_warning("sph", 505.0, two_kbar)
+    assert titanite is not None and "510 K" in titanite
+    assert _lambda_stencil_warning("sph", 485.0, two_kbar) is None
+    assert _lambda_stencil_warning("sph", 500.0, two_kbar) is not None
+    assert _lambda_stencil_warning("sph", 520.0, two_kbar) is not None
+    assert _lambda_stencil_warning("sph", 499.0, two_kbar) is None
+    assert _lambda_stencil_warning("sph", 521.0, two_kbar) is None
 
 
 # --- ThermoEngine: live access path ----------------------------------------

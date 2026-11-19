@@ -8627,19 +8627,29 @@ def test_magemin_unlabeled_naalsio4_entropy_matches_schumm_s298() -> None:
 
 
 def test_magemin_landau_stencil_is_flagged_on_the_accessor() -> None:
-    """A stencil on q, ne, or sph Tc carries the lambda flag and the value.
+    """The accessor flags Tc(P), and the value stays finite.
 
-    1000 K sits outside every ±10 K window. The accessor still returns
-    S, Cp, and H at both temperatures.
+    At 1 bar the printed Tc is the pressure-shifted record (nepheline
+    467.008 K). At 2 kbar nepheline is 483 K and 467 K is quiet. Quartz
+    and titanite follow the same pressure.
     """
 
     if not magemin_binary_available():
         pytest.skip("no MAGEMin binary")
     from simulator.battery import compilation_tier
 
-    cases = (("q", 847.0), ("ne", 467.0), ("sph", 485.0))
+    one_bar = (
+        ("q", 847.0, "847.024 K"),
+        ("ne", 467.0, "467.008 K"),
+        ("sph", 485.0, "485.012 K"),
+    )
+    two_kbar = (
+        ("q", 890.0, "894.364 K", 847.0),
+        ("ne", 480.0, "483 K", 467.0),
+        ("sph", 505.0, "510 K", 485.0),
+    )
     try:
-        for symbol, transition_K in cases:
+        for symbol, transition_K, text in one_bar:
             straddling = compilation_tier.default_pure_phase(
                 Engine.MAGEMIN, symbol, transition_K, 1.0
             )
@@ -8651,7 +8661,23 @@ def test_magemin_landau_stencil_is_flagged_on_the_accessor() -> None:
                 assert math.isfinite(props.Cp_J_K_mol)
                 assert math.isfinite(props.H_J_mol)
             assert any(
-                "lambda" in warning and f"{transition_K:g} K" in warning
+                "lambda" in warning and text in warning
+                for warning in straddling.warnings
+            ), straddling.warnings
+            assert not any("lambda" in warning for warning in quiet.warnings), (
+                quiet.warnings
+            )
+        for symbol, temperature_K, text, tabulated_K in two_kbar:
+            straddling = compilation_tier.default_pure_phase(
+                Engine.MAGEMIN, symbol, temperature_K, 2000.0
+            )
+            quiet = compilation_tier.default_pure_phase(
+                Engine.MAGEMIN, symbol, tabulated_K, 2000.0
+            )
+            assert math.isfinite(straddling.Cp_J_K_mol)
+            assert math.isfinite(quiet.Cp_J_K_mol)
+            assert any(
+                "lambda" in warning and text in warning
                 for warning in straddling.warnings
             ), straddling.warnings
             assert not any("lambda" in warning for warning in quiet.warnings), (
@@ -8659,6 +8685,86 @@ def test_magemin_landau_stencil_is_flagged_on_the_accessor() -> None:
             )
     finally:
         _close_cached_backend(Engine.MAGEMIN)
+
+
+def test_landau_reference_read_reaches_the_scored_attempt() -> None:
+    """A lambda sentence on the enthalpy anchor is a scoring notice."""
+
+    from simulator.melt_backend.magemin import _lambda_stencil_warning
+
+    anchor_note = _lambda_stencil_warning("ne", 467.0, 0.001)
+    assert anchor_note is not None
+    assert _lambda_stencil_warning("ne", 1000.0, 0.001) is None
+
+    class _Props:
+        def __init__(self, warnings):
+            self.formula = "MgO"
+            self.H_J_mol = 5000.0
+            self.Cp_J_K_mol = 40.0
+            self.S_J_K_mol = 30.0
+            self.absences = ()
+            self.warnings = warnings
+
+    def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        if abs(temperature_K - 298.15) < 1e-6:
+            return _Props((anchor_note,))
+        return _Props(())
+
+    identity = replace(
+        _pure_phase_identity(Quantity.H_MINUS_H298),
+        subtype=State.of("H(T)-H(298.15 K)"),
+    )
+    observation = F.observation(
+        "mgo-h-landau-anchor",
+        "exp-1",
+        identity,
+        Decimal("4"),
+    )
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN, observation, pure_phase=pure_phase
+    )
+    assert attempt.value is not None
+    assert attempt.refusal_reason is None
+    matched = [
+        notice
+        for notice in attempt.notices
+        if notice.reason == anchor_note
+    ]
+    assert len(matched) == 1
+    assert matched[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert matched[0].affected_quantities == (Quantity.H_MINUS_H298,)
+
+
+def test_magemin_nepheline_entropy_at_467_keeps_the_transition_flag() -> None:
+    """Crystalline NaAlSiO4 entropy at 467 K is not an ordinary score.
+
+    The accessor flags the 1 bar stencil. That sentence is on the
+    scored attempt, and the notice alone leaves the ordinary stratum.
+    The value stays finite.
+    """
+
+    if not magemin_binary_available():
+        pytest.skip("no MAGEMin binary")
+    observation = F.observation(
+        "naalsio4-transition-s",
+        "exp-1",
+        _crystal_thermo_identity("NaAlSiO4", None, Decimal("467")),
+        Decimal("1"),
+    )
+    try:
+        attempt = predict_thermo_attempt(Engine.MAGEMIN, observation)
+    finally:
+        _close_cached_backend(Engine.MAGEMIN)
+    assert attempt.value is not None
+    assert attempt.refusal_reason is None
+    lambda_notices = tuple(
+        notice for notice in attempt.notices if "lambda" in notice.reason
+    )
+    assert len(lambda_notices) == 1
+    assert "467.008" in lambda_notices[0].reason
+    assert lambda_notices[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert lambda_notices[0].affected_quantities == (Quantity.S,)
+    assert flagged_strata(lambda_notices) == ("out_of_certified_band",)
 
 
 @pytest.mark.parametrize(
