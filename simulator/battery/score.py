@@ -568,6 +568,19 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "openimcc-v1.0.3-d066-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-ext-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-v1-kcaalsi2o7": ("sf04-magma-companion-workbook",),
+    # Kress & Carmichael 1991 Eq. (7) / Table 7 natural-liquid regression
+    # (the formula internal-analytical evaluates; a = 0.196). Published
+    # p. 87, PDF page index 5: 228 quench data from Kennedy (1948),
+    # Fudali (1965), Thornber et al. (1980), Sack et al. (1980), Kilinc
+    # et al. (1983), Kress and Carmichael (1988), and this study.
+    # Kennedy, Fudali, Thornber, Sack 1980 and Kilinc are not store works.
+    # Stebbins et al. (1984) supplied the fixed e and is not one of the
+    # 228. Table 6 CAFS/NAFS (this study + Kress & Carmichael 1989; this
+    # study + Lange & Carmichael 1989) is a different fit.
+    "Kress and Carmichael 1991, doi:10.1007/BF00307328": (
+        "10.1007/bf00307328",
+        "17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae",
+    ),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
@@ -17983,6 +17996,10 @@ def _compile_residual_with_lineage(
         rail is Rail.REDOX
         and engine is Engine.INTERNAL_ANALYTICAL
         and quantity is Quantity.FE3_FE2_RATIO
+        # A completed id walk that already shares a calibration work is
+        # SAME_INPUT. The attribution labels below are a separate citation
+        # list and must not relabel that walk as independent.
+        and source_relation is not SourceRelation.SAME_INPUT
     ):
         # The attribution split applies only when both walks are COMPLETE.
         # An unresolved Kress citation, a printed-unresolved coefficient,

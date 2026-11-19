@@ -1635,6 +1635,144 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
             )
 
 
+_KRESS91_EQUATION7_WORK_IDS = (
+    "10.1007/bf00307328",
+    "17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae",
+)
+_POST_1991_REDOX_SOURCES = (
+    "aithala-2026-magmatic-iron-redox-to-2100c",
+    "berry-2018-morb-iron-redox",
+    "borisov-behrens-holtz-2015-melt-composition-fe-redox",
+)
+
+
+def _kress91_equation7_lineage_context():
+    """1988 and 1991 calibration works plus the later redox extracts.
+
+    Both calibration works have to be in the context. The coefficient walk
+    fails closed when either mapped work is missing, and an 1988-only
+    context would leave the 1991 work unresolved.
+    """
+
+    root = Path(__file__).resolve().parents[2]
+    source_paths = tuple(
+        root / "data/literature/extracts" / f"{name}.yaml"
+        for name in (
+            "kress-carmichael-1988-iron-oxidation-stoichiometry",
+            "kress-carmichael-1991-iron-redox-calibration",
+            *_POST_1991_REDOX_SOURCES,
+        )
+    )
+    migrator = Migrator(root)
+    for path in source_paths:
+        migrator._migrate_extract(path)
+    migrator.finalize()
+    result = migrator.result
+    origins = {}
+    for observation_id in result.observations:
+        origin = next(
+            (
+                path.name
+                for path in source_paths
+                if observation_id.startswith(f"{path.stem}::")
+            ),
+            None,
+        )
+        assert origin is not None, observation_id
+        origins[observation_id] = origin
+    context = ScoreContext(
+        result.works,
+        result.experiments,
+        result.observations,
+        origins=origins,
+        benches=result.benches,
+    )
+    return context
+
+
+def _score_internal_analytical_redox(context):
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+    )
+    return residuals
+
+
+def test_kress91_equation7_lineage_blocks_insample_1988_rows():
+    """Eq. (7) calibration rows are same-input; later melts stay independent.
+
+    Kress & Carmichael 1991, published p. 87 (PDF page index 5), fitted
+    Eq. (7) on 228 quench data that include Kress & Carmichael 1988 and
+    this study. Those two works are the in-store members of that list.
+    Deleting the alias map in-process returns the 1988 row to unknown,
+    which d-445 would admit.
+    """
+
+    alias = score_module._KRESS91_SOURCES[0]
+    assert score_module.COEFFICIENT_SOURCE_STORE_IDS[alias] == (
+        _KRESS91_EQUATION7_WORK_IDS
+    )
+    context = _kress91_equation7_lineage_context()
+    for work_id in _KRESS91_EQUATION7_WORK_IDS:
+        assert work_id in context.works
+    residuals = _score_internal_analytical_redox(context)
+    by_source: dict[str, list] = {}
+    for residual in residuals:
+        source_id = context.observations[residual.reference].source_id
+        by_source.setdefault(source_id, []).append(residual)
+
+    calibrated = by_source["kress-carmichael-1988-iron-oxidation-stoichiometry"]
+    assert calibrated
+    assert all(
+        residual.source_relation is score_module.SourceRelation.SAME_INPUT
+        for residual in calibrated
+    )
+    blocked = [
+        residual
+        for residual in calibrated
+        if not residual.score_eligible
+        and "source_relation_not_same_input" in residual.exclusions
+    ]
+    assert blocked
+    assert all(not residual.score_eligible for residual in calibrated)
+
+    for source_id in _POST_1991_REDOX_SOURCES:
+        rows = by_source.get(source_id) or []
+        assert rows, source_id
+        eligible = [residual for residual in rows if residual.score_eligible]
+        assert eligible, source_id
+        assert all(
+            residual.source_relation is score_module.SourceRelation.INDEPENDENT
+            for residual in eligible
+        )
+        assert all(
+            residual.source_relation is not score_module.SourceRelation.SAME_INPUT
+            for residual in rows
+        )
+
+    saved = score_module.COEFFICIENT_SOURCE_STORE_IDS.pop(alias)
+    try:
+        mutated = _score_internal_analytical_redox(context)
+    finally:
+        score_module.COEFFICIENT_SOURCE_STORE_IDS[alias] = saved
+    mutated_1988 = [
+        residual
+        for residual in mutated
+        if context.observations[residual.reference].source_id
+        == "kress-carmichael-1988-iron-oxidation-stoichiometry"
+    ]
+    assert mutated_1988
+    assert all(
+        residual.source_relation is score_module.SourceRelation.UNKNOWN
+        for residual in mutated_1988
+    )
+    assert all(
+        "source_relation_not_same_input" not in residual.exclusions
+        for residual in mutated_1988
+    )
+
+
 def test_kress_table1_redox_rows_score_at_ambient_furnace_pressure():
     # SCHEMA.md: an ambient_pressure_evidence quote supplies 101325 Pa when
     # total pressure is otherwise missing. Kress Table 1's gas_mixing quote is
