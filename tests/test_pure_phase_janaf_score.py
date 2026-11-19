@@ -825,6 +825,69 @@ def test_build_all_rows_one_bad_phase_does_not_abort():
     )
 
 
+# Berman has no active pure phase for these formulas. test_compilation_tier
+# parametrizes the same tuple. The MAGEMin absent list is separate.
+THERMOENGINE_ABSENT_FORMULAS = (
+    'Ca2Fe2O5',
+    'CaFe2O4',
+    'KAlO2',
+    'KAlSi2O6',
+    'Na2Ca2Si2O7',
+    'Na2Ca2Si3O9',
+    'Na2CaSiO4',
+    'Na2O',
+    'Na4CaSi3O9',
+    'NaFeO2',
+    'CoTiO3',
+    'NiTiO3',
+    'CoCO3',
+    'NiCO3',
+    'MgTi2O5',
+    'Ca2SiO4',
+    'Ca3Si2O7',
+)
+
+
+def _berman_active_pure_formulas(database):
+    """Formulas of BermanPurePhases.csv rows, not construction-time phase_info.
+
+    phase_info right after Database() holds the special phases only.
+    Every active abbreviation must be a valid symbol, and each row's
+    formula is FormulaOveride when that cell is non-empty, otherwise the
+    PurePhaseList formula the database validates abbreviations against.
+    """
+
+    import csv
+    import os
+
+    from thermoengine import model
+    from thermoengine import phases
+
+    active_path = os.path.join(
+        os.path.dirname(model.__file__), model.DATADIR, 'BermanPurePhases.csv'
+    )
+    catalogue_path = os.path.join(
+        os.path.dirname(phases.__file__), phases.DATADIR, phases.PURE_PHASE_FILE
+    )
+    with open(active_path, newline='') as handle:
+        active_rows = list(csv.DictReader(handle))
+    with open(catalogue_path, newline='') as handle:
+        catalogue = {
+            row['Abbrev']: (row.get('Formula') or '').strip()
+            for row in csv.DictReader(handle)
+        }
+    assert active_rows, active_path
+    formulas = set()
+    for row in active_rows:
+        abbrev = row['Abbrev']
+        assert abbrev in database.valid_phase_symbols, abbrev
+        override = (row.get('FormulaOveride') or '').strip()
+        formula = override or catalogue[abbrev]
+        assert formula, abbrev
+        formulas.add(formula)
+    return formulas
+
+
 needs_thermoengine = pytest.mark.skipif(
     not thermoengine_package_available(),
     reason='ThermoEngine dylibs/package unavailable on this machine',
@@ -850,16 +913,12 @@ def test_catalogue_thermoengine_symbols_resolve_on_the_engine():
     )
 
     database = model.Database(database='Berman')
-    absent_formulas = {
-        'Ca2Fe2O5', 'CaFe2O4', 'KAlO2', 'KAlSi2O6',
-        'Na2Ca2Si2O7', 'Na2Ca2Si3O9', 'Na2CaSiO4', 'Na2O',
-        'Na4CaSi3O9', 'NaFeO2', 'CoTiO3', 'NiTiO3', 'CoCO3', 'NiCO3',
-        'MgTi2O5', 'Ca2SiO4', 'Ca3Si2O7',
-    }
-    database_formulas = {
-        str(formula).strip() for formula in database.phase_info['formula']
-    }
-    assert absent_formulas.isdisjoint(database_formulas)
+    active_formulas = _berman_active_pure_formulas(database)
+    assert set(THERMOENGINE_ABSENT_FORMULAS).isdisjoint(active_formulas)
+    # Nph is active. An empty or special-phase-only join would miss it.
+    assert 'Nph' in database.valid_phase_symbols
+    assert 'NaAlSiO4' in active_formulas
+    assert {'Krt', 'Lct', 'Lrn', 'Rnk'}.isdisjoint(database.valid_phase_symbols)
     catalogue_symbols = {
         phase_id
         for reaction in REACTION_CATALOGUE
@@ -887,7 +946,7 @@ def test_catalogue_thermoengine_symbols_resolve_on_the_engine():
             assert formula == want_formula
             assert want_name in str(name)
         assert symbol in _TE_PURE_PHASE_POLYMORPH
-    for bad in ('Co', 'Sp', 'a', 'Krt', 'Lct', 'Rnk'):
+    for bad in ('Co', 'Sp', 'a', 'Krt', 'Lct', 'Lrn', 'Rnk'):
         with pytest.raises(Exception):
             database.get_phase(bad)
 
@@ -930,8 +989,10 @@ def test_catalogue_magemin_endmembers_resolve_in_the_verb1_table():
                 assert phase.endmember in pure_phases
             else:
                 assert phase.endmember in solutions[phase.host_phase]
-    for endmember in ('cor', 'and', 'ky', 'sill'):
+    for endmember in ('cor', 'and', 'ky', 'sill', 'ne'):
         assert endmember in pure_phases
+    assert 'cg' not in pure_phases
+    assert 'cgh' not in pure_phases
 
 
 # --- apparent G -> Delta_fG (element reference at T) -----------------------
