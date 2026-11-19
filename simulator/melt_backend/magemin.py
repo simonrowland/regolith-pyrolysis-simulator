@@ -1795,9 +1795,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     },
                 )
 
-            pressure_min_bar, pressure_max_bar = (
-                MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
-            )
             try:
                 native_activity_pressure_bar = float(pressure_bar)
             except (TypeError, ValueError, OverflowError):
@@ -1828,12 +1825,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         ),
                     },
                 )
-            if (
-                native_activity_formula == "SiO2"
-                and not native_activity_reference_available(
-                    native_activity_formula, native_activity_pressure_bar
-                )
+            if not native_activity_reference_available(
+                native_activity_formula, native_activity_pressure_bar
             ):
+                pressure_min_bar, pressure_max_bar = (
+                    MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+                )
                 reason = "magemin_native_silica_reference_unavailable"
                 return EquilibriumResult(
                     temperature_C=temperature_C,
@@ -1856,7 +1853,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         },
                     },
                 )
-            if not pressure_min_bar <= native_activity_pressure_bar <= pressure_max_bar:
+            if not native_activity_reference_available(
+                "SiO2", native_activity_pressure_bar
+            ):
+                pressure_min_bar, pressure_max_bar = (
+                    MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+                )
                 native_activity_pressure_notice = {
                     'kind': 'out_of_certified_band',
                     'reason': (
@@ -2014,11 +2016,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
 
         if native_activity_formula is not None:
-            from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
-
-            native_spec = MAGEMIN_NATIVE_MELT_ACTIVITIES.get(
-                native_activity_formula
-            )
             native_bulk_component = (
                 None if native_spec is None else native_spec[2]
             )
@@ -2235,7 +2232,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             except (TypeError, ValueError, OverflowError):
                 activity_value = math.nan
             if (
-                native_activity_formula not in MAGEMIN_NATIVE_MELT_ACTIVITIES
+                native_spec is None
                 or solver_status not in {0, 1, 2}
                 or not math.isfinite(activity_value)
                 or activity_value <= 0.0
