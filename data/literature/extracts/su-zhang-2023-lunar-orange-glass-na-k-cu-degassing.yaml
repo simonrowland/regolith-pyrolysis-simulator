@@ -36,10 +36,16 @@ extraction:
   scope_note: S2–S4 are the measured analytical profiles; S4 profiles are author-reduced from S5 signals using the DOCX S3
     method. Table S1 standards and Table S5 map extents are retained as context metadata. Figure digitizations and degassing
     fluxes are not extracted. Diffusion-model inputs and Table 3.1 outputs are context rows and are not profile analysis
-    conditions. The cooling law, the diffusivities, and the Appendix B surface-boundary form are literature_fixed_model_input.
-    The numerical K_Na in Equation B.6 is a sample_specific_derived_parameter for lunar sample 12065, from De Maria fugacities
-    and an assumed 0.29 wt% surface concentration, not a fixed 74220 input. The 74220 fit uses that boundary form with free
-    surface coefficients. Those coefficients and the per-bead cooling time scales are author_fitted_model_parameter. Printed
+    conditions. The cooling law and the diffusivities are literature_fixed_model_input. The Appendix B boundary record is
+    mixed_provenance_boundary, not one literature-fixed input. Equation B.1, NaO0.5(melt) = Na(gas) + 1/4 O2(gas), is literature
+    from De Maria et al. 1971. Equation B.7, K_Na = A exp(-B/T), is an authors_expectation. The more general form is expected to
+    also apply to Na vapor pressure of orange glass beads (high-Ti basalt) in lunar sample 74220. Equation B.10,
+    Ce = a0 * exp(b0/T), is an authors_assumption obtained only if ambient sodium and oxygen fugacities vary with temperature in
+    the form of exp(a-b/T) as in Eqs. B.3 and B.4; those ambient fugacities cannot be known a priori. The numerical K_Na in
+    Equation B.6 is a sample_specific_derived_parameter for lunar sample 12065, from De Maria fugacities and an assumed 0.29 wt%
+    surface concentration, not a fixed 74220 input. The 74220 Na and Cu surface coefficients and the per-bead cooling time scales
+    are author_fitted_model_parameter fitted to these profiles. Chapter 3 Eq. 3.3 uses that author-selected form with free fitting
+    parameters. Printed
     Table 3.1 cells are in the corpus table named on those rows. T0 = 1640 K is the model initial temperature
     from the 74220 liquidus (Delano 1990; thesis printed page 61), not a profile analysis condition. No profile row prints T, fO2, or total pressure; they remain unknown. Glass quench status
     is not_stated because cooling to glass is described, but preservation of volatile concentrations during quench is not
@@ -100049,7 +100055,7 @@ species:
           locator: *id2961
     context:
     - observation_id: su_zhang_2023_model_na_surface_boundary
-      type: literature_fixed_model_input
+      type: mixed_provenance_boundary
       units: dimensionless
       locator:
         source_path: raw/su-2024-lunar-volatiles-thesis/su-2024-lunar-volatiles-thesis.pdf
@@ -100061,29 +100067,52 @@ species:
         equation: "B.1"
       values:
         quantity: surface_equilibrium_boundary
-        role: literature_fixed_form
-        provenance: literature_fixed
+        reaction_role: literature
         reaction_as_printed: "NaO0.5(melt) = Na(gas) + 1/4 O2(gas)"
         reaction_source: De Maria et al. 1971
         reaction_equation: "B.1"
+        general_form_role: authors_expectation
         general_form_as_printed: "K_Na = A exp(-B/T)"
         general_form_equation: "B.7"
-        general_form_applies_to: "74220 orange glass, high-Ti basalt"
+        general_form_applicability_as_printed: >-
+          The more general form of K_Na (Eq. B.7) is expected to also apply
+          to Na vapor pressure of orange glass beads (high-Ti basalt) in
+          lunar sample 74220.
         general_form_locator:
           page: 144
           published_page: 129
           pdf_page_index: 143
           equation: "B.7"
+        surface_form_role: authors_assumption
         surface_form_as_printed: "Ce = a0 * exp(b0/T)"
         surface_form_equation: "B.10"
+        surface_form_condition_as_printed: >-
+          If f_Na,ambient and f_O2,ambient vary with temperature in the form
+          of exp(a-b/T) as in Eqs. (B.3) and (B.4), then C_e would have the
+          form C_e = a0 * exp(b0/T).
         surface_form_locator:
           page: 144
           published_page: 129
           pdf_page_index: 143
           equation: "B.10"
-        used_by_74220_fit: boundary_form_with_free_surface_coefficients
+        surface_coefficients_role: fitted_to_these_profiles
+        surface_coefficients_equation: "3.3"
+        surface_coefficients_as_printed: >-
+          The boundary condition assumes that the concentration of Na or Cu
+          on the bead surface is in equilibrium with the transient atmosphere,
+          and is modeled as C_e = a0 * exp(b0/T). a0 and b0 are two fitting
+          parameters because Na or Cu vapor pressure in the local atmosphere
+          (or volcanic plume) is not known.
+        surface_coefficients_records:
+        - su_zhang_2023_model_na_surface_parameters
+        - su_zhang_2023_model_cu_surface_parameters
+        sample_12065_role: sample_specific_derived_for_12065
+        sample_12065_record: su_zhang_2023_model_na_k_12065
         not_the_numerical_K_Na: true
         ambient_fugacity: cannot_be_known_a_priori
+        ambient_as_printed: >-
+          f_Na,ambient and f_O2,ambient are dependent on the location of the
+          glass bead along a flight path and cannot be known a priori.
         ambient_locator:
           page: 144
           published_page: 129
@@ -100177,8 +100206,10 @@ species:
         shared_across_beads: true
         boundary_form: "Ce = a0 * exp(b0/T)"
         boundary_form_role: >-
-          The 74220 fit uses the Appendix B boundary form with these free
-          surface coefficients. It does not use the sample-12065 numerical K_Na.
+          Fitted to these profiles. Chapter 3 Eq. 3.3 uses a0 and b0 as free
+          fitting parameters. The form is the authors' Eq. B.10 assumption on
+          su_zhang_2023_model_na_surface_boundary, not a literature-fixed input.
+          These coefficients are not the sample-12065 numerical K_Na.
         not_the_12065_K_Na: true
         table_path: tables/su-2024-lunar-volatiles-thesis/t3-1.csv
         table_sha256: "1a4cb24bcd21e09ba1c5c7560ae633fc22558b435ebb2a9b9b3213162a0629e9"
@@ -126749,7 +126780,8 @@ species:
         shared_across_beads: true
         boundary_form: "Ce = a0 * exp(b0/T)"
         boundary_form_role: >-
-          The 74220 fit uses the Appendix B boundary form with these free
-          surface coefficients. It does not use a fixed numerical K_Na.
+          Fitted to these profiles. Chapter 3 Eq. 3.3 uses a0 and b0 as free
+          fitting parameters. The form is the authors' Eq. B.10 assumption on
+          su_zhang_2023_model_na_surface_boundary, not a literature-fixed input.
         table_path: tables/su-2024-lunar-volatiles-thesis/t3-1.csv
         table_sha256: "1a4cb24bcd21e09ba1c5c7560ae633fc22558b435ebb2a9b9b3213162a0629e9"

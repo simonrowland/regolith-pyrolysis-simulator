@@ -718,7 +718,7 @@ def test_thesis_pdf_sha_and_chapter_page_map() -> None:
 _MODEL_CONTEXT_IDS = (
     ("unknown", "su_zhang_2023_model_cooling_law", "literature_fixed_model_input"),
     ("unknown", "su_zhang_2023_model_bead_tau", "author_fitted_model_parameter"),
-    ("Na2O", "su_zhang_2023_model_na_surface_boundary", "literature_fixed_model_input"),
+    ("Na2O", "su_zhang_2023_model_na_surface_boundary", "mixed_provenance_boundary"),
     ("Na2O", "su_zhang_2023_model_na_k_12065", "sample_specific_derived_parameter"),
     ("Na2O", "su_zhang_2023_model_na_diffusivity", "literature_fixed_model_input"),
     ("Na2O", "su_zhang_2023_model_na_surface_parameters", "author_fitted_model_parameter"),
@@ -826,6 +826,15 @@ def _assert_model_context(document: dict) -> None:
     assert "literature_fixed_model_input" in scope_note
     assert "sample_specific_derived_parameter" in scope_note
     assert "not a fixed 74220 input" in scope_note
+    assert "mixed_provenance_boundary" in scope_note
+    assert "authors_expectation" in scope_note
+    assert "expected to also apply" in scope_note
+    assert "authors_assumption" in scope_note
+    assert "cannot be known a priori" in scope_note
+    assert "fitted to these profiles" in scope_note
+    assert (
+        "Appendix B surface-boundary form are literature_fixed_model_input"
+    ) not in scope_note
     assert (
         "Fit parameters, figure digitizations, diffusivities, and degassing fluxes "
         "are not extracted."
@@ -898,20 +907,41 @@ def _assert_model_context(document: dict) -> None:
     )
     _assert_thesis_locator(boundary["locator"], page=143, published_page=128)
     assert boundary["locator"]["equation"] == "B.1"
-    assert boundary["values"]["role"] == "literature_fixed_form"
-    assert boundary["values"]["provenance"] == "literature_fixed"
+    assert boundary["type"] != "literature_fixed_model_input"
+    assert "role" not in boundary["values"]
+    assert "provenance" not in boundary["values"]
+    assert "general_form_applies_to" not in boundary["values"]
+    assert "used_by_74220_fit" not in boundary["values"]
+    assert boundary["values"]["reaction_role"] == "literature"
     assert boundary["values"]["reaction_source"] == "De Maria et al. 1971"
+    assert boundary["values"]["reaction_equation"] == "B.1"
+    assert boundary["values"]["general_form_role"] == "authors_expectation"
+    assert boundary["values"]["general_form_equation"] == "B.7"
+    applicability = boundary["values"]["general_form_applicability_as_printed"]
+    assert "expected to also apply" in applicability
+    assert "74220" in applicability
+    assert "high-Ti basalt" in applicability
+    assert boundary["values"]["surface_form_role"] == "authors_assumption"
     assert boundary["values"]["surface_form_as_printed"] == "Ce = a0 * exp(b0/T)"
     assert boundary["values"]["surface_form_equation"] == "B.10"
-    assert (
-        boundary["values"]["used_by_74220_fit"]
-        == "boundary_form_with_free_surface_coefficients"
-    )
+    condition = boundary["values"]["surface_form_condition_as_printed"]
+    assert "exp(a-b/T)" in condition
+    assert "Eqs. (B.3) and (B.4)" in condition
+    assert boundary["values"]["surface_coefficients_role"] == "fitted_to_these_profiles"
+    assert boundary["values"]["surface_coefficients_equation"] == "3.3"
+    assert "two fitting parameters" in boundary["values"]["surface_coefficients_as_printed"]
+    assert boundary["values"]["surface_coefficients_records"] == [
+        "su_zhang_2023_model_na_surface_parameters",
+        "su_zhang_2023_model_cu_surface_parameters",
+    ]
+    assert boundary["values"]["sample_12065_role"] == "sample_specific_derived_for_12065"
+    assert boundary["values"]["sample_12065_record"] == "su_zhang_2023_model_na_k_12065"
     assert boundary["values"]["not_the_numerical_K_Na"] is True
     assert "K_Na" not in boundary["values"]
     assert "fNa_equil_atm" not in boundary["values"]
     assert "fO2_equil_atm" not in boundary["values"]
     assert boundary["values"]["ambient_fugacity"] == "cannot_be_known_a_priori"
+    assert "cannot be known a priori" in boundary["values"]["ambient_as_printed"]
     _assert_page_map(
         boundary["values"]["surface_form_locator"], page=144, published_page=129
     )
@@ -953,6 +983,7 @@ def _assert_model_context(document: dict) -> None:
     assert na_fit["values"]["parameter_names"] == ["a0", "b0"]
     assert na_fit["values"]["boundary_form"] == "Ce = a0 * exp(b0/T)"
     assert na_fit["values"]["not_the_12065_K_Na"] is True
+    _assert_fitted_boundary_form(na_fit)
     assert na_fit["values"]["table_path"] == TABLE_3_1_ASSET
     assert "a0_as_printed" not in na_fit["values"]
 
@@ -969,6 +1000,7 @@ def _assert_model_context(document: dict) -> None:
     assert cu_fit["values"]["provenance"] == "fitted_to_these_profiles"
     assert cu_fit["values"]["parameter_names"] == ["a0", "b0"]
     assert cu_fit["values"]["boundary_form"] == "Ce = a0 * exp(b0/T)"
+    _assert_fitted_boundary_form(cu_fit)
     assert cu_fit["values"]["table_path"] == TABLE_3_1_ASSET
     assert "a0_as_printed" not in cu_fit["values"]
     assert "b0_as_printed" not in cu_fit["values"]
@@ -1019,11 +1051,62 @@ def test_model_context_pins_printed_inputs_and_table_3_1() -> None:
     _assert_model_context(_document())
 
 
+def _assert_fitted_boundary_form(row: dict) -> None:
+    role = row["values"]["boundary_form_role"]
+    assert row["values"]["provenance"] == "fitted_to_these_profiles"
+    assert "fitting parameters" in role
+    assert "Eq. B.10" in role
+    assert "literature-fixed input" in role
+    assert "Appendix B boundary form" not in role
+
+
 def test_model_context_tau_range_mutation_is_detected() -> None:
     document = deepcopy(_document())
     tau = _context_row(document, "unknown", "su_zhang_2023_model_bead_tau")
     tau["values"]["tau_range_s_as_printed"] = "49 to 179"
     with pytest.raises(AssertionError):
+        _assert_model_context(document)
+
+
+def test_boundary_single_literature_class_is_detected() -> None:
+    document = deepcopy(_document())
+    boundary = _context_row(
+        document, "Na2O", "su_zhang_2023_model_na_surface_boundary"
+    )
+    boundary["values"]["general_form_role"] = "literature_fixed_form"
+    with pytest.raises(AssertionError, match="authors_expectation"):
+        _assert_model_context(document)
+
+    document = deepcopy(_document())
+    boundary = _context_row(
+        document, "Na2O", "su_zhang_2023_model_na_surface_boundary"
+    )
+    boundary["values"]["surface_form_role"] = "literature_fixed_form"
+    with pytest.raises(AssertionError, match="authors_assumption"):
+        _assert_model_context(document)
+
+
+def test_boundary_applicability_qualifier_mutation_is_detected() -> None:
+    document = deepcopy(_document())
+    boundary = _context_row(
+        document, "Na2O", "su_zhang_2023_model_na_surface_boundary"
+    )
+    boundary["values"]["general_form_applicability_as_printed"] = (
+        "Equation B.7 applies to 74220 orange glass."
+    )
+    with pytest.raises(AssertionError, match="expected to also apply"):
+        _assert_model_context(document)
+
+
+def test_boundary_surface_assumption_mutation_is_detected() -> None:
+    document = deepcopy(_document())
+    boundary = _context_row(
+        document, "Na2O", "su_zhang_2023_model_na_surface_boundary"
+    )
+    boundary["values"]["surface_form_condition_as_printed"] = (
+        "Ce = a0 * exp(b0/T) is the 74220 boundary."
+    )
+    with pytest.raises(AssertionError, match="exp\\(a-b/T\\)"):
         _assert_model_context(document)
 
 
