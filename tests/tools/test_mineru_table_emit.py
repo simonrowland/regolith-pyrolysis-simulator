@@ -1031,7 +1031,7 @@ def test_merged_shornikov_fragments_migrate_with_temperature_and_conditions(
     for record in emitted_2017:
         assert record.value.kind is ValueKind.UNAVAILABLE
         assert record.locator.table == "2"
-        assert "row_label=" in (record.locator.note or "")
+        assert record.locator.row is not None
         composition = record.point_conditions["composition"]
         assert composition.state.is_value
         assert dict(composition.state.value.components) == {

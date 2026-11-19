@@ -515,8 +515,7 @@ def test_isolated_migration_carries_each_species_and_pressure_condition() -> Non
         assert temperature.state.value.kind is ValueKind.INTERVAL
         assert temperature.locator is not None
         assert temperature.locator.table == "5"
-        assert temperature.locator.note is not None
-        assert f"row={source['locator']['row']}" in temperature.locator.note
+        assert temperature.locator.row == source["locator"]["row"]
         source_temperature = source["point_conditions"]["temperature_K"]["state"]["value"]
         assert temperature.state.value.interval_low == Decimal(source_temperature["interval_low"])
         assert temperature.state.value.interval_high == Decimal(source_temperature["interval_high"])
@@ -629,8 +628,7 @@ def test_isolated_migration_carries_each_species_and_pressure_condition() -> Non
         assert temperature.locator.page == 14
         expected_row = "2" if "sublimation" in local_id else "5"
         assert source_rows[local_id][1]["locator"]["row"] == expected_row
-        assert temperature.locator.note is not None
-        assert f"row={expected_row}" in temperature.locator.note
+        assert temperature.locator.row == expected_row
         assert row.identity.composition.is_unknown
         assert row.identity.total_pressure_Pa is None
         assert row.identity.fO2_Pa is None

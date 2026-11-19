@@ -59,9 +59,8 @@ def _one(rows, parent: str, sample: str, column: str):
         row
         for row in rows
         if parent in row.observation_id
-        and row.locator.note is not None
-        and f"row={sample}" in row.locator.note
-        and f"column={column}" in row.locator.note
+        and row.locator.row == sample
+        and row.locator.column == column
     ]
     assert len(matches) == 1, [row.observation_id for row in matches]
     return matches[0]
@@ -102,7 +101,7 @@ def test_rys_tables_7_and_9_thermal_cells_migrate_with_composition_and_locators(
     for row in table7:
         assert row.identity.composition.is_value
     for row in table9:
-        if row.locator.note and "row=56Na2O-44SiO2" in row.locator.note:
+        if row.locator.row == "56Na2O-44SiO2":
             assert row.identity.composition.is_unknown
             assert row.identity.composition.reason == (
                 "printed_components_total_96_percent_no_reconstruction"

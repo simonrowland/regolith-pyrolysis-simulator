@@ -82,8 +82,8 @@ def test_costa_table3_migrates_composition_temperature_and_source_conditions(
 
     for row in rows:
         composition = row.point_conditions["composition"]
-        assert composition.locator.note is not None
-        sample = composition.locator.note.removeprefix("row=").casefold()
+        assert composition.locator.row is not None
+        sample = composition.locator.row.casefold()
         formula = row.identity.species.formula
         source_observation = next(
             observation
@@ -109,8 +109,7 @@ def test_costa_table3_migrates_composition_temperature_and_source_conditions(
         assert composition.state.is_value
         assert composition.locator.page == 11
         assert composition.locator.table == "1"
-        assert composition.locator.note is not None
-        assert composition.locator.note.startswith("row=")
+        assert composition.locator.row is not None
         gas = conditions["gas_environment"]
         assert gas.state.is_value
         assert gas.locator.page == 3
@@ -182,5 +181,5 @@ def test_costa_table3_render_pins_use_physical_pdf_page_and_printed_values(
         assert Decimal(str(row.uncertainty.verbatim["value"])) == uncertainty
         assert row.locator.page == 11
         assert row.locator.pdf_page_index == 10
-        assert row_label in row.locator.note
-        assert column_label in row.locator.note
+        assert row.locator.row == row_label.removeprefix("row=")
+        assert row.locator.column == column_label.removeprefix("column=")
