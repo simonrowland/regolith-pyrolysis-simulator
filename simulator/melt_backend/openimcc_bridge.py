@@ -1210,6 +1210,18 @@ def _evaluate_uncached(
             },
         }
     package_labels = result.labels
+    for notice in getattr(package_labels, "notices", ()):
+        for estimate in getattr(notice, "estimates", ()):
+            source_row_id = getattr(estimate, "source_row_id", None)
+            oxide = getattr(estimate, "oxide", None)
+            if not isinstance(source_row_id, str) or not source_row_id:
+                continue
+            if not isinstance(oxide, str) or not oxide:
+                continue
+            component = single_cation_component_formula(oxide)
+            activity_coefficients.setdefault(component, {})[
+                "source_row_id"
+            ] = source_row_id
     labels = ImccAdapterLabels(
         identity=package_labels.identity,
         coverage=package_labels.coverage,

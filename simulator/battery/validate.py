@@ -2298,9 +2298,9 @@ def _observation_lineage(
     """COMPLETE observation/table ids, or INCOMPLETE with one reason.
 
     A shared ancestor is returned from the cache. An id still on the
-    active stack is a cycle. A derivation input that is neither an
-    observation, a table, nor a registered source asset is unresolvable
-    and is not dropped. Citation links are traversed as scoring ancestry
+    active stack is a cycle. An unknown derivation input is unresolvable and
+    is not dropped; same-source context references on model-derived rows
+    resolve at work scope. Citation links are traversed as scoring ancestry
     without changing ``derived_from``. read_from is a work asset, not an
     observation edge: a table is an ancestor, a registered non-table asset
     stays out of the id set, and any other nonempty value is unresolvable.
@@ -2330,6 +2330,37 @@ def _observation_lineage(
         result = Ancestry.incomplete(AncestryFailure.PRINTED_UNRESOLVED)
     else:
         ids: set[str] = {observation_id}
+        derivation_inputs = (
+            obs.derivation.inputs if obs.derivation is not None else ()
+        )
+        lineage_inputs = (obs.derived_from or ()) + derivation_inputs
+        evidence_class = obs.evidence.class_
+        model_derived = (
+            evidence_class.is_value
+            and evidence_class.value is EvidenceClass.MODEL_DERIVED
+        )
+        context_prefix = (
+            None
+            if (
+                not model_derived
+                or not obs.source_id
+                or obs.derivation is not None
+                and obs.derivation.declares_unprinted_raw_inputs
+            )
+            else f"{obs.source_id}::context::"
+        )
+        local_context_inputs = {
+            input_id
+            for input_id in lineage_inputs
+            if context_prefix is not None
+            and input_id.startswith(context_prefix)
+            and input_id not in observations
+        }
+        # An in-paper model_derived observation with no external inputs is
+        # complete at its own work. Same-source context IDs describe inputs
+        # recorded within that work, not missing Observation edges; the work
+        # resolver already supplies the work ID. Foreign or missing inputs
+        # still have to resolve below.
         unresolved_read_from = False
         if obs.read_from:
             if obs.read_from in table_ids:
@@ -2342,9 +2373,18 @@ def _observation_lineage(
             result = Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
         else:
             result = Ancestry.of(ids)
-            for parent in obs.derived_from or ():
+            for input_id in lineage_inputs:
+                if input_id in local_context_inputs:
+                    continue
+                if input_id not in observations and input_id not in table_ids:
+                    if _is_registered_non_table(input_id, table_ids, asset_ids):
+                        continue
+                    result = Ancestry.incomplete(
+                        AncestryFailure.UNRESOLVABLE_INPUT
+                    )
+                    break
                 nested = _observation_lineage(
-                    parent,
+                    input_id,
                     observations,
                     table_ids,
                     experiments=experiments,
@@ -2358,31 +2398,6 @@ def _observation_lineage(
                 assert nested.ids is not None and result.ids is not None
                 ids |= set(nested.ids)
                 result = Ancestry.of(ids)
-            else:
-                if obs.derivation is not None:
-                    for inp in obs.derivation.inputs:
-                        if inp not in observations and inp not in table_ids:
-                            if _is_registered_non_table(inp, table_ids, asset_ids):
-                                continue
-                            result = Ancestry.incomplete(
-                                AncestryFailure.UNRESOLVABLE_INPUT
-                            )
-                            break
-                        nested = _observation_lineage(
-                            inp,
-                            observations,
-                            table_ids,
-                            experiments=experiments,
-                            asset_ids=asset_ids,
-                            _cache=_cache,
-                            _stack=_stack,
-                        )
-                        if not nested.complete:
-                            result = nested
-                            break
-                        assert nested.ids is not None and result.ids is not None
-                        ids |= set(nested.ids)
-                        result = Ancestry.of(ids)
             if result.complete and experiments is not None:
                 experiment = experiments.get(obs.experiment_id)
                 if experiment is not None and experiment.quoted_from is not None:
