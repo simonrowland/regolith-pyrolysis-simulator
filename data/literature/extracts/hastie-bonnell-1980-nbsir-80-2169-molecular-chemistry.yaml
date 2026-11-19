@@ -1006,6 +1006,7 @@ species:
         units: kcal/mol
         confidence_level: not_stated
     - observation_id: hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
+      per: mol_species
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_11
       locator:
@@ -1605,6 +1606,7 @@ species:
       derived_from:
       - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
     - observation_id: hastie_bonnell_1980_tableE3_hpo2_delta_fH
+      per: mol_species
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_15
       locator: &id002
@@ -1783,6 +1785,7 @@ species:
         units: log10 Kp
         confidence_level: not_stated
     - observation_id: hastie_bonnell_1980_appendixD_hpo2_delta_fH_third_law
+      per: mol_species
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_06
       locator: &id004
@@ -3689,6 +3692,7 @@ species:
       derived_from:
       - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
     - observation_id: hastie_bonnell_1980_tableE3_napo2_delta_fH
+      per: mol_species
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_15
       locator: &id006
@@ -3745,6 +3749,7 @@ species:
       - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
       - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
     - observation_id: hastie_bonnell_1980_tableD2_napo2_delta_fH_third_law
+      per: mol_species
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_19
       locator: &id007
@@ -3999,6 +4004,7 @@ species:
       derived_from:
       - hastie_bonnell_1980_appendixE_tableE3_untyped_parameters_typed_refusal
     - observation_id: hastie_bonnell_1980_tableE3_lipo2_delta_fH
+      per: mol_species
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_15
       locator: &id008
@@ -4055,6 +4061,7 @@ species:
       - hastie_bonnell_1980_appendixD_tableD2_typed_refusal
       - hastie_bonnell_1980_appendixE_po_delta_fH298_present_study
     - observation_id: hastie_bonnell_1980_tableD2_lipo2_delta_fH_third_law
+      per: mol_species
       type: heat_capacity_and_heat_content_series
       experiment: hastie_bonnell_1980_experiment_19
       locator: &id009
