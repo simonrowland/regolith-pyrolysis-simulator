@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from simulator.config_flags import bool_feature_flag
+from simulator.campaigns import C2A_STAGED_PN2_SWEEP_MAX_MBAR
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -39,7 +40,7 @@ _SPECIES_ALIASES = {
 }
 
 PO2_REGIMES = ("oxidizing", "buffered", "reducing")
-PRESSURE_REGIMES = ("vacuum", "millibar_sweep")
+PRESSURE_REGIMES = ("vacuum", "millibar_sweep", "viscous_above_sweep")
 
 # Operating-point thresholds, anchored on the recipe catalog rather than feel:
 # - The dosed-O2 SiO2-hold excursion runs pO2 3.0-15.0 mbar
@@ -54,6 +55,9 @@ PRESSURE_REGIMES = ("vacuum", "millibar_sweep")
 #   advisor uses its conservative "vacuum" bucket; this threshold is not a
 #   Knudsen boundary because the default 0.12 m pipe at ~1 mbar is still
 #   viscous by Kn.
+# - Above the sweep train's 15 mbar upper setting, report viscous operation
+#   separately. This is an advisor label beyond the engineering sweep band,
+#   not a physical flow-regime boundary; Kn remains the diagnostic.
 DOSED_O2_PO2_MIN_MBAR = 3.0
 BUFFERED_PO2_MIN_MBAR = 0.5
 VISCOUS_SWEEP_MIN_MBAR = 5.0
@@ -133,7 +137,11 @@ def resolve_wall_operating_point(
     else:
         po2_regime = "reducing"
     if buffer_pressure is not None and buffer_pressure >= VISCOUS_SWEEP_MIN_MBAR:
-        pressure_regime = "millibar_sweep"
+        pressure_regime = (
+            "viscous_above_sweep"
+            if buffer_pressure > C2A_STAGED_PN2_SWEEP_MAX_MBAR
+            else "millibar_sweep"
+        )
     else:
         pressure_regime = "vacuum"
     return WallOperatingPoint(

@@ -2077,6 +2077,9 @@ CONDENSATION_TEMPS_C = {
     'Al':  1180,   # capture-threshold fallback; not a designated stage
     'Ti':  1500,   # capture-threshold fallback; not a designated stage
 }
+# Reference partial pressure encoded by the catalogue's
+# ``condensation_T_C_at_1mbar`` fallback field.
+CONDENSATION_TEMPERATURE_FALLBACK_REFERENCE_MBAR = 1.0
 
 _CONFIG_BUNDLE = load_config_bundle(DATA_DIR)
 from simulator.vapour_rail.catalog import (
@@ -3213,6 +3216,7 @@ class CondensationModel:
         # inlet partial onto every wall (b-282).
 
         stage_route_by_species: dict[str, dict[str, Any]] = {}
+        condensation_pressure_assumption_notices: dict[str, dict[str, Any]] = {}
         for species in evap_flux.species_kg_hr:
             if (
                 carrier_authority_status_by_species.get(species)
@@ -3223,6 +3227,37 @@ class CondensationModel:
                 )
             ):
                 continue
+            if (
+                species not in self.condensation_temperatures_C
+                and not math.isclose(
+                    self.overhead_pressure_mbar,
+                    CONDENSATION_TEMPERATURE_FALLBACK_REFERENCE_MBAR,
+                    rel_tol=0.0,
+                    abs_tol=1.0e-12,
+                )
+            ):
+                condensation_pressure_assumption_notices[species] = {
+                    'kind': 'out_of_domain_physics',
+                    'code': 'condensation_routing_pressure_assumption',
+                    'reason': (
+                        'Condensation routing retains the 1 mbar partial-pressure '
+                        'fallback at a different running total pressure; the fallback '
+                        'temperature is not pressure-adjusted.'
+                    ),
+                    'authority_level': 'extrapolated',
+                    'certified_band': {
+                        'partial_pressure_mbar': [
+                            CONDENSATION_TEMPERATURE_FALLBACK_REFERENCE_MBAR,
+                            CONDENSATION_TEMPERATURE_FALLBACK_REFERENCE_MBAR,
+                        ],
+                    },
+                    'reference_pressure_mbar': (
+                        CONDENSATION_TEMPERATURE_FALLBACK_REFERENCE_MBAR
+                    ),
+                    'running_total_pressure_mbar': float(
+                        self.overhead_pressure_mbar
+                    ),
+                }
             stage_route_by_species[species] = {
                 'T_cond_C': _species_condensation_temperature_C(
                     species, temps=self.condensation_temperatures_C,
@@ -3702,6 +3737,11 @@ class CondensationModel:
         sticking_notice['vapour_carrier_lineage_by_deposited_species'] = (
             wall_carrier_lineage_by_deposited_species
         )
+        if condensation_pressure_assumption_notices:
+            sticking_notice = dict(sticking_notice)
+            sticking_notice[
+                'condensation_pressure_assumption_notices_by_species'
+            ] = condensation_pressure_assumption_notices
         extrapolations = self.last_sticking_alpha_provenance_notice.get(
             'wall_saturation_pressure_extrapolations_by_species', {}
         )

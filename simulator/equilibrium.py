@@ -55,6 +55,10 @@ _O2_CONTROLLED_ATMOSPHERES = frozenset({
     Atmosphere.CONTROLLED_O2_FLOW,
     Atmosphere.O2_BACKPRESSURE,
 })
+_INERT_COVER_ATMOSPHERES = frozenset({
+    Atmosphere.ARGON_FLOW,
+    Atmosphere.PN2_SWEEP,
+})
 _ELLINGHAM_STANDARD_PRESSURE_PA = PA_PER_BAR
 
 
@@ -221,20 +225,49 @@ class EquilibriumMixin:
             # floor alone.
             if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
                 pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
-            return max(self._headspace_equilibrated_pO2_bar(pO2_bar), self._oxygen_numerical_floor_bar())
+            pO2_bar = self._headspace_equilibrated_pO2_bar(pO2_bar)
+        else:
+            upstream_partials = getattr(
+                self,
+                '_melt_headspace_composition_mbar',
+                {},
+            ) or {}
+            pO2_bar = max(
+                0.0,
+                float(upstream_partials.get('O2', 0.0) or 0.0) / 1000.0,
+            )
+            if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
+                pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
+            pO2_bar = self._headspace_equilibrated_pO2_bar(pO2_bar)
 
-        upstream_partials = getattr(
-            self,
-            '_melt_headspace_composition_mbar',
-            {},
-        ) or {}
-        pO2_bar = max(
-            0.0,
-            float(upstream_partials.get('O2', 0.0) or 0.0) / 1000.0,
+        floor_bar = self._oxygen_numerical_floor_bar()
+        floor_binds = pO2_bar < floor_bar
+        self._last_pressure_assumption_notice = None
+        total_pressure_mbar = float(
+            getattr(self.melt, 'p_total_mbar', 0.0) or 0.0
         )
-        if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
-            pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
-        return max(self._headspace_equilibrated_pO2_bar(pO2_bar), self._oxygen_numerical_floor_bar())
+        if (
+            floor_binds
+            and self.melt.atmosphere in _INERT_COVER_ATMOSPHERES
+            and total_pressure_mbar > 0.0
+        ):
+            self._last_pressure_assumption_notice = {
+                'kind': 'pressure_assumption',
+                'code': 'inert_cover_numerical_o2_floor',
+                'reason': (
+                    'The numerical O2 floor binds under an inert cover at '
+                    f'{total_pressure_mbar:g} mbar total pressure; it is a '
+                    'division guard, not a physical O2 measurement.'
+                ),
+                'authority_level': 'numerical_guard',
+                'certified_band': {
+                    'pO2_bar': [0.0, floor_bar],
+                    'scope': 'numerical floor only; no physical certification',
+                },
+                'numerical_floor_bar': floor_bar,
+                'running_total_pressure_mbar': total_pressure_mbar,
+            }
+        return max(pO2_bar, floor_bar)
 
     def _headspace_transport_pO2_bar(self) -> float:
         """O2 transport reservoir pO2 consumed by SiO/vapor transport."""

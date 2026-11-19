@@ -10196,6 +10196,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_backend_diagnostics = dict(
             getattr(result, 'diagnostics', {}) or {}
         )
+        pressure_notice = getattr(self, '_last_pressure_assumption_notice', None)
+        if isinstance(pressure_notice, Mapping):
+            result_diagnostics = dict(self._last_backend_diagnostics)
+            result_diagnostics['pressure_assumption_notices'] = [
+                dict(pressure_notice)
+            ]
+            result.diagnostics = result_diagnostics
+            self._last_backend_diagnostics = result_diagnostics
+            self._last_pressure_assumption_notice = None
         if (
             str(self._last_backend_status) == 'out_of_domain'
             and self._last_backend_diagnostics
