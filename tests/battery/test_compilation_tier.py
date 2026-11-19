@@ -8469,3 +8469,76 @@ def test_ambiguous_pure_phase_cases_stay_refused() -> None:
     )
     assert held.refusal_detail["reason"] == "pure-phase-call-required"
     assert held.refusal_detail["symbol"] == "Wo"
+
+
+@pytest.mark.parametrize(
+    "engine, formula",
+    (
+        *(
+            (Engine.MAGEMIN, formula)
+            for formula in (
+                "Ca2Fe2O5",
+                "CaFe2O4",
+                "CaSiO3",
+                "Fe3O4",
+                "KAlO2",
+                "KAlSi2O6",
+                "KAlSi3O8",
+                "KAlSiO4",
+                "Na2Ca2Si2O7",
+                "Na2Ca2Si3O9",
+                "Na2CaSiO4",
+                "Na2O",
+                "Na4CaSi3O9",
+                "NaAlSi3O8",
+                "NaAlSiO4",
+                "NaFeO2",
+                "CoTiO3",
+                "NiTiO3",
+                "CoCO3",
+                "NiCO3",
+                "MgTi2O5",
+                "Ca2SiO4",
+                "Ca3Si2O7",
+            )
+        ),
+        *(
+            (Engine.THERMOENGINE, formula)
+            for formula in (
+                "Ca2Fe2O5",
+                "CaFe2O4",
+                "KAlO2",
+                "KAlSi2O6",
+                "Na2Ca2Si2O7",
+                "Na2Ca2Si3O9",
+                "Na2CaSiO4",
+                "Na2O",
+                "Na4CaSi3O9",
+                "NaFeO2",
+                "CoTiO3",
+                "NiTiO3",
+                "CoCO3",
+                "NiCO3",
+                "MgTi2O5",
+                "Ca2SiO4",
+                "Ca3Si2O7",
+            )
+        ),
+    ),
+)
+def test_absent_engine_phases_stay_typed_refused(engine, formula) -> None:
+    observation = F.observation(
+        f"unmapped-{formula}-{engine.value}",
+        "exp-1",
+        _crystal_thermo_identity(formula, None, Decimal("298.15")),
+        Decimal("0"),
+    )
+
+    def forbid_engine(*_args, **_kwargs):
+        raise AssertionError("unmapped phase must refuse before an engine call")
+
+    attempt = predict_thermo_attempt(
+        engine, observation, pure_phase=forbid_engine
+    )
+    assert attempt.value is None
+    assert attempt.refusal_detail["reason"] == "pure-phase-symbol-unmapped"

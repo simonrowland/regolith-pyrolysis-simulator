@@ -850,6 +850,16 @@ def test_catalogue_thermoengine_symbols_resolve_on_the_engine():
     )
 
     database = model.Database(database='Berman')
+    absent_formulas = {
+        'Ca2Fe2O5', 'CaFe2O4', 'KAlO2', 'KAlSi2O6',
+        'Na2Ca2Si2O7', 'Na2Ca2Si3O9', 'Na2CaSiO4', 'Na2O',
+        'Na4CaSi3O9', 'NaFeO2', 'CoTiO3', 'NiTiO3', 'CoCO3', 'NiCO3',
+        'MgTi2O5', 'Ca2SiO4', 'Ca3Si2O7',
+    }
+    database_formulas = {
+        str(formula).strip() for formula in database.phase_info['formula']
+    }
+    assert absent_formulas.isdisjoint(database_formulas)
     catalogue_symbols = {
         phase_id
         for reaction in REACTION_CATALOGUE
@@ -877,7 +887,7 @@ def test_catalogue_thermoengine_symbols_resolve_on_the_engine():
             assert formula == want_formula
             assert want_name in str(name)
         assert symbol in _TE_PURE_PHASE_POLYMORPH
-    for bad in ('Co', 'Sp', 'a'):
+    for bad in ('Co', 'Sp', 'a', 'Krt', 'Lct', 'Rnk'):
         with pytest.raises(Exception):
             database.get_phase(bad)
 
@@ -889,16 +899,20 @@ def test_catalogue_magemin_endmembers_resolve_in_the_verb1_table():
         MAGEMinBackend,
         _MAGEMIN_PURE_PHASES,
         _parse_magemin_gbase_tables,
+        _parse_magemin_sys_oxide_row,
     )
 
     backend = MAGEMinBackend()
     assert backend.initialize({'warm_worker': False})
     spec = _MAGEMIN_PURE_PHASES['q']
-    stdout, _matlab, _notes = backend._run_pure_phase_probe(
+    stdout, matlab_text, _notes = backend._run_pure_phase_probe(
         bulk_wt_ig=dict(spec.bulk_wt_pct),
         temperature_C=1000.0 - 273.15,
         pressure_kbar=0.001,
     )
+    oxide_components = _parse_magemin_sys_oxide_row(matlab_text)
+    assert oxide_components is not None
+    assert not {'CoO', 'NiO', 'CO2', 'C'} & set(oxide_components)
     pure_phases, solutions = _parse_magemin_gbase_tables(stdout)
     assert 'spl' in solutions
     assert 'nsp' in solutions['spl']
