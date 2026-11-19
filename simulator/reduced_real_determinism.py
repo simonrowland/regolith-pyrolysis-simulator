@@ -981,6 +981,37 @@ class PT0DeterminismStore:
                 "PT-0 cached replay miss: no admitted gate candidates"
             )
         redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
+        require_domain_diagnostic = False
+        domain_key_builder = getattr(
+            sim,
+            "_freeze_gate_cache_key_and_domain",
+            None,
+        )
+        redox_key_builder = getattr(
+            sim,
+            "_freeze_gate_redox_key_fO2_log",
+            None,
+        )
+        if callable(domain_key_builder) and callable(redox_key_builder):
+            domain_key, _domain_reason = domain_key_builder(
+                pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
+                fO2_log=redox_key_builder(fO2_log=fO2_log),
+                **redox_state_kwargs,
+            )
+            domain_verdict = getattr(
+                domain_key,
+                "magemin_domain_verdict",
+                None,
+            )
+            domain_warnings = (
+                domain_verdict[1]
+                if isinstance(domain_verdict, tuple) and len(domain_verdict) > 1
+                else ()
+            )
+            require_domain_diagnostic = any(
+                "authority=extrapolated" in str(warning)
+                for warning in domain_warnings
+            )
         keys = tuple(
             canonical_replay_key(
                 sim,
@@ -994,7 +1025,12 @@ class PT0DeterminismStore:
             )
             for provider_role in roles
         )
-        payload = self._lookup_first_available("freeze_gate_curve", keys, sim=sim)
+        payload = self._lookup_first_available(
+            "freeze_gate_curve",
+            keys,
+            sim=sim,
+            require_gate_curve_domain_diagnostic=require_domain_diagnostic,
+        )
         sim._last_reduced_real_cache_state = self.last_cache_state
         return _curve_from_payload(payload["curve"])
 
@@ -1240,6 +1276,7 @@ class PT0DeterminismStore:
         keys: tuple[Mapping[str, Any], ...],
         *,
         sim: Any | None = None,
+        require_gate_curve_domain_diagnostic: bool = False,
     ) -> dict[str, Any]:
         if not keys:
             raise PT0CacheMiss(f"PT-0 cached replay miss: no keys for {artifact}")
@@ -1255,6 +1292,20 @@ class PT0DeterminismStore:
                 entry.get("key", {}),
             ):
                 continue
+            if require_gate_curve_domain_diagnostic:
+                curve_payload = (entry.get("payload") or {}).get("curve")
+                certified_band = (
+                    curve_payload.get("certified_band")
+                    if isinstance(curve_payload, Mapping)
+                    else None
+                )
+                if (
+                    not isinstance(curve_payload, Mapping)
+                    or curve_payload.get("authority") != "extrapolated"
+                    or not isinstance(certified_band, Mapping)
+                    or "sio2_wt_pct" not in certified_band
+                ):
+                    continue
             if not _disclosures_known(entry):
                 continue
             self.replay_sequence.append(

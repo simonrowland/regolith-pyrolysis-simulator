@@ -3534,6 +3534,10 @@ class EvaporationMixin:
             'curve': copy.deepcopy(curve),
             'computed_hour': int(self.melt.hour),
             'composition_wt_pct': self.melt.composition_wt_pct(),
+            'domain_identity': (
+                curve.get('authority'),
+                copy.deepcopy(curve.get('certified_band')),
+            ),
         }
         self._freeze_gate_held_curve_record = None
         return curve
@@ -3543,6 +3547,20 @@ class EvaporationMixin:
     ) -> dict[str, Any] | None:
         previous = self._freeze_gate_last_good_curve
         if previous is None or previous['provider'] != self._liquid_fraction_provider:
+            return None
+        diagnostic = failure['provider_diagnostic']
+        backend_diagnostic = diagnostic.get('backend_diagnostics') or {}
+        authority = diagnostic.get('authority')
+        certified_band = diagnostic.get('certified_band')
+        if authority is None:
+            authority = backend_diagnostic.get('authority')
+        if certified_band is None:
+            certified_band = backend_diagnostic.get('certified_band')
+        current_domain_identity = (
+            authority,
+            copy.deepcopy(certified_band),
+        )
+        if previous.get('domain_identity') != current_domain_identity:
             return None
         realized_provider = previous.get('realized_provider')
         if realized_provider and realized_provider not in {
@@ -3563,7 +3581,6 @@ class EvaporationMixin:
             for oxide in sorted(composition.keys() | previous_composition.keys())
         )
         curve = copy.deepcopy(previous['curve'])
-        diagnostic = failure['provider_diagnostic']
         curve['gate_provider_refusal'] = {
             **failure,
             'reason': (
