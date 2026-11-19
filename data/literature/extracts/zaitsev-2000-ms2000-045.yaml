@@ -330,6 +330,30 @@ experiments:
         pdf_page_index: 4
         section: Experimental realisation and assignment of mass spectra
     calibration:
+      technique:
+        state: {tag: value, value: mass_spectrometry}
+        locator:
+          page: 2
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+          note: "The apparatus was set up on the basis of the MI-1201V mass spectrometer."
+      comparison:
+        state: {tag: value, value: multiple_cell_or_successive_pure_reference_sample}
+        locator:
+          page: 2
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+          note: "The paper says all investigations used double effusion cells with a sample in one compartment and a reference substance in the other."
+      sensitivity:
+        state: {tag: value, value: stable}
+        locator:
+          page: 3
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+          note: "The paper reports that reference-substance ion-current temperature dependencies were reproducible in all cases and agreed with the IVTANTERMO databank."
       method:
         state:
           tag: value
@@ -1671,6 +1695,10 @@ species:
     - observation_id: zaitsev_2000_table1_mno_activities_eqn5
       type: activity_coefficient
       experiment: mnosi2-table1-1773k
+      point_conditions:
+        activity_method: &zaitsev_table1_direct_activity_method
+          state: {tag: value, value: direct_comparison}
+          locator: {page: 4, published_page: 4, pdf_page_index: 3, section: Theoretical basis, equation: '(5)', note: "Eqn. (5) calculates activities from measured partial pressures over mixtures saturated and unsaturated with each oxide."}
       locator:
         published_page: 20
         table: '1'
@@ -1845,6 +1873,10 @@ species:
     - observation_id: zaitsev_2000_table1_mno_activities_eqn11
       type: activity_coefficient
       experiment: mnosi2-table1-1773k
+      point_conditions:
+        activity_method: &zaitsev_table1_integrated_activity_method
+          state: {tag: value, value: belton_fruehan_integration}
+          locator: {page: 5, published_page: 5, pdf_page_index: 4, section: Theoretical basis, equation: '(11)', note: "Following Belton and Fruehan, Eqn. (11) computes activity by integrating the composition-weighted log ion-current ratio."}
       locator:
         published_page: 20
         table: '1'
@@ -2339,6 +2371,8 @@ species:
     - observation_id: zaitsev_2000_table1_sio2_activities_eqn5
       type: activity_coefficient
       experiment: mnosi2-table1-1773k
+      point_conditions:
+        activity_method: *zaitsev_table1_direct_activity_method
       locator:
         published_page: 20
         table: '1'
@@ -2527,6 +2561,8 @@ species:
     - observation_id: zaitsev_2000_table1_sio2_activities_eqn11
       type: activity_coefficient
       experiment: mnosi2-table1-1773k
+      point_conditions:
+        activity_method: *zaitsev_table1_integrated_activity_method
       locator:
         published_page: 20
         table: '1'

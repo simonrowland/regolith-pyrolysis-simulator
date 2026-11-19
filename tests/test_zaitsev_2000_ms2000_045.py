@@ -4,6 +4,10 @@ from decimal import Decimal
 import yaml
 
 from simulator.battery.enums import Phase
+from simulator.battery.method_class_bands import (
+    _located_fact,
+    select_method_class_band,
+)
 from tests.battery.factories import migrate_one_extract
 
 
@@ -56,3 +60,37 @@ def test_zaitsev_2000_table_1_activities_migrate_and_pin_printed_values():
             observation.identity.species.phase.value is Phase.L
             for observation in migrated_rows
         ), parent_id
+
+    activity_methods = {
+        "zaitsev_2000_table1_mno_activities_eqn5": "direct_comparison",
+        "zaitsev_2000_table1_sio2_activities_eqn5": "direct_comparison",
+        "zaitsev_2000_table1_mno_activities_eqn11": "belton_fruehan_integration",
+        "zaitsev_2000_table1_sio2_activities_eqn11": "belton_fruehan_integration",
+    }
+    activity_observations = [
+        observation
+        for observation in migrator.result.observations.values()
+        if any(f"::{parent_id}::" in observation.observation_id for parent_id in activity_methods)
+    ]
+    assert len(activity_observations) == 32
+    for observation in activity_observations:
+        parent_id = next(
+            parent_id
+            for parent_id in activity_methods
+            if f"::{parent_id}::" in observation.observation_id
+        )
+        experiment = migrator.result.experiments[observation.experiment_id]
+        assert _located_fact(observation, experiment, "technique") == "mass_spectrometry"
+        assert (
+            _located_fact(observation, experiment, "comparison")
+            == "multiple_cell_or_successive_pure_reference_sample"
+        )
+        assert _located_fact(observation, experiment, "sensitivity") == "stable"
+        assert _located_fact(observation, experiment, "activity_method") == activity_methods[parent_id]
+        method_band = select_method_class_band(observation, experiment)
+        if activity_methods[parent_id] == "direct_comparison":
+            assert method_band["class_id"] == "kems_direct_comparison_activity"
+        else:
+            assert method_band == {
+                "refusal": {"reason": "method_class_applicability_unknown"}
+            }
