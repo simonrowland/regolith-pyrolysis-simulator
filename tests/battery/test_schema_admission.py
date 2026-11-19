@@ -875,6 +875,52 @@ def test_real_sample_volume_and_unadopted_fugacity_are_preserved():
             assert all(o.value.kind.value == "unavailable" for o in rows)
 
 
+def test_fugacity_identity_matches_partial_pressure_except_quantity() -> None:
+    from simulator.battery.enums import AmountBasis, Phase
+    from simulator.battery.identity import (
+        IdentityEqualKind,
+        identity_equal,
+        profile_for,
+    )
+    from simulator.battery.records import Composition, Species, State
+
+    species = Species("H2O", Phase.G)
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("SiO2", Decimal("0.55")), ("Na2O", Decimal("0.45"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    axes = {
+        "temperature_K": State.of(Decimal("1643.15")),
+        "fO2_Pa": State.of(Decimal("1e-8")),
+        "total_pressure_Pa": State.of(Decimal("100000")),
+        "composition": State.of(composition),
+    }
+    partial_pressure = M.fill_identity(Quantity.P_PARTIAL, species, **axes)
+    fugacity = M.fill_identity(Quantity.FUGACITY, species, **axes)
+
+    partial_profile = profile_for(partial_pressure)
+    fugacity_profile = profile_for(fugacity)
+    assert fugacity_profile == partial_profile
+    assert fugacity.species == partial_pressure.species == species
+    for name in partial_profile.required:
+        assert getattr(fugacity, name) == getattr(partial_pressure, name)
+
+    missing_axes = M.fill_identity(
+        Quantity.FUGACITY,
+        species,
+        temperature_K=State.of(Decimal("1643.15")),
+    )
+    assert all(
+        getattr(missing_axes, name).is_unknown
+        for name in {"fO2_Pa", "total_pressure_Pa", "composition"}
+    )
+    assert (
+        identity_equal(missing_axes, missing_axes).kind
+        is IdentityEqualKind.IDENTITY_UNKNOWN
+    )
+
+
 def test_fugacity_only_uses_supported_gas_map_engines(monkeypatch):
     from simulator.battery.enums import Engine, MetricOperation, Phase, SourceRelation
     from simulator.battery.records import Species, State

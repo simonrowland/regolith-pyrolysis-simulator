@@ -422,8 +422,9 @@ _AXIS_NAMES = (
     "counter_phase_role",
 )
 
-# These printed axes can be retained on p_partial rows but do not describe the
-# measured mixture-pressure comparison. Keep them optional and un-compared.
+# These printed axes can be retained on p_partial and fugacity rows but do
+# not describe the measured mixture-pressure comparison. Keep them optional
+# and un-compared.
 _P_PARTIAL_UNCOMPARED_AXES = frozenset(
     {"reaction", "reference_state", "reservoir"}
 )
@@ -1096,11 +1097,10 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "subtype",
             "total_pressure_Pa",
         )
-    elif q is Quantity.P_PARTIAL:
-        # A measured gas partial pressure is predicted from T, oxygen, total
-        # pressure, and the printed melt. Its reaction, standard state, and
-        # pure-reservoir axes are not prediction inputs; do not require them or
-        # turn source omissions into stoichiometric assumptions.
+    elif q in {Quantity.P_PARTIAL, Quantity.FUGACITY}:
+        # Gas partial pressure and fugacity share the same species and state:
+        # temperature, oxygen, total pressure, and printed melt. Their
+        # reaction, standard state, and pure-reservoir axes are not inputs.
         req(
             "temperature_K",
             "fO2_Pa",
@@ -1497,7 +1497,7 @@ def _melt_activity_uncompared_axes(
 def _uncompared_axes_for(identity: Identity) -> frozenset[str]:
     """Return axes that may retain values without becoming comparison keys."""
 
-    if quantity_token(identity) is Quantity.P_PARTIAL:
+    if quantity_token(identity) in {Quantity.P_PARTIAL, Quantity.FUGACITY}:
         return _P_PARTIAL_UNCOMPARED_AXES
     return _melt_activity_uncompared_axes((identity,))
 
@@ -2043,7 +2043,7 @@ def _quantity_state(identity: Identity) -> State[Quantity]:
 
 
 def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
-    """Reject values on inapplicable axes; preserve optional p_partial metadata."""
+    """Reject inapplicable values; preserve optional pressure metadata."""
 
     q_state = _quantity_state(identity)
     if q_state.is_not_applicable:
@@ -2055,7 +2055,7 @@ def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
     if quantity_token(identity) is None:
         return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
     profile = profile_for(identity)
-    # p_partial's optional reaction/reference/reservoir values and melt
+    # Pressure rows' optional reaction/reference/reservoir values and melt
     # activity's omitted pressure axes remain metadata, not comparison keys.
     uncompared_axes = _uncompared_axes_for(identity)
     bad: list[str] = []

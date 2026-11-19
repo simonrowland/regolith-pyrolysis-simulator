@@ -4682,9 +4682,15 @@ def test_gas_pressure_and_fugacity_use_only_the_matching_gas_map_species(
             T_K=Decimal("1643.15"),
             total_P=Decimal("100000"),
         )
-        fugacity_identity = Identity(
-            quantity=Quantity.FUGACITY,
-            species=Species("H2O", Phase.G),
+        from simulator.battery import migrate as M
+
+        fugacity_identity = M.fill_identity(
+            Quantity.FUGACITY,
+            Species("H2O", Phase.G),
+            temperature_K=State.of(Decimal("1643.15")),
+            fO2_Pa=State.of(Decimal("1e-8")),
+            total_pressure_Pa=State.of(Decimal("100000")),
+            composition=State.of(composition),
         )
         reference = F.observation(
             "fugacity-score-reference",

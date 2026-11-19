@@ -15049,7 +15049,7 @@ def fill_identity(
     """Fill required/uncompared axes as unknown and permitted axes as N/A.
 
     Keep source values on explicitly uncompared axes even when they are not
-    required, including p_partial reaction/reference/reservoir metadata.
+    required, including p_partial and fugacity reaction/reference/reservoir metadata.
     Transition temperatures store T as the observable, never as
     ``identity.temperature_K``.
     """
