@@ -1029,13 +1029,14 @@ def test_merged_shornikov_fragments_migrate_with_temperature_and_conditions(
     ]
     assert len(emitted_2017) == 73
     emitted_2017_by_id = {
-        row["observation_id"]: row for row in _observations(fragment_2017)
+        f"{sid_2017}::{row['observation_id']}": row
+        for row in _observations(fragment_2017)
     }
     for record in emitted_2017:
         assert record.value.kind is ValueKind.UNAVAILABLE
         assert record.locator.table == "2"
         source_row = emitted_2017_by_id[record.observation_id]
-        assert record.locator.row == source_row["locator"]["row"]
+        assert record.locator.row == source_row["locator"]["row_label"]
         composition = record.point_conditions["composition"]
         assert composition.state.is_value
         assert dict(composition.state.value.components) == {
