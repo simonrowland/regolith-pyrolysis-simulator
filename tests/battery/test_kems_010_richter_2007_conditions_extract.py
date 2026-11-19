@@ -16,7 +16,6 @@ SOURCE_ID = "kems-010-richter-2007"
 
 SCHEMA_GAP_QUANTITIES = {
     "vacuum_evaporation_flux_J_Mg_vs_T",
-    "sample_surface_area_series",
     "published_mass_loss_and_reduced_flux_time_series",
     "published_reduced_silicon_flux_time_series",
     "qualitative_non_loss_bound",
@@ -93,7 +92,7 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
     document = load_yaml(EXTRACT)
     source_rows = list(_source_observations(document))
 
-    assert len(rows) == 350
+    assert len(rows) == 342
     composition_links = [
         source_row["values"]["composition_role"]["locator"]
         for source_row in source_rows
@@ -107,6 +106,38 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         and locator["row"] == "Starting material"
         for locator in composition_links
     )
+    area_context = {
+        row["observation_id"]: row
+        for context_rows in result.context_by_work.values()
+        for row in context_rows
+        if row["observation_id"].startswith(
+            "richter_2007_mg_table1_numeric_areas_b1_"
+        )
+    }
+    assert len(area_context) == 8
+    assert all(row["type"] == "sample_geometry" for row in area_context.values())
+    assert all(
+        row["locator"]["page"] == 6
+        and row["locator"]["published_page"] == 5549
+        and row["locator"]["pdf_page_index"] == 5
+        for row in area_context.values()
+    )
+    migrated_ids = {
+        row.observation_id.rsplit("::", 1)[-1] for row in rows.values()
+    }
+    assert not area_context.keys() & migrated_ids
+    r3_12_area = area_context[
+        "richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-12"
+    ]
+    assert r3_12_area["values"]["samples"] == [
+        {
+            "sample": "R3-12",
+            "diam_mm": 2.5,
+            "T_C": 1900,
+            "init_area_mm2": 22.4,
+            "final_area_mm2": 21.3,
+        }
+    ]
     assert not result.validation.hard_issues
     assert sum(_complete_identity(row) for row in rows.values()) == 0
     assert not Counter(
@@ -138,7 +169,6 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         if row.get("values", {}).get("quantity") in SCHEMA_GAP_QUANTITIES
     ) == {
         "vacuum_evaporation_flux_J_Mg_vs_T": 1,
-        "sample_surface_area_series": 8,
         "published_mass_loss_and_reduced_flux_time_series": 51,
         "published_reduced_silicon_flux_time_series": 32,
         "qualitative_non_loss_bound": 4,
@@ -171,7 +201,7 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         assert temperature.locator is not None
         assert temperature.locator.page == temperature.locator.published_page - 5543
         temperature_kinds["value" if temperature.state.is_value else "unknown"] += 1
-    assert temperature_kinds == {"value": 345, "unknown": 5}
+    assert temperature_kinds == {"value": 337, "unknown": 5}
 
     mutated_conditions = dict(next(iter(rows.values())).point_conditions)
     mutated_conditions.pop("total_pressure_Pa")
