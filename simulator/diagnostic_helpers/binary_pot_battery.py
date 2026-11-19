@@ -3184,6 +3184,7 @@ class _OpenImccBatteryBackend:
         composition_mol: Mapping[str, float] | None = None,
         po2_request: Po2Request | None = None,
         call_timeout_s: float | None = None,
+        _gas_parent_activity: tuple[str, float] | None = None,
         **_unused: object,
     ) -> Any:
         from types import SimpleNamespace
@@ -3223,6 +3224,13 @@ class _OpenImccBatteryBackend:
             bridge_kwargs["composition_mol"] = composition_mol
         with self._bridge._with_solve_timeout(call_timeout_s):
             result = self._bridge.evaluate(**bridge_kwargs)
+        gas_parent_oxide_activities = dict(result.parent_oxide_activities)
+        gas_parent_oxides = tuple(result.parent_oxides)
+        if _gas_parent_activity is not None:
+            parent, activity = _gas_parent_activity
+            gas_parent_oxide_activities[parent] = activity
+            if parent not in gas_parent_oxides:
+                gas_parent_oxides += (parent,)
         self.model_id = result.pack_model_id
         self._identity["model_id"] = self.model_id
         self._identity["name"] = self.model_id
@@ -3332,10 +3340,10 @@ class _OpenImccBatteryBackend:
                 )
 
                 po2_bar, gas_result, balance = evaluate_gas_oxygen_balance(
-                    result.parent_oxide_activities,
+                    gas_parent_oxide_activities,
                     temperature_K,
                     self._gas,
-                    parent_oxides=result.parent_oxides,
+                    parent_oxides=gas_parent_oxides,
                 )
                 cell_fraction = 0.0
                 cell_info = {
@@ -3360,24 +3368,24 @@ class _OpenImccBatteryBackend:
 
                 channels, _omission_notices = (
                     _openimcc_gas_channels_and_omission_notices(
-                        result.parent_oxides, self._gas
+                        gas_parent_oxides, self._gas
                     )
                 )
                 base_species = _openimcc_oxygen_balance_species_metadata(
-                    result.parent_oxide_activities,
+                    gas_parent_oxide_activities,
                     temperature_K,
                     self._gas,
                     channels,
-                    parent_oxides=result.parent_oxides,
+                    parent_oxides=gas_parent_oxides,
                 )
 
                 def pressure_model(pO2_bar: float) -> Mapping[str, float]:
                     return evaluate_gas(
-                        result.parent_oxide_activities,
+                        gas_parent_oxide_activities,
                         temperature_K,
                         pO2_bar,
                         self._gas,
-                        parent_oxides=result.parent_oxides,
+                        parent_oxides=gas_parent_oxides,
                         allow_extrapolation=True,
                     )
 
@@ -3393,11 +3401,11 @@ class _OpenImccBatteryBackend:
                     )
                 )
                 gas_result = evaluate_gas(
-                    result.parent_oxide_activities,
+                    gas_parent_oxide_activities,
                     temperature_K,
                     po2_bar,
                     self._gas,
-                    parent_oxides=result.parent_oxides,
+                    parent_oxides=gas_parent_oxides,
                     allow_extrapolation=True,
                 )
                 gas_pressures = dict(gas_result)
@@ -3406,7 +3414,7 @@ class _OpenImccBatteryBackend:
                 )
             _channels, omission_notices = (
                 _openimcc_gas_channels_and_omission_notices(
-                    result.parent_oxides, self._gas, gas_result
+                    gas_parent_oxides, self._gas, gas_result
                 )
             )
             notices.extend(omission_notices)
@@ -3474,16 +3482,16 @@ class _OpenImccBatteryBackend:
 
                 fo2_bar = 10.0 ** float(fO2_log)
                 gas_result = evaluate_gas(
-                    result.parent_oxide_activities,
+                    gas_parent_oxide_activities,
                     temperature_K,
                     fo2_bar,
                     self._gas,
-                    parent_oxides=result.parent_oxides,
+                    parent_oxides=gas_parent_oxides,
                     allow_extrapolation=True,
                 )
                 _channels, omission_notices = (
                     _openimcc_gas_channels_and_omission_notices(
-                        result.parent_oxides, self._gas, gas_result
+                        gas_parent_oxides, self._gas, gas_result
                     )
                 )
                 notices.extend(omission_notices)
@@ -5275,6 +5283,7 @@ def equilibrate_cell(
     simulate_crash: str | None = None,
     physical_pressure_bar: float | None = None,
     native_activity_formula: str | None = None,
+    _gas_parent_activity: tuple[str, float] | None = None,
     _defer_qualification_decoration: bool = False,
 ) -> EquilibrateCell:
     return _equilibrate_cell_uncached(
@@ -5289,6 +5298,7 @@ def equilibrate_cell(
         simulate_crash=simulate_crash,
         physical_pressure_bar=physical_pressure_bar,
         native_activity_formula=native_activity_formula,
+        _gas_parent_activity=_gas_parent_activity,
         _defer_qualification_decoration=_defer_qualification_decoration,
     )
 
@@ -5306,6 +5316,7 @@ def _equilibrate_cell_uncached(
     simulate_crash: str | None = None,
     physical_pressure_bar: float | None = None,
     native_activity_formula: str | None = None,
+    _gas_parent_activity: tuple[str, float] | None = None,
     _defer_qualification_decoration: bool = False,
     _cache_engine_call: bool = True,
 ) -> EquilibrateCell:
@@ -5318,6 +5329,10 @@ def _equilibrate_cell_uncached(
             simulate_crash
             or (qualification and handle.name in MELTS_FAMILY_ENGINES)
         )
+    if handle.name == "openimcc" and _gas_parent_activity is not None:
+        # The OpenIMCC bridge owns a hard solve timeout. Keep this private
+        # row-specific input in process instead of extending the worker wire.
+        use_isolated = False
     # MAGEMin's native-activity fields are carried by its existing bounded
     # binary call. Keep that request on this process so it does not need a
     # second private-worker payload shape.
@@ -5461,6 +5476,8 @@ def _equilibrate_cell_uncached(
         kwargs["call_timeout_s"] = timeout
     if "native_activity_formula" in parameters:
         kwargs["native_activity_formula"] = native_activity_formula
+    if "_gas_parent_activity" in parameters and _gas_parent_activity is not None:
+        kwargs["_gas_parent_activity"] = _gas_parent_activity
     from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
 
     kwargs.update(isothermal_run_kwargs(handle.name, parameters))

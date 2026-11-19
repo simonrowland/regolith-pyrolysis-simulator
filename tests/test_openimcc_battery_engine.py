@@ -2304,6 +2304,120 @@ def test_openimcc_ti_gas_matches_direct_calculation() -> None:
     assert float(prediction.value) == pytest.approx(reported["Ti"] * 1.0e5)
 
 
+def _openimcc_vapour_observation(
+    *,
+    vapour_formula: str,
+    reservoir: Species | None,
+) -> object:
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("SiO2", Decimal("0.8")), ("TiO2", Decimal("0.2"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = F.activity_identity(
+        formula="TiO2",
+        composition=composition,
+        T_K=Decimal("2200"),
+        fO2_Pa=Decimal("1e-4"),
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.P_PARTIAL,
+        species=Species(vapour_formula, Phase.G),
+        reservoir=(
+            State.of(reservoir)
+            if reservoir is not None
+            else State.unknown("no condensed reservoir stated")
+        ),
+    )
+    return F.observation(
+        f"openimcc-{vapour_formula.casefold()}-gas",
+        "openimcc-test",
+        identity,
+        Decimal("1"),
+    )
+
+
+def test_openimcc_pure_matching_reservoir_activates_nondefault_gas_parent() -> None:
+    _require_openimcc()
+    observation = _openimcc_vapour_observation(
+        vapour_formula="Ba",
+        reservoir=Species("BaO", Phase.L),
+    )
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.value > 0
+    assert prediction.refusal_reason is None
+
+
+def test_openimcc_pure_reservoir_phase_mismatch_is_typed() -> None:
+    _require_openimcc()
+    observation = _openimcc_vapour_observation(
+        vapour_formula="Ba",
+        reservoir=Species("BaO", Phase.CR),
+    )
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_MISMATCH, (
+        prediction.refusal_detail
+    )
+    assert (
+        prediction.refusal_detail["reason"]
+        == "openimcc_gas_parent_phase_mismatch"
+    )
+
+
+def test_openimcc_melt_reservoir_does_not_default_nondefault_gas_parent() -> None:
+    _require_openimcc()
+    observation = _openimcc_vapour_observation(
+        vapour_formula="Ba", reservoir=None
+    )
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+
+
+def test_openimcc_gas_phase_parent_reference_is_typed_refusal() -> None:
+    _require_openimcc()
+    observation = _openimcc_vapour_observation(
+        vapour_formula="S",
+        reservoir=Species("S2", Phase.CR),
+    )
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_MISMATCH, (
+        prediction.refusal_detail
+    )
+    assert (
+        prediction.refusal_detail["reason"]
+        == "openimcc_gas_parent_not_condensed"
+    )
+
+
 def test_openimcc_domain_policy_flags_extrapolation() -> None:
     _require_openimcc()
     pot = _binary_probe()

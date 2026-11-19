@@ -14728,6 +14728,44 @@ def _predict_with_engine(
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY
         else None
     )
+    openimcc_gas_parent_activity: tuple[str, float] | None = None
+    if engine is Engine.OPENIMCC and quantity in _VAPOUR_EQUILIBRIUM:
+        # Identity.reservoir is the evidence owner; this existing resolver
+        # admits only a stated, valid condensed reservoir for this row.
+        reservoir = stated_pure_substance_reservoir(identity)
+        if reservoir is not None:
+            from simulator.melt_backend.openimcc_bridge import (
+                OpenImccGasParentActivityRefusal,
+                openimcc_reservoir_gas_parent_activity,
+            )
+
+            try:
+                openimcc_gas_parent_activity = (
+                    openimcc_reservoir_gas_parent_activity(
+                        formula,
+                        reservoir,
+                        float(T),
+                    )
+                )
+            except OpenImccGasParentActivityRefusal as exc:
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                    authority=Authority.REFUSED,
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason(exc.refusal_reason),
+                    refusal_detail={
+                        "reason": exc.code,
+                        "detail": str(exc),
+                        "formula": formula,
+                        "reservoir": reservoir,
+                    },
+                    identity=identity,
+                    requested_composition=requested,
+                    version=engine_version,
+                )
     if (
         po2.mode == PO2_OXYGEN_BALANCE_EFFUSION
         and engine not in OXYGEN_BALANCE_EFFUSION_ENGINES
@@ -14865,6 +14903,7 @@ def _predict_with_engine(
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
                 native_activity_formula=native_activity_formula,
+                _gas_parent_activity=openimcc_gas_parent_activity,
             )
 
         def solve_oxygen_balance_at_current_pressure():
@@ -14966,6 +15005,7 @@ def _predict_with_engine(
                     arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                     physical_pressure_bar=pressure_bar,
                     native_activity_formula=native_activity_formula,
+                    _gas_parent_activity=openimcc_gas_parent_activity,
                 )
             except Exception as exc:
                 return engine_call_failure(exc)
@@ -14981,6 +15021,7 @@ def _predict_with_engine(
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
                 native_activity_formula=native_activity_formula,
+                _gas_parent_activity=openimcc_gas_parent_activity,
             )
         except Exception as exc:
             return engine_call_failure(exc)
@@ -15266,6 +15307,7 @@ def _predict_with_engine(
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
                 native_activity_formula=native_activity_formula,
+                _gas_parent_activity=openimcc_gas_parent_activity,
             )
         except Exception as exc:
             return engine_call_failure(exc)

@@ -256,6 +256,107 @@ class OpenImccOxygenBalanceUnavailableError(RuntimeError):
         super().__init__(self.backend_status_reason)
 
 
+class OpenImccGasParentActivityRefusal(ValueError):
+    """Typed refusal for a pure-reservoir gas parent that cannot be supplied."""
+
+    def __init__(self, code: str, detail: str, *, refusal_reason: str) -> None:
+        self.code = str(code)
+        self.refusal_reason = str(refusal_reason)
+        super().__init__(detail)
+
+
+def openimcc_reservoir_gas_parent_activity(
+    channel: str,
+    reservoir: tuple[str, str] | None,
+    temperature_K: float,
+) -> tuple[str, float] | None:
+    """Return unit activity only for a matching stated condensed reservoir.
+
+    The caller obtains ``reservoir`` through the battery's
+    ``stated_pure_substance_reservoir`` identity owner. Parent phases and
+    optional side parents are resolved from the installed OpenIMCC pin.
+    """
+
+    if reservoir is None:
+        return None
+    _require_openimcc()
+    try:
+        from openimcc.gas import _GAS_REACTIONS, _parent_standard_row
+    except (AttributeError, ImportError) as exc:
+        raise OpenImccGasParentActivityRefusal(
+            "openimcc_gas_parent_metadata_unavailable",
+            f"OpenIMCC gas parent metadata is unavailable: {exc}",
+            refusal_reason="outside_supported_species",
+        ) from exc
+
+    reaction = _GAS_REACTIONS.get(str(channel))
+    if reaction is None:
+        return None
+    parent = getattr(reaction, "parent", None)
+    side_parent = getattr(reaction, "side_parent", None)
+    if not isinstance(parent, str) or not parent:
+        return None
+    if parent in OPENIMCC_PARENT_OXIDES:
+        return None
+    reservoir_formula, reservoir_phase = reservoir
+    if reservoir_formula != parent:
+        return None
+    if (
+        side_parent
+        and side_parent not in OPENIMCC_PARENT_OXIDES
+        and side_parent != parent
+    ):
+        raise OpenImccGasParentActivityRefusal(
+            "openimcc_gas_side_parent_activity_missing",
+            f"gas channel {channel!r} also requires unsupplied parent {side_parent!r}",
+            refusal_reason="identity_incomplete",
+        )
+
+    try:
+        standard_row = _parent_standard_row(parent, float(temperature_K))
+    except (KeyError, TypeError, ValueError) as exc:
+        raise OpenImccGasParentActivityRefusal(
+            "openimcc_gas_parent_reference_unresolved",
+            f"cannot resolve OpenIMCC reference row for {parent!r} at "
+            f"{temperature_K:g} K: {exc}",
+            refusal_reason="outside_supported_species",
+        ) from exc
+    if not isinstance(standard_row, str):
+        raise OpenImccGasParentActivityRefusal(
+            "openimcc_gas_parent_reference_unresolved",
+            f"OpenIMCC returned an unrecognized reference row for {parent!r}: "
+            f"{standard_row!r}",
+            refusal_reason="outside_supported_species",
+        )
+    if standard_row.endswith("(l)"):
+        reference_phase = "l"
+    elif standard_row.endswith("(cr)"):
+        reference_phase = "cr"
+    elif standard_row.endswith("(g)"):
+        reference_phase = "g"
+    else:
+        raise OpenImccGasParentActivityRefusal(
+            "openimcc_gas_parent_reference_unresolved",
+            f"OpenIMCC reference row {standard_row!r} has no known phase",
+            refusal_reason="outside_supported_species",
+        )
+    if reference_phase == "g":
+        raise OpenImccGasParentActivityRefusal(
+            "openimcc_gas_parent_not_condensed",
+            f"gas channel {channel!r} uses gas-phase parent reference "
+            f"{standard_row!r}",
+            refusal_reason="identity_mismatch",
+        )
+    if reservoir_phase != reference_phase:
+        raise OpenImccGasParentActivityRefusal(
+            "openimcc_gas_parent_phase_mismatch",
+            f"reservoir {reservoir_formula}({reservoir_phase}) does not match "
+            f"OpenIMCC reference {standard_row}",
+            refusal_reason="identity_mismatch",
+        )
+    return parent, 1.0
+
+
 class OpenImccBindingDigestUnavailableError(RuntimeError):
     """Typed refusal when openimcc cannot identify a datapack binding."""
 
