@@ -12,6 +12,20 @@ import subprocess
 from importlib import resources
 
 
+OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX = (
+    "openimcc-index-vocabulary:mismatch;"
+)
+OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX = (
+    "openimcc-review-gamma-row-withheld;"
+)
+OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX = (
+    "openimcc-coefficient-lineage-unmatched;"
+)
+OPENIMCC_LINEAGE_CAVEAT_PREFIXES = (
+    OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
+    OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+    OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX,
+)
 OPENIMCC_PROVENANCE_PREFIXES: tuple[str, ...] = (
     "openimcc-pack-version:",
     "openimcc-pack-digest:",
@@ -21,10 +35,8 @@ OPENIMCC_PROVENANCE_PREFIXES: tuple[str, ...] = (
     "openimcc-condensate-table:",
     "openimcc-gas-table:",
     "openimcc-index-vocabulary:",
-)
-
-OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX = (
-    "openimcc-index-vocabulary:mismatch;"
+    OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+    OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX,
 )
 
 _OPENIMCC_ENGINE_IDENTITY_FIELDS: tuple[tuple[str, str], ...] = (
@@ -106,8 +118,8 @@ def _openimcc_index_vocabulary_flag() -> str | None:
     if current_commit.startswith(pinned_commit):
         return None
     return (
-        "openimcc-index-vocabulary:mismatch;"
-        f"manifest={pinned_commit};current={current_commit}"
+        OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX
+        + f"manifest={pinned_commit};current={current_commit}"
     )
 
 
@@ -124,35 +136,95 @@ def _work_ids_from_rows(rows: object) -> tuple[str, ...]:
     }))
 
 
-@lru_cache(maxsize=32)
-def _openimcc_trace_component_rule(species_formula: str | None) -> object | None:
+@lru_cache(maxsize=128)
+def _single_cation_element(species_formula: str | None) -> str | None:
     if not isinstance(species_formula, str) or not species_formula:
         return None
+    from simulator.accounting.exceptions import AccountingError
+    from simulator.accounting.formulas import parse_formula
+
     try:
-        from openimcc.trace_components import trace_component_rule
-    except (ImportError, ModuleNotFoundError):
+        elements = parse_formula(species_formula, species=species_formula).elements
+    except AccountingError:
         return None
-    return trace_component_rule(species_formula)
+    cations = tuple(element for element in elements if element != "O")
+    return cations[0] if len(cations) == 1 else None
+
+
+@lru_cache(maxsize=1)
+def _openimcc_trace_fragment_by_cation() -> Mapping[str, str]:
+    """Map each registered one-cation trace oxide to its fragment identity."""
+
+    try:
+        from openimcc.trace_components import (
+            supported_trace_oxides,
+            trace_component_rule,
+        )
+    except (ImportError, ModuleNotFoundError):
+        return {}
+    fragments_by_cation: dict[str, set[str]] = {}
+    for supported in supported_trace_oxides():
+        element = _single_cation_element(supported.oxide)
+        rule = trace_component_rule(supported.oxide)
+        if element is None or rule is None:
+            continue
+        for field in ("review_gamma_element", "activity_fragment"):
+            fragment = getattr(rule, field, None)
+            if isinstance(fragment, str) and fragment:
+                fragments_by_cation.setdefault(element, set()).add(
+                    fragment.casefold()
+                )
+    return {
+        element: next(iter(fragments))
+        for element, fragments in fragments_by_cation.items()
+        if len(fragments) == 1
+    }
 
 
 def _species_fragment_artifact(
     artifacts: Sequence[Mapping[str, object]], species_formula: str | None
 ) -> Mapping[str, object] | None:
-    rule = _openimcc_trace_component_rule(species_formula)
-    element = getattr(rule, "review_gamma_element", None)
-    if not isinstance(element, str) or not element:
+    cation = _single_cation_element(species_formula)
+    fragment = _openimcc_trace_fragment_by_cation().get(cation or "")
+    if fragment is None:
         return None
-    wanted = element.casefold()
     for artifact in artifacts:
         identity = artifact.get("identity")
         if not isinstance(identity, str):
             continue
         if not identity.startswith("openimcc-review-gamma-activity.v1:"):
             continue
-        if identity.rsplit(":", 1)[-1].casefold() != wanted:
+        if identity.rsplit(":", 1)[-1].casefold() != fragment:
             continue
         return artifact
     return None
+
+
+def _fragment_row_scopes(
+    rows: object,
+) -> dict[str, tuple[str, ...]]:
+    if not isinstance(rows, Sequence) or isinstance(rows, str) or not rows:
+        return {}
+    row_scopes = [
+        _row_source_scopes(row)
+        for row in rows
+        if isinstance(row, Mapping)
+    ]
+    if len(row_scopes) != len(rows):
+        return {}
+    shared_work_ids = set(row_scopes[0])
+    for scopes in row_scopes[1:]:
+        shared_work_ids.intersection_update(scopes)
+    combined: dict[str, tuple[str, ...]] = {}
+    for work_id in shared_work_ids:
+        per_row = [scopes[work_id] for scopes in row_scopes]
+        if any(scope is None or "unparsed" in scope for scope in per_row):
+            combined[work_id] = ("unparsed",)
+        else:
+            combined[work_id] = tuple(
+                sorted({item for scope in per_row for item in scope or ()})
+            )
+    return combined
 
 
 def _species_fragment_sources(
@@ -160,11 +232,69 @@ def _species_fragment_sources(
 ) -> tuple[str, ...]:
     artifact = _species_fragment_artifact(artifacts, species_formula)
     rows = artifact.get("rows") if artifact is not None else None
-    if not isinstance(rows, Sequence) or isinstance(rows, str) or len(rows) != 1:
-        # The pinned evaluator does not expose the selected review-gamma row.
-        # Only one-row fragments are unambiguous until that provenance exists.
-        return ()
-    return _work_ids_from_rows(rows)
+    return tuple(sorted(_fragment_row_scopes(rows)))
+
+
+def _withheld_fragment_flag(
+    artifact: Mapping[str, object], rows: object
+) -> str | None:
+    if not isinstance(rows, Sequence) or isinstance(rows, str) or len(rows) <= 1:
+        return None
+    identity = str(artifact.get("identity") or "unknown")
+    fragment = identity.rsplit(":", 1)[-1]
+    candidate_rows = sorted(
+        str(row.get("id") or "unknown")
+        for row in rows
+        if isinstance(row, Mapping)
+    )
+    all_work_ids = set(_work_ids_from_rows(rows))
+    shared_work_ids = set(_fragment_row_scopes(rows))
+    withheld_work_ids = sorted(all_work_ids - shared_work_ids)
+    return (
+        f"{OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX}"
+        f"fragment={fragment};candidate_rows={','.join(candidate_rows)};"
+        f"withheld_work_ids={','.join(withheld_work_ids)}"
+    )
+
+
+def _table_ids(text: str) -> set[str]:
+    table_number = r"[a-z]?-?\d+(?:\.\d+)?[a-z]?"
+    separator = r"(?:,|/|&|\band\b)"
+    table_lists = re.findall(
+        rf"\btables?\s+({table_number}(?:\s*{separator}\s*{table_number})*)",
+        text,
+        re.I,
+    )
+    if table_lists:
+        return {
+            match.casefold()
+            for table_list in table_lists
+            for match in re.findall(table_number, table_list, re.I)
+        }
+    if re.fullmatch(
+        rf"\s*{table_number}(?:\s*{separator}\s*{table_number})*\s*",
+        text,
+        re.I,
+    ):
+        return {
+            match.casefold()
+            for match in re.findall(table_number, text, re.I)
+        }
+    return set()
+
+
+def _page_ranges(
+    text: str, *, citation_locator: bool = False
+) -> set[tuple[int, int]]:
+    page_pattern = (
+        r"\bpp?\.?\s*(\d+)(?:\s*[\u2013\u2014-]\s*(\d+))?\b"
+        if citation_locator
+        else r"(?<!\d)(\d+)(?:\s*[\u2013\u2014-]\s*(\d+))?(?!\d)"
+    )
+    return {
+        (int(first), int(last or first))
+        for first, last in re.findall(page_pattern, text, re.I)
+    }
 
 
 def _locator_scope_from_citation(citation: object) -> tuple[str, ...] | None:
@@ -173,19 +303,12 @@ def _locator_scope_from_citation(citation: object) -> tuple[str, ...] | None:
     _head, marker, locator = citation.partition("locator:")
     if not marker:
         return None
-    scopes = {
-        f"table:{match.casefold()}"
-        for match in re.findall(r"\btable\s+([0-9]+[a-z]?)\b", locator, re.I)
-    }
-    for first, last in re.findall(
-        r"\bpp?\.?\s*([0-9]+)(?:\s*[\u2013\u2014-]\s*([0-9]+))?\b",
-        locator,
-        re.I,
-    ):
-        scopes.add(f"page:{first}")
-        if last:
-            scopes.add(f"page:{last}")
-    return tuple(sorted(scopes)) if scopes else ("unparsed",)
+    scopes = {f"table:{table}" for table in _table_ids(locator)}
+    scopes.update(
+        f"page:{first}-{last}"
+        for first, last in _page_ranges(locator, citation_locator=True)
+    )
+    return tuple(sorted(scopes)) if scopes else None
 
 
 def _row_source_scopes(row: Mapping[str, object]) -> dict[str, tuple[str, ...] | None]:
@@ -203,7 +326,7 @@ def _row_source_scopes(row: Mapping[str, object]) -> dict[str, tuple[str, ...] |
         if work_id not in scopes:
             scopes[work_id] = scope
         elif scopes[work_id] is None or scope is None:
-            scopes[work_id] = None
+            scopes[work_id] = ("unparsed",)
         else:
             scopes[work_id] = tuple(sorted(set(scopes[work_id]) | set(scope)))
     return scopes
@@ -213,21 +336,14 @@ def _row_source_scopes(row: Mapping[str, object]) -> dict[str, tuple[str, ...] |
 def openimcc_species_source_locator_scopes(
     species_formula: str | None,
 ) -> Mapping[str, tuple[str, ...]]:
-    """Return locator scopes for a one-row review-gamma fragment.
-
-    Multi-row fragments have no selected-row result at the current OpenIMCC
-    pin, so they deliberately contribute no source scopes.
-    """
+    """Return scopes shared by all candidate rows of a review-gamma fragment."""
 
     artifacts = _openimcc_coefficient_ancestry()
     artifact = _species_fragment_artifact(artifacts, species_formula)
     rows = artifact.get("rows") if artifact is not None else None
-    if not isinstance(rows, Sequence) or isinstance(rows, str) or len(rows) != 1:
-        return {}
     return {
         work_id: scopes
-        for work_id, scopes in _row_source_scopes(rows[0]).items()
-        if scopes is not None
+        for work_id, scopes in _fragment_row_scopes(rows).items()
     }
 
 
@@ -242,42 +358,37 @@ def openimcc_source_locator_matches(
 
     if "unparsed" in scopes or locator is None:
         return None
-    locator_tables = {
-        match.casefold()
-        for match in re.findall(
-            r"[0-9]+[a-z]?", str(getattr(locator, "table", "") or ""), re.I
-        )
-    }
-    locator_pages = {
-        match
-        for value in (
-            getattr(locator, "page", None),
-            getattr(locator, "published_page", None),
-        )
-        if value is not None
-        for match in re.findall(r"[0-9]+", str(value))
-    }
+    locator_table_text = str(getattr(locator, "table", "") or "")
+    locator_tables = _table_ids(locator_table_text)
     scope_tables = {
         scope.partition(":")[2]
         for scope in scopes
         if scope.startswith("table:")
     }
     scope_pages = {
-        scope.partition(":")[2]
+        tuple(int(value) for value in scope.partition(":")[2].split("-", 1))
         for scope in scopes
         if scope.startswith("page:")
     }
-    comparable = False
-    if locator_tables and scope_tables:
-        comparable = True
-        if locator_tables & scope_tables:
-            return True
-    if locator_pages and scope_pages:
-        comparable = True
-        if locator_pages & scope_pages:
-            return True
-    if comparable:
-        return False
+    if locator_table_text.strip():
+        if not locator_tables:
+            return None
+        return bool(locator_tables & scope_tables) if scope_tables else None
+    locator_page_ranges = {
+        page_range
+        for value in (
+            getattr(locator, "page", None),
+            getattr(locator, "published_page", None),
+        )
+        if value is not None
+        for page_range in _page_ranges(str(value))
+    }
+    if locator_page_ranges and scope_pages:
+        return any(
+            max(scope_first, locator_first) <= min(scope_last, locator_last)
+            for scope_first, scope_last in scope_pages
+            for locator_first, locator_last in locator_page_ranges
+        )
     return None
 
 
@@ -291,8 +402,8 @@ def openimcc_pack_coefficient_sources(
 
     The active OpenIMCC evaluator does not expose the D066 interaction rows
     used by a major-oxide output, so that artifact's work-ID union is the
-    pack-level fallback. Trace activities exclude D066 ancestry. A
-    review-gamma fragment is usable only when it has one manifest row.
+    pack-level fallback for its major oxides. Trace fragments use only work
+    IDs shared by every candidate manifest row until row identity is exposed.
     """
 
     version = pack_version if isinstance(pack_version, str) and pack_version else None
@@ -334,28 +445,69 @@ def openimcc_pack_coefficient_sources(
         isinstance(identity, str)
         and identity.startswith("openimcc-review-gamma-activity.v1:")
     )
-    trace_rule = _openimcc_trace_component_rule(species_formula)
-    is_trace_species = trace_rule is not None
-    if is_d066 and (not species_formula or is_trace_species):
-        sources: set[str] = set()
+    selected_fragment = _species_fragment_artifact(artifacts, species_formula)
+    fragment = selected_fragment
+    fragment_matches = fragment is not None and (
+        not is_fragment or fragment.get("identity") == identity
+    )
+    fragment_rows = fragment.get("rows") if fragment is not None else None
+    fragment_sources = (
+        set(_species_fragment_sources(artifacts, species_formula))
+        if fragment_matches
+        else set()
+    )
+    is_major_oxide = False
+    if is_d066 and species_formula:
+        try:
+            from openimcc.gas_data import IMCC_PARENT_OXIDES as parent_oxides
+        except (ImportError, ModuleNotFoundError):
+            parent_oxides = ()
+        is_major_oxide = species_formula in parent_oxides
+
+    flags: set[str] = set()
+    if fragment_matches and fragment is not None:
+        withheld_flag = _withheld_fragment_flag(fragment, fragment_rows)
+        if withheld_flag is not None:
+            flags.add(withheld_flag)
+    if is_fragment and not fragment_matches:
+        flags.add(
+            f"{OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX}"
+            f"formula={species_formula or 'missing'}"
+        )
+
+    if is_d066 and is_major_oxide:
+        sources = {
+            item
+            for item in matching.get("work_ids", ())
+            if isinstance(item, str) and item
+        }
+        if not sources:
+            sources.update(_work_ids_from_rows(matching.get("rows")))
+    elif is_d066:
+        sources = fragment_sources
+        if not sources and not flags:
+            flags.add(
+                f"{OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX}"
+                f"formula={species_formula or 'missing'}"
+            )
     elif is_fragment:
-        sources = set(_species_fragment_sources(artifacts, species_formula))
+        sources = fragment_sources if fragment is not None else set()
     else:
         sources = set(_work_ids_from_rows(matching.get("rows")))
-    if is_d066 and species_formula and not is_trace_species and not sources:
+    if not is_d066 and not is_fragment and not sources:
         sources.update(
             item
             for item in matching.get("work_ids", ())
             if isinstance(item, str) and item
         )
-    elif not is_d066 and not is_fragment and not sources:
-        sources.update(
-            item
-            for item in matching.get("work_ids", ())
-            if isinstance(item, str) and item
-        )
-    if not is_fragment:
-        sources.update(_species_fragment_sources(artifacts, species_formula))
+    if not is_d066 and not is_fragment:
+        sources.update(fragment_sources)
+        if species_formula and not sources and not fragment_matches:
+            flags.add(
+                f"{OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX}"
+                f"formula={species_formula}"
+            )
+    sources.update(flags)
     flag = _openimcc_index_vocabulary_flag()
     if flag is not None:
         sources.add(flag)

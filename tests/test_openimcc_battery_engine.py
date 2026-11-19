@@ -30,6 +30,7 @@ from simulator.battery.enums import (
     Rail,
     RefusalReason,
     ResidualStatus,
+    SourceRelation,
 )
 from simulator.battery.identity import Exposure, SweepIdentity
 from simulator.battery.migrate import load_yaml
@@ -444,11 +445,12 @@ def _zhang_k_case(tmp_path: Path, temperature: str):
 
 def _assert_zhang_rb2o_projection(residual, candidate, reference) -> None:
     # OpenIMCC 9c includes Rb2O through a trace projection. Keep the row
-    # unscored and require the model caveat that identifies the projection.
+    # score-eligible under d-445 and require the model caveat identifying it.
     assert candidate is not None
     assert residual.refusal is None
     assert residual.candidate == candidate.observation_id
-    assert residual.score_eligible is False
+    assert residual.source_relation is not SourceRelation.SAME_INPUT
+    assert residual.score_eligible is True
     assert any(
         notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
         and notice.reason.startswith("trace_components_outside_melt_model {Rb2O:")
@@ -460,7 +462,7 @@ def _assert_zhang_rb2o_projection(residual, candidate, reference) -> None:
 
 
 @pytest.mark.parametrize("temperature", ["1473.15", "1673.15"])
-def test_openimcc_zhang_implied_alpha_refuses_unsupported_rb2o(
+def test_openimcc_zhang_implied_alpha_scores_supported_rb2o_projection(
     tmp_path: Path,
     temperature: str,
 ) -> None:
@@ -2627,7 +2629,7 @@ print(json.dumps({"available": handle.available, "reason": handle.unavailable_re
     assert "remedy:" in payload["reason"]
 
 
-def test_openimcc_scores_plante_with_independent_lineage() -> None:
+def test_openimcc_scores_plante_with_unresolved_coefficient_lineage() -> None:
     _require_oxygen_balance()
     code = r'''
 import json
@@ -2638,7 +2640,10 @@ import simulator.backends
 import simulator.battery.score
 import engines.engine_commissioning
 
-from simulator.battery.enums import Engine
+from simulator.battery.enums import Engine, NoticeKind
+from simulator.battery.source_lineage import (
+    OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX,
+)
 from simulator.battery.score import headline_rows, score_store
 
 test_helpers = runpy.run_path("tests/test_openimcc_battery_engine.py")
@@ -2658,6 +2663,14 @@ engine_rows = [
     if candidate.engine is not None and candidate.engine.name is Engine.OPENIMCC
 ]
 assert len(engine_rows) == 162
+assert all(
+    any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason.startswith(OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX)
+        for notice in residual.notices
+    )
+    for residual, _candidate in engine_rows
+)
 binary_pot_residual, binary_pot_candidate = next(
     (residual, candidate)
     for residual, candidate in engine_rows
@@ -2673,7 +2686,7 @@ assert {
     (candidate.engine.lineage_complete, residual.source_relation.value)
     for residual, candidate in engine_rows
     if candidate.engine is not None
-} == {(True, "independent")}
+} == {(False, "unknown")}
 assert any(
     "openimcc-pack-digest:0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0"
     in candidate.engine.coefficient_sources
@@ -2694,7 +2707,7 @@ assert all(
 assert summary["n_inside_band"] == 56
 assert abs(float(summary["median_dex"]) - (-0.19068318829283099)) < 0.00000001
 assert abs(float(summary["rms_dex"]) - 0.2063429411922417977) < 0.00000001
-print(json.dumps({"headline": summary, "lineage": "independent"}))
+print(json.dumps({"headline": summary, "lineage": "unknown"}))
 '''
     env = {
         "PATH": os.environ.get("PATH", ""),
@@ -2722,7 +2735,7 @@ print(json.dumps({"headline": summary, "lineage": "independent"}))
     assert float(result["headline"]["rms_dex"]) == pytest.approx(
         0.2063429411922417977, abs=1e-8
     )
-    assert result["lineage"] == "independent"
+    assert result["lineage"] == "unknown"
 
 
 def test_openimcc_unsupported_cr_gas_species_is_typed() -> None:
@@ -3223,7 +3236,7 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
         engines=engines,
         work_id="kems-042-plante-1979",
     )
-    expected = {Engine.OPENIMCC: (True, "independent")}
+    expected = {Engine.OPENIMCC: (False, "unknown")}
     rows = [
         (residual, candidates[residual.candidate])
         for residual in residuals

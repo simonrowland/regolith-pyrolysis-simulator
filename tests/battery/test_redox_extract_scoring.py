@@ -12,6 +12,9 @@ from types import SimpleNamespace
 import pytest
 
 import simulator.battery.score as score_module
+from simulator.battery.source_lineage import (
+    OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
+)
 from simulator.battery.enums import (
     AmountBasis,
     Authority,
@@ -312,7 +315,9 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     assert all(
         not score_module.flagged_strata(residual.notices) for residual in residuals
     )
-    assert not any(residual.score_eligible for residual in residuals)
+    # d-445 keeps UNKNOWN source relations score-eligible; this ancestry change
+    # does not move any residual value above.
+    assert any(residual.score_eligible for residual in residuals)
 
 
 def test_openimcc_redox_without_printed_fo2_still_refuses():
@@ -501,7 +506,7 @@ def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
     }
     assert redox_work_ids.issubset(sources)
     assert any(
-        source.startswith("openimcc-index-vocabulary:mismatch;")
+        source.startswith(OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX)
         for source in sources
     )
     assert not any(source.startswith("openimcc-v") for source in sources)
@@ -636,10 +641,9 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
     # primary 1-sigma verdicts without the assumption/alternative notices.
     # t-1646 round 5 refuses the Sossi (11)/(12) two-sigma spans that cross
     # r=0; the remaining source widths use the transformed log-ratio metric.
-    # The payload now hashes to
-    # 6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862.
+    # d-445 changes only lineage/eligibility metadata; numeric values stay pinned above.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862"
+        "b875816627fc72c7cc10798f200dbcfc1086bb8b1709cf203661c93bfd337acc"
     )
 
 

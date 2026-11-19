@@ -82,12 +82,28 @@ def _counts(
 
 
 def test_openimcc_vocabulary_mismatch_is_visible_in_report() -> None:
+    from simulator.battery.source_lineage import (
+        OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
+        OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+    )
+
     reason = (
-        "openimcc-index-vocabulary:mismatch;"
-        "manifest=3645e2c2bb;current=56a27a9249"
+        OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX
+        + "manifest=3645e2c2bb;current=56a27a9249"
+    )
+    withheld_reason = (
+        f"{OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX}"
+        "fragment=cu;candidate_rows=CuO0.5-1573K,CuO0.5-1923K"
     )
     notice_counts = notice_backlog_data(
-        [{"notices": [{"kind": "engine_model_caveat", "reason": reason}]}]
+        [
+            {
+                "notices": [
+                    {"kind": "engine_model_caveat", "reason": reason},
+                    {"kind": "engine_model_caveat", "reason": withheld_reason},
+                ]
+            }
+        ]
     )
     census = EligibilityFailureCensus((), ())
 
@@ -119,8 +135,12 @@ def test_openimcc_vocabulary_mismatch_is_visible_in_report() -> None:
         circularity_warning="",
     )
 
-    assert notice_counts == {f"engine_model_caveat:{reason}": 1}
+    assert notice_counts == {
+        f"engine_model_caveat:{reason}": 1,
+        f"engine_model_caveat:{withheld_reason}": 1,
+    }
     assert f"`engine_model_caveat:{reason}` | 1" in report
+    assert f"`engine_model_caveat:{withheld_reason}` | 1" in report
 
 
 def test_eligibility_census_counts_events_observations_and_first_failures() -> None:

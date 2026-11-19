@@ -11,7 +11,7 @@ from simulator.battery.enums import Quantity, SourceRelation, ValueKind
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import Notice, Observation, Residual, Uncertainty
 from simulator.battery.source_lineage import (
-    OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
+    OPENIMCC_LINEAGE_CAVEAT_PREFIXES,
 )
 
 
@@ -126,7 +126,7 @@ class Nasa9FitComparisonData(NamedTuple):
 def notice_backlog_data(
     rows: Iterable[Residual | Mapping[str, object]],
 ) -> dict[str, int]:
-    """Count notices, keeping the OpenIMCC vocabulary warning visible by reason."""
+    """Count OpenIMCC lineage caveats by reason so withheld rows stay visible."""
 
     counts: dict[str, int] = defaultdict(int)
     for row in rows:
@@ -145,7 +145,7 @@ def notice_backlog_data(
             key = (
                 f"{kind}:{reason}"
                 if kind == "engine_model_caveat"
-                and reason.startswith(OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX)
+                and reason.startswith(OPENIMCC_LINEAGE_CAVEAT_PREFIXES)
                 else kind
             )
             counts[key] += 1

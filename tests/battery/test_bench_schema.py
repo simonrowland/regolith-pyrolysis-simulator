@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import collections.abc
 import importlib.util
+import sys
 from dataclasses import fields, is_dataclass, replace
 from decimal import Decimal
 from pathlib import Path
@@ -191,7 +192,11 @@ def test_validator_allowed_set_equals_vocabulary_printed_names() -> None:
     spec = importlib.util.spec_from_file_location("validate_literature_extracts", VALIDATOR_PATH)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    sys.modules[spec.name] = module
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.modules.pop(spec.name, None)
     printed = frozenset(str(row["printed"]) for row in _vocabulary())
     assert module.EQUIPMENT_FIELDS == printed
 

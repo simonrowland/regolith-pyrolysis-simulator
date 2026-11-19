@@ -288,8 +288,8 @@ from simulator.battery.composition import (
     phase_printed_mole_amounts_to_wt_percent,
 )
 from simulator.battery.source_lineage import (
+    OPENIMCC_LINEAGE_CAVEAT_PREFIXES,
     OPENIMCC_PROVENANCE_PREFIXES,
-    OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
     coefficient_lineage_sources,
     openimcc_engine_identity_sources,
     openimcc_pack_coefficient_sources,
@@ -5396,6 +5396,9 @@ def _coefficient_sources_in_reference_scope(
     reference: Observation,
     coefficient_sources: Sequence[str],
     reference_lineage: Ancestry,
+    *,
+    coefficient_species_formula: str | None = None,
+    _indexes: _ValidationIndexes,
 ) -> tuple[tuple[str, ...], bool]:
     """Drop manifest work IDs whose locator scope excludes this observation."""
 
@@ -5407,14 +5410,31 @@ def _coefficient_sources_in_reference_scope(
         return lineage_sources, False
     if reference_lineage.ids is None:
         return lineage_sources, False
-    species_formula = _openimcc_identity_species_formula(reference.identity)
+    species_formula = coefficient_species_formula or _openimcc_identity_species_formula(
+        reference.identity
+    )
     scopes_by_work = openimcc_species_source_locator_scopes(species_formula)
     if not scopes_by_work:
         return lineage_sources, False
+    canonical_scopes_by_work: dict[str, tuple[str, ...]] = {}
+    for work_id, scopes in scopes_by_work.items():
+        work = _indexes.work_by_alias.get(work_id)
+        canonical_work_id = work.work_id if work is not None else work_id
+        previous = canonical_scopes_by_work.get(canonical_work_id)
+        if previous is None:
+            canonical_scopes_by_work[canonical_work_id] = scopes
+        elif "unparsed" in previous or "unparsed" in scopes:
+            canonical_scopes_by_work[canonical_work_id] = ("unparsed",)
+        else:
+            canonical_scopes_by_work[canonical_work_id] = tuple(
+                sorted(set(previous) | set(scopes))
+            )
     scoped_sources: list[str] = []
     for source in lineage_sources:
-        scopes = scopes_by_work.get(source)
-        if scopes is None or source not in reference_lineage.ids:
+        work = _indexes.work_by_alias.get(source)
+        canonical_work_id = work.work_id if work is not None else source
+        scopes = canonical_scopes_by_work.get(canonical_work_id)
+        if scopes is None or canonical_work_id not in reference_lineage.ids:
             scoped_sources.append(source)
             continue
         scope_matches = openimcc_source_locator_matches(scopes, reference.locator)
@@ -5434,6 +5454,7 @@ def _resolve_source_relation_with_indexes(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
     _indexes: _ValidationIndexes | None,
+    coefficient_species_formula: str | None = None,
 ) -> SourceRelation:
     if not lineage_complete:
         return SourceRelation.UNKNOWN
@@ -5444,7 +5465,11 @@ def _resolve_source_relation_with_indexes(
     if not reference_lineage.complete or reference_lineage.ids is None:
         return SourceRelation.UNKNOWN
     scoped_sources, unresolved_scope = _coefficient_sources_in_reference_scope(
-        reference, coefficient_sources, reference_lineage
+        reference,
+        coefficient_sources,
+        reference_lineage,
+        coefficient_species_formula=coefficient_species_formula,
+        _indexes=indexes,
     )
     if unresolved_scope:
         return SourceRelation.UNKNOWN
@@ -5512,7 +5537,11 @@ class _ScoringLineageResolver:
         return self._candidate_lineage(sources)[0]
 
     def for_reference(
-        self, reference: Observation, sources: Sequence[str]
+        self,
+        reference: Observation,
+        sources: Sequence[str],
+        *,
+        coefficient_species_formula: str | None = None,
     ) -> tuple[bool, SourceRelation]:
         complete, _candidate_lineage = self._candidate_lineage(sources)
         if not complete:
@@ -5526,7 +5555,11 @@ class _ScoringLineageResolver:
         ):
             return complete, SourceRelation.UNKNOWN
         scoped_sources, unresolved_scope = _coefficient_sources_in_reference_scope(
-            reference, sources, reference_lineage
+            reference,
+            sources,
+            reference_lineage,
+            coefficient_species_formula=coefficient_species_formula,
+            _indexes=self.indexes,
         )
         if unresolved_scope:
             return complete, SourceRelation.UNKNOWN
@@ -17924,7 +17957,7 @@ def _compile_residual_with_lineage(
             (_pressure_independent_comparison_notice(quantity, prediction),),
         )
     prediction_sources = tuple(prediction.coefficient_sources)
-    vocabulary_notices = tuple(
+    lineage_caveat_notices = tuple(
         Notice(
             kind=NoticeKind.ENGINE_MODEL_CAVEAT,
             affected_quantities=(quantity,),
@@ -17933,14 +17966,14 @@ def _compile_residual_with_lineage(
         )
         for source in dict.fromkeys(prediction_sources)
         if quantity is not None
-        and source.startswith(OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX)
+        and source.startswith(OPENIMCC_LINEAGE_CAVEAT_PREFIXES)
     )
-    if vocabulary_notices:
+    if lineage_caveat_notices:
         prediction = replace(
             prediction,
-            notices=union_notices(prediction.notices, vocabulary_notices),
+            notices=union_notices(prediction.notices, lineage_caveat_notices),
         )
-        notices = union_notices(notices, vocabulary_notices)
+        notices = union_notices(notices, lineage_caveat_notices)
     unmapped_aliases = _unmapped_coefficient_source_aliases(prediction_sources)
     if engine is Engine.OPENIMCC and unmapped_aliases:
         return _refused(
@@ -17999,10 +18032,17 @@ def _compile_residual_with_lineage(
             observations=context.observations,
             experiments=context.experiments,
             _indexes=validation_indexes,
+            coefficient_species_formula=_openimcc_identity_species_formula(
+                prediction.identity
+            ),
         )
     else:
         _complete, source_relation = _source_relation_resolver.for_reference(
-            relation_reference, prediction_sources
+            relation_reference,
+            prediction_sources,
+            coefficient_species_formula=_openimcc_identity_species_formula(
+                prediction.identity
+            ),
         )
     if (
         rail is Rail.REDOX

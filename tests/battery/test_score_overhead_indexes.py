@@ -65,7 +65,12 @@ def test_validation_indexes_reuse_store_sets_aliases_tables_and_lineage(
 
     assert first.complete and first.ids is not None
     assert first.ids == frozenset(
-        {"nasa-cea-thermo", delta.observation_id, log_k.observation_id}
+        {
+            "nasa-cea-thermo",
+            work.work_id,
+            delta.observation_id,
+            log_k.observation_id,
+        }
     )
     assert second == first
     assert first_walks > 0
