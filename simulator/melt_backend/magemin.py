@@ -1467,6 +1467,20 @@ def _landau_equilibrium_tc_K(
     return tc0_K + float(pressure_kbar) * vmax_kJ_per_kbar / smax_kJ_per_K
 
 
+# MAGEMin's CLI reads ``--Temp`` and ``--Pres`` with strtold. Six decimal
+# places are the token. The float parsed back from that token is the
+# double the binary stores. Bulk wt% and buffer_n keep their own
+# ``:.6f`` at the argv builder: they are not this temperature/pressure pair.
+_MAGEMIN_CLI_DECIMALS = 6
+
+
+def _magemin_cli_scalar(value: float) -> tuple[str, float]:
+    """CLI token for one Celsius or kbar value, and the float of that token."""
+
+    token = f'{float(value):.{_MAGEMIN_CLI_DECIMALS}f}'
+    return token, float(token)
+
+
 _LANDAU_STENCIL_PREFIX = 'finite-difference stencil straddles '
 
 
@@ -3410,12 +3424,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             temperature_C=temperature_C,
             fO2_log=fO2_log,
         )
+        temperature_token = _magemin_cli_scalar(temperature_C)[0]
+        pressure_token = _magemin_cli_scalar(pressure_kbar)[0]
         args = [
             str(binary_path),
             '--Verb=0',
             f'--db={self._effective_database()}',
-            f'--Temp={temperature_C:.6f}',
-            f'--Pres={pressure_kbar:.6f}',
+            f'--Temp={temperature_token}',
+            f'--Pres={pressure_token}',
             '--sys_in=wt',
             '--Bulk=' + ','.join(f'{value:.6f}' for value in bulk_projection.vector),
             f'--buffer={buffer_name}',
