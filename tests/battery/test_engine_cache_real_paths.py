@@ -845,7 +845,11 @@ def _capture_engine_cache_settings_paths(
         return original_projection(name, settings, **kwargs)
 
     def cached_call(
-        _name: str, request: dict[str, Any], solve: Callable[[], Any]
+        _name: str,
+        request: dict[str, Any],
+        solve: Callable[[], Any],
+        *,
+        disclosure_runtime: Any | None = None,
     ) -> Any:
         requests.append(dict(request))
         return solve()
