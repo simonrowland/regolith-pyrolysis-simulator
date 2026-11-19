@@ -34,6 +34,7 @@ from simulator.battery.source_oxygen import (
     linked_source_pressure,
     resolve_source_oxygen,
 )
+from simulator.source_ids import RYS_SOURCE_ID
 from simulator.diagnostic_helpers import binary_pot_battery as battery
 
 
@@ -776,6 +777,30 @@ def _pair_rows(o_uncertainty=None, o2_uncertainty=None):
     if o2_uncertainty is not None:
         molecular = replace(molecular, uncertainty=o2_uncertainty)
     return sample, (sample, atomic, molecular)
+
+
+def test_rys_oxygen_selection_requires_independent_measurement_status():
+    sample = _partial_pressure("rys-sample", "SiO", Decimal("1"))
+    sample = replace(sample, source_id=RYS_SOURCE_ID)
+    oxygen = _partial_pressure("rys-o2", "O2", Decimal("1e-8"))
+    oxygen = replace(
+        oxygen,
+        source_id=RYS_SOURCE_ID,
+        provenance={"oxygen_measurement_status": "unknown"},
+    )
+
+    rejected = resolve_source_oxygen(sample, (sample, oxygen), None)
+    assert isinstance(rejected, SourceOxygenFallback)
+    assert rejected.reason is FallbackReason.UNTYPED_LINEAGE
+
+    oxygen = replace(
+        oxygen,
+        provenance={"oxygen_measurement_status": "measured_independent"},
+    )
+    selected = resolve_source_oxygen(sample, (sample, oxygen), None)
+    assert isinstance(selected, SourceOxygenCondition)
+    assert selected.observation.derivation is not None
+    assert selected.observation.derivation.inputs == (oxygen.observation_id,)
 
 
 def _mo_pair_atomic_oxygen(*, evidence, derived_from=()):

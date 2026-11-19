@@ -12,6 +12,7 @@ from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
 from simulator.source_ids import (
     FEDKIN_SOURCE_ID,
     HASHIMOTO_SOURCE_ID,
+    RYS_SOURCE_ID,
     SCHAEFER_FEGLEY_SOURCE_ID,
     SF04_WORKBOOK_SOURCE_ID,
     SOSSI_FEGLEY_SOURCE_ID,
@@ -62,6 +63,12 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
         "residue_component_phase": SourceRule(
             Phase.GLASS,
             "Sossi Table 2 reports residue ppm in quenched glass",
+        ),
+    },
+    RYS_SOURCE_ID: {
+        "oxygen_measurement_status_required": SourceRule(
+            True,
+            "Ryś pO2 may be calculated from congruent effusion; only independently measured oxygen is eligible",
         ),
     },
     MAVROGENES_SOURCE_ID: {
