@@ -42,6 +42,38 @@ experiments:
     table: '3'
     row: '1'
   apparatus_family: High-temperature mass spectrometry using a Knudsen effusion cell.
+  apparatus:
+    calibration:
+      technique:
+        state:
+          tag: value
+          value: mass_spectrometry
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 1565
+          section: Experimental part
+          note: "The paper says vapor composition and thermodynamic properties were studied by high-temperature differential mass spectrometry on an MS-1301."
+      comparison:
+        state:
+          tag: value
+          value: multiple_cell_or_successive_pure_reference_sample
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 1563
+          section: Activity determination
+          note: "The paper says one compartment held the studied sample and the other held the comparison sample, individual TiO2."
+      sensitivity:
+        state:
+          tag: value
+          value: stable
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 1563
+          section: Activity determination
+          note: "The paired-cell method measures the sample against individual TiO2 in the other compartment during the same run."
 fidelity_samples:
 - path: species.TiO2.observations[stolyarova_2021_table3_TiO2_partial_pressure_row_01].values.pressure_Pa
   value: '1.34'
@@ -122,6 +154,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '1'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -237,6 +282,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '2'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -352,6 +410,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '3'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -467,6 +538,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '4'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -582,6 +666,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '5'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -697,6 +794,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '6'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -812,6 +922,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '7'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -927,6 +1050,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '8'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -1042,6 +1178,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '9'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -1157,6 +1306,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '10'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -1272,6 +1434,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '11'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -1389,6 +1564,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '12'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -1504,6 +1692,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '13'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -1619,6 +1820,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '14'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -1735,6 +1949,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '15'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -1853,6 +2080,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '16'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -1969,6 +2209,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '17'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -2087,6 +2340,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '18'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -2202,6 +2468,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '19'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -2317,6 +2596,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '20'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -2432,6 +2724,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '21'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -2547,6 +2852,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '22'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -2662,6 +2980,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '23'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -2777,6 +3108,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '24'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -2892,6 +3236,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '25'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -3007,6 +3364,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '26'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -3122,6 +3492,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '27'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value
@@ -3237,6 +3620,19 @@ species:
           pure oxide at the measurement temperature. NIST-JANAF O-043 places the rutile crystal-to-liquid transition
           at 2130 K; every Table 3 activity temperature is above 2130 K.
       point_conditions:
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 1563
+            table: '3'
+            row: '28'
+            column_header: a(TiO2)
+            section: Activity determination
+            note: "The paper defines a(TiO2) from the TiO2 pressure and TiO2+ ion-current ratios in Eq. (10)."
         temperature_K:
           state:
             tag: value

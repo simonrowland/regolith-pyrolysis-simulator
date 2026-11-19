@@ -11,6 +11,7 @@ import yaml
 
 from simulator.battery.enums import Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
+from simulator.battery.method_class_bands import _located_fact
 from tests.helpers.corpus_paths import regolith_corpus_root
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -253,6 +254,29 @@ def test_isolated_migration_types_each_printed_value_and_identity() -> None:
             notice.kind.value == "source_value_outside_physical_range"
             for notice in migrated.notices
         )
+
+    experiment = next(iter(result.experiments.values()))
+    direct_activity_rows = [
+        result.observations[source_id]
+        for source_id, (formula, source) in source_observations.items()
+        if formula == "TiO2" and source["type"] == "gibbs_table"
+    ]
+    integrated_activity_rows = [
+        result.observations[source_id]
+        for source_id, (formula, source) in source_observations.items()
+        if formula == "Al2O3" and source["type"] == "gibbs_table"
+    ]
+    assert len(direct_activity_rows) == sum(row[9] is not None for row in TABLE3_RENDER) == 28
+    assert len(integrated_activity_rows) == sum(row[10] is not None for row in TABLE3_RENDER) == 26
+    for row in direct_activity_rows:
+        assert _located_fact(row, experiment, "technique") == "mass_spectrometry"
+        assert _located_fact(row, experiment, "comparison") == (
+            "multiple_cell_or_successive_pure_reference_sample"
+        )
+        assert _located_fact(row, experiment, "sensitivity") == "stable"
+        assert _located_fact(row, experiment, "activity_method") == "direct_comparison"
+    for row in integrated_activity_rows:
+        assert _located_fact(row, experiment, "activity_method") is None
 
 
 def test_figure_records_are_deferred_and_point_free() -> None:
