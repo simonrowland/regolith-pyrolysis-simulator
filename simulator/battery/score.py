@@ -8295,6 +8295,9 @@ def _comparison_identity(
     knudsen_total_pressure = _knudsen_total_pressure_details(
         prediction.notices
     )
+    transition_temperature = (
+        quantity_token(identity) is Quantity.TRANSITION_TEMPERATURE
+    )
     if (
         not resolved_oxygen
         and not shared_oxygen_condition
@@ -8304,6 +8307,7 @@ def _comparison_identity(
         and knudsen_total_pressure is None
         and melt_identity is identity
         and not fusion_polymorph_flag
+        and not transition_temperature
     ):
         return identity
     updates: dict[str, State] = {}
@@ -8339,6 +8343,22 @@ def _comparison_identity(
         point, _notice = _printed_point_composition(reference)
         if point is not None:
             updates["composition"] = point
+    if transition_temperature and (
+        identity.total_pressure_Pa is None
+        or not identity.total_pressure_Pa.is_value
+    ):
+        # The located point is the pressure both sides were solved at.
+        # Copy that state. Do not convert it again, and do not put the
+        # oxygen command on the identity: the transition profile forbids it.
+        located_pressure = (reference.point_conditions or {}).get(
+            "total_pressure_Pa"
+        )
+        if (
+            isinstance(located_pressure, Located)
+            and located_pressure.inference is None
+            and located_pressure.state.is_value
+        ):
+            updates["total_pressure_Pa"] = located_pressure.state
     if (
         selected_oxygen is not None
         and selected_oxygen[0] is not None

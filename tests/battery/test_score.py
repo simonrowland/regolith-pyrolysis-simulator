@@ -20053,6 +20053,103 @@ def test_transition_temperature_dispatches_exact_native_result_and_inputs(
         assert mutated.refusal_reason is None
 
 
+def _assert_located_transition_residual(monkeypatch) -> None:
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    composition = Composition(
+        basis="printed_CaO_SiO2_binary_wt_percent",
+        components=(("CaO", Decimal("36.1")), ("SiO2", Decimal("63.9"))),
+        amount_basis=AmountBasis.MASS_PERCENT,
+    )
+    na = "transition temperature has no duplicate coordinate"
+    identity = replace(
+        F.activity_identity(
+            formula="CaO",
+            component_basis="CaO",
+            composition=composition,
+        ),
+        quantity=Quantity.TRANSITION_TEMPERATURE,
+        subtype=State.of("solidus"),
+        temperature_K=State.not_applicable(na),
+        per=State.not_applicable(na),
+        reference_state=State.not_applicable(na),
+        composition=State.unknown("composition is printed on the point"),
+        fO2_Pa=State.not_applicable("oxygen stays a located command"),
+        total_pressure_Pa=State.unknown("total pressure is printed on the point"),
+    )
+    experiment = F.tabulation_experiment()
+    reference = replace(
+        F.observation(
+            "transition-located-solidus",
+            experiment.experiment_id,
+            identity,
+            Decimal("1709.15"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        ),
+        point_conditions={
+            "composition": Located(State.of(composition)),
+            "total_pressure_Pa": Located(State.of(Decimal("100000"))),
+            "oxygen_partial_pressure_Pa": Located(State.of(Decimal("1e-4"))),
+        },
+    )
+
+    def find_liquidus_solidus(**kwargs):
+        assert kwargs["composition_kg"] == {"CaO": 0.361, "SiO2": 0.639}
+        assert kwargs["fO2_log"] == -9.0
+        assert kwargs["pressure_bar"] == 1.0
+        return LiquidusSolidusResult(
+            liquidus_T_C=1450.0,
+            solidus_T_C=1400.0,
+            liquid_fraction=0.0,
+            status="ok",
+        )
+
+    handle = SimpleNamespace(
+        name=Engine.MAGEMIN.value,
+        backend=SimpleNamespace(find_liquidus_solidus=find_liquidus_solidus),
+        available=True,
+        unavailable_reason=None,
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_open_cached_battery_handle",
+        lambda *_args: (handle, False),
+    )
+    residuals, _candidates = score_store(
+        _context(
+            F.work(),
+            experiment,
+            reference,
+            review="reviewed",
+        ),
+        engines=(Engine.MAGEMIN,),
+        rail=Rail.THERMOCHEMISTRY,
+        include_diagnostics=False,
+    )
+    assert len(residuals) == 1
+    residual = residuals[0]
+    assert residual.refusal is None
+    assert residual.numeric is not None
+    assert residual.numeric.value == Decimal("-36")
+    assert residual.status is ResidualStatus.NO_BAND
+
+
+def test_located_transition_point_scores_a_numeric_residual(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _assert_located_transition_residual(monkeypatch)
+
+    def unchanged(identity, _reference, _prediction):
+        return identity
+
+    monkeypatch.setattr(score_mod, "_comparison_identity", unchanged)
+    with pytest.raises(AssertionError):
+        _assert_located_transition_residual(monkeypatch)
+
+
 @pytest.mark.parametrize(
     ("missing", "identity_field"),
     (
