@@ -5567,6 +5567,61 @@ def test_standalone_melt_and_rank_publish_fe_without_a_run_scope(monkeypatch) ->
         }
 
 
+def test_ordering_publishes_one_disclosure_per_rank_evaluation(monkeypatch) -> None:
+    import simulator.diagnostic_helpers.extract_reproduction as extract_reproduction
+
+    observation = extract_reproduction.AdoptedObservation(
+        species_id="Fe",
+        source_id="test-ordering",
+        observation_id="one-count-per-rank",
+        obs_type="qualitative_bound",
+        review_status="accepted",
+        phase="gas",
+        regime="gas_standard_state_thermo",
+        standard_state="CEA/JANAF P°=100000 Pa",
+        T_range_K=(1800.0, 1800.0),
+        units=None,
+        uncertainty=None,
+        locator={},
+        values={
+            "source_reported_sequence": ["Fe", "Mg"],
+            "composition_wt_pct": {"SiO2": 50.0, "MgO": 50.0},
+        },
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption="",
+    )
+    disclosure = {"law_id": "test:one-rank", "evaluation_count": 1}
+    monkeypatch.setattr(
+        extract_reproduction,
+        "rail_alpha_comparability",
+        lambda _obs: (True, None, {}),
+    )
+    monkeypatch.setattr(
+        extract_reproduction,
+        "_melt_recipe_mol",
+        lambda _obs: ({"SiO2": 1.0}, "test-composition", None),
+    )
+    monkeypatch.setattr(
+        extract_reproduction,
+        "_engine_species_rank_metric",
+        lambda *_args: (1.0, None, {"law_disclosures": [disclosure]}),
+    )
+
+    evaluation = extract_reproduction.ObservationEvaluation(observation)
+    ranked = extract_reproduction._evaluate_ordering(
+        observation,
+        evaluation,
+        vp_data={},
+        pO2=1.0e-8,
+    )
+
+    assert ranked.records[0].runtime["law_disclosures"] == [
+        {"law_id": "test:one-rank", "evaluation_count": 2}
+    ]
+
+
 # Table-3 runs whose (temperature, duration) pair is unique, so the
 # integration stub can tell them apart. The cohort does not pass experiment
 # id into ``_hashimoto_integrate_geometry``. 17c5-1 and 17c5-3 share a pair

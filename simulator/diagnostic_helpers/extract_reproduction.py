@@ -4554,10 +4554,6 @@ def _evaluate_ordering(
                 ranked_disclosures,
                 rank_runtime.get("law_disclosures"),
             )
-            ranked_disclosures = _published_law_disclosures(
-                ranked_disclosures,
-                rank_runtime.get("law_disclosures"),
-            )
             if value is None:
                 refusals[species] = refusal or "engine_rank_unavailable"
                 continue
