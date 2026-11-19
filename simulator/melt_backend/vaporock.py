@@ -1030,6 +1030,7 @@ def _oxide_activities_from_full_output(
     *,
     composition_wt_pct: Mapping[str, float],
     omit_nonfinite: bool = False,
+    unusable_oxide_activities: Optional[Dict[str, Dict[str, str]]] = None,
 ) -> Dict[str, float]:
     """Project VapoRock's full-output activity vector onto present oxides.
 
@@ -1042,7 +1043,9 @@ def _oxide_activities_from_full_output(
     has a non-finite activity, because that call is one speciation result.
     The liquid-chemical-potential call sets ``omit_nonfinite`` so one
     oxide the model cannot evaluate does not discard a sibling oxide that
-    it did evaluate.
+    it did evaluate. An exponent that overflows ``math.exp`` is the same
+    kind of per-oxide failure: the liquid path records it and keeps the
+    sibling, and the gas path still refuses the whole vector.
     """
     try:
         columns = list(system.vapor.rxn_coefs.columns)
@@ -1063,7 +1066,20 @@ def _oxide_activities_from_full_output(
                 log_activity = float(row[0])
             except (TypeError, IndexError):
                 log_activity = float(row)
-            activity = math.exp(log_activity)
+            try:
+                activity = math.exp(log_activity)
+            except OverflowError:
+                if omit_nonfinite:
+                    if unusable_oxide_activities is not None:
+                        unusable_oxide_activities[oxide] = {
+                            'status': 'not_converged',
+                            'reason': 'activity_exponent_overflow',
+                        }
+                    continue
+                raise ValueError(
+                    f'VapoRock {oxide} activity exponent overflow '
+                    '(not_converged: activity_exponent_overflow)'
+                ) from None
             if not math.isfinite(activity) or activity <= 0.0:
                 if omit_nonfinite:
                     continue
@@ -1087,6 +1103,7 @@ def _oxide_activities_from_liquid_chempot(
     *,
     composition_wt_pct: Mapping[str, float],
     temperature_K: float,
+    unusable_oxide_activities: Optional[Dict[str, Dict[str, str]]] = None,
 ) -> Dict[str, float]:
     """Oxide activities from liquid chemical potentials, with no fO2.
 
@@ -1137,6 +1154,7 @@ def _oxide_activities_from_liquid_chempot(
         ln_activity,
         composition_wt_pct=composition,
         omit_nonfinite=True,
+        unusable_oxide_activities=unusable_oxide_activities,
     )
 
 
@@ -1268,14 +1286,17 @@ def _handle_vaporock_request(
         # Fresh System. Do not store it: a gas reuse target must not carry
         # an activity-only residue, and this path never calls the gas function.
         system = _construct_system(system_cls, resource=resource)
+        unusable_oxide_activities: Dict[str, Dict[str, str]] = {}
         oxide_activity = _oxide_activities_from_liquid_chempot(
             system,
             composition_wt_pct=composition_wt_pct,
             temperature_K=temperature_K,
+            unusable_oxide_activities=unusable_oxide_activities,
         )
         return {
             'liquid_activity_only': True,
             'oxide_activity': dict(oxide_activity),
+            'unusable_oxide_activities': dict(unusable_oxide_activities),
             'oxide_activity_standard_state': (
                 _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
             ),
@@ -1577,6 +1598,7 @@ class VapoRockBackend(MeltBackend):
         self._last_error: Optional[str] = None
         self._last_pressure_authority_warning: Optional[str] = None
         self._last_liquid_model_pressure_bar: Optional[float] = None
+        self._last_unusable_oxide_activities: Dict[str, Dict[str, str]] = {}
         self._last_empty_speciation_cause: Optional[EmptySpeciationCause] = None
         self._last_empty_speciation_stats: Optional[Dict[str, int]] = None
         self._last_empty_speciation_reason: Optional[str] = None
@@ -2486,6 +2508,13 @@ class VapoRockBackend(MeltBackend):
         else:
             result_status = 'ok'
 
+        if self._last_unusable_oxide_activities:
+            projection_diagnostics = dict(projection_diagnostics)
+            projection_diagnostics['unusable_oxide_activities'] = {
+                oxide: dict(row)
+                for oxide, row in self._last_unusable_oxide_activities.items()
+            }
+
         # _call_vaporock already returns a finished species -> Pa dict
         # (declared-unit dict path or unambiguous log10(bar) path); do not
         # re-scale here or an already-Pa result is inflated 1e5x.
@@ -2613,6 +2642,7 @@ class VapoRockBackend(MeltBackend):
         """
         self._last_pressure_authority_warning = None
         self._last_liquid_model_pressure_bar = None
+        self._last_unusable_oxide_activities = {}
         self._clear_empty_speciation()
         temperature_K = (
             float(temperature)
@@ -2709,11 +2739,14 @@ class VapoRockBackend(MeltBackend):
             # prefix probe, not a proven admitted-grid equivalence.
             system = _construct_system(system_cls)
             if include_oxide_activities and fO2_log is None:
+                unusable_oxide_activities: Dict[str, Dict[str, str]] = {}
                 oxide_activity = _oxide_activities_from_liquid_chempot(
                     system,
                     composition_wt_pct=composition_wt_pct,
                     temperature_K=temperature_K,
+                    unusable_oxide_activities=unusable_oxide_activities,
                 )
+                self._last_unusable_oxide_activities = unusable_oxide_activities
                 if not oxide_activity:
                     self._latch_empty_speciation(
                         EmptySpeciationCause.NO_FINITE_VALUES
@@ -2831,6 +2864,15 @@ class VapoRockBackend(MeltBackend):
                 f'{type(payload)!r}'
             )
         if payload.get('liquid_activity_only') is True:
+            raw_unusable = payload.get('unusable_oxide_activities') or {}
+            if isinstance(raw_unusable, Mapping):
+                self._last_unusable_oxide_activities = {
+                    str(oxide): {
+                        'status': str(row['status']),
+                        'reason': str(row['reason']),
+                    }
+                    for oxide, row in raw_unusable.items()
+                }
             oxide_activity, state = self._worker_oxide_activity_pair(payload)
             if oxide_activity:
                 self._last_pressure_authority_warning = (

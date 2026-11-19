@@ -5081,6 +5081,126 @@ def _assert_one_melts_oxide_alias_owner() -> None:
     )
 
 
+def _overflow_sibling_activity_contract(monkeypatch):
+    """A positive overflow is typed per oxide. A finite sibling stays."""
+    calls = {"gas": 0, "chempot": 0}
+
+    class _Vapor:
+        class _ReactionCoefficients:
+            columns = ["O2", "SiO2", "Na2O"]
+
+        rxn_coefs = _ReactionCoefficients()
+
+    class FakeSystem:
+        R = 8.314
+        vapor = _Vapor()
+
+        def set_melt_comp(self, _composition):
+            self.mol_liq = [1.0, 1.0]
+
+        def eval_gas_abundances(self, *_args, **_kwargs):
+            calls["gas"] += 1
+            return (
+                {"SiO": 1.0},
+                None,
+                [[0.0], [math.log(0.4)], [1000.0]],
+            )
+
+        def _calc_liquid_chempot(self, temperature, pressure, _mol_liq):
+            calls["chempot"] += 1
+            calls["pressure"] = float(pressure)
+            thermal = 8.314 * float(temperature)
+            return [math.log(0.4) * thermal, 1000.0 * thermal], [0.0, 0.0]
+
+    _install_fake_import(
+        monkeypatch, types.SimpleNamespace(System=FakeSystem)
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+    result = backend.equilibrate(
+        1600.0,
+        composition_kg={"SiO2": 60.0, "Na2O": 40.0},
+        fO2_log=None,
+        pressure_bar=1.0,
+        include_oxide_activities=True,
+    )
+    assert result.status == "non_authoritative"
+    published = result.diagnostics["oxide_activity"]
+    assert set(published) == {"SiO2"}
+    assert published["SiO2"] == pytest.approx(0.4)
+    assert math.isfinite(published["SiO2"]) and published["SiO2"] > 0.0
+    assert result.diagnostics["unusable_oxide_activities"]["Na2O"] == {
+        "status": "not_converged",
+        "reason": "activity_exponent_overflow",
+    }
+    assert calls["gas"] == 0
+    assert calls["pressure"] == pytest.approx(1e-10)
+
+    payload = vaporock_module._handle_vaporock_request(
+        {
+            "system_cls": FakeSystem,
+            "system": object(),
+            "temperature_units": "K",
+            "vapor_pressure_units": "bar",
+            "reuse_system": False,
+            "system_construct_count": 0,
+            "reuse_equivalence_checks_done": 0,
+            "reuse_latched_fresh": False,
+        },
+        {
+            "composition_wt_pct": {"SiO2": 60.0, "Na2O": 40.0},
+            "temperature_K": 1873.15,
+            "include_oxide_activities": True,
+        },
+        None,
+    )
+    assert set(payload["oxide_activity"]) == {"SiO2"}
+    assert payload["oxide_activity"]["SiO2"] == pytest.approx(0.4)
+    assert payload["unusable_oxide_activities"]["Na2O"]["status"] == (
+        "not_converged"
+    )
+    assert payload["unusable_oxide_activities"]["Na2O"]["reason"] == (
+        "activity_exponent_overflow"
+    )
+
+    gas = backend.equilibrate(
+        1600.0,
+        composition_kg={"SiO2": 60.0, "Na2O": 40.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        include_oxide_activities=True,
+    )
+    assert gas.status == "not_converged"
+    message = gas.diagnostics["engine_exception_message"]
+    assert "activity_exponent_overflow" in message
+    assert "Na2O" in message
+    assert "inf" not in message
+    assert "oxide_activity" not in gas.diagnostics
+    assert calls["gas"] == 1
+
+
+def test_exponent_overflow_keeps_a_finite_sibling_oxide(monkeypatch):
+    _overflow_sibling_activity_contract(monkeypatch)
+
+
+def test_overflow_that_escapes_the_oxide_fails_the_sibling_pin(monkeypatch):
+    """Process-local mutation: letting the overflow escape drops the sibling."""
+    real = vaporock_module._oxide_activities_from_full_output
+
+    def _refuse_the_whole_vector(*args, **kwargs):
+        kwargs["omit_nonfinite"] = False
+        return real(*args, **kwargs)
+
+    _overflow_sibling_activity_contract(monkeypatch)
+    monkeypatch.setattr(
+        vaporock_module,
+        "_oxide_activities_from_full_output",
+        _refuse_the_whole_vector,
+    )
+    with pytest.raises(AssertionError):
+        _overflow_sibling_activity_contract(monkeypatch)
+
+
 def test_melts_oxide_alias_table_has_one_owner_outside_either_adapter():
     _assert_one_melts_oxide_alias_owner()
 
