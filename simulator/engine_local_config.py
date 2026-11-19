@@ -1162,7 +1162,19 @@ def _thermoengine_phaseobjc_library_path() -> Path:
     return dylib_dir / library_name
 
 
+# Set only after libphaseobjc is mapped. Fork copies that Objective-C runtime
+# into the child; Python module names do not show the ctypes load.
+_THERMOENGINE_PHASEOBJC_LOADED = False
+
+
+def thermoengine_phaseobjc_runtime_loaded() -> bool:
+    """Whether this process has loaded ThermoEngine's Objective-C runtime."""
+
+    return _THERMOENGINE_PHASEOBJC_LOADED
+
+
 def _load_thermoengine_phaseobjc_library() -> Path:
+    global _THERMOENGINE_PHASEOBJC_LOADED
     library_path = _thermoengine_phaseobjc_library_path()
     try:
         ctypes.CDLL(str(library_path))
@@ -1171,6 +1183,7 @@ def _load_thermoengine_phaseobjc_library() -> Path:
             "ThermoEngine Objective-C library could not be loaded from "
             f"{library_path}: {exc}"
         ) from exc
+    _THERMOENGINE_PHASEOBJC_LOADED = True
     return library_path
 
 

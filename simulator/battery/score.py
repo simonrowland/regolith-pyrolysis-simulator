@@ -7146,25 +7146,9 @@ def _source_band_catalog(
                 magnitude = point_magnitude(cell.value)
                 if magnitude is None or not magnitude.is_finite():
                     continue
-                if alignment_template is None:
-                    key_doc = _source_alignment_group_key(cell, tier=tier)
-                    if key_doc is None:
-                        continue
-                    alignment_template = key_doc
-                    alignment_profile = profile_for(cell.identity)
-                else:
-                    key_doc = dict(alignment_template)
-                    axes = dict(alignment_template["axes"])
-                    if "temperature_K" in axes:
-                        assert alignment_profile is not None
-                        temperature_axis = _axis_alignment_value(
-                            cell.identity, "temperature_K", alignment_profile
-                        )
-                        if temperature_axis is None:
-                            continue
-                        axes["temperature_K"] = temperature_axis
-                    key_doc["axes"] = axes
-                    key_doc["aligned_T_K"] = _source_aligned_temperature(cell.identity)
+                key_doc = _source_alignment_group_key(cell, tier=tier)
+                if key_doc is None:
+                    continue
                 key = _group_token(key_doc)
                 group_keys[key] = key_doc
                 identities[key] = cell.identity

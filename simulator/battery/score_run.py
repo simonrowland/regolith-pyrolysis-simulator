@@ -889,20 +889,88 @@ def _score_failed_shard_residual(
     )
 
 
+def _mach_thread_count() -> int | None:
+    """OS threads, the count macOS ``os.fork`` uses for its warning.
+
+    ``mach_task_self_`` is a variable, not a function. Returns None when the
+    count is unavailable; the caller then uses interpreter frames.
+    """
+
+    if sys.platform != "darwin":
+        return None
+    import ctypes
+
+    try:
+        libc = ctypes.CDLL("/usr/lib/libSystem.B.dylib", use_errno=True)
+        task = ctypes.c_uint32.in_dll(libc, "mach_task_self_").value
+    except (OSError, ValueError):
+        return None
+    thread_t = ctypes.c_uint32
+    libc.task_threads.restype = ctypes.c_int32
+    libc.task_threads.argtypes = [
+        ctypes.c_uint32,
+        ctypes.POINTER(ctypes.POINTER(thread_t)),
+        ctypes.POINTER(ctypes.c_uint32),
+    ]
+    threads = ctypes.POINTER(thread_t)()
+    count = ctypes.c_uint32(0)
+    if libc.task_threads(task, ctypes.byref(threads), ctypes.byref(count)) != 0:
+        return None
+    total = int(count.value)
+    if total < 1:
+        return None
+    libc.mach_port_deallocate.restype = ctypes.c_int32
+    libc.mach_port_deallocate.argtypes = [ctypes.c_uint32, ctypes.c_uint32]
+    for index in range(total):
+        libc.mach_port_deallocate(task, threads[index])
+    libc.vm_deallocate.restype = ctypes.c_int32
+    libc.vm_deallocate.argtypes = [
+        ctypes.c_uint32,
+        ctypes.c_uint64,
+        ctypes.c_uint64,
+    ]
+    address = ctypes.cast(threads, ctypes.c_void_p).value or 0
+    libc.vm_deallocate(task, address, total * ctypes.sizeof(thread_t))
+    return total
+
+
+def _fork_warning_thread_count() -> int:
+    """Threads that make ``os.fork`` emit its multi-thread DeprecationWarning.
+
+    On macOS the warning counts mach threads. ``threading.enumerate()`` misses
+    a thread started with ``_thread.start_new_thread``; ``sys._current_frames``
+    sees that interpreter thread. The warning fires when the count exceeds one.
+    """
+
+    frames = len(sys._current_frames())
+    mach = _mach_thread_count()
+    if mach is None:
+        return frames
+    return max(frames, mach)
+
+
 def _score_fork_blockers(*, residual_sqlite_open: bool = False) -> tuple[str, ...]:
     """Why this process must not fork a score worker.
 
-    A fresh ``--workers N`` process can inherit the prepared run. Forking
-    after an in-process score deadlocks: engine threads and the Objective-C
-    runtime are already alive (measured on the cache-equivalence script,
-    which scores with one worker and then with several in the same process).
-    An open sqlite connection would also be inherited.
+    A fresh ``--workers N`` process can inherit the prepared run. Fork only
+    when that inheritance is safe. Otherwise the child can deadlock: another
+    thread, the Objective-C runtime loaded by libphaseobjc, or an open sqlite
+    connection would be copied into the child.
     """
 
     reasons: list[str] = []
     names = [thread.name for thread in threading.enumerate()]
-    if names != ["MainThread"]:
-        reasons.append("threads:" + ",".join(names))
+    thread_count = _fork_warning_thread_count()
+    if thread_count > 1 or names != ["MainThread"]:
+        detail = []
+        if names != ["MainThread"]:
+            detail.append(",".join(names))
+        detail.append(f"count:{thread_count}")
+        reasons.append("threads:" + ";".join(detail))
+    from simulator.engine_local_config import thermoengine_phaseobjc_runtime_loaded
+
+    if thermoengine_phaseobjc_runtime_loaded():
+        reasons.append("native_runtime:thermoengine_phaseobjc")
     dangerous = sorted(
         name
         for name in sys.modules
@@ -1259,7 +1327,7 @@ def _score_store_to_jsonl(
                                 protocol=pickle.HIGHEST_PROTOCOL,
                             )
                         # Spawn children load this one file. Fork is unsafe
-                        # once engine threads or the Objective-C runtime exist.
+                        # once another thread or the Objective-C runtime exists.
                         _INHERITED_SCORE_RUN = None
                         worker_context = mp.get_context("spawn")
                     else:
