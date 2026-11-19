@@ -545,9 +545,11 @@ def solve_capacity_shadow(
 #
 # Fast commits G = q_head + S - Q = 0 when that scalar has one sign
 # change and the admission bound holds. Slow integrates
-# dn_i/dt = q_i + S_i - Q_i(n) with solve_ivp (Radau). Newton proposes
-# on the fast residual. Brent publishes the root. There is no seam that
-# injects a Newton step: a returned Newton value is discarded.
+# dn_i/dt = q_i + S_i - Q_i(n) with solve_ivp (Radau). The booked
+# bleed on that branch is B_i = ∫ Q_i dt, not q(end)·Δt. Newton
+# proposes on the fast residual. Brent publishes the root. There is
+# no seam that injects a Newton step: a returned Newton value is
+# discarded.
 #
 # The slow tolerance is per species. atol_i = 1e-7 Pa * V / (R T) is
 # one tenth of the 1e-6 Pa partial floor, in moles. A test on the total
@@ -925,6 +927,9 @@ class _HeadspaceLaw:
         moles: Mapping[str, float],
         iterations: int,
         residual_Pa: float,
+        *,
+        added_mol: Mapping[str, float] | None = None,
+        bled_mol_in: Mapping[str, float] | None = None,
     ) -> _HeadspaceStep:
         partials = self.partials_of(moles)
         source, outflow, binding, _piece = self._flows(partials)
@@ -935,22 +940,38 @@ class _HeadspaceLaw:
         mass_end = math.fsum(
             moles[species] * self.masses[species] for species in self.species
         )
-        # m_source = (q + S) * M * Δt. At a fast root q + S = Q, so the
-        # bled mass is the hour's source plus the drained holdup.
-        # Unit check: mol/s * kg/mol * s = kg.
-        # Limit: already at the root, m0 = m_end and bled = (q + S) Δt.
-        source_kg = math.fsum(
-            (source[species] + self.redox_mol_s[species])
-            * self.masses[species]
-            * dt_s
-            for species in self.species
-        )
-        bled_mol = {
-            species: n0[species]
-            + (source[species] + self.redox_mol_s[species]) * dt_s
-            - moles[species]
-            for species in self.species
-        }
+        if added_mol is None:
+            # Fast root. m_source = (q + S) * M * Δt. At the root
+            # q + S = Q, so the bled mass is the hour's source plus
+            # the drained holdup. This is not the slow branch: a
+            # source that changes inside the step is not q(end)·Δt.
+            # Unit check: mol/s * kg/mol * s = kg.
+            # Limit: already at the root, m0 = m_end and bled = (q + S) Δt.
+            source_kg = math.fsum(
+                (source[species] + self.redox_mol_s[species])
+                * self.masses[species]
+                * dt_s
+                for species in self.species
+            )
+            bled_mol = {
+                species: n0[species]
+                + (source[species] + self.redox_mol_s[species]) * dt_s
+                - moles[species]
+                for species in self.species
+            }
+        else:
+            # Slow branch. added_mol is A_i(Δt) = ∫ (q_i + S_i) dt and
+            # bled_mol_in is B_i(Δt) = ∫ Q_i dt, both in mol. The caller
+            # published n_end = n0 + A − B, so this booking is that
+            # identity. Unit check: mol * kg/mol = kg.
+            # Limit: constant q and Q = 0 gives A = (q + S) Δt and B = 0.
+            source_kg = math.fsum(
+                added_mol[species] * self.masses[species]
+                for species in self.species
+            )
+            bled_mol = {
+                species: bled_mol_in[species] for species in self.species
+            }
         bled_kg = math.fsum(
             bled_mol[species] * self.masses[species] for species in self.species
         )
@@ -1281,56 +1302,97 @@ def _slow_converge(
     difference. Error control crosses a sonic edge or a blend knot;
     this difference does not have to.
 
-    atol_i = 1e-7 Pa * V / (R T). Unit check: Pa * m^3 / (J/(mol·K) * K)
-    = mol. Limit: Q = 0 and constant q gives n = n0 + (q + S) dt, a
-    degree-1 polynomial, which this order integrates in one step.
+    Premise: the booked bleed is the outflow the step removed. A source
+    that changes inside the step is not the end rate times the whole
+    step. Algebra, one extra state per species for each integral:
+      dA_i/dt = q_i + S_i
+      dB_i/dt = Q_i
+      dn_i/dt = dA_i/dt − dB_i/dt
+    so n_i(dt) = n0_i + A_i(dt) − B_i(dt) and the bled moles are
+    B_i(dt). That identity is what is published, so the closure is
+    exact in the booked moles, not only when q is constant.
+    atol on A and on B is the same per-species mole tolerance as n.
+    Unit check: (mol/s)·s = mol, and Pa·m³/(J/(mol·K)·K) = mol.
+    Limit: Q = 0 and constant q gives A = (q + S) dt, B = 0, and
+    n = n0 + A, a degree-1 polynomial this order integrates in one step.
     """
 
     import numpy as np
     from scipy.integrate import solve_ivp
 
     species = law.species
-    y0 = [float(n0[name]) for name in species]
+    count = len(species)
+    # State is n, then A = ∫(q+S) dt, then B = ∫Q dt. A(0) = B(0) = 0.
+    y0 = (
+        [float(n0[name]) for name in species]
+        + [0.0] * count
+        + [0.0] * count
+    )
     pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
     # Premise: each partial is held to 1e-7 Pa. Algebra: n = p V / (R T),
-    # so the mole tolerance is that pressure times V / (R T).
+    # so the mole tolerance is that pressure times V / (R T). A and B
+    # are moles, so they take that same tolerance.
     atol_mol = _SLOW_ATOL_PA / pa_per_mol
 
     def moles_of(state) -> dict[str, float]:
         # A stage may step a draining inventory slightly negative.
         # The pipe law is defined on n >= 0. The end state is checked
         # against the partial floor before that clamp is published.
+        # A and B are integrals, not an inventory.
         return {
             name: (float(state[index]) if float(state[index]) > 0.0 else 0.0)
             for index, name in enumerate(species)
         }
 
-    def rates_of(moles: Mapping[str, float]) -> tuple[list[float], tuple]:
+    def rates_of(
+        moles: Mapping[str, float],
+    ) -> tuple[list[float], list[float], list[float], tuple]:
         source, outflow, _binding, piece = law._flows(law.partials_of(moles))
-        rates: list[float] = []
+        added: list[float] = []
+        bled: list[float] = []
+        net: list[float] = []
         for name in species:
-            rate = source[name] + law.redox_mol_s[name] - outflow[name]
-            if not math.isfinite(rate):
+            inflow = source[name] + law.redox_mol_s[name]
+            removed = outflow[name]
+            rate = inflow - removed
+            if not (
+                math.isfinite(inflow)
+                and math.isfinite(removed)
+                and math.isfinite(rate)
+            ):
                 raise _BalanceRefused("headspace_balance_nonconvergence")
-            rates.append(rate)
+            added.append(inflow)
+            bled.append(removed)
+            net.append(rate)
         # Binding, blend bucket, cap. The empty-holdup flag is not a
         # kink a fill is forbidden to leave. Mole fraction is not a
         # piece: the mean free path is continuous across equal moles.
-        return rates, piece[:3]
+        return net, added, bled, piece[:3]
 
     def rhs(_time: float, state) -> list[float]:
-        rates, _piece = rates_of(moles_of(state))
-        return rates
+        net, added, bled, _piece = rates_of(moles_of(state))
+        return net + added + bled
 
     def jacobian(_time: float, state):
         # |dn| starts at |n| * 1e-8 and shrinks until the sample stays
         # on this piece. A column of zeros is not the fallback: that
         # is the flat update a crossed stencil returned on the
-        # free-molecular piece.
+        # free-molecular piece. A and B do not enter the rates, so
+        # their columns stay zero.
         moles = moles_of(state)
-        base, piece = rates_of(moles)
-        count = len(species)
-        matrix = np.zeros((count, count))
+        base_net, base_added, base_bled, piece = rates_of(moles)
+        width_count = 3 * count
+        matrix = np.zeros((width_count, width_count))
+
+        def column_of(up, down, span: float) -> list[float]:
+            # up and down are (net, added, bled). One sample difference
+            # keeps ∂n/∂n_j = ∂A/∂n_j − ∂B/∂n_j.
+            return [
+                (up[block][index] - down[block][index]) / span
+                for block in range(3)
+                for index in range(count)
+            ]
+
         for column, name in enumerate(species):
             amount = moles[name]
             width = 1.0e-14 if amount == 0.0 else max(abs(amount) * 1.0e-8, 1.0e-18)
@@ -1338,33 +1400,44 @@ def _slow_converge(
             for _shrink in range(24):
                 up_moles = dict(moles)
                 up_moles[name] = amount + width
-                up, up_piece = rates_of(up_moles)
-                up_ok = up_piece == piece
+                up = rates_of(up_moles)
+                up_ok = up[3] == piece
                 down = None
                 down_ok = False
                 if amount > width:
                     down_moles = dict(moles)
                     down_moles[name] = amount - width
-                    down, down_piece = rates_of(down_moles)
-                    down_ok = down_piece == piece
+                    down = rates_of(down_moles)
+                    down_ok = down[3] == piece
                 if up_ok and down_ok and down is not None:
-                    span = 2.0 * width
-                    chosen = [(up[index] - down[index]) / span for index in range(count)]
+                    chosen = column_of(up, down, 2.0 * width)
                     break
                 if up_ok:
-                    chosen = [(up[index] - base[index]) / width for index in range(count)]
+                    chosen = column_of(
+                        up,
+                        (base_net, base_added, base_bled, piece),
+                        width,
+                    )
                     break
                 if down_ok and down is not None:
-                    chosen = [(base[index] - down[index]) / width for index in range(count)]
+                    chosen = column_of(
+                        (base_net, base_added, base_bled, piece),
+                        down,
+                        width,
+                    )
                     break
                 next_width = width * 0.1
                 if next_width < 1.0e-18:
-                    chosen = [(up[index] - base[index]) / width for index in range(count)]
+                    chosen = column_of(
+                        up,
+                        (base_net, base_added, base_bled, piece),
+                        width,
+                    )
                     break
                 width = next_width
             if chosen is None:
                 raise _BalanceRefused("headspace_balance_nonconvergence")
-            for row in range(count):
+            for row in range(width_count):
                 matrix[row, column] = chosen[row]
         return matrix
 
@@ -1382,17 +1455,42 @@ def _slow_converge(
         raise
     if not solution.success:
         raise _BalanceRefused("headspace_balance_nonconvergence")
-    end: dict[str, float] = {}
-    for name, value in zip(species, solution.y[:, -1]):
+    y_end = solution.y[:, -1]
+    for value in y_end[:count]:
         amount = float(value)
         if not math.isfinite(amount):
             raise _BalanceRefused("headspace_balance_nonconvergence")
-        # Undershoot inside the partial floor is the tolerance. A
-        # partial below -1e-6 Pa is not.
+        # The integrated inventory may undershoot. A partial below
+        # -1e-6 Pa is not the tolerance. The published moles are the
+        # closure identity below, not this component.
+        if amount < 0.0 and -amount * pa_per_mol > DEFAULT_ABS_TOL_PA:
+            raise _BalanceRefused("headspace_balance_nonconvergence")
+    added_mol: dict[str, float] = {}
+    bled_mol: dict[str, float] = {}
+    end: dict[str, float] = {}
+    for index, name in enumerate(species):
+        added = float(y_end[count + index])
+        bled = float(y_end[2 * count + index])
+        if not math.isfinite(added) or not math.isfinite(bled):
+            raise _BalanceRefused("headspace_balance_nonconvergence")
+        # Q is nonnegative. An undershoot of B inside the partial
+        # floor is the tolerance. Past that floor the integral failed.
+        if bled < 0.0:
+            if -bled * pa_per_mol > DEFAULT_ABS_TOL_PA:
+                raise _BalanceRefused("headspace_balance_nonconvergence")
+            bled = 0.0
+        # n_end = n0 + A − B. Publishing this, and booking B, is the
+        # closure. A reconstructed partial below -1e-6 Pa is a refusal.
+        # Inside the floor the inventory is empty and the bleed is the
+        # holdup plus the source, which keeps the same identity.
+        amount = float(n0[name]) + added - bled
         if amount < 0.0:
             if -amount * pa_per_mol > DEFAULT_ABS_TOL_PA:
                 raise _BalanceRefused("headspace_balance_nonconvergence")
             amount = 0.0
+            bled = float(n0[name]) + added
+        added_mol[name] = added
+        bled_mol[name] = bled
         end[name] = amount
     return law.step_from_moles(
         n0,
@@ -1400,6 +1498,8 @@ def _slow_converge(
         end,
         max(int(solution.nfev), 1),
         _SLOW_ATOL_PA,
+        added_mol=added_mol,
+        bled_mol_in=bled_mol,
     )
 
 

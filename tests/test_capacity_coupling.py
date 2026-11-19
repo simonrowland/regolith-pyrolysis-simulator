@@ -3217,3 +3217,104 @@ def test_two_kinks_stay_inside_the_partial_floor():
         8000,
     )
     assert result.saturation.binding_cause == "pipe"
+
+
+def _independent_jump_outflow_mol(dt_s: float, threshold_pa: float) -> float:
+    """∫ Q dt for a source that is 0 at or above threshold_pa.
+
+    Two BDF legs at rtol 1e-12, split by a terminal event at the
+    threshold. The extra state is the outflow integral. This does not
+    call the production drain.
+    """
+
+    from scipy.integrate import solve_ivp
+
+    molar = _o2_molar_mass_kg()
+    source_mol_s = _SOURCE_02_KG_H / molar / 3600.0
+    n0 = _moles_of_kg(_STRANDED_O2_KG)
+
+    def rhs(_time: float, state: list[float]) -> list[float]:
+        amount = float(state[0]) if float(state[0]) > 0.0 else 0.0
+        partial = amount * _HS_PA_PER_MOL
+        inflow = 0.0 if partial >= threshold_pa else source_mol_s
+        if partial <= 0.0 or amount <= 0.0:
+            return [inflow, 0.0]
+        outflow = pipe_species_outflow_mol_s(
+            partial,
+            0.0,
+            _HS_T_K,
+            {"O2": amount},
+            _HS_D_M,
+            _HS_L_M,
+        )
+        removed = float(outflow.species_mol_s["O2"])
+        return [inflow - removed, removed]
+
+    def crossed(_time: float, state: list[float]) -> float:
+        amount = float(state[0]) if float(state[0]) > 0.0 else 0.0
+        return amount * _HS_PA_PER_MOL - threshold_pa
+
+    crossed.terminal = True
+    crossed.direction = -1.0
+
+    first = solve_ivp(
+        rhs,
+        (0.0, dt_s),
+        [n0, 0.0],
+        method="BDF",
+        rtol=1.0e-12,
+        atol=1.0e-16,
+        events=crossed,
+    )
+    assert first.success
+    assert len(first.t_events[0]) == 1
+    t_cross = float(first.t_events[0][0])
+    n_cross = float(first.y_events[0][0][0])
+    b_cross = float(first.y_events[0][0][1])
+    second = solve_ivp(
+        rhs,
+        (t_cross, dt_s),
+        [n_cross, b_cross],
+        method="BDF",
+        rtol=1.0e-12,
+        atol=1.0e-16,
+    )
+    assert second.success
+    return float(second.y[1, -1])
+
+
+def test_slow_bleed_integrates_a_source_that_jumps_inside_the_step():
+    # Stranded O2, dt 0.25 s. The source is 0 at or above 100 Pa and
+    # 0.2 kg/h below. Booking q(end)*dt counts the low-pressure rate
+    # over the choked part of the step. The booked bleed is ∫ Q dt.
+    dt_s = 0.25
+    threshold_pa = 100.0
+
+    def flux(partials: dict[str, float]) -> dict[str, float]:
+        if partials["O2"] >= threshold_pa:
+            return {"O2": 0.0}
+        return {"O2": _SOURCE_02_KG_H}
+
+    result = _as_result(
+        _commit_o2(
+            _STRANDED_O2_KG,
+            _SOURCE_02_KG_H,
+            dt_s / 3600.0,
+            flux=flux,
+        )
+    )
+    booked_mol = result.bled_species_mol["O2"]
+    n_end = result.partial_pressures_Pa["O2"] / _HS_PA_PER_MOL
+    n0 = _moles_of_kg(_STRANDED_O2_KG)
+    integral_mol = _independent_jump_outflow_mol(dt_s, threshold_pa)
+    # 1e-6 Pa on this headspace, in mol. The booked bleed has to
+    # match the independent integral inside that.
+    assert abs(booked_mol - integral_mol) * _HS_PA_PER_MOL <= 1.0e-6
+    assert result.partial_pressures_Pa["O2"] < threshold_pa
+    end_rate_mol = _SOURCE_02_KG_H / _o2_molar_mass_kg() / 3600.0 * dt_s
+    end_rate_bleed = n0 + end_rate_mol - n_end
+    assert abs(booked_mol - end_rate_bleed) * _HS_PA_PER_MOL > 1.0
+    # n_end = n0 + A - B is the closure. The percent is that residual
+    # over the booked mass. Constant-source rows keep the same
+    # telescope; this row must not need q(end) to close.
+    assert result.mass_closure_error_pct <= 5.0e-12
