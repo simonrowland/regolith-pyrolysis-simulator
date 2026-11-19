@@ -14349,6 +14349,7 @@ def test_invalid_run_composition_refuses_vapour_prediction(
         assert prediction.refusal_detail["reason"] == point_composition.state.reason
         assert prediction.refusal_detail["consumer"] == "vapour"
     assert refused
+    assert all(row.refusal is not None for row in refused)
     assert all(row.status is ResidualStatus.REFUSED and row.numeric is None for row in refused)
 
 
@@ -14510,6 +14511,7 @@ def test_initial_charge_proxy_is_used_only_when_composition_is_not_printed(
         ("initial", "unsupported_map"),
         ("printed", "malformed_amount"),
         ("invalid", "malformed_amount"),
+        ("invalid", "unsupported_map"),
         ("absent", "malformed_amount"),
         ("not_printed", None),
     ],
@@ -14522,6 +14524,7 @@ def test_initial_charge_proxy_is_used_only_when_composition_is_not_printed(
         "initial-unsupported-map",
         "printed-charge",
         "invalid-charge",
+        "invalid-charge-with-invalid-run-echo",
         "absent-charge",
         "not-printed-proxy",
     ],
@@ -14582,17 +14585,12 @@ def test_migrated_point_run_composition_does_not_replace_kems_charge(
             ),
         )
     experiment = replace(base_experiment, sample=sample)
-    migrated_point_conditions = dict(migrated.point_conditions or {})
-    if invalid_kind == "unsupported_map":
-        # This invalid run map has a raw wt% echo; do not let that echo become
-        # a point charge when the sample's independent initial charge is clean.
-        migrated_point_conditions.pop("printed_composition", None)
     observation = replace(
         migrated,
         observation_id=kems_observation.observation_id,
         experiment_id=experiment.experiment_id,
         point_conditions={
-            **migrated_point_conditions,
+            **(migrated.point_conditions or {}),
             **(kems_observation.point_conditions or {}),
         },
     )
@@ -14612,6 +14610,7 @@ def test_migrated_point_run_composition_does_not_replace_kems_charge(
         assert generated.readiness.status is ReadinessStatus.GAP
         assert any(
             gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
+            and any("Unobtainium2O" in path for path in gap.missing)
             for gap in generated.readiness.gaps
         )
     else:
