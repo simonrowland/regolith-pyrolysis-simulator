@@ -2342,9 +2342,20 @@ def _observation_lineage(
             result = Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
         else:
             result = Ancestry.of(ids)
-            for parent in obs.derived_from or ():
+            derivation_inputs = (
+                obs.derivation.inputs if obs.derivation is not None else ()
+            )
+            lineage_inputs = (obs.derived_from or ()) + derivation_inputs
+            for input_id in lineage_inputs:
+                if input_id not in observations and input_id not in table_ids:
+                    if _is_registered_non_table(input_id, table_ids, asset_ids):
+                        continue
+                    result = Ancestry.incomplete(
+                        AncestryFailure.UNRESOLVABLE_INPUT
+                    )
+                    break
                 nested = _observation_lineage(
-                    parent,
+                    input_id,
                     observations,
                     table_ids,
                     experiments=experiments,
@@ -2358,31 +2369,6 @@ def _observation_lineage(
                 assert nested.ids is not None and result.ids is not None
                 ids |= set(nested.ids)
                 result = Ancestry.of(ids)
-            else:
-                if obs.derivation is not None:
-                    for inp in obs.derivation.inputs:
-                        if inp not in observations and inp not in table_ids:
-                            if _is_registered_non_table(inp, table_ids, asset_ids):
-                                continue
-                            result = Ancestry.incomplete(
-                                AncestryFailure.UNRESOLVABLE_INPUT
-                            )
-                            break
-                        nested = _observation_lineage(
-                            inp,
-                            observations,
-                            table_ids,
-                            experiments=experiments,
-                            asset_ids=asset_ids,
-                            _cache=_cache,
-                            _stack=_stack,
-                        )
-                        if not nested.complete:
-                            result = nested
-                            break
-                        assert nested.ids is not None and result.ids is not None
-                        ids |= set(nested.ids)
-                        result = Ancestry.of(ids)
             if result.complete and experiments is not None:
                 experiment = experiments.get(obs.experiment_id)
                 if experiment is not None and experiment.quoted_from is not None:
