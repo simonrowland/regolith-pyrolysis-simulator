@@ -2032,6 +2032,18 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
 
         assert stable(cache_off) == stable(cold) == stable(warm)
         assert scorer_fields(cache_off) == scorer_fields(cold) == scorer_fields(warm)
+        if engine is Engine.MAGEMIN and cache_off.engine_status == "not_converged":
+            # A failed MAGEMin solve now carries no phase payload and is not
+            # cacheable; each call must re-run instead of persisting refusal.
+            assert engine_cache.engine_cache_counters(reset=True)[engine.value] == {
+                "hits": 0,
+                "misses": 2,
+                "stores": 0,
+                "store_error": 0,
+                "read_error": 0,
+                "conflicts": 0,
+            }
+            return
         assert engine_cache.engine_cache_counters(reset=True)[engine.value] == {
             "hits": 1,
             "misses": 1,

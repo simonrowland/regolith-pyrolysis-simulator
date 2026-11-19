@@ -926,6 +926,7 @@ _MAGEMIN_STATUS_RE = re.compile(
     r'^\s*Status\s+:\s+(-?\d+)(?:\s+\[([^\]]+)\])?\s*$',
     re.MULTILINE,
 )
+_MAGEMIN_ACCEPTED_SOLVER_STATUSES = frozenset((0, 1, 2))
 # PrintOutput writes this whenever verbose is not -1, including --Verb=0.
 # Example: "Mass residual      : +5.34576e-06" (non-negative BR_norm).
 _MAGEMIN_MASS_RESIDUAL_RE = re.compile(
@@ -2669,7 +2670,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 activity_value = math.nan
             if (
                 native_activity_formula not in MAGEMIN_NATIVE_MELT_ACTIVITIES
-                or solver_status not in {0, 1, 2}
+                or solver_status not in _MAGEMIN_ACCEPTED_SOLVER_STATUSES
                 or not math.isfinite(activity_value)
                 or activity_value <= 0.0
             ):
@@ -2705,6 +2706,26 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 and 'magemin_solver_status' not in result_diagnostics
             ):
                 result_diagnostics['magemin_solver_status'] = solver_status
+            if (
+                solver_status is not None
+                and solver_status not in _MAGEMIN_ACCEPTED_SOLVER_STATUSES
+            ):
+                message = (
+                    'MAGEMin ordinary solve did not converge: '
+                    f'solver_status={solver_status}'
+                )
+                result_diagnostics.update({
+                    'backend_status': 'not_converged',
+                    'backend_status_reason': 'engine_not_converged',
+                })
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=result_fO2_log,
+                    status='not_converged',
+                    warnings=[*all_warnings, message],
+                    diagnostics=result_diagnostics,
+                )
         repair_notices: List[str] = []
         (
             phases_present,

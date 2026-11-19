@@ -3190,30 +3190,12 @@ def _magemin_property_row(
 
 
 def _magemin_matlab_fixture() -> str:
-    return "\n".join([
-        "End-members fractions[wt fr]",
-        "      fo         fa         -",
-        "  ol   0.80000    0.20000    -",
-        "",
-        "Oxide compositions [wt fr]:",
-        "      SiO2       MgO       FeO         O",
-        " SYS   0.50000   0.40000   0.10000   0.02000",
-        "  ol   0.40000   0.50000   0.10000   0.00000",
-        " liq   0.55000   0.30000   0.10000   0.05000",
-        " qfm   0.00000   0.00000   0.00000   1.00000",
-        "",
-        "Stable mineral assemblage:",
-        _MAGEMIN_PROPERTY_HEADER,
-        _magemin_property_row("ol", 0.40, 3200.0, 10.0),
-        _magemin_property_row("liq", 0.60, 2700.0, 20.0, cp=0.25),
-        _magemin_property_row("qfm", 0.01, 5000.0, 1.0),
-        "",
-        "Gamma[J] (chemical potential of oxides):",
-        "  SiO2 +100.00000",
-        "   FeO +50.00000",
-        "     O -10.00000",
-        "",
-    ])
+    return (
+        Path(__file__).parent
+        / "fixtures"
+        / "magemin"
+        / "phase-map-matlab-output.txt"
+    ).read_text(encoding="utf-8")
 
 
 def test_magemin_matlab_phase_maps_scale_weight_fraction_and_keep_feo_o():
@@ -3304,7 +3286,7 @@ def _equilibrate_fake_magemin_matlab(monkeypatch: pytest.MonkeyPatch):
     backend._bridge = "subprocess"
     backend._binary_path = Path("/fake/MAGEMin")
     backend._database = "ig"
-    backend._config = {"database": "ig", "timeout_s": 1.0, "fO2_buffer": "nno"}
+    backend._config = {"database": "ig", "timeout_s": 1.0, "fO2_buffer": "qfm"}
 
     def fake_run(_args, **kwargs):
         # numpy's SVE probe calls subprocess.run("lscpu") while score.py
@@ -3333,7 +3315,7 @@ def _equilibrate_fake_magemin_matlab(monkeypatch: pytest.MonkeyPatch):
         1100.0,
         composition_kg={"SiO2": 50.0, "MgO": 40.0, "FeO": 10.0},
         pressure_bar=2000.0,
-        fO2_log=-8.0,
+        fO2_log=backend._qfm_logfo2_oneill(1100.0),
         call_timeout_s=1.0,
     )
 
@@ -3342,12 +3324,69 @@ def test_magemin_subprocess_attaches_matlab_composition_without_verb1(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     result = _equilibrate_fake_magemin_matlab(monkeypatch)
+    assert result.status == "ok", (result.warnings, result.diagnostics)
     assert result.phase_compositions["ol"]["SiO2"] == pytest.approx(40.0)
     assert result.phase_compositions["liq"]["O"] == pytest.approx(5.0)
     assert result.liquid_composition_wt_pct["SiO2"] == pytest.approx(55.0)
     assert result.phase_thermo["liq"]["density_kg_m3"] == pytest.approx(2700.0)
     assert "qfm" not in result.phase_compositions
     assert result.chem_potentials["system"]["components"]["FeO"] == pytest.approx(50.0)
+
+
+@pytest.mark.parametrize(
+    ("stdout_fixture", "expected_status", "expected_liquid_sio2"),
+    [
+        ("status0-verb0.stdout", "ok", 55.0),
+        ("status3-verb0.stdout", "not_converged", None),
+    ],
+)
+def test_magemin_verb0_solver_status_gates_matlab_phase_maps(
+    monkeypatch: pytest.MonkeyPatch,
+    stdout_fixture: str,
+    expected_status: str,
+    expected_liquid_sio2: float | None,
+) -> None:
+    fixture_dir = Path(__file__).parent / "fixtures" / "magemin"
+    matlab_dump = _magemin_matlab_fixture()
+    stdout = (fixture_dir / stdout_fixture).read_text(encoding="utf-8")
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._database = "ig"
+    backend._config = {"database": "ig", "timeout_s": 1.0, "fO2_buffer": "qfm"}
+
+    def fake_run(_args, **kwargs):
+        cwd = kwargs.get("cwd")
+        if cwd is None:
+            return types.SimpleNamespace(returncode=0, stdout="", stderr="")
+        output = Path(cwd) / "output"
+        output.mkdir()
+        (output / "_matlab_output.txt").write_text(matlab_dump, encoding="utf-8")
+        return types.SimpleNamespace(returncode=0, stdout=stdout, stderr="")
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.magemin.subprocess.run", fake_run
+    )
+    result = backend.equilibrate(
+        1100.0,
+        composition_kg={"SiO2": 50.0, "MgO": 40.0, "FeO": 10.0},
+        pressure_bar=2000.0,
+        fO2_log=backend._qfm_logfo2_oneill(1100.0),
+        call_timeout_s=1.0,
+    )
+
+    assert result.status == expected_status, (result.warnings, result.diagnostics)
+    if expected_liquid_sio2 is None:
+        assert result.phase_compositions == {}
+        assert not result.liquid_composition_wt_pct
+    else:
+        assert result.phase_compositions["liq"]["SiO2"] == pytest.approx(
+            expected_liquid_sio2
+        )
+        assert result.liquid_composition_wt_pct["SiO2"] == pytest.approx(
+            expected_liquid_sio2
+        )
 
 
 def _score_magemin_melt_silica(result):
@@ -4578,25 +4617,6 @@ def _independent_magemin_rho(matlab_text: str) -> dict[str, float]:
     return parsed
 
 
-def _independent_magemin_modes(stdout: str) -> dict[str, float]:
-    """Test-local Phase/Mode reader. Not ``_parse_subprocess_stdout``."""
-    phase_line = None
-    mode_line = None
-    for line in stdout.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("Phase"):
-            phase_line = stripped.split(":", 1)[1]
-        elif stripped.startswith("Mode"):
-            mode_line = stripped.split(":", 1)[1]
-    if phase_line is None or mode_line is None:
-        return {}
-    names = phase_line.split()
-    values = mode_line.split()
-    if len(names) != len(values):
-        return {}
-    return {name: float(value) for name, value in zip(names, values)}
-
-
 @pytest.mark.skipif(
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
@@ -4673,7 +4693,6 @@ def test_magemin_live_subliquidus_phase_maps_match_matlab_dump(request):
             matlab_text = (
                 Path(tmpdir) / "output" / "_matlab_output.txt"
             ).read_text()
-            direct_stdout = completed.stdout or ""
 
     direct = _independent_magemin_oxide_wt_pct(matlab_text)
     assert "SYS" in direct
@@ -4697,25 +4716,29 @@ def test_magemin_live_subliquidus_phase_maps_match_matlab_dump(request):
                 rho * float(fraction)
             )
 
-    direct_modes = _independent_magemin_modes(direct_stdout)
-    assert direct_modes, direct_stdout
-    total_fraction = 0.0
+    phase_mass_fractions = _independent_magemin_fraction_rows(matlab_text)
+    assert phase_mass_fractions, matlab_text
     reconstructed: dict[str, float] = {}
     for name, composition_wt in direct.items():
         if name == "SYS" or name.lower() in buffers:
             continue
-        fraction = float(direct_modes.get(name, 0.0))
-        total_fraction += fraction
+        # MAGEMin's native fraction[wt] is the phase mass fraction; summing
+        # it against oxide wt% closes the bulk on a mass basis. The table
+        # rounds fractions and compositions to 5 decimals, so 0.05 wt%-point
+        # covers accumulated print rounding across the assemblage.
+        phase_mass_fraction = sum(phase_mass_fractions.get(name, ()))
+        assert phase_mass_fraction > 0.0, name
         for oxide, wt_pct in composition_wt.items():
             if oxide == "O":
                 continue
-            reconstructed[oxide] = reconstructed.get(oxide, 0.0) + fraction * wt_pct
-    assert total_fraction > 0.0
+            reconstructed[oxide] = (
+                reconstructed.get(oxide, 0.0) + phase_mass_fraction * wt_pct
+            )
     for oxide, sys_wt_pct in direct["SYS"].items():
         if oxide == "O" or sys_wt_pct <= 0.0:
             continue
-        assert reconstructed.get(oxide, 0.0) / total_fraction == pytest.approx(
-            sys_wt_pct, abs=1.0
+        assert reconstructed.get(oxide, 0.0) == pytest.approx(
+            sys_wt_pct, abs=0.05
         )
 
     crystal_names = [
