@@ -135,6 +135,15 @@ experiments:
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
       calibration: &tsaplin_pressure_calibration
+        technique:
+          state: {tag: value, value: mass_spectrometry}
+          locator: {page: 3, published_page: 3, pdf_page_index: 2, section: '2. Experimental', note: 'Section 2 identifies Knudsen effusion mass spectrometry.'}
+        comparison:
+          state: {tag: value, value: multiple_cell_or_successive_pure_reference_sample}
+          locator: {page: 3, published_page: 3, pdf_page_index: 2, section: '2. Experimental', note: 'The paper states that double effusion cells were used.'}
+        sensitivity:
+          state: {tag: value, value: stable}
+          locator: {page: 4, published_page: 4, pdf_page_index: 3, section: '3.1. Liquid solution', note: 'Activities from different conditions and cell diameters agree with divergence no greater than 1–3 percent.'}
         reference_vapour_pressure_function:
           state: {tag: value, value: 'Ag, Ni, or Cu reference-substance vapour pressure from IVTANTERMO'}
           locator: *apparatus_locator
@@ -1404,6 +1413,10 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: &tsaplin_direct_activity_method
+            state: {tag: value, value: direct_comparison}
+            locator: {page: 4, published_page: 4, pdf_page_index: 3, equation: '(2)', note: 'Equation (2) compares the alkali oxide activity with a pure liquid reference at unit activity.'}
         supersedes: ms2000_044_na2o_activity_xsio2_0805_t1473
         model_provenance:
           page: 22
@@ -1445,6 +1458,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_na2o_activity_xsio2_0753_t1273
         model_provenance:
           page: 22
@@ -1486,6 +1501,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_na2o_activity_xsio2_0709_t1673
         model_provenance:
           page: 22
@@ -1527,6 +1544,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_na2o_activity_xsio2_0671_t1173
         model_provenance:
           page: 22
@@ -1568,6 +1587,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_na2o_activity_xsio2_0625_t1573
         model_provenance:
           page: 22
@@ -1609,6 +1630,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_na2o_activity_xsio2_0573_t1473
         model_provenance:
           page: 22
@@ -1650,6 +1673,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_na2o_activity_xsio2_0524_t1573
         model_provenance:
           page: 22
@@ -1691,6 +1716,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_na2o_activity_xsio2_0477_t1373
         model_provenance:
           page: 22
@@ -1732,6 +1759,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_na2o_activity_xsio2_0430_t1473
         model_provenance:
           page: 22
@@ -1773,6 +1802,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_na2o_activity_xsio2_0405_t1423
         model_provenance:
           page: 22
@@ -1814,6 +1845,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_na2o_activity_xsio2_0382_t1383
         model_provenance:
           page: 22
@@ -1855,6 +1888,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_na2o_activity_xsio2_0349_t1373
         model_provenance:
           page: 22
@@ -2095,6 +2130,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_k2o_activity_xsio2_0848_t1573
         model_provenance:
           page: 22
@@ -2136,6 +2173,8 @@ species:
         uncertainty:
           note: Experimental and model entries differ by two decades as printed; neither is altered.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_k2o_activity_xsio2_0811_t1173
         model_provenance:
           page: 22
@@ -2182,6 +2221,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_k2o_activity_xsio2_0770_t1073
         model_provenance:
           page: 22
@@ -2223,6 +2264,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_k2o_activity_xsio2_0722_t1323
         model_provenance:
           page: 22
@@ -2264,6 +2307,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_k2o_activity_xsio2_0722_t1673
         model_provenance:
           page: 22
@@ -2305,6 +2350,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_k2o_activity_xsio2_0674_t1373
         model_provenance:
           page: 22
@@ -2346,6 +2393,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_k2o_activity_xsio2_0630_t1323
         model_provenance:
           page: 22
@@ -2387,6 +2436,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_k2o_activity_xsio2_0630_t1523
         model_provenance:
           page: 22
@@ -2428,6 +2479,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_k2o_activity_xsio2_0591_t1323
         model_provenance:
           page: 22
@@ -2469,6 +2522,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_k2o_activity_xsio2_0543_t1473
         model_provenance:
           page: 22
@@ -2510,6 +2565,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_direct_activity_method
         supersedes: ms2000_044_k2o_activity_xsio2_0500_t1473
         model_provenance:
           page: 22
@@ -2913,6 +2970,10 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: &tsaplin_integrated_activity_method
+            state: {tag: value, value: gibbs_duhem_integration}
+            locator: {page: 4, published_page: 4, pdf_page_index: 3, section: '3.1. Liquid solution', note: 'The paper states that silica activities were calculated by integrating the Gibbs-Duhem equation.'}
         supersedes: ms2000_044_sio2_activity_na_system_xsio2_0805_t1473
         derived_from:
         - tables:kems-ms2000-044
@@ -2963,6 +3024,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_na_system_xsio2_0753_t1273
         derived_from:
         - tables:kems-ms2000-044
@@ -3013,6 +3076,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_na_system_xsio2_0709_t1673
         derived_from:
         - tables:kems-ms2000-044
@@ -3063,6 +3128,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_na_system_xsio2_0671_t1173
         derived_from:
         - tables:kems-ms2000-044
@@ -3113,6 +3180,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_na_system_xsio2_0625_t1573
         derived_from:
         - tables:kems-ms2000-044
@@ -3163,6 +3232,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_na_system_xsio2_0573_t1473
         derived_from:
         - tables:kems-ms2000-044
@@ -3213,6 +3284,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_na_system_xsio2_0524_t1573
         derived_from:
         - tables:kems-ms2000-044
@@ -3263,6 +3336,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_na_system_xsio2_0477_t1373
         derived_from:
         - tables:kems-ms2000-044
@@ -3313,6 +3388,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_na_system_xsio2_0430_t1473
         derived_from:
         - tables:kems-ms2000-044
@@ -3363,6 +3440,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_na_system_xsio2_0405_t1423
         derived_from:
         - tables:kems-ms2000-044
@@ -3413,6 +3492,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_na_system_xsio2_0382_t1383
         derived_from:
         - tables:kems-ms2000-044
@@ -3463,6 +3544,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_na_system_xsio2_0349_t1373
         derived_from:
         - tables:kems-ms2000-044
@@ -3513,6 +3596,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_k_system_xsio2_0892_t1723
         derived_from:
         - tables:kems-ms2000-044
@@ -3563,6 +3648,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_k_system_xsio2_0848_t1573
         derived_from:
         - tables:kems-ms2000-044
@@ -3613,6 +3700,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_k_system_xsio2_0811_t1173
         derived_from:
         - tables:kems-ms2000-044
@@ -3663,6 +3752,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_k_system_xsio2_0770_t1073
         derived_from:
         - tables:kems-ms2000-044
@@ -3713,6 +3804,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_k_system_xsio2_0722_t1323
         derived_from:
         - tables:kems-ms2000-044
@@ -3763,6 +3856,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_k_system_xsio2_0722_t1673
         derived_from:
         - tables:kems-ms2000-044
@@ -3813,6 +3908,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_k_system_xsio2_0674_t1373
         derived_from:
         - tables:kems-ms2000-044
@@ -3863,6 +3960,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_k_system_xsio2_0630_t1323
         derived_from:
         - tables:kems-ms2000-044
@@ -3913,6 +4012,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_k_system_xsio2_0630_t1523
         derived_from:
         - tables:kems-ms2000-044
@@ -3963,6 +4064,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_k_system_xsio2_0591_t1323
         derived_from:
         - tables:kems-ms2000-044
@@ -4013,6 +4116,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_k_system_xsio2_0543_t1473
         derived_from:
         - tables:kems-ms2000-044
@@ -4063,6 +4168,8 @@ species:
         uncertainty:
           note: Table 1 states no uncertainty for this point.
         equipment: {}
+        point_conditions:
+          activity_method: *tsaplin_integrated_activity_method
         supersedes: ms2000_044_sio2_activity_k_system_xsio2_0500_t1473
         derived_from:
         - tables:kems-ms2000-044
