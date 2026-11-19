@@ -438,6 +438,7 @@ def test_magemin_activity_score_passes_printed_row_pressure(monkeypatch):
     experiment, _bench, observation = _case(
         composition=_composition(("SiO2", "0.5"), ("Al2O3", "0.5")),
         formula="Al2O3",
+        basis="Al2O3",
         phase=Phase.CR,
     )
     observation = replace(
