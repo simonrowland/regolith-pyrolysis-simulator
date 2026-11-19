@@ -268,6 +268,38 @@ def test_undefined_load_line_comes_from_its_own_scope(tmp_path: Path) -> None:
     assert undefined_names(path) == (("ChemistryIntent", 6),)
 
 
+def test_augmented_assignment_requires_an_existing_module_binding(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "augmented_assignment.py"
+    path.write_text("total += 1\n")
+
+    assert undefined_names(path) == (("total", 1),)
+
+
+def test_comprehension_target_subexpressions_are_loads(tmp_path: Path) -> None:
+    path = tmp_path / "comprehension_target_subexpressions.py"
+    path.write_text("value = [None for slots[missing] in (1,)]\n")
+
+    assert undefined_names(path) == (("missing", 1), ("slots", 1))
+
+
+def test_closure_cannot_read_function_scope_type_checking_import(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "closure_type_checking_import.py"
+    path.write_text(
+        "from typing import TYPE_CHECKING\n"
+        "def outer():\n"
+        "    if TYPE_CHECKING:\n"
+        "        from math import sqrt\n"
+        "    def inner():\n"
+        "        return sqrt(4)\n"
+    )
+
+    assert undefined_names(path) == (("sqrt", 6),)
+
+
 def test_simulator_and_web_have_no_undefined_names() -> None:
     repo = Path(__file__).resolve().parents[1]
     violations = []
