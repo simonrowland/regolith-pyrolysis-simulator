@@ -4242,24 +4242,28 @@ class EvaporationMixin:
             projected_valid = exact_valid
             projected_warnings = []
             projected_reason = None
-            database_projection = backend._build_db_bulk_projection(
-                magemin_projection.oxide_wt_pct
-            )
-            projected_notice = {
-                'dropped_components': [
-                    {
-                        'component': species,
-                        'mass_fraction': mass_fraction,
-                    }
-                    for species, mass_fraction
-                    in database_projection.dropped_component_mass_fractions
-                ],
-            }
-            projection_reason = (
-                _projected_liquidus_refusal_reason(projected_notice)
-                if database_projection.dropped_components
-                else None
-            )
+            try:
+                database_projection = backend._build_db_bulk_projection(
+                    magemin_projection.oxide_wt_pct
+                )
+            except magemin_module.MeltCompositionError:
+                projection_reason = None
+            else:
+                projected_notice = {
+                    'dropped_components': [
+                        {
+                            'component': species,
+                            'mass_fraction': mass_fraction,
+                        }
+                        for species, mass_fraction
+                        in database_projection.dropped_component_mass_fractions
+                    ],
+                }
+                projection_reason = (
+                    _projected_liquidus_refusal_reason(projected_notice)
+                    if database_projection.dropped_components
+                    else None
+                )
             _submitted_bulk, projected_verdict = (
                 backend._submitted_bulk_and_domain_verdict(
                     magemin_projection,
