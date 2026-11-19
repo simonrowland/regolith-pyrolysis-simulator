@@ -5,9 +5,9 @@ from __future__ import annotations
 import json
 from collections import defaultdict
 from decimal import Decimal
-from typing import Callable, Iterable, Mapping, NamedTuple
+from typing import Callable, Iterable, Mapping, NamedTuple, Sequence
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import Quantity, SourceRelation, ValueKind
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import Observation, Residual, Uncertainty
 
@@ -294,3 +294,233 @@ def nasa9_fit_comparison_report_data(
         (*key, count) for key, count in sorted(refusals.items())
     )
     return Nasa9FitComparisonData(sorted_counts, sorted_refusals)
+
+
+class _SuspectedCalibrationOverlapThresholds(NamedTuple):
+    minimum_rows: int
+    median_abs_residual_fraction_of_band: Decimal
+    rows_inside_tight_band_fraction: Decimal
+    tight_band_fraction: Decimal
+
+
+# Diagnostic heuristic only (d-445). These cuts are not a physics claim
+# and do not change score_eligible. A counted row with no usable band
+# means the pair is not flagged.
+SUSPECTED_CALIBRATION_OVERLAP = _SuspectedCalibrationOverlapThresholds(
+    minimum_rows=10,
+    median_abs_residual_fraction_of_band=Decimal("0.10"),
+    rows_inside_tight_band_fraction=Decimal("0.80"),
+    tight_band_fraction=Decimal("0.10"),
+)
+
+
+class EligibleSourceRelationCount(NamedTuple):
+    """score_eligible rows for one engine, plus the openimcc pending count.
+
+    ``n_same_input_pending_lineage`` is not an eligible column. It counts
+    residuals labelled ``source_relation_same_input_pending_lineage``
+    (interim t-1874). Those rows stay out of ``n_unknown``.
+    """
+
+    engine: str
+    n_independent: int
+    n_unknown: int
+    n_same_input_pending_lineage: int
+
+
+class SuspectedCalibrationOverlap(NamedTuple):
+    """One (reference source, engine) pair the diagnostic flagged."""
+
+    source_id: str
+    engine: str
+    n: int
+    median_abs_residual: Decimal
+    median_band_half_width: Decimal
+    fraction_inside_tight_band: Decimal
+
+
+def _decimal_median(values: Sequence[Decimal]) -> Decimal:
+    """Median of a nonempty decimal sequence.
+
+    Same odd/even rule as ``score._median``. This copy stays here because
+    ``score`` imports this module; importing ``score._median`` would cycle.
+    """
+
+    ordered = sorted(values)
+    count = len(ordered)
+    mid = count // 2
+    if count % 2:
+        return ordered[mid]
+    return (ordered[mid - 1] + ordered[mid]) / Decimal(2)
+
+
+def _source_relation_token(row: Mapping[str, object]) -> str:
+    relation = row.get("source_relation")
+    if isinstance(relation, SourceRelation):
+        return relation.value
+    if relation is None:
+        return ""
+    return str(relation)
+
+
+def _finite_decimal(raw: object) -> Decimal | None:
+    if isinstance(raw, bool) or raw is None:
+        return None
+    try:
+        value = Decimal(str(raw))
+    except (ArithmeticError, TypeError, ValueError):
+        return None
+    if not value.is_finite():
+        return None
+    return value
+
+
+def eligible_source_relation_breakdown(
+    rows: Iterable[Mapping[str, object]],
+    *,
+    engine_for_row: Callable[[Mapping[str, object]], str],
+    pending_exclusion: str,
+) -> tuple[EligibleSourceRelationCount, ...]:
+    """Count score_eligible rows by engine and source_relation.
+
+    Only ``independent`` and ``unknown`` are columns. A score_eligible
+    row with any other relation is omitted, not folded into either count.
+    ``pending_exclusion`` is the interim openimcc label owned by
+    ``score.py``. This module does not import the scorer. Does not
+    change eligibility.
+    """
+
+    independent: dict[str, int] = defaultdict(int)
+    unknown: dict[str, int] = defaultdict(int)
+    pending: dict[str, int] = defaultdict(int)
+    for row in rows:
+        engine = engine_for_row(row)
+        exclusions = row.get("exclusions") or ()
+        if (
+            isinstance(exclusions, str)
+            and exclusions == pending_exclusion
+        ) or (
+            not isinstance(exclusions, str)
+            and pending_exclusion in exclusions
+        ):
+            pending[engine] += 1
+        if row.get("score_eligible") is not True:
+            continue
+        token = _source_relation_token(row)
+        if token == SourceRelation.INDEPENDENT.value:
+            independent[engine] += 1
+        elif token == SourceRelation.UNKNOWN.value:
+            unknown[engine] += 1
+    engines = sorted(set(independent) | set(unknown) | set(pending))
+    return tuple(
+        EligibleSourceRelationCount(
+            engine,
+            independent[engine],
+            unknown[engine],
+            pending[engine],
+        )
+        for engine in engines
+    )
+
+
+def suspected_calibration_overlaps(
+    rows: Iterable[Mapping[str, object]],
+    observations: Mapping[str, Observation] | None,
+    *,
+    engine_for_row: Callable[[Mapping[str, object]], str],
+) -> tuple[SuspectedCalibrationOverlap, ...]:
+    """Flag implausibly tight eligible pairs. Diagnostic only.
+
+    A pair is one reference ``source_id`` and one engine with at least
+    ``SUSPECTED_CALIBRATION_OVERLAP.minimum_rows`` eligible numeric
+    residuals. It is flagged when the median absolute residual is below
+    the named fraction of the median decision-band half-width and at
+    least the named fraction of rows sit inside that fraction of their
+    own band. ``DecisionBand.value`` is the half-width. If any counted
+    row lacks a positive band, or the residual and band units disagree,
+    the pair is skipped. Does not write notices or change eligibility.
+    """
+
+    if observations is None:
+        return ()
+    from simulator.battery.compilation_tier import reference_observation
+
+    thresholds = SUSPECTED_CALIBRATION_OVERLAP
+    grouped: dict[tuple[str, str], list[tuple[Decimal, str, Decimal | None, str | None]]] = defaultdict(list)
+    for row in rows:
+        if row.get("score_eligible") is not True:
+            continue
+        numeric = row.get("numeric")
+        if not isinstance(numeric, Mapping):
+            continue
+        value = _finite_decimal(numeric.get("value"))
+        if value is None:
+            continue
+        observation = reference_observation(
+            observations, str(row.get("reference") or "")
+        )
+        source_id = "" if observation is None else str(observation.source_id or "")
+        if not source_id:
+            continue
+        unit = numeric.get("unit")
+        residual_unit = "" if unit is None else str(unit)
+        band = numeric.get("decision_band")
+        band_value: Decimal | None = None
+        band_unit: str | None = None
+        if isinstance(band, Mapping):
+            band_value = _finite_decimal(band.get("value"))
+            raw_band_unit = band.get("unit")
+            band_unit = None if raw_band_unit is None else str(raw_band_unit)
+        grouped[(source_id, engine_for_row(row))].append(
+            (value, residual_unit, band_value, band_unit)
+        )
+
+    flagged: list[SuspectedCalibrationOverlap] = []
+    for (source_id, engine), samples in grouped.items():
+        if len(samples) < thresholds.minimum_rows:
+            continue
+        residual_units = {sample[1] for sample in samples}
+        if len(residual_units) != 1:
+            continue
+        residual_unit = next(iter(residual_units))
+        usable = True
+        abs_values: list[Decimal] = []
+        band_values: list[Decimal] = []
+        for value, _unit, band_value, band_unit in samples:
+            if (
+                band_value is None
+                or band_value <= 0
+                or band_unit != residual_unit
+                or not residual_unit
+            ):
+                usable = False
+                break
+            abs_values.append(abs(value))
+            band_values.append(band_value)
+        if not usable:
+            continue
+        median_abs = _decimal_median(abs_values)
+        median_band = _decimal_median(band_values)
+        tight = thresholds.tight_band_fraction
+        inside = sum(
+            1
+            for abs_value, band_value in zip(abs_values, band_values)
+            if abs_value < tight * band_value
+        )
+        fraction = Decimal(inside) / Decimal(len(samples))
+        if (
+            median_abs
+            < thresholds.median_abs_residual_fraction_of_band * median_band
+            and fraction >= thresholds.rows_inside_tight_band_fraction
+        ):
+            flagged.append(
+                SuspectedCalibrationOverlap(
+                    source_id,
+                    engine,
+                    len(samples),
+                    median_abs,
+                    median_band,
+                    fraction,
+                )
+            )
+    return tuple(sorted(flagged, key=lambda row: (row.source_id, row.engine)))
