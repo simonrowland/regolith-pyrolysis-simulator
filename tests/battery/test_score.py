@@ -12782,6 +12782,80 @@ def test_registered_read_from_stays_out_of_the_lineage() -> None:
         check()
 
 
+def test_registered_asset_derived_from_stays_out_of_the_lineage() -> None:
+    """A registered non-table derived_from parent is not an observation edge.
+
+    Store validation accepts the asset. The scoring walk keeps the row
+    complete and out of the overlap set, so a coefficient work that owns
+    the row still intersects on the row id. An unregistered parent stays
+    unresolvable.
+    """
+
+    from simulator.battery.validate import (
+        AncestryFailure,
+        _asset_ids,
+        _observation_lineage,
+        _table_ids,
+    )
+
+    work = F.work("registered-derived-work")
+    experiment = F.tabulation_experiment(
+        experiment_id="registered-derived-exp", work_id=work.work_id
+    )
+    asset_edge = Derivation(
+        relation="read from the source pdf",
+        inputs=("pdf-1",),
+        parameters=(),
+        output_unit="dimensionless",
+    )
+    row = F.observation(
+        "registered-derived-row",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id=work.work_id,
+        derived_from=("pdf-1",),
+        derivation=asset_edge,
+    )
+    observations = {row.observation_id: row}
+    experiments = {experiment.experiment_id: experiment}
+    works = {work.work_id: work}
+    table_ids = _table_ids(works)
+    corpus = _asset_ids(works)
+    direct = _observation_lineage(
+        row.observation_id, observations, table_ids, asset_ids=corpus
+    )
+    assert direct.complete and direct.ids == frozenset({row.observation_id})
+    assert "pdf-1" not in direct.ids
+    assert (
+        resolve_source_relation(
+            row,
+            (work.work_id,),
+            True,
+            works=works,
+            observations=observations,
+            experiments=experiments,
+        )
+        is SourceRelation.SAME_INPUT
+    )
+    missing = replace(
+        row,
+        observation_id="unregistered-derived-row",
+        derived_from=("pdf:not-a-work-asset",),
+        derivation=replace(asset_edge, inputs=("pdf:not-a-work-asset",)),
+    )
+    assert (
+        _observation_lineage(
+            missing.observation_id,
+            {missing.observation_id: missing},
+            table_ids,
+            asset_ids=corpus,
+        ).failure
+        is AncestryFailure.UNRESOLVABLE_INPUT
+    )
+
+
 def test_cross_work_registered_asset_resolves_on_both_paths() -> None:
     """b-979: direct resolution and alias expansion accept the same cross-work asset."""
 

@@ -2285,9 +2285,11 @@ def _observation_lineage(
     active stack is a cycle. A derivation input that is neither an
     observation, a table, nor a registered source asset is unresolvable
     and is not dropped. Citation links are traversed as scoring ancestry
-    without changing ``derived_from``. read_from is a work asset, not an
-    observation edge: a table is an ancestor, a registered non-table asset
-    stays out of the id set, and any other nonempty value is unresolvable.
+    without changing ``derived_from``. read_from and a ``derived_from``
+    parent that is a registered source asset are work assets, not
+    observation edges: a table is an ancestor, a registered non-table
+    asset stays out of the id set, and any other nonempty value is
+    unresolvable.
     """
 
     if _cache is None:
@@ -2327,6 +2329,15 @@ def _observation_lineage(
         else:
             result = Ancestry.of(ids)
             for parent in obs.derived_from or ():
+                # Validation accepts a registered asset as derived_from.
+                # A table is an ancestor id. A non-table asset is the same
+                # non-edge as read_from: it must not blank the row's lineage.
+                if (
+                    parent not in observations
+                    and parent not in table_ids
+                    and _is_registered_non_table(parent, table_ids, asset_ids)
+                ):
+                    continue
                 nested = _observation_lineage(
                     parent,
                     observations,

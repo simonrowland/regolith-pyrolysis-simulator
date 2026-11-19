@@ -620,10 +620,14 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
     # primary 1-sigma verdicts without the assumption/alternative notices.
     # t-1646 round 5 refuses the Sossi (11)/(12) two-sigma spans that cross
     # r=0; the remaining source widths use the transformed log-ratio metric.
+    # d-445: unknown source relation no longer excludes internal-analytical,
+    # so score_eligible and exclusions moved. This context has no Kress
+    # works, so the relation itself stays unknown. Recounted on
+    # 248b4e324e95964fcea2a1de49375ea053bcb271.
     # The payload now hashes to
-    # 6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862.
+    # b875816627fc72c7cc10798f200dbcfc1086bb8b1709cf203661c93bfd337acc.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862"
+        "b875816627fc72c7cc10798f200dbcfc1086bb8b1709cf203661c93bfd337acc"
     )
 
 
@@ -1724,6 +1728,10 @@ def test_kress91_equation7_lineage_blocks_insample_1988_rows():
 
     calibrated = by_source["kress-carmichael-1988-iron-oxidation-stoichiometry"]
     assert calibrated
+    relations = sorted(
+        {residual.source_relation.value for residual in calibrated}
+    )
+    assert relations == [score_module.SourceRelation.SAME_INPUT.value], relations
     assert all(
         residual.source_relation is score_module.SourceRelation.SAME_INPUT
         for residual in calibrated
