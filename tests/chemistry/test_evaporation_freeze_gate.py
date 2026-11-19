@@ -1749,6 +1749,88 @@ def test_magemin_ferric_fold_flags_the_evaluated_freeze_gate_bulk(
     )
 
 
+def test_same_hour_magemin_pin_redispatches_after_char_crosses_silica_band(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.account_ids import SOLID_CHAR_CARBON_ACCOUNT
+    from simulator.core import CHAR_SPECIES, FEO_CHAR_REDUCTION_MIN_T_C
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    ledger.load_external(
+        _CLEANED_MELT_ACCOUNT,
+        {'SiO2': 79.9, 'FeO': 20.1},
+        source='d-447 current-hour pin regression melt',
+        material_origin='feedstock',
+    )
+    # From a 100 kg melt, removing >0.125 kg FeO crosses 80 wt% SiO2.
+    # 0.10 kg C can reduce 0.10*(71.844/12.011)=0.598 kg FeO by
+    # FeO + C -> Fe + CO, so the committed char covers that crossing.
+    ledger.load_external(
+        SOLID_CHAR_CARBON_ACCOUNT,
+        {CHAR_SPECIES: 0.10},
+        source='d-447 current-hour pin regression char',
+        material_origin='reagent',
+    )
+    sim.atom_ledger = ledger
+    sim._project_cleaned_melt_from_atom_ledger()
+    sim.melt.temperature_C = FEO_CHAR_REDUCTION_MIN_T_C + 100.0
+
+    pinned_curve = {
+        'source': 'gate_liquid_fraction:test-pin',
+        'solidus_T_C': 800.0,
+        'liquidus_T_C': 1200.0,
+        'path': ((800.0, 0.0), (1200.0, 1.0)),
+    }
+    pinned_record = gate_curve_memo_record(
+        pinned_curve,
+        None,
+        (),
+        'live',
+    )
+    monkeypatch.setattr(
+        sim,
+        '_melt_redox_liquidus_gate_record',
+        lambda **_kwargs: pinned_record,
+    )
+    monkeypatch.setattr(
+        sim,
+        '_melt_redox_gate_record_is_admitted',
+        lambda *_args, **_kwargs: True,
+    )
+    sim._establish_melt_redox_gate_authority_for_current_hour()
+
+    reduction = sim._apply_char_feo_reduction()
+    assert reduction['extent_mol'] > 0.0
+    assert sim.melt.composition_wt_pct()['SiO2'] > 80.0
+
+    dispatched_curve = {
+        **pinned_curve,
+        'authority': 'extrapolated',
+        'certified_band': {'sio2_wt_pct': [30.0, 80.0]},
+    }
+    dispatches = []
+
+    def redispatch(**_kwargs):
+        dispatches.append(True)
+        return dispatched_curve
+
+    monkeypatch.setattr(sim, '_melt_redox_liquidus_gate_curve', redispatch)
+    sim.melt.temperature_C = 1400.0
+
+    assert sim._freeze_gate_liquid_fraction_factor() == pytest.approx(1.0)
+    assert dispatches == [True]
+
+
 def test_freeze_gate_enabled_refuses_instead_of_using_backend_liquidus(
     monkeypatch,
     vapor_pressure_data,

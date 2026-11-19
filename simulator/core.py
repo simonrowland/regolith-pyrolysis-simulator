@@ -5194,6 +5194,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if self._melt_redox_gate_record_is_admitted(
                     pinned_authority,
                     **redox_state_kwargs,
+                ) and self._melt_redox_gate_record_silica_verdict_matches_current(
+                    pinned_authority
                 ):
                     return pinned_authority['curve']
                 if not isinstance(pinned_authority, Mapping):
@@ -5216,6 +5218,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     gate_authority,
                     **redox_state_kwargs,
                 ):
+                    if (
+                        gate_authority is getattr(
+                            self,
+                            '_melt_redox_gate_authority_this_tick',
+                            None,
+                        )
+                        and not self._melt_redox_gate_record_silica_verdict_matches_current(
+                            gate_authority
+                        )
+                    ):
+                        self._melt_redox_gate_authority_this_tick = (
+                            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+                        )
+                        self._melt_redox_gate_authority_tick_hour = None
+                        return self._melt_redox_liquidus_gate_curve(
+                            **redox_state_kwargs,
+                        )
                     return gate_authority['curve']
                 return None
             return gate_authority
@@ -5245,6 +5264,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             redox_state=redox_state,
         )
 
+    def _melt_redox_gate_record_silica_verdict_matches_current(
+        self,
+        value: Any,
+    ) -> bool:
+        if getattr(self, '_liquid_fraction_provider', None) != 'magemin':
+            return True
+        curve = value.get('curve') if isinstance(value, Mapping) else value
+        if not isinstance(curve, Mapping):
+            return True
+        certified_band = curve.get('certified_band')
+        pinned_out_of_band = (
+            curve.get('authority') == 'extrapolated'
+            and isinstance(certified_band, Mapping)
+            and 'sio2_wt_pct' in certified_band
+        )
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+        from simulator.melt_backend.magemin import (
+            _liquidus_evaluated_bulk_silica_diagnostic,
+        )
+
+        provider_inputs = self._silicate_provider_melt_inputs(
+            ChemistryIntent.GATE_LIQUID_FRACTION
+        )
+        if provider_inputs is None:
+            return False
+        evaluated_diagnostic = _liquidus_evaluated_bulk_silica_diagnostic(
+            {'process.cleaned_melt': provider_inputs.composition_mol},
+            species_formula_registry=self.species_formula_registry,
+        )
+        return bool(evaluated_diagnostic) == pinned_out_of_band
+
     def _establish_melt_redox_gate_authority_for_current_hour(
         self,
     ) -> _MeltRedoxGateAuthority:
@@ -5263,7 +5313,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             pinned_hour == current_hour
             and pinned_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         ):
-            if self._melt_redox_gate_record_is_admitted(pinned_authority):
+            if (
+                self._melt_redox_gate_record_is_admitted(pinned_authority)
+                and self._melt_redox_gate_record_silica_verdict_matches_current(
+                    pinned_authority
+                )
+            ):
                 return pinned_authority['curve']
             if not isinstance(pinned_authority, Mapping):
                 return pinned_authority
@@ -14763,6 +14818,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 and gate_authority_hour == current_hour
                 and isinstance(gate_authority, Mapping)
                 and self._melt_redox_gate_record_is_admitted(gate_authority)
+                and self._melt_redox_gate_record_silica_verdict_matches_current(
+                    gate_authority
+                )
             )
             if not reuse_gate_authority:
                 gate_authority = _RESOLVE_MELT_REDOX_GATE_AUTHORITY
