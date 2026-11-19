@@ -630,19 +630,19 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
             "AlphaMELTS default",
             "alphamelts",
             None,
-            "050005ff7708a47acb6e5ca7dafe87caabd285f5",
+            "050002ff7708a47acb6e5ca7dafe87caabd285f5",
         ),
         (
             "AlphaMELTS Python API default model",
             "alphamelts",
             {"transport": "python_api"},
-            "050005ff7708a47acb6e5ca7dafe87caabd285f5",
+            "050002ff7708a47acb6e5ca7dafe87caabd285f5",
         ),
         (
             "ThermoEngine default",
             "thermoengine",
             None,
-            "060005ff2330afdabce1130820fde70d072941aa",
+            "060002ff2330afdabce1130820fde70d072941aa",
         ),
         (
             "ThermoEngine explicit None defaults",
@@ -652,7 +652,7 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
                 "configured_vapor_transport_pO2_bar": None,
                 "configured_vapor_transport_floor_bar": None,
             },
-            "060005ff2330afdabce1130820fde70d072941aa",
+            "060002ff2330afdabce1130820fde70d072941aa",
         ),
         (
             "VapoRock default",
@@ -674,7 +674,7 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
             "MAGEMin default",
             "magemin",
             None,
-            "0400050008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d",
+            "0400020008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d",
         ),
         (
             "MAGEMin explicit None defaults",
@@ -685,7 +685,7 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
                 "python_bridge": None,
                 "fO2_buffer": None,
             },
-            "0400050008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d",
+            "0400020008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d",
         ),
     )
     mismatches = {}
@@ -701,46 +701,46 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
 
     case_key_hex = {
         "AlphaMELTS transport mode": (
-            "050005ff08aef82d27a383e073ad83ef3a95a1f5"
+            "050002ff08aef82d27a383e073ad83ef3a95a1f5"
         ),
         "AlphaMELTS model": (
-            "050005ff08aef82d27a383e073ad83ef3a95a1f5"
+            "050002ff08aef82d27a383e073ad83ef3a95a1f5"
         ),
         "AlphaMELTS Python API model": (
-            "050005ff7708a47acb6e5ca7dafe87caabd285f5"
+            "050002ff7708a47acb6e5ca7dafe87caabd285f5"
         ),
         "AlphaMELTS redox buffer": (
-            "050005ff84021d1fcf18c54719c9792ae3309859"
+            "050002ff84021d1fcf18c54719c9792ae3309859"
         ),
         "AlphaMELTS fO2 offset": (
-            "050005ff8b7a9acff52ddfac563117c0e162ab62"
+            "050002ff8b7a9acff52ddfac563117c0e162ab62"
         ),
         "AlphaMELTS Fe3+/Fet ratio": (
-            "050005ff08aef82d27a383e073ad83ef3a95a1f5"
+            "050002ff08aef82d27a383e073ad83ef3a95a1f5"
         ),
         "AlphaMELTS configured vapor pO2": (
-            "050005ffed5e2dd0542d245c6de74c7e5b9191bb"
+            "050002ffed5e2dd0542d245c6de74c7e5b9191bb"
         ),
         "AlphaMELTS configured vapor floor": (
-            "050005ff08aef82d27a383e073ad83ef3a95a1f5"
+            "050002ff08aef82d27a383e073ad83ef3a95a1f5"
         ),
         "MAGEMin database": (
-            "0400050008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d"
+            "0400020008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d"
         ),
         "MAGEMin worker fO2 buffer": (
-            "0400050008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d"
+            "0400020008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d"
         ),
         "MAGEMin bridge selection": (
-            "0400050008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d"
+            "0400020008018b08030506627269646765050a73756270726f636573730508646174616261736505026967050a664f325f627566666572050371666d"
         ),
         "ThermoEngine transport model": (
-            "060005ff2330afdabce1130820fde70d072941aa"
+            "060002ff2330afdabce1130820fde70d072941aa"
         ),
         "ThermoEngine vapor transport pO2": (
-            "060005ff2330afdabce1130820fde70d072941aa"
+            "060002ff2330afdabce1130820fde70d072941aa"
         ),
         "ThermoEngine vapor transport floor": (
-            "060005ff2330afdabce1130820fde70d072941aa"
+            "060002ff2330afdabce1130820fde70d072941aa"
         ),
         "OpenIMCC loaded cell pack": (
             "0100010008018b080205086761735f7061636b050764656661756c7405096d656c745f7061636b050f6f70656e696d63632d76312e302e32"
@@ -769,6 +769,104 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
         if key.hex() != case_key_hex[case.label]:
             mismatches[case.label] = key.hex()
     assert not mismatches, repr(mismatches)
+
+
+def test_liquidus_finder_does_not_use_the_equilibrium_chemistry_version(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The finder is uncached, so a chemistry-version bump only moves other keys."""
+
+    from simulator.engine_cache import ENGINE_CHEMISTRY_VERSION, engine_cache_key
+    from simulator.melt_backend.alphamelts import (
+        AlphaMELTSBackend,
+        AlphaMELTSSubprocessRunMode,
+    )
+    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.melt_backend.magemin import MAGEMinBackend
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    engines = ("magemin", "alphamelts", "thermoengine")
+    assert [ENGINE_CHEMISTRY_VERSION[engine] for engine in engines] == [2, 2, 2]
+    request = {"seam": "equilibrium-cell"}
+    pinned = {
+        engine: engine_cache_key(engine, 2, request)
+        for engine in engines
+    }
+    for engine, key in pinned.items():
+        assert engine_cache_key(
+            engine,
+            ENGINE_CHEMISTRY_VERSION[engine],
+            request,
+        ) == key
+
+    def forbid_equilibrium_key(*_args, **_kwargs):
+        raise AssertionError(
+            "liquidus finder must not build an equilibrium cache key"
+        )
+
+    monkeypatch.setattr(
+        "simulator.engine_cache.engine_cache_key",
+        forbid_equilibrium_key,
+    )
+
+    class _NativeLiquidus(AlphaMELTSBackend):
+        def __init__(self):
+            super().__init__()
+            self._mode = "subprocess"
+
+        def equilibrate(self, temperature_C, **kwargs):
+            assert kwargs["subprocess_run_mode"] is (
+                AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER
+            )
+            return EquilibriumResult(
+                temperature_C=1300.0,
+                pressure_bar=1.0,
+                liquid_fraction=1.0,
+                phases_present=["liq"],
+                phase_masses_kg={"liq": 1.0},
+                liquidus_T_C=1300.0,
+                status="ok",
+            )
+
+    composition = {"SiO2": 50.0, "Al2O3": 15.0, "MgO": 15.0, "CaO": 20.0}
+    native = _NativeLiquidus().find_liquidus_solidus(
+        composition_kg=composition,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+    assert native.status == "ok"
+    assert native.liquidus_T_C == pytest.approx(1300.0)
+    assert MAGEMinBackend().find_liquidus_solidus(
+        composition_kg=composition,
+    ).status == "unavailable"
+    assert ThermoEngineBackend().find_liquidus_solidus(
+        composition_kg=composition,
+    ).status == "unavailable"
+
+    def version_five(engine, _version, payload):
+        return engine_cache_key(engine, 5, payload)
+
+    monkeypatch.setattr(
+        "simulator.engine_cache.engine_cache_key",
+        version_five,
+    )
+
+    def pinned_key_matches(engine: str) -> None:
+        from simulator import engine_cache as engine_cache_module
+
+        assert engine_cache_module.engine_cache_key(
+            engine,
+            engine_cache_module.ENGINE_CHEMISTRY_VERSION[engine],
+            request,
+        ) == pinned[engine]
+
+    for engine in engines:
+        with pytest.raises(AssertionError):
+            pinned_key_matches(engine)
 
 
 def test_default_alphamelts_projection_matches_resolved_opener_settings(
