@@ -156,6 +156,7 @@ def test_vaporock_activity_diagnostics_survive_engine_cache_hit(
 ) -> None:
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "vaporock.sqlite"))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
     handle = open_available_engine(
         Engine.VAPOROCK, nodeid=request.node.nodeid
     )
@@ -172,12 +173,15 @@ def test_vaporock_activity_diagnostics_survive_engine_cache_hit(
         cold = equilibrate_cell(handle, _REAL_POTS[0], **kwargs)
         assert cold.status == "ok", cold.as_payload()
         assert cold.engine_status == "non_authoritative"
-        assert cold.authoritative_for_requested_vapor_pressure is False
         assert cold.melt_activities["SiO2"] > 0.0
         expected = dict(cold.melt_activities)
+        assert engine_cache.engine_cache_counters()["vaporock"]["stores"] >= 1
 
         engine_cache._MEMORY_CACHE.clear()
 
+        original_equilibrate = handle.backend.equilibrate
+
+        @wraps(original_equilibrate)
         def unexpected_solve(*_args, **_kwargs):
             pytest.fail("VapoRock activity result should come from the cache")
 

@@ -345,15 +345,16 @@ def test_installed_vaporock_oxide_activity_matches_native_lna_and_pure_limit():
     )
     columns = list(system.vapor.rxn_coefs.columns)
     assert columns[0] == "O2"
+    assert "Fe2O3" not in columns
+    assert "Fe2O3" not in activities
     for oxide, activity in activities.items():
         # The library reports ln(a); exponentiation gives its dimensionless a.
         expected = math.exp(float(ln_activity[columns.index(oxide)][0]))
         assert activity == pytest.approx(expected, rel=1e-12), oxide
 
-    # These are precisely the parent oxides that the existing MELTS domain
-    # owner admits as liquid oxide endmembers (H2O is outside VapoRock's
-    # battery input basis). Their own Raoultian pure limits must be unity.
-    for oxide in ("SiO2", "TiO2", "Al2O3", "Fe2O3"):
+    # These shared MELTS and VapoRock endmembers have Raoultian pure limits.
+    # Fe2O3 is excluded because it has no native VapoRock activity-axis column.
+    for oxide in ("SiO2", "TiO2", "Al2O3"):
         pure = native.System()
         pure.set_melt_comp({oxide: 100.0})
         _log_pressure, _ln_k, pure_ln_activity = pure.eval_gas_abundances(

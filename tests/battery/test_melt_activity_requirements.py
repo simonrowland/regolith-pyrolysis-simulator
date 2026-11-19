@@ -447,6 +447,7 @@ def test_iron_without_oxygen_is_a_typed_refusal():
     ]
     assert {item.readiness.engine for item in comparable} == {
         "alphamelts", "thermoengine", "openimcc", "internal-analytical",
+        "vaporock",
     }
     assert all(item.readiness.status is ReadinessStatus.READY for item in comparable)
     assert all(item.payload is not None for item in comparable)
@@ -576,6 +577,18 @@ def test_activity_coefficient_uses_the_same_contract():
     assert activity[0].payload["quantity"] == "activity"
     assert activity[0].payload["quantity"] != results[0].payload["quantity"]
     assert activity[0].payload["reference_state"] == results[0].payload["reference_state"]
+    fe2o3 = _melt(*_case(
+        composition=_composition(("SiO2", "0.8"), ("Fe2O3", "0.2")),
+        formula="Fe2O3",
+    ))
+    vaporock_fe2o3 = next(
+        item for item in fe2o3 if item.readiness.engine == "vaporock"
+    )
+    assert vaporock_fe2o3.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert vaporock_fe2o3.payload is None
+    assert "vaporock_activity_axis_omits:Fe2O3" in str(
+        vaporock_fe2o3.readiness.gaps
+    )
     imcc = next(item for item in results if item.readiness.engine == "openimcc")
     assert imcc.payload["reference_state"] == "raoultian_pure_liquid_oxide_parent"
     assert imcc.payload["quantity"] == "activity_coefficient"

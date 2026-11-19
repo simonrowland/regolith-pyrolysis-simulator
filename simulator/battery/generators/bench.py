@@ -248,7 +248,17 @@ def _engine_reports_formula(engine: str, formula: str) -> tuple[bool, str]:
         if formula in MAGEMIN_NATIVE_MELT_ACTIVITIES:
             return True, "raoultian_native_crystal_activity"
         return False, f"typed-refusal:magemin_no_native_activity:{formula}"
-    if engine in ("alphamelts", "thermoengine", "vaporock"):
+    if engine == "vaporock":
+        matches, reason = _melts_reports_oxide_endmember(formula)
+        if not matches:
+            return matches, reason
+        # VapoRock's native Vapor.melt_comps basis omits Fe2O3 even though
+        # LiquidMelts can transform it. Its full-output activity axis cannot
+        # report that oxide, so only advertise the verified shared endmembers.
+        if formula == "Fe2O3":
+            return False, "typed-refusal:vaporock_activity_axis_omits:Fe2O3"
+        return True, reason
+    if engine in ("alphamelts", "thermoengine"):
         return _melts_reports_oxide_endmember(formula)
     if engine == "openimcc":
         return _imcc_reports_parent_oxide(formula)

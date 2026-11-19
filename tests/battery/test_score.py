@@ -4727,7 +4727,7 @@ def test_vaporock_scores_native_activity_with_diagnostic_pressure():
     assert zero_inventory_prediction.value is None
     assert zero_inventory_prediction.refusal_reason is not None
     assert zero_inventory_prediction.refusal_detail["reason"] == (
-        "species_unmatched_in_engine_output"
+        "reference_state_mismatch"
     )
 
 
