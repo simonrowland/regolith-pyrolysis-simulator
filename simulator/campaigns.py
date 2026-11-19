@@ -141,11 +141,10 @@ class C0RemainingBudgetExit(TypedDict):
 class CampaignPressureSetpointRefusal(ValueError):
     """Typed refusal for a campaign pressure request with an EMPTY feasible set.
 
-    SC-67 boundary: when the operating band is computable and non-empty, an
-    out-of-band request is adjusted to the band edge with loud provenance
-    (pn2_band_action) instead of raising. This refusal fires only when there
-    is nothing to recompute toward (empty/invalid band); run_executor maps it
-    into the structured failure envelope.
+    When the engineering band is computable and non-empty, an out-of-band
+    request is honored with a notice. This refusal fires only when the band is
+    empty or invalid; run_executor maps it into the structured failure
+    envelope.
     """
 
     reason = C2A_STAGED_PN2_BAND_REFUSAL_REASON
@@ -1748,7 +1747,10 @@ class CampaignManager:
 
     def _c2a_staged_stage_gas_control(
             self,
-            stage: Mapping) -> tuple[Atmosphere, dict[str, object]]:
+            stage: Mapping,
+            *,
+            current_total_mbar: float | None = None,
+    ) -> tuple[Atmosphere, dict[str, object]]:
         cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
         stage_name = self._c2a_staged_stage_label(stage)
         raw_mode = stage.get('gas_cover_mode', cfg.get(
@@ -1764,8 +1766,15 @@ class CampaignManager:
 
         default_pO2 = self._pressure_config_float(
             CampaignPhase.C2A_STAGED, 'pO2_mbar', 'pO2_mbar_default')
-        default_total = self._pressure_config_float(
-            CampaignPhase.C2A_STAGED, 'p_total_mbar', 'p_total_mbar_default')
+        default_total = (
+            float(current_total_mbar)
+            if current_total_mbar is not None
+            else self._pressure_config_float(
+                CampaignPhase.C2A_STAGED,
+                'p_total_mbar',
+                'p_total_mbar_default',
+            )
+        )
         pO2_mbar, pO2_present = self._c2a_staged_stage_float(
             stage, 'pO2_mbar', default_pO2)
         p_total_mbar, p_total_present = self._c2a_staged_stage_float(
@@ -1781,6 +1790,7 @@ class CampaignManager:
                 'must be finite and non-negative'
             )
         band_action = ''
+        band_notice: dict[str, object] | None = None
         requested_p_total_mbar = p_total_mbar
         if mode == C2A_STAGED_GAS_COVER_PO2_HOLD:
             if (not pO2_present) or pO2_mbar <= 0.0:
@@ -1821,26 +1831,25 @@ class CampaignManager:
                         C2A_STAGED_PN2_SWEEP_MAX_MBAR,
                     ],
                 })
-            # SC-67 recompute-and-adjust (t-185): the viscous-flow band is a
-            # computable, non-empty feasible set, so an out-of-band configured
-            # p_total adjusts to the nearest band edge like a physical
-            # regulator hitting its limit stop — LOUDLY: requested vs applied
-            # and the band action are recorded in the diagnostic
-            # (pn2_band_action / requested_p_total_mbar). The fail-loud
-            # doctrine targets SILENT coercion; this substitution is visible.
-            # Refusal is reserved for the empty-band case above.
-            clamped_pN2 = min(
-                C2A_STAGED_PN2_SWEEP_MAX_MBAR,
-                max(C2A_STAGED_PN2_SWEEP_MIN_MBAR, pN2_mbar),
-            )
-            if clamped_pN2 != pN2_mbar:
-                band_action = (
-                    'clamped_low'
-                    if pN2_mbar < C2A_STAGED_PN2_SWEEP_MIN_MBAR
-                    else 'clamped_high'
-                )
-                pN2_mbar = clamped_pN2
-                p_total_mbar = pO2_mbar + pN2_mbar
+            if (
+                pN2_mbar < C2A_STAGED_PN2_SWEEP_MIN_MBAR
+                or pN2_mbar > C2A_STAGED_PN2_SWEEP_MAX_MBAR
+            ):
+                band_action = 'honored_outside_band'
+                band_notice = {
+                    'type': 'c2a_staged_pn2_outside_engineering_band',
+                    'reason': 'requested_pN2_outside_engineering_band',
+                    'authority_level': 'extrapolated',
+                    'requested_p_total_mbar': float(
+                        requested_p_total_mbar),
+                    'requested_pN2_mbar': float(pN2_mbar),
+                    'certified_band': {
+                        'pN2_mbar': [
+                            float(C2A_STAGED_PN2_SWEEP_MIN_MBAR),
+                            float(C2A_STAGED_PN2_SWEEP_MAX_MBAR),
+                        ],
+                    },
+                }
             atmosphere = Atmosphere.PN2_SWEEP
 
         diagnostic = {
@@ -1853,6 +1862,8 @@ class CampaignManager:
             'requested_p_total_mbar': float(requested_p_total_mbar),
             'pn2_band_action': band_action,
         }
+        if band_notice is not None:
+            diagnostic['pn2_band_notice'] = band_notice
         adjustment = self.last_c2a_staged_max_hold_adjustment
         if isinstance(adjustment, Mapping):
             diagnostic['max_hold_adjustment'] = dict(adjustment)
@@ -1878,7 +1889,16 @@ class CampaignManager:
         stage = self._c2a_staged_active_stage(melt.campaign_hour)
         if not isinstance(stage, Mapping):
             raise ValueError('C2A_staged.stages did not select a stage')
-        atmosphere, diagnostic = self._c2a_staged_stage_gas_control(stage)
+        has_requested_total = (
+            'p_total_mbar' in self._campaign_overrides(active_campaign)
+            or self._lab_schedule(active_campaign) is not None
+        )
+        atmosphere, diagnostic = self._c2a_staged_stage_gas_control(
+            stage,
+            current_total_mbar=(
+                float(melt.p_total_mbar) if has_requested_total else None
+            ),
+        )
         melt.atmosphere = atmosphere
         melt.pO2_mbar = float(diagnostic['pO2_mbar'])
         melt.p_total_mbar = float(diagnostic['p_total_mbar'])

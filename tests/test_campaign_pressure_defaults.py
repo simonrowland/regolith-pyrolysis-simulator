@@ -725,19 +725,15 @@ def test_c2a_staged_pn2_sweep_trace_po2_is_not_silent_or_phantom_o2():
     assert gas["pn2_band_action"] == ""
 
 
-# SC-67 adjudication (t-185 x wave-06-pressure fold): an out-of-band configured
-# p_total is a strandable operating point with a COMPUTABLE non-empty feasible
-# band, so it adjusts to the nearest band edge with loud provenance
-# (pn2_band_action + requested_p_total_mbar) instead of refusing; the typed
-# refusal is reserved for the genuinely empty/invalid band (test below).
+# An out-of-band requested p_total remains the operating point. The engineering
+# band is reported as a notice, and only an empty/invalid band refuses (below).
 @pytest.mark.parametrize(
-    ("p_total_mbar", "expected_pN2", "expected_action"),
-    [(1.25, 5.0, "clamped_low"), (20.25, 15.0, "clamped_high")],
+    ("p_total_mbar", "expected_pN2"),
+    [(1.25, 1.0), (20.25, 20.0)],
 )
-def test_c2a_staged_pn2_sweep_outside_operating_band_adjusts_with_provenance(
+def test_c2a_staged_pn2_sweep_honors_outside_operating_band_with_notice(
     p_total_mbar,
     expected_pN2,
-    expected_action,
 ):
     setpoints = deepcopy(_setpoints())
     _stage(setpoints, "alkali_early_fe").update({
@@ -753,12 +749,50 @@ def test_c2a_staged_pn2_sweep_outside_operating_band_adjusts_with_provenance(
 
     assert melt.atmosphere is Atmosphere.PN2_SWEEP
     assert gas["pN2_mbar"] == pytest.approx(expected_pN2)
-    assert gas["p_total_mbar"] == pytest.approx(0.25 + expected_pN2)
+    assert gas["p_total_mbar"] == pytest.approx(p_total_mbar)
     assert gas["requested_p_total_mbar"] == pytest.approx(p_total_mbar)
-    assert gas["pn2_band_action"] == expected_action
+    assert gas["pn2_band_action"] == "honored_outside_band"
+    notice = gas["pn2_band_notice"]
+    assert notice["reason"] == "requested_pN2_outside_engineering_band"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["requested_p_total_mbar"] == pytest.approx(p_total_mbar)
+    assert notice["requested_pN2_mbar"] == pytest.approx(expected_pN2)
+    assert notice["certified_band"] == {"pN2_mbar": [5.0, 15.0]}
 
 
-def test_c2a_staged_pn2_sweep_recovers_when_total_does_not_exceed_po2():
+def test_c2a_staged_one_atm_override_and_lab_schedule_keep_total_and_notice():
+    setpoints = _setpoints()
+    manager = CampaignManager(setpoints)
+    lab_schedule = _n2_lab_schedule()
+    for point in lab_schedule["chamber_pressure_mbar"]:
+        point["value"] = 1013.25
+    manager.overrides["C2A_staged"] = {
+        "p_total_mbar": 1013.25,
+        "lab_schedule": lab_schedule,
+    }
+    melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
+
+    manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
+    gas = dict(manager.last_c2a_staged_gas_control or {})
+
+    assert melt.p_total_mbar == pytest.approx(1013.25)
+    assert gas["p_total_mbar"] == pytest.approx(1013.25)
+    assert gas["requested_p_total_mbar"] == pytest.approx(1013.25)
+    assert gas["pn2_band_action"] == "honored_outside_band"
+    notice = gas["pn2_band_notice"]
+    assert notice["requested_p_total_mbar"] == pytest.approx(1013.25)
+    assert notice["reason"] == "requested_pN2_outside_engineering_band"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["certified_band"] == {"pN2_mbar": [5.0, 15.0]}
+
+    from simulator.optimize.sso2_evidence import _stage_gas_payload_from_raw
+
+    evidence_gas = _stage_gas_payload_from_raw(gas, snapshot=object())
+    assert evidence_gas["pn2_band_action"] == "honored_outside_band"
+    assert evidence_gas["pn2_band_notice"] == notice
+
+
+def test_c2a_staged_pn2_sweep_refuses_total_below_oxygen_partial():
     setpoints = deepcopy(_setpoints())
     _stage(setpoints, "alkali_early_fe").update({
         "gas_cover_mode": "pn2_sweep",
@@ -768,17 +802,11 @@ def test_c2a_staged_pn2_sweep_recovers_when_total_does_not_exceed_po2():
 
     manager = CampaignManager(setpoints)
     melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
-    manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
-    gas = dict(manager.last_c2a_staged_gas_control or {})
-
-    assert gas["requested_p_total_mbar"] == pytest.approx(1.0)
-    assert gas["pN2_mbar"] == pytest.approx(5.0)
-    assert gas["p_total_mbar"] == pytest.approx(7.0)
-    assert gas["pn2_band_action"] == "clamped_low"
-    assert melt.p_total_mbar == pytest.approx(7.0)
+    with pytest.raises(ValueError, match="melt_pressure_partial_exceeds_total"):
+        manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
 
 
-def test_c2a_staged_pn2_sweep_refuses_invalid_empty_clamp_band(monkeypatch):
+def test_c2a_staged_pn2_sweep_refuses_invalid_empty_band(monkeypatch):
     setpoints = deepcopy(_setpoints())
     _stage(setpoints, "alkali_early_fe").update({
         "gas_cover_mode": "pn2_sweep",
@@ -788,8 +816,8 @@ def test_c2a_staged_pn2_sweep_refuses_invalid_empty_clamp_band(monkeypatch):
     monkeypatch.setattr(campaigns_module, "C2A_STAGED_PN2_SWEEP_MIN_MBAR", 15.0)
     monkeypatch.setattr(campaigns_module, "C2A_STAGED_PN2_SWEEP_MAX_MBAR", 5.0)
 
-    # Empty feasible band = the SC-67 boundary case: typed refusal (feeds the
-    # runner failure envelope), not adjustment.
+    # Empty feasible band remains a typed refusal (feeds the runner failure
+    # envelope); only out-of-band requests in a non-empty band are honored.
     with pytest.raises(
         CampaignPressureSetpointRefusal,
         match="operating band is empty or invalid",
