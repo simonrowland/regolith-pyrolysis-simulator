@@ -2464,18 +2464,20 @@ def test_live_zero_activity_melt_species_match_the_evidence_invariant() -> None:
             )
             # Independent absolute pin: at 1800 K the pure-Fe Antoine
             # sidecar gives p_Fe = 10**(10.670336 - 17759.430841/1800)
-            # = 6.367743083223312 Pa. NASA CEA Fe(g) + 0.5 O2(g) -> FeO(g)
-            # gives ΔG° = -80537.386803 J/mol, so with
-            # GAS_CONSTANT=8.31446261815324 J/(mol K),
-            # Kp = exp(-ΔG°/(R*T)) = 217.31438847812507. Therefore
-            # p_FeO = p_Fe*Kp*sqrt(pO2/1 bar) = 1383.8021941164845 Pa
-            # at pO2=1 bar. Sanity: the ratio drops tenfold when pO2 drops
-            # 100-fold.
+            # = 6.367743083223312 Pa. The landed NASA CEA Fe, FeO, and O2
+            # polynomial rows give ΔG°/(R*T) = -5.381345099908113 for
+            # Fe(g) + 0.5 O2(g) -> FeO(g), so Kp = exp(5.381345099908113)
+            # = 217.31438848426154. With exact
+            # GAS_CONSTANT=8.31446261815324 J/(mol K), this ratio corresponds
+            # to ΔG°=-80537.38680342262 J/mol; rounding ΔG° to six decimals
+            # before exponentiation caused the prior discrepancy. Thus
+            # p_FeO=p_Fe*Kp*sqrt(pO2/1 bar)=1383.80219415556 Pa at pO2=1 bar.
+            # Sanity: the ratio drops tenfold when pO2 drops 100-fold.
             pressure_at_reference_o2 = evaluator.evaluate(
                 1800.0, pO2_bar=1.0
             ).pressure_pa
             assert pressure_at_reference_o2 == pytest.approx(
-                1383.8021941164845, rel=1e-12, abs=0.0
+                1383.80219415556, rel=1e-12, abs=0.0
             )
             for pO2_bar in (1.0e-9, 0.01):
                 evaluation = evaluator.evaluate(1800.0, pO2_bar=pO2_bar)
