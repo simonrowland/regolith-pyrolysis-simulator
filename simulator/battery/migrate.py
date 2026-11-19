@@ -9520,24 +9520,44 @@ def _initial_charge_only_composition_proxy(
         role != INITIAL_CHARGE_ONLY_PROXY_FLAG
         and not existing_initial_charge_proxy
     )
-    if (
-        (
-            outside_initial_charge_proxy_scope
-            and malformed_composition_reason is None
+    if outside_initial_charge_proxy_scope:
+        malformed_state_reason = None
+        incoming_compositions = (
+            point_composition.state
+            if isinstance(point_composition, Located)
+            else None,
+            identity.composition,
         )
-        or (
-            not outside_initial_charge_proxy_scope
-            and (
-                quantity
-                in {
-                    Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
-                    Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                }
-                or (
-                    isinstance(quantity_as_printed, str)
-                    and "composition" in quantity_as_printed.casefold()
+        for incoming in incoming_compositions:
+            if (
+                incoming is not None
+                and incoming.is_unknown
+                and (incoming.reason or "").startswith(
+                    f"{_MALFORMED_DECLARED_AMOUNT_PREFIX}:"
                 )
+            ):
+                malformed_state_reason = incoming.reason
+                break
+        if malformed_state_reason is not None:
+            invalid = Located(
+                State.unknown(malformed_state_reason), locator=locator
             )
+            conditions["composition"] = invalid
+            return (
+                replace(identity, composition=invalid.state),
+                conditions,
+                list(notices),
+            )
+    if (
+        outside_initial_charge_proxy_scope
+        or quantity
+        in {
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        }
+        or (
+            isinstance(quantity_as_printed, str)
+            and "composition" in quantity_as_printed.casefold()
         )
     ):
         return identity, point_conditions, list(notices)
@@ -9549,9 +9569,6 @@ def _initial_charge_only_composition_proxy(
     if any(
         state is not None and state.is_not_applicable
         for state in (point_composition_state, identity_composition_state)
-    ) and not (
-        outside_initial_charge_proxy_scope
-        and malformed_composition_reason is not None
     ):
         return identity, point_conditions, list(notices)
 

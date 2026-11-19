@@ -106,6 +106,7 @@ from simulator.battery.migrate import (
     _provenance_from_extract,
     _source_method_uncertainty_from_plain,
     _initial_charge_only_composition_proxy,
+    _named_material_mixture_binding,
     _named_fraction_bound_selection,
     _queue_work_counts,
     _initial_oxide_map_from_values,
@@ -14529,6 +14530,110 @@ def test_initial_charge_proxy_leaves_not_applicable_composition_untouched(
     assert updated_identity.composition.is_not_applicable
     updated_point_composition = updated_conditions["composition"]
     assert updated_point_composition.state.is_not_applicable
+
+
+def test_malformed_amount_does_not_replace_explicit_point_composition() -> None:
+    reason = "malformed declared amount: invalid cell"
+    composition = Composition(
+        basis="printed_oxides",
+        components=(("SiO2", Decimal("0.5")), ("MgO", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    composition_state = State.of(composition)
+    identity = fill_identity(
+        Quantity.ACTIVITY, None, composition=composition_state
+    )
+    point_conditions = {"composition": Located(composition_state)}
+
+    updated_identity, updated_conditions, notices = (
+        _initial_charge_only_composition_proxy(
+            identity,
+            point_conditions,
+            (),
+            role=None,
+            quantity=Quantity.ACTIVITY,
+            quantity_as_printed="activity",
+            locator=None,
+            origin="explicit-point-composition",
+            malformed_composition_reason=reason,
+            declared_composition_state=State.unknown(reason),
+        )
+    )
+
+    assert updated_identity.composition == composition_state
+    assert updated_conditions == point_conditions
+    assert notices == []
+
+
+def test_malformed_amount_does_not_replace_resolved_named_material_mixture() -> None:
+    reason = "malformed declared amount: invalid cell"
+    binding = _named_material_mixture_binding(
+        {
+            "basis": "printed_reactant_mass_percent",
+            "amount_basis": "mass_percent",
+            "components": [["Mg", "26"], ["JSC-1A", "74"]],
+            "named_material_records": {"JSC-1A": "jsc1a"},
+        },
+        records={
+            "jsc1a": (
+                {"SiO2": Decimal("50"), "MgO": Decimal("50")},
+                None,
+            )
+        },
+        source_id="fixture-source",
+    )
+    assert binding is not None
+    assert binding.located.state.is_value
+    mixture_state = binding.located.state
+    identity = fill_identity(Quantity.ACTIVITY, None, composition=mixture_state)
+    point_conditions = {"composition": binding.located}
+
+    updated_identity, updated_conditions, notices = (
+        _initial_charge_only_composition_proxy(
+            identity,
+            point_conditions,
+            (),
+            role=None,
+            quantity=Quantity.ACTIVITY,
+            quantity_as_printed="activity",
+            locator=None,
+            origin="named-material-mixture",
+            malformed_composition_reason=reason,
+            declared_composition_state=State.unknown(reason),
+        )
+    )
+
+    assert updated_identity.composition == mixture_state
+    assert updated_conditions == point_conditions
+    assert notices == []
+
+
+def test_malformed_inherited_identity_composition_is_refused_without_parameter() -> None:
+    reason = "malformed declared amount: inherited input"
+    identity = fill_identity(
+        Quantity.ACTIVITY, None, composition=State.unknown(reason)
+    )
+
+    updated_identity, updated_conditions, notices = (
+        _initial_charge_only_composition_proxy(
+            identity,
+            None,
+            (),
+            role=None,
+            quantity=Quantity.ACTIVITY,
+            quantity_as_printed="activity",
+            locator=None,
+            origin="inherited-malformed-composition",
+            malformed_composition_reason=None,
+        )
+    )
+
+    assert updated_identity.composition is not None
+    assert updated_identity.composition.is_unknown
+    assert updated_identity.composition.reason == reason
+    assert updated_conditions is not None
+    assert updated_conditions["composition"].state.reason == reason
+    assert notices == []
 
 
 @pytest.mark.parametrize("printed_marker", ["<0.01", "tr."])
