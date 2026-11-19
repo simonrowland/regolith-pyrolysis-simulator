@@ -9801,15 +9801,14 @@ def _wall_deposition_driving_pressure_pa(
     diagnostic_out: MutableMapping[str, Any] | None = None,
     wall_pO2_Pa: float | None = None,
     wall_surface_state: Mapping[str, Any] | None = None,
+    equilibrium_pressure_pa: float | None = None,
 ) -> float:
-    try:
-        local_pressure_pa = float(P_local_pa)
-    except (TypeError, ValueError):
-        return 0.0
-    if not math.isfinite(local_pressure_pa) or local_pressure_pa <= 0.0:
-        return 0.0
-
-    if wall_surface_state is not None:
+    if equilibrium_pressure_pa is not None:
+        equilibrium_pressure = _finite_nonnegative_value(
+            equilibrium_pressure_pa,
+            label='surface equilibrium pressure',
+        )
+    elif wall_surface_state is not None:
         if not isinstance(wall_surface_state, Mapping):
             raise DepositionInputRefusal(
                 "wall_surface_state", wall_surface_state, "must be a mapping"
@@ -9820,22 +9819,39 @@ def _wall_deposition_driving_pressure_pa(
                 "the liner corrosion override requires declared P_eq_Pa",
             )
         try:
-            equilibrium_pressure_pa = float(wall_surface_state["P_eq_Pa"])
+            equilibrium_pressure = float(wall_surface_state["P_eq_Pa"])
         except (TypeError, ValueError) as exc:
             raise DepositionInputRefusal(
                 "wall_surface_state.P_eq_Pa",
                 wall_surface_state["P_eq_Pa"],
                 "must be numeric",
             ) from exc
-        if not math.isfinite(equilibrium_pressure_pa) or equilibrium_pressure_pa < 0.0:
+        if not math.isfinite(equilibrium_pressure) or equilibrium_pressure < 0.0:
             raise DepositionInputRefusal(
                 "wall_surface_state.P_eq_Pa",
-                equilibrium_pressure_pa,
+                equilibrium_pressure,
                 "must be finite and non-negative",
             )
-        driving_pressure_pa = max(0.0, local_pressure_pa - equilibrium_pressure_pa)
-        if diagnostic_out is not None:
-            diagnostic_out["wall_saturation_pressure_pa"] = equilibrium_pressure_pa
+    else:
+        equilibrium_pressure = None
+
+    try:
+        local_pressure_pa = float(P_local_pa)
+    except (TypeError, ValueError):
+        return 0.0
+    if not math.isfinite(local_pressure_pa) or local_pressure_pa <= 0.0:
+        return 0.0
+
+    if equilibrium_pressure is not None:
+        driving_pressure_pa = max(
+            0.0, local_pressure_pa - equilibrium_pressure
+        )
+        if (
+            diagnostic_out is not None
+            and wall_surface_state is not None
+            and equilibrium_pressure_pa is None
+        ):
+            diagnostic_out["wall_saturation_pressure_pa"] = equilibrium_pressure
             diagnostic_out["wall_saturation_pressure_refused"] = False
             diagnostic_out["wall_saturation_pressure_status"] = (
                 "wall_surface_state_override"
@@ -10205,86 +10221,53 @@ def _series_resistance_deposition_flux_mol_m2_s(
         # Category 3 (see above): perfectly non-sticking surface; the
         # zero is real, not a refusal.
         return 0.0
-    if equilibrium_pressure_pa is None and wall_surface_state is not None:
-        if not isinstance(wall_surface_state, Mapping):
-            raise DepositionInputRefusal(
-                "wall_surface_state", wall_surface_state, "must be a mapping"
-            )
-        if "P_eq_Pa" not in wall_surface_state:
-            raise DepositionInputRefusal(
-                "wall_surface_state.P_eq_Pa", None,
-                "the liner corrosion override requires declared P_eq_Pa",
-            )
-        try:
-            equilibrium_pressure_pa = float(wall_surface_state["P_eq_Pa"])
-        except (TypeError, ValueError) as exc:
-            raise DepositionInputRefusal(
-                "wall_surface_state.P_eq_Pa",
-                wall_surface_state["P_eq_Pa"],
-                "must be numeric",
-            ) from exc
-        if (
-            not math.isfinite(equilibrium_pressure_pa)
-            or equilibrium_pressure_pa < 0.0
-        ):
-            raise DepositionInputRefusal(
-                "wall_surface_state.P_eq_Pa",
-                equilibrium_pressure_pa,
-                "must be finite and non-negative",
-            )
+    try:
+        driving_pressure_pa = _wall_deposition_driving_pressure_pa(
+            species,
+            P_local_pa,
+            T_surface_K,
+            vapor_pressure_data=vapor_pressure_data,
+            reactive_product_backstop=reactive_product_backstop,
+            stable_condensation_product_backstop=(
+                stable_condensation_product_backstop
+            ),
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            diagnostic_out=diagnostic_out,
+            wall_pO2_Pa=wall_pO2_Pa,
+            wall_surface_state=wall_surface_state,
+            equilibrium_pressure_pa=equilibrium_pressure_pa,
+        )
+    except WallSaturationPressureRefusal as exc:
         if diagnostic_out is not None:
-            diagnostic_out["wall_saturation_pressure_pa"] = (
-                equilibrium_pressure_pa
+            diagnostic_out['wall_saturation_pressure_pa'] = None
+            diagnostic_out['wall_saturation_pressure_refused'] = True
+            diagnostic_out['wall_saturation_pressure_refusal_reason'] = (
+                exc.reason
             )
-            diagnostic_out["wall_saturation_pressure_refused"] = False
-            diagnostic_out["wall_saturation_pressure_status"] = (
-                "wall_surface_state_override"
-            )
-    if equilibrium_pressure_pa is None:
-        try:
-            driving_pressure_pa = _wall_deposition_driving_pressure_pa(
-                species,
-                P_local_pa,
-                T_surface_K,
-                vapor_pressure_data=vapor_pressure_data,
-                reactive_product_backstop=reactive_product_backstop,
-                stable_condensation_product_backstop=(
-                    stable_condensation_product_backstop
-                ),
-                antoine_extrapolations=antoine_extrapolations,
-                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-                diagnostic_out=diagnostic_out,
-                wall_pO2_Pa=wall_pO2_Pa,
-                wall_surface_state=wall_surface_state,
-            )
-        except WallSaturationPressureRefusal as exc:
-            if diagnostic_out is not None:
-                diagnostic_out['wall_saturation_pressure_pa'] = None
-                diagnostic_out['wall_saturation_pressure_refused'] = True
-                diagnostic_out['wall_saturation_pressure_refusal_reason'] = (
-                    exc.reason
-                )
-            raise
-        if (
-            diagnostic_out is not None
-            and diagnostic_out.get('wall_saturation_pressure_refused')
-        ):
-            raise WallSaturationPressureRefusal(
-                species,
-                T_surface_K,
-                str(diagnostic_out.get(
-                    'wall_saturation_pressure_refusal_reason',
-                    'saturation_pressure_unavailable',
-                )),
-            )
+        raise
+    if (
+        diagnostic_out is not None
+        and diagnostic_out.get('wall_saturation_pressure_refused')
+    ):
+        raise WallSaturationPressureRefusal(
+            species,
+            T_surface_K,
+            str(diagnostic_out.get(
+                'wall_saturation_pressure_refusal_reason',
+                'saturation_pressure_unavailable',
+            )),
+        )
+    if equilibrium_pressure_pa is not None:
+        rate_equilibrium_pressure_pa = float(equilibrium_pressure_pa)
+    elif wall_surface_state is not None:
+        rate_equilibrium_pressure_pa = float(
+            wall_surface_state['P_eq_Pa']
+        )
+    else:
         rate_equilibrium_pressure_pa = max(
             0.0, P_local_pa - driving_pressure_pa
         )
-    else:
-        equilibrium_pressure_pa = _finite_nonnegative_value(
-            equilibrium_pressure_pa, label='surface equilibrium pressure')
-        driving_pressure_pa = max(0.0, P_local_pa - equilibrium_pressure_pa)
-        rate_equilibrium_pressure_pa = equilibrium_pressure_pa
     if driving_pressure_pa <= 0.0:
         return 0.0
 
