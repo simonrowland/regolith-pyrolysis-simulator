@@ -52,7 +52,7 @@ PRESSURE_REGIMES = ("vacuum", "millibar_sweep")
 # - Buffer gas at or above ~5 mbar selects the recipe's millibar-sweep wall
 #   branch (CLAUDE.md SS4: ~5-15 mbar pN2 keeps Kn << 0.01). Below that the
 #   advisor uses its conservative "vacuum" bucket; this threshold is not a
-#   Knudsen boundary because the default 0.12 m pipe at ~1 mbar is still
+#   Knudsen boundary because the 0.50 m maximum throat at ~1 mbar is still
 #   viscous by Kn.
 DOSED_O2_PO2_MIN_MBAR = 3.0
 BUFFERED_PO2_MIN_MBAR = 0.5

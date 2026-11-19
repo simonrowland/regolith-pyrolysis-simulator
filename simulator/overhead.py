@@ -34,8 +34,9 @@ volumetric flow varies as 1/P. Integrating circular Poiseuille flow
 therefore replaces the incompressible pressure difference with
 (P₁²-P₂²)/2, giving the denominator 256. Unit check:
 [m⁴·Pa²·kg/mol]/[(Pa·s)·m·(Pa·m³/(mol·K))·K] = kg/s.
-Sanity check: d=0.12 m, L=1 m, T=1773.15 K, pure SiO, P₁=1000 Pa,
-and P₂=0 gives 0.121878 kg/s; P₁=P₂ gives zero flow.
+Sanity check: d=0.50 m, L=1 m, T=1773.15 K, pure SiO, P₁=1000 Pa,
+and P₂=0 gives about 36.735 kg/s (301x the 12 cm result); P₁=P₂ gives
+zero flow.
 
 Feedback quantities exposed:
     [LOOP-1]  Backpressure: overhead partial pressures feed back as
@@ -134,7 +135,7 @@ def compressible_poiseuille_mass_flow(
     return numerator / denominator
 
 
-DEFAULT_INITIAL_THROAT_AREA_M2 = math.pi * 0.06**2  # m² — 12 cm diameter throat back-compat anchor
+DEFAULT_INITIAL_THROAT_AREA_M2 = math.pi * 0.25**2  # m² — owner-set 0.50 m maximum aperture
 DEFAULT_CONDENSER_STAGE_AREA_RATIOS = {
     'fe_stage1': 4.0,
     'cr_stage2': 4.5,

@@ -197,7 +197,8 @@ LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 #     Sh = 3.66 (asymptotic, fully developed laminar)
 #
 # For the simulator's overhead piping at C2A_continuous typical
-# operating point (pN2 ~10 mbar, T_gas ~1700 C, D_pipe = 0.12 m), the
+# operating point (pN2 ~10 mbar, T_gas ~1700 C, with the configured effective
+# throat diameter), the
 # Reynolds number Re = rho * v * D / mu is well below 2100 (laminar),
 # so Sh = 3.66 is the right anchor. Mass-transfer coefficient:
 #     k_c = Sh * D_AB / D_pipe   (m/s)
@@ -4361,7 +4362,7 @@ class CondensationModel:
         # k_g [m/s] = Sh * D_AB [m2/s] / Dh [m]. The molar coefficient per
         # pascal is k_g / (R * T_gas) [mol/(m2*s*Pa)]. Sherwood is 3.66 at
         # radial stir 1. This length is not written onto duct inner_diameter_m,
-        # so throat Poiseuille flow stays on the ~0.12 m throat.
+        # so throat Poiseuille flow stays on the configured throat diameter.
         gas_side_length_m = self._hydraulic_diameter_m_for_stage_number(
             stage.stage_number)
         T_gas_K = float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET

@@ -127,11 +127,11 @@ def test_controlled_flow_reports_holdup_remaining_after_tick():
     assert flow.retained_holdup_after_tick_kg == pytest.approx(0.75)
 
 
-def test_d452_numeric_pin_for_original_fixed_throat_anchor():
+def test_d452_default_fixed_throat_matches_owner_hardware_aperture():
     model = OverheadGasModel()
 
-    assert model.initial_throat_area_m2 == 0.011309733552923255
-    assert model.pipe_diameter_m == pytest.approx(0.12)
+    assert model.initial_throat_area_m2 == 0.19634954084936207
+    assert model.pipe_diameter_m == pytest.approx(0.5)
 
 
 def test_explicit_zero_conductance_closes_controlled_line():
