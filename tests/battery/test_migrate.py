@@ -14118,7 +14118,13 @@ def _score_initial_charge_composition_path(
     path: str,
     invalid_kind: str | None,
     consumer: str = "melt",
+    starting_wt_pct: dict[str, int] | None = None,
 ):
+    starting_composition = (
+        {"SiO2": 50, "MgO": 50}
+        if starting_wt_pct is None
+        else starting_wt_pct
+    )
     if consumer == "vapour":
         quantity = "p_partial"
         units = "Pa"
@@ -14136,7 +14142,7 @@ def _score_initial_charge_composition_path(
         "activity": 0.2,
         "method_class": "measured_direct",
         "admission_status": "admitted",
-        "composition_wt_pct": {"SiO2": 50, "MgO": 50},
+        "composition_wt_pct": starting_composition,
     }
     values["composition_role"] = INITIAL_CHARGE_ONLY_PROXY_FLAG
     malformed_map = {
@@ -14195,7 +14201,7 @@ def _score_initial_charge_composition_path(
             "printed_composition": {
                 "state": {
                     "tag": "value",
-                    "value": {"SiO2": 50, "MgO": 50},
+                    "value": starting_composition,
                 },
                 "locator": {"table": "1", "page": 1},
             }
@@ -14519,6 +14525,7 @@ def test_migrated_point_run_composition_does_not_replace_kems_charge(
         path="points",
         invalid_kind=invalid_kind,
         consumer="vapour",
+        starting_wt_pct={"MgO": 100},
     )
     migrated_point_composition = (migrated.point_conditions or {}).get("composition")
     assert isinstance(migrated_point_composition, Located)
