@@ -53,7 +53,16 @@ _UPSTREAM_COMPILATION_RECORDS = (
 
 
 @pytest.mark.parametrize("relative_path", _UPSTREAM_COMPILATION_RECORDS)
-def test_compilation_record_binding_retains_upstream_locator_fact(relative_path: str) -> None:
+def test_compilation_observation_source_path_is_the_ingested_record(
+    relative_path: str,
+) -> None:
+    """Canonicalization must not replace the ingested JSON with the raw source.
+
+    atct's ``path`` and burcat's ``path`` (and the same shape on fastchem,
+    nasa-glenn, and pankratz b677) name the upstream text. That fact stays
+    in the note. ``source_path`` stays the record file, which exists.
+    """
+
     from simulator.battery.migrate import compilation_record_asset_id
 
     path = REPO_ROOT / relative_path
@@ -68,7 +77,12 @@ def test_compilation_record_binding_retains_upstream_locator_fact(relative_path:
     assert observations
     asset_id = compilation_record_asset_id(relative_path)
     for observation in observations:
-        assert observation.locator.source_path == upstream_path
+        locator = observation.locator
+        assert locator.source_path == relative_path
+        assert (REPO_ROOT / locator.source_path).is_file()
+        assert upstream_path in (locator.note or "")
+        extras = locator.extras or {}
+        assert all(value != upstream_path for value in extras.values())
         assert observation.read_from == asset_id
         if observation.derivation is not None:
             assert observation.derivation.inputs[0] == asset_id
@@ -83,16 +97,29 @@ def test_compilation_record_binding_retains_upstream_locator_fact(relative_path:
 def test_compilation_record_binding_detects_upstream_path_winning(
     relative_path: str, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    from dataclasses import replace
+
     from simulator.battery import migrate as migrate_module
 
-    choose = migrate_module.choose_read_from
+    def canonicalize_upstream_into_source_path(
+        raw: object, *, record_path: str, record_id: str
+    ):
+        locator = migrate_module._locator_from_plain(raw, refuse_invalid=True)
+        locator = locator or Locator(record=record_id)
+        if not locator.source_path:
+            locator = replace(locator, source_path=record_path)
+        return locator
+
     with monkeypatch.context() as mutation:
         mutation.setattr(
-            migrate_module, "choose_read_from",
-            lambda work, locator, **_context: choose(work, locator),
+            migrate_module,
+            "compilation_record_locator",
+            canonicalize_upstream_into_source_path,
         )
         with pytest.raises(AssertionError):
-            test_compilation_record_binding_retains_upstream_locator_fact(relative_path)
+            test_compilation_observation_source_path_is_the_ingested_record(
+                relative_path
+            )
 
 
 def test_printed_labels_and_grid_aliases_survive_extract_migration(

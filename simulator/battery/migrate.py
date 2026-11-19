@@ -23163,6 +23163,49 @@ def compilation_record_source_file(source_path: str) -> SourceFile:
     )
 
 
+def compilation_record_locator(
+    raw: object, *, record_path: str, record_id: str
+) -> Locator:
+    """Bind a compilation observation to the ingested record file.
+
+    ``source_path`` is that record. Readers open it as the record. An
+    upstream ``path`` or ``file`` inside ``source_locator`` names the text
+    the record quotes; the schema has no separate field for it, so it stays
+    in the note with the other non-field keys. Promoting those aliases to
+    ``source_path`` replaces the record with a raw file that is not the
+    evidence.
+    """
+
+    if not isinstance(raw, Mapping) or not any(
+        value is not None and value != "" for value in raw.values()
+    ):
+        return Locator(note=record_id, source_path=record_path)
+    address: dict[str, object] = {"source_path": record_path}
+    provenance: list[str] = []
+    for key, value in raw.items():
+        name = str(key)
+        if value is None or value == "":
+            continue
+        if name == "source_path":
+            if str(value).replace("\\", "/") != record_path:
+                provenance.append(f"{name}={value}")
+            continue
+        if name in _LOCATOR_KEYS:
+            address[name] = value
+            continue
+        provenance.append(f"{name}={value}")
+    locator = _locator_from_plain(address, refuse_invalid=True)
+    if locator is None:
+        locator = Locator(source_path=record_path)
+    if provenance:
+        extra = "; ".join(provenance)
+        existing = str(locator.note or "")
+        locator = replace(locator, note=f"{existing}; {extra}".strip("; "))
+    if locator.source_path != record_path:
+        locator = replace(locator, source_path=record_path)
+    return locator
+
+
 def choose_read_from(
     work: Work, locator: Locator | None, *, source_key: str | None = None,
 ) -> str:
@@ -32912,7 +32955,9 @@ class Migrator:
             phase, _unmapped = map_phase("(c)")
         loc_raw = doc.get("source_locator")
         try:
-            source_locator = _locator_from_plain(loc_raw, refuse_invalid=True)
+            locator = compilation_record_locator(
+                loc_raw, record_path=rel, record_id=record_id
+            )
         except _InvalidLocator as exc:
             self.result.registry_issues.append(
                 ValidationIssue(
@@ -32922,9 +32967,6 @@ class Migrator:
                 )
             )
             return
-        locator = source_locator or Locator(record=record_id)
-        if not locator.source_path:
-            locator = replace(locator, source_path=rel)
         t = _compilation_temperature_state(doc)
         p_std = None
         column_series = compilation_column_series_from_record(doc)
