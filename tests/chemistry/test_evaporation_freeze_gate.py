@@ -1521,6 +1521,57 @@ def test_freeze_gate_dispatches_intrinsic_fo2_to_declared_gate(
         assert kwargs['fe_redox_policy'] == 'intrinsic'
 
 
+def test_magemin_freeze_gate_curve_keeps_provider_warning_and_flags(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    warning = (
+        'MAGEMinDomainGate: SiO2 = 29.99 wt% outside MELTS calibration '
+        'range [30, 80] wt%; reason=silicate_window; '
+        'authority=extrapolated; certified_band=SiO2 [30, 80] wt%.'
+    )
+    certified_band = {'sio2_wt_pct': [30.0, 80.0]}
+    monkeypatch.setattr(
+        sim,
+        '_register_freeze_gate_liquid_fraction_providers',
+        lambda: None,
+    )
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda *_args, **_kwargs: SimpleNamespace(
+            status='ok',
+            diagnostic={
+                'solidus_T_C': 900.0,
+                'liquidus_T_C': 1300.0,
+                'liquid_fraction_path': (
+                    {'temperature_C': 900.0, 'liquid_fraction': 0.0},
+                    {'temperature_C': 1300.0, 'liquid_fraction': 1.0},
+                ),
+                'authority': 'extrapolated',
+                'certified_band': certified_band,
+            },
+            warnings=(warning,),
+        ),
+    )
+
+    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-9.0)
+
+    assert curve is not None
+    assert curve['gate_provider_warnings'] == [warning]
+    assert curve['authority'] == 'extrapolated'
+    assert curve['certified_band'] == certified_band
+
+
 def test_freeze_gate_enabled_refuses_instead_of_using_backend_liquidus(
     monkeypatch,
     vapor_pressure_data,

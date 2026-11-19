@@ -1229,22 +1229,10 @@ def test_magemin_freeze_gate_memo_key_preserves_extrapolated_boundary_identity()
 
     sim = _build_pt0_sim(PT0DeterminismStore("capture"))
     sim._liquid_fraction_provider = "magemin"
-    remainder = {
-        "Al2O3": 15.0,
-        "FeO": 10.0,
-        "MgO": 20.0,
-        "CaO": 20.0,
-        "Na2O": 5.0,
-    }
-
     def key_for(sio2_wt_pct: float):
-        scale = (100.0 - sio2_wt_pct) / sum(remainder.values())
         composition_wt_pct = {
             "SiO2": sio2_wt_pct,
-            **{
-                species: amount * scale
-                for species, amount in remainder.items()
-            },
+            "MgO": 100.0 - sio2_wt_pct,
         }
         mol_by_species = {
             species: amount
@@ -1268,10 +1256,10 @@ def test_magemin_freeze_gate_memo_key_preserves_extrapolated_boundary_identity()
         )
         return key, reason, composition_wt_pct
 
-    inside, inside_reason, _inside_composition = key_for(30.0)
+    inside, inside_reason, _inside_composition = key_for(30.001)
     # PT-0 capture uses six significant figures before the gate sees this
-    # input. d-447 keeps positive 29.999 wt% silica on the flagged
-    # extrapolation path while it shares the quantized composition key.
+    # binary bulk. d-447 keeps positive 29.999 wt% silica on the flagged
+    # extrapolation path even though both compositions share a quantized key.
     outside, outside_reason, outside_composition = key_for(29.999)
 
     from engines.magemin.domain import MAGEMinDomainGate
@@ -1283,6 +1271,11 @@ def test_magemin_freeze_gate_memo_key_preserves_extrapolated_boundary_identity()
     assert inside.composition_mol_fractions == outside.composition_mol_fractions
     assert inside_reason is None
     assert outside_reason is None
+    assert inside.magemin_domain_verdict == (True, (), None)
+    assert outside.magemin_domain_verdict is not None
+    assert outside.magemin_domain_verdict[0] is True
+    assert outside.magemin_domain_verdict[2] is None
+    assert inside.magemin_domain_verdict != outside.magemin_domain_verdict
     assert valid is True
     assert reason is None
     assert any(
@@ -1290,7 +1283,78 @@ def test_magemin_freeze_gate_memo_key_preserves_extrapolated_boundary_identity()
         and "certified_band=SiO2 [30, 80] wt%" in warning
         for warning in warnings
     )
-    assert inside == outside
+    assert inside != outside
+
+
+def test_magemin_freeze_gate_key_carries_projection_threshold_verdict(
+    monkeypatch,
+) -> None:
+    from engines.magemin.domain import MAGEMinDomainGate
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.accounting.ledger import AtomLedger
+
+    sim = _build_pt0_sim(PT0DeterminismStore("capture"))
+    sim._liquid_fraction_provider = "magemin"
+    gate_inputs = []
+    original_validate = MAGEMinDomainGate.validate_with_reason
+
+    def capture_exact_gate_input(composition_wt_pct):
+        gate_inputs.append(dict(composition_wt_pct))
+        return original_validate(composition_wt_pct)
+
+    monkeypatch.setattr(
+        MAGEMinDomainGate,
+        "validate_with_reason",
+        staticmethod(capture_exact_gate_input),
+    )
+
+    def key_for(p2o5_wt_pct: float):
+        composition_wt_pct = {
+            "SiO2": 50.0,
+            "MgO": 50.0 - p2o5_wt_pct,
+            "P2O5": p2o5_wt_pct,
+        }
+        mol_by_species = {
+            species: amount
+            / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            "process.cleaned_melt",
+            mol_by_species,
+            source="b-1225 database projection threshold pin",
+            material_origin="feedstock",
+        )
+        sim.atom_ledger = ledger
+        return sim._freeze_gate_cache_key_and_domain(
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+        )[0]
+
+    admitted = key_for(0.999)
+    refused = key_for(1.001)
+
+    assert admitted.composition_mol_fractions == (
+        refused.composition_mol_fractions
+    )
+    assert admitted.magemin_domain_verdict is not None
+    assert admitted.magemin_domain_verdict[2] is None
+    assert refused.magemin_domain_verdict is not None
+    assert refused.magemin_domain_verdict[2].startswith(
+        "composition_projected_over_threshold:"
+    )
+    assert admitted != refused
+    assert len(gate_inputs) == 4
+    # The exact submitted P2O5 bulk reaches the live domain gate before the
+    # subsequent ig-order projection drops it.
+    assert "P2O5" in gate_inputs[0]
+    assert "P2O5" not in gate_inputs[1]
+    assert "P2O5" in gate_inputs[2]
+    assert "P2O5" not in gate_inputs[3]
 
 
 def test_amount_is_present_only_for_extensive_alphamelts_composite() -> None:
