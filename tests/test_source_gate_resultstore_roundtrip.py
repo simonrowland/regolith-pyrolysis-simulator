@@ -8,7 +8,7 @@ from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_versio
 from simulator.optimize.evaluate import RunReference, ScoredResult
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, ThresholdSpec
-from simulator.optimize.results_store import ResultStore
+from simulator.optimize.results_store import ResultStore, _decode_result_payload
 
 
 def _source_report(source: str = "builtin_authoritative") -> dict[str, object]:
@@ -143,7 +143,7 @@ def test_strip_heavy_result_preserves_vapor_source_report_for_store_gate(
     assert loaded.run_reference.trace["vapor_pressure_source_report"] == _source_report(
         "builtin_authoritative"
     )
-    assert assert_strict_vapor_result_store(db_path) == {
+    assert assert_strict_vapor_result_store(db_path, _decode_result_payload) == {
         "rows": 1,
         "vapor_active_rows": 1,
         "source_reports": 1,
@@ -209,7 +209,7 @@ def test_reference_trace_fallback_preserves_vapor_source_report_for_store_gate(
     assert loaded.run_reference.trace["vapor_pressure_provider_id"] == "builtin-vapor-pressure"
     assert loaded.run_reference.trace["allow_fallback_vapor"] is False
     assert loaded.run_reference.trace["force_builtin_vapor_pressure"] is False
-    assert assert_strict_vapor_result_store(db_path) == {
+    assert assert_strict_vapor_result_store(db_path, _decode_result_payload) == {
         "rows": 1,
         "vapor_active_rows": 1,
         "source_reports": 1,

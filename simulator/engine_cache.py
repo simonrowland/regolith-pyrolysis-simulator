@@ -1143,6 +1143,62 @@ def _remember_memory_value(key: tuple[str, bytes, bool], value: Any) -> None:
         _MEMORY_CACHE.popitem(last=False)
 
 
+# These cached engines can execute compiled vapour laws:
+# - internal-analytical: residue pressure and inline cell equilibration use the
+#   internal analytical vapour-pressure adapter.
+# - alphamelts: subprocess equilibrium calls
+#   _builtin_vapor_projection_for_subprocess; the Antoine/catalog fallback
+#   also evaluates compiled laws.
+# - thermoengine: the Antoine/catalog fallback runs when VapoRock is absent or
+#   returns no pressures.
+ENGINE_CACHE_DISCLOSURE_ENGINES = frozenset({
+    "internal-analytical",
+    "alphamelts",
+    "thermoengine",
+})
+
+# These cacheable engines have no live path through register_executed_law.
+# OpenIMCC's gas path goes through its bridge; VapoRock does not evaluate
+# compiled laws; MAGEMin solves phase equilibrium without the vapour evaluator.
+ENGINE_CACHE_NO_DISCLOSURE_ENGINES = {
+    "openimcc": "gas evaluations use openimcc_bridge, not the vapour-law evaluator",
+    "vaporock": "equilibrate does not call register_executed_law",
+    "magemin": "phase equilibrium does not call the compiled vapour evaluator",
+}
+_ENGINE_CACHE_VALUE_KEY = "_engine_cache_value"
+
+
+def _engine_carries_disclosures(engine_id: str) -> bool:
+    """Return whether cached values for this engine carry law disclosures."""
+
+    return engine_id in ENGINE_CACHE_DISCLOSURE_ENGINES
+
+
+def _accept_cached_engine_disclosures(
+    engine_id: str, value: Any, disclosure_runtime: Any | None
+) -> bool:
+    """Replay a measured engine disclosure before returning a cache hit."""
+
+    if not _engine_carries_disclosures(engine_id) or disclosure_runtime is None:
+        return True
+    if not isinstance(value, Mapping) or _ENGINE_CACHE_VALUE_KEY not in value:
+        return False
+    disclosures = value.get("law_disclosures")
+    if disclosures is None:
+        # Unscoped values are explicitly unknown and cannot serve a scoped run.
+        return disclosure_runtime.active_registry() is None
+    return disclosure_runtime.accept_stored_memo(value) is not None
+
+
+def _unwrap_engine_cache_value(engine_id: str, value: Any) -> Any:
+    if (
+        _engine_carries_disclosures(engine_id)
+        and isinstance(value, Mapping)
+        and _ENGINE_CACHE_VALUE_KEY in value
+    ):
+        return live_hot(value[_ENGINE_CACHE_VALUE_KEY])
+    return value
+
 def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = False) -> bool:
     expected_columns = {
         table: tuple(name for name, _ in columns)
@@ -1466,7 +1522,13 @@ def _store_cold(connection: sqlite3.Connection, path: Path, key: bytes, values: 
         connection.execute("DELETE FROM cold.engine_values WHERE key=?", (key,))
 
 
-def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
+def cached_engine_call(
+    engine_id: str,
+    request: Any,
+    solve: Any,
+    *,
+    disclosure_runtime: Any | None = None,
+) -> Any:
     if _CACHE_BYPASSED.get():
         return live_hot(solve())
     path_value = _configured_engine_cache_path()
@@ -1485,14 +1547,24 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     chem_version = ENGINE_CHEMISTRY_VERSION[engine_id]
     cache_key = engine_cache_key(engine_id, chem_version, request)
     memory_key = (path_value, cache_key, readonly)
+    disclosure_registry = None
+    disclosure_before: tuple[dict[str, Any], ...] = ()
+    if _engine_carries_disclosures(engine_id) and disclosure_runtime is not None:
+        disclosure_registry = disclosure_runtime.active_registry()
+        if disclosure_registry is not None:
+            disclosure_before = disclosure_runtime.active_snapshot()
     with _LOCK:
         _prepare_memory_cache()
         counts = _counter_bucket(engine_id)
         if memory_key in _MEMORY_CACHE:
             result = _MEMORY_CACHE[memory_key]
-            _MEMORY_CACHE.move_to_end(memory_key)
-            counts["hits"] += 1
-            return result
+            if _accept_cached_engine_disclosures(
+                engine_id, result, disclosure_runtime
+            ):
+                _MEMORY_CACHE.move_to_end(memory_key)
+                counts["hits"] += 1
+                return _unwrap_engine_cache_value(engine_id, result)
+            del _MEMORY_CACHE[memory_key]
 
     path = Path(path_value).expanduser()
     try:
@@ -1517,9 +1589,21 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 counts["read_error"] += 1
                 row = None
             else:
-                counts["hits"] += 1
-                _remember_memory_value(memory_key, result)
-                return result
+                if _accept_cached_engine_disclosures(
+                    engine_id, result, disclosure_runtime
+                ):
+                    counts["hits"] += 1
+                    _remember_memory_value(memory_key, result)
+                    return _unwrap_engine_cache_value(engine_id, result)
+                row = None
+                if _engine_carries_disclosures(engine_id) and not readonly:
+                    try:
+                        connection.execute(
+                            f"DELETE FROM {_TABLE} WHERE key=?", (cache_key,)
+                        )
+                        connection.commit()
+                    except sqlite3.Error:
+                        counts["store_error"] += 1
         counts["misses"] += 1
 
     solved = solve()
@@ -1528,13 +1612,35 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         return hot
     if (_is_refusal(hot) and not cacheable_refusal(hot)) or readonly or connection is None:
         return hot
+    memory_value = hot
+    storage_value = solved.hot if isinstance(solved, EngineCacheValue) else solved
+    if _engine_carries_disclosures(engine_id) and disclosure_runtime is not None:
+        disclosures = None
+        if (
+            disclosure_registry is not None
+            and disclosure_runtime.active_registry() is disclosure_registry
+        ):
+            disclosures = [
+                dict(item)
+                for item in disclosure_runtime.disclosure_delta(
+                    disclosure_before, disclosure_runtime.active_snapshot()
+                )
+            ]
+        storage_value = {
+            _ENGINE_CACHE_VALUE_KEY: storage_value,
+            "law_disclosures": disclosures,
+        }
+        memory_value = {
+            _ENGINE_CACHE_VALUE_KEY: hot,
+            "law_disclosures": disclosures,
+        }
     try:
         if not isinstance(solved, EngineCacheValue) and (
             isinstance(hot, Mapping) and any(isinstance(item, (Mapping, list, tuple)) for item in hot.values())
             or isinstance(hot, (list, tuple))
         ):
             raise TypeError("result has no declared HOT projection")
-        hot_value, provenance = _encode_hot(solved.hot if isinstance(solved, EngineCacheValue) else solved)
+        hot_value, provenance = _encode_hot(storage_value)
     except (TypeError, ValueError):
         with _LOCK:
             counts = _counter_bucket(engine_id)
@@ -1572,7 +1678,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             _counter_bucket(engine_id)["store_error"] += 1
     with _LOCK:
         _prepare_memory_cache()
-        _remember_memory_value(memory_key, hot)
+        _remember_memory_value(memory_key, memory_value)
     return hot
 
 

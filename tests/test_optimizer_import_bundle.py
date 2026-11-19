@@ -32,6 +32,7 @@ from simulator.optimize.import_bundle import (
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.recipe import RecipeSchema
+from simulator.optimize.results_store import _encode_result_payload
 from simulator.optimize.save_bundle import (
     ARTIFACT_INDEX_NAME,
     MEMBER_SCHEMA_VERSION,
@@ -649,6 +650,54 @@ def test_margin_mapping_preserves_signed_infinity(
     assert margins["coating"]["margin"] == expected
     assert margins["coating"]["observed"] == expected
     assert import_bundle_module._optional_number(serialized) is None
+
+
+def test_imported_claim_decodes_shared_result_payload() -> None:
+    authority = {"source": "wall saturation"}
+    flags = {"output_status": "status_bearing"}
+    margin = GateMargin(
+        gate="coating",
+        feasible=True,
+        margin=1.0,
+        threshold=ThresholdSpec(
+            id="coating",
+            value=1.0,
+            units="campaigns",
+            source="test",
+            source_ref="test",
+        ),
+        observed=2.0,
+        detail="imported shared payload",
+        status_payload={
+            "coating_verdict": "clear",
+            "coating_warning_flags": [
+                {"reason": "first", "authority": authority, "flags": flags},
+                {"reason": "second", "authority": authority, "flags": flags},
+            ],
+        },
+    )
+    margins, result_blob = _encode_result_payload(
+        {"coating": margin},
+        {"backend_status": "ok"},
+    )
+    claim = import_bundle_module._imported_claim(
+        {"cache_key": "cache-a", "candidate_id": "candidate-a"},
+        {
+            "cache_key": "cache-a",
+            "candidate_id": "candidate-a",
+            "feasible": 1,
+            "eval_spec": "{}",
+            "objectives": "[]",
+            "feasibility_margins": json.dumps(margins),
+            "result_blob": json.dumps(result_blob),
+        },
+    )
+
+    assert claim["margins"]["coating"] == {
+        "feasible": True,
+        "margin": 1.0,
+        "observed": 2.0,
+    }
 
 
 def test_t155_import_preserves_conditional_subspace_identity_in_cache(

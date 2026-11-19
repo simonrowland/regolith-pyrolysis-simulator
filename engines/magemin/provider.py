@@ -8,11 +8,10 @@ provider under goal #9 ``MAGEMIN-SHADOW-PARITY``. The provider:
 - declares ``process.cleaned_melt`` as its sole accessible account; the
   kernel filter drops every other account before dispatch (same
   silicate-oxide isolation contract AlphaMELTS uses),
-- runs the :class:`MAGEMinDomainGate` on the cleaned-melt composition
-  before delegating to the today-hook adapter,
 - delegates to :mod:`simulator.melt_backend.magemin.MAGEMinBackend`
   for the chemistry with ``python_bridge='subprocess'`` pinned for
-  shadow determinism,
+  shadow determinism; the adapter owns the domain gate at its
+  ``equilibrate`` entry so direct and provider calls share one check,
 - returns a :class:`MAGEMinShadowDiagnostics` payload on
   :attr:`IntentResult.diagnostic`, with ``transition=None`` always --
   MAGEMin has no ledger-write authority.
@@ -54,7 +53,6 @@ import weakref
 from dataclasses import replace
 from typing import Any, Mapping, Optional
 
-from engines.magemin.domain import MAGEMinDomainGate
 from engines.magemin.parity import MAGEMinParityComparator, ParityReport
 from engines.magemin.result import MAGEMinShadowDiagnostics
 from simulator.chemistry.kernel.capabilities import (
@@ -217,14 +215,13 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
            the kernel registry already routes correctly).
         2. Builds the ControlAudit with ``applied == requested`` and
            the shadow note.
-        3. Runs :class:`MAGEMinDomainGate`. If rejected, returns
-           ``status='out_of_domain'`` with the warnings recorded.
-        4. Lazily initialises the adapter; if the MAGEMin binary is
-           absent, returns ``status='unavailable'``.
-        5. Calls the adapter's :meth:`equilibrate`.
-        6. Projects the adapter's :class:`EquilibriumResult` into a
+        3. Lazily initialises the adapter; if construction fails, returns
+           ``status='unavailable'``.
+        4. Calls the adapter's :meth:`equilibrate`; it applies the domain
+           gate before checking engine availability.
+        5. Projects the adapter's :class:`EquilibriumResult` into a
            :class:`MAGEMinShadowDiagnostics`.
-        7. Returns the :class:`IntentResult` with ``transition=None``.
+        6. Returns the :class:`IntentResult` with ``transition=None``.
         """
         fO2_log, redox_state = normalize_redox_state(
             request.fO2_log,
@@ -254,35 +251,8 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         control_audit = self._build_control_audit(request)
 
         composition_mol_by_account = self._composition_from_view(request)
-        composition_wt_pct = self._composition_wt_pct(
-            composition_mol_by_account.get(self.DECLARED_ACCOUNT, {}),
-            request.account_view.species_formula_registry,
-        )
-
-        # Run the domain gate even when the adapter is None so callers
-        # see a meaningful rejection (rather than a silent
-        # 'unavailable' surface that hides the input issue).
-        valid, gate_warnings, gate_reason = (
-            MAGEMinDomainGate.validate_with_reason(composition_wt_pct)
-        )
-        if not valid:
-            return IntentResult(
-                intent=request.intent,
-                status='out_of_domain',
-                transition=None,
-                control_audit=control_audit,
-                diagnostic=MAGEMinShadowDiagnostics(
-                    mode='unavailable',
-                    engine_version=self._engine_version(),
-                    backend_status='out_of_domain',
-                    backend_status_reason=gate_reason,
-                    backend_warnings=tuple(gate_warnings),
-                ).as_diagnostic(),
-                warnings=tuple(gate_warnings),
-            )
-
         backend = self._ensure_backend()
-        if backend is None or not self._backend_available(backend):
+        if backend is None:
             return IntentResult(
                 intent=request.intent,
                 status='unavailable',
@@ -482,40 +452,6 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             }
         return result
 
-    def _composition_wt_pct(
-        self,
-        species_mol: Mapping[str, float],
-        species_formula_registry: Mapping[str, Any],
-    ) -> dict:
-        """Project mol -> wt% for the domain gate."""
-        if not species_mol:
-            return {}
-        from simulator.accounting.formulas import resolve_species_formula
-
-        kg_by_species: dict = {}
-        total_kg = 0.0
-        for species, mol in species_mol.items():
-            mol_val = float(mol)
-            if mol_val <= 0.0:
-                continue
-            try:
-                formula = resolve_species_formula(species, species_formula_registry)
-            except Exception:
-                continue
-            mass_kg = mol_val * formula.molar_mass_kg_per_mol()
-            if mass_kg <= 0.0:
-                continue
-            kg_by_species[str(species)] = (
-                kg_by_species.get(str(species), 0.0) + mass_kg
-            )
-            total_kg += mass_kg
-        if total_kg <= 0.0:
-            return {}
-        return {
-            species: kg / total_kg * 100.0
-            for species, kg in kg_by_species.items()
-        }
-
     def _ensure_backend(self) -> Optional[Any]:
         """Return the live adapter, lazily constructing it on first use.
 
@@ -529,10 +465,18 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             if not self._backend_initialised:
                 self._backend_initialization_error = None
                 try:
-                    self._backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
+                    initialized = self._backend.initialize(
+                        dict(_SHADOW_BACKEND_CONFIG)
+                    )
+                    if initialized is False:
+                        self._backend_initialization_error = RuntimeError(
+                            "MAGEMin backend initialization reported unavailable"
+                        )
                 except Exception as exc:
                     self._backend_initialization_error = exc
                 self._backend_initialised = True
+            if self._backend_initialization_error is not None:
+                return None
             return self._backend
         backend = None
         backend_finalizer = None
@@ -545,7 +489,10 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 backend_finalizer = weakref.finalize(
                     self, _enqueue_backend_close, close, os.getpid()
                 )
-            backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
+            if backend.initialize(dict(_SHADOW_BACKEND_CONFIG)) is False:
+                raise RuntimeError(
+                    "MAGEMin backend initialization reported unavailable"
+                )
         except Exception as exc:
             self._backend_initialization_error = exc
             if backend_finalizer is not None:
@@ -560,16 +507,6 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         self._backend_finalizer = backend_finalizer
         self._backend_initialised = True
         return backend
-
-    @staticmethod
-    def _backend_available(backend: Any) -> bool:
-        is_avail = getattr(backend, 'is_available', None)
-        if callable(is_avail):
-            try:
-                return bool(is_avail())
-            except Exception:
-                return False
-        return False
 
     def _run_backend(
         self,

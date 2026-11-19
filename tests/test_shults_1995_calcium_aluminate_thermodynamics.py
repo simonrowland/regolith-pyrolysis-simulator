@@ -22,7 +22,7 @@ def test_shults_1995_calcium_aluminate_migrates_and_pins_table_1_currents():
     assert migrator.result.validation is not None
     assert migrator.result.validation.ok
     assert migrator.result.validation.hard_issues == ()
-    assert len(migrator.result.observations) == 1
+    assert len(migrator.result.observations) == 7
     context = [
         row
         for rows in migrator.result.context_by_work.values()
@@ -30,5 +30,7 @@ def test_shults_1995_calcium_aluminate_migrates_and_pins_table_1_currents():
     ]
     alo = next(row for row in context if row["observation_id"] == "shults_1995_table1_alo_intensity_al2o3")
     ca = next(row for row in context if row["observation_id"] == "shults_1995_table1_ca_intensity_cao")
+    assert alo["locator"]["table"] == "1"
+    assert ca["locator"]["table"] == "1"
     assert alo["values"]["ion_intensity"] == 0.18
     assert ca["values"]["ion_intensity"] == 100.0

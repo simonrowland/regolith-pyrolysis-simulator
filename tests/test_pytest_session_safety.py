@@ -44,6 +44,25 @@ def test_bare_conftest_import_resolves_to_repository_root() -> None:
     )
 
 
+def test_conftest_import_from_tests_resolves_to_repository_root() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    child_code = (
+        "import sys; from pathlib import Path; import conftest; "
+        "repo_root = Path(sys.argv[1]); "
+        "assert Path(conftest.__file__).resolve() == repo_root / 'conftest.py'"
+    )
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = os.pathsep.join(
+        filter(None, (str(repo_root), environment.get("PYTHONPATH", "")))
+    )
+    subprocess.run(
+        [sys.executable, "-c", child_code, str(repo_root)],
+        cwd=repo_root / "tests",
+        env=environment,
+        check=True,
+    )
+
+
 class _Clock:
     def __init__(self) -> None:
         self.wall = 0.0

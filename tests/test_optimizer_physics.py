@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import math
 import pickle
+from dataclasses import dataclass
+from enum import Enum
 from types import SimpleNamespace
 
 import pytest
@@ -12,6 +14,7 @@ from simulator.accounting.yield_disposition import (
 )
 from simulator.optimize.physics import (
     CoatingFeasibilityReportError,
+    GateMargin,
     GATE_ORDER,
     PhysicsConstraintSet,
     ThresholdSpec,
@@ -20,6 +23,7 @@ from simulator.optimize.physics import (
     extraction_completeness_report,
     physics_constraints_digest,
 )
+from simulator.optimize import physics as physics_module
 from simulator.optimize.objective import product_summary
 from simulator.optimize.profiles import physics_constraints_from_profile
 from simulator.state import CampaignPhase, HourSnapshot
@@ -929,6 +933,75 @@ def test_d045_flagged_deposit_below_threshold_passes_with_flag() -> None:
     )
 
 
+def test_coating_warning_authority_is_shared_and_read_only() -> None:
+    authority = {
+        "carrier_authority": {
+            "SiO": {"status": "status_bearing", "detail": "wall evidence"},
+        },
+        "extrapolations": [{"wall_temperature_C": 1400.0}],
+    }
+    shared_authority, shared_flags = physics_module._coating_authority_values(
+        authority
+    )
+    warnings = [
+        physics_module._coating_reason_record(
+            f"warning-{index}",
+            authority=shared_authority,
+            authority_flags=shared_flags,
+        )
+        for index in range(2)
+    ]
+    margin = GateMargin(
+        gate="coating",
+        feasible=True,
+        margin=1.0,
+        threshold=ThresholdSpec(
+            id="coating",
+            value=1.0,
+            units="campaigns",
+            source="test",
+            source_ref="test",
+        ),
+        observed=2.0,
+        detail="shared warning authority",
+        status_payload={
+            "coating_verdict": "clear",
+            "coating_warning_flags": warnings,
+        },
+    )
+    first, second = margin.status_payload["coating_warning_flags"]
+
+    # Plain built-ins preserve engine-worker pickling and Flask JSON encoding.
+    assert type(first["authority"]) is dict
+    assert type(first["flags"]) is dict
+    assert first["authority"] is second["authority"]
+    assert first["flags"] is second["flags"]
+    pickle.dumps(margin)
+    import json
+
+    json.dumps(margin.status_payload)
+
+    # Shared authority trees follow a read-only-by-contract rule. Exercise the
+    # result encoder and decoder, which are the readers that receive these refs.
+    from simulator.optimize.results_store import (
+        _decode_result_payload,
+        _encode_result_payload,
+    )
+
+    encoded_margins, result_blob = _encode_result_payload(
+        {"coating": margin},
+        {"backend_status": "ok"},
+    )
+    decoded, _trace = _decode_result_payload(encoded_margins, result_blob)
+    loaded_warnings = decoded["coating"].status_payload["coating_warning_flags"]
+    assert loaded_warnings[0]["authority"] is loaded_warnings[1]["authority"]
+    assert loaded_warnings[0]["flags"] is loaded_warnings[1]["flags"]
+    assert shared_authority == authority
+    assert first["authority"] == authority
+    first["reason"] = "edited warning"
+    assert second["reason"] == "warning-1"
+
+
 def test_d045_silica_exposure_fails_at_zero_wall_deposit_mass() -> None:
     report = _d045_report(
         wall_deposit_kg_per_campaign=0.0,
@@ -950,6 +1023,63 @@ def test_d045_silica_exposure_fails_at_zero_wall_deposit_mass() -> None:
         reason["reason"] == "silica_exposed_to_alkali"
         for reason in coating.status_payload["coating_violation_reasons"]
     )
+
+
+def test_equal_nested_coating_reasons_keep_content_based_deduplication() -> None:
+    class DetailKind(Enum):
+        SOURCE = "source"
+
+    @dataclass(frozen=True)
+    class DetailRecord:
+        source: str
+
+    finding = {
+        "key": "silica_exposed_to_alkali",
+        "stage_number": 3,
+        "evidence": {"excess": 0.1, "source": "wall"},
+    }
+    explicit_reason_a = {
+        "reason": "explicit_coating_violation",
+        "detail": {"species": "SiO", "segment": "hot_wall"},
+    }
+    explicit_reason_b = {
+        "reason": "explicit_coating_violation",
+        "detail": {"segment": "hot_wall", "species": "SiO"},
+    }
+    equivalent_details = (
+        ("positive_infinity", float("inf"), float("inf")),
+        ("nan", float("nan"), float("nan")),
+        ("negative_zero", -0.0, -0.0),
+        ("set", {"wall", "source"}, {"source", "wall"}),
+        ("tuple", tuple(["wall", 3]), tuple(["wall", 3])),
+        ("enum", DetailKind.SOURCE, DetailKind.SOURCE),
+        ("dataclass", DetailRecord("wall"), DetailRecord("wall")),
+    )
+    explicit_reasons = [explicit_reason_a, explicit_reason_b]
+    for name, first_value, second_value in equivalent_details:
+        reason_name = f"explicit_{name}"
+        explicit_reasons.extend((
+            {"reason": reason_name, "detail": {"value": first_value}},
+            {"reason": reason_name, "detail": {"value": second_value}},
+        ))
+
+    reasons = physics_module._coating_violation_reasons(
+        authority={"code": "test-authority"},
+        diagnostics={
+            "silica_exposed_to_alkali_findings": [dict(finding), dict(finding)],
+        },
+        explicit_reasons=explicit_reasons,
+    )
+
+    assert sum(
+        reason["reason"] == "silica_exposed_to_alkali" for reason in reasons
+    ) == 1
+    assert sum(
+        reason["reason"] == "explicit_coating_violation" for reason in reasons
+    ) == 1
+    for name, _first_value, _second_value in equivalent_details:
+        reason_name = f"explicit_{name}"
+        assert sum(reason["reason"] == reason_name for reason in reasons) == 1
 
 
 def test_d045_dew_point_finding_below_threshold_is_a_warning() -> None:

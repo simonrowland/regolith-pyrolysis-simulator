@@ -1324,12 +1324,30 @@ def _imported_claim(
     candidate: Mapping[str, Any],
     imported_row: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
+    from simulator.optimize.results_store import _decode_result_payload
+
     row = dict(imported_row or {})
     eval_spec = _json_value(row.get("eval_spec"), {})
     objectives = _objective_mapping(_json_value(row.get("objectives"), []))
     if not objectives:
         objectives = _leaderboard_objectives(candidate)
-    margins = _margin_mapping(_json_value(row.get("feasibility_margins"), {}))
+    raw_margins = _json_value(row.get("feasibility_margins"), {})
+    decoded_margins, _result_blob = _decode_result_payload(
+        raw_margins,
+        row.get("result_blob"),
+    )
+    margins = (
+        {
+            gate: {
+                "feasible": margin.feasible,
+                "margin": margin.margin,
+                "observed": margin.observed,
+            }
+            for gate, margin in decoded_margins.items()
+        }
+        if decoded_margins
+        else _margin_mapping(raw_margins)
+    )
     return {
         "cache_key": str(row.get("cache_key") or candidate.get("cache_key") or ""),
         "candidate_id": str(row.get("candidate_id") or candidate.get("candidate_id") or ""),

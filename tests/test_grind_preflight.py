@@ -26,6 +26,7 @@ from simulator.grind_preflight import (
     assert_strict_vapor_source_report,
     vapor_pressure_source_report_from_sim,
 )
+from simulator.optimize.results_store import _decode_result_payload
 
 
 def _eval_spec(**overrides: object) -> dict[str, object]:
@@ -371,7 +372,7 @@ def test_strict_vapor_result_store_accepts_all_builtin_authoritative_with_sio_wa
         },
     )
 
-    summary = assert_strict_vapor_result_store(db_path)
+    summary = assert_strict_vapor_result_store(db_path, _decode_result_payload)
 
     assert summary == {"rows": 1, "vapor_active_rows": 1, "source_reports": 1}
 
@@ -569,7 +570,7 @@ def test_strict_vapor_result_store_rejects_builtin_fallback_report(
     )
 
     with pytest.raises(GrindSourceGateError, match="builtin_fallback"):
-        assert_strict_vapor_result_store(db_path)
+        assert_strict_vapor_result_store(db_path, _decode_result_payload)
 
 
 def test_strict_vapor_result_store_rejects_kernel_fallback_key(
@@ -586,7 +587,7 @@ def test_strict_vapor_result_store_rejects_kernel_fallback_key(
     )
 
     with pytest.raises(GrindSourceGateError, match="kernel_fallback_used"):
-        assert_strict_vapor_result_store(db_path)
+        assert_strict_vapor_result_store(db_path, _decode_result_payload)
 
 
 def test_strict_vapor_result_store_pt1_strict_off_is_explicit_noop(
@@ -595,7 +596,9 @@ def test_strict_vapor_result_store_pt1_strict_off_is_explicit_noop(
     db_path = tmp_path / "cache.sqlite"
     _write_pt1_store(db_path, source="vaporock")
 
-    summary = assert_strict_vapor_result_store(db_path, strict_vapor_gate=False)
+    summary = assert_strict_vapor_result_store(
+        db_path, _decode_result_payload, strict_vapor_gate=False
+    )
 
     assert summary == {
         "rows": 1,
@@ -613,7 +616,7 @@ def test_strict_vapor_result_store_rejects_unrecognized_schema(
         conn.execute("CREATE TABLE unrelated (id TEXT PRIMARY KEY)")
 
     with pytest.raises(GrindSourceGateError, match="unrecognized cache schema"):
-        assert_strict_vapor_result_store(db_path)
+        assert_strict_vapor_result_store(db_path, _decode_result_payload)
 
 
 def test_strict_vapor_result_store_pt1_strict_on_rejects_vaporock(
@@ -623,7 +626,9 @@ def test_strict_vapor_result_store_pt1_strict_on_rejects_vaporock(
     _write_pt1_store(db_path, source="vaporock")
 
     with pytest.raises(GrindSourceGateError, match="vaporock"):
-        assert_strict_vapor_result_store(db_path, strict_vapor_gate=True)
+        assert_strict_vapor_result_store(
+            db_path, _decode_result_payload, strict_vapor_gate=True
+        )
 
 
 def test_strict_vapor_result_payload_rejects_nested_vaporock_provider_id() -> None:
@@ -655,4 +660,4 @@ def test_strict_vapor_result_store_requires_report_for_vapor_active_result(
     )
 
     with pytest.raises(GrindSourceGateError, match="missing vapor_pressure_source_report"):
-        assert_strict_vapor_result_store(db_path)
+        assert_strict_vapor_result_store(db_path, _decode_result_payload)

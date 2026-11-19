@@ -18,6 +18,7 @@ from typing import Any, Mapping
 
 import pytest
 
+from simulator.engine_cache import ENGINE_CACHE_DISCLOSURE_ENGINES
 from simulator.diagnostic_helpers.binary_pot_battery import (
     ARM_QUALIFICATION,
     AUTHORITY_EXTRAPOLATED,
@@ -30,6 +31,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     QUANTITY_PRESSURE,
     PO2_NOT_AN_INPUT,
     REFUSAL_COMPOSITION_PROJECTED,
+    REFUSAL_DIAGNOSTIC_GAP,
     REFUSAL_ENGINE_CRASH,
     REFUSAL_GATE_REFUSED_IN_ADAPTER,
     REFUSAL_TIMEOUT,
@@ -721,6 +723,90 @@ def test_classify_out_of_domain_and_no_liquid() -> None:
     )
     assert status == "refusal"
     assert reason == "no_liquid"
+
+
+@pytest.mark.parametrize(
+    ("reason_code", "expected_refusal"),
+    (
+        ("missing_binary", REFUSAL_UNAVAILABLE),
+        ("magemin_untyped_failure", REFUSAL_DIAGNOSTIC_GAP),
+    ),
+)
+def test_classify_backend_reason_into_typed_refusal(
+    reason_code: str,
+    expected_refusal: str,
+) -> None:
+    diagnostics = {
+        "backend_status": "not_converged",
+        "backend_status_reason": reason_code,
+    }
+    status, reason, engine_reason = classify_equilibrate_outcome(
+        SimpleNamespace(
+            status="not_converged",
+            diagnostics=diagnostics,
+            warnings=[],
+            activity_coefficients={},
+            vapor_pressures_Pa={},
+            liquid_fraction=None,
+        )
+    )
+
+    assert status == "refusal"
+    assert reason == expected_refusal
+    assert engine_reason == reason_code
+
+
+def test_magemin_untyped_failure_remains_visible_in_battery_cell(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    bare_failure = EquilibriumResult(status="not_converged", diagnostics={})
+    monkeypatch.setattr(
+        backend,
+        "_equilibrate_body",
+        lambda *_args, **_kwargs: bare_failure,
+    )
+    handle = EngineHandle(
+        name="magemin",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    pot = BinaryPot(
+        pot_id="untyped-failure",
+        kato_1993_table4_system=None,
+        why="diagnostic gap battery row",
+        composition_wt_pct={"SiO2": 50.0, "Al2O3": 50.0},
+    )
+
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1500.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        isolated=False,
+    )
+
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == REFUSAL_DIAGNOSTIC_GAP
+    assert cell.engine_reason == "magemin_untyped_failure"
+    notices = [
+        notice for notice in cell.notices
+        if notice.get("kind") == REFUSAL_DIAGNOSTIC_GAP
+    ]
+    assert notices == [
+        {
+            "kind": REFUSAL_DIAGNOSTIC_GAP,
+            "reason": "magemin_untyped_failure",
+            "magemin_untyped_failure_diagnostic_gap": True,
+        }
+    ]
+    assert cell.as_payload()["notices"] == cell.notices
 
 
 def test_classify_thermoengine_nonfinite_keeps_field_detail() -> None:
@@ -2752,6 +2838,52 @@ def test_internal_analytical_wall_backstop_refuses_a_blocked_child(
     assert raised.value.timeout_reason is None
 
 
+@pytest.mark.parametrize("engine_id", sorted(ENGINE_CACHE_DISCLOSURE_ENGINES))
+def test_carrying_engine_isolated_worker_keeps_disclosures_unknown(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    engine_id: str,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    from simulator import engine_cache
+    from simulator.engine_cache import _engine_cache_path_scope
+    from simulator.vapour_rail.run_disclosure import disclosure_scope
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    worker = battery._IsolatedCellWorker(engine_id)
+    response = _ok_cell(engine=engine_id, gas={}).as_payload()
+    calls = {"n": 0}
+
+    def fake_call(_payload, *, timeout_s: float):
+        calls["n"] += 1
+        return dict(response)
+
+    monkeypatch.setattr(worker._worker, "call", fake_call)
+    request = {
+        "pot_id": "isolated-cell-disclosure-cache",
+        "temperature_K": 1700.0,
+        "po2": Po2Request(mode="engine_default", po2_bar=None).as_payload(),
+    }
+    try:
+        with _engine_cache_path_scope(tmp_path / "isolated-cell-disclosure.sqlite"):
+            first = worker.request(request, timeout_s=1.0)
+            with disclosure_scope(inherit=False) as disclosures:
+                second = worker.request(request, timeout_s=1.0)
+                third = worker.request(request, timeout_s=1.0)
+                assert disclosures.snapshot() == ()
+            counts = engine_cache.engine_cache_counters(reset=True)[engine_id]
+    finally:
+        worker.close()
+
+    assert first["status"] == second["status"] == third["status"] == "ok"
+    assert calls["n"] == 3
+    assert counts["hits"] == 0
+    assert counts["stores"] == 1
+
+
 def test_internal_analytical_cpu_budget_tolerates_idle_wall_that_old_cap_refused(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -3151,15 +3283,17 @@ def test_qualification_inline_adapter_gate_is_gate_refused_in_adapter() -> None:
     assert "fe_free" in (cell.engine_reason or "")
 
 
-def test_classify_subprocess_died_is_engine_crash() -> None:
+@pytest.mark.parametrize(
+    "reason_code",
+    ("subprocess_died", "magemin_engine_worker_died"),
+)
+def test_classify_worker_process_death_is_engine_crash(reason_code: str) -> None:
     status, reason, engine_reason = classify_equilibrate_outcome(
         SimpleNamespace(
             status="out_of_domain",
             diagnostics={
-                "backend_status_reason": "subprocess_died",
-                "backend_failure_reason_code": "subprocess_died",
-                "backend_failure_category": "engine_crash",
-                "subprocess_failure": {"returncode": -6, "signal": "SIGABRT"},
+                "backend_status_reason": reason_code,
+                "backend_failure_reason_code": reason_code,
             },
             warnings=["AlphaMELTS subprocess exited before producing a result"],
             activity_coefficients={},

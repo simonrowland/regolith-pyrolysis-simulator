@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import fields, replace
+from dataclasses import dataclass, fields, replace
+from enum import Enum
 import json
 import math
 import multiprocessing
@@ -9,9 +10,10 @@ import queue
 import sqlite3
 import threading
 import time
-from types import SimpleNamespace
+from types import MappingProxyType, SimpleNamespace
 
 import pytest
+import numpy as np
 
 from simulator.corpus_version import current_corpus_version
 from simulator.chemistry.kernel.dto import DEGRADING_INTENT_RESULT_STATUSES
@@ -32,11 +34,14 @@ from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, Thresho
 from simulator.optimize.result_scope import result_scope_payload, selector_where
 from simulator.optimize.results_store import (
     ResultStore,
+    ResultStoreSchemaError,
     ResultStoreWriteLock,
     ResultStoreWriteLockTimeout,
     ResultStoreWriteRejected,
     SCHEMA_VERSION,
     _deserialize_margins,
+    _decode_result_payload,
+    _encode_result_payload,
     _serialize_objectives,
     _serialize_margins,
     grounded_result_feasible,
@@ -48,6 +53,24 @@ from web.routes import _coating_readout
 # not assert a latency. Any test that means to claim "within N seconds" should
 # use its own explicit figure and say so, rather than borrowing this one.
 _RENDEZVOUS_TIMEOUT_S = 30.0
+
+
+# Keep these module-scoped: legacy _jsonable stores str(value), including __qualname__.
+class PayloadEnum(Enum):
+    COATING = "coating"
+
+
+@dataclass
+class PayloadData:
+    count: int
+
+
+class GeneratorLike:
+    def __iter__(self):
+        yield from (1, 2)
+
+    def __str__(self) -> str:
+        return "generator-like(1, 2)"
 
 
 def _base_spec(**overrides: object) -> EvalSpec:
@@ -164,6 +187,50 @@ def test_numeric_partial_objective_status_survives_result_serialization():
     assert serialized["value"] == 8.5
     assert serialized["value_status"] == "partial"
     assert serialized["evidence"]["excluded"] == excluded
+
+
+def test_optimizer_coating_margin_serialization_matches_golden_json() -> None:
+    status_payload = MappingProxyType({
+        "coating_verdict": "violated",
+        "coating_diagnostics": MappingProxyType({
+            "upstream_hot_wall_findings": (
+                MappingProxyType({
+                    "hour": 1,
+                    "segment": "hot",
+                    "evidence": MappingProxyType({"excess": 0.1}),
+                }),
+            ),
+        }),
+        "refusal_diagnostic": MappingProxyType({
+            "species": "SiO",
+            "reasons": {"z", "a"},
+        }),
+    })
+    serialized = json.dumps(
+        _serialize_margins({
+            "coating": _coating_margin(
+                feasible=False,
+                observed=0.75,
+                threshold=1.0,
+                status_payload=status_payload,
+            ),
+        }),
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
+
+    assert serialized == (
+        '{"coating":{"authoritative":true,"detail":"coating test margin",'
+        '"feasible":false,"gate":"coating","margin":-0.25,'
+        '"observed":0.75,"output_status":"authoritative","status":"available",'
+        '"status_payload":{"coating_diagnostics":{"upstream_hot_wall_findings":['
+        '{"evidence":{"excess":0.1},"hour":1,"segment":"hot"}]},'
+        '"coating_verdict":"violated","refusal_diagnostic":{"reasons":["a","z"],'
+        '"species":"SiO"}},"threshold":{"id":"coating_min_campaigns_to_resinter",'
+        '"source":"profile","source_ref":"test profile","tolerance":0.0,'
+        '"units":"campaigns","value":1.0}}}'
+    )
 
 
 # Shape written by alphamelts._build_result: backend_name and engine_version
@@ -446,6 +513,318 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
         "glass_status": "unavailable",
         "glass_status_reason": "stage_3_missing",
     }
+
+
+def test_coating_warning_flag_shared_payloads_round_trip(tmp_path) -> None:
+    spec = _base_spec()
+    authority = {
+        "carrier_authority": {
+            f"species-{index}": {"status": "status_bearing", "detail": "wall evidence" * 20}
+            for index in range(40)
+        },
+        "extrapolations": [{"temperature_C": 1200.0 + index} for index in range(40)],
+    }
+    flags = {"status": "status_bearing", "codes": ["wall_evidence_pending"]}
+    warning_flags = [
+        {
+            "reason": "upstream_hot_wall_refused",
+            "authority": authority,
+            "flags": flags,
+            "finding": {"segment": f"segment-{index}", "species": "SiO"},
+        }
+        for index in range(4)
+    ]
+    status_payload = {
+        "coating_verdict": "clear",
+        "coating_diagnostics": {"upstream_hot_wall_findings": []},
+        "coating_warning_flags": warning_flags,
+    }
+    scored = _scored(
+        spec,
+        margins={
+            "coating": _coating_margin(
+                feasible=True,
+                observed=11.0,
+                threshold=10.0,
+                status_payload=status_payload,
+            )
+        },
+    )
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+
+    store.store(spec, scored, created_at="2026-11-17T00:00:00Z")
+    loaded = store.lookup(spec)
+
+    assert loaded is not None
+    assert loaded.feasibility_margins["coating"].status_payload == status_payload
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        row = conn.execute(
+            "SELECT feasibility_margins, result_blob FROM results WHERE cache_key = ?",
+            (cache_key(spec),),
+        ).fetchone()
+    stored_margins = json.loads(row[0])
+    stored_flags = stored_margins["coating"]["status_payload"]["coating_warning_flags"]
+    envelope = json.loads(row[1])["__optimizer_result_store_envelope_v1__"]
+    assert len(envelope["shared_status_payloads"]) == 2
+    assert all(
+        set(flag["authority"]) == {"__optimizer_result_store_ref_v1__"}
+        and set(flag["flags"]) == {"__optimizer_result_store_ref_v1__"}
+        for flag in stored_flags
+    )
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        conn.execute(
+            "UPDATE results SET result_blob = ? WHERE cache_key = ?",
+            (
+                json.dumps({
+                    "__optimizer_result_store_envelope_v1__": {
+                        "trace": envelope["trace"],
+                        "shared_status_payloads": {},
+                    }
+                }),
+                cache_key(spec),
+            ),
+        )
+    with pytest.raises(ResultStoreSchemaError, match="shared coating payload is missing"):
+        store.lookup(spec)
+
+
+def test_shared_coating_record_codec_work_scales_with_distinct_trees(monkeypatch) -> None:
+    """One large shared tree is copied, encoded, and validated once per row."""
+    import simulator.optimize.physics as physics_module
+    import simulator.optimize.results_store as results_store_module
+
+    warning_count = 500
+    authority_source = {
+        "code": "synthetic-authority",
+        "output_status": "status_bearing",
+        "large_evidence": "x" * 200_000,
+    }
+    plain_source_calls = 0
+    plain_shared_calls = 0
+    shared_authority_ref = []
+    original_plain_value = physics_module._plain_value
+
+    def count_plain_source(value):
+        nonlocal plain_source_calls, plain_shared_calls
+        if value is authority_source:
+            plain_source_calls += 1
+        if shared_authority_ref and value is shared_authority_ref[0]:
+            plain_shared_calls += 1
+        return original_plain_value(value)
+
+    monkeypatch.setattr(physics_module, "_plain_value", count_plain_source)
+    source_cache = {}
+    shared_authority, shared_flags = physics_module._coating_authority_values(
+        authority_source,
+        shared_cache=source_cache,
+    )
+    cached_authority, cached_flags = physics_module._coating_authority_values(
+        authority_source,
+        shared_cache=source_cache,
+    )
+    shared_authority_ref.append(shared_authority)
+    assert cached_authority is shared_authority
+    assert cached_flags is shared_flags
+    warnings = physics_module._unique_coating_records([
+        physics_module._coating_reason_record(
+            "synthetic-warning",
+            authority=shared_authority,
+            authority_flags=shared_flags,
+            record_number=index,
+        )
+        for index in range(warning_count)
+    ])
+    reasons = physics_module._unique_coating_records([
+        physics_module._coating_reason_record(
+            "synthetic-violation",
+            authority=shared_authority,
+            authority_flags=shared_flags,
+            record_number=index,
+        )
+        for index in range(warning_count)
+    ])
+    margin = GateMargin(
+        gate="coating",
+        feasible=False,
+        margin=-1.0,
+        threshold=ThresholdSpec(
+            id="coating",
+            value=1.0,
+            units="campaigns",
+            source="test",
+            source_ref="synthetic",
+        ),
+        observed=2.0,
+        detail="synthetic shared coating records",
+        status_payload={
+            "coating_verdict": "violated",
+            "coating_warning_flags": warnings,
+            "coating_violation_reasons": reasons,
+        },
+    )
+    assert plain_source_calls == 1
+    assert plain_shared_calls == 0
+    assert len(margin.status_payload["coating_warning_flags"]) == warning_count
+    assert len(margin.status_payload["coating_violation_reasons"]) == warning_count
+    assert all(
+        record["authority"] is shared_authority
+        and record["flags"] is shared_flags
+        for record in margin.status_payload["coating_warning_flags"]
+        + margin.status_payload["coating_violation_reasons"]
+    )
+
+    original_jsonable = results_store_module._jsonable
+    original_json_dump = results_store_module._json_dump
+    original_sha256 = results_store_module.hashlib.sha256
+    stage = "encode"
+    source_convert_calls = 0
+    source_hash_calls = 0
+    decoded_convert_calls = 0
+    decoded_hash_calls = 0
+    decoded_shared_source = None
+    authority_hash_bytes = original_json_dump(
+        original_jsonable(shared_authority)
+    ).encode()
+
+    def count_jsonable(value):
+        nonlocal source_convert_calls, decoded_convert_calls
+        if stage == "encode" and value is shared_authority:
+            source_convert_calls += 1
+        if stage == "decode" and value is decoded_shared_source:
+            decoded_convert_calls += 1
+        return original_jsonable(value)
+
+    def count_sha256(data=b"", *args, **kwargs):
+        nonlocal source_hash_calls, decoded_hash_calls
+        if data == authority_hash_bytes:
+            if stage == "encode":
+                source_hash_calls += 1
+            else:
+                decoded_hash_calls += 1
+        return original_sha256(data, *args, **kwargs)
+
+    monkeypatch.setattr(results_store_module, "_jsonable", count_jsonable)
+    monkeypatch.setattr(results_store_module.hashlib, "sha256", count_sha256)
+    serialized_margins, result_blob = _encode_result_payload(
+        {"coating": margin},
+        {"trace_marker": "synthetic-work-guard"},
+    )
+    assert source_convert_calls == 1
+    assert source_hash_calls == 1
+
+    stored_margins = json.loads(json.dumps(serialized_margins))
+    stored_blob = json.loads(json.dumps(result_blob))
+    projected_bytes = len(json.dumps(stored_margins).encode()) + len(
+        json.dumps(stored_blob).encode()
+    )
+    # One 200 KB authority plus 1,000 small records/references stays below
+    # 1 MB; inline repetition would exceed 100 MB (500 x 200 KB).
+    assert projected_bytes < 1_000_000
+    envelope = stored_blob["__optimizer_result_store_envelope_v1__"]
+    authority_reference = stored_margins["coating"]["status_payload"][
+        "coating_warning_flags"
+    ][0]["authority"]["__optimizer_result_store_ref_v1__"]
+    decoded_shared_source = envelope["shared_status_payloads"][authority_reference]
+    authority_hash_bytes = original_json_dump(decoded_shared_source).encode()
+    stage = "decode"
+
+    decoded, _trace = _decode_result_payload(stored_margins, stored_blob)
+    assert decoded_convert_calls == 1
+    assert decoded_hash_calls == 1
+    decoded_records = (
+        decoded["coating"].status_payload["coating_warning_flags"]
+        + decoded["coating"].status_payload["coating_violation_reasons"]
+    )
+    assert all(record["authority"] is decoded_records[0]["authority"] for record in decoded_records)
+    assert all(record["flags"] is decoded_records[0]["flags"] for record in decoded_records)
+    assert plain_source_calls == 1
+
+
+def test_result_payload_round_trip_preserves_legacy_jsonable_identity() -> None:
+    payload = {
+        "coating_verdict": "clear",
+        "identity_payload": {
+            "range": range(2),
+            "generator_like": GeneratorLike(),
+            "numpy_array": np.array([1, 2]),
+            "numpy_scalar": np.int64(7),
+            "set": {"z", "a"},
+            "enum": PayloadEnum.COATING,
+            "dataclass": PayloadData(count=2),
+            "nan": float("nan"),
+            "positive_infinity": float("inf"),
+            "negative_infinity": float("-inf"),
+            "negative_zero": -0.0,
+            "boolean": True,
+        },
+    }
+    margin = _coating_margin(
+        feasible=True,
+        observed=2.0,
+        threshold=1.0,
+        status_payload=payload,
+    )
+    margins, result_blob = _encode_result_payload(
+        {"coating": margin},
+        {"trace_marker": "legacy-compatible"},
+    )
+    stored_margins = json.loads(json.dumps(margins, allow_nan=False))
+    stored_blob = json.loads(json.dumps(result_blob, allow_nan=False))
+    decoded, decoded_blob = _decode_result_payload(stored_margins, stored_blob)
+
+    decoded_payload = decoded["coating"].status_payload
+    assert decoded_payload == {
+        "coating_verdict": "clear",
+        "identity_payload": {
+            "range": "range(0, 2)",
+            "generator_like": "generator-like(1, 2)",
+            "numpy_array": "[1 2]",
+            "numpy_scalar": "7",
+            "set": ["a", "z"],
+            "enum": "PayloadEnum.COATING",
+            "dataclass": "PayloadData(count=2)",
+            "nan": "nan",
+            "positive_infinity": "inf",
+            "negative_infinity": "-inf",
+            "negative_zero": -0.0,
+            "boolean": True,
+        },
+    }
+    assert math.copysign(
+        1.0, decoded_payload["identity_payload"]["negative_zero"]
+    ) == -1.0
+    assert decoded_blob == {"trace_marker": "legacy-compatible"}
+
+
+def test_result_payload_decoder_refuses_malformed_shared_reference() -> None:
+    authority = {"source": "wall saturation"}
+    flags = {"output_status": "status_bearing"}
+    margin = _coating_margin(
+        feasible=True,
+        observed=2.0,
+        threshold=1.0,
+        status_payload={
+            "coating_verdict": "clear",
+            "coating_warning_flags": [
+                {"reason": "first", "authority": authority, "flags": flags},
+                {"reason": "second", "authority": authority, "flags": flags},
+            ],
+        },
+    )
+    margins, result_blob = _encode_result_payload(
+        {"coating": margin},
+        {"trace_marker": "test"},
+    )
+    margins["coating"]["status_payload"]["coating_warning_flags"][0][
+        "authority"
+    ]["unexpected"] = "malformed"
+
+    with pytest.raises(ResultStoreSchemaError, match="reference is malformed"):
+        _decode_result_payload(margins, result_blob)
 
 
 def test_lookup_preserves_finite_objectives_on_infeasible_rows(tmp_path) -> None:

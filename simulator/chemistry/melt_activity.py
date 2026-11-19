@@ -265,13 +265,26 @@ class MeltOxideActivity:
         return self.activity ** (1.0 / exponent)
 
     def thermodynamic_parent_activity(self) -> float:
-        """Return activity on the parent-oxide formula basis."""
+        """Return activity on the parent-oxide formula basis.
+
+        Invariant: the basis is a(parent) = a(single)**cations. This is the
+        only parent-oxide power the publication paths call. Float underflow
+        of that power is 0.0. That is not a measured zero and it is not
+        permission to publish a(single). A vapour law floors a parent
+        activity below 1e-300 and discloses source_activity_floor_notice.
+        """
 
         cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(self.parent_oxide, 1.0)
         if self.activity <= 0.0:
             return 0.0
-        # For a pure-endmember reference, mu(parent) is cations times the
-        # single-cation chemical potential, so a(parent) = a(single)**cations.
+        # Premise: mu(parent) = cations * mu(single) on a pure-endmember
+        # reference, so a(parent) = a(single)**cations.
+        # Unit check: both activities are dimensionless.
+        # Sanity: cations = 1 leaves the activity unchanged, and a = 1 stays 1.
+        # (1e-200)**2 = 1e-400, which is 0.0 in float64, while 1e-200 itself
+        # is above the 1e-300 evaluator floor. Returning a(single) there
+        # would drop the floor notice and raise a unit-exponent pressure
+        # (K2, Na2) by 100 dex. The 0.0 is the power; the evaluator floors it.
         return self.activity ** float(cations)
 
     def provenance(self) -> dict[str, Any]:

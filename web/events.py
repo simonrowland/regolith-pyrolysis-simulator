@@ -10,6 +10,7 @@ from collections.abc import Mapping
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 try:
     from flask import request, session as flask_session
@@ -810,6 +811,16 @@ def _browser_socket_payload(event: str, payload):
         # This whole-train report is also included in simulation_complete. It
         # is not consumed from hourly ticks and grows as product is captured.
         emitted.pop('stage_purity_report', None)
+        # The run-wide law registry is stored on run_metadata. Re-sending it,
+        # or the step's disclosures, on every tick grows the socket payload
+        # past the 100 bytes/hour bound. The per_hour_summary event keeps the
+        # step's disclosures.
+        emitted.pop('law_disclosures', None)
+        delta = emitted.get('per_hour_summary_delta')
+        if isinstance(delta, Mapping):
+            delta_copy = dict(delta)
+            delta_copy.pop('law_disclosures', None)
+            emitted['per_hour_summary_delta'] = delta_copy
         vapour_rail = emitted.get('vapour_rail_instrumentation_panel')
         if isinstance(vapour_rail, Mapping):
             channels = vapour_rail.get('channels_by_species')

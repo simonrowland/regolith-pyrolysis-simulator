@@ -7,10 +7,11 @@ source:
   year: 1964
   publisher: U.S. Geological Survey
 extraction:
-  method: Manual transcription from the controller-fetched 173-page born-digital PDF; whole-volume pdftotext decode; all fourteen
+  method: Manual transcription from the controller-fetched 173-page born-digital PDF; whole-volume pdftotext decode; all sixteen
     extracted tables checked cell by cell against page images rendered at 180 dpi or higher; scoped tables including BACKLOG-priority ternaries T22/T13/T19/T28 transcribed.
-  date: '2026-10-04'
-  worker: extract-morey1964
+    Tables 12 and 21 and four prose transition values were added from rendered pages; existing Tables 6 and 26 were reused.
+  date: '2026-11-14'
+  worker: bugs1110-fix-1816-tierA-141429
   provenance_path: tables/morey-1964-usgs-pp440l-phase-equilibria/
 review_status: draft
 fidelity_samples:
@@ -79,8 +80,10 @@ scope_assessment:
   - 8
   - 9
   - 10
+  - 12
   - 13
   - 19
+  - 21
   - 22
   - 26
   - 28
@@ -88,14 +91,12 @@ scope_assessment:
   unextracted_tables:
   - 7
   - 11
-  - 12
   - 14
   - 15
   - 16
   - 17
   - 18
   - 20
-  - 21
   - 23
   - 24
   - 25
@@ -105,7 +106,7 @@ scope_assessment:
   - 31
   - 32
   note: Unary oxide transitions and melting data, binary invariant tables 3-6/8/9, iron-oxygen table 10, and ternary tables
-    13/19/22/26/28 transcribed (BACKLOG item 29 priority order for new ternaries). Remaining unextracted tables and
+    12/13/19/21/22/26/28 transcribed (BACKLOG item 29 priority order for new ternaries). Remaining unextracted tables and
     figure-only data are not digitized.
 conventions:
   composition_basis: Compositions are in weight percent unless otherwise specified.
@@ -2035,6 +2036,546 @@ species:
           SiO2: 88.0
           TiO2: 10.5
         qualifier: 'Two coexisting liquid layers; Morey prints 1535°C for both N and N''.; Morey cites these as diagram-level sources; he does not assign individual table rows to a single study.'
+    - observation_id: morey1964_t12_r1
+      type: composition
+      locator:
+        page: 41
+        published_page: L30
+        table: '12'
+        note: Table 12 row 1, invariant point a
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 12
+        table_row: 1
+        subsystem_as_printed: Na2O-CaO-Al2O3
+        invariant_type: eutectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: CaO·2Al2O3 + 2Na2O·3CaO·5Al2O3 ⇌ L
+        phases_as_printed:
+        - CaO·2Al2O3
+        - 2Na2O·3CaO·5Al2O3
+        - liquid
+        temperature_C_as_printed: 1550
+        composition_mass_percent:
+          Na2O: 8.6
+          CaO: 21.3
+          Al2O3: 70.1
+        invariant_point_as_printed: a
+    - observation_id: morey1964_t12_r2
+      type: composition
+      locator:
+        page: 41
+        published_page: L30
+        table: '12'
+        note: Table 12 row 2, invariant point B
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 12
+        table_row: 2
+        subsystem_as_printed: Na2O-CaO-Al2O3
+        invariant_type: eutectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: CaO·Al2O3 + 2Na2O·3CaO·5Al2O3 + CaO·2Al2O3 ⇌ L
+        phases_as_printed:
+        - CaO·Al2O3
+        - 2Na2O·3CaO·5Al2O3
+        - CaO·2Al2O3
+        - liquid
+        temperature_C_as_printed: 1465
+        composition_mass_percent:
+          Na2O: 6
+          CaO: 27.5
+          Al2O3: 66.5
+        invariant_point_as_printed: B
+    - observation_id: morey1964_t12_r3
+      type: composition
+      locator:
+        page: 41
+        published_page: L30
+        table: '12'
+        note: Table 12 row 3, invariant point d
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 12
+        table_row: 3
+        subsystem_as_printed: Na2O-CaO-Al2O3
+        invariant_type: eutectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: CaO·Al2O3 + 2Na2O·3CaO·5Al2O3 ⇌ L
+        phases_as_printed:
+        - CaO·Al2O3
+        - 2Na2O·3CaO·5Al2O3
+        - liquid
+        temperature_C_as_printed: 1515
+        composition_mass_percent:
+          Na2O: 5.4
+          CaO: 30.2
+          Al2O3: 64.3
+        invariant_point_as_printed: d
+    - observation_id: morey1964_t12_r4
+      type: composition
+      locator:
+        page: 41
+        published_page: L30
+        table: '12'
+        note: Table 12 row 4, invariant point F
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 12
+        table_row: 4
+        subsystem_as_printed: Na2O-CaO-Al2O3
+        invariant_type: eutectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: 5CaO·3Al2O3 + 2Na2O·3CaO·5Al2O3 + CaO·Al2O3 ⇌ L
+        phases_as_printed:
+        - 5CaO·3Al2O3
+        - 2Na2O·3CaO·5Al2O3
+        - CaO·Al2O3
+        - liquid
+        temperature_C_as_printed: 1430
+        composition_mass_percent:
+          Na2O: 4.0
+          CaO: 38.0
+          Al2O3: 58.0
+        invariant_point_as_printed: F
+    - observation_id: morey1964_t12_r5
+      type: composition
+      locator:
+        page: 41
+        published_page: L30
+        table: '12'
+        note: Table 12 row 5, invariant point h
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 12
+        table_row: 5
+        subsystem_as_printed: Na2O-CaO-Al2O3
+        invariant_type: eutectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: 5CaO·3Al2O3 + 2Na2O·3CaO·5Al2O3 ⇌ L
+        phases_as_printed:
+        - 5CaO·3Al2O3
+        - 2Na2O·3CaO·5Al2O3
+        - liquid
+        temperature_C_as_printed: 1450
+        composition_mass_percent:
+          Na2O: 4.3
+          CaO: 40.4
+          Al2O3: 55.3
+        invariant_point_as_printed: h
+    - observation_id: morey1964_t12_r6
+      type: composition
+      locator:
+        page: 41
+        published_page: L30
+        table: '12'
+        note: Table 12 row 6, invariant point i
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 12
+        table_row: 6
+        subsystem_as_printed: Na2O-CaO-Al2O3
+        invariant_type: eutectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: 5CaO·3Al2O3 + Na2O·8CaO·3Al2O3 + 2Na2O·3CaO·5Al2O3 ⇌ L
+        phases_as_printed:
+        - 5CaO·3Al2O3
+        - Na2O·8CaO·3Al2O3
+        - 2Na2O·3CaO·5Al2O3
+        - liquid
+        temperature_C_as_printed: 1420
+        composition_mass_percent:
+          Na2O: 5.0
+          CaO: 46.0
+          Al2O3: 49.0
+        invariant_point_as_printed: i
+    - observation_id: morey1964_t12_r7
+      type: composition
+      locator:
+        page: 41
+        published_page: L30
+        table: '12'
+        note: Table 12 row 7, invariant point j
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 12
+        table_row: 7
+        subsystem_as_printed: Na2O-CaO-Al2O3
+        invariant_type: peritectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: 5CaO·3Al2O3 + Na2O·8CaO·3Al2O3 ⇌ 3CaO·Al2O3 + L
+        phases_as_printed:
+        - 5CaO·3Al2O3
+        - Na2O·8CaO·3Al2O3
+        - 3CaO·Al2O3
+        - liquid
+        temperature_C_as_printed: 1423
+        composition_mass_percent:
+          Na2O: 4.5
+          CaO: 46.5
+          Al2O3: 49.0
+        invariant_point_as_printed: j
+    - observation_id: morey1964_t12_r8
+      type: composition
+      locator:
+        page: 41
+        published_page: L30
+        table: '12'
+        note: Table 12 row 8, invariant point q
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 12
+        table_row: 8
+        subsystem_as_printed: Na2O-CaO-Al2O3
+        invariant_type: eutectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: CaO + Na2O·Al2O3 ⇌ L
+        phases_as_printed:
+        - CaO
+        - Na2O·Al2O3
+        - liquid
+        temperature_C_as_printed: 1565
+        composition_mass_percent:
+          Na2O: 30.0
+          CaO: 20.0
+          Al2O3: 50.0
+        invariant_point_as_printed: q
+    - observation_id: morey1964_t12_r9
+      type: composition
+      locator:
+        page: 41
+        published_page: L30
+        table: '12'
+        note: Table 12 row 9, invariant point r
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 12
+        table_row: 9
+        subsystem_as_printed: Na2O-CaO-Al2O3
+        invariant_type: eutectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: Na2O·8CaO·3Al2O3 + 2Na2O·3CaO·5Al2O3 ⇌ L
+        phases_as_printed:
+        - Na2O·8CaO·3Al2O3
+        - 2Na2O·3CaO·5Al2O3
+        - liquid
+        temperature_C_as_printed: 1462
+        composition_mass_percent:
+          Na2O: 10.2
+          CaO: 43.7
+          Al2O3: 46.1
+        invariant_point_as_printed: r
+    - observation_id: morey1964_t12_r10
+      type: composition
+      locator:
+        page: 41
+        published_page: L30
+        table: '12'
+        note: Table 12 row 10, invariant point P
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 12
+        table_row: 10
+        subsystem_as_printed: Na2O-CaO-Al2O3
+        invariant_type: peritectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: Na2O·8CaO·3Al2O3 ⇌ (Na2O·Al2O3-2Na2O·3CaO·5Al2O3)ss + L
+        phases_as_printed:
+        - Na2O·8CaO·3Al2O3
+        - (Na2O·Al2O3-2Na2O·3CaO·5Al2O3)ss
+        - liquid
+        temperature_C_as_printed: 1475
+        composition_mass_percent:
+          Na2O: 13.0
+          CaO: 42.5
+          Al2O3: 44.5
+        invariant_point_as_printed: P
+    - observation_id: morey1964_t12_r11
+      type: composition
+      locator:
+        page: 41
+        published_page: L30
+        table: '12'
+        note: Table 12 row 11, invariant point M
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 12
+        table_row: 11
+        subsystem_as_printed: Na2O-CaO-Al2O3
+        invariant_type: peritectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: 3CaO·Al2O3 + Na2O·8CaO·3Al2O3 ⇌ CaO + L
+        phases_as_printed:
+        - 3CaO·Al2O3
+        - Na2O·8CaO·3Al2O3
+        - CaO
+        - liquid
+        temperature_C_as_printed: 1490
+        composition_mass_percent:
+          Na2O: 6.0
+          CaO: 50.0
+          Al2O3: 44.0
+        invariant_point_as_printed: M
+    - observation_id: morey1964_t21_r1
+      type: composition
+      locator:
+        page: 63
+        published_page: L52
+        table: '21'
+        note: Table 21 row 1; heading says composition, phase not stated
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 21
+        table_row: 1
+        subsystem_as_printed: MgO-CaO-Al2O3
+        invariant_type: peritectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: MgO + 3CaO·Al2O3 ⇌ CaO + L
+        phases_as_printed:
+        - MgO
+        - 3CaO·Al2O3
+        - CaO
+        - liquid
+        temperature_C_as_printed: 1450
+        composition_mass_percent:
+          MgO: 6.2
+          CaO: 51.5
+          Al2O3: 43.3
+        temperature_uncertainty_C_as_printed: 5
+        composition_header_as_printed: Composition (percent by weight); reaction includes liquid
+    - observation_id: morey1964_t21_r2
+      type: composition
+      locator:
+        page: 63
+        published_page: L52
+        table: '21'
+        note: Table 21 row 2; heading says composition, phase not stated
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 21
+        table_row: 2
+        subsystem_as_printed: MgO-CaO-Al2O3
+        invariant_type: eutectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: MgO + 5CaO·3Al2O3 ⇌ L
+        phases_as_printed:
+        - MgO
+        - 5CaO·3Al2O3
+        - liquid
+        temperature_C_as_printed: 1345
+        composition_mass_percent:
+          MgO: 6.3
+          CaO: 46.0
+          Al2O3: 47.7
+        temperature_uncertainty_C_as_printed: 5
+        composition_header_as_printed: Composition (percent by weight); reaction includes liquid
+    - observation_id: morey1964_t21_r3
+      type: composition
+      locator:
+        page: 63
+        published_page: L52
+        table: '21'
+        note: Table 21 row 3; heading says composition, phase not stated
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 21
+        table_row: 3
+        subsystem_as_printed: MgO-CaO-Al2O3
+        invariant_type: eutectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: MgO + CaO·Al2O3 + 5CaO·3Al2O3 ⇌ L
+        phases_as_printed:
+        - MgO
+        - CaO·Al2O3
+        - 5CaO·3Al2O3
+        - liquid
+        temperature_C_as_printed: 1345
+        composition_mass_percent:
+          MgO: 6.7
+          CaO: 41.5
+          Al2O3: 51.8
+        temperature_uncertainty_C_as_printed: 5
+        composition_header_as_printed: Composition (percent by weight); reaction includes liquid
+    - observation_id: morey1964_t21_r4
+      type: composition
+      locator:
+        page: 63
+        published_page: L52
+        table: '21'
+        note: Table 21 row 4; heading says composition, phase not stated
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 21
+        table_row: 4
+        subsystem_as_printed: MgO-CaO-Al2O3
+        invariant_type: peritectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: MgO + CaO·Al2O3 ⇌ MgO·Al2O3 + L
+        phases_as_printed:
+        - MgO
+        - CaO·Al2O3
+        - MgO·Al2O3
+        - liquid
+        temperature_C_as_printed: 1370
+        composition_mass_percent:
+          MgO: 6.9
+          CaO: 40.7
+          Al2O3: 52.4
+        temperature_uncertainty_C_as_printed: 5
+        composition_header_as_printed: Composition (percent by weight); reaction includes liquid
+    - observation_id: morey1964_t21_r5
+      type: composition
+      locator:
+        page: 63
+        published_page: L52
+        table: '21'
+        note: Table 21 row 5; heading says composition, phase not stated
+      units: wt%; °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_number: 21
+        table_row: 5
+        subsystem_as_printed: MgO-CaO-Al2O3
+        invariant_type: peritectic
+        invariant_type_basis: classified from the printed phase reaction; the source table identifies invariant points
+        phase_reaction_as_printed: MgO·Al2O3 + CaO·Al2O3 ⇌ CaO·2Al2O3 + L
+        phases_as_printed:
+        - MgO·Al2O3
+        - CaO·Al2O3
+        - CaO·2Al2O3
+        - liquid
+        temperature_C_as_printed: 1550
+        composition_mass_percent:
+          MgO: 3.5
+          CaO: 33.3
+          Al2O3: 63.2
+        temperature_uncertainty_C_as_printed: 5
+        composition_header_as_printed: Composition (percent by weight); reaction includes liquid
+    - observation_id: morey1964_t6_c12a7_1455
+      type: composition
+      locator:
+        page: 25
+        published_page: L14
+        section: CaO-Al2O3
+        note: Printed compound-transition sentence
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        subsystem_as_printed: CaO-Al2O3
+        compound_as_printed: 12CaO·7Al2O3
+        invariant_type: reported melting point; type not stated
+        phases_as_printed: not stated
+        temperature_C_as_printed: 1455
+        liquid_composition_as_printed: not stated
+        temperature_qualification_as_printed: reported as the uncertain melting point
+    - observation_id: morey1964_t6_c12a7_1391
+      type: composition
+      locator:
+        page: 25
+        published_page: L14
+        section: CaO-Al2O3
+        note: Printed compound-transition sentence
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        subsystem_as_printed: CaO-Al2O3
+        compound_as_printed: 12CaO·7Al2O3
+        invariant_type: reported melting point; type not stated
+        phases_as_printed: not stated
+        temperature_C_as_printed: 1391
+        liquid_composition_as_printed: not stated
+        temperature_qualification_as_printed: Nurse value reported as low as this temperature
+    - observation_id: morey1964_cas_gehlenite_1590
+      type: composition
+      locator:
+        page: 82
+        published_page: L71
+        section: CaO-Al2O3-SiO2
+        note: Printed compound-transition sentence
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        compound_as_printed: 2CaO·Al2O3·SiO2
+        invariant_type: congruent melting
+        phases_as_printed:
+        - 2CaO·Al2O3·SiO2
+        - liquid
+        temperature_C_as_printed: 1590
+        liquid_composition_as_printed: not stated
+        temperature_qualification_as_printed: printed compound melting point
+    - observation_id: morey1964_cas_c3as_1335
+      type: composition
+      locator:
+        page: 82
+        published_page: L71
+        section: CaO-Al2O3-SiO2
+        note: Printed compound-transition sentence
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        subsystem_as_printed: CaO-Al2O3-SiO2
+        compound_as_printed: 3CaO·Al2O3·SiO2
+        invariant_type: decomposition; products not stated
+        phases_as_printed: not stated
+        temperature_C_as_printed: 1335
+        liquid_composition_as_printed: not stated
+        temperature_qualification_as_printed: below the liquidus surface
   Al2O3:
     observations: []
     context:

@@ -78,6 +78,9 @@ PER_HOUR_DIAGNOSTIC_KEYS = {
     # typed refused status instead of letting the debit reader evaporate them
     # silently -- so the key showing up is the fix working, not a leak.
     "condensation_refusals_by_species",
+    # Optional on an advanced step after a law executed. Same contract as
+    # the runner per-hour row. The hourly simulation_tick omits it.
+    "law_disclosures",
 }
 
 

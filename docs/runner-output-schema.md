@@ -1048,6 +1048,13 @@ incident, stuck, re-evaporated, and net continuous flux and has
     `_last_reduced_real_cache_state` is not `None`) and serialized into
     `per_hour_summary` via `simulator/runner/__init__.py`; the reduced-real backend
     cache-state label (string).
+  * `law_disclosures` -- when a law is first registered during a step, that
+    per-hour row carries the disclosure with its evaluation count for that
+    step. Later rows do not repeat that law. `run_metadata.law_disclosures`
+    retains the complete cumulative run registry. The hourly
+    `simulation_tick` socket payload omits disclosure fields at the top level
+    and inside `per_hour_summary_delta`; the `per_hour_summary` event keeps
+    the row's first-raised disclosures.
 * Wall-deposit fields are direct projections of
   `HourSnapshot.wall_deposit_by_segment_species_delta` and the running
   sum of those deltas. The report layer does not recompute deposits.

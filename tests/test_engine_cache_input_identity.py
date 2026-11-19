@@ -376,7 +376,9 @@ def test_internal_analytical_thermo_extract_changes_pressure_and_key(
         reset_catalog()
         before = solve()
         key_before = engine_cache.engine_cache_key(
-            "internal-analytical", 2, {"temperature_K": 1800.0}
+            "internal-analytical",
+            engine_cache.ENGINE_CHEMISTRY_VERSION["internal-analytical"],
+            {"temperature_K": 1800.0},
         )
 
         def changed_bytes(path, *args, **kwargs):
@@ -389,7 +391,9 @@ def test_internal_analytical_thermo_extract_changes_pressure_and_key(
         reset_catalog()
         after = solve()
         key_after = engine_cache.engine_cache_key(
-            "internal-analytical", 2, {"temperature_K": 1800.0}
+            "internal-analytical",
+            engine_cache.ENGINE_CHEMISTRY_VERSION["internal-analytical"],
+            {"temperature_K": 1800.0},
         )
         assert reads, "coefficient mutation did not reach the real catalog loader"
         changed = {

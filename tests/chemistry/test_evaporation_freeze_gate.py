@@ -15,6 +15,8 @@ import pytest
 from simulator import evaporation as evaporation_module
 from simulator import engine_binding_admission as admission_module
 from simulator import engine_binding_admission
+from simulator.accounting.formulas import resolve_species_formula
+from simulator.accounting.ledger import AtomLedger
 import simulator.fe_redox as fe_redox_module
 from simulator.chemistry.kernel import (
     CapabilityProfile,
@@ -1254,6 +1256,9 @@ def _install_freeze_gate_curve(
         curve,
     )
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
+    # Measured zero: this fixture curve did not execute a flagged law.
+    # Omitting the field makes the core reader recompute it.
+    record['law_disclosures'] = []
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -1625,6 +1630,11 @@ def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
         ),
         provenance_override={
             "binding_provenance_verifiable": True,
+            "runtime_version": {
+                "tag": "value",
+                "value": "MAGEMin fixture runtime",
+                "reason": None,
+            },
             "runtime_artifacts": {
                 "magemin_selected_binary": {"sha256": "a" * 64},
             },
@@ -2061,7 +2071,7 @@ def test_uncacheable_gate_failure_survives_in_progress_redox_bootstrap(
     assert uncacheable_replay_disposition(sim)
     assert sim._freeze_gate_liquid_fraction_cache is None
     assert shared_cache == {}
-    assert store.entries == {}
+    assert store._entries == {}
     assert store.capture_sequence == []
 
 
@@ -3806,6 +3816,336 @@ def test_keyed_freeze_gate_memo_hits_without_local_slot_and_keeps_redox_key(
     assert len(calls) == 2
 
 
+@pytest.mark.parametrize(("composition_wt_pct", "expected_reason"), [
+    ({"Al2O3": 100.0}, "silicate_window"),
+    (
+        {"SiO2": 20.0, "MgO": 20.0, "NaCl": 60.0},
+        "forbidden_species",
+    ),
+])
+def test_magemin_out_of_domain_bulk_bypasses_freeze_gate_caches(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    composition_wt_pct,
+    expected_reason,
+):
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    ledger_composition_wt_pct = dict(composition_wt_pct)
+    if 'FeOt' in ledger_composition_wt_pct:
+        ledger_composition_wt_pct['FeO'] = (
+            ledger_composition_wt_pct.get('FeO', 0.0)
+            + ledger_composition_wt_pct.pop('FeOt')
+        )
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in ledger_composition_wt_pct.items()
+    }
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    ledger.load_external_mol(
+        _CLEANED_MELT_ACCOUNT,
+        composition_mol,
+        source='b-1225 cache refusal pin',
+        material_origin='feedstock',
+    )
+    sim.atom_ledger = ledger
+    key, domain_reason = sim._freeze_gate_cache_key_and_domain(
+        pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
+        fO2_log=sim._freeze_gate_redox_key_fO2_log(
+            fO2_log=float(sim._current_melt_redox_fO2_log()),
+        ),
+    )
+    assert domain_reason == expected_reason
+    live = MAGEMinBackend().equilibrate(
+        1200.0,
+        composition_kg=composition_wt_pct,
+        species_formula_registry=sim.species_formula_registry,
+    )
+    assert live.status == 'out_of_domain'
+    assert live.diagnostics['backend_status_reason'] == domain_reason
+    cached_record = gate_curve_memo_record(
+        {
+            'source': 'gate_liquid_fraction:test-cache',
+            'status': 'ok',
+            'solidus_T_C': 900.0,
+            'liquidus_T_C': 1300.0,
+            'path': ((900.0, 0.0), (1300.0, 1.0)),
+        },
+        None,
+        (),
+        'live',
+    )
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': key,
+        **cached_record,
+    }
+    sim._freeze_gate_shared_curve_cache = {key: cached_record}
+    sim._freeze_gate_liquid_fraction_curve_memo = {key: cached_record}
+    sim._freeze_gate_held_curve_record = {
+        'hour': int(sim.melt.hour),
+        'provider': 'magemin',
+        'record': cached_record,
+    }
+
+    class ReplaySpy:
+        replay_enabled = True
+
+        def __init__(self):
+            self.calls = 0
+
+        def replay_gate_curve(self, *_args, **_kwargs):
+            self.calls += 1
+            return cached_record['curve']
+
+    store = ReplaySpy()
+    monkeypatch.setattr(sim, '_pt0_store', lambda: store, raising=False)
+    live_dispatch_calls = []
+
+    def fail_live_dispatch(*_args, **_kwargs):
+        live_dispatch_calls.append(True)
+        raise RuntimeError('live gate dispatch reached')
+
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_from_gate_dispatch',
+        fail_live_dispatch,
+    )
+    with pytest.raises(RuntimeError, match='live gate dispatch reached'):
+        sim._freeze_gate_curve_record()
+    assert store.calls == 0
+    assert live_dispatch_calls == [True]
+
+    def fail_live_record(**_kwargs):
+        raise RuntimeError('live gate record reached')
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve_record', fail_live_record)
+    with pytest.raises(RuntimeError, match='live gate record reached'):
+        sim._melt_redox_liquidus_gate_record()
+
+
+@pytest.mark.parametrize(
+    ("composition_wt_pct", "projected_retry", "expected_gate_input"),
+    [
+        (
+            {"SiO2": 50.0, "MgO": 50.0},
+            False,
+            # 50+50=100 wt%; the submitted values are unchanged.
+            {"SiO2": 50.0, "MgO": 50.0},
+        ),
+        (
+            {"SiO2": 20.0, "MgO": 80.0},
+            False,
+            # 20+80=100 wt%; the submitted values are unchanged.
+            {"SiO2": 20.0, "MgO": 80.0},
+        ),
+        (
+            {
+                "SiO2": 50.0,
+                "MgO": 29.0,
+                "FeO": 10.0,
+                "P2O5": 10.0,
+                "MnO": 1.0,
+            },
+            True,
+            # Retained mass is 50+29+10=89; 100*(50,29,10)/89 gives
+            # (56.17977528089888, 32.58426966292135, 11.235955056179776).
+            {
+                "SiO2": 56.17977528089888,
+                "MgO": 32.58426966292135,
+                "FeO": 11.235955056179776,
+            },
+        ),
+        (
+            {"SiO2": 79.0, "MgO": 16.0, "P2O5": 5.0},
+            True,
+            # P2O5 is dropped; 100*(79,16)/95 gives (83.15789473684211,
+            # 16.842105263157894).
+            {"SiO2": 83.15789473684211, "MgO": 16.842105263157894},
+        ),
+        (
+            {"SiO2": 29.0, "MgO": 66.0, "P2O5": 5.0},
+            True,
+            # P2O5 is dropped; 100*(29,66)/95 gives (30.526315789473685,
+            # 69.47368421052632).
+            {"SiO2": 30.526315789473685, "MgO": 69.47368421052632},
+        ),
+        (
+            {
+                "SiO2": 50.0,
+                "MgO": 35.0,
+                "FeO": 5.0,
+                "O": 5.0,
+                "P2O5": 5.0,
+            },
+            True,
+            # FeO 5 + O 5 contributes 10 g FeO-equivalent; after dropping
+            # P2O5, 50+35+10=95 and 100*(50,35,10)/95 gives these values.
+            {
+                "SiO2": 52.63157894736842,
+                "MgO": 36.8421052631579,
+                "FeO": 10.526315789473685,
+            },
+        ),
+        (
+            {"SiO2": 20.0, "MgO": 20.0, "NaCl": 60.0},
+            False,
+            # NaCl is dropped; 20+20=40 and 100*(20,20)/40=(50,50).
+            {"SiO2": 50.0, "MgO": 50.0},
+        ),
+        (
+            {
+                "SiO2": 49.0,
+                "MgO": 20.0,
+                "Al2O3": 20.0,
+                "CaO": 8.5,
+                "H2O": 2.5,
+            },
+            False,
+            # 49+20+20+8.5+2.5=100 wt%; these values stay unchanged.
+            {
+                "SiO2": 49.0,
+                "MgO": 20.0,
+                "Al2O3": 20.0,
+                "CaO": 8.5,
+                "H2O": 2.5,
+            },
+        ),
+    ],
+)
+def test_magemin_cache_classifier_matches_live_gate_decision(
+    monkeypatch,
+    composition_wt_pct,
+    projected_retry,
+    expected_gate_input,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.melt_backend.base import project_melt_to_oxide_projection
+    from simulator.melt_backend.magemin import MAGEMinBackend
+    import simulator.melt_backend.magemin as magemin_module
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    ledger.load_external_mol(
+        _CLEANED_MELT_ACCOUNT,
+        composition_mol,
+        source='b-1225 cache/live gate parity pin',
+        material_origin='feedstock',
+    )
+    sim.atom_ledger = ledger
+
+    owner_calls = []
+    gate_inputs = []
+    original_owner = MAGEMinBackend._submitted_bulk_and_domain_verdict
+    original_validate = (
+        magemin_module._validate_magemin_projection_with_reason
+    )
+
+    def capture_gate_input(composition, **kwargs):
+        gate_inputs.append(dict(composition))
+        return original_validate(composition, **kwargs)
+
+    def capture_owner(self, *args, **kwargs):
+        gate_start = len(gate_inputs)
+        bulk, verdict = original_owner(self, *args, **kwargs)
+        owner_calls.append((bulk, verdict, gate_inputs[gate_start:]))
+        return bulk, verdict
+
+    monkeypatch.setattr(
+        magemin_module,
+        '_validate_magemin_projection_with_reason',
+        capture_gate_input,
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        '_submitted_bulk_and_domain_verdict',
+        capture_owner,
+    )
+    _key, cache_reason = sim._freeze_gate_cache_key_and_domain(
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    backend = MAGEMinBackend()
+    equilibrium_kwargs = {
+        'composition_kg': composition_wt_pct,
+        'species_formula_registry': sim.species_formula_registry,
+    }
+    if projected_retry:
+        source_projection = project_melt_to_oxide_projection(
+            composition_kg=composition_wt_pct,
+            composition_mol=None,
+            oxide_basis=backend._MAGEMIN_INPUT_BASIS,
+            species_formula_registry=sim.species_formula_registry,
+        )
+        submitted_projection = backend._build_db_bulk_projection(
+            source_projection.oxide_wt_pct
+        )
+        equilibrium_kwargs['projected_oxide_wt_pct'] = (
+            submitted_projection.composition_wt_pct
+        )
+    live_result = backend.equilibrate(1200.0, **equilibrium_kwargs)
+    live_domain_reason = (
+        (live_result.diagnostics or {}).get('backend_status_reason')
+        if live_result.status == 'out_of_domain'
+        else None
+    )
+
+    assert cache_reason == live_domain_reason
+    if cache_reason is None:
+        assert live_result.status == 'unavailable'
+    else:
+        assert live_result.status == 'out_of_domain'
+
+    assert len(owner_calls) == 2
+    assert (owner_calls[0][1][0], owner_calls[0][1][2]) == (
+        owner_calls[1][1][0],
+        owner_calls[1][1][2],
+    )
+    assert len(owner_calls[0][2]) == 1
+    assert len(owner_calls[1][2]) == 1
+    for _bulk, _verdict, gate_input in owner_calls:
+        assert set(gate_input[0]) == set(expected_gate_input)
+        for species, amount in expected_gate_input.items():
+            assert gate_input[0][species] == pytest.approx(
+                amount, rel=0.0, abs=1e-9
+            )
+    if owner_calls[0][0] is not None and owner_calls[1][0] is not None:
+        cache_bulk = owner_calls[0][0].composition_wt_pct
+        live_bulk = owner_calls[1][0].composition_wt_pct
+        assert set(cache_bulk) == set(live_bulk)
+        for species, amount in cache_bulk.items():
+            assert amount == pytest.approx(
+                live_bulk[species], rel=0.0, abs=1e-9
+            )
+
+
 def test_absolute_redox_states_keep_freeze_gate_cache_reuse(
     vapor_pressure_data,
     feedstocks_data,
@@ -4089,6 +4429,11 @@ def test_gate_curve_memo_reuses_without_receipt_and_emits_notice_once(
     )
     provenance = {
         'binding_provenance_verifiable': True,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': 'a' * 64},
         },
@@ -5144,6 +5489,16 @@ def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
                 'solidus_T_C': 1000.0,
                 'liquidus_T_C': 1700.0,
             })
+        if curve_calls > 1:
+            return engine_binding_admission.write_gate_curve_memo_record(
+                sim,
+                curve,
+                evidence=engine_binding_admission.GateCurveEvidence(
+                    'a' * 64,
+                    False,
+                ),
+                provider_outcome=GateCurveProviderOutcome.PRODUCED,
+            )
         return gate_curve_memo_record(
             curve,
             None,
@@ -5398,8 +5753,12 @@ def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
     feedstocks_data,
     setpoints_data,
 ):
+    from contextlib import contextmanager
+    import subprocess
+
     from engines.magemin import MAGEMinShadowProvider
     from simulator.engine_binding_admission import gate_curve_memo_evidence
+    import simulator.melt_backend.magemin as magemin_module
     from simulator.melt_backend.magemin import MAGEMinBackend
 
     producer = _build_freeze_gate_sim(
@@ -5439,7 +5798,40 @@ def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
         'liquidus_T_C': 1300.0,
     }
 
+    resolved_version = producer_backend.get_engine_version()
+    assert resolved_version != 'unavailable'
     producer_evidence = gate_curve_memo_evidence(
+        producer,
+        curve,
+        include_selected_bindings=False,
+    )
+
+    def unavailable_slot(_timeout_s):
+        raise magemin_module._MAGEMinEngineLifecycleError(
+            'MAGEMinSubprocessSlotTimeout', 'slot timed out'
+        )
+
+    monkeypatch.setattr(
+        magemin_module, '_magemin_subprocess_slot', unavailable_slot
+    )
+    slot_failure_evidence = gate_curve_memo_evidence(
+        producer,
+        curve,
+        include_selected_bindings=False,
+    )
+
+    @contextmanager
+    def available_slot(_timeout_s):
+        yield
+
+    def timed_out_probe(args, **_kwargs):
+        raise subprocess.TimeoutExpired(args, timeout=5)
+
+    monkeypatch.setattr(
+        magemin_module, '_magemin_subprocess_slot', available_slot
+    )
+    monkeypatch.setattr(magemin_module.subprocess, 'run', timed_out_probe)
+    probe_timeout_evidence = gate_curve_memo_evidence(
         producer,
         curve,
         include_selected_bindings=False,
@@ -5450,6 +5842,14 @@ def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
         include_selected_bindings=False,
     )
 
+    for failure_evidence in (slot_failure_evidence, probe_timeout_evidence):
+        assert failure_evidence.identity == producer_evidence.identity
+        assert failure_evidence.provenance['runtime_version'] == (
+            producer_evidence.provenance['runtime_version']
+        )
+        assert failure_evidence.producer_evidence == (
+            producer_evidence.producer_evidence
+        )
     assert producer_evidence.identity == receiver_evidence.identity
     assert producer_evidence.provenance['runtime_version'] == (
         receiver_evidence.provenance['runtime_version']
@@ -5457,6 +5857,163 @@ def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
     assert producer_evidence.producer_evidence == (
         receiver_evidence.producer_evidence
     )
+
+
+def test_cold_magemin_version_failures_do_not_store_or_reuse_gate_memos(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from contextlib import contextmanager
+    import subprocess
+
+    from engines.magemin import MAGEMinShadowProvider
+    from simulator import engine_binding_admission as admission
+    from simulator import engine_local_config
+    import simulator.melt_backend.magemin as magemin_module
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    monkeypatch.setattr(magemin_module, '_MAGEMIN_ENGINE_VERSION_CACHE', {})
+    monkeypatch.setattr(engine_local_config, 'cache_version_for', lambda _: None)
+    monkeypatch.setattr(
+        engine_local_config, 'warn_legacy_once', lambda *_args: None
+    )
+    monkeypatch.setattr(
+        admission, 'authorize_binding', lambda *_args, **_kwargs: {}
+    )
+    monkeypatch.setattr(
+        admission, 'selected_binding_identities', lambda *_args, **_kwargs: ()
+    )
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    assert isinstance(provider, MAGEMinShadowProvider)
+    backend = MAGEMinBackend()
+    binary = tmp_path / 'MAGEMin'
+    binary.write_bytes(b'fixture MAGEMin binary identity')
+    backend._binary_path = binary
+    backend.is_available = lambda: True
+    provider._backend = backend
+    provider._backend_initialised = True
+    shared_cache = {}
+    sim._freeze_gate_shared_curve_cache = shared_cache
+
+    curve = {
+        'source': 'gate_liquid_fraction:fallback:magemin-shadow',
+        'status': 'ok',
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1300.0,
+    }
+    dispatch_calls = []
+
+    def dispatch_curve(_reasons, **_kwargs):
+        dispatch_calls.append(True)
+        return _freeze_gate_curve_with_outcome(sim, curve)
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve_from_gate_dispatch', dispatch_curve)
+
+    def unavailable_slot(_timeout_s):
+        raise magemin_module._MAGEMinEngineLifecycleError(
+            'MAGEMinSubprocessSlotTimeout', 'fixture slot failure'
+        )
+
+    monkeypatch.setattr(magemin_module, '_magemin_subprocess_slot', unavailable_slot)
+    monkeypatch.setattr(
+        magemin_module.subprocess,
+        'run',
+        lambda *_args, **_kwargs: pytest.fail('slot failure must skip probe'),
+    )
+    first = sim._freeze_gate_curve_record()
+    first_evidence = admission.gate_curve_memo_evidence(
+        sim,
+        curve,
+        include_selected_bindings=True,
+    )
+
+    assert first['disposition'] == 'live'
+    assert first_evidence.eligible is False
+    assert first_evidence.producer_evidence == 'evidence-unavailable'
+    assert first_evidence.provenance['runtime_version'] == {
+        'tag': 'unknown',
+        'value': None,
+        'reason': 'version getter failed: ValueError',
+    }
+    assert not admission.gate_curve_memo_eligibility(sim, curve)
+    assert any(
+        notice['reason'] == 'MAGEMin runtime version unknown'
+        for notice in sim._engine_binding_admission_notices
+    )
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    assert shared_cache == {}
+
+    @contextmanager
+    def acquired_slot(_timeout_s):
+        yield
+
+    def timed_out_probe(args, **_kwargs):
+        raise subprocess.TimeoutExpired(args, timeout=5)
+
+    monkeypatch.setattr(magemin_module, '_magemin_subprocess_slot', acquired_slot)
+    monkeypatch.setattr(magemin_module.subprocess, 'run', timed_out_probe)
+    second = sim._freeze_gate_curve_record()
+    second_evidence = admission.gate_curve_memo_evidence(
+        sim,
+        curve,
+        include_selected_bindings=True,
+    )
+
+    assert second['disposition'] == 'live'
+    assert second_evidence.eligible is False
+    assert second_evidence.producer_evidence == 'evidence-unavailable'
+    assert second_evidence.provenance['runtime_version'] == (
+        first_evidence.provenance['runtime_version']
+    )
+    assert len(dispatch_calls) == 2
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    assert shared_cache == {}
+
+    def successful_probe(args, **_kwargs):
+        return subprocess.CompletedProcess(
+            args,
+            0,
+            stdout='MAGEMin 1.9.6\n',
+            stderr='',
+        )
+
+    monkeypatch.setattr(magemin_module.subprocess, 'run', successful_probe)
+    third = sim._freeze_gate_curve_record()
+    normal_evidence = admission.gate_curve_memo_evidence(
+        sim,
+        curve,
+        include_selected_bindings=True,
+    )
+    assert admission.gate_curve_memo_eligibility(sim, curve)
+    fourth = sim._freeze_gate_curve_record()
+
+    assert normal_evidence.eligible is True
+    assert normal_evidence.provenance['runtime_version'] == {
+        'tag': 'value',
+        'value': 'MAGEMin 1.9.6',
+        'reason': None,
+    }
+    assert third['disposition'] == 'live'
+    assert third['origin']['producer_evidence'] == (
+        normal_evidence.producer_evidence
+    )
+    assert fourth['disposition'] == 'memo-hit'
+    assert len(dispatch_calls) == 3
+    assert isinstance(sim._freeze_gate_liquid_fraction_cache, dict)
+    assert len(shared_cache) == 1
 
 
 def _installed_magemin_runtime_binaries():
@@ -6109,6 +6666,7 @@ def test_core_gate_curve_local_slot_reads_match_green_provenance_count(
         curve,
     )
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
+    record['law_disclosures'] = []
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -6172,6 +6730,7 @@ def test_gate_memo_origin_reuses_live_binding_provenance_per_read(
         curve,
     )
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
+    record['law_disclosures'] = []
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -6307,7 +6866,17 @@ def test_gate_memo_origin_missing_is_a_miss(
         'liquidus_T_C': 1300.0,
     }
     expected_curve = _freeze_gate_curve_fixture(sim, curve)
-    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    record = engine_binding_admission.write_gate_curve_memo_record(
+        sim,
+        curve,
+        provider_outcome=GateCurveProviderOutcome.PRODUCED,
+    )
+    assert not engine_binding_admission.gate_curve_memo_reuse_eligible(
+        sim,
+        record['curve'],
+        None,
+        fresh_evidence=False,
+    )
     record['origin'] = None
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
@@ -6343,6 +6912,11 @@ def test_gate_memo_origin_rejects_install_fingerprint_change(
     first_digest = 'a' * 64
     provenance = [{
         'binding_provenance_verifiable': True,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': first_digest},
         },
@@ -6367,6 +6941,11 @@ def test_gate_memo_origin_rejects_install_fingerprint_change(
     }
     provenance[0] = {
         'binding_provenance_verifiable': True,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': 'b' * 64},
         },
@@ -6527,6 +7106,11 @@ def test_gate_memo_evidence_unavailable_is_a_miss(
     provenance_calls = []
     provenance = {
         'binding_provenance_verifiable': True,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': None},
         },
@@ -6714,6 +7298,11 @@ def test_gate_memo_reuses_live_curve_without_metadata_receipt_digests(
     )
     provenance = {
         'binding_provenance_verifiable': False,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': 'a' * 64},
         },
@@ -6734,6 +7323,7 @@ def test_gate_memo_reuses_live_curve_without_metadata_receipt_digests(
     }
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
+    record['law_disclosures'] = []
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -6763,6 +7353,11 @@ def test_gate_capture_rejects_foreign_origin_with_valid_consumer_receipt(
     )
     provenance = {
         'binding_provenance_verifiable': True,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': 'a' * 64},
         },
@@ -6846,6 +7441,11 @@ def test_gate_capture_requires_curve_associated_with_active_record(
     )
     provenance = {
         'binding_provenance_verifiable': True,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
         'runtime_artifacts': {
             'magemin_selected_binary': {'sha256': 'a' * 64},
         },
@@ -7556,7 +8156,7 @@ def test_failed_freeze_gate_refusal_preserves_repair_notices_without_memoizing(
         assert [notice['site'] for notice in sim._reduced_real_repair_notices] == ['SR18', 'SR18']
         assert sim._freeze_gate_liquid_fraction_cache is None
         assert shared_cache == {}
-        assert store.entries == {}
+        assert store._entries == {}
     assert len(gate_provider_calls) == 2
 
 

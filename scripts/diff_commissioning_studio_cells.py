@@ -41,7 +41,11 @@ COMPARE_FIELDS = (
     "liquid_fraction",
 )
 
-CRASH_REFUSALS = frozenset({"engine_crash", "subprocess_died"})
+CRASH_REFUSALS = frozenset({
+    "engine_crash",
+    "magemin_engine_worker_died",
+    "subprocess_died",
+})
 CRASH_ANNOTATION_REASON = "sio2_below_observed_crash_floor"
 REFUSAL_STATUSES = frozenset({"refusal", "out_of_domain"})
 OK_STATUSES = frozenset({"ok"})
@@ -181,7 +185,7 @@ def _is_crash(cell: Mapping[str, Any]) -> bool:
     return (
         reason in CRASH_REFUSALS
         or engine_status in CRASH_REFUSALS
-        or engine_reason == "engine_crash"
+        or engine_reason in CRASH_REFUSALS
         or "subprocess_died" in engine_reason
     )
 

@@ -90,6 +90,27 @@ def test_continuous_rate_limiting_cases() -> None:
     assert equilibrium.net_mol_m2_s == pytest.approx(0.0)
 
 
+def test_hot_wall_na_alpha_one_without_zero_equilibrium_pressure_still_has_no_flux():
+    common = {
+        "species": "Na",
+        "P_local_pa": 1.0,
+        "T_surface_K": 1500.0,
+        "alpha_s": 1.0,
+        "regime_factor": 1.0,
+        "T_gas_K": 1500.0,
+        "vapor_pressure_data": copy.deepcopy(VAPOR_PRESSURE_DATA),
+    }
+
+    inert_surface = _series_resistance_deposition_flux_mol_m2_s(**common)
+    reactive_upper_bound = _series_resistance_deposition_flux_mol_m2_s(
+        **common,
+        wall_surface_state={"alpha_s": 1.0, "P_eq_Pa": 0.0},
+    )
+
+    assert inert_surface == 0.0
+    assert reactive_upper_bound > 0.0
+
+
 def test_continuous_rate_accepts_distinct_reevaporation_flux() -> None:
     rate = continuous_wall_deposition_flux(
         bulk_pressure_pa=3.0,

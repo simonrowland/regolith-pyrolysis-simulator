@@ -482,9 +482,12 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
     document = run._build_output(execution)
     for row in document["per_hour_summary"]:
         if row["T_C"] == 2200.0:
-            melt_notice = row["vapour_batch_summary"]["metadata"]["extrapolation_notices_by_species"]["SiO"]
+            melt_notices = row["vapour_batch_summary"]["metadata"]["extrapolation_notices_by_species"]["SiO"]
+            assert isinstance(melt_notices, list)
+            melt_notice = next(
+                item for item in melt_notices if item.get("temperature_K") == 2473.15
+            )
             assert melt_notice["authority_level"] == "extrapolated"
-            assert melt_notice["temperature_K"] == 2473.15
             assert melt_notice["valid_range_K"] == [1400.0, 2273.15]
         wall = row["vapour_batch_summary"]["metadata"]["wall_deposit_sticking_authority"]
         assert wall["authoritative_for_coating"] is False
@@ -530,7 +533,11 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
     assert "wall_saturation_pressure_refusals" not in na_pareto
     assert na_pareto["wall_saturation_pressure_extrapolations"]
     assert pareto["Al2"]["status"] == "unavailable"
-    assert pareto["SiO"]["vapour_pressure_extrapolation_notice"]["authority_level"] == "extrapolated"
+    pareto_notices = pareto["SiO"]["vapour_pressure_extrapolation_notice"]
+    assert isinstance(pareto_notices, list)
+    assert any(
+        item.get("authority_level") == "extrapolated" for item in pareto_notices
+    )
     if hours == 24:
         assert pareto["SiO"]["evaporation_transport_notices"] == transport["SiO"]
         assert pareto["Si"]["evaporation_transport_notices"] == transport["Si"]

@@ -1107,7 +1107,9 @@ def test_mapping_equilibrium_result_uses_compact_projection(
         stored = connection.execute(
             "SELECT value FROM engine_outputs"
         ).fetchone()[0]
-    assert isinstance(_stored_hot(database), list)
+    stored_hot = _stored_hot(database)
+    assert isinstance(stored_hot[engine_cache._ENGINE_CACHE_VALUE_KEY], list)
+    assert stored_hot["law_disclosures"] is None
     assert isinstance(stored, bytes)
     assert cold.activity_coefficients == warm.activity_coefficients == {"FeO": 0.75}
     assert cold.diagnostics == warm.diagnostics == {
@@ -1188,8 +1190,10 @@ def test_isolated_cell_cache_stores_only_compact_hot_fields(
     with sqlite3.connect(database) as connection:
         hot_value = connection.execute("SELECT value FROM engine_outputs").fetchone()[0]
     stored = _stored_hot(database)
-    assert isinstance(stored["cell"], list)
-    assert stored["activities_standard_state"] == result["activities_standard_state"]
+    compact_hot = stored[engine_cache._ENGINE_CACHE_VALUE_KEY]
+    assert isinstance(compact_hot["cell"], list)
+    assert compact_hot["activities_standard_state"] == result["activities_standard_state"]
+    assert stored["law_disclosures"] is None
     assert b"verbose engine diagnostic" not in hot_value
     assert cold["pot_id"] == warm["pot_id"] == "caller-pot"
     assert cold["melt_activities"] == warm["melt_activities"] == {"SiO2": 0.5}

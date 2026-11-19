@@ -5,7 +5,7 @@ import math
 from dataclasses import replace
 from itertools import permutations
 from types import MethodType, SimpleNamespace
-from typing import Mapping
+from typing import Any, Mapping
 
 import pytest
 

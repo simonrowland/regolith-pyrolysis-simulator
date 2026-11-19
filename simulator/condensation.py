@@ -8219,12 +8219,42 @@ def _wall_alpha_record(
     *,
     segment: PipeSegment | None = None,
     T_K: float | None = None,
+    wall_surface_state: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     if T_K is None and segment is not None:
         T_K = max(
             float(segment.wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
             1.0,
         )
+    if wall_surface_state is not None:
+        if not isinstance(wall_surface_state, Mapping):
+            raise DepositionInputRefusal(
+                "wall_surface_state", wall_surface_state, "must be a mapping"
+            )
+        if "alpha_s" not in wall_surface_state:
+            raise DepositionInputRefusal(
+                "wall_surface_state.alpha_s", None,
+                "the liner corrosion override requires declared alpha_s",
+            )
+        override = _alpha_record(
+            species=species,
+            entry=wall_surface_state["alpha_s"],
+            source="liner_corrosion.wall_surface_state.alpha_s",
+            T_K=T_K,
+            segment=segment,
+            source_class="assumption_ungrounded_fitted_coefficient",
+            status="assumed_upper_bound",
+            output_status="uncertainty_only",
+        )
+        alpha_value = _required_record_alpha_s(
+            override, species=species, site="wall_surface_state"
+        )
+        if not 0.0 <= alpha_value <= 1.0:
+            raise DepositionInputRefusal(
+                "wall_surface_state.alpha_s", alpha_value,
+                "must be within [0, 1]",
+            )
+        return override
     config = _wall_material_config(materials)
     alpha_by_species = config.get('alpha_s_by_species', {}) or {}
     if segment is not None and getattr(segment, 'liner_material', ''):
@@ -9751,6 +9781,7 @@ def _wall_deposition_driving_pressure_pa(
     antoine_extrapolation_warnings: list[str] | None = None,
     diagnostic_out: MutableMapping[str, Any] | None = None,
     wall_pO2_Pa: float | None = None,
+    wall_surface_state: Mapping[str, Any] | None = None,
 ) -> float:
     try:
         local_pressure_pa = float(P_local_pa)
@@ -9758,6 +9789,39 @@ def _wall_deposition_driving_pressure_pa(
         return 0.0
     if not math.isfinite(local_pressure_pa) or local_pressure_pa <= 0.0:
         return 0.0
+
+    if wall_surface_state is not None:
+        if not isinstance(wall_surface_state, Mapping):
+            raise DepositionInputRefusal(
+                "wall_surface_state", wall_surface_state, "must be a mapping"
+            )
+        if "P_eq_Pa" not in wall_surface_state:
+            raise DepositionInputRefusal(
+                "wall_surface_state.P_eq_Pa", None,
+                "the liner corrosion override requires declared P_eq_Pa",
+            )
+        try:
+            equilibrium_pressure_pa = float(wall_surface_state["P_eq_Pa"])
+        except (TypeError, ValueError) as exc:
+            raise DepositionInputRefusal(
+                "wall_surface_state.P_eq_Pa",
+                wall_surface_state["P_eq_Pa"],
+                "must be numeric",
+            ) from exc
+        if not math.isfinite(equilibrium_pressure_pa) or equilibrium_pressure_pa < 0.0:
+            raise DepositionInputRefusal(
+                "wall_surface_state.P_eq_Pa",
+                equilibrium_pressure_pa,
+                "must be finite and non-negative",
+            )
+        driving_pressure_pa = max(0.0, local_pressure_pa - equilibrium_pressure_pa)
+        if diagnostic_out is not None:
+            diagnostic_out["wall_saturation_pressure_pa"] = equilibrium_pressure_pa
+            diagnostic_out["wall_saturation_pressure_refused"] = False
+            diagnostic_out["wall_saturation_pressure_status"] = (
+                "wall_surface_state_override"
+            )
+        return driving_pressure_pa
 
     (
         antoine_extrapolations,
@@ -10003,6 +10067,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     equilibrium_pressure_pa: float | None = None,
     diffusivity_temperature_K: float | None = None,
     wall_pO2_Pa: float | None = None,
+    wall_surface_state: Mapping[str, Any] | None = None,
 ) -> float:
     """Series-resistance deposition flux (Bird/Stewart/Lightfoot canonical
     form), regime-aware: ``1/k_total = 1/(α_s · k_HKL) + (1 − f) / k_MT``,
@@ -10136,6 +10201,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                 diagnostic_out=diagnostic_out,
                 wall_pO2_Pa=wall_pO2_Pa,
+                wall_surface_state=wall_surface_state,
             )
         except WallSaturationPressureRefusal as exc:
             if diagnostic_out is not None:

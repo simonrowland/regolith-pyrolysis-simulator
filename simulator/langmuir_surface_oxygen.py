@@ -189,6 +189,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
+from simulator.scalar_boundary import finite_float
+
 from simulator.accounting.formulas import (
     SpeciesFormula,
     resolve_species_formula,
@@ -719,24 +721,14 @@ def _reaction_exponent(
         if math.isfinite(n_metal) and n_metal != 0.0:
             return -1.0 / n_metal
     if evaluator is not None:
-        exponent = _finite_or_none(getattr(evaluator, "pO2_exponent", None))
+        exponent = finite_float(getattr(evaluator, "pO2_exponent", None))
         if exponent is not None:
             return exponent
     if isinstance(row, Mapping) and "pO2_exponent" in row:
-        exponent = _finite_or_none(row.get("pO2_exponent"))
+        exponent = finite_float(row.get("pO2_exponent"))
         if exponent is not None:
             return exponent
-    return _finite_or_none(provenance.get("pO2_exponent"))
-
-
-def _finite_or_none(value: Any) -> float | None:
-    try:
-        number = float(value)
-    except (TypeError, ValueError):
-        return None
-    if not math.isfinite(number):
-        return None
-    return number
+    return finite_float(provenance.get("pO2_exponent"))
 
 
 def _reference_pO2_bar(

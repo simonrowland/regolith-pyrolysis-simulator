@@ -189,19 +189,22 @@ def test_hot_cell_version_record_is_interned_once(tmp_path, monkeypatch) -> None
         wall_s=0.0, cpu_s=0.0, hostname="test",
         vapor_pressure_backend_status_reason=version,
     )
-    legacy = cell.to_engine_cache_value()
-    legacy[11][3] = "fallback"
-    legacy_hot, _ = engine_cache.pack_hot(legacy)
     for temperature in (1700.0, 1800.0):
         engine_cache.cached_engine_call(
             cell.engine, {"temperature_K": temperature}, cell.to_hot
         )
     with sqlite3.connect(path) as connection:
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
         assert connection.execute("SELECT count(*) FROM provenance").fetchone()[0] == 1
         rows = connection.execute("SELECT value,provenance_id FROM engine_outputs").fetchall()
+        restored = engine_cache.unpack_hot(
+            rows[0][0], engine_cache._read_provenance(connection, rows[0][1])
+        )
     assert len(rows) == 2
     assert rows[0] == rows[1]
-    assert len(rows[0][0]) == len(legacy_hot) + 1
+    assert set(restored) == {"_engine_cache_value", "law_disclosures"}
+    assert restored["law_disclosures"] is None
+    assert restored["_engine_cache_value"] == cell.to_engine_cache_value()
     assert version.encode() not in rows[0][0]
 
 

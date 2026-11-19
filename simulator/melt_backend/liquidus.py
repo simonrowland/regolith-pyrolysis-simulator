@@ -21,12 +21,15 @@ from simulator.melt_regime import liquid_fraction_invalidity
 # about 163 s. Ten times that is 1630 s, rounded up to 1800 s (30 minutes) to
 # leave normal runs ample headroom. Unit check: 163 s * 10 is seconds.
 DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 1800.0
+DEFAULT_LIQUIDUS_FINDER_MAX_T_C = 2200.0
 MAX_LIQUIDUS_SCAN_POINTS = 100_000
 # frac_M >= 1 - LIQUIDUS_LIQUID_EPSILON is liquid. This is the finder's
 # declaration tolerance. The freeze-gate consumer may snap a supplied
 # liquidus fraction to 1 only inside this band. One owner: do not copy
 # the literal. The solid threshold is a different rule and stays separate.
 LIQUIDUS_LIQUID_EPSILON = 1.0e-3
+# Solid-side threshold shared with single-point first-liquid diagnostics.
+LIQUIDUS_SOLID_EPSILON = 1.0e-3
 # The statuses a SAMPLE may refuse with and still be carried out through the
 # finder, so the caller learns WHICH refusal occurred rather than a generic
 # solver failure.
@@ -358,10 +361,10 @@ def find_liquidus_solidus_by_fraction(
     sample_fraction: Callable[..., float],
     *,
     min_T_C: float = 400.0,
-    max_T_C: float = 2200.0,
+    max_T_C: float = DEFAULT_LIQUIDUS_FINDER_MAX_T_C,
     scan_step_C: float = 50.0,
     tolerance_C: float = 2.0,
-    solid_epsilon: float = 1.0e-3,
+    solid_epsilon: float = LIQUIDUS_SOLID_EPSILON,
     liquid_epsilon: float = LIQUIDUS_LIQUID_EPSILON,
     monotonicity_tolerance: float = 2.0e-2,
     monotone_smoothing_max: float = 5.0e-1,
