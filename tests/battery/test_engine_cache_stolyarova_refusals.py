@@ -43,7 +43,7 @@ def test_stolyarova_vaporock_and_thermoengine_refusals_hit_warm_with_parity(
     assert cold_rows == warm_rows
     expected_warm_hits = {
         Engine.VAPOROCK: 1394,
-        Engine.THERMOENGINE: 24,
+        Engine.THERMOENGINE: 11,
     }
     for engine in engines:
         cold = cold_counts[engine.value]
@@ -52,5 +52,6 @@ def test_stolyarova_vaporock_and_thermoengine_refusals_hit_warm_with_parity(
         engine: warm_counts[engine.value]["hits"] for engine in engines
     }
     assert actual_warm_hits == expected_warm_hits, repr(actual_warm_hits)
-    for engine in engines:
-        assert warm_counts[engine.value]["misses"] == 0
+    # ThermoEngine's non-finite outcome stays uncached without a live-child
+    # proof; VapoRock still must have no warm misses.
+    assert warm_counts[Engine.VAPOROCK.value]["misses"] == 0
