@@ -20,6 +20,16 @@ experiments:
   kambayashi_1984_kems_mgo_sio2:
     method: knudsen_effusion
     method_as_printed: Knudsen effusion high-temperature mass spectrometry
+    apparatus:
+      calibration:
+        technique:
+          state: {tag: value, value: mass_spectrometry}
+          locator:
+            page: 1
+            published_page: 241
+            pdf_page_index: 0
+            section: Experimental
+            note: "The title and abstract identify the study as high-temperature mass spectrometry; the Experimental section says the activities were determined from measured Mg+ and SiO+ ion intensities."
     locator:
       page: 1
       published_page: 241
@@ -2322,6 +2332,9 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: &kambayashi_kato_1984_gibbs_duhem_method
+          state: {tag: value, value: gibbs_duhem_integration}
+          locator: {page: 4, published_page: 244, pdf_page_index: 3, section: Results, equation: '[3]-[4]', note: "The paper computes activities by Eqs. [3] and [4], shown as Gibbs-Duhem integrals of the measured ion-current ratio."}
         temperature_K:
           state:
             tag: value
@@ -2451,6 +2464,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -2580,6 +2594,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -2709,6 +2724,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -2838,6 +2854,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -2967,6 +2984,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -3096,6 +3114,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -3225,6 +3244,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -3354,6 +3374,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -3483,6 +3504,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -3612,6 +3634,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -3741,6 +3764,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -3870,6 +3894,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -3999,6 +4024,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -4128,6 +4154,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -4257,6 +4284,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -4726,6 +4754,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -4848,6 +4877,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -4970,6 +5000,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -5092,6 +5123,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -5214,6 +5246,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -5336,6 +5369,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -5458,6 +5492,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -5580,6 +5615,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -5702,6 +5738,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -5824,6 +5861,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -5946,6 +5984,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -6068,6 +6107,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -6190,6 +6230,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -6312,6 +6353,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -6434,6 +6476,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value
@@ -6556,6 +6599,7 @@ species:
       experiment: kambayashi_1984_kems_mgo_sio2
       regime: knudsen_effusion
       point_conditions:
+        activity_method: *kambayashi_kato_1984_gibbs_duhem_method
         temperature_K:
           state:
             tag: value

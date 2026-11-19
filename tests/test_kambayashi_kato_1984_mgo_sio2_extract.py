@@ -9,6 +9,10 @@ import yaml
 
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import Migrator, REPO_ROOT
+from simulator.battery.method_class_bands import (
+    _located_fact,
+    select_method_class_band,
+)
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -55,11 +59,22 @@ def test_tables_match_rendered_rows_and_migrate_all_typed_values_as_points() -> 
     assert len(migrator.result.observations) == 77
 
     by_quantity = Counter()
+    applicability_activity_count = 0
     for formula, body in document["species"].items():
         for row in body["observations"]:
             q = Quantity(row["values"]["quantity"])
             by_quantity[q] += 1
             migrated = migrator.result.observations[f"{EXTRACT.stem}::{row['observation_id']}"]
+            if q is Quantity.ACTIVITY:
+                applicability_activity_count += 1
+                experiment = migrator.result.experiments[migrated.experiment_id]
+                assert _located_fact(migrated, experiment, "technique") == "mass_spectrometry"
+                assert _located_fact(migrated, experiment, "activity_method") == "gibbs_duhem_integration"
+                assert _located_fact(migrated, experiment, "comparison") is None
+                assert _located_fact(migrated, experiment, "sensitivity") is None
+                assert select_method_class_band(migrated, experiment) == {
+                    "refusal": {"reason": "method_class_applicability_unknown"}
+                }
             source_value = next(
                 row["values"][field]
                 for field in ("activity", "ion_intensity", "ion_intensity_ratio")
@@ -108,6 +123,7 @@ def test_tables_match_rendered_rows_and_migrate_all_typed_values_as_points() -> 
         Quantity.ION_INTENSITY_RATIO: 15,
         Quantity.ACTIVITY: 32,
     }
+    assert applicability_activity_count == 32
 
     ratios = [
         (row["values"]["x_SiO2_as_printed"], row["values"]["ion_intensity_ratio"])
