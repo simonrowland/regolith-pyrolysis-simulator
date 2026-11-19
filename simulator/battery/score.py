@@ -290,6 +290,8 @@ from simulator.battery.composition import (
 from simulator.battery.source_lineage import (
     OPENIMCC_LINEAGE_CAVEAT_PREFIXES,
     OPENIMCC_PROVENANCE_PREFIXES,
+    OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+    OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE,
     coefficient_lineage_sources,
     openimcc_engine_identity_sources,
     openimcc_pack_coefficient_sources,
@@ -5402,6 +5404,10 @@ def _coefficient_sources_in_reference_scope(
 ) -> tuple[tuple[str, ...], bool]:
     """Drop manifest work IDs whose locator scope excludes this observation."""
 
+    has_withheld_fragment_flag = any(
+        source.startswith(OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX)
+        for source in coefficient_sources
+    )
     lineage_sources = coefficient_lineage_sources(coefficient_sources)
     if not any(
         source.startswith(OPENIMCC_PROVENANCE_PREFIXES)
@@ -5423,12 +5429,22 @@ def _coefficient_sources_in_reference_scope(
         previous = canonical_scopes_by_work.get(canonical_work_id)
         if previous is None:
             canonical_scopes_by_work[canonical_work_id] = scopes
-        elif "unparsed" in previous or "unparsed" in scopes:
-            canonical_scopes_by_work[canonical_work_id] = ("unparsed",)
         else:
             canonical_scopes_by_work[canonical_work_id] = tuple(
                 sorted(set(previous) | set(scopes))
             )
+    if has_withheld_fragment_flag:
+        for work_id, scopes in canonical_scopes_by_work.items():
+            if (
+                OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE not in scopes
+                or work_id not in reference_lineage.ids
+            ):
+                continue
+            if (
+                openimcc_source_locator_matches(scopes, reference.locator)
+                is not False
+            ):
+                return (), True
     scoped_sources: list[str] = []
     for source in lineage_sources:
         work = _indexes.work_by_alias.get(source)

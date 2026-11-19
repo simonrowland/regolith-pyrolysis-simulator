@@ -13032,6 +13032,8 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
         OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX,
         OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
         OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+        OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE,
+        _locator_scope_from_citation,
         _species_fragment_artifact,
         coefficient_lineage_sources,
         openimcc_pack_coefficient_sources,
@@ -13129,6 +13131,7 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
         assert isinstance(digest, str), identity
         fragment = identity.startswith("openimcc-review-gamma-activity.v1:")
         work_ids = row_work_ids(artifact)
+        withheld_work_ids: set[str] = set()
         all_work_ids = work_ids | {
             str(item)
             for item in artifact.get("work_ids", ())
@@ -13171,6 +13174,7 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
                 if per_row_work_ids
                 else set()
             )
+            withheld_work_ids = work_ids - common_work_ids
             assert common_work_ids.issubset(sources), (identity, common_work_ids)
             assert not (work_ids - common_work_ids).intersection(sources), identity
             if len(per_row_work_ids) > 1:
@@ -13179,8 +13183,6 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
                     and identity.rsplit(":", 1)[-1] in source
                     for source in sources
                 ), identity
-            if not common_work_ids:
-                continue
         else:
             sources = (
                 openimcc_redox_coefficient_sources(digest, None, species_formula=formula)
@@ -13200,6 +13202,11 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
                 if fragment
                 else {}
             )
+            if fragment:
+                assert all(
+                    "unparsed" not in scopes
+                    for scopes in scopes_by_work.values()
+                ), (identity, scopes_by_work)
             scopes = scopes_by_work.get(work_id)
             if scopes:
                 references = [
@@ -13233,6 +13240,51 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
                     work_id,
                     reference.observation_id,
                 )
+        if fragment:
+            assert formula is not None, identity
+            scopes_by_work = openimcc_species_source_locator_scopes(formula)
+            for work_id in sorted(withheld_work_ids):
+                scopes = scopes_by_work.get(work_id)
+                assert scopes is not None, (identity, work_id)
+                row_scopes = tuple(
+                    scope
+                    for scope in scopes
+                    if scope != OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE
+                )
+                references = [
+                    reference
+                    for reference in observations_by_work.get(
+                        canonical_work_id(work_id), ()
+                    )
+                    if reference.identity.species is not None
+                    and (
+                        selected := _species_fragment_artifact(
+                            artifacts, reference.identity.species.formula
+                        )
+                    ) is not None
+                    and selected.get("identity") == identity
+                    and openimcc_source_locator_matches(
+                        row_scopes, reference.locator
+                    ) is not False
+                ]
+                assert references, (identity, work_id, formula)
+                assert any(
+                    source.startswith(OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX)
+                    for source in sources
+                ), identity
+                for reference in references:
+                    complete, relation = resolver.for_reference(
+                        reference,
+                        sources,
+                        coefficient_species_formula=formula,
+                    )
+                    assert complete
+                    assert relation is SourceRelation.UNKNOWN, (
+                        identity,
+                        work_id,
+                        reference.observation_id,
+                        relation,
+                    )
 
     mo_sources = current_pack_sources("MoO3")
     assert "oneill-2002-feo-activity-coefficients-cmas" in mo_sources
@@ -13243,7 +13295,13 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
         scope.partition(":")[2]
         for scope in mo_scopes["oneill-2002-feo-activity-coefficients-cmas"]
         if scope.startswith("table:")
-    } == {"1", "6", "7", "8"}
+    } == {"7", "8"}
+    # Table 8 supplies the composition terms used by the manifest gamma law.
+    assert {
+        scope.partition(":")[2]
+        for scope in mo_scopes["oneill-2002-feo-activity-coefficients-cmas"]
+        if scope.startswith("page:")
+    } == {"164-164", "165-165"}
     assert openimcc_source_locator_matches(
         mo_scopes["oneill-2002-feo-activity-coefficients-cmas"],
         SimpleNamespace(table="2", page="164", published_page=None),
@@ -13275,6 +13333,25 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
         ("page:916-918",),
         SimpleNamespace(table=None, page="917", published_page=None),
     ) is True
+    assert _locator_scope_from_citation(
+        "Holzheid et al. (1997); locator: Abstract; reported mean gamma"
+    ) == ("work",)
+    assert _locator_scope_from_citation(
+        "Holzheid et al. (1997), Chemical Geology 139, 21-38"
+    ) == ("work",)
+    assert openimcc_source_locator_matches(
+        ("work",), SimpleNamespace(table=None, page=None, published_page=None)
+    ) is True
+    assert openimcc_source_locator_matches(("work",), None) is True
+    assert _locator_scope_from_citation(
+        "Unparsed source; locator: Table IV"
+    ) == ("unparsed",)
+    assert _locator_scope_from_citation(
+        "Unparsed source; locator: pp. unavailable"
+    ) == ("unparsed",)
+    assert openimcc_source_locator_matches(
+        ("unparsed",), SimpleNamespace(table="2", page=None, published_page=None)
+    ) is None
 
     copper_sources = current_pack_sources("CuO0.5")
     assert "kems-041-sossi-fegley-2018" in copper_sources
@@ -13403,6 +13480,8 @@ def test_openimcc_trace_lineage_for_real_kems_and_holzheid_rows_through_score_st
                 observation.source_id == source_id
                 and species is not None
                 and species.formula in formulas
+                and observation.admission.status
+                in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}
                 and (
                     source_id != "kems-041-sossi-fegley-2018"
                     or observation.locator is not None
@@ -13445,6 +13524,64 @@ def test_openimcc_trace_lineage_for_real_kems_and_holzheid_rows_through_score_st
                 and count > 0
                 for key, count in backlog.items()
             )
+
+
+def test_openimcc_partial_copper_lineage_stays_unknown_through_score_store() -> None:
+    pytest.importorskip("openimcc")
+    from simulator.battery.source_lineage import (
+        OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+    )
+
+    for source_id, expected_relation in (
+        (
+            "holzheid-lodders-2001-copper-solubility",
+            SourceRelation.UNKNOWN,
+        ),
+        ("wood-wade-2013-trace-activities", SourceRelation.UNKNOWN),
+        ("kems-012-sossi-2019", SourceRelation.INDEPENDENT),
+    ):
+        context = load_score_context(sources=(source_id,))
+        references = [
+            observation
+            for observation in context.observations.values()
+            if observation.source_id == source_id
+            and observation.identity.species is not None
+            and observation.identity.species.formula == "CuO0.5"
+            and observation.admission.status
+            in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}
+        ]
+        assert references, f"{source_id}: missing CuO0.5 observation"
+        residuals, _candidates = score_store(
+            context,
+            engines=(Engine.OPENIMCC,),
+            work_id=source_id,
+        )
+        for reference in references:
+            scored = next(
+                (
+                    residual
+                    for residual in residuals
+                    if residual.reference == reference.observation_id
+                    and residual.candidate_request is not None
+                    and residual.candidate_request.engine is Engine.OPENIMCC
+                ),
+                None,
+            )
+            assert scored is not None, (source_id, reference.observation_id)
+            assert scored.source_relation is expected_relation, (
+                source_id,
+                reference.observation_id,
+                scored.source_relation,
+            )
+            if expected_relation is SourceRelation.UNKNOWN:
+                assert scored.score_eligible is True
+                assert any(
+                    notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+                    and notice.reason.startswith(
+                        OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX
+                    )
+                    for notice in scored.notices
+                ), (source_id, reference.observation_id, scored.notices)
 
 
 def test_openimcc_mo_o3_score_path_resolves_oneill_fragment() -> None:

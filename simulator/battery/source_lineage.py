@@ -18,6 +18,7 @@ OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX = (
 OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX = (
     "openimcc-review-gamma-row-withheld;"
 )
+OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE = "withheld"
 OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX = (
     "openimcc-coefficient-lineage-unmatched;"
 )
@@ -203,6 +204,8 @@ def _species_fragment_artifact(
 def _fragment_row_scopes(
     rows: object,
 ) -> dict[str, tuple[str, ...]]:
+    """Collect locator scopes and mark work IDs missing from candidate rows."""
+
     if not isinstance(rows, Sequence) or isinstance(rows, str) or not rows:
         return {}
     row_scopes = [
@@ -212,18 +215,23 @@ def _fragment_row_scopes(
     ]
     if len(row_scopes) != len(rows):
         return {}
-    shared_work_ids = set(row_scopes[0])
-    for scopes in row_scopes[1:]:
-        shared_work_ids.intersection_update(scopes)
     combined: dict[str, tuple[str, ...]] = {}
-    for work_id in shared_work_ids:
-        per_row = [scopes[work_id] for scopes in row_scopes]
-        if any(scope is None or "unparsed" in scope for scope in per_row):
-            combined[work_id] = ("unparsed",)
-        else:
-            combined[work_id] = tuple(
-                sorted({item for scope in per_row for item in scope or ()})
-            )
+    all_work_ids = set().union(*(set(scopes) for scopes in row_scopes))
+    for work_id in sorted(all_work_ids):
+        scopes_for_work: set[str] = set()
+        missing_from_row = False
+        for scopes in row_scopes:
+            if work_id not in scopes:
+                missing_from_row = True
+                continue
+            scope = scopes[work_id]
+            if scope is None:
+                scopes_for_work.add("unparsed")
+            else:
+                scopes_for_work.update(scope)
+        if missing_from_row:
+            scopes_for_work.add(OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE)
+        combined[work_id] = tuple(sorted(scopes_for_work))
     return combined
 
 
@@ -232,7 +240,13 @@ def _species_fragment_sources(
 ) -> tuple[str, ...]:
     artifact = _species_fragment_artifact(artifacts, species_formula)
     rows = artifact.get("rows") if artifact is not None else None
-    return tuple(sorted(_fragment_row_scopes(rows)))
+    return tuple(
+        sorted(
+            work_id
+            for work_id, scopes in _fragment_row_scopes(rows).items()
+            if OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE not in scopes
+        )
+    )
 
 
 def _withheld_fragment_flag(
@@ -247,9 +261,11 @@ def _withheld_fragment_flag(
         for row in rows
         if isinstance(row, Mapping)
     )
-    all_work_ids = set(_work_ids_from_rows(rows))
-    shared_work_ids = set(_fragment_row_scopes(rows))
-    withheld_work_ids = sorted(all_work_ids - shared_work_ids)
+    withheld_work_ids = sorted(
+        work_id
+        for work_id, scopes in _fragment_row_scopes(rows).items()
+        if OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE in scopes
+    )
     return (
         f"{OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX}"
         f"fragment={fragment};candidate_rows={','.join(candidate_rows)};"
@@ -297,18 +313,52 @@ def _page_ranges(
     }
 
 
-def _locator_scope_from_citation(citation: object) -> tuple[str, ...] | None:
+def _locator_scope_from_citation(
+    citation: object, *, row_id: object = None
+) -> tuple[str, ...] | None:
+    """Parse locator tokens, treating citations without them as work-wide."""
+
     if not isinstance(citation, str):
         return None
     _head, marker, locator = citation.partition("locator:")
     if not marker:
-        return None
-    scopes = {f"table:{table}" for table in _table_ids(locator)}
-    scopes.update(
-        f"page:{first}-{last}"
-        for first, last in _page_ranges(locator, citation_locator=True)
+        locator = citation
+    locator_segments = (locator,)
+    row_table = (
+        re.search(
+            r"(?:^|[-_\s])table[-_\s]?([a-z]?-?\d+(?:\.\d+)?[a-z]?)",
+            row_id,
+            re.I,
+        )
+        if isinstance(row_id, str)
+        else None
     )
-    return tuple(sorted(scopes)) if scopes else None
+    if row_table is not None and re.search(
+        r"\bcomposition\s+law\b", locator, re.I
+    ):
+        # Keep the row's coefficient table and the table supplying its fitted
+        # composition law; closure inputs and standard-state tables are context.
+        coefficient_table = row_table.group(1).casefold()
+        relevant_segments = tuple(
+            segment
+            for segment in locator.split(";")
+            if coefficient_table in _table_ids(segment)
+            or re.search(r"\bcomposition\s+law\b", segment, re.I)
+        )
+        if relevant_segments:
+            locator_segments = relevant_segments
+    scopes: set[str] = set()
+    for segment in locator_segments:
+        scopes.update(f"table:{table}" for table in _table_ids(segment))
+        scopes.update(
+            f"page:{first}-{last}"
+            for first, last in _page_ranges(segment, citation_locator=True)
+        )
+    if scopes:
+        return tuple(sorted(scopes))
+    if re.search(r"\b(?:tables?|pages?)\b|\bpp?\.", locator, re.I):
+        return ("unparsed",)
+    return ("work",)
 
 
 def _row_source_scopes(row: Mapping[str, object]) -> dict[str, tuple[str, ...] | None]:
@@ -322,7 +372,9 @@ def _row_source_scopes(row: Mapping[str, object]) -> dict[str, tuple[str, ...] |
         work_id = source.get("work_id")
         if not isinstance(work_id, str) or not work_id:
             continue
-        scope = _locator_scope_from_citation(source.get("citation"))
+        scope = _locator_scope_from_citation(
+            source.get("citation"), row_id=row.get("id")
+        )
         if work_id not in scopes:
             scopes[work_id] = scope
         elif scopes[work_id] is None or scope is None:
@@ -336,7 +388,7 @@ def _row_source_scopes(row: Mapping[str, object]) -> dict[str, tuple[str, ...] |
 def openimcc_species_source_locator_scopes(
     species_formula: str | None,
 ) -> Mapping[str, tuple[str, ...]]:
-    """Return scopes shared by all candidate rows of a review-gamma fragment."""
+    """Return candidate-row scopes, marking work IDs withheld from some rows."""
 
     artifacts = _openimcc_coefficient_ancestry()
     artifact = _species_fragment_artifact(artifacts, species_formula)
@@ -356,8 +408,17 @@ def openimcc_source_locator_matches(
     to decide. A known different table/page is an independent source row.
     """
 
-    if "unparsed" in scopes or locator is None:
+    if "unparsed" in scopes:
         return None
+    if "work" in scopes:
+        return True
+    if locator is None:
+        return None
+    scopes = tuple(
+        scope
+        for scope in scopes
+        if scope != OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE
+    )
     locator_table_text = str(getattr(locator, "table", "") or "")
     locator_tables = _table_ids(locator_table_text)
     scope_tables = {
