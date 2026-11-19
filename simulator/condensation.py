@@ -8236,9 +8236,28 @@ def _wall_alpha_record(
                 "wall_surface_state.alpha_s", None,
                 "the liner corrosion override requires declared alpha_s",
             )
+        alpha_entry = _alpha_entry_with_species(
+            species, wall_surface_state["alpha_s"]
+        )
+        declared_alpha_s = _alpha_s_spec_from_entry(species, alpha_entry)
+        if (
+            isinstance(declared_alpha_s, Mapping)
+            and declared_alpha_s.get("form") == "scalar"
+        ):
+            declared_alpha_s = declared_alpha_s.get("value")
+        if not isinstance(declared_alpha_s, Mapping):
+            declared_alpha_value = _deposition_finite_scalar(
+                "wall_surface_state.alpha_s", declared_alpha_s
+            )
+            if not 0.0 <= declared_alpha_value <= 1.0:
+                raise DepositionInputRefusal(
+                    "wall_surface_state.alpha_s",
+                    declared_alpha_value,
+                    "must be within [0, 1]",
+                )
         override = _alpha_record(
             species=species,
-            entry=wall_surface_state["alpha_s"],
+            entry=alpha_entry,
             source="liner_corrosion.wall_surface_state.alpha_s",
             T_K=T_K,
             segment=segment,
@@ -10186,6 +10205,41 @@ def _series_resistance_deposition_flux_mol_m2_s(
         # Category 3 (see above): perfectly non-sticking surface; the
         # zero is real, not a refusal.
         return 0.0
+    if equilibrium_pressure_pa is None and wall_surface_state is not None:
+        if not isinstance(wall_surface_state, Mapping):
+            raise DepositionInputRefusal(
+                "wall_surface_state", wall_surface_state, "must be a mapping"
+            )
+        if "P_eq_Pa" not in wall_surface_state:
+            raise DepositionInputRefusal(
+                "wall_surface_state.P_eq_Pa", None,
+                "the liner corrosion override requires declared P_eq_Pa",
+            )
+        try:
+            equilibrium_pressure_pa = float(wall_surface_state["P_eq_Pa"])
+        except (TypeError, ValueError) as exc:
+            raise DepositionInputRefusal(
+                "wall_surface_state.P_eq_Pa",
+                wall_surface_state["P_eq_Pa"],
+                "must be numeric",
+            ) from exc
+        if (
+            not math.isfinite(equilibrium_pressure_pa)
+            or equilibrium_pressure_pa < 0.0
+        ):
+            raise DepositionInputRefusal(
+                "wall_surface_state.P_eq_Pa",
+                equilibrium_pressure_pa,
+                "must be finite and non-negative",
+            )
+        if diagnostic_out is not None:
+            diagnostic_out["wall_saturation_pressure_pa"] = (
+                equilibrium_pressure_pa
+            )
+            diagnostic_out["wall_saturation_pressure_refused"] = False
+            diagnostic_out["wall_saturation_pressure_status"] = (
+                "wall_surface_state_override"
+            )
     if equilibrium_pressure_pa is None:
         try:
             driving_pressure_pa = _wall_deposition_driving_pressure_pa(
@@ -10223,10 +10277,14 @@ def _series_resistance_deposition_flux_mol_m2_s(
                     'saturation_pressure_unavailable',
                 )),
             )
+        rate_equilibrium_pressure_pa = max(
+            0.0, P_local_pa - driving_pressure_pa
+        )
     else:
         equilibrium_pressure_pa = _finite_nonnegative_value(
             equilibrium_pressure_pa, label='surface equilibrium pressure')
         driving_pressure_pa = max(0.0, P_local_pa - equilibrium_pressure_pa)
+        rate_equilibrium_pressure_pa = equilibrium_pressure_pa
     if driving_pressure_pa <= 0.0:
         return 0.0
 
@@ -10263,9 +10321,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
         flux = k_hkl_per_pa * driving_pressure_pa
         rate = continuous_wall_deposition_flux(
             bulk_pressure_pa=P_local_pa,
-            equilibrium_pressure_pa=max(
-                0.0, P_local_pa - driving_pressure_pa
-            ),
+            equilibrium_pressure_pa=rate_equilibrium_pressure_pa,
             collision_coefficient_mol_m2_s_pa=(
                 collision_coefficient_per_pa
             ),
@@ -10351,7 +10407,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     flux = driving_pressure_pa / inv_k_total
     rate = continuous_wall_deposition_flux(
         bulk_pressure_pa=P_local_pa,
-        equilibrium_pressure_pa=max(0.0, P_local_pa - driving_pressure_pa),
+        equilibrium_pressure_pa=rate_equilibrium_pressure_pa,
         collision_coefficient_mol_m2_s_pa=collision_coefficient_per_pa,
         sticking_coefficient=alpha_s,
         gas_resistance_pa_m2_s_mol=mt_weight / k_mt_per_pa,

@@ -390,6 +390,18 @@ def test_fe_condensation_sidecar_loader_validates_nested_arrhenius_spec(
         condensation_module._load_sticking_data(path)
 
 
+def test_liner_wall_alpha_refuses_negative_declared_override() -> None:
+    with pytest.raises(
+        condensation_module.DepositionInputRefusal,
+        match="wall_surface_state.alpha_s",
+    ):
+        condensation_module._wall_alpha_record(
+            "Fe",
+            T_K=1200.0,
+            wall_surface_state={"alpha_s": -0.1, "P_eq_Pa": 0.0},
+        )
+
+
 def _analytical_value_ref_entry(source_class: str) -> dict[str, object]:
     return {
         "value_ref": (
