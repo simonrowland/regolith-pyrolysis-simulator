@@ -108,6 +108,15 @@ experiments:
       state: {tag: value, value: Pure Fe and Mo charged with Mo at the bottom and Fe above; alloying took 1-1.5 h before measurement}
       locator: {published_page: '553-554', section: II.2 Samples, note: 'Alloying duration is preparation, not a measurement hold'}
   apparatus:
+    calibration:
+      technique: &kems111_technique
+        state: {tag: value, value: mass_spectrometry}
+        locator:
+          page: 2
+          published_page: 553
+          pdf_page_index: 1
+          section: II.1 Experimental Apparatus
+          note: 'The HITACHI RM6K Knudsen cell-mass spectrometer assembly was used.'
     geometry:
       orifice_diameter_m:
         state: {tag: value, value: {kind: point, point: '0.0005'}}
@@ -363,6 +372,12 @@ species:
           activity: 0.897
           phases: Fe liquid solution
           point_conditions:
+            comparison: &kems111_low_comparison
+              state: {tag: value, value: multiple_cell_or_successive_pure_reference_sample}
+              locator: {page: 3, published_page: 554, pdf_page_index: 2, section: 'II.4 Determination of Activity', equation: '6', note: 'Equation (6) compares alloy Fe ion intensity with extrapolated pure liquid Fe intensity.'}
+            activity_method: &kems111_low_direct_method
+              state: {tag: value, value: direct_comparison}
+              locator: {page: 3, published_page: 554, pdf_page_index: 2, section: 'II.4 Determination of Activity', equation: '6', note: 'Equation (6) defines a_Fe as the ratio of alloy Fe ion intensity to extrapolated pure-Fe ion intensity.'}
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.096']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -377,6 +392,8 @@ species:
           activity: 0.81
           phases: Fe liquid solution
           point_conditions:
+            comparison: *kems111_low_comparison
+            activity_method: *kems111_low_direct_method
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.154']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -391,6 +408,8 @@ species:
           activity: 0.8
           phases: Fe liquid solution
           point_conditions:
+            comparison: *kems111_low_comparison
+            activity_method: *kems111_low_direct_method
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.2']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -405,6 +424,8 @@ species:
           activity: 0.767
           phases: Fe liquid solution
           point_conditions:
+            comparison: *kems111_low_comparison
+            activity_method: *kems111_low_direct_method
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.201']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -419,6 +440,8 @@ species:
           activity: 0.692
           phases: Fe liquid solution
           point_conditions:
+            comparison: *kems111_low_comparison
+            activity_method: *kems111_low_direct_method
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.24']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -433,6 +456,8 @@ species:
           activity: 0.737
           phases: Fe liquid solution
           point_conditions:
+            comparison: *kems111_low_comparison
+            activity_method: *kems111_low_direct_method
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.251']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -447,6 +472,8 @@ species:
           activity: 0.741
           phases: Fe liquid solution
           point_conditions:
+            comparison: *kems111_low_comparison
+            activity_method: *kems111_low_direct_method
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.254']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -461,6 +488,8 @@ species:
           activity: 0.69
           phases: Fe liquid solution
           point_conditions:
+            comparison: *kems111_low_comparison
+            activity_method: *kems111_low_direct_method
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.3']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -475,6 +504,8 @@ species:
           activity: 0.673
           phases: Fe liquid solution
           point_conditions:
+            comparison: *kems111_low_comparison
+            activity_method: *kems111_low_direct_method
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.302']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -489,6 +520,8 @@ species:
           activity: 0.677
           phases: Fe liquid solution
           point_conditions:
+            comparison: *kems111_low_comparison
+            activity_method: *kems111_low_direct_method
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.333']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -503,6 +536,15 @@ species:
           activity: 0.652
           phases: Fe liquid solution
           point_conditions:
+            comparison: &kems111_ag_comparison
+              state: {tag: value, value: multiple_cell_or_successive_pure_reference_sample}
+              locator: {page: 3, published_page: 554, pdf_page_index: 2, section: 'II.4 Determination of Activity', note: 'The Ag-Fe run measures pure Fe with Ag foil; a separate Ag-Fe-Mo run measures the alloy with Ag foil, and the two measurements are compared.'}
+            activity_method: &kems111_ag_direct_method
+              state: {tag: value, value: direct_comparison}
+              locator: {page: 4, published_page: 555, pdf_page_index: 3, section: 'II.4 Determination of Activity', equation: '10', note: 'Equation (10) gives a_Fe from the alloy Fe ion intensity divided by the Ag ion intensity and the pure-Fe/Ag reference ratio.'}
+            sensitivity: &kems111_stable_sensitivity
+              state: {tag: value, value: stable}
+              locator: {page: 3, published_page: 554, pdf_page_index: 2, section: 'II.4 Determination of Activity', equation: '7', note: 'The pure-Fe-to-Ag ion-current ratio is almost constant for runs with different cells.'}
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.339']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -517,6 +559,9 @@ species:
           activity: 0.652
           phases: Fe liquid solution
           point_conditions:
+            comparison: *kems111_ag_comparison
+            activity_method: *kems111_ag_direct_method
+            sensitivity: *kems111_stable_sensitivity
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.348']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -531,6 +576,9 @@ species:
           activity: 0.621
           phases: Fe liquid solution+σ
           point_conditions:
+            comparison: *kems111_ag_comparison
+            activity_method: *kems111_ag_direct_method
+            sensitivity: *kems111_stable_sensitivity
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.434']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -545,6 +593,9 @@ species:
           activity: 0.656
           phases: Fe liquid solution+σ
           point_conditions:
+            comparison: *kems111_ag_comparison
+            activity_method: *kems111_ag_direct_method
+            sensitivity: *kems111_stable_sensitivity
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.434']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -560,6 +611,9 @@ species:
           a_Fe_as_printed: 0.528*
           phases: Fe liquid solution+σ
           point_conditions:
+            comparison: *kems111_ag_comparison
+            activity_method: *kems111_ag_direct_method
+            sensitivity: *kems111_stable_sensitivity
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.434']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -577,6 +631,9 @@ species:
           activity: 0.585
           phases: σ+Mo solid solution
           point_conditions:
+            comparison: *kems111_ag_comparison
+            activity_method: *kems111_ag_direct_method
+            sensitivity: *kems111_stable_sensitivity
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.556']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -591,6 +648,9 @@ species:
           activity: 0.552
           phases: σ+Mo solid solution
           point_conditions:
+            comparison: *kems111_ag_comparison
+            activity_method: *kems111_ag_direct_method
+            sensitivity: *kems111_stable_sensitivity
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.613']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -605,6 +665,9 @@ species:
           activity: 0.526
           phases: σ+Mo solid solution
           point_conditions:
+            comparison: *kems111_ag_comparison
+            activity_method: *kems111_ag_direct_method
+            sensitivity: *kems111_stable_sensitivity
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.666']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -619,6 +682,9 @@ species:
           activity: 0.556
           phases: σ+Mo solid solution
           point_conditions:
+            comparison: *kems111_ag_comparison
+            activity_method: *kems111_ag_direct_method
+            sensitivity: *kems111_stable_sensitivity
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.778']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -633,6 +699,9 @@ species:
           activity: 0.538
           phases: σ+Mo solid solution
           point_conditions:
+            comparison: *kems111_ag_comparison
+            activity_method: *kems111_ag_direct_method
+            sensitivity: *kems111_stable_sensitivity
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.793']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -647,6 +716,9 @@ species:
           activity: 0.518
           phases: Mo solid solution
           point_conditions:
+            comparison: *kems111_ag_comparison
+            activity_method: *kems111_ag_direct_method
+            sensitivity: *kems111_stable_sensitivity
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.842']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -661,6 +733,9 @@ species:
           activity: 0.36
           phases: Mo solid solution
           point_conditions:
+            comparison: *kems111_ag_comparison
+            activity_method: *kems111_ag_direct_method
+            sensitivity: *kems111_stable_sensitivity
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.912']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
@@ -675,6 +750,9 @@ species:
           activity: 0.383
           phases: Mo solid solution
           point_conditions:
+            comparison: *kems111_ag_comparison
+            activity_method: *kems111_ag_direct_method
+            sensitivity: *kems111_stable_sensitivity
             composition:
               state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.912']]}}
               locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
