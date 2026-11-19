@@ -20920,7 +20920,7 @@ def test_liquidus_success_keeps_native_authority_and_diagnostics(
         _assert_extrapolated_success_keeps_native_authority(monkeypatch)
 
 
-def test_transition_temperature_out_of_domain_bracket_is_typed_refusal(
+def test_transition_temperature_missing_bracket_is_typed_not_converged(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from types import SimpleNamespace
@@ -20929,7 +20929,7 @@ def test_transition_temperature_out_of_domain_bracket_is_typed_refusal(
 
     reference = _transition_temperature_observation()
     unavailable_result = LiquidusSolidusResult(
-        status="out_of_domain",
+        status="not_converged",
         warnings=("liquidus bracket absent: frac_M never reached 0.999",),
     )
     handle = SimpleNamespace(
@@ -20952,10 +20952,86 @@ def test_transition_temperature_out_of_domain_bracket_is_typed_refusal(
     assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
     assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
     assert prediction.refusal_detail == {
-        "reason": "liquidus_finder_out_of_domain",
-        "status": "out_of_domain",
+        "reason": "liquidus_finder_not_converged",
+        "status": "not_converged",
         "warnings": ["liquidus bracket absent: frac_M never reached 0.999"],
     }
+
+
+def test_extended_liquidus_search_notice_names_the_original_bracket(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    prediction = _native_transition_prediction(
+        monkeypatch,
+        {
+            "original_search_bracket_C": (800.0, 1200.0),
+            "bounded_search_interval_C": (500.0, 1600.0),
+        },
+    )
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.authority is Authority.BRIDGE
+    matching = [
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and "original search bracket" in notice.reason
+    ]
+    assert len(matching) == 1
+    notice = matching[0]
+    assert notice.reason == (
+        "liquidus finder extended beyond original search bracket "
+        "[800, 1200] C to [500, 1600] C"
+    )
+    assert notice.authority is Authority.BRIDGE
+    assert notice.affected_quantities == (Quantity.TRANSITION_TEMPERATURE,)
+    assert notice.origin == f"engine:{Engine.MAGEMIN.value}"
+
+    extrapolated = _native_transition_prediction(
+        monkeypatch,
+        {
+            "authority": "extrapolated",
+            "original_search_bracket_C": (400.0, 2200.0),
+            "bounded_search_interval_C": (400.0, 2500.0),
+        },
+    )
+    assert extrapolated.authority is Authority.EXTRAPOLATED
+    assert any(
+        item.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and item.authority is Authority.EXTRAPOLATED
+        and item.reason
+        == (
+            "liquidus finder extended beyond original search bracket "
+            "[400, 2200] C to [400, 2500] C"
+        )
+        for item in extrapolated.notices
+    )
+
+    same_window = _native_transition_prediction(
+        monkeypatch,
+        {
+            "original_search_bracket_C": (800.0, 1200.0),
+            "bounded_search_interval_C": (800.0, 1200.0),
+        },
+    )
+    assert not any(
+        "original search bracket" in item.reason for item in same_window.notices
+    )
+
+
+def test_dropping_the_extension_notice_hides_the_original_bracket(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend import liquidus as liquidus_module
+
+    monkeypatch.setattr(
+        liquidus_module,
+        "liquidus_search_extension_notice",
+        lambda _diagnostics: None,
+    )
+    with pytest.raises(AssertionError):
+        test_extended_liquidus_search_notice_names_the_original_bracket(
+            monkeypatch,
+        )
 
 
 @pytest.mark.parametrize(

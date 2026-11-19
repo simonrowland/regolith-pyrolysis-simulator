@@ -863,9 +863,7 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
                 'backend_status_reason': 'no_convergence',
             }, warnings=('non-monotone frac_M(T)',))
         if failure == 'missing_bracket':
-            return SimpleNamespace(status='out_of_domain', diagnostic={
-                'reason': 'out_of_domain',
-            }, warnings=(
+            return SimpleNamespace(status='not_converged', diagnostic={}, warnings=(
                 'solidus bracket absent: frac_M never crossed 0.001',
                 'liquidus bracket absent: frac_M never reached 0.995',
             ))
@@ -903,30 +901,21 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
             'path': ((1200.0, 0.0), (1200.000001, 1.0)),
         }
         notice = curve['gate_provider_refusal']
-        if failure == 'missing_bracket':
-            assert notice['authority'] == 'extrapolated'
-            assert notice['qualification'] == 'out_of_domain_kress91_floor_prediction'
-            assert notice['status'] == 'out_of_domain'
-            assert notice['reason'] is None
-            assert 'failure_hour' not in notice
-        else:
-            assert notice['authority'] == 'extrapolated (lower-rung)'
-            assert notice['qualification'] == 'first_call_kress91_floor_prediction'
-            assert notice['failure_hour'] == 7
-            assert notice['failure_temperature_C'] == 1500.0
-            assert notice['status'] == ('unavailable' if failure == 'warm_timeout' else (
-                'not_converged' if failure in {'numerical', 'non_monotone'} else
-                'out_of_domain'
-            ))
-        if failure == 'non_monotone':
+        assert notice['authority'] == 'extrapolated (lower-rung)'
+        assert notice['qualification'] == 'first_call_kress91_floor_prediction'
+        assert notice['failure_hour'] == 7
+        assert notice['failure_temperature_C'] == 1500.0
+        assert notice['status'] == ('unavailable' if failure == 'warm_timeout' else (
+            'not_converged' if failure in {
+                'numerical', 'missing_bracket', 'non_monotone',
+            } else 'out_of_domain'
+        ))
+        if failure in {'missing_bracket', 'non_monotone'}:
             assert notice['provider_diagnostic'] == {}
-        elif failure == 'missing_bracket':
-            assert 'outcome' not in notice
         else:
             assert notice['provider_diagnostic']
-        if failure != 'missing_bracket':
-            assert 'calibration-floor step' in notice['detail']
-            assert 'not a fresh solve or a melting measurement' in notice['detail']
+        assert 'calibration-floor step' in notice['detail']
+        assert 'not a fresh solve or a melting measurement' in notice['detail']
         if timed_out:
             assert notice['backend_failure_disposition'] == 'environment'
             assert notice['reason'] == (
@@ -934,10 +923,10 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
                 if failure == 'aggregate_timeout'
                 else 'engine_worker_timeout'
             )
-        elif failure != 'missing_bracket':
+        else:
             assert notice['outcome'] == 'numerical_failure'
             assert notice['warnings']
-            if failure == 'non_monotone':
+            if failure in {'missing_bracket', 'non_monotone'}:
                 assert notice['reason'] == 'liquid_fraction_provider_failed'
         if failure == 'warm_timeout':
             assert notice['availability_notice'] == {
@@ -948,26 +937,14 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
                 'source_used': 'kress91_liquid_calibration_floor',
             }
         assert sim._freeze_gate_last_good_curve is None
-        if failure == 'missing_bracket':
-            assert sim._freeze_gate_liquid_fraction_cache['curve']['source'] == (
-                'kress91_liquid_calibration_floor'
-            )
-        else:
-            assert sim._freeze_gate_liquid_fraction_cache is None
-            assert sim._freeze_gate_liquid_fraction_curve_memo == {}
-            assert shared == {}
-        if failure == 'missing_bracket':
-            assert [row['artifact'] for row in store.capture_sequence] == [
-                'freeze_gate_curve',
-            ]
-        else:
-            assert store.capture_sequence == []
+        assert sim._freeze_gate_liquid_fraction_cache is None
+        assert sim._freeze_gate_liquid_fraction_curve_memo == {}
+        assert shared == {}
+        assert store.capture_sequence == []
         assert sim._make_snapshot().liquid_fraction_gate['redox']['gate_provider_refusal'] == notice
         call_count = len(calls)
         assert sim._melt_redox_liquidus_gate_curve() == curve
         assert len(calls) == call_count
-        if failure == 'missing_bracket':
-            return
         sim.melt.hour = 8
         again = sim._melt_redox_liquidus_gate_curve()
         assert again['gate_provider_refusal']['failure_hour'] == 8
@@ -1008,16 +985,6 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     sim.configure_pt0_determinism_store(store)
     held = sim._melt_redox_liquidus_gate_curve()
     notice = held['gate_provider_refusal']
-    if failure == 'missing_bracket':
-        assert notice['status'] == 'out_of_domain'
-        assert notice['qualification'] == 'out_of_domain_kress91_floor_prediction'
-        assert notice['authority'] == 'extrapolated'
-        assert notice['reason'] is None
-        assert notice['warnings']
-        assert held['source'] == 'kress91_liquid_calibration_floor'
-        assert 'computed_hour' not in notice
-        assert sim._freeze_gate_held_curve_record is None
-        return
     assert {
         key: held[key]
         for key in ('source', 'solidus_T_C', 'liquidus_T_C', 'path')

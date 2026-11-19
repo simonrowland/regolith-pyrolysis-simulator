@@ -14071,7 +14071,10 @@ def _predict_liquidus_transition_temperature(
 
             close_battery_engine_handle(handle)
 
-    from simulator.melt_backend.liquidus import liquidus_transition_decision
+    from simulator.melt_backend.liquidus import (
+        liquidus_search_extension_notice,
+        liquidus_transition_decision,
+    )
 
     temperature_K, decision_reason = liquidus_transition_decision(result, subtype)
     authority, certified_band, native_notices, carried = _liquidus_native_score(
@@ -14092,6 +14095,19 @@ def _predict_liquidus_transition_temperature(
         if carried:
             detail["diagnostics"] = carried
         return unavailable(detail)
+    extension_notice = liquidus_search_extension_notice(
+        getattr(result, "diagnostics", None)
+    )
+    if extension_notice is not None:
+        notices.append(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.TRANSITION_TEMPERATURE,),
+                reason=extension_notice,
+                origin=f"engine:{engine.value}",
+                authority=authority,
+            )
+        )
     return EnginePrediction(
         engine=engine,
         channel=channel,

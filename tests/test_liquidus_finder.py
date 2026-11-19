@@ -64,6 +64,7 @@ def test_liquidus_finder_bisects_monotone_fraction_curve():
     assert frac_M(result.solidus_T_C) <= 1.0e-3
     assert frac_M(result.liquidus_T_C) >= 1.0 - 1.0e-3
     assert result.iterations <= 64
+    assert result.diagnostics == {}
 
 
 def test_liquidus_result_celsius_kelvin_conversion_is_pinned():
@@ -368,7 +369,7 @@ def test_threshold_equality_at_an_outer_boundary_is_not_a_crossing(
 ):
     result = _scan_transition(anchors)
 
-    assert result.status == "out_of_domain"
+    assert result.status == "not_converged"
     assert any(missing_bracket in warning for warning in result.warnings)
 
 
@@ -719,14 +720,17 @@ def test_liquidus_finder_reports_missing_bracket_without_crashing():
         tolerance_C=1.0,
     )
 
-    assert result.status == 'out_of_domain'
+    assert result.status == 'not_converged'
     assert any('solidus bracket absent' in warning for warning in result.warnings)
     assert any('liquidus bracket absent' in warning for warning in result.warnings)
     assert result.diagnostics == {
-        'reason': 'out_of_domain',
+        'reason': 'not_converged',
         'original_search_bracket_C': (800.0, 1200.0),
         'bounded_search_interval_C': (500.0, 2500.0),
     }
+    assert liquidus_module.liquidus_search_extension_notice(
+        result.diagnostics,
+    ) is None
 
 
 def test_liquidus_finder_expands_bracket_and_names_original_window():
@@ -749,6 +753,13 @@ def test_liquidus_finder_expands_bracket_and_names_original_window():
         and 'extended' in warning
         for warning in result.warnings
     )
+    assert result.diagnostics == {
+        'original_search_bracket_C': (800.0, 1200.0),
+        'bounded_search_interval_C': (500.0, 1600.0),
+    }
+    assert liquidus_module.liquidus_search_extension_notice(
+        result.diagnostics,
+    ) in result.warnings
 
 
 def test_liquidus_finder_default_budget_is_unbounded():
@@ -766,7 +777,7 @@ def test_liquidus_finder_default_budget_is_unbounded():
         max_T_C=1000.0,
         scan_step_C=100.0,
     )
-    assert result.status == 'out_of_domain'
+    assert result.status == 'not_converged'
     assert calls['n'] == 21  # 500 through 2500 C at 100 C steps
     assert result.diagnostics.get('reason') != 'aggregate_budget_exceeded'
 

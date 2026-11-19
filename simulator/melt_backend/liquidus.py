@@ -287,6 +287,48 @@ def _liquidus_transition_temperature_K(
     return temperature_K
 
 
+def liquidus_search_extension_notice(
+    diagnostics: Mapping[str, Any] | None,
+) -> str | None:
+    """Name a search that grew past the caller window, or None.
+
+    The finder stores the original bracket and the interval it actually
+    searched. This is the only wording of that fact. The scorer copies it
+    onto the produced temperature. Equal brackets are not an extension.
+    A missing threshold is not an extension: that result carries its own
+    reason and does not use this sentence.
+    """
+
+    if not isinstance(diagnostics, Mapping):
+        return None
+    # A missing threshold carries reason='not_converged' and the same bracket
+    # keys. That is a refusal, not a produced temperature outside the window.
+    if diagnostics.get("reason") not in (None, ""):
+        return None
+    original = _temperature_bracket(diagnostics.get("original_search_bracket_C"))
+    searched = _temperature_bracket(diagnostics.get("bounded_search_interval_C"))
+    if original is None or searched is None or original == searched:
+        return None
+    return (
+        "liquidus finder extended beyond original search bracket "
+        f"[{original[0]:g}, {original[1]:g}] C to "
+        f"[{searched[0]:g}, {searched[1]:g}] C"
+    )
+
+
+def _temperature_bracket(value: object) -> tuple[float, float] | None:
+    if not isinstance(value, (tuple, list)) or len(value) != 2:
+        return None
+    try:
+        low = float(value[0])
+        high = float(value[1])
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(low) or not math.isfinite(high):
+        return None
+    return low, high
+
+
 def liquidus_transition_decision(
     result: object,
     subtype: str,
@@ -709,16 +751,18 @@ def find_liquidus_solidus_by_fraction(
             search_max_T = next_max_T
             solidus_bracket, liquidus_bracket = threshold_brackets()
 
-        extended_notice = None
-        if (
-            search_min_T < min_T
-            or search_max_T > max_T
-        ):
-            extended_notice = (
-                'liquidus finder extended beyond original search bracket '
-                f'[{min_T:g}, {max_T:g}] C to '
-                f'[{search_min_T:g}, {search_max_T:g}] C'
-            )
+        extension_diagnostics = None
+        if search_min_T < min_T or search_max_T > max_T:
+            extension_diagnostics = {
+                'original_search_bracket_C': (min_T, max_T),
+                'bounded_search_interval_C': (
+                    search_min_T,
+                    search_max_T,
+                ),
+            }
+        extended_notice = liquidus_search_extension_notice(
+            extension_diagnostics,
+        )
         for bracket in (solidus_bracket, liquidus_bracket):
             if bracket is None:
                 continue
@@ -741,7 +785,7 @@ def find_liquidus_solidus_by_fraction(
             )
         if missing:
             return LiquidusSolidusResult(
-                status='out_of_domain',
+                status='not_converged',
                 warnings=tuple([
                     *smoothing_warnings,
                     *missing,
@@ -752,7 +796,7 @@ def find_liquidus_solidus_by_fraction(
                 samples=tuple(samples),
                 iterations=iterations,
                 diagnostics={
-                    'reason': 'out_of_domain',
+                    'reason': 'not_converged',
                     'original_search_bracket_C': (min_T, max_T),
                     'bounded_search_interval_C': (
                         search_min_T,
@@ -839,6 +883,7 @@ def find_liquidus_solidus_by_fraction(
         ]),
         samples=tuple(samples),
         iterations=iterations,
+        diagnostics=extension_diagnostics or {},
     )
 
 
