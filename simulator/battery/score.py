@@ -118,7 +118,6 @@ from simulator.battery.identity import (
     _STANDARD_PRESSURE_AMBIGUITY_RELATION,
 )
 from simulator.battery.non_observations import (
-    INTERNAL_CONSISTENCY_STEMS,
     is_internal_consistency,
     is_non_observation,
 )

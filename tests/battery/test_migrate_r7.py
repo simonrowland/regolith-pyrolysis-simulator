@@ -1081,6 +1081,18 @@ def test_b2131_formation_gibbs_cells_land_at_printed_temperature(tmp_path):
 def _b2131_formation_observations(tmp_path):
     source_id = "robie-hemingway-1995-usgs-b2131"
     root = _write_min_tree(tmp_path / "tree")
+    index_path = root / "data/literature/INDEX.yaml"
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    repository_index = yaml.safe_load(
+        (REPO_ROOT / "data/literature/INDEX.yaml").read_text(encoding="utf-8")
+    )
+    source_row = next(
+        row for row in repository_index["sources"] if row["source_id"] == source_id
+    )
+    assert source_row["corpus"]["raw"]["present"] is True
+    index["sources"].append(source_row)
+    index_path.write_text(yaml.safe_dump(index, sort_keys=False), encoding="utf-8")
+
     source_dir = REPO_ROOT / "data/literature/compilations" / source_id
     for source_path in sorted(source_dir.rglob("*")):
         if not source_path.is_file():
@@ -1149,10 +1161,19 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
         if fields
     }
     assert non_admission_diffs
-    assert {
+    changed_fields = {
         field for fields in non_admission_diffs.values() for field in fields
-    } == {"derivation", "provenance", "read_from"}, json.dumps(
-        non_admission_diffs, sort_keys=True
+    }
+    assert changed_fields == {"experiment_id", "provenance"}
+    assert all(
+        candidate[observation_id].get("read_from")
+        == baseline[observation_id].get("read_from")
+        for observation_id in baseline
+    )
+    assert all(
+        row.get("derivation") is None
+        or row["derivation"]["inputs"] == [row["read_from"]]
+        for row in candidate.values()
     )
     manifest = yaml.safe_load(
         (
@@ -1161,6 +1182,7 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
         ).read_text(encoding="utf-8")
     )
     expected_role = manifest["compilation_role"]
+    assert all(row.get("provenance") is None for row in baseline_rows)
     assert all(
         row["provenance"]["compilation_role"] == expected_role
         for row in candidate.values()
@@ -1174,12 +1196,13 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     payload = json.dumps(
         observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
-    # Green's B2131 index changes read_from to the PDF and updates its
-    # derivation input; t-1832 adds the manifest role provenance. Admissions
-    # stay unchanged across these serialization changes.
+    # The repository INDEX resolves summary locators to the existing PDF
+    # asset and record locators to compilation records. The candidate differs
+    # by experiment_id and t-1832's manifest-role provenance. Admissions stay
+    # unchanged across these serialization changes.
     assert (len(observations), hashlib.sha256(payload).hexdigest()) == (
         945,
-        "bf062b5860bc2f5ac3e1980a6d42e85ac9d10539c26b06449705a40a1234dda7",
+        "284f95aaa43650c82faa4bf3de9534b6c749814be2b5cf90e4950057bebb618d",
     )
 
 

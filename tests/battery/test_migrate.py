@@ -14741,14 +14741,25 @@ def test_g1_delta_fh_migrate_refuses_blank_units_and_admits_declared_point(
     assert atct_obs
     assert all(quantity_token(obs.identity) is Quantity.DELTA_FH for obs in atct_obs)
     assert all(obs.value.kind is ValueKind.UNAVAILABLE for obs in atct_obs)
+    assert any(
+        "missing printed unit" in (obs.value.unavailable_reason or "")
+        for obs in atct_obs
+    )
+    assert all(
+        obs.provenance is not None
+        and obs.provenance["compilation_role"]["engine_reference_input"] is True
+        and obs.provenance["compilation_role"]["validation_measurement"] is False
+        and obs.provenance["compilation_role"]["scoring_eligible"] is False
+        for obs in atct_obs
+    )
     atct_repairs = [
         entry
         for entry in result.queue
         if "atct-1.222-0001" in (entry.observation_id or "")
     ]
-    # The source declares these ATcT values non-scoring engine references, so
-    # even a missing-unit comparison repair is re-homed with that role.
-    assert all("read_from" in (entry.axes or ()) for entry in atct_repairs)
+    # The explicit non-scoring engine-reference role removes comparison queue
+    # work; the missing-unit refusal remains on the unavailable observation.
+    assert atct_repairs == []
 
     ng_obs = [
         obs
