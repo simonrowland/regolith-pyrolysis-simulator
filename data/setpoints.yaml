@@ -445,17 +445,19 @@ campaigns:
     p_total_mbar_default: 0.2
     # The N2 continuum floor derives from hard-sphere kinetic theory:
     # p_min = k_B*T/(sqrt(2)*pi*sigma_N2^2*Kn_max*D), with T=1670 C,
-    # sigma_N2=3.798e-10 m, Kn_max=0.01, and hot-wall D=0.12 m. The
-    # formula returns Pa; divide by 100 for mbar. The operational 5-15 mbar
+    # sigma_N2=3.798e-10 m, Kn_max=0.01, and the owner-set D=0.50 m maximum
+    # aperture. The prior 0.348846 mbar floor scales inversely with D:
+    # 0.348846 * 0.12/0.50 = 0.083723 mbar. The formula returns Pa; divide
+    # by 100 for mbar. The operational 5-15 mbar
     # pN2 band keeps Kn well below 0.01. Derive total pressure as pO2+pN2.
     # The optimizer pressure-cap chunk consumes this data; it is not a clamp.
     continuum_pressure_bounds:
       pN2_mbar: [5.0, 15.0]
-      derived_pN2_floor_mbar: 0.348846
+      derived_pN2_floor_mbar: 0.08372304
       knudsen_max: 0.01
       carrier_gas: "N2"
       gas_temperature_C: 1670
-      pipe_diameter_m: 0.12
+      pipe_diameter_m: 0.5
     target_species: ["Mg"]
     # Mg threshold derivation (diagnostic grounding, not a replacement C4 hold):
     # Premise: late-stage melt fO2 has reached the named CF-1 body floor and
@@ -589,16 +591,17 @@ campaigns:
     pO2_mbar_default: 0.2
     p_total_mbar_default: 0.2
     # Same N2 continuum derivation and operational band as C4, evaluated at
-    # the selected C6 static hold 1400 C: k_B*(1400+273.15) /
-    # (sqrt(2)*pi*(3.798e-10 m)^2*0.12 m*0.01) = 30.037 Pa = 0.300374 mbar.
-    # The 5.0 mbar operating floor remains conservative at 16.65x that minimum.
+    # the selected C6 static hold 1400 C and owner-set D=0.50 m maximum
+    # aperture. The prior 0.300374 mbar floor scales inversely with D:
+    # 0.300374 * 0.12/0.50 = 0.07208976 mbar.
+    # The 5.0 mbar operating floor remains conservative at about 69.4x that minimum.
     continuum_pressure_bounds:
       pN2_mbar: [5.0, 15.0]
-      derived_pN2_floor_mbar: 0.300374
+      derived_pN2_floor_mbar: 0.07208976
       knudsen_max: 0.01
       carrier_gas: "N2"
       gas_temperature_C: 1400
-      pipe_diameter_m: 0.12
+      pipe_diameter_m: 0.5
     target_species: ["Al"]
     reaction: "3Mg(l) + Al2O3(melt) -> 3MgO(slag) + 2Al(l)"
     # 2026-07-11 C6 static-recipe sweep:
@@ -1184,11 +1187,12 @@ condensation_train:
 # ============================================================================
 condenser_geometry:
 
-  # BH-063 user-exposed knob candidate. Default is pi * (0.06 m)^2,
-  # which reproduces the historical 12 cm hot-wall throat diameter:
-  # sqrt(4 * initial_throat_area_m2 / pi) = 0.12 m.
-  initial_throat_area_m2: 0.011309733552923255
-  initial_throat_area_source: "BH-063 owner-approved back-compat anchor; 12 cm pipe throat, 2026-07-08"
+  # Owner-set fixed maximum aperture is pi * (0.25 m)^2. Since the
+  # compressible-Poiseuille capacity scales as d^4, (0.50/0.12)^4 = 301x the
+  # historical 12 cm throat (about 0.35 kg/hr * 301 = 105 kg/hr at C4's
+  # 0.2 mbar setpoint). Knudsen pressure floors scale as 1/d.
+  initial_throat_area_m2: 0.19634954084936207
+  initial_throat_area_source: "owner 2026-11-19 (d-452): 0.5 m fixed throat"
   initial_throat_area_knob_candidate: true
 
   # Physical stage area = initial_throat_area_m2 * ratio. The throat is
@@ -1203,11 +1207,11 @@ condenser_geometry:
     k_stage4b: 5.658842421045168
     terminal: 2.0
   stage_area_ratio_sources:
-    fe_stage1: "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window"
+    fe_stage1: "owner-ruling-d137: baseline 0.236 m2 at the historical 12 cm throat; physical area scales with configured throat-area ratio; sized for 95% of the C2A Fe window"
     cr_stage2: "engineering-default: removable Cr oxide cartridge sits between Fe condenser and SiO baffles with intermediate capture surface"
     sio_stage3: "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages"
-    alkali_stage4: "owner-ruling-d137: Na collector, area 0.051 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
-    k_stage4b: "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
+    alkali_stage4: "owner-ruling-d137: baseline Na collector area 0.051 m2 at the historical 12 cm throat; physical area scales with configured throat-area ratio; t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
+    k_stage4b: "owner-ruling-d137: baseline K cold-trap area 0.064 m2 at the historical 12 cm throat; physical area scales with configured throat-area ratio; t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
     terminal: "engineering-default: terminal vent/capture area is not the constriction; keep >= throat for follow-on Kn diagnostics"
   # Capture-law gas-side length only. Parallel plates of gap g have
   # Dh = 2*g. The Stage-1 collector is a 10 mm gap, so Dh = 0.020 m.

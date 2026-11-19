@@ -22,7 +22,7 @@ The resulting PlantDesign is:
 
 Reference scale:
     100 m² concentrator → ~136 kW → appropriate for ~1 tonne batch
-    12 cm pipe → 7-16 g/s SiO at 10 mbar pN₂
+    Unconfigured standalone fallback: 12 cm pipe → 7-16 g/s SiO at 10 mbar pN₂
 
 Key equations:
     Crucible volume:   V = m / ρ_melt, h = 1.5d, +20% freeboard    [EQ-1]
@@ -76,7 +76,7 @@ class ConcentratorSpec:
 @dataclass
 class PipeSpec:
     """Collection pipe sizing."""
-    diameter_m: float = 0.12
+    diameter_m: float = 0.12  # standalone fallback when no aperture is configured
     length_m: float = 1.0
     surface_area_m2: float = math.pi * 0.12 * 1.0
     initial_throat_area_m2: float = math.pi * 0.06**2
@@ -379,7 +379,7 @@ class EquipmentDesigner:
 
         At millibar pressures: viscous flow (Kn << 0.01).
         Require C ≥ peak_evap_rate / acceptable_pressure_drop.
-        Reference: 12 cm pipe handles 7-16 g/s SiO at 10 mbar.
+        Unconfigured standalone reference: 12 cm handles 7-16 g/s SiO at 10 mbar.
         """
         # EQ-3 uses absolute upstream pressure against vacuum; a signed gauge
         # value cannot be squared without destroying its physical meaning.
@@ -388,13 +388,16 @@ class EquipmentDesigner:
             raise ValueError("pressure_mbar must be a positive finite value")
 
         # Scale pipe diameter with batch size
-        # Reference: 12 cm for 1 tonne
+        # Standalone fallback anchor: 12 cm for 1 tonne when no hardware
+        # aperture is configured. Configured apertures are fixed hardware.
         scale = (peak_evap_rate_kg_s / 0.010) ** 0.25
         throat_area_m2 = self._configured_initial_throat_area_m2()
         if throat_area_m2 is not None:
             anchor_d = math.sqrt(4.0 * throat_area_m2 / math.pi)
-            d = anchor_d * max(scale, 1.0)
-            throat_area_m2 = math.pi * (d / 2.0) ** 2
+            # A configured throat is the actual hardware aperture. Scaling it
+            # again by batch rate would exceed the optimizer's hardware bounds
+            # and make the selected geometry mean something else at runtime.
+            d = anchor_d
         else:
             d = 0.12 * max(scale, 1.0)
             throat_area_m2 = math.pi * (d / 2.0) ** 2
