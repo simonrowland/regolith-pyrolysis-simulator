@@ -306,7 +306,7 @@ def cacheable_refusal(result) -> bool:
     )
 
 ENGINE_CHEMISTRY_VERSION = {
-    "openimcc": 1,
+    "openimcc": 3,
     "internal-analytical": 1,
     "vaporock": 1,
     "magemin": 2,
@@ -325,6 +325,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
+# openimcc v3: 2026-11-18 OpenIMCC pure-species thermochemistry dispatch adds Cp, S, and anchored H increments
 ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     "openimcc": {
         "identity": "commit:66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84",
