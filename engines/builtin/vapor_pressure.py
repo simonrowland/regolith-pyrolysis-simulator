@@ -1894,6 +1894,15 @@ def _attach_high_t_activity_provenance(
                 provenance["openimcc_projection_crmn_relaxed"] = dict(
                     relaxed_projection
                 )
+        composition_policy = authority.get("composition_policy")
+        if isinstance(composition_policy, Mapping):
+            trace_activity_models = composition_policy.get(
+                "trace_activity_models"
+            )
+            if isinstance(trace_activity_models, Mapping) and trace_activity_models:
+                provenance["openimcc_trace_activity_models"] = dict(
+                    trace_activity_models
+                )
         source = str(vapor_pressure_sources.get(species) or "")
         if source and token not in source.split(":"):
             source = f"{source}:{token}"
@@ -4810,7 +4819,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         if high_t_activity_authority is not None:
             selected_parent_activities = {}
             selected_parent_provenance = {}
+            composition_policy = high_t_activity_authority.get(
+                "composition_policy", {}
+            )
+            dropped_components = set(
+                composition_policy.get("dropped_components", ())
+                if isinstance(composition_policy, Mapping)
+                else ()
+            )
             for parent in melt_account_mol:
+                if parent in dropped_components:
+                    continue
                 selected = _high_t_activity_for_parent(
                     parent, melt_account_mol, temperature_K=T_K,
                     authority=high_t_activity_authority,

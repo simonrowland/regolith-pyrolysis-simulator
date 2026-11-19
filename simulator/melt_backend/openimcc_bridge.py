@@ -12,8 +12,7 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from functools import lru_cache
-from importlib import metadata
-from importlib import resources
+from importlib import metadata, resources
 import json
 import math
 import numbers
@@ -22,8 +21,8 @@ import subprocess
 from types import MappingProxyType
 from typing import Any
 
-from simulator.accounting.exceptions import UnknownSpeciesError
-from simulator.accounting.formulas import resolve_species_formula
+from simulator.accounting.exceptions import UnparseableCompositionComponent
+from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 from simulator.feedstock_composition import (
     FEOT_FROM_FE2O3,
     feot_equivalent_moles,
@@ -38,7 +37,6 @@ from simulator.composition_projection import (
     classify_projected_bulk,
     projected_component_moles_per_kg,
 )
-from simulator.state import MOLAR_MASS
 from simulator.melt_backend.imcc_adapter_labels import ImccAdapterLabels
 from simulator.melt_backend.base import (
     DEFAULT_BACKEND_CAPABILITIES,
@@ -274,7 +272,7 @@ class OpenImccBindingDigestUnavailableError(RuntimeError):
 
 @dataclass(frozen=True)
 class OpenImccBridgeResult:
-    """Parent activities and provenance returned by one openimcc evaluation."""
+    """Component activities and provenance returned by one openimcc evaluation."""
 
     parent_oxide_activities: Mapping[str, float]
     parent_oxides: tuple[str, ...]
@@ -638,8 +636,11 @@ def evaluate_gas_oxygen_balance(
         error.backend_status_reason += f" ({type(exc).__name__}: {exc})"
         error.args = (error.backend_status_reason,)
         raise error from exc
+    gas_parent_activities = _activities_for_gas_parents(
+        parent_activities, parent_oxides
+    )
     return solver(
-        parent_activities,
+        gas_parent_activities,
         _openimcc_temperature_argument(temperature_K),
         datapack,
         parent_oxides=parent_oxides,
@@ -664,12 +665,77 @@ def _canonical_composition(composition: Mapping[str, float]) -> dict[str, float]
     return normalized
 
 
+@lru_cache(maxsize=1)
+def openimcc_trace_activity_models() -> Mapping[str, str]:
+    """Read accepted trace names and activity kinds from the installed pin."""
+
+    package = _openimcc
+    if package is None:
+        return MappingProxyType({})
+
+    accepted_trace_oxides = getattr(package, "supported_trace_oxides", None)
+    if not callable(accepted_trace_oxides):
+        return MappingProxyType({})
+    try:
+        components = tuple(accepted_trace_oxides())
+        source_to_model = {
+            "redox_associates": "redox_associates",
+            "helper": "activity_fragment",
+            "review_gamma": "review_gamma",
+            "ideal_flagged": "ideal",
+        }
+        models: dict[str, str] = {}
+        for component in components:
+            name = component.oxide
+            model = source_to_model.get(component.activity_source)
+            if not isinstance(name, str) or not name or model is None:
+                raise ValueError("invalid supported trace activity metadata")
+            models[name] = model
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise OpenImccCompositionPolicyRefusal(
+            "openimcc_trace_metadata_unavailable",
+            "installed openimcc returned invalid supported trace metadata",
+        ) from exc
+    if any(not name or not model for name, model in models.items()):
+        raise OpenImccCompositionPolicyRefusal(
+            "openimcc_trace_metadata_unavailable",
+            "installed openimcc returned a trace without its activity model",
+        )
+    return MappingProxyType(dict(sorted(models.items())))
+
+
+def _cleaned_melt_trace_activity_models() -> Mapping[str, str]:
+    """Return accepted traces after the existing Cr/Mn projection ruling."""
+
+    models = openimcc_trace_activity_models()
+    return MappingProxyType(
+        {
+            name: model
+            for name, model in models.items()
+            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES
+        }
+    )
+
+
+def _trace_activity_models_for_components(
+    components: Mapping[str, Any] | Sequence[str],
+) -> dict[str, str]:
+    """Return installed activity-model labels for the named trace components."""
+
+    models = openimcc_trace_activity_models()
+    return {
+        name: models[name]
+        for name in sorted(set(components).intersection(models))
+    }
+
+
 def _cleaned_melt_projection(
     composition_mol: Mapping[str, float],
 ) -> tuple[dict[str, float], dict[str, float]]:
     """Return source wt% and the cleaned IMCC mole projection."""
 
     canonical = _canonical_composition(composition_mol)
+    trace_activity_models = _cleaned_melt_trace_activity_models()
 
     source_mass_kg: dict[str, float] = {}
     cleaned_composition_mol: dict[str, float] = {}
@@ -714,26 +780,17 @@ def _cleaned_melt_projection(
             continue
         if mol == 0.0:
             continue
-        if name in OPENIMCC_PARENT_OXIDES:
+        if name in OPENIMCC_PARENT_OXIDES or name in trace_activity_models:
             cleaned_composition_mol[name] = mol
-        try:
-            formula = resolve_species_formula(name)
-        except UnknownSpeciesError as exc:
-            raise OpenImccCompositionPolicyRefusal(
-                "openimcc_composition_formula_unavailable",
-                f"cannot resolve cleaned-melt formula for {name!r} "
-                f"({type(exc).__name__}: {exc})",
-            ) from exc
-        mass_kg = mol * formula.molar_mass_kg_per_mol()
+        molar_mass_kg_per_mol = _molar_mass_kg_per_mol(name)
+        mass_kg = mol * molar_mass_kg_per_mol
         source_mass_kg[name] = source_mass_kg.get(name, 0.0) + mass_kg
 
     feo_moles, fe2o3_moles = iron_oxide_values(canonical)
     for oxide, mol in (("FeO", feo_moles), ("Fe2O3", fe2o3_moles)):
         if mol <= 0.0:
             continue
-        source_mass_kg[oxide] = (
-            mol * resolve_species_formula(oxide).molar_mass_kg_per_mol()
-        )
+        source_mass_kg[oxide] = mol * _molar_mass_kg_per_mol(oxide)
 
     feo_equivalent_moles = feot_equivalent_moles(canonical)
     if feo_equivalent_moles > 0.0:
@@ -752,14 +809,27 @@ def _cleaned_melt_projection(
     return source_wt_pct, cleaned_composition_mol
 
 
+def _molar_mass_kg_per_mol(name: str) -> float:
+    """Adapt the accounting molar-mass owner to the bridge's typed refusal."""
+
+    try:
+        return oxide_molar_mass_g_mol(name) / 1000.0
+    except UnparseableCompositionComponent as exc:
+        raise OpenImccCompositionPolicyRefusal(
+            "openimcc_composition_formula_unavailable",
+            f"cannot resolve cleaned-melt formula for {name!r}: {exc}",
+        ) from exc
+
+
 def _composition_wt_pct_from_moles(
     composition_mol: Mapping[str, float],
 ) -> dict[str, float]:
-    masses = {
-        name: float(amount) * float(MOLAR_MASS[name])
-        for name, amount in composition_mol.items()
-        if amount > 0.0
-    }
+    masses: dict[str, float] = {}
+    for raw_name, amount in composition_mol.items():
+        if amount <= 0.0:
+            continue
+        name = str(raw_name)
+        masses[name] = float(amount) * _molar_mass_kg_per_mol(name)
     total_mass = sum(masses.values())
     return {
         name: mass / total_mass * 100.0
@@ -806,12 +876,16 @@ def _oxide_wt_pct_known(composition_mol: Mapping[str, Any]) -> dict[str, float]:
 
     masses: dict[str, float] = {}
     for name, amount in composition_mol.items():
-        if str(name) not in MOLAR_MASS or isinstance(amount, bool):
+        if isinstance(amount, bool):
             continue
         if not isinstance(amount, numbers.Real):
             continue
         value = float(amount)
         if math.isfinite(value) and value > 0.0:
+            try:
+                _molar_mass_kg_per_mol(str(name))
+            except OpenImccCompositionPolicyRefusal:
+                continue
             masses[str(name)] = value
     if not masses:
         return {}
@@ -861,10 +935,13 @@ def _cleaned_melt_policy(
     source_wt_pct, cleaned_composition_mol = _cleaned_melt_projection(
         composition_mol
     )
+    trace_activity_models = _cleaned_melt_trace_activity_models()
     dropped = {
         name: value
         for name, value in source_wt_pct.items()
-        if name not in OPENIMCC_PARENT_OXIDES and name != "Fe2O3"
+        if name not in OPENIMCC_PARENT_OXIDES
+        and name not in trace_activity_models
+        and name != "Fe2O3"
     }
     dropped_mol_per_kg, unavailable_reasons = projected_component_moles_per_kg(
         dropped,
@@ -962,6 +1039,9 @@ def _cleaned_melt_policy(
     policy = dict(classification_record)
     policy[PROJECTED_BULK_CLASSIFICATION_KEY] = classification_record
     policy["status"] = "projected" if classification.components else "direct"
+    policy["trace_activity_models"] = _trace_activity_models_for_components(
+        cleaned_composition_mol
+    )
     if classification.components:
         policy["notice"] = {
             "code": "openimcc_projected_bulk",
@@ -1183,17 +1263,53 @@ def _evaluate_uncached(
         name: float(value)
         for name, value in zip(parent_oxides, result.parent_activity, strict=True)
     }
+    trace_activity_models = openimcc_trace_activity_models()
+    requested_trace_components = {
+        name
+        for name, amount in composition.items()
+        if name in trace_activity_models and float(amount) > 0.0
+    }
+    trace_activities: dict[str, float] = {}
+    for notice in getattr(result.labels, "notices", ()):
+        for estimate in getattr(notice, "estimates", ()):
+            oxide = str(getattr(estimate, "oxide", ""))
+            if oxide not in requested_trace_components or oxide in activities:
+                continue
+            try:
+                activity = float(estimate.activity)
+            except (AttributeError, OverflowError, TypeError, ValueError) as exc:
+                raise OpenImccCompositionPolicyRefusal(
+                    "openimcc_trace_activity_invalid",
+                    f"openimcc returned an invalid trace activity for {oxide!r}",
+                ) from exc
+            if not math.isfinite(activity) or activity < 0.0:
+                raise OpenImccCompositionPolicyRefusal(
+                    "openimcc_trace_activity_invalid",
+                    f"openimcc returned a non-finite or negative trace activity for {oxide!r}",
+                )
+            trace_activities[oxide] = activity
+    missing_trace_activities = requested_trace_components.difference(
+        activities, trace_activities
+    )
+    if missing_trace_activities:
+        raise OpenImccCompositionPolicyRefusal(
+            "openimcc_trace_activity_missing",
+            "openimcc omitted trace activity estimates for accepted components: "
+            + ", ".join(sorted(missing_trace_activities)),
+        )
+    activities.update(trace_activities)
     if basis_type == "mol":
         composition_mol_for_fraction = composition
     else:
         composition_mol_for_fraction = {
             str(name): float(value)
-            / resolve_species_formula(str(name)).molar_mass_kg_per_mol()
+            / _molar_mass_kg_per_mol(str(name))
             for name, value in composition.items()
             if float(value) > 0.0
         }
     activity_coefficients: dict[str, dict[str, Any]] = {}
-    for oxide, parent_activity in activities.items():
+    for oxide in parent_oxides:
+        parent_activity = activities[oxide]
         single_activity, fraction = single_cation_activity_and_fraction(
             oxide, parent_activity, composition_mol_for_fraction
         )
@@ -1257,6 +1373,7 @@ def _evaluate_request_vector(
     """Build the shared cache vector for direct and residue OpenIMCC evaluations."""
     return {
         "call": "evaluate",
+        "trace_activity_results": "with-traces-v1",
         "composition_mol": composition_mol,
         "composition_kg": composition_kg,
         "temperature_K": temperature_K,
@@ -1354,9 +1471,13 @@ def evaluate_gas(
 
     record_engine_open("openimcc")
 
+    gas_parent_activities = _activities_for_gas_parents(
+        parent_oxide_activities, parent_oxides
+    )
+
     request = {
         "call": "evaluate_gas",
-        "parent_oxide_activities": dict(parent_oxide_activities),
+        "parent_oxide_activities": gas_parent_activities,
         "temperature_K": temperature_K,
         "pressure_bar": pressure_bar,
         "gas_pack_selection": gas_pack_selection,
@@ -1367,7 +1488,7 @@ def evaluate_gas(
         "openimcc",
         request,
         lambda: dict(openimcc_evaluate_gas(
-            parent_oxide_activities,
+            gas_parent_activities,
             temperature_K,
             pressure_bar,
             gas_pack,
@@ -1375,6 +1496,23 @@ def evaluate_gas(
             allow_extrapolation=allow_extrapolation,
         )),
     )
+
+
+def _activities_for_gas_parents(
+    activities: Mapping[str, float],
+    parent_oxides: Sequence[str] | None,
+) -> dict[str, float]:
+    """Keep trace melt activities out of gas inputs unless explicitly selected."""
+
+    if parent_oxides is None:
+        return dict(activities)
+    selected = set(parent_oxides)
+    return {
+        name: value
+        for name, value in activities.items()
+        if name in selected
+    }
+
 
 def evaluate_redox(
     inventory: Mapping[str, float],

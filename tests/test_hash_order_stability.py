@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import difflib
 import json
 import os
 import subprocess
@@ -59,4 +60,14 @@ print(json.dumps(p, sort_keys=True, separators=(',', ':'), allow_nan=False))""",
 )
 def test_hash_seed_does_not_change_site_output(source: str) -> None:
     """Compare production consumers under different process hash orders."""
-    assert _seeded_output(source, "0") == _seeded_output(source, "1")
+    seed_zero = json.loads(_seeded_output(source, "0"))
+    seed_one = json.loads(_seeded_output(source, "1"))
+    assert seed_zero == seed_one, "\n".join(
+        difflib.unified_diff(
+            json.dumps(seed_zero, indent=2, sort_keys=True).splitlines(),
+            json.dumps(seed_one, indent=2, sort_keys=True).splitlines(),
+            fromfile="PYTHONHASHSEED=0",
+            tofile="PYTHONHASHSEED=1",
+            lineterm="",
+        )
+    )
