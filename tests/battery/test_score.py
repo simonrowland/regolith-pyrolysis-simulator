@@ -17180,9 +17180,11 @@ def test_magemin_liquid_feo_reference_without_wustite_bridge_stays_typed() -> No
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
     assert residual.refusal.detail["reason"] == (
-        "magemin_native_reference_conversion_missing_input"
+        "solid_liquid_reference_conversion_missing_input"
     )
-    assert "FeO" in residual.refusal.detail["notice"]
+    assert "fusion conversion missing input for FeO" in (
+        residual.refusal.detail["notice"]
+    )
 
 
 def _raw_janaf_formation_gibbs_at(table_id: str, temperature_K: Decimal) -> Decimal:
