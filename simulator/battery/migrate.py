@@ -124,6 +124,10 @@ from simulator.battery.composition import (
     unidentified_component_refusal,
 )
 from simulator.battery.extract_context import iter_extract_context_containers
+from simulator.battery.non_observations import (
+    declares_non_scoring_compilation_reference,
+    is_non_observation,
+)
 from simulator.battery.redox_fields import (
     FE3_FE2_RATIO_PRINTED_FIELDS,
     FERRIC_FRACTION_FIELDS,
@@ -24138,6 +24142,7 @@ class Migrator:
         self._work_extra_assets: dict[str, dict[str, SourceFile]] = defaultdict(dict)
         # t-1123a: per-source printed liquidus / plateau records (phase_field.py).
         self._phase_field_records: dict[str, PhaseFieldRecords | None] = {}
+        self._compilation_manifests: dict[Path, Mapping[str, Any]] = {}
 
     def _count(self, path: str) -> SourceCount:
         rec = self.result.source_counts.get(path)
@@ -31889,6 +31894,7 @@ class Migrator:
         reaction: Reaction | State[Reaction] | None = None,
         notices: tuple[Notice, ...] = (),
         value_reason: str | None = None,
+        provenance: Mapping[str, Any] | None = None,
     ) -> Observation:
         ident_kwargs: dict[str, Any] = {}
         if isinstance(temperature_K, State):
@@ -31993,6 +31999,7 @@ class Migrator:
             evidence=evidence,
             admission=admission,
             notices=notices,
+            provenance=provenance,
             source_id=source_id,
             locator=locator,
             read_from=read_from,
@@ -32812,6 +32819,24 @@ class Migrator:
             return printed_formula
         return closed_formula
 
+    def _compilation_role_for_record(
+        self,
+        path: Path,
+        record_role: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        """Combine the family declaration with any record-specific role."""
+
+        compilation_root = self.literature / "compilations"
+        role: dict[str, Any] = {}
+        manifest = _compilation_manifest_for_path(
+            path, compilation_root, self._compilation_manifests
+        )
+        manifest_role = manifest.get("compilation_role")
+        if isinstance(manifest_role, Mapping):
+            role.update(manifest_role)
+        role.update(record_role)
+        return role
+
     def _migrate_compilation_file(self, path: Path) -> None:
         rel = path.relative_to(self.root).as_posix() if path.is_relative_to(self.root) else str(path)
         count = self._count(rel)
@@ -32843,7 +32868,18 @@ class Migrator:
         doi = extract_doi((src or {}).get("doi"), citation)
         work = self._work_from_citation(citation, doi, source_id)
         work = self._register_compilation_record_asset(work, rel)
-        role = doc.get("compilation_role") if isinstance(doc.get("compilation_role"), Mapping) else {}
+        record_role = (
+            doc.get("compilation_role")
+            if isinstance(doc.get("compilation_role"), Mapping)
+            else {}
+        )
+        role = record_role
+        declared_role = self._compilation_role_for_record(path, record_role)
+        role_provenance = (
+            {"compilation_role": declared_role}
+            if declares_non_scoring_compilation_reference(declared_role)
+            else None
+        )
         evidence = Evidence(
             class_=State.of(EvidenceClass.COMPILATION_ASSESSED),
             original_method_class=str((role or {}).get("kind") or "compilation"),
@@ -32889,7 +32925,14 @@ class Migrator:
             from simulator.battery.generators.usgs_b2131 import owns_record
 
             if owns_record(doc):
-                self._lift_b2131_from_generator(work, source_id, rel, count, doc)
+                self._lift_b2131_from_generator(
+                    work,
+                    source_id,
+                    rel,
+                    count,
+                    doc,
+                    role_provenance=role_provenance,
+                )
                 return
         count.rows_in += 1
         record_id = str(doc.get("record_id") or path.stem)
@@ -33034,6 +33077,7 @@ class Migrator:
                         locator,
                         read_from,
                     ),
+                    provenance=role_provenance,
                     notices=(
                         Notice(
                             kind=NoticeKind.DERIVATION_USES_COMPILATION,
@@ -33142,6 +33186,7 @@ class Migrator:
                         locator,
                         choose_read_from(work, locator, source_key=rel),
                     ),
+                    provenance=role_provenance,
                 )
             return
         if series_items:
@@ -33210,6 +33255,7 @@ class Migrator:
                 locator,
                 read_from,
             ),
+            provenance=role_provenance,
             value_reason=(
                 "mapped compilation series retained; table-level scalar value is not selected"
                 if series_summary and value.kind is ValueKind.UNAVAILABLE
@@ -33560,6 +33606,8 @@ class Migrator:
         rel: str,
         count: SourceCount,
         doc: Mapping[str, Any],
+        *,
+        role_provenance: Mapping[str, Any] | None = None,
     ) -> None:
         from simulator.battery.generators.usgs_b2131 import generate_record
 
@@ -33584,6 +33632,10 @@ class Migrator:
                 updates["derivation"] = replace(
                     observation.derivation, inputs=(read_from,)
                 )
+            if role_provenance is not None:
+                provenance = dict(observation.provenance or {})
+                provenance.update(role_provenance)
+                updates["provenance"] = provenance
             if updates:
                 observation = replace(observation, **updates)
             self._ensure_experiment(
@@ -34090,10 +34142,94 @@ class Migrator:
                 for row in rows
             },
         )
-        self.result.validation = ValidationReport(
+        initial_validation = ValidationReport(
             validation.issues + tuple(self.result.registry_issues),
             validation.notices,
         )
+        hard_issues = initial_validation.hard_issues
+        hard_issues_by_observation = initial_validation.hard_issues_by_observation
+        batch_admitted = False
+        for source_key, observation_ids in self.result.observations_by_source.items():
+            source_experiment_ids = {
+                self.result.observations[item].experiment_id for item in observation_ids
+            }
+            source_hard_issue = any(
+                issue.path.startswith(f"extract[{source_key}]")
+                or any(
+                    issue.path.startswith(f"experiment[{experiment_id}]")
+                    for experiment_id in source_experiment_ids
+                )
+                for issue in hard_issues
+            )
+            for observation_id in observation_ids:
+                observation = self.result.observations[observation_id]
+                experiment = self.result.experiments.get(observation.experiment_id)
+                if (
+                    experiment is None
+                    or experiment.kind is not ExperimentKind.LITERATURE
+                    or observation.admission.status is not AdmissionStatus.PENDING
+                    or observation.admission.decided_by is not None
+                    or observation.admission.reason not in _DEFAULTABLE_PENDING_REASONS
+                    or not observation.identity.quantity.is_value
+                    or not _value_has_numeric_value(observation.value)
+                    or not observation.evidence.class_.is_value
+                    or observation.evidence.class_.value not in MEASURED_EVIDENCE
+                    or observation.locator is None
+                ):
+                    continue
+                row_hard_issue = bool(
+                    hard_issues_by_observation.get(observation_id)
+                ) or any(
+                    issue.path.startswith(f"observation[{observation_id},")
+                    or issue.path.startswith(f"observations.{observation_id}.")
+                    for issue in hard_issues
+                )
+                if row_hard_issue or source_hard_issue:
+                    continue
+                rule = "d-413-batch-literature"
+                self.result.observations[observation_id] = replace(
+                    observation,
+                    admission=Admission(
+                        status=AdmissionStatus.ADMITTED,
+                        reason=f"batch admission {rule}",
+                        decided_by=AdmissionDecision(
+                            worker=rule,
+                            date="2026-11-15",
+                            evidence=observation.locator,
+                        ),
+                    ),
+                )
+                batch_admitted = True
+        if batch_admitted:
+            validation = validate_corpus(
+                self.result.works,
+                self.result.experiments,
+                self.result.observations,
+                residuals=None,
+                benches=self.result.benches,
+                context_rows={
+                    str(row["context_id"]): row
+                    for rows in self.result.context_by_work.values()
+                    for row in rows
+                },
+            )
+            self.result.validation = ValidationReport(
+                validation.issues + tuple(self.result.registry_issues),
+                validation.notices,
+            )
+        else:
+            self.result.validation = initial_validation
+        # Re-homed rows may still need source-link repair; that is not comparison work.
+        self.result.queue[:] = [
+            entry
+            for entry in self.result.queue
+            if entry.observation_id not in self.result.observations
+            or "read_from" in (entry.axes or ())
+            or not is_non_observation(
+                self.result.observations[entry.observation_id],
+                self._obs_source.get(entry.observation_id, entry.source),
+            )
+        ]
         self.result.queue_work_counts = _queue_work_counts(
             self.result.queue, self.root
         )
@@ -34534,6 +34670,32 @@ def _store_regeneration_differences(
     )
 
 
+def _compilation_manifest_for_path(
+    source_path: Path,
+    compilation_root: Path,
+    manifest_cache: dict[Path, Mapping[str, Any]],
+) -> Mapping[str, Any]:
+    """Load the nearest compilation-family manifest, with per-run caching."""
+
+    manifest_path = next(
+        (
+            parent / "manifest.yaml"
+            for parent in source_path.parents
+            if parent.is_relative_to(compilation_root)
+            and (parent / "manifest.yaml").is_file()
+        ),
+        None,
+    )
+    if manifest_path is None:
+        return {}
+    if manifest_path not in manifest_cache:
+        loaded = load_yaml(manifest_path)
+        manifest_cache[manifest_path] = (
+            loaded if isinstance(loaded, Mapping) else {}
+        )
+    return manifest_cache[manifest_path]
+
+
 def _queue_work_counts(
     queue: Iterable[QueueEntry], root: Path
 ) -> QueueWorkCounts:
@@ -34548,23 +34710,9 @@ def _queue_work_counts(
     for entry in queue:
         source = entry.source or ""
         source_path = root / source
-        manifest_path = next(
-            (
-                parent / "manifest.yaml"
-                for parent in source_path.parents
-                if parent.is_relative_to(compilations)
-                and (parent / "manifest.yaml").is_file()
-            ),
-            None,
+        manifest = _compilation_manifest_for_path(
+            source_path, compilations, manifest_cache
         )
-        manifest: Mapping[str, Any] = {}
-        if manifest_path is not None:
-            if manifest_path not in manifest_cache:
-                loaded = load_yaml(manifest_path)
-                manifest_cache[manifest_path] = (
-                    loaded if isinstance(loaded, Mapping) else {}
-                )
-            manifest = manifest_cache[manifest_path]
         role = manifest.get("compilation_role")
         role = role if isinstance(role, Mapping) else {}
         source_name = str(manifest.get("source_id") or source or "<unknown>")

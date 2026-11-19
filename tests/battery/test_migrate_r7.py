@@ -1078,9 +1078,24 @@ def test_b2131_formation_gibbs_cells_land_at_printed_temperature(tmp_path):
     assert _landed_formation_points(acanthite[0]) == []
 
 
-def _b2131_formation_observation_serialization(tmp_path):
+def _b2131_formation_observations(tmp_path, *, include_repository_index=True):
     source_id = "robie-hemingway-1995-usgs-b2131"
     root = _write_min_tree(tmp_path / "tree")
+    if include_repository_index:
+        index_path = root / "data/literature/INDEX.yaml"
+        index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+        repository_index = yaml.safe_load(
+            (REPO_ROOT / "data/literature/INDEX.yaml").read_text(encoding="utf-8")
+        )
+        source_row = next(
+            row
+            for row in repository_index["sources"]
+            if row["source_id"] == source_id
+        )
+        assert source_row["corpus"]["raw"]["present"] is True
+        index["sources"].append(source_row)
+        index_path.write_text(yaml.safe_dump(index, sort_keys=False), encoding="utf-8")
+
     source_dir = REPO_ROOT / "data/literature/compilations" / source_id
     for source_path in sorted(source_dir.rglob("*")):
         if not source_path.is_file():
@@ -1099,10 +1114,7 @@ def _b2131_formation_observation_serialization(tmp_path):
         ),
         key=lambda obs: obs["observation_id"],
     )
-    payload = json.dumps(
-        observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    ).encode("utf-8")
-    return len(observations), hashlib.sha256(payload).hexdigest()
+    return observations
 
 
 def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
@@ -1114,9 +1126,105 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     # unavailable windows, p089/p115's one unavailable window, plus the
     # restored p274/p367 formula rows; reference p005-05/p005-11/p006-05/
     # p007-13 are typed unavailable. These are source-page grounded changes.
-    assert _b2131_formation_observation_serialization(tmp_path) == (
+    unindexed_observations = _b2131_formation_observations(
+        tmp_path / "without-repository-index", include_repository_index=False
+    )
+    unindexed_payload = json.dumps(
+        unindexed_observations,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    unindexed_digest = hashlib.sha256(unindexed_payload).hexdigest()
+
+    observations = _b2131_formation_observations(
+        tmp_path / "with-repository-index"
+    )
+    stored = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "data/literature/observations-v2/compilations-robie-hemingway-1995-usgs-b2131.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    baseline = {
+        row["observation_id"]: row
+        for row in stored["observations"]
+        if row["identity"]["quantity"].get("value") == "delta_fG"
+    }
+    baseline_rows = sorted(
+        baseline.values(), key=lambda row: row["observation_id"]
+    )
+    baseline_payload = json.dumps(
+        baseline_rows, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    assert (len(baseline_rows), hashlib.sha256(baseline_payload).hexdigest()) == (
         945,
-        "7074651ad0c8cb59dd1ea3c11b3fe5e4df0b40e4dd7d89b7cea690555298ed0f",
+        "c65bfa19ec308e80797586f68ea77597fbb917eb982db29511b631d4f537ddd5",
+    )
+    candidate = {row["observation_id"]: row for row in observations}
+    assert set(candidate) == set(baseline)
+    non_admission_diffs = {
+        observation_id: sorted(
+            key
+            for key in row.keys() | baseline[observation_id].keys()
+            if key != "admission" and row.get(key) != baseline[observation_id].get(key)
+        )
+        for observation_id, row in candidate.items()
+    }
+    non_admission_diffs = {
+        observation_id: fields
+        for observation_id, fields in non_admission_diffs.items()
+        if fields
+    }
+    assert non_admission_diffs
+    changed_fields = {
+        field for fields in non_admission_diffs.values() for field in fields
+    }
+    assert changed_fields == {"experiment_id", "locator", "provenance"}
+    assert all(
+        candidate[observation_id].get("read_from")
+        == baseline[observation_id].get("read_from")
+        for observation_id in baseline
+    )
+    assert all(
+        row.get("derivation") is None
+        or row["derivation"]["inputs"] == [row["read_from"]]
+        for row in candidate.values()
+    )
+    manifest = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "data/literature/compilations/robie-hemingway-1995-usgs-b2131/manifest.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    expected_role = manifest["compilation_role"]
+    assert all(row.get("provenance") is None for row in baseline_rows)
+    assert all(
+        row["provenance"]["compilation_role"] == expected_role
+        for row in candidate.values()
+    )
+    changed_admissions = {
+        observation_id: (baseline[observation_id]["admission"], row["admission"])
+        for observation_id, row in candidate.items()
+        if row["admission"] != baseline[observation_id]["admission"]
+    }
+    assert not changed_admissions
+    payload = json.dumps(
+        observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    # The repository INDEX resolves summary locators to the existing PDF
+    # asset and record locators to compilation records. The merged candidate
+    # also carries b-1230's canonical locator fields. Admissions stay unchanged.
+    assert (
+        len(unindexed_observations),
+        unindexed_digest,
+        len(observations),
+        hashlib.sha256(payload).hexdigest(),
+    ) == (
+        945,
+        "9acc738c7162288bf01581492eab47b6919fb02377109d94b52edd1313c58718",
+        945,
+        "de617332cd3318fd7e7adeda5418f9ab73f991872e360ffbc81eed932739f623",
     )
 
 

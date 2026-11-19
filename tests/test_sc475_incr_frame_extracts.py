@@ -2718,6 +2718,7 @@ def _assert_stack_shornikov_rows(document, hit_rows):
 def test_increment_and_frame_repairs_migrate_unavailable():
     assert schema_gap_module.SC475_SCHEMA_GAP_SOURCE_IDS == SC475_SOURCE_IDS
     reason_mismatches = []
+    queue_missing = []
     checked_sources = set()
     for source_id, expected in HIT_ROWS.items():
         path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
@@ -2757,11 +2758,27 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 continue
             assert all(not row.identity.quantity.is_value for row in migrated)
             assert all(row.value.kind.value == "unavailable" for row in migrated)
-            if source_id in SC475_SOURCE_IDS:
+            if source_id in SC475_SOURCE_IDS or source_id == (
+                "shornikov-2002-aluminosilicate-solid-phases"
+            ):
                 expected_status = _expected_sc475_admission(source_id, observation_id)
                 assert all(
                     row.admission.status.value == expected_status for row in migrated
                 ), (source_id, observation_id)
+                if migrated:
+                    queue_ids = {
+                        entry.observation_id
+                        for entry in migrator.result.queue
+                        if entry.source == f"data/literature/extracts/{source_id}.yaml"
+                    }
+                    source_prefix = f"{source_id}::{observation_id}"
+                    if not any(
+                        queued_id == source_prefix
+                        or queued_id.startswith(source_prefix + "::")
+                        or source_prefix.startswith(queued_id + "::")
+                        for queued_id in queue_ids
+                    ):
+                        queue_missing.append((source_id, observation_id))
         checked_sources.add(source_id)
         if source_id not in SC475_SOURCE_IDS:
             continue
@@ -2798,6 +2815,7 @@ def test_increment_and_frame_repairs_migrate_unavailable():
     assert not reason_mismatches, "SC-475 reason mismatches:\n" + "\n".join(
         reason_mismatches
     )
+    assert not queue_missing, f"SC-475 rows missing queue entries: {queue_missing}"
 
 
 def test_increment_reason_assertions_catch_entropy_increment_mutation(monkeypatch):
@@ -3039,7 +3057,7 @@ def test_schema_gap_rejection_decided_by_remains_validator_required():
     )
 
 
-def test_non_sc475_kelley_series_store_matches_green_without_decided_by(tmp_path):
+def test_non_sc475_kelley_schema_gap_store_changes_only_for_batch_admissions(tmp_path):
     source_id = "kelley-1953-alkali-aluminosilicate-thermodynamics"
     observation_id = "kelley_1953_table25_s51_extrapolated_albite"
     extract_path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
@@ -3066,9 +3084,29 @@ def test_non_sc475_kelley_series_store_matches_green_without_decided_by(tmp_path
         tmp_path / "data/literature/extracts-v2" / f"{source_id}.yaml"
     )
     green_store = ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml"
-    before = yaml.safe_load(green_store.read_text(encoding="utf-8"))
-    after = yaml.safe_load(migrated_store.read_text(encoding="utf-8"))
-    assert canonical_source_locations(after, extract) == canonical_source_locations(before, extract)
+    migrated_payload = yaml.safe_load(migrated_store.read_text(encoding="utf-8"))
+    green_payload = yaml.safe_load(green_store.read_text(encoding="utf-8"))
+    green_by_id = {
+        row["observation_id"]: row for row in green_payload["observations"]
+    }
+    assert {row["observation_id"] for row in migrated_payload["observations"]} == set(
+        green_by_id
+    )
+    for row in migrated_payload["observations"]:
+        green_row = green_by_id[row["observation_id"]]
+        if row["admission"] == green_row["admission"]:
+            continue
+        assert row["admission"]["status"] == "admitted"
+        assert row["admission"]["reason"] == "batch admission d-413-batch-literature"
+        assert row["admission"]["decided_by"]["worker"] == (
+            "d-413-batch-literature"
+        )
+        row["admission"] = green_row["admission"]
+    # b-1230 canonicalizes serialized locator fields while preserving the
+    # source locations and all other payload fields.
+    assert canonical_source_locations(migrated_payload, extract) == (
+        canonical_source_locations(green_payload, extract)
+    )
 
 
 def test_kelley_fixed_point_detects_corrupt_serialized_location(tmp_path, monkeypatch):
@@ -3084,4 +3122,6 @@ def test_kelley_fixed_point_detects_corrupt_serialized_location(tmp_path, monkey
     with monkeypatch.context() as mutation:
         mutation.setattr(migrate_module, "write_outputs", corrupt_output)
         with pytest.raises(AssertionError):
-            test_non_sc475_kelley_series_store_matches_green_without_decided_by(tmp_path)
+            test_non_sc475_kelley_schema_gap_store_changes_only_for_batch_admissions(
+                tmp_path
+            )
