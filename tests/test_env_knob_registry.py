@@ -25,11 +25,12 @@ OPERATOR_DOC = ROOT / "docs" / "configuration.md"
 # t-1747 adds two reviewed sites to the 94-token count after removing two
 # local-alias tokens from scripts/grind_home.py. Removing the YAML cache's
 # per-process root assignment leaves 94 + 2 - 1 = 95.
-# The b265 cooling path adds two tokens in simulator/melt_backend/alphamelts.py:
-# os.environ.get("ALPHAMELTS_CALC_MODE") and one subprocess os.environ.copy().
-# The ambient helper's existing `environment = os.environ` token is unchanged.
-# 95 + 2 = 97.
-ENV_ACCESS_TOKEN_CEILING = 97
+# The b265 cooling path adds one token: env = os.environ.copy() in
+# simulator/melt_backend/alphamelts.py gate_cooling_path. The ambient helper's
+# environment = os.environ token, and its .get("ALPHAMELTS_CALC_MODE"), were
+# already in the 95. The .get call is not itself an environ/getenv token.
+# 95 + 1 = 96.
+ENV_ACCESS_TOKEN_CEILING = 96
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
 # Internal means a probe, diagnostic, debug switch, or harness control. Keep
