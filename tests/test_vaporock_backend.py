@@ -5081,6 +5081,92 @@ def _assert_one_melts_oxide_alias_owner() -> None:
     )
 
 
+def test_activity_notice_labels_requested_unknown_and_call_default(monkeypatch):
+    calls = {"gas": 0, "chempot": 0, "temperature": [], "pressure": []}
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(System=_liquid_chempot_system_cls(calls)),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+    composition = {"SiO2": 60.0, "Na2O": 40.0}
+
+    omitted = backend.equilibrate(
+        1600.0,
+        composition_kg=composition,
+        fO2_log=None,
+        include_oxide_activities=True,
+    )
+    omitted_notice = omitted.diagnostics["vaporock_model_pressure_notice"]
+    assert omitted_notice["pressure_role"] == "call_default"
+    assert omitted_notice["requested_pressure_bar"] is None
+    assert omitted_notice["model_pressure_bar"] == pytest.approx(1e-10)
+    assert "call default" in omitted_notice["reason"]
+    assert "1e-06" in omitted_notice["reason"]
+    assert "requested pressure" not in omitted_notice["reason"]
+
+    explicit = backend.equilibrate(
+        1600.0,
+        composition_kg=composition,
+        fO2_log=None,
+        pressure_bar=1e-6,
+        include_oxide_activities=True,
+    )
+    explicit_notice = explicit.diagnostics["vaporock_model_pressure_notice"]
+    assert explicit_notice["pressure_role"] == "requested"
+    assert explicit_notice["requested_pressure_bar"] == pytest.approx(1e-6)
+    assert "requested pressure 1e-06 bar" in explicit_notice["reason"]
+
+    unknown = backend.equilibrate(
+        1600.0,
+        composition_kg=composition,
+        fO2_log=None,
+        pressure_bar=1e-6,
+        pressure_role="unknown",
+        include_oxide_activities=True,
+    )
+    unknown_notice = unknown.diagnostics["vaporock_model_pressure_notice"]
+    assert unknown_notice["pressure_role"] == "unknown"
+    assert unknown_notice["requested_pressure_bar"] is None
+    assert unknown_notice["model_pressure_bar"] == pytest.approx(1e-10)
+    assert "observation pressure is unknown" in unknown_notice["reason"]
+    assert "requested pressure" not in unknown_notice["reason"]
+    assert "1e-06" not in unknown_notice["reason"]
+    assert "1e-6" not in unknown_notice["reason"]
+    assert calls["pressure"] == pytest.approx([1e-10, 1e-10, 1e-10])
+    assert calls["gas"] == 0
+
+    refused = backend.equilibrate(
+        1600.0,
+        composition_kg=composition,
+        fO2_log=None,
+        pressure_bar=1.0,
+        pressure_role="guess",
+        include_oxide_activities=True,
+    )
+    assert refused.status == "out_of_domain"
+    assert refused.diagnostics["backend_status_reason"] == "invalid_pressure_role"
+    assert calls["chempot"] == 3
+
+
+def test_relabeling_unknown_pressure_as_requested_fails_the_notice_pin(monkeypatch):
+    """Process-local mutation: a notice that always says requested 1e-6 fails."""
+    real = vaporock_module.vaporock_model_pressure_notice
+
+    def _always_requested_default(**_kwargs):
+        return real(
+            requested_pressure_bar=1e-6,
+            pressure_role="requested",
+        )
+
+    test_activity_notice_labels_requested_unknown_and_call_default(monkeypatch)
+    monkeypatch.setattr(
+        vaporock_module, "vaporock_model_pressure_notice", _always_requested_default
+    )
+    with pytest.raises(AssertionError):
+        test_activity_notice_labels_requested_unknown_and_call_default(monkeypatch)
+
+
 def _overflow_sibling_activity_contract(monkeypatch):
     """A positive overflow is typed per oxide. A finite sibling stays."""
     calls = {"gas": 0, "chempot": 0}

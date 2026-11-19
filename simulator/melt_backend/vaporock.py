@@ -201,6 +201,18 @@ VAPOROCK_REUSE_EQUIVALENCE_ATOL_LOG10 = 1e-6
 # potentials are evaluated here. The observation pressure is not passed
 # in, and this adapter does not correct it.
 VAPOROCK_LIQUID_MODEL_PRESSURE_BAR = 1e-10
+# equilibrate's omitted-argument pressure. It is an adapter coordinate,
+# not an observation pressure. An explicit 1e-6 bar stays a request.
+VAPOROCK_CALL_DEFAULT_PRESSURE_BAR = 1e-6
+VAPOROCK_PRESSURE_ROLE_REQUESTED = 'requested'
+VAPOROCK_PRESSURE_ROLE_UNKNOWN = 'unknown'
+VAPOROCK_PRESSURE_ROLE_CALL_DEFAULT = 'call_default'
+_VAPOROCK_PRESSURE_ROLES = frozenset({
+    VAPOROCK_PRESSURE_ROLE_REQUESTED,
+    VAPOROCK_PRESSURE_ROLE_UNKNOWN,
+    VAPOROCK_PRESSURE_ROLE_CALL_DEFAULT,
+})
+_PRESSURE_UNSET = object()
 
 # Hollow-success class: the adapter emptied the Pa dict. The *cause* is
 # a closed token; the human string is derived from it. Do not invent a
@@ -472,27 +484,57 @@ def vaporock_liquid_activity_pressure_warning() -> str:
 
 def vaporock_model_pressure_notice(
     *,
-    requested_pressure_bar: float,
+    requested_pressure_bar: float | None = None,
+    pressure_role: str = VAPOROCK_PRESSURE_ROLE_REQUESTED,
 ) -> Dict[str, Any]:
     """Typed notice for liquid potentials evaluated at the upstream P.
 
-    The observation pressure is unchanged. This records the pressure the
-    liquid model actually used, the pressure the caller asked for, and
-    that no correction was applied.
+    The model pressure stays at the upstream default. ``requested`` names
+    an observation pressure the caller supplied. ``unknown`` means the
+    observation did not carry one. ``call_default`` means the caller
+    omitted the argument and the adapter filled its own coordinate.
+    None of the three is a pressure correction.
     """
     model = float(VAPOROCK_LIQUID_MODEL_PRESSURE_BAR)
-    requested = float(requested_pressure_bar)
-    return {
-        'kind': 'engine_model_caveat',
-        'reason': (
+    role = str(pressure_role)
+    if role == VAPOROCK_PRESSURE_ROLE_REQUESTED:
+        requested = float(requested_pressure_bar)
+        reason = (
             'VapoRock liquid chemical potentials were evaluated at '
             f'the upstream default model pressure {model:g} bar, not '
             f'the requested pressure {requested:g} bar. No pressure '
             'correction was applied. The vapor result remains '
             'non-authoritative.'
-        ),
+        )
+        requested_field: float | None = requested
+    elif role == VAPOROCK_PRESSURE_ROLE_UNKNOWN:
+        reason = (
+            'VapoRock liquid chemical potentials were evaluated at '
+            f'the upstream default model pressure {model:g} bar. '
+            'The observation pressure is unknown. No pressure '
+            'correction was applied. The vapor result remains '
+            'non-authoritative.'
+        )
+        requested_field = None
+    elif role == VAPOROCK_PRESSURE_ROLE_CALL_DEFAULT:
+        default = float(VAPOROCK_CALL_DEFAULT_PRESSURE_BAR)
+        reason = (
+            'VapoRock liquid chemical potentials were evaluated at '
+            f'the upstream default model pressure {model:g} bar. '
+            'The caller omitted an observation pressure; the adapter '
+            f'call default {default:g} bar is not an observation '
+            'request. No pressure correction was applied. The vapor '
+            'result remains non-authoritative.'
+        )
+        requested_field = None
+    else:
+        raise ValueError(f'unknown VapoRock pressure role {pressure_role!r}')
+    return {
+        'kind': 'engine_model_caveat',
+        'reason': reason,
         'model_pressure_bar': model,
-        'requested_pressure_bar': requested,
+        'requested_pressure_bar': requested_field,
+        'pressure_role': role,
         'scope': 'liquid_chemical_potential',
     }
 
@@ -1937,7 +1979,7 @@ class VapoRockBackend(MeltBackend):
         temperature_C: float,
         composition_kg: Optional[Dict[str, float]] = None,
         fO2_log: Optional[float] = -9.0,
-        pressure_bar: float = 1e-6,
+        pressure_bar: Any = _PRESSURE_UNSET,
         *,
         composition_mol: Optional[Dict[str, float]] = None,
         composition_mol_by_account: Optional[
@@ -1946,6 +1988,7 @@ class VapoRockBackend(MeltBackend):
         species_formula_registry: Optional[Mapping[str, Any]] = None,
         liquid_fraction: Optional[float] = None,
         include_oxide_activities: bool = False,
+        pressure_role: Optional[str] = None,
     ) -> EquilibriumResult:
         """
         Call VapoRock for vapor-melt equilibrium.
@@ -1970,7 +2013,10 @@ class VapoRockBackend(MeltBackend):
         optional ``P`` argument of ``eval_gas_abundances``. An
         oxygen-irrelevant activity request calls ``_calc_liquid_chempot``
         at the same upstream default pressure. Neither path passes the
-        requested pressure, and neither corrects it.
+        requested pressure, and neither corrects it. An omitted
+        ``pressure_bar`` is the adapter call default, not an observation
+        request; ``pressure_role`` records requested, unknown, or that
+        default.
         Non-finite, zero, or negative ``pressure_bar``, and non-finite
         ``fO2_log``, are refused on this entry path before any engine
         call. ``fO2_log is None`` is admitted only for an oxide-activity
@@ -1994,6 +2040,15 @@ class VapoRockBackend(MeltBackend):
             temperature_K,
             _MELT_MODEL_ID,
         )
+        pressure_omitted = pressure_bar is _PRESSURE_UNSET
+        if pressure_omitted:
+            pressure_bar = float(VAPOROCK_CALL_DEFAULT_PRESSURE_BAR)
+        if pressure_role is None:
+            pressure_role = (
+                VAPOROCK_PRESSURE_ROLE_CALL_DEFAULT
+                if pressure_omitted
+                else VAPOROCK_PRESSURE_ROLE_REQUESTED
+            )
 
         if not self._available or (
             self._warm_pool is None and self._vaporock is None
@@ -2093,6 +2148,31 @@ class VapoRockBackend(MeltBackend):
                     '(external liquid-state domain gate)'
                 ],
                 diagnostics=diagnostics,
+            )
+
+        if (
+            vaporock_pressure_bar_admitted(pressure_bar)
+            and pressure_role not in _VAPOROCK_PRESSURE_ROLES
+        ):
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                liquid_fraction=liquid_fraction,
+                phase_assemblage_available=False,
+                status='out_of_domain',
+                warnings=[
+                    'VapoRock refused pressure_role='
+                    f'{pressure_role!r} (need requested, unknown, or '
+                    'call_default)'
+                ],
+                diagnostics={
+                    **melt_envelope_diagnostics,
+                    'backend_status_reason': 'invalid_pressure_role',
+                    'temperature_K': float(temperature_K),
+                    'pressure_role': pressure_role,
+                    'pressure_control_authoritative': False,
+                },
             )
 
         if not vaporock_pressure_bar_admitted(pressure_bar):
@@ -2448,7 +2528,12 @@ class VapoRockBackend(MeltBackend):
             projection_diagnostics = dict(projection_diagnostics)
             projection_diagnostics['vaporock_model_pressure_notice'] = (
                 vaporock_model_pressure_notice(
-                    requested_pressure_bar=float(pressure_bar),
+                    requested_pressure_bar=(
+                        float(pressure_bar)
+                        if pressure_role == VAPOROCK_PRESSURE_ROLE_REQUESTED
+                        else None
+                    ),
+                    pressure_role=pressure_role,
                 )
             )
 

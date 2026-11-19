@@ -20926,3 +20926,158 @@ def test_printed_knudsen_number_notice_does_not_claim_both_ends() -> None:
     )
     assert regime.passed
     assert regime.checks[0].name == "orifice_knudsen"
+
+
+def _vaporock_activity_pressure_case(total_pressure_Pa: State):
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(
+            ("SiO2", Decimal("0.6")),
+            ("Na2O", Decimal("0.4")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1873.15"),
+            component_basis="oxide",
+            composition=composition,
+            total_P=Decimal("100000"),
+        ),
+        fO2_Pa=State.unknown("oxygen not printed"),
+        total_pressure_Pa=total_pressure_Pa,
+    )
+    experiment = F.tabulation_experiment(
+        experiment_id="vaporock-pressure-role",
+        T_K=Decimal("1873.15"),
+        total_P=Decimal("100000"),
+    )
+    observation = F.observation(
+        "vaporock-silica-activity-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="vaporock-pressure-role",
+    )
+    return experiment, observation
+
+
+def test_scored_vaporock_activity_notice_uses_the_row_pressure(
+    tmp_path, monkeypatch
+):
+    """The scored caveat names the observation pressure, not the 1e-6 bar fallback."""
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        normalize_engine_settings,
+    )
+    from simulator.melt_backend.vaporock import VapoRockBackend
+    from tests.test_vaporock_backend import (
+        _install_fake_import,
+        _liquid_chempot_system_cls,
+    )
+    import simulator.melt_backend.vaporock as vaporock_module
+
+    def caveat(prediction):
+        rows = [
+            notice
+            for notice in prediction.notices
+            if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        ]
+        assert len(rows) == 1, prediction.refusal_detail
+        return rows[0]
+
+    generation = {"n": 0}
+
+    def contract():
+        import types
+
+        generation["n"] += 1
+        calls = {"gas": 0, "chempot": 0, "temperature": [], "pressure": []}
+        _install_fake_import(
+            monkeypatch,
+            types.SimpleNamespace(System=_liquid_chempot_system_cls(calls)),
+        )
+        backend = VapoRockBackend()
+        assert backend.initialize({"warm_worker": False})
+        # A new path per contract call. Reusing one sqlite would replay the
+        # good notice after the process-local mutation below.
+        database = tmp_path / f"pressure-role-{generation['n']}.sqlite"
+        monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+        monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+        engine_cache._MEMORY_CACHE.clear()
+        engine_cache.engine_cache_counters(reset=True)
+        handle = EngineHandle(
+            name=Engine.VAPOROCK.value,
+            backend=backend,
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=True,
+            supports_intrinsic_fo2=False,
+            engine_settings=normalize_engine_settings("vaporock", None),
+        )
+
+        def predict(total_pressure_Pa: State):
+            experiment, observation = _vaporock_activity_pressure_case(
+                total_pressure_Pa
+            )
+            prediction = predict_with_engine(
+                Engine.VAPOROCK,
+                observation,
+                handles={Engine.VAPOROCK.value: handle},
+                experiment=experiment,
+                isolated=False,
+            )
+            assert prediction.refusal_reason is None, prediction.refusal_detail
+            return prediction
+
+        one_bar = predict(State.of(Decimal("100000")))
+        one_reason = caveat(one_bar).reason
+        assert "requested pressure 1 bar" in one_reason
+        assert "1e-10" in one_reason
+        assert "1e-06" not in one_reason
+        assert "1e-6" not in one_reason
+        assert calls["chempot"] == 1
+        assert calls["pressure"] == pytest.approx([1e-10])
+        engine_cache._MEMORY_CACHE.clear()
+        replay = predict(State.of(Decimal("100000")))
+        assert caveat(replay).reason == one_reason
+        assert calls["chempot"] == 1
+        assert engine_cache.engine_cache_counters()["vaporock"]["hits"] >= 1
+
+        thousand = predict(State.of(Decimal("100000000")))
+        thousand_reason = caveat(thousand).reason
+        assert "requested pressure 1000 bar" in thousand_reason
+        assert "1e-10" in thousand_reason
+        assert "1e-06" not in thousand_reason
+
+        unknown = predict(State.unknown("pressure not printed"))
+        unknown_reason = caveat(unknown).reason
+        assert "observation pressure is unknown" in unknown_reason
+        assert "requested pressure" not in unknown_reason
+        assert "1e-06" not in unknown_reason
+        assert "1e-6" not in unknown_reason
+        assert "residual assumes" not in unknown_reason
+        assert all(
+            "1e-6" not in notice.reason and "1e-06" not in notice.reason
+            for notice in unknown.notices
+        )
+        assert one_bar.value == thousand.value == unknown.value
+        assert calls["pressure"] == pytest.approx([1e-10, 1e-10, 1e-10])
+        assert calls["gas"] == 0
+
+    contract()
+    real = vaporock_module.vaporock_model_pressure_notice
+
+    def _label_the_cell_default(**_kwargs):
+        return real(requested_pressure_bar=1e-6, pressure_role="requested")
+
+    monkeypatch.setattr(
+        vaporock_module,
+        "vaporock_model_pressure_notice",
+        _label_the_cell_default,
+    )
+    with pytest.raises(AssertionError):
+        contract()

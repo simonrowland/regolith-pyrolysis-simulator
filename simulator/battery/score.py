@@ -14422,6 +14422,7 @@ def _predict_with_engine(
     )
     pressure_bar: float | None = None
     knudsen_seed_pressure_bar: float | None = None
+    vaporock_pressure_role: str | None = None
     if activity_payload is None:
         if derive_knudsen_total_pressure:
             # Knudsen premise: P_total=sum_i p_i. From dG/dP=V,
@@ -14451,6 +14452,49 @@ def _predict_with_engine(
                 )
             if pressure_notice is not None:
                 input_notices.append(pressure_notice)
+    elif engine is Engine.VAPOROCK:
+        # Activity rows do not inherit the cell's 1e-6 bar coordinate.
+        # A printed pressure is the request. An absent pressure stays
+        # unknown. A present non-finite or negative pressure is invalid.
+        from simulator.melt_backend.vaporock import (
+            VAPOROCK_PRESSURE_ROLE_REQUESTED,
+            VAPOROCK_PRESSURE_ROLE_UNKNOWN,
+        )
+
+        pressure_state = identity.total_pressure_Pa
+        if (
+            pressure_state is not None
+            and pressure_state.is_value
+            and pressure_state.value is not None
+        ):
+            bar, _pressure_notice, pressure_invalid = (
+                total_pressure_bar_for_score(identity, quantity)
+            )
+            if pressure_invalid is not None:
+                return _input_refusal(
+                    engine=engine,
+                    channel=channel,
+                    sources=sources,
+                    identity=identity,
+                    requested=requested,
+                    reason=RefusalReason.INVALID_IDENTITY,
+                    detail={
+                        "reason": pressure_invalid,
+                        "quantity": quantity.value,
+                    },
+                    notices=tuple(input_notices),
+                )
+            pressure_bar = bar
+            vaporock_pressure_role = VAPOROCK_PRESSURE_ROLE_REQUESTED
+        else:
+            printed_pressure_bar = _printed_total_pressure_bar(
+                identity, observation
+            )
+            if printed_pressure_bar is not None:
+                pressure_bar = float(printed_pressure_bar)
+                vaporock_pressure_role = VAPOROCK_PRESSURE_ROLE_REQUESTED
+            else:
+                vaporock_pressure_role = VAPOROCK_PRESSURE_ROLE_UNKNOWN
 
     printed_fo2 = _has_printed_fo2(observation, identity)
     source_pressure = (
@@ -14848,6 +14892,7 @@ def _predict_with_engine(
                 isolated=use_isolated,
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
+                pressure_role=vaporock_pressure_role,
                 native_activity_formula=native_activity_formula,
             )
 
@@ -14949,6 +14994,7 @@ def _predict_with_engine(
                     isolated=use_isolated,
                     arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                     physical_pressure_bar=pressure_bar,
+                    pressure_role=vaporock_pressure_role,
                     native_activity_formula=native_activity_formula,
                 )
             except Exception as exc:
@@ -14964,6 +15010,7 @@ def _predict_with_engine(
                 isolated=use_isolated,
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
+                pressure_role=vaporock_pressure_role,
                 native_activity_formula=native_activity_formula,
             )
         except Exception as exc:
@@ -15249,6 +15296,7 @@ def _predict_with_engine(
                 isolated=use_isolated,
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
+                pressure_role=vaporock_pressure_role,
                 native_activity_formula=native_activity_formula,
             )
         except Exception as exc:

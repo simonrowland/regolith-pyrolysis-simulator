@@ -4350,6 +4350,7 @@ def run_isolated_cell_worker(
                 if payload.get("physical_pressure_bar") is None
                 else float(payload["physical_pressure_bar"])
             ),
+            pressure_role=payload.get("pressure_role"),
             native_activity_formula=payload.get("native_activity_formula"),
             qualification=bool(payload.get("qualification")),
             isolated=False,
@@ -4626,7 +4627,8 @@ class _IsolatedCellWorker:
             key: payload[key]
             for key in (
                 "composition_wt_pct", "temperature_K", "physical_pressure_bar",
-                "po2", "engine_settings", "native_activity_formula",
+                "pressure_role", "po2", "engine_settings",
+                "native_activity_formula",
             ) if key in payload
         }
         if payload.get("simulate_crash") is not None:
@@ -4709,6 +4711,7 @@ def _run_cell_in_subprocess(
     certified_band: Mapping[str, Any] | None,
     simulate_crash: str | None = None,
     physical_pressure_bar: float | None = None,
+    pressure_role: str | None = None,
     native_activity_formula: str | None = None,
     defer_qualification_decoration: bool = False,
     engine_settings: Mapping[str, Any] | None = None,
@@ -4733,6 +4736,8 @@ def _run_cell_in_subprocess(
     }
     if physical_pressure_bar is not None:
         payload["physical_pressure_bar"] = float(physical_pressure_bar)
+    if pressure_role is not None:
+        payload["pressure_role"] = pressure_role
     if native_activity_formula is not None:
         payload["native_activity_formula"] = native_activity_formula
     worker = _isolated_cell_worker(handle.name, engine_settings)
@@ -5211,6 +5216,7 @@ def equilibrate_cell(
     arm: str | None = None,
     simulate_crash: str | None = None,
     physical_pressure_bar: float | None = None,
+    pressure_role: str | None = None,
     native_activity_formula: str | None = None,
     _defer_qualification_decoration: bool = False,
 ) -> EquilibrateCell:
@@ -5225,6 +5231,7 @@ def equilibrate_cell(
         arm=arm,
         simulate_crash=simulate_crash,
         physical_pressure_bar=physical_pressure_bar,
+        pressure_role=pressure_role,
         native_activity_formula=native_activity_formula,
         _defer_qualification_decoration=_defer_qualification_decoration,
     )
@@ -5242,6 +5249,7 @@ def _equilibrate_cell_uncached(
     arm: str | None = None,
     simulate_crash: str | None = None,
     physical_pressure_bar: float | None = None,
+    pressure_role: str | None = None,
     native_activity_formula: str | None = None,
     _defer_qualification_decoration: bool = False,
     _cache_engine_call: bool = True,
@@ -5327,6 +5335,7 @@ def _equilibrate_cell_uncached(
             certified_band=certified_band,
             simulate_crash=simulate_crash,
             physical_pressure_bar=physical_pressure_bar,
+            pressure_role=pressure_role,
             native_activity_formula=native_activity_formula,
             defer_qualification_decoration=True,
             engine_settings=handle.engine_settings or None,
@@ -5350,6 +5359,7 @@ def _equilibrate_cell_uncached(
     composition_kg, composition_mol = composition_kg_and_mol(pot.composition_wt_pct)
     temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
     fo2_log = _fo2_log_for_request(handle, po2)
+    supplied_pressure = physical_pressure_bar is not None
     if physical_pressure_bar is None:
         physical_pressure_bar = _DEFAULT_PRESSURE_BAR
     else:
@@ -5405,6 +5415,16 @@ def _equilibrate_cell_uncached(
         and "include_oxide_activities" in parameters
     ):
         kwargs["include_oxide_activities"] = True
+    if handle.name == "vaporock" and "pressure_role" in parameters:
+        role = pressure_role
+        if role is None and not supplied_pressure:
+            from simulator.melt_backend.vaporock import (
+                VAPOROCK_PRESSURE_ROLE_CALL_DEFAULT,
+            )
+
+            role = VAPOROCK_PRESSURE_ROLE_CALL_DEFAULT
+        if role is not None:
+            kwargs["pressure_role"] = role
     from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
 
     kwargs.update(isothermal_run_kwargs(handle.name, parameters))
