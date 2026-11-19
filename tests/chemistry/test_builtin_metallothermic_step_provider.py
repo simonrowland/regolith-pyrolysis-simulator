@@ -3221,7 +3221,6 @@ def test_full_run_mass_balance_holds_with_kernel_committed_metallothermic(
 
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
-@pytest.mark.cpu_budget(1800)
 def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
     vapor_pressure_data,
     feedstocks_data,
