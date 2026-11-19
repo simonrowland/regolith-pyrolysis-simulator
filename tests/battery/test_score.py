@@ -20515,7 +20515,6 @@ def test_persisted_kushiro_transitions_score_from_the_extract_unit(
     ("missing", "identity_field"),
     (
         ("composition", "composition"),
-        ("total_pressure_Pa", "total_pressure_Pa"),
         ("fO2_Pa", "fO2_Pa"),
     ),
 )
@@ -20559,6 +20558,403 @@ def test_transition_temperature_missing_printed_input_refuses_without_solve(
     assert prediction.execution.state is ExecutionState.NOT_PROBED
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert prediction.refusal_detail == {"reason": "missing_input", "input": missing}
+
+
+_AMBIENT_PRESSURE_REASON = "ambient pressure assumed, not printed"
+
+
+def _liquidus_pressure_case(
+    monkeypatch,
+    engine: Engine,
+    *,
+    subtype: str,
+    printed_pressure: bool,
+    experiment=None,
+    bench=None,
+):
+    """Score one liquidus/solidus row with the finder stubbed.
+
+    ``printed_pressure`` puts 1 bar on the point. The ambient case leaves
+    pressure unknown on the identity and absent from the point.
+    """
+
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+    from simulator.physical_constants import BAR_PA_DECIMAL
+
+    composition = Composition(
+        basis="printed_CaO_SiO2_binary_wt_percent",
+        components=(("CaO", Decimal("36.1")), ("SiO2", Decimal("63.9"))),
+        amount_basis=AmountBasis.MASS_PERCENT,
+    )
+    na = "transition temperature has no duplicate coordinate"
+    identity = replace(
+        F.activity_identity(
+            formula="CaO",
+            component_basis="CaO",
+            composition=composition,
+        ),
+        quantity=Quantity.TRANSITION_TEMPERATURE,
+        subtype=State.of(subtype),
+        temperature_K=State.not_applicable(na),
+        per=State.not_applicable(na),
+        reference_state=State.not_applicable(na),
+        composition=State.unknown("composition is printed on the point"),
+        fO2_Pa=State.not_applicable("oxygen stays a located command"),
+        total_pressure_Pa=State.unknown("total pressure is not printed"),
+    )
+    experiment = experiment or F.tabulation_experiment()
+    if bench is not None:
+        experiment = replace(experiment, bench_id=bench.id)
+    points = {
+        "composition": Located(State.of(composition)),
+        "oxygen_partial_pressure_Pa": Located(State.of(Decimal("1e-4"))),
+    }
+    if printed_pressure:
+        points["total_pressure_Pa"] = Located(State.of(BAR_PA_DECIMAL))
+    reference = replace(
+        F.observation(
+            f"transition-{subtype}-{'printed' if printed_pressure else 'ambient'}",
+            experiment.experiment_id,
+            identity,
+            Decimal("1709.15"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        ),
+        point_conditions=points,
+    )
+    calls: list[dict[str, object]] = []
+
+    def find_liquidus_solidus(**kwargs):
+        calls.append(dict(kwargs))
+        return LiquidusSolidusResult(
+            liquidus_T_C=1450.0,
+            solidus_T_C=1400.0,
+            liquid_fraction=0.0,
+            status="ok",
+        )
+
+    handle = SimpleNamespace(
+        name=engine.value,
+        backend=SimpleNamespace(find_liquidus_solidus=find_liquidus_solidus),
+        available=True,
+        unavailable_reason=None,
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_open_cached_battery_handle",
+        lambda *_args: (handle, False),
+    )
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    if bench is not None:
+        context = replace(context, benches={bench.id: bench})
+    residuals, candidates = score_store(
+        context,
+        engines=(engine,),
+        rail=Rail.THERMOCHEMISTRY,
+        include_diagnostics=False,
+    )
+    assert len(residuals) == 1
+    return residuals[0], calls, reference, candidates
+
+
+def _assert_ambient_transition_scores(monkeypatch, engine: Engine, subtype: str) -> None:
+    from simulator.physical_constants import BAR_PA_DECIMAL
+
+    ambient, ambient_calls, ambient_row, candidates = _liquidus_pressure_case(
+        monkeypatch,
+        engine,
+        subtype=subtype,
+        printed_pressure=False,
+    )
+    printed, printed_calls, _printed_row, _printed_candidates = _liquidus_pressure_case(
+        monkeypatch,
+        engine,
+        subtype=subtype,
+        printed_pressure=True,
+    )
+    assert ambient_calls
+    assert printed_calls
+    assert all(call["pressure_bar"] == 1.0 for call in ambient_calls)
+    assert all(call["pressure_bar"] == 1.0 for call in printed_calls)
+    assert ambient_calls[0]["fO2_log"] == printed_calls[0]["fO2_log"]
+    assert ambient_calls[0]["composition_kg"] == printed_calls[0]["composition_kg"]
+    assert ambient.refusal is None
+    assert ambient.numeric is not None
+    assert printed.numeric is not None
+    assert ambient.numeric.value == printed.numeric.value
+    assert ambient.score_eligible is printed.score_eligible
+    assert any(
+        notice.kind is NoticeKind.AMBIENT_PRESSURE_ASSUMED
+        and notice.reason == _AMBIENT_PRESSURE_REASON
+        for notice in ambient.notices
+    )
+    assert not any(
+        notice.kind is NoticeKind.AMBIENT_PRESSURE_ASSUMED for notice in printed.notices
+    )
+    stored_pressure = ambient_row.identity.total_pressure_Pa
+    assert stored_pressure is not None and stored_pressure.is_unknown
+    assert "total_pressure_Pa" not in (ambient_row.point_conditions or {})
+    assert ambient_row.notices == ()
+    candidate = candidates[ambient.candidate or ""]
+    assumed = candidate.identity.total_pressure_Pa
+    assert assumed is not None and assumed.is_value
+    assert assumed.value == BAR_PA_DECIMAL
+
+
+@pytest.mark.parametrize("engine", tuple(score_mod.MELTS_ENGINES))
+@pytest.mark.parametrize("subtype", ("liquidus", "solidus"))
+def test_unprinted_ambient_transition_scores_at_one_bar(
+    monkeypatch: pytest.MonkeyPatch,
+    engine: Engine,
+    subtype: str,
+) -> None:
+    _assert_ambient_transition_scores(monkeypatch, engine, subtype)
+
+
+def test_dropping_the_pressure_owner_restores_the_missing_pressure_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _assert_ambient_transition_scores(monkeypatch, Engine.MAGEMIN, "solidus")
+
+    monkeypatch.setattr(
+        score_mod,
+        "unprinted_liquidus_solidus_pressure",
+        lambda *_args, **_kwargs: None,
+    )
+    with pytest.raises(AssertionError):
+        _assert_ambient_transition_scores(monkeypatch, Engine.MAGEMIN, "solidus")
+
+
+def test_dropping_the_comparison_pressure_drops_the_numeric_residual(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _assert_ambient_transition_scores(monkeypatch, Engine.MAGEMIN, "liquidus")
+
+    monkeypatch.setattr(
+        score_mod, "assumed_transition_pressure", lambda _notices: None
+    )
+    with pytest.raises(AssertionError):
+        _assert_ambient_transition_scores(monkeypatch, Engine.MAGEMIN, "liquidus")
+
+
+def _unprinted_transition_reference(experiment):
+    reference = _transition_temperature_observation(subtype="liquidus")
+    identity = reference.identity
+    assert isinstance(identity, Identity)
+    identity = replace(
+        identity,
+        total_pressure_Pa=State.unknown("pressure is not printed"),
+    )
+    return replace(
+        reference,
+        experiment_id=experiment.experiment_id,
+        identity=identity,
+        point_conditions=None,
+    )
+
+
+@pytest.mark.parametrize("engine", tuple(score_mod.MELTS_ENGINES))
+def test_high_pressure_token_without_pressure_still_refuses(
+    monkeypatch: pytest.MonkeyPatch,
+    engine: Engine,
+) -> None:
+    experiment = replace(
+        F.tabulation_experiment(),
+        method=State.of(MethodToken.PISTON_CYLINDER),
+    )
+    reference = _unprinted_transition_reference(experiment)
+
+    def unexpected_open(*_args):
+        pytest.fail("a piston-cylinder row must refuse before opening an engine")
+
+    monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
+    prediction = predict_with_engine(engine, reference, experiment=experiment)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {
+        "reason": "missing_input",
+        "input": "total_pressure_Pa",
+    }
+    assert not any(
+        notice.kind is NoticeKind.AMBIENT_PRESSURE_ASSUMED
+        for notice in prediction.notices
+    )
+    stored = reference.identity.total_pressure_Pa
+    assert stored is not None and stored.is_unknown
+
+
+def test_high_pressure_prose_without_pressure_still_refuses(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    experiment = F.tabulation_experiment()
+    experiment = replace(
+        experiment,
+        sample=replace(experiment.sample, form=F.located("piston-cylinder quench")),
+    )
+    reference = _unprinted_transition_reference(experiment)
+
+    def unexpected_open(*_args):
+        pytest.fail("piston-cylinder prose must refuse before opening an engine")
+
+    monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE, reference, experiment=experiment
+    )
+
+    assert prediction.refusal_detail == {
+        "reason": "missing_input",
+        "input": "total_pressure_Pa",
+    }
+    assert reference.identity.total_pressure_Pa.is_unknown
+
+
+def test_bench_high_pressure_phrase_reaches_the_liquidus_route(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.enums import BenchIdentityBasis
+    from simulator.battery.records import Bench, BenchIdentity
+
+    experiment = F.tabulation_experiment()
+    bench = Bench(
+        "bench-hp",
+        experiment.work_id or "work-1",
+        BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+        apparatus_family=F.located("multi-anvil"),
+    )
+    experiment = replace(experiment, bench_id=bench.id)
+    reference = _unprinted_transition_reference(experiment)
+
+    def unexpected_open(*_args):
+        pytest.fail("the bench apparatus must refuse before opening an engine")
+
+    monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
+    context = replace(
+        _context(F.work(), experiment, reference, review="reviewed"),
+        benches={bench.id: bench},
+    )
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.ALPHAMELTS,),
+        rail=Rail.THERMOCHEMISTRY,
+        include_diagnostics=False,
+    )
+    assert len(residuals) == 1
+    residual = residuals[0]
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == "missing_input"
+    assert residual.refusal.detail["input"] == "total_pressure_Pa"
+    assert reference.identity.total_pressure_Pa.is_unknown
+    assert reference.notices == ()
+
+
+def test_knudsen_transition_without_printed_pressure_does_not_assume(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    experiment = F.kems_experiment()
+    reference = _unprinted_transition_reference(experiment)
+
+    def unexpected_open(*_args):
+        pytest.fail("a Knudsen row must not assume 1 bar or open an engine")
+
+    monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
+    prediction = predict_with_engine(
+        Engine.MAGEMIN, reference, experiment=experiment
+    )
+
+    assert prediction.refusal_detail == {
+        "reason": "missing_input",
+        "input": "total_pressure_Pa",
+    }
+    assert not any(
+        notice.kind is NoticeKind.AMBIENT_PRESSURE_ASSUMED
+        for notice in prediction.notices
+    )
+    assert reference.identity.total_pressure_Pa.is_unknown
+
+
+def test_missing_oxygen_still_refuses_after_the_pressure_assumption(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    reference = _transition_temperature_observation(subtype="liquidus")
+    identity = reference.identity
+    assert isinstance(identity, Identity)
+    reference = replace(
+        reference,
+        identity=replace(
+            identity,
+            total_pressure_Pa=State.unknown("pressure is not printed"),
+            fO2_Pa=State.unknown("oxygen is not printed"),
+        ),
+        point_conditions=None,
+    )
+
+    def unexpected_open(*_args):
+        pytest.fail("missing oxygen must refuse before opening an engine")
+
+    monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
+    prediction = predict_with_engine(Engine.MAGEMIN, reference)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {"reason": "missing_input", "input": "fO2_Pa"}
+    assert any(
+        notice.kind is NoticeKind.AMBIENT_PRESSURE_ASSUMED
+        and notice.reason == _AMBIENT_PRESSURE_REASON
+        for notice in prediction.notices
+    )
+    assert reference.identity.total_pressure_Pa.is_unknown
+    assert reference.notices == ()
+
+
+def test_inferred_point_pressure_is_not_treated_as_ambient(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.records import Derivation
+
+    reference = _transition_temperature_observation(subtype="solidus")
+    identity = reference.identity
+    assert isinstance(identity, Identity)
+    reference = replace(
+        reference,
+        identity=replace(
+            identity,
+            total_pressure_Pa=State.unknown("pressure is not printed"),
+        ),
+        point_conditions={
+            "total_pressure_Pa": Located(
+                State.of(Decimal("100000")),
+                locator=F.loc(page=3, table="II"),
+                inference=Derivation(
+                    relation="read_from_a_figure_axis",
+                    inputs=(),
+                    parameters=(),
+                    output_unit="Pa",
+                ),
+            )
+        },
+    )
+
+    def unexpected_open(*_args):
+        pytest.fail("an inferred pressure is invalid, not an ambient assumption")
+
+    monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
+    prediction = predict_with_engine(Engine.ALPHAMELTS, reference)
+
+    assert prediction.refusal_reason is RefusalReason.INVALID_IDENTITY
+    assert prediction.refusal_detail == {
+        "reason": "invalid_input",
+        "input": "total_pressure_Pa",
+    }
+    assert not any(
+        notice.kind is NoticeKind.AMBIENT_PRESSURE_ASSUMED
+        for notice in prediction.notices
+    )
+    assert reference.identity.total_pressure_Pa.is_unknown
 
 
 @pytest.mark.parametrize("subtype", (None, "glass_transition", "liquidus/solidus"))

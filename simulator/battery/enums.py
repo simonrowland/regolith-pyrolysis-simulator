@@ -395,6 +395,10 @@ class NoticeKind(StrEnum):
     BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS = (
         "buffer_band_unsized_beyond_all_calibrations"
     )
+    # d-280: a condensed liquidus or solidus with no printed pressure and no
+    # high-pressure apparatus is scored at 1 bar. Advisory. The stored row
+    # stays not printed. Not a flagged stratum.
+    AMBIENT_PRESSURE_ASSUMED = "ambient_pressure_assumed"
 
 
 class ReferenceStateConvention(StrEnum):

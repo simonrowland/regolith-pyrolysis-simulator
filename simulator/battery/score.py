@@ -144,6 +144,10 @@ from simulator.battery.input_provenance import (
     printed_single_melt_evidence,
     single_phase_printed_bulk_policy,
 )
+from simulator.battery.transition_pressure import (
+    assumed_transition_pressure,
+    unprinted_liquidus_solidus_pressure,
+)
 from simulator.physical_constants import ATM_PA_DECIMAL, GAS_CONSTANT, PA_PER_BAR
 
 if TYPE_CHECKING:
@@ -8366,6 +8370,13 @@ def _comparison_identity(
             bound = identity_pressure_state(located_pressure.state)
             if bound is not None:
                 updates["total_pressure_Pa"] = bound
+        # A printed point wins. The d-280 notice is the only other source,
+        # and only when this comparison side still has no pressure. The
+        # value is the 1 bar the finder was called with, not a store write.
+        if "total_pressure_Pa" not in updates:
+            assumed = assumed_transition_pressure(prediction.notices)
+            if assumed is not None:
+                updates["total_pressure_Pa"] = assumed
     if (
         selected_oxygen is not None
         and selected_oxygen[0] is not None
@@ -13729,6 +13740,7 @@ def _predict_liquidus_transition_temperature(
     *,
     handles: Mapping[str, object] | None,
     experiment: Experiment | None,
+    bench: Bench | None = None,
 ) -> EnginePrediction:
     from simulator.melt_backend.liquidus import _LIQUIDUS_TRANSITION_SUBTYPES
 
@@ -13809,23 +13821,39 @@ def _predict_liquidus_transition_temperature(
         ) or (
             isinstance(point_pressure, Located) and point_pressure.state.is_value
         )
-        return _input_refusal(
-            engine=engine,
-            channel=channel,
-            sources=sources,
-            identity=identity,
-            requested=requested,
-            reason=(
-                RefusalReason.INVALID_IDENTITY
-                if has_value
-                else RefusalReason.IDENTITY_INCOMPLETE
-            ),
-            detail={
-                "reason": "invalid_input" if has_value else "missing_input",
-                "input": "total_pressure_Pa",
-            },
-            notices=tuple(notices),
+        if has_value:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=RefusalReason.INVALID_IDENTITY,
+                detail={"reason": "invalid_input", "input": "total_pressure_Pa"},
+                notices=tuple(notices),
+            )
+        # d-280. The owner refuses a high-pressure apparatus and a Knudsen
+        # token. Anything else is scored at 1 bar. The observation is left
+        # as recorded: pressure stays not printed in the store.
+        assumed_pressure = unprinted_liquidus_solidus_pressure(
+            observation, experiment, bench
         )
+        if assumed_pressure is None:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=RefusalReason.IDENTITY_INCOMPLETE,
+                detail={"reason": "missing_input", "input": "total_pressure_Pa"},
+                notices=tuple(notices),
+            )
+        pressure_bar = assumed_pressure.pressure_bar
+        identity = replace(
+            identity, total_pressure_Pa=State.of(assumed_pressure.pressure_Pa)
+        )
+        notices.append(assumed_pressure.notice)
     try:
         pressure_bar_value = float(pressure_bar)
     except (TypeError, ValueError, OverflowError):
@@ -14223,6 +14251,7 @@ def _predict_with_engine(
                 sources,
                 handles=handles,
                 experiment=experiment,
+                bench=bench,
             )
     if quantity in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES:
         return _predict_mass_loss_with_residue(
