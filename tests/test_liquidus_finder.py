@@ -107,15 +107,6 @@ def test_liquidus_transition_selector_uses_exact_subtype_in_kelvin():
     assert _liquidus_transition_temperature_K(result, "solidus") == pytest.approx(
         1673.15
     )
-    assert _liquidus_transition_temperature_K(result, "glass_transition") is None
-    assert _liquidus_transition_temperature_K(
-        LiquidusSolidusResult(
-            liquidus_T_C=1000.0,
-            liquid_fraction=1.0,
-            status="not_converged",
-        ),
-        "liquidus",
-    ) is None
 
 
 def test_liquidus_transition_decision_names_the_existing_refusal():
@@ -154,6 +145,35 @@ def test_liquidus_transition_decision_names_the_existing_refusal():
     assert liquidus_transition_decision(object(), "liquidus") == (
         None,
         "liquidus_finder_result_invalid",
+    )
+
+
+def test_transition_decision_owns_status_when_the_helper_returns_kelvin(
+    monkeypatch,
+):
+    """A refused result stays refused even if field extraction returns a temperature."""
+
+    refused = LiquidusSolidusResult(
+        liquidus_T_C=1436.0,
+        liquid_fraction=1.0,
+        status="not_converged",
+    )
+    assert liquidus_transition_decision(refused, "liquidus") == (
+        None,
+        "liquidus_finder_not_converged",
+    )
+
+    def temperature_anyway(_result, _subtype):
+        return 1709.15
+
+    monkeypatch.setattr(
+        liquidus_module,
+        "_liquidus_transition_temperature_K",
+        temperature_anyway,
+    )
+    assert liquidus_transition_decision(refused, "liquidus") == (
+        None,
+        "liquidus_finder_not_converged",
     )
 
 

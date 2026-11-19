@@ -14008,10 +14008,14 @@ def _predict_liquidus_transition_temperature(
                 identity=identity,
                 requested_composition=requested,
             )
-        if (
-            subtype == "solidus"
-            and getattr(backend, "_mode", None) == "subprocess"
-        ):
+        # The opened backend names a liquidus-only transport. Absence of
+        # the method is not a refusal: MAGEMin and a fraction-finder
+        # AlphaMELTS transport both run the finder. Do not read ``_mode``.
+        transport_refusal = getattr(backend, "liquidus_transition_refusal", None)
+        transport = (
+            transport_refusal(subtype) if callable(transport_refusal) else None
+        )
+        if isinstance(transport, str) and transport:
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
@@ -14023,7 +14027,7 @@ def _predict_liquidus_transition_temperature(
                 refusal_reason=RefusalReason.UNSUPPORTED,
                 refusal_detail={
                     "reason": "liquidus_only_transport",
-                    "transport": "subprocess",
+                    "transport": transport,
                 },
                 identity=identity,
                 requested_composition=requested,

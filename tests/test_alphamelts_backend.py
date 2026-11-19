@@ -133,6 +133,19 @@ def _select_python_api_for_test(backend: AlphaMELTSBackend) -> None:
     )
 
 
+def test_liquidus_transition_refusal_follows_the_opened_transport():
+    """Solidus on the subprocess transport is liquidus-only. No engine launch."""
+
+    backend = AlphaMELTSBackend()
+    assert backend.liquidus_transition_refusal("liquidus") is None
+    assert backend.liquidus_transition_refusal("solidus") is None
+    backend._mode = "subprocess"
+    assert backend.liquidus_transition_refusal("liquidus") is None
+    assert backend.liquidus_transition_refusal("solidus") == "subprocess"
+    backend._mode = "python_api"
+    assert backend.liquidus_transition_refusal("solidus") is None
+
+
 def _petthermotools_call_arguments(model_name: str | None):
     backend = AlphaMELTSBackend(model_name=model_name)
     _select_python_api_for_test(backend)

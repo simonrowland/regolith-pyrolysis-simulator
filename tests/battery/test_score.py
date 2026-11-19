@@ -20380,7 +20380,11 @@ def test_openimcc_liquidus_refuses_before_engine_open(
     }
 
 
-def _assert_subprocess_solidus_refuses_without_finder(monkeypatch) -> None:
+def _subprocess_solidus_refusal(_subtype: str) -> str:
+    return "subprocess"
+
+
+def _run_solidus_transport(monkeypatch, *, mode, refusal):
     from types import SimpleNamespace
 
     from simulator.melt_backend.liquidus import LiquidusSolidusResult
@@ -20397,12 +20401,16 @@ def _assert_subprocess_solidus_refuses_without_finder(monkeypatch) -> None:
             status="ok",
         )
 
+    backend_fields: dict[str, object] = {
+        "find_liquidus_solidus": find_liquidus_solidus,
+    }
+    if mode is not None:
+        backend_fields["_mode"] = mode
+    if refusal is not None:
+        backend_fields["liquidus_transition_refusal"] = refusal
     handle = SimpleNamespace(
         name=Engine.ALPHAMELTS.value,
-        backend=SimpleNamespace(
-            find_liquidus_solidus=find_liquidus_solidus,
-            _mode="subprocess",
-        ),
+        backend=SimpleNamespace(**backend_fields),
         available=True,
         unavailable_reason=None,
     )
@@ -20411,8 +20419,16 @@ def _assert_subprocess_solidus_refuses_without_finder(monkeypatch) -> None:
         "_open_cached_battery_handle",
         lambda *_args: (handle, False),
     )
-    prediction = predict_with_engine(Engine.ALPHAMELTS, reference)
-    assert calls == []
+    return predict_with_engine(Engine.ALPHAMELTS, reference), calls
+
+
+def _assert_subprocess_solidus_refuses_without_finder(monkeypatch) -> None:
+    prediction, seen = _run_solidus_transport(
+        monkeypatch,
+        mode="subprocess",
+        refusal=_subprocess_solidus_refusal,
+    )
+    assert seen == []
     assert prediction.value is None
     assert prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prediction.refusal_detail == {
@@ -20426,24 +20442,28 @@ def test_alphamelts_subprocess_solidus_refuses_without_the_finder(
 ) -> None:
     _assert_subprocess_solidus_refuses_without_finder(monkeypatch)
 
-    def legacy_support(engine: Engine, phase_basis: str | None) -> bool:
-        from simulator.melt_backend.base import battery_adapter_class
-        from simulator.melt_backend.liquidus import _LIQUIDUS_TRANSITION_SUBTYPES
-
-        if phase_basis not in _LIQUIDUS_TRANSITION_SUBTYPES:
-            return False
-        if engine is Engine.ALPHAMELTS and phase_basis != "liquidus":
-            return False
-        adapter = battery_adapter_class(engine.value)
-        return callable(getattr(adapter, "find_liquidus_solidus", None))
-
-    monkeypatch.setattr(
-        score_mod,
-        "_engine_supports_liquidus_transition",
-        legacy_support,
+    # The opened backend owns the refusal. ``_mode`` stays subprocess, and
+    # a method that allows the finder is called.
+    prediction, calls = _run_solidus_transport(
+        monkeypatch,
+        mode="subprocess",
+        refusal=lambda _subtype: None,
     )
-    with pytest.raises(AssertionError):
-        _assert_subprocess_solidus_refuses_without_finder(monkeypatch)
+    assert len(calls) == 1
+    assert prediction.value == Decimal("1673.15")
+    assert prediction.refusal_reason is None
+
+    # The same method refuses even when ``_mode`` is a fraction-finder mode.
+    prediction, calls = _run_solidus_transport(
+        monkeypatch,
+        mode="python_api",
+        refusal=_subprocess_solidus_refusal,
+    )
+    assert calls == []
+    assert prediction.refusal_detail == {
+        "reason": "liquidus_only_transport",
+        "transport": "subprocess",
+    }
 
 
 @pytest.mark.parametrize("mode", ("python_api", None))

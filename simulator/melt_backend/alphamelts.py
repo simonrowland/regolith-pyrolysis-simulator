@@ -1966,6 +1966,20 @@ class _MELTSBackendSupport(MeltBackend):
         }
         return self._fail_closed_on_clamped_operating_point(eq)
 
+    def liquidus_transition_refusal(self, subtype: str) -> str | None:
+        """Name the transport when this backend cannot produce ``subtype``.
+
+        The subprocess path returns from its native liquidus mode before
+        the fraction scan, so a solidus request has no transport. The
+        scorer used to read the private ``_mode`` and apply that rule
+        itself. The opened backend owns it. A fraction-finder transport
+        returns None and the scorer calls the finder.
+        """
+
+        if subtype == "solidus" and self._mode == "subprocess":
+            return "subprocess"
+        return None
+
     def find_liquidus_solidus(self,
                               composition_kg: Optional[Dict[str, float]] = None,
                               fO2_log: float = -9.0,

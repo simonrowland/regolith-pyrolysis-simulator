@@ -257,23 +257,22 @@ def _liquidus_transition_temperature_K(
     result: object,
     subtype: str,
 ) -> float | None:
-    """Return only the exact requested transition field in kelvin."""
+    """Kelvin of one field on a result the decision has already accepted.
 
-    if (
-        not isinstance(result, LiquidusSolidusResult)
-        or result.status != 'ok'
-        or subtype not in _LIQUIDUS_TRANSITION_SUBTYPES
-    ):
+    ``liquidus_transition_decision`` owns the result type, the status, and
+    the subtype. This only reads the accepted field. The solidus field is
+    degrees Celsius. T_K = t_C + 273.15; the interval unit is the same.
+    At 0 °C the limiting value is 273.15 K.
+    """
+
+    if not isinstance(result, LiquidusSolidusResult):
         return None
     if subtype == 'liquidus':
         temperature_K = result.liquidus_T_K
-    elif result.solidus_T_C is not None:
-        # Premise: the solidus field is degrees Celsius and the physical
-        # offset is 273.15 K. T_K = t_C + offset; Celsius and kelvin have the
-        # same interval unit. At 0 °C this gives the limiting value 273.15 K.
+    elif subtype == 'solidus' and result.solidus_T_C is not None:
         temperature_K = result.solidus_T_C + CELSIUS_TO_KELVIN_OFFSET
     else:
-        temperature_K = None
+        return None
     if (
         temperature_K is None
         or not math.isfinite(temperature_K)
@@ -291,6 +290,8 @@ def liquidus_transition_decision(
 
     The scorer builds the prediction envelope. This is the only owner of
     which result field is the transition and which status is a refusal.
+    The helper does not repeat those checks: a temperature from a refused
+    result is still a refusal.
     """
 
     if not isinstance(result, LiquidusSolidusResult):
