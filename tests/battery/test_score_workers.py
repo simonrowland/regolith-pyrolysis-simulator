@@ -549,11 +549,49 @@ def test_failed_phaseobjc_load_does_not_mark_runtime(
     assert "native_runtime:thermoengine_phaseobjc" not in _score_fork_blockers()
 
 
+def _fresh_python(script: str) -> subprocess.CompletedProcess[str]:
+    """Run a script in a new interpreter. Pytest's threads must not count."""
+
+    root = Path(__file__).resolve().parents[2]
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.pathsep.join(
+        [str(root), env.get("PYTHONPATH", "")]
+    ).removesuffix(os.pathsep)
+    return subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=root,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=False,
+    )
+
+
+def test_fresh_interpreter_has_no_fork_blocker() -> None:
+    """A new score process still has nothing that makes fork unsafe."""
+
+    result = _fresh_python(
+        """
+import socket
+from simulator.battery.score_run import _score_fork_blockers
+reasons = _score_fork_blockers()
+print("HOST", socket.gethostname())
+print("BLOCKERS", len(reasons))
+for reason in reasons:
+    print("REASON", reason)
+"""
+    )
+    output = result.stdout + result.stderr
+    assert result.returncode == 0, output
+    assert "BLOCKERS 0" in result.stdout, output
+
+
 def test_real_phaseobjc_cdll_blocks_fork() -> None:
     """The production loader maps libphaseobjc with ctypes.CDLL."""
 
-    root = Path(__file__).resolve().parents[2]
-    script = """
+    result = _fresh_python(
+        """
 from simulator.engine_local_config import (
     _load_thermoengine_phaseobjc_library,
     thermoengine_phaseobjc_runtime_loaded,
@@ -564,18 +602,6 @@ print("FLAG", int(thermoengine_phaseobjc_runtime_loaded()))
 for reason in _score_fork_blockers():
     print("REASON", reason)
 """
-    env = os.environ.copy()
-    env["PYTHONPATH"] = os.pathsep.join(
-        [str(root), env.get("PYTHONPATH", "")]
-    ).removesuffix(os.pathsep)
-    result = subprocess.run(
-        [sys.executable, "-c", script],
-        cwd=root,
-        env=env,
-        capture_output=True,
-        text=True,
-        timeout=120,
-        check=False,
     )
     output = result.stdout + result.stderr
     assert result.returncode == 0, output
