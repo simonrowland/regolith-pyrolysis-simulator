@@ -148,6 +148,7 @@ from simulator.melt_backend.base import (
     split_cleaned_melt_account,
 )
 from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
+from simulator.melt_backend.melts_oxide_aliases import MELTS_OXIDE_ALIASES
 from simulator.silent_zero import (
     CATEGORY_PROVEN_ZERO,
     ZeroBecause,
@@ -501,11 +502,8 @@ def _activity_oxygen_required(comp_wt: Mapping[str, float]) -> bool:
 
     Composition half of the scorer's oxygen rule. The measured species is
     not visible on this backend; the scorer refuses that case before the
-    call. The alias map is imported lazily because alphamelts imports this
-    backend at module level.
+    call. The alias map is the shared MELTS table, not AlphaMELTS itself.
     """
-    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
-
     return bool(
         multivalent_components(comp_wt, oxide_aliases=MELTS_OXIDE_ALIASES)
     )

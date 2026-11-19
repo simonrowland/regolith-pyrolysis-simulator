@@ -96,6 +96,10 @@ from simulator.engine_pool import (
 from simulator.melt_backend.alphamelts_contract import (
     AlphaMELTSSubprocessRunMode,
 )
+from simulator.melt_backend.melts_oxide_aliases import (
+    MELTS_OXIDE_ALIASES,
+    MELTS_OXIDE_BASIS,
+)
 from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.environment import (
     DEFAULT_VACUUM_FLOOR_BAR,
@@ -157,26 +161,10 @@ ALPHAMELTS_REAP_GRACE_S = 1.0
 # launchers that detach a descendant are outside this process-group contract.
 ALPHAMELTS_DESCENDANT_CONTAINMENT = 'process_group'
 PETTHERMOTOOLS_WARM_CALL_TIMEOUT_S = 3.0
-MELTS_OXIDE_BASIS = (
-    'SiO2', 'TiO2', 'Al2O3', 'FeO', 'Fe2O3', 'MgO', 'CaO',
-    'Na2O', 'K2O', 'Cr2O3', 'MnO', 'P2O5', 'NiO', 'CoO',
-)
 MELTS_MAJOR_OXIDES = set(MELTS_OXIDE_BASIS)
 # MELTS binding spec: admit only compositions with major oxide sum >95.0 wt%.
 # Exact 95.0 wt% is rejected so adapter and provider gates share one boundary.
 MELTS_MAJOR_OXIDE_MIN_TOTAL_WT_PCT = 95.0
-MELTS_OXIDE_ALIASES = {
-    oxide.lower(): oxide
-    for oxide in MELTS_OXIDE_BASIS
-}
-MELTS_OXIDE_ALIASES.update({
-    'feo_total': 'FeO_total',
-    'feototal': 'FeO_total',
-    'feo_tot': 'FeO_total',
-})
-MELTS_OXIDE_ALIASES.update({
-    key.lower(): 'FeO_total' for key in _TOTAL_IRON_AS_FEO_KEYS
-})
 FE_REDOX_BUFFERS = {'QFM', 'NNO', 'IW', 'HM'}
 FE_REDOX_BUFFER_ALIASES = {'FMQ': 'QFM'}
 FE3_TO_FEOT_FACTOR = 0.8998

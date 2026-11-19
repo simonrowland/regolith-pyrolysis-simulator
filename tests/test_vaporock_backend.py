@@ -5050,3 +5050,69 @@ def test_installed_activity_without_fo2_matches_liquid_chempot_at_both_pressures
             (float(mu_oxides[index]) - float(mu0_oxides[index])) / thermal
         )
         assert activity == pytest.approx(expected, rel=1e-12), oxide
+
+
+def _assert_one_melts_oxide_alias_owner() -> None:
+    """The MELTS alias table has one object, and VapoRock does not import AlphaMELTS."""
+    import ast
+    import inspect
+
+    import simulator.melt_backend.alphamelts as alphamelts
+    from simulator.melt_backend.melts_oxide_aliases import (
+        MELTS_OXIDE_ALIASES as owner,
+    )
+
+    tree = ast.parse(Path(vaporock_module.__file__).read_text())
+    peer_imports = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        and node.module == "simulator.melt_backend.alphamelts"
+    ]
+    assert peer_imports == []
+    assert "alphamelts" not in inspect.getsource(
+        vaporock_module._activity_oxygen_required
+    )
+    assert alphamelts.MELTS_OXIDE_ALIASES is owner
+    assert vaporock_module.MELTS_OXIDE_ALIASES is owner
+    assert vaporock_module._activity_oxygen_required({"SiO2": 80.0, "FeO": 20.0})
+    assert not vaporock_module._activity_oxygen_required(
+        {"SiO2": 60.0, "Na2O": 40.0}
+    )
+
+
+def test_melts_oxide_alias_table_has_one_owner_outside_either_adapter():
+    _assert_one_melts_oxide_alias_owner()
+
+
+def test_split_alias_table_or_peer_import_fails_the_owner_pin(monkeypatch):
+    """Process-local mutation: a copied table or an AlphaMELTS import fails the pin."""
+    import inspect
+
+    import simulator.melt_backend.alphamelts as alphamelts
+    from simulator.melt_backend.base import multivalent_components
+    from simulator.melt_backend.melts_oxide_aliases import MELTS_OXIDE_ALIASES
+
+    _assert_one_melts_oxide_alias_owner()
+    monkeypatch.setattr(
+        alphamelts, "MELTS_OXIDE_ALIASES", dict(MELTS_OXIDE_ALIASES)
+    )
+    with pytest.raises(AssertionError):
+        _assert_one_melts_oxide_alias_owner()
+    monkeypatch.undo()
+
+    def _imported_from_alphamelts(comp_wt):
+        from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES as peer
+
+        return bool(multivalent_components(comp_wt, oxide_aliases=peer))
+
+    monkeypatch.setattr(
+        vaporock_module,
+        "_activity_oxygen_required",
+        _imported_from_alphamelts,
+    )
+    assert "alphamelts" in inspect.getsource(
+        vaporock_module._activity_oxygen_required
+    )
+    with pytest.raises(AssertionError):
+        _assert_one_melts_oxide_alias_owner()
