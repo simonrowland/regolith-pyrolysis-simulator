@@ -97,6 +97,12 @@ def test_invalid_or_constricting_stage_ratios_fail_closed(ratios):
         _designer(stage_area_ratios=ratios).size_collection_pipe(0.01)
 
 
+@pytest.mark.parametrize("areas", ["bad", {"stage": 0.0}, {"stage": "bad"}])
+def test_invalid_absolute_stage_areas_fail_closed(areas):
+    with pytest.raises(ValueError, match="stage_areas_m2"):
+        _designer(stage_areas_m2=areas).size_collection_pipe(0.01)
+
+
 def test_configured_condenser_catalog_populates_plant_design():
     throat_area_m2 = 0.02
     design = _designer(
@@ -124,3 +130,52 @@ def test_configured_condenser_catalog_populates_plant_design():
             throat_area_m2 * 5.0,
         ]
     )
+
+
+def test_absolute_condenser_areas_do_not_scale_with_throat():
+    areas = {
+        "fe_stage1": 0.236,
+        "alkali_stage4": 0.051,
+        "k_stage4b": 0.064,
+    }
+    narrow = _designer(
+        initial_throat_area_m2=math.pi * 0.06**2,
+        stage_area_ratios={stage: 2.0 for stage in areas},
+        stage_areas_m2=areas,
+    ).design_for_batch(1000.0, {})
+    wide = _designer(
+        initial_throat_area_m2=math.pi * 0.25**2,
+        stage_area_ratios={stage: 2.0 for stage in areas},
+        stage_areas_m2=areas,
+    ).design_for_batch(1000.0, {})
+
+    assert wide.pipe.diameter_m == pytest.approx(0.5)
+    assert [stage.surface_area_m2 for stage in narrow.condensers] == pytest.approx(
+        [areas[stage.stage_name] for stage in narrow.condensers]
+    )
+    assert [stage.surface_area_m2 for stage in wide.condensers] == pytest.approx(
+        [areas[stage.stage_name] for stage in wide.condensers]
+    )
+
+
+def test_ratio_fallback_stages_remain_sized_when_absolute_map_is_partial():
+    ratio_only = _designer(
+        initial_throat_area_m2=math.pi * 0.06**2,
+        stage_area_ratios={"fe_stage1": 1.5},
+    ).design_for_batch(1000.0, {})
+    mixed = _designer(
+        initial_throat_area_m2=math.pi * 0.06**2,
+        stage_area_ratios={"fe_stage1": 1.5},
+        stage_areas_m2={"terminal": 0.09},
+    ).design_for_batch(1000.0, {})
+
+    ratio_only_fe = next(
+        stage.surface_area_m2
+        for stage in ratio_only.condensers
+        if stage.stage_name == "fe_stage1"
+    )
+    mixed_by_name = {
+        stage.stage_name: stage.surface_area_m2 for stage in mixed.condensers
+    }
+    assert mixed_by_name["fe_stage1"] == ratio_only_fe
+    assert mixed_by_name["terminal"] == pytest.approx(0.09)

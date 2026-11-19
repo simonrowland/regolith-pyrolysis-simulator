@@ -1013,10 +1013,10 @@ class OverheadGas:
     # Circular-equivalent throat diameter
 
     stage_area_m2_by_stage: Dict[str, float] = field(default_factory=dict)
-    # Condenser/volatiles stage physical areas from throat area ratios
+    # Condenser/volatiles stage physical areas from configured areas
 
     stage_area_geometry_provenance_notice: Dict[str, Any] = field(default_factory=dict)
-    # Provenance/status for condenser stage-area ratios used by wall deposits
+    # Provenance/status for condenser stage geometry used by wall deposits
 
     turbine_flow_kg_hr: float = 0.0  # Read-only mirror of OVERHEAD_BLEED o2_stored_mol.
     # Mass flow rate through turbine (sets pO₂)

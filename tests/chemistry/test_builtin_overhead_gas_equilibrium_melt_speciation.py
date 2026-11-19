@@ -9,6 +9,7 @@ import pytest
 
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.campaigns import CampaignManager
+from simulator.overhead import OverheadGasModel
 from simulator.state import CampaignPhase, GAS_CONSTANT
 from tests.chemistry.conftest import _build_sim
 
@@ -17,12 +18,12 @@ def test_partial_campaign_condenser_geometry_deep_merges_once_at_campaign_start(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     setpoints = copy.deepcopy(setpoints_data)
-    setpoints["condenser_geometry"]["stage_area_ratios"]["terminal"] = 9.0
+    setpoints["condenser_geometry"]["stage_areas_m2"]["terminal"] = 0.09
     setpoints["condenser_geometry"]["stage_area_ratio_sources"]["terminal"] = (
-        "certified-geometry: terminal ratio 9 test anchor"
+        "certified-geometry: terminal design basis test anchor"
     )
     setpoints["campaigns"]["C0"]["condenser_geometry"] = {
-        "stage_area_ratios": {"fe_stage1": 1.5},
+        "stage_areas_m2": {"fe_stage1": 0.05},
     }
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -32,7 +33,7 @@ def test_partial_campaign_condenser_geometry_deep_merges_once_at_campaign_start(
     )
 
     sim.start_campaign(CampaignPhase.C0)
-    ratios_at_campaign_start = dict(sim.overhead_model.stage_area_ratios)
+    areas_at_campaign_start = dict(sim.overhead_model.stage_area_m2_by_stage())
     provenance_at_campaign_start = (
         sim.overhead_model.stage_area_geometry_provenance_notice()
     )
@@ -40,16 +41,20 @@ def test_partial_campaign_condenser_geometry_deep_merges_once_at_campaign_start(
         "stage_area_ratio_provenance_by_stage"
     ]["terminal"]
 
-    assert ratios_at_campaign_start["fe_stage1"] == pytest.approx(1.5)
-    assert ratios_at_campaign_start["terminal"] == pytest.approx(9.0)
+    assert areas_at_campaign_start["fe_stage1"] == pytest.approx(0.05)
+    assert areas_at_campaign_start["terminal"] == pytest.approx(0.09)
     assert terminal_provenance["status"] == "sourced"
 
     sim._get_turbine_spec()
 
-    assert sim._equipment.pipe.stage_area_ratios["fe_stage1"] == pytest.approx(1.5)
-    assert sim._equipment.pipe.stage_area_ratios["terminal"] == pytest.approx(9.0)
-    assert sim.overhead_model.stage_area_ratios == pytest.approx(
-        ratios_at_campaign_start
+    assert sim._equipment.pipe.stage_areas_m2_by_stage["fe_stage1"] == pytest.approx(
+        0.05
+    )
+    assert sim._equipment.pipe.stage_areas_m2_by_stage["terminal"] == pytest.approx(
+        0.09
+    )
+    assert sim.overhead_model.stage_area_m2_by_stage() == pytest.approx(
+        areas_at_campaign_start
     )
     assert (
         sim.overhead_model.stage_area_geometry_provenance_notice()
@@ -68,6 +73,30 @@ def test_runtime_condenser_geometry_override_is_allowed_and_consumed(
     )
     sim.campaign_mgr.overrides["C0"] = {
         "condenser_geometry": {
+            "stage_areas_m2": {"fe_stage1": 0.05},
+        },
+    }
+    CampaignManager.validate_runtime_campaign_overrides(sim.campaign_mgr.overrides)
+
+    sim.start_campaign(CampaignPhase.C0)
+
+    assert sim.overhead_model.stage_area_m2("fe_stage1") == pytest.approx(0.05)
+    assert sim.overhead_model.stage_area_m2("terminal") == pytest.approx(
+        0.02261946710584651
+    )
+
+
+def test_campaign_stage_ratio_override_remains_effective_with_absolute_defaults(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.campaign_mgr.overrides["C0"] = {
+        "condenser_geometry": {
             "stage_area_ratios": {"fe_stage1": 1.5},
         },
     }
@@ -75,8 +104,18 @@ def test_runtime_condenser_geometry_override_is_allowed_and_consumed(
 
     sim.start_campaign(CampaignPhase.C0)
 
-    assert sim.overhead_model.stage_area_ratios["fe_stage1"] == pytest.approx(1.5)
-    assert sim.overhead_model.stage_area_ratios["terminal"] == pytest.approx(2.0)
+    legacy = OverheadGasModel(
+        {},
+        condenser_geometry_config={
+            "initial_throat_area_m2": setpoints_data[
+                "condenser_geometry"
+            ]["initial_throat_area_m2"],
+            "stage_area_ratios": {"fe_stage1": 1.5},
+        },
+    )
+    assert sim.overhead_model.stage_area_m2("fe_stage1") == (
+        legacy.stage_area_m2("fe_stage1")
+    )
 
 
 def test_invalid_runtime_condenser_geometry_refuses_before_campaign_mutation(
@@ -97,15 +136,15 @@ def test_invalid_runtime_condenser_geometry_refuses_before_campaign_mutation(
         "condenser_geometry": copy.deepcopy(
             sim._overhead_condenser_geometry_config
         ),
-        "stage_area_ratios": dict(sim.overhead_model.stage_area_ratios),
+        "stage_areas_m2": dict(sim.overhead_model.stage_areas_m2),
     }
     sim.campaign_mgr.overrides["C2A"] = {
         "condenser_geometry": {
-            "stage_area_ratios": {"fe_stage1": 0.5},
+            "stage_areas_m2": {"fe_stage1": 0.0},
         },
     }
 
-    with pytest.raises(ValueError, match="stage_area_ratios"):
+    with pytest.raises(ValueError, match="stage_areas_m2"):
         sim.start_campaign(CampaignPhase.C2A)
 
     assert sim.melt.campaign == before["campaign"]
@@ -113,7 +152,7 @@ def test_invalid_runtime_condenser_geometry_refuses_before_campaign_mutation(
     assert sim.paused_for_decision == before["paused_for_decision"]
     assert sim.pending_decision == before["pending_decision"]
     assert sim._overhead_condenser_geometry_config == before["condenser_geometry"]
-    assert sim.overhead_model.stage_area_ratios == before["stage_area_ratios"]
+    assert sim.overhead_model.stage_areas_m2 == before["stage_areas_m2"]
 
 
 def test_runtime_condenser_geometry_stage_aliases_canonicalize_before_consumers(
@@ -127,22 +166,24 @@ def test_runtime_condenser_geometry_stage_aliases_canonicalize_before_consumers(
     )
     sim.campaign_mgr.overrides["C0"] = {
         "condenser_geometry": {
-            "stage_area_ratios": {"stage_7": 9.0},
+            "stage_areas_m2": {"stage_7": 0.09},
         },
     }
     CampaignManager.validate_runtime_campaign_overrides(sim.campaign_mgr.overrides)
 
     sim.start_campaign(CampaignPhase.C0)
-    resolved_ratios = sim._overhead_condenser_geometry_config["stage_area_ratios"]
+    resolved_areas = sim._overhead_condenser_geometry_config["stage_areas_m2"]
 
-    assert "stage_7" not in resolved_ratios
-    assert resolved_ratios["terminal"] == pytest.approx(9.0)
-    assert sim.overhead_model.stage_area_ratios["terminal"] == pytest.approx(9.0)
+    assert "stage_7" not in resolved_areas
+    assert resolved_areas["terminal"] == pytest.approx(0.09)
+    assert sim.overhead_model.stage_areas_m2["terminal"] == pytest.approx(0.09)
 
     sim._get_turbine_spec()
 
-    assert "stage_7" not in sim._equipment.pipe.stage_area_ratios
-    assert sim._equipment.pipe.stage_area_ratios["terminal"] == pytest.approx(9.0)
+    assert "stage_7" not in sim._equipment.pipe.stage_areas_m2_by_stage
+    assert sim._equipment.pipe.stage_areas_m2_by_stage["terminal"] == pytest.approx(
+        0.09
+    )
 
 
 def test_melt_composition_and_speciation_fill_missing_al_surface(

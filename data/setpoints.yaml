@@ -1191,10 +1191,9 @@ condenser_geometry:
   initial_throat_area_source: "BH-063 owner-approved back-compat anchor; 12 cm pipe throat, 2026-07-08"
   initial_throat_area_knob_candidate: true
 
-  # Physical stage area = initial_throat_area_m2 * ratio. The throat is
-  # the constriction; downstream condenser and terminal capture areas stay
-  # at or above throat area and expose conservative baffle/cyclone surface
-  # multipliers for later per-stage Kn/coating work.
+  # Ratios record the historical 12 cm-anchor design basis only. Runtime
+  # collector surfaces come from the absolute stage_areas_m2 map below and
+  # do not scale when the collection throat changes.
   stage_area_ratios:
     fe_stage1: 20.866981427604056
     cr_stage2: 4.5
@@ -1209,10 +1208,26 @@ condenser_geometry:
     alkali_stage4: "owner-ruling-d137: Na collector, area 0.051 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
     k_stage4b: "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
     terminal: "engineering-default: terminal vent/capture area is not the constriction; keep >= throat for follow-on Kn diagnostics"
+  # The applied capture and wall areas are held as absolute hardware geometry.
+  # These are the existing stage areas at the historical 12 cm throat; the
+  # collection throat must not silently resize the condenser train. FLAGGED
+  # to d-283 for the stated peak-flux/target-capture design rule.
+  stage_areas_m2:
+    fe_stage1: 0.236
+    cr_stage2: 0.050893800988154644
+    sio_stage3: 0.06785840131753954
+    alkali_stage4: 0.05099999999999999
+    k_stage4b: 0.064
+    terminal: 0.02261946710584651
+  stage_areas_m2_source: "FLAGGED d-283 (d-452): 12 cm-anchor areas pinned pending peak-flux capture sizing"
+  # This configured 12 cm hydraulic diameter is shared by condenser transfer
+  # fallbacks and the physical wall segments; it is independent of the throat.
+  condenser_hydraulic_diameter_m: 0.12
+  condenser_hydraulic_diameter_source: "FLAGGED d-283 (d-452): 12 cm-anchor condenser/wall hydraulic diameter pinned independent of the collection throat"
   # Capture-law gas-side length only. Parallel plates of gap g have
   # Dh = 2*g. The Stage-1 collector is a 10 mm gap, so Dh = 0.020 m.
   # Sherwood 3.66 is the laminar value at radial stir 1. Stages without
-  # an entry keep the throat diameter. This map is not the duct or throat.
+  # an entry use the separately configured condenser hydraulic diameter.
   stage_hydraulic_diameter_m:
     fe_stage1: 0.020
 

@@ -764,6 +764,19 @@ def _deep_merge_condenser_geometry(
             merged[key] = _deep_merge_condenser_geometry(current, value)
         else:
             merged[key] = copy.deepcopy(value)
+    ratio_overrides = override.get('stage_area_ratios')
+    if isinstance(ratio_overrides, Mapping):
+        absolute_overrides = override.get('stage_areas_m2', {})
+        explicit_area_stages = (
+            set(absolute_overrides)
+            if isinstance(absolute_overrides, Mapping)
+            else set()
+        )
+        areas = dict(merged.get('stage_areas_m2', {}) or {})
+        for stage in ratio_overrides:
+            if stage not in explicit_area_stages:
+                areas.pop(stage, None)
+        merged['stage_areas_m2'] = areas
     return merged
 
 
@@ -778,6 +791,7 @@ def _canonicalize_condenser_geometry_stage_keys(
     for stage_map_key in (
         'stage_area_ratios',
         'stage_area_ratio_sources',
+        'stage_areas_m2',
         'stage_hydraulic_diameter_m',
     ):
         raw_stage_map = resolved.get(stage_map_key)
@@ -3932,7 +3946,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             species_partial_pressures_mbar=(
                 self.overhead_model.species_partial_pressures(*partial_pressure_args)
             ),
-            pipe_diameter_m=self.overhead_model.pipe_diameter_m,
+            pipe_diameter_m=(
+                self.overhead_model.condenser_hydraulic_diameter_m
+            ),
             # The upstream vapor is evaluated at the melt-side temperature used
             # by the conductance model; the independently scheduled pipe and
             # segment temperatures are liner-wall states, not gas states.
@@ -16717,6 +16733,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         stage_ratios = getattr(pipe, 'stage_area_ratios', None)
         if isinstance(stage_ratios, Mapping) and stage_ratios:
             geometry_config['stage_area_ratios'] = dict(stage_ratios)
+        stage_areas = getattr(pipe, 'stage_areas_m2_by_stage', None)
+        if isinstance(stage_areas, Mapping) and stage_areas:
+            geometry_config['stage_areas_m2'] = dict(stage_areas)
         from simulator.overhead import validate_condenser_geometry_config
 
         geometry_config = validate_condenser_geometry_config(

@@ -4658,7 +4658,9 @@ def _apply_sio_wall_sweep_controls(
     if sim._condensation_model is not None:
         sim.condensation_model.configure_operating_conditions(
             wall_temperature_C=float(liner_temperature_c),
-            pipe_diameter_m=sim.overhead_model.pipe_diameter_m,
+            pipe_diameter_m=(
+                sim.overhead_model.condenser_hydraulic_diameter_m
+            ),
             gas_temperature_C=float(sim.melt.temperature_C),
             stage_area_m2_by_stage=sim.overhead_model.stage_area_m2_by_stage(),
             stage_hydraulic_diameter_m_by_stage=dict(

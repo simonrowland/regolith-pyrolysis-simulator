@@ -4194,7 +4194,9 @@ class EvaporationMixin:
                         self.species_formula_registry,
                     )
                 ),
-                pipe_diameter_m=self.overhead_model.pipe_diameter_m,
+                pipe_diameter_m=(
+                    self.overhead_model.condenser_hydraulic_diameter_m
+                ),
                 # Chapman-Enskog diffusion uses bulk-gas temperature; the
                 # separate pipe temperature is a wall/liner condition.
                 gas_temperature_C=transport['conductance_temperature_C'],

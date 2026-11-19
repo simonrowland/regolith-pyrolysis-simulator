@@ -81,6 +81,7 @@ class PipeSpec:
     surface_area_m2: float = math.pi * 0.12 * 1.0
     initial_throat_area_m2: float = math.pi * 0.06**2
     stage_area_ratios: Dict[str, float] = field(default_factory=dict)
+    stage_areas_m2_by_stage: Dict[str, float] = field(default_factory=dict)
     conductance_kg_s: float = 0.0
     max_transport_g_s: float = 0.0
 
@@ -284,6 +285,7 @@ class EquipmentDesigner:
             surface_area_m2=total_area_m2,
             initial_throat_area_m2=math.pi * (diameter_m / 2.0) ** 2,
             stage_area_ratios=self._condenser_stage_area_ratios(),
+            stage_areas_m2_by_stage=self._condenser_stage_areas_m2(),
             conductance_kg_s=0.0,
             max_transport_g_s=0.0,
         )
@@ -429,6 +431,7 @@ class EquipmentDesigner:
             surface_area_m2=math.pi * d * L,
             initial_throat_area_m2=throat_area_m2,
             stage_area_ratios=self._condenser_stage_area_ratios(),
+            stage_areas_m2_by_stage=self._condenser_stage_areas_m2(),
             conductance_kg_s=C_mass,
             max_transport_g_s=C_mass * 1000.0,
         )
@@ -490,6 +493,22 @@ class EquipmentDesigner:
             ratios[str(stage)] = ratio
         return ratios
 
+    def _condenser_stage_areas_m2(self) -> Dict[str, float]:
+        config = self._condenser_geometry_config()
+        raw = config.get("stage_areas_m2", {})
+        if not isinstance(raw, Mapping):
+            raise ValueError("condenser_geometry.stage_areas_m2 must be a mapping")
+        areas: Dict[str, float] = {}
+        for stage, value in raw.items():
+            area = self._positive_float_or_none(value)
+            if area is None:
+                raise ValueError(
+                    "condenser_geometry.stage_areas_m2 values must be finite "
+                    "and positive"
+                )
+            areas[str(stage)] = area
+        return areas
+
     @staticmethod
     def _crucible_freeboard_volume_m3(crucible: CrucibleSpec) -> float:
         # volume_m3 is already total capacity: V_total = V_melt * (1 + f).
@@ -505,17 +524,23 @@ class EquipmentDesigner:
 
     @staticmethod
     def _condenser_specs(pipe: PipeSpec) -> List[CondenserSpec]:
+        stages = dict.fromkeys(
+            (*pipe.stage_area_ratios, *pipe.stage_areas_m2_by_stage)
+        )
         return [
             CondenserSpec(
                 stage_number=EquipmentDesigner._condenser_stage_number(
                     stage, index
                 ),
                 stage_name=stage,
-                surface_area_m2=pipe.initial_throat_area_m2 * ratio,
+                surface_area_m2=(
+                    pipe.stage_areas_m2_by_stage[stage]
+                    if stage in pipe.stage_areas_m2_by_stage
+                    else pipe.initial_throat_area_m2
+                    * pipe.stage_area_ratios[stage]
+                ),
             )
-            for index, (stage, ratio) in enumerate(
-                pipe.stage_area_ratios.items(), start=1
-            )
+            for index, stage in enumerate(stages, start=1)
         ]
 
     def size_turbine(self, mass_kg: float) -> TurbineSpec:

@@ -12,7 +12,7 @@ Train topology (metals train, active C2A onward):
     Stage 0  Hot duct (>1400°C)      — IR spectroscopy. ``route()`` still
              walks this stage through ``_condensation_efficiency``. The
              default area map (``STAGE_AREA_KEY_BY_STAGE_NUMBER`` /
-             setpoints ``stage_area_ratios``) names stages 1-4 and
+             setpoints ``stage_areas_m2``) names stages 1-4 and
              terminal, so Stage 0 has no configured capture area and
              eta takes the no-area zero. A configured Stage-0 area
              admits species whose routing temperature sits in the
@@ -2398,7 +2398,8 @@ class CondensationModel:
         ``stage_hydraulic_diameter_m_by_stage`` is the capture-law
         gas-side length. It is stored beside the stage areas and is
         not written onto duct ``inner_diameter_m``. Stages absent from
-        the map keep ``pipe_diameter_m`` (the throat).
+        the map use ``pipe_diameter_m`` (the configured condenser/wall
+        hydraulic diameter), independent of the collection throat.
         """
 
         # Validate the complete candidate first. A late invalid pressure,
@@ -2905,7 +2906,7 @@ class CondensationModel:
         return None
 
     def _hydraulic_diameter_m_for_stage_number(self, stage_number: int) -> float:
-        """Capture-law gas-side length. Absent stages keep the throat."""
+        """Capture-law gas-side length. Absent stages use the condenser pipe."""
 
         for key in (STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage_number)),
                     f'stage_{stage_number}', str(stage_number)):

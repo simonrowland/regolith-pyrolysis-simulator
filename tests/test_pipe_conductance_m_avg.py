@@ -624,22 +624,38 @@ def test_setpoint_condenser_geometry_defaults_anchor_throat_and_stage_areas():
     setpoints = load_config_bundle(DEFAULT_DATA_DIR).setpoints
     geometry = setpoints["condenser_geometry"]
     throat_area_m2 = float(geometry["initial_throat_area_m2"])
-    ratios = geometry["stage_area_ratios"]
+    areas_m2 = geometry["stage_areas_m2"]
     model = OverheadGasModel({}, condenser_geometry_config=geometry)
 
-    assert math.sqrt(4.0 * throat_area_m2 / math.pi) == pytest.approx(0.12)
-    assert model.pipe_diameter_m == pytest.approx(0.12)
     assert model.stage_area_m2("fe_stage1") == pytest.approx(0.236, abs=0.0)
     assert model.stage_area_m2("alkali_stage4") == pytest.approx(0.051, abs=1e-15)
     assert model.stage_area_m2("k_stage4b") == pytest.approx(0.064, abs=0.0)
+    assert math.sqrt(4.0 * throat_area_m2 / math.pi) == pytest.approx(
+        model.pipe_diameter_m
+    )
+    assert model.condenser_hydraulic_diameter_m == pytest.approx(0.12)
     assert "k_stage4b" not in model.stage_hydraulic_diameter_m
     assert model.stage_hydraulic_diameter_m["fe_stage1"] == pytest.approx(0.020)
     assert "cr_stage2" not in model.stage_hydraulic_diameter_m
-    for stage, ratio in ratios.items():
-        assert float(ratio) >= 1.0
-        assert model.stage_area_m2(stage) == pytest.approx(
-            throat_area_m2 * float(ratio)
-        )
+    assert model.stage_area_m2_by_stage() == pytest.approx(areas_m2)
+
+
+def test_condenser_areas_and_hydraulic_diameter_do_not_follow_throat():
+    geometry = load_config_bundle(DEFAULT_DATA_DIR).setpoints[
+        "condenser_geometry"
+    ]
+    original = OverheadGasModel({}, condenser_geometry_config=geometry)
+    wider_geometry = dict(geometry)
+    wider_geometry["initial_throat_area_m2"] = math.pi * 0.25**2
+    wider = OverheadGasModel({}, condenser_geometry_config=wider_geometry)
+
+    assert wider.pipe_diameter_m == pytest.approx(0.5)
+    assert wider.stage_area_m2_by_stage() == pytest.approx(
+        original.stage_area_m2_by_stage()
+    )
+    assert wider.condenser_hydraulic_diameter_m == pytest.approx(
+        original.condenser_hydraulic_diameter_m
+    )
 
 
 def test_default_condenser_throat_anchor_still_allows_batch_pipe_scaling():

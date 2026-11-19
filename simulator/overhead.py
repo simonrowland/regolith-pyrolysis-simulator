@@ -67,7 +67,10 @@ from simulator.state import (
 )
 # Single-source the pipe-temperature default from condensation (canonical
 # pipe-defaults home; cycle-safe — condensation doesn't import overhead) [BUG-052].
-from simulator.condensation import DEFAULT_PIPE_TEMPERATURE_C  # °C — default pipe/liner temperature
+from simulator.condensation import (
+    DEFAULT_PIPE_DIAMETER_M,
+    DEFAULT_PIPE_TEMPERATURE_C,
+)  # default downstream condenser geometry
 from engines.builtin.overhead_bleed import (
     EffectiveTransportCapacity,
     controlled_flow_capacity,
@@ -310,6 +313,11 @@ def validate_condenser_geometry_config(config: Mapping | None) -> dict[str, Any]
             resolved['initial_throat_area_m2'],
             'condenser_geometry.initial_throat_area_m2',
         )
+    if 'condenser_hydraulic_diameter_m' in resolved:
+        _required_positive_finite_float(
+            resolved['condenser_hydraulic_diameter_m'],
+            'condenser_geometry.condenser_hydraulic_diameter_m',
+        )
 
     raw_ratios = resolved.get('stage_area_ratios', {})
     if not isinstance(raw_ratios, Mapping):
@@ -326,6 +334,19 @@ def validate_condenser_geometry_config(config: Mapping | None) -> dict[str, Any]
         )
         ratios[stage] = ratio
     resolved['stage_area_ratios'] = ratios
+
+    raw_areas = resolved.get('stage_areas_m2', {})
+    if not isinstance(raw_areas, Mapping):
+        raise OverheadConfigurationError(
+            'condenser_geometry.stage_areas_m2 must be a mapping'
+        )
+    resolved['stage_areas_m2'] = {
+        _stage_area_key(stage): _required_positive_finite_float(
+            area,
+            'condenser_geometry.stage_areas_m2',
+        )
+        for stage, area in raw_areas.items()
+    }
 
     raw_sources = resolved.get('stage_area_ratio_sources')
     if raw_sources is not None:
@@ -535,7 +556,9 @@ class OverheadGasModel:
         self.initial_throat_area_m2 = DEFAULT_INITIAL_THROAT_AREA_M2  # m² — configurable throat cross-section
         self.pipe_diameter_m = self.throat_diameter_m  # m — throat-equivalent inner diameter
         self.pipe_length_m = 1.0         # m — crucible-to-first-condenser pipe length
-        self.stage_area_ratios = dict(DEFAULT_CONDENSER_STAGE_AREA_RATIOS)  # dimensionless — stage area / throat area
+        self.stage_area_ratios = dict(DEFAULT_CONDENSER_STAGE_AREA_RATIOS)  # legacy/design sizing basis
+        self.stage_areas_m2: dict[str, float] = {}
+        self.condenser_hydraulic_diameter_m = DEFAULT_PIPE_DIAMETER_M
         self.stage_area_ratio_provenance_by_stage = {
             stage: _stage_area_ratio_provenance_record(
                 stage,
@@ -584,7 +607,7 @@ class OverheadGasModel:
         return math.sqrt(4.0 * area / math.pi)  # m — circular equivalent diameter
 
     def configure_condenser_geometry(self, config: Mapping) -> None:
-        """Resolve throat area and per-stage area ratios from setpoints."""
+        """Resolve duct, condenser, and absolute stage geometry from setpoints."""
 
         source = validate_condenser_geometry_config(config)
         throat_area = self._optional_positive_float(
@@ -593,6 +616,10 @@ class OverheadGasModel:
         )  # m² — user-exposed throat cross-section
         self.initial_throat_area_m2 = throat_area
         self.pipe_diameter_m = self.throat_diameter_m  # m — derived back-compat pipe diameter
+        self.condenser_hydraulic_diameter_m = self._optional_positive_float(
+            self._config_value(source.get('condenser_hydraulic_diameter_m')),
+            DEFAULT_PIPE_DIAMETER_M,
+        )
 
         ratios = dict(DEFAULT_CONDENSER_STAGE_AREA_RATIOS)
         provenance = {
@@ -637,6 +664,12 @@ class OverheadGasModel:
                 )
         self.stage_area_ratios = ratios
         self.stage_area_ratio_provenance_by_stage = provenance
+        self.stage_areas_m2 = {
+            stage: self._optional_positive_float(
+                self._config_value(area), 0.0
+            )
+            for stage, area in source.get('stage_areas_m2', {}).items()
+        }
         raw_diameters = source.get('stage_hydraulic_diameter_m') or {}
         diameters: dict[str, float] = {}
         if isinstance(raw_diameters, Mapping):
@@ -652,6 +685,8 @@ class OverheadGasModel:
         """Physical area for a named condenser/volatiles stage."""
 
         key = _stage_area_key(stage)
+        if key in self.stage_areas_m2:
+            return self.stage_areas_m2[key]
         ratio = self.stage_area_ratios[key]
         return self.initial_throat_area_m2 * ratio  # m² — throat area × dimensionless ratio
 
@@ -660,7 +695,9 @@ class OverheadGasModel:
 
         return {
             stage: self.stage_area_m2(stage)
-            for stage in self.stage_area_ratios
+            for stage in dict.fromkeys(
+                (*self.stage_area_ratios, *self.stage_areas_m2)
+            )
         }
 
     def stage_area_geometry_provenance_notice(self) -> dict[str, Any]:
@@ -910,7 +947,7 @@ class OverheadGasModel:
             'p_mean_Pa': allowed_pressure_Pa,  # Pa — compatibility field; allowed upstream pressure
             'initial_throat_area_m2': self.initial_throat_area_m2,  # m² — user-configured throat cross-section
             'throat_diameter_m': self.pipe_diameter_m,  # m — circular-equivalent throat diameter
-            'stage_area_m2_by_stage': self.stage_area_m2_by_stage(),  # m² by stage — throat area × ratio
+            'stage_area_m2_by_stage': self.stage_area_m2_by_stage(),  # m² by stage — configured collector surface
             'stage_hydraulic_diameter_m_by_stage': dict(
                 self.stage_hydraulic_diameter_m
             ),  # m by stage — capture-law gas-side length; not the throat
@@ -1185,7 +1222,7 @@ class OverheadGasModel:
         gas.pipe_conductance_kg_hr = transport_state['pipe_conductance_kg_hr']  # kg/hr — pipe mass-flow capacity
         gas.initial_throat_area_m2 = transport_state['initial_throat_area_m2']  # m² — user-configured throat cross-section
         gas.throat_diameter_m = transport_state['throat_diameter_m']  # m — circular-equivalent throat diameter
-        gas.stage_area_m2_by_stage = dict(transport_state['stage_area_m2_by_stage'])  # m² by stage — throat area × ratio
+        gas.stage_area_m2_by_stage = dict(transport_state['stage_area_m2_by_stage'])  # m² by stage — configured collector surface
         gas.stage_area_geometry_provenance_notice = dict(
             transport_state['stage_area_geometry_provenance_notice'])
         finite_conductance = self._resolve_bleed_conductance(  # kg/s — finite-headspace bleed mass-flow capacity
