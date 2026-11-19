@@ -1288,27 +1288,6 @@ species:
         semantics: bound_not_point_ordering
       uncertainty:
         note: not applicable
-    - observation_id: hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906
-      experiment: hastie-1981-pt-kms
-      supersedes: hastie_1981_k2_slag_orifice_0p34mm
-      type: apparatus
-      class_tag: derived
-      locator:
-        page: 59
-        published_page: 53
-        figure: '20'
-        pdf_page_index: 58
-      quote: KMS data with Pt-cell orifice diameter of 0.34 mm.
-      phase: K2_slag_liquid
-      regime: kems_effusion
-      units: m2
-      values:
-        quantity: equipment_metadata_pointer
-        method_class: derived
-        status: typed_refusal
-        admission_status: equipment_metadata
-        semantics: bound_not_point_ordering
-        reason: Geometry retained in source_metadata; not pressure or rate evidence.
     - observation_id: hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked_quoted_20260906
       supersedes: hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked
       type: figure
@@ -1352,29 +1331,6 @@ species:
         admission_status: figure_only
         semantics: bound_not_point_ordering
         reason: Plotted evidence, not a printed numeric table. See completeness ledger for individual figures.
-    - observation_id: hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
-      type: figure
-      class_tag: figure_only
-      locator:
-        page: 58
-        published_page: 52
-        figure: '11'
-        pdf_page_index: 57
-        note: Caption locator; plotted pages recorded in completeness ledger.
-      quote: KMS data for variation of K2O activity coefficient with temperature and composition for the K1
-        slag. The numbers, ranging from 0.154 to 0.08, refer to the mole fraction of K2O remaining in the
-        sample at each measurement point.
-      phase: real_MHD_channel_slag_K1
-      regime: mixed_kms_tms
-      units: dimensionless
-      values:
-        quantity: apparent_gamma_K2O
-        method_class: figure_only
-        status: typed_refusal
-        admission_status: figure_only
-        semantics: bound_not_point_ordering
-        reason: Parent digitization retained unchanged as archival derived evidence; plotted point coordinates
-          are not printed numeric cells. No re-digitization or invented cell quote in this deepening.
   Na:
     observations:
     - observation_id: hastie_1981_nacl_liquid_logP_prose
@@ -3110,6 +3066,30 @@ species:
           section: '10.8'
         quote: about 50 min.; About six percent; ~ 10^4
         note: Approximation qualifiers retained; no numeric sigma stated.
+    context:
+    - observation_id: hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+      type: figure
+      class_tag: figure_only
+      locator:
+        page: 58
+        published_page: 52
+        figure: '11'
+        pdf_page_index: 57
+        note: Caption locator; plotted pages recorded in completeness ledger.
+      quote: KMS data for variation of K2O activity coefficient with temperature and composition for the K1
+        slag. The numbers, ranging from 0.154 to 0.08, refer to the mole fraction of K2O remaining in the
+        sample at each measurement point.
+      phase: real_MHD_channel_slag_K1
+      regime: mixed_kms_tms
+      units: dimensionless
+      values:
+        quantity: apparent_gamma_K2O
+        method_class: figure_only
+        status: typed_refusal
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        reason: Parent digitization retained unchanged as archival derived evidence; plotted point coordinates
+          are not printed numeric cells. No re-digitization or invented cell quote in this deepening.
   KCl:
     context:
     - observation_id: hastie_1981_fig15_kcl_std_pressure_printed

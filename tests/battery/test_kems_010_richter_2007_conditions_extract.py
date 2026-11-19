@@ -126,18 +126,32 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         row.observation_id.rsplit("::", 1)[-1] for row in rows.values()
     }
     assert not area_context.keys() & migrated_ids
-    r3_12_area = area_context[
-        "richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-12"
-    ]
-    assert r3_12_area["values"]["samples"] == [
-        {
-            "sample": "R3-12",
-            "diam_mm": 2.5,
-            "T_C": 1900,
-            "init_area_mm2": 22.4,
-            "final_area_mm2": 21.3,
-        }
-    ]
+    expected_area_samples = {
+        "R3-12": (2.5, 1900, 22.4, 21.3),
+        "R3-10": (2.5, 1900, 24.0, 18.9),
+        "R3-11": (2.5, 1900, 20.9, 15.9),
+        "R-8": (6.0, 1800, 87.5, 83.4),
+        "R-9": (6.0, 1800, 82.6, 76.6),
+        "R-11": (6.0, 1800, 91.3, 80.0),
+        "R2-4": (6.0, 1800, 88.5, 75.5),
+        "R-16": (1.0, 1800, 5.9, 5.8),
+    }
+    assert len(expected_area_samples) == len(area_context) == 8
+    assert {
+        row["values"]["samples"][0]["sample"] for row in area_context.values()
+    } == set(expected_area_samples)
+    for row in area_context.values():
+        sample_name = row["values"]["samples"][0]["sample"]
+        diam, temp, initial, final = expected_area_samples[sample_name]
+        assert row["values"]["samples"] == [
+            {
+                "sample": sample_name,
+                "diam_mm": diam,
+                "T_C": temp,
+                "init_area_mm2": initial,
+                "final_area_mm2": final,
+            }
+        ]
     assert not result.validation.hard_issues
     assert sum(_complete_identity(row) for row in rows.values()) == 0
     assert not Counter(
