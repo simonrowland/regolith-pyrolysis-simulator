@@ -624,6 +624,54 @@ def test_nondefault_openimcc_profile_refuses_an_undeclared_feo_standard() -> Non
     assert refusal.detail["reason"] == "openimcc_feo_standard_melt_pack_identity_unknown"
 
 
+def test_malformed_openimcc_datapack_becomes_a_typed_feo_standard_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    openimcc = pytest.importorskip("openimcc")
+    from simulator.melt_backend import openimcc_bridge
+
+    identity = _melt_pack_identity("default")
+    feo_standard_module._openimcc_pack_identity_and_payload.cache_clear()
+
+    def malformed(_pack_name: str):
+        raise openimcc.ImccMalformedDatapackError("invalid liquid-standard id")
+
+    monkeypatch.setattr(openimcc_bridge, "_load_pack", malformed)
+    standard, refusal = feo_standard_module._resolve_feo_activity_standard(
+        Engine.OPENIMCC,
+        (f"openimcc-melt-binding:sha256:{identity['binding_digest']}",),
+        melt_pack_identity=identity,
+        temperature_K=Decimal("1700"),
+    )
+
+    assert standard is None
+    assert refusal is not None
+    assert refusal.detail["reason"] == "openimcc_feo_standard_pack_data_unavailable"
+    assert "invalid liquid-standard id" in refusal.detail["detail"]
+
+
+def test_malformed_openimcc_redox_datapack_becomes_a_typed_feo_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    openimcc = pytest.importorskip("openimcc")
+    from openimcc import redox_pack
+
+    def malformed(*_args, **_kwargs):
+        raise openimcc.ImccMalformedDatapackError("invalid liquid-standard id")
+
+    monkeypatch.setattr(redox_pack, "load_redox_pack", malformed)
+    standard, refusal = feo_standard_module._resolve_feo_activity_standard(
+        Engine.OPENIMCC,
+        ("openimcc-redox-pack:sha256:" + "a" * 64,),
+        temperature_K=Decimal("1700"),
+    )
+
+    assert standard is None
+    assert refusal is not None
+    assert refusal.detail["reason"] == "openimcc_feo_redox_pack_unresolved"
+    assert "invalid liquid-standard id" in refusal.detail["detail"]
+
+
 def test_nonzero_feo_standard_conversion_matches_hand_value() -> None:
     converter = getattr(feo_standard_module, "_canonical_log10_feo_activity", None)
     assert callable(converter)

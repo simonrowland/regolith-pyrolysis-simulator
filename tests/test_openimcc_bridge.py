@@ -1403,6 +1403,59 @@ def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None
     assert requests[0][1]["pack"] == "published-ext"
 
 
+def test_evaluate_preserves_boolean_temperature_for_openimcc_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    observed = []
+
+    class UpstreamRefusal(Exception):
+        pass
+
+    def evaluate(_composition, temperature_K, *_args, **_kwargs):
+        observed.append(temperature_K)
+        raise UpstreamRefusal("boolean temperatures are invalid")
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(evaluate=evaluate)
+    )
+    monkeypatch.setattr(openimcc_bridge, "_load_pack", lambda _name: object())
+
+    with pytest.raises(UpstreamRefusal, match="boolean temperatures"):
+        openimcc_bridge._evaluate_uncached(
+            composition_mol={"SiO2": 1.0}, temperature_K=True
+        )
+
+    assert observed == [True]
+
+
+def test_gas_oxygen_balance_preserves_boolean_temperature_for_openimcc_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    observed = []
+
+    class UpstreamRefusal(Exception):
+        pass
+
+    def solve(_activities, temperature_K, _datapack, **_kwargs):
+        observed.append(temperature_K)
+        raise UpstreamRefusal("boolean temperatures are invalid")
+
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_openimcc",
+        SimpleNamespace(evaluate_gas_oxygen_balance=solve),
+    )
+
+    with pytest.raises(UpstreamRefusal, match="boolean temperatures"):
+        openimcc_bridge.evaluate_gas_oxygen_balance({}, True, object())
+
+    assert observed == [True]
+
+
 def test_redox_result_keeps_its_type_across_cache_round_trip(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

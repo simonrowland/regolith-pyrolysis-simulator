@@ -35,7 +35,7 @@ dependencies = [
     # Recipe optimizer strategies (python -m simulator.optimize); a default install.
     "optuna==4.8.0",
     # OpenIMCC: high-temperature melt activities (sister project); a default install.
-    "openimcc @ git+https://github.com/simonrowland/openimcc@9c327c2991fcc07b902019d26a8fe7cd25deb075",
+    "openimcc @ git+https://github.com/simonrowland/openimcc@979adb26079c8b94ab8dfc9586cef2e2120cf818",
     # PetThermoTools and the other engine distributions are installed
     # editable by install-engines.py after the base environment sync.
     # vaporock (VAPOR_PRESSURE diagnostic overlay) is intentionally NOT a pip dependency.

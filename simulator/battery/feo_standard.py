@@ -61,10 +61,13 @@ def _source_value(sources: Sequence[str], prefix: str) -> str | None:
 
 
 def _openimcc_redox_pack_feo_entry(redox_pack_digest: str) -> Mapping[str, object]:
+    import openimcc
     from openimcc.redox_pack import RedoxInputError, load_redox_pack
 
     try:
         pack = load_redox_pack()
+    except openimcc.ImccMalformedDatapackError as exc:
+        raise ValueError(f"OpenIMCC redox datapack is malformed: {exc}") from exc
     except RedoxInputError:
         pack = None
     if pack is None or pack.canonical_digest != redox_pack_digest:
@@ -78,6 +81,10 @@ def _openimcc_redox_pack_feo_entry(redox_pack_digest: str) -> Mapping[str, objec
             try:
                 with resources.as_file(resource) as pack_path:
                     candidate = load_redox_pack(pack_path)
+            except openimcc.ImccMalformedDatapackError as exc:
+                raise ValueError(
+                    f"OpenIMCC redox datapack is malformed: {exc}"
+                ) from exc
             except RedoxInputError:
                 continue
             if candidate.canonical_digest == redox_pack_digest:
@@ -357,7 +364,10 @@ def _openimcc_pack_identity_and_payload(
     import openimcc
     from simulator.melt_backend import openimcc_bridge
 
-    pack = openimcc_bridge._load_pack(pack_name)
+    try:
+        pack = openimcc_bridge._load_pack(pack_name)
+    except openimcc.ImccMalformedDatapackError as exc:
+        raise ValueError(f"OpenIMCC melt datapack is malformed: {exc}") from exc
     identity = {
         "model_id": str(pack.model_id),
         "pack_version": str(pack.version),

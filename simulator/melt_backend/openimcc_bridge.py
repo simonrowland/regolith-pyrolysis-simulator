@@ -72,7 +72,7 @@ OPENIMCC_INSTALL_HINT = (
 )
 OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
-    "@9c327c2991fcc07b902019d26a8fe7cd25deb075"
+    "@979adb26079c8b94ab8dfc9586cef2e2120cf818"
 )
 DEFAULT_GAS_PACK_SELECTION = "default"
 
@@ -610,6 +610,12 @@ def _require_openimcc() -> Any:
     return _openimcc
 
 
+def _openimcc_temperature_argument(temperature_K: float) -> Any:
+    """Keep bools intact so OpenIMCC can issue its typed invalid-input refusal."""
+
+    return temperature_K if isinstance(temperature_K, bool) else float(temperature_K)
+
+
 def evaluate_gas_oxygen_balance(
     parent_activities: Mapping[str, float],
     temperature_K: float,
@@ -634,7 +640,7 @@ def evaluate_gas_oxygen_balance(
         raise error from exc
     return solver(
         parent_activities,
-        float(temperature_K),
+        _openimcc_temperature_argument(temperature_K),
         datapack,
         parent_oxides=parent_oxides,
         allow_extrapolation=True,
@@ -1154,7 +1160,7 @@ def _evaluate_uncached(
     loaded_pack = _load_pack(pack)
     result = package.evaluate(
         composition,
-        float(temperature_K),
+        _openimcc_temperature_argument(temperature_K),
         loaded_pack,
         basis_type=basis_type,
         enable_sp_extension=pack in {"published-ext", "d066-ext"},
