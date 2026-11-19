@@ -1198,7 +1198,7 @@ def _validate_optional_fraction(value: Optional[float], name: str) -> None:
 
 def _validate_temperature_C(value: Optional[float], name: str) -> None:
     _validate_optional_finite(value, name)
-    if value is not None and float(value) < -273.15:
+    if value is not None and float(value) < -CELSIUS_TO_KELVIN_OFFSET:
         raise ValueError(f'{name} must not be below absolute zero')
 
 
@@ -1214,13 +1214,13 @@ def _validate_temperature_pair(
         raise ValueError(f'{context}_T_K must not be below absolute zero')
     if temperature_C is None or temperature_K is None:
         return
-    # Premise: T_K = T_C + 273.15 by thermodynamic temperature definition.
-    # Algebra: residual = T_K - T_C - 273.15; unit check: kelvin increments
+    # Premise: T_K = T_C + offset by thermodynamic temperature definition.
+    # Algebra: residual = T_K - T_C - offset; unit check: kelvin increments
     # and Celsius increments are identical. Sanity: contradictory serialized
-    # unit fields must fail rather than let consumers choose different physics.
+    # unit fields must fail; at 0 °C the offset is 273.15 K.
     if not math.isclose(
         float(temperature_K),
-        float(temperature_C) + 273.15,
+        float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
         rel_tol=0.0,
         abs_tol=1.0e-9,
     ):

@@ -256,6 +256,7 @@ from simulator.battery.score_metrics import (
     populate_numeric,
 )
 from simulator.transport_regime import KnudsenRegime, high_edge_knudsen_clause
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.melt_backend.base import (
     MULTIVALENT_MELT_ELEMENTS,
     EquilibriumResult,
@@ -3933,7 +3934,7 @@ _CITED_SATURATION_NOTICE = "fe_saturation_composition_from_cited_standard"
 _DERIVED_SATURATION_NOTICE = "composition_derived_from_source_analyses"
 _OWNER_SATURATION_NOTICE = "fe_saturation_composition_owner_supplied"
 _FE_PER_O_FORMULA = re.compile(r"^Fe([0-9]+(?:\.[0-9]+)?)O$")
-_KELVIN_FROM_CELSIUS = Decimal("273.15")
+_KELVIN_FROM_CELSIUS = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 _IRON_SATURATED_FEO_MISSING_INPUT = "iron-saturated FeO conversion missing input:"
 # Cold and hot ends of the Holzheid and Distin rows this conversion scores.
 _FEO_SCORED_SPAN_K = (Decimal("1578"), Decimal("2233.15"))
@@ -6204,7 +6205,7 @@ def _temperature_envelope_value(
         try:
             keyed_temperature = Decimal(match.group(1))
             if match.group(2) == "C":
-                keyed_temperature += Decimal("273.15")
+                keyed_temperature += _KELVIN_FROM_CELSIUS
             if keyed_temperature == temperature:
                 try:
                     parsed = abs(as_decimal(value))
@@ -9439,7 +9440,9 @@ def _predict_redox(
         # Identity fO2_Pa is log10_fo2_to_pa of that printed log. The predictor
         # still receives the printed log, with no frame shift.
         assert fo2_log is not None
-        band = kress91_temperature_band_case(float(material.temperature) - 273.15)
+        band = kress91_temperature_band_case(
+            float(material.temperature) - CELSIUS_TO_KELVIN_OFFSET
+        )
         try:
             split = kress91_split(
                 fO2_log=float(fo2_log),
@@ -9462,16 +9465,19 @@ def _predict_redox(
         authority = Authority.BRIDGE
         if not band["authoritative"]:
             authority = Authority.EXTRAPOLATED
+        minimum_K = (
+            KRESS91_LIQUID_CALIBRATION_MIN_T_C + CELSIUS_TO_KELVIN_OFFSET
+        )
+        maximum_K = (
+            KRESS91_LIQUID_CALIBRATION_MAX_T_C + CELSIUS_TO_KELVIN_OFFSET
+        )
         certified_band = {
             "temperature_K": (
-                Decimal(str(KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15)),
-                Decimal(str(KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15)),
+                Decimal(str(minimum_K)),
+                Decimal(str(maximum_K)),
             )
         }
-        certified_band_text = (
-            f"[{KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15:g}, "
-            f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
-        )
+        certified_band_text = f"[{minimum_K:g}, {maximum_K:g}] K"
         notices: tuple[Notice, ...] = ()
         if kress_basis.dropped_components and kress_basis.dropped_mass_fraction is not None:
             notices = (
@@ -9502,10 +9508,7 @@ def _predict_redox(
                         f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C:g}]"
                     ),
                     origin="simulator.fe_redox:kress91_split",
-                    band=(
-                        f"[{KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15:g}, "
-                        f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
-                    ),
+                    band=certified_band_text,
                     authority=authority,
                 ),
             )
@@ -11463,7 +11466,7 @@ def _predict_element_mass_fraction_phase(
     try:
         result = _equilibrate_phase_assemblage(
             engine,
-            temperature_C=float(temperature - Decimal("273.15")),
+            temperature_C=float(temperature - _KELVIN_FROM_CELSIUS),
             composition_kg={
                 name: float(amount) / 1000.0 for name, amount in weights
             },
@@ -11889,7 +11892,7 @@ def _predict_phase_row(
             call_kwargs["handles"] = handles
         result = _equilibrate_phase_assemblage(
             engine,
-            temperature_C=float(temperature - Decimal("273.15")),
+            temperature_C=float(temperature - _KELVIN_FROM_CELSIUS),
             composition_kg={name: amount / 1000.0 for name, amount in wt.items()},
             fO2_log=fo2_log,
             pressure_bar=float(pressure_bar),
@@ -12670,8 +12673,6 @@ def _wall_areal_rate_from_existing_flux(
         _species_condensation_temperature_C,
         reactive_product_backstop_enabled,
     )
-    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
-
     missing: list[str] = []
     temperature = _identity_decimal(identity.temperature_K)
     pressure = nominal_pressure_pa(identity.total_pressure_Pa)
