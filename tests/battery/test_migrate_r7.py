@@ -1174,9 +1174,10 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     payload = json.dumps(
         observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
-    # The old digest matches the committed baseline exactly. These rows do not
-    # change admission; the combined digest records phase-parser identity and
-    # manifest-role provenance changes.
+    # t-1832 pinned this candidate at bf062b5860bc2f5ac3e1980a6d42e85ac9d10539c26b06449705a40a1234dda7.
+    # The combined digest moves because the car phase parser resolves printed
+    # glass-window identities and t-1832 adds manifest-role provenance. IDs and
+    # admissions remain fixed; the digest pins both intended field changes.
     assert (len(observations), hashlib.sha256(payload).hexdigest()) == (
         945,
         "5cfaf7bb0c51c310c8b424d7c18ff6bfc6e562e6e95c004f66703e3e3c4ed6aa",

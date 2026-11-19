@@ -9947,7 +9947,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # cells: 4319->4353.
     # Car t-1781 retypes Su & Zhang's 3,435 natural-glass profile cells as
     # explicit typed absences. The fam13 census changes below remain pinned.
-    assert census.get("residue_component_composition") == 5525
+    # The combined six-source migration census confirms 36 Mendybaev residue
+    # cells: 5,561 residue cells and 10,144 numeric series cells overall.
+    assert census.get("residue_component_composition") == 5561
     assert (
         per_source.get("su-zhang-2023-lunar-orange-glass-na-k-cu-degassing", {})
         .get("residue_component_composition", 0)
@@ -10006,7 +10008,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # unavailable; their printed cells remain unchanged and are pinned by
     # test_sc475_incr_frame_extracts. Ozawa's 86 flat Table 1 rows are not
     assert census.get("cp") == 1764
-    # Provisional: fam13 adds 95 H_minus_H298 cells to b268r2's 451.
+    # fam13 adds 95 H_minus_H298 cells to b268r2's 451.
     assert census.get("H_minus_H298") == 546
     assert per_source.get("fredrickson-chasanov-1973-na2o-enthalpy-1300k") == {
         "H_minus_H298": 74,
@@ -10061,9 +10063,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    # With the fam13/Floss additions retained, t-1781's retyped Su & Zhang
-    # cells leave this many numeric series cells; the remote census verifies it.
-    assert n_numeric == 10108, (n_numeric, census, n_unavailable)
+    # With fam13/Floss retained, t-1781's retyped Su & Zhang cells leave this
+    # many numeric cells; b-1209 adds 36 Mendybaev cells. Re-derived remotely.
+    assert n_numeric == 10144, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:

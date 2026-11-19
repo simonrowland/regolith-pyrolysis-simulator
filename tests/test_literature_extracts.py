@@ -5667,16 +5667,19 @@ def test_aithala_s5_preserves_all_61_row_addressable_series_summaries():
 # extracts unchanged; the source was already counted). 2026-11-18 combined with
 # the fam13/Floss replay (t-1859), whose own recount gave 52231 / 645 / 3406:
 # 52231 + 61 = 52292 observations, 645 extracts, 3406 + 3 = 3409 samples.
-# No reviewed_by was added. These ceilings may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 52292
-_UNCOVERED_EXTRACTS_CEILING = 645
+# The combined tree was recounted with vle.fidelity_source_warnings after
+# adding b-1209's Mendybaev extract: 52275 observations, 644 extracts,
+# 3409 unattested samples. No reviewed_by was added. Each ceiling may only fall.
+_UNCOVERED_OBSERVATIONS_CEILING = 52275
+_UNCOVERED_EXTRACTS_CEILING = 644
 _UNATTESTED_SAMPLES_CEILING = 3409
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
 # A second pilot pin inside an already-affected extract must still fail.
 _PILOT_PINS_CEILING = 57
-# Attestation-complete pins whose locator is not opened. With the corpus root
-# mounted, Barin's 124 newly attested table pins resolve and leave none blind.
+# Attestation-complete pins with a source-blind reason beyond an unmounted
+# corpus root or prefix. Barin's 124 newly attested table pins resolve with
+# the corpus mounted; mount-only failures are tracked separately.
 _SOURCE_BLIND_PINS_CEILING = 0
 # Scored observation ids that name more than one row. Zero on this corpus:
 # schema validation already rejects duplicates. The ceiling cannot rise.
@@ -5723,6 +5726,14 @@ def _fidelity_warning_totals(documents, corpus_mount=None, artifact_root=None):
                 )
                 details.append(warning.render())
     return totals, extract_counts, mount_dependent_pins, details
+
+
+def _assert_source_blind_pin_ceiling(source_blind_pins, mount_dependent_pins):
+    non_mount_dependent = source_blind_pins - mount_dependent_pins
+    assert non_mount_dependent <= _SOURCE_BLIND_PINS_CEILING, (
+        f"source_blind_pin={source_blind_pins}; "
+        f"mount_dependent_pins={mount_dependent_pins}"
+    )
 
 
 def _require_fidelity_corpus_root(root: str | None, mount_dependent_pins: int) -> Path:
@@ -5788,6 +5799,15 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
 
     documents = list(_fidelity_extract_documents())
     monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+    barin_document = next(doc for label, doc in documents if label == "barin-1995")
+    barin_source_blind = sum(
+        warning.count
+        for warning in vle.fidelity_source_warnings(
+            barin_document, label="barin-1995"
+        )
+        if warning.kind == "source_blind_pin"
+    )
+    assert barin_source_blind == 124
     unmounted, unmounted_extract_counts, mount_dependent_pins, _details = (
         _fidelity_warning_totals(documents)
     )
@@ -5852,18 +5872,15 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     ambiguous_ids = unmounted["ambiguous_observation_id"]
     missing_ids = unmounted["missing_observation_id"]
     non_finite = unmounted["non_finite_evidence"]
-    assert source_blind_pins == 124
     record_property("mount_dependent_pins", mount_dependent_pins)
+    record_property("source_blind_pins", source_blind_pins)
     assert mount_dependent_pins <= source_blind_pins
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
     assert uncovered_extracts <= _UNCOVERED_EXTRACTS_CEILING, uncovered_extracts
     assert unattested_samples <= _UNATTESTED_SAMPLES_CEILING, unattested_samples
     assert pilot_pins <= _PILOT_PINS_CEILING, pilot_pins
     assert pilot_extracts <= _PILOT_PIN_EXTRACTS_CEILING, pilot_extracts
-    non_mount_dependent_source_blind = source_blind_pins - mount_dependent_pins
-    assert (
-        non_mount_dependent_source_blind <= _SOURCE_BLIND_PINS_CEILING
-    ), f"source_blind_pin={source_blind_pins}; mount_dependent_pins={mount_dependent_pins}"
+    _assert_source_blind_pin_ceiling(source_blind_pins, mount_dependent_pins)
     assert ambiguous_ids <= _AMBIGUOUS_OBSERVATION_IDS_CEILING, ambiguous_ids
     assert missing_ids <= _MISSING_OBSERVATION_IDS_CEILING, missing_ids
     assert non_finite <= _NON_FINITE_EVIDENCE_CEILING, non_finite
@@ -5947,6 +5964,174 @@ def test_source_attestation_rejects_a_missing_additional_locator(tmp_path: Path)
         and "missing-review-witness.tsv" in refusal
         for refusal in refusals
     ), refusals
+
+
+@pytest.mark.parametrize(
+    "locator",
+    [
+        {"page": 2, "table": "1"},
+        {"page": 2, "source_path": None},
+        {"page": 2, "source_path": 17},
+        {"page": 2, "quotes_path": []},
+        {"page": 2, "record": ""},
+    ],
+    ids=[
+        "page-only",
+        "null-source-path",
+        "numeric-source-path",
+        "list-quotes-path",
+        "empty-record",
+    ],
+)
+@pytest.mark.parametrize("corpus_mounted", [False, True], ids=["unmounted", "mounted"])
+def test_fidelity_source_warning_ratchet_rejects_missing_or_malformed_artifact(
+    monkeypatch, tmp_path, locator, corpus_mounted
+):
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    sample = doc["fidelity_samples"][0]
+    sample.update(
+        reviewed_by="independent reviewer",
+        reviewed_on="2026-11-15",
+        locator=locator,
+    )
+    extract_path = tmp_path / "fixture-source.yaml"
+    extract_path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+    monkeypatch.setattr(vle, "discover_extracts", lambda: [extract_path])
+
+    if corpus_mounted:
+        corpus_root = tmp_path / "mounted-corpus"
+        corpus_root.mkdir()
+        (corpus_root / "unrelated-source.txt").write_text("0.24", encoding="utf-8")
+        monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+    else:
+        monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    totals, _extract_counts, mount_dependent_pins, details = (
+        _fidelity_warning_totals([(extract_path.stem, doc)])
+    )
+    assert totals["source_blind_pin"] == 1, details
+    assert mount_dependent_pins == 0, details
+    with pytest.raises(AssertionError, match="1"):
+        _assert_source_blind_pin_ceiling(
+            totals["source_blind_pin"], mount_dependent_pins
+        )
+
+
+def test_fidelity_source_warning_ratchet_rejects_broken_mendybaev_locator(
+    monkeypatch, tmp_path
+):
+    """A missing second artifact is counted when the cited source is mounted."""
+    extract_path = EXTRACTS / "mendybaev-2017-fun-cai-lab-evaporation.yaml"
+    doc = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
+    sample = next(
+        sample
+        for sample in doc["fidelity_samples"]
+        if isinstance(sample, dict)
+        and isinstance(sample.get("locator"), dict)
+        and sample["locator"].get("source_path")
+    )
+    locator = sample["locator"]
+    corpus_root = vle.regolith_corpus_root()
+    transcription_path = corpus_root / locator["source_path"]
+    if not transcription_path.is_file():
+        pytest.skip(f"corpus transcription unavailable: {transcription_path}")
+
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+    source_path = locator["source_path"]
+    source_sha256 = locator["source_sha256"]
+    missing_quotes_path = "tables/missing-review-witness.tsv"
+    assert not (corpus_root / missing_quotes_path).exists()
+    locator["quotes_path"] = missing_quotes_path
+
+    warnings = vle.fidelity_source_warnings(doc, label=extract_path.stem)
+    source_blind = [
+        warning for warning in warnings if warning.kind == "source_blind_pin"
+    ]
+    assert len(source_blind) == 1 and source_blind[0].count == 1, warnings
+    assert missing_quotes_path in source_blind[0].detail
+    assert "corpus_artifact_missing" in source_blind[0].detail
+    assert locator["source_path"] == source_path
+    assert locator["source_sha256"] == source_sha256
+
+    mutated_path = tmp_path / extract_path.name
+    mutated_path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+    monkeypatch.setattr(vle, "discover_extracts", lambda: [mutated_path])
+    totals, _extract_counts, mount_dependent_pins, details = (
+        _fidelity_warning_totals(list(_fidelity_extract_documents()))
+    )
+    assert totals["source_blind_pin"] == 1, details
+    assert mount_dependent_pins == 0, details
+    with pytest.raises(AssertionError, match="1"):
+        _assert_source_blind_pin_ceiling(
+            totals["source_blind_pin"], mount_dependent_pins
+        )
+
+
+def test_fidelity_source_warning_ratchet_runs_and_fails_without_mendybaev_transcription(
+    monkeypatch, tmp_path, record_property
+):
+    """A missing source transcription cannot suppress unrelated corpus warnings."""
+    paths = list(vle.discover_extracts())
+    for path in paths:
+        if path.name == "mendybaev-2017-fun-cai-lab-evaporation.yaml":
+            continue
+        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+        if not isinstance(doc, dict) or doc.get("schema_version") != vle.SCHEMA_VERSION:
+            continue
+        seeded = False
+        for species in (doc.get("species") or {}).values():
+            if not isinstance(species, dict):
+                continue
+            for observation in species.get("observations") or []:
+                values = (
+                    observation.get("values")
+                    if isinstance(observation, dict)
+                    else None
+                )
+                if (
+                    isinstance(observation, dict)
+                    and observation.get("type") in vle.OBSERVATION_TYPES
+                    and isinstance(values, dict)
+                ):
+                    values["ratchet_non_finite_probe"] = float("nan")
+                    seeded = True
+                    break
+            if seeded:
+                break
+        if seeded:
+            mutated_path = tmp_path / path.name
+            mutated_path.write_text(
+                yaml.safe_dump(doc, sort_keys=False), encoding="utf-8"
+            )
+            paths[paths.index(path)] = mutated_path
+            break
+    else:
+        pytest.fail("no non-Mendybaev scored corpus extract could be mutated")
+
+    monkeypatch.setattr(vle, "discover_extracts", lambda: paths)
+    for name in (
+        "_UNCOVERED_OBSERVATIONS_CEILING",
+        "_UNCOVERED_EXTRACTS_CEILING",
+        "_UNATTESTED_SAMPLES_CEILING",
+        "_PILOT_PINS_CEILING",
+        "_PILOT_PIN_EXTRACTS_CEILING",
+        "_SOURCE_BLIND_PINS_CEILING",
+        "_AMBIGUOUS_OBSERVATION_IDS_CEILING",
+        "_MISSING_OBSERVATION_IDS_CEILING",
+    ):
+        monkeypatch.setitem(globals(), name, sys.maxsize)
+    monkeypatch.setattr(
+        sys.modules[__name__],
+        "regolith_corpus_root",
+        lambda: tmp_path / "corpus-without-mendybaev",
+    )
+    failure = assert_regression_raises_assertion_without_skip(
+        lambda: test_fidelity_source_warning_ratchet(
+            monkeypatch, tmp_path / "empty-corpus", record_property
+        )
+    )
+    assert str(failure).splitlines()[0] == "1"
 
 
 def test_auto_migrated_pilot_pin_counts_each_sample():
