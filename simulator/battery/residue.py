@@ -25,7 +25,10 @@ from simulator.battery.oxygen_balance import (
 )
 from simulator.battery.records import nominal_pressure_pa
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
-from simulator.physical_constants import PA_PER_BAR
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    PA_PER_BAR,
+)
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
 
@@ -4137,7 +4140,9 @@ def _predict_sossi_residue_cohort(
                 ) -> Mapping[str, float]:
                     response = internal_analytical_residue_vapor_pressure(
                         core=analytical_core,
-                        temperature_C=temperature_K - 273.15,
+                        temperature_C=(
+                            temperature_K - CELSIUS_TO_KELVIN_OFFSET
+                        ),
                         pressure_bar=total_pressure_Pa / PA_PER_BAR,
                         composition_kg=None,
                         composition_mol=composition,
