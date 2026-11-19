@@ -13032,6 +13032,7 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
         OPENIMCC_COEFFICIENT_LINEAGE_UNMATCHED_PREFIX,
         OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
         OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+        OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX,
         OPENIMCC_REVIEW_GAMMA_WITHHELD_SCOPE,
         _locator_scope_from_citation,
         _species_fragment_artifact,
@@ -13159,6 +13160,91 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
         elif fragment:
             assert formula is not None, identity
             sources = current_pack_sources(formula)
+            for manifest_row in artifact.get("rows", ()):
+                if not isinstance(manifest_row, Mapping):
+                    continue
+                source_row_id = manifest_row.get("id")
+                assert isinstance(source_row_id, str) and source_row_id, identity
+                selected_row_work_ids = {
+                    str(source["work_id"])
+                    for source in manifest_row.get("sources", ())
+                    if isinstance(source, Mapping)
+                    and isinstance(source.get("work_id"), str)
+                }
+                row_sources = openimcc_pack_coefficient_sources(
+                    pack.version,
+                    pack.binding_digest,
+                    species_formula=formula,
+                    source_row_id=source_row_id,
+                )
+                assert (
+                    set(coefficient_lineage_sources(row_sources))
+                    == selected_row_work_ids
+                ), (
+                    identity,
+                    source_row_id,
+                    row_sources,
+                )
+                assert (
+                    f"{OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX}{source_row_id}"
+                    in row_sources
+                ), (identity, source_row_id)
+                assert any(
+                    source.startswith(OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX)
+                    for source in row_sources
+                ), (identity, source_row_id)
+                assert not any(
+                    source.startswith(OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX)
+                    for source in row_sources
+                ), (identity, source_row_id)
+                row_scopes_by_work = openimcc_species_source_locator_scopes(
+                    formula, source_row_id=source_row_id
+                )
+                assert set(row_scopes_by_work) == selected_row_work_ids, (
+                    identity,
+                    source_row_id,
+                    row_scopes_by_work,
+                )
+                for work_id in sorted(selected_row_work_ids):
+                    scopes = row_scopes_by_work[work_id]
+                    scoped_references = [
+                        (reference, scope_match)
+                        for reference in observations_by_work.get(
+                            canonical_work_id(work_id), ()
+                        )
+                        if reference.identity.species is not None
+                        and (
+                            selected := _species_fragment_artifact(
+                                artifacts, reference.identity.species.formula
+                            )
+                        ) is not None
+                        and selected.get("identity") == identity
+                        and (
+                            scope_match := openimcc_source_locator_matches(
+                                scopes, reference.locator
+                            )
+                        )
+                        is not False
+                    ]
+                    for reference, scope_match in scoped_references:
+                        complete, relation = resolver.for_reference(
+                            reference,
+                            row_sources,
+                            coefficient_species_formula=formula,
+                        )
+                        assert complete
+                        expected_relation = (
+                            SourceRelation.SAME_INPUT
+                            if scope_match is True
+                            else SourceRelation.UNKNOWN
+                        )
+                        assert relation is expected_relation, (
+                            identity,
+                            source_row_id,
+                            work_id,
+                            reference.observation_id,
+                            relation,
+                        )
             per_row_work_ids = [
                 {
                     str(source["work_id"])
@@ -13461,9 +13547,6 @@ def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
 
 def test_openimcc_trace_lineage_for_real_kems_and_holzheid_rows_through_score_store() -> None:
     pytest.importorskip("openimcc")
-    from simulator.battery.source_lineage import (
-        OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
-    )
 
     for source_id, formulas in (
         ("kems-041-sossi-fegley-2018", ("AsO1.5", "CuO0.5")),
@@ -13514,32 +13597,37 @@ def test_openimcc_trace_lineage_for_real_kems_and_holzheid_rows_through_score_st
                 scored.source_relation,
             )
 
-        if source_id == "kems-041-sossi-fegley-2018":
-            backlog = score_mod.notice_backlog(residuals)
-            assert any(
-                key.startswith(
-                    f"{NoticeKind.ENGINE_MODEL_CAVEAT.value}:"
-                    f"{OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX}"
-                )
-                and count > 0
-                for key, count in backlog.items()
-            )
-
-
-def test_openimcc_partial_copper_lineage_stays_unknown_through_score_store() -> None:
+def test_openimcc_selected_copper_rows_resolve_through_score_store() -> None:
     pytest.importorskip("openimcc")
     from simulator.battery.source_lineage import (
         OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+        OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX,
     )
 
-    for source_id, expected_relation in (
+    expected_by_source = (
         (
             "holzheid-lodders-2001-copper-solubility",
-            SourceRelation.UNKNOWN,
+            {
+                Decimal("1573"): SourceRelation.SAME_INPUT,
+                Decimal("1923"): SourceRelation.INDEPENDENT,
+            },
         ),
-        ("wood-wade-2013-trace-activities", SourceRelation.UNKNOWN),
-        ("kems-012-sossi-2019", SourceRelation.INDEPENDENT),
-    ):
+        (
+            "wood-wade-2013-trace-activities",
+            {
+                Decimal("1573"): SourceRelation.INDEPENDENT,
+                Decimal("1923"): SourceRelation.SAME_INPUT,
+            },
+        ),
+        (
+            "kems-041-sossi-fegley-2018",
+            {
+                Decimal("1573"): SourceRelation.SAME_INPUT,
+                Decimal("1923"): SourceRelation.SAME_INPUT,
+            },
+        ),
+    )
+    for source_id, expected_by_temperature in expected_by_source:
         context = load_score_context(sources=(source_id,))
         references = [
             observation
@@ -13549,39 +13637,138 @@ def test_openimcc_partial_copper_lineage_stays_unknown_through_score_store() -> 
             and observation.identity.species.formula == "CuO0.5"
             and observation.admission.status
             in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}
+            and (
+                source_id != "kems-041-sossi-fegley-2018"
+                or observation.locator is not None
+                and observation.locator.table == "2"
+            )
         ]
         assert references, f"{source_id}: missing CuO0.5 observation"
-        residuals, _candidates = score_store(
+        residuals, candidates = score_store(
             context,
             engines=(Engine.OPENIMCC,),
             work_id=source_id,
+            include_diagnostics=False,
         )
-        for reference in references:
-            scored = next(
-                (
-                    residual
-                    for residual in residuals
-                    if residual.reference == reference.observation_id
-                    and residual.candidate_request is not None
-                    and residual.candidate_request.engine is Engine.OPENIMCC
-                ),
-                None,
+
+        for temperature, expected_relation in expected_by_temperature.items():
+            matching_references = [
+                reference
+                for reference in references
+                if reference.identity.temperature_K is not None
+                and reference.identity.temperature_K.is_value
+                and reference.identity.temperature_K.value == temperature
+            ]
+            assert matching_references, (source_id, temperature)
+            expected_row_id = f"CuO0.5-{temperature}K"
+            for reference in matching_references:
+                scored = next(
+                    (
+                        residual
+                        for residual in residuals
+                        if residual.reference == reference.observation_id
+                        and residual.candidate_request is not None
+                        and residual.candidate_request.engine is Engine.OPENIMCC
+                    ),
+                    None,
+                )
+                assert scored is not None, (source_id, reference.observation_id)
+                assert scored.source_relation is expected_relation, (
+                    source_id,
+                    reference.observation_id,
+                    scored.source_relation,
+                )
+                assert scored.candidate is not None
+                candidate = candidates[scored.candidate]
+                assert candidate.engine is not None
+                assert (
+                    f"{OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX}{expected_row_id}"
+                    in candidate.engine.coefficient_sources
+                ), (source_id, reference.observation_id, candidate.engine)
+                assert not any(
+                    source.startswith(OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX)
+                    for source in candidate.engine.coefficient_sources
+                ), (source_id, reference.observation_id, candidate.engine)
+
+
+def test_openimcc_selected_tin_and_cerium_rows_resolve_through_score_store() -> None:
+    pytest.importorskip("openimcc")
+    from simulator.battery.source_lineage import (
+        OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX,
+        OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX,
+    )
+
+    cases = (
+        (
+            "kems-041-sossi-fegley-2018",
+            "SnO",
+            Decimal("1573"),
+            "SnO-FCS-1573K",
+            "2",
+            None,
+        ),
+        (
+            "chen-2020-ce2o3-cmas-activity-phase-equilibria",
+            "Ce2O3",
+            Decimal("1873"),
+            "Ce2O3-Chen-2020-CMAS-1873K",
+            "2",
+            "row=sample 101",
+        ),
+    )
+    for source_id, formula, temperature, expected_row_id, table, locator_note in cases:
+        context = load_score_context(sources=(source_id,))
+        references = [
+            observation
+            for observation in context.observations.values()
+            if observation.source_id == source_id
+            and observation.identity.species is not None
+            and observation.identity.species.formula == formula
+            and observation.identity.temperature_K is not None
+            and observation.identity.temperature_K.is_value
+            and observation.identity.temperature_K.value == temperature
+            and observation.locator is not None
+            and observation.locator.table == table
+            and (
+                locator_note is None
+                or locator_note in (observation.locator.note or "")
             )
-            assert scored is not None, (source_id, reference.observation_id)
-            assert scored.source_relation is expected_relation, (
-                source_id,
-                reference.observation_id,
-                scored.source_relation,
-            )
-            if expected_relation is SourceRelation.UNKNOWN:
-                assert scored.score_eligible is True
-                assert any(
-                    notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
-                    and notice.reason.startswith(
-                        OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX
-                    )
-                    for notice in scored.notices
-                ), (source_id, reference.observation_id, scored.notices)
+        ]
+        assert references, (source_id, formula, temperature)
+        reference = references[0]
+        residuals, candidates = score_store(
+            context,
+            engines=(Engine.OPENIMCC,),
+            work_id=source_id,
+            include_diagnostics=False,
+        )
+        scored = next(
+            (
+                residual
+                for residual in residuals
+                if residual.reference == reference.observation_id
+                and residual.candidate_request is not None
+                and residual.candidate_request.engine is Engine.OPENIMCC
+            ),
+            None,
+        )
+        assert scored is not None, (source_id, reference.observation_id)
+        assert scored.source_relation is SourceRelation.SAME_INPUT, (
+            source_id,
+            reference.observation_id,
+            scored.source_relation,
+        )
+        assert scored.candidate is not None
+        candidate = candidates[scored.candidate]
+        assert candidate.engine is not None
+        assert (
+            f"{OPENIMCC_REVIEW_GAMMA_SOURCE_ROW_PREFIX}{expected_row_id}"
+            in candidate.engine.coefficient_sources
+        ), (source_id, reference.observation_id, candidate.engine)
+        assert not any(
+            source.startswith(OPENIMCC_REVIEW_GAMMA_ROW_WITHHELD_PREFIX)
+            for source in candidate.engine.coefficient_sources
+        ), (source_id, reference.observation_id, candidate.engine)
 
 
 def test_openimcc_mo_o3_score_path_resolves_oneill_fragment() -> None:
