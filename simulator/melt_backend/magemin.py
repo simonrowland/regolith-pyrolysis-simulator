@@ -2324,6 +2324,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 warnings=[*all_warnings, message],
                 diagnostics=result_diagnostics,
             ), reason='negative_convergence_evidence')
+        mode_deficit = (
+            raw.get('mode_vector_mass_deficit')
+            if isinstance(raw, Mapping)
+            else None
+        )
         if not (isinstance(raw, Mapping) and 'operating_point_diagnostics' in raw):
             # MAGEMin_C's stable-system fO2 is already log10(fO2/bar),
             # dump_function.c:127; ph is its stable phase-name list.
@@ -2332,13 +2337,24 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 else lambda key: getattr(raw, key, None)
             )
             phase_names = read('ph')
+            buffer_present = phase_names is not None and any(
+                name in self._BUFFER_CHOICES for name in phase_names
+            )
+            # A deficient Mode vector cannot establish a successful solve.
+            # If it reports a buffer phase, preserve the more specific native
+            # fO2 readback/clamp failure even for a bulk with no redox carrier.
+            check_reported_buffer = (
+                isinstance(mode_deficit, Mapping) and buffer_present
+            )
             operating_point = self._fo2_operating_point(
                 fO2_log, read('fO2'),
-                phase_names is not None and any(
-                    name in self._BUFFER_CHOICES for name in phase_names
-                ),
+                buffer_present,
                 database=bulk_projection.database,
-                bulk_components=bulk_projection.composition_wt_pct,
+                bulk_components=(
+                    None
+                    if check_reported_buffer
+                    else bulk_projection.composition_wt_pct
+                ),
             )
         else:
             operating_point = raw['operating_point_diagnostics']
@@ -2355,7 +2371,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if operating_point.get('authoritative_for_requested_conditions') is False:
             all_warnings.append(str(operating_point['fO2_control_notice']))
         if isinstance(raw, Mapping):
-            mode_deficit = raw.get('mode_vector_mass_deficit')
             if isinstance(mode_deficit, Mapping):
                 mode_sum = float(mode_deficit['mode_sum'])
                 deficit = float(mode_deficit['deficit'])
