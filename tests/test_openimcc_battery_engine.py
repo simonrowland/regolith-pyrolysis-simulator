@@ -2352,16 +2352,19 @@ def _openimcc_vapour_observation(
     *,
     vapour_formula: str,
     reservoir: Species | None,
+    composition: Composition | None = None,
+    temperature_K: Decimal = Decimal("2200"),
 ) -> object:
-    composition = Composition(
-        basis="ordered_complete_mole_inventory",
-        components=(("SiO2", Decimal("0.8")), ("TiO2", Decimal("0.2"))),
-        amount_basis=AmountBasis.MOLE_FRACTION,
-    )
+    if composition is None:
+        composition = Composition(
+            basis="ordered_complete_mole_inventory",
+            components=(("SiO2", Decimal("0.8")), ("TiO2", Decimal("0.2"))),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
     identity = F.activity_identity(
         formula="TiO2",
         composition=composition,
-        T_K=Decimal("2200"),
+        T_K=temperature_K,
         fO2_Pa=Decimal("1e-4"),
     )
     identity = replace(
@@ -2379,6 +2382,24 @@ def _openimcc_vapour_observation(
         "openimcc-test",
         identity,
         Decimal("1"),
+    )
+
+
+def _openimcc_trace_gas_melt_composition(trace_oxide: str) -> Composition:
+    return Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("Na2O", Decimal("0.08")),
+            ("K2O", Decimal("0.01")),
+            ("SiO2", Decimal("0.604")),
+            ("FeO", Decimal("0.12")),
+            ("MgO", Decimal("0.12")),
+            ("CaO", Decimal("0.04")),
+            ("Al2O3", Decimal("0.02")),
+            ("TiO2", Decimal("0.005")),
+            (trace_oxide, Decimal("0.001")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
     )
 
 
@@ -2437,6 +2458,86 @@ def test_openimcc_melt_reservoir_does_not_default_nondefault_gas_parent() -> Non
 
     assert prediction.value is None
     assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+
+
+def test_openimcc_modelled_trace_parent_predicts_and_reaches_residual_provenance() -> None:
+    _require_openimcc()
+    from simulator.melt_backend.openimcc_bridge import (
+        _openimcc_trace_activity_models,
+    )
+
+    model = _openimcc_trace_activity_models()["NiO"]
+    observation = _openimcc_vapour_observation(
+        vapour_formula="Ni",
+        reservoir=None,
+        composition=_openimcc_trace_gas_melt_composition("NiO"),
+        temperature_K=Decimal("1800"),
+    )
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.value > 0
+    assert prediction.provenance["openimcc_trace_activity_models"] == {
+        "NiO": model
+    }
+    candidate = candidate_observation(observation, prediction)
+    assert candidate.provenance["openimcc_trace_activity_models"] == {
+        "NiO": model
+    }
+
+
+def test_openimcc_unmodelled_trace_parent_still_refuses() -> None:
+    _require_openimcc()
+    from simulator.melt_backend.openimcc_bridge import (
+        _openimcc_trace_activity_models,
+    )
+
+    assert "B2O3" not in _openimcc_trace_activity_models()
+    observation = _openimcc_vapour_observation(
+        vapour_formula="B",
+        reservoir=None,
+        composition=_openimcc_trace_gas_melt_composition("B2O3"),
+        temperature_K=Decimal("1800"),
+    )
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+
+
+def test_openimcc_side_gas_reaction_refuses_with_one_parent_unsupplied() -> None:
+    _require_openimcc()
+    from openimcc.gas import _GAS_REACTIONS
+    from simulator.melt_backend.openimcc_bridge import OPENIMCC_PARENT_OXIDES
+
+    reaction = _GAS_REACTIONS["NaBr"]
+    assert reaction.parent not in OPENIMCC_PARENT_OXIDES
+    assert reaction.side_parent in OPENIMCC_PARENT_OXIDES
+    observation = _openimcc_vapour_observation(
+        vapour_formula="NaBr",
+        reservoir=None,
+        composition=_openimcc_trace_gas_melt_composition("NiO"),
+        temperature_K=Decimal("1800"),
+    )
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert prediction.refusal_detail["reason"] == (
+        RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value
+    )
 
 
 def test_openimcc_gas_phase_parent_reference_is_typed_refusal() -> None:

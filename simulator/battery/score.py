@@ -15806,6 +15806,19 @@ def _predict_with_engine(
             and float(solved_bar) > 0.0
         ):
             prediction_fo2_bar = float(solved_bar)
+    provenance: dict[str, object] = (
+        {}
+        if melt_pack_identity is None
+        else {"melt_pack_identity": melt_pack_identity}
+    )
+    if engine is Engine.OPENIMCC and quantity in _VAPOUR_EQUILIBRIUM:
+        from simulator.melt_backend.openimcc_bridge import (
+            _trace_activity_models_for_components,
+        )
+
+        trace_activity_models = _trace_activity_models_for_components(activities)
+        if trace_activity_models:
+            provenance["openimcc_trace_activity_models"] = trace_activity_models
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -15825,11 +15838,7 @@ def _predict_with_engine(
         ),
         requested_composition=requested,
         version=engine_version,
-        provenance=(
-            {}
-            if melt_pack_identity is None
-            else {"melt_pack_identity": melt_pack_identity}
-        ),
+        provenance=provenance,
     )
 
 

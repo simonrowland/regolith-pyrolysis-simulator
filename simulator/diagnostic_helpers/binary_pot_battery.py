@@ -3224,13 +3224,6 @@ class _OpenImccBatteryBackend:
             bridge_kwargs["composition_mol"] = composition_mol
         with self._bridge._with_solve_timeout(call_timeout_s):
             result = self._bridge.evaluate(**bridge_kwargs)
-        gas_parent_oxide_activities = dict(result.parent_oxide_activities)
-        gas_parent_oxides = tuple(result.parent_oxides)
-        if _gas_parent_activity is not None:
-            parent, activity = _gas_parent_activity
-            gas_parent_oxide_activities[parent] = activity
-            if parent not in gas_parent_oxides:
-                gas_parent_oxides += (parent,)
         self.model_id = result.pack_model_id
         self._identity["model_id"] = self.model_id
         self._identity["name"] = self.model_id
@@ -3320,6 +3313,23 @@ class _OpenImccBatteryBackend:
             for name in result.parent_oxides
             if name in result.parent_oxide_activities
         }
+        gas_parent_oxides = tuple(result.parent_oxides)
+        trace_activity_models = (
+            self._bridge._trace_activity_models_for_components(
+                result.parent_oxide_activities
+            )
+        )
+        for parent in trace_activity_models:
+            gas_parent_oxide_activities[parent] = (
+                result.parent_oxide_activities[parent]
+            )
+            if parent not in gas_parent_oxides:
+                gas_parent_oxides += (parent,)
+        if _gas_parent_activity is not None:
+            parent, activity = _gas_parent_activity
+            gas_parent_oxide_activities[parent] = activity
+            if parent not in gas_parent_oxides:
+                gas_parent_oxides += (parent,)
         pressures: dict[str, float] = {}
         vapor_sources: dict[str, str] = {}
         gas_diagnostics: dict[str, Any] = {}
@@ -3527,11 +3537,6 @@ class _OpenImccBatteryBackend:
             "pack": result.pack_version,
             "pack_digest": result.pack_digest,
         }
-        trace_activity_models = (
-            self._bridge._trace_activity_models_for_components(
-                result.parent_oxide_activities
-            )
-        )
         if trace_activity_models:
             provenance["trace_activity_models"] = trace_activity_models
         if "engine_binding_identity" in self._identity:
