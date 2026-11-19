@@ -16,6 +16,7 @@ from functools import wraps
 from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator import engine_cache
 
@@ -35,6 +36,39 @@ ENGINE_GOLDEN_PROBES = {
     "alphamelts": (3, "ff6a0568162891d88ef8924d6317eb5bd53c932717c5bde9acdc7fc4feb49c11"),
     "thermoengine": (3, "3db7ad76c46e3130880e2782b235e739a7de72b825180c84fa94e46ec68bfb53"),
 }
+
+_EXPECTED_NUMERIC_TRACE_PATHS = {
+    "openimcc": set(),
+    "internal-analytical": {
+        "data/vapor_pressures.yaml",
+        "data/setpoints.yaml",
+        "data/species_catalog.yaml",
+        "data/literature/extracts/nasa-cea-thermo.yaml",
+        "data/literature/extracts/ivtan-mno-coo-thermo.yaml",
+    },
+    "vaporock": set(),
+    "magemin": set(),
+    "alphamelts": {
+        "data/vapor_pressures.yaml",
+        "data/literature/extracts/nasa-cea-thermo.yaml",
+        "data/literature/extracts/ivtan-mno-coo-thermo.yaml",
+    },
+    "thermoengine": {
+        "data/vapor_pressures.yaml",
+        "data/literature/extracts/nasa-cea-thermo.yaml",
+        "data/literature/extracts/ivtan-mno-coo-thermo.yaml",
+    },
+}
+
+_DATA_PRESSURE_GOLDENS = {
+    "Fe": "0x1.1f0c7cf66d4d7p-3",
+    "SiO": "0x1.6adedc06bbbddp+2",
+    "Na": "0x1.798a909525fabp+22",
+}
+_DATA_PRESSURE_GOLDEN_DIGEST = (
+    "bf676f323569a54be3fe78ae24a5dca0ffaebdc8248ff7ecb41526cb1c9fe51f"
+)
+
 
 def _numeric_leaves(value, path=()):
     if isinstance(value, bool) or value is None:
@@ -143,28 +177,22 @@ def _trace_workspace_data_reads(
     return reads
 
 
-def _assert_trace_is_keyed(
+def _assert_trace_is_fingerprinted(
     engine_name: str,
     observed: set[str],
     callsites: Mapping[str, set[str]],
 ) -> None:
-    from tests.test_engine_cache_input_identity import _EXPECTED_ENGINE_INPUTS
-
     numeric_reads = _numeric_trace_paths(observed, callsites)
     declared = {
-        path
-        for path, kind, _selector in _EXPECTED_ENGINE_INPUTS[engine_name]
-        if kind == "data"
+        input_ref.path
+        for input_ref in engine_cache.ENGINE_CACHE_INPUTS[engine_name]
+        if input_ref.kind == "data"
     }
-    unkeyed = numeric_reads - declared
-    callsite_detail = {
-        path: sorted(callsites.get(path, set())) for path in unkeyed
-    }
-    assert not unkeyed, (
-        f"{engine_name} real-solve file access was not declared in the independent "
-        f"input contract: {sorted(unkeyed)}; numeric trace={sorted(numeric_reads)}; "
-        f"full trace={sorted(observed)}; "
-        f"callsites={callsite_detail}"
+    unrecorded = numeric_reads - declared
+    assert not unrecorded, (
+        f"{engine_name} numeric data reads are absent from COLD-row trace metadata: "
+        f"{sorted(unrecorded)}; numeric trace={sorted(numeric_reads)}; "
+        f"full trace={sorted(observed)}"
     )
 
 
@@ -184,10 +212,6 @@ def _assert_expected_numeric_trace(
     observed: set[str],
     callsites: Mapping[str, set[str]],
 ) -> None:
-    from tests.test_engine_cache_input_identity import (
-        _EXPECTED_NUMERIC_TRACE_PATHS,
-    )
-
     expected = set(_EXPECTED_NUMERIC_TRACE_PATHS[engine_name])
     # Engine binding admission hashes these files only for runtime provenance;
     # that diagnostic snapshot is not part of the cached numeric result.
@@ -196,6 +220,86 @@ def _assert_expected_numeric_trace(
     assert not missing, (
         f"{engine_name} numeric input trace did not reach expected files: "
         f"{sorted(missing)}; full trace={sorted(observed)}"
+    )
+
+
+def _data_driven_pressure_probe() -> dict[str, str]:
+    """Pin Fe, SiO and Na outputs through the live data-backed resolvers."""
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+    from simulator.chemistry.kernel.dto import ProviderAccountView
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.vapour_rail.catalog import vapor_pressure_compatibility_view
+
+    vapor_pressure_path = (
+        engine_cache._ENGINE_CACHE_ROOT / "data/vapor_pressures.yaml"
+    )
+    raw_vapor_pressure_data = yaml.safe_load(vapor_pressure_path.read_text())
+    provider = BuiltinVaporPressureProvider(
+        vapor_pressure_compatibility_view(raw_vapor_pressure_data)
+    )
+
+    def dispatch(cleaned_melt, temperature_K, *, control_inputs):
+        return provider.dispatch(
+            IntentRequest(
+                intent=ChemistryIntent.VAPOR_PRESSURE,
+                account_view=ProviderAccountView(
+                    accounts={"process.cleaned_melt": cleaned_melt},
+                    species_formula_registry={},
+                ),
+                temperature_C=temperature_K - 273.15,
+                pressure_bar=1.0e-6,
+                control_inputs=control_inputs,
+            )
+        )
+
+    fe = dispatch({"FeO": 1.0}, 1650.0, control_inputs={"pO2_bar": 1.0e-9})
+    sio = dispatch(
+        {"SiO2": 1.0},
+        1900.0,
+        control_inputs={
+            "pO2_bar": 1.0e-9,
+            "high_t_melt_activity": "constant_gamma",
+        },
+    )
+    assert fe.status == sio.status == "ok"
+
+    na_pressures = AlphaMELTSBackend()._activities_times_antoine(
+        1600.0,
+        {"Na": 2.0, "K": 1.0, "unknown": 10.0},
+        {"SiO2": 100.0},
+        pO2_bar=1.0e-9,
+    )
+    return {
+        "Fe": fe.diagnostic["vapor_pressures_Pa"]["Fe"].hex(),
+        "SiO": sio.diagnostic["vapor_pressures_Pa"]["SiO"].hex(),
+        "Na": na_pressures["Na"].hex(),
+    }
+
+
+def _assert_data_pressures_match_version(
+    engine_name: str, version: int, observed: Mapping[str, str]
+) -> None:
+    expected_version, _ = ENGINE_GOLDEN_PROBES[engine_name]
+    assert version == expected_version, (
+        f"{engine_name}: data-driven pressure probe must be reviewed with its "
+        f"ENGINE_CHEMISTRY_VERSION bump (expected {expected_version}, got {version})"
+    )
+    actual_digest = _numeric_output_digest(
+        engine_cache.EngineCacheValue(
+            {species: float.fromhex(value) for species, value in observed.items()},
+            {},
+        )
+    )
+    assert actual_digest == _DATA_PRESSURE_GOLDEN_DIGEST, (
+        f"{engine_name}: data-driven pressure digest changed without a reviewed "
+        f"ENGINE_CHEMISTRY_VERSION update; expected {_DATA_PRESSURE_GOLDEN_DIGEST}, "
+        f"got {actual_digest}"
+    )
+    assert dict(observed) == _DATA_PRESSURE_GOLDENS, (
+        f"{engine_name}: Fe/SiO/Na data-driven pressure changed without a "
+        "reviewed ENGINE_CHEMISTRY_VERSION update; "
+        f"expected {_DATA_PRESSURE_GOLDENS}, got {dict(observed)}"
     )
 
 
@@ -288,6 +392,11 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
                 timeout_s=90.0,
                 isolated=False,
             )
+        data_pressures = (
+            _data_driven_pressure_probe()
+            if engine_name in {"internal-analytical", "alphamelts", "thermoengine"}
+            else None
+        )
         assert cached_values, (
             f"{engine_name}: real solve did not expose its cache value; "
             f"cell status={cell.status}, refusal={cell.refusal_reason}, "
@@ -300,6 +409,7 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
             "observed": sorted(traced),
             "callsites": {path: sorted(sites) for path, sites in callsites.items()},
             "mutations": len(mutations),
+            "data_pressures": data_pressures,
         }
     finally:
         close_battery_engine_handle(handle)
@@ -340,8 +450,12 @@ def _run_probe(
     assert result["pid"] != os.getpid(), "live probe ran in the pytest worker"
     observed = set(result["observed"])
     callsites = {path: set(sites) for path, sites in result["callsites"].items()}
-    _assert_trace_is_keyed(engine_name, observed, callsites)
+    _assert_trace_is_fingerprinted(engine_name, observed, callsites)
     _assert_expected_numeric_trace(engine_name, observed, callsites)
+    if engine_name in {"internal-analytical", "alphamelts", "thermoengine"}:
+        _assert_data_pressures_match_version(
+            engine_name, result["version"], result["data_pressures"]
+        )
     return result
 
 
@@ -449,6 +563,11 @@ def test_numeric_probe_change_without_version_bump_fails_guard() -> None:
     assert changed != digest
     with pytest.raises(AssertionError, match="bump ENGINE_CHEMISTRY_VERSION"):
         _assert_probe_matches_golden("internal-analytical", version, changed)
+    changed_pressures = {**_DATA_PRESSURE_GOLDENS, "Fe": "0x1.0p+0"}
+    with pytest.raises(AssertionError, match="ENGINE_CHEMISTRY_VERSION update"):
+        _assert_data_pressures_match_version(
+            "internal-analytical", version, changed_pressures
+        )
 
 
 def test_real_cold_field_mutation_without_version_bump_fails_guard(

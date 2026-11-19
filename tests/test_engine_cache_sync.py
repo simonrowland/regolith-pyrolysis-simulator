@@ -76,6 +76,48 @@ def test_merge_is_incremental_idempotent_and_preserves_disjoint_sequences(tmp_pa
     assert rows(master) == sorted(rows(first) + rows(second))
 
 
+def test_merge_carries_cold_fingerprint_without_treating_it_as_payload_conflict(
+    tmp_path, monkeypatch
+):
+    first, second, master = (
+        tmp_path / name for name in ("first", "second", "master")
+    )
+    value = EngineCacheValue({"answer": 1}, {"enthalpy": 2.0})
+    write_box(monkeypatch, first, "s1", [(1, value)])
+    write_box(monkeypatch, second, "s2", [(1, value)])
+    with sqlite3.connect(str(first) + ".cold") as connection:
+        expected_fingerprint = connection.execute(
+            "SELECT input_fingerprint FROM engine_values"
+        ).fetchone()[0]
+    with sqlite3.connect(str(second) + ".cold") as connection:
+        connection.execute(
+            "UPDATE engine_values SET input_fingerprint=?", (b"different-metadata",)
+        )
+
+    result = cache.merge_cache_files(master, [first, second])
+
+    assert result["conflicts"] == 0
+    with sqlite3.connect(str(master) + ".cold") as connection:
+        merged_fingerprint = connection.execute(
+            "SELECT input_fingerprint FROM engine_values"
+        ).fetchone()[0]
+    assert merged_fingerprint == expected_fingerprint
+
+
+def test_readonly_incomplete_cache_schema_refuses_instead_of_miss(tmp_path, monkeypatch):
+    path = tmp_path / "incomplete.sqlite"
+    connection = cache._connect(path, readonly=False)
+    assert connection is not None
+    cache._close_connections()
+    with sqlite3.connect(path) as writer:
+        writer.execute("DROP TABLE box_sequences")
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    with pytest.raises(cache.EngineCacheSchemaMismatch):
+        cache.cached_engine_call("openimcc", {"request": 1}, lambda: {"answer": 2})
+
+
 def test_conflicts_keep_master_report_both_origins_and_strict_only_exit(tmp_path, monkeypatch, capsys):
     first, second, master, strict_master = (tmp_path / n for n in ("a", "b", "m", "strict"))
     write_box(monkeypatch, first, "s1", [(1, {"answer": 1})])
@@ -213,7 +255,10 @@ def test_failure_after_legacy_cold_commit_retry_keeps_matching_pair(tmp_path, mo
     # Reproduce the persisted orphan left by the old independent COLD commit.
     with sqlite3.connect(str(live) + ".cold") as cold:
         cache._initialize_cold(cold)
-        cold.execute("INSERT INTO engine_values VALUES (?,?)", (key, zlib.compress(pack({"enthalpy": 111.0}))))
+        cold.execute(
+            "INSERT INTO engine_values (key,value,input_fingerprint) VALUES (?,?,NULL)",
+            (key, zlib.compress(pack({"enthalpy": 111.0}))),
+        )
     original = cache._store_cold
 
     def fail_after_cold_write(*args):

@@ -595,12 +595,11 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
     )
 
     def expected_current_key(engine: str, legacy_wire_hex: str) -> bytes:
-        # These snapshots pin the canonical request tail. Chemistry versions
-        # and the new source-input digest form the current key header.
+        # These snapshots pin the canonical request tail; engine and chemistry
+        # version are the complete key header.
         return (
             bytes((engine_cache._ENGINE_NUMBERS[engine],))
             + ENGINE_CHEMISTRY_VERSION[engine].to_bytes(2, "big")
-            + engine_cache._engine_cache_input_identity_digest(engine)
             + bytes.fromhex(legacy_wire_hex[6:])
         )
 
