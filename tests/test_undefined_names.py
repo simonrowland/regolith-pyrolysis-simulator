@@ -1,4 +1,4 @@
-"""Check the whole Python tree for undefined names with Pyflakes.
+"""Check the simulator/ and web/ Python trees for undefined names with Pyflakes.
 
 Pyflakes checks files independently and misses dynamically created runtime names.
 """
