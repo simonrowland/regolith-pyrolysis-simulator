@@ -344,6 +344,7 @@ class NoticeKind(StrEnum):
     ADMISSION_FROM_LEGACY_TOKEN = "admission_from_legacy_token"
     VALIDATION_HARD_ISSUE_LABEL = "validation_hard_issue_label"
     FIGURE_ONLY = "figure_only"
+    EVALUATED_FROM_FIT_ON_DECLARED_GRID = "evaluated_from_fit_on_declared_grid"
     APPROXIMATE_VALUE = "approximate_value"
     # The identity pressure is a band. Distinct from APPROXIMATE_VALUE, which
     # is the measured observable. An exact residue wt% must not take that stratum.
@@ -397,13 +398,21 @@ class NoticeKind(StrEnum):
 
 
 class ReferenceStateConvention(StrEnum):
-    """Reference-frame conventions used by activity and formation records."""
+    """Reference frames used by activity and formation records.
+
+    Premise: FeO follows the Temkin ideal-ionic-solution model. Its expression
+    is ``a_FeO = (N_Fe2+)(N_O2-)``: the first factor counts Fe2+ over the
+    cation sublattice; the second counts O2- over the anion sublattice,
+    including silicate anions. Pure FeO has both fractions equal to one, so
+    its activity is one.
+    """
 
     RAOULTIAN_PURE_ENDMEMBER = "raoultian_pure_endmember"
     HENRIAN_SOLID = "henrian_solid"
     HENRIAN_LIQUID = "henrian_liquid"
     HYPOTHETICAL_1WT_PCT = "hypothetical_1wt_pct"
     CONDENSED_ELEMENT_REFERENCE = "condensed_element_reference"
+    TEMKIN = "temkin"
 
 
 class Phase(StrEnum):
@@ -640,6 +649,11 @@ METHOD_TOKEN_ALIASES = MappingProxyType(
 class ExperimentKind(StrEnum):
     LITERATURE = "literature"
     SYNTHETIC = "synthetic"
+
+
+class QuotedTargetKind(StrEnum):
+    OBSERVATION = "observation"
+    EXPERIMENT = "experiment"
 
 
 class AmbientPressureEvidenceClass(StrEnum):

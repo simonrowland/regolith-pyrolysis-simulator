@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import importlib
 import inspect
 import json
 import math
@@ -30,6 +31,8 @@ from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
     Authority,
+    BoundDirection,
+    BoundInclusivity,
     Engine,
     EvidenceClass,
     ExecutionState,
@@ -102,6 +105,8 @@ from simulator.battery.score import (
     ScoreContext,
     SINGLE_CATION_COEFFICIENT_BASIS,
     SINGLE_LIQUID_ENGINES,
+    _catalog_score_rows,
+    _janaf_pure_solid_table_index,
     _battery_hero_minor_foulant_facets,
     _battery_hero_sio2_mole_fraction,
     _battery_hero_sweet_spot_records,
@@ -165,7 +170,16 @@ def test_score_eligible_conjunct_red_then_green(conjunct: str) -> None:
 
 
 def test_retired_imcc_engines_are_excluded_from_score_set() -> None:
-    assert Engine.OPENIMCC in SCORE_ENGINE_SET
+    assert SCORE_ENGINE_SET == (
+        Engine.VAPOROCK,
+        Engine.ALPHAMELTS,
+        Engine.THERMOENGINE,
+        Engine.MAGEMIN,
+        Engine.OPENIMCC,
+        Engine.INTERNAL_ANALYTICAL,
+        Engine.NASA_CEA_9,
+        Engine.CATALOG_EVALUATOR,
+    )
     assert {engine.value for engine in SCORE_ENGINE_SET}.isdisjoint(
         {"imcc_sf04", "imcc_sf04_ext"}
     )
@@ -187,6 +201,117 @@ def test_retired_imcc_engines_are_excluded_from_score_set() -> None:
     assert "Call" not in src
     assert engines_from_names(["nasa_cea_9"]) == (Engine.NASA_CEA_9,)
     assert engines_from_names(["catalog_evaluator"]) == (Engine.CATALOG_EVALUATOR,)
+
+
+def test_engine_payload_source_precedence_and_residual_key_tokens_are_pinned() -> None:
+    from simulator.battery.score import _engine_from_payload
+
+    assert _engine_from_payload(
+        {
+            "candidate_request": {"engine": Engine.OPENIMCC.value},
+            "candidate": "engine:vaporock",
+            "key": "row::T=1500::p_sat::vapour::thermoengine",
+        }
+    ) == Engine.OPENIMCC.value
+    assert _engine_from_payload(
+        {
+            "candidate": "engine:vaporock",
+            "key": "row::T=1500::p_sat::vapour::thermoengine",
+        }
+    ) == Engine.VAPOROCK.value
+    assert _engine_from_payload(
+        {"key": "row::T=1500::p_sat::vapour::thermoengine::fo2_mode=shared_ladder"}
+    ) == Engine.THERMOENGINE.value
+    assert _engine_from_payload({}) == "unknown"
+
+
+@pytest.mark.parametrize(
+    "cache_name, owner_cache",
+    (
+        ("_janaf_pure_solid_table_index", _janaf_pure_solid_table_index),
+        ("_catalog_score_rows", _catalog_score_rows),
+    ),
+)
+def test_score_lru_cache_keeps_one_wrapper_and_cached_value(
+    cache_name: str, owner_cache
+) -> None:
+    if cache_name == "_catalog_score_rows":
+        # This is the only other module that imports this cache by name.
+        importlib.import_module("tests.battery.test_catalog_evaluator_battery_engine")
+
+    bindings = {
+        f"{module_name}.{cache_name}": binding
+        for module_name, module in tuple(sys.modules.items())
+        if module is not None
+        and (binding := vars(module).get(cache_name)) is not None
+        and getattr(binding, "__module__", None) == owner_cache.__module__
+    }
+    assert f"{owner_cache.__module__}.{cache_name}" in bindings
+    assert bindings
+    assert all(binding is owner_cache for binding in bindings.values()), bindings
+
+    owner_cache.cache_clear()
+
+    first = owner_cache()
+    after_first = owner_cache.cache_info()
+    second = owner_cache()
+    after_second = owner_cache.cache_info()
+
+    assert second is first
+    assert after_second.misses == after_first.misses
+    assert after_second.hits == after_first.hits + 1
+
+
+def test_catalog_public_scoring_path_uses_the_owner_cache() -> None:
+    temperature_K = Decimal("180")
+    experiment = F.tabulation_experiment(
+        experiment_id="catalog-cache-exp",
+        work_id="catalog-cache-work",
+        T_K=temperature_K,
+    )
+    observation = F.observation(
+        "catalog-cache-reference",
+        experiment.experiment_id,
+        F.psat_identity("H2O", T_K=temperature_K, reservoir_phase=Phase.CR),
+        Decimal("1"),
+    )
+    owner_cache = _catalog_score_rows
+    owner_cache.cache_clear()
+    before = owner_cache.cache_info()
+
+    predictions = tuple(
+        predict_with_engine(
+            Engine.CATALOG_EVALUATOR, observation, experiment=experiment
+        )
+        for _ in range(2)
+    )
+
+    after = owner_cache.cache_info()
+    assert all(
+        prediction.engine is Engine.CATALOG_EVALUATOR for prediction in predictions
+    )
+    assert after.misses == before.misses + 1
+    assert after.hits == before.hits + 1
+
+
+def test_catalog_score_rows_share_the_catalog_module_cache() -> None:
+    from simulator.vapour_rail import catalog as catalog_mod
+
+    compile_cache = catalog_mod._COMPILE_CACHE
+    score_mod._catalog_score_rows.cache_clear()
+    rows, error = score_mod._catalog_score_rows()
+
+    assert error is None
+    assert rows
+    assert catalog_mod._COMPILE_CACHE is compile_cache
+    assert all(
+        any(
+            row.species is species
+            for compiled in compile_cache.values()
+            for species in compiled.species.values()
+        )
+        for row in rows
+    )
 
 
 @pytest.mark.parametrize("name", ("imcc_sf04", "imcc_sf04_ext"))
@@ -1505,10 +1630,10 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
         "redox-field-uncertainty",
         "redox-field-experiment",
         identity,
-        Decimal("0.72"),
+        Decimal("18") / Decimal("7"),
         evidence=EvidenceClass.MEASURED_REDUCED,
         derivation=Derivation(
-            relation="Fe3_over_FeT to Fe3+/Fe2+",
+            relation=score_mod.FERRIC_FRACTION_RELATION,
             inputs=("redox-source-row",),
             parameters=(("original_Fe3_over_FeT", F.located(Decimal("0.72"))),),
             output_unit="dimensionless",
@@ -1522,14 +1647,20 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     printed = _printed_uncertainty_band(
         Quantity.FE3_FE2_RATIO,
         uncertainty,
-        Decimal("0.72"),
+        Decimal("18") / Decimal("7"),
         source_observation=observation,
     )
 
     assert printed.refusal is None
     assert printed.band is not None
     assert printed.band.band_basis == "row_printed"
-    assert printed.band.value == Decimal("0.01223445641701162951905623210")
+    expected_sigma_log10_ratio = Decimal("0.02") / (
+        Decimal(10).ln() * Decimal("0.72") * Decimal("0.28")
+    )
+    assert abs(
+        printed.band.value
+        - expected_sigma_log10_ratio * score_mod.NORMAL_95_TICKET_MULTIPLIER
+    ) < Decimal("1e-20")
 
     unparseable = _printed_uncertainty_band(
         Quantity.FE3_FE2_RATIO,
@@ -1543,6 +1674,47 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     assert unparseable.band is None
     assert unparseable.refusal is not None
     assert unparseable.refusal["reason"] == "unparseable_printed_uncertainty"
+
+    near_one = F.observation(
+        "redox-near-one-uncertainty",
+        "redox-near-one-experiment",
+        identity,
+        Decimal("99"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        derivation=Derivation(
+            relation=score_mod.FERRIC_FRACTION_RELATION,
+            inputs=("redox-source-row",),
+            parameters=(("original_Fe3_over_FeT", F.located(Decimal("0.99"))),),
+            output_unit="dimensionless",
+        ),
+    )
+    near_one_band = _printed_uncertainty_band(
+        Quantity.FE3_FE2_RATIO,
+        uncertainty,
+        Decimal("99"),
+        source_observation=near_one,
+    )
+    assert near_one_band.band is None
+    assert near_one_band.refusal is not None
+    assert near_one_band.refusal["reason"] == (
+        "ferric_fraction_uncertainty_linearization_invalid"
+    )
+
+    from simulator.battery.score_metrics import populate_numeric
+
+    numeric, reason, _ = populate_numeric(
+        quantity=Quantity.FE3_FE2_RATIO,
+        candidate=Decimal("100"),
+        reference=Decimal("99"),
+        source_relation=SourceRelation.UNKNOWN,
+        printed_refusal=near_one_band.refusal,
+        operation_override=MetricOperation.DEX,
+        band_operation=MetricOperation.DEX,
+    )
+    assert reason is None
+    assert numeric is not None
+    assert numeric.value.is_finite()
+    assert numeric.decision_band is None
 
 
 def test_delta_fh_printed_uncertainty_uses_absolute_width() -> None:
@@ -5060,27 +5232,241 @@ def test_different_cell_comparison_activity_still_refuses_geometry() -> None:
     assert residual.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
 
 
-def test_comparison_ratio_does_not_flag_unverified_activity_coefficient_regime() -> None:
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+@pytest.mark.parametrize(
+    ("orifice_area", "clausing"),
+    (
+        (None, None),
+        (None, Decimal("0.9")),
+        (Decimal("3.14e-7"), None),
+    ),
+)
+def test_kems_activity_with_unverified_regime_scores_in_flagged_stratum(
+    quantity: Quantity,
+    orifice_area: Decimal | None,
+    clausing: Decimal | None,
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        flagged_stratum_payloads,
+        flagged_stratum_rows,
+        flagged_strata,
+        headline_payloads,
+        headline_rows,
+    )
+
     identity = replace(
         F.activity_identity(formula="NaO0.5"),
-        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        quantity=quantity,
     )
     experiment = F.kems_experiment(
-        orifice_area=Decimal("3.14e-7"),
-        clausing=Decimal("0.9"),
+        orifice_area=orifice_area,
+        clausing=clausing,
         kn=None,
         calibrated=True,
     )
-    reference = replace(
-        F.observation(
-            "comparison-activity-coefficient-unverified-regime",
-            experiment.experiment_id,
-            identity,
-            Decimal("0.2"),
-            evidence=EvidenceClass.MEASURED_DIRECT,
-        ),
-        provenance=_comparison_activity_provenance("same_effective_setup_assumed"),
+    reference = F.observation(
+        "comparison-activity-coefficient-unverified-regime",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.FIGURE_ONLY,
     )
+
+    gates = run_validity_gates(experiment, reference)
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={reference.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.score_eligible is False
+    assert residual.refusal is None
+    apparatus_notices = [
+        item
+        for item in residual.notices
+        if item.kind is NoticeKind.UNVERIFIED_APPARATUS
+    ]
+    assert any(
+        item.reason.startswith("apparatus_unverified:in_cell_partial_pressure_sum")
+        for item in apparatus_notices
+    )
+    assert any(
+        item.reason == "apparatus_unverified:geometry_determinants"
+        for item in apparatus_notices
+    )
+    assert FLAGGED_STRATUM_UNVERIFIED_APPARATUS in flagged_strata(
+        residual.notices
+    )
+    assert headline_rows(
+        (residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+    )[0]["n"] == 0
+    assert {
+        row["stratum"]: row["n"]
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    }[FLAGGED_STRATUM_UNVERIFIED_APPARATUS] == 1
+    payload = residual_to_plain(residual)
+    for tier in ("measured", "compilation"):
+        assert headline_payloads(
+            (payload,), (Engine.INTERNAL_ANALYTICAL,), tier=tier
+        )[0]["n"] == 0
+    assert {
+        row["stratum"]: row["n"]
+        for row in flagged_stratum_payloads(
+            (payload,), (Engine.INTERNAL_ANALYTICAL,)
+        )
+    }[FLAGGED_STRATUM_UNVERIFIED_APPARATUS] == 1
+
+    valueless = replace(
+        reference,
+        value=Value(
+            kind=ValueKind.UNAVAILABLE, unavailable_reason="no printed value"
+        ),
+    )
+    refused, _candidate = compile_residual(
+        valueless,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, valueless, review="reviewed"),
+        comparison_ids={valueless.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+    )
+    assert refused.status is ResidualStatus.REFUSED
+    assert refused.numeric is None
+    assert refused.refusal is not None
+    assert refused.refusal.reason is RefusalReason.METRIC_DOMAIN
+
+
+@pytest.mark.parametrize(
+    ("orifice_area", "clausing", "invalid_field"),
+    (
+        (Decimal("-1"), None, "orifice_area_m2"),
+        (None, Decimal("2"), "clausing_factor"),
+    ),
+)
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_activity_with_invalid_geometry_still_refuses(
+    quantity: Quantity,
+    orifice_area: Decimal | None,
+    clausing: Decimal | None,
+    invalid_field: str,
+) -> None:
+    identity = replace(F.activity_identity(formula="NaO0.5"), quantity=quantity)
+    experiment = F.kems_experiment(
+        orifice_area=orifice_area,
+        clausing=clausing,
+        kn=None,
+        calibrated=True,
+    )
+    reference = F.observation(
+        f"invalid-geometry-{quantity.value}-{invalid_field}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+    )
+
+    gates = run_validity_gates(experiment, reference)
+    geometry_check = next(
+        check for check in gates.checks if check.name == "geometry_determinants"
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert geometry_check.passed is False
+    assert geometry_check.detail["invalid"] == [invalid_field]
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        comparison_ids={reference.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in residual.notices
+    )
+
+
+def _kems_experiment_with_geometry_value(field: str, value: Value):
+    experiment = F.kems_experiment(
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=True,
+    )
+    geometry = replace(
+        experiment.apparatus.geometry,
+        **{field: F.located(value)},
+    )
+    return replace(
+        experiment,
+        apparatus=replace(experiment.apparatus, geometry=geometry),
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "low", "high"),
+    (
+        ("orifice_area_m2", "-2", "-1"),
+        ("orifice_diameter_m", "-2", "-1"),
+        ("clausing_factor", "2", "3"),
+    ),
+)
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_activity_with_impossible_geometry_interval_still_refuses(
+    quantity: Quantity, field: str, low: str, high: str
+) -> None:
+    identity = replace(F.activity_identity(formula="NaO0.5"), quantity=quantity)
+    experiment = _kems_experiment_with_geometry_value(
+        field,
+        Value(
+            ValueKind.INTERVAL,
+            interval_low=Decimal(low),
+            interval_high=Decimal(high),
+        ),
+    )
+    reference = F.observation(
+        f"impossible-geometry-interval-{quantity.value}-{field}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+    )
+
+    gates = run_validity_gates(experiment, reference)
+    geometry_check = next(
+        check for check in gates.checks if check.name == "geometry_determinants"
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert geometry_check.passed is False
+    assert geometry_check.detail["invalid"] == [field]
 
     residual, _candidate = _compile(
         reference,
@@ -5090,8 +5476,189 @@ def test_comparison_ratio_does_not_flag_unverified_activity_coefficient_regime()
     )
 
     assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in residual.notices
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "operator", "bound", "direction", "inclusivity"),
+    (
+        ("orifice_area_m2", "<=", "-1", None, None),
+        ("orifice_diameter_m", "<=", "-1", None, None),
+        ("clausing_factor", ">=", "2", None, None),
+        ("clausing_factor", ">", "1", None, None),
+        (
+            "clausing_factor",
+            None,
+            "2",
+            BoundDirection.LOWER,
+            BoundInclusivity.INCLUDED,
+        ),
+        (
+            "clausing_factor",
+            None,
+            "1",
+            BoundDirection.LOWER,
+            BoundInclusivity.EXCLUDED,
+        ),
+    ),
+)
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_activity_with_impossible_geometry_bound_still_refuses(
+    quantity: Quantity,
+    field: str,
+    operator: str | None,
+    bound: str,
+    direction: BoundDirection | None,
+    inclusivity: BoundInclusivity | None,
+) -> None:
+    identity = replace(F.activity_identity(formula="NaO0.5"), quantity=quantity)
+    value = Value(
+        ValueKind.BOUND,
+        bound_operator=operator,
+        bound_value=Decimal(bound),
+        bound_direction=direction,
+        bound_inclusivity=inclusivity,
+    )
+    experiment = _kems_experiment_with_geometry_value(field, value)
+    reference = F.observation(
+        (
+            f"impossible-geometry-bound-{quantity.value}-{field}-"
+            f"{operator or inclusivity}"
+        ),
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+    )
+
+    gates = run_validity_gates(experiment, reference)
+    geometry_check = next(
+        check for check in gates.checks if check.name == "geometry_determinants"
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert geometry_check.passed is False
+    assert geometry_check.detail["invalid"] == [field]
+
+    residual, _candidate = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+        review="reviewed",
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in residual.notices
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        (
+            "orifice_area_m2",
+            Value(
+                ValueKind.INTERVAL,
+                interval_low=Decimal("-1"),
+                interval_high=Decimal("2"),
+            ),
+        ),
+        (
+            "orifice_diameter_m",
+            Value(
+                ValueKind.INTERVAL,
+                interval_low=Decimal("-1"),
+                interval_high=Decimal("2"),
+            ),
+        ),
+        (
+            "clausing_factor",
+            Value(
+                ValueKind.INTERVAL,
+                interval_low=Decimal("0.5"),
+                interval_high=Decimal("1.2"),
+            ),
+        ),
+        (
+            "orifice_area_m2",
+            Value(ValueKind.BOUND, bound_operator=">=", bound_value=Decimal("-1")),
+        ),
+        (
+            "orifice_area_m2",
+            Value(ValueKind.BOUND, bound_operator="<=", bound_value=Decimal("1")),
+        ),
+        (
+            "orifice_diameter_m",
+            Value(ValueKind.BOUND, bound_operator=">=", bound_value=Decimal("-1")),
+        ),
+        (
+            "orifice_diameter_m",
+            Value(ValueKind.BOUND, bound_operator="<=", bound_value=Decimal("1")),
+        ),
+        (
+            "clausing_factor",
+            Value(ValueKind.BOUND, bound_operator=">=", bound_value=Decimal("1")),
+        ),
+        (
+            "clausing_factor",
+            Value(
+                ValueKind.BOUND,
+                bound_value=Decimal("1"),
+                bound_direction=BoundDirection.LOWER,
+                bound_inclusivity=BoundInclusivity.UNKNOWN,
+            ),
+        ),
+    ),
+)
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_activity_with_possible_geometry_ranges_stays_flagged(
+    quantity: Quantity, field: str, value: Value
+) -> None:
+    identity = replace(F.activity_identity(formula="NaO0.5"), quantity=quantity)
+    experiment = _kems_experiment_with_geometry_value(field, value)
+    reference = F.observation(
+        f"possible-geometry-range-{quantity.value}-{field}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+    )
+
+    gates = run_validity_gates(experiment, reference)
+    geometry_check = next(
+        check for check in gates.checks if check.name == "geometry_determinants"
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert geometry_check.passed is False
+    assert "invalid" not in geometry_check.detail
+
+    residual, _candidate = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+        review="reviewed",
+    )
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.score_eligible is False
+    assert residual.refusal is None
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in residual.notices
+    )
 
 
 @pytest.mark.parametrize(
@@ -5169,8 +5736,15 @@ def test_uncalibrated_kems_activity_uses_calibration_not_grounded_stratum(
     )
 
 
-def test_uncalibrated_kems_activity_pressure_sum_over_limit_still_refuses() -> None:
-    identity = F.activity_identity(formula="NaO0.5")
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_activity_pressure_sum_over_limit_still_refuses(
+    quantity: Quantity,
+) -> None:
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"), quantity=quantity
+    )
     experiment = F.kems_experiment(
         orifice_area=None, clausing=None, kn=None, calibrated=False
     )
@@ -7570,6 +8144,91 @@ def test_unstated_printed_uncertainty_sets_a_band_and_notice() -> None:
         notice.reason == "confidence_level_not_stated"
         and "field=sigma" in notice.band
         and "printed_width=0.02" in notice.band
+        for notice in residual.notices
+    )
+
+
+def test_assumed_one_sigma_notice_reports_flipped_two_sigma_verdict() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.psat_identity("Na")
+    ref = replace(
+        F.observation(
+            "na-psat-unstated-plus-minus",
+            exp.experiment_id,
+            ident,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="± 0.01 Pa",
+        ),
+    )
+
+    residual, _ = _compile(ref, exp, _predict(Decimal("1.015"), ident))
+
+    assert residual.numeric is not None
+    assert residual.refusal is None
+    assert residual.status is ResidualStatus.MATCH
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+    )
+    assert notice.band is not None
+    assert "two_sigma_reading_verdict=mismatch" in notice.band
+
+
+def test_source_method_confidence_level_overrides_assumption() -> None:
+    from simulator.battery.records import Locator, SourceMethodUncertainty
+
+    exp = F.tabulation_experiment()
+    ident = F.psat_identity("Na")
+    ref = replace(
+        F.observation(
+            "na-psat-method-two-sigma",
+            exp.experiment_id,
+            ident,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="± 0.01 Pa",
+        ),
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=Decimal("0.01"),
+        meaning="two_sigma",
+        quantity=Quantity.P_SAT,
+        basis="absolute",
+        quantity_basis="partial pressure in Pa",
+        locator=Locator(
+            page=2,
+            paragraph="Methods",
+            note="Reported ± uncertainties are two standard deviations.",
+        ),
+    )
+    work = replace(
+        F.work(), source_method_uncertainties={"work-1": method_uncertainty}
+    )
+    context = _context(work, exp, ref)
+
+    residual, _ = compile_residual(
+        ref,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={ref.observation_id},
+        prediction=_predict(Decimal("1.015"), ident),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is not None
+    assert residual.numeric.decision_band.rule.startswith("printed_2sigma:")
+    assert not any(
+        notice.reason == "uncertainty_confidence_level_assumed_1sigma"
         for notice in residual.notices
     )
 
@@ -11157,7 +11816,8 @@ def test_indexed_work_inputs_match_independent_per_work_resolution() -> None:
         works, observations, experiments, indexes
     )
     assert indexed == expected
-    assert experiments.lookups == len(observations)
+    # Work grouping and quoted-source lineage each resolve an experiment.
+    assert experiments.lookups == 2 * len(observations)
     assert expected[first_work.work_id].ids == {
         first_observation.observation_id,
         "nasa-cea-thermo",
@@ -11329,6 +11989,7 @@ def test_nasa9_comparisons_reuse_one_work_lineage_index(
     from simulator.battery.compilation_tier import (
         ThermoAttempt,
         _nasa9_fit_comparisons,
+        _nasa9_fit_temperature_grid,
     )
     from simulator.battery.generators import compilation_thermo_fits
     from simulator.battery.records import Locator
@@ -11441,15 +12102,17 @@ def test_nasa9_comparisons_reuse_one_work_lineage_index(
         fit_records=(record,),
     )
 
-    assert len(comparisons) == 2
+    assert len(comparisons) == len(
+        _nasa9_fit_temperature_grid(Decimal("900"), Decimal("1200"))
+    )
     assert all(
         item.residual.source_relation is SourceRelation.SAME_INPUT
         for item in comparisons
     )
     assert work_expansions[0] == 1
-    # The first comparison resolves the work's registered inputs; the shared
-    # snapshot memo serves the second comparison without another registered
-    # lookup. Two references still each get their own ancestry classification.
+    # The first generated grid point resolves the work's registered inputs;
+    # the snapshot memo serves the remaining points without another lookup.
+    # Each reference still gets its own ancestry classification.
     assert len(registered_lookup_walks) == 1
     assert all(
         walks == 0 and complete for walks, complete in registered_lookup_walks
@@ -14286,6 +14949,26 @@ def test_fusion_conversion_combines_printed_uncertainty_and_keeps_flag(
 ) -> None:
     from simulator.battery import score as score_module
 
+    original_combine = getattr(
+        score_module, "_combine_independent_standard_uncertainties", None
+    )
+    combine_calls = []
+    combined_by_measurement = {}
+
+    def capture_combine(measurement_sigma, conversion_sigma):
+        combine_calls.append((measurement_sigma, conversion_sigma))
+        if original_combine is None:
+            return Decimal(0)
+        combined = original_combine(measurement_sigma, conversion_sigma)
+        combined_by_measurement[measurement_sigma] = combined
+        return combined
+
+    monkeypatch.setattr(
+        score_module,
+        "_combine_independent_standard_uncertainties",
+        capture_combine,
+        raising=False,
+    )
     temperature = Decimal("2000")
     composition = Composition(
         basis="printed_mole_fraction",
@@ -14314,7 +14997,7 @@ def test_fusion_conversion_combines_printed_uncertainty_and_keeps_flag(
         ),
         uncertainty=Uncertainty(
             kind=UncertaintyKind.PRINTED,
-            verbatim="±0.10 standard deviation of log10(a) as printed",
+            verbatim="±0.10 dex",
             locator=F.loc(page=4, table="2"),
         ),
     )
@@ -14342,17 +15025,37 @@ def test_fusion_conversion_combines_printed_uncertainty_and_keeps_flag(
         reference,
         Engine.INTERNAL_ANALYTICAL,
         context=_context(F.work(), experiment, reference, review="reviewed"),
-        prediction=_predict(converted.value.point, converted.identity),
+        prediction=_predict(
+            converted.value.point * Decimal("1.4125375446227544"),
+            converted.identity,
+        ),
     )
 
     assert residual.numeric is not None
     assert residual.numeric.decision_band is not None
+    assert residual.status is ResidualStatus.MATCH
     band = residual.numeric.decision_band
     assert band.band_basis == "fusion_combined_row_printed"
     assert band.value > Decimal("0.10") * score_module.NORMAL_95_TICKET_MULTIPLIER
     # sigma_conv = 1 kJ/mol * 1000 J/kJ / (8.31441 J/(mol K) * 2000 K * ln(10));
     # sigma_total = sqrt(0.10^2 + sigma_conv^2) dex; ticket = 1.959963984540054 * sigma_total.
     assert band.value.quantize(Decimal("0.00001")) == Decimal("0.20257")
+    # The two-sigma reading treats the same printed width as 0.05 dex.
+    # With the same JANAF conversion sigma its ticket is 0.11056 dex.
+    assert [measurement for measurement, _conversion in combine_calls] == [
+        Decimal("0.10"),
+        Decimal("0.05"),
+    ]
+    assert combine_calls[0][1] == combine_calls[1][1]
+    assert (
+        score_module.NORMAL_95_TICKET_MULTIPLIER
+        * combined_by_measurement[Decimal("0.05")]
+    ).quantize(Decimal("0.00001")) == Decimal("0.11056")
+    assert any(
+        notice.reason == "uncertainty_confidence_level_assumed_1sigma"
+        and "two_sigma_reading_verdict=mismatch" in (notice.band or "")
+        for notice in residual.notices
+    )
     assert any(
         item.reason.startswith("reference_converted_via_fusion;")
         for item in residual.notices
@@ -18504,8 +19207,8 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             if row.reference not in class_s_activity_refs
         )
         assert any(
-            row.refusal is not None
-            and row.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+            score_module.FLAGGED_STRATUM_UNVERIFIED_APPARATUS
+            in score_module.flagged_strata(row.notices)
             for row in activity_rows
         )
         assert all(not row.score_eligible for row in stolyarova_rows)
@@ -20205,6 +20908,16 @@ def test_knudsen_raw_rate_interval_evaluates_at_geometric_mean_diameter() -> Non
         origin="synthetic-knudsen-ideal-orifice",
     )
     assert ideal.pressure_Pa == result.pressure_Pa
+    for invalid_clausing in (Decimal("0"), Decimal("1.01")):
+        with pytest.raises(ValueError, match="clausing_factor must be a point"):
+            knudsen_effusion_pressure_from_mass_rate(
+                rate,
+                temperature,
+                molar_mass,
+                diameter,
+                clausing_factor=invalid_clausing,
+                origin="synthetic-knudsen-invalid-clausing",
+            )
 
     assert result.notice is not None
     assert result.notice.kind is NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED

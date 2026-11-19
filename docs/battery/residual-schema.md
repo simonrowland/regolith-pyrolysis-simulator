@@ -16,6 +16,19 @@ Mode-labeled residual keys include that token so records from distinct
 conditions remain separate. Residuals without a resolved or requested fO2
 mode omit the field.
 
+Activity `reference_state.convention` may be `temkin` for the ideal-ionic
+solution interpretation of FeO activity: the Fe²⁺ fraction on the cation
+sublattice multiplied by the O²⁻ fraction on the anion sublattice, including
+silicate anions. For pure FeO both fractions are one, so `a_FeO = 1`.
+
+For Distin, keep the measured reference distinct from that model
+interpretation. The measured activity is the oxygen ratio against the
+nonstoichiometric oxide saturated with liquid iron; the source then converts
+it to a stoichiometric standard. The scorer's iron-saturation reference owner
+uses the Darken & Gurry factor for that conversion. Its N₀ payload describes
+the saturation composition and comparison band and is not an additional
+activity divisor.
+
 The `composition_binary_complement` notice records a binary composition
 derived as the complement of a printed caption mole percent. Such residuals
 remain visible in the `binary-complement-composition` flagged stratum.
@@ -25,6 +38,16 @@ fractions computed by stoichiometry from printed element mass percent, when
 those oxides account for the whole sample. The reason carries the printed
 oxide sum in wt%, read from the derivation inputs. Such residuals remain
 visible in the `oxide-from-element-mass-percent-composition` flagged stratum.
+
+**Range-only NASA-9 fit points.** An accepted fit with no source-printed grid is
+evaluated at `Tmin`, `Tmax`, and every interior multiple of 100 K. If that gives
+more than 11 points, it is evaluated at 11 evenly spaced points including both
+endpoints. The evaluator refuses temperatures outside the fit's validity range.
+Each comparison carries the `evaluated_from_fit_on_declared_grid` notice; its
+reason names the fit record, validity range, and grid rule. Points from one
+fit quantity share a series id, so the grid is one flagged series rather than
+independent measurements. NASA-9 comparison JSONL rows serialize these notices
+in `notices`.
 
 ## Composition and liquidus storage rules
 

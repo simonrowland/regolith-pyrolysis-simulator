@@ -42,6 +42,7 @@ from simulator.battery.records import Execution, phase_token
 from simulator.battery.score import (
     ENGINE_CHANNELS,
     EnginePrediction,
+    NORMAL_95_TICKET_MULTIPLIER,
     ScoreContext,
     _condensed_element_reference_table_diagnostics,
     _condensed_element_reference_table_key,
@@ -376,8 +377,25 @@ def test_unprinted_standard_pressure_widens_printed_gas_band_at_row_temperature(
     )
     assert scored.refusal is None
     assert scored.band is not None
-    assert scored.band.value == Decimal("0.2") + expected
+    assert scored.band.value == (
+        Decimal("0.2") * NORMAL_95_TICKET_MULTIPLIER + expected
+    )
     assert scored.band.band_basis == "printed_plus_derived_bound"
+    assert scored.two_sigma_band is not None
+    assert scored.two_sigma_band.value == Decimal("0.2") + expected
+
+    overridden = _printed_uncertainty_band(
+        Quantity.DELTA_FG,
+        observation.uncertainty,
+        observation.value.point,
+        source_observation=observation,
+        confidence_level_override="two_sigma",
+    )
+    assert overridden.refusal is None
+    assert overridden.band is not None
+    assert overridden.band.value == Decimal("0.2") + expected
+    assert overridden.notice is None
+    assert overridden.two_sigma_band is None
     if temperature_K == "2973":
         assert abs(expected - Decimal("0.33")) < Decimal("0.005")
     notice = next(

@@ -962,6 +962,14 @@ or `partial_pressure`; `buffer` remains the source's verbatim printed descriptio
 systems. A commanded pure-O2 atmosphere uses `channel: gas_mix` and the
 printed `oxygen_partial_pressure_Pa` instead of `gas_ratio`.
 
+When a source evaluates its printed gas fO2 at a stated temperature that
+differs from the run temperature, record that separate value as the located
+experiment condition `gas_fO2_evaluation_temperature_K`. Its locator must
+identify the source's calculation temperature. The migrator uses it only for
+the printed-gas consistency check; the observation keeps its actual run
+temperature. If the source does not state an evaluation temperature, the check
+uses the run temperature and emits an `input_omitted` notice.
+
 | SweepGas field | Meaning |
 |---|---|
 | `species` | Single gas species, or `none` for carrier-free conditions; omit for mixtures/alternatives |

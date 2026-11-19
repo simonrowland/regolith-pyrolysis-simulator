@@ -33,6 +33,8 @@ import yaml
 
 from simulator.state_types import StateTag
 from simulator.yaml_cache import load_cached_safe_yaml
+from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.regression import assert_regression_raises_assertion_without_skip
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 TOOLS = REPO_ROOT / "tools"
@@ -2573,6 +2575,202 @@ def test_corpus_fidelity_gate_rejects_copied_unattested_values():
     assert any("reviewed_by is required" in error for error in errors), errors
 
 
+def test_barin_1995_aluminate_tables_are_pinned_and_migrate_conditions(
+    tmp_path: Path,
+) -> None:
+    source_name = "barin-1995.yaml"
+    doc = yaml.safe_load((EXTRACTS / source_name).read_text(encoding="utf-8"))
+    pending = [doc]
+    locators = []
+    while pending:
+        item = pending.pop()
+        if isinstance(item, dict):
+            locator = item.get("locator")
+            if isinstance(locator, dict):
+                locators.append(locator)
+            pending.extend(item.values())
+        elif isinstance(item, list):
+            pending.extend(item)
+    corpus_table = "tables/barin-1995-aluminates/barin-1995-aluminate-tables.md"
+    table_locators = [locator for locator in locators if locator.get("source_path")]
+    assert len(table_locators) == 124
+    assert {locator["source_path"] for locator in table_locators} == {corpus_table}
+    assert {locator["source_sha256"] for locator in table_locators} == {
+        "cbebc0379da5867e227e843674fec34a34afd2a24b13497d6bbb60cd4bc18c55"
+    }
+    assert not any(
+        str(locator.get("source_path", "")).startswith("docs/references/")
+        and not str(locator.get("source_path", "")).startswith(
+            "docs/references/pdfs/"
+        )
+        for locator in locators
+    )
+    expected_tables = {
+        "CaAl2O4": (17, 557, 442, 556, "barin95_caal2o4_sol_cp", "120.791"),
+        "CaAl4O7": (19, 558, 443, 557, "barin95_caal4o7_sol_cp", "198.174"),
+        "Ca3Al2O6": (17, 560, 445, 559, "barin95_c3a_sol_cp", "209.697"),
+        "Ca12Al14O33": (16, 560, 445, 559, "barin95_c12a7_sol_cp", "1084.825"),
+        "NaAlO2": (20, 1248, 1132, 1247, "barin95_naalo2_sol_a_cp", "73.535"),
+        "MgAl2O4": (26, 1131, 1015, 1130, "barin95_mgal2o4_sol_cp", "116.191"),
+    }
+    for species_id, (row_count, page, folio, pdf_index, cp_id, cp_value) in (
+        expected_tables.items()
+    ):
+        observations = doc["species"][species_id]["observations"]
+        cp_observations = [
+            observation
+            for observation in observations
+            if observation["observation_id"].endswith("_cp")
+        ]
+        assert sum(len(item["values"]["points"]) for item in cp_observations) == row_count
+        pin = next(
+            observation
+            for observation in cp_observations
+            if observation["observation_id"] == cp_id
+        )
+        first_point = pin["values"]["points"][0]
+        assert first_point["T_K"] == "298.15"
+        assert first_point["value"] == cp_value
+        assert first_point["locator"]["page"] == page
+        assert first_point["locator"]["published_page"] == folio
+        assert first_point["locator"]["pdf_page_index"] == pdf_index
+        assert first_point["locator"]["row"] == f"{pin['phase_label_as_printed']} 298.15"
+        samples = [
+            sample
+            for sample in doc["fidelity_samples"]
+            if sample.get("path", "").startswith(
+                f"species.{species_id}.observations[{cp_id}]"
+            )
+        ]
+        assert any(
+            sample["value"]["points"][0]["value"] == cp_value
+            for sample in samples
+            if sample["path"].endswith(".values")
+        )
+        assert any(
+            sample.get("locator", {}).get("pdf_page_index") == pdf_index
+            for sample in samples
+        )
+        for observation in observations:
+            if observation["type"] != "heat_capacity_and_heat_content_series":
+                continue
+            assert len(observation["values"]["points"]) > 0
+            for point in observation["values"]["points"]:
+                locator = point["locator"]
+                assert locator["page"] == page
+                assert locator["pdf_page_index"] == pdf_index
+                condition = point["point_conditions"]["temperature_K"]
+                assert condition["state"]["value"]["point"] == point["T_K"]
+                assert condition["locator"]["page"] == page
+                assert condition["locator"]["pdf_page_index"] == pdf_index
+                assert condition["locator"]["column"] == "T"
+                assert condition["locator"]["table_column_number"] == 2
+
+    transition_rows = {
+        observation["observation_id"]: observation
+        for species_id in ("NaAlO2", "MgAl2O4")
+        for observation in doc["species"][species_id]["observations"]
+        if observation["type"] in {"transition_point", "phase_transition"}
+    }
+    expected_transitions = {
+        "barin95_naalo2_transition_sol_a_sol_b_temperature_740": (
+            "transition_temperature", "740.00", 1248, 1247, 9, "T", 2,
+            "SOL-A 740.00",
+        ),
+        "barin95_naalo2_transition_enthalpy_740": (
+            "polymorph_transition_enthalpy_as_printed", "1.297", 1248, 1247,
+            10, "H", 6, "SOL-A 740.00",
+        ),
+        "barin95_naalo2_transition_entropy_740": (
+            "polymorph_transition_entropy_as_printed", "1.753", 1248, 1247,
+            10, "S", 4, "SOL-A 740.00",
+        ),
+        "barin95_mgal2o4_fusion_temperature_2408": (
+            "transition_temperature", "2408.00", 1131, 1130, 26, "T", 2,
+            "SOL 2408.00",
+        ),
+        "barin95_mgal2o4_fusion_enthalpy_2408": (
+            "heat_of_fusion", "196.648", 1131, 1130, 27, "H", 6,
+            "SOL 2408.00",
+        ),
+        "barin95_mgal2o4_fusion_entropy_2408": (
+            "entropy_of_fusion", "81.664", 1131, 1130, 27, "S", 4,
+            "SOL 2408.00",
+        ),
+    }
+    assert set(transition_rows) == set(expected_transitions)
+    for observation_id, (
+        quantity, value, page, pdf_index, row_number, column, column_number,
+        temperature_row,
+    ) in expected_transitions.items():
+        observation = transition_rows[observation_id]
+        assert observation["values"]["quantity"] == quantity
+        if quantity == "transition_temperature":
+            actual = observation["values"]["T_m_K"]
+        else:
+            actual = observation["values"]["value"]
+        assert actual == value
+        assert observation["locator"]["page"] == page
+        assert observation["locator"]["pdf_page_index"] == pdf_index
+        assert observation["locator"]["table_row_number"] == row_number
+        assert observation["locator"]["column"] == column
+        assert observation["locator"]["table_column_number"] == column_number
+        condition = observation["point_conditions"]["temperature_K"]
+        assert condition["locator"]["page"] == page
+        assert condition["locator"]["pdf_page_index"] == pdf_index
+        assert condition["locator"]["column"] == "T"
+        assert condition["locator"]["table_column_number"] == 2
+        assert condition["locator"]["row"] == temperature_row
+        assert condition["locator"]["table_row_number"] == (
+            9 if page == 1248 else 26
+        )
+
+    new_samples = [
+        sample for sample in doc["fidelity_samples"]
+        if sample.get("path", "").startswith("species.CaAl2O4.observations[barin95_")
+        or sample.get("path", "").startswith("species.CaAl4O7.observations[barin95_")
+        or sample.get("path", "").startswith("species.Ca3Al2O6.observations[barin95_")
+        or sample.get("path", "").startswith("species.Ca12Al14O33.observations[barin95_")
+        or sample.get("path", "").startswith("species.NaAlO2.observations[barin95_")
+        or sample.get("path", "").startswith("species.MgAl2O4.observations[barin95_")
+    ]
+    assert len(new_samples) == 124
+    assert vle.check_all_fidelity_samples_match(doc, label="barin-1995") == []
+    mutated = copy.deepcopy(doc)
+    sample = new_samples[0]
+    actual = vle.resolve_fidelity_sample(mutated, sample)
+    assert actual == sample["value"]
+    path = sample["path"]
+    assert path.endswith(".values")
+    observation_id = path.split("observations[", 1)[1].split("]", 1)[0]
+    species_id = path.split("species.", 1)[1].split(".observations", 1)[0]
+    target = next(
+        observation
+        for observation in mutated["species"][species_id]["observations"]
+        if observation["observation_id"] == observation_id
+    )
+    target["values"]["points"][0]["value"] = "999.999"
+    assert vle.check_all_fidelity_samples_match(mutated, label="barin-1995-mutation")
+
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    migrated = _migrate_real_extract(tmp_path, source_name, extract_doc=doc)
+    observations = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.source_id == "barin-1995"
+        and observation.locator is not None
+        and observation.locator.page in {557, 558, 560, 1131, 1248}
+    ]
+    assert len(observations) == 811
+    assert all(
+        observation.point_conditions is not None
+        and observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].locator is not None
+        for observation in observations
+    )
+
+
 def test_numeric_index_path_does_not_cover_a_scored_observation():
     """``observations[0]`` is a position. Reordering would retarget the pin."""
     doc = _minimal_extract()
@@ -4414,6 +4612,45 @@ def test_every_extract_has_fidelity_sample():
             assert doc.get("fidelity_samples"), f"{path.name} missing fidelity_samples"
 
 
+def test_audit_mapping_fidelity_samples_match_canonical_extracts():
+    """Keep every mapped printed pin bound to its canonical observation value."""
+    audit_dir = EXTRACTS / "audits"
+    mapping_paths = sorted(audit_dir.glob("*.mapping.yaml"))
+    checked = 0
+    for mapping_path in mapping_paths:
+        source = mapping_path.read_text(encoding="utf-8")
+        if not re.search(r"^fidelity_samples\s*:", source, flags=re.MULTILINE):
+            continue
+        mapping = load_cached_safe_yaml(source)
+        samples = mapping.get("fidelity_samples") or []
+        if not samples:
+            continue
+        source_id = mapping.get("source_id")
+        assert isinstance(source_id, str) and source_id
+        extract_path = EXTRACTS / f"{source_id}.yaml"
+        assert extract_path.is_file(), f"missing canonical extract for {mapping_path.name}"
+        extract = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
+        candidate = copy.deepcopy(extract)
+        candidate["fidelity_samples"] = [
+            (
+                {
+                    key: value
+                    for key, value in sample.items()
+                    if key not in {"species", "observable", "observation_id"}
+                }
+                if sample.get("path")
+                else sample
+            )
+            for sample in samples
+        ]
+        errors = vle.check_all_fidelity_samples_match(
+            candidate, label=f"{mapping_path.name} -> {extract_path.name}"
+        )
+        assert errors == [], errors
+        checked += 1
+    assert checked > 0, "no audit mapping fidelity samples were checked"
+
+
 def test_costa_jacobson_retained_sio_has_fidelity_sample(monkeypatch):
     """Run the landed-pilot sample-presence guard against this extract alone."""
     path = EXTRACTS / "costa-jacobson-2015.yaml"
@@ -5294,8 +5531,8 @@ _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
 # A second pilot pin inside an already-affected extract must still fail.
 _PILOT_PINS_CEILING = 57
-# Attestation-complete pins whose locator is not opened. Zero on this corpus:
-# no sample carries reviewed_by. The ceiling may only fall.
+# Attestation-complete pins whose locator is not opened. With the corpus root
+# mounted, Barin's 124 newly attested table pins resolve and leave none blind.
 _SOURCE_BLIND_PINS_CEILING = 0
 # Scored observation ids that name more than one row. Zero on this corpus:
 # schema validation already rejects duplicates. The ceiling cannot rise.
@@ -5397,6 +5634,13 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     affected extracts alone would miss another pilot pin in an extract that
     already has one.
     """
+    corpus_root = regolith_corpus_root()
+    barin_transcription = (
+        corpus_root
+        / "tables"
+        / "barin-1995-aluminates"
+        / "barin-1995-aluminate-tables.md"
+    )
 
     documents = list(_fidelity_extract_documents())
     monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
@@ -5414,6 +5658,34 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
         unmounted["uncovered_observation"],
         unmounted_extract_counts["uncovered_observation"],
     )
+    if barin_transcription.is_file():
+        monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+        corpus_mounted, corpus_mounted_extract_counts, _mount_pins, _details = (
+            _fidelity_warning_totals(documents)
+        )
+        assert (
+            corpus_mounted["uncovered_observation"],
+            corpus_mounted_extract_counts["uncovered_observation"],
+            corpus_mounted["unattested_sample"],
+            corpus_mounted["auto_migrated_pilot_pin"],
+            corpus_mounted_extract_counts["auto_migrated_pilot_pin"],
+            corpus_mounted["ambiguous_observation_id"],
+            corpus_mounted["missing_observation_id"],
+            corpus_mounted["non_finite_evidence"],
+        ) == (
+            unmounted["uncovered_observation"],
+            unmounted_extract_counts["uncovered_observation"],
+            unmounted["unattested_sample"],
+            unmounted["auto_migrated_pilot_pin"],
+            unmounted_extract_counts["auto_migrated_pilot_pin"],
+            unmounted["ambiguous_observation_id"],
+            unmounted["missing_observation_id"],
+            unmounted["non_finite_evidence"],
+        )
+        assert (
+            corpus_mounted["source_blind_pin"] <= _SOURCE_BLIND_PINS_CEILING
+        ), corpus_mounted["source_blind_pin"]
+
     uncovered_obs = unmounted["uncovered_observation"]
     uncovered_extracts = unmounted_extract_counts["uncovered_observation"]
     unattested_samples = unmounted["unattested_sample"]
@@ -5423,6 +5695,7 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     ambiguous_ids = unmounted["ambiguous_observation_id"]
     missing_ids = unmounted["missing_observation_id"]
     non_finite = unmounted["non_finite_evidence"]
+    assert source_blind_pins == 124
     record_property("mount_dependent_pins", mount_dependent_pins)
     assert mount_dependent_pins <= source_blind_pins
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
@@ -5451,6 +5724,72 @@ def test_fidelity_corpus_pins_open(monkeypatch, record_property):
     tally = _assert_corpus_pins_open(list(_fidelity_extract_documents()))
     record_property("verified_corpus_opens", tally.verified_opens)
     record_property("unverified_corpus_prefixes", _format_unverified_prefixes(tally))
+
+
+def test_fidelity_warning_ratchet_detects_nonfinite_without_barin_transcription(
+    monkeypatch, tmp_path, record_property
+):
+    """A missing Barin transcription cannot skip unrelated corpus warnings."""
+    source_path = next(
+        path for path in vle.discover_extracts() if path.stem != "barin-1995"
+    )
+    source_text = source_path.read_text(encoding="utf-8")
+    original_document = load_cached_safe_yaml(source_text)
+    scored_observations, _, _ = vle._scored_observations(original_document)
+    target = next(
+        observation
+        for observation in scored_observations.values()
+        if isinstance(observation.get("values"), dict)
+    )
+    target["values"]["ratchet_regression_probe"] = float("nan")
+
+    original_loader = load_cached_safe_yaml
+
+    def load_with_nonfinite_probe(text):
+        if text == source_text:
+            return copy.deepcopy(original_document)
+        return original_loader(text)
+
+    missing_corpus_root = tmp_path / "corpus-without-barin"
+    monkeypatch.setattr(
+        sys.modules[__name__],
+        "regolith_corpus_root",
+        lambda: missing_corpus_root,
+    )
+    monkeypatch.setattr(
+        sys.modules[__name__],
+        "load_cached_safe_yaml",
+        load_with_nonfinite_probe,
+    )
+    failure = assert_regression_raises_assertion_without_skip(
+        lambda: test_fidelity_source_warning_ratchet(
+            monkeypatch, tmp_path / "empty-corpus", record_property
+        )
+    )
+    assert str(failure).splitlines()[0] == "1"
+
+
+def test_source_attestation_rejects_a_missing_additional_locator(tmp_path: Path):
+    """Every declared artifact path must open under production validation."""
+    document = _tabular_source_document(tmp_path, 0.91, "csv", "0.91\n")
+    locator = document["fidelity_samples"][0]["locator"]
+    locator["source_path"] = locator.pop("quotes_path")
+    baseline_refusals = vle.certify_extract_source_fidelity(
+        document, label="fixture", artifact_root=tmp_path
+    )
+    assert not any("source_blind_pin" in refusal for refusal in baseline_refusals), (
+        baseline_refusals
+    )
+
+    locator["quotes_path"] = "tables/missing-review-witness.tsv"
+    refusals = vle.certify_extract_source_fidelity(
+        document, label="fixture", artifact_root=tmp_path
+    )
+    assert any(
+        "source_blind_pin count=1" in refusal
+        and "missing-review-witness.tsv" in refusal
+        for refusal in refusals
+    ), refusals
 
 
 def test_auto_migrated_pilot_pin_counts_each_sample():
@@ -14307,6 +14646,88 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     mo = experiment_named(allibert, "allibert-1981-mo-kems")
     assert all(item.experiment_id != mo.experiment_id for item in emf)
     assert allibert.experiments[emf[0].experiment_id].bench_id is None
+
+
+def test_shornikov_kems_methods_migrate_with_typed_unverified_regime(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import Quantity, RefusalReason
+    from simulator.battery.validity import run_validity_gates
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    cases = (
+        (
+            "shornikov-2008-mgo-aluminosilicate-melts.yaml",
+            "shornikov-archakov-2001-kems",
+            "Mass-spectrometric Knudsen effusion measurements, as attributed in the paper.",
+            17,
+        ),
+        (
+            "shornikov-2011-cao-mgo-alumina-melts.yaml",
+            "shornikov_2011_figure1_series1_allibert_1979",
+            "mass-spectrometric Knudsen effusion method",
+            15,
+        ),
+    )
+    for filename, local_id, prior_method, expected_measurements in cases:
+        source = EXTRACTS / filename
+        extract = battery_migrate.load_yaml(source)
+        declaration = next(
+            item for item in extract["experiments"]
+            if item["experiment_id"] == local_id
+        )
+        assert declaration["method"] == "knudsen_effusion"
+
+        migrated = _migrate_real_extract(
+            tmp_path / f"{source.stem}-current", filename, extract_doc=extract
+        )
+        experiment = next(
+            item for item in migrated.experiments.values()
+            if item.experiment_id.endswith(f"::experiment::{local_id}")
+        )
+        assert experiment.method.is_value
+        assert experiment.method.value.value == "knudsen_effusion"
+        assert experiment.pressure_environment.regime.regime_class.is_value
+        assert (
+            experiment.pressure_environment.regime.regime_class.value.value
+            == "molecular"
+        )
+        assert experiment.pressure_environment.total_pressure_Pa.state.is_unknown
+        knudsen_number = experiment.pressure_environment.regime.knudsen_number_orifice
+        assert knudsen_number is not None and knudsen_number.state.is_unknown
+
+        measurements = [
+            item for item in migrated.observations.values()
+            if item.experiment_id == experiment.experiment_id
+            and item.identity.quantity.is_value
+            and item.identity.quantity.value in {
+                Quantity.ACTIVITY,
+                Quantity.ACTIVITY_COEFFICIENT,
+            }
+        ]
+        assert len(measurements) == expected_measurements
+        gates = [run_validity_gates(experiment, item) for item in measurements]
+        assert all(
+            not gate.passed
+            and gate.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+            for gate in gates
+        )
+
+        mutated = copy.deepcopy(extract)
+        next(
+            item for item in mutated["experiments"]
+            if item["experiment_id"] == local_id
+        )["method"] = prior_method
+        mutant_migration = _migrate_real_extract(
+            tmp_path / f"{source.stem}-mutated",
+            filename,
+            extract_doc=mutated,
+        )
+        mutant_experiment = next(
+            item for item in mutant_migration.experiments.values()
+            if item.experiment_id.endswith(f"::experiment::{local_id}")
+        )
+        assert mutant_experiment.method.is_unknown
 
 
 def test_shornikov_and_demaria_printed_cell_materials_reach_observations(
