@@ -128,22 +128,43 @@ def extract_comparator(monkeypatch):
     return install
 
 
-@pytest.mark.parametrize(("source_id", "expected_kind"), [
-    ("kems-005-fedkin-2006", "derived measurement"),
-    ("kems-008-schaefer-fegley-2004", "literature correlation"),
-    ("kems-041-sossi-fegley-2018", "literature correlation"),
+@pytest.mark.parametrize(("source_id", "expected_kind", "has_fit"), [
+    ("kems-005-fedkin-2006", "derived measurement", True),
+    ("kems-008-schaefer-fegley-2004", "literature correlation", False),
+    ("kems-041-sossi-fegley-2018", "literature correlation", False),
 ])
 def test_calibration_source_kind_uses_source_declaration(
-    extract_comparator, source_id, expected_kind
+    extract_comparator, source_id, expected_kind, has_fit
 ):
     from scripts.calibration_battery import extract_rows
 
     obs = extract_comparator("match", source_id=source_id)
-    obs.values["fit"] = True
+    if has_fit:
+        obs.values["fit"] = True
 
     rows = extract_rows()
 
     assert rows and {row["measurement_kind"] for row in rows} == {expected_kind}
+
+
+@pytest.mark.parametrize(("source_id", "expected_kind"), [
+    ("kems-008-schaefer-fegley-2004", "literature correlation"),
+    ("kems-041-sossi-fegley-2018", "literature correlation"),
+])
+def test_calibration_correlation_classification_depends_on_declaration(
+    extract_comparator, monkeypatch, source_id, expected_kind
+):
+    from scripts.calibration_battery import extract_rows
+    from simulator.battery.source_declarations import SOURCE_DECLARATIONS
+
+    extract_comparator("match", source_id=source_id)
+    rows = extract_rows()
+    assert rows and {row["measurement_kind"] for row in rows} == {expected_kind}
+
+    monkeypatch.setitem(SOURCE_DECLARATIONS, source_id, {})
+    mutated_rows = extract_rows()
+    assert mutated_rows
+    assert {row["measurement_kind"] for row in mutated_rows} == {"direct experiment"}
 
 
 @pytest.mark.parametrize("markers", [
