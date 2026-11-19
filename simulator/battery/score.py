@@ -13610,10 +13610,7 @@ def _predict_liquidus_transition_temperature(
     handles: Mapping[str, object] | None,
     experiment: Experiment | None,
 ) -> EnginePrediction:
-    from simulator.melt_backend.liquidus import (
-        _LIQUIDUS_TRANSITION_SUBTYPES,
-        _liquidus_transition_temperature_K,
-    )
+    from simulator.melt_backend.liquidus import _LIQUIDUS_TRANSITION_SUBTYPES
 
     subtype = _subtype_text(identity)
     requested = identity.composition
@@ -13938,27 +13935,21 @@ def _predict_liquidus_transition_temperature(
 
             close_battery_engine_handle(handle)
 
-    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+    from simulator.melt_backend.liquidus import liquidus_transition_decision
 
-    if not isinstance(result, LiquidusSolidusResult):
-        return unavailable({"reason": "liquidus_finder_result_invalid"})
-    if result.status != "ok":
-        return unavailable(
-            {
-                "reason": f"liquidus_finder_{result.status}",
-                "status": result.status,
-                "warnings": list(result.warnings),
-            }
-        )
-    temperature_K = _liquidus_transition_temperature_K(result, subtype)
+    temperature_K, decision_reason = liquidus_transition_decision(result, subtype)
     if temperature_K is None:
-        return unavailable(
-            {
-                "reason": "liquidus_finder_requested_transition_missing",
-                "subtype": subtype,
-                "status": result.status,
-            }
-        )
+        detail: dict[str, object] = {"reason": decision_reason}
+        if decision_reason == "liquidus_finder_requested_transition_missing":
+            detail["subtype"] = subtype
+            detail["status"] = result.status
+        elif decision_reason not in {
+            "liquidus_finder_result_invalid",
+            "unsupported_subtype",
+        }:
+            detail["status"] = result.status
+            detail["warnings"] = list(result.warnings)
+        return unavailable(detail)
     return EnginePrediction(
         engine=engine,
         channel=channel,

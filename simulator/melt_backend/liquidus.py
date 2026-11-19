@@ -283,6 +283,28 @@ def _liquidus_transition_temperature_K(
     return temperature_K
 
 
+def liquidus_transition_decision(
+    result: object,
+    subtype: str,
+) -> tuple[float | None, str | None]:
+    """Kelvin of the requested transition, or the existing refusal reason.
+
+    The scorer builds the prediction envelope. This is the only owner of
+    which result field is the transition and which status is a refusal.
+    """
+
+    if not isinstance(result, LiquidusSolidusResult):
+        return None, "liquidus_finder_result_invalid"
+    if subtype not in _LIQUIDUS_TRANSITION_SUBTYPES:
+        return None, "unsupported_subtype"
+    if result.status != "ok":
+        return None, f"liquidus_finder_{result.status}"
+    temperature_K = _liquidus_transition_temperature_K(result, subtype)
+    if temperature_K is None:
+        return None, "liquidus_finder_requested_transition_missing"
+    return temperature_K, None
+
+
 @dataclass(frozen=True)
 class LiquidFractionPathPoint:
     temperature_C: float

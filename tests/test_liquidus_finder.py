@@ -20,6 +20,7 @@ from simulator.melt_backend.liquidus import (
     _liquidus_transition_temperature_K,
     build_equilibrium_crystallization_path,
     find_liquidus_solidus_by_fraction,
+    liquidus_transition_decision,
 )
 
 
@@ -115,6 +116,45 @@ def test_liquidus_transition_selector_uses_exact_subtype_in_kelvin():
         ),
         "liquidus",
     ) is None
+
+
+def test_liquidus_transition_decision_names_the_existing_refusal():
+    located = LiquidusSolidusResult(
+        liquidus_T_C=1436.0,
+        solidus_T_C=1400.0,
+        liquid_fraction=1.0,
+        status="ok",
+    )
+    temperature_K, reason = liquidus_transition_decision(located, "solidus")
+    assert reason is None
+    assert temperature_K == pytest.approx(
+        _liquidus_transition_temperature_K(located, "solidus")
+    )
+    missing_solidus = LiquidusSolidusResult(
+        liquidus_T_C=1436.0,
+        liquid_fraction=1.0,
+        status="ok",
+    )
+    assert liquidus_transition_decision(missing_solidus, "solidus") == (
+        None,
+        "liquidus_finder_requested_transition_missing",
+    )
+    refused = LiquidusSolidusResult(
+        status="not_converged",
+        warnings=("solidus bracket absent",),
+    )
+    assert liquidus_transition_decision(refused, "liquidus") == (
+        None,
+        "liquidus_finder_not_converged",
+    )
+    assert liquidus_transition_decision(located, "glass_transition") == (
+        None,
+        "unsupported_subtype",
+    )
+    assert liquidus_transition_decision(object(), "liquidus") == (
+        None,
+        "liquidus_finder_result_invalid",
+    )
 
 
 def _scan_transition(anchors: dict[float, float]):

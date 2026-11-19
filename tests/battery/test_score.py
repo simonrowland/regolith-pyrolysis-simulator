@@ -20040,6 +20040,18 @@ def test_transition_temperature_dispatches_exact_native_result_and_inputs(
     assert prediction.execution.state is ExecutionState.PRODUCED
     assert prediction.refusal_reason is None
 
+    def drop_the_owner(_result, _subtype):
+        return None, "liquidus_finder_requested_transition_missing"
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.liquidus.liquidus_transition_decision",
+        drop_the_owner,
+    )
+    with pytest.raises(AssertionError):
+        mutated = predict_with_engine(Engine.MAGEMIN, reference)
+        assert mutated.value == Decimal("1673.15")
+        assert mutated.refusal_reason is None
+
 
 @pytest.mark.parametrize(
     ("missing", "identity_field"),
