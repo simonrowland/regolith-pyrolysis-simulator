@@ -1194,7 +1194,7 @@ def test_distin_oxygen_ratio_converts_by_the_gibbs_factor() -> None:
         == factor
     )
     vaporock = fusion_comparison_reference(row, engine=Engine.VAPOROCK)
-    assert vaporock.value.point == point
+    assert vaporock.value.point == point * factor
 
 
 def test_recorded_n0_does_not_scale_a_distin_oxygen_ratio() -> None:

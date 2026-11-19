@@ -297,16 +297,26 @@ def test_table5_migration_reaches_temperature_and_scored_composition(
             context=context,
             comparison_ids={observation.observation_id},
         )
-        # The contract echoes identity.composition and generated is None.
-        # That is not consumption of the derived point composition.
-        assert vaporock.execution.state is ExecutionState.NOT_PROBED
         assert vaporock.refusal is not None
-        assert vaporock.refusal.reason is RefusalReason.UNSUPPORTED
-        assert vaporock.refusal.detail["reason"] == (
-            "engine_does_not_report_melt_activity"
-        )
-        assert vaporock.refusal.detail["gaps"] == []
-        assert all(
-            item.kind is not NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
-            for item in vaporock.notices
-        )
+        if endmember.formula == "CaO":
+            # The shared melt reference owner refuses CaO: the native liquid
+            # endmember basis has no pure-CaO standard state.
+            assert vaporock.execution.state is ExecutionState.NOT_PROBED
+            assert vaporock.refusal.reason is RefusalReason.UNSUPPORTED
+            assert vaporock.refusal.detail["reason"] == "reference_state_mismatch"
+            assert vaporock.refusal.detail["engine_convention"].startswith(
+                "typed-refusal:melts_endmember_not_parent_oxide:CaO:"
+            )
+        else:
+            # VapoRock consumes the derived composition for supported oxide
+            # references, then refuses this row's invalid native fO2 log.
+            assert vaporock.execution.state is ExecutionState.UNSUPPORTED
+            assert vaporock.refusal.reason is RefusalReason.UNSUPPORTED
+            assert vaporock.refusal.detail["refusal_reason"] == "out_of_basis"
+            assert vaporock.refusal.detail["engine_reason"].startswith(
+                "invalid_fo2_log"
+            )
+            assert any(
+                item.kind is NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
+                for item in vaporock.notices
+            )
