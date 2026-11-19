@@ -3554,9 +3554,12 @@ def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures
     import tempfile
     from pathlib import Path
 
+    pytest.importorskip("openimcc")
     from simulator.battery.enums import NoticeKind, RefusalReason
     from simulator.battery.identity import quantity_token
     from tests.battery.test_migrate import _migrate_real_extract
+
+    from openimcc.gas_data import IMCC_PARENT_OXIDES
 
     with tempfile.TemporaryDirectory() as tmp:
         result = _migrate_real_extract(Path(tmp), "kems-051-allibert-1981.yaml")
@@ -3586,7 +3589,7 @@ def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures
         observations={observation.observation_id: observation for observation in rows},
         extract_review={"kems-051-allibert-1981": "reviewed"},
     )
-    residuals, _candidates = score_store(
+    residuals, candidates = score_store(
         context,
         engines=(Engine.OPENIMCC,),
         include_diagnostics=True,
@@ -3616,6 +3619,19 @@ def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures
         )
         for residual in scored
     )
+    d066_major_oxide_rows = []
+    for residual in scored:
+        reference = context.observations[residual.reference]
+        species = reference.identity.species
+        if species is None or species.formula not in IMCC_PARENT_OXIDES:
+            continue
+        assert residual.candidate is not None
+        candidate = candidates[residual.candidate]
+        assert candidate.engine is not None
+        assert "kems-051-allibert-1981" in candidate.engine.coefficient_sources
+        assert residual.source_relation is SourceRelation.SAME_INPUT
+        d066_major_oxide_rows.append(residual.reference)
+    assert d066_major_oxide_rows
 
 
 def _fe2o3_partial_observation():
