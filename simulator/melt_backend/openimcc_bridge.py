@@ -191,8 +191,6 @@ OPENIMCC_PARENT_OXIDES = (
     "Al2O3",
     "TiO2",
 )
-_OPENIMCC_CRMN_RELAXED_OXIDES = ("Cr2O3", "MnO")
-_OPENIMCC_CRMN_RELAXED_RULING = "owner 2026-09-27"
 
 # Fe2O3 contributes two FeO-equivalent moles. Keep this mass ratio for the
 # policy diagnostic only; the actual projection folds moles directly.
@@ -704,19 +702,6 @@ def openimcc_trace_activity_models() -> Mapping[str, str]:
     return MappingProxyType(dict(sorted(models.items())))
 
 
-def _cleaned_melt_trace_activity_models() -> Mapping[str, str]:
-    """Return accepted traces after the existing Cr/Mn projection ruling."""
-
-    models = openimcc_trace_activity_models()
-    return MappingProxyType(
-        {
-            name: model
-            for name, model in models.items()
-            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES
-        }
-    )
-
-
 def _trace_activity_models_for_components(
     components: Mapping[str, Any] | Sequence[str],
 ) -> dict[str, str]:
@@ -729,13 +714,27 @@ def _trace_activity_models_for_components(
     }
 
 
+def _trace_activity_models_for_pack(pack: str | None = None) -> Mapping[str, str]:
+    """Return trace rules compatible with the selected melt/redox pack pair."""
+
+    selected_pack = DEFAULT_BACKEND_PACK_NAME if pack is None else pack
+    models = openimcc_trace_activity_models()
+    if selected_pack == "published-core" and models.get("MnO") == "redox_associates":
+        return MappingProxyType(
+            {name: model for name, model in models.items() if name != "MnO"}
+        )
+    return models
+
+
 def _cleaned_melt_projection(
     composition_mol: Mapping[str, float],
+    *,
+    pack: str | None = None,
 ) -> tuple[dict[str, float], dict[str, float]]:
     """Return source wt% and the cleaned IMCC mole projection."""
 
     canonical = _canonical_composition(composition_mol)
-    trace_activity_models = _cleaned_melt_trace_activity_models()
+    trace_activity_models = _trace_activity_models_for_pack(pack)
 
     source_mass_kg: dict[str, float] = {}
     cleaned_composition_mol: dict[str, float] = {}
@@ -931,11 +930,14 @@ def fold_ferric_to_feot(
 
 def _cleaned_melt_policy(
     composition_mol: Mapping[str, float],
+    *,
+    pack: str | None = None,
 ) -> tuple[dict[str, float], dict[str, Any]]:
     source_wt_pct, cleaned_composition_mol = _cleaned_melt_projection(
-        composition_mol
+        composition_mol,
+        pack=pack,
     )
-    trace_activity_models = _cleaned_melt_trace_activity_models()
+    trace_activity_models = _trace_activity_models_for_pack(pack)
     dropped = {
         name: value
         for name, value in source_wt_pct.items()
@@ -965,71 +967,14 @@ def _cleaned_melt_policy(
                 PROJECTED_BULK_CLASSIFICATION_KEY: classification_record,
             },
         )
-    relaxed_dropped = {
-        name: value
-        for name, value in dropped.items()
-        if name in _OPENIMCC_CRMN_RELAXED_OXIDES
-    }
-    relaxed_notice: dict[str, Any] | None = None
-    threshold_classification = classification
-    if relaxed_dropped:
-        threshold_dropped = {
-            name: value
-            for name, value in dropped.items()
-            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES
-        }
-        threshold_dropped_mol_per_kg = {
-            name: value
-            for name, value in dropped_mol_per_kg.items()
-            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES
-        }
-        threshold_unavailable_reasons = {
-            name: value
-            for name, value in unavailable_reasons.items()
-            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES
-        }
-        threshold_classification = classify_projected_bulk(
-            threshold_dropped,
-            source_sum_wt_pct=100.0,
-            dropped_component_mol_per_kg=threshold_dropped_mol_per_kg,
-            dropped_component_mol_unavailable_reasons=(
-                threshold_unavailable_reasons
-            ),
-        )
-        classification_record.update(
-            {
-                "projection_verdict": threshold_classification.verdict,
-                "thresholded_dropped_total_wt_pct": (
-                    threshold_classification.dropped_total_wt_pct
-                ),
-                "thresholded_dropped_components": list(
-                    threshold_classification.dropped_components
-                ),
-                "relaxed_dropped_components": list(relaxed_dropped),
-                "relaxed_dropped_component_wt_pct": dict(relaxed_dropped),
-            }
-        )
-        relaxed_notice = {
-            "code": "openimcc_projection_crmn_relaxed",
-            "ruling": _OPENIMCC_CRMN_RELAXED_RULING,
-            "owner_ruling_date": "2026-09-27",
-            "wt_pct": dict(relaxed_dropped),
-            "message": (
-                "Cr2O3 and MnO remain projected from the openimcc input, "
-                "but do not count toward the shared 1.0 wt% gate"
-            ),
-        }
-        classification_record["openimcc_projection_crmn_relaxed"] = dict(
-            relaxed_notice
-        )
-    if threshold_classification.verdict == "over_threshold":
+    if classification.verdict == "over_threshold":
         raise OpenImccCompositionPolicyRefusal(
             "openimcc_projection_over_threshold",
             (
                 "cleaned-melt components outside IMCC parents exceed the "
-                f"{threshold_classification.threshold_wt_pct:g} wt% "
+                f"{classification.threshold_wt_pct:g} wt% "
                 "projected-bulk limit: "
-                f"{threshold_classification.dropped_total_wt_pct:.12g} wt%"
+                f"{classification.dropped_total_wt_pct:.12g} wt%"
             ),
             diagnostics={
                 PROJECTED_BULK_CLASSIFICATION_KEY: classification_record,
@@ -1050,8 +995,6 @@ def _cleaned_melt_policy(
                 "components remain visible in the classifier record"
             ),
         }
-    if relaxed_notice is not None:
-        policy["openimcc_projection_crmn_relaxed"] = relaxed_notice
     _feo_wt_pct, fe2o3_wt_pct = iron_oxide_values(source_wt_pct)
     if fe2o3_wt_pct > 0.0:
         fold_notice, redox_notice = ferric_folded_to_feot_notices(
@@ -1074,14 +1017,18 @@ def evaluate_cleaned_melt(
     """Apply C3's cleaned-melt policy, then call the C1 bridge."""
 
     _require_openimcc()
-    cleaned_composition_mol, policy = _cleaned_melt_policy(composition_mol)
+    selected_pack = DEFAULT_BACKEND_PACK_NAME
+    cleaned_composition_mol, policy = _cleaned_melt_policy(
+        composition_mol,
+        pack=selected_pack,
+    )
     composition_wt_pct = _composition_wt_pct_from_moles(
         cleaned_composition_mol
     )
     bridge = evaluate(
         composition_mol=cleaned_composition_mol,
         temperature_K=temperature_K,
-        pack=DEFAULT_BACKEND_PACK_NAME,
+        pack=selected_pack,
         allow_extrapolation=allow_extrapolation,
         allow_out_of_envelope=False,
     )
@@ -1097,6 +1044,12 @@ def evaluate_cleaned_melt(
         for name, amount in composition_mol.items()
         if str(name) not in refused_trace_components
     }
+    if "openimcc_trace_stitch:majors_from_majors_only_solve" in bridge.notices:
+        fraction_composition_mol = {
+            name: amount
+            for name, amount in fraction_composition_mol.items()
+            if name not in trace_activity_models
+        }
     single_cation = {}
     for oxide in OPENIMCC_PARENT_OXIDES:
         if oxide not in composition_wt_pct:
@@ -1250,7 +1203,7 @@ def _evaluate_uncached(
     if pack is None:
         pack = DEFAULT_BACKEND_PACK_NAME
     loaded_pack = _load_pack(pack)
-    trace_activity_models = openimcc_trace_activity_models()
+    trace_activity_models = _trace_activity_models_for_pack(pack)
     requested_trace_components = {
         name
         for name, amount in composition.items()
@@ -1344,20 +1297,29 @@ def _evaluate_uncached(
                             f"{type(trace_exc).__name__}: {trace_exc}",
                         )
                     )
-    parent_oxides = tuple(str(name) for name in result.parent_oxides)
+    melt_result_parent_oxides = tuple(str(name) for name in result.parent_oxides)
     parent_oxide_x_star_ratios: dict[str, float] = {}
     parent_x = getattr(result, "parent_x", None)
     parent_x_star = getattr(result, "parent_x_star", None)
     if parent_x is not None and parent_x_star is not None:
         for name, nominal, free in zip(
-            parent_oxides, parent_x, parent_x_star, strict=True
+            melt_result_parent_oxides, parent_x, parent_x_star, strict=True
         ):
             nominal = float(nominal)
             free = float(free)
             if nominal > 0.0 and math.isfinite(nominal) and math.isfinite(free):
                 parent_oxide_x_star_ratios[name] = free / nominal
+    active_input_components = {
+        str(name)
+        for name, amount in composition.items()
+        if float(amount) > 0.0
+    }
     activities: dict[str, float] = {}
-    for name, raw_activity in zip(parent_oxides, result.parent_activity, strict=True):
+    for name, raw_activity in zip(
+        melt_result_parent_oxides, result.parent_activity, strict=True
+    ):
+        if name not in active_input_components:
+            continue
         try:
             activity = float(raw_activity)
         except (OverflowError, TypeError, ValueError) as exc:
@@ -1450,6 +1412,51 @@ def _evaluate_uncached(
             )
     for oxide in sorted(trace_activities):
         activities[oxide] = trace_activities[oxide]
+    if (
+        float(result_composition.get("MnO", 0.0)) > 0.0
+        and "MnO" in melt_result_parent_oxides
+        and "MnO" in activities
+        and trace_activity_models.get("MnO") == "redox_associates"
+    ):
+        trace_notices.append(
+            "openimcc_trace_effect:MnO_full_component_replaced_parent_vector:redox-v6"
+        )
+    package_labels = result.labels
+    affected_trace_components = sorted(
+        {
+            str(estimate.oxide)
+            for notice in package_labels.notices
+            for estimate in (
+                *getattr(notice, "estimates", ()),
+                *getattr(notice, "activities", {}).values(),
+            )
+            if estimate.code == "out_of_domain_associate_activity"
+            and "temperature_K" in estimate.violated_axes
+        }
+    )
+    redox_temperature_flag_prefix = (
+        "RED: redox_row_temperature_extrapolation row="
+    )
+    extrapolated_redox_rows = sorted(
+        {
+            flag[len(redox_temperature_flag_prefix) :].partition(
+                " temperature_K="
+            )[0]
+            for flag in package_labels.flags
+            if isinstance(flag, str)
+            and flag.startswith(redox_temperature_flag_prefix)
+        }
+    )
+    # Components are affected by the shared solve; rows identify its causes.
+    if affected_trace_components and bool(
+        getattr(result, "extrapolated", False)
+    ):
+        trace_notices.append(
+            "openimcc_trace_effect:temperature_extrapolation:"
+            f"affected_components={','.join(affected_trace_components)}:"
+            f"extrapolated_rows={','.join(extrapolated_redox_rows)}:"
+            "effective_gamma_certification_cleared"
+        )
     reduced_result_composition = {
         name: amount
         for name, amount in result_composition.items()
@@ -1465,7 +1472,7 @@ def _evaluate_uncached(
             if float(value) > 0.0
         }
     activity_coefficients: dict[str, dict[str, Any]] = {}
-    for oxide in parent_oxides:
+    for oxide in melt_result_parent_oxides:
         if oxide not in activities:
             continue
         parent_activity = activities[oxide]
@@ -1485,7 +1492,6 @@ def _evaluate_uncached(
             },
         }
     parent_oxides = tuple(activities)
-    package_labels = result.labels
     package_notices = tuple(
         _canonicalize_trace_component_notice(notice)
         for notice in package_labels.notices

@@ -71,7 +71,10 @@ def test_sossi_geometry_is_declared_from_bead_mass_without_residue_inputs() -> N
     ]
 
 
-def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -> None:
+@pytest.mark.parametrize("melt_pack", ("published-core", "default"))
+def test_sossi_prediction_provenance_pins_engine_binding_identity(
+    monkeypatch, melt_pack: str
+) -> None:
     pytest.importorskip("openimcc")
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     import openimcc
@@ -80,9 +83,9 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     from simulator.melt_backend import openimcc_bridge
     from simulator.chemistry.melt_activity import melt_oxide_activity
 
-    monkeypatch.setattr(
-        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
-    )
+    if melt_pack == "default" and "MnO" not in openimcc_bridge.openimcc_trace_activity_models():
+        pytest.skip("installed OpenIMCC pin has no MnO trace model")
+    monkeypatch.setattr(openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", melt_pack)
 
     def no_evaporation(inventory, *_args, **_kwargs):
         return SimpleNamespace(
@@ -110,13 +113,16 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     )
     assert expected_mno_activity is not None
     evaluated_compositions: list[dict[str, float]] = []
+    evaluated_states = []
     gas_activity_inputs: list[dict[str, float]] = []
     original_melt_evaluate = openimcc_bridge._evaluate_uncached
     original_gas_evaluate = openimcc.evaluate_gas
 
     def capture_melt_evaluate(**kwargs):
         evaluated_compositions.append(dict(kwargs["composition_mol"]))
-        return original_melt_evaluate(**kwargs)
+        state = original_melt_evaluate(**kwargs)
+        evaluated_states.append(state)
+        return state
 
     def capture_gas_evaluate(activities, *args, **kwargs):
         gas_activity_inputs.append(dict(activities))
@@ -140,7 +146,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
 
     gas_pack = openimcc.load_gas_datapack()
     package_identity = openimcc.engine_binding_identity(
-        openimcc_bridge._load_pack("published-core"), gas_pack
+        openimcc_bridge._load_pack(melt_pack), gas_pack
     )
     expected_identity = {
         "engine_binding_digest": package_identity.digest,
@@ -152,16 +158,34 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     assert "gas_pack_digest" not in prediction.provenance
     assert "liquid_pack_digest" not in prediction.provenance
     assert evaluated_compositions
-    assert all("MnO" not in composition for composition in evaluated_compositions)
     mno_inputs = [activities for activities in gas_activity_inputs if "MnO" in activities]
     assert mno_inputs
-    assert mno_inputs[0]["MnO"] == pytest.approx(
-        expected_mno_activity.thermodynamic_parent_activity()
-    )
-    mno_extension = prediction.provenance["melt_activity_extensions"]["MnO"]
-    assert mno_extension["authority_level"] == expected_mno_activity.evidence_tier
-    assert mno_extension["certified_band_K"] is None
-    assert mno_extension["activity_provenance"] == expected_mno_activity.provenance()
+    if melt_pack == "published-core":
+        assert all("MnO" not in composition for composition in evaluated_compositions)
+        assert mno_inputs[0]["MnO"] == pytest.approx(
+            expected_mno_activity.thermodynamic_parent_activity()
+        )
+        policy = prediction.provenance["melt_activity_input_policy"]
+        assert "MnO" in policy["composition_projection_classification"][
+            "dropped_components"
+        ]
+        assert policy["notice"]["code"] == "openimcc_projected_bulk"
+        mno_extension = prediction.provenance["melt_activity_extensions"]["MnO"]
+        assert mno_extension["reason"].startswith("pack_compatibility_fallback:")
+        assert mno_extension["authority_level"] == expected_mno_activity.evidence_tier
+        assert mno_extension["certified_band_K"] is None
+        assert mno_extension["activity_provenance"] == expected_mno_activity.provenance()
+    else:
+        assert all("MnO" in composition for composition in evaluated_compositions)
+        assert evaluated_states
+        modeled_mno_activity = evaluated_states[0].parent_oxide_activities["MnO"]
+        assert mno_inputs[0]["MnO"] == pytest.approx(modeled_mno_activity)
+        assert prediction.provenance["melt_activity_input_policy"][
+            "trace_activity_models"
+        ]["MnO"] == "redox_associates"
+        assert "MnO" not in prediction.provenance.get(
+            "melt_activity_extensions", {}
+        )
 
 
 def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
@@ -439,7 +463,7 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
                     "integration": {"primary": {"status": "converged"}},
                     "melt_activity_extensions": {
                         "MnO": {
-                            "reason": "MnO is outside the IMCC-SF04 melt-activity domain",
+                            "reason": "pack_compatibility_fallback: MnO redox trace activity is incompatible with the published-core melt pack and installed redox pack",
                             "authority_level": "UNCERTIFIED",
                             "certified_band_K": None,
                         }
@@ -474,7 +498,7 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
     )
     assert any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-        and notice.reason == "MnO is outside the IMCC-SF04 melt-activity domain"
+        and notice.reason.startswith("pack_compatibility_fallback:")
         and "authority_level=UNCERTIFIED" in notice.band
         and "certified_band_K=none" in notice.band
         for notice in prediction.notices

@@ -307,7 +307,7 @@ def cacheable_refusal(result) -> bool:
     )
 
 ENGINE_CHEMISTRY_VERSION = {
-    "openimcc": 2,
+    "openimcc": 3,
     "internal-analytical": 3,
     "vaporock": 1,
     "magemin": 3,
@@ -333,6 +333,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 # openimcc v2: 2026-11-17 OpenIMCC 9c327c2: binary-pot oxygen balance and residue, Knudsen, mass-loss and Hashimoto runtimes consume AlSiO/Si2O2 and use corrected multi-parent oxygen metadata
 # internal-analytical v3: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f); d-207 - phase-basis liquidus authority can lower the adapter vapour switch
+# openimcc v3: 2026-11-19 OpenIMCC 979adb2 + the DG46 pack - absent-parent filter; Cr2O3/MnO trace admission per d-454; canonical predictions pin 1949e2325b47ebf8455543032e300ce5185982dad33cce29e59b81eebbe3e05c (base 938c3e3717 already stale); distinct numeric cache probe in test_engine_cache_golden_probes.py remains 2047a6ae9fa1d8824088e0cbf3292260e40ac9fd90953775d1bd6050c7d98cf2
 
 
 @dataclass(frozen=True)
@@ -581,7 +582,7 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     },
 }
 
-OPENIMCC_CANONICAL_OUTPUT_SHA256 = "95491c859bfde965707a441e0598bdd38bee327b2099229dbf3ead253f750547"
+OPENIMCC_CANONICAL_OUTPUT_SHA256 = "1949e2325b47ebf8455543032e300ce5185982dad33cce29e59b81eebbe3e05c"
 
 _TABLE = "engine_outputs"
 _CACHE_SCHEMA_VERSION = 3
