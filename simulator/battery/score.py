@@ -18220,6 +18220,10 @@ def _compile_residual_with_lineage(
         ref_point = _phase_component_reference_wt_percent(identity, ref_point)
     printed = _PrintedBandResolution()
     fusion_band_refusal: Mapping[str, object] | None = None
+    # The measurement's own refusal, captured before a fusion conversion
+    # replaces ``printed.refusal``. ``conversion_uncertainty_unprinted`` is a
+    # missing JANAF sigma, not a printed uncertainty. d-443 still reads the row.
+    measurement_printed_refusal = None
     if implied_alpha:
         numeric, metric_reason, metric_detail = _implied_alpha_numeric(prediction.value)
     else:
@@ -18414,6 +18418,7 @@ def _compile_residual_with_lineage(
                     standard_uncertainty_dex=sigma_total_dex,
                     two_sigma_band=two_sigma_band,
                 )
+        measurement_printed_refusal = printed.refusal
         if fusion_band_refusal is not None:
             reason = str(fusion_band_refusal["reason"])
             printed = replace(
@@ -18636,13 +18641,15 @@ def _compile_residual_with_lineage(
     assumed_details = None
     # d-443 controller clarification: keep NO_BAND, eligibility and all old
     # headline contributions intact. A literature band is additive metadata.
+    # Gate on the measurement refusal. A fusion-conversion refusal stays on
+    # the headline residual and is not a printed uncertainty.
     if (
         not implied_alpha
         and evidence_class.is_value and evidence_class.value in MEASURED_EVIDENCE
         and numeric.decision_band is None
         and printed.band is None
         and derived_band is None
-        and printed.refusal is None
+        and measurement_printed_refusal is None
         and source_method_uncertainty is None
         and (
             source_reference.uncertainty.kind is UncertaintyKind.NONE
