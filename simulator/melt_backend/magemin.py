@@ -4091,6 +4091,49 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             projected_sum_wt_pct=sum(float(value) for value in projected.values()),
         )
 
+    def _domain_gate_oxide_composition(
+        self,
+        engine_bulk_wt_pct: Mapping[str, float],
+        *,
+        submitted_oxide_wt_pct: Optional[Mapping[str, float]] = None,
+    ) -> Dict[str, float]:
+        """Convert the engine FeOt/O slots back to domain-gate oxides.
+
+        When checking the exact source bulk, retain its non-database oxides
+        while applying the same iron normalization used for the live engine
+        projection.
+        """
+        domain_oxides = dict(engine_bulk_wt_pct)
+        submitted_feot_present = 'FeOt' in domain_oxides
+        submitted_feot = float(domain_oxides.pop('FeOt', 0.0))
+        submitted_oxygen = float(domain_oxides.pop('O', 0.0))
+        if submitted_feot_present:
+            submitted_feo, submitted_fe2o3 = iron_oxide_values({
+                'FeOt': submitted_feot + submitted_oxygen,
+            })
+            if submitted_feo > 0.0:
+                domain_oxides['FeO'] = (
+                    float(domain_oxides.get('FeO', 0.0)) + submitted_feo
+                )
+            if submitted_fe2o3 > 0.0:
+                domain_oxides['Fe2O3'] = (
+                    float(domain_oxides.get('Fe2O3', 0.0)) + submitted_fe2o3
+                )
+        elif submitted_oxygen > 0.0:
+            domain_oxides['O'] = submitted_oxygen
+
+        if submitted_oxide_wt_pct is None:
+            return domain_oxides
+
+        exact_oxides = dict(submitted_oxide_wt_pct)
+        if submitted_feot_present:
+            for species in ('FeO', 'Fe2O3', 'FeOt', 'O'):
+                exact_oxides.pop(species, None)
+            for species in ('FeO', 'Fe2O3'):
+                if species in domain_oxides:
+                    exact_oxides[species] = domain_oxides[species]
+        return exact_oxides
+
     def _submitted_bulk_and_domain_verdict(
         self,
         source_projection: MeltOxideProjection,
@@ -4148,26 +4191,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         # The exact submitted bulk represents iron as FeOt+O. Fold that pair
         # through the shared alias resolver for the domain gate while leaving
         # the engine vector untouched.
-        submitted_oxides = dict(bulk_projection.composition_wt_pct)
-        submitted_feot_present = 'FeOt' in submitted_oxides
-        submitted_feot = float(submitted_oxides.pop('FeOt', 0.0))
-        submitted_oxygen = float(submitted_oxides.pop('O', 0.0))
-        if submitted_feot_present:
-            submitted_feo, submitted_fe2o3 = iron_oxide_values({
-                'FeOt': submitted_feot + submitted_oxygen,
-            })
-            if submitted_feo > 0.0:
-                submitted_oxides['FeO'] = (
-                    float(submitted_oxides.get('FeO', 0.0))
-                    + submitted_feo
-                )
-            if submitted_fe2o3 > 0.0:
-                submitted_oxides['Fe2O3'] = (
-                    float(submitted_oxides.get('Fe2O3', 0.0))
-                    + submitted_fe2o3
-                )
-        elif submitted_oxygen > 0.0:
-            submitted_oxides['O'] = submitted_oxygen
+        submitted_oxides = self._domain_gate_oxide_composition(
+            bulk_projection.composition_wt_pct
+        )
         domain_projection = project_melt_to_oxide_projection(
             composition_kg=submitted_oxides,
             composition_mol=None,

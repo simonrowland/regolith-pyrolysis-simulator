@@ -1127,7 +1127,18 @@ class FreezeGateCurveCacheKey(NamedTuple):
     water_mol_fraction: float
     formula_registry_digest: str
     inert_species: tuple[str, ...]
-    magemin_domain_verdict: tuple[bool, tuple[str, ...], str | None] | None
+    redox_state_identity: tuple[tuple[str, Any], ...] | None
+
+
+class _FlaggedFreezeGateCurveCacheKey(NamedTuple):
+    schema: str
+    pressure_bar: float
+    fO2_log: float
+    composition_mol_fractions: tuple[tuple[str, float], ...]
+    water_mol_fraction: float
+    formula_registry_digest: str
+    inert_species: tuple[str, ...]
+    magemin_domain_verdict: tuple[bool, tuple[str, ...], str | None]
     redox_state_identity: tuple[tuple[str, Any], ...] | None
 
 
@@ -4056,7 +4067,7 @@ class EvaporationMixin:
         fO2_log: float,
         redox_state: RedoxState | None = None,
         provider_melt_inputs: _SilicateProviderMeltInputs | None = None,
-    ) -> FreezeGateCurveCacheKey:
+    ) -> FreezeGateCurveCacheKey | _FlaggedFreezeGateCurveCacheKey:
         key, _magemin_domain_reason = self._freeze_gate_cache_key_and_domain(
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
@@ -4072,7 +4083,10 @@ class EvaporationMixin:
         fO2_log: float,
         redox_state: RedoxState | None = None,
         provider_melt_inputs: _SilicateProviderMeltInputs | None = None,
-    ) -> tuple[FreezeGateCurveCacheKey, str | None]:
+    ) -> tuple[
+        FreezeGateCurveCacheKey | _FlaggedFreezeGateCurveCacheKey,
+        str | None,
+    ]:
         from simulator.reduced_real_determinism import _digest
         from simulator.chemistry.kernel import ChemistryIntent
 
@@ -4171,8 +4185,10 @@ class EvaporationMixin:
             provider_formula_identity.append(
                 (species_key, normalized_elements)
             )
-        # Include the full MAGEMin gate outcome so an extrapolation notice or
-        # projection refusal cannot alias an otherwise equivalent curve.
+        # The ordinary key must retain its v7 tuple shape and byte identity.
+        # Use an extended key only when the MAGEMin gate or its database
+        # projection carries a warning/refusal that must not alias a clean
+        # curve.
         magemin_domain_reason = None
         magemin_domain_verdict = None
         if self._liquid_fraction_provider == 'magemin':
@@ -4191,12 +4207,32 @@ class EvaporationMixin:
                 oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
                 species_formula_registry=formula_registry,
             )
-            # Gate the submitted oxide bulk before reducing it to the ig
-            # database order. The projection decision is also part of the
-            # verdict: a held curve must not hide an over-threshold drop.
+            backend = MAGEMinBackend()
+            # The exact source check retains non-DB oxides. Normalize the
+            # FeOt/O engine convention the same way as the live gate before
+            # applying the domain validator, while preserving other submitted
+            # components for this pre-cache check.
+            exact_iron_input = {
+                species: amount
+                for species, amount in magemin_projection.oxide_wt_pct.items()
+                if species in {'FeO', 'Fe2O3', 'FeOt', 'O'}
+            }
+            if any(
+                float(exact_iron_input.get(species, 0.0)) > 0.0
+                for species in ('FeO', 'Fe2O3', 'FeOt')
+            ):
+                exact_engine_bulk = backend._build_db_bulk_projection(
+                    exact_iron_input
+                )
+                exact_gate_bulk = backend._domain_gate_oxide_composition(
+                    exact_engine_bulk.composition_wt_pct,
+                    submitted_oxide_wt_pct=magemin_projection.oxide_wt_pct,
+                )
+            else:
+                exact_gate_bulk = dict(magemin_projection.oxide_wt_pct)
             exact_valid, exact_warnings, exact_reason = (
                 magemin_module._validate_magemin_projection_with_reason(
-                    magemin_projection.oxide_wt_pct,
+                    exact_gate_bulk,
                     dropped_mass_kg_by_species=(
                         magemin_projection.dropped_mass_kg_by_species
                     ),
@@ -4206,73 +4242,77 @@ class EvaporationMixin:
             projected_valid = exact_valid
             projected_warnings = []
             projected_reason = None
-            if exact_valid:
-                backend = MAGEMinBackend()
-                database_projection = backend._build_db_bulk_projection(
-                    magemin_projection.oxide_wt_pct
+            database_projection = backend._build_db_bulk_projection(
+                magemin_projection.oxide_wt_pct
+            )
+            projected_notice = {
+                'dropped_components': [
+                    {
+                        'component': species,
+                        'mass_fraction': mass_fraction,
+                    }
+                    for species, mass_fraction
+                    in database_projection.dropped_component_mass_fractions
+                ],
+            }
+            projection_reason = (
+                _projected_liquidus_refusal_reason(projected_notice)
+                if database_projection.dropped_components
+                else None
+            )
+            _submitted_bulk, projected_verdict = (
+                backend._submitted_bulk_and_domain_verdict(
+                    magemin_projection,
+                    species_formula_registry=formula_registry,
+                    projected_retry=True,
                 )
-                projected_notice = {
-                    'dropped_components': [
-                        {
-                            'component': species,
-                            'mass_fraction': mass_fraction,
-                        }
-                        for species, mass_fraction
-                        in database_projection.dropped_component_mass_fractions
-                    ],
-                }
-                projection_reason = (
-                    _projected_liquidus_refusal_reason(projected_notice)
-                    if database_projection.dropped_components
-                    else None
-                )
-                _submitted_bulk, projected_verdict = (
-                    backend._submitted_bulk_and_domain_verdict(
-                        magemin_projection,
-                        species_formula_registry=formula_registry,
-                        projected_retry=True,
-                    )
-                )
-                projected_valid, projected_warnings, projected_reason = (
-                    projected_verdict
-                )
+            )
+            projected_valid, projected_warnings, projected_reason = (
+                projected_verdict
+            )
             verdict_warnings = list(exact_warnings)
             for warning in projected_warnings:
                 if warning not in verdict_warnings:
                     verdict_warnings.append(warning)
             if projection_reason is not None:
                 verdict_warnings.append(projection_reason)
-            magemin_domain_reason = (
-                exact_reason or projection_reason or projected_reason
-            )
+            magemin_domain_reason = exact_reason or projected_reason
             magemin_domain_valid = (
                 exact_valid
-                and projection_reason is None
                 and projected_valid
             )
             magemin_domain_verdict = (
                 magemin_domain_valid,
                 tuple(verdict_warnings),
-                magemin_domain_reason,
+                magemin_domain_reason or projection_reason,
             )
             if magemin_domain_valid:
                 magemin_domain_reason = None
-        key = FreezeGateCurveCacheKey(
-            # v8 adds the exact MAGEMin domain and projection verdict. Positive
-            # extrapolation warnings and over-threshold drops must not alias
-            # an in-domain curve at the same quantized composition.
-            schema='oxide_mol_fraction_p_fO2_v8',
-            pressure_bar=round(pressure_bucket, 6),
-            fO2_log=round(fO2_bucket, 6),
-            composition_mol_fractions=tuple(sorted(composition_key)),
-            water_mol_fraction=round(water_bucket, 7),
-            formula_registry_digest=_digest(
+        key_values = {
+            'pressure_bar': round(pressure_bucket, 6),
+            'fO2_log': round(fO2_bucket, 6),
+            'composition_mol_fractions': tuple(sorted(composition_key)),
+            'water_mol_fraction': round(water_bucket, 7),
+            'formula_registry_digest': _digest(
                 tuple(sorted(provider_formula_identity))
             ),
-            inert_species=inert_species,
-            magemin_domain_verdict=magemin_domain_verdict,
-            redox_state_identity=redox_identity_key,
-        )
+            'inert_species': inert_species,
+            'redox_state_identity': redox_identity_key,
+        }
+        if magemin_domain_verdict not in (None, (True, (), None)):
+            key = _FlaggedFreezeGateCurveCacheKey(
+                schema='oxide_mol_fraction_p_fO2_v8',
+                **key_values,
+                magemin_domain_verdict=magemin_domain_verdict,
+            )
+        else:
+            key = FreezeGateCurveCacheKey(
+                # v7 moves explicitly inert species out of the submitted
+                # curve composition while keeping membership as a separate
+                # input. Preserve this exact tuple for ordinary compositions.
+                schema='oxide_mol_fraction_p_fO2_v7',
+                **key_values,
+            )
         return key, magemin_domain_reason
 
     def _silicate_provider_melt_inputs(
@@ -4470,9 +4510,6 @@ class EvaporationMixin:
             notices['calibration_status'] = 'pending_validation'
         if diagnostic.get('gate_provider_step_down'):
             notices['gate_provider_step_down'] = diagnostic['gate_provider_step_down']
-        if self._liquid_fraction_provider == 'magemin':
-            if warnings:
-                notices['gate_provider_warnings'] = list(warnings)
         backend_diagnostic = diagnostic.get('backend_diagnostics') or {}
         if 'condensed_phase_reference_pressure_bar' not in backend_diagnostic:
             for attempt in diagnostic.get('gate_provider_step_down', {}).get('failed_providers', ()):
@@ -4480,10 +4517,21 @@ class EvaporationMixin:
                 if 'condensed_phase_reference_pressure_bar' in details:
                     backend_diagnostic = details
         if self._liquid_fraction_provider == 'magemin':
-            for field in ('authority', 'certified_band'):
-                value = diagnostic.get(field, backend_diagnostic.get(field))
-                if value is not None:
-                    notices[field] = copy.deepcopy(value)
+            authority = (
+                diagnostic.get('authority')
+                or backend_diagnostic.get('authority')
+            )
+            extrapolation_flag = authority == 'extrapolated' or any(
+                'authority=extrapolated' in str(warning)
+                for warning in warnings
+            )
+            if extrapolation_flag:
+                if warnings:
+                    notices['gate_provider_warnings'] = list(warnings)
+                for field in ('authority', 'certified_band'):
+                    value = diagnostic.get(field) or backend_diagnostic.get(field)
+                    if value is not None:
+                        notices[field] = copy.deepcopy(value)
         if 'condensed_phase_reference_pressure_bar' in backend_diagnostic:
             notices['alphamelts_reference_pressure'] = {
                 key: backend_diagnostic[key] for key in (
