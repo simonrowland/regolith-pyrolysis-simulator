@@ -14,12 +14,14 @@ from simulator.battery.score_report import (
     _all_numeric_markdown_lines,
     _eligibility_failure_census_lines,
     format_source_relation_diagnostics,
+    render_payload_score_report_markdown,
 )
 from simulator.battery.score_report_data import (
     EligibilityFailureCensus,
     EligibleSourceRelationCount,
     eligibility_failure_census,
     eligible_source_relation_breakdown,
+    notice_backlog_data,
     suspected_calibration_overlaps,
 )
 
@@ -77,6 +79,48 @@ def _counts(
         conjunct: (events, observations, first_events)
         for _rail, _engine, conjunct, events, observations, first_events in census.rows
     }
+
+
+def test_openimcc_vocabulary_mismatch_is_visible_in_report() -> None:
+    reason = (
+        "openimcc-index-vocabulary:mismatch;"
+        "manifest=3645e2c2bb;current=56a27a9249"
+    )
+    notice_counts = notice_backlog_data(
+        [{"notices": [{"kind": "engine_model_caveat", "reason": reason}]}]
+    )
+    census = EligibilityFailureCensus((), ())
+
+    report = render_payload_score_report_markdown(
+        hostname="test",
+        studio_hostname=None,
+        store_stamp=None,
+        mismatch_warning=None,
+        engines=(),
+        observations_present=False,
+        all_numeric_records=(),
+        eligibility_census=census,
+        measured_headline_rows=(),
+        e15_lines=(),
+        flagged_rows=(),
+        condition_lines=None,
+        compilation_lines=(),
+        refusal_counts={},
+        admit={
+            "residuals_with_admission_exclusion": 0,
+            "residuals_admission_alone": 0,
+            "unique_obs_admission_alone": 0,
+        },
+        notice_counts=notice_counts,
+        diagnostic_count=0,
+        pin_failures=(),
+        status_diff=(),
+        unmapped_legacy_keys=(),
+        circularity_warning="",
+    )
+
+    assert notice_counts == {f"engine_model_caveat:{reason}": 1}
+    assert f"`engine_model_caveat:{reason}` | 1" in report
 
 
 def test_eligibility_census_counts_events_observations_and_first_failures() -> None:

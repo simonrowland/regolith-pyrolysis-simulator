@@ -9,7 +9,10 @@ from typing import Callable, Iterable, Mapping, NamedTuple, Sequence
 
 from simulator.battery.enums import Quantity, SourceRelation, ValueKind
 from simulator.battery.identity import Identity, quantity_token
-from simulator.battery.records import Observation, Residual, Uncertainty
+from simulator.battery.records import Notice, Observation, Residual, Uncertainty
+from simulator.battery.source_lineage import (
+    OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
+)
 
 
 _RETENTION_LOSS_BINS = (
@@ -118,6 +121,35 @@ class Nasa9FitComparisonData(NamedTuple):
 
     counts: tuple[tuple[str, str, int, int, int], ...]
     refusals: tuple[tuple[str, str, str, str, int], ...]
+
+
+def notice_backlog_data(
+    rows: Iterable[Residual | Mapping[str, object]],
+) -> dict[str, int]:
+    """Count notices, keeping the OpenIMCC vocabulary warning visible by reason."""
+
+    counts: dict[str, int] = defaultdict(int)
+    for row in rows:
+        raw_notices = row.notices if isinstance(row, Residual) else row.get("notices")
+        for notice in raw_notices or ():
+            if isinstance(notice, Notice):
+                kind = notice.kind.value
+                reason = notice.reason
+            elif isinstance(notice, Mapping):
+                kind = str(notice.get("kind") or "")
+                reason = str(notice.get("reason") or "")
+            else:
+                continue
+            if not kind:
+                continue
+            key = (
+                f"{kind}:{reason}"
+                if kind == "engine_model_caveat"
+                and reason.startswith(OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX)
+                else kind
+            )
+            counts[key] += 1
+    return dict(sorted(counts.items()))
 
 
 class EligibilityFailureCensus(NamedTuple):

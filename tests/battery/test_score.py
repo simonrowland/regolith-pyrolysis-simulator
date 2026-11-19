@@ -13024,140 +13024,212 @@ def test_openimcc_pack_alias_is_only_used_without_a_manifest() -> None:
     assert lineage_complete_for(legacy_sources) is True
 
 
-def test_every_openimcc_manifest_source_resolves_to_same_input() -> None:
+def test_every_openimcc_manifest_row_resolves_to_its_index_sources() -> None:
     openimcc = pytest.importorskip("openimcc")
+    from openimcc.trace_components import trace_component_rule
+
     from simulator.battery.source_lineage import (
+        OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX,
         openimcc_pack_coefficient_sources,
         openimcc_redox_coefficient_sources,
+        openimcc_source_locator_matches,
+        openimcc_species_source_locator_scopes,
     )
 
     artifacts = openimcc.coefficient_ancestry()
     context = load_score_context()
     resolver = score_mod._ScoringLineageResolver(context)
-    checked: set[tuple[str, str, str]] = set()
-    works_by_artifact: dict[str, set[str]] = {}
+    observations_by_work: dict[str, list[Observation]] = {}
+    for observation in context.observations.values():
+        experiment = context.experiments[observation.experiment_id]
+        observations_by_work.setdefault(experiment.work_id, []).append(observation)
+
+    def row_work_ids(artifact: Mapping[str, object]) -> set[str]:
+        return {
+            str(source["work_id"])
+            for row in artifact.get("rows", ())
+            if isinstance(row, Mapping)
+            for source in row.get("sources", ())
+            if isinstance(source, Mapping)
+            and isinstance(source.get("work_id"), str)
+        }
+
+    def fragment_formula(
+        artifact: Mapping[str, object], work_ids: set[str]
+    ) -> str | None:
+        identity = str(artifact.get("identity", ""))
+        wanted = identity.rsplit(":", 1)[-1].casefold()
+        for work_id in sorted(work_ids):
+            for observation in observations_by_work.get(work_id, ()):
+                species = observation.identity.species
+                if species is None:
+                    continue
+                rule = trace_component_rule(species.formula)
+                element = getattr(rule, "review_gamma_element", None)
+                if isinstance(element, str) and element.casefold() == wanted:
+                    return species.formula
+        return None
+
+    pack = openimcc.load_datapack()
+    pack_artifact = next(
+        artifact for artifact in artifacts
+        if artifact.get("runtime_digest") == pack.binding_digest
+        or artifact.get("digest") == pack.binding_digest
+    )
+    assert str(pack_artifact["identity"]).startswith("IMCC-SF04-D066@")
+    d066_work_ids = set(pack_artifact.get("work_ids", ()))
+    major_sources = openimcc_pack_coefficient_sources(
+        pack.version, pack.binding_digest, species_formula="MgO"
+    )
+    assert d066_work_ids.issubset(major_sources)
 
     for artifact in artifacts:
-        artifact_id = str(artifact["identity"])
-        artifact_digest = artifact.get("runtime_digest") or artifact.get("digest")
-        assert isinstance(artifact_digest, str)
-        species_symbol = (
-            artifact_id.rsplit(":", 1)[-1] if ":" in artifact_id else None
-        )
-        resolved_sources = set(
-            openimcc_pack_coefficient_sources(
-                None, artifact_digest, species_symbol=species_symbol
+        identity = str(artifact.get("identity", ""))
+        digest = artifact.get("runtime_digest") or artifact.get("digest")
+        assert isinstance(digest, str), identity
+        fragment = identity.startswith("openimcc-review-gamma-activity.v1:")
+        work_ids = row_work_ids(artifact)
+        all_work_ids = work_ids | {
+            str(item)
+            for item in artifact.get("work_ids", ())
+            if isinstance(item, str)
+        }
+        for work_id in all_work_ids:
+            assert work_id in context.works, (identity, work_id)
+            complete, ancestry = resolver._candidate_lineage((work_id,))
+            assert (
+                complete
+                and ancestry is not None
+                and ancestry.ids is not None
+                and work_id in ancestry.ids
+            ), (identity, work_id)
+        formula = fragment_formula(artifact, work_ids) if fragment else None
+        if fragment and len(artifact.get("rows", ())) > 1:
+            # The selected row is not exposed by the pinned evaluator. Its
+            # work IDs must not be unioned until OpenIMCC carries that row.
+            sources = openimcc_pack_coefficient_sources(
+                None, digest, species_formula=formula
             )
-        )
-        for row in artifact.get("rows", ()):
-            row_id = str(row["id"])
-            row_work_ids = {
-                str(source["work_id"])
-                for source in row.get("sources", ())
-                if isinstance(source.get("work_id"), str)
-            }
-            if not row_work_ids:
-                continue
-            assert row_work_ids.issubset(resolved_sources), (
-                artifact_id,
-                row.get("id"),
-                row_work_ids - resolved_sources,
-            )
-            works_by_artifact.setdefault(artifact_id, set()).update(row_work_ids)
-            for work_id in row_work_ids:
-                assert work_id in context.works, (artifact_id, row_id, work_id)
-                complete, ancestry = resolver._candidate_lineage((work_id,))
-                assert (
-                    complete
-                    and ancestry is not None
-                    and ancestry.ids is not None
-                    and work_id in ancestry.ids
-                )
-                reference = next(
-                    observation
-                    for observation in context.observations.values()
-                    if context.experiments[observation.experiment_id].work_id
-                    == work_id
-                )
-                complete, relation = resolver.for_reference(reference, (work_id,))
-                assert complete
-                assert relation is SourceRelation.SAME_INPUT, (
-                    artifact_id,
-                    row_id,
-                    work_id,
-                )
-                checked.add((artifact_id, row_id, work_id))
+            assert not work_ids.intersection(sources), identity
+            continue
 
-    assert checked
-    assert "1.8.0" in works_by_artifact
-    assert any(identity.startswith("IMCC-SF04-D066@") for identity in works_by_artifact)
+        if identity.startswith("IMCC-SF04-D066@"):
+            sources = major_sources
+        else:
+            sources = openimcc_pack_coefficient_sources(
+                None, digest, species_formula=formula
+            )
+
+        for work_id in work_ids:
+            assert work_id in sources, (identity, work_id, sources)
+            references = observations_by_work.get(work_id, ())
+            assert references, (identity, work_id, "no in-sample rows")
+            scopes_by_work = (
+                openimcc_species_source_locator_scopes(formula)
+                if fragment
+                else {}
+            )
+            scopes = scopes_by_work.get(work_id)
+            if scopes:
+                references = [
+                    reference
+                    for reference in references
+                    if openimcc_source_locator_matches(scopes, reference.locator)
+                    is True
+                ]
+            if fragment and formula is not None:
+                references = [
+                    reference
+                    for reference in references
+                    if reference.identity.species is not None
+                    and reference.identity.species.formula == formula
+                ]
+            assert references, (identity, work_id, formula, scopes)
+            complete, relation = resolver.for_reference(references[0], sources)
+            assert complete
+            assert relation is SourceRelation.SAME_INPUT, (
+                identity,
+                work_id,
+                references[0].observation_id,
+            )
+
+        if fragment and work_ids:
+            assert formula is not None, identity
+            assert work_ids.issubset(sources), (identity, work_ids - set(sources))
+
+    mo_sources = openimcc_pack_coefficient_sources(
+        pack.version, pack.binding_digest, species_formula="MoO3"
+    )
+    assert "oneill-2002-feo-activity-coefficients-cmas" in mo_sources
+    assert not d066_work_ids.intersection(mo_sources)
+    mo_scopes = openimcc_species_source_locator_scopes("MoO3")
+    assert "oneill-2002-feo-activity-coefficients-cmas" in mo_scopes
+
+    copper_sources = openimcc_pack_coefficient_sources(
+        pack.version, pack.binding_digest, species_formula="Cu2O"
+    )
+    assert not {
+        "holzheid-lodders-2001-copper-solubility",
+        "wood-wade-2013-trace-activities",
+        "kems-041-sossi-fegley-2018",
+    }.intersection(copper_sources)
+
+    as_sources = openimcc_pack_coefficient_sources(
+        pack.version, pack.binding_digest, species_formula="As2O3"
+    )
+    assert "kems-041-sossi-fegley-2018" in as_sources
+    scoped_as_sources = (
+        *as_sources,
+        f"openimcc-pack-version:{pack.version}",
+        f"openimcc-pack-digest:{pack.binding_digest}",
+    )
+    kems_references = [
+        observation
+        for observation in context.observations.values()
+        if context.experiments[observation.experiment_id].work_id
+        == "kems-041-sossi-fegley-2018"
+    ]
+    by_table = {
+        table: next(
+            observation
+            for observation in kems_references
+            if observation.locator is not None
+            and f"Table {table}".casefold()
+            in str(observation.locator.table or "").casefold()
+        )
+        for table in (1, 2, 5)
+    }
+    by_table[1] = replace(by_table[1], identity=by_table[2].identity)
+    by_table[5] = replace(by_table[5], identity=by_table[2].identity)
+    for table, expected in (
+        (1, SourceRelation.INDEPENDENT),
+        (2, SourceRelation.SAME_INPUT),
+        (5, SourceRelation.INDEPENDENT),
+    ):
+        complete, relation = resolver.for_reference(
+            by_table[table], scoped_as_sources
+        )
+        assert complete
+        assert relation is expected
+
     redox_artifact = next(
         artifact for artifact in artifacts if artifact["identity"] == "1.8.0"
     )
     redox_sources = openimcc_redox_coefficient_sources(
-        redox_artifact["runtime_digest"], None, species_symbol="Fe"
+        redox_artifact["runtime_digest"], None, species_formula="FeO"
     )
-    assert works_by_artifact["1.8.0"].issubset(redox_sources)
-
-    mo = next(
-        artifact for artifact in artifacts
-        if artifact["identity"] == "openimcc-review-gamma-activity.v1:mo"
+    assert set(redox_artifact["work_ids"]).issubset(redox_sources)
+    assert any(
+        source.startswith(OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX)
+        for source in major_sources
     )
-    assert works_by_artifact[mo["identity"]] == {
-        "oneill-2002-feo-activity-coefficients-cmas"
-    }
-    for symbol in ("as", "bi", "ge"):
-        artifact = next(
-            item for item in artifacts
-            if item["identity"] == f"openimcc-review-gamma-activity.v1:{symbol}"
-        )
-        assert "kems-041-sossi-fegley-2018" in works_by_artifact[artifact["identity"]]
-    copper = next(
-        artifact for artifact in artifacts
-        if artifact["identity"] == "openimcc-review-gamma-activity.v1:cu"
-    )
-    assert "kems-041-sossi-fegley-2018" in works_by_artifact[copper["identity"]]
-    assert "holzheid-lodders-2001-copper-solubility" in works_by_artifact[
-        copper["identity"]
-    ]
-    assert "oneill-2002-feo-activity-coefficients-cmas" in openimcc_pack_coefficient_sources(
-        None, mo["runtime_digest"], species_symbol="Mo"
-    )
-    for symbol in ("As", "Bi", "Ge", "Cu"):
-        fragment = next(
-            item for item in artifacts
-            if item["identity"] == f"openimcc-review-gamma-activity.v1:{symbol.casefold()}"
-        )
-        assert "kems-041-sossi-fegley-2018" in openimcc_pack_coefficient_sources(
-            None, fragment["runtime_digest"], species_symbol=symbol
-        )
-
-    pack = openimcc.load_datapack()
-    sources = openimcc_pack_coefficient_sources(
-        pack.version, pack.binding_digest, species_symbol="Cu"
-    )
-    assert works_by_artifact[
-        f"{pack.model_id}@{pack.version}"
-    ].issubset(sources)
-    assert "holzheid-lodders-2001-copper-solubility" in sources
-    assert "kems-041-sossi-fegley-2018" in sources
-    assert not any(source.startswith("openimcc-v") for source in sources)
-    assert any(source.startswith("openimcc-index-vocabulary:mismatch;") for source in sources)
+    assert "holzheid-lodders-2001-copper-solubility" in context.works
     assert score_mod.lineage_complete_for(
-        sources,
+        major_sources,
         works=context.works,
         observations=context.observations,
         experiments=context.experiments,
     ) is True
-
-    copper_reference = next(
-        observation for observation in context.observations.values()
-        if context.experiments[observation.experiment_id].work_id
-        == "holzheid-lodders-2001-copper-solubility"
-    )
-    complete, relation = resolver.for_reference(copper_reference, sources)
-    assert complete
-    assert relation is SourceRelation.SAME_INPUT
 
     assert openimcc_pack_coefficient_sources(
         "1.0.6-d066-v4", "wrong-runtime-digest"
@@ -13165,6 +13237,31 @@ def test_every_openimcc_manifest_source_resolves_to_same_input() -> None:
     assert openimcc_pack_coefficient_sources(
         "wrong-pack-version", pack.binding_digest
     ) == ()
+
+
+def test_openimcc_mo_o3_score_path_resolves_oneill_fragment() -> None:
+    pytest.importorskip("openimcc")
+    source_id = "oneill-2002-feo-activity-coefficients-cmas"
+    context = load_score_context(sources=(source_id,))
+    reference = next(
+        observation
+        for observation in context.observations.values()
+        if context.experiments[observation.experiment_id].work_id == source_id
+        and isinstance(observation.identity, Identity)
+        and observation.identity.species is not None
+        and observation.identity.species.formula == "MoO3"
+    )
+
+    residuals, _candidates = score_store(context, engines=(Engine.OPENIMCC,))
+
+    scored = next(
+        residual
+        for residual in residuals
+        if residual.reference == reference.observation_id
+        and residual.candidate_request is not None
+        and residual.candidate_request.engine is Engine.OPENIMCC
+    )
+    assert scored.source_relation is SourceRelation.SAME_INPUT
 
 
 def test_openimcc_manifest_work_id_lineage_resolves_in_full_and_filtered_contexts() -> None:
