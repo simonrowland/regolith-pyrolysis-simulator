@@ -1809,10 +1809,6 @@ def test_same_hour_magemin_pin_redispatches_after_char_crosses_silica_band(
     )
     sim._establish_melt_redox_gate_authority_for_current_hour()
 
-    reduction = sim._apply_char_feo_reduction()
-    assert reduction['extent_mol'] > 0.0
-    assert sim.melt.composition_wt_pct()['SiO2'] > 80.0
-
     dispatched_curve = {
         **pinned_curve,
         'authority': 'extrapolated',
@@ -1826,6 +1822,12 @@ def test_same_hour_magemin_pin_redispatches_after_char_crosses_silica_band(
 
     monkeypatch.setattr(sim, '_melt_redox_liquidus_gate_curve', redispatch)
     sim.melt.temperature_C = 1400.0
+    assert sim._freeze_gate_liquid_fraction_factor() == pytest.approx(1.0)
+    assert dispatches == []
+
+    reduction = sim._apply_char_feo_reduction()
+    assert reduction['extent_mol'] > 0.0
+    assert sim.melt.composition_wt_pct()['SiO2'] > 80.0
 
     assert sim._freeze_gate_liquid_fraction_factor() == pytest.approx(1.0)
     assert dispatches == [True]

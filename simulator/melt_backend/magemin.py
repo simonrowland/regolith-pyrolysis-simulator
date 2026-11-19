@@ -1681,8 +1681,7 @@ def _liquidus_evaluated_bulk_silica_diagnostic(
         return None
     source_projection = project_melt_to_oxide_projection(
         composition_kg=None,
-        composition_mol=None,
-        composition_mol_by_account=folded_accounts,
+        composition_mol=folded_accounts.get(CLEANED_MELT_ACCOUNT),
         oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
         species_formula_registry=species_formula_registry,
     )
