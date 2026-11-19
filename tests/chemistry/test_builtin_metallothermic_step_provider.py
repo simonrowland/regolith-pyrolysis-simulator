@@ -3222,13 +3222,12 @@ def test_full_run_mass_balance_holds_with_kernel_committed_metallothermic(
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.cpu_budget(1800)
-def test_c3_na_source_redox_and_elemental_vapor_respect_coexisting_buffers(
+def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
 ):
     from simulator.chemistry.ellingham_graph import (
-        dissociation_pO2_threshold,
         metal_saturation_pressure_Pa,
     )
 
@@ -3270,24 +3269,13 @@ def test_c3_na_source_redox_and_elemental_vapor_respect_coexisting_buffers(
 
     assert sim.melt.campaign == CampaignPhase.C3_NA
     assert sim.melt.campaign_hour == 3, "run did not reach C3_NA hour 3"
-    reagent_inventory = sim.atom_ledger.mol_by_account(
-        "process.reagent_inventory"
-    )
-    spent_residue = sim.atom_ledger.mol_by_account(
-        "process.spent_reductant_residue"
-    )
-    assert reagent_inventory.get("Na", 0.0) > 0.0
-    assert spent_residue.get("Na2O", 0.0) > 0.0
-
     diagnostic = sim._last_vapor_pressure_diagnostic
     source_fO2_log = diagnostic["source_reaction_fO2_log10"]
     temperature_K = sim.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
-    na_na2o_buffer_bar = dissociation_pO2_threshold(
-        "Na",
-        temperature_K,
-        a_oxide=1.0,
-    )
-    assert source_fO2_log >= math.log10(na_na2o_buffer_bar)
+    saturation_floor = sim._last_redox_source_metal_saturation_floor
+    assert saturation_floor is not None
+    assert saturation_floor["binding_oxide"] == "FeO"
+    assert source_fO2_log >= saturation_floor["log10_fO2_bar"]
 
     vapor_pressures = diagnostic["vapor_pressures_Pa"]
     for species in ("Mg", "Si", "Cr", "Mn"):

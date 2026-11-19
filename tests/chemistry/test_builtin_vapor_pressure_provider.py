@@ -3418,10 +3418,26 @@ def test_internal_source_reaction_metal_pressure_respects_pure_saturation(
         def _compute_intrinsic_melt_fO2(self):
             return -28.0
 
+    class _NaOnlyMelt:
+        temperature_C = 1423.15 - 273.15
+        p_total_mbar = 1e-3
+
+        def composition_wt_pct(self):
+            return {"Na2O": 100.0}
+
+    class _KOnlyMelt:
+        temperature_C = 1423.15 - 273.15
+        p_total_mbar = 1e-3
+
+        def composition_wt_pct(self):
+            return {"K2O": 100.0}
+
     temperature_K = 1423.15
     for species, melt in (
         ("Cr", _CrOnlyMelt()),
         ("Mg", _MgOnlyMelt(temperature_K)),
+        ("Na", _NaOnlyMelt()),
+        ("K", _KOnlyMelt()),
     ):
         result = _LowFO2InternalModel(
             vapor_pressure_data,

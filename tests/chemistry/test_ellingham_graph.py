@@ -140,13 +140,14 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
             assert notice["was_clamped"] is False
 
 
-@pytest.mark.parametrize("species", ("Cr", "Mg"))
+@pytest.mark.parametrize("species", ("Cr", "Mg", "Na", "K"))
 def test_elemental_metal_pressure_is_capped_at_pure_saturation(
     vapor_pressure_data,
     species,
 ) -> None:
     from engines.builtin.vapor_pressure import (
         COEFF_BLOCK_PURE_COMPONENT,
+        vapor_pressure_antoine_coefficients,
         wall_condensation_antoine_coefficients,
     )
 
@@ -165,6 +166,12 @@ def test_elemental_metal_pressure_is_capped_at_pure_saturation(
     pure_antoine, coefficient_block = wall_condensation_antoine_coefficients(
         vapor_pressure_data["metals"][species], temperature_K,
     )
+    if species in {"Na", "K"}:
+        runtime_antoine, runtime_block = vapor_pressure_antoine_coefficients(
+            vapor_pressure_data["metals"][species], temperature_K,
+        )
+        assert runtime_block != coefficient_block
+        assert runtime_antoine != pure_antoine
 
     assert coefficient_block == COEFF_BLOCK_PURE_COMPONENT
     assert pure_metal_saturation == ellingham_graph._antoine_reference_pressure_Pa(
