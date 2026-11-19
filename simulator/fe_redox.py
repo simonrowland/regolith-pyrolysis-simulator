@@ -460,12 +460,34 @@ def kress91_furnace_activity_pressure_bar(
 
 
 def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
-    temperature_K = float(T_K)
+    try:
+        temperature_K = float(T_K)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise Kress91InvalidControls(
+            'Holzheid stoichiometric FeO gamma invalid control T_K: expected '
+            f'finite positive value, got {T_K!r}'
+        ) from exc
     if not math.isfinite(temperature_K) or temperature_K <= 0.0:
         raise Kress91InvalidControls(
             'Holzheid stoichiometric FeO gamma invalid control T_K: expected '
             f'finite positive value, got {T_K!r}'
         )
+
+    def representable_prediction(exponent: float) -> float:
+        try:
+            result = math.exp(exponent)
+        except OverflowError as exc:
+            raise Kress91InvalidControls(
+                'Holzheid stoichiometric FeO gamma invalid control T_K: '
+                f'prediction is unrepresentable at {T_K!r}'
+            ) from exc
+        if not math.isfinite(result) or result <= 0.0:
+            raise Kress91InvalidControls(
+                'Holzheid stoichiometric FeO gamma invalid control T_K: '
+                f'prediction is unrepresentable at {T_K!r}'
+            )
+        return result
+
     T_C = temperature_K - CELSIUS_TO_KELVIN_OFFSET
     points = HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C
     first_C, last_C = points[0][0], points[-1][0]
@@ -488,15 +510,17 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
         # 2.822; the 1600 C edge gives W=16.157 kJ/mol. Since the ratio
         # T_edge/T is one at the edge, this joins continuously to the
         # unchanged linear interpolation over 1300-1600 C.
-        central = math.exp(math.log(edge_gamma) * edge_T_K / temperature_K)
+        central = representable_prediction(
+            math.log(edge_gamma) * edge_T_K / temperature_K
+        )
         multiplier = central / HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
 
         # Carry the nearest edge's printed uncertainty limits through the same
         # regular-solution relation and preserve the adjacent printed spread.
-        scaled_low = math.exp(
+        scaled_low = representable_prediction(
             math.log(edge_gamma - edge_sigma) * edge_T_K / temperature_K
         )
-        scaled_high = math.exp(
+        scaled_high = representable_prediction(
             math.log(edge_gamma + edge_sigma) * edge_T_K / temperature_K
         )
         edge_points = points[:2] if below else points[-2:]
@@ -538,7 +562,7 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
                 HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
                 * scatter_edge_multiplier
             )
-            curve_1400_gamma = math.exp(
+            curve_1400_gamma = representable_prediction(
                 math.log(scatter_edge_gamma)
                 * (scatter_edge_C + CELSIUS_TO_KELVIN_OFFSET)
                 / target_1400_T_K
@@ -560,11 +584,13 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
             uncertainty_band_low_log10,
             uncertainty_band_high_log10,
         )
-        measurement_low = 10.0 ** (
-            math.log10(central) - uncertainty_band_low_log10
+        measurement_low = representable_prediction(
+            math.log(10.0)
+            * (math.log10(central) - uncertainty_band_low_log10)
         )
-        measurement_high = 10.0 ** (
-            math.log10(central) + uncertainty_band_high_log10
+        measurement_high = representable_prediction(
+            math.log(10.0)
+            * (math.log10(central) + uncertainty_band_high_log10)
         )
         sigma = max(central - measurement_low, measurement_high - central)
         excess_enthalpy_J_mol = GAS_CONSTANT * edge_T_K * math.log(edge_gamma)
@@ -1337,6 +1363,25 @@ def _calphad_feo_activity_components(
     delta_iw_pure_feo = delta_iw_log10(float(fO2_log), pure_feo_iw)
     calphad_weight = _calphad_authority_weight(delta_iw_pure_feo)
     kress91_weight = 1.0 - calphad_weight
+    holzheid_notice = holzheid.get('notice')
+    holzheid_extrapolation = (
+        isinstance(holzheid_notice, Mapping)
+        and holzheid.get('authority_level') == 'extrapolated'
+    )
+    kress91_extrapolation = bool(
+        split and split.get('extrapolation', False)
+    )
+    consumed_extrapolation = (
+        (calphad_weight > 0.0 and holzheid_extrapolation)
+        or (kress91_weight > 0.0 and kress91_extrapolation)
+    )
+    consumed_authoritative = (
+        (calphad_weight <= 0.0 or not holzheid_extrapolation)
+        and (
+            kress91_weight <= 0.0
+            or bool(split and split.get('authoritative', False))
+        )
+    )
     authoritative_unclamped = calphad_weight * central + kress91_weight * kress91_activity
     # Premise: the pure-liquid-FeO standard state has a_FeO = 1 at metal
     # saturation, so greater activities are unphysical supersaturation.  The
@@ -1397,6 +1442,11 @@ def _calphad_feo_activity_components(
         },
         'authority': {
             'regime': regime,
+            'authority_level': (
+                'extrapolated' if consumed_extrapolation else 'certified'
+            ),
+            'authoritative': consumed_authoritative,
+            'extrapolation': consumed_extrapolation,
             'iw_basis': 'IW(pure-FeO)',
             'relative_to_iw_pure_feo_log10': delta_iw_pure_feo,
             'calphad_weight': calphad_weight,
@@ -1464,8 +1514,7 @@ def _calphad_feo_activity_components(
         'cation_fractions': cation_fractions,
         'sources': FEO_ACTIVITY_DIAGNOSTIC_SOURCES,
     }
-    holzheid_notice = holzheid.get('notice')
-    if isinstance(holzheid_notice, Mapping):
+    if calphad_weight > 0.0 and isinstance(holzheid_notice, Mapping):
         components['notices'] = [dict(holzheid_notice)]
     return _with_liquid_model_below_liquidus_notice(components, liquid_domain)
 

@@ -13,6 +13,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import CampaignPhase
+from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -244,6 +245,28 @@ def test_native_fe_holzheid_extrapolation_is_flagged_at_1610_c(
     assert holzheid_notice["certified_band"] == {"temperature_C": (1300.0, 1600.0)}
     assert split["authoritative"] is False
     assert split["extrapolation"] is True
+
+
+@pytest.mark.parametrize(
+    ("delta_iw", "expected_extrapolation"),
+    [(2.0, False), (-0.25, True)],
+)
+def test_runtime_fe_authority_tracks_the_activity_blend(
+    delta_iw: float,
+    expected_extrapolation: bool,
+) -> None:
+    temperature_K = 1610.0 + 273.15
+    fO2_log = feo_iw_log10_fO2_bar(temperature_K) + delta_iw
+    sim = _make_sim("lunar_mare_low_ti", temperature_C=1610.0)
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log
+    sim.melt.fO2_log = fO2_log
+    sim.melt.melt_fO2_log = fO2_log
+
+    split = sim._compute_fe_redox_split_diagnostic()
+
+    assert split["extrapolation"] is expected_extrapolation
+    assert split["authoritative"] is (not expected_extrapolation)
+    assert ("notices" in split) is expected_extrapolation
 
 
 def test_native_fe_authoritative_extent_ignores_diagnostic_payload(

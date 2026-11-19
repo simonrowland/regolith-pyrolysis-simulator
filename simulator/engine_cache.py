@@ -328,7 +328,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
 # internal-analytical v2: 2026-11-17 b-1244 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 # internal-analytical v3: reserved by b265 immediately after b269 on the landing train
-# internal-analytical v4: b-1124 Holzheid FeO gamma continuation changes analytical Fe vapour predictions
+# internal-analytical v4: 2026-11-19 b-1124 Holzheid FeO gamma continuation changes analytical Fe vapour predictions
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
 # magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
@@ -550,8 +550,8 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
         "date": "2026-11-08",
     },
     "internal-analytical": {
-        "identity": "source-sha256:90c737d7d2fbca99e892bc88c4889d21e2d5cc98710f600847afe437e7ced5af",
-        "date": "2026-11-17",
+        "identity": "source-sha256:c49b38579b949b893865bce76a22fa7d07cf0bd547dc684537a5d0a266056404",
+        "date": "2026-11-19",
     },
     "vaporock": {
         "identity": "version:1.0.0;record-sha256:89e860e3d6995f542337748019c4f6198f76c127ce3ca90fbbc2063bd401fc5a",

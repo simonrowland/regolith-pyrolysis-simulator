@@ -103,7 +103,7 @@ def test_holzheid_low_edge_predicts_printed_1600_gamma():
 @pytest.mark.parametrize(
     (
         "temperature_C",
-        "printed_gamma",
+        "model_prediction_gamma",
         "expected_sigma_ext_low_log10",
         "expected_sigma_ext_high_log10",
     ),
@@ -118,7 +118,7 @@ def test_holzheid_low_edge_predicts_printed_1600_gamma():
 )
 def test_holzheid_regular_solution_extrapolation_and_notice(
     temperature_C: float,
-    printed_gamma: float,
+    model_prediction_gamma: float,
     expected_sigma_ext_low_log10: float,
     expected_sigma_ext_high_log10: float,
 ) -> None:
@@ -139,7 +139,7 @@ def test_holzheid_regular_solution_extrapolation_and_notice(
     expected_W_J_mol = 16137.0 if below else 16157.0
     gamma_digits = 1 if temperature_C == 225.0 else 3
 
-    assert round(band["central"], gamma_digits) == printed_gamma
+    assert round(band["central"], gamma_digits) == model_prediction_gamma
     assert band["conversion_status"] == (
         "extrapolated_below_verified_range"
         if below
@@ -215,12 +215,45 @@ def test_holzheid_cold_extrapolation_keeps_finite_positive_asymmetric_band(
     )
 
 
-@pytest.mark.parametrize("temperature_K", [math.nan, math.inf, -math.inf, 0.0, -10.0])
+@pytest.mark.parametrize(
+    "temperature_K",
+    [None, "invalid", math.nan, math.inf, -math.inf, 0.0, -10.0],
+)
 def test_holzheid_gamma_refuses_non_finite_or_non_positive_temperature(
-    temperature_K: float,
+    temperature_K: object,
 ) -> None:
     with pytest.raises(Kress91InvalidControls, match="finite positive"):
         holzheid_stoich_feo_gamma_band(temperature_K)
+
+
+def test_holzheid_gamma_refuses_unrepresentable_positive_temperature():
+    with pytest.raises(Kress91InvalidControls, match="unrepresentable"):
+        holzheid_stoich_feo_gamma_band(2.5)
+
+
+@pytest.mark.parametrize(
+    ("delta_iw", "expected_weight", "expected_authoritative", "expected_notice"),
+    [(2.0, 0.0, True, False), (-0.25, 1.0, False, True)],
+)
+def test_consumed_feo_authority_follows_the_contributing_model(
+    delta_iw: float,
+    expected_weight: float,
+    expected_authoritative: bool,
+    expected_notice: bool,
+) -> None:
+    temperature_K = 1610.0 + 273.15
+    diagnostic = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=_BASALTIC_FE_MELT_WT,
+        fO2_log=feo_iw_log10_fO2_bar(temperature_K) + delta_iw,
+        T_K=temperature_K,
+        pressure_bar=1e-6,
+    )
+
+    authority = diagnostic["authority"]
+    assert authority["calphad_weight"] == pytest.approx(expected_weight)
+    assert authority["authoritative"] is expected_authoritative
+    assert authority["extrapolation"] is expected_notice
+    assert ("notices" in diagnostic) is expected_notice
 
 
 def _moles_from_wt_pct(comp_wt: dict[str, float]) -> dict[str, float]:
