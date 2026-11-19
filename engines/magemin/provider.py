@@ -326,10 +326,31 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             engine_version=self._engine_version(),
         )
 
+        evaluated_domain_diagnostic = domain_diagnostic
+        equilibrium_diagnostics = dict(
+            getattr(equilibrium, 'diagnostics', {}) or {}
+        )
+        projected_diagnostics = equilibrium_diagnostics.get(
+            'projected_liquidus_diagnostics'
+        )
+        if (
+            request.intent is ChemistryIntent.GATE_LIQUID_FRACTION
+            and equilibrium_diagnostics.get('projected_liquidus_status') == 'ok'
+            and isinstance(projected_diagnostics, Mapping)
+        ):
+            # The allowed projected retry evaluates a different bulk. Its
+            # domain verdict supersedes the original request's verdict,
+            # including clearing a request-level flag when the evaluated
+            # bulk is in band.
+            evaluated_domain_diagnostic = {
+                field: projected_diagnostics.get(field)
+                for field in ('authority', 'certified_band')
+            }
+
         diagnostics = replace(
             diagnostics,
             backend_warnings=tuple(gate_warnings) + diagnostics.backend_warnings,
-            **domain_diagnostic,
+            **evaluated_domain_diagnostic,
         )
 
         # Hand the adapter's status to the vocabulary owner unchanged.

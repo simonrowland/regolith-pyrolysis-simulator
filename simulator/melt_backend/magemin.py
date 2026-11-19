@@ -110,7 +110,7 @@ import tempfile
 import threading
 import time
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
@@ -2720,6 +2720,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             folded_wt = projection_payload.get(
                 'magemin_projected_composition_wt_pct'
             )
+            projected_bulk_wt_pct = (
+                dict(folded_wt) if isinstance(folded_wt, Mapping) else None
+            )
             projected = self.find_liquidus_solidus(
                 fO2_log=fO2_log,
                 redox_state=redox_state,
@@ -2733,10 +2736,39 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 scan_step_C=scan_step_C,
                 tolerance_C=tolerance_C,
                 projected_retry=True,
-                projected_oxide_wt_pct=(
-                    dict(folded_wt) if isinstance(folded_wt, Mapping) else None
-                ),
+                projected_oxide_wt_pct=projected_bulk_wt_pct,
             )
+            if (
+                projected.status == 'ok'
+                and isinstance(projected_bulk_wt_pct, Mapping)
+            ):
+                from engines.magemin.domain import MAGEMinDomainGate
+
+                evaluated_bulk = self._build_db_bulk_projection(
+                    projected_bulk_wt_pct
+                )
+                evaluated_domain_source = self._domain_gate_oxide_composition(
+                    evaluated_bulk.composition_wt_pct
+                )
+                evaluated_domain_projection = project_melt_to_oxide_projection(
+                    composition_kg=evaluated_domain_source,
+                    composition_mol=None,
+                    oxide_basis=self._MAGEMIN_INPUT_BASIS,
+                    species_formula_registry=species_formula_registry,
+                )
+                projected_domain = (
+                    MAGEMinDomainGate.silica_extrapolation_diagnostic(
+                        evaluated_domain_projection.oxide_wt_pct
+                    )
+                    or {}
+                )
+                projected = replace(
+                    projected,
+                    diagnostics={
+                        **dict(projected.diagnostics or {}),
+                        **projected_domain,
+                    },
+                )
             diagnostics['projected_liquidus_status'] = projected.status
             diagnostics['projected_liquidus_diagnostics'] = dict(
                 projected.diagnostics or {}

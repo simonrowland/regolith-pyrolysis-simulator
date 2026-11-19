@@ -1521,10 +1521,19 @@ def test_freeze_gate_dispatches_intrinsic_fo2_to_declared_gate(
         assert kwargs['fe_redox_policy'] == 'intrinsic'
 
 
+@pytest.mark.parametrize(
+    'composition_wt_pct',
+    [
+        {'SiO2': 29.999, 'MgO': 50.001, 'FeO': 20.0},
+        {'SiO2': 79.9, 'MgO': 19.6, 'MnO': 0.5},
+    ],
+)
 def test_magemin_freeze_gate_curve_keeps_provider_warning_and_flags(
+    monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    composition_wt_pct,
 ):
     from pathlib import Path
 
@@ -1533,6 +1542,7 @@ def test_magemin_freeze_gate_curve_keeps_provider_warning_and_flags(
         _curve_from_payload,
         _curve_payload,
     )
+    import simulator.melt_backend.magemin as magemin_module
     from simulator.melt_backend.magemin import MAGEMinBackend
 
     sim = _build_freeze_gate_sim(
@@ -1542,7 +1552,6 @@ def test_magemin_freeze_gate_curve_keeps_provider_warning_and_flags(
         enabled=True,
         liquid_fraction_provider='magemin',
     )
-    composition_wt_pct = {'SiO2': 29.999, 'MgO': 50.001, 'FeO': 20.0}
     composition_mol = {
         species: amount / resolve_species_formula(
             species,
@@ -1563,6 +1572,15 @@ def test_magemin_freeze_gate_curve_keeps_provider_warning_and_flags(
         ChemistryIntent.GATE_LIQUID_FRACTION
     )
     assert isinstance(provider, MAGEMinShadowProvider)
+    provider_diagnostics = []
+    original_dispatch = provider.dispatch
+
+    def capture_provider_diagnostic(request):
+        result = original_dispatch(request)
+        provider_diagnostics.append(result.diagnostic)
+        return result
+
+    monkeypatch.setattr(provider, 'dispatch', capture_provider_diagnostic)
 
     backend = MAGEMinBackend()
     backend._available = True
@@ -1571,8 +1589,23 @@ def test_magemin_freeze_gate_curve_keeps_provider_warning_and_flags(
     backend._config = {'liquidus_finder_budget_s': 30.0}
     backend.get_engine_version = lambda: 'magemin-test-subprocess'
 
+    evaluated_compositions = []
+    domain_gate_inputs = []
+    original_validate = magemin_module._validate_magemin_projection_with_reason
+
+    def capture_domain_gate_input(composition, **kwargs):
+        domain_gate_inputs.append(dict(composition))
+        return original_validate(composition, **kwargs)
+
+    monkeypatch.setattr(
+        magemin_module,
+        '_validate_magemin_projection_with_reason',
+        capture_domain_gate_input,
+    )
+
     def subprocess_result(**kwargs):
         projection = kwargs['bulk_projection']
+        evaluated_compositions.append(dict(projection.composition_wt_pct))
         fraction = min(
             1.0,
             max(0.0, (float(kwargs['temperature_C']) - 1000.0) / 200.0),
@@ -1613,6 +1646,21 @@ def test_magemin_freeze_gate_curve_keeps_provider_warning_and_flags(
         'authority=extrapolated' in warning
         for warning in curve['gate_provider_warnings']
     )
+    if composition_wt_pct['SiO2'] == 79.9:
+        assert any(
+            'MnO' not in evaluated
+            for evaluated in evaluated_compositions
+        )
+        assert any(
+            evaluated.get('SiO2') == pytest.approx(79.9 / 99.5 * 100.0)
+            for evaluated in domain_gate_inputs
+        )
+        assert provider_diagnostics[0]['authority'] == 'extrapolated'
+        projected_diagnostic = provider_diagnostics[0]['backend_diagnostics'][
+            'projected_liquidus_diagnostics'
+        ]
+        assert projected_diagnostic['authority'] == 'extrapolated'
+        assert projected_diagnostic['certified_band'] == expected_band
 
     payload = _curve_payload(curve)
     assert payload['authority'] == 'extrapolated'
