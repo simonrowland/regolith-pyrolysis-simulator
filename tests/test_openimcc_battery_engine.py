@@ -2956,15 +2956,18 @@ def test_openimcc_melt_reservoir_does_not_default_nondefault_gas_parent() -> Non
 
 def test_openimcc_modelled_trace_parent_predicts_and_reaches_residual_provenance() -> None:
     _require_openimcc()
+    from openimcc import evaluate_gas, load_gas_datapack
     from simulator.melt_backend.openimcc_bridge import (
         _openimcc_trace_activity_models,
     )
+    from simulator.melt_backend import openimcc_bridge
 
     model = _openimcc_trace_activity_models()["NiO"]
+    composition = _openimcc_trace_gas_melt_composition("NiO")
     observation = _openimcc_vapour_observation(
         vapour_formula="Ni",
         reservoir=None,
-        composition=_openimcc_trace_gas_melt_composition("NiO"),
+        composition=composition,
         temperature_K=Decimal("1800"),
     )
     prediction = predict_with_engine(
@@ -2975,6 +2978,22 @@ def test_openimcc_modelled_trace_parent_predicts_and_reaches_residual_provenance
 
     assert prediction.value is not None, prediction.refusal_detail
     assert prediction.value > 0
+    melt = openimcc_bridge.evaluate(
+        composition_mol={name: float(value) for name, value in composition.components},
+        temperature_K=1800.0,
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    activities = dict(melt.parent_oxide_activities)
+    gas = evaluate_gas(
+        activities,
+        1800.0,
+        1.0e-9,
+        load_gas_datapack(),
+        parent_oxides=(*melt.parent_oxides, "NiO"),
+        allow_extrapolation=True,
+    )
+    assert float(prediction.value) == pytest.approx(gas["Ni"] * 1.0e5)
     assert prediction.provenance["openimcc_trace_activity_models"] == {
         "NiO": model
     }
@@ -3009,12 +3028,13 @@ def test_openimcc_unmodelled_trace_parent_still_refuses() -> None:
 
 def test_openimcc_side_gas_reaction_refuses_with_one_parent_unsupplied() -> None:
     _require_openimcc()
-    from openimcc.gas import _GAS_REACTIONS
+    from openimcc import gas as openimcc_gas
     from simulator.melt_backend.openimcc_bridge import OPENIMCC_PARENT_OXIDES
 
-    reaction = _GAS_REACTIONS["NaBr"]
-    assert reaction.parent not in OPENIMCC_PARENT_OXIDES
-    assert reaction.side_parent in OPENIMCC_PARENT_OXIDES
+    reaction = openimcc_gas._GAS_REACTIONS["NaBr"]
+    side_parent = openimcc_gas._side_parent("NaBr")
+    assert reaction[0] not in OPENIMCC_PARENT_OXIDES
+    assert side_parent in OPENIMCC_PARENT_OXIDES
     observation = _openimcc_vapour_observation(
         vapour_formula="NaBr",
         reservoir=None,
@@ -3031,6 +3051,79 @@ def test_openimcc_side_gas_reaction_refuses_with_one_parent_unsupplied() -> None
     assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
     assert prediction.refusal_detail["reason"] == (
         RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value
+    )
+
+
+@pytest.mark.parametrize(
+    ("trace_oxide", "reason"),
+    (
+        ("Ga2O3", "openimcc_trace_gas_parent_standard_unverified"),
+        ("In2O3", "openimcc_trace_gas_parent_standard_unverified"),
+        ("Ag2O", "openimcc_trace_gas_parent_engine_parent_mismatch"),
+        ("Sb2O3", "openimcc_trace_gas_parent_engine_parent_mismatch"),
+        ("Tl2O", "openimcc_trace_gas_parent_engine_parent_mismatch"),
+    ),
+)
+def test_openimcc_gas_parent_assembly_flags_unsafe_trace_activities(
+    trace_oxide: str, reason: str
+) -> None:
+    _require_openimcc()
+    from simulator.melt_backend import openimcc_bridge
+
+    trace_models = openimcc_bridge._openimcc_trace_activity_models()
+    assert trace_oxide in trace_models
+
+    activities, parents, forwarded_models, notices = (
+        openimcc_bridge._openimcc_gas_parent_inputs(
+            {trace_oxide: 0.25}, (),
+        )
+    )
+
+    assert trace_oxide not in activities
+    assert trace_oxide not in parents
+    assert trace_oxide not in forwarded_models
+    assert any(
+        notice["kind"] == reason and notice["species"] == trace_oxide
+        for notice in notices
+    )
+
+
+@pytest.mark.parametrize("trace_oxide", ("S", "SO3", "Cl", "F"))
+def test_openimcc_trace_carrier_activity_is_not_a_gas_fugacity_notice(
+    trace_oxide: str,
+) -> None:
+    _require_openimcc()
+    from simulator.melt_backend import openimcc_bridge
+
+    assert trace_oxide in openimcc_bridge._openimcc_trace_activity_models()
+    activities, parents, _, notices = openimcc_bridge._openimcc_gas_parent_inputs(
+        {trace_oxide: 0.25}, (),
+    )
+
+    assert trace_oxide not in activities
+    assert trace_oxide not in parents
+    assert any(
+        notice["kind"] == "openimcc_trace_gas_carrier_mismatch"
+        and notice["species"] == trace_oxide
+        for notice in notices
+    )
+
+
+def test_openimcc_zero_trace_activity_is_absent_and_recorded() -> None:
+    _require_openimcc()
+    from simulator.melt_backend import openimcc_bridge
+
+    activities, parents, _, notices = openimcc_bridge._openimcc_gas_parent_inputs(
+        {"NiO": 0.0}, (),
+    )
+
+    assert "NiO" not in activities
+    assert "NiO" not in parents
+    assert any(
+        notice["kind"] == "openimcc_trace_gas_parent_absent"
+        and notice["species"] == "NiO"
+        and notice["activity"] == 0.0
+        for notice in notices
     )
 
 
