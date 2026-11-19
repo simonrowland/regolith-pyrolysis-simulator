@@ -9,9 +9,11 @@ import pytest
 import yaml
 
 from simulator.battery.migrate import Migrator, REPO_ROOT
+from simulator.battery.enums import RefusalReason
 
 
 EXTRACT = REPO_ROOT / "data/literature/extracts/oishi-1986-cu2o-cao-activities.yaml"
+pytestmark = pytest.mark.timeout(300)
 TABLE1_RENDER_GRID = {
     "1": ("90.32", "9.61", "0", "0.07"),
     "2": ("88.20", "10.01", "1.64", "0.15"),
@@ -61,7 +63,6 @@ def test_table1_component_rows_migrate_as_points_with_printed_oxygen_log() -> No
     migrator.finalize()
     result = migrator.result
 
-    assert not result.validation.hard_issues
     source_rows = [
         (formula, row)
         for formula, block in document["species"].items()
@@ -69,6 +70,20 @@ def test_table1_component_rows_migrate_as_points_with_printed_oxygen_log() -> No
     ]
     assert len(source_rows) == 48
     assert _table1_grid(document) == TABLE1_RENDER_GRID
+    # Physical p. 2 / folio 977 prints Run No. 1 through 12**. The
+    # extract's row_label 3 through 14 is a grid offset, not that label.
+    # Refuse the conflicting aliases until the extract coordinates are repaired.
+    issues = result.validation.hard_issues
+    assert len(issues) == len(source_rows)
+    assert all(issue.reason is RefusalReason.INVALID_SOURCE for issue in issues)
+    assert {issue.path for issue in issues} == {
+        f"extract[data/literature/extracts/oishi-1986-cu2o-cao-activities.yaml].species.{formula}.observations[{index}].locator"
+        for formula in ("Cu", "O", "CaO", "MgO") for index in range(12)
+    }
+    assert all("row_label=" in issue.detail and "row=" in issue.detail for issue in issues)
+    for _formula, row in source_rows:
+        assert row["locator"]["row"] == row["sample_id"]
+        assert int(row["locator"]["row_label"]) == int(row["sample_id"].rstrip("*")) + 2
     # d-233 leaves crystal/oxide phase roles outside the closed schema. Keep
     # every printed cell and pin the migrator's typed refusal for each row.
     refusals = [
@@ -125,3 +140,10 @@ def test_plotted_data_figures_are_deferred_without_numeric_points() -> None:
         for row in figures
         for series in row["series"]
     )
+
+
+def test_table1_coordinate_refusal_detects_disabled_validation(monkeypatch) -> None:
+    with monkeypatch.context() as mutation:
+        mutation.setattr(Migrator, "_validate_extract_locators", lambda *_args, **_kwargs: None)
+        with pytest.raises(AssertionError):
+            test_table1_component_rows_migrate_as_points_with_printed_oxygen_log()
