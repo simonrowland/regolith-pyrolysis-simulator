@@ -9834,15 +9834,21 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # 4110->4319.
     # Yakovlev 2017 (fc7c11533, merge F20 23a54e9b3) adds 34 printed residue
     # cells: 4319->4353.
-    # These are green's starting census pins. The Su & Zhang source-specific
-    # result below is fresh-migrated; the controller will repin the totals from
-    # the regenerated store.
-    assert census.get("residue_component_composition") == 8112
+    # Re-pinned from the regenerated store: car-1114d types the natural
+    # orange-glass profiles in su-zhang-2023-lunar-orange-glass-na-k-cu-degassing
+    # as typed absence, removing 3435 residue cells; b-1209 adds 36 residue
+    # cells from mendybaev-2017-fun-cai-lab-evaporation. Thus 8112 - 3435 + 36
+    # = 4713; mismatches stays 0.
+    assert census.get("residue_component_composition") == 4713
     assert (
         per_source.get("su-zhang-2023-lunar-orange-glass-na-k-cu-degassing", {})
         .get("residue_component_composition", 0)
         == 0
     )
+    assert per_source.get("mendybaev-2017-fun-cai-lab-evaporation") == {
+        "mass_loss_fraction": 9,
+        "residue_component_composition": 36,
+    }
     assert per_source.get(
         "richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation"
     ) == {"isotope_delta": 21, "residue_component_composition": 324}
