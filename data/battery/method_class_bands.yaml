@@ -1,0 +1,143 @@
+schema_version: method_class_bands.v1
+ruling: d-443
+classes:
+  kems_absolute_pressure_weight_loss_calibrated:
+    method_token: knudsen_effusion
+    technique: mass_spectrometry
+    quantities: [p_partial, p_sat]
+    precision:
+      basis: relative_fraction
+      value: '0.20'
+      meaning: accuracy_limit
+      confidence: unstated
+    applicability:
+      calibration: gravimetric_or_equivalent_collection
+      dominant_vapour_mole_fraction_min: '0.95'
+      cell: inert_for_sample
+      parasitic_phenomena: controlled
+      effusion_validity: established
+    citation:
+      source_id: kems-014-drowart-2005
+      doi: 10.1351/pac200577040683
+      pdf_page: 38
+      printed_page: '720'
+      locator: Section 7.1 absolute-pressure accuracy paragraph
+  kems_direct_comparison_activity:
+    method_token: knudsen_effusion
+    technique: mass_spectrometry
+    quantities: [activity]
+    precision:
+      basis: relative_fraction
+      value: '0.10'
+      meaning: reproducibility_limit
+      confidence: unstated
+    applicability:
+      comparison: multiple_cell_or_successive_pure_reference_sample
+      sensitivity: stable
+      activity_method: direct_comparison
+    citation:
+      source_id: kems-014-drowart-2005
+      doi: 10.1351/pac200577040683
+      pdf_page: 42
+      printed_page: '724'
+      locator: Direct activity comparison reproducibility discussion
+  knudsen_weight_loss_collection_torsion_pressure:
+    method_token: knudsen_effusion
+    technique: weight_loss_collection_or_torsion
+    quantities: [p_partial, p_sat]
+    precision:
+      basis: relative_fraction
+      value: '0.20'
+      meaning: accuracy_limit
+      confidence: unstated
+    applicability:
+      effusion_validity: established
+      composition_and_species: controlled
+      cell: inert_for_sample
+      parasitic_phenomena: controlled
+      mass_loss_measurement: established
+    citation:
+      source_id: kems-014-drowart-2005
+      doi: 10.1351/pac200577040683
+      pdf_page: 38
+      printed_page: '720'
+      locator: Section 7.1 effusion-pressure accuracy discussion
+  transpiration_mass_spectrometry_pressure:
+    method_token: transpiration
+    technique: transpiration_mass_spectrometry
+    quantities: [p_partial, p_sat]
+    precision:
+      basis: relative_fraction
+      value: '0.20'
+      meaning: accuracy_limit
+      confidence: unstated
+    applicability:
+      saturation_and_transport: established
+      species_and_calibration: controlled
+      mass_loss_measurement: established
+      total_carrier_flow: established
+    citation:
+      source_id: kems-014-drowart-2005
+      doi: 10.1351/pac200577040683
+      pdf_page: 39
+      printed_page: '721'
+      locator: Transpiration mass spectrometry comparison with effusion
+  mossbauer_fe_glass_ferric_fraction:
+    method_token: mossbauer_spectroscopy
+    technique: mossbauer_spectroscopy
+    quantities: [fe3_fe2_ratio, valence_ratio]
+    precision:
+      basis: ferric_fraction
+      value: '0.01'
+      meaning: analytical_precision
+      confidence: unstated
+    applicability:
+      element: Fe
+      sample: quenched_isotropic_glass
+      absorption_model: appropriate
+      recoil_free_fraction: treated
+    citation:
+      source_id: berry-2018-morb-iron-redox
+      doi: 10.1016/j.epsl.2017.11.032
+      pdf_page: 4
+      printed_page: '117'
+      locator: Analytical error estimate before thermodynamic fitting
+  xanes_fe_glass_ferric_fraction:
+    method_token: xanes_spectroscopy
+    technique: fe_k_edge_xanes
+    quantities: [fe3_fe2_ratio, valence_ratio]
+    precision:
+      basis: ferric_fraction
+      value: '0.01'
+      meaning: analytical_precision
+      confidence: unstated
+    applicability:
+      element: Fe
+      sample: glass
+      calibration: matrix_matched
+    citation:
+      source_id: berry-2018-morb-iron-redox
+      doi: 10.1016/j.epsl.2017.11.032
+      pdf_page: 1
+      printed_page: '114'
+      locator: Typical Fe K-edge XANES analytical precision
+  drop_calorimetry_heat_content_copper_block:
+    method_token: drop_calorimetry
+    technique: copper_block_drop_calorimetry
+    quantities: [H_minus_H298]
+    precision:
+      basis: relative_fraction
+      value: '0.003'
+      meaning: apparatus_validation_limit
+      confidence: unstated
+    applicability:
+      reference_validation: sapphire_recovery
+      temperature_K_min: '598'
+      temperature_K_max: '1010'
+      mol_basis: declared
+      thermal_history: controlled
+    citation:
+      source_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k
+      pdf_page: 2
+      printed_page: '486'
+      locator: Copper-block sapphire reference recovery validation

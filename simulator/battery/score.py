@@ -183,6 +183,7 @@ from simulator.battery.migrate import (
     evaporation_alpha_family_key,
 )
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
+from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
     INITIAL_CHARGE_ONLY_PROXY_NOTICE,
@@ -228,12 +229,14 @@ from simulator.battery.score_report import (
     _e15_number,
     _score_shard_failure_report_lines,
     format_element_retention_diagnostics,
+    format_assumed_band_report,
     format_store_stamp_report_lines,
     render_legacy_score_report_markdown,
     render_payload_score_report_markdown,
     store_stamp_has_known_revision,
 )
 from simulator.battery.score_report_data import (
+    AssumedBandReport,
     eligibility_failure_census,
     element_retention_report_data,
 )
@@ -6452,6 +6455,67 @@ def _metric_uncertainty_width(
             abs((Decimal(1) - fraction).ln() / ln10),
         )
     return None
+
+
+def _assumed_method_class_band(
+    observation: Observation, experiment: Experiment | None, reference: Decimal,
+) -> dict[str, object]:
+    selected = select_method_class_band(observation, experiment)
+    if "refusal" in selected:
+        return selected
+    quantity = quantity_token(observation.identity)
+    operation = _residual_metric_operation(quantity, observation)
+    precision = selected["precision"]
+    amount = Decimal(precision["value"])
+    amount_unit = "fraction"
+    if precision["basis"] == "ferric_fraction":
+        fraction_form = (
+            quantity is Quantity.VALENCE_RATIO
+            and _fe_valence_named_form(observation.identity) == "fraction"
+        )
+        if quantity is Quantity.VALENCE_RATIO and _fe_valence_named_form(
+            observation.identity
+        ) not in {"fraction", "ratio"}:
+            return {"refusal": {"reason": "method_class_fe_observable_unmatched"}}
+        fraction = reference if fraction_form else next(
+            (
+                condition.state.value
+                for name, condition in (observation.point_conditions or {}).items()
+                if name in FERRIC_FRACTION_FIELDS
+                and condition.locator is not None and condition.state.is_value
+            ),
+            None,
+        )
+        if not isinstance(fraction, Decimal) or (
+            not fraction_form
+            and fe3_fe2_ratio_from_ferric_fraction(fraction) != reference
+        ):
+            return {"refusal": {"reason": "method_class_ferric_fraction_unknown"}}
+        propagated, reason = _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+            fraction, amount
+        )
+        if propagated is None:
+            return {"refusal": {"reason": reason}}
+        amount, amount_unit = (
+            (amount, "dimensionless") if fraction_form else (propagated, "dex")
+        )
+    width = _metric_uncertainty_width(
+        operation, quantity, reference, amount, amount_unit
+    )
+    if width is None or not width.is_finite() or width <= 0:
+        return {"refusal": {"reason": "method_class_metric_domain"}}
+    return {
+        "class_id": selected["class_id"],
+        "version": selected["version"],
+        "citation": selected["citation"],
+        "precision": precision,
+        "band": DecisionBand(
+            width,
+            "dimensionless" if operation is not MetricOperation.ABSOLUTE else QUANTITY_UNITS[quantity],
+            f"assumed_band: {selected['class_id']}; confidence unstated",
+            band_basis="method_class_assumed",
+        ),
+    }
 
 
 def _combine_independent_standard_uncertainties(
@@ -18652,6 +18716,33 @@ def _compile_residual_with_lineage(
     if is_sf04_workbook(reference):
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
     eligible = conjuncts.eligible()
+    assumed_details = None
+    # d-443 controller clarification: keep NO_BAND, eligibility and all old
+    # headline contributions intact. A literature band is additive metadata.
+    if (
+        not implied_alpha
+        and evidence_class.is_value and evidence_class.value in MEASURED_EVIDENCE
+        and numeric.decision_band is None
+        and printed.band is None
+        and derived_band is None
+        and printed.refusal is None
+        and source_method_uncertainty is None
+        and (
+            source_reference.uncertainty.kind is UncertaintyKind.NONE
+            or _verbatim_denies_printed_uncertainty(source_reference.uncertainty)
+        )
+    ):
+        assumed_details = _assumed_method_class_band(
+            source_reference, experiment, ref_point
+        )
+        assumed_details["eligible"] = (
+            "band" in assumed_details and eligible and not has_no_band_flag
+        )
+        if "band" in assumed_details:
+            assumed_details["inside_band"] = match_status(
+                replace(numeric, decision_band=assumed_details["band"])
+            ) is ResidualStatus.MATCH
+        assumed_details["evidence_class"] = evidence_class.value.value
     return (
         Residual(
             key=_key_for_fo2_mode(key, result_mode),
@@ -18661,6 +18752,8 @@ def _compile_residual_with_lineage(
             status=status,
             source_relation=source_relation,
             score_eligible=eligible,
+            assumed_band=True if assumed_details is not None and "band" in assumed_details else None,
+            assumed_band_details=assumed_details,
             exclusions=conjuncts.exclusions(),
             notices=notices,
             candidate=candidate.observation_id,
@@ -22877,6 +22970,21 @@ def all_numeric_payload_records(
 HEADLINE_SUMMARY_KIND = "battery_headline_summary"
 
 
+def _assumed_band_summary(
+    rows: Iterable[Mapping[str, object]],
+    observations: Mapping[str, Observation] | None = None,
+) -> dict[str, object]:
+    report = AssumedBandReport()
+    for row in rows:
+        observation = (observations or {}).get(str(row.get("reference") or ""))
+        quantity = None if observation is None else quantity_token(observation.identity)
+        report.add(
+            row, engine=_engine_from_payload(row),
+            quantity=quantity.value if quantity is not None else _residual_key_quantity(row.get("key")),
+        )
+    return report.payload()
+
+
 def headline_summary_payload(
     records: Sequence[Mapping[str, object]],
     *,
@@ -22908,6 +23016,9 @@ def write_headline_summary_json(
     payload = headline_summary_payload(
         headline_records(residuals, context=context, engines=engines),
         store_stamp=stamp,
+    )
+    payload["assumed_band"] = _assumed_band_summary(
+        (to_plain(row) for row in residuals), context.observations
     )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -23357,7 +23468,7 @@ def _render_score_report_from_payloads_legacy(
             + "\n".join(_score_shard_failure_report_lines(shard_failures))
             + "\n"
         )
-    return report
+    return format_assumed_band_report(report, aggregate.assumed_bands.payload())
 
 
 def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
@@ -24377,6 +24488,7 @@ class _ScorePayloadAccumulator:
             str, dict[tuple[str, str, str], dict[str, object]]
         ] = {"measured": {}, "compilation": {}}
         self.all_numeric = _AllNumericHeadline()
+        self.assumed_bands = AssumedBandReport()
         self.e15_points: list[_E15ResidualPoint] = []
         self.headline_hulls: dict[tuple[str, str, str], _ConditionHull] = {}
         self.report_engine_names: set[str] = set()
@@ -24654,6 +24766,14 @@ class _ScorePayloadAccumulator:
         from simulator.battery.compilation_tier import _tier_cell_from_payload_fields
 
         metadata = row_metadata or self._row_metadata(row)
+        assumed_quantity = (
+            None if metadata.observation is None
+            else quantity_token(metadata.observation.identity)
+        )
+        self.assumed_bands.add(
+            row, engine=metadata.engine,
+            quantity=assumed_quantity.value if assumed_quantity is not None else _residual_key_quantity(row.get("key")),
+        )
         self.count += 1
         if row.get("score_eligible"):
             self.scored_count += 1
@@ -24951,11 +25071,13 @@ class _ScorePayloadAccumulator:
         )
 
     def summary_payload(self, store_stamp: Mapping[str, object] | None) -> dict[str, object]:
-        return headline_summary_payload(
+        payload = headline_summary_payload(
             self.headline_records(),
             store_stamp=store_stamp,
             static_refusals=self.static_refusals,
         )
+        payload["assumed_band"] = self.assumed_bands.payload()
+        return payload
 
 
 def write_headline_summary_from_payloads_json(
@@ -24967,6 +25089,7 @@ def write_headline_summary_from_payloads_json(
     origins: Mapping[str, str] | None = None,
     store_stamp: Mapping[str, object] | None = None,
 ) -> None:
+    rows = tuple(rows)
     payload = headline_summary_payload(
         headline_payload_records(
             rows,
@@ -24976,6 +25099,7 @@ def write_headline_summary_from_payloads_json(
         ),
         store_stamp=store_stamp,
     )
+    payload["assumed_band"] = _assumed_band_summary(rows, observations)
     _write_headline_summary_payload_json(payload, path)
 
 
@@ -25175,6 +25299,9 @@ def render_score_report_from_payloads(
         status_diff=status_diff,
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
+    )
+    report = format_assumed_band_report(
+        report, _assumed_band_summary(rows, observations)
     )
     if observations is None:
         return report
