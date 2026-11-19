@@ -307,7 +307,7 @@ def cacheable_refusal(result) -> bool:
     )
 
 ENGINE_CHEMISTRY_VERSION = {
-    "openimcc": 2,
+    "openimcc": 3,
     "internal-analytical": 3,
     "vaporock": 1,
     "magemin": 3,
@@ -333,6 +333,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 # openimcc v2: 2026-11-17 OpenIMCC 9c327c2: binary-pot oxygen balance and residue, Knudsen, mass-loss and Hashimoto runtimes consume AlSiO/Si2O2 and use corrected multi-parent oxygen metadata
 # internal-analytical v3: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f); d-207 - phase-basis liquidus authority can lower the adapter vapour switch
+# openimcc v3: 2026-11-19 OpenIMCC 979adb2 re-pin (text/identity only) and species_thermo scoring (d-446)
 
 
 @dataclass(frozen=True)
@@ -581,7 +582,7 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     },
 }
 
-OPENIMCC_CANONICAL_OUTPUT_SHA256 = "95491c859bfde965707a441e0598bdd38bee327b2099229dbf3ead253f750547"
+OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2bec587e444805a7bd6ec091308c00c88840357191d2e3d27dfee37fc99581af"
 
 _TABLE = "engine_outputs"
 _CACHE_SCHEMA_VERSION = 3

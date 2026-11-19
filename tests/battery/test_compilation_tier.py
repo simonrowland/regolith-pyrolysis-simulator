@@ -1111,13 +1111,13 @@ def test_compilation_thermo_routes_by_phase_and_engine_quantity_capability() -> 
     ) == (Engine.NASA_CEA_9,)
     assert _compilation_engines_for_pair(
         SCORE_ENGINE_SET, gas_cp
-    ) == (Engine.VAPOROCK, Engine.NASA_CEA_9)
+    ) == (Engine.VAPOROCK, Engine.OPENIMCC, Engine.NASA_CEA_9)
     assert _compilation_engines_for_pair(
         SCORE_ENGINE_SET, crystal_cp
-    ) == (Engine.THERMOENGINE, Engine.MAGEMIN)
+    ) == (Engine.THERMOENGINE, Engine.MAGEMIN, Engine.OPENIMCC)
     assert _compilation_engines_for_pair(
         SCORE_ENGINE_SET, liquid_cp
-    ) == (Engine.NASA_CEA_9,)
+    ) == (Engine.OPENIMCC, Engine.NASA_CEA_9)
     assert Engine.INTERNAL_ANALYTICAL in _compilation_engines_for_pair(
         SCORE_ENGINE_SET, liquid_delta_fg
     )
@@ -1144,6 +1144,43 @@ def test_compilation_thermo_routes_by_phase_and_engine_quantity_capability() -> 
     assert Engine.VAPOROCK not in _compilation_engines_for_pair(
         SCORE_ENGINE_SET, replace(gas_cp, quantity=Quantity.FE3_FE2_RATIO)
     )
+
+
+def test_openimcc_species_thermo_refuses_ambiguous_inputs_before_native_call(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    def unexpected_native_call(*_args, **_kwargs):
+        raise AssertionError("invalid OpenIMCC species thermo identity reached the engine")
+
+    monkeypatch.setattr(openimcc_bridge, "species_thermo", unexpected_native_call)
+    gas = replace(
+        _gas_thermo("FeO", Quantity.CP, Decimal("2000")),
+        per=State.of(PerBasis.MOL_ATOM),
+    )
+    unknown_polymorph = _pure_phase_identity(Quantity.CP, polymorph=None)
+    liquid_h = replace(
+        _gas_thermo("FeO", Quantity.H_MINUS_H298, Decimal("2000")),
+        species=Species("FeO", Phase.L),
+        subtype=State.of("H(T)-H(298.15 K); reference phase: solid"),
+    )
+    apparent_g = _gas_thermo("FeO", Quantity.DELTA_FG, Decimal("2000"))
+
+    attempts = tuple(
+        predict_thermo_attempt(
+            Engine.OPENIMCC,
+            F.observation(f"openimcc-invalid-{index}", "exp-1", identity, Decimal("1")),
+        )
+        for index, identity in enumerate((gas, unknown_polymorph, liquid_h, apparent_g))
+    )
+
+    assert [attempt.refusal_detail["reason"] for attempt in attempts] == [
+        "pure-phase-per-basis-mismatch",
+        "pure-phase-polymorph-unresolved",
+        "pure-phase-enthalpy-anchor-mismatch",
+        "apparent-gibbs-is-not-delta-fG",
+    ]
 
 
 def test_unrouted_summary_resolves_each_selected_cell_once(monkeypatch) -> None:

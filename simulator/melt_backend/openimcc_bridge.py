@@ -1546,6 +1546,95 @@ def _activities_for_gas_parents(
     }
 
 
+def species_thermo(
+    species: str,
+    phase: str,
+    temperature_K: float,
+    *,
+    allow_extrapolation: bool = False,
+) -> dict[str, Any]:
+    """Cached, JSON-safe view of OpenIMCC's selected pure-species function."""
+
+    from simulator.engine_cache import cached_engine_call, record_engine_open
+
+    module = _require_openimcc()
+    record_engine_open("openimcc")
+    request = {
+        "call": "species_thermo",
+        "species": species,
+        "phase": phase,
+        "T_K": float(temperature_K),
+        "datapack": DEFAULT_GAS_PACK_SELECTION,
+        "allow_extrapolation": allow_extrapolation,
+    }
+
+    def solve() -> dict[str, Any]:
+        datapack = module.load_gas_datapack()
+        props = module.species_thermo(
+            species,
+            phase,
+            float(temperature_K),
+            datapack=datapack,
+            allow_extrapolation=allow_extrapolation,
+        )
+        source_row_id = getattr(props, "source_row_id", None)
+        source_table_id = getattr(props, "source_table_id", None)
+        interval = getattr(props, "T_interval", None)
+        declared_interval = getattr(props, "declared_interval_K", None)
+        return {
+            "Cp_J_molK": getattr(props, "Cp_J_molK", None),
+            "S_J_molK": getattr(props, "S_J_molK", None),
+            "H_app_kJ_mol": getattr(props, "H_app_kJ_mol", None),
+            "G_J_mol": getattr(props, "G_J_mol", None),
+            "source_row_id": source_row_id,
+            "source_table_id": source_table_id,
+            "T_interval": (
+                tuple(interval)
+                if isinstance(interval, (tuple, list))
+                else None
+            ),
+            "declared_interval_K": (
+                tuple(declared_interval)
+                if isinstance(declared_interval, (tuple, list))
+                else None
+            ),
+            "T_min": getattr(props, "T_min", None),
+            "T_max": getattr(props, "T_max", None),
+            "derivatives_fit_implied": getattr(
+                props, "derivatives_fit_implied", None
+            ),
+            "extrapolated": getattr(props, "extrapolated", None),
+            "continuation": getattr(props, "continuation", None),
+            "authority": getattr(props, "authority", None),
+        }
+
+    return dict(cached_engine_call("openimcc", request, solve))
+
+
+def _species_thermo_crystal_declared_interval(
+    species: str,
+    temperature_K: float,
+) -> tuple[float, float]:
+    """Return the interval of the OpenIMCC-selected crystal thermo row."""
+
+    module = _require_openimcc()
+    # OpenIMCC 979adb2's crystal no-continuation error omits its selected
+    # interval. Keep this private selector use in the bridge; OpenIMCC was
+    # asked on 2026-11-19 to put the interval on that error, after which this
+    # helper should read the error attribute instead.
+    row = module.gas._oxide_row_for_T(
+        module.load_gas_datapack().oxide_df,
+        f"{species}(cr)",
+        float(temperature_K),
+        allow_extrapolation=True,
+    )
+    low = float(row["T_min"])
+    high = float(row["T_max"])
+    if not math.isfinite(low) or not math.isfinite(high) or low > high:
+        raise ValueError("OpenIMCC selected crystal row has an invalid interval")
+    return low, high
+
+
 def evaluate_redox(
     inventory: Mapping[str, float],
     temperature_K: float,
