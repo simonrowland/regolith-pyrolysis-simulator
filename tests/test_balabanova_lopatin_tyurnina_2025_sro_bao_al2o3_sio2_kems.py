@@ -81,6 +81,9 @@ def test_table_2_values_migrate_as_points_with_composition_temperature_and_speci
     ba_activity = by_id["balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c07"]
     assert ba_activity.identity.reference_state.tag.value == "unknown"
     assert "SrAl2Si2O8 or BaAl2Si2O8" in ba_activity.identity.reference_state.reason
+    experiment = next(iter(migrator.result.experiments.values()))
+    assert experiment.method.is_value
+    assert experiment.method.value.value == "knudsen_effusion"
 
     for observation in observations:
         assert observation.value.kind.value == "point"
