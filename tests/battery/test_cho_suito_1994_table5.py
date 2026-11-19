@@ -215,6 +215,7 @@ def test_table5_migration_reaches_temperature_and_scored_composition(
         hostname="oxide-deriv",
         benches=migrated_result.benches,
     )
+    produced_activity_ids: list[str] = []
 
     for observation_id, observation in migrated.items():
         temperature = observation.identity.temperature_K
@@ -308,15 +309,48 @@ def test_table5_migration_reaches_temperature_and_scored_composition(
                 "typed-refusal:melts_endmember_not_parent_oxide:CaO:"
             )
         else:
-            # VapoRock consumes the derived composition for supported oxide
-            # references, then refuses this row's invalid native fO2 log.
-            assert vaporock.execution.state is ExecutionState.UNSUPPORTED
-            assert vaporock.refusal.reason is RefusalReason.UNSUPPORTED
-            assert vaporock.refusal.detail["refusal_reason"] == "out_of_basis"
-            assert vaporock.refusal.detail["engine_reason"].startswith(
-                "invalid_fo2_log"
-            )
-            assert any(
-                item.kind is NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
-                for item in vaporock.notices
-            )
+            # Oxygen is not an input for these CaO-SiO2-Al2O3 melts.
+            # A finite liquid chemical potential is the activity, evaluated
+            # at the upstream default pressure. Some slags return no finite
+            # oxide activity at that pressure; that stays a typed engine
+            # result, not an oxygen refusal. The observation pressure stays
+            # unknown either way.
+            detail = vaporock.refusal.detail
+            engine_reason = str(detail.get("engine_reason") or "")
+            assert detail.get("refusal_reason") != "out_of_basis", observation_id
+            assert not engine_reason.startswith("invalid_fo2_log"), observation_id
+            if vaporock.execution.state is ExecutionState.PRODUCED:
+                assert vaporock.numeric is not None, observation_id
+                assert any(
+                    item.kind
+                    is NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
+                    for item in vaporock.notices
+                ), observation_id
+                assert any(
+                    item.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+                    and "1e-10" in item.reason
+                    and "liquid chemical potential" in item.reason
+                    for item in vaporock.notices
+                ), observation_id
+                produced_activity_ids.append(observation_id)
+            else:
+                assert (
+                    vaporock.execution.state is ExecutionState.UNSUPPORTED
+                ), observation_id
+                assert (
+                    vaporock.refusal.reason is RefusalReason.UNSUPPORTED
+                ), observation_id
+                assert detail.get("refusal_reason") == "not_converged", (
+                    observation_id,
+                    detail,
+                )
+                assert engine_reason == "speciation_no_finite_values", (
+                    observation_id,
+                    detail,
+                )
+                assert vaporock.numeric is None, observation_id
+            pressure_state = observation.identity.total_pressure_Pa
+            assert pressure_state is not None and not pressure_state.is_value
+    assert produced_activity_ids, (
+        "oxygen-irrelevant Cho-Suito rows produced no VapoRock activity"
+    )

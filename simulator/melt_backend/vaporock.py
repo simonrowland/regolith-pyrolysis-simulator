@@ -6,7 +6,10 @@ Adapter around VapoRock for equilibrium vapor speciation over silicate melts.
 
 Canonical upstream package metadata uses package/import name ``vaporock``
 and exposes ``vaporock.System().set_melt_comp(...)`` plus
-``eval_gas_abundances(T, logfO2, P=1e-10, ...)``.  This project does not
+``eval_gas_abundances(T, logfO2, P=1e-10, ...)``.  An oxide-activity
+request whose composition makes oxygen irrelevant does not call that
+gas function: it evaluates ``System._calc_liquid_chempot`` at the same
+default pressure.  This project does not
 declare a ``[vapor]`` extra; VapoRock is provisioned by
 ``install-engines.py`` as a sibling editable clone (installed
 distribution 1.0.0). The historical GitLab v0.1 source tag is not an
@@ -139,6 +142,7 @@ from simulator.melt_backend.base import (
     DEFAULT_BACKEND_CAPABILITIES,
     EquilibriumResult,
     MeltBackend,
+    multivalent_components,
     projection_diagnostics_for_melt_input,
     project_melt_to_oxide_projection,
     split_cleaned_melt_account,
@@ -192,6 +196,10 @@ VAPOROCK_WORKER_STARTUP_TIMEOUT_S = 60.0
 # worker lifetime. Absolute tolerance is on log10(bar) values (decades).
 VAPOROCK_REUSE_EQUIVALENCE_PROBE_LIMIT = 20
 VAPOROCK_REUSE_EQUIVALENCE_ATOL_LOG10 = 1e-6
+# Installed ``System.eval_gas_abundances`` default. Liquid chemical
+# potentials are evaluated here. The observation pressure is not passed
+# in, and this adapter does not correct it.
+VAPOROCK_LIQUID_MODEL_PRESSURE_BAR = 1e-10
 
 # Hollow-success class: the adapter emptied the Pa dict. The *cause* is
 # a closed token; the human string is derived from it. Do not invent a
@@ -262,9 +270,18 @@ def _oxide_activity_fields_for_speciation(
     speciation_Pa: Optional[Mapping[str, Any]],
     oxide_activity: Optional[Mapping[str, float]],
     standard_state: Any,
+    *,
+    allow_without_speciation: bool = False,
 ) -> Dict[str, Any]:
-    """Return the activity pair only when usable vapor speciation exists."""
-    if not speciation_Pa or not oxide_activity or not standard_state:
+    """Return the activity pair only when it is safe to publish.
+
+    A hollow gas table does not publish activities. The oxygen-irrelevant
+    liquid-potential path has no gas table; it sets
+    ``allow_without_speciation`` only after a non-empty activity map.
+    """
+    if not oxide_activity or not standard_state:
+        return {}
+    if not speciation_Pa and not allow_without_speciation:
         return {}
     return {
         'oxide_activity': dict(oxide_activity),
@@ -425,6 +442,73 @@ def vaporock_fo2_log_admitted(fO2_log: Any) -> bool:
     except (TypeError, ValueError):
         return False
     return math.isfinite(value)
+
+
+def vaporock_system_pressure_authority_warning() -> str:
+    """Gas-path warning: eval_gas_abundances omits the optional P argument."""
+    model = f'{VAPOROCK_LIQUID_MODEL_PRESSURE_BAR:g}'
+    return (
+        'This adapter calls System.eval_gas_abundances without '
+        'the optional P argument, so upstream evaluates liquid '
+        'chemical potentials at its default P (installed '
+        f'source: P={model} bar) rather than the requested '
+        'pressure_bar. The vapor result is non-authoritative '
+        'for pressure-sensitive transport.'
+    )
+
+
+def vaporock_liquid_activity_pressure_warning() -> str:
+    """Activity-only warning: liquid potentials use the default P, not gas."""
+    model = f'{VAPOROCK_LIQUID_MODEL_PRESSURE_BAR:g}'
+    return (
+        'This adapter evaluates VapoRock liquid chemical potentials '
+        f'at the upstream default P={model} bar rather than the '
+        'requested pressure_bar. No pressure correction is applied. '
+        'The vapor result remains non-authoritative for '
+        'pressure-sensitive transport.'
+    )
+
+
+def vaporock_model_pressure_notice(
+    *,
+    requested_pressure_bar: float,
+) -> Dict[str, Any]:
+    """Typed notice for liquid potentials evaluated at the upstream P.
+
+    The observation pressure is unchanged. This records the pressure the
+    liquid model actually used, the pressure the caller asked for, and
+    that no correction was applied.
+    """
+    model = float(VAPOROCK_LIQUID_MODEL_PRESSURE_BAR)
+    requested = float(requested_pressure_bar)
+    return {
+        'kind': 'engine_model_caveat',
+        'reason': (
+            'VapoRock liquid chemical potentials were evaluated at '
+            f'the upstream default model pressure {model:g} bar, not '
+            f'the requested pressure {requested:g} bar. No pressure '
+            'correction was applied. The vapor result remains '
+            'non-authoritative.'
+        ),
+        'model_pressure_bar': model,
+        'requested_pressure_bar': requested,
+        'scope': 'liquid_chemical_potential',
+    }
+
+
+def _activity_oxygen_required(comp_wt: Mapping[str, float]) -> bool:
+    """True when this fixed oxide composition has a multivalent component.
+
+    Composition half of the scorer's oxygen rule. The measured species is
+    not visible on this backend; the scorer refuses that case before the
+    call. The alias map is imported lazily because alphamelts imports this
+    backend at module level.
+    """
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+
+    return bool(
+        multivalent_components(comp_wt, oxide_aliases=MELTS_OXIDE_ALIASES)
+    )
 
 
 def _nonfinite_numeric_keys(
@@ -947,6 +1031,7 @@ def _oxide_activities_from_full_output(
     ln_activity: Any,
     *,
     composition_wt_pct: Mapping[str, float],
+    omit_nonfinite: bool = False,
 ) -> Dict[str, float]:
     """Project VapoRock's full-output activity vector onto present oxides.
 
@@ -954,6 +1039,12 @@ def _oxide_activities_from_full_output(
     O2 fugacity first, then liquid oxide activities.  The first entry is not
     an oxide activity.  Zero-inventory oxides are omitted because VapoRock's
     liquid model can return a fabricated chemical potential for them.
+
+    The gas-abundance call refuses the whole result when a present oxide
+    has a non-finite activity, because that call is one speciation result.
+    The liquid-chemical-potential call sets ``omit_nonfinite`` so one
+    oxide the model cannot evaluate does not discard a sibling oxide that
+    it did evaluate.
     """
     try:
         columns = list(system.vapor.rxn_coefs.columns)
@@ -976,6 +1067,8 @@ def _oxide_activities_from_full_output(
                 log_activity = float(row)
             activity = math.exp(log_activity)
             if not math.isfinite(activity) or activity <= 0.0:
+                if omit_nonfinite:
+                    continue
                 raise ValueError(
                     f'VapoRock returned invalid {oxide} activity '
                     f'{activity!r}'
@@ -989,6 +1082,64 @@ def _oxide_activities_from_full_output(
             f'could not map VapoRock full-output oxide activities: {exc}',
         ) from exc
     return oxide_activity
+
+
+def _oxide_activities_from_liquid_chempot(
+    system: Any,
+    *,
+    composition_wt_pct: Mapping[str, float],
+    temperature_K: float,
+) -> Dict[str, float]:
+    """Oxide activities from liquid chemical potentials, with no fO2.
+
+    ``System._calc_liquid_chempot`` needs temperature, pressure, and the
+    fixed composition. Only the gas-abundance path needs log fO2. Pressure
+    is the upstream default, not the observation pressure.
+    """
+    composition = dict(composition_wt_pct)
+    temperature = float(temperature_K)
+    try:
+        set_melt_comp = getattr(system, 'set_melt_comp')
+        calc_liquid_chempot = getattr(system, '_calc_liquid_chempot')
+        set_melt_comp(composition)
+        mu_oxides, mu0_oxides = calc_liquid_chempot(
+            temperature,
+            float(VAPOROCK_LIQUID_MODEL_PRESSURE_BAR),
+            system.mol_liq,
+        )
+        thermal = float(system.R) * temperature
+        if not math.isfinite(thermal) or thermal == 0.0:
+            raise VapoRockCallError(
+                'VapoRockIncompatibleAPI',
+                'VapoRock liquid chemical-potential scale R*T is not finite',
+            )
+        columns = list(system.vapor.rxn_coefs.columns)
+        mu_values = [float(value) for value in list(mu_oxides)]
+        mu0_values = [float(value) for value in list(mu0_oxides)]
+        if (
+            not columns
+            or str(columns[0]) != 'O2'
+            or len(mu_values) != len(columns) - 1
+            or len(mu0_values) != len(columns) - 1
+        ):
+            raise VapoRockCallError(
+                'VapoRockIncompatibleAPI',
+                'VapoRock liquid chemical potentials are not aligned with '
+                'the O2-first reaction-coefficient axis',
+            )
+        ln_activity = [[0.0]]
+        for mu_value, mu0_value in zip(mu_values, mu0_values):
+            ln_activity.append([(mu_value - mu0_value) / thermal])
+    except Exception as exc:
+        if isinstance(exc, VapoRockCallError):
+            raise
+        raise VapoRockCallError(exc) from exc
+    return _oxide_activities_from_full_output(
+        system,
+        ln_activity,
+        composition_wt_pct=composition,
+        omit_nonfinite=True,
+    )
 
 
 def _construct_system(
@@ -1108,7 +1259,6 @@ def _handle_vaporock_request(
     """
     composition_wt_pct = dict(request['composition_wt_pct'])
     temperature_K = float(request['temperature_K'])
-    fO2_log = float(request['fO2_log'])
     include_oxide_activities = request.get('include_oxide_activities') is True
     system_cls = resource.get('system_cls')
     if system_cls is None:
@@ -1116,6 +1266,29 @@ def _handle_vaporock_request(
             'VapoRockIncompatibleAPI',
             'VapoRock warm worker has no System entry point',
         )
+    if include_oxide_activities and request.get('fO2_log') is None:
+        # Fresh System. Do not store it: a gas reuse target must not carry
+        # an activity-only residue, and this path never calls the gas function.
+        system = _construct_system(system_cls, resource=resource)
+        oxide_activity = _oxide_activities_from_liquid_chempot(
+            system,
+            composition_wt_pct=composition_wt_pct,
+            temperature_K=temperature_K,
+        )
+        return {
+            'liquid_activity_only': True,
+            'oxide_activity': dict(oxide_activity),
+            'oxide_activity_standard_state': (
+                _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
+            ),
+            'path': 'liquid_chempot',
+            'system_construct_count': int(
+                resource.get('system_construct_count') or 0
+            ),
+            'reuse_mode': 'fresh',
+            'reuse_latched_fresh': bool(resource.get('reuse_latched_fresh')),
+        }
+    fO2_log = float(request['fO2_log'])
 
     latched = bool(resource.get('reuse_latched_fresh'))
     want_reuse = bool(resource.get('reuse_system')) and not latched
@@ -1405,6 +1578,7 @@ class VapoRockBackend(MeltBackend):
         self._warnings: List[str] = []
         self._last_error: Optional[str] = None
         self._last_pressure_authority_warning: Optional[str] = None
+        self._last_liquid_model_pressure_bar: Optional[float] = None
         self._last_empty_speciation_cause: Optional[EmptySpeciationCause] = None
         self._last_empty_speciation_stats: Optional[Dict[str, int]] = None
         self._last_empty_speciation_reason: Optional[str] = None
@@ -1742,7 +1916,7 @@ class VapoRockBackend(MeltBackend):
         self,
         temperature_C: float,
         composition_kg: Optional[Dict[str, float]] = None,
-        fO2_log: float = -9.0,
+        fO2_log: Optional[float] = -9.0,
         pressure_bar: float = 1e-6,
         *,
         composition_mol: Optional[Dict[str, float]] = None,
@@ -1772,12 +1946,17 @@ class VapoRockBackend(MeltBackend):
         8.3e5 bar total at 10000 K; it is not a current-engine recompute),
         so the independent 10 bar ceiling still applies after evaluation.
 
-        ``pressure_bar`` remains diagnostic-only: the System path in this
-        adapter does not pass total pressure through to the engine
-        (upstream accepts optional ``P``; this adapter omits it).
+        ``pressure_bar`` remains diagnostic-only. The gas path omits the
+        optional ``P`` argument of ``eval_gas_abundances``. An
+        oxygen-irrelevant activity request calls ``_calc_liquid_chempot``
+        at the same upstream default pressure. Neither path passes the
+        requested pressure, and neither corrects it.
         Non-finite, zero, or negative ``pressure_bar``, and non-finite
         ``fO2_log``, are refused on this entry path before any engine
-        call.
+        call. ``fO2_log is None`` is admitted only for an oxide-activity
+        request whose composition has no multivalent component. A gas
+        request, a multivalent activity request, and a non-finite log
+        still refuse with ``invalid_fo2_log`` before the engine.
 
         ``EquilibriumResult.ledger_transition`` is left ``None`` and no
         phase assemblage is reported: VapoRock holds no ``AtomLedger``
@@ -1925,7 +2104,7 @@ class VapoRockBackend(MeltBackend):
                 diagnostics=diagnostics,
             )
 
-        if not vaporock_fo2_log_admitted(fO2_log):
+        def _refuse_invalid_fo2() -> EquilibriumResult:
             try:
                 fo2_diag: Any = float(fO2_log)
                 if not math.isfinite(fo2_diag):
@@ -1954,6 +2133,14 @@ class VapoRockBackend(MeltBackend):
                 ],
                 diagnostics=diagnostics,
             )
+
+        # None is an omitted oxygen condition, not a non-finite log. It is
+        # admitted only when activities were requested; the composition
+        # check below still refuses a multivalent melt before the engine.
+        if not (
+            include_oxide_activities and fO2_log is None
+        ) and not vaporock_fo2_log_admitted(fO2_log):
+            return _refuse_invalid_fo2()
 
         dropped_accounts: List[str] = []
         dropped_account_species: Dict[str, tuple[str, ...]] = {}
@@ -2065,6 +2252,13 @@ class VapoRockBackend(MeltBackend):
                 ],
                 diagnostics=diagnostics,
             )
+
+        if (
+            include_oxide_activities
+            and fO2_log is None
+            and _activity_oxygen_required(comp_wt)
+        ):
+            return _refuse_invalid_fo2()
 
         # VapoRock rides the MELTS liquid model, so its default commissioning
         # band is the MELTS band until battery qualification re-sets it.
@@ -2192,11 +2386,19 @@ class VapoRockBackend(MeltBackend):
                 diagnostics=diagnostics,
             )
 
+        liquid_activity_only = (
+            include_oxide_activities
+            and not vaporock_full_speciation_Pa
+            and bool(oxide_activity)
+            and not vaporock_fo2_log_admitted(fO2_log)
+        )
+        activity_fields: Dict[str, Any] = {}
         if include_oxide_activities:
             activity_fields = _oxide_activity_fields_for_speciation(
                 vaporock_full_speciation_Pa,
                 oxide_activity,
                 oxide_activity_standard_state,
+                allow_without_speciation=liquid_activity_only,
             )
             if activity_fields:
                 projection_diagnostics = dict(projection_diagnostics)
@@ -2219,12 +2421,23 @@ class VapoRockBackend(MeltBackend):
             projection_diagnostics['temperature_K'] = float(temperature_K)
             projection_diagnostics['sum_pressure_bar'] = float(sum_bar)
 
+        if (
+            activity_fields
+            and self._last_liquid_model_pressure_bar is not None
+        ):
+            projection_diagnostics = dict(projection_diagnostics)
+            projection_diagnostics['vaporock_model_pressure_notice'] = (
+                vaporock_model_pressure_notice(
+                    requested_pressure_bar=float(pressure_bar),
+                )
+            )
+
         if self._last_silent_zero_notes:
             merge_notes_into_mapping(
                 projection_diagnostics, self._last_silent_zero_notes
             )
 
-        if not vaporock_full_speciation_Pa:
+        if not vaporock_full_speciation_Pa and not liquid_activity_only:
             cause = self._last_empty_speciation_cause
             if cause is None:
                 raise RuntimeError(
@@ -2259,13 +2472,16 @@ class VapoRockBackend(MeltBackend):
         # not_converged (documented: "ran but did not produce one"), not
         # non_authoritative. non_authoritative is the pressure-authority
         # outcome of a speciation that produced at least one finite
-        # positive Pa (the adapter omitted total P). Degenerate
-        # independent variables and non-finite pressure maps are
-        # refused before this branch. Rail consumers treat only
-        # {ok, non_authoritative} as live cells; this status is what
-        # stops evaluate_cell / engine_crosscheck walking a hollow dict
-        # as a live success.
-        if not vaporock_full_speciation_Pa:
+        # positive Pa (the adapter omitted total P), and of an
+        # oxygen-irrelevant activity that published liquid potentials
+        # with an empty gas map. Degenerate independent variables and
+        # non-finite pressure maps are refused before this branch. Rail
+        # consumers treat only {ok, non_authoritative} as live cells;
+        # this status is what stops evaluate_cell / engine_crosscheck
+        # walking a hollow dict as a live success.
+        if liquid_activity_only:
+            result_status = 'non_authoritative'
+        elif not vaporock_full_speciation_Pa:
             result_status = 'not_converged'
         elif pressure_authority_warning:
             result_status = 'non_authoritative'
@@ -2365,7 +2581,7 @@ class VapoRockBackend(MeltBackend):
         composition_wt_pct: Dict[str, float],
         temperature: float,
         pressure: float,
-        fO2_log: float,
+        fO2_log: Optional[float],
         include_oxide_activities: bool = False,
     ) -> Any:
         """
@@ -2398,6 +2614,7 @@ class VapoRockBackend(MeltBackend):
         (they are not collision-free).
         """
         self._last_pressure_authority_warning = None
+        self._last_liquid_model_pressure_bar = None
         self._clear_empty_speciation()
         temperature_K = (
             float(temperature)
@@ -2493,6 +2710,28 @@ class VapoRockBackend(MeltBackend):
             # opt-in warm-worker flag with a finite reused-vs-fresh
             # prefix probe, not a proven admitted-grid equivalence.
             system = _construct_system(system_cls)
+            if include_oxide_activities and fO2_log is None:
+                oxide_activity = _oxide_activities_from_liquid_chempot(
+                    system,
+                    composition_wt_pct=composition_wt_pct,
+                    temperature_K=temperature_K,
+                )
+                if not oxide_activity:
+                    self._latch_empty_speciation(
+                        EmptySpeciationCause.NO_FINITE_VALUES
+                    )
+                    return {}, {}, _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
+                self._last_pressure_authority_warning = (
+                    vaporock_liquid_activity_pressure_warning()
+                )
+                self._last_liquid_model_pressure_bar = float(
+                    VAPOROCK_LIQUID_MODEL_PRESSURE_BAR
+                )
+                return (
+                    {},
+                    oxide_activity,
+                    _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
+                )
             system_output = _call_system_eval_gas_abundances(
                 system,
                 composition_wt_pct=composition_wt_pct,
@@ -2501,12 +2740,10 @@ class VapoRockBackend(MeltBackend):
                 include_oxide_activities=include_oxide_activities,
             )
             self._last_pressure_authority_warning = (
-                'This adapter calls System.eval_gas_abundances without '
-                'the optional P argument, so upstream evaluates liquid '
-                'chemical potentials at its default P (installed '
-                'source: P=1e-10 bar) rather than the requested '
-                'pressure_bar. The vapor result is non-authoritative '
-                'for pressure-sensitive transport.'
+                vaporock_system_pressure_authority_warning()
+            )
+            self._last_liquid_model_pressure_bar = float(
+                VAPOROCK_LIQUID_MODEL_PRESSURE_BAR
             )
             # log10(bar) result is unit-unambiguous; convert directly
             # without the declared-unit dict path.
@@ -2534,7 +2771,7 @@ class VapoRockBackend(MeltBackend):
         *,
         composition_wt_pct: Dict[str, float],
         temperature_K: float,
-        fO2_log: float,
+        fO2_log: Optional[float],
         include_oxide_activities: bool = False,
     ) -> Any:
         """Dispatch one request through the warm pool (fresh System default)."""
@@ -2542,12 +2779,14 @@ class VapoRockBackend(MeltBackend):
         if pool is None:
             raise RuntimeError('VapoRock warm pool is not initialised')
         # pressure_bar is intentionally NOT sent: diagnostic-only; worker
-        # never passes total P to eval_gas_abundances.
+        # never passes total P to eval_gas_abundances. An omitted fO2 is
+        # absent from the request so the worker does not float(None).
         request = {
             'composition_wt_pct': dict(composition_wt_pct),
             'temperature_K': float(temperature_K),
-            'fO2_log': float(fO2_log),
         }
+        if fO2_log is not None:
+            request['fO2_log'] = float(fO2_log)
         if include_oxide_activities:
             request['include_oxide_activities'] = True
         future = pool.submit(
@@ -2593,13 +2832,23 @@ class VapoRockBackend(MeltBackend):
                 f'VapoRock warm worker returned non-dict payload: '
                 f'{type(payload)!r}'
             )
+        if payload.get('liquid_activity_only') is True:
+            oxide_activity, state = self._worker_oxide_activity_pair(payload)
+            if oxide_activity:
+                self._last_pressure_authority_warning = (
+                    vaporock_liquid_activity_pressure_warning()
+                )
+                self._last_liquid_model_pressure_bar = float(
+                    VAPOROCK_LIQUID_MODEL_PRESSURE_BAR
+                )
+                return {}, oxide_activity, state
+            self._latch_empty_speciation(EmptySpeciationCause.NO_FINITE_VALUES)
+            return {}, {}, state
         self._last_pressure_authority_warning = (
-            'This adapter calls System.eval_gas_abundances without '
-            'the optional P argument, so upstream evaluates liquid '
-            'chemical potentials at its default P (installed '
-            'source: P=1e-10 bar) rather than the requested '
-            'pressure_bar. The vapor result is non-authoritative '
-            'for pressure-sensitive transport.'
+            vaporock_system_pressure_authority_warning()
+        )
+        self._last_liquid_model_pressure_bar = float(
+            VAPOROCK_LIQUID_MODEL_PRESSURE_BAR
         )
         if 'log10_bar' not in payload:
             self._latch_empty_speciation(EmptySpeciationCause.PAYLOAD_ABSENT)
@@ -2649,6 +2898,14 @@ class VapoRockBackend(MeltBackend):
         )
         if not include_oxide_activities:
             return pressures
+        oxide_activity, state = self._worker_oxide_activity_pair(payload)
+        return pressures, oxide_activity, state
+
+    def _worker_oxide_activity_pair(
+        self,
+        payload: Mapping[str, Any],
+    ) -> tuple[Dict[str, float], str]:
+        """Parse the worker's oxide-activity pair. Invalid values raise."""
         raw_activity = payload.get('oxide_activity')
         if not isinstance(raw_activity, dict):
             raise RuntimeError(
@@ -2674,7 +2931,7 @@ class VapoRockBackend(MeltBackend):
                 'VapoRock warm worker did not state the oxide activity '
                 'standard state'
             )
-        return pressures, oxide_activity, state
+        return oxide_activity, state
 
     # ------------------------------------------------------------------
     # Composition / result projection

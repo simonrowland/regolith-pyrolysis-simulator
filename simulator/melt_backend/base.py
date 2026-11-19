@@ -104,6 +104,7 @@ ENGINE_CACHE_NOTICE_CODE_TABLE = (
     ('internal-analytical', 2, 'floor_inversion', 'Analytical pressure used a floor inversion.'),
     ('internal-analytical', 3, 'fo2_oxygen_balance_effusion_solved', 'Analytical input used the solved effusion oxygen condition.'),
     ('internal-analytical', 90, 'warning_text', 'Analytical warning used by cell classification.'),
+    ('vaporock', 3, 'engine_model_caveat', 'VapoRock liquid chemical potentials use the upstream default pressure.'),
 )
 _ENGINE_NOTICE_BY_CODE = {
     (engine, code): number
@@ -374,6 +375,8 @@ def equilibrium_cache_from_value(
                         'notice': FO2_GAS_ONLY_NOTICE,
                         **row,
                     }
+                elif source == 'vaporock_model_pressure_notice':
+                    diagnostics['vaporock_model_pressure_notice'] = row
                 else:
                     raise ValueError(f'invalid engine notice source {source!r}')
         warning_codes = metadata.get('warning_codes', ())
@@ -447,6 +450,12 @@ def _equilibrium_cache_consumer_metadata(
             '_source': 'fo2_gas_only',
             'kind': 'fo2_gas_only',
             'printed_fO2_log': gas_only.get('printed_fO2_log'),
+        })
+    model_pressure = diagnostics.get('vaporock_model_pressure_notice')
+    if isinstance(model_pressure, Mapping):
+        notice_rows.append({
+            '_source': 'vaporock_model_pressure_notice',
+            **model_pressure,
         })
     warnings = values.get('warnings')
     warnings = warnings if isinstance(warnings, (list, tuple)) else ()

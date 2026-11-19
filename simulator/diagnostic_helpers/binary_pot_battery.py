@@ -1625,6 +1625,9 @@ def engine_flags_from_result(
         band = row.get("certified_band")
         if isinstance(band, Mapping):
             certified_band = dict(band)
+    model_pressure = diagnostics.get("vaporock_model_pressure_notice")
+    if isinstance(model_pressure, Mapping):
+        notices.append(_plain_data(model_pressure))
     if authority is None and diagnostics.get("authority"):
         authority = str(diagnostics["authority"])
     if certified_band is None and isinstance(

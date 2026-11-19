@@ -4666,3 +4666,387 @@ def test_warm_pool_inflight_disable_is_typed_worker_death():
     assert "worker exited without a result" in (
         result.diagnostics["engine_exception_message"]
     )
+
+
+class _LiquidChempotVapor:
+    class _ReactionCoefficients:
+        columns = ["O2", "SiO2", "Na2O"]
+
+    rxn_coefs = _ReactionCoefficients()
+
+
+def _liquid_chempot_system_cls(calls):
+    class FakeSystem:
+        R = 8.314
+        vapor = _LiquidChempotVapor()
+
+        def set_melt_comp(self, composition):
+            self.mol_liq = [1.0, 1.0]
+
+        def eval_gas_abundances(self, *_args, **_kwargs):
+            calls["gas"] += 1
+            raise AssertionError("gas abundances are not the activity path")
+
+        def _calc_liquid_chempot(self, temperature, pressure, _mol_liq):
+            calls["chempot"] += 1
+            calls["temperature"].append(float(temperature))
+            calls["pressure"].append(float(pressure))
+            thermal = 8.314 * float(temperature)
+            return [math.log(0.4) * thermal, math.log(0.2) * thermal], [0.0, 0.0]
+
+    return FakeSystem
+
+
+def test_oxygen_irrelevant_activity_uses_liquid_chempot_without_fo2(monkeypatch):
+    calls = {"gas": 0, "chempot": 0, "temperature": [], "pressure": []}
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(System=_liquid_chempot_system_cls(calls)),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+    published = []
+    for pressure_bar in (1.0, 1000.0):
+        result = backend.equilibrate(
+            1600.0,
+            composition_kg={"SiO2": 60.0, "Na2O": 40.0},
+            fO2_log=None,
+            pressure_bar=pressure_bar,
+            include_oxide_activities=True,
+        )
+        assert result.status == "non_authoritative", pressure_bar
+        assert result.fO2_log is None
+        assert result.vapor_pressures_Pa == {}
+        assert result.diagnostics["oxide_activity"]["SiO2"] == pytest.approx(0.4)
+        assert result.diagnostics["oxide_activity"]["Na2O"] == pytest.approx(0.2)
+        notice = result.diagnostics["vaporock_model_pressure_notice"]
+        assert notice["kind"] == "engine_model_caveat"
+        assert notice["scope"] == "liquid_chemical_potential"
+        assert notice["model_pressure_bar"] == pytest.approx(1e-10)
+        assert notice["requested_pressure_bar"] == pytest.approx(pressure_bar)
+        assert "1e-10" in notice["reason"]
+        assert "liquid chemical potential" in notice["reason"]
+        assert "No pressure correction" in notice["reason"]
+        assert "non-authoritative" in notice["reason"]
+        assert "without the optional P argument" not in " ".join(result.warnings)
+        published.append(result.diagnostics["oxide_activity"]["SiO2"])
+    assert calls["gas"] == 0
+    assert calls["chempot"] == 2
+    assert calls["pressure"] == pytest.approx([1e-10, 1e-10])
+    assert published[0] == pytest.approx(published[1])
+
+
+def test_nonfinite_sibling_oxide_does_not_drop_a_finite_activity(monkeypatch):
+    """A present oxide the liquid model cannot evaluate is omitted.
+
+    The gas-abundance mapper still refuses the whole vector. A sibling
+    with a finite chemical potential is still published.
+    """
+    calls = {"gas": 0}
+
+    class _Vapor:
+        class _ReactionCoefficients:
+            columns = ["O2", "CaO", "SiO2"]
+
+        rxn_coefs = _ReactionCoefficients()
+
+    class FakeSystem:
+        R = 8.314
+        vapor = _Vapor()
+
+        def set_melt_comp(self, _composition):
+            self.mol_liq = [1.0, 1.0]
+
+        def eval_gas_abundances(self, *_args, **_kwargs):
+            calls["gas"] += 1
+            raise AssertionError("gas abundances are not the activity path")
+
+        def _calc_liquid_chempot(self, temperature, _pressure, _mol_liq):
+            thermal = 8.314 * float(temperature)
+            return [float("nan"), math.log(0.3) * thermal], [0.0, 0.0]
+
+    _install_fake_import(
+        monkeypatch, types.SimpleNamespace(System=FakeSystem)
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+    result = backend.equilibrate(
+        1600.0,
+        composition_kg={"CaO": 40.0, "SiO2": 60.0},
+        fO2_log=None,
+        pressure_bar=1.0,
+        include_oxide_activities=True,
+    )
+    assert result.status == "non_authoritative"
+    assert result.diagnostics["oxide_activity"] == pytest.approx({"SiO2": 0.3})
+    assert "CaO" not in result.diagnostics["oxide_activity"]
+    assert calls["gas"] == 0
+    notice = result.diagnostics["vaporock_model_pressure_notice"]
+    assert notice["model_pressure_bar"] == pytest.approx(1e-10)
+
+    class GasSystem(FakeSystem):
+        def eval_gas_abundances(self, *_args, **_kwargs):
+            calls["gas"] += 1
+            return (
+                {"SiO": 1.0},
+                None,
+                [[0.0], [float("nan")], [math.log(0.3)]],
+            )
+
+    _install_fake_import(
+        monkeypatch, types.SimpleNamespace(System=GasSystem)
+    )
+    gas_backend = VapoRockBackend()
+    assert gas_backend.initialize({"warm_worker": False})
+    gas = gas_backend.equilibrate(
+        1600.0,
+        composition_kg={"CaO": 40.0, "SiO2": 60.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        include_oxide_activities=True,
+    )
+    assert gas.status == "not_converged"
+    assert "invalid CaO activity" in gas.diagnostics["engine_exception_message"]
+    assert "oxide_activity" not in gas.diagnostics
+    assert calls["gas"] == 1
+
+
+def test_omitted_fo2_on_a_gas_request_is_refused_before_the_engine(monkeypatch):
+    calls = {"n": 0}
+
+    def calc_vapor_pressures(**_kwargs):
+        calls["n"] += 1
+        return {"SiO": 1.0}
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize(
+        {"warm_worker": False, "vapor_pressure_units": "Pa"}
+    )
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0},
+        fO2_log=None,
+        pressure_bar=1e-6,
+    )
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == "invalid_fo2_log"
+    assert "vaporock_model_pressure_notice" not in result.diagnostics
+    assert calls["n"] == 0
+
+    activity = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0},
+        fO2_log=float("nan"),
+        pressure_bar=1e-6,
+        include_oxide_activities=True,
+    )
+    assert activity.status == "out_of_domain"
+    assert activity.diagnostics["backend_status_reason"] == "invalid_fo2_log"
+    assert "vaporock_model_pressure_notice" not in activity.diagnostics
+    assert calls["n"] == 0
+
+
+def test_multivalent_activity_without_fo2_is_refused_before_the_engine(monkeypatch):
+    calls = {"n": 0}
+
+    class FakeSystem:
+        def set_melt_comp(self, _composition):
+            calls["n"] += 1
+
+        def eval_gas_abundances(self, *_args, **_kwargs):
+            calls["n"] += 1
+            return {}
+
+        def _calc_liquid_chempot(self, *_args, **_kwargs):
+            calls["n"] += 1
+            return [], []
+
+    _install_fake_import(monkeypatch, types.SimpleNamespace(System=FakeSystem))
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+    result = backend.equilibrate(
+        1600.0,
+        composition_kg={"SiO2": 80.0, "FeO": 20.0},
+        fO2_log=None,
+        pressure_bar=1e-6,
+        include_oxide_activities=True,
+    )
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == "invalid_fo2_log"
+    assert "commissioning_notice" not in result.diagnostics
+    assert "vaporock_model_pressure_notice" not in result.diagnostics
+    assert calls["n"] == 0
+
+
+def test_model_pressure_notice_round_trips_through_equilibrium_cache():
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        engine_flags_from_result,
+    )
+    from simulator.melt_backend.base import (
+        decode_engine_notice_codes,
+        encode_engine_notice_codes,
+        equilibrium_cache_from_value,
+        equilibrium_cache_value,
+    )
+
+    notice = vaporock_module.vaporock_model_pressure_notice(
+        requested_pressure_bar=1000.0,
+    )
+    hot = equilibrium_cache_value(
+        {
+            "status": "non_authoritative",
+            "phase_assemblage_available": False,
+            "diagnostics": {
+                "oxide_activity": {"SiO2": 0.4},
+                "oxide_activity_standard_state": (
+                    vaporock_module._VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
+                ),
+                "vaporock_model_pressure_notice": notice,
+            },
+        },
+        engine_id="vaporock",
+    )
+    restored = equilibrium_cache_from_value(hot, engine_id="vaporock")
+    got = restored["diagnostics"]["vaporock_model_pressure_notice"]
+    assert got["kind"] == "engine_model_caveat"
+    assert got["model_pressure_bar"] == pytest.approx(1e-10)
+    assert got["requested_pressure_bar"] == pytest.approx(1000.0)
+    assert got["scope"] == "liquid_chemical_potential"
+    assert "liquid chemical potential" in got["reason"]
+    flags, _authority, _band = engine_flags_from_result(
+        types.SimpleNamespace(diagnostics=restored["diagnostics"], warnings=())
+    )
+    codes, values = encode_engine_notice_codes("vaporock", flags)
+    assert decode_engine_notice_codes("vaporock", codes, values) == flags
+    assert any(
+        row.get("kind") == "engine_model_caveat" and "1e-10" in row["reason"]
+        for row in flags
+    )
+
+
+def test_warm_worker_omitted_fo2_activity_uses_liquid_chempot():
+    calls = {"gas": 0, "chempot": 0, "temperature": [], "pressure": []}
+    stored = object()
+    resource = {
+        "system_cls": _liquid_chempot_system_cls(calls),
+        "system": stored,
+        "temperature_units": "K",
+        "vapor_pressure_units": "bar",
+        "reuse_system": True,
+        "system_construct_count": 0,
+        "reuse_equivalence_checks_done": 0,
+        "reuse_latched_fresh": False,
+    }
+    payload = vaporock_module._handle_vaporock_request(
+        resource,
+        {
+            "composition_wt_pct": {"SiO2": 60.0, "Na2O": 40.0},
+            "temperature_K": 1873.15,
+            "include_oxide_activities": True,
+        },
+        None,
+    )
+    assert payload["liquid_activity_only"] is True
+    assert "log10_bar" not in payload
+    assert payload["oxide_activity"]["SiO2"] == pytest.approx(0.4)
+    assert payload["oxide_activity"]["Na2O"] == pytest.approx(0.2)
+    assert calls["gas"] == 0
+    assert calls["chempot"] == 1
+    assert calls["pressure"] == pytest.approx([1e-10])
+    assert resource["system"] is stored
+    assert resource["system_construct_count"] == 1
+
+
+def test_warm_pool_liquid_activity_only_is_not_a_hollow_gas_table():
+    state = vaporock_module._VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
+    pool = _FakeWarmPool(
+        {
+            "liquid_activity_only": True,
+            "oxide_activity": {"SiO2": 0.4, "Na2O": 0.2},
+            "oxide_activity_standard_state": state,
+        }
+    )
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = pool
+    backend._clear_empty_speciation()
+    pressures, activity, returned = backend._call_vaporock_via_pool(
+        composition_wt_pct={"SiO2": 60.0, "Na2O": 40.0},
+        temperature_K=1873.15,
+        fO2_log=None,
+        include_oxide_activities=True,
+    )
+    assert set(pool.requests[0]) == {
+        "composition_wt_pct",
+        "temperature_K",
+        "include_oxide_activities",
+    }
+    assert "fO2_log" not in pool.requests[0]
+    assert pressures == {}
+    assert activity == {"SiO2": 0.4, "Na2O": 0.2}
+    assert returned == state
+    assert backend._last_empty_speciation_cause is None
+    assert backend._last_liquid_model_pressure_bar == pytest.approx(1e-10)
+    assert "without the optional P argument" not in (
+        backend._last_pressure_authority_warning
+    )
+    assert "P=1e-10 bar" in backend._last_pressure_authority_warning
+
+
+def test_installed_activity_without_fo2_matches_liquid_chempot_at_both_pressures():
+    import importlib
+
+    backend = VapoRockBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        available = backend.initialize({"warm_worker": False})
+    if not available:
+        pytest.skip("VapoRock optional dependency unavailable")
+
+    composition = {"SiO2": 60.0, "Na2O": 40.0}
+    published = []
+    for pressure_bar in (1.0, 1000.0):
+        result = backend.equilibrate(
+            1600.0,
+            composition_kg=composition,
+            fO2_log=None,
+            pressure_bar=pressure_bar,
+            include_oxide_activities=True,
+        )
+        assert result.status == "non_authoritative", pressure_bar
+        assert result.fO2_log is None
+        assert result.vapor_pressures_Pa == {}
+        assert getattr(result, "vaporock_full_speciation_Pa", {}) == {}
+        notice = result.diagnostics["vaporock_model_pressure_notice"]
+        assert notice["model_pressure_bar"] == pytest.approx(1e-10)
+        assert notice["requested_pressure_bar"] == pytest.approx(pressure_bar)
+        assert notice["scope"] == "liquid_chemical_potential"
+        assert "liquid chemical potential" in notice["reason"]
+        assert "1e-10" in notice["reason"]
+        assert result.diagnostics["oxide_activity"]["SiO2"] > 0.0
+        assert result.diagnostics["oxide_activity"]["Na2O"] > 0.0
+        published.append(dict(result.diagnostics["oxide_activity"]))
+    assert published[0]["SiO2"] == pytest.approx(published[1]["SiO2"], rel=1e-12)
+    assert published[0]["Na2O"] == pytest.approx(published[1]["Na2O"], rel=1e-12)
+
+    native = importlib.import_module("vaporock")
+    system = native.System()
+    system.set_melt_comp(composition)
+    temperature_K = 1600.0 + 273.15
+    mu_oxides, mu0_oxides = system._calc_liquid_chempot(
+        temperature_K,
+        1e-10,
+        system.mol_liq,
+    )
+    columns = list(system.vapor.rxn_coefs.columns)
+    thermal = float(system.R) * temperature_K
+    for oxide, activity in published[0].items():
+        index = columns.index(oxide) - 1
+        expected = math.exp(
+            (float(mu_oxides[index]) - float(mu0_oxides[index])) / thermal
+        )
+        assert activity == pytest.approx(expected, rel=1e-12), oxide
