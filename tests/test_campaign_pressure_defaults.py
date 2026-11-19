@@ -14,6 +14,7 @@ from simulator.campaigns import (
     CampaignSetpointMissingRefusal,
 )
 from simulator.core import Atmosphere, CampaignPhase, MeltState
+from simulator.lab_schedule import LabScheduleValidationError
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun, _parse_runtime_campaign_overrides_json
 
@@ -968,6 +969,90 @@ def test_zero_o2_argon_lab_schedule_does_not_synthesize_n2():
 
     assert gas.composition.get("Ar", 0.0) == pytest.approx(8.0)
     assert gas.composition.get("N2", 0.0) == pytest.approx(0.0)
+
+
+def test_air_lab_schedule_resolves_to_oxygen_and_nitrogen_at_one_atmosphere():
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import CondensationTrain, EvaporationFlux
+
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["chamber_pressure_mbar"] = [
+        {"t_h": 0.0, "value": 1013.25, "unit": "mbar"},
+        {"t_h": 1.0, "value": 1013.25, "unit": "mbar"},
+    ]
+    schedule["gas_boundary"]["background_gas"].update({
+        "species": "air",
+        "mole_fraction": 1.0,
+    })
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = {"lab_schedule": schedule}
+    melt = MeltState(campaign=CampaignPhase.C2A)
+
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+
+    assert melt.p_total_mbar == pytest.approx(1013.25)
+    assert melt.pO2_mbar == pytest.approx(212.28, abs=0.005)
+    assert melt.background_gas_species == "N2"
+    assert melt.background_gas_mole_fraction == pytest.approx(1.0)
+    gas = OverheadGasModel({"enabled": True, "volume_m3": 1.0}).update(
+        EvaporationFlux(), melt, CondensationTrain.create_default(),
+    )
+    assert gas.composition["O2"] == pytest.approx(212.28, abs=0.005)
+    assert gas.composition["N2"] == pytest.approx(800.97, abs=0.005)
+
+
+def test_lab_schedule_unknown_background_gas_refuses_typed():
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["gas_boundary"]["background_gas"]["species"] = "unknown-gas"
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = {"lab_schedule": schedule}
+
+    with pytest.raises(
+        LabScheduleValidationError,
+        match="lab_schedule_background_gas_species_unsupported",
+    ):
+        manager.configure_campaign(
+            MeltState(campaign=CampaignPhase.C2A), CampaignPhase.C2A,
+        )
+
+
+def test_lab_schedule_background_mole_fraction_above_one_refuses_typed():
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["gas_boundary"]["background_gas"]["mole_fraction"] = 1.5
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = {"lab_schedule": schedule}
+
+    with pytest.raises(
+        LabScheduleValidationError,
+        match="lab_schedule_background_gas_mole_fraction_out_of_range",
+    ):
+        manager.configure_campaign(
+            MeltState(campaign=CampaignPhase.C2A), CampaignPhase.C2A,
+        )
+
+
+def test_lab_schedule_positive_oxygen_requires_named_balance_gas():
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["gas_boundary"]["background_gas"] = {
+        "reported_status": "not_reported",
+        "source_class": "test_fixture",
+        "citation_id": "unit_test",
+        "digest": "not_applicable",
+        "reason": "unit test",
+    }
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = {
+        "lab_schedule": schedule,
+        "lab_schedule_pO2_setpoint_mbar": 1.0,
+    }
+
+    with pytest.raises(
+        LabScheduleValidationError,
+        match="lab_schedule_positive_pO2_requires_named_balance_gas",
+    ):
+        manager.configure_campaign(
+            MeltState(campaign=CampaignPhase.C2A), CampaignPhase.C2A,
+        )
 
 
 def test_c2a_schedule_gas_overrides_operator_carrier_for_the_scheduled_step():

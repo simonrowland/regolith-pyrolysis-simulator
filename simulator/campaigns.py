@@ -29,11 +29,17 @@ from simulator.backend_names import C0_FORECAST_ENGINE_NAMES
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LAB_SCHEDULE_PO2_SETPOINT_KEY,
+    LabScheduleValidationError,
+    _background_gas_mole_fraction,
     interpolate_schedule_points,
     normalize_lab_schedule,
     pO2_enforcement_row,
     pO2_setpoint_mbar_from_schedule,
     schedule_sample_time_h,
+)
+from simulator.environment import (
+    CoverGasCompositionUnavailable,
+    cover_gas_partial_pressures,
 )
 from simulator.furnace_materials import (
     FURNACE_CEILING_FALLBACK_C,
@@ -2513,21 +2519,57 @@ class CampaignManager:
             isinstance(background_gas, Mapping)
             and str(background_gas.get('reported_status', '') or '') != 'not_reported'
         ):
-            background_species = str(background_gas.get('species') or '').strip()
-            raw_background_fraction = background_gas.get('mole_fraction', 1.0)
+            declared_species = str(background_gas.get('species') or '').strip()
+            background_fraction = _background_gas_mole_fraction(background_gas)
             try:
-                if not is_declared_real_scalar(
-                    raw_background_fraction,
-                    allow_numeric_str=True,
+                partials = cover_gas_partial_pressures(
+                    declared_species,
+                    total_pressure,
+                )
+            except CoverGasCompositionUnavailable:
+                partials = {}
+            if partials and not math.isclose(
+                sum(partials.values()), total_pressure,
+                rel_tol=1e-9, abs_tol=1e-12,
+            ):
+                raise LabScheduleValidationError(
+                    'lab_schedule_background_gas_composition_incomplete'
+                )
+            if {'O2', 'N2'} <= partials.keys():
+                # Air is represented by its O2 partial and an N2 balance.
+                # OverheadGasModel applies this fraction to (P_total - pO2),
+                # so a unit fraction writes the complete nitrogen remainder.
+                expected_pO2 = partials['O2'] * background_fraction
+                if not math.isclose(
+                    float(row['achieved_mbar']), expected_pO2,
+                    rel_tol=0.0, abs_tol=1e-9,
                 ):
-                    raise TypeError
-                background_fraction = float(raw_background_fraction)
-            except (TypeError, ValueError):
-                background_fraction = 0.0
-            if background_fraction < 0.0:
-                background_fraction = 0.0
-            elif background_fraction > 1.0:
+                    raise LabScheduleValidationError(
+                        'lab_schedule_air_cover_conflicts_with_pO2_setpoint'
+                    )
+                background_species = 'N2'
                 background_fraction = 1.0
+            else:
+                try:
+                    background_species = _canonical_carrier_gas_key(
+                        declared_species,
+                    )
+                except ValueError as exc:
+                    raise LabScheduleValidationError(
+                        'lab_schedule_background_gas_species_unsupported'
+                    ) from exc
+        if (
+            float(row['achieved_mbar']) > 0.0
+            and float(row['achieved_mbar']) < total_pressure
+            and (
+                not background_species
+                or background_species.upper() == 'O2'
+                or background_fraction <= 0.0
+            )
+        ):
+            raise LabScheduleValidationError(
+                'lab_schedule_positive_pO2_requires_named_balance_gas'
+            )
         melt.p_total_mbar = float(total_pressure)
         melt.pO2_mbar = float(row['achieved_mbar'])
         melt.background_gas_species = background_species

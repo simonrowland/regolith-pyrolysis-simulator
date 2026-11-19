@@ -59,7 +59,10 @@ def cover_gas_partial_pressures(
     Output pressure units match the input (bar or mbar).
 
     A percentage specifies that species only; the unreported balance is not
-    invented as oxygen. Air explicitly denotes the 0.21 oxygen mole fraction.
+    invented as oxygen. The two-species dry-air approximation uses 20.95% O2,
+    with the remainder represented as N2. NOAA reports dry air at 20.95% O2
+    by volume (https://www.nesdis.noaa.gov/news/peeling-back-the-layers-of-the-atmosphere);
+    the audit's 0.21 is rounded.
     """
     pressure = float(total_pressure)
     if not math.isfinite(pressure) or pressure < 0.0:
@@ -68,7 +71,8 @@ def cover_gas_partial_pressures(
         return {}
     token = str(atmosphere).strip().upper().replace(" ", "")
     if token == "AIR":
-        return {"O2": pressure * 0.21, "N2": pressure * 0.79}
+        oxygen_fraction = 0.2095
+        return {"O2": pressure * oxygen_fraction, "N2": pressure * (1.0 - oxygen_fraction)}
     if token in {"CO2", "O2", "N2", "AR", "KR", "HE"}:
         species = {"AR": "Ar", "KR": "Kr", "HE": "He"}.get(token, token)
         return {species: pressure}

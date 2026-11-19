@@ -15,6 +15,10 @@ from types import MappingProxyType
 from typing import Any
 
 from simulator.canonical import canonical_json_dumps, normalize_canonical_value
+from simulator.environment import (
+    CoverGasCompositionUnavailable,
+    cover_gas_partial_pressures,
+)
 
 
 LAB_SCHEDULE_OVERRIDE_KEY = "lab_schedule"
@@ -185,10 +189,28 @@ def pO2_setpoint_mbar_from_schedule(
     if isinstance(cover, Mapping) and bool(cover.get("enabled", False)):
         return _finite_non_negative(cover.get("setpoint_mbar"), "pO2_cover.setpoint_mbar")
     gas = schedule.get("gas_boundary", {}).get("background_gas", {})
-    if isinstance(gas, Mapping) and str(gas.get("species", "")).strip().upper() == "O2":
-        mole_fraction = _finite_non_negative(gas.get("mole_fraction", 1.0), "background_gas.mole_fraction")
-        return total_pressure_mbar * mole_fraction
+    if isinstance(gas, Mapping) and str(gas.get("species", "")).strip():
+        mole_fraction = _background_gas_mole_fraction(gas)
+        try:
+            partials = cover_gas_partial_pressures(
+                str(gas["species"]), total_pressure_mbar,
+            )
+        except CoverGasCompositionUnavailable:
+            return 0.0
+        return partials.get("O2", 0.0) * mole_fraction
     return 0.0
+
+
+def _background_gas_mole_fraction(gas: Mapping[str, Any]) -> float:
+    """Validate and return a declared background gas mole fraction."""
+    mole_fraction = _finite_non_negative(
+        gas.get("mole_fraction", 1.0), "background_gas.mole_fraction",
+    )
+    if mole_fraction > 1.0:
+        raise LabScheduleValidationError(
+            "lab_schedule_background_gas_mole_fraction_out_of_range"
+        )
+    return mole_fraction
 
 
 def pO2_enforcement_row(
