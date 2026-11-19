@@ -14,6 +14,7 @@ from simulator.battery.enums import (
 from simulator.battery.records import (
     StandardState,
     Value,
+    nominal_pressure_pa,
     phase_token,
     polymorph_token,
 )
@@ -459,8 +460,12 @@ def melt_activity_requests(
     the composition or measured species holds a multivalent element, every
     engine receives the same fO2 from the row ladder, or the same oxygen gap
     when no tier resolves. A printed fO2 is attached for every engine even
-    when oxygen is not otherwise an input. Pressure and the gas boundary are
-    not inputs. ``engine_intrinsic`` omits fO2 only for internal-analytical;
+    when oxygen is not otherwise an input. Pressure is optional; MAGEMin
+    receives the typed row identity pressure first, then a point from the
+    pressure waypoint ladder. The ladder retains its Knudsen chamber-
+    background exclusion. Other engines omit pressure. The gas boundary is
+    not an input.
+    ``engine_intrinsic`` omits fO2 only for internal-analytical;
     all other engines retain the shared-ladder requirement. A missing required
     input is a typed gap, and a missing oxygen point is never filled from the
     engine default.
@@ -677,13 +682,67 @@ def melt_activity_requests(
                     "authority": composition.selected.authority.value,
                     "route": composition.selected.route,
                 },
-                "pressure_bar": {"authority": "not_an_input", "reason": "condensed-phase activity; PV term omitted"},
                 "quantity": {"waypoint": "identity.quantity"},
                 "reference_state": {
                     "waypoint": "identity.reference_state",
                     "engine_reports": reported,
                 },
             }
+            if engine == "magemin":
+                identity_pressure = (
+                    None if observation is None
+                    else observation.identity.total_pressure_Pa
+                )
+                pressure_pa = None
+                pressure_route = None
+                if identity_pressure is not None and identity_pressure.is_value:
+                    pressure_pa = nominal_pressure_pa(identity_pressure)
+                    if (
+                        pressure_pa is None
+                        or not pressure_pa.is_finite()
+                        or pressure_pa <= 0
+                    ):
+                        raise UnsupportedValue("identity.total_pressure_Pa")
+                    pressure_route = {
+                        "waypoint": "identity.total_pressure_Pa",
+                        "authority": "typed_identity",
+                        "route": "identity.total_pressure_Pa",
+                        "formula": "Pa / 100000",
+                    }
+                elif identity_pressure is None or identity_pressure.is_unknown:
+                    pressure = _prediction_pressure_waypoint(
+                        inputs.waypoints["pressure_boundary"], inputs.method
+                    )
+                    pressure_value = None if pressure is None else pressure.value
+                    if (
+                        isinstance(pressure_value, Value)
+                        and pressure_value.kind is ValueKind.POINT
+                    ):
+                        pressure_pa = pressure_value.point
+                        pressure_route = {
+                            "waypoint": "pressure_boundary",
+                            "authority": pressure.authority.value,
+                            "route": pressure.route,
+                            "formula": "Pa / 100000",
+                        }
+                if pressure_pa is not None:
+                    if not pressure_pa.is_finite() or pressure_pa <= 0:
+                        raise UnsupportedValue("pressure_boundary")
+                    payload["pressure_bar"] = float(
+                        pressure_pa / BAR_PA_DECIMAL
+                    )
+                    routes["pressure_bar"] = pressure_route
+                else:
+                    routes["pressure_bar"] = {
+                        "waypoint": "pressure_boundary",
+                        "authority": "not_provided",
+                        "reason": "no positive point pressure",
+                    }
+            else:
+                routes["pressure_bar"] = {
+                    "authority": "not_an_input",
+                    "reason": "condensed-phase activity; PV term omitted",
+                }
             if shared is not None:
                 payload["fO2_log"] = shared.log10_fO2_bar
                 payload["fO2_tier"] = shared.tier

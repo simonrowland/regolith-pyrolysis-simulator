@@ -1769,6 +1769,109 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 warnings=['MAGEMin backend not initialized'],
             )
 
+        native_activity_pressure_notice = None
+        if native_activity_formula is not None:
+            from engines.magemin.domain import (
+                MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW,
+                MAGEMIN_NATIVE_MELT_ACTIVITIES,
+                native_activity_reference_available,
+            )
+
+            native_spec = MAGEMIN_NATIVE_MELT_ACTIVITIES.get(
+                native_activity_formula
+            )
+            if native_spec is None:
+                reason = "magemin_native_activity_reference_unavailable"
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=fO2_log,
+                    status='out_of_domain',
+                    warnings=[reason],
+                    diagnostics={
+                        'backend_status': 'out_of_domain',
+                        'backend_status_reason': reason,
+                        'magemin_native_formula': native_activity_formula,
+                    },
+                )
+
+            try:
+                native_activity_pressure_bar = float(pressure_bar)
+            except (TypeError, ValueError, OverflowError):
+                native_activity_pressure_bar = math.nan
+            if (
+                not math.isfinite(native_activity_pressure_bar)
+                or native_activity_pressure_bar <= 0.0
+            ):
+                reason = "invalid_input"
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=(
+                        native_activity_pressure_bar
+                        if math.isfinite(native_activity_pressure_bar)
+                        else None
+                    ),
+                    fO2_log=fO2_log,
+                    status='out_of_domain',
+                    warnings=[reason],
+                    diagnostics={
+                        'backend_status': 'out_of_domain',
+                        'backend_status_reason': reason,
+                        'magemin_native_formula': native_activity_formula,
+                        'magemin_native_activity_pressure_bar': (
+                            native_activity_pressure_bar
+                            if math.isfinite(native_activity_pressure_bar)
+                            else repr(pressure_bar)
+                        ),
+                    },
+                )
+            if not native_activity_reference_available(
+                native_activity_formula, native_activity_pressure_bar
+            ):
+                pressure_min_bar, pressure_max_bar = (
+                    MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+                )
+                reason = "magemin_native_silica_reference_unavailable"
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=native_activity_pressure_bar,
+                    fO2_log=fO2_log,
+                    status='out_of_domain',
+                    warnings=[reason],
+                    diagnostics={
+                        'backend_status': 'out_of_domain',
+                        'backend_status_reason': reason,
+                        'magemin_native_formula': native_activity_formula,
+                        'magemin_native_activity_pressure_bar': (
+                            native_activity_pressure_bar
+                        ),
+                        'certified_band': {
+                            'pressure_bar': [
+                                pressure_min_bar,
+                                pressure_max_bar,
+                            ],
+                        },
+                    },
+                )
+            if not native_activity_reference_available(
+                "SiO2", native_activity_pressure_bar
+            ):
+                pressure_min_bar, pressure_max_bar = (
+                    MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+                )
+                native_activity_pressure_notice = {
+                    'kind': 'out_of_certified_band',
+                    'reason': (
+                        'magemin_native_activity_pressure_outside_certified_band: '
+                        f'requested pressure {native_activity_pressure_bar:g} bar '
+                        f'is outside [{pressure_min_bar:g}, {pressure_max_bar:g}] bar'
+                    ),
+                    'authority': 'extrapolated',
+                    'certified_band': {
+                        'pressure_bar': [pressure_min_bar, pressure_max_bar],
+                    },
+                }
+
         prior_warnings: List[str] = []
         dropped_accounts: List[str] = []
         dropped_account_species: Dict[str, Tuple[str, ...]] = {}
@@ -1911,6 +2014,37 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 ],
                 diagnostics=diagnostics,
             )
+
+        if native_activity_formula is not None:
+            native_bulk_component = native_spec[2]
+            if (
+                native_bulk_component is not None
+                and bulk_projection.composition_wt_pct.get(
+                    native_bulk_component, 0.0
+                ) <= 0.0
+            ):
+                diagnostics = dict(result_diagnostics)
+                diagnostics.update({
+                    'backend_status': 'out_of_domain',
+                    'backend_status_reason': (
+                        'magemin_native_activity_component_absent'
+                    ),
+                    'magemin_native_formula': native_activity_formula,
+                    'magemin_native_bulk_component': native_bulk_component,
+                })
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=fO2_log,
+                    status='out_of_domain',
+                    warnings=[
+                        *prior_warnings,
+                        *bulk_projection.warnings,
+                        'MAGEMin native activity component is absent from '
+                        f'projected bulk: {native_bulk_component}',
+                    ],
+                    diagnostics=diagnostics,
+                )
 
         try:
             raw = self._call_magemin(
@@ -2071,8 +2205,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 )
         native_activities: Dict[str, float] = {}
         if native_activity_formula is not None:
-            from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
-
             native = raw.get('native_activities') if isinstance(raw, Mapping) else None
             solver_status = raw.get('solver_status') if isinstance(raw, Mapping) else None
             raw_activity = (
@@ -2098,8 +2230,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             except (TypeError, ValueError, OverflowError):
                 activity_value = math.nan
             if (
-                native_activity_formula not in MAGEMIN_NATIVE_MELT_ACTIVITIES
-                or solver_status not in {0, 1, 2}
+                solver_status not in {0, 1, 2}
                 or not math.isfinite(activity_value)
                 or activity_value <= 0.0
             ):
@@ -2121,7 +2252,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     ],
                     diagnostics=result_diagnostics,
                 )
-            for formula, (field, _polymorph) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
+            if native_activity_pressure_notice is not None:
+                result_diagnostics['commissioning_notice'] = (
+                    native_activity_pressure_notice
+                )
+            for formula, (field, _polymorph, _bulk_component) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
+                if not native_activity_reference_available(formula, pressure_bar):
+                    continue
                 try:
                     value = float(native.get(formula))
                 except (TypeError, ValueError, OverflowError):
@@ -3334,12 +3471,18 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             temperature_C=temperature_C,
             fO2_log=fO2_log,
         )
+        fixed_pressure = f'{pressure_kbar:.6f}'
+        pressure_argument = (
+            fixed_pressure
+            if float(fixed_pressure) == pressure_kbar
+            else repr(pressure_kbar)
+        )
         args = [
             str(binary_path),
             '--Verb=0',
             f'--db={self._effective_database()}',
             f'--Temp={temperature_C:.6f}',
-            f'--Pres={pressure_kbar:.6f}',
+            f'--Pres={pressure_argument}',
             '--sys_in=wt',
             '--Bulk=' + ','.join(f'{value:.6f}' for value in bulk_projection.vector),
             f'--buffer={buffer_name}',
@@ -3542,7 +3685,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             result.update({
                 'native_activities': {
                     formula: native_fields[field]
-                    for formula, (field, _polymorph)
+                    for formula, (field, _polymorph, _bulk_component)
                     in MAGEMIN_NATIVE_MELT_ACTIVITIES.items()
                     if field in native_fields
                 },
@@ -3882,7 +4025,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
 
         parsed: Dict[str, float] = {}
-        for field, _polymorph in MAGEMIN_NATIVE_MELT_ACTIVITIES.values():
+        for field, _polymorph, _bulk_component in MAGEMIN_NATIVE_MELT_ACTIVITIES.values():
             match = re.search(
                 rf'^\s*{re.escape(field)}\s+([^\s,;]+)',
                 matlab_text,

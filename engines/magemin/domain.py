@@ -6,11 +6,11 @@ non-silicate (native Fe, halides, sulfides, elemental S, etc.) must be
 rejected before the chemistry call — these species violate MAGEMin's
 solid-solution model and produce silent garbage on output.
 
-This module exposes a single class, :class:`MAGEMinDomainGate`, that
-returns ``(valid, warnings)`` and never raises. The caller (the kernel
-planner post-carve-out; the today-hook adapter pre-carve-out) is
-responsible for routing rejected compositions elsewhere (e.g. builtin
-Stage 0 cleanup).
+This module exposes :class:`MAGEMinDomainGate`, which returns
+``(valid, warnings)`` and never raises, and the native-activity reference
+map. The caller (the kernel planner post-carve-out; the today-hook adapter
+pre-carve-out) is responsible for routing rejected compositions elsewhere
+(e.g. builtin Stage 0 cleanup).
 """
 
 from __future__ import annotations
@@ -21,14 +21,50 @@ from engines.domain_reason import OutOfDomainReason, reason_value
 from simulator.scalar_boundary import is_finite
 from simulator.state import OXIDE_SPECIES
 
-# Native melt activities exposed by the ig database. These are standard
-# states, not liquid-endmember activities: periclase for MgO and quartz for
-# SiO2 at the scorer's low-pressure default. Other formulas have no native
-# activity/reference pair in this adapter.
+# Native activities exposed by the patched MAGEMin build. Values contain the
+# dump field, pure-crystal standard, and component coordinate in the projected
+# DB bulk. These are solid endmember standards, not liquid-endmember
+# activities. FeO is represented by MAGEMin's FeOt coordinate after the
+# projection merges FeO, Fe2O3, and native FeOt. The quartz token is the
+# verified-band standard only. Outside that band MAGEMin selects quartz,
+# coesite, or database-dependent stishovite by reference Gibbs energy and
+# does not report which phase won, so a silica activity there is refused
+# rather than labeled quartz. H2O is deliberately absent: the MAGEMin input
+# gate admits only the MELTS 14-oxide basis, which excludes its native
+# fluid endmember.
 MAGEMIN_NATIVE_MELT_ACTIVITIES = {
-    'MgO': ('aMgO', 'periclase'),
-    'SiO2': ('aSiO2', 'quartz'),
+    'MgO': ('aMgO', 'periclase', 'MgO'),
+    'SiO2': ('aSiO2', 'quartz', 'SiO2'),
+    'FeO': ('aFeO', 'wustite', 'FeOt'),
+    'Al2O3': ('aAl2O3', 'corundum', 'Al2O3'),
+    'TiO2': ('aTiO2', 'rutile', 'TiO2'),
 }
+
+# Inclusive certified verification band for MAGEMin native activities.
+# Valid pressures outside this band are solved and flagged as extrapolated,
+# except SiO2: see native_activity_reference_available.
+MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW = (1.0e-6, 1.0)
+
+
+def native_activity_reference_available(formula: str, pressure_bar: float) -> bool:
+    """Whether this activity may be published against the map's reference.
+
+    SiO2 is quartz only inside the certified window. Outside it the binary
+    does not say whether the reference was quartz, coesite, or stishovite.
+    Every other mapped oxide has one reference at every pressure. An unknown
+    formula has no reference.
+    """
+
+    if formula not in MAGEMIN_NATIVE_MELT_ACTIVITIES:
+        return False
+    if formula != "SiO2":
+        return True
+    if not is_finite(pressure_bar):
+        return False
+    low, high = MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+    pressure = float(pressure_bar)
+    return low <= pressure <= high
+
 
 # Canonical MELTS 14-oxide basis, sourced from
 # ``simulator.state.OXIDE_SPECIES`` (the single source of truth; also the

@@ -4826,7 +4826,7 @@ def fusion_comparison_reference(
         magemin_target_polymorph = Polymorph(native[1])
         magemin_source_polymorph = polymorph_token(standard_state.endmember)
         if magemin_source_polymorph is magemin_target_polymorph:
-            # Guo's MgO measurement is already on the periclase standard.
+            # The observation is already on MAGEMin's mapped native standard.
             return reference
 
     def fusion_missing_input_notice(reason: str) -> Notice | None:
@@ -4958,9 +4958,8 @@ def fusion_comparison_reference(
             )
             return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
-        # MAGEMin's native ig activities use periclase for MgO and quartz for
-        # SiO2 (the low-pressure basis used by this scorer; the official API
-        # also names coesite at high pressure). At equal chemical potential,
+        # MAGEMin's native crystal standards come from the domain map. At
+        # equal chemical potential,
         # mu=G°+RT ln(a), so a_target=a_source*exp((G_source-G_target)/RT).
         # With ΔG_fus=G_liquid-G_crystal, G_source-G_target is
         # ΔG_fus(target)-ΔG_fus(source), fixing the conversion sign. The
@@ -5011,10 +5010,10 @@ def fusion_comparison_reference(
         )
 
     if engine is not Engine.MAGEMIN and magemin_native_reference:
-        # The prior MAGEMin conversion explicitly established a quartz solid
-        # basis. Resolve that same JANAF table when the next owner request is
-        # for a liquid-reference engine; the generic stable-solid choice can
-        # be a different SiO2 polymorph at this temperature.
+        # The prior MAGEMin conversion explicitly established its mapped
+        # crystal basis. Resolve that same JANAF table when the next owner
+        # request is for a liquid-reference engine; the generic stable-solid
+        # choice can be a different polymorph at this temperature.
         source_polymorph = polymorph_token(standard_state.endmember)
         try:
             eligible = _janaf_eligible_pure_crystal_tables(formula, temperature_K)
@@ -7408,8 +7407,7 @@ def cell_notices(
                     band=band,
                     authority=(
                         Authority.EXTRAPOLATED
-                        if kind == "openimcc_temperature_extrapolated"
-                        and row.get("authority") == AUTHORITY_EXTRAPOLATED
+                        if row.get("authority") == AUTHORITY_EXTRAPOLATED
                         else None
                     ),
                 )
@@ -14495,6 +14493,43 @@ def _predict_with_engine(
                 vaporock_pressure_role = VAPOROCK_PRESSURE_ROLE_REQUESTED
             else:
                 vaporock_pressure_role = VAPOROCK_PRESSURE_ROLE_UNKNOWN
+    elif engine is Engine.MAGEMIN:
+        # MAGEMin's native crystal activities are evaluated at the row's
+        # printed pressure when it is available. Other activity engines keep
+        # their existing condensed-phase pressure omission.
+        pressure_bar = activity_payload.get("pressure_bar")
+        if quantity is Quantity.ACTIVITY and pressure_bar is None:
+            from engines.magemin.domain import (
+                MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW,
+            )
+            from simulator.diagnostic_helpers.binary_pot_battery import (
+                _DEFAULT_PRESSURE_BAR,
+            )
+
+            pressure_min_bar, pressure_max_bar = (
+                MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+            )
+            # equilibrate_cell owns the default pressure used when a row has
+            # no typed point. At a 1 bar pressure separation and 1600 K,
+            # (ΔV·ΔP)/(RT) with a typical
+            # ΔV=1e-5 m³/mol is (1e-5·1e5)/(8.314·1600)=7.5e-5 in ln(a),
+            # about 1e-4. The default is inside the certified pressure window.
+            input_notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        "row printed no total pressure; MAGEMin native "
+                        f"activity evaluated at its {_DEFAULT_PRESSURE_BAR:g} "
+                        "bar default inside certified inclusive pressure window "
+                        f"[{pressure_min_bar:g}, {pressure_max_bar:g}] bar; "
+                        "for a 1 bar pressure separation, the condensed-phase "
+                        "correction is estimated at about 1e-4 in ln(a) at "
+                        "1600 K"
+                    ),
+                    origin="engine:magemin",
+                )
+            )
 
     printed_fo2 = _has_printed_fo2(observation, identity)
     source_pressure = (

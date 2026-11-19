@@ -310,7 +310,7 @@ ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
     "internal-analytical": 2,
     "vaporock": 3,
-    "magemin": 3,
+    "magemin": 7,
     "alphamelts": 3,
     "thermoengine": 3,
 }
@@ -324,12 +324,18 @@ ENGINE_CHEMISTRY_VERSION = {
 # thermoengine v2: 2026-11-11 ThermoEngine df7a5f4609116a83bf40a5a352a19e3826a822d9 - apply configured redox buffer, fO2 offset and Fe3Fet ratio during backend initialization (bd99e209c)
 # magemin v1: 2026-11-08 MAGEMin commit 40ed109d07d4246001cab59382596d33fed79086 - initial cache version
 # magemin v2: 2026-11-11 MAGEMin binary pin unchanged, b257r landing 982a8d9fa - d-367 mode-vector closure before liquid-fraction and composition extraction (cd48a78fe)
+# magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
+# magemin v5: 2026-11-18 expose native FeO, Al2O3 and TiO2 activities (w1118eA)
+# magemin v6: 2026-11-19 predict and flag valid out-of-band native activities;
+#   preserve requested pressure in the subprocess argv (w1119eAg)
+# magemin v7: 2026-11-19 refuse out-of-band silica whose reference phase is
+#   unreported, and round-trip subprocess pressures six decimals cannot keep
+#   (w1119eAh)
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # vaporock v2: 2026-11-18 retain requested oxide activities and standard-state diagnostics
 # vaporock v3: 2026-11-19 oxygen-independent oxide activities are computed; do not replay v2 out_of_basis refusals or pressure notices that named the 1e-6 bar call default as the requested pressure
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
-# magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)

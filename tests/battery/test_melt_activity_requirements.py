@@ -5,10 +5,12 @@ point temperature, and a reference state that matches the engine. For melt
 activity, oxygen is required when the composition or measured species holds
 a multivalent element. That oxygen is one fO2 from the row ladder, the same
 value on every engine. Other quantities follow their identity input profile.
-Pressure is not an input, and a missing required input is refused rather than
-defaulted.
+Pressure is not required; MAGEMin receives an optional printed point pressure
+for its native-crystal activity path. A missing required input is refused
+rather than defaulted.
 """
 
+import json
 from dataclasses import replace
 from decimal import Decimal
 from types import SimpleNamespace
@@ -28,6 +30,8 @@ from simulator.battery.generators import melt_activity_requests
 from simulator.battery.identity import Identity, profile_for
 from simulator.battery.migrate import fill_identity
 from simulator.battery.records import (
+    ApproxPressure,
+    BandBasis,
     Bench,
     BenchIdentity,
     Composition,
@@ -36,6 +40,7 @@ from simulator.battery.records import (
     StandardState,
     State,
     Value,
+    nominal_pressure_pa,
 )
 from simulator.battery.waypoints import (
     MELT_ACTIVITY_ENGINES,
@@ -393,6 +398,424 @@ def test_requirement_tuple_does_not_include_pressure_or_oxygen():
     assert REQUIREMENTS["melt_activity"] == ("normalized_composition", "temperature_K")
     assert "pressure_boundary" not in REQUIREMENTS["melt_activity"]
     assert "oxygen_condition" not in REQUIREMENTS["melt_activity"]
+
+
+def _magemin_native_alumina_activity_row(
+    *,
+    pressure_pa: Decimal | None,
+    identity_pressure_pa: Decimal | ApproxPressure | None = None,
+    formula: str = "Al2O3",
+):
+    experiment, _bench, observation = _case(
+        composition=_composition(("SiO2", "0.5"), ("Al2O3", "0.5")),
+        formula=formula,
+        basis=formula,
+        phase=Phase.CR,
+    )
+    from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+    identity = observation.identity
+    reference_state = identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert reference_state.value is not None
+    native_polymorph = MAGEMIN_NATIVE_MELT_ACTIVITIES[formula][1]
+    observation = replace(
+        observation,
+        identity=replace(
+            identity,
+            reference_state=State.of(
+                replace(
+                    reference_state.value,
+                    endmember=replace(
+                        reference_state.value.endmember,
+                        polymorph=State.of(native_polymorph),
+                    ),
+                )
+            ),
+        ),
+    )
+    if pressure_pa is not None:
+        observation = replace(
+            observation,
+            point_conditions={
+                **observation.point_conditions,
+                "total_pressure_Pa": f.located(pressure_pa),
+            },
+        )
+    if identity_pressure_pa is not None:
+        observation = replace(
+            observation,
+            identity=replace(
+                observation.identity,
+                total_pressure_Pa=State.of(identity_pressure_pa),
+            ),
+        )
+    return experiment, observation
+
+
+def _score_magemin_activity_pressure(monkeypatch, experiment, observation):
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    seen = {}
+
+    def _open(name):
+        return SimpleNamespace(
+            name=name,
+            available=True,
+            unavailable_reason=None,
+            supports_intrinsic_fO2=False,
+            backend=object(),
+        )
+
+    def _cell(_handle, _pot, *, physical_pressure_bar, **_kwargs):
+        seen["pressure_bar"] = physical_pressure_bar
+        return SimpleNamespace(
+            status="ok",
+            refusal_reason=None,
+            melt_activities={"Al2O3": 0.8},
+            melt_activity_coefficients={},
+            gas_partial_pressures_Pa={},
+            hostname="test",
+            exit_code=0,
+            exit_signal=None,
+            notices=[],
+            authority=None,
+            certified_band=None,
+        )
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    prediction = predict_with_engine(
+        Engine.MAGEMIN, observation, experiment=experiment, isolated=False,
+    )
+    return prediction, seen
+
+
+def test_magemin_activity_score_passes_printed_row_pressure(monkeypatch):
+    experiment, observation = _magemin_native_alumina_activity_row(
+        pressure_pa=Decimal("100000")
+    )
+
+    prediction, seen = _score_magemin_activity_pressure(
+        monkeypatch, experiment, observation
+    )
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert seen["pressure_bar"] == pytest.approx(1.0)
+
+
+def test_magemin_activity_score_uses_identity_only_pressure_before_waypoint(
+    monkeypatch,
+):
+    experiment, observation = _magemin_native_alumina_activity_row(
+        pressure_pa=None,
+        identity_pressure_pa=Decimal("250000"),
+    )
+    prediction, seen = _score_magemin_activity_pressure(
+        monkeypatch, experiment, observation
+    )
+    assert prediction.value is not None, prediction.refusal_detail
+    assert seen["pressure_bar"] == pytest.approx(2.5)
+
+    observation_with_waypoint = replace(
+        observation,
+        point_conditions={
+            **observation.point_conditions,
+            "total_pressure_Pa": f.located(Decimal("100000")),
+        },
+    )
+    prediction_with_waypoint, seen_with_waypoint = _score_magemin_activity_pressure(
+        monkeypatch, experiment, observation_with_waypoint
+    )
+    assert prediction_with_waypoint.value is not None
+    assert seen_with_waypoint["pressure_bar"] == pytest.approx(2.5)
+
+
+def test_magemin_activity_without_row_pressure_uses_default_and_flags_it(
+    monkeypatch,
+):
+    from simulator.battery.enums import Engine, NoticeKind
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    seen = {}
+
+    class _Backend:
+        def equilibrate(self, *, pressure_bar, **_kwargs):
+            seen["pressure_bar"] = pressure_bar
+            return SimpleNamespace(
+                status="ok",
+                diagnostics={},
+                warnings=[],
+                activity_coefficients={"Al2O3": 0.8},
+                vapor_pressures_Pa={},
+                liquid_fraction=None,
+                phase_assemblage_available=False,
+            )
+
+    handle = EngineHandle(
+        name="magemin",
+        backend=_Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    monkeypatch.setattr(
+        binary_pot_battery, "open_battery_engine", lambda _name: handle
+    )
+    monkeypatch.setattr(binary_pot_battery, "_DEFAULT_PRESSURE_BAR", 1.0e-5)
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_call_cached_backend_equilibrate",
+        lambda _handle, _kwargs, solve, **_options: solve(),
+    )
+    experiment, observation = _magemin_native_alumina_activity_row(
+        pressure_pa=None
+    )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN, observation, experiment=experiment, isolated=False,
+    )
+
+    assert prediction.value == Decimal("0.8")
+    assert seen["pressure_bar"] == pytest.approx(1.0e-5)
+    pressure_notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and "row printed no total pressure" in notice.reason
+    )
+    assert (
+        "evaluated at its 1e-05 bar default inside certified inclusive "
+        "pressure window [1e-06, 1] bar"
+    ) in pressure_notice.reason
+    assert (
+        "for a 1 bar pressure separation, the condensed-phase correction is "
+        "estimated at about 1e-4 in ln(a) at 1600 K"
+    ) in pressure_notice.reason
+
+
+def test_magemin_activity_score_predicts_and_flags_pressure_outside_verified_window(
+    monkeypatch,
+):
+    from simulator.battery.enums import Authority, Engine, NoticeKind
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.melt_backend.magemin import MAGEMinBackend
+    from engines.magemin.domain import MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._database = "ig"
+    backend._config = {}
+    backend._subprocess_pool = None
+    solve_pressures = []
+
+    def solved(*, pressure_bar, **_kwargs):
+        solve_pressures.append(pressure_bar)
+        return {
+            "native_activities": {"Al2O3": 0.8},
+            "solver_status": 0,
+            "native_phase": "liq",
+            "native_mode": 1.0,
+            "iterations": 1,
+        }
+
+    backend._call_magemin = solved
+    backend._phase_assemblage_payload = lambda *_args, **_kwargs: (
+        [], {}, {}, 1.0, {"SiO2": 50.0, "Al2O3": 50.0},
+    )
+    handle = SimpleNamespace(
+        name="magemin",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        supports_intrinsic_fO2=False,
+        engine_settings={},
+    )
+    monkeypatch.setattr(
+        binary_pot_battery, "open_battery_engine", lambda _name: handle
+    )
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_call_cached_backend_equilibrate",
+        lambda _handle, _kwargs, solve, **_options: solve(),
+    )
+    experiment, observation = _magemin_native_alumina_activity_row(
+        pressure_pa=Decimal("200000")
+    )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN, observation, experiment=experiment, isolated=False,
+    )
+
+    assert prediction.value == Decimal("0.8"), prediction.refusal_detail
+    assert solve_pressures == [2.0]
+    assert prediction.authority is Authority.EXTRAPOLATED
+    expected_band = MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+    assert prediction.certified_band == {"pressure_bar": expected_band}
+    notice = next(
+        notice for notice in prediction.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    )
+    assert notice.authority is Authority.EXTRAPOLATED
+    serialized_band = json.loads(notice.band)
+    assert tuple(map(float, serialized_band["pressure_bar"])) == pytest.approx(
+        expected_band
+    )
+    assert "magemin_native_activity_pressure_outside_certified_band" in (
+        notice.reason
+    )
+
+
+def test_magemin_activity_score_uses_approx_pressure_identity_point(monkeypatch):
+    band = ApproxPressure(
+        Decimal("250000"),
+        Decimal("200000"),
+        Decimal("300000"),
+        BandBasis.PRINTED,
+    )
+    experiment, observation = _magemin_native_alumina_activity_row(
+        pressure_pa=None,
+        identity_pressure_pa=band,
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            **observation.point_conditions,
+            "total_pressure_Pa": f.located(Decimal("100000")),
+        },
+    )
+
+    prediction, seen = _score_magemin_activity_pressure(
+        monkeypatch, experiment, observation
+    )
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert seen["pressure_bar"] == pytest.approx(2.5)
+    preserved = observation.identity.total_pressure_Pa
+    assert preserved is not None and preserved.is_value
+    assert preserved.value == band
+    assert preserved.value.point == Decimal("250000")
+    assert preserved.value.low == Decimal("200000")
+    assert preserved.value.high == Decimal("300000")
+    assert preserved.value.band_basis is BandBasis.PRINTED
+
+
+def test_decimal_str_identity_pressure_mutation_turns_approx_pin_red(monkeypatch):
+    import simulator.battery.generators.bench as bench
+
+    def legacy_nominal(value):
+        raw = value.value if getattr(value, "is_value", False) else value
+        if isinstance(raw, ApproxPressure):
+            return None
+        return nominal_pressure_pa(value)
+
+    monkeypatch.setattr(bench, "nominal_pressure_pa", legacy_nominal)
+    with pytest.raises(AssertionError):
+        test_magemin_activity_score_uses_approx_pressure_identity_point(monkeypatch)
+
+
+def test_magemin_silica_activity_scores_only_inside_verified_quartz_band(
+    monkeypatch,
+):
+    from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    def run(pressure_pa: Decimal):
+        backend = MAGEMinBackend()
+        backend._available = True
+        backend._bridge = "subprocess"
+        backend._database = "ig"
+        backend._config = {}
+        backend._subprocess_pool = None
+        solve_pressures = []
+
+        def solved(*, pressure_bar, **_kwargs):
+            solve_pressures.append(pressure_bar)
+            return {
+                "native_activities": {"SiO2": 0.8},
+                "solver_status": 0,
+                "native_phase": "liq",
+                "native_mode": 1.0,
+                "iterations": 1,
+            }
+
+        backend._call_magemin = solved
+        backend._phase_assemblage_payload = lambda *_args, **_kwargs: (
+            [], {}, {}, 1.0, {"SiO2": 50.0, "Al2O3": 50.0},
+        )
+        handle = SimpleNamespace(
+            name="magemin",
+            backend=backend,
+            available=True,
+            unavailable_reason=None,
+            supports_intrinsic_fO2=False,
+            engine_settings={},
+        )
+        monkeypatch.setattr(
+            binary_pot_battery, "open_battery_engine", lambda _name: handle
+        )
+        monkeypatch.setattr(
+            binary_pot_battery,
+            "_call_cached_backend_equilibrate",
+            lambda _handle, _kwargs, solve, **_options: solve(),
+        )
+        experiment, observation = _magemin_native_alumina_activity_row(
+            pressure_pa=pressure_pa,
+            formula="SiO2",
+        )
+        prediction = predict_with_engine(
+            Engine.MAGEMIN, observation, experiment=experiment, isolated=False,
+        )
+        return prediction, list(solve_pressures)
+
+    inside, inside_pressures = run(Decimal("100000"))
+    assert inside.value == Decimal("0.8"), inside.refusal_detail
+    assert inside_pressures == [1.0]
+    assert MAGEMIN_NATIVE_MELT_ACTIVITIES["SiO2"][1] == "quartz"
+
+    coesite_side, coesite_pressures = run(Decimal("3500000000"))
+    assert coesite_side.value is None
+    assert coesite_pressures == []
+    assert coesite_side.refusal_detail["reason"] == "out_of_domain"
+    assert coesite_side.refusal_detail["engine_reason"] == (
+        "magemin_native_silica_reference_unavailable"
+    )
+
+    quartz_side, quartz_pressures = run(Decimal("200000"))
+    assert quartz_side.value is None
+    assert quartz_pressures == []
+    assert quartz_side.refusal_detail["engine_reason"] == (
+        "magemin_native_silica_reference_unavailable"
+    )
+
+
+def test_silica_reference_bypass_mutation_scores_the_wrong_standard(monkeypatch):
+    import engines.magemin.domain as domain
+
+    monkeypatch.setattr(
+        domain,
+        "native_activity_reference_available",
+        lambda formula, _pressure: formula in domain.MAGEMIN_NATIVE_MELT_ACTIVITIES,
+    )
+    with pytest.raises(AssertionError):
+        test_magemin_silica_activity_scores_only_inside_verified_quartz_band(
+            monkeypatch
+        )
 
 
 def test_no_iron_without_oxygen_is_ready_and_engine_point_stays_gap():
@@ -1417,7 +1840,7 @@ def test_oneill_feo_activity_coefficient_refusal_is_typed_per_engine():
     assert magemin.refusal_reason is RefusalReason.UNSUPPORTED
     assert magemin.refusal_detail["reason"] == "reference_state_mismatch"
     assert magemin.refusal_detail["engine_convention"] == (
-        "typed-refusal:magemin_no_native_activity:FeO"
+        "raoultian_native_crystal_activity"
     )
 
 
