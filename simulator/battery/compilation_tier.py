@@ -2518,6 +2518,9 @@ def _pure_phase_attempt(
             extra={"engine": engine.value},
         )
     notices = _unrequested_phase_notices(props, second, quantity, origin, t_ref_props)
+    notices = notices + _landau_transition_notices(
+        props, second, quantity, origin, t_ref_props
+    )
     if anchor_notice is not None:
         notices = notices + (anchor_notice,)
     if assumed_pressure:
@@ -2643,6 +2646,23 @@ def _apply_printed_entropy_shift(
     return shifted, None
 
 
+def _warning_texts(
+    sources: tuple[object, ...],
+    select: Callable[[tuple[str, ...]], tuple[str, ...]],
+) -> tuple[str, ...]:
+    """Selected accessor sentences from each property read, once each."""
+
+    texts: list[str] = []
+    for source in sources:
+        if source is None:
+            continue
+        warnings = getattr(source, "warnings", ()) or ()
+        for text in select(tuple(warnings)):
+            if text not in texts:
+                texts.append(text)
+    return tuple(texts)
+
+
 def _unrequested_phase_notices(
     props: object,
     second: object | None,
@@ -2652,21 +2672,13 @@ def _unrequested_phase_notices(
 ) -> tuple[Notice, ...]:
     """Carry ignored-token diagnostics onto the attempt.
 
-    The parser owns the sentence. Stencil, status, and lambda warnings
-    stay on the property result and are not scoring notices. The enthalpy
-    anchor is a second property read; its diagnostics are included.
+    The parser owns the sentence. Only that prefix is this notice.
+    The enthalpy anchor is a second property read; its diagnostics
+    are included.
     """
 
     from simulator.melt_backend.magemin import _unrelated_gbase_nonfinite_notes
 
-    texts: list[str] = []
-    for source in (props, second, extra):
-        if source is None:
-            continue
-        warnings = getattr(source, "warnings", ()) or ()
-        for text in _unrelated_gbase_nonfinite_notes(tuple(warnings)):
-            if text not in texts:
-                texts.append(text)
     return tuple(
         Notice(
             kind=NoticeKind.UNREQUESTED_PHASE_NONFINITE,
@@ -2674,7 +2686,38 @@ def _unrequested_phase_notices(
             reason=text,
             origin=origin,
         )
-        for text in texts
+        for text in _warning_texts(
+            (props, second, extra), _unrelated_gbase_nonfinite_notes
+        )
+    )
+
+
+def _landau_transition_notices(
+    props: object,
+    second: object | None,
+    quantity: Quantity,
+    origin: str,
+    extra: object | None = None,
+) -> tuple[Notice, ...]:
+    """Carry a straddling Landau stencil onto the scored attempt.
+
+    The accessor owns the sentence. A contributing reference read
+    (the enthalpy anchor, or H at 298.15 K) is included. The value
+    stays. The notice is out of the certified band, so the residual
+    is not an ordinary unflagged score.
+    """
+
+    from simulator.melt_backend.magemin import _landau_stencil_notes
+
+    return tuple(
+        Notice(
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            affected_quantities=(quantity,),
+            reason=text,
+            origin=origin,
+            authority=Authority.BRIDGE,
+        )
+        for text in _warning_texts((props, second, extra), _landau_stencil_notes)
     )
 
 

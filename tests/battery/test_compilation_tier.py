@@ -8,6 +8,7 @@ log10 Kf = 0.092. The Ellingham segment at that temperature is
 from __future__ import annotations
 
 import functools
+import math
 import re
 import signal
 from dataclasses import replace
@@ -47,6 +48,7 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import (
+    THERMOCHEMICAL_CALORIE_J,
     assumed_crystal_standard_pressure_Pa,
     bar_to_pa,
     identity_equal,
@@ -84,6 +86,7 @@ from tests.engine_availability import (
     magemin_binary_available,
     thermoengine_package_available,
 )
+from tests.test_pure_phase_janaf_score import THERMOENGINE_ABSENT_FORMULAS
 
 _PRINTED_DFG = Decimal("-3.886")
 _PRINTED_LOGK = Decimal("0.092")
@@ -8285,6 +8288,43 @@ def _printed_janaf_entropy(table_id: str, temperature_K: float) -> Decimal:
     raise AssertionError(f"{table_id} has no entropy row at {temperature_K} K")
 
 
+def _printed_schumm_nepheline_s298_cal() -> Decimal:
+    """Schumm 1981 S298 cell for the nepheline heading, in cal/mol/K.
+
+    The YAML float tag is kept as the printed token. A float round-trip
+    would not be the cell Schumm printed.
+    """
+
+    import yaml
+
+    class _Loader(yaml.SafeLoader):
+        pass
+
+    def _keep_decimal(loader, node):
+        return Decimal(loader.construct_scalar(node))
+
+    _Loader.add_constructor("tag:yaml.org,2002:float", _keep_decimal)
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "data"
+        / "literature"
+        / "extracts"
+        / "schumm-1981-alkali-aluminosilicate-thermochemical-tables.yaml"
+    )
+    document = yaml.load(path.read_text(encoding="utf-8"), Loader=_Loader)
+    observations = document["species"]["NaAlSiO4"]["observations"]
+    observation = next(
+        item
+        for item in observations
+        if item["observation_id"] == "schumm81_nepheline_S298"
+    )
+    assert observation["values"]["quantity"] == "S"
+    row = next(item for item in observation["values"]["series"] if item["T_K"] == 298)
+    printed = row["entropy"]
+    assert isinstance(printed, Decimal)
+    return printed
+
+
 def _crystal_thermo_identity(formula: str, polymorph: str | None, temperature_K: Decimal):
     identity = F.oxide_identity(
         formula,
@@ -8469,3 +8509,360 @@ def test_ambiguous_pure_phase_cases_stay_refused() -> None:
     )
     assert held.refusal_detail["reason"] == "pure-phase-call-required"
     assert held.refusal_detail["symbol"] == "Wo"
+
+
+def _naalsio4_spelled(name: str, polymorph_state):
+    identity = _crystal_thermo_identity("NaAlSiO4", None, Decimal("298"))
+    identity = replace(
+        identity,
+        species=replace(identity.species, polymorph=polymorph_state),
+    )
+    return F.observation(name, "exp-1", identity, Decimal("0"))
+
+
+def test_magemin_nepheline_spelling_resolves_to_ne() -> None:
+    """Unrecognised spelling nepheline is ig pure phase ``ne``.
+
+    invoke_pure_phase is false, so the hold returns before the engine.
+    The callback raises if resolution skips that hold.
+    """
+
+    from simulator.battery.polymorph_dictionary import unrecognised_polymorph_state
+
+    observation = _naalsio4_spelled(
+        "naalsio4-nepheline", unrecognised_polymorph_state("nepheline")
+    )
+
+    def forbid_engine(*_args, **_kwargs):
+        raise AssertionError("nepheline spelling must not call the engine")
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        observation,
+        invoke_pure_phase=False,
+        pure_phase=forbid_engine,
+    )
+    assert attempt.value is None
+    assert attempt.refusal_detail["reason"] == "pure-phase-call-required"
+    assert attempt.refusal_detail["symbol"] == "ne"
+
+
+def test_magemin_carnegieite_spelling_stays_polymorph_unresolved() -> None:
+    """Carnegieite is not ig ``ne``. cg and cgh are not on the map.
+
+    The row's polymorph is nepheline, so this spelling never reaches the
+    engine. Alpha, beta, and gamma stay off the same row.
+    """
+
+    from simulator.battery.polymorph_dictionary import unrecognised_polymorph_state
+
+    def forbid_engine(*_args, **_kwargs):
+        raise AssertionError("non-nepheline spelling must not call the engine")
+
+    observation = _naalsio4_spelled(
+        "naalsio4-carnegieite", unrecognised_polymorph_state("carnegieite")
+    )
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN, observation, pure_phase=forbid_engine
+    )
+    assert attempt.value is None
+    assert attempt.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
+
+    for spelling in (
+        Polymorph.ALPHA.value,
+        Polymorph.BETA.value,
+        Polymorph.GAMMA.value,
+    ):
+        named = F.observation(
+            f"naalsio4-{spelling}",
+            "exp-1",
+            _crystal_thermo_identity("NaAlSiO4", spelling, Decimal("298")),
+            Decimal("0"),
+        )
+        refused = predict_thermo_attempt(
+            Engine.MAGEMIN, named, pure_phase=forbid_engine
+        )
+        assert refused.value is None
+        assert refused.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
+
+
+def test_magemin_unlabeled_naalsio4_entropy_matches_schumm_s298() -> None:
+    """Unlabeled NaAlSiO4 scores on ig ``ne`` once that row is unique.
+
+    Same one-candidate rule as unlabeled TiO2 on ``ru``. That branch is
+    unchanged. A nepheline spelling is the named row; carnegieite and the
+    alpha, beta, and gamma tokens stay unresolved because the row's
+    polymorph is nepheline. Schumm's own alpha series is not this identity.
+
+    The printed cell is schumm81_nepheline_S298 at 298 K (Kelley 1953,
+    cal/mol/K). The joule value is that cell times THERMOCHEMICAL_CALORIE_J.
+    298 K is far from the nepheline lambda at 467 K. The 2% band is the
+    accessor's S band.
+    """
+
+    expected = _printed_schumm_nepheline_s298_cal() * THERMOCHEMICAL_CALORIE_J
+    observation = F.observation(
+        "naalsio4-unset-s-298",
+        "exp-1",
+        _crystal_thermo_identity("NaAlSiO4", None, Decimal("298")),
+        expected,
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="schumm-1981-alkali-aluminosilicate-thermochemical-tables",
+    )
+    held = predict_thermo_attempt(
+        Engine.MAGEMIN, observation, invoke_pure_phase=False
+    )
+    assert held.value is None
+    assert held.refusal_detail["reason"] == "pure-phase-call-required"
+    assert held.refusal_detail["symbol"] == "ne"
+    if not magemin_binary_available():
+        pytest.skip("no MAGEMin binary")
+    try:
+        attempt = predict_thermo_attempt(Engine.MAGEMIN, observation)
+    finally:
+        _close_cached_backend(Engine.MAGEMIN)
+    assert attempt.refusal_reason is None
+    assert attempt.unit == "J_per_declared_mol_basis_per_K"
+    assert float(attempt.value) == pytest.approx(float(expected), rel=0.02)
+
+
+def test_magemin_landau_stencil_is_flagged_on_the_accessor() -> None:
+    """The accessor flags Tc(P), and the value stays finite.
+
+    At 1 bar the printed Tc is the pressure-shifted record (nepheline
+    467.008 K). At 2 kbar nepheline is 483 K and 467 K is quiet. Quartz
+    and titanite follow the same pressure.
+    """
+
+    if not magemin_binary_available():
+        pytest.skip("no MAGEMin binary")
+    from simulator.battery import compilation_tier
+
+    one_bar = (
+        ("q", 847.0, "847.024 K"),
+        ("ne", 467.0, "467.008 K"),
+        ("sph", 485.0, "485.012 K"),
+    )
+    two_kbar = (
+        ("q", 890.0, "894.364 K", 847.0),
+        ("ne", 480.0, "483 K", 467.0),
+        ("sph", 505.0, "510 K", 485.0),
+    )
+    try:
+        for symbol, transition_K, text in one_bar:
+            straddling = compilation_tier.default_pure_phase(
+                Engine.MAGEMIN, symbol, transition_K, 1.0
+            )
+            quiet = compilation_tier.default_pure_phase(
+                Engine.MAGEMIN, symbol, 1000.0, 1.0
+            )
+            for props in (straddling, quiet):
+                assert math.isfinite(props.S_J_K_mol)
+                assert math.isfinite(props.Cp_J_K_mol)
+                assert math.isfinite(props.H_J_mol)
+            assert any(
+                "lambda" in warning and text in warning
+                for warning in straddling.warnings
+            ), straddling.warnings
+            assert not any("lambda" in warning for warning in quiet.warnings), (
+                quiet.warnings
+            )
+        for symbol, temperature_K, text, tabulated_K in two_kbar:
+            straddling = compilation_tier.default_pure_phase(
+                Engine.MAGEMIN, symbol, temperature_K, 2000.0
+            )
+            quiet = compilation_tier.default_pure_phase(
+                Engine.MAGEMIN, symbol, tabulated_K, 2000.0
+            )
+            assert math.isfinite(straddling.Cp_J_K_mol)
+            assert math.isfinite(quiet.Cp_J_K_mol)
+            assert any(
+                "lambda" in warning and text in warning
+                for warning in straddling.warnings
+            ), straddling.warnings
+            assert not any("lambda" in warning for warning in quiet.warnings), (
+                quiet.warnings
+            )
+    finally:
+        _close_cached_backend(Engine.MAGEMIN)
+
+
+def test_magemin_serialized_pressure_boundary_keeps_the_nepheline_flag() -> None:
+    """Round-trip pressure: 2000.0004 bar is quiet; the next stencil flags.
+
+    2000.0004 bar is token 2.0000004 kbar. Nepheline Tc at that token is
+    483.0000032 K, 0.0000022 K above the 473.000001 K stencil's high
+    endpoint 483.000001 K, so the accessor is quiet and Cp stays finite.
+    473.0000035 K pushes that high endpoint to 483.000004 K and flags.
+    Exact 2000 bar is token 2.000000 kbar and flags 473.000001 K.
+    """
+
+    if not magemin_binary_available():
+        pytest.skip("no MAGEMin binary")
+    from simulator.battery import compilation_tier
+    from simulator.melt_backend.magemin import (
+        MAGEMinBackend,
+        _landau_stencil_notes,
+        _magemin_cli_scalar,
+    )
+
+    pressure_kbar = MAGEMinBackend._GPa_to_kbar(
+        MAGEMinBackend._pressure_bar_to_GPa(2000.0004)
+    )
+    assert _magemin_cli_scalar(pressure_kbar, pressure=True)[0] == "2.0000004"
+    exact_kbar = MAGEMinBackend._GPa_to_kbar(
+        MAGEMinBackend._pressure_bar_to_GPa(2000.0)
+    )
+    assert _magemin_cli_scalar(exact_kbar, pressure=True)[0] == "2.000000"
+    try:
+        quiet = compilation_tier.default_pure_phase(
+            Engine.MAGEMIN, "ne", 473.000001, 2000.0004
+        )
+        flagged = compilation_tier.default_pure_phase(
+            Engine.MAGEMIN, "ne", 473.0000035, 2000.0004
+        )
+        round_trip = compilation_tier.default_pure_phase(
+            Engine.MAGEMIN, "ne", 473.000001, 2000.0
+        )
+    finally:
+        _close_cached_backend(Engine.MAGEMIN)
+    assert math.isfinite(quiet.Cp_J_K_mol)
+    assert math.isfinite(flagged.Cp_J_K_mol)
+    assert math.isfinite(round_trip.Cp_J_K_mol)
+    assert not _landau_stencil_notes(quiet.warnings)
+    assert _landau_stencil_notes(flagged.warnings)
+    assert _landau_stencil_notes(round_trip.warnings)
+
+
+def test_landau_reference_read_reaches_the_scored_attempt() -> None:
+    """A lambda sentence on the enthalpy anchor is a scoring notice."""
+
+    from simulator.melt_backend.magemin import _lambda_stencil_warning
+
+    anchor_note = _lambda_stencil_warning("ne", 467.0, 0.001)
+    assert anchor_note is not None
+    assert _lambda_stencil_warning("ne", 1000.0, 0.001) is None
+
+    class _Props:
+        def __init__(self, warnings):
+            self.formula = "MgO"
+            self.H_J_mol = 5000.0
+            self.Cp_J_K_mol = 40.0
+            self.S_J_K_mol = 30.0
+            self.absences = ()
+            self.warnings = warnings
+
+    def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        if abs(temperature_K - 298.15) < 1e-6:
+            return _Props((anchor_note,))
+        return _Props(())
+
+    identity = replace(
+        _pure_phase_identity(Quantity.H_MINUS_H298),
+        subtype=State.of("H(T)-H(298.15 K)"),
+    )
+    observation = F.observation(
+        "mgo-h-landau-anchor",
+        "exp-1",
+        identity,
+        Decimal("4"),
+    )
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN, observation, pure_phase=pure_phase
+    )
+    assert attempt.value is not None
+    assert attempt.refusal_reason is None
+    matched = [
+        notice
+        for notice in attempt.notices
+        if notice.reason == anchor_note
+    ]
+    assert len(matched) == 1
+    assert matched[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert matched[0].affected_quantities == (Quantity.H_MINUS_H298,)
+
+
+def test_magemin_nepheline_entropy_at_467_keeps_the_transition_flag() -> None:
+    """Crystalline NaAlSiO4 entropy at 467 K is not an ordinary score.
+
+    The accessor flags the 1 bar stencil. That sentence is on the
+    scored attempt, and the notice alone leaves the ordinary stratum.
+    The value stays finite.
+    """
+
+    if not magemin_binary_available():
+        pytest.skip("no MAGEMin binary")
+    observation = F.observation(
+        "naalsio4-transition-s",
+        "exp-1",
+        _crystal_thermo_identity("NaAlSiO4", None, Decimal("467")),
+        Decimal("1"),
+    )
+    try:
+        attempt = predict_thermo_attempt(Engine.MAGEMIN, observation)
+    finally:
+        _close_cached_backend(Engine.MAGEMIN)
+    assert attempt.value is not None
+    assert attempt.refusal_reason is None
+    lambda_notices = tuple(
+        notice for notice in attempt.notices if "lambda" in notice.reason
+    )
+    assert len(lambda_notices) == 1
+    assert "467.008" in lambda_notices[0].reason
+    assert lambda_notices[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert lambda_notices[0].affected_quantities == (Quantity.S,)
+    assert flagged_strata(lambda_notices) == ("out_of_certified_band",)
+
+
+@pytest.mark.parametrize(
+    "engine, formula",
+    (
+        *(
+            (Engine.MAGEMIN, formula)
+            for formula in (
+                "Ca2Fe2O5",
+                "CaFe2O4",
+                "CaSiO3",
+                "Fe3O4",
+                "KAlO2",
+                "KAlSi2O6",
+                "KAlSi3O8",
+                "KAlSiO4",
+                "Na2Ca2Si2O7",
+                "Na2Ca2Si3O9",
+                "Na2CaSiO4",
+                "Na2O",
+                "Na4CaSi3O9",
+                "NaAlSi3O8",
+                "NaFeO2",
+                "CoTiO3",
+                "NiTiO3",
+                "CoCO3",
+                "NiCO3",
+                "MgTi2O5",
+                "Ca2SiO4",
+                "Ca3Si2O7",
+            )
+        ),
+        *(
+            (Engine.THERMOENGINE, formula)
+            for formula in THERMOENGINE_ABSENT_FORMULAS
+        ),
+    ),
+)
+def test_absent_engine_phases_stay_typed_refused(engine, formula) -> None:
+    observation = F.observation(
+        f"unmapped-{formula}-{engine.value}",
+        "exp-1",
+        _crystal_thermo_identity(formula, None, Decimal("298.15")),
+        Decimal("0"),
+    )
+
+    def forbid_engine(*_args, **_kwargs):
+        raise AssertionError("unmapped phase must refuse before an engine call")
+
+    attempt = predict_thermo_attempt(
+        engine, observation, pure_phase=forbid_engine
+    )
+    assert attempt.value is None
+    assert attempt.refusal_detail["reason"] == "pure-phase-symbol-unmapped"

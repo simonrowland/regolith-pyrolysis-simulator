@@ -768,10 +768,178 @@ def test_solver_status_success_is_silent_and_failure_refuses():
             _check_magemin_solver_status(text, [])
 
 
-def test_quartz_lambda_stencil_is_flagged_only_when_straddled():
-    assert _lambda_stencil_warning("q", 847.0) is not None
-    assert _lambda_stencil_warning("q", 1000.0) is None
-    assert _lambda_stencil_warning("fo", 847.0) is None
+def _probe_kbar(pressure_bar: float) -> float:
+    """The kbar value ``pure_phase`` sends to MAGEMin."""
+
+    return MAGEMinBackend._GPa_to_kbar(
+        MAGEMinBackend._pressure_bar_to_GPa(pressure_bar)
+    )
+
+
+def test_landau_stencil_is_flagged_only_when_straddled():
+    """The ±10 K window follows equilibrium Tc(P), for q, ne, and sph.
+
+    At 0 kbar the window is the tabulated Tc. At 1 bar nepheline stays
+    on 467.008 K. At 2 kbar it is 483 K, and 467 K is quiet. Quartz and
+    titanite move off their tabulated temperatures by the same rule.
+    """
+
+    zero = 0.0
+    one_bar = _probe_kbar(1.0)
+    two_kbar = _probe_kbar(2000.0)
+
+    for endmember, transition_K in (("q", 847.0), ("ne", 467.0), ("sph", 485.0)):
+        note = _lambda_stencil_warning(endmember, transition_K, zero)
+        assert note is not None
+        assert "lambda" in note
+        assert f"{transition_K:g} K" in note
+        assert _lambda_stencil_warning(endmember, 1000.0, zero) is None
+        assert _lambda_stencil_warning("fo", transition_K, zero) is None
+    assert _lambda_stencil_warning("ne", 477.0, zero) is not None
+    assert _lambda_stencil_warning("ne", 457.0, zero) is not None
+    assert _lambda_stencil_warning("ne", 478.0, zero) is None
+    assert _lambda_stencil_warning("ne", 456.0, zero) is None
+
+    shifted = _lambda_stencil_warning("ne", 480.0, two_kbar)
+    assert shifted is not None and "483 K" in shifted
+    assert _lambda_stencil_warning("ne", 473.0, two_kbar) is not None
+    assert _lambda_stencil_warning("ne", 493.0, two_kbar) is not None
+    assert _lambda_stencil_warning("ne", 472.0, two_kbar) is None
+    assert _lambda_stencil_warning("ne", 494.0, two_kbar) is None
+    assert _lambda_stencil_warning("ne", 467.0, two_kbar) is None
+
+    at_one_bar = _lambda_stencil_warning("ne", 467.0, one_bar)
+    assert at_one_bar is not None and "467.008 K" in at_one_bar
+    assert _lambda_stencil_warning("ne", 477.0, one_bar) is not None
+    assert _lambda_stencil_warning("ne", 457.0, one_bar) is None
+    assert _lambda_stencil_warning("ne", 483.0, one_bar) is None
+
+    quartz = _lambda_stencil_warning("q", 890.0, two_kbar)
+    assert quartz is not None and "894.364 K" in quartz
+    assert "890" not in quartz
+    assert _lambda_stencil_warning("q", 847.0, two_kbar) is None
+    titanite = _lambda_stencil_warning("sph", 505.0, two_kbar)
+    assert titanite is not None and "510 K" in titanite
+    assert _lambda_stencil_warning("sph", 485.0, two_kbar) is None
+    assert _lambda_stencil_warning("sph", 500.0, two_kbar) is not None
+    assert _lambda_stencil_warning("sph", 520.0, two_kbar) is not None
+    assert _lambda_stencil_warning("sph", 499.0, two_kbar) is None
+    assert _lambda_stencil_warning("sph", 521.0, two_kbar) is None
+
+
+def test_landau_boundary_flag_uses_the_cli_temperature_and_pressure(monkeypatch):
+    """Round-trip ``--Pres`` decides whether the nepheline stencil flags.
+
+    2000.0004 bar is 2.0000004 kbar. Six decimals is 2.000000, which does
+    not parse back, so the token is ``2.0000004``. Nepheline Tc at that
+    token is 483.0000032 K. The 473.000001 K stencil endpoints parse to
+    463.000001 K and 483.000001 K, and 483.0000032 K sits 0.0000022 K
+    above the high endpoint, so the window is quiet. 472.000001 K is
+    quiet as well. Temperature stays six-decimal Celsius.
+
+    473.0000035 K at the same pressure has high-endpoint token 209.850004,
+    which parses to 483.000004 K, just past that Tc, so the window flags.
+
+    Exact 2.000000 kbar round-trips through six decimals. At 473.000001 K
+    the high endpoint is 483.000001 K and Tc is 483 K, so the window flags
+    with ``--Pres=2.000000``. The argv builder and the warning both read
+    ``_magemin_cli_scalar``.
+    """
+
+    from decimal import Decimal
+
+    from simulator.melt_backend import magemin as magemin_module
+
+    pressure_kbar = _probe_kbar(2000.0004)
+    temperature_K = 473.000001
+    seen: list[tuple[float, bool]] = []
+    original = magemin_module._magemin_cli_scalar
+
+    def spy(value: float, *, pressure: bool = False) -> tuple[str, float]:
+        seen.append((float(value), pressure))
+        return original(value, pressure=pressure)
+
+    monkeypatch.setattr(magemin_module, "_magemin_cli_scalar", spy)
+    backend = MAGEMinBackend()
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._database = "ig"
+    backend._config = {"fO2_buffer": "nno"}
+    projection = backend._build_db_bulk_projection({"SiO2": 60.0, "MgO": 40.0})
+
+    def argv_at(temperature_K_query: float, pressure_kbar_query: float) -> list[str]:
+        args, _buffer_name, _buffer_n, _warnings = (
+            backend._build_magemin_subprocess_args(
+                bulk_projection=projection,
+                temperature_C=temperature_K_query - 273.15,
+                pressure_kbar=pressure_kbar_query,
+                fO2_log=-8.0,
+            )
+        )
+        return args
+
+    args = argv_at(temperature_K, pressure_kbar)
+    assert "--Temp=199.850001" in args
+    assert "--Pres=2.0000004" in args
+    assert (temperature_K - 273.15, False) in seen
+    assert (pressure_kbar, True) in seen
+    parsed_kbar = float(original(pressure_kbar, pressure=True)[0])
+    assert parsed_kbar == 2.0000004
+    record = magemin_module._MAGEMIN_LANDAU["ne"]
+    transition_K = magemin_module._landau_equilibrium_tc_K(record, parsed_kbar)
+    high_K = magemin_module._magemin_engine_kelvin(
+        temperature_K + magemin_module._MAGEMIN_FD_DELTA_K
+    )
+    assert transition_K == 483.0000032
+    assert high_K == 483.000001
+    assert high_K < transition_K
+
+    seen.clear()
+    note = magemin_module._lambda_stencil_warning(
+        "ne", temperature_K, pressure_kbar
+    )
+    assert note is None
+    low_c = float(temperature_K - magemin_module._MAGEMIN_FD_DELTA_K) - 273.15
+    high_c = float(temperature_K + magemin_module._MAGEMIN_FD_DELTA_K) - 273.15
+    assert (low_c, False) in seen
+    assert (high_c, False) in seen
+    assert (pressure_kbar, True) in seen
+    assert original(low_c)[0] == "189.850001"
+    assert original(high_c)[0] == "209.850001"
+    assert (
+        magemin_module._lambda_stencil_warning("ne", 472.000001, pressure_kbar)
+        is None
+    )
+
+    straddling_K = 473.0000035
+    seen.clear()
+    straddling = magemin_module._lambda_stencil_warning(
+        "ne", straddling_K, pressure_kbar
+    )
+    assert straddling is not None
+    assert "483 K" in straddling
+    straddling_high_c = (
+        float(straddling_K + magemin_module._MAGEMIN_FD_DELTA_K) - 273.15
+    )
+    straddling_high_token = original(straddling_high_c)[0]
+    assert straddling_high_token == "209.850004"
+    assert (straddling_high_c, False) in seen
+    assert (pressure_kbar, True) in seen
+    assert (
+        Decimal(straddling_high_token) + Decimal("273.15")
+        > Decimal("483.0000032")
+    )
+
+    exact_kbar = _probe_kbar(2000.0)
+    seen.clear()
+    exact_args = argv_at(temperature_K, exact_kbar)
+    assert "--Temp=199.850001" in exact_args
+    assert "--Pres=2.000000" in exact_args
+    assert (exact_kbar, True) in seen
+    exact_note = magemin_module._lambda_stencil_warning(
+        "ne", temperature_K, exact_kbar
+    )
+    assert exact_note is not None
+    assert "483 K" in exact_note
 
 
 # --- ThermoEngine: live access path ----------------------------------------

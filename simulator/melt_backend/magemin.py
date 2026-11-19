@@ -695,11 +695,19 @@ _MAGEMIN_BULK_ECHO_TOL = 3.0e-3
 # endmember's property, not a noisy proxy.
 _MAGEMIN_FD_DELTA_K = 10.0
 
-# ds62 Landau temperature of ig quartz (TC_endmembers.c "q", 847.0 K).
-# The experimental α–β point is 573 °C = 846.15 K, inside the same ±δ
-# window.  A stencil that contains it mixes the two branches and
-# misattributes the lambda Cp spike; the result is still returned, flagged.
-_MAGEMIN_QUARTZ_LAMBDA_K = 847.0
+# ds636 Landau records for the mapped ig endmembers (TC_endmembers.c
+# arr_em_db_tc_ds636, input_3[4] == 1). The tuple is
+# (Tc0_K, Smax_kJ_per_K, Vmax_kJ_per_kbar, label), input_3[5..7].
+# The same Tc0 values are in ds62 and ds633. Equilibrium Tc(P) is
+# `_landau_equilibrium_tc_K`. The experimental quartz α–β point is
+# 573 °C = 846.15 K, inside the 1 bar ±δ window. A stencil that
+# contains Tc(P) mixes the two branches and misattributes the lambda
+# Cp spike; the result is still returned, flagged.
+_MAGEMIN_LANDAU: Mapping[str, tuple[float, float, float, str]] = {
+    'q': (847.0, 0.00535, 0.1267, 'the alpha-beta quartz'),
+    'ne': (467.0, 0.01, 0.08, 'the nepheline'),
+    'sph': (485.0, 0.0004, 0.005, 'the titanite'),
+}
 
 
 @dataclass(frozen=True)
@@ -861,6 +869,23 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
         formula_divisor=1.0,
         polymorph='',
         bulk_wt_pct={'SiO2': 30.6468, 'CaO': 28.6064, 'TiO2': 40.7468},
+    ),
+    # ig pure phase ne. TC_endmembers.c::arr_em_db_tc_ds636, record ne,
+    # is 1 SiO2 + 0.5 Al2O3 + 0.5 Na2O (atoms 7). cg and cgh share that
+    # composition and are not ig pure phases. wt% use the oxide masses
+    # and 4 d.p. half-up above; the 0.0001 excess lands on Na2O, the
+    # largest |remainder|.
+    'ne': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='ne',
+        formula='NaAlSiO4',
+        formula_basis=(
+            'per 1 mol NaAlSiO4 '
+            '(TC_endmembers.c::arr_em_db_tc_ds636, record ne, atoms 7)'
+        ),
+        formula_divisor=1.0,
+        polymorph='nepheline',
+        bulk_wt_pct={'SiO2': 42.2950, 'Al2O3': 35.8888, 'Na2O': 21.8162},
     ),
     'cats': _MAGEMinPurePhaseSpec(
         host_phase='cpx',
@@ -1409,24 +1434,118 @@ def _magemin_endmember_gbase_kJ(
     return g_kJ
 
 
-def _lambda_stencil_warning(endmember: str, temperature_K: float) -> Optional[str]:
-    """Flag a finite-difference stencil straddling a known lambda point.
+def _landau_equilibrium_tc_K(
+    record: tuple[float, float, float, str],
+    pressure_kbar: float,
+) -> float:
+    """Equilibrium Landau Tc at the kbar pressure sent to MAGEMin.
 
-    Only quartz carries a lambda term in the ig (ds62) phase map over this
-    accessor's domain; the centred stencil across 846.15 K mixes the alpha
-    and beta branches' G(T) and misattributes the lambda Cp spike.
+    Premise. ``TC_gem_function.c`` (MAGEMin 40ed109), equilibrium state,
+    when ``input_3[4] == 1`` and ``Smax > 0``::
+
+        Tc = Tc0                        if Vmax == 0
+        Tc = Tc0 + P * Vmax / Smax      otherwise
+
+    ``P`` is that function's pressure argument. ``p0 = 0.001`` kbar is
+    the volume-integral reference and is not subtracted. Callers pass
+    the kbar parsed back from the ``--Pres`` token.
+
+    Algebra. ``Tc(P) = Tc0 + P_kbar * Vmax / Smax``.
+
+    Units. ``gbase`` is kJ (``R = 0.0083144`` kJ/K), so ``input_3[6]``
+    Smax is kJ/K and ``input_3[7]`` Vmax is kJ/kbar. ``Vmax/Smax`` is
+    K/kbar. ds636 nepheline: ``0.08 / 0.01 = 8`` K/kbar.
+
+    Sanity. ``P = 0``: nepheline Tc = 467 K. ``P = 2`` kbar:
+    ``467 + 16 = 483`` K. Quartz (847 K, 0.00535 kJ/K, 0.1267 kJ/kbar)
+    and titanite (485 K, 0.0004 kJ/K, 0.005 kJ/kbar) use the same rule.
     """
-    if (
-        endmember == 'q'
-        and abs(temperature_K - _MAGEMIN_QUARTZ_LAMBDA_K)
-        <= _MAGEMIN_FD_DELTA_K
-    ):
-        return (
-            'finite-difference stencil straddles the alpha-beta quartz '
-            f'lambda transition ({_MAGEMIN_QUARTZ_LAMBDA_K:g} K); S/Cp/H '
-            'mix the two branches and Cp is misattributed across the spike'
-        )
-    return None
+
+    tc0_K, smax_kJ_per_K, vmax_kJ_per_kbar, _label = record
+    if vmax_kJ_per_kbar == 0.0:
+        return tc0_K
+    return tc0_K + float(pressure_kbar) * vmax_kJ_per_kbar / smax_kJ_per_K
+
+
+# MAGEMin's CLI reads ``--Temp`` and ``--Pres`` with strtold. Temperature
+# is six decimal Celsius. Pressure is six decimals when that token parses
+# back to the requested kbar, otherwise ``repr`` of the requested float,
+# so the binary stores the pressure the caller asked for. The float parsed
+# back from the token is the double the binary stores. Bulk wt% and
+# buffer_n keep their own ``:.6f`` at the argv builder: they are not this
+# temperature/pressure pair.
+_MAGEMIN_CLI_DECIMALS = 6
+
+
+def _magemin_cli_scalar(value: float, *, pressure: bool = False) -> tuple[str, float]:
+    """CLI token for one Celsius or kbar value, and the float of that token.
+
+    ``pressure=True`` is the ``--Pres`` rule: fixed six decimals when
+    ``float`` of that token equals the requested kbar, else ``repr``.
+    Temperature stays six decimals even when that token does not round-trip.
+    """
+
+    numeric = float(value)
+    if pressure:
+        fixed = f'{numeric:.{_MAGEMIN_CLI_DECIMALS}f}'
+        token = fixed if float(fixed) == numeric else repr(numeric)
+    else:
+        token = f'{numeric:.{_MAGEMIN_CLI_DECIMALS}f}'
+    return token, float(token)
+
+
+_LANDAU_STENCIL_PREFIX = 'finite-difference stencil straddles '
+
+
+def _magemin_engine_kelvin(temperature_K: float) -> float:
+    """Kelvin stored from the ``--Temp`` token of this request.
+
+    MAGEMin does ``strtold(--Temp) + 273.15`` into a double. ``--Temp``
+    is the six-decimal Celsius token from ``_magemin_cli_scalar``.
+    """
+
+    celsius = _magemin_cli_scalar(float(temperature_K) - 273.15)[1]
+    return celsius + 273.15
+
+
+def _lambda_stencil_warning(
+    endmember: str,
+    temperature_K: float,
+    pressure_kbar: float,
+) -> Optional[str]:
+    """Flag a finite-difference stencil that contains the equilibrium Tc.
+
+    ``temperature_K`` and ``pressure_kbar`` are the pure-phase request.
+    The check uses the ``--Temp`` and ``--Pres`` values the binary
+    stores, from ``_magemin_cli_scalar``, not the unrounded request.
+    A stencil that contains Tc(P) mixes the two branches' G(T) and
+    misattributes the lambda Cp spike. The predicted value is still
+    returned.
+    """
+
+    record = _MAGEMIN_LANDAU.get(endmember)
+    if record is None:
+        return None
+    pressure_engine_kbar = _magemin_cli_scalar(pressure_kbar, pressure=True)[1]
+    transition_K = _landau_equilibrium_tc_K(record, pressure_engine_kbar)
+    low_K = _magemin_engine_kelvin(temperature_K - _MAGEMIN_FD_DELTA_K)
+    high_K = _magemin_engine_kelvin(temperature_K + _MAGEMIN_FD_DELTA_K)
+    if not low_K <= transition_K <= high_K:
+        return None
+    label = record[3]
+    return (
+        f'{_LANDAU_STENCIL_PREFIX}{label} '
+        f'lambda transition ({transition_K:g} K); S/Cp/H '
+        'mix the two branches and Cp is misattributed across the spike'
+    )
+
+
+def _landau_stencil_notes(warnings: Sequence[str]) -> Tuple[str, ...]:
+    """Accessor sentences for a stencil that straddles Tc(P)."""
+
+    return tuple(
+        item for item in warnings if item.startswith(_LANDAU_STENCIL_PREFIX)
+    )
 
 
 def _parse_magemin_sys_oxide_row(
@@ -3471,18 +3590,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             temperature_C=temperature_C,
             fO2_log=fO2_log,
         )
-        fixed_pressure = f'{pressure_kbar:.6f}'
-        pressure_argument = (
-            fixed_pressure
-            if float(fixed_pressure) == pressure_kbar
-            else repr(pressure_kbar)
-        )
+        temperature_token = _magemin_cli_scalar(temperature_C)[0]
+        pressure_token = _magemin_cli_scalar(pressure_kbar, pressure=True)[0]
         args = [
             str(binary_path),
             '--Verb=0',
             f'--db={self._effective_database()}',
-            f'--Temp={temperature_C:.6f}',
-            f'--Pres={pressure_argument}',
+            f'--Temp={temperature_token}',
+            f'--Pres={pressure_token}',
             '--sys_in=wt',
             '--Bulk=' + ','.join(f'{value:.6f}' for value in bulk_projection.vector),
             f'--buffer={buffer_name}',
@@ -4060,8 +4175,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     # assemblage row (that row is a slightly impure solution: MAGEMin
     # substitutes trace oxides, and its S/H do not match this G).  Because
     # the derivative does not need the phase to be stable, en/crst/trd and
-    # metastable quartz return S/Cp/H too.  A stencil across the quartz
-    # lambda is flagged, not dropped.
+    # metastable quartz return S/Cp/H too.  A stencil across a mapped
+    # Landau Tc (q, ne, sph) is flagged, not dropped.
 
     def pure_phase_properties(
         self,
@@ -4075,7 +4190,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         ``phase_id`` is an ig-database symbol: ``fo`` (olivine endmember),
         ``per`` (ferropericlase endmember), ``en`` (orthopyroxene endmember,
         Mg2Si2O6 basis), the pure phases ``q`` / ``crst`` / ``trd`` /
-        ``cor`` / ``and`` / ``ky`` / ``sill`` / ``ru`` / ``sph``, or the
+        ``cor`` / ``and`` / ``ky`` / ``sill`` / ``ru`` / ``sph`` / ``ne``, or the
         solution endmembers ``an`` (fsp), ``cats`` / ``jd`` (cpx),
         ``gr`` / ``py`` (g), and ``mont`` (ol). There is no plain spinel id.
         Cold subprocess: same binary and slot discipline as the production
@@ -4163,7 +4278,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
         if derived not in notes:
             notes.append(derived)
-        lambda_note = _lambda_stencil_warning(spec.endmember, temperature_K)
+        lambda_note = _lambda_stencil_warning(
+            spec.endmember, temperature_K, pressure_kbar
+        )
         if lambda_note is not None and lambda_note not in notes:
             notes.append(lambda_note)
 
