@@ -10,7 +10,6 @@ import hashlib
 from pathlib import Path
 import re
 import shutil
-import subprocess
 from time import perf_counter
 
 from openpyxl import load_workbook
@@ -19,6 +18,8 @@ import yaml
 
 from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
 from simulator.battery.migrate import Migrator, to_plain
+from simulator.corpus_paths import regolith_corpus_root
+from tests.helpers.pdf_text import pdftotext_page_text
 from tools.validate_literature_extracts import (
     check_all_fidelity_samples_match,
     resolve_field_path,
@@ -31,11 +32,15 @@ SID = "su-zhang-2023-lunar-orange-glass-na-k-cu-degassing"
 EXTRACT = ROOT / "data/literature/extracts" / f"{SID}.yaml"
 AUDIT = ROOT / "data/literature/extracts/audits"
 TABLE_ASSET = f"tables:{SID}"
-SOURCE_XLSX = Path.home() / "Repos/regolith-corpus/raw" / SID / f"{SID}.xlsx"
 THESIS_SID = "su-2024-lunar-volatiles-thesis"
 THESIS_SHA = "471f14fd7cf2c51aacb54d7104b94b893512c9bda1936b519e6fb03675eaa401"
 THESIS_ASSET = f"raw/{THESIS_SID}/{THESIS_SID}.pdf"
-THESIS_PDF = Path.home() / "Repos/regolith-corpus" / THESIS_ASSET
+TABLE_3_1_ASSET = "tables/su-2024-lunar-volatiles-thesis/t3-1.csv"
+WORKBOOK_ASSET = f"raw/{SID}/{SID}.xlsx"
+
+
+def _corpus_file(relative: str) -> Path:
+    return regolith_corpus_root() / relative
 
 
 def _assert_thesis_chapter(document: dict) -> None:
@@ -182,14 +187,15 @@ def test_extract_validates_and_fidelity_mutation_is_detected() -> None:
 
 
 def test_every_cell_audit_value_matches_independent_workbook_display() -> None:
-    if not SOURCE_XLSX.is_file():
-        pytest.skip(f"corpus workbook not available: {SOURCE_XLSX}")
+    workbook_path = _corpus_file(WORKBOOK_ASSET)
+    if not workbook_path.is_file():
+        pytest.skip(f"corpus workbook not available: {workbook_path}")
 
     started = perf_counter()
     document = _document()
     with (AUDIT / f"{SID}.cells.csv").open(encoding="utf-8", newline="") as stream:
         cell_audit = list(csv.DictReader(stream))
-    workbook = load_workbook(SOURCE_XLSX, data_only=True, read_only=False)
+    workbook = load_workbook(workbook_path, data_only=True, read_only=False)
     assert len(cell_audit) == 7_777
 
     mismatches, target_checks = _source_display_mismatches(
@@ -425,12 +431,7 @@ def test_all_printed_rows_cells_and_maps_are_accounted_for() -> None:
         and "drowart-1960-al2o3-kems.yaml" in row["values"]["schema_gap"]
         for row in maps
     )
-    context_counts = Counter(
-        row["locator"]["table"]
-        for row in document["species"]["unknown"]["context"]
-        if "table" in row["locator"]
-    )
-    assert context_counts == {"Table S1": 1, "Table S5": 32, "Table 3.1": 1}
+    _assert_unknown_context_census(document)
 
     with (AUDIT / f"{SID}.cells.csv").open(encoding="utf-8", newline="") as stream:
         cell_audit = list(csv.DictReader(stream))
@@ -667,25 +668,6 @@ def test_isolated_migration_pins_values_conditions_and_schema_gaps() -> None:
     _assert_model_context_is_unscored(document, result)
 
 
-def _pdf_page_text(page_number: int) -> str:
-    completed = subprocess.run(
-        [
-            "pdftotext",
-            "-f",
-            str(page_number),
-            "-l",
-            str(page_number),
-            "-layout",
-            str(THESIS_PDF),
-            "-",
-        ],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return completed.stdout
-
-
 def _pdf_footer(page_text: str) -> str:
     lines = [line.strip() for line in page_text.splitlines() if line.strip()]
     assert lines
@@ -712,47 +694,86 @@ def test_article_text_page_mapping_mutation_is_detected() -> None:
 
 
 def test_thesis_pdf_sha_and_chapter_page_map() -> None:
-    if not THESIS_PDF.is_file():
-        pytest.skip(f"thesis PDF not available: {THESIS_PDF}")
+    thesis_pdf = _corpus_file(THESIS_ASSET)
+    if not thesis_pdf.is_file():
+        pytest.skip(f"thesis PDF not available: {thesis_pdf}")
 
-    digest = hashlib.sha256(THESIS_PDF.read_bytes()).hexdigest()
+    digest = hashlib.sha256(thesis_pdf.read_bytes()).hexdigest()
     assert digest == THESIS_SHA
     if shutil.which("pdftotext") is None:
         pytest.skip("pdftotext is not available")
 
-    chapter = _pdf_page_text(59)
+    chapter = pdftotext_page_text(thesis_pdf, 59)
     assert "Chapter 3" in chapter
     assert "117924" in chapter
     assert _pdf_footer(chapter) == "44"
-    table = _pdf_page_text(78)
+    table = pdftotext_page_text(thesis_pdf, 78)
     assert "Table 3.1" in table
     assert "0.145(3)" in table
     assert _pdf_footer(table) == "63"
-    assert _pdf_footer(_pdf_page_text(76)) == "61"
-    assert _pdf_footer(_pdf_page_text(86)) == "71"
+    assert _pdf_footer(pdftotext_page_text(thesis_pdf, 76)) == "61"
+    assert _pdf_footer(pdftotext_page_text(thesis_pdf, 86)) == "71"
 
 
 _MODEL_CONTEXT_IDS = (
     ("unknown", "su_zhang_2023_model_cooling_law", "literature_fixed_model_input"),
     ("unknown", "su_zhang_2023_model_bead_tau", "author_fitted_model_parameter"),
     ("Na2O", "su_zhang_2023_model_na_surface_boundary", "literature_fixed_model_input"),
+    ("Na2O", "su_zhang_2023_model_na_k_12065", "sample_specific_derived_parameter"),
     ("Na2O", "su_zhang_2023_model_na_diffusivity", "literature_fixed_model_input"),
     ("Na2O", "su_zhang_2023_model_na_surface_parameters", "author_fitted_model_parameter"),
     ("Cu", "su_zhang_2023_model_cu_diffusivity", "literature_fixed_model_input"),
     ("Cu", "su_zhang_2023_model_cu_surface_parameters", "author_fitted_model_parameter"),
     ("K2O", "su_zhang_2023_model_k_not_fitted", "model_parameter_absent"),
 )
-_TABLE_3_1_BEADS = (
-    ("GB-A", "261", "62(3)", "62", "3", "Na (E+L), Cu (L)"),
-    ("GB-B", "210", "93(5)", "93", "5", "Na (E+L), Cu (L)"),
-    ("GB-C", "253", "56(2)", "56", "2", "Na (E+L), Cu (L)"),
-    ("GB-G1", "232", "48(2)", "48", "2", "Na (S+E+L), Cu (L)"),
-    ("GB-G2", "285", "67(2)", "67", "2", "Na (S+E+L), Cu (L)"),
-    ("GB-G5", "250", "53(2)", "53", "2", "Na (S+E+L), Cu (L)"),
-    ("GB-G6", "293", "179(7)", "179", "7", "Na (S+E+L), Cu (L)"),
-    ("GB-G7", "272", "62(2)", "62", "2", "Na (E+L), Cu (L)"),
-    ("GB3", "251", "66(15)", "66", "15", "Na (E)"),
-    ("GB-S6", "130", "61(9)", "61", "9", "Na (E)"),
+_UNKNOWN_MODEL_CONTEXT_IDS = frozenset(
+    observation_id
+    for species, observation_id, _context_type in _MODEL_CONTEXT_IDS
+    if species == "unknown"
+)
+_UNKNOWN_SUPPLEMENTARY_CONTEXT_IDS = (
+    "su_zhang_2023_table_s1_empa_standards",
+    "su_zhang_2023_table_s5_gb_a_na23_map",
+    "su_zhang_2023_table_s5_gb_a_k39_map",
+    "su_zhang_2023_table_s5_gb_a_fe57_map",
+    "su_zhang_2023_table_s5_gb_a_cu63_map",
+    "su_zhang_2023_table_s5_gb_b_na23_map",
+    "su_zhang_2023_table_s5_gb_b_k39_map",
+    "su_zhang_2023_table_s5_gb_b_fe57_map",
+    "su_zhang_2023_table_s5_gb_b_cu63_map",
+    "su_zhang_2023_table_s5_gb_c_na23_map",
+    "su_zhang_2023_table_s5_gb_c_k39_map",
+    "su_zhang_2023_table_s5_gb_c_fe57_map",
+    "su_zhang_2023_table_s5_gb_c_cu63_map",
+    "su_zhang_2023_table_s5_gb_g1_na23_map",
+    "su_zhang_2023_table_s5_gb_g1_k39_map",
+    "su_zhang_2023_table_s5_gb_g1_fe57_map",
+    "su_zhang_2023_table_s5_gb_g1_cu63_map",
+    "su_zhang_2023_table_s5_gb_g2_na23_map",
+    "su_zhang_2023_table_s5_gb_g2_k39_map",
+    "su_zhang_2023_table_s5_gb_g2_fe57_map",
+    "su_zhang_2023_table_s5_gb_g2_cu63_map",
+    "su_zhang_2023_table_s5_gb_g5_na23_map",
+    "su_zhang_2023_table_s5_gb_g5_k39_map",
+    "su_zhang_2023_table_s5_gb_g5_fe57_map",
+    "su_zhang_2023_table_s5_gb_g5_cu63_map",
+    "su_zhang_2023_table_s5_gb_g6_na23_map",
+    "su_zhang_2023_table_s5_gb_g6_k39_map",
+    "su_zhang_2023_table_s5_gb_g6_fe57_map",
+    "su_zhang_2023_table_s5_gb_g6_cu63_map",
+    "su_zhang_2023_table_s5_gb_g7_na23_map",
+    "su_zhang_2023_table_s5_gb_g7_k39_map",
+    "su_zhang_2023_table_s5_gb_g7_fe57_map",
+    "su_zhang_2023_table_s5_gb_g7_cu63_map",
+)
+_TABLE_3_1_PUBLIC_TOKENS = (
+    "0.145(3)",
+    "6001(236)",
+    "62(3)",
+    "179(7)",
+    "diameter_um_as_printed",
+    "data_as_printed",
+    "total_mswd",
 )
 
 
@@ -777,16 +798,49 @@ def _assert_thesis_locator(locator: dict, *, page: int, published_page: int) -> 
     _assert_page_map(locator, page=page, published_page=published_page)
 
 
+def _assert_unknown_context_census(document: dict) -> None:
+    """The unknown context is exactly one S1 row, 32 S5 rows, and the model rows.
+
+    A row outside that id set fails, including a row with no table locator.
+    """
+    rows = document["species"]["unknown"]["context"]
+    ids = [row["observation_id"] for row in rows]
+    assert len(ids) == len(set(ids))
+    assert set(ids) == set(_UNKNOWN_SUPPLEMENTARY_CONTEXT_IDS) | set(
+        _UNKNOWN_MODEL_CONTEXT_IDS
+    )
+    supplementary = [
+        row for row in rows if row["observation_id"] not in _UNKNOWN_MODEL_CONTEXT_IDS
+    ]
+    for row in supplementary:
+        assert "table" in row["locator"], row["observation_id"]
+    assert Counter(row["locator"]["table"] for row in supplementary) == {
+        "Table S1": 1,
+        "Table S5": 32,
+    }
+
+
 def _assert_model_context(document: dict) -> None:
     scope_note = document["extraction"]["scope_note"]
     assert "author_fitted_model_parameter" in scope_note
     assert "literature_fixed_model_input" in scope_note
+    assert "sample_specific_derived_parameter" in scope_note
+    assert "not a fixed 74220 input" in scope_note
     assert (
         "Fit parameters, figure digitizations, diffusivities, and degassing fluxes "
         "are not extracted."
     ) not in scope_note
     assert "not a profile analysis condition" in scope_note
+    _assert_unknown_context_census(document)
 
+    found = [
+        (species, row["observation_id"], row["type"])
+        for species, body in document["species"].items()
+        for row in body.get("context") or []
+        if row["observation_id"].startswith("su_zhang_2023_model_")
+    ]
+    assert set(found) == set(_MODEL_CONTEXT_IDS)
+    assert len(found) == len(_MODEL_CONTEXT_IDS)
     for species, observation_id, context_type in _MODEL_CONTEXT_IDS:
         row = _context_row(document, species, observation_id)
         assert row["type"] == context_type
@@ -795,6 +849,14 @@ def _assert_model_context(document: dict) -> None:
             "partial_pressure",
             "volatility_series",
         }
+    model_blob = yaml.safe_dump(
+        [
+            _context_row(document, species, observation_id)
+            for species, observation_id, _context_type in _MODEL_CONTEXT_IDS
+        ]
+    )
+    for token in _TABLE_3_1_PUBLIC_TOKENS:
+        assert token not in model_blob
 
     cooling = _context_row(document, "unknown", "su_zhang_2023_model_cooling_law")
     _assert_thesis_locator(cooling["locator"], page=76, published_page=61)
@@ -810,62 +872,67 @@ def _assert_model_context(document: dict) -> None:
     tau = _context_row(document, "unknown", "su_zhang_2023_model_bead_tau")
     _assert_thesis_locator(tau["locator"], page=78, published_page=63)
     assert tau["locator"]["table"] == "Table 3.1"
+    assert tau["values"]["role"] == "fitted_coefficients"
     assert tau["values"]["provenance"] == "fitted_to_these_profiles"
     assert tau["values"]["fit_scope"] == "in_sample"
+    assert tau["values"]["parameter_names"] == [
+        "tau",
+        "a0_Na2O",
+        "b0_Na2O",
+        "a0_Cu",
+        "b0_Cu",
+    ]
     assert tau["values"]["parameter_count"] == 14
-    assert tau["values"]["total_mswd"] == "2.91"
+    assert tau["values"]["tau_range_s_as_printed"] == "48 to 179"
     assert tau["values"]["initial_cooling_rate_K_per_s_as_printed"] == "9-34"
     assert tau["values"]["cooling_rate_at_900_K_as_printed"] == "3-10"
     assert tau["values"]["cooling_rate_role"] == "derived_from_fitted_tau"
+    assert tau["values"]["table_path"] == TABLE_3_1_ASSET
+    assert "beads" not in tau["values"]
+    assert "total_mswd" not in tau["values"]
     assert tau["values"]["figure_3_9"]["figure"] == "3.9"
     _assert_page_map(tau["values"]["figure_3_9"], page=80, published_page=65)
-    beads = tau["values"]["beads"]
-    assert [
-        (
-            bead["sample"],
-            bead["diameter_um_as_printed"],
-            bead["tau_s_as_printed"],
-            bead["tau_s"],
-            bead["tau_standard_error_s"],
-            bead["data_as_printed"],
-        )
-        for bead in beads
-    ] == list(_TABLE_3_1_BEADS)
-    assert tau["values"]["diameter_disagreement"] == [
-        {
-            "sample": "GB-A",
-            "table_3_1_um": "261",
-            "table_s2_displayed_um": "260.7",
-            "supplement_fit_diameter_um": "260.7",
-        },
-        {
-            "sample": "GB-C",
-            "table_3_1_um": "253",
-            "table_s2_displayed_um": "253.4",
-            "supplement_fit_diameter_um": "253.4",
-        },
-        {
-            "sample": "GB-S6",
-            "table_3_1_um": "130",
-            "table_s2_displayed_um": "127",
-            "supplement_fit_diameter_um": "130",
-        },
-    ]
 
     boundary = _context_row(
         document, "Na2O", "su_zhang_2023_model_na_surface_boundary"
     )
     _assert_thesis_locator(boundary["locator"], page=143, published_page=128)
     assert boundary["locator"]["equation"] == "B.1"
+    assert boundary["values"]["role"] == "literature_fixed_form"
     assert boundary["values"]["provenance"] == "literature_fixed"
     assert boundary["values"]["reaction_source"] == "De Maria et al. 1971"
-    assert boundary["values"]["fO2_equil_atm"] == "exp(18.24 - 53813/T)"
-    assert boundary["values"]["fNa_equil_atm"] == "exp(31.34 - 70400/T)"
     assert boundary["values"]["surface_form_as_printed"] == "Ce = a0 * exp(b0/T)"
+    assert boundary["values"]["surface_form_equation"] == "B.10"
+    assert (
+        boundary["values"]["used_by_74220_fit"]
+        == "boundary_form_with_free_surface_coefficients"
+    )
+    assert boundary["values"]["not_the_numerical_K_Na"] is True
+    assert "K_Na" not in boundary["values"]
+    assert "fNa_equil_atm" not in boundary["values"]
+    assert "fO2_equil_atm" not in boundary["values"]
     assert boundary["values"]["ambient_fugacity"] == "cannot_be_known_a_priori"
+    _assert_page_map(
+        boundary["values"]["surface_form_locator"], page=144, published_page=129
+    )
     _assert_page_map(
         boundary["values"]["ambient_locator"], page=144, published_page=129
     )
+
+    derived = _context_row(document, "Na2O", "su_zhang_2023_model_na_k_12065")
+    _assert_thesis_locator(derived["locator"], page=144, published_page=129)
+    assert derived["locator"]["equation"] == "B.6"
+    assert derived["values"]["role"] == "sample_specific_derived_number"
+    assert derived["values"]["provenance"] == "derived_for_sample_12065"
+    assert derived["values"]["sample"] == "12065"
+    assert derived["values"]["not_a_fixed_74220_input"] is True
+    assert derived["values"]["K_Na"] == "exp(37.14 - 83853/T)"
+    assert derived["values"]["K_Na_equation"] == "B.6"
+    assert derived["values"]["C_NaO0_5_wt_pct"] == "0.29"
+    assert derived["values"]["fNa_equil_atm"] == "exp(31.34 - 70400/T)"
+    assert derived["values"]["fO2_equil_atm"] == "exp(18.24 - 53813/T)"
+    _assert_page_map(derived["values"]["fNa_locator"], page=143, published_page=128)
+    _assert_page_map(derived["values"]["fO2_locator"], page=143, published_page=128)
 
     na_d = _context_row(document, "Na2O", "su_zhang_2023_model_na_diffusivity")
     _assert_thesis_locator(na_d["locator"], page=76, published_page=61)
@@ -878,13 +945,16 @@ def _assert_model_context(document: dict) -> None:
         document, "Na2O", "su_zhang_2023_model_na_surface_parameters"
     )
     _assert_thesis_locator(na_fit["locator"], page=78, published_page=63)
+    assert na_fit["locator"]["table"] == "Table 3.1"
+    assert na_fit["values"]["role"] == "fitted_coefficients"
     assert na_fit["values"]["provenance"] == "fitted_to_these_profiles"
     assert na_fit["values"]["fit_scope"] == "in_sample"
     assert na_fit["values"]["shared_across_beads"] is True
-    assert na_fit["values"]["a0_as_printed"] == "0.145(3)"
-    assert na_fit["values"]["a0_standard_error_wt_pct"] == "0.003"
-    assert na_fit["values"]["b0_as_printed"] == "1183(33)"
-    assert na_fit["values"]["b0_standard_error_K"] == "33"
+    assert na_fit["values"]["parameter_names"] == ["a0", "b0"]
+    assert na_fit["values"]["boundary_form"] == "Ce = a0 * exp(b0/T)"
+    assert na_fit["values"]["not_the_12065_K_Na"] is True
+    assert na_fit["values"]["table_path"] == TABLE_3_1_ASSET
+    assert "a0_as_printed" not in na_fit["values"]
 
     cu_d = _context_row(document, "Cu", "su_zhang_2023_model_cu_diffusivity")
     assert cu_d["values"]["source"] == "Ni and Zhang 2016"
@@ -893,11 +963,15 @@ def _assert_model_context(document: dict) -> None:
     assert cu_d["values"]["C0_uncertainty_ppm"] == "0.6"
 
     cu_fit = _context_row(document, "Cu", "su_zhang_2023_model_cu_surface_parameters")
+    _assert_thesis_locator(cu_fit["locator"], page=78, published_page=63)
+    assert cu_fit["locator"]["table"] == "Table 3.1"
+    assert cu_fit["values"]["role"] == "fitted_coefficients"
     assert cu_fit["values"]["provenance"] == "fitted_to_these_profiles"
-    assert cu_fit["values"]["a0_as_printed"] == "0.011(2)"
-    assert cu_fit["values"]["a0_standard_error_ppm"] == "0.002"
-    assert cu_fit["values"]["b0_as_printed"] == "6001(236)"
-    assert cu_fit["values"]["b0_standard_error_K"] == "236"
+    assert cu_fit["values"]["parameter_names"] == ["a0", "b0"]
+    assert cu_fit["values"]["boundary_form"] == "Ce = a0 * exp(b0/T)"
+    assert cu_fit["values"]["table_path"] == TABLE_3_1_ASSET
+    assert "a0_as_printed" not in cu_fit["values"]
+    assert "b0_as_printed" not in cu_fit["values"]
 
     potassium = _context_row(document, "K2O", "su_zhang_2023_model_k_not_fitted")
     _assert_thesis_locator(potassium["locator"], page=75, published_page=60)
@@ -911,9 +985,19 @@ def _assert_model_context_is_unscored(document: dict, result) -> None:
     contexts = [row for rows in result.context_by_work.values() for row in rows]
     by_id = {row["context_id"]: row for row in contexts}
     assert len(by_id) == len(contexts)
+    expected_model_ids = {
+        f"{SID}::context::{observation_id}"
+        for _species, observation_id, _context_type in _MODEL_CONTEXT_IDS
+    }
+    present_model_ids = {
+        context_id
+        for context_id in by_id
+        if context_id.startswith(f"{SID}::context::su_zhang_2023_model_")
+    }
+    assert present_model_ids == expected_model_ids
+    assert len(by_id) == len(_UNKNOWN_SUPPLEMENTARY_CONTEXT_IDS) + len(_MODEL_CONTEXT_IDS)
     for species, observation_id, context_type in _MODEL_CONTEXT_IDS:
         context_id = f"{SID}::context::{observation_id}"
-        assert context_id in by_id
         assert by_id[context_id]["species"] == species
         assert by_id[context_id]["type"] == context_type
         assert context_id not in result.observations
@@ -935,10 +1019,60 @@ def test_model_context_pins_printed_inputs_and_table_3_1() -> None:
     _assert_model_context(_document())
 
 
-def test_model_context_tau_mutation_is_detected() -> None:
+def test_model_context_tau_range_mutation_is_detected() -> None:
     document = deepcopy(_document())
     tau = _context_row(document, "unknown", "su_zhang_2023_model_bead_tau")
-    bead = next(item for item in tau["values"]["beads"] if item["sample"] == "GB-G1")
-    bead["tau_s_as_printed"] = "49(2)"
+    tau["values"]["tau_range_s_as_printed"] = "49 to 179"
     with pytest.raises(AssertionError):
         _assert_model_context(document)
+
+
+def _assert_table_3_1_cells(table_path: Path) -> None:
+    with table_path.open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    beads = [row for row in rows if row["kind"] == "bead"]
+    shared = [row for row in rows if row["kind"] == "shared_parameter"]
+    footer = [row for row in rows if row["kind"] == "table_footer"]
+    assert len(beads) == 10
+    by_sample = {row["sample"]: row for row in beads}
+    assert by_sample["GB-G1"]["tau_s_as_printed"] == "48(2)"
+    assert by_sample["GB-G1"]["diameter_um_as_printed"] == "232"
+    assert by_sample["GB-G6"]["tau_s_as_printed"] == "179(7)"
+    sodium = next(row for row in shared if row["sample"] == "Na2O")
+    copper = next(row for row in shared if row["sample"] == "Cu")
+    assert sodium["a0_as_printed"] == "0.145(3)"
+    assert sodium["b0_as_printed"] == "1183(33)"
+    assert copper["a0_as_printed"] == "0.011(2)"
+    assert copper["b0_as_printed"] == "6001(236)"
+    assert len(footer) == 1
+    assert footer[0]["mswd_as_printed"] == "2.91"
+
+
+def test_table_3_1_corpus_pin_reads_cells_from_corpus() -> None:
+    table_path = _corpus_file(TABLE_3_1_ASSET)
+    if not table_path.is_file():
+        pytest.skip(f"corpus table not available: {table_path}")
+    document = _document()
+    digest = hashlib.sha256(table_path.read_bytes()).hexdigest()
+    for species, observation_id in (
+        ("unknown", "su_zhang_2023_model_bead_tau"),
+        ("Na2O", "su_zhang_2023_model_na_surface_parameters"),
+        ("Cu", "su_zhang_2023_model_cu_surface_parameters"),
+    ):
+        row = _context_row(document, species, observation_id)
+        assert row["values"]["table_path"] == TABLE_3_1_ASSET
+        assert row["values"]["table_sha256"] == digest
+    _assert_table_3_1_cells(table_path)
+
+
+def test_table_3_1_corpus_cell_mutation_is_detected(tmp_path: Path) -> None:
+    table_path = _corpus_file(TABLE_3_1_ASSET)
+    if not table_path.is_file():
+        pytest.skip(f"corpus table not available: {table_path}")
+    mutated = tmp_path / "t3-1.csv"
+    mutated.write_text(
+        table_path.read_text(encoding="utf-8").replace("48(2)", "49(2)", 1),
+        encoding="utf-8",
+    )
+    with pytest.raises(AssertionError):
+        _assert_table_3_1_cells(mutated)

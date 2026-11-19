@@ -35,8 +35,12 @@ extraction:
   worker: w1107ev-sz23b
   scope_note: S2–S4 are the measured analytical profiles; S4 profiles are author-reduced from S5 signals using the DOCX S3
     method. Table S1 standards and Table S5 map extents are retained as context metadata. Figure digitizations and degassing
-    fluxes are not extracted. Diffusion-model inputs and Table 3.1 outputs are context rows typed literature_fixed_model_input
-    or author_fitted_model_parameter and are not profile analysis conditions. T0 = 1640 K is the model initial temperature
+    fluxes are not extracted. Diffusion-model inputs and Table 3.1 outputs are context rows and are not profile analysis
+    conditions. The cooling law, the diffusivities, and the Appendix B surface-boundary form are literature_fixed_model_input.
+    The numerical K_Na in Equation B.6 is a sample_specific_derived_parameter for lunar sample 12065, from De Maria fugacities
+    and an assumed 0.29 wt% surface concentration, not a fixed 74220 input. The 74220 fit uses that boundary form with free
+    surface coefficients. Those coefficients and the per-bead cooling time scales are author_fitted_model_parameter. Printed
+    Table 3.1 cells are in the corpus table named on those rows. T0 = 1640 K is the model initial temperature
     from the 74220 liquidus (Delano 1990; thesis printed page 61), not a profile analysis condition. No profile row prints T, fO2, or total pressure; they remain unknown. Glass quench status
     is not_stated because cooling to glass is described, but preservation of volatile concentrations during quench is not
     asserted. Table S2 Total is a printed analytical total, not an oxide component; no exact quantity token exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES,
@@ -11584,7 +11588,6 @@ species:
     - observation_id: su_zhang_2023_model_bead_tau
       type: author_fitted_model_parameter
       units: s
-      uncertainty: "Table 3.1 caption: brackets are ±1 standard error on the last significant digits."
       locator:
         source_path: raw/su-2024-lunar-volatiles-thesis/su-2024-lunar-volatiles-thesis.pdf
         source_sha256: 471f14fd7cf2c51aacb54d7104b94b893512c9bda1936b519e6fb03675eaa401
@@ -11595,82 +11598,30 @@ species:
         section: "3.5.2"
       values:
         quantity: asymptotic_cooling_time_scale
+        role: fitted_coefficients
         provenance: fitted_to_these_profiles
         fit_scope: in_sample
-        shared_surface_parameters: true
+        parameter_names:
+        - tau
+        - a0_Na2O
+        - b0_Na2O
+        - a0_Cu
+        - b0_Cu
         parameter_count: 14
         parameter_count_locator:
           page: 77
           published_page: 62
           pdf_page_index: 76
           section: "3.5.2"
-        total_mswd: "2.91"
-        bracket_place_rule: "parentheses are ±1 standard error on the last significant digits"
+        shared_surface_parameters: true
+        tau_range_s_as_printed: "48 to 179"
+        tau_range_role: prose_on_printed_page_63
         initial_cooling_rate_K_per_s_as_printed: "9-34"
         cooling_rate_at_900_K_as_printed: "3-10"
         cooling_rate_role: derived_from_fitted_tau
         cooling_rate_T0_K: "1640"
-        beads:
-        - sample: GB-A
-          diameter_um_as_printed: "261"
-          tau_s_as_printed: "62(3)"
-          tau_s: "62"
-          tau_standard_error_s: "3"
-          data_as_printed: "Na (E+L), Cu (L)"
-        - sample: GB-B
-          diameter_um_as_printed: "210"
-          tau_s_as_printed: "93(5)"
-          tau_s: "93"
-          tau_standard_error_s: "5"
-          data_as_printed: "Na (E+L), Cu (L)"
-        - sample: GB-C
-          diameter_um_as_printed: "253"
-          tau_s_as_printed: "56(2)"
-          tau_s: "56"
-          tau_standard_error_s: "2"
-          data_as_printed: "Na (E+L), Cu (L)"
-        - sample: GB-G1
-          diameter_um_as_printed: "232"
-          tau_s_as_printed: "48(2)"
-          tau_s: "48"
-          tau_standard_error_s: "2"
-          data_as_printed: "Na (S+E+L), Cu (L)"
-        - sample: GB-G2
-          diameter_um_as_printed: "285"
-          tau_s_as_printed: "67(2)"
-          tau_s: "67"
-          tau_standard_error_s: "2"
-          data_as_printed: "Na (S+E+L), Cu (L)"
-        - sample: GB-G5
-          diameter_um_as_printed: "250"
-          tau_s_as_printed: "53(2)"
-          tau_s: "53"
-          tau_standard_error_s: "2"
-          data_as_printed: "Na (S+E+L), Cu (L)"
-        - sample: GB-G6
-          diameter_um_as_printed: "293"
-          tau_s_as_printed: "179(7)"
-          tau_s: "179"
-          tau_standard_error_s: "7"
-          data_as_printed: "Na (S+E+L), Cu (L)"
-        - sample: GB-G7
-          diameter_um_as_printed: "272"
-          tau_s_as_printed: "62(2)"
-          tau_s: "62"
-          tau_standard_error_s: "2"
-          data_as_printed: "Na (E+L), Cu (L)"
-        - sample: GB3
-          diameter_um_as_printed: "251"
-          tau_s_as_printed: "66(15)"
-          tau_s: "66"
-          tau_standard_error_s: "15"
-          data_as_printed: "Na (E)"
-        - sample: GB-S6
-          diameter_um_as_printed: "130"
-          tau_s_as_printed: "61(9)"
-          tau_s: "61"
-          tau_standard_error_s: "9"
-          data_as_printed: "Na (E)"
+        table_path: tables/su-2024-lunar-volatiles-thesis/t3-1.csv
+        table_sha256: "1a4cb24bcd21e09ba1c5c7560ae633fc22558b435ebb2a9b9b3213162a0629e9"
         figure_3_9:
           figure: "3.9"
           page: 80
@@ -11680,27 +11631,6 @@ species:
             Tau is plotted against bead diameter. The text reports no overall
             trend and two possible subparallel trends. This row does not
             digitize the figure.
-        diameter_disagreement:
-        - sample: GB-A
-          table_3_1_um: "261"
-          table_s2_displayed_um: "260.7"
-          supplement_fit_diameter_um: "260.7"
-        - sample: GB-C
-          table_3_1_um: "253"
-          table_s2_displayed_um: "253.4"
-          supplement_fit_diameter_um: "253.4"
-        - sample: GB-S6
-          table_3_1_um: "130"
-          table_s2_displayed_um: "127"
-          supplement_fit_diameter_um: "130"
-        fit_radius_locator:
-          source_path: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
-          source_sha256: 18afaf45a603291100c46cbb8143ff79fd473fc7e9bc0f81d072334f1f91d818
-          section: S6
-          note: >-
-            The ten-bead fit radius array uses 260.7, 253.4, and 130
-            micrometres for GB-A, GB-C, and GB-S6. An earlier eight-bead
-            array matches Table S2. Table 3.1 diameters stay as printed.
   SiO2:
     observations:
     - observation_id: su_zhang_2023_table_s2_empa_sio2_profile
@@ -100120,7 +100050,7 @@ species:
     context:
     - observation_id: su_zhang_2023_model_na_surface_boundary
       type: literature_fixed_model_input
-      units: atm
+      units: dimensionless
       locator:
         source_path: raw/su-2024-lunar-volatiles-thesis/su-2024-lunar-volatiles-thesis.pdf
         source_sha256: 471f14fd7cf2c51aacb54d7104b94b893512c9bda1936b519e6fb03675eaa401
@@ -100131,24 +100061,77 @@ species:
         equation: "B.1"
       values:
         quantity: surface_equilibrium_boundary
+        role: literature_fixed_form
         provenance: literature_fixed
         reaction_as_printed: "NaO0.5(melt) = Na(gas) + 1/4 O2(gas)"
         reaction_source: De Maria et al. 1971
-        sample: "12065"
-        fNa_equil_atm: "exp(31.34 - 70400/T)"
-        fO2_equil_atm: "exp(18.24 - 53813/T)"
-        C_NaO0_5_wt_pct: "0.29"
-        C_NaO0_5_range_wt_pct: "0.24-0.39"
-        C_NaO0_5_source: Lunar Sample Compendium
-        K_Na: "exp(37.14 - 83853/T)"
+        reaction_equation: "B.1"
+        general_form_as_printed: "K_Na = A exp(-B/T)"
+        general_form_equation: "B.7"
+        general_form_applies_to: "74220 orange glass, high-Ti basalt"
+        general_form_locator:
+          page: 144
+          published_page: 129
+          pdf_page_index: 143
+          equation: "B.7"
         surface_form_as_printed: "Ce = a0 * exp(b0/T)"
         surface_form_equation: "B.10"
+        surface_form_locator:
+          page: 144
+          published_page: 129
+          pdf_page_index: 143
+          equation: "B.10"
+        used_by_74220_fit: boundary_form_with_free_surface_coefficients
+        not_the_numerical_K_Na: true
         ambient_fugacity: cannot_be_known_a_priori
         ambient_locator:
           page: 144
           published_page: 129
           pdf_page_index: 143
           equation: "B.10"
+    - observation_id: su_zhang_2023_model_na_k_12065
+      type: sample_specific_derived_parameter
+      units: "wt% and atm"
+      locator:
+        source_path: raw/su-2024-lunar-volatiles-thesis/su-2024-lunar-volatiles-thesis.pdf
+        source_sha256: 471f14fd7cf2c51aacb54d7104b94b893512c9bda1936b519e6fb03675eaa401
+        page: 144
+        published_page: 129
+        pdf_page_index: 143
+        section: "B.1"
+        equation: "B.6"
+      values:
+        quantity: equilibrium_constant
+        role: sample_specific_derived_number
+        provenance: derived_for_sample_12065
+        sample: "12065"
+        not_a_fixed_74220_input: true
+        derivation: >-
+          Equation B.6 combines De Maria et al. 1971 equilibrium fugacities
+          for lunar sample 12065 with an assumed surface concentration of
+          0.29 wt% NaO0.5. The 74220 fit does not take this number as an input.
+        reaction_source: De Maria et al. 1971
+        fNa_equil_atm: "exp(31.34 - 70400/T)"
+        fNa_equation: "B.3"
+        fNa_locator:
+          page: 143
+          published_page: 128
+          pdf_page_index: 142
+          equation: "B.3"
+        fO2_equil_atm: "exp(18.24 - 53813/T)"
+        fO2_equation: "B.4"
+        fO2_locator:
+          page: 143
+          published_page: 128
+          pdf_page_index: 142
+          equation: "B.4"
+        C_NaO0_5_wt_pct: "0.29"
+        C_NaO0_5_range_wt_pct: "0.24-0.39"
+        C_NaO0_5_source: Lunar Sample Compendium
+        C_NaO0_5_assumption: surface concentration assumed equal to bulk 12065
+        K_Na: "exp(37.14 - 83853/T)"
+        K_Na_equation: "B.6"
+        K_Na_basis: NaO0.5 concentration in wt% and fugacities in atm
     - observation_id: su_zhang_2023_model_na_diffusivity
       type: literature_fixed_model_input
       units: m2/s
@@ -100176,7 +100159,6 @@ species:
     - observation_id: su_zhang_2023_model_na_surface_parameters
       type: author_fitted_model_parameter
       units: "wt% and K"
-      uncertainty: "Table 3.1 caption: brackets are ±1 standard error on the last significant digits."
       locator:
         source_path: raw/su-2024-lunar-volatiles-thesis/su-2024-lunar-volatiles-thesis.pdf
         source_sha256: 471f14fd7cf2c51aacb54d7104b94b893512c9bda1936b519e6fb03675eaa401
@@ -100186,17 +100168,20 @@ species:
         pdf_page_index: 77
       values:
         quantity: surface_boundary_parameters
+        role: fitted_coefficients
         provenance: fitted_to_these_profiles
         fit_scope: in_sample
+        parameter_names:
+        - a0
+        - b0
         shared_across_beads: true
-        a0_as_printed: "0.145(3)"
-        a0_wt_pct: "0.145"
-        a0_standard_error_wt_pct: "0.003"
-        b0_as_printed: "1183(33)"
-        b0_K: "1183"
-        b0_standard_error_K: "33"
         boundary_form: "Ce = a0 * exp(b0/T)"
-        bracket_place_rule: "parentheses are ±1 standard error on the last significant digits"
+        boundary_form_role: >-
+          The 74220 fit uses the Appendix B boundary form with these free
+          surface coefficients. It does not use the sample-12065 numerical K_Na.
+        not_the_12065_K_Na: true
+        table_path: tables/su-2024-lunar-volatiles-thesis/t3-1.csv
+        table_sha256: "1a4cb24bcd21e09ba1c5c7560ae633fc22558b435ebb2a9b9b3213162a0629e9"
   K2O:
     observations:
     - observation_id: su_zhang_2023_table_s2_empa_k2o_profile
@@ -126746,7 +126731,6 @@ species:
     - observation_id: su_zhang_2023_model_cu_surface_parameters
       type: author_fitted_model_parameter
       units: "ppm and K"
-      uncertainty: "Table 3.1 caption: brackets are ±1 standard error on the last significant digits."
       locator:
         source_path: raw/su-2024-lunar-volatiles-thesis/su-2024-lunar-volatiles-thesis.pdf
         source_sha256: 471f14fd7cf2c51aacb54d7104b94b893512c9bda1936b519e6fb03675eaa401
@@ -126756,14 +126740,16 @@ species:
         pdf_page_index: 77
       values:
         quantity: surface_boundary_parameters
+        role: fitted_coefficients
         provenance: fitted_to_these_profiles
         fit_scope: in_sample
+        parameter_names:
+        - a0
+        - b0
         shared_across_beads: true
-        a0_as_printed: "0.011(2)"
-        a0_ppm: "0.011"
-        a0_standard_error_ppm: "0.002"
-        b0_as_printed: "6001(236)"
-        b0_K: "6001"
-        b0_standard_error_K: "236"
         boundary_form: "Ce = a0 * exp(b0/T)"
-        bracket_place_rule: "parentheses are ±1 standard error on the last significant digits"
+        boundary_form_role: >-
+          The 74220 fit uses the Appendix B boundary form with these free
+          surface coefficients. It does not use a fixed numerical K_Na.
+        table_path: tables/su-2024-lunar-volatiles-thesis/t3-1.csv
+        table_sha256: "1a4cb24bcd21e09ba1c5c7560ae633fc22558b435ebb2a9b9b3213162a0629e9"
