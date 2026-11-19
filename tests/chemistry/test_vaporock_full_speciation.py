@@ -314,13 +314,14 @@ def test_installed_vaporock_oxide_activity_matches_native_lna_and_pure_limit():
         pytest.skip("VapoRock optional dependency unavailable")
 
     result = backend.equilibrate(
-        1600.0,
+        1600.0 - 273.15,
         composition_kg=composition,
         fO2_log=-8.0,
         pressure_bar=1e-6,
         include_oxide_activities=True,
     )
     assert result.status == "non_authoritative"
+    assert result.diagnostics["temperature_K"] == pytest.approx(1600.0)
     assert result.pressure_bar == pytest.approx(1e-6)
     assert result.vapor_pressures_Pa == {}
     assert result.diagnostics["pressure_control_authoritative"] is False
@@ -347,7 +348,7 @@ def test_installed_vaporock_oxide_activity_matches_native_lna_and_pure_limit():
     for oxide, activity in activities.items():
         # The library reports ln(a); exponentiation gives its dimensionless a.
         expected = math.exp(float(ln_activity[columns.index(oxide)][0]))
-        assert activity == pytest.approx(expected, rel=1e-12)
+        assert activity == pytest.approx(expected, rel=1e-12), oxide
 
     # These are precisely the parent oxides that the existing MELTS domain
     # owner admits as liquid oxide endmembers (H2O is outside VapoRock's
