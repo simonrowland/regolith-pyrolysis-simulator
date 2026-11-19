@@ -46,6 +46,45 @@ species:
         table: '2'
       phase: l
       regime: kems_effusion
+      point_conditions:
+        technique:
+          state:
+            tag: value
+            value: mass_spectrometry
+          locator:
+            page: 2
+            published_page: 2
+            pdf_page_index: 1
+            section: Experimental details
+            note: "The paper says the study used the Knudsen effusion mass spectrometry method on an MS-1301 mass spectrometer."
+        comparison:
+          state:
+            tag: value
+            value: multiple_cell_or_successive_pure_reference_sample
+          locator:
+            page: 4
+            published_page: 4
+            pdf_page_index: 3
+            note: "The paper says the sample was in one cell of the twin cell and pure sodium borate or boron oxide was placed in the other cell alternately."
+        sensitivity:
+          state:
+            tag: value
+            value: stable
+          locator:
+            page: 4
+            published_page: 4
+            pdf_page_index: 3
+            note: "The alternating pure sodium borate or boron oxide reference cell provides a same-run reference check; this supports the cited stable-sensitivity judgment."
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            section: Equations 6 and 7
+            note: "Equations 6 and 7 define NaBO2 and B2O3 activities as sample-to-pure-standard partial-pressure and ion-current ratios."
       standard_state: Pure sodium borate activity standard; physical reference phase not stated in the source.
       units: dimensionless activity as printed
       values:
@@ -3356,6 +3395,45 @@ species:
         table: '2'
       phase: l
       regime: kems_effusion
+      point_conditions:
+        technique:
+          state:
+            tag: value
+            value: mass_spectrometry
+          locator:
+            page: 2
+            published_page: 2
+            pdf_page_index: 1
+            section: Experimental details
+            note: "The paper says the study used the Knudsen effusion mass spectrometry method on an MS-1301 mass spectrometer."
+        comparison:
+          state:
+            tag: value
+            value: multiple_cell_or_successive_pure_reference_sample
+          locator:
+            page: 4
+            published_page: 4
+            pdf_page_index: 3
+            note: "The paper says the sample was in one cell of the twin cell and pure sodium borate or boron oxide was placed in the other cell alternately."
+        sensitivity:
+          state:
+            tag: value
+            value: stable
+          locator:
+            page: 4
+            published_page: 4
+            pdf_page_index: 3
+            note: "The alternating pure sodium borate or boron oxide reference cell provides a same-run reference check; this supports the cited stable-sensitivity judgment."
+        activity_method:
+          state:
+            tag: value
+            value: direct_comparison
+          locator:
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            section: Equations 6 and 7
+            note: "Equations 6 and 7 define NaBO2 and B2O3 activities as sample-to-pure-standard partial-pressure and ion-current ratios."
       standard_state: Pure boron oxide activity standard; physical reference phase not stated in the source.
       units: dimensionless activity as printed
       values:
@@ -6545,6 +6623,35 @@ species:
         table: '2'
       phase: l
       regime: kems_effusion
+      point_conditions:
+        technique:
+          state:
+            tag: value
+            value: mass_spectrometry
+          locator:
+            page: 2
+            published_page: 2
+            pdf_page_index: 1
+            section: Experimental details
+            note: "The paper says the study used the Knudsen effusion mass spectrometry method on an MS-1301 mass spectrometer."
+        comparison:
+          state:
+            tag: value
+            value: multiple_cell_or_successive_pure_reference_sample
+          locator:
+            page: 4
+            published_page: 4
+            pdf_page_index: 3
+            note: "The paper says the sample was in one cell of the twin cell and pure sodium borate or boron oxide was placed in the other cell alternately."
+        sensitivity:
+          state:
+            tag: value
+            value: stable
+          locator:
+            page: 4
+            published_page: 4
+            pdf_page_index: 3
+            note: "The alternating pure sodium borate or boron oxide reference cell provides a same-run reference check; this supports the cited stable-sensitivity judgment."
       standard_state: Gibbs–Duhem-derived activity; reference phase and standard-state basis not stated in the source.
       units: dimensionless activity as printed
       values:

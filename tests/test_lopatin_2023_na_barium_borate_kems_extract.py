@@ -9,6 +9,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import MethodToken, Quantity
+from simulator.battery.method_class_bands import _located_fact
 from simulator.battery.validity import effusion_regime_unverified
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -245,3 +246,57 @@ def test_table2_points_migrate_with_compositions_and_deferred_figures(tmp_path: 
     assert all(record["values"]["digitisation"] == "deferred to a figure pass" for record in figures)
     activity_figures = {record["locator"]["figure"]: record for record in figures if record["locator"]["figure"] in {"6", "7"}}
     assert {key: record["values"]["quantity"] for key, record in activity_figures.items()} == {"6": "activity", "7": "activity"}
+
+
+def test_located_applicability_facts_reach_each_migrated_activity_row(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    migrated = _migrate_real_extract(tmp_path, EXTRACT.name)
+    observations = [
+        row for row in migrated.observations.values() if row.source_id == SID
+    ]
+    assert migrated.validation is not None
+    assert not migrated.validation.hard_issues
+
+    direct_source_ids = (
+        "lopatin_2023_table2_NaBO2_activity",
+        "lopatin_2023_table2_B2O3_activity",
+    )
+    direct_activity_rows = [
+        row
+        for row in observations
+        if any(
+            row.observation_id.startswith(f"{SID}::{record_id}::")
+            for record_id in direct_source_ids
+        )
+    ]
+    assert direct_activity_rows
+    for row in direct_activity_rows:
+        experiment = migrated.experiments[row.experiment_id]
+        assert _located_fact(row, experiment, "technique") == "mass_spectrometry"
+        assert _located_fact(row, experiment, "comparison") == (
+            "multiple_cell_or_successive_pure_reference_sample"
+        )
+        assert _located_fact(row, experiment, "sensitivity") == "stable"
+        assert _located_fact(row, experiment, "activity_method") == (
+            "direct_comparison"
+        )
+
+    integrated_activity_rows = [
+        row
+        for row in observations
+        if row.observation_id.startswith(
+            f"{SID}::lopatin_2023_table2_BaB2O4_activity::"
+        )
+    ]
+    assert integrated_activity_rows
+    assert all(
+        _located_fact(
+            row,
+            migrated.experiments[row.experiment_id],
+            "activity_method",
+        ) is None
+        for row in integrated_activity_rows
+    )
