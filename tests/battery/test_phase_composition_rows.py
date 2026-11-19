@@ -2872,10 +2872,27 @@ def test_openimcc_reports_missing_non_fe_redox_couples() -> None:
         ),
     )
     for index, (formula, basis, expected_couple) in enumerate(missing_bases):
+        identity = _valence_identity(formula, basis)
+        if formula == "Mn":
+            # The candidate route requires total Fe before checking pinned
+            # Mn coverage. Supply both elements so this asserts coverage.
+            composition = Composition(
+                basis="test_candidate_oxide_mass_percent",
+                components=(
+                    ("SiO2", Decimal("70")),
+                    ("MgO", Decimal("20")),
+                    ("FeO", Decimal("7")),
+                    ("MnO", Decimal("3")),
+                ),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            )
+            identity = replace(
+                identity, composition=State.of(composition)
+            )
         observation = F.observation(
             f"missing-openimcc-couple-{index}",
             "sample-1",
-            _valence_identity(formula, basis),
+            identity,
             Decimal("0.5"),
             evidence=EvidenceClass.MEASURED_DIRECT,
             source_id="fixture-phase-source",
@@ -2888,7 +2905,11 @@ def test_openimcc_reports_missing_non_fe_redox_couples() -> None:
         assert prediction.refusal_detail["reason"] == (
             "openimcc_redox_couple_not_in_pinned_pack"
         )
-        assert expected_couple in prediction.refusal_detail["detail"]
+        if formula == "Mn":
+            assert prediction.refusal_detail["modelled_states"] == (2,)
+            assert prediction.refusal_detail["unmodelled_states"] == (3,)
+        else:
+            assert expected_couple in prediction.refusal_detail["detail"]
 
 
 def test_other_fe_valence_forms_stay_refused(

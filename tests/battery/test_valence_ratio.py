@@ -3,6 +3,7 @@ from collections import Counter
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -91,6 +92,45 @@ def _identity(basis: ValenceBasis) -> Identity:
         species=Species("Cr", Phase.L),
         valence_basis=State.of(basis),
     )
+
+
+def test_openimcc_candidate_ledger_matches_pre_move_cr_ti_projection():
+    from simulator.battery.score import _openimcc_candidate_valence_value
+
+    cases = (
+        (
+            _identity(parse_valence_basis("Cr2plus_over_total_Cr")),
+            SimpleNamespace(
+                chromous_cr_mol=0.0002444200024627717,
+                chromic_cr_mol=0.026073239410179725,
+                element_moles_by_oxidation_state={
+                    "Cr": {2: 0.0002444200024627717, 3: 0.026073239410179725}
+                },
+            ),
+            (2, 3),
+            lambda output: output.chromous_cr_mol
+            / (output.chromous_cr_mol + output.chromic_cr_mol),
+        ),
+        (
+            replace(
+                _identity(parse_valence_basis("Ti3plus_over_Ti4plus")),
+                species=Species("Ti", Phase.L),
+            ),
+            SimpleNamespace(
+                titanous_ti_mol=0.0002885915704367488,
+                titanic_ti_mol=0.024753667241308078,
+                element_moles_by_oxidation_state={
+                    "Ti": {3: 0.0002885915704367488, 4: 0.024753667241308078}
+                },
+            ),
+            (3, 4),
+            lambda output: output.titanous_ti_mol / output.titanic_ti_mol,
+        ),
+    )
+    for identity, output, states, legacy_projection in cases:
+        projected = _openimcc_candidate_valence_value(identity, output, states)
+        assert projected is not None
+        assert Decimal(str(projected)) == Decimal(str(legacy_projection(output)))
 
 
 @pytest.mark.parametrize(
@@ -757,6 +797,10 @@ def test_openimcc_candidate_pins_legacy_cr_output_and_refuses_unmodelled_total(
     )
     assert ledger_fraction is not None
     assert Decimal(str(ledger_fraction)) == Decimal("0.009287300159578668")
+    legacy_fraction = output.chromous_cr_mol / (
+        output.chromous_cr_mol + output.chromic_cr_mol
+    )
+    assert Decimal(str(ledger_fraction)) == Decimal(str(legacy_fraction))
     chromium_coverage = next(
         entry
         for entry in output.unmodelled_redox_couples
@@ -770,6 +814,20 @@ def test_openimcc_candidate_pins_legacy_cr_output_and_refuses_unmodelled_total(
         "openimcc_redox_couple_not_in_pinned_pack"
     )
     assert prediction.refusal_detail["unmodelled_states"] == (6,)
+
+    # Cr(III)/Cr(II) is a supported pair in the pinned pack. Exercise the
+    # public predictor and pin its numeric projection from the legacy fields.
+    pair_basis = parse_valence_basis("Cr3plus_over_Cr2plus", species_formula="Cr")
+    pair_observation = replace(
+        observation,
+        identity=replace(
+            observation.identity, valence_basis=State.of(pair_basis)
+        ),
+    )
+    pair_prediction = predict_with_engine(
+        Engine.OPENIMCC, pair_observation, experiment=experiment
+    )
+    assert pair_prediction.value == Decimal("106.6739184496613")
 
 
 def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
@@ -839,6 +897,8 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
     assert output.titanous_ti_mol == 0.0002885915704367488
     assert output.titanic_ti_mol == 0.024753667241308078
     assert prediction.value == Decimal("0.011658538010689464")
+    legacy_ratio = output.titanous_ti_mol / output.titanic_ti_mol
+    assert Decimal(str(prediction.value)) == Decimal(str(legacy_ratio))
 
 
 def test_openimcc_refuses_mn_rows_when_pinned_pack_omits_mn3(

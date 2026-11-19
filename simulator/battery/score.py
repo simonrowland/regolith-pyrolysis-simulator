@@ -12340,9 +12340,10 @@ def _predict_named_fe_valence(
     Fe3+/Fe2+ (ratio form) is already R. Fe3+/sumFe (fraction form) is
     scored as R = r/(1-r) after the engine returns R; r outside (0, 1)
     is refused here, before the engine. OpenIMCC's pinned candidate pack also
-    reports Cr(II/III), Ti(III/IV), and Mn(II/III) in its generic oxidation-
-    state ledger; other non-Fe couples and unsupported iron printings stay
-    refused.
+    reports Cr(II/III) and Ti(III/IV) in its generic oxidation-state ledger.
+    Mn(II/III) is a dispatched candidate couple; pinned coverage models (2,)
+    and leaves (3,) unmodelled. Other non-Fe couples and unsupported iron
+    printings stay refused.
     """
 
     form = _fe_valence_named_form(identity)
