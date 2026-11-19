@@ -58,6 +58,35 @@ def test_activity_tables_and_appendix_compositions_are_typed_and_located():
 
     observations = document["species"]["CrO"]["observations"]
     assert len(observations) == 386
+    activity_rows = [
+        row
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row.get("values", {}).get("quantity") == "activity"
+    ]
+    assert len(activity_rows) == 135
+    assert all(
+        row["values"]["method_class"] == "model_derived"
+        and (
+            row["locator"]["page"],
+            row["locator"]["published_page"],
+            row["locator"]["table"],
+        )
+        in {(3, 1366, "II"), (7, 1370, "III")}
+        for row in activity_rows
+    )
+    mutated = deepcopy(document)
+    mutated_activity_rows = [
+        row
+        for species in mutated["species"].values()
+        for row in species["observations"]
+        if row.get("values", {}).get("quantity") == "activity"
+    ]
+    mutated_activity_rows[0]["values"]["method_class"] = "measured_direct"
+    assert not all(
+        row["values"]["method_class"] == "model_derived"
+        for row in mutated_activity_rows
+    )
     activity = _observation(
         document,
         "CrO",
