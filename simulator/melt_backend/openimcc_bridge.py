@@ -261,6 +261,44 @@ class OpenImccGasParentActivityRefusal(ValueError):
         super().__init__(detail)
 
 
+def _openimcc_gas_parent_from_reaction(
+    channel: str, reaction: object,
+) -> str | None:
+    if reaction is None:
+        return None
+    if (
+        not isinstance(reaction, tuple)
+        or len(reaction) != 3
+        or not isinstance(reaction[0], str)
+        or not reaction[0]
+    ):
+        raise OpenImccGasParentActivityRefusal(
+            "openimcc_gas_parent_metadata_unavailable",
+            f"OpenIMCC reaction metadata for {channel!r} is not a parent tuple",
+            refusal_reason="outside_supported_species",
+        )
+    return reaction[0]
+
+
+def _openimcc_gas_parent_oxide_for_channel(channel: str) -> str | None:
+    """Resolve one gas channel's parent oxide from the installed OpenIMCC pin."""
+
+    _require_openimcc()
+    try:
+        from openimcc import gas as gas_module
+
+        gas_reactions = gas_module._GAS_REACTIONS
+    except (AttributeError, ImportError) as exc:
+        raise OpenImccGasParentActivityRefusal(
+            "openimcc_gas_parent_metadata_unavailable",
+            f"OpenIMCC gas parent metadata is unavailable: {exc}",
+            refusal_reason="outside_supported_species",
+        ) from exc
+    return _openimcc_gas_parent_from_reaction(
+        str(channel), gas_reactions.get(str(channel))
+    )
+
+
 def openimcc_reservoir_gas_parent_activity(
     channel: str,
     reservoir: tuple[str, str] | None,
@@ -289,24 +327,14 @@ def openimcc_reservoir_gas_parent_activity(
             refusal_reason="outside_supported_species",
         ) from exc
 
-    reaction = gas_reactions.get(str(channel))
-    if reaction is None:
-        return None
     # Pin 979adb2 stores reaction metadata as (parent, exponent, oxygen)
     # tuples. Its private _side_parent helper resolves the separate side-oxide
     # table; neither value is an attribute on the reaction tuple.
-    if (
-        not isinstance(reaction, tuple)
-        or len(reaction) != 3
-        or not isinstance(reaction[0], str)
-        or not reaction[0]
-    ):
-        raise OpenImccGasParentActivityRefusal(
-            "openimcc_gas_parent_metadata_unavailable",
-            f"OpenIMCC reaction metadata for {channel!r} is not a parent tuple",
-            refusal_reason="outside_supported_species",
-        )
-    parent = reaction[0]
+    parent = _openimcc_gas_parent_from_reaction(
+        str(channel), gas_reactions.get(str(channel))
+    )
+    if parent is None:
+        return None
     try:
         side_parent = side_parent_for_species(str(channel))
     except (KeyError, TypeError, ValueError) as exc:
@@ -321,8 +349,6 @@ def openimcc_reservoir_gas_parent_activity(
             f"OpenIMCC side parent for {channel!r} is not a species string",
             refusal_reason="outside_supported_species",
         )
-    if not isinstance(parent, str) or not parent:
-        return None
     if parent in OPENIMCC_PARENT_OXIDES:
         return None
     reservoir_formula, reservoir_phase = reservoir
@@ -1673,7 +1699,10 @@ def _openimcc_gas_parent_inputs(
                     "species": parent,
                     "activity": activity,
                     "activity_model": activity_model,
-                    "reason": "zero trace activity is absent, not a gas parent",
+                    "reason": (
+                        f"zero trace activity for {parent} is absent, "
+                        "not a gas parent"
+                    ),
                 }
             )
             continue
@@ -1685,7 +1714,10 @@ def _openimcc_gas_parent_inputs(
                     "species": parent,
                     "activity": activity,
                     "activity_model": activity_model,
-                    "reason": _OPENIMCC_TRACE_GAS_PARENT_STANDARD_REASON,
+                    "reason": (
+                        f"trace parent {parent}: "
+                        f"{_OPENIMCC_TRACE_GAS_PARENT_STANDARD_REASON}"
+                    ),
                 }
             )
             continue
@@ -1696,7 +1728,10 @@ def _openimcc_gas_parent_inputs(
                     "species": parent,
                     "activity": activity,
                     "activity_model": activity_model,
-                    "reason": _OPENIMCC_TRACE_GAS_PARENT_ENGINE_MISMATCH_REASON,
+                    "reason": (
+                        f"trace parent {parent}: "
+                        f"{_OPENIMCC_TRACE_GAS_PARENT_ENGINE_MISMATCH_REASON}"
+                    ),
                 }
             )
             continue

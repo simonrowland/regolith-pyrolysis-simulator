@@ -2879,19 +2879,23 @@ def _openimcc_vapour_observation(
     )
 
 
-def _openimcc_trace_gas_melt_composition(trace_oxide: str) -> Composition:
+def _openimcc_trace_gas_melt_composition(
+    trace_oxide: str | tuple[str, ...],
+) -> Composition:
+    trace_oxides = (trace_oxide,) if isinstance(trace_oxide, str) else trace_oxide
+    silica = Decimal("0.604") - Decimal("0.001") * (len(trace_oxides) - 1)
     return Composition(
         basis="ordered_complete_mole_inventory",
         components=(
             ("Na2O", Decimal("0.08")),
             ("K2O", Decimal("0.01")),
-            ("SiO2", Decimal("0.604")),
+            ("SiO2", silica),
             ("FeO", Decimal("0.12")),
             ("MgO", Decimal("0.12")),
             ("CaO", Decimal("0.04")),
             ("Al2O3", Decimal("0.02")),
             ("TiO2", Decimal("0.005")),
-            (trace_oxide, Decimal("0.001")),
+            *((oxide, Decimal("0.001")) for oxide in trace_oxides),
         ),
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
@@ -3028,6 +3032,45 @@ def test_openimcc_kems_standard_trace_parent_is_not_applied_to_gas(
     assert prediction.refusal_detail["reason"] == (
         "openimcc_trace_gas_parent_standard_unverified"
     )
+
+
+def test_openimcc_mixed_trace_refusals_follow_each_vapour_parent() -> None:
+    _require_openimcc()
+    composition = _openimcc_trace_gas_melt_composition(
+        ("Ga2O3", "S", "Ag2O")
+    )
+    expected = {
+        "Ga": (
+            "openimcc_trace_gas_parent_standard_unverified",
+            "Ga2O3",
+        ),
+        "S": (
+            "openimcc_trace_gas_carrier_mismatch",
+            "S",
+        ),
+        "Ag": (
+            "openimcc_trace_gas_parent_engine_parent_mismatch",
+            "Ag2O",
+        ),
+    }
+
+    for vapour_formula, (reason, parent) in expected.items():
+        observation = _openimcc_vapour_observation(
+            vapour_formula=vapour_formula,
+            reservoir=None,
+            composition=composition,
+            temperature_K=Decimal("1800"),
+        )
+        prediction = predict_with_engine(
+            Engine.OPENIMCC,
+            observation,
+            isolated=False,
+        )
+
+        assert prediction.value is None
+        assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+        assert prediction.refusal_detail["reason"] == reason
+        assert parent in prediction.refusal_detail["explanation"]
 
 
 def test_openimcc_unmodelled_trace_parent_still_refuses() -> None:

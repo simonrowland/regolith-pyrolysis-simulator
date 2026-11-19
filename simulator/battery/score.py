@@ -15744,19 +15744,52 @@ def _predict_with_engine(
             refusal_reason = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
             detail["reason"] = RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value
             detail["engine"] = "openimcc gas tables"
+            trace_notice_rows = tuple(
+                row
+                for row in (getattr(cell, "notices", None) or ())
+                if isinstance(row, Mapping)
+                and str(row.get("kind") or "").startswith(
+                    "openimcc_trace_gas_"
+                )
+            )
             trace_notice = next(
                 (
-                    notice.reason
-                    for notice in notices
-                    if notice.reason.startswith("openimcc_trace_gas_")
+                    row
+                    for row in trace_notice_rows
+                    if str(row.get("species") or "") == formula
                 ),
                 None,
             )
+            if trace_notice is None and trace_notice_rows:
+                from simulator.melt_backend.openimcc_bridge import (
+                    OpenImccGasParentActivityRefusal,
+                    OpenImccUnavailableError,
+                    _openimcc_gas_parent_oxide_for_channel,
+                )
+
+                try:
+                    gas_parent_oxide = (
+                        _openimcc_gas_parent_oxide_for_channel(formula)
+                    )
+                except (
+                    OpenImccGasParentActivityRefusal,
+                    OpenImccUnavailableError,
+                ):
+                    gas_parent_oxide = None
+                trace_notice = next(
+                    (
+                        row
+                        for row in trace_notice_rows
+                        if gas_parent_oxide is not None
+                        and str(row.get("species") or "") == gas_parent_oxide
+                    ),
+                    None,
+                )
             if trace_notice is not None:
-                reason_code, _, explanation = trace_notice.partition(":")
-                detail["reason"] = reason_code
-                if explanation.strip():
-                    detail["explanation"] = explanation.strip()
+                detail["reason"] = str(trace_notice["kind"])
+                explanation = str(trace_notice.get("reason") or "")
+                if explanation:
+                    detail["explanation"] = explanation
         return EnginePrediction(
             engine=engine,
             channel=channel,
