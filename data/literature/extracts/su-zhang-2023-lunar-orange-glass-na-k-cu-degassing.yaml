@@ -40,8 +40,8 @@ extraction:
     mixed_provenance_boundary, not one literature-fixed input. Equation B.1, NaO0.5(melt) = Na(gas) + 1/4 O2(gas), is literature
     from De Maria et al. 1971. Equation B.7, K_Na = A exp(-B/T), is an authors_expectation. The more general form is expected to
     also apply to Na vapor pressure of orange glass beads (high-Ti basalt) in lunar sample 74220. Equation B.10,
-    Ce = a0 * exp(b0/T), is an authors_assumption obtained only if ambient sodium and oxygen fugacities vary with temperature in
-    the form of exp(a-b/T) as in Eqs. B.3 and B.4; those ambient fugacities cannot be known a priori. The numerical K_Na in
+    Ce = a0 * exp(b0/T), is an authors_assumption obtained under the assumed temperature dependence that ambient sodium and oxygen fugacities vary with temperature in
+    the form of exp(a-b/T) as in Eqs. B.3 and B.4. If those fugacities vary in that form, then C_e has the form of Equation B.10. Those ambient fugacities cannot be known a priori. The numerical K_Na in
     Equation B.6 is a sample_specific_derived_parameter for lunar sample 12065, from De Maria fugacities and an assumed 0.29 wt%
     surface concentration, not a fixed 74220 input. The 74220 Na and Cu surface coefficients and the per-bead cooling time scales
     are author_fitted_model_parameter fitted to these profiles. Chapter 3 Eq. 3.3 uses that author-selected form with free fitting
@@ -100100,9 +100100,11 @@ species:
         surface_coefficients_as_printed: >-
           The boundary condition assumes that the concentration of Na or Cu
           on the bead surface is in equilibrium with the transient atmosphere,
-          and is modeled as C_e = a0 * exp(b0/T). a0 and b0 are two fitting
-          parameters because Na or Cu vapor pressure in the local atmosphere
-          (or volcanic plume) is not known.
+          and is modeled as follows: C_e = a0 * exp(b0/T), at r = a, where
+          C_e is the concentration of the volatile element at the surface of
+          the bead (r = a), a0 and b0 are two fitting parameters because Na
+          or Cu vapor pressure in the local atmosphere (or volcanic plume) is
+          not known, and T is the temperature of the bead.
         surface_coefficients_records:
         - su_zhang_2023_model_na_surface_parameters
         - su_zhang_2023_model_cu_surface_parameters

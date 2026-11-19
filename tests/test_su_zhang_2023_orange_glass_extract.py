@@ -36,6 +36,22 @@ THESIS_SID = "su-2024-lunar-volatiles-thesis"
 THESIS_SHA = "471f14fd7cf2c51aacb54d7104b94b893512c9bda1936b519e6fb03675eaa401"
 THESIS_ASSET = f"raw/{THESIS_SID}/{THESIS_SID}.pdf"
 TABLE_3_1_ASSET = "tables/su-2024-lunar-volatiles-thesis/t3-1.csv"
+TABLE_3_1_COMPANION_COMMIT = "c9d38e02737fd28961d1a631f59c49196fc796c4"
+TABLE_3_1_COMPANION_REF = "refs/heads/w1119szc2-su2024-table-3-1"
+_SURFACE_FORM_CONDITION = (
+    "If f_Na,ambient and f_O2,ambient vary with temperature in the form "
+    "of exp(a-b/T) as in Eqs. (B.3) and (B.4), then C_e would have the "
+    "form C_e = a0 * exp(b0/T)."
+)
+_SURFACE_COEFFICIENTS_AS_PRINTED = (
+    "The boundary condition assumes that the concentration of Na or Cu "
+    "on the bead surface is in equilibrium with the transient atmosphere, "
+    "and is modeled as follows: C_e = a0 * exp(b0/T), at r = a, where "
+    "C_e is the concentration of the volatile element at the surface of "
+    "the bead (r = a), a0 and b0 are two fitting parameters because Na "
+    "or Cu vapor pressure in the local atmosphere (or volcanic plume) is "
+    "not known, and T is the temperature of the bead."
+)
 WORKBOOK_ASSET = f"raw/{SID}/{SID}.xlsx"
 
 
@@ -830,6 +846,8 @@ def _assert_model_context(document: dict) -> None:
     assert "authors_expectation" in scope_note
     assert "expected to also apply" in scope_note
     assert "authors_assumption" in scope_note
+    assert "obtained under the assumed temperature dependence" in scope_note
+    assert "obtained only if" not in scope_note
     assert "cannot be known a priori" in scope_note
     assert "fitted to these profiles" in scope_note
     assert (
@@ -924,12 +942,16 @@ def _assert_model_context(document: dict) -> None:
     assert boundary["values"]["surface_form_role"] == "authors_assumption"
     assert boundary["values"]["surface_form_as_printed"] == "Ce = a0 * exp(b0/T)"
     assert boundary["values"]["surface_form_equation"] == "B.10"
-    condition = boundary["values"]["surface_form_condition_as_printed"]
-    assert "exp(a-b/T)" in condition
-    assert "Eqs. (B.3) and (B.4)" in condition
+    assert (
+        boundary["values"]["surface_form_condition_as_printed"]
+        == _SURFACE_FORM_CONDITION
+    )
     assert boundary["values"]["surface_coefficients_role"] == "fitted_to_these_profiles"
     assert boundary["values"]["surface_coefficients_equation"] == "3.3"
-    assert "two fitting parameters" in boundary["values"]["surface_coefficients_as_printed"]
+    assert (
+        boundary["values"]["surface_coefficients_as_printed"]
+        == _SURFACE_COEFFICIENTS_AS_PRINTED
+    )
     assert boundary["values"]["surface_coefficients_records"] == [
         "su_zhang_2023_model_na_surface_parameters",
         "su_zhang_2023_model_cu_surface_parameters",
@@ -1054,9 +1076,10 @@ def test_model_context_pins_printed_inputs_and_table_3_1() -> None:
 def _assert_fitted_boundary_form(row: dict) -> None:
     role = row["values"]["boundary_form_role"]
     assert row["values"]["provenance"] == "fitted_to_these_profiles"
-    assert "fitting parameters" in role
+    assert "not a literature-fixed input" in role
+    assert "is a literature-fixed input" not in role
+    assert "free fitting parameters" in role
     assert "Eq. B.10" in role
-    assert "literature-fixed input" in role
     assert "Appendix B boundary form" not in role
 
 
@@ -1106,7 +1129,58 @@ def test_boundary_surface_assumption_mutation_is_detected() -> None:
     boundary["values"]["surface_form_condition_as_printed"] = (
         "Ce = a0 * exp(b0/T) is the 74220 boundary."
     )
-    with pytest.raises(AssertionError, match="exp\\(a-b/T\\)"):
+    with pytest.raises(AssertionError, match="then C_e would have the form"):
+        _assert_model_context(document)
+
+
+def test_scope_note_only_if_wording_is_detected() -> None:
+    document = deepcopy(_document())
+    document["extraction"]["scope_note"] = document["extraction"]["scope_note"].replace(
+        "obtained under the assumed temperature dependence",
+        "obtained only if",
+    )
+    with pytest.raises(
+        AssertionError, match="obtained under the assumed temperature dependence"
+    ):
+        _assert_model_context(document)
+
+
+def test_reversed_boundary_condition_and_fit_role_are_detected() -> None:
+    document = deepcopy(_document())
+    boundary = _context_row(
+        document, "Na2O", "su_zhang_2023_model_na_surface_boundary"
+    )
+    boundary["values"]["surface_form_condition_as_printed"] = (
+        "Unconditional, regardless of whether exp(a-b/T) in "
+        "Eqs. (B.3) and (B.4) applies."
+    )
+    with pytest.raises(AssertionError, match="then C_e would have the form"):
+        _assert_model_context(document)
+
+    document = deepcopy(_document())
+    fit = _context_row(
+        document, "Na2O", "su_zhang_2023_model_na_surface_parameters"
+    )
+    fit["values"]["boundary_form_role"] = (
+        "Eq. B.10 is a literature-fixed input with fitting parameters."
+    )
+    with pytest.raises(AssertionError, match="not a literature-fixed input"):
+        _assert_model_context(document)
+
+
+def test_surface_coefficients_paraphrase_mutation_is_detected() -> None:
+    document = deepcopy(_document())
+    boundary = _context_row(
+        document, "Na2O", "su_zhang_2023_model_na_surface_boundary"
+    )
+    boundary["values"]["surface_coefficients_as_printed"] = (
+        "The boundary condition assumes that the concentration of Na or Cu "
+        "on the bead surface is in equilibrium with the transient atmosphere, "
+        "and is modeled as C_e = a0 * exp(b0/T). a0 and b0 are two fitting "
+        "parameters because Na or Cu vapor pressure in the local atmosphere "
+        "(or volcanic plume) is not known."
+    )
+    with pytest.raises(AssertionError, match="at r = a"):
         _assert_model_context(document)
 
 
@@ -1131,10 +1205,20 @@ def _assert_table_3_1_cells(table_path: Path) -> None:
     assert footer[0]["mswd_as_printed"] == "2.91"
 
 
-def test_table_3_1_corpus_pin_reads_cells_from_corpus() -> None:
+def _table_3_1_or_skip() -> Path:
     table_path = _corpus_file(TABLE_3_1_ASSET)
-    if not table_path.is_file():
-        pytest.skip(f"corpus table not available: {table_path}")
+    if table_path.is_file():
+        return table_path
+    pytest.skip(
+        "landing dependency: corpus commit "
+        f"{TABLE_3_1_COMPANION_COMMIT} on {TABLE_3_1_COMPANION_REF} "
+        "is not on the corpus revision distributed to reviewers and CI; "
+        f"missing {table_path}"
+    )
+
+
+def test_table_3_1_corpus_pin_reads_cells_from_corpus() -> None:
+    table_path = _table_3_1_or_skip()
     document = _document()
     digest = hashlib.sha256(table_path.read_bytes()).hexdigest()
     for species, observation_id in (
@@ -1148,10 +1232,18 @@ def test_table_3_1_corpus_pin_reads_cells_from_corpus() -> None:
     _assert_table_3_1_cells(table_path)
 
 
+def test_table_3_1_absent_checkout_skips_named_landing_dependency(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path / "empty-corpus"))
+    with pytest.raises(pytest.skip.Exception, match=TABLE_3_1_COMPANION_COMMIT):
+        test_table_3_1_corpus_pin_reads_cells_from_corpus()
+    with pytest.raises(pytest.skip.Exception, match=TABLE_3_1_COMPANION_REF):
+        test_table_3_1_corpus_cell_mutation_is_detected(tmp_path)
+
+
 def test_table_3_1_corpus_cell_mutation_is_detected(tmp_path: Path) -> None:
-    table_path = _corpus_file(TABLE_3_1_ASSET)
-    if not table_path.is_file():
-        pytest.skip(f"corpus table not available: {table_path}")
+    table_path = _table_3_1_or_skip()
     mutated = tmp_path / "t3-1.csv"
     mutated.write_text(
         table_path.read_text(encoding="utf-8").replace("48(2)", "49(2)", 1),
