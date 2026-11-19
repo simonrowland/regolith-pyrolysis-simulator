@@ -2960,31 +2960,31 @@ def _magemin_backend_with_spied_engine_call(monkeypatch):
             {"Al2O3": 100.0},
             "out_of_domain",
             "silicate_window",
-            "MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%; reason=silicate_window; authority=extrapolated; certified_band=SiO2 [30, 80] wt%.",
+            "MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%; reason=silicate_window; positive SiO2 is required.",
         ),
         (
             {"MgO": 100.0},
             "out_of_domain",
             "silicate_window",
-            "MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%; reason=silicate_window; authority=extrapolated; certified_band=SiO2 [30, 80] wt%.",
+            "MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%; reason=silicate_window; positive SiO2 is required.",
         ),
         (
             {"CaO": 60.0, "Al2O3": 40.0},
             "out_of_domain",
             "silicate_window",
-            "MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%; reason=silicate_window; authority=extrapolated; certified_band=SiO2 [30, 80] wt%.",
+            "MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%; reason=silicate_window; positive SiO2 is required.",
         ),
         (
             {"Al2O3": 95.0, "Na2O": 5.0},
             "out_of_domain",
             "silicate_window",
-            "MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%; reason=silicate_window; authority=extrapolated; certified_band=SiO2 [30, 80] wt%.",
+            "MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%; reason=silicate_window; positive SiO2 is required.",
         ),
         (
             _basalt_like_bulk_at_sio2(0.0),
             "out_of_domain",
             "silicate_window",
-            "MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%; reason=silicate_window; authority=extrapolated; certified_band=SiO2 [30, 80] wt%.",
+            "MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%; reason=silicate_window; positive SiO2 is required.",
         ),
         # d-447: positive out-of-band silica is predicted and flagged.
         (

@@ -464,8 +464,9 @@ def test_provider_dispatch_preserves_domain_refusal_when_engine_unavailable(
         'silicate_window'
     )
     assert any(
-        'SiO2 = 0.00 wt% is outside MELTS calibration window '
-        '[30.0, 80.0] wt% (below the window).' in warning
+        'SiO2 = 0.00 wt% outside MELTS calibration range '
+        '[30.0, 80.0] wt%; reason=silicate_window; '
+        'positive SiO2 is required.' in warning
         for warning in result.warnings
     )
     assert engine_calls == []

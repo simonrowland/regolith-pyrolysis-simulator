@@ -390,7 +390,10 @@ def test_magemin_phi_curve_brackets_valid_request_near_silica_domain_edge():
         request.get("Na2O", 0.0) / 20.0
     )
     assert curve.points[-1][0] >= 0.01
-    assert all(call[3]["SiO2"] >= 30.0 for call in backend.calls)
+    # Positive out-of-band silica is now evaluated with extrapolated authority;
+    # only a zero-silica request remains a domain refusal.
+    assert all(call[3]["SiO2"] > 0.0 for call in backend.calls)
+    assert any(call[3]["SiO2"] < 30.0 for call in backend.calls)
 
 
 @pytest.mark.live_engine

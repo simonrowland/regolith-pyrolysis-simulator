@@ -1472,7 +1472,7 @@ def test_vapor_engine_labels_magemin_silicate_window_start_refusals() -> None:
     )
 
     valid, warnings, engine_reason = MAGEMinDomainGate.validate_with_reason(
-        {"SiO2": 20.0, "MgO": 80.0}
+        {"SiO2": 0.0, "MgO": 100.0}
     )
     assert not valid
     assert engine_reason == "silicate_window"

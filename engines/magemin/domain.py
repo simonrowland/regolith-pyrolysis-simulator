@@ -203,12 +203,19 @@ class MAGEMinDomainGate:
         if sio2 < _SIO2_MIN_WT_PCT or sio2 > _SIO2_MAX_WT_PCT:
             if sio2 <= 0.0:
                 reason = reason or OutOfDomainReason.SILICATE_WINDOW
-            warnings.append(
+            silica_warning = (
                 f'MAGEMinDomainGate: SiO2 = {sio2:.2f} wt% outside MELTS '
                 f'calibration range [{_SIO2_MIN_WT_PCT}, '
-                f'{_SIO2_MAX_WT_PCT}] wt%; reason=silicate_window; '
-                'authority=extrapolated; certified_band=SiO2 [30, 80] wt%.'
+                f'{_SIO2_MAX_WT_PCT}] wt%; reason=silicate_window;'
             )
+            if sio2 <= 0.0:
+                silica_warning += ' positive SiO2 is required.'
+            else:
+                silica_warning += (
+                    ' authority=extrapolated; '
+                    'certified_band=SiO2 [30, 80] wt%.'
+                )
+            warnings.append(silica_warning)
 
         # Check 4: major oxides total > 95 wt%.
         major_total = sum(
