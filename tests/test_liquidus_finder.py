@@ -63,6 +63,43 @@ def test_liquidus_finder_bisects_monotone_fraction_curve():
     assert result.iterations <= 64
 
 
+def test_liquidus_result_celsius_kelvin_conversion_is_pinned():
+    at_zero_celsius = LiquidusSolidusResult(liquidus_T_C=0.0)
+    at_zero_celsius_kelvin = LiquidusSolidusResult(liquidus_T_K=273.15)
+
+    assert at_zero_celsius.liquidus_T_K == pytest.approx(273.15)
+    assert at_zero_celsius_kelvin.liquidus_T_C == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize(
+    ("anchors", "missing_bracket"),
+    (
+        (
+            {800.0: 0.0, 900.0: 0.001, 1000.0: 0.2, 1100.0: 0.5, 1200.0: 1.0},
+            "solidus bracket absent",
+        ),
+        (
+            {800.0: 0.0, 900.0: 0.1, 1000.0: 0.5, 1100.0: 0.999, 1200.0: 1.0},
+            "liquidus bracket absent",
+        ),
+    ),
+)
+def test_liquidus_finder_does_not_treat_threshold_endpoint_as_crossing(
+    anchors: dict[float, float],
+    missing_bracket: str,
+):
+    result = find_liquidus_solidus_by_fraction(
+        _piecewise_fraction(anchors),
+        min_T_C=800.0,
+        max_T_C=1200.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == "not_converged"
+    assert any(missing_bracket in warning for warning in result.warnings)
+
+
 @pytest.mark.parametrize(
     'overrides',
     (
