@@ -4542,9 +4542,7 @@ def _evaluate_ordering(
     violations: list[dict[str, Any]] = []
     metric_by_T: list[dict[str, Any]] = []
     ranked_disclosures: list[Any] = []
-    # A shared row object is the same evaluator result surfaced by multiple
-    # species metrics; publishing it again would count one evaluation twice.
-    seen_rank_disclosure_rows: list[Mapping[str, Any]] = []
+    seen_rank_evaluations: set[tuple[Any, ...]] = set()
     for T_K in T_grid:
         metrics: dict[str, float] = {}
         refusals: dict[str, str] = {}
@@ -4554,14 +4552,40 @@ def _evaluate_ordering(
                 species, T_K, diagnostic_pO2, vp, melt_recipe
             )
             rank_disclosure_rows = rank_runtime.get("law_disclosures")
+            evaluation_identity = None
+            if (
+                rank_runtime.get("provider_id") == "builtin-vapor-pressure"
+                and isinstance(rank_runtime.get("account_mol"), Mapping)
+            ):
+                try:
+                    evaluation_identity = (
+                        round(float(rank_runtime["temperature_K"]), 6),
+                        float(rank_runtime["pO2_bar"]),
+                        tuple(sorted(
+                            (
+                                str(name),
+                                round(float(amount), 12),
+                            )
+                            for name, amount
+                            in rank_runtime["account_mol"].items()
+                        )),
+                    )
+                except (KeyError, TypeError, ValueError):
+                    evaluation_identity = None
+            duplicate_evaluation = (
+                evaluation_identity is not None
+                and evaluation_identity in seen_rank_evaluations
+            )
+            if evaluation_identity is not None:
+                seen_rank_evaluations.add(evaluation_identity)
             new_rank_disclosure_rows = []
-            if isinstance(rank_disclosure_rows, (list, tuple)):
+            if (
+                not duplicate_evaluation
+                and isinstance(rank_disclosure_rows, (list, tuple))
+            ):
                 for row in rank_disclosure_rows:
                     if not isinstance(row, Mapping):
                         continue
-                    if any(row is seen for seen in seen_rank_disclosure_rows):
-                        continue
-                    seen_rank_disclosure_rows.append(row)
                     new_rank_disclosure_rows.append(row)
             if new_rank_disclosure_rows:
                 ranked_disclosures = _published_law_disclosures(

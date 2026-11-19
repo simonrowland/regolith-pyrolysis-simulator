@@ -5568,6 +5568,8 @@ def test_standalone_melt_and_rank_publish_fe_without_a_run_scope(monkeypatch) ->
 
 
 def test_ordering_publishes_one_disclosure_per_rank_evaluation(monkeypatch) -> None:
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+
     import simulator.diagnostic_helpers.extract_reproduction as extract_reproduction
 
     observation = extract_reproduction.AdoptedObservation(
@@ -5585,28 +5587,46 @@ def test_ordering_publishes_one_disclosure_per_rank_evaluation(monkeypatch) -> N
         locator={},
         values={
             "source_reported_sequence": ["Fe", "Mg"],
-            "composition_wt_pct": {"SiO2": 50.0, "MgO": 50.0},
+            "composition_wt_pct": {
+                "SiO2": 50.0,
+                "MgO": 30.0,
+                "FeO": 20.0,
+            },
         },
         equipment={},
         disagreement_dex=None,
         is_priority_winner=True,
         geometry_assumption="",
     )
-    disclosure = {"law_id": "test:one-rank", "evaluation_count": 1}
+    monkeypatch.setattr(extract_reproduction, "_MELT_PSAT_CACHE", {})
     monkeypatch.setattr(
         extract_reproduction,
         "rail_alpha_comparability",
         lambda _obs: (True, None, {}),
     )
+    vapor = _live_vapor()
+    dispatch_calls = []
+    original_dispatch = BuiltinVaporPressureProvider.dispatch
+
+    def count_dispatch(provider, request):
+        dispatch_calls.append(request)
+        return original_dispatch(provider, request)
+
     monkeypatch.setattr(
-        extract_reproduction,
-        "_melt_recipe_mol",
-        lambda _obs: ({"SiO2": 1.0}, "test-composition", None),
+        BuiltinVaporPressureProvider, "dispatch", count_dispatch,
     )
+    rank_runtimes = []
+    original_rank_metric = extract_reproduction._engine_species_rank_metric
+
+    def capture_rank_runtime(*args):
+        ranked = original_rank_metric(*args)
+        rank_runtimes.append(ranked[2])
+        return ranked
+
     monkeypatch.setattr(
         extract_reproduction,
         "_engine_species_rank_metric",
-        lambda *_args: (1.0, None, {"law_disclosures": [disclosure]}),
+        capture_rank_runtime,
     )
     compared_runtimes = []
     compare_point = extract_reproduction._compare_point
@@ -5623,14 +5643,22 @@ def test_ordering_publishes_one_disclosure_per_rank_evaluation(monkeypatch) -> N
     ranked = extract_reproduction._evaluate_ordering(
         observation,
         evaluation,
-        vp_data={},
+        vp_data=vapor,
         pO2=1.0e-8,
     )
 
     published = compared_runtimes[0]["law_disclosures"]
-    assert len(published) == 1
-    assert published[0]["law_id"] == "test:one-rank"
-    assert published[0]["evaluation_count"] == 1
+    assert len(dispatch_calls) == 1
+    assert len(rank_runtimes) == 2
+    first_rows = rank_runtimes[0]["law_disclosures"]
+    second_rows = rank_runtimes[1]["law_disclosures"]
+    assert first_rows == second_rows
+    assert first_rows[0] is not second_rows[0]
+    assert {
+        row["law_id"]: row["evaluation_count"] for row in published
+    } == {
+        row["law_id"]: row["evaluation_count"] for row in first_rows
+    }
 
 
 # Table-3 runs whose (temperature, duration) pair is unique, so the
