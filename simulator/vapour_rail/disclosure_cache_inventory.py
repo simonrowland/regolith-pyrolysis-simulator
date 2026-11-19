@@ -285,7 +285,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'attr:simulator/evaporation.py:_freeze_gate_shared_curve_cache': {
         "path": 'simulator/evaporation.py',
-        "line": 3735,
+        "line": 3764,
         "kind": 'attr',
         "name": '_freeze_gate_shared_curve_cache',
         "carries_disclosure": True,
@@ -301,7 +301,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'class:simulator/reduced_real_determinism.py:PT1PersistentEquilibriumStore': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 1679,
+        "line": 1754,
         "kind": 'class',
         "name": 'PT1PersistentEquilibriumStore',
         "carries_disclosure": True,
@@ -749,7 +749,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/reduced_real_determinism.py:_source_module_digest': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 4944,
+        "line": 5034,
         "kind": 'lru',
         "name": '_source_module_digest',
         "carries_disclosure": False,
@@ -893,7 +893,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/residue.py:pressure_cache': {
         "path": 'simulator/battery/residue.py',
-        "line": 4095,
+        "line": 4098,
         "kind": 'store',
         "name": 'pressure_cache',
         "carries_disclosure": True,
@@ -901,7 +901,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/residue.py:pressure_state_cache': {
         "path": 'simulator/battery/residue.py',
-        "line": 1467,
+        "line": 1470,
         "kind": 'store',
         "name": 'pressure_state_cache',
         "carries_disclosure": True,
@@ -965,7 +965,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:published_cache': {
         "path": 'simulator/core.py',
-        "line": 5405,
+        "line": 5489,
         "kind": 'store',
         "name": 'published_cache',
         "carries_disclosure": False,
@@ -973,7 +973,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:rates_cache': {
         "path": 'simulator/core.py',
-        "line": 7618,
+        "line": 7708,
         "kind": 'store',
         "name": 'rates_cache',
         "carries_disclosure": False,
@@ -981,7 +981,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/diagnostic_helpers/extract_reproduction.py:_LEGACY_VIEW_CACHE': {
         "path": 'simulator/diagnostic_helpers/extract_reproduction.py',
-        "line": 1966,
+        "line": 1977,
         "kind": 'store',
         "name": '_LEGACY_VIEW_CACHE',
         "carries_disclosure": False,
@@ -1029,7 +1029,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/evaporation.py:_freeze_gate_held_curve_record': {
         "path": 'simulator/evaporation.py',
-        "line": 3529,
+        "line": 3542,
         "kind": 'store',
         "name": '_freeze_gate_held_curve_record',
         "carries_disclosure": True,
@@ -1037,7 +1037,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/evaporation.py:_freeze_gate_liquid_fraction_cache': {
         "path": 'simulator/evaporation.py',
-        "line": 3976,
+        "line": 4008,
         "kind": 'store',
         "name": '_freeze_gate_liquid_fraction_cache',
         "carries_disclosure": True,
@@ -1045,7 +1045,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/evaporation.py:computing_cache': {
         "path": 'simulator/evaporation.py',
-        "line": 3815,
+        "line": 3844,
         "kind": 'store',
         "name": 'computing_cache',
         "carries_disclosure": False,
@@ -1053,7 +1053,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/liner_corrosion.py:_point_cache': {
         "path": 'simulator/liner_corrosion.py',
-        "line": 4064,
+        "line": 4071,
         "kind": 'store',
         "name": '_point_cache',
         "carries_disclosure": False,
@@ -1061,7 +1061,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/liner_corrosion.py:_curve_cache': {
         "path": 'simulator/liner_corrosion.py',
-        "line": 4066,
+        "line": 4073,
         "kind": 'store',
         "name": '_curve_cache',
         "carries_disclosure": False,
@@ -1133,7 +1133,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/reduced_real_determinism.py:_entries': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 442,
+        "line": 444,
         "kind": 'store',
         "name": '_entries',
         "carries_disclosure": True,
@@ -1141,7 +1141,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/reduced_real_determinism.py:physics_bucket_entries': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 443,
+        "line": 445,
         "kind": 'store',
         "name": 'physics_bucket_entries',
         "carries_disclosure": False,
