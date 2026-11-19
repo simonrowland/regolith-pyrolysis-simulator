@@ -1455,6 +1455,49 @@ def test_redox_result_keeps_its_type_across_cache_round_trip(
     }
 
 
+def test_candidate_redox_pack_keeps_the_raw_valence_amounts(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    openimcc = pytest.importorskip("openimcc")
+    from simulator import engine_cache
+    from simulator.melt_backend.openimcc_bridge import evaluate_redox
+
+    expected = object()
+    calls = []
+
+    def cached_call(*_args, **_kwargs):
+        raise AssertionError("candidate valence amounts must stay in the raw result")
+
+    def counted(
+        inventory,
+        temperature_K,
+        mode,
+        *,
+        lambda_imposed=None,
+        redox_pack_path=None,
+    ):
+        calls.append((inventory, temperature_K, mode, lambda_imposed, redox_pack_path))
+        return expected
+
+    monkeypatch.setattr(engine_cache, "cached_engine_call", cached_call)
+    monkeypatch.setattr(engine_cache, "record_engine_open", lambda *_args: None)
+    monkeypatch.setattr(openimcc, "evaluate_redox", counted)
+    inventory = {"Fe": 1.0, "O": 1.0}
+
+    result = evaluate_redox(
+        inventory,
+        1700.0,
+        "imposed",
+        lambda_imposed=-12.0,
+        redox_pack_path="candidate-pack.json",
+    )
+
+    assert result is expected
+    assert calls == [
+        (inventory, 1700.0, "imposed", -12.0, "candidate-pack.json")
+    ]
+
+
 def test_openimcc_canonical_predictions_match_chemistry_version_pin(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

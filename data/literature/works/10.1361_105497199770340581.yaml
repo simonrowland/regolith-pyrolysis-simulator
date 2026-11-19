@@ -2076,7 +2076,107 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.1283577749596164220322148685'
+          - - SiO2
+            - '0.4069562733964552595733630291'
+          - - TiO2
+            - '0.4646859516439283183944221022'
+          amount_basis: mole_fraction
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2, run STC 16-1H, single-liquid quenched glass composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.58'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STC 16-1H, single-liquid quenched glass composition.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STC 16-1H, single-liquid quenched glass composition.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.94'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STC 16-1H, single-liquid quenched glass composition.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STC 16-1H, single-liquid quenched glass composition.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '54.55'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STC 16-1H, single-liquid quenched glass composition.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STC 16-1H, single-liquid quenched glass composition.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '10.58'
+          SiO2: '35.94'
+          TiO2: '54.55'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2, run STC 16-1H, single-liquid quenched glass composition.
   conditions:
     temperature_K:
       state:
@@ -2314,7 +2414,107 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.1598741344558205917625255853'
+          - - SiO2
+            - '0.4294097235592642511940020536'
+          - - TiO2
+            - '0.4107161419849151570434723609'
+          amount_basis: mole_fraction
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2, run STM 7-2H, single-liquid quenched glass composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '9.93'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STM 7-2H, single-liquid quenched glass composition.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STM 7-2H, single-liquid quenched glass composition.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '39.76'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STM 7-2H, single-liquid quenched glass composition.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STM 7-2H, single-liquid quenched glass composition.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.55'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STM 7-2H, single-liquid quenched glass composition.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STM 7-2H, single-liquid quenched glass composition.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '9.93'
+          SiO2: '39.76'
+          TiO2: '50.55'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2, run STM 7-2H, single-liquid quenched glass composition.
   conditions:
     temperature_K:
       state:
@@ -2450,7 +2650,130 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.06908233015831058195667918811'
+          - - MgO
+            - '0.06277741422880721491375323155'
+          - - SiO2
+            - '0.4942092407291951804396885434'
+          - - TiO2
+            - '0.3739310148836870226898790372'
+          amount_basis: mole_fraction
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2, run STMC 4-1H, single-liquid quenched glass composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '5.91'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 4-1H, single-liquid quenched glass composition.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 4-1H, single-liquid quenched glass composition.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '3.86'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 4-1H, single-liquid quenched glass composition.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 4-1H, single-liquid quenched glass composition.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.3'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 4-1H, single-liquid quenched glass composition.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 4-1H, single-liquid quenched glass composition.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.56'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 4-1H, single-liquid quenched glass composition.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 4-1H, single-liquid quenched glass composition.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '5.91'
+          MgO: '3.86'
+          SiO2: '45.30'
+          TiO2: '45.56'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2, run STMC 4-1H, single-liquid quenched glass composition.
   conditions:
     temperature_K:
       state:
@@ -2518,7 +2841,130 @@ experiments:
   method:
     tag: value
     value: quench_equilibration
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.07674513293164407411552948014'
+          - - MgO
+            - '0.07247546478123599268105129665'
+          - - SiO2
+            - '0.3781066275288990069964426462'
+          - - TiO2
+            - '0.4726727747582209262069765768'
+          amount_basis: mole_fraction
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2, run STMC 5-2H, single-liquid quenched glass composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '6.35'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 5-2H, single-liquid quenched glass composition.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 5-2H, single-liquid quenched glass composition.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '4.31'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 5-2H, single-liquid quenched glass composition.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 5-2H, single-liquid quenched glass composition.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '33.52'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 5-2H, single-liquid quenched glass composition.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 5-2H, single-liquid quenched glass composition.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '55.7'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 5-2H, single-liquid quenched glass composition.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 15
+              published_page: '598'
+              pdf_page_index: 14
+              table: '2'
+              note: Table 2, run STMC 5-2H, single-liquid quenched glass composition.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '6.35'
+          MgO: '4.31'
+          SiO2: '33.52'
+          TiO2: '55.70'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2, run STMC 5-2H, single-liquid quenched glass composition.
   conditions:
     temperature_K:
       state:
@@ -3086,6 +3532,1440 @@ context:
     reason: The d-223 equilibrium_phase_composition phase_role enum has no crystalline solid role; preserve the measured rutile
       row in context rather than misclassify it as glass or melt.
   context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_rut_stmc5_crystalline_context
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stc_16_1h_phase1_cao
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stc_16_1h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STC 16-1H, liquid row 1, CaO column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: CaO
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '1930'
+      units: C
+      sigma: '30'
+    temperature_as_published: 1930±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STC 16-1H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STC 16-1H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '10.58'
+      sigma: '0.22'
+    printed_sum: '101.07'
+    n_measurements: '50'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '10.58'
+          - - SiO2
+            - '35.94'
+          - - TiO2
+            - '54.55'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STC 16-1H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '0.22'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stc_16_1h_phase1_cao
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stc_16_1h_phase1_mgo
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stc_16_1h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STC 16-1H, liquid row 1, MgO column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: MgO
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '1930'
+      units: C
+      sigma: '30'
+    temperature_as_published: 1930±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STC 16-1H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STC 16-1H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: typed_refusal
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    status: typed_refusal
+    reason: Table 2 prints an ellipsis ("...") for MgO; no component amount is reported.
+    printed_cell_as_published: '...'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stc_16_1h_phase1_mgo
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stc_16_1h_phase1_sio2
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stc_16_1h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STC 16-1H, liquid row 1, SiO2 column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: SiO2
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '1930'
+      units: C
+      sigma: '30'
+    temperature_as_published: 1930±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STC 16-1H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STC 16-1H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '35.94'
+      sigma: '0.59'
+    printed_sum: '101.07'
+    n_measurements: '50'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '10.58'
+          - - SiO2
+            - '35.94'
+          - - TiO2
+            - '54.55'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STC 16-1H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '0.59'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stc_16_1h_phase1_sio2
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stc_16_1h_phase1_tio2
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stc_16_1h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STC 16-1H, liquid row 1, TiO2 column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: TiO2
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '1930'
+      units: C
+      sigma: '30'
+    temperature_as_published: 1930±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STC 16-1H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STC 16-1H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '54.55'
+      sigma: '0.67'
+    printed_sum: '101.07'
+    n_measurements: '50'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '10.58'
+          - - SiO2
+            - '35.94'
+          - - TiO2
+            - '54.55'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STC 16-1H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '0.67'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stc_16_1h_phase1_tio2
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stm_7_2h_phase1_cao
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stm_7_2h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STM 7-2H, liquid row 1, CaO column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: CaO
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '2094'
+      units: C
+      sigma: '30'
+    temperature_as_published: 2094±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STM 7-2H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STM 7-2H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: typed_refusal
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    status: typed_refusal
+    reason: Table 2 prints an ellipsis ("...") for CaO; no component amount is reported.
+    printed_cell_as_published: '...'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stm_7_2h_phase1_cao
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stm_7_2h_phase1_mgo
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stm_7_2h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STM 7-2H, liquid row 1, MgO column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: MgO
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '2094'
+      units: C
+      sigma: '30'
+    temperature_as_published: 2094±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STM 7-2H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STM 7-2H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '9.93'
+      sigma: '0.37'
+    printed_sum: '100.24'
+    n_measurements: '51'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '9.93'
+          - - SiO2
+            - '39.76'
+          - - TiO2
+            - '50.55'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STM 7-2H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '0.37'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stm_7_2h_phase1_mgo
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stm_7_2h_phase1_sio2
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stm_7_2h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STM 7-2H, liquid row 1, SiO2 column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: SiO2
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '2094'
+      units: C
+      sigma: '30'
+    temperature_as_published: 2094±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STM 7-2H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STM 7-2H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '39.76'
+      sigma: '1.17'
+    printed_sum: '100.24'
+    n_measurements: '51'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '9.93'
+          - - SiO2
+            - '39.76'
+          - - TiO2
+            - '50.55'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STM 7-2H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '1.17'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stm_7_2h_phase1_sio2
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stm_7_2h_phase1_tio2
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stm_7_2h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STM 7-2H, liquid row 1, TiO2 column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: TiO2
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '2094'
+      units: C
+      sigma: '30'
+    temperature_as_published: 2094±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STM 7-2H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STM 7-2H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '50.55'
+      sigma: '0.98'
+    printed_sum: '100.24'
+    n_measurements: '51'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - MgO
+            - '9.93'
+          - - SiO2
+            - '39.76'
+          - - TiO2
+            - '50.55'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STM 7-2H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '0.98'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stm_7_2h_phase1_tio2
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stmc_4_1h_phase1_cao
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stmc_4_1h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STMC 4-1H, liquid row 1, CaO column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: CaO
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '1890'
+      units: C
+      sigma: '30'
+    temperature_as_published: 1890±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STMC 4-1H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STMC 4-1H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '5.91'
+      sigma: '0.12'
+    printed_sum: '100.63'
+    n_measurements: '51'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '5.91'
+          - - MgO
+            - '3.86'
+          - - SiO2
+            - '45.30'
+          - - TiO2
+            - '45.56'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STMC 4-1H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '0.12'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stmc_4_1h_phase1_cao
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stmc_4_1h_phase1_mgo
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stmc_4_1h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STMC 4-1H, liquid row 1, MgO column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: MgO
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '1890'
+      units: C
+      sigma: '30'
+    temperature_as_published: 1890±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STMC 4-1H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STMC 4-1H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '3.86'
+      sigma: '0.09'
+    printed_sum: '100.63'
+    n_measurements: '51'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '5.91'
+          - - MgO
+            - '3.86'
+          - - SiO2
+            - '45.30'
+          - - TiO2
+            - '45.56'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STMC 4-1H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '0.09'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stmc_4_1h_phase1_mgo
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stmc_4_1h_phase1_sio2
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stmc_4_1h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STMC 4-1H, liquid row 1, SiO2 column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: SiO2
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '1890'
+      units: C
+      sigma: '30'
+    temperature_as_published: 1890±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STMC 4-1H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STMC 4-1H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '45.30'
+      sigma: '0.40'
+    printed_sum: '100.63'
+    n_measurements: '51'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '5.91'
+          - - MgO
+            - '3.86'
+          - - SiO2
+            - '45.30'
+          - - TiO2
+            - '45.56'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STMC 4-1H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '0.40'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stmc_4_1h_phase1_sio2
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stmc_4_1h_phase1_tio2
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stmc_4_1h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STMC 4-1H, liquid row 1, TiO2 column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: TiO2
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '1890'
+      units: C
+      sigma: '30'
+    temperature_as_published: 1890±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STMC 4-1H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STMC 4-1H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '45.56'
+      sigma: '0.52'
+    printed_sum: '100.63'
+    n_measurements: '51'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '5.91'
+          - - MgO
+            - '3.86'
+          - - SiO2
+            - '45.30'
+          - - TiO2
+            - '45.56'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STMC 4-1H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '0.52'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stmc_4_1h_phase1_tio2
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stmc_5_2h_phase1_cao
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stmc_5_2h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STMC 5-2H, liquid row 1, CaO column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: CaO
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '1990'
+      units: C
+      sigma: '30'
+    temperature_as_published: 1990±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STMC 5-2H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STMC 5-2H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '6.35'
+      sigma: '0.19'
+    printed_sum: '99.88'
+    n_measurements: '51'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '6.35'
+          - - MgO
+            - '4.31'
+          - - SiO2
+            - '33.52'
+          - - TiO2
+            - '55.70'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STMC 5-2H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '0.19'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stmc_5_2h_phase1_cao
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stmc_5_2h_phase1_mgo
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stmc_5_2h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STMC 5-2H, liquid row 1, MgO column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: MgO
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '1990'
+      units: C
+      sigma: '30'
+    temperature_as_published: 1990±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STMC 5-2H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STMC 5-2H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '4.31'
+      sigma: '0.18'
+    printed_sum: '99.88'
+    n_measurements: '51'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '6.35'
+          - - MgO
+            - '4.31'
+          - - SiO2
+            - '33.52'
+          - - TiO2
+            - '55.70'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STMC 5-2H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '0.18'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stmc_5_2h_phase1_mgo
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stmc_5_2h_phase1_sio2
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stmc_5_2h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STMC 5-2H, liquid row 1, SiO2 column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: SiO2
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '1990'
+      units: C
+      sigma: '30'
+    temperature_as_published: 1990±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STMC 5-2H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STMC 5-2H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '33.52'
+      sigma: '1.09'
+    printed_sum: '99.88'
+    n_measurements: '51'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '6.35'
+          - - MgO
+            - '4.31'
+          - - SiO2
+            - '33.52'
+          - - TiO2
+            - '55.70'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STMC 5-2H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '1.09'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stmc_5_2h_phase1_sio2
+  work_id: 10.1361/105497199770340581
+  source_id: kirschen-decapitani-1999-liquid-miscibility
+  species: SiO2
+- observation_id: kirschen_decapitani_1999_t2_stmc_5_2h_phase1_tio2
+  type: phase_composition_context
+  units: wt_percent
+  experiment: kirschen_decapitani_1999_t2_stmc_5_2h
+  regime: quench_equilibration
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '598'
+    table: '2'
+    note: Table 2, run STMC 5-2H, liquid row 1, TiO2 column.
+  values:
+    quantity: equilibrium_phase_composition
+    formula: TiO2
+    phase_label: glass
+    basis: wt_percent
+    T_C:
+      value: '1990'
+      units: C
+      sigma: '30'
+    temperature_as_published: 1990±30 °C
+    system_as_printed: CaO-MgO-SiO2-TiO2
+    sample_id_as_printed: STMC 5-2H
+    run_note_as_printed: ''
+    phase_order: 1
+    assemblage_id: Table 2:STMC 5-2H
+    phase_assemblage_as_printed: One liquid
+    phase_as_analyzed: quenched glass by electron microprobe analysis
+    quench_provenance_as_printed: Laser heated air levitation; the abstract states ambient pressure in air. The quench rate
+      is not stated for Table 2 runs.
+    quench_status: not_stated
+    quench_status_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: Abstract states the experiments were at ambient pressure in air.
+    pressure_as_printed: ambient pressure
+    method_class: measured_direct
+    admission_status: admitted
+    point_conditions:
+      gas_mix:
+        state:
+          tag: value
+          value: air
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: '593'
+          section: Abstract
+          note: Abstract states the experiments were at ambient pressure in air.
+    component_amount:
+      value: '55.70'
+      sigma: '1.02'
+    printed_sum: '99.88'
+    n_measurements: '51'
+    pressure_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: '593'
+      section: Abstract
+      note: The abstract states ambient pressure in air; no numeric total pressure is printed.
+    condition_note: Ambient pressure is printed qualitatively; no numeric total pressure is inferred.
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '6.35'
+          - - MgO
+            - '4.31'
+          - - SiO2
+            - '33.52'
+          - - TiO2
+            - '55.70'
+      locator:
+        page: 15
+        published_page: '598'
+        pdf_page_index: 14
+        table: '2'
+        note: Table 2 run STMC 5-2H phase 1 quenched glass composition in wt percent.
+  uncertainty:
+    sigma: '1.02'
+    units: wt_percent
+    confidence_level: one_sigma
+    note: Parenthetical component standard deviation as printed (1σ).
+  context_id: kirschen-decapitani-1999-liquid-miscibility::context::kirschen_decapitani_1999_t2_stmc_5_2h_phase1_tio2
   work_id: 10.1361/105497199770340581
   source_id: kirschen-decapitani-1999-liquid-miscibility
   species: SiO2
