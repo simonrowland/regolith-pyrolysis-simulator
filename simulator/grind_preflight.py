@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from collections import Counter
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -440,6 +440,7 @@ def assert_strict_vapor_result_payload(
 
 def assert_strict_vapor_result_store(
     db_path: Path,
+    decode_result_payload: Callable[[Any, Any], tuple[Any, Any]],
     *,
     context: str | None = None,
     approved_sources: frozenset[str] = APPROVED_LIVE_VAPOR_SOURCES,
@@ -481,13 +482,12 @@ def assert_strict_vapor_result_store(
     checked_rows = 0
     vapor_active_rows = 0
     source_reports = 0
-    from simulator.optimize.results_store import _decode_result_payload
 
     for row in rows:
         checked_rows += 1
         row_context = f"{context}:{row['cache_key']}"
         eval_spec = _json_mapping(row["eval_spec"], f"{row_context}.eval_spec")
-        _margins, result_blob = _decode_result_payload(
+        _margins, result_blob = decode_result_payload(
             None,
             row["result_blob"],
         )
