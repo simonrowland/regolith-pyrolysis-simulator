@@ -1090,19 +1090,46 @@ def same_component_activity_coefficients_from_moles(
     X_i = n_i / sum(n_j) over exactly the components that have an activity.
     An extra positive mole, or a missing mole, is a different normalization
     and refuses every component. Zero moles do not change the sum; they are
-    simply absent.
+    simply absent. A negative or non-finite mole is invalid input and
+    refuses the set. It is not dropped, and it is not added into the total.
     """
 
     activity_map = {str(name): value for name, value in activities.items()}
     mole_map: dict[str, float] = {}
     for name, amount in moles.items():
+        component = str(name)
         try:
             number = float(amount)
         except (TypeError, ValueError):
-            number = math.nan
+            return {}, {}, (
+                SameComponentActivityRefusal(
+                    reason="mole_not_finite",
+                    component=component,
+                    detail=f"mole amount {amount!r} is not a real number",
+                ),
+            )
+        if not math.isfinite(number):
+            return {}, {}, (
+                SameComponentActivityRefusal(
+                    reason="mole_not_finite",
+                    component=component,
+                    detail=f"mole amount {amount!r} is not finite",
+                ),
+            )
+        if number < 0.0:
+            return {}, {}, (
+                SameComponentActivityRefusal(
+                    reason="negative_mole",
+                    component=component,
+                    detail=(
+                        f"mole amount {amount!r} is negative; a negative "
+                        "mole is not a normalization"
+                    ),
+                ),
+            )
         if number == 0.0:
             continue
-        mole_map[str(name)] = number
+        mole_map[component] = number
     if set(mole_map) != set(activity_map):
         refusal = SameComponentActivityRefusal(
             reason="normalization_mismatch",

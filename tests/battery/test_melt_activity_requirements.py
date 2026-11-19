@@ -541,37 +541,162 @@ def test_identity_composition_outranks_a_different_sample_bulk():
 
 
 def test_activity_coefficient_uses_the_same_contract():
+    from simulator.melt_backend.vaporock import (
+        _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
+    )
+
     experiment, bench, observation = _case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
         quantity=Quantity.ACTIVITY_COEFFICIENT,
         formula="SiO2",
     )
-    results = _melt(experiment, bench, observation)
-    internal_analytical = next(
-        item for item in results if item.readiness.engine == "internal-analytical"
-    )
+    results = _by_engine(_melt(experiment, bench, observation))
+    internal_analytical = results["internal-analytical"]
     assert internal_analytical.readiness.status is ReadinessStatus.NOT_APPLICABLE
     assert internal_analytical.payload is None
-    assert all(
-        item.readiness.status is ReadinessStatus.READY
-        for item in results
-        if item.readiness.engine not in {"internal-analytical", "magemin"}
+    assert results["magemin"].readiness.status is ReadinessStatus.NOT_APPLICABLE
+    imcc = results["openimcc"]
+    assert imcc.readiness.status is ReadinessStatus.READY
+    assert imcc.payload["quantity"] == "activity_coefficient"
+    assert imcc.payload["reference_state"] == "raoultian_pure_liquid_oxide_parent"
+    # 0.1 SiO2 + 0.9 Mg2SiO4 is X_SiO2 = 0.1 on the endmember fraction.
+    # Oxide moles are SiO2 = 1.0 and MgO = 1.8, so X_SiO2 = 1/2.8.
+    # Those gammas are not the same number. MELTS is not admitted.
+    for engine in ("alphamelts", "thermoengine"):
+        item = results[engine]
+        assert item.payload is None
+        assert item.readiness.status is ReadinessStatus.NOT_APPLICABLE
+        gap = item.readiness.gaps[0]
+        assert gap.reason is GapReason.REFERENCE_STATE_MISMATCH
+        assert gap.missing[1] == (
+            "typed-refusal:endmember_fraction_is_not_oxide_mole_fraction"
+        )
+        assert gap.missing[1] != "raoultian_pure_liquid_endmember"
+    vaporock = results["vaporock"]
+    assert vaporock.payload is None
+    assert vaporock.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert vaporock.readiness.gaps[0].missing[1] == (
+        _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
     )
-    assert next(
-        item for item in results if item.readiness.engine == "magemin"
-    ).readiness.status is ReadinessStatus.NOT_APPLICABLE
-    assert results[0].payload["quantity"] == "activity_coefficient"
-    assert results[0].payload["reference_state"] == "raoultian_pure_liquid_endmember"
+    assert vaporock.readiness.gaps[0].missing[1] != "raoultian_pure_liquid_oxide"
+    assert "raoultian_pure_endmember" not in vaporock.readiness.gaps[0].missing[1]
     activity = _melt(*_case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
         formula="SiO2",
     ))
     assert activity[0].payload["quantity"] == "activity"
-    assert activity[0].payload["quantity"] != results[0].payload["quantity"]
-    assert activity[0].payload["reference_state"] == results[0].payload["reference_state"]
-    imcc = next(item for item in results if item.readiness.engine == "openimcc")
-    assert imcc.payload["reference_state"] == "raoultian_pure_liquid_oxide_parent"
-    assert imcc.payload["quantity"] == "activity_coefficient"
+    assert activity[0].payload["quantity"] != imcc.payload["quantity"]
+    assert activity[0].payload["reference_state"] == "raoultian_pure_liquid_endmember"
+    assert activity[0].readiness.status is ReadinessStatus.READY
+    assert "vaporock" not in {item.readiness.engine for item in activity}
+
+
+@pytest.mark.parametrize("basis", ["oxide", "SiO2"])
+def test_melts_endmember_gamma_is_not_scored_on_an_oxide_basis_row(monkeypatch, basis):
+    """a(SiO2)/X_endmember is not an oxide-basis gamma.
+
+    The planted cell would score 2 if the row were admitted. Details use
+    component_basis SiO2 and the Raoultian convention, which is the match
+    that used to accept the endmember fraction as the oxide formula.
+    """
+
+    opened: list[str] = []
+
+    def _open(name):
+        opened.append(name)
+        return type("Handle", (), {
+            "name": name,
+            "available": True,
+            "unavailable_reason": None,
+            "supports_intrinsic_fO2": False,
+        })()
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        return type("Cell", (), {
+            "status": "ok",
+            "refusal_reason": None,
+            "melt_activities": {"SiO2": 0.5, "Mg2SiO4": 0.2},
+            "melt_activity_coefficients": {"SiO2": 2.0},
+            "melt_activity_coefficient_details": {
+                "SiO2": {
+                    "value": 2.0,
+                    "coefficient_basis": "mole_fraction",
+                    "standard_state": {
+                        "convention": "raoultian_pure_endmember",
+                        "phase": "l",
+                        "component_basis": "SiO2",
+                    },
+                }
+            },
+            "gas_partial_pressures_Pa": {},
+            "hostname": "test",
+            "exit_code": 0,
+            "exit_signal": None,
+            "notices": [],
+            "authority": None,
+            "certified_band": None,
+        })()
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    from simulator.battery.enums import Engine, ExecutionState, RefusalReason
+    from simulator.battery.score import predict_with_engine
+    from simulator.melt_backend.vaporock import (
+        _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
+    )
+
+    experiment, bench, observation = _case(
+        composition=_composition(("MgO", "0.4"), ("SiO2", "0.6")),
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        formula="SiO2",
+        basis=basis,
+    )
+    admitted = _by_engine(_melt(experiment, bench, observation))
+    assert admitted["openimcc"].readiness.status is ReadinessStatus.READY
+    assert admitted["openimcc"].payload is not None
+    for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE):
+        opened.clear()
+        prediction = predict_with_engine(
+            engine, observation, experiment=experiment, isolated=False,
+        )
+        assert prediction.value is None
+        assert prediction.value != Decimal("2")
+        assert prediction.execution.state is ExecutionState.NOT_PROBED
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail["reason"] == "reference_state_mismatch"
+        assert prediction.refusal_detail["engine_convention"] == (
+            "typed-refusal:endmember_fraction_is_not_oxide_mole_fraction"
+        )
+        assert opened == []
+    opened.clear()
+    vaporock = predict_with_engine(
+        Engine.VAPOROCK, observation, experiment=experiment, isolated=False,
+    )
+    assert vaporock.value is None
+    assert vaporock.value != Decimal("2")
+    assert vaporock.execution.state is ExecutionState.NOT_PROBED
+    assert vaporock.refusal_detail["engine_convention"] == (
+        _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
+    )
+    assert opened == []
+    if basis == "SiO2":
+        activity_experiment, activity_bench, activity_observation = _case(
+            composition=_composition(("MgO", "0.4"), ("SiO2", "0.6")),
+            formula="SiO2",
+            basis="SiO2",
+        )
+        activity = _by_engine(_melt(
+            activity_experiment, activity_bench, activity_observation,
+        ))
+        assert activity["alphamelts"].readiness.status is ReadinessStatus.READY
+        assert activity["alphamelts"].payload["quantity"] == "activity"
+        assert activity["thermoengine"].readiness.status is ReadinessStatus.READY
 
 
 def test_other_quantities_are_not_applicable_and_do_not_loosen_engine_point():

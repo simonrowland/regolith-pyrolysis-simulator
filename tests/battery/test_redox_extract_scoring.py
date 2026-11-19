@@ -1039,12 +1039,15 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
 
     # MAGEMin reports the liquid endmember Fe3+/Fe2+. It is not the Kress
     # value pinned above, and it is not the old blanket refusal.
+    # Live ig-liquid ratio on this row, Mac-Studio-256-2, 2026-11-19.
+    # A wrong endmember ratio that merely differs from Kress used to pass.
+    # The monkeypatched cell pins 0.25 and 0; this is the unpatched call.
     magemin = predict_with_engine(Engine.MAGEMIN, row4)
     assert magemin.refusal_reason is None
-    assert magemin.value is not None
-    assert magemin.value.is_finite()
-    assert magemin.value >= 0
+    assert magemin.value == Decimal("2.0313223043629747")
     assert magemin.value != prediction4.value
+    assert magemin.value != Decimal("0.25")
+    assert magemin.value != Decimal(0)
     assert magemin.coefficient_sources == ("magemin",)
     assert magemin.execution.state is ExecutionState.PRODUCED
 

@@ -40,6 +40,7 @@ from simulator.melt_backend.alphamelts import (
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.magemin import magemin_liquid_fe3_fe2_from_matlab
 from simulator.melt_backend.vaporock import (
+    _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
     vaporock_oxide_same_component_coefficients,
 )
 from tests.battery.test_redox_extract_scoring import (
@@ -144,29 +145,92 @@ def test_alphamelts_pairs_activity_with_the_same_suffix_only():
     assert unpaired[0] == {}
 
 
-def test_vaporock_gamma_normalizes_only_the_reported_oxides():
-    # Weights equal the formula masses, so each reported oxide is 1 mol
-    # and X = 1/2. FeO is in the composition and has no activity, so it
-    # is not part of that sum. gamma(SiO2) = 0.5 / 0.5 = 1.
-    # gamma(MgO) = 0.25 / 0.5 = 0.5.
+def test_vaporock_gamma_refuses_a_positive_oxide_with_no_activity():
+    # Weights equal the formula masses, so SiO2 and MgO are 1 mol each.
+    # FeO weight 10 is a positive oxide with no activity. Leaving it out
+    # of the sum would make X = 1/2 and gamma(SiO2) = 0.5 / 0.5 = 1.
+    # That subset normalization is refused.
     sio2_mass = oxide_molar_mass_g_mol("SiO2")
     mgo_mass = oxide_molar_mass_g_mol("MgO")
-    gammas, details = vaporock_oxide_same_component_coefficients(
+    feo_mass = oxide_molar_mass_g_mol("FeO")
+    gammas, details, refusals = vaporock_oxide_same_component_coefficients(
         {"SiO2": 0.5, "MgO": 0.25},
         {"SiO2": sio2_mass, "MgO": mgo_mass, "FeO": 10.0},
     )
-    assert gammas["SiO2"] == pytest.approx(1.0)
-    assert gammas["MgO"] == pytest.approx(0.5)
-    assert gammas["MgO"] != pytest.approx(0.25)
-    assert "FeO" not in gammas
-    assert details["MgO"]["standard_state"]["component_basis"] == "MgO"
-    assert details["MgO"]["coefficient_basis"] == "mole_fraction"
+    assert gammas == {}
+    assert details == {}
+    assert gammas.get("SiO2") != pytest.approx(1.0)
+    assert refusals[0].reason == "normalization_mismatch"
+    assert "FeO" in refusals[0].detail
 
-    refused, _details = vaporock_oxide_same_component_coefficients(
+    # The same two oxides, and no other positive oxide, are one set.
+    # X = 1/2. gamma(SiO2) = 0.5 / 0.5 = 1. gamma(MgO) = 0.25 / 0.5 = 0.5.
+    # The standard state is the MELTS-endmember transform, not Raoultian.
+    complete, complete_details, complete_refusals = (
+        vaporock_oxide_same_component_coefficients(
+            {"SiO2": 0.5, "MgO": 0.25},
+            {"SiO2": sio2_mass, "MgO": mgo_mass, "FeO": 0.0},
+        )
+    )
+    assert complete_refusals == ()
+    assert complete["SiO2"] == pytest.approx(1.0)
+    assert complete["MgO"] == pytest.approx(0.5)
+    assert complete["MgO"] != pytest.approx(0.25)
+    assert "FeO" not in complete
+    standard = complete_details["MgO"]["standard_state"]
+    assert standard["component_basis"] == "MgO"
+    assert standard["phase"] == "l"
+    assert standard["convention"] == _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
+    assert standard["convention"] != "raoultian_pure_endmember"
+    assert complete_details["MgO"]["coefficient_basis"] == "mole_fraction"
+    # FeO's formula mass is not part of this sum. Using it as a third
+    # mole would be a different X.
+    assert feo_mass > 0.0
+
+    refused, _details, refused_reasons = vaporock_oxide_same_component_coefficients(
         {"SiO2": 0.5, "MgO": 0.2},
         {"SiO2": sio2_mass},
     )
     assert refused == {}
+    assert refused_reasons[0].reason == "normalization_mismatch"
+
+
+def test_negative_mole_refuses_and_zero_mole_is_absent():
+    # SiO2 = 2 mol, MgO = -1 mol. The defect keeps the negative in the
+    # total, so X_SiO2 = 2 / (2 - 1) = 2 and gamma = 0.5 / 2 = 0.25.
+    gammas, _details, refusals = same_component_activity_coefficients_from_moles(
+        {"SiO2": 0.5, "MgO": 0.5},
+        {"SiO2": 2.0, "MgO": -1.0},
+        reference_convention=SAME_COMPONENT_REFERENCE_CONVENTION,
+        reference_phase=SAME_COMPONENT_REFERENCE_PHASE,
+    )
+    assert gammas == {}
+    assert refusals[0].reason == "negative_mole"
+    assert refusals[0].component == "MgO"
+    assert gammas.get("SiO2") != pytest.approx(0.25)
+
+    non_finite, _details, non_finite_refusals = (
+        same_component_activity_coefficients_from_moles(
+            {"SiO2": 0.5},
+            {"SiO2": float("nan")},
+            reference_convention=SAME_COMPONENT_REFERENCE_CONVENTION,
+            reference_phase=SAME_COMPONENT_REFERENCE_PHASE,
+        )
+    )
+    assert non_finite == {}
+    assert non_finite_refusals[0].reason == "mole_not_finite"
+
+    # a = 1 and n_SiO2 = 1. A zero MgO mole is absent, so X = 1 and gamma = 1.
+    # Treating that zero as a member of the activity set would refuse.
+    ideal, _details, ideal_refusals = same_component_activity_coefficients_from_moles(
+        {"SiO2": 1.0},
+        {"SiO2": 1.0, "MgO": 0.0},
+        reference_convention=SAME_COMPONENT_REFERENCE_CONVENTION,
+        reference_phase=SAME_COMPONENT_REFERENCE_PHASE,
+    )
+    assert ideal_refusals == ()
+    assert "MgO" not in ideal
+    assert ideal["SiO2"] == pytest.approx(1.0)
 
 
 def test_extra_positive_mole_refuses_the_whole_set():

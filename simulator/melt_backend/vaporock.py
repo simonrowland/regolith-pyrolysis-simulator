@@ -945,48 +945,72 @@ def _call_system_eval_gas_abundances(
 def vaporock_oxide_same_component_coefficients(
     oxide_activity: Mapping[str, float],
     composition_wt_pct: Mapping[str, float],
-) -> tuple[dict[str, float], dict[str, dict[str, Any]]]:
-    """gamma_i = a_i / X_i on the oxides whose activities were reported.
+) -> tuple[
+    dict[str, float],
+    dict[str, dict[str, Any]],
+    tuple[Any, ...],
+]:
+    """gamma_i = a_i / X_i on every positive oxide in the melt.
 
-    Premise: VapoRock's ln a is the liquid-oxide activity relative to the
-    pure oxide, and the composition weight is that same oxide. Algebra:
-    n_i = w_i / M_i, X_i = n_i / sum(n) over exactly those oxides, then
-    gamma_i = a_i / X_i. Units: g / (g/mol) is mol; the ratio is
-    dimensionless. Sanity: one oxide with a = X has gamma 1. mol_liq
-    endmember fractions are a different basis and are not used. A missing
-    mass or a mismatched component set yields no gamma.
+    Premise: VapoRock's ln a is the liquid-oxide activity on the
+    MELTS-endmember-transformed oxide component, not a JANAF
+    pure-liquid-oxide standard state. The composition weight is that
+    same oxide. Algebra: n_i = w_i / M_i for every positive weight,
+    including an oxide with no activity, then the owner normalizes
+    X_i = n_i / sum(n) over exactly the activity set. A positive oxide
+    with no activity is a different normalization and refuses the set.
+    gamma_i = a_i / X_i only when the sets match. Units: g / (g/mol)
+    is mol; the ratio is dimensionless. Sanity: one oxide with a = X
+    has gamma 1. mol_liq endmember fractions are a different basis and
+    are not used. A missing mass yields no gamma.
     """
 
     from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
     from simulator.chemistry.melt_activity import (
-        SAME_COMPONENT_REFERENCE_CONVENTION,
         SAME_COMPONENT_REFERENCE_PHASE,
+        SameComponentActivityRefusal,
         same_component_activity_coefficients_from_moles,
     )
 
     moles: dict[str, float] = {}
-    for oxide in oxide_activity:
-        name = str(oxide)
+    for raw_name, raw_weight in composition_wt_pct.items():
+        name = str(raw_name)
+        if raw_weight is None:
+            continue
         try:
-            weight = float(composition_wt_pct.get(name, 0.0) or 0.0)
+            weight = float(raw_weight)
         except (TypeError, ValueError):
-            return {}, {}
-        if weight <= 0.0:
+            return {}, {}, ()
+        if weight == 0.0:
+            continue
+        if not math.isfinite(weight) or weight < 0.0:
+            # The owner refuses a negative or non-finite mole. Do not
+            # drop it and renormalize the oxides that remain.
+            moles[name] = weight
             continue
         try:
             mass = oxide_molar_mass_g_mol(name)
         except (KeyError, TypeError, ValueError):
-            return {}, {}
+            return {}, {}, (
+                SameComponentActivityRefusal(
+                    reason="normalization_mismatch",
+                    component=name,
+                    detail=(
+                        f"positive composition oxide {name!r} has no "
+                        "molar mass, so its mole cannot enter the "
+                        "normalization"
+                    ),
+                ),
+            )
         if not math.isfinite(mass) or mass <= 0.0:
-            return {}, {}
+            return {}, {}, ()
         moles[name] = weight / mass
-    gammas, details, _refusals = same_component_activity_coefficients_from_moles(
+    return same_component_activity_coefficients_from_moles(
         oxide_activity,
         moles,
-        reference_convention=SAME_COMPONENT_REFERENCE_CONVENTION,
+        reference_convention=_VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
         reference_phase=SAME_COMPONENT_REFERENCE_PHASE,
     )
-    return gammas, details
 
 
 def _oxide_activities_from_full_output(
@@ -2352,7 +2376,7 @@ class VapoRockBackend(MeltBackend):
             and include_oxide_activities
             and oxide_activity
         ):
-            gammas, details = vaporock_oxide_same_component_coefficients(
+            gammas, details, _refusals = vaporock_oxide_same_component_coefficients(
                 oxide_activity,
                 comp_wt,
             )

@@ -138,6 +138,14 @@ class UnsupportedValue(ValueError):
 # different activity and is not converted into this set.
 _PARENT_OXIDE_COMPONENT_BASES = frozenset({"oxide", "parent", "parent_oxide"})
 _IMCC_SINGLE_CATION_COMPONENTS = frozenset({"NaO0.5", "KO0.5"})
+# a_endmember / X_endmember is the liquid endmember fraction. It equals
+# the oxide mole fraction only when every positive endmember is itself
+# an oxide endmember. Ordinary MELTS liquids contain compound
+# endmembers (Mg2SiO4, CaSiO3, ...). This gate does not score that
+# coincidence: an oxide-basis activity coefficient is refused.
+_ENDMEMBER_FRACTION_NOT_OXIDE_BASIS = (
+    "typed-refusal:endmember_fraction_is_not_oxide_mole_fraction"
+)
 
 
 @dataclass(frozen=True)
@@ -185,6 +193,8 @@ _ENGINE_REPORTED_ACTIVITY["magemin"] = EngineReportedActivity(
     Phase.CR,
     _PARENT_OXIDE_COMPONENT_BASES,
 )
+# Coefficient rows do not use this record. They are refused with the
+# transformed-oxide standard state. Activity rows do not list vaporock.
 _ENGINE_REPORTED_ACTIVITY["vaporock"] = EngineReportedActivity(
     "raoultian_pure_liquid_oxide",
     ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
@@ -566,8 +576,9 @@ def melt_activity_requests(
         ))
     gap_tuple = tuple(dict.fromkeys(gaps))
     results = []
-    # VapoRock reports oxide activities, not the ACTIVITY observable. It is
-    # admitted only for a coefficient whose component is one of those oxides.
+    # VapoRock is listed on a coefficient row so the refusal names the
+    # transformed-oxide standard state. It is not admitted as a
+    # Raoultian pure-endmember coefficient. Activity rows do not list it.
     activity_engines = MELT_ACTIVITY_ENGINES
     if inputs.activity_quantity == "activity_coefficient":
         activity_engines = (*MELT_ACTIVITY_ENGINES, "vaporock")
@@ -624,6 +635,23 @@ def melt_activity_requests(
             engine_side = reported_activity.reported
         else:
             matches, engine_side = _reference_matches(state, reported_activity, engine)
+        if engine == "vaporock":
+            from simulator.melt_backend.vaporock import (
+                _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
+            )
+
+            # The activity this adapter labels is the MELTS-endmember
+            # transform. A JANAF pure-liquid-oxide comparison needs a
+            # standard-Gibbs correction this coefficient does not apply.
+            matches = False
+            engine_side = _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
+        elif (
+            matches
+            and inputs.activity_quantity == "activity_coefficient"
+            and engine in ("alphamelts", "thermoengine")
+        ):
+            matches = False
+            engine_side = _ENDMEMBER_FRACTION_NOT_OXIDE_BASIS
         if not matches:
             # Henrian, 1 wt%, a pure solid, a gas endmember, an unadmitted
             # single-cation basis, or an endmember formula this engine does not report.
