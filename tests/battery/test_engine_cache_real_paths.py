@@ -595,7 +595,8 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
     )
 
     expected_rebumped_versions = {
-        "openimcc": 4,
+        # openimcc ENGINE_CHEMISTRY_VERSION 4->5 at 7e202a3
+        "openimcc": 5,
         "internal-analytical": 3,
     }
 

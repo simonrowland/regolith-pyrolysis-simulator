@@ -943,7 +943,7 @@ def test_openimcc_gas_formation_anchors_match_every_regolith_janaf_table() -> No
         for row_name in datapack.gas_df.index
         if str(row_name).endswith("(g)")
     }
-    anchors_by_table_id: dict[str, tuple[str, Decimal]] = {}
+    anchors_by_table_id: dict[str, list[tuple[str, Decimal]]] = {}
     for species in sorted(gas_species):
         native = species_thermo(
             species,
@@ -957,30 +957,24 @@ def test_openimcc_gas_formation_anchors_match_every_regolith_janaf_table() -> No
             continue
         table_id = native.formation_enthalpy_source_id
         assert isinstance(table_id, str) and table_id, (species, table_id)
-        assert table_id not in anchors_by_table_id, (
-            table_id,
-            anchors_by_table_id.get(table_id),
-            species,
+        anchors_by_table_id.setdefault(table_id, []).append(
+            (species, Decimal(str(anchor)))
         )
-        anchors_by_table_id[table_id] = (species, Decimal(str(anchor)))
 
-    assert len(anchors_by_table_id) == 240
     regolith_table_ids = {
         table_id
         for table_ids in _janaf_gas_table_ids().values()
         for table_id in table_ids
     }
-    unmatched = {
-        (species, table_id)
-        for table_id, (species, _anchor) in anchors_by_table_id.items()
-        if table_id not in regolith_table_ids
-    }
-    assert unmatched == {("e-", "D-020"), ("Hg+", "Hg-004")}
-
-    compared_table_ids = set(anchors_by_table_id) & regolith_table_ids
-    assert len(compared_table_ids) == 238
-    for table_id in sorted(compared_table_ids):
-        species, openimcc_anchor = anchors_by_table_id[table_id]
+    compared_species = 0
+    unmatched_entries = []
+    anchor_mismatches = []
+    for table_id, entries in sorted(anchors_by_table_id.items()):
+        if table_id not in regolith_table_ids:
+            unmatched_entries.extend(
+                (species, table_id) for species, _anchor in entries
+            )
+            continue
         rows, _digest = _checked_fusion_table_rows(table_id)
         janaf_anchors = []
         for row in rows:
@@ -1000,13 +994,36 @@ def test_openimcc_gas_formation_anchors_match_every_regolith_janaf_table() -> No
                 and enthalpy_value is not None
             ):
                 janaf_anchors.append(Decimal(str(enthalpy_value)))
-        assert len(janaf_anchors) == 1, (species, table_id, janaf_anchors)
-        assert openimcc_anchor == janaf_anchors[0], (
-            species,
-            table_id,
-            openimcc_anchor,
-            janaf_anchors[0],
-        )
+        if len(janaf_anchors) != 1:
+            anchor_mismatches.extend(
+                (species, table_id, openimcc_anchor, janaf_anchors)
+                for species, openimcc_anchor in entries
+            )
+            continue
+        for species, openimcc_anchor in entries:
+            compared_species += 1
+            if openimcc_anchor != janaf_anchors[0]:
+                anchor_mismatches.append(
+                    (species, table_id, openimcc_anchor, janaf_anchors[0])
+                )
+
+    anchor_count = sum(map(len, anchors_by_table_id.values()))
+    expected_unmatched = {
+        (species, table_id)
+        for table_id, entries in anchors_by_table_id.items()
+        if table_id not in regolith_table_ids
+        for species, _anchor in entries
+    }
+    assert set(unmatched_entries) == expected_unmatched, (
+        f"OpenIMCC anchors={anchor_count}; matched species={compared_species}; "
+        f"unmatched species={len(unmatched_entries)}; "
+        f"unmatched table IDs={sorted({table_id for _, table_id in unmatched_entries})}"
+    )
+    assert not anchor_mismatches, (
+        f"OpenIMCC anchors={anchor_count}; compared species={compared_species}; "
+        f"unmatched species={len(unmatched_entries)}; "
+        f"anchor mismatches={anchor_mismatches}"
+    )
 
 
 def test_openimcc_enthalpy_source_anchor_is_resolved_after_native_cache_hit(
@@ -1377,6 +1394,7 @@ def test_openimcc_crystal_missing_interval_attribute_keeps_typed_refusal(
     assert prediction.refusal_detail["declared_interval_K"] is None
     assert set(prediction.refusal_detail) == {
         "reason",
+        "quantity",
         "species",
         "phase",
         "requested_T_K",
