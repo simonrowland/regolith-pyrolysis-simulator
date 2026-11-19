@@ -1441,6 +1441,30 @@ def species_thermo(
 
     return dict(cached_engine_call("openimcc", request, solve))
 
+
+def _species_thermo_crystal_declared_interval(
+    species: str,
+    temperature_K: float,
+) -> tuple[float, float]:
+    """Return the interval of the OpenIMCC-selected crystal thermo row."""
+
+    module = _require_openimcc()
+    # OpenIMCC 979adb2's crystal no-continuation error omits its selected
+    # interval. Keep this private selector use in the bridge; OpenIMCC was
+    # asked on 2026-11-19 to put the interval on that error, after which this
+    # helper should read the error attribute instead.
+    row = module.gas._oxide_row_for_T(
+        module.load_gas_datapack().oxide_df,
+        f"{species}(cr)",
+        float(temperature_K),
+        allow_extrapolation=True,
+    )
+    low = float(row["T_min"])
+    high = float(row["T_max"])
+    if not math.isfinite(low) or not math.isfinite(high) or low > high:
+        raise ValueError("OpenIMCC selected crystal row has an invalid interval")
+    return low, high
+
 def evaluate_redox(
     inventory: Mapping[str, float],
     temperature_K: float,
