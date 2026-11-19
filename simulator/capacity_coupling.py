@@ -822,41 +822,7 @@ class _HeadspaceLaw:
         )
 
     def g_samples(self) -> list[tuple[float, float]]:
-        lo = self.downstream_pa if self.downstream_pa > 0.0 else 1.0e-8
-        hi = max(1.0e8, lo * 10.0)
-        samples: list[tuple[float, float]] = []
-        if self.downstream_pa <= 0.0:
-            samples.append((0.0, self._scalar_g(0.0)))
-        samples.extend(self._pressure_grid(lo, hi, _SIGN_SCAN_POINTS))
-        if samples[-1][1] > 0.0:
-            samples.extend(self._pressure_grid(hi, 1.0e12, 1024)[1:])
-        return samples
-
-    def _pressure_grid(
-        self,
-        lo: float,
-        hi: float,
-        count: int,
-    ) -> list[tuple[float, float]]:
-        log_lo = math.log(lo)
-        log_hi = math.log(hi)
-        samples: list[tuple[float, float]] = []
-        crossings = 0
-        previous: float | None = None
-        for index in range(count):
-            pressure = math.exp(log_lo + (log_hi - log_lo) * index / (count - 1))
-            value = self._scalar_g(pressure)
-            if not math.isfinite(value):
-                raise _BalanceRefused("headspace_balance_nonconvergence")
-            if previous is not None and previous * value < 0.0:
-                crossings += 1
-            if value == 0.0 and previous not in (None, 0.0):
-                crossings += 1
-            previous = value
-            samples.append((pressure, value))
-            if crossings >= 2:
-                break
-        return samples
+        return _pressure_sign_scan(self.downstream_pa, self._scalar_g)
 
     def piece_at(self, pressure_pa: float) -> tuple:
         _source, _outflow, _binding, piece = self._flows(
@@ -984,6 +950,64 @@ class _HeadspaceLaw:
             binding=binding,
             residual_Pa=residual_Pa,
         )
+
+
+def _log_pressure_samples(
+    lo: float,
+    hi: float,
+    count: int,
+    value_at: Callable[[float], float],
+) -> list[tuple[float, float]]:
+    """Log-spaced samples on [lo, hi]. Stop once two sign changes are in.
+
+    The one-species grid and the mixture ray both used this spacing,
+    the same two-crossing stop, and the same 1e12 Pa extension. One
+    edit has to move both, or a second root past 1e8 Pa is a refusal
+    on one path and a fast commit on the other.
+    """
+
+    log_lo = math.log(lo)
+    log_hi = math.log(hi)
+    samples: list[tuple[float, float]] = []
+    crossings = 0
+    previous: float | None = None
+    for index in range(count):
+        pressure = math.exp(log_lo + (log_hi - log_lo) * index / (count - 1))
+        value = value_at(pressure)
+        if not math.isfinite(value):
+            raise _BalanceRefused("headspace_balance_nonconvergence")
+        if previous is not None and previous * value < 0.0:
+            crossings += 1
+        if value == 0.0 and previous not in (None, 0.0):
+            crossings += 1
+        previous = value
+        samples.append((pressure, value))
+        if crossings >= 2:
+            break
+    return samples
+
+
+def _pressure_sign_scan(
+    downstream_pa: float,
+    value_at: Callable[[float], float],
+) -> list[tuple[float, float]]:
+    """Sign samples of one scalar from vacuum or P_down up to 1e12 Pa.
+
+    Floor is P_down, or 1e-8 Pa when the downstream pressure is 0, then
+    a 4096-point log grid through 1e8 Pa. A still-positive end extends
+    the same grid to 1e12 Pa. The explicit 0 Pa sample is only for a
+    vacuum downstream, where P = 0 is the closed end of the pipe.
+    """
+
+    lo = downstream_pa if downstream_pa > 0.0 else 1.0e-8
+    hi = max(1.0e8, lo * 10.0)
+    samples: list[tuple[float, float]] = []
+    if downstream_pa <= 0.0:
+        samples.append((0.0, value_at(0.0)))
+    samples.extend(_log_pressure_samples(lo, hi, _SIGN_SCAN_POINTS, value_at))
+    if samples[-1][1] > 0.0:
+        samples.extend(_log_pressure_samples(hi, 1.0e12, 1024, value_at)[1:])
+    return samples
 
 
 def _crossings(
@@ -1429,9 +1453,6 @@ def _ray_samples(
     law: _HeadspaceLaw,
     fractions: Mapping[str, float],
 ) -> list[tuple[float, float]]:
-    lo = law.downstream_pa if law.downstream_pa > 0.0 else 1.0e-8
-    hi = max(1.0e8, lo * 10.0)
-
     def total_g(pressure: float) -> float:
         if pressure <= 0.0:
             partials = {species: 0.0 for species in law.species}
@@ -1445,25 +1466,7 @@ def _ray_samples(
             for species in law.species
         )
 
-    samples: list[tuple[float, float]] = []
-    if law.downstream_pa <= 0.0:
-        samples.append((0.0, total_g(0.0)))
-    log_lo = math.log(lo)
-    log_hi = math.log(hi)
-    for index in range(_SIGN_SCAN_POINTS):
-        pressure = math.exp(log_lo + (log_hi - log_lo) * index / (_SIGN_SCAN_POINTS - 1))
-        samples.append((pressure, total_g(pressure)))
-        if len(_crossings(samples)) >= 2:
-            return samples
-    if samples[-1][1] > 0.0:
-        log_lo = math.log(hi)
-        log_hi = math.log(1.0e12)
-        for index in range(1, 1024):
-            pressure = math.exp(log_lo + (log_hi - log_lo) * index / 1023.0)
-            samples.append((pressure, total_g(pressure)))
-            if len(_crossings(samples)) >= 2:
-                break
-    return samples
+    return _pressure_sign_scan(law.downstream_pa, total_g)
 
 
 def _fractions_of(
