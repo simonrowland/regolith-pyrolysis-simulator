@@ -51,6 +51,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from types import MappingProxyType
 from typing import Any, Callable, Mapping, Optional
 
 from simulator.environment import (
@@ -74,9 +75,28 @@ from engines.builtin.overhead_bleed import (
 )
 from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,  # K — Celsius-to-Kelvin offset
+    DIATOMIC_HEAT_CAPACITY_RATIO,
+    GAS_CONSTANT as GAS_CONSTANT_CODATA,  # J/(mol·K) — full CODATA leaf
     PA_PER_BAR,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.transport_constants import (
+    FREE_MOLECULAR_KNUDSEN_MIN,
+    VISCOUS_KNUDSEN_MAX,
+)
+from simulator.transport_regime import (
+    LONG_TUBE_L_OVER_D_MIN,
+    KnudsenRegime,
+    MeanFreePathResult,
+    TransportRegimeRefusal,
+    beskok_karniadakis_rarefaction_factor,
+    carrier_mixture_mean_free_path,
+    long_tube_clausing_transmission,
+    molecular_tube_conductance_m3_s,
+    short_tube_dushman_transmission,
+    single_species_mean_free_path,
+    throughput_pa_m3_s,
+)
 
 O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0  # kg/mol — O2 molar mass; g/mol -> kg/mol
 
@@ -132,6 +152,459 @@ def compressible_poiseuille_mass_flow(
         * T_K
     )
     return numerator / denominator
+
+
+# Log-Kn smoothstep from continuum onto effusion. Kn_hi is the free-molecular
+# threshold, so the blend ends where classify_knudsen_regime changes.
+# Kn_lo is 0.05, not 1: a smoothstep that starts at Kn = 1 has a negative
+# dQ/dP on this pipe. w = 0 at and below Kn_lo, so the lunar roots
+# (Kn ≈ 0.016 and Kn ≈ 0.0018) stay on the sonic-capped continuum law.
+PIPE_MOLECULAR_BLEND_KN_LO = 0.05
+
+_NOTICE_HEAT_CAPACITY_RATIO = "heat_capacity_ratio_ideal_diatomic"
+_NOTICE_MOLECULAR_BLEND = "molecular_blend_unvalidated"
+# Cole's variational transmission (Matuda, J. Vac. Soc. Jpn. 58, 2015,
+# Table 1) is 0.19094 at L/D = 5 and 0.10932 at L/D = 10. Dushman at those
+# two ratios is 0.21052631579 and 0.11764705882, 10.26% and 7.62% high.
+# Stated on the free-molecular end. Not a second transmission formula.
+_NOTICE_DUSHMAN_BIAS = (
+    "dushman_transmission_high_bias: "
+    "10.26% above Cole 0.19094 at L/D=5 and "
+    "7.62% above Cole 0.10932 at L/D=10"
+)
+
+
+@dataclass(frozen=True)
+class PipeSpeciesOutflow:
+    """Species molar outflow of one pipe at one upstream state.
+
+    ``species_mol_s`` is already split. Continuum moles are one total
+    divided by mole fraction. Free-molecular moles are per-species
+    effusion. A caller must not split the mapping again.
+    """
+
+    species_mol_s: Mapping[str, float]
+    regime: KnudsenRegime
+    blend_weight: float
+    binding_cause: str
+    notices: tuple[str, ...]
+
+
+def _pipe_scalar(
+    value: Any,
+    name: str,
+    category: str,
+    *,
+    allow_zero: bool,
+) -> float:
+    if not is_declared_real_scalar(value):
+        raise TypeError(f"{name} must be numeric")
+    number = float(value)
+    if (
+        not math.isfinite(number)
+        or number < 0.0
+        or (number == 0.0 and not allow_zero)
+    ):
+        bound = ">= 0" if allow_zero else "> 0"
+        raise TransportRegimeRefusal(
+            category,
+            f"{name} must be finite and {bound}",
+        )
+    return number
+
+
+def _pipe_mole_fractions(holdup_mol: Mapping[str, float]) -> dict[str, float]:
+    if not isinstance(holdup_mol, Mapping):
+        raise TransportRegimeRefusal(
+            "invalid_holdup",
+            "holdup_mol must map species to moles",
+        )
+    amounts: dict[str, float] = {}
+    for species, raw in holdup_mol.items():
+        if not isinstance(species, str) or species == "":
+            raise TransportRegimeRefusal(
+                "invalid_holdup",
+                "species name must be a non-empty string",
+            )
+        if not is_declared_real_scalar(raw):
+            raise TransportRegimeRefusal(
+                "invalid_holdup",
+                f"{species} moles must be numeric",
+            )
+        amount = float(raw)
+        if not math.isfinite(amount) or amount < 0.0:
+            raise TransportRegimeRefusal(
+                "invalid_holdup",
+                f"{species} moles must be finite and >= 0",
+            )
+        if amount == 0.0:
+            continue
+        amounts[species] = amount
+    total = math.fsum(amounts.values())
+    if total <= 0.0:
+        raise TransportRegimeRefusal(
+            "missing_holdup",
+            "holdup_mol has no positive species amount",
+        )
+    return {
+        species: amount / total for species, amount in amounts.items()
+    }
+
+
+def _pipe_transmission(diameter_m: float, length_m: float) -> float:
+    """One transmission for one geometry.
+
+    L/D >= 10 stays on long_tube_clausing_transmission, whose guard is
+    unchanged. The short duct uses short_tube_dushman_transmission.
+    """
+
+    length_over_diameter = length_m / diameter_m
+    if length_over_diameter >= LONG_TUBE_L_OVER_D_MIN:
+        return long_tube_clausing_transmission(diameter_m, length_m)
+    return short_tube_dushman_transmission(diameter_m, length_m)
+
+
+def _pipe_knudsen(
+    fractions: Mapping[str, float],
+    pressure_pa: float,
+    temperature_K: float,
+    diameter_m: float,
+) -> MeanFreePathResult:
+    """Regime at the upstream state. Characteristic length is the diameter.
+
+    One species calls single_species_mean_free_path. More than one calls
+    carrier_mixture_mean_free_path, which is mixture_mean_free_path_m of
+    the majority species divided by the diameter. The mixture helper
+    requires one test species; the majority mole fraction is that species,
+    and a tie breaks to the earlier name. A missing collision diameter or
+    molar mass is that helper's typed refusal.
+    """
+
+    if len(fractions) == 1:
+        species = next(iter(fractions))
+        return single_species_mean_free_path(
+            species,
+            pressure_pa,
+            temperature_K,
+            diameter_m,
+        )
+    test_species = min(
+        fractions,
+        key=lambda species: (-fractions[species], species),
+    )
+    return carrier_mixture_mean_free_path(
+        test_species,
+        fractions,
+        pressure_pa,
+        temperature_K,
+        diameter_m,
+    )
+
+
+def _molecular_blend_weight(knudsen_number: float) -> float:
+    """Cubic smoothstep of log(Kn) from Kn_lo to the free-molecular edge.
+
+    Premise: hard switches at Kn = 0.01 and Kn = 10 each leave a pressure
+    band with two roots. Algebra: s = log(Kn/Kn_lo) / log(Kn_hi/Kn_lo),
+    w = s^2 * (3 - 2s). That cubic has dw/ds = 0 at both ends and w
+    running from 0 to 1. Unit check: s and w are dimensionless.
+    Limit: Kn <= 0.05 gives w = 0; Kn >= 10 gives w = 1.
+    """
+
+    if knudsen_number <= PIPE_MOLECULAR_BLEND_KN_LO:
+        return 0.0
+    if knudsen_number >= FREE_MOLECULAR_KNUDSEN_MIN:
+        return 1.0
+    span = math.log(FREE_MOLECULAR_KNUDSEN_MIN / PIPE_MOLECULAR_BLEND_KN_LO)
+    progress = math.log(knudsen_number / PIPE_MOLECULAR_BLEND_KN_LO) / span
+    return progress * progress * (3.0 - 2.0 * progress)
+
+
+def _diatomic_sonic_orifice_mass_flow_kg_s(
+    diameter_m: float,
+    pressure_pa: float,
+    temperature_K: float,
+    mean_molar_mass_kg_mol: float,
+) -> float:
+    """Adiabatic sonic mass flow of this duct's own throat.
+
+    Premise: stagnation state at the upstream inventory, discharge into a
+    pressure low enough to choke, ideal gas, frozen composition, discharge
+    coefficient 1. gamma is DIATOMIC_HEAT_CAPACITY_RATIO (7/5), not a fit.
+    Algebra: m = A * P * sqrt(gamma / (R_specific * T))
+    * (2 / (gamma + 1)) ** ((gamma + 1) / (2 * (gamma - 1))),
+    with A = pi d^2 / 4 and R_specific = R / M_bar. R is the CODATA leaf.
+    The 6-sig gas constant stays inside compressible_poiseuille_mass_flow;
+    this orifice does not read it.
+    Unit check: Pa * m^2 * sqrt(kg/J) = kg/s.
+    Limit: linear in P, and P = 0 gives zero.
+    The thermal-train orifice keeps OXYGEN_GAMMA = 1.395 and its own
+    specific gas constant. It is a different constant, not this cap.
+    """
+
+    gamma = DIATOMIC_HEAT_CAPACITY_RATIO
+    area_m2 = math.pi * diameter_m * diameter_m / 4.0
+    specific_gas_constant = GAS_CONSTANT_CODATA / mean_molar_mass_kg_mol
+    critical = (2.0 / (gamma + 1.0)) ** (
+        (gamma + 1.0) / (2.0 * (gamma - 1.0))
+    )
+    return (
+        area_m2
+        * pressure_pa
+        * math.sqrt(gamma / (specific_gas_constant * temperature_K))
+        * critical
+    )
+
+
+def _continuum_species_mol_s(
+    fractions: Mapping[str, float],
+    masses_kg_mol: Mapping[str, float],
+    mean_molar_mass_kg_mol: float,
+    *,
+    diameter_m: float,
+    length_m: float,
+    temperature_K: float,
+    upstream_pa: float,
+    downstream_pa: float,
+    knudsen_number: float,
+) -> tuple[dict[str, float], bool]:
+    """One Beskok–Poiseuille total, capped, then split once by mole fraction.
+
+    The near-viscous cross-check is passed only for Kn < 0.01. At and
+    above that edge the factor's own domain already accepts the call.
+    Species moles are x_i * m / M_bar, the split _bled_species_mol uses.
+    Returns the species rates and whether the sonic cap is the tighter one.
+    """
+
+    viscosity_pa_s = gas_dynamic_viscosity_Pa_s(temperature_K)
+    poiseuille_kg_s = compressible_poiseuille_mass_flow(
+        diameter_m,
+        length_m,
+        mean_molar_mass_kg_mol,
+        viscosity_pa_s,
+        temperature_K,
+        upstream_pa,
+        downstream_pa,
+    )
+    factor = beskok_karniadakis_rarefaction_factor(
+        knudsen_number,
+        allow_near_viscous_cross_check=(
+            knudsen_number < VISCOUS_KNUDSEN_MAX
+        ),
+    )
+    continuum_kg_s = poiseuille_kg_s * factor
+    sonic_kg_s = _diatomic_sonic_orifice_mass_flow_kg_s(
+        diameter_m,
+        upstream_pa,
+        temperature_K,
+        mean_molar_mass_kg_mol,
+    )
+    capped_kg_s = min(continuum_kg_s, sonic_kg_s)
+    total_mol_s = capped_kg_s / mean_molar_mass_kg_mol
+    species_mol_s = {
+        species: fraction * total_mol_s
+        for species, fraction in fractions.items()
+    }
+    return species_mol_s, sonic_kg_s < continuum_kg_s
+
+
+def _effusion_species_mol_s(
+    fractions: Mapping[str, float],
+    masses_kg_mol: Mapping[str, float],
+    *,
+    diameter_m: float,
+    length_m: float,
+    temperature_K: float,
+    upstream_pa: float,
+    transmission: float,
+) -> dict[str, float]:
+    """Per-species effusion. Not a mole-fraction split of one total.
+
+    C_i is molecular_tube_conductance_m3_s at Kn = 10. Conductance does
+    not depend on pressure; that Kn is the helper's domain assertion, and
+    the Dushman W of the canonical pipe is inside it. The same C_i is
+    the molar conductance at every pressure.
+    Algebra: Q_i = C_i * max(p_i, 0) / (R T), p_i = x_i * P_up, vacuum
+    downstream so p_down,i = 0. R is the CODATA leaf, the same constant
+    mean_molecular_speed_m_s uses inside the conductance helper.
+    Unit check: (m^3/s) * Pa / (J/(mol·K) * K) = mol/s.
+    Limit: P_up = 0 gives zero.
+    """
+
+    rates: dict[str, float] = {}
+    for species, fraction in fractions.items():
+        conductance_m3_s = molecular_tube_conductance_m3_s(
+            diameter_m,
+            length_m,
+            temperature_K,
+            masses_kg_mol[species],
+            transmission_probability=transmission,
+            knudsen_number=FREE_MOLECULAR_KNUDSEN_MIN,
+        )
+        partial_pa = fraction * upstream_pa
+        throughput_pa_m3 = throughput_pa_m3_s(conductance_m3_s, partial_pa)
+        rates[species] = throughput_pa_m3 / (
+            GAS_CONSTANT_CODATA * temperature_K
+        )
+    return rates
+
+
+def _pipe_outflow_result(
+    species_mol_s: Mapping[str, float],
+    *,
+    regime: KnudsenRegime,
+    blend_weight: float,
+    binding_cause: str,
+    notices: tuple[str, ...],
+) -> PipeSpeciesOutflow:
+    return PipeSpeciesOutflow(
+        species_mol_s=MappingProxyType(dict(sorted(species_mol_s.items()))),
+        regime=regime,
+        blend_weight=blend_weight,
+        binding_cause=binding_cause,
+        notices=notices,
+    )
+
+
+def pipe_species_outflow_mol_s(
+    P_up_Pa: float,
+    P_down_Pa: float,
+    T_K: float,
+    holdup_mol: Mapping[str, float],
+    diameter_m: float,
+    length_m: float,
+) -> PipeSpeciesOutflow:
+    """Molar outflow of each holdup species through one pipe.
+
+    Continuum (blend weight 0) is one sonic-capped Beskok–Poiseuille
+    total split by mole fraction. The free-molecular end (weight 1) is
+    each species' own effusion. Between Kn = 0.05 and Kn = 10 the two
+    rates mix with the smoothstep weight, and that mix is not split
+    again. P_down >= P_up is zero forward flow. A positive downstream
+    pressure on a branch that still has an effusion term refuses: the
+    free-molecular law needs p_down,i, and this function is given one
+    total downstream pressure, not a downstream composition.
+    """
+
+    upstream_pa = _pipe_scalar(
+        P_up_Pa,
+        "P_up_Pa",
+        "invalid_pressure",
+        allow_zero=True,
+    )
+    downstream_pa = _pipe_scalar(
+        P_down_Pa,
+        "P_down_Pa",
+        "invalid_pressure",
+        allow_zero=True,
+    )
+    temperature_K = _pipe_scalar(
+        T_K,
+        "T_K",
+        "invalid_temperature",
+        allow_zero=False,
+    )
+    diameter = _pipe_scalar(
+        diameter_m,
+        "diameter_m",
+        "invalid_geometry",
+        allow_zero=False,
+    )
+    length = _pipe_scalar(
+        length_m,
+        "length_m",
+        "invalid_geometry",
+        allow_zero=False,
+    )
+    fractions = _pipe_mole_fractions(holdup_mol)
+    transmission = _pipe_transmission(diameter, length)
+    state = _pipe_knudsen(fractions, upstream_pa, temperature_K, diameter)
+    knudsen_number = state.knudsen_number
+    blend_weight = _molecular_blend_weight(knudsen_number)
+    masses = {
+        carrier.species: carrier.molar_mass_kg_mol
+        for carrier in state.carriers
+    }
+    mean_molar_mass = math.fsum(
+        fraction * masses[species] for species, fraction in fractions.items()
+    )
+    uses_dushman = (length / diameter) < LONG_TUBE_L_OVER_D_MIN
+    notices: list[str] = []
+    if knudsen_number > PIPE_MOLECULAR_BLEND_KN_LO:
+        notices.append(_NOTICE_MOLECULAR_BLEND)
+    if blend_weight > 0.0 and uses_dushman:
+        notices.append(_NOTICE_DUSHMAN_BIAS)
+    notice_tuple = tuple(notices)
+
+    if downstream_pa >= upstream_pa:
+        binding = (
+            "molecular_conductance" if blend_weight == 1.0 else "pipe"
+        )
+        return _pipe_outflow_result(
+            {species: 0.0 for species in fractions},
+            regime=state.regime,
+            blend_weight=blend_weight,
+            binding_cause=binding,
+            notices=notice_tuple,
+        )
+    if downstream_pa > 0.0 and blend_weight > 0.0:
+        raise TransportRegimeRefusal(
+            "downstream_composition_unspecified",
+            "free-molecular outflow needs a per-species downstream "
+            "pressure; one total P_down is not a composition",
+        )
+
+    choked = False
+    continuum: dict[str, float] | None = None
+    if blend_weight < 1.0:
+        continuum, choked = _continuum_species_mol_s(
+            fractions,
+            masses,
+            mean_molar_mass,
+            diameter_m=diameter,
+            length_m=length,
+            temperature_K=temperature_K,
+            upstream_pa=upstream_pa,
+            downstream_pa=downstream_pa,
+            knudsen_number=knudsen_number,
+        )
+        if choked:
+            notices.append(_NOTICE_HEAT_CAPACITY_RATIO)
+            notice_tuple = tuple(notices)
+    effusion: dict[str, float] | None = None
+    if blend_weight > 0.0:
+        effusion = _effusion_species_mol_s(
+            fractions,
+            masses,
+            diameter_m=diameter,
+            length_m=length,
+            temperature_K=temperature_K,
+            upstream_pa=upstream_pa,
+            transmission=transmission,
+        )
+
+    blended: dict[str, float] = {}
+    for species in fractions:
+        from_continuum = 0.0 if continuum is None else continuum[species]
+        from_effusion = 0.0 if effusion is None else effusion[species]
+        # One mix of the two already-split rates. No second split.
+        blended[species] = (
+            (1.0 - blend_weight) * from_continuum
+            + blend_weight * from_effusion
+        )
+    if blend_weight == 0.0 and choked:
+        binding = "choked_throat"
+    elif blend_weight == 1.0:
+        binding = "molecular_conductance"
+    else:
+        binding = "pipe"
+    return _pipe_outflow_result(
+        blended,
+        regime=state.regime,
+        blend_weight=blend_weight,
+        binding_cause=binding,
+        notices=notice_tuple,
+    )
 
 
 DEFAULT_INITIAL_THROAT_AREA_M2 = math.pi * 0.06**2  # m² — 12 cm diameter throat back-compat anchor

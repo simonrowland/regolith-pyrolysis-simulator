@@ -698,6 +698,37 @@ def long_tube_clausing_transmission(
     return 4.0 * diameter_m / (3.0 * length_m)
 
 
+def short_tube_dushman_transmission(
+    diameter_m: float,
+    length_m: float,
+) -> float:
+    """Dushman entrance transmission.
+
+    Premise: an orifice (transmission 1) in series with the long-tube wall
+    resistance 3L/(4d). Algebra: the reciprocal sum is
+    W = 1 / (1 + (3/4)*(L/d)). Dropping the entrance 1 leaves 4d/(3L),
+    which is long_tube_clausing_transmission. That helper still refuses
+    L/D < LONG_TUBE_L_OVER_D_MIN; this function does not relax the guard
+    and is not the L/D >= 10 path.
+    Unit check: W is dimensionless.
+    Limit: L/d -> 0 gives W -> 1. At L/d = 1/0.12, W = 0.13793103448;
+    the refused asymptote 4d/(3L) would be 0.160.
+    """
+
+    diameter_m = _require_positive(
+        diameter_m,
+        name="diameter_m",
+        category="invalid_geometry",
+    )
+    length_m = _require_positive(
+        length_m,
+        name="length_m",
+        category="invalid_geometry",
+    )
+    length_over_diameter = length_m / diameter_m
+    return 1.0 / (1.0 + 0.75 * length_over_diameter)
+
+
 def molecular_tube_conductance_m3_s(
     diameter_m: float,
     length_m: float,

@@ -33,6 +33,20 @@ from simulator.overhead import (
     OverheadConfigurationError,
     OverheadGasModel,
     _mean_molar_mass_kg_mol,
+    compressible_poiseuille_mass_flow,
+    gas_dynamic_viscosity_Pa_s,
+    pipe_species_outflow_mol_s,
+)
+from simulator.physical_constants import GAS_CONSTANT as GAS_CONSTANT_CODATA
+from simulator.transport_regime import (
+    MOLAR_MASSES_KG_PER_MOL,
+    KnudsenRegime,
+    TransportRegimeRefusal,
+    beskok_karniadakis_rarefaction_factor,
+    long_tube_clausing_transmission,
+    molecular_tube_conductance_m3_s,
+    short_tube_dushman_transmission,
+    single_species_mean_free_path,
 )
 from simulator.state import (
     Atmosphere,
@@ -1010,3 +1024,302 @@ def test_sc333_equipment_overhead_pipe_transport_numeric_pins():
     assert equipment_conductance.hex() == expected_conductance_hex
     assert overhead_conductance.hex() == expected_conductance_hex
     assert equipment_conductance == overhead_conductance
+
+
+# d-450 canonical O2 pipe. Hand values are the design probe's printed
+# digits. Helpers below only call production symbols.
+_CANONICAL_T_K = 1904.7700354769336
+_CANONICAL_D_M = 0.12
+_CANONICAL_L_M = 1.0
+_HOUR103_PA = 5.6005612727e7
+
+
+def _o2_outflow(
+    upstream_pa,
+    downstream_pa=0.0,
+    holdup_mol=1.0,
+    diameter_m=_CANONICAL_D_M,
+    length_m=_CANONICAL_L_M,
+):
+    return pipe_species_outflow_mol_s(
+        upstream_pa,
+        downstream_pa,
+        _CANONICAL_T_K,
+        {"O2": holdup_mol},
+        diameter_m,
+        length_m,
+    )
+
+
+def _kg_per_h(result):
+    return (
+        result.species_mol_s["O2"]
+        * MOLAR_MASSES_KG_PER_MOL["O2"]
+        * 3600.0
+    )
+
+
+def _continuum_parts(
+    upstream_pa,
+    downstream_pa=0.0,
+    diameter_m=_CANONICAL_D_M,
+    length_m=_CANONICAL_L_M,
+):
+    """Uncapped Poiseuille, Beskok factor, and their product, in kg/h."""
+
+    state = single_species_mean_free_path(
+        "O2",
+        upstream_pa,
+        _CANONICAL_T_K,
+        diameter_m,
+    )
+    poiseuille_kg_s = compressible_poiseuille_mass_flow(
+        diameter_m,
+        length_m,
+        MOLAR_MASSES_KG_PER_MOL["O2"],
+        gas_dynamic_viscosity_Pa_s(_CANONICAL_T_K),
+        _CANONICAL_T_K,
+        upstream_pa,
+        downstream_pa,
+    )
+    factor = beskok_karniadakis_rarefaction_factor(
+        state.knudsen_number,
+        allow_near_viscous_cross_check=state.knudsen_number < 0.01,
+    )
+    return (
+        poiseuille_kg_s * 3600.0,
+        factor,
+        poiseuille_kg_s * factor * 3600.0,
+        state.knudsen_number,
+    )
+
+
+def _pressure_root_pa(target_kg_h, low_pa, high_pa):
+    low = low_pa
+    high = high_pa
+    for _ in range(80):
+        mid = 0.5 * (low + high)
+        if _kg_per_h(_o2_outflow(mid)) < target_kg_h:
+            low = mid
+        else:
+            high = mid
+    return 0.5 * (low + high)
+
+
+def _sign_changes(target_kg_h, pressures):
+    previous = None
+    changes = 0
+    for pressure in pressures:
+        delta = _kg_per_h(_o2_outflow(pressure)) - target_kg_h
+        if previous is not None and previous * delta < 0.0:
+            changes += 1
+        previous = delta
+    return changes
+
+
+def test_pipe_mass_flow_at_20_Pa_matches_poiseuille_times_beskok():
+    result = _o2_outflow(20.0)
+    poiseuille, factor, product, knudsen = _continuum_parts(20.0)
+
+    assert knudsen == pytest.approx(0.020518331284, abs=5e-13)
+    assert poiseuille == pytest.approx(0.11278885995, abs=5e-12)
+    assert factor == pytest.approx(1.0960933853, abs=5e-11)
+    assert product == pytest.approx(0.1236271233, abs=5e-11)
+    assert _kg_per_h(result) == pytest.approx(0.1236271233, abs=5e-11)
+    assert _kg_per_h(result) == pytest.approx(poiseuille * factor, rel=1e-12)
+    assert result.regime is KnudsenRegime.TRANSITIONAL
+    assert result.blend_weight == 0.0
+    assert result.binding_cause == "pipe"
+    assert _o2_outflow(20.0, holdup_mol=1.0e-4).species_mol_s["O2"] == (
+        result.species_mol_s["O2"]
+    )
+
+
+def test_canonical_pipe_does_not_use_long_tube_clausing():
+    length_over_diameter = _CANONICAL_L_M / _CANONICAL_D_M
+    assert length_over_diameter == pytest.approx(8.3333333333, abs=5e-11)
+    with pytest.raises(TransportRegimeRefusal) as refused:
+        long_tube_clausing_transmission(_CANONICAL_D_M, _CANONICAL_L_M)
+    assert refused.value.category == "clausing_long_tube_asymptote_out_of_range"
+
+    transmission = short_tube_dushman_transmission(_CANONICAL_D_M, _CANONICAL_L_M)
+    assert transmission == pytest.approx(0.13793103448, abs=5e-12)
+
+    # Kn = 10 on this pipe. Effusion uses the hand W, not 4d/(3L) = 0.160.
+    pressure = 0.041036662569
+    result = _o2_outflow(pressure)
+    molar_mass = MOLAR_MASSES_KG_PER_MOL["O2"]
+    dushman = molecular_tube_conductance_m3_s(
+        _CANONICAL_D_M,
+        _CANONICAL_L_M,
+        _CANONICAL_T_K,
+        molar_mass,
+        transmission_probability=0.13793103448,
+        knudsen_number=10.0,
+    )
+    expected_mol_s = dushman * pressure / (GAS_CONSTANT_CODATA * _CANONICAL_T_K)
+    assert result.blend_weight == 1.0
+    assert result.binding_cause == "molecular_conductance"
+    assert result.species_mol_s["O2"] == pytest.approx(expected_mol_s, rel=1e-9)
+    asymptote = molecular_tube_conductance_m3_s(
+        _CANONICAL_D_M,
+        _CANONICAL_L_M,
+        _CANONICAL_T_K,
+        molar_mass,
+        transmission_probability=0.160,
+        knudsen_number=10.0,
+    )
+    asymptote_mol_s = asymptote * pressure / (GAS_CONSTANT_CODATA * _CANONICAL_T_K)
+    assert result.species_mol_s["O2"] != pytest.approx(asymptote_mol_s, rel=1e-3)
+    assert any(
+        notice.startswith("dushman_transmission_high_bias")
+        for notice in result.notices
+    )
+
+    # L/D = 10 stays on the long-tube helper.
+    long_diameter_m = 0.10
+    long_length_m = 1.0
+    long_w = long_tube_clausing_transmission(long_diameter_m, long_length_m)
+    short_w = short_tube_dushman_transmission(long_diameter_m, long_length_m)
+    long_result = _o2_outflow(
+        0.02,
+        diameter_m=long_diameter_m,
+        length_m=long_length_m,
+    )
+    long_conductance = molecular_tube_conductance_m3_s(
+        long_diameter_m,
+        long_length_m,
+        _CANONICAL_T_K,
+        molar_mass,
+        transmission_probability=long_w,
+        knudsen_number=10.0,
+    )
+    short_conductance = molecular_tube_conductance_m3_s(
+        long_diameter_m,
+        long_length_m,
+        _CANONICAL_T_K,
+        molar_mass,
+        transmission_probability=short_w,
+        knudsen_number=10.0,
+    )
+    long_mol_s = long_conductance * 0.02 / (GAS_CONSTANT_CODATA * _CANONICAL_T_K)
+    short_mol_s = short_conductance * 0.02 / (GAS_CONSTANT_CODATA * _CANONICAL_T_K)
+    assert long_result.species_mol_s["O2"] == pytest.approx(long_mol_s, rel=1e-12)
+    assert long_result.species_mol_s["O2"] != pytest.approx(short_mol_s, rel=1e-4)
+
+
+def test_beskok_factor_is_continuous_at_kn_0_01():
+    at_boundary = beskok_karniadakis_rarefaction_factor(0.01)
+    at_boundary_flagged = beskok_karniadakis_rarefaction_factor(
+        0.01,
+        allow_near_viscous_cross_check=True,
+    )
+    assert at_boundary == pytest.approx(1.0458533635, abs=5e-11)
+    assert at_boundary_flagged == at_boundary
+
+    pressure = 41.036662569
+    state = single_species_mean_free_path("O2", pressure, _CANONICAL_T_K, _CANONICAL_D_M)
+    assert state.knudsen_number == pytest.approx(0.01, abs=1e-12)
+    flagged = beskok_karniadakis_rarefaction_factor(
+        state.knudsen_number,
+        allow_near_viscous_cross_check=True,
+    )
+    assert flagged == pytest.approx(1.0458533635, abs=5e-11)
+    _poiseuille, _factor, product, _knudsen = _continuum_parts(pressure)
+    assert _kg_per_h(_o2_outflow(pressure)) == pytest.approx(product, rel=1e-12)
+
+    # Same formula a hair into each side. The hard switch jumped by about 4%.
+    viscous = beskok_karniadakis_rarefaction_factor(
+        0.00999,
+        allow_near_viscous_cross_check=True,
+    )
+    transitional = beskok_karniadakis_rarefaction_factor(0.01001)
+    assert abs(viscous - transitional) / at_boundary < 1e-3
+
+    assert _pressure_root_pa(0.485, 30.0, 55.0) == pytest.approx(
+        40.542726457,
+        abs=5e-10,
+    )
+    assert _kg_per_h(_o2_outflow(40.542726457)) == pytest.approx(0.485, abs=1e-9)
+    assert abs(_kg_per_h(_o2_outflow(41.473220575)) - 0.485) > 0.01
+    pressures = [30.0 + 25.0 * i / 400.0 for i in range(401)]
+    assert _sign_changes(0.485, pressures) == 1
+
+
+def test_molecular_blend_has_one_root_inside_the_former_jump():
+    target_kg_h = 8e-5
+    low_pa = 0.025121178
+    high_pa = 0.110419978
+    low = _o2_outflow(low_pa)
+    assert low.blend_weight == 1.0
+    assert _kg_per_h(low) == pytest.approx(target_kg_h, abs=5e-12)
+
+    _poiseuille, _factor, continuum, _knudsen = _continuum_parts(high_pa)
+    assert continuum == pytest.approx(target_kg_h, abs=5e-12)
+    high = _o2_outflow(high_pa)
+    assert 0.0 < high.blend_weight < 1.0
+    assert abs(_kg_per_h(high) - target_kg_h) > 1e-4
+
+    assert _pressure_root_pa(target_kg_h, 0.001, 1.0) == pytest.approx(
+        low_pa,
+        abs=5e-10,
+    )
+    pressures = [
+        math.exp(math.log(0.001) + (math.log(1.0) - math.log(0.001)) * i / 399.0)
+        for i in range(400)
+    ]
+    assert _sign_changes(target_kg_h, pressures) == 1
+
+
+def test_sonic_cap_binds_above_crossing():
+    result = _o2_outflow(_HOUR103_PA)
+    kg_s = result.species_mol_s["O2"] * MOLAR_MASSES_KG_PER_MOL["O2"]
+    assert kg_s == pytest.approx(616.49173048, abs=5e-9)
+    poiseuille_kg_h, _factor, _product, _knudsen = _continuum_parts(_HOUR103_PA)
+    poiseuille_kg_s = poiseuille_kg_h / 3600.0
+    assert poiseuille_kg_s == pytest.approx(2.4567831270e8, rel=1e-10)
+    assert kg_s < poiseuille_kg_s
+    assert result.binding_cause == "choked_throat"
+    assert result.blend_weight == 0.0
+    assert "heat_capacity_ratio_ideal_diatomic" in result.notices
+
+    low = _o2_outflow(26.6)
+    _poiseuille, _factor, continuum, _knudsen = _continuum_parts(26.6)
+    assert _kg_per_h(low) == pytest.approx(continuum, rel=1e-12)
+    sonic_kg_s = 616.49173048 * (26.6 / _HOUR103_PA)
+    assert _kg_per_h(low) / 3600.0 < sonic_kg_s
+    assert low.binding_cause == "pipe"
+    assert "heat_capacity_ratio_ideal_diatomic" not in low.notices
+
+
+def test_credit_rate_is_on_the_sonic_branch():
+    pressure = 222.82427409
+    result = _o2_outflow(pressure)
+    assert _kg_per_h(result) == pytest.approx(8.83, abs=1e-9)
+    _poiseuille, _factor, continuum, knudsen = _continuum_parts(pressure)
+    assert knudsen == pytest.approx(0.001841660328, abs=5e-13)
+    assert continuum == pytest.approx(14.112770115, abs=5e-10)
+    assert _kg_per_h(result) < continuum
+    sonic_kg_h = 616.49173048 * (pressure / _HOUR103_PA) * 3600.0
+    assert sonic_kg_h == pytest.approx(8.83, abs=1e-9)
+    assert result.binding_cause == "choked_throat"
+    assert result.blend_weight == 0.0
+    assert result.regime is KnudsenRegime.VISCOUS
+    assert "heat_capacity_ratio_ideal_diatomic" in result.notices
+    assert "molecular_blend_unvalidated" not in result.notices
+
+
+def test_vacuum_downstream_zero_when_P_down_ge_P_up():
+    for upstream_pa, downstream_pa in (
+        (20.0, 20.0),
+        (20.0, 25.0),
+        (0.02, 0.02),
+        (0.02, 0.05),
+    ):
+        result = _o2_outflow(upstream_pa, downstream_pa)
+        assert result.species_mol_s["O2"] == 0.0
+    vacuum = _o2_outflow(20.0, 0.0)
+    assert _kg_per_h(vacuum) == pytest.approx(0.1236271233, abs=5e-11)
+    with pytest.raises(TransportRegimeRefusal) as refused:
+        _o2_outflow(0.02, 0.01)
+    assert refused.value.category == "downstream_composition_unspecified"
