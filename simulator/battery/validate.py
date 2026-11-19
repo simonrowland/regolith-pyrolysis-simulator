@@ -2685,8 +2685,8 @@ def _validate_residual_with_indexes(
                 )
             else:
                 relation_detail = (
-                    "score_eligible requires a source relation that is "
-                    "not a proven same input"
+                    "score_eligible blocks source_relation same_input, "
+                    "training, quoted_overlap, and correlated"
                 )
             issues.append(
                 _issue(
