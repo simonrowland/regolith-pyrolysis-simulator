@@ -39,6 +39,35 @@ def test_timeout_admission_is_detected(tmp_path, monkeypatch):
         test_transient_and_unknown_refusals_are_never_stored("engine_timeout", tmp_path, monkeypatch)
 
 
+@pytest.mark.parametrize("marker", [
+    "speciation_no_finite_values", "no_finite_values",
+    "thermoengine_nonfinite_field",
+])
+def test_deterministic_engine_refusal_marker_removal_is_detected(marker, monkeypatch):
+    original = engine_cache._DETERMINISTIC_ENGINE_REFUSAL_MARKER_GROUPS
+    monkeypatch.setattr(
+        engine_cache,
+        "_DETERMINISTIC_ENGINE_REFUSAL_MARKER_GROUPS",
+        tuple(
+            filtered
+            for group in original
+            if (filtered := tuple(item for item in group if item != marker))
+        ),
+    )
+    if marker == "thermoengine_nonfinite_field":
+        from tests.test_engine_cache_refusals import (
+            test_thermoengine_refusal_requires_its_typed_field_code,
+        )
+        with pytest.raises(AssertionError):
+            test_thermoengine_refusal_requires_its_typed_field_code()
+    else:
+        from tests.test_engine_cache_refusals import (
+            test_vaporock_refusal_requires_both_empty_speciation_codes,
+        )
+        with pytest.raises(AssertionError):
+            test_vaporock_refusal_requires_both_empty_speciation_codes()
+
+
 def test_sequence_reuse_is_detected(tmp_path, monkeypatch):
     from tests.test_engine_cache_boxes import test_per_box_sequence_ranges_persist_without_max_scans
 

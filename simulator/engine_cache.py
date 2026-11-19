@@ -14,6 +14,7 @@ import inspect
 import json
 import logging
 import math
+import re
 import struct
 import os
 import sqlite3
@@ -294,16 +295,68 @@ CACHEABLE_REFUSAL_CODES = frozenset({
     REFUSAL_NO_LIQUID,
 })
 
+# These are solver outcomes for a fixed, exact request, rather than transport
+# or installation failures. VapoRock classifies an empty finite speciation
+# after conversion, and ThermoEngine classifies a row-local non-finite Gibbs
+# field; neither can change without changing the request or engine version.
+# Keep timeouts, crashes, unavailable engines, and unknown failures uncached.
+_DETERMINISTIC_ENGINE_REFUSAL_MARKER_GROUPS = (
+    ("speciation_no_finite_values", "no_finite_values"),
+    ("thermoengine_nonfinite_field",),
+)
+
+
+def _has_deterministic_engine_refusal(detail: str) -> bool:
+    reason_codes = set(re.findall(r"[a-z0-9_]+", detail))
+    return any(
+        all(marker in reason_codes for marker in group)
+        for group in _DETERMINISTIC_ENGINE_REFUSAL_MARKER_GROUPS
+    )
+
 
 def cacheable_refusal(result) -> bool:
-    return (
+    # EquilibriumResult and its light-weight adapter projections carry the
+    # refusal code in backend diagnostics rather than a mapping envelope.
+    diagnostics = getattr(result, "diagnostics", None)
+    if isinstance(diagnostics, Mapping):
+        if diagnostics.get("backend_failure_disposition"):
+            return False
+        status = getattr(result, "status", None)
+        reason = " ".join(
+            str(diagnostics.get(name) or "").lower()
+            for name in (
+                "backend_status_reason", "backend_failure_reason_code",
+                "empty_speciation_cause", "engine_reason",
+            )
+        )
+        if (
+            status == "not_converged"
+            and _has_deterministic_engine_refusal(reason)
+        ):
+            return True
+        # ThermoEngineNonFiniteField is emitted only for a row-local numeric
+        # field validation failure. Missing engines and transport failures
+        # have distinct statuses/dispositions and remain excluded.
+        if _has_deterministic_engine_refusal(reason):
+            return True
+    if (
         isinstance(result, Mapping)
         and result.get("status") == "refusal"
-        and result.get("refusal_reason") in CACHEABLE_REFUSAL_CODES
-        and result.get("engine_status") in {None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok"}
         and not result.get("exit_signal")
         and not result.get("exit_code")
-    )
+    ):
+        if result.get("refusal_reason") in CACHEABLE_REFUSAL_CODES:
+            return result.get("engine_status") in {
+                None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok",
+            }
+        detail = " ".join(str(result.get(name) or "") for name in (
+            "refusal_reason", "engine_status", "reason", "engine_reason",
+        )).lower()
+        # These are the engine-level failure labels emitted by VapoRock and
+        # ThermoEngine. Exact marker matching leaves generic not_converged and
+        # unavailable outcomes on the existing non-cacheable path.
+        return _has_deterministic_engine_refusal(detail)
+    return False
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,

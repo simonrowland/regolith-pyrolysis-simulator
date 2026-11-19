@@ -4,7 +4,7 @@ import threading
 import pytest
 
 from simulator import engine_cache
-from simulator.melt_backend.base import _call_with_hard_timeout
+from simulator.melt_backend.base import EquilibriumResult, _call_with_hard_timeout
 
 
 def test_deterministic_refusal_allowlist_is_explicit():
@@ -12,6 +12,113 @@ def test_deterministic_refusal_allowlist_is_explicit():
 
     assert CACHEABLE_REFUSAL_CODES == frozenset({
         "out_of_basis", "composition_projected", "sum_below_95_wt_pct", "no_liquid",
+    })
+
+
+@pytest.mark.parametrize(("engine", "reason", "detail"), [
+    ("vaporock", "not_converged", "speciation_no_finite_values (no_finite_values)"),
+    ("thermoengine", "unavailable", "thermoengine_nonfinite_field: liquid Gibbs energy"),
+])
+def test_deterministic_engine_refusal_round_trips_with_reason_and_detail(
+    engine, reason, detail, tmp_path, monkeypatch,
+):
+    path = tmp_path / "cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache.engine_cache_counters(reset=True)
+    expected = {
+        "status": "refusal", "refusal_reason": reason,
+        "engine_status": reason, "engine_reason": detail,
+    }
+    assert engine_cache.cached_engine_call(engine, {}, lambda: expected) == expected
+    engine_cache._MEMORY_CACHE.clear()
+    assert engine_cache.cached_engine_call(
+        engine, {}, lambda: pytest.fail("deterministic refusal was not stored")
+    ) == expected
+    counts = engine_cache.engine_cache_counters(reset=True)[engine]
+    assert counts["misses"] == counts["hits"] == counts["stores"] == 1
+
+
+def test_vaporock_equilibrium_refusal_round_trips_its_typed_diagnostics(
+    tmp_path, monkeypatch,
+):
+    path = tmp_path / "cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache.engine_cache_counters(reset=True)
+    refusal = EquilibriumResult(
+        phase_assemblage_available=False,
+        status="not_converged",
+        warnings=["speciation_no_finite_values (no_finite_values)"],
+        diagnostics={
+            "backend_status_reason": "speciation_no_finite_values",
+            "empty_speciation_cause": "no_finite_values",
+        },
+    )
+
+    def solve():
+        assert engine_cache.cacheable_refusal(refusal)
+        return refusal.to_hot(engine_id="vaporock")
+
+    cold = engine_cache.cached_engine_call("vaporock", {"input": 1}, solve)
+    engine_cache._MEMORY_CACHE.clear()
+    warm = engine_cache.cached_engine_call(
+        "vaporock", {"input": 1}, lambda: pytest.fail("refusal was not stored")
+    )
+    restored = EquilibriumResult.from_engine_cache_value(warm, engine_id="vaporock")
+    assert restored.status == refusal.status
+    assert restored.diagnostics["backend_status_reason"] == "speciation_no_finite_values"
+    assert restored.diagnostics["empty_speciation_cause"] == "no_finite_values"
+    assert restored.warnings == refusal.warnings
+    assert cold == warm
+    counts = engine_cache.engine_cache_counters(reset=True)["vaporock"]
+    assert counts["misses"] == counts["hits"] == counts["stores"] == 1
+
+
+def test_deterministic_refusal_markers_do_not_cache_unavailable_or_crash(
+    tmp_path, monkeypatch,
+):
+    path = tmp_path / "cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache.engine_cache_counters(reset=True)
+    calls = []
+
+    def solve():
+        calls.append(1)
+        return {
+            "status": "refusal", "refusal_reason": "unavailable",
+            "engine_status": "unavailable", "engine_reason": "engine install missing",
+        }
+
+    for _ in range(2):
+        engine_cache.cached_engine_call("thermoengine", {}, solve)
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+
+
+def test_vaporock_refusal_requires_both_empty_speciation_codes():
+    for detail in ("speciation_no_finite_values", "no_finite_values"):
+        assert not engine_cache.cacheable_refusal({
+            "status": "refusal", "refusal_reason": "not_converged",
+            "engine_status": "not_converged", "engine_reason": detail,
+        })
+    assert engine_cache.cacheable_refusal({
+        "status": "refusal", "refusal_reason": "not_converged",
+        "engine_status": "not_converged",
+        "engine_reason": "speciation_no_finite_values no_finite_values",
+    })
+
+
+def test_thermoengine_refusal_requires_its_typed_field_code():
+    assert not engine_cache.cacheable_refusal({
+        "status": "refusal", "refusal_reason": "unavailable",
+        "engine_status": "unavailable", "engine_reason": "liquid Gibbs energy unavailable",
+    })
+    assert engine_cache.cacheable_refusal({
+        "status": "refusal", "refusal_reason": "unavailable",
+        "engine_status": "unavailable",
+        "engine_reason": "thermoengine_nonfinite_field: liquid Gibbs energy",
     })
 
 
