@@ -1589,9 +1589,28 @@ _OPENIMCC_TRACE_GAS_PARENT_ENGINE_MISMATCH = (
 )
 _OPENIMCC_TRACE_GAS_CARRIER_MISMATCH = "openimcc_trace_gas_carrier_mismatch"
 _OPENIMCC_TRACE_GAS_PARENT_ABSENT = "openimcc_trace_gas_parent_absent"
-_OPENIMCC_TRACE_GAS_STANDARD_MISMATCH_SPECIES = frozenset({"Ga2O3", "In2O3"})
-_OPENIMCC_TRACE_GAS_ENGINE_PARENT_MISMATCH_SPECIES = frozenset(
-    {"Ag2O", "Sb2O3", "Tl2O"}
+_OPENIMCC_TRACE_GAS_PARENT_MISMATCHES: Mapping[str, str] = MappingProxyType(
+    {
+        "Ga2O3": _OPENIMCC_TRACE_GAS_PARENT_STANDARD_UNVERIFIED,
+        "In2O3": _OPENIMCC_TRACE_GAS_PARENT_STANDARD_UNVERIFIED,
+        "Ag2O": _OPENIMCC_TRACE_GAS_PARENT_ENGINE_MISMATCH,
+        "Sb2O3": _OPENIMCC_TRACE_GAS_PARENT_ENGINE_MISMATCH,
+        "Tl2O": _OPENIMCC_TRACE_GAS_PARENT_ENGINE_MISMATCH,
+    }
+)
+_OPENIMCC_TRACE_GAS_PARENT_SAME_STANDARD: tuple[str, ...] = (
+    "As2O3",
+    "Bi2O3",
+    "Ce2O3",
+    "Cu2O",
+    "GeO2",
+    "La2O3",
+    "MoO3",
+    "PbO",
+    "Rb2O",
+    "SnO",
+    "V2O3",
+    "WO3",
 )
 _OPENIMCC_TRACE_GAS_PARENT_STANDARD_REASON = (
     "Bischof KEMS liquid activity uses a different standard from the "
@@ -1658,7 +1677,8 @@ def _openimcc_gas_parent_inputs(
                 }
             )
             continue
-        if parent in _OPENIMCC_TRACE_GAS_STANDARD_MISMATCH_SPECIES:
+        mismatch = _OPENIMCC_TRACE_GAS_PARENT_MISMATCHES.get(parent)
+        if mismatch == _OPENIMCC_TRACE_GAS_PARENT_STANDARD_UNVERIFIED:
             trace_notices.append(
                 {
                     "kind": _OPENIMCC_TRACE_GAS_PARENT_STANDARD_UNVERIFIED,
@@ -1669,7 +1689,7 @@ def _openimcc_gas_parent_inputs(
                 }
             )
             continue
-        if parent in _OPENIMCC_TRACE_GAS_ENGINE_PARENT_MISMATCH_SPECIES:
+        if mismatch == _OPENIMCC_TRACE_GAS_PARENT_ENGINE_MISMATCH:
             trace_notices.append(
                 {
                     "kind": _OPENIMCC_TRACE_GAS_PARENT_ENGINE_MISMATCH,

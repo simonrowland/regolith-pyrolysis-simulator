@@ -3134,6 +3134,25 @@ def test_openimcc_gas_parent_assembly_flags_unsafe_trace_activities(
     )
 
 
+def test_openimcc_fragment_parent_standard_classification_covers_pin() -> None:
+    _require_openimcc()
+    from openimcc import supported_trace_oxides
+    from simulator.melt_backend import openimcc_bridge
+
+    fragment_parents = {
+        str(component.oxide)
+        for component in supported_trace_oxides()
+        if component.activity_source == "review_gamma"
+    }
+    mismatched = set(openimcc_bridge._OPENIMCC_TRACE_GAS_PARENT_MISMATCHES)
+    same_standard = set(
+        openimcc_bridge._OPENIMCC_TRACE_GAS_PARENT_SAME_STANDARD
+    )
+
+    assert mismatched.isdisjoint(same_standard)
+    assert fragment_parents == mismatched | same_standard
+
+
 @pytest.mark.parametrize("trace_oxide", ("S", "SO3", "Cl", "F"))
 def test_openimcc_trace_carrier_activity_is_not_a_gas_fugacity_notice(
     trace_oxide: str,
