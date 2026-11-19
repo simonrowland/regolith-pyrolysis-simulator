@@ -8549,54 +8549,61 @@ class _FeRedoxRefusal:
     detail: dict[str, object]
 
 
-def _openimcc_candidate_valence_fields(
+def _openimcc_candidate_valence_states(
     identity: Identity,
-) -> Mapping[int, str] | None:
+) -> tuple[int, ...] | None:
     """Return the pinned candidate pack's modeled states for this basis."""
 
     formula = identity.species.formula if identity.species is not None else ""
-    if formula == "Cr":
-        fields = {2: "chromous_cr_mol", 3: "chromic_cr_mol"}
-    elif formula == "Ti":
-        fields = {3: "titanous_ti_mol", 4: "titanic_ti_mol"}
-    else:
+    states_by_element = {"Cr": (2, 3), "Ti": (3, 4), "Mn": (2, 3)}
+    states = states_by_element.get(formula)
+    if states is None:
         return None
     basis_state = identity.valence_basis
     if basis_state is None or not basis_state.is_value:
         return None
     basis = basis_state.value
     numerator = basis.numerator_oxidation_states
-    if len(numerator) != 1 or numerator[0] not in fields:
+    if len(numerator) != 1 or numerator[0] not in states:
         return None
     if (
         basis.value_form is ValenceValueForm.FRACTION
         and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
     ):
-        return fields
+        return states
     if (
         basis.value_form in {ValenceValueForm.RATIO, ValenceValueForm.LOG10_RATIO}
         and basis.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
-        and basis.denominator_oxidation_state in fields
+        and basis.denominator_oxidation_state in states
         and basis.denominator_oxidation_state != numerator[0]
     ):
-        return fields
+        return states
     return None
 
 
 def _openimcc_candidate_valence_value(
     identity: Identity,
     result: object,
-    fields: Mapping[int, str],
+    states: tuple[int, ...],
 ) -> float | None:
-    """Project OpenIMCC's two-state mole ledger onto the printed valence basis."""
+    """Project OpenIMCC's generic state ledger onto the printed valence basis."""
 
     basis_state = identity.valence_basis
     if basis_state is None or not basis_state.is_value:
         return None
     basis = basis_state.value
+    formula = identity.species.formula if identity.species is not None else ""
+    by_element = getattr(result, "element_moles_by_oxidation_state", None)
+    if not isinstance(by_element, Mapping):
+        return None
+    element_amounts = by_element.get(formula)
+    if not isinstance(element_amounts, Mapping):
+        return None
+    # OpenIMCC omits zero-amount states from this ledger. A missing supported
+    # state is therefore a computed zero; a missing element ledger is not.
     amounts = {
-        state: float(getattr(result, field_name))
-        for state, field_name in fields.items()
+        state: float(element_amounts.get(state, 0.0))
+        for state in states
     }
     if any(not math.isfinite(amount) or amount < 0.0 for amount in amounts.values()):
         return None
@@ -8604,7 +8611,7 @@ def _openimcc_candidate_valence_value(
     numerator = amounts[numerator_state]
     if basis.value_form is ValenceValueForm.FRACTION:
         # These candidate rows model only the supported pair, which is the
-        # full element denominator for the Cr(II/III) and Ti(III/IV) bases.
+        # full element denominator for the Cr, Ti, and Mn bases.
         denominator = math.fsum(amounts.values())
     else:
         assert basis.denominator_oxidation_state is not None
@@ -9301,10 +9308,10 @@ def _predict_redox(
                 RefusalReason.INVALID_IDENTITY,
                 {"reason": "invalid_redox_composition", "detail": str(exc)},
             )
-        candidate_fields = _openimcc_candidate_valence_fields(identity)
+        candidate_states = _openimcc_candidate_valence_states(identity)
         redox_element = (
             identity.species.formula
-            if candidate_fields is not None and identity.species is not None
+            if candidate_states is not None and identity.species is not None
             else "Fe"
         )
         if inventory.get("Fe", 0.0) <= 0.0:
@@ -9339,7 +9346,7 @@ def _predict_redox(
         redox_kwargs: dict[str, object] = {
             "lambda_imposed": float(fo2_log) * math.log(10.0)
         }
-        if candidate_fields is not None:
+        if candidate_states is not None:
             redox_kwargs["redox_pack_path"] = (
                 Path(openimcc.__file__).resolve().parent
                 / "data"
@@ -9364,9 +9371,9 @@ def _predict_redox(
             )
         prediction_value = (
             result.ferric_fe_mol / result.ferrous_fe_mol
-            if candidate_fields is None
+            if candidate_states is None
             else _openimcc_candidate_valence_value(
-                identity, result, candidate_fields
+                identity, result, candidate_states
             )
         )
         if prediction_value is None:
@@ -9375,7 +9382,7 @@ def _predict_redox(
                 {"reason": "openimcc_valence_abundance_undefined"},
             )
         if not math.isfinite(prediction_value) or prediction_value <= 0.0:
-            if candidate_fields is None:
+            if candidate_states is None:
                 return refused(
                     RefusalReason.METRIC_DOMAIN,
                     {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
@@ -9389,7 +9396,7 @@ def _predict_redox(
         authority, band, notices = _openimcc_redox_result_evidence(
             result,
             Quantity.VALENCE_RATIO
-            if candidate_fields is not None
+            if candidate_states is not None
             else Quantity.FE3_FE2_RATIO,
         )
         prediction_identity = replace(
@@ -9416,7 +9423,7 @@ def _predict_redox(
             identity=prediction_identity,
             version=(
                 "openimcc-redox-cr-ti-candidate"
-                if candidate_fields is not None
+                if candidate_states is not None
                 else "openimcc-redox"
             ),
         )
@@ -12265,8 +12272,9 @@ def _predict_named_fe_valence(
     Fe3+/Fe2+ (ratio form) is already R. Fe3+/sumFe (fraction form) is
     scored as R = r/(1-r) after the engine returns R; r outside (0, 1)
     is refused here, before the engine. OpenIMCC's pinned candidate pack also
-    models Cr2+/Cr3+ and Ti3+/Ti4+; other non-Fe couples and unsupported
-    iron printings stay refused.
+    reports Cr(II/III), Ti(III/IV), and Mn(II/III) in its generic oxidation-
+    state ledger; other non-Fe couples and unsupported iron printings stay
+    refused.
     """
 
     form = _fe_valence_named_form(identity)
@@ -12290,7 +12298,7 @@ def _predict_named_fe_valence(
     if form == "non_fe":
         if (
             engine is Engine.OPENIMCC
-            and _openimcc_candidate_valence_fields(identity) is not None
+            and _openimcc_candidate_valence_states(identity) is not None
         ):
             return _predict_redox(
                 engine,
