@@ -33,7 +33,7 @@ from simulator.battery.records import Composition, Derivation, Locator, Species
 from simulator.battery.score import (
     _fe_redox_material,
     _input_composition_echo_detail,
-    _predict_fe_redox,
+    _predict_redox,
     _predict_phase_row,
 )
 from simulator.state_types import State
@@ -466,7 +466,7 @@ def test_fe3_row_feeds_feo_t_not_the_split(monkeypatch: pytest.MonkeyPatch) -> N
         "simulator.battery.score._open_cached_battery_handle",
         lambda _engine, _handles: (_Handle(), False),
     )
-    prediction = _predict_fe_redox(
+    prediction = _predict_redox(
         Engine.ALPHAMELTS,
         observation,
         identity,
