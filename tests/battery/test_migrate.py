@@ -14493,6 +14493,103 @@ def test_initial_charge_proxy_is_used_only_when_composition_is_not_printed(
 
 
 @pytest.mark.parametrize(
+    "charge_source",
+    ["initial", "printed", "invalid", "absent", "not_printed"],
+    ids=["sample-initial", "sample-printed", "invalid-charge", "absent-charge", "not-printed-proxy"],
+)
+def test_migrated_point_run_composition_does_not_replace_kems_charge(
+    tmp_path: Path, charge_source: str
+) -> None:
+    from simulator.battery.consumer_inputs import collect_consumer_inputs
+    from simulator.battery.generators import kems_case
+    from simulator.battery.waypoints import GapReason, ReadinessStatus
+    from tests.battery.test_bench_generators import complete_kems
+
+    invalid_kind = None if charge_source == "not_printed" else "malformed_amount"
+    migrated, _refused, migrated_result = _score_initial_charge_composition_path(
+        tmp_path / "migrated",
+        path="points",
+        invalid_kind=invalid_kind,
+        consumer="vapour",
+    )
+    migrated_point_composition = (migrated.point_conditions or {}).get("composition")
+    assert isinstance(migrated_point_composition, Located)
+    if charge_source == "not_printed":
+        assert migrated.identity.composition is not None
+        assert migrated.identity.composition.is_value
+        assert migrated.identity.composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    else:
+        assert migrated_point_composition.state.is_unknown
+
+    base_experiment, bench, kems_observation = complete_kems()
+    migrated_experiment = migrated_result.experiments[migrated.experiment_id]
+    sample = replace(
+        migrated_experiment.sample,
+        mass_kg=base_experiment.sample.mass_kg,
+        initial_composition=None,
+        printed_composition=None,
+    )
+    if charge_source == "initial":
+        sample = replace(
+            sample,
+            initial_composition=F.located(
+                Composition((("MgO", Decimal("1")),), AmountBasis.MOL_INVENTORY)
+            ),
+        )
+    elif charge_source in {"printed", "not_printed"}:
+        sample = replace(
+            sample,
+            printed_composition=F.located({"MgO": Decimal("100")}),
+        )
+    elif charge_source == "invalid":
+        sample = replace(
+            sample,
+            printed_composition=F.located(
+                {"MgO": Decimal("97"), "Unobtainium2O": Decimal("3")}
+            ),
+        )
+    experiment = replace(base_experiment, sample=sample)
+    observation = replace(
+        migrated,
+        observation_id=kems_observation.observation_id,
+        experiment_id=experiment.experiment_id,
+        point_conditions={
+            **(migrated.point_conditions or {}),
+            **(kems_observation.point_conditions or {}),
+        },
+    )
+    identity_before = observation.identity.composition
+    conditions_before = observation.point_conditions
+
+    generated = kems_case(
+        collect_consumer_inputs(experiment, bench, observation)
+    )
+
+    if charge_source in {"initial", "printed", "not_printed"}:
+        assert generated.readiness.status is ReadinessStatus.READY
+        assert generated.payload is not None
+        assert generated.payload["oxide"]["formula"] == "MgO"
+    elif charge_source == "invalid":
+        assert generated.payload is None
+        assert generated.readiness.status is ReadinessStatus.GAP
+        assert any(
+            gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
+            for gap in generated.readiness.gaps
+        )
+    else:
+        assert generated.payload is None
+        assert generated.readiness.status is ReadinessStatus.GAP
+        assert any(
+            gap.waypoint == "charge_moles_by_species"
+            and gap.reason is GapReason.MISSING_EVIDENCE
+            for gap in generated.readiness.gaps
+        )
+    if charge_source == "not_printed":
+        assert observation.identity.composition == identity_before
+        assert observation.point_conditions == conditions_before
+
+
+@pytest.mark.parametrize(
     "quantity",
     [
         Quantity.DELTA_FG,
