@@ -38,6 +38,9 @@ _THERMO_PIN: dict[Engine, frozenset[Quantity]] = {
             Quantity.DELTA_FG,
         }
     ),
+    Engine.OPENIMCC: frozenset(
+        {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+    ),
 }
 
 # Quantities the predict-time ladder treats as callable on every engine,
@@ -131,6 +134,9 @@ def test_declared_capability_is_the_adapter_set() -> None:
         (Engine.MAGEMIN, Quantity.ACTIVITY),
         (Engine.ALPHAMELTS, Quantity.P_PARTIAL),
         (Engine.OPENIMCC, Quantity.P_PARTIAL),
+        (Engine.OPENIMCC, Quantity.CP),
+        (Engine.OPENIMCC, Quantity.S),
+        (Engine.OPENIMCC, Quantity.H_MINUS_H298),
         (Engine.INTERNAL_ANALYTICAL, Quantity.DELTA_FG),
         (Engine.INTERNAL_ANALYTICAL, Quantity.LOG10_KF),
         (Engine.INTERNAL_ANALYTICAL, Quantity.ENTHALPY_OF_FUSION),

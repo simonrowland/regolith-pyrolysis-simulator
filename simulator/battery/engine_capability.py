@@ -44,7 +44,7 @@ THERMO_QUANTITIES = (
 )
 # Ellingham ΔfG and log10 Kf. Internal Analytical is the only owner.
 ELLINGHAM_QUANTITIES = frozenset({Quantity.DELTA_FG, Quantity.LOG10_KF})
-# Cp, S, and H(T)−H(298.15 K). VapoRock, ThermoEngine, MAGEMin, and NASA.
+# Cp, S, and H(T)−H(298.15 K). VapoRock, ThermoEngine, MAGEMin, NASA, and OpenIMCC.
 PURE_PHASE_QUANTITIES = frozenset(
     {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
 )
@@ -107,7 +107,7 @@ ENGINE_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
     Engine.ALPHAMELTS: _cell_quantities(vapour=True, thermo=frozenset()),
     Engine.THERMOENGINE: _cell_quantities(vapour=True, thermo=PURE_PHASE_QUANTITIES),
     Engine.MAGEMIN: _cell_quantities(vapour=False, thermo=PURE_PHASE_QUANTITIES),
-    Engine.OPENIMCC: _cell_quantities(vapour=True, thermo=frozenset()),
+    Engine.OPENIMCC: _cell_quantities(vapour=True, thermo=PURE_PHASE_QUANTITIES),
     Engine.INTERNAL_ANALYTICAL: _cell_quantities(
         vapour=True, thermo=ELLINGHAM_QUANTITIES | FUSION_QUANTITIES
     ),

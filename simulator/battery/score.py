@@ -14610,9 +14610,16 @@ def _predict_with_engine(
         or quantity in FUSION_QUANTITIES
         or (engine is Engine.NASA_CEA_9 and quantity is Quantity.P_SAT)
     ):
-        from simulator.battery.compilation_tier import predict_thermo_attempt
+        if engine is Engine.OPENIMCC and quantity in PURE_STANDARD_THERMO:
+            from simulator.battery.compilation_tier import (
+                _openimcc_species_thermo_attempt,
+            )
 
-        attempt = predict_thermo_attempt(engine, observation)
+            attempt = _openimcc_species_thermo_attempt(observation)
+        else:
+            from simulator.battery.compilation_tier import predict_thermo_attempt
+
+            attempt = predict_thermo_attempt(engine, observation)
         coefficient_sources = _attempt_coefficient_sources(
             engine, attempt.coefficient_sources
         )
