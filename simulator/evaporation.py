@@ -3860,8 +3860,8 @@ class EvaporationMixin:
                 'axial': clamp_stir_factor(self.melt.stir_state.axial),
                 'radial': clamp_stir_factor(self.melt.stir_state.radial),
             },
-            'pipe_diameter_m': float(
-                getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
+            'pipe_diameter_m': self.overhead_model.effective_throat_diameter_m(
+                self.melt
             ),
             'overhead_pressure_pa': (
                 sum(overhead_partials_Pa.values())
@@ -4194,7 +4194,9 @@ class EvaporationMixin:
                         self.species_formula_registry,
                     )
                 ),
-                pipe_diameter_m=self.overhead_model.pipe_diameter_m,
+                pipe_diameter_m=self.overhead_model.effective_throat_diameter_m(
+                    self.melt
+                ),
                 # Chapman-Enskog diffusion uses bulk-gas temperature; the
                 # separate pipe temperature is a wall/liner condition.
                 gas_temperature_C=transport['conductance_temperature_C'],

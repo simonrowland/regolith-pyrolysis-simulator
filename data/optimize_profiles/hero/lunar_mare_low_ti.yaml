@@ -2,7 +2,7 @@ profile_id: lunar-mare-low-ti-hero-v1
 profile_schema_version: profile-schema-v1
 feedstock: lunar_mare_low_ti
 description: Canonical continuous C2A optimizer hero at the 2200 C zirconia wall ceiling.
-north_star_rationale: Use the canonical lunar mare Path A ramp over the same 225 hour horizon as the fixed hero run.
+north_star_rationale: Optimize the completed C2A campaign sequence, trading cycle time against yield and extraction under the owner-set 300 h duration ceiling.
 objective_emphasis: Pyrolysis-only Fe, SiO, alkali, and Mg yield under the zirconia furnace ceiling.
 objectives:
   - metric: oxygen_kg
@@ -39,7 +39,7 @@ objectives:
     sense: minimize
     units: USD
     weight: 0.03
-    rationale: carrier makeup/recycle energy, reagent loss, and run-local extraction cost
+    rationale: provisional hot-duct and shared-train hardware with carrier, reagent, and run-local costs
   - metric: duration_h
     sense: minimize
     units: h
@@ -52,32 +52,43 @@ constraints:
     - extraction_completeness
     - knudsen_viscous
     - furnace_temperature
+    - cycle_time
   stream_purity_min: 0.95
+  enforce_delivered_stream_purity: true
+  # Owner-set hard cap: green's 12 cm C6 static-hold case takes ~321 h
+  # and is infeasible; the 0.5 m candidate took ~238 h.
+  cycle_time_max_h: 300
+  cycle_time_max_h_source: "owner 2026-11-19 (d-452)"
 early_tap_mode: false
 pinned_paths:
   - furnace_max_T_C
 run:
   campaign: C2A
-  hours: 225
+  hours: 360
+  until_campaign_complete: true
   mass_kg: 1.0
   backend_name: internal-analytical
 fidelities:
   internal-analytical:
     backend_name: internal-analytical
-    hours: 225
+    hours: 360
+    until_campaign_complete: true
   fast:
     backend_name: internal-analytical
-    hours: 225
+    hours: 360
+    until_campaign_complete: true
   high:
     backend_name: internal-analytical
-    hours: 225
+    hours: 360
+    until_campaign_complete: true
   auto:
     backend_name: internal-analytical
-    hours: 225
+    hours: 360
+    until_campaign_complete: true
 seed_recipes:
   - id: canonical-lunar-full-yield
     source_campaign: C2A_continuous
-    rationale: Canonical continuous Path A seed with the 2200 C zirconia ceiling; inherited C2A ramp settings preserve the full 225 hour runner horizon.
+    rationale: Canonical continuous Path A seed with the 2200 C zirconia ceiling; the runner follows the campaign sequence to its endpoint.
     patch:
       furnace_max_T_C: 2200
       campaigns:

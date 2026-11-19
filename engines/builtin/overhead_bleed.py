@@ -55,6 +55,10 @@ class EffectiveTransportCapacity:
     binding_cause: str
     required_throat_diameter_m: float | None = None
     required_throat_diameter_status: str = "unavailable_geometry_not_supplied"
+    required_slider_vane_open_fraction: float | None = None
+    required_slider_vane_open_fraction_status: str = (
+        "unavailable_geometry_not_supplied"
+    )
     retained_holdup_after_tick_kg: float = 0.0
 
 

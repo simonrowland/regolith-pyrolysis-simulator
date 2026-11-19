@@ -1083,7 +1083,10 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
             melt_surface_area_m2=1.0,
             stir_state=SimpleNamespace(axial=1.0, radial=1.0),
         ),
-        overhead_model=SimpleNamespace(pipe_diameter_m=0.12),
+        overhead_model=SimpleNamespace(
+            pipe_diameter_m=0.12,
+            effective_throat_diameter_m=lambda _melt: 0.12,
+        ),
         overhead=SimpleNamespace(headspace_temperature_K=1873.15),
         _last_vapor_pressure_diagnostic={
             "backend_vapor_pressures_Pa": backend_shadow,
@@ -1242,7 +1245,10 @@ def test_evaporation_control_inputs_pack_batch_flux_key() -> None:
                 stir_state=SimpleNamespace(axial=1.0, radial=1.0),
                 temperature_C=1600.0,
             )
-            self.overhead_model = SimpleNamespace(pipe_diameter_m=0.12)
+            self.overhead_model = SimpleNamespace(
+                pipe_diameter_m=0.12,
+                effective_throat_diameter_m=lambda _melt: 0.12,
+            )
             self.overhead = SimpleNamespace(headspace_temperature_K=0.0)
             self._last_vapor_pressure_diagnostic = {}
 

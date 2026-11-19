@@ -125,14 +125,14 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # string; no value changed. Removing exactly those nine leaves recovers
     # b8c8690e41376896aa578e93acb1db4c40a95b1fb46cbe8aa9a50b1c28ab55a0.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "4436185d4b632cf72cf30d44df0dbc9a5278866f671bc72c14f13f18cbb027f8"
+        "e93969b421ce19432a3cd1a12d243b1cbee44b3e0ecb41f8e8f534044404c5d3"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
     # b-282: upstream wall search floor leaves the SiO-quiescent 1400 C
     # figure and becomes the coldest downstream collector interface (20 C).
     assert schema.bounds_digest == (
-        "924bcffff0ce77444cfd851929faefa132f8441929df26d5196704b996941b04"
+        "bd8e538788ce756c4d81f63cef16014c19af3d0643fbb89bd3016c18c977bb26"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
@@ -141,7 +141,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
     # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
     assert empty.recipe_id(schema) == (
-        "0df7598273ce6b4f9a8e436eb93bcb6371b0ab49a1b5f7112f297929f110521f"
+        "9a57784b379a3e45f26758b57e49bc9ffbe3168f07395dcc6dc7a6a92eb41d81"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -154,7 +154,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "8744ed2c41d68c6cde9722d7d45cc9963c4861e6d0ea5b2dd4424658b108d069"
+        "eea33f29c5d79ad58ac74f628764232f63ab593d7a884c29eb478e8d7ebdf2f4"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -601,10 +601,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
     assert unpinned is schema
-    assert len(paths) == 65
+    assert len(paths) == 71
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "2ec62a88bfd19a7ada68b2cef06882b85d218b2e57dfc753d5d3feb1cc91dec7"
+        == "4dbf4a95861f112f8327a7bdbc7002400f6381a4a96f803d6fa13aa728247546"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -728,7 +728,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # cache_key(spec) with that default-off policy.
     # 2026-11-12 b260: recomputed for t-1720 (d-389 carrier cost in the
     # objective).
-    assert cache_key(spec) == "8d41af13498d7c9be4c2b39053f64c9c439e2d2ef109fac255f8d027cb4d8861"
+    assert cache_key(spec) == "8b4b2b63cd437c87b17c79db5ee5e2c06f91d39dbac8b718416dbf35f2c26e1b"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -1204,6 +1204,66 @@ def test_c2a_staged_stage_gas_knobs_validate_and_render() -> None:
     assert sio_stage["pO2_mbar"] == pytest.approx(2.5)
     assert sio_stage["p_total_mbar"] == pytest.approx(12.0)
     assert sio_stage["gas_cover_mode"] == "po2_hold"
+
+
+def test_d452_throat_and_stage_vane_knobs_use_log_bounded_paths() -> None:
+    schema = RecipeSchema()
+    optimizer_bounds = yaml.safe_load(SETPOINTS_PATH.read_text())[
+        "condenser_geometry"
+    ]["optimizer_bounds"]
+    area_path = ("condenser_geometry", "initial_throat_area_m2")
+    vane_path = (
+        "campaigns", "C2A_staged", "stages", "sio_window",
+        "slider_vane_open_fraction",
+    )
+    area_spec = schema.spec_for(area_path)
+    vane_spec = schema.spec_for(vane_path)
+
+    assert area_spec.scale == "log"
+    assert area_spec.bounds_source == (
+        "setpoints:condenser_geometry.optimizer_bounds.max_throat_area_m2"
+    )
+    assert (area_spec.low, area_spec.high) == pytest.approx(
+        tuple(optimizer_bounds["max_throat_area_m2"])
+    )
+    assert vane_spec.scale == "log"
+    assert vane_spec.bounds_source == (
+        "setpoints:condenser_geometry.optimizer_bounds.slider_vane_open_fraction"
+    )
+    assert (vane_spec.low, vane_spec.high) == pytest.approx(
+        tuple(optimizer_bounds["slider_vane_open_fraction"])
+    )
+    patch = RecipePatch({area_path: area_spec.high, vane_path: 0.25}).validated(
+        schema
+    )
+    staged = schema.to_setpoints_patch(patch)
+    stage = _stage_by_name(staged["campaigns"]["C2A_staged"]["stages"], "sio_window")
+    assert stage["slider_vane_open_fraction"] == pytest.approx(0.25)
+
+
+def test_d452_throat_and_vanes_are_doe_continuous_knobs() -> None:
+    expected = {
+        ("condenser_geometry", "initial_throat_area_m2"),
+        ("campaigns", "C2A_continuous", "slider_vane_open_fraction"),
+        (
+            "campaigns", "C2A_staged", "stages", "alkali_early_fe",
+            "slider_vane_open_fraction",
+        ),
+        (
+            "campaigns", "C2A_staged", "stages", "sio_window",
+            "slider_vane_open_fraction",
+        ),
+        (
+            "campaigns", "C2A_staged", "stages", "fe_hot_hold",
+            "slider_vane_open_fraction",
+        ),
+        (
+            "campaigns", "C2A_staged", "stages", "cool_for_na_shuttle",
+            "slider_vane_open_fraction",
+        ),
+    }
+
+    assert expected <= set(doe_module.PHASE_ORDER_CONTINUOUS_KNOBS)
 
 
 def test_c2a_staged_stage_gas_knobs_fail_loudly() -> None:
@@ -2181,7 +2241,7 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
         + grounded_sources
         == len(RecipeSchema().allowlist)
     )
-    assert range_sourced == 41
+    assert range_sourced == 47
     assert converted_setpoint_ranges == 2
     assert engineering_envelopes > 0
     assert grounded_sources > 0
@@ -2233,6 +2293,25 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
         "campaigns.C6.pO2_mbar_default": (0.08, 0.35),
         "campaigns.C6.p_total_mbar_default": (0.08, 0.35),
     }
+    optimizer_bounds = yaml.safe_load(SETPOINTS_PATH.read_text())[
+        "condenser_geometry"
+    ]["optimizer_bounds"]
+    expected["condenser_geometry.initial_throat_area_m2"] = tuple(
+        optimizer_bounds["max_throat_area_m2"]
+    )
+    vane_bounds = tuple(optimizer_bounds["slider_vane_open_fraction"])
+    expected.update(
+        {
+            path: vane_bounds
+            for path in (
+                "campaigns.C2A_continuous.slider_vane_open_fraction",
+                "campaigns.C2A_staged.stages.alkali_early_fe.slider_vane_open_fraction",
+                "campaigns.C2A_staged.stages.sio_window.slider_vane_open_fraction",
+                "campaigns.C2A_staged.stages.fe_hot_hold.slider_vane_open_fraction",
+                "campaigns.C2A_staged.stages.cool_for_na_shuttle.slider_vane_open_fraction",
+            )
+        }
+    )
     schema = RecipeSchema()
     actual = {
         ".".join(spec.path): (
@@ -2248,7 +2327,7 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
         )
     }
 
-    assert len(actual) == 43
+    assert len(actual) == 49
     assert actual == {
         path: (type(low), low, type(high), high)
         for path, (low, high) in expected.items()

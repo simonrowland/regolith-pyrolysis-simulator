@@ -556,6 +556,8 @@ class MeltState:
     temperature_C: float = 25.0
     atmosphere: Atmosphere = Atmosphere.HARD_VACUUM
     pO2_mbar: float = 0.0          # Controlled oxygen partial pressure
+    slider_vane_open_fraction: float = 1.0
+    # Per-campaign open fraction of the maximum-aperture throat area
     p_total_mbar: float = 0.0      # Total pressure above melt
     fO2_log: float = -9.0          # log₁₀(fO₂/bar) for MELTS calc
     # SSO-R intrinsic melt redox state, log10(fO2/bar); seeded from the
@@ -1012,6 +1014,12 @@ class OverheadGas:
     throat_diameter_m: float = 0.0
     # Circular-equivalent throat diameter
 
+    maximum_throat_diameter_m: float = 0.0
+    # Hardware maximum aperture diameter before the slider-vane setting
+
+    slider_vane_open_fraction: float = 1.0
+    # Effective throat area divided by maximum aperture area
+
     stage_area_m2_by_stage: Dict[str, float] = field(default_factory=dict)
     # Condenser/volatiles stage physical areas from throat area ratios
 
@@ -1066,6 +1074,15 @@ class OverheadGas:
 
     required_throat_diameter_status: str = "unavailable_not_computed"
     # Typed status for the required-diameter diagnostic
+
+    required_slider_vane_open_fraction: float | None = None
+    # Slider-vane open-area fraction needed for this tick's demand
+
+    required_slider_vane_open_fraction_peak: float | None = None
+    # Largest required open-area fraction during this run
+
+    required_slider_vane_open_fraction_status: str = "unavailable_not_computed"
+    # Typed status for the required-vane diagnostic
 
     train_mass_flow_kg_hr: float = 0.0
     # Process demand entering the shared condenser train this tick

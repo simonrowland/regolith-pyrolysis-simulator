@@ -362,6 +362,28 @@ def test_reoptimize_vocabulary_drift_refuses_and_enumerates_every_identifier(
     }
 
 
+def test_reoptimize_vocabulary_recognizes_throat_and_vane_knobs() -> None:
+    profile = dict(PROFILE)
+    profile["pinned_paths"] = ["condenser_geometry.initial_throat_area_m2"]
+    profile["seed_recipes"] = [
+        {
+            "patch": {
+                "campaigns": {
+                    "C2A_staged": {
+                        "stages": {
+                            "sio_window": {
+                                "slider_vane_open_fraction": 0.5,
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+
+    assert collect_vocabulary_drift(profile) == ()
+
+
 def test_current_local_profile_is_escape_hatch_for_bundled_vocab_drift(
     tmp_path: Path,
 ) -> None:

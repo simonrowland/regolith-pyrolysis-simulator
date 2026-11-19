@@ -52,6 +52,7 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
         estimate_transport_state=lambda _flux, _melt: {
             "pipe_temperature_C": 900.0,
             "conductance_temperature_C": 1450.0,
+            "throat_diameter_m": 0.4,
             "pressure_mbar": 2.0,
             "vapor_pressure_mbar": 1.0,
             "stage_area_m2_by_stage": {},

@@ -297,6 +297,49 @@ def required_throat_diameter_for_flow(
     return diameter * (demand / capacity) ** 0.25, "ok"
 
 
+def resolve_slider_vane_open_fraction(value: Any) -> float:
+    """Validate the physical open-area fraction of the throat vane."""
+
+    fraction = _required_positive_finite_float(
+        value, "slider_vane_open_fraction"
+    )
+    if fraction > 1.0:
+        raise OverheadConfigurationError(
+            "slider_vane_open_fraction must be in the interval (0, 1]"
+        )
+    return fraction
+
+
+def required_slider_vane_open_fraction_for_flow(
+    current_fraction: float,
+    demand_kg_hr: float,
+    current_pipe_capacity_kg_hr: float,
+) -> tuple[float | None, str]:
+    """Size the vane opening needed to carry a flow at fixed pressure.
+
+    At fixed conditions d_eff = d_max × sqrt(f), so Poiseuille capacity
+    scales as d_eff⁴ = f² × capacity_at_full_open. The current capacity is
+    f_current² × capacity_at_full_open, hence f_required =
+    f_current × sqrt(demand / current_capacity). The result is an area
+    fraction; values above one report demand beyond the full-open aperture.
+    """
+
+    fraction = resolve_slider_vane_open_fraction(current_fraction)
+    demand = _required_finite_nonnegative_float(demand_kg_hr, "demand_kg_hr")
+    capacity = _required_finite_nonnegative_float(
+        current_pipe_capacity_kg_hr, "current_pipe_capacity_kg_hr"
+    )
+    if demand == 0.0:
+        return 0.0, "no_demand"
+    if capacity <= 0.0:
+        return None, "unavailable_zero_pipe_capacity"
+    required = fraction * math.sqrt(demand / capacity)
+    status = (
+        "exceeds_fully_open_capacity" if required > 1.0 else "ok"
+    )
+    return required, status
+
+
 def validate_condenser_geometry_config(config: Mapping | None) -> dict[str, Any]:
     """Fail closed and canonicalize condenser geometry before model use."""
 
@@ -584,6 +627,17 @@ class OverheadGasModel:
             return 0.0
         return math.sqrt(4.0 * area / math.pi)  # m — circular equivalent diameter
 
+    def effective_throat_diameter_m(self, melt: Any) -> float:
+        """Return the active pipe diameter after the campaign vane setting."""
+
+        fraction = resolve_slider_vane_open_fraction(
+            getattr(melt, "slider_vane_open_fraction", 1.0)
+        )
+        # The vane scales open AREA: A_eff=f*A_max. For a circular aperture,
+        # d_eff=d_max*sqrt(f); substituting into Poiseuille's d⁴ law gives the
+        # capacity multiplier f². Units remain metres; f=1 preserves d_max.
+        return self.pipe_diameter_m * math.sqrt(fraction)
+
     def configure_condenser_geometry(self, config: Mapping) -> None:
         """Resolve throat area and per-stage area ratios from setpoints."""
 
@@ -811,6 +865,10 @@ class OverheadGasModel:
             evap_flux.total_kg_hr,
             'evap_flux.total_kg_hr',
         )  # kg/hr — total evaporation mass flow
+        effective_diameter_m = self.effective_throat_diameter_m(melt)
+        vane_fraction = resolve_slider_vane_open_fraction(
+            getattr(melt, 'slider_vane_open_fraction', 1.0)
+        )
         allowed_pressure_mbar = _required_finite_nonnegative_float(
             melt.p_total_mbar,
             'melt.p_total_mbar',
@@ -849,17 +907,35 @@ class OverheadGasModel:
             required_diameter_status = (
                 effective_transport_capacity.required_throat_diameter_status
             )
+            required_vane_fraction = (
+                effective_transport_capacity.required_slider_vane_open_fraction
+            )
+            required_vane_status = (
+                effective_transport_capacity.required_slider_vane_open_fraction_status
+            )
         else:
             conductance = self._pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream/downstream pressures
                 allowed_pressure_Pa,
                 conductance_temperature_C,
                 p_downstream_Pa=downstream_pressure_Pa,
                 species_kg_for_M_avg=evap_flux.species_kg_hr,  # kg/hr by species — composition basis for M_avg
+                diameter_m=effective_diameter_m,
             )
             pipe_conductance_kg_hr = conductance * 3600.0  # kg/hr — capacity at allowed pressure; kg/s -> kg/hr
+            # Capacity uses the active diameter after vane throttling, so the
+            # inverse reports the effective throat diameter needed at this
+            # tick and pressure. It equals the active diameter when demand
+            # equals capacity, including a partially closed vane.
             required_diameter_m, required_diameter_status = (
                 required_throat_diameter_for_flow(
-                    self.pipe_diameter_m,
+                    effective_diameter_m,
+                    total_evap_kg_hr,
+                    pipe_conductance_kg_hr,
+                )
+            )
+            required_vane_fraction, required_vane_status = (
+                required_slider_vane_open_fraction_for_flow(
+                    vane_fraction,
                     total_evap_kg_hr,
                     pipe_conductance_kg_hr,
                 )
@@ -870,6 +946,7 @@ class OverheadGasModel:
                 conductance_temperature_C,
                 p_downstream_bar=downstream_pressure_Pa / PA_PER_BAR,
                 species_kg_for_M_avg=evap_flux.species_kg_hr,
+                diameter_m=effective_diameter_m,
             )
         elif not controlled_flow:
             # Premise: zero forward conductance is a closed-line condition,
@@ -910,7 +987,9 @@ class OverheadGasModel:
             'conductance_temperature_C': conductance_temperature_C,  # °C — gas temperature used for conductance
             'p_mean_Pa': allowed_pressure_Pa,  # Pa — compatibility field; allowed upstream pressure
             'initial_throat_area_m2': self.initial_throat_area_m2,  # m² — user-configured throat cross-section
-            'throat_diameter_m': self.pipe_diameter_m,  # m — circular-equivalent throat diameter
+            'maximum_throat_diameter_m': self.pipe_diameter_m,
+            'throat_diameter_m': effective_diameter_m,
+            'slider_vane_open_fraction': vane_fraction,
             'stage_area_m2_by_stage': self.stage_area_m2_by_stage(),  # m² by stage — throat area × ratio
             'stage_hydraulic_diameter_m_by_stage': dict(
                 self.stage_hydraulic_diameter_m
@@ -923,6 +1002,8 @@ class OverheadGasModel:
             'pipe_conductance_kg_hr': pipe_conductance_kg_hr,  # kg/hr — pipe mass-flow capacity
             'required_throat_diameter_m': required_diameter_m,
             'required_throat_diameter_status': required_diameter_status,
+            'required_slider_vane_open_fraction': required_vane_fraction,
+            'required_slider_vane_open_fraction_status': required_vane_status,
             'pipe_capacity_used_pct': pipe_capacity_used_pct,  # percent — capacity used
             'vapor_pressure_mbar': vapor_pressure_mbar,  # mbar — steady-state vapor partial pressure
             'pressure_mbar': pressure_mbar,  # mbar — reported total overhead pressure
@@ -953,6 +1034,10 @@ class OverheadGasModel:
             'O2_BACKPRESSURE',
         }:
             return None
+        effective_diameter_m = self.effective_throat_diameter_m(melt)
+        vane_fraction = resolve_slider_vane_open_fraction(
+            getattr(melt, 'slider_vane_open_fraction', 1.0)
+        )
         allowed_pressure_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)
         pipe_capacity_kg_hr = (
             max(0.0, float(self._conductance_override)) * 3600.0
@@ -962,6 +1047,7 @@ class OverheadGasModel:
                 float(melt.temperature_C),
                 p_downstream_Pa=0.0,
                 species_kg_for_M_avg=evap_flux.species_kg_hr,
+                diameter_m=effective_diameter_m,
             ) * 3600.0
         )
         from simulator.thermal_train import FiniteCapacity, NoColdTrain
@@ -986,15 +1072,33 @@ class OverheadGasModel:
         )
         required_diameter_m, required_diameter_status = (
             required_throat_diameter_for_flow(
-                self.pipe_diameter_m,
+                effective_diameter_m,
                 flow.demand_flux_kg_hr,
                 flow.pipe_capacity_kg_hr,
             )
         )
+        required_vane_fraction, required_vane_status = (
+            required_slider_vane_open_fraction_for_flow(
+                vane_fraction,
+                flow.demand_flux_kg_hr,
+                flow.pipe_capacity_kg_hr,
+            )
+        )
+        if self._conductance_override is not None:
+            required_diameter_m = None
+            required_diameter_status = (
+                'unavailable_fixed_conductance_override'
+            )
+            required_vane_fraction = None
+            required_vane_status = (
+                'unavailable_fixed_conductance_override'
+            )
         return replace(
             flow,
             required_throat_diameter_m=required_diameter_m,
             required_throat_diameter_status=required_diameter_status,
+            required_slider_vane_open_fraction=required_vane_fraction,
+            required_slider_vane_open_fraction_status=required_vane_status,
         )
 
     def _resolve_liner_temperature_value(
@@ -1186,6 +1290,12 @@ class OverheadGasModel:
         gas.pipe_conductance_kg_hr = transport_state['pipe_conductance_kg_hr']  # kg/hr — pipe mass-flow capacity
         gas.initial_throat_area_m2 = transport_state['initial_throat_area_m2']  # m² — user-configured throat cross-section
         gas.throat_diameter_m = transport_state['throat_diameter_m']  # m — circular-equivalent throat diameter
+        gas.maximum_throat_diameter_m = transport_state[
+            'maximum_throat_diameter_m'
+        ]
+        gas.slider_vane_open_fraction = transport_state[
+            'slider_vane_open_fraction'
+        ]
         gas.stage_area_m2_by_stage = dict(transport_state['stage_area_m2_by_stage'])  # m² by stage — throat area × ratio
         gas.stage_area_geometry_provenance_notice = dict(
             transport_state['stage_area_geometry_provenance_notice'])
@@ -1228,6 +1338,18 @@ class OverheadGasModel:
         gas.required_throat_diameter_status = transport_state[
             'required_throat_diameter_status'
         ]
+        gas.required_slider_vane_open_fraction = transport_state[
+            'required_slider_vane_open_fraction'
+        ]
+        gas.required_slider_vane_open_fraction_status = transport_state[
+            'required_slider_vane_open_fraction_status'
+        ]
+        if gas.required_slider_vane_open_fraction is not None:
+            previous_peak = gas.required_slider_vane_open_fraction_peak
+            gas.required_slider_vane_open_fraction_peak = max(
+                float(previous_peak or 0.0),
+                gas.required_slider_vane_open_fraction,
+            )
         if gas.required_throat_diameter_m is not None:
             gas.required_throat_diameter_peak_m = max(
                 gas.required_throat_diameter_peak_m,
@@ -1636,6 +1758,7 @@ class OverheadGasModel:
         *,
         p_downstream_Pa: float = 0.0,  # Pa — downstream/reference pressure
         species_kg_for_M_avg: Optional[Mapping[str, float]] = None,  # kg or kg/hr by species — M_avg basis
+        diameter_m: float | None = None,
     ) -> float:
         """
         Compressible Poiseuille mass-flow capacity of the collection pipe.
@@ -1666,7 +1789,9 @@ class OverheadGasModel:
         species mixture; legacy callers without the kwarg get the
         documented fallback.
         """
-        d = self.pipe_diameter_m  # m — pipe inner diameter
+        d = (
+            self.pipe_diameter_m if diameter_m is None else diameter_m
+        )  # m — active pipe inner diameter
         L = self.pipe_length_m  # m — pipe length
 
         # Direct-helper invalid-input contract: T_K, L, d, and both pressures
@@ -1743,13 +1868,16 @@ class OverheadGasModel:
         *,
         p_downstream_bar: float = 0.0,  # bar — downstream/reference pressure
         species_kg_for_M_avg: Optional[Mapping[str, float]] = None,  # kg or kg/hr by species — M_avg basis
+        diameter_m: float | None = None,
     ) -> float:
         """Invert the shared compressible Poiseuille law."""
 
         try:
             F_kg_s = float(total_evap_kg_s)  # kg/s — candidate vapor mass throughput
             T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET  # K — pipe gas temperature
-            d = float(self.pipe_diameter_m)  # m — throat-equivalent diameter
+            d = float(
+                self.pipe_diameter_m if diameter_m is None else diameter_m
+            )  # m — active throat-equivalent diameter
             L = float(self.pipe_length_m)  # m — throat/pipe length
             p_downstream_bar = float(p_downstream_bar)  # bar — candidate downstream pressure
         except (TypeError, ValueError):
