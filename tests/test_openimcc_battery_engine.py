@@ -719,6 +719,32 @@ def test_openimcc_missing_crystal_polymorph_keeps_typed_refusal() -> None:
     assert prediction.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
 
 
+def test_openimcc_non_janaf_crystal_source_refuses_named_polymorph() -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack, species_thermo
+
+    temperature_K = Decimal("1000")
+    native = species_thermo(
+        "C", "cr", float(temperature_K), datapack=load_gas_datapack()
+    )
+    assert native.source_row_id == "C-002"
+    observation = _openimcc_thermo_observation(
+        "openimcc-carbon-non-janaf-crystal-source-unresolved",
+        "C",
+        Phase.CR,
+        Quantity.CP,
+        temperature_K,
+        polymorph=Polymorph.ALPHA,
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
+    assert prediction.refusal_detail["source_row_id"] == "C-002"
+
+
 def test_openimcc_species_thermo_uses_source_dfh298_for_enthalpy_increment() -> None:
     _require_openimcc()
     from openimcc import load_gas_datapack, species_thermo
@@ -763,7 +789,6 @@ def test_openimcc_enthalpy_source_anchor_is_resolved_after_native_cache_hit(
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
-    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "")
     engine_cache._close_connections()
     engine_cache._MEMORY_CACHE.clear()
     native_calls = []
@@ -780,7 +805,7 @@ def test_openimcc_enthalpy_source_anchor_is_resolved_after_native_cache_hit(
         T_max=3000.0,
         derivatives_fit_implied=False,
         extrapolated=False,
-        declared_interval_K=(500.0, 3000.0),
+        declared_interval_K=[500.0, 3000.0],
         continuation=None,
         authority="JANAF source row",
     )

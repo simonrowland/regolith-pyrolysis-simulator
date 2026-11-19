@@ -1495,7 +1495,7 @@ def test_species_thermo_cache_request_covers_native_inputs(monkeypatch) -> None:
 
     def cache_call(engine, request, solve):
         requests.append((engine, request))
-        return solve()
+        return engine_cache.live_hot(solve())
 
     monkeypatch.setattr(engine_cache, "cached_engine_call", cache_call)
 
@@ -1505,7 +1505,8 @@ def test_species_thermo_cache_request_covers_native_inputs(monkeypatch) -> None:
 
     assert result["source_row_id"] == "JANAF-FeO-gas"
     assert result["extrapolated"] is True
-    assert result["declared_interval_K"] == (298.15, 6000.0)
+    assert result["T_interval"] == [298.15, 6000.0]
+    assert result["declared_interval_K"] == [298.15, 6000.0]
     assert result["continuation"] == "Shomate fit continued above its declared interval"
     assert result["authority"] == "JANAF source row"
     assert calls == [("FeO", "g", 6001.0, "default-gas-datapack", True)]
@@ -1522,6 +1523,66 @@ def test_species_thermo_cache_request_covers_native_inputs(monkeypatch) -> None:
             },
         )
     ]
+
+
+def test_species_thermo_hot_shape_is_cacheable(tmp_path, monkeypatch) -> None:
+    from simulator import engine_cache
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    native_calls = []
+    props = SimpleNamespace(
+        Cp_J_molK=42.0,
+        S_J_molK=20.0,
+        H_app_kJ_mol=3.0,
+        G_J_mol=400.0,
+        source_row_id="JANAF-FeO-gas",
+        source_table_id="gas-janaf-4th",
+        T_interval=(298.15, 6000.0),
+        T_min=298.15,
+        T_max=6000.0,
+        derivatives_fit_implied=False,
+        extrapolated=True,
+        declared_interval_K=(298.15, 6000.0),
+        continuation="Shomate fit continued above its declared interval",
+        authority="JANAF source row",
+    )
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_openimcc",
+        SimpleNamespace(
+            load_gas_datapack=lambda: "default-gas-datapack",
+            species_thermo=lambda *_args, **_kwargs: (
+                native_calls.append(True) or props
+            ),
+        ),
+    )
+    monkeypatch.setattr(engine_cache, "record_engine_open", lambda *_args: None)
+
+    try:
+        cold = openimcc_bridge.species_thermo(
+            "FeO", "g", 6001.0, allow_extrapolation=True
+        )
+        warm = openimcc_bridge.species_thermo(
+            "FeO", "g", 6001.0, allow_extrapolation=True
+        )
+        counts = engine_cache.engine_cache_counters()["openimcc"]
+    finally:
+        engine_cache._close_connections()
+        engine_cache._MEMORY_CACHE.clear()
+        engine_cache.engine_cache_counters(reset=True)
+
+    assert cold["T_interval"] == [298.15, 6000.0]
+    assert cold["declared_interval_K"] == [298.15, 6000.0]
+    assert warm == cold
+    assert native_calls == [True]
+    assert counts["stores"] == 1
+    assert counts["hits"] == 1
 
 
 def test_redox_result_keeps_its_type_across_cache_round_trip(
