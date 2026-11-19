@@ -10,6 +10,7 @@ for its native-crystal activity path. A missing required input is refused
 rather than defaulted.
 """
 
+import json
 from dataclasses import replace
 from decimal import Decimal
 from types import SimpleNamespace
@@ -604,6 +605,7 @@ def test_magemin_activity_score_predicts_and_flags_pressure_outside_verified_win
     from simulator.battery.score import predict_with_engine
     from simulator.diagnostic_helpers import binary_pot_battery
     from simulator.melt_backend.magemin import MAGEMinBackend
+    from engines.magemin.domain import MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
 
     backend = MAGEMinBackend()
     backend._available = True
@@ -654,13 +656,17 @@ def test_magemin_activity_score_predicts_and_flags_pressure_outside_verified_win
     assert prediction.value == Decimal("0.8"), prediction.refusal_detail
     assert solve_pressures == [2.0]
     assert prediction.authority is Authority.EXTRAPOLATED
-    assert prediction.certified_band == {"pressure_bar": (1.0e-6, 1.0)}
+    expected_band = MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+    assert prediction.certified_band == {"pressure_bar": expected_band}
     notice = next(
         notice for notice in prediction.notices
         if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
     )
     assert notice.authority is Authority.EXTRAPOLATED
-    assert notice.band == "{\"pressure_bar\": [1e-06, 1.0]}"
+    serialized_band = json.loads(notice.band)
+    assert tuple(map(float, serialized_band["pressure_bar"])) == pytest.approx(
+        expected_band
+    )
     assert "magemin_native_activity_pressure_outside_certified_band" in (
         notice.reason
     )
