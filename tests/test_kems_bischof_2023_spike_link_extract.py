@@ -15,7 +15,11 @@ from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
     INITIAL_CHARGE_ONLY_PROXY_NOTICE,
 )
-from simulator.battery.migrate import PrintedOxygenFacts, printed_oxygen_decision
+from simulator.battery.migrate import (
+    PrintedOxygenFacts,
+    printed_oxygen_decision,
+    wt_pct_to_mole_fraction,
+)
 from simulator.battery.score import (
     SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE,
     rail_for_quantity,
@@ -187,7 +191,8 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
             assert abs(band.low - Decimal("0.000031622776601683793319988935")) < Decimal("1e-30")
             assert abs(band.high - Decimal("0.00031622776601683793319988935")) < Decimal("1e-29")
             assert abs(band.high / band.low - 10) < Decimal("1e-25")
-            assert row.point_conditions["composition"].state.is_unknown
+            if sid == "kems-138-bischof-2023":
+                assert row.point_conditions["composition"].state.is_unknown
             if sid == "kems-137-bischof-2023":
                 temperature = row.identity.temperature_K.value
                 printed_point = next(
@@ -300,6 +305,14 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
                 assert row.point_conditions["temperature_K"].locator.page == expected_page
 
     bischof_137_rows = target_rows["kems-137-bischof-2023"]
+    printed_start = wt_pct_to_mole_fraction(
+        {
+            "SiO2": Decimal("50.47"),
+            "Al2O3": Decimal("15.38"),
+            "MgO": Decimal("10.42"),
+            "CaO": Decimal("23.63"),
+        }
+    )
     for parent_id in (
         "bischof_2023_ga_psat_s1_1low_polytherm",
         "bischof_2023_in_psat_s1_1low_polytherm",
@@ -315,6 +328,12 @@ def test_bischof_spike_links_render_fidelity_and_real_migration(tmp_path: Path) 
             assert composition is not None and composition.is_value
             assert composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
             assert composition.value.input_provenance == PRINTED_STARTING_BULK
+            assert composition.value.as_map() == printed_start.as_map()
+            point_composition = row.point_conditions["composition"].state
+            assert point_composition.is_value
+            assert point_composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+            assert point_composition.value.input_provenance == PRINTED_STARTING_BULK
+            assert point_composition.value.as_map() == printed_start.as_map()
             proxy_notices = [
                 notice
                 for notice in row.notices
