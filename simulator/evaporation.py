@@ -4609,6 +4609,27 @@ class EvaporationMixin:
             status,
             diagnostic,
         )
+        control_failure_reason = (
+            diagnostic.get('backend_status_reason')
+            or backend_diagnostic.get('backend_status_reason')
+        )
+        if (
+            self._liquid_fraction_provider == 'magemin'
+            and (
+                diagnostic.get('magemin_mode_vector_mass_deficit') is True
+                or backend_diagnostic.get(
+                    'magemin_mode_vector_mass_deficit'
+                ) is True
+            )
+            and control_failure_reason in {
+                'clamped_operating_point',
+                'engine_not_converged',
+            }
+        ):
+            # Backend classification keeps its more specific first failure.
+            # At the evaporation boundary, the combined control failure can
+            # still hold the last good gate curve or use the reviewed floor.
+            status_outcome = GateCurveProviderOutcome.NUMERICAL_FAILURE
         record_gate_curve_provider_outcome(self, status_outcome)
         if (
             status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE

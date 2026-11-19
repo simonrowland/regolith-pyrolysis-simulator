@@ -374,7 +374,11 @@ def test_control_failure_reaches_existing_gate_hold_or_floor(
     )
     if native is not None:
         diagnostics = failed.diagnostics
-        assert diagnostics['backend_status_reason'] == 'engine_not_converged'
+        assert diagnostics['backend_status_reason'] == (
+            'engine_not_converged'
+            if native == '-inf'
+            else 'clamped_operating_point'
+        )
         assert diagnostics['magemin_mode_vector_mass_deficit'] is True
         assert diagnostics['magemin_mode_vector_deficit'] == pytest.approx(0.1)
         assert diagnostics['authoritative_for_requested_conditions'] is False

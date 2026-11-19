@@ -2440,21 +2440,15 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     if result_status != 'ok'
                     else MAGEMIN_MODE_VECTOR_MASS_DEFICIT
                 )
-                # A deficient Mode vector cannot establish a stable control
-                # refusal. Keep the solve on the numerical-failure path so the
-                # freeze gate holds a prior curve or uses its first-call floor.
+                # Keep an earlier, more specific solver/control failure as
+                # the result. The Mode-vector deficit is additional evidence,
+                # and the gate consumer decides whether that combination can
+                # hold a prior curve or use its first-call floor.
                 if result_status == 'ok':
                     result_status = 'out_of_domain'
                     result_diagnostics.update({
                         'backend_status': result_status,
                         'backend_status_reason': MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
-                    })
-                else:
-                    result_status = 'not_converged'
-                    mode_failure_reason = 'engine_not_converged'
-                    result_diagnostics.update({
-                        'backend_status': result_status,
-                        'backend_status_reason': mode_failure_reason,
                     })
                 result_diagnostics.update({
                     MAGEMIN_MODE_VECTOR_MASS_DEFICIT: True,

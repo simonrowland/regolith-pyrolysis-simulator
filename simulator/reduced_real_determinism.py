@@ -3179,6 +3179,23 @@ def gate_curve_provider_outcome_for_status(
 
     normalized_status = str(status).strip().lower()
     reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
+    if normalized_status == "not_converged" and "engine_not_converged" in reasons:
+        backend_diagnostic = (
+            diagnostic.get("backend_diagnostics")
+            if isinstance(diagnostic, Mapping)
+            else None
+        )
+        mode_deficit_diagnostics = (diagnostic, backend_diagnostic)
+        if any(
+            isinstance(item, Mapping)
+            and item.get("magemin_mode_vector_mass_deficit") is True
+            and item.get("solved_fO2_log") is None
+            for item in mode_deficit_diagnostics
+        ):
+            # Preserve the reviewed generic outcome for a failed native fO2
+            # readback combined with an incomplete Mode vector. Evaporation
+            # applies the hold-or-floor qualification from these details.
+            return GateCurveProviderOutcome.FAILED
     # MAGEMinOutputError is unusable solver output; keep its flagged fallback.
     # Other providers' parse-empty contract failures remain fail-closed below.
     magemin_invalid_output = "mageminoutputerror" in reasons
