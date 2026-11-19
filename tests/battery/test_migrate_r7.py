@@ -1140,6 +1140,10 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     observations = _b2131_formation_observations(
         tmp_path / "with-repository-index"
     )
+    # p007-13 are typed unavailable. The shared phase parser also resolves
+    # printed glass windows; these source-page grounded identities affect the
+    # serialization digest. Keep both paths so the test pins the generator's
+    # output without and with B-1230's repository-index locator resolution.
     stored = yaml.safe_load(
         (
             REPO_ROOT
@@ -1180,7 +1184,7 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     changed_fields = {
         field for fields in non_admission_diffs.values() for field in fields
     }
-    assert changed_fields == {"experiment_id", "locator", "provenance"}
+    assert changed_fields == {"experiment_id", "identity", "locator", "provenance"}
     assert all(
         candidate[observation_id].get("read_from")
         == baseline[observation_id].get("read_from")
@@ -1215,6 +1219,9 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     # The repository INDEX resolves summary locators to the existing PDF
     # asset and record locators to compilation records. The merged candidate
     # also carries b-1230's canonical locator fields. Admissions stay unchanged.
+    # The merged parser changes printed glass-window identities; the B-1230
+    # index resolution and t-1832 provenance remain independently pinned by
+    # the indexed and unindexed migration results.
     assert (
         len(unindexed_observations),
         unindexed_digest,

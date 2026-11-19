@@ -1236,6 +1236,30 @@ class Notice:
             )
 
 
+def notice_from_plain(payload: object) -> Notice:
+    assert isinstance(payload, Mapping)
+    affected = tuple(Quantity(str(q)) for q in (payload.get("affected_quantities") or ()))
+    dropped = payload.get("dropped")
+    return Notice(
+        kind=NoticeKind(str(payload["kind"])),
+        affected_quantities=affected,
+        reason=str(payload.get("reason") or ""),
+        origin=str(payload.get("origin") or ""),
+        original=None if payload.get("original") is None else as_decimal(payload["original"]),
+        source=payload.get("source"),
+        destination=payload.get("destination"),
+        band=payload.get("band"),
+        dropped=None if dropped is None else tuple(str(x) for x in dropped),
+        dropped_mass_fraction=None
+        if payload.get("dropped_mass_fraction") is None
+        else as_decimal(payload["dropped_mass_fraction"]),
+        authority=None
+        if payload.get("authority") is None
+        else Authority(str(payload["authority"])),
+        certification=payload.get("certification"),
+    )
+
+
 SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX = "source_internally_inconsistent:"
 
 

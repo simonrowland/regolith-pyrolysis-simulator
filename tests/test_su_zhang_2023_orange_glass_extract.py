@@ -15,7 +15,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import Migrator, to_plain
 from tools.validate_literature_extracts import (
     check_all_fidelity_samples_match,
     resolve_field_path,
@@ -447,77 +447,157 @@ def test_cell_audit_detects_unpinned_profile_mutation() -> None:
 
 def test_isolated_migration_pins_values_conditions_and_schema_gaps() -> None:
     document = _document()
+    profile_refusal = "natural glass radial profile; no evaporation experiment"
+    source_record_count = 0
+    source_profile_point_count = 0
+    source_profile_points_by_table: Counter[str] = Counter()
+    source_method_class_counts: Counter[str] = Counter()
+    expected_refused_ids: set[str] = set()
+    expected_profile_ids: set[str] = set()
+    for body in document["species"].values():
+        for source_row in body.get("observations", []):
+            values = source_row.get("values") or {}
+            series = values.get("series")
+            point_count = len(series) if isinstance(series, list) else 1
+            source_record_count += point_count
+            raw_id = source_row["observation_id"]
+            if values.get("typed_refused_schema_gap"):
+                if isinstance(series, list):
+                    expected_refused_ids.update(
+                        f"{SID}::{raw_id}::point:{index}"
+                        for index in range(len(series))
+                    )
+                else:
+                    expected_refused_ids.add(f"{SID}::{raw_id}")
+            if values.get("quantity") == profile_refusal:
+                assert isinstance(series, list)
+                source_profile_point_count += len(series)
+                expected_profile_ids.update(
+                    f"{SID}::{raw_id}::point:{index}"
+                    for index in range(len(series))
+                )
+                source_profile_points_by_table[source_row["locator"]["table"]] += len(
+                    series
+                )
+                source_method_class_counts[values["method_class"]] += len(series)
+
+    assert source_record_count == 3_758
+    assert source_profile_point_count == 3_495
+    assert source_profile_points_by_table == {
+        "Table S2": 2_630,
+        "Table S3": 61,
+        "Table S4": 804,
+    }
+    assert len(expected_refused_ids) == source_record_count
+
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
     result = migrator.result
 
-    assert len(result.observations) == 3_698
+    assert len(result.observations) == source_record_count
     assert not result.validation.hard_issues
     assert result.registry_issues == []
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in result.observations.values()) == 263
+    assert sum(
+        row.value.kind is ValueKind.UNAVAILABLE for row in result.observations.values()
+    ) == len(expected_refused_ids)
 
     unknown_quantity = {
         row.observation_id
         for row in result.observations.values()
         if not row.identity.quantity.is_value
     }
-    expected_total_ids = {
-        f"{SID}::{row['observation_id']}"
-        for row in document["species"]["unknown"]["observations"]
-        if row["values"].get("typed_refused_schema_gap")
-    }
-    assert unknown_quantity == expected_total_ids
-    assert not [row for row in result.observations.values() if not row.identity.species.phase.is_value]
-
-    typed_profiles = [
+    assert unknown_quantity == expected_refused_ids
+    assert not [
         row
         for row in result.observations.values()
-        if row.identity.quantity.is_value
-        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        if not row.identity.species.phase.is_value
     ]
-    assert len(typed_profiles) == 3_435
-    assert sum(
-        row.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
-        for row in typed_profiles
-    ) == 2_631
-    assert sum(
-        row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
-        for row in typed_profiles
-    ) == 804
+
+    profile_observations = [result.observations[oid] for oid in expected_profile_ids]
+    assert len(profile_observations) == source_profile_point_count
+    assert not any(
+        row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        for row in profile_observations
+    )
+    assert Counter(row.evidence.class_.value for row in profile_observations) == (
+        source_method_class_counts
+    )
 
     s2 = _migrated_point(
         migrator, "su_zhang_2023_table_s2_empa_sio2_profile", "point:0"
     )
     s3 = _migrated_point(
-        migrator, "su_zhang_2023_table_s3_sims_na2o_profile", "field:Na2O:row:0"
+        migrator, "su_zhang_2023_table_s3_sims_na2o_profile", "point:0"
     )
     s4_na = _migrated_point(
-        migrator, "su_zhang_2023_table_s4_la_icp_ms_na2o_profile", "field:Na2O:row:0"
+        migrator, "su_zhang_2023_table_s4_la_icp_ms_na2o_profile", "point:0"
     )
     s4_cu = _migrated_point(
-        migrator, "su_zhang_2023_table_s4_la_icp_ms_cu_profile", "field:residue_ppm:row:0"
+        migrator, "su_zhang_2023_table_s4_la_icp_ms_cu_profile", "point:0"
     )
-    assert s2.value.point == Decimal("38.8")
-    assert s3.value.point == Decimal("0.3469")
-    assert s4_na.value.point == Decimal("0.369")
-    assert s4_cu.value.point == Decimal("5.56")
-    assert s2.uncertainty.verbatim["sigma"] == "0.2"
-    assert s3.uncertainty.verbatim["sigma"] == "0.0019"
-    assert s4_na.uncertainty.verbatim["sigma"] == "0.005"
-    assert s4_cu.uncertainty.verbatim["sigma"] == "0.05"
-    assert all(
-        row.uncertainty.verbatim["confidence_level"] == "one_sigma"
-        for row in (s2, s3, s4_na, s4_cu)
+    source_points = (
+        (
+            s2,
+            _observation(
+                document, "SiO2", "su_zhang_2023_table_s2_empa_sio2_profile"
+            ),
+            "SiO2_wt_pct",
+            "38.8",
+            "0.2",
+        ),
+        (
+            s3,
+            _observation(
+                document, "Na2O", "su_zhang_2023_table_s3_sims_na2o_profile"
+            ),
+            "Na2O_wt_pct",
+            "0.3469",
+            "0.0019",
+        ),
+        (
+            s4_na,
+            _observation(
+                document, "Na2O", "su_zhang_2023_table_s4_la_icp_ms_na2o_profile"
+            ),
+            "Na2O_wt_pct",
+            "0.369",
+            "0.005",
+        ),
+        (
+            s4_cu,
+            _observation(
+                document, "Cu", "su_zhang_2023_table_s4_la_icp_ms_cu_profile"
+            ),
+            "residue_ppm",
+            "5.56",
+            "0.05",
+        ),
     )
+    for migrated, source_row, field, expected_value, expected_sigma in source_points:
+        source_point = source_row["values"]["series"][0]
+        assert Decimal(source_point[field]) == Decimal(expected_value)
+        assert migrated.value.kind is ValueKind.UNAVAILABLE
+        assert migrated.value.unavailable_reason == (
+            "declared quantity is unknown; refusing to pick a number"
+        )
+        assert source_point["sigma"] == expected_sigma
+        assert migrated.uncertainty.verbatim["sigma"] == expected_sigma
+        assert migrated.uncertainty.verbatim["confidence_level"] == "one_sigma"
+        assert migrated.locator is not None
+        assert to_plain(migrated.locator) == source_point["locator"]
 
-    for row in typed_profiles:
-        assert row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    for row in profile_observations:
+        assert row.identity.quantity.is_unknown
+        assert row.identity.quantity.reason == (
+            f"unsupported quantity {profile_refusal!r}"
+        )
         assert row.identity.species.phase.value.value == "glass"
-        assert row.identity.temperature_K.is_unknown
-        assert row.identity.fO2_Pa.is_unknown
-        assert row.identity.total_pressure_Pa.is_unknown
-        assert row.identity.composition.is_unknown
+        assert row.identity.temperature_K is None
+        assert row.identity.fO2_Pa is None
+        assert row.identity.total_pressure_Pa is None
+        assert row.identity.composition is None
         assert row.point_conditions is not None
         for axis in ("temperature_K", "fO2_Pa"):
             assert row.point_conditions[axis].state.is_unknown
@@ -534,15 +614,21 @@ def test_isolated_migration_pins_values_conditions_and_schema_gaps() -> None:
     assert any("gb_g1_fe57_map" in ref for ref in s4_na.derivation.references)
     assert s4_na.derivation.method.locator.section == "S3"
 
-    # The only untyped quantities are the 263 published analytical totals; all
-    # 17,175 non-hard validation findings are the five source-absent axes on
-    # each of the 3,435 measured profile observations.
-    assert len(result.validation.issues) == 17_175
-    assert all(issue.reason.value == "identity_incomplete" for issue in result.validation.issues)
-    assert Counter(issue.path.rsplit(".", 1)[-1] for issue in result.validation.issues) == {
-        "composition": 3_435,
-        "fO2_Pa": 3_435,
-        "total_pressure_Pa": 3_435,
-        "sample_mass_kg": 3_435,
-        "temperature_K": 3_435,
-    }
+    # Every source profile point has a typed refusal, so none contributes an
+    # incomplete-identity finding for these source-absent axes.
+    typed_profile_ids = expected_profile_ids - expected_refused_ids
+    assert not typed_profile_ids
+    validation_axes = (
+        "composition",
+        "fO2_Pa",
+        "total_pressure_Pa",
+        "sample_mass_kg",
+        "temperature_K",
+    )
+    expected_validation_counts = Counter(
+        {axis: len(typed_profile_ids) for axis in validation_axes}
+    )
+    assert len(result.validation.issues) == sum(expected_validation_counts.values())
+    assert Counter(
+        issue.path.rsplit(".", 1)[-1] for issue in result.validation.issues
+    ) == expected_validation_counts
