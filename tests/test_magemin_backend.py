@@ -45,6 +45,7 @@ from simulator.engine_pool import (
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 from engines.domain_reason import OutOfDomainReason
 from engines.magemin.domain import (
+    MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW,
     MAGEMIN_NATIVE_MELT_ACTIVITIES,
     MAGEMinDomainGate,
 )
@@ -4290,7 +4291,9 @@ def _native_activity_pressure_test_backend():
     return backend
 
 
-@pytest.mark.parametrize("pressure_bar", [1.0e-6, 1.0])
+@pytest.mark.parametrize(
+    "pressure_bar", MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+)
 def test_magemin_native_activity_pressure_admits_verified_window_endpoints(
     pressure_bar,
 ):
@@ -4350,7 +4353,9 @@ def test_magemin_native_activity_pressure_outside_window_runs_and_flags(
     notice = result.diagnostics["commissioning_notice"]
     assert notice["kind"] == "out_of_certified_band"
     assert notice["authority"] == "extrapolated"
-    assert notice["certified_band"] == {"pressure_bar": [1.0e-6, 1.0]}
+    assert notice["certified_band"] == {
+        "pressure_bar": list(MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW)
+    }
     assert "magemin_native_activity_pressure_outside_certified_band" in (
         notice["reason"]
     )
