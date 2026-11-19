@@ -14,6 +14,7 @@ from simulator.battery.enums import (
 from simulator.battery.records import (
     StandardState,
     Value,
+    nominal_pressure_pa,
     phase_token,
     polymorph_token,
 )
@@ -676,13 +677,12 @@ def melt_activity_requests(
                 pressure_pa = None
                 pressure_route = None
                 if identity_pressure is not None and identity_pressure.is_value:
-                    try:
-                        pressure_pa = Decimal(str(identity_pressure.value))
-                    except (ValueError, TypeError, ArithmeticError) as exc:
-                        raise UnsupportedValue(
-                            "identity.total_pressure_Pa"
-                        ) from exc
-                    if not pressure_pa.is_finite() or pressure_pa <= 0:
+                    pressure_pa = nominal_pressure_pa(identity_pressure)
+                    if (
+                        pressure_pa is None
+                        or not pressure_pa.is_finite()
+                        or pressure_pa <= 0
+                    ):
                         raise UnsupportedValue("identity.total_pressure_Pa")
                     pressure_route = {
                         "waypoint": "identity.total_pressure_Pa",

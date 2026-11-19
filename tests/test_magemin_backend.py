@@ -48,6 +48,7 @@ from engines.magemin.domain import (
     MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW,
     MAGEMIN_NATIVE_MELT_ACTIVITIES,
     MAGEMinDomainGate,
+    native_activity_reference_available,
 )
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
@@ -4381,6 +4382,140 @@ def test_magemin_native_activity_invalid_pressure_stays_typed(
     assert result.diagnostics["backend_status_reason"] == "invalid_input"
 
 
+def test_native_activity_reference_is_quartz_only_inside_the_verified_band():
+    low, high = MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+    assert MAGEMIN_NATIVE_MELT_ACTIVITIES["SiO2"][1] == "quartz"
+    for formula in MAGEMIN_NATIVE_MELT_ACTIVITIES:
+        assert native_activity_reference_available(formula, low) is True
+        assert native_activity_reference_available(formula, high) is True
+        outside = formula == "SiO2"
+        assert native_activity_reference_available(formula, 2.0) is (not outside)
+        assert native_activity_reference_available(formula, 35000.0) is (
+            not outside
+        )
+    assert native_activity_reference_available("Na2O", 1.0) is False
+    assert native_activity_reference_available("SiO2", float("nan")) is False
+
+
+@pytest.mark.parametrize("pressure_bar", [1.0e-6, 1.0])
+def test_magemin_native_silica_inside_verified_band_publishes_quartz_activity(
+    pressure_bar,
+):
+    backend = _native_activity_pressure_test_backend()
+    solve_pressures = []
+
+    def solved(*, pressure_bar, **_kwargs):
+        solve_pressures.append(pressure_bar)
+        return {
+            "native_activities": {"SiO2": 0.91, "MgO": 0.2},
+            "solver_status": 0,
+            "native_phase": "liq",
+            "native_mode": 1.0,
+            "iterations": 1,
+        }
+
+    backend._call_magemin = solved
+    backend._phase_assemblage_payload = lambda *_args, **_kwargs: (
+        [], {}, {}, 1.0, {"SiO2": 60.0, "MgO": 40.0},
+    )
+
+    result = backend.equilibrate(
+        1429.85,
+        composition_kg={"SiO2": 60.0, "MgO": 40.0},
+        pressure_bar=pressure_bar,
+        native_activity_formula="SiO2",
+    )
+
+    assert result.status == "ok", result.warnings
+    assert solve_pressures == [pressure_bar]
+    assert result.activity_coefficients["SiO2"] == pytest.approx(0.91)
+    assert "commissioning_notice" not in result.diagnostics
+    assert MAGEMIN_NATIVE_MELT_ACTIVITIES["SiO2"][1] == "quartz"
+
+
+@pytest.mark.parametrize("pressure_bar", [2.0, 35000.0])
+def test_magemin_native_silica_outside_verified_band_refuses_unavailable_reference(
+    pressure_bar,
+):
+    """2 bar is still quartz; 35000 bar is the coesite side. Both are unlabeled."""
+    backend = _native_activity_pressure_test_backend()
+    solve_calls = []
+    backend._call_magemin = lambda **kwargs: solve_calls.append(kwargs)
+
+    result = backend.equilibrate(
+        1429.85,
+        composition_kg={"SiO2": 60.0, "MgO": 40.0},
+        pressure_bar=pressure_bar,
+        native_activity_formula="SiO2",
+    )
+
+    assert result.status == "out_of_domain"
+    assert solve_calls == []
+    assert result.activity_coefficients == {}
+    assert result.diagnostics["backend_status_reason"] == (
+        "magemin_native_silica_reference_unavailable"
+    )
+    assert result.diagnostics["magemin_native_formula"] == "SiO2"
+    assert result.diagnostics["magemin_native_activity_pressure_bar"] == pressure_bar
+    assert result.diagnostics["certified_band"] == {
+        "pressure_bar": list(MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW)
+    }
+    assert "commissioning_notice" not in result.diagnostics
+    assert MAGEMIN_NATIVE_MELT_ACTIVITIES["SiO2"][1] == "quartz"
+
+
+@pytest.mark.parametrize("pressure_bar", [2.0, 35000.0])
+def test_magemin_out_of_band_oxide_solve_omits_passenger_silica(pressure_bar):
+    backend = _native_activity_pressure_test_backend()
+    solve_pressures = []
+
+    def solved(*, pressure_bar, **_kwargs):
+        solve_pressures.append(pressure_bar)
+        return {
+            "native_activities": {"MgO": 0.8, "SiO2": 0.99},
+            "solver_status": 0,
+            "native_phase": "liq",
+            "native_mode": 1.0,
+            "iterations": 1,
+        }
+
+    backend._call_magemin = solved
+    backend._phase_assemblage_payload = lambda *_args, **_kwargs: (
+        [], {}, {}, 1.0, {"SiO2": 60.0, "MgO": 40.0},
+    )
+
+    result = backend.equilibrate(
+        1429.85,
+        composition_kg={"SiO2": 60.0, "MgO": 40.0},
+        pressure_bar=pressure_bar,
+        native_activity_formula="MgO",
+    )
+
+    assert result.status == "ok", result.warnings
+    assert solve_pressures == [pressure_bar]
+    assert result.activity_coefficients["MgO"] == pytest.approx(0.8)
+    assert "SiO2" not in result.activity_coefficients
+    notice = result.diagnostics["commissioning_notice"]
+    assert notice["kind"] == "out_of_certified_band"
+    assert notice["authority"] == "extrapolated"
+
+
+def test_silica_reference_bypass_mutation_turns_refusal_pin_red(monkeypatch):
+    import engines.magemin.domain as domain
+
+    monkeypatch.setattr(
+        domain,
+        "native_activity_reference_available",
+        lambda formula, _pressure: formula in domain.MAGEMIN_NATIVE_MELT_ACTIVITIES,
+    )
+    with pytest.raises(AssertionError):
+        test_magemin_native_silica_outside_verified_band_refuses_unavailable_reference(
+            35000.0
+        )
+    with pytest.raises(AssertionError):
+        test_magemin_out_of_band_oxide_solve_omits_passenger_silica(35000.0)
+
+
 def test_magemin_native_activity_unavailable_reference_stays_typed():
     backend = _native_activity_pressure_test_backend()
     solve_calls = []
@@ -4422,6 +4557,70 @@ def test_magemin_native_activity_subprocess_preserves_low_pressure(
     )
 
     assert expected_argument in args
+
+
+def test_magemin_subprocess_pressure_keeps_non_power_of_ten_round_trip():
+    backend = MAGEMinBackend()
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._database = "ig"
+    backend._config = {"fO2_buffer": "nno"}
+    projection = backend._build_db_bulk_projection({"SiO2": 60.0, "MgO": 40.0})
+    pressure_kbar = 12.3456789
+
+    args, *_rest = backend._build_magemin_subprocess_args(
+        bulk_projection=projection,
+        temperature_C=1234.5,
+        pressure_kbar=pressure_kbar,
+        fO2_log=-8.0,
+    )
+
+    token = next(item for item in args if item.startswith("--Pres="))
+    assert token == "--Pres=12.3456789"
+    assert float(token.removeprefix("--Pres=")) == pressure_kbar
+    assert token not in {"--Pres=12.345679", "--Pres=12.3457"}
+
+
+def test_fixed_six_pressure_mutation_turns_low_pressure_pin_red(monkeypatch):
+    original = MAGEMinBackend._build_magemin_subprocess_args
+
+    def round_to_fixed_six(self, *, pressure_kbar, **kwargs):
+        return original(
+            self, pressure_kbar=float(f"{pressure_kbar:.6f}"), **kwargs
+        )
+
+    monkeypatch.setattr(
+        MAGEMinBackend, "_build_magemin_subprocess_args", round_to_fixed_six
+    )
+    with pytest.raises(AssertionError):
+        test_magemin_native_activity_subprocess_preserves_low_pressure(
+            1.0e-6, "--Pres=1e-09"
+        )
+    with pytest.raises(AssertionError):
+        test_magemin_native_activity_subprocess_preserves_low_pressure(
+            1.0e-4, "--Pres=1e-07"
+        )
+    with pytest.raises(AssertionError):
+        test_magemin_subprocess_pressure_keeps_non_power_of_ten_round_trip()
+
+
+def test_six_sig_pressure_mutation_turns_round_trip_pin_red(monkeypatch):
+    original = MAGEMinBackend._build_magemin_subprocess_args
+
+    def collapse_to_six_sig(self, *, pressure_kbar, **kwargs):
+        args, *rest = original(self, pressure_kbar=pressure_kbar, **kwargs)
+        fixed = f"{pressure_kbar:.6f}"
+        argument = fixed if float(fixed) == pressure_kbar else f"{pressure_kbar:.6g}"
+        rewritten = [
+            f"--Pres={argument}" if item.startswith("--Pres=") else item
+            for item in args
+        ]
+        return (rewritten, *rest)
+
+    monkeypatch.setattr(
+        MAGEMinBackend, "_build_magemin_subprocess_args", collapse_to_six_sig
+    )
+    with pytest.raises(AssertionError):
+        test_magemin_subprocess_pressure_keeps_non_power_of_ten_round_trip()
 
 
 def test_magemin_nonfinite_requested_native_activity_returns_not_converged(

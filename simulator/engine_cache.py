@@ -310,7 +310,7 @@ ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
     "internal-analytical": 2,
     "vaporock": 1,
-    "magemin": 6,
+    "magemin": 7,
     "alphamelts": 3,
     "thermoengine": 3,
 }
@@ -328,6 +328,9 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v5: 2026-11-18 expose native FeO, Al2O3 and TiO2 activities (w1118eA)
 # magemin v6: 2026-11-19 predict and flag valid out-of-band native activities;
 #   preserve requested pressure in the subprocess argv (w1119eAg)
+# magemin v7: 2026-11-19 refuse out-of-band silica whose reference phase is
+#   unreported, and round-trip subprocess pressures six decimals cannot keep
+#   (w1119eAh)
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version

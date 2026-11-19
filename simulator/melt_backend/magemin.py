@@ -1774,6 +1774,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             from engines.magemin.domain import (
                 MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW,
                 MAGEMIN_NATIVE_MELT_ACTIVITIES,
+                native_activity_reference_available,
             )
 
             native_spec = MAGEMIN_NATIVE_MELT_ACTIVITIES.get(
@@ -1825,6 +1826,34 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             if math.isfinite(native_activity_pressure_bar)
                             else repr(pressure_bar)
                         ),
+                    },
+                )
+            if (
+                native_activity_formula == "SiO2"
+                and not native_activity_reference_available(
+                    native_activity_formula, native_activity_pressure_bar
+                )
+            ):
+                reason = "magemin_native_silica_reference_unavailable"
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=native_activity_pressure_bar,
+                    fO2_log=fO2_log,
+                    status='out_of_domain',
+                    warnings=[reason],
+                    diagnostics={
+                        'backend_status': 'out_of_domain',
+                        'backend_status_reason': reason,
+                        'magemin_native_formula': native_activity_formula,
+                        'magemin_native_activity_pressure_bar': (
+                            native_activity_pressure_bar
+                        ),
+                        'certified_band': {
+                            'pressure_bar': [
+                                pressure_min_bar,
+                                pressure_max_bar,
+                            ],
+                        },
                     },
                 )
             if not pressure_min_bar <= native_activity_pressure_bar <= pressure_max_bar:
@@ -2234,6 +2263,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     native_activity_pressure_notice
                 )
             for formula, (field, _polymorph, _bulk_component) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
+                if not native_activity_reference_available(formula, pressure_bar):
+                    continue
                 try:
                     value = float(native.get(formula))
                 except (TypeError, ValueError, OverflowError):
@@ -3450,7 +3481,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         pressure_argument = (
             fixed_pressure
             if float(fixed_pressure) == pressure_kbar
-            else f'{pressure_kbar:.6g}'
+            else repr(pressure_kbar)
         )
         args = [
             str(binary_path),
