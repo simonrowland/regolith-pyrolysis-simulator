@@ -650,15 +650,9 @@ def test_openimcc_species_thermo_uses_source_dfh298_for_enthalpy_increment() -> 
     datapack = load_gas_datapack()
     native = species_thermo("FeO", "g", float(temperature_K), datapack=datapack)
     assert native.T_min > 298.15
-    selected = datapack.gas_df.loc["FeO(g)"]
-    rows = (
-        (row for _index, row in selected.iterrows())
-        if hasattr(selected, "iterrows")
-        else iter((selected,))
-    )
-    source = next(row for row in rows if str(row["Ref"]) == native.source_row_id)
-    dfh298_J_mol = Decimal(str(source["dfH298"]))
-    assert dfh298_J_mol != 0
+    assert native.source_row_id == native.source_table_id == "Fe-021"
+    # NIST-JANAF Fe-021, row 298.15 K, delta-f H column (kJ/mol).
+    dfh298_kJ_mol = Decimal("251.040")
     observation = _openimcc_thermo_observation(
         "openimcc-feo-g-h-minus-h298",
         "FeO",
@@ -670,7 +664,7 @@ def test_openimcc_species_thermo_uses_source_dfh298_for_enthalpy_increment() -> 
 
     prediction = predict_with_engine(Engine.OPENIMCC, observation)
 
-    expected_kJ_mol = Decimal(str(native.H_app_kJ_mol)) - dfh298_J_mol / Decimal(1000)
+    expected_kJ_mol = Decimal(str(native.H_app_kJ_mol)) - dfh298_kJ_mol
     assert prediction.execution.state is ExecutionState.PRODUCED, (
         prediction.refusal_detail
     )

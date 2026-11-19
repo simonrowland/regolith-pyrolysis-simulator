@@ -1341,32 +1341,21 @@ def evaluate_gas(
 
 
 def _species_thermo_source_dfh298(
-    datapack: Any, species: str, phase: str, source_row_id: object
+    species: str, phase: str, source_row_id: object, source_table_id: object
 ) -> float | None:
-    table = getattr(datapack, "gas_df" if phase == "g" else "oxide_df", None)
-    if table is None:
+    if phase != "g" or str(source_row_id) != str(source_table_id):
         return None
     try:
-        selected = table.loc[f"{species}({phase})"]
-    except (KeyError, TypeError, AttributeError):
+        from simulator.battery.generators.janaf import (
+            _janaf_gas_dfh298_kJ_per_mol,
+        )
+
+        value_kJ_mol = _janaf_gas_dfh298_kJ_per_mol(species, str(source_table_id))
+    except (ImportError, OSError, ValueError):
         return None
-    rows = selected.iterrows() if hasattr(selected, "iterrows") else ((None, selected),)
-    matches: set[float] = set()
-    for _index, row in rows:
-        try:
-            row_id = row["Ref"]
-            value = row["dfH298"]
-        except (KeyError, TypeError, IndexError):
-            continue
-        if str(row_id) != str(source_row_id) or value is None:
-            continue
-        try:
-            number = float(value)
-        except (TypeError, ValueError):
-            continue
-        if math.isfinite(number):
-            matches.add(number)
-    return next(iter(matches)) if len(matches) == 1 else None
+    if value_kJ_mol is None:
+        return None
+    return float(value_kJ_mol * 1000)
 
 
 def species_thermo(species: str, phase: str, temperature_K: float) -> dict[str, Any]:
@@ -1390,6 +1379,7 @@ def species_thermo(species: str, phase: str, temperature_K: float) -> dict[str, 
             species, phase, float(temperature_K), datapack=datapack
         )
         source_row_id = getattr(props, "source_row_id", None)
+        source_table_id = getattr(props, "source_table_id", None)
         interval = getattr(props, "T_interval", None)
         return {
             "Cp_J_molK": getattr(props, "Cp_J_molK", None),
@@ -1397,7 +1387,7 @@ def species_thermo(species: str, phase: str, temperature_K: float) -> dict[str, 
             "H_app_kJ_mol": getattr(props, "H_app_kJ_mol", None),
             "G_J_mol": getattr(props, "G_J_mol", None),
             "source_row_id": source_row_id,
-            "source_table_id": getattr(props, "source_table_id", None),
+            "source_table_id": source_table_id,
             "T_interval": (
                 tuple(interval)
                 if isinstance(interval, (tuple, list))
@@ -1409,7 +1399,7 @@ def species_thermo(species: str, phase: str, temperature_K: float) -> dict[str, 
                 props, "derivatives_fit_implied", None
             ),
             "dfH298_J_mol": _species_thermo_source_dfh298(
-                datapack, species, phase, source_row_id
+                species, phase, source_row_id, source_table_id
             ),
         }
 
