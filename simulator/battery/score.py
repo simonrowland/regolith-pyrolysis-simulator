@@ -101,6 +101,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import (
     Identity,
     SweepIdentity,
+    ValenceBasis,
     WallIdentity,
     IdentityEqualKind,
     IdentityEqualOutcome,
@@ -8549,6 +8550,32 @@ class _FeRedoxRefusal:
     detail: dict[str, object]
 
 
+def _scored_valence_basis_shape(basis: ValenceBasis) -> tuple[int, str] | None:
+    """Single-numerator fraction or oxidation-state ratio, or None.
+
+    A fraction uses the total element as its denominator. A ratio or
+    log10 ratio uses one other oxidation state. Callers still decide
+    which states that element is allowed to score. Iron rejects a
+    log10 printing itself; this shape does not.
+    """
+
+    numerator = basis.numerator_oxidation_states
+    if len(numerator) != 1:
+        return None
+    if (
+        basis.value_form is ValenceValueForm.FRACTION
+        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+    ):
+        return numerator[0], "fraction"
+    if (
+        basis.value_form in {ValenceValueForm.RATIO, ValenceValueForm.LOG10_RATIO}
+        and basis.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
+        and basis.denominator_oxidation_state is not None
+    ):
+        return numerator[0], "ratio"
+    return None
+
+
 def _openimcc_candidate_valence_fields(
     identity: Identity,
 ) -> Mapping[int, str] | None:
@@ -8564,20 +8591,18 @@ def _openimcc_candidate_valence_fields(
     basis_state = identity.valence_basis
     if basis_state is None or not basis_state.is_value:
         return None
-    basis = basis_state.value
-    numerator = basis.numerator_oxidation_states
-    if len(numerator) != 1 or numerator[0] not in fields:
+    shaped = _scored_valence_basis_shape(basis_state.value)
+    if shaped is None:
         return None
-    if (
-        basis.value_form is ValenceValueForm.FRACTION
-        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
-    ):
+    numerator_state, kind = shaped
+    if numerator_state not in fields:
+        return None
+    if kind == "fraction":
         return fields
+    denominator_state = basis_state.value.denominator_oxidation_state
     if (
-        basis.value_form in {ValenceValueForm.RATIO, ValenceValueForm.LOG10_RATIO}
-        and basis.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
-        and basis.denominator_oxidation_state in fields
-        and basis.denominator_oxidation_state != numerator[0]
+        denominator_state in fields
+        and denominator_state != numerator_state
     ):
         return fields
     return None
@@ -11026,19 +11051,16 @@ def _fe_valence_named_form(identity: Identity) -> str:
     if basis_state is None or not basis_state.is_value:
         return "other_fe"
     basis = basis_state.value
-    numerator = basis.numerator_oxidation_states
+    shaped = _scored_valence_basis_shape(basis)
+    # Iron scores Fe3+/Fe2+ only as a straight ratio. A log10 printing of
+    # the same states stays refused.
     if (
-        numerator == (3,)
+        shaped == (3, "ratio")
         and basis.value_form is ValenceValueForm.RATIO
-        and basis.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
         and basis.denominator_oxidation_state == 2
     ):
         return "ratio"
-    if (
-        numerator == (3,)
-        and basis.value_form is ValenceValueForm.FRACTION
-        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
-    ):
+    if shaped == (3, "fraction"):
         return "fraction"
     return "other_fe"
 
