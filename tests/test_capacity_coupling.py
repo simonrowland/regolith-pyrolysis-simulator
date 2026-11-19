@@ -2527,8 +2527,9 @@ def test_source_above_the_sonic_crossing_returns_the_sonic_root():
 def _integrated_stranded_kg(dt_s: float) -> float:
     """Holdup after dt_s from the production pipe. Not the linearised step.
 
-    scipy's BDF integrates dm/dt = q - Q(P(m)) on pipe_species_outflow_mol_s.
-    The commit is accepted when it lands on that trajectory.
+    scipy's BDF integrates dm/dt = q - Q(P(m)) on pipe_species_outflow_mol_s
+    at rtol 1e-10. On a megapascal state that band is wider than 1e-6 Pa;
+    the choked piece uses the closed form instead.
     """
 
     from scipy.integrate import solve_ivp
@@ -2554,18 +2555,63 @@ def _integrated_stranded_kg(dt_s: float) -> float:
         (0.0, dt_s),
         [_STRANDED_O2_KG],
         method="BDF",
-        rtol=1.0e-8,
-        atol=1.0e-14,
+        rtol=1.0e-10,
+        atol=1.0e-16,
     )
     assert integrated.success
     return float(integrated.y[0, -1])
 
 
-@pytest.mark.parametrize("dt_s", [1.0, 0.05, 1.0e-4])
+def _choked_mass_rate_s(pressure_pa: float) -> float:
+    """Q/m from the production pipe. Not the integrator's stencil."""
+
+    mass = _holdup_kg(pressure_pa)
+    outflow = pipe_species_outflow_mol_s(
+        pressure_pa,
+        0.0,
+        _HS_T_K,
+        {"O2": mass / _o2_molar_mass_kg()},
+        _HS_D_M,
+        _HS_L_M,
+    )
+    return outflow.species_mol_s["O2"] * _o2_molar_mass_kg() / mass
+
+
+def _stranded_oracle_pa(dt_s: float) -> float:
+    """End pressure of dm/dt = q − Q(m).
+
+    On the choked piece Q/m is constant, so
+    m(t) = q/a + (m0 − q/a) exp(−a t). Two pressures have to give the
+    same a, or this is not that piece. Once the closed form has left
+    1000 Pa the reference is the BDF of the pipe law.
+    Unit check: (kg/s) / (1/s) = kg.
+    """
+
+    high = _choked_mass_rate_s(1.0e5)
+    low = _choked_mass_rate_s(1.0e3)
+    assert high == pytest.approx(low, rel=1.0e-9)
+    rate = high
+    source_kg_s = _SOURCE_02_KG_H / 3600.0
+    mass = source_kg_s / rate + (
+        _STRANDED_O2_KG - source_kg_s / rate
+    ) * math.exp(-rate * dt_s)
+    pressure = (
+        mass * GAS_CONSTANT * _HS_T_K / (_o2_molar_mass_kg() * _HS_V_M3)
+    )
+    if pressure >= 1000.0:
+        return pressure
+    arrived = _integrated_stranded_kg(dt_s)
+    return arrived * GAS_CONSTANT * _HS_T_K / (_o2_molar_mass_kg() * _HS_V_M3)
+
+
+@pytest.mark.parametrize("dt_s", [1.0, 0.25, 0.05, 1.0e-4])
 def test_stiff_slow_step_commits_the_integrated_drain(dt_s: float):
     # Hour-103 inventory, classified slow: the one-step residual has a
     # root, and the commit is the integral, not a refusal and not that
-    # single backward-Euler pressure.
+    # single backward-Euler pressure. 0.25 s crosses the sonic kink.
+    # The design floor is 1e-6 Pa. On the choked piece the oracle is the
+    # closed form; once that form has left the piece it is BDF at
+    # rtol 1e-10, whose band at 40 Pa is far under the floor.
     result = _as_result(
         _commit_o2(_STRANDED_O2_KG, _SOURCE_02_KG_H, dt_s / 3600.0)
     )
@@ -2573,16 +2619,13 @@ def test_stiff_slow_step_commits_the_integrated_drain(dt_s: float):
     holdup = _holdup_kg(pressure)
     bled = result.bled_species_mol["O2"] * _o2_molar_mass_kg()
     source_kg = _SOURCE_02_KG_H * dt_s / 3600.0
-    arrived = _integrated_stranded_kg(dt_s)
-    arrived_pa = (
-        arrived * GAS_CONSTANT * _HS_T_K / (_o2_molar_mass_kg() * _HS_V_M3)
-    )
+    arrived_pa = _stranded_oracle_pa(dt_s)
     diagnostic = _as_result(
         _diagnostic_o2(_STRANDED_O2_KG, _SOURCE_02_KG_H, dt_s / 3600.0)
     )
     diagnostic_pa = diagnostic.partial_pressures_Pa["O2"]
 
-    assert pressure == pytest.approx(arrived_pa, abs=1.0)
+    assert pressure == pytest.approx(arrived_pa, abs=1.0e-6)
     assert abs(pressure - diagnostic_pa) > abs(pressure - arrived_pa)
     assert bled == pytest.approx(
         _STRANDED_O2_KG + source_kg - holdup,
@@ -2718,3 +2761,221 @@ def test_second_root_above_1e8_pa_refuses_on_both_paths():
     )
     assert isinstance(two, CapacityShadowRefusal)
     assert two.reason == "headspace_balance_multiple_roots"
+
+
+# d-450 second fold. Mixture drain and the free-molecular stencil.
+# Oracles call pipe_species_outflow_mol_s or its BDF. They do not call
+# the linearised step.
+_HS_PA_PER_MOL = GAS_CONSTANT * _HS_T_K / _HS_V_M3
+_MOLECULAR_DECAY_S = 5.127738455
+
+
+def _outflow_at(moles: dict[str, float]):
+    pressure = math.fsum(moles.values()) * _HS_PA_PER_MOL
+    return pipe_species_outflow_mol_s(
+        pressure,
+        0.0,
+        _HS_T_K,
+        moles,
+        _HS_D_M,
+        _HS_L_M,
+    )
+
+
+def _decay_rates(moles: dict[str, float]) -> dict[str, float]:
+    outflow = _outflow_at(moles)
+    return {
+        species: outflow.species_mol_s[species] / moles[species]
+        for species in moles
+    }
+
+
+def _bdf_partials(
+    moles: dict[str, float],
+    source_kg_hr: dict[str, float],
+    dt_s: float,
+    *,
+    rtol: float,
+) -> dict[str, float]:
+    """Independent BDF of dn_i/dt = S_i − Q_i(pipe_species_outflow_mol_s)."""
+
+    from scipy.integrate import solve_ivp
+
+    species = tuple(moles)
+    masses = {"O2": _o2_molar_mass_kg(), "N2": MOLAR_MASS["N2"] / 1000.0}
+    source_mol_s = {
+        name: source_kg_hr.get(name, 0.0) / masses[name] / 3600.0
+        for name in species
+    }
+
+    def rhs(_time, state):
+        holdup = {}
+        pressure = 0.0
+        for index, name in enumerate(species):
+            amount = max(float(state[index]), 0.0)
+            pressure += amount * _HS_PA_PER_MOL
+            if amount > 0.0:
+                holdup[name] = amount
+        if pressure <= 0.0 or not holdup:
+            return [source_mol_s[name] for name in species]
+        outflow = pipe_species_outflow_mol_s(
+            pressure,
+            0.0,
+            _HS_T_K,
+            holdup,
+            _HS_D_M,
+            _HS_L_M,
+        )
+        return [
+            source_mol_s[name] - float(outflow.species_mol_s.get(name, 0.0))
+            for name in species
+        ]
+
+    integrated = solve_ivp(
+        rhs,
+        (0.0, dt_s),
+        [moles[name] for name in species],
+        method="BDF",
+        rtol=rtol,
+        atol=1.0e-16,
+    )
+    assert integrated.success
+    return {
+        name: float(integrated.y[index, -1]) * _HS_PA_PER_MOL
+        for index, name in enumerate(species)
+    }
+
+
+def _assert_near_bdf_or_its_band(commit_pa: float, bdf_pa: float, analytic_pa: float):
+    # A megapascal BDF at rtol 1e-10 misses the closed form by ~1e-4 Pa,
+    # which is coarser than the 1e-6 Pa floor. The commit has to match
+    # the closed form to that floor, and it may not sit farther from
+    # the BDF than the closed form does, plus the same floor.
+    assert commit_pa == pytest.approx(analytic_pa, abs=1.0e-6)
+    band = abs(bdf_pa - analytic_pa) + 1.0e-6
+    assert commit_pa == pytest.approx(bdf_pa, abs=band)
+
+
+@pytest.mark.parametrize("dt_s", [0.01, 0.05])
+def test_equal_moles_stay_on_one_choked_exponential(dt_s: float):
+    # Continuum splits by mole fraction. With no source, x is invariant,
+    # so equal moles stay equal. Q_i/n_i is one number on the choked piece.
+    moles = {"O2": 10.0, "N2": 10.0}
+    outflow = _outflow_at(moles)
+    rates = _decay_rates(moles)
+    assert outflow.binding_cause == "choked_throat"
+    assert outflow.blend_weight == 0.0
+    assert rates["O2"] == pytest.approx(rates["N2"], rel=1.0e-12)
+    result = _as_result(_commit_o2_n2(10.0 * _o2_molar_mass_kg(), 10.0, 0.0, dt_s / 3600.0))
+    analytic = 10.0 * _HS_PA_PER_MOL * math.exp(-rates["O2"] * dt_s)
+    bdf = _bdf_partials(moles, {}, dt_s, rtol=1.0e-10)
+    assert abs(result.partial_pressures_Pa["O2"] - result.partial_pressures_Pa["N2"]) <= 1.0e-9
+    for species, molar in (("O2", _o2_molar_mass_kg()), ("N2", MOLAR_MASS["N2"] / 1000.0)):
+        partial = result.partial_pressures_Pa[species]
+        _assert_near_bdf_or_its_band(partial, bdf[species], analytic)
+        n_end = partial / _HS_PA_PER_MOL
+        n_analytic = 10.0 * math.exp(-rates["O2"] * dt_s)
+        assert result.bled_species_mol[species] == pytest.approx(10.0 - n_end, abs=1.0e-12)
+        assert result.bled_species_mol[species] * molar == pytest.approx(
+            (10.0 - n_analytic) * molar,
+            abs=1.0e-12,
+        )
+
+
+def test_equal_mass_uses_the_same_choked_rate():
+    molar_n2 = MOLAR_MASS["N2"] / 1000.0
+    moles = {"O2": 1.0 / _o2_molar_mass_kg(), "N2": 1.0 / molar_n2}
+    rates = _decay_rates(moles)
+    assert rates["O2"] == pytest.approx(rates["N2"], rel=1.0e-12)
+    dt_s = 0.01
+    result = _as_result(_commit_o2_n2(1.0, moles["N2"], 0.0, dt_s / 3600.0))
+    bdf = _bdf_partials(moles, {}, dt_s, rtol=1.0e-10)
+    for species in moles:
+        analytic = moles[species] * _HS_PA_PER_MOL * math.exp(-rates[species] * dt_s)
+        _assert_near_bdf_or_its_band(
+            result.partial_pressures_Pa[species],
+            bdf[species],
+            analytic,
+        )
+
+
+def test_trace_beside_stranded_oxygen_keeps_the_oxygen_partial():
+    # A species source breaks the mole-fraction invariant. The choked
+    # piece is still Q_i = a n_i with one a, so
+    # n_O2 = S/a + (n0 − S/a) exp(−a t) and n_N2 = n0 exp(−a t).
+    molar_o2 = _o2_molar_mass_kg()
+    n_o2 = _STRANDED_O2_KG / molar_o2
+    n_n2 = 1.0e-3
+    moles = {"O2": n_o2, "N2": n_n2}
+    rates = _decay_rates(moles)
+    assert rates["O2"] == pytest.approx(rates["N2"], rel=1.0e-12)
+    rate = rates["O2"]
+    source_mol_s = _SOURCE_02_KG_H / molar_o2 / 3600.0
+    dt_s = 0.05
+    decay = math.exp(-rate * dt_s)
+    analytic = {
+        "O2": (source_mol_s / rate + (n_o2 - source_mol_s / rate) * decay) * _HS_PA_PER_MOL,
+        "N2": n_n2 * decay * _HS_PA_PER_MOL,
+    }
+    result = _as_result(
+        _commit_o2_n2(_STRANDED_O2_KG, n_n2, _SOURCE_02_KG_H, dt_s / 3600.0)
+    )
+    bdf = _bdf_partials(moles, {"O2": _SOURCE_02_KG_H}, dt_s, rtol=1.0e-10)
+    for species in moles:
+        _assert_near_bdf_or_its_band(
+            result.partial_pressures_Pa[species],
+            bdf[species],
+            analytic[species],
+        )
+    n_end_o2 = result.partial_pressures_Pa["O2"] / _HS_PA_PER_MOL
+    booked = result.bled_species_mol["O2"]
+    assert booked == pytest.approx(n_o2 + source_mol_s * dt_s - n_end_o2, abs=1.0e-9)
+    assert booked * molar_o2 == pytest.approx(
+        (n_o2 + source_mol_s * dt_s - analytic["O2"] / _HS_PA_PER_MOL) * molar_o2,
+        abs=1.0e-9,
+    )
+
+
+@pytest.mark.parametrize("dt_s", [0.01, 0.1, 1.0])
+def test_free_molecular_oxygen_is_the_exponential(dt_s: float):
+    # P(t) = 0.02 exp(−a t), a = 5.127738455 s^-1, the free-molecular
+    # Q/m. The old stencil stepped off that piece and returned α = 0.
+    n0 = 0.02 / _HS_PA_PER_MOL
+    result = _as_result(_commit_o2(_holdup_kg(0.02), 0.0, dt_s / 3600.0))
+    analytic = 0.02 * math.exp(-_MOLECULAR_DECAY_S * dt_s)
+    bdf = _bdf_partials({"O2": n0}, {}, dt_s, rtol=1.0e-12)
+    partial = result.partial_pressures_Pa["O2"]
+    assert partial == pytest.approx(analytic, abs=1.0e-6)
+    assert partial == pytest.approx(bdf["O2"], abs=1.0e-6)
+    assert result.saturation.binding_cause == "molecular_conductance"
+
+
+def test_molecular_mixture_separates_by_effusion_speed():
+    # Free-molecular Q_i = C_i n_i / V with C_i ∝ sqrt(1/M_i). Equal
+    # partials do not stay equal. A mole-fraction split would keep them
+    # equal and fail this test.
+    moles = {"O2": 0.01 / _HS_PA_PER_MOL, "N2": 0.01 / _HS_PA_PER_MOL}
+    outflow = _outflow_at(moles)
+    rates = _decay_rates(moles)
+    assert outflow.blend_weight == 1.0
+    assert outflow.binding_cause == "molecular_conductance"
+    molar_n2 = MOLAR_MASS["N2"] / 1000.0
+    assert rates["O2"] / rates["N2"] == pytest.approx(
+        math.sqrt(molar_n2 / _o2_molar_mass_kg()),
+        rel=1.0e-4,
+    )
+    dt_s = 0.1
+    result = _as_result(
+        _commit_o2_n2(0.01 / _HS_PA_PER_MOL * _o2_molar_mass_kg(), moles["N2"], 0.0, dt_s / 3600.0)
+    )
+    bdf = _bdf_partials(moles, {}, dt_s, rtol=1.0e-12)
+    for species in moles:
+        analytic = 0.01 * math.exp(-rates[species] * dt_s)
+        assert result.partial_pressures_Pa[species] == pytest.approx(analytic, abs=1.0e-6)
+        assert result.partial_pressures_Pa[species] == pytest.approx(bdf[species], abs=1.0e-6)
+    ratio = result.partial_pressures_Pa["O2"] / result.partial_pressures_Pa["N2"]
+    assert ratio == pytest.approx(
+        math.exp(-(rates["O2"] - rates["N2"]) * dt_s),
+        rel=1.0e-6,
+    )
+    assert abs(ratio - 1.0) > 1.0e-3

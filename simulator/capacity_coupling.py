@@ -546,25 +546,37 @@ def solve_capacity_shadow(
 # Fast commits G = q_head + S - Q = 0 when that scalar has one sign
 # change and the admission bound holds. Slow commits one backward-Euler
 # step when that step already agrees with its two halves, and otherwise
-# the linearised drain over Δt. Newton proposes on the equation of the
-# branch it is called for. Brent publishes the root. There is no seam
-# that injects a Newton step: a returned Newton value is discarded.
+# the coupled linearised drain over Δt. Newton proposes on the equation
+# of the branch it is called for. Brent publishes the root. There is no
+# seam that injects a Newton step: a returned Newton value is discarded.
+#
+# A slow step is accepted only when |P(Δt) - P(Δt/2)| <= 1e-6 Pa and
+# the bled-mass pair is inside its floor. A relative 1e-4 of the
+# substep's own pressure change certified a diagonal step whose two
+# halves agreed with each other and still sat 3.87e-4 Pa off the pipe.
+# On a through-origin piece the slope is Q/n, not a mass stencil: the
+# stencil's 1e-10 relative wobble opens a 1e-4 Pa pair gap and the
+# substeps then leave the closed form.
 
 _ADMISSION_EXP_UNDERFLOW = 745.0
 _SIGN_SCAN_POINTS = 4096
-# Relative pair for one linearised substep. On a piece where
-# d(Q - q)/dn = a is constant, the exponential below is exact and the
-# pair is 0. Where a changes inside the step, accept when the
-# re-linearised halves land within 1e-4 of that step's own change, or
-# within the design floors when the change is already that small.
-# Premise: one backward-Euler step of dm/dt = -a (m - m_eq) against
-# its two halves leaves a pressure gap |P - P_eq| (a h)^2 / 4.
-# Algebra: |P - P_eq| ≈ 5.6e7 Pa and a gap of 1e-6 Pa give
-# (a h)^2 / 4 * 5.6e7 = 1e-6, so a h ≈ 2.7e-7.
-# Unit check: a h is dimensionless. With a ≈ 64 s^-1, h ≈ 4e-9 s.
-# Limit: a h → 0 and the gap → 0. That nanosecond step is not the
-# refusal. The exponential on a frozen piece is the converged step.
-_SUBSTEP_REL = 1.0e-4
+# Relative mole stencil. The old width max(|n|, 1) * 1e-6 stepped a
+# 1e-7 mol free-molecular inventory by 1e-6 mol, left the piece, and
+# the slope came back 0. The floor is far below that inventory.
+_STENCIL_REL = 1.0e-6
+_STENCIL_FLOOR_MOL = 1.0e-18
+# |a_stencil - Q/n| / max(Q/n, 1) at or under this is a through-origin
+# line (choked throat, free-molecular effusion). Poiseuille is order 1.
+_LINE_RATE_REL = 1.0e-4
+# Substep |P(Δt) − P(Δt/2)| limit. The state kept is the Δt/2 member.
+# On a smooth piece its error is at most |pair| / 3 (local error C h^3,
+# the two halves carry C h^3 / 4). At the sonic kink the order drops and
+# the next substep carries a second gap of the same order. Measured on
+# the stranded O2 inventory at 0.25 s, against a BDF of the pipe law at
+# rtol 1e-10: a 1e-6 Pa limit finished 1.35e-6 Pa high, and this half
+# floor finished 5.73e-7 Pa high. Still an absolute test. A relative
+# 1e-4 is not used.
+_SUBSTEP_PRESSURE_PA = 0.5 * DEFAULT_ABS_TOL_PA
 
 
 class _BalanceRefused(Exception):
@@ -1278,42 +1290,274 @@ def _piece_key(piece: tuple) -> tuple:
     return piece[:3]
 
 
-def _linear_slope(
+def _stencil_width(amount: float) -> float:
+    # dn = |n| * 1e-6, and never below 1e-18 mol. A floor of 1 mol
+    # times 1e-6 is the step that left the free-molecular piece.
+    return max(abs(amount) * _STENCIL_REL, _STENCIL_FLOOR_MOL)
+
+
+def _net_rates(
     law: _HeadspaceLaw,
     moles: Mapping[str, float],
-    species: str,
-    piece: tuple,
-    beta: float,
-) -> float:
-    """α = -d(q + S - Q)/dn on this piece. 0 when the stencil leaves it.
+) -> tuple[list[float], tuple] | None:
+    source, outflow, _binding, piece = law._flows(law.partials_of(moles))
+    rates: list[float] = []
+    for species in law.species:
+        rate = source[species] + law.redox_mol_s[species] - outflow[species]
+        if not math.isfinite(rate):
+            return None
+        rates.append(rate)
+    return rates, piece
 
-    Unit check: (mol/s) / mol = 1/s. Limit: a flat outflow and a
-    pressure-independent source have α = 0, and the advance is n + β Δt.
+
+def _jacobian_column(
+    law: _HeadspaceLaw,
+    moles: Mapping[str, float],
+    index: int,
+    piece_key: tuple,
+    base_rates: list[float],
+) -> list[float] | None:
+    """∂f_i/∂n_j on this piece. None when no in-piece stencil exists.
+
+    The width shrinks until both sides, or the one side that still
+    has a positive inventory, stay on the piece. Returning 0 for a
+    crossed stencil is the free-molecular failure: the advance then
+    took the flat-cap update.
     """
 
-    dn = max(abs(moles[species]), 1.0) * 1.0e-6
-    up = dict(moles)
-    up[species] = moles[species] + dn
-    source_up, outflow_up, _binding, piece_up = law._flows(law.partials_of(up))
-    if _piece_key(piece_up) != _piece_key(piece):
-        return 0.0
-    rate_up = (
-        source_up[species] + law.redox_mol_s[species] - outflow_up[species]
-    )
-    if moles[species] > dn:
-        down = dict(moles)
-        down[species] = moles[species] - dn
-        source_dn, outflow_dn, _binding_dn, piece_dn = law._flows(
-            law.partials_of(down)
-        )
-        if _piece_key(piece_dn) == _piece_key(piece):
-            rate_dn = (
-                source_dn[species]
-                + law.redox_mol_s[species]
-                - outflow_dn[species]
-            )
-            return -(rate_up - rate_dn) / (2.0 * dn)
-    return -(rate_up - beta) / dn
+    species = law.species[index]
+    amount = moles[species]
+    width = _STENCIL_FLOOR_MOL if amount == 0.0 else _stencil_width(amount)
+    count = len(law.species)
+    for _shrink in range(16):
+        up_moles = dict(moles)
+        up_moles[species] = amount + width
+        up = _net_rates(law, up_moles)
+        down = None
+        if amount > width:
+            down_moles = dict(moles)
+            down_moles[species] = amount - width
+            down = _net_rates(law, down_moles)
+        up_ok = up is not None and _piece_key(up[1]) == piece_key
+        down_ok = down is not None and _piece_key(down[1]) == piece_key
+        if up_ok and down_ok:
+            span = 2.0 * width
+            return [(up[0][i] - down[0][i]) / span for i in range(count)]
+        if up_ok and (amount <= width or not down_ok):
+            return [(up[0][i] - base_rates[i]) / width for i in range(count)]
+        if down_ok and not up_ok:
+            return [(base_rates[i] - down[0][i]) / width for i in range(count)]
+        width *= 0.1
+        if width < _STENCIL_FLOOR_MOL:
+            return None
+    return None
+
+
+def _select_decay_rate(chord_per_s: float, tangent_per_s: float) -> float:
+    """Decay rate a in dn/dt = S − a n.
+
+    Premise: a through-origin piece has Q = a n, so dQ/dn = Q/n.
+    The mass stencil recovers that only to about 1e-10 relative, and
+    the leftover makes one exponential disagree with its two halves
+    by ~1e-4 Pa. Algebra: use Q/n when |a_stencil − Q/n| <= 1e-4
+    max(Q/n, 1 s^-1). Unit check: mol/s / mol = 1/s.
+    Limit: Poiseuille at 40 Pa disagrees by order 1, so the tangent
+    is kept and the pair test halves Δt.
+    """
+
+    if (
+        chord_per_s > 0.0
+        and math.isfinite(tangent_per_s)
+        and abs(tangent_per_s - chord_per_s)
+        <= _LINE_RATE_REL * max(chord_per_s, 1.0)
+    ):
+        return chord_per_s
+    return tangent_per_s
+
+
+def _scalar_drain(n0: float, beta: float, alpha: float, dt_s: float) -> float:
+    """Exact step of dn/dt = β − α (n − n0).
+
+    Premise: f(n) = β − α (n − n0) is the frozen linear drain.
+    Algebra: n(Δt) = n0 + (β/α) (1 − exp(−α Δt)) for α > 0.
+    The small-product branch is the Taylor step
+    1 − exp(−x) = x − x²/2 + O(x³), so
+    (β/α) (α Δt − (α Δt)²/2) = β Δt (1 − ½ α Δt).
+    Unit check: β/α is mol. Limit: α → 0 gives n0 + β Δt, the closed
+    line and the flat cap. α Δt ≥ 745 underflows exp to 0 and lands
+    on n0 + β/α.
+    """
+
+    product = alpha * dt_s
+    if alpha <= 0.0 or abs(product) < 1.0e-8:
+        return n0 + beta * dt_s * (1.0 - 0.5 * max(alpha, 0.0) * dt_s)
+    if product >= _ADMISSION_EXP_UNDERFLOW:
+        return n0 + beta / alpha
+    return n0 + (beta / alpha) * (1.0 - math.exp(-product))
+
+
+def _sources_are_zero(
+    law: _HeadspaceLaw,
+    moles: Mapping[str, float],
+    piece_key: tuple,
+) -> bool:
+    # A source that is zero only at this pressure is not the invariant.
+    # The sample up the same mole fraction has to be zero as well.
+    for scale in (1.0, 1.0 + _STENCIL_REL):
+        scaled = {
+            species: moles[species] * scale for species in law.species
+        }
+        source, _outflow, _binding, got = law._flows(law.partials_of(scaled))
+        if _piece_key(got) != piece_key:
+            return False
+        for species in law.species:
+            if source[species] != 0.0 or law.redox_mol_s[species] != 0.0:
+                return False
+    return True
+
+
+def _continuum_split_step(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    piece: tuple,
+    outflow: Mapping[str, float],
+) -> dict[str, float] | None:
+    """Total mole drain at fixed mole fraction. Exact on this piece.
+
+    Continuum, including the sonic cap, is one total split by mole
+    fraction: Q_i = x_i Q_mol(N, x). With S_i = 0,
+    dn_i/dt = −(n_i/N) Q_mol and dN/dt = −Q_mol, so
+    N dn_i − n_i dN = 0 and x_i is constant.
+    Integrate N, then n_i = x_i N. That is exact for any Q_mol(N, x),
+    linear or not. The scalar exponential is the exact N(t) while
+    Q_mol/N is constant, which is the choked throat. On the Poiseuille
+    piece Q_mol is not linear in N and the pair test halves Δt.
+
+    Not this split: free-molecular effusion. There
+    Q_i = C_i n_i / V and C_i ∝ mean speed ∝ sqrt(1/M_i), so
+    d(ln n_i)/dt differs by species and the ratio separates as
+    exp(−(a_i − a_j) t). A blend is neither identity. A species
+    source is neither identity. Those steps use the full Jacobian.
+    """
+
+    # piece = (binding, blend bucket, cold-train cap, empty).
+    # Bucket 0 is blend weight 0. A ductless mass cap is also bucket
+    # 0 and is not this split: its molar rate is x_i * cap / M_i.
+    if law.diameter_m is None or piece[1] != 0 or piece[3]:
+        return None
+    piece_key = _piece_key(piece)
+    if not _sources_are_zero(law, n0, piece_key):
+        return None
+    total = math.fsum(n0[species] for species in law.species)
+    if total <= 0.0:
+        return None
+    # α = dQ_mol/dN at fixed x. At fixed composition m = M_bar N and
+    # Q_kg = M_bar Q_mol, so dQ_kg/dm = dQ_mol/dN.
+    # Unit check: (kg/s) / kg = 1/s. β = −Q_mol is mol/s.
+    # S_i = 0 was checked above, so β_i = −Q_i and the sum is −Q_mol.
+    # On the choked piece that derivative is Q_mol/N itself.
+    tangent = _state_slope(law, n0)
+    if tangent is None:
+        return None
+    beta = -math.fsum(outflow[species] for species in law.species)
+    alpha = _select_decay_rate(-beta / total, tangent)
+    updated = _scalar_drain(total, beta, alpha, dt_s)
+    if not math.isfinite(updated) or updated < 0.0:
+        return None
+    return {
+        species: n0[species] / total * updated for species in law.species
+    }
+
+
+def _jacobian_step(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    beta: list[float],
+    piece_key: tuple,
+    outflow: Mapping[str, float],
+) -> dict[str, float] | None:
+    """Exact step of dn/dt = β + A (n − n0), A the full Jacobian.
+
+    Where Q_i = a_i n_i, the step is the scalar drain at a_i = Q_i/n_i
+    for each species, not the off-diagonal stencil. That rate is exact
+    while a_i is constant: molecular effusion (a_i ∝ sqrt(1/M_i)) and
+    a choked throat with a source. The cross derivative n_i ∂a_i/∂n_j
+    is re-evaluated on the next substep. Freezing it inside A, on a
+    stencil that does not shrink with Δt, put the trace 1e-5 Pa off
+    the closed form. A curved piece keeps the full matrix.
+    Algebra: u = n − n0, du/dt = β + A u, u(0) = 0. The last column
+    of exp([[A, β], [0, 0]] Δt) is u(Δt), including a singular A
+    (flat cap), where it reduces to β Δt.
+    Unit check: A Δt is dimensionless and β Δt is mol.
+    Limit: one species is the scalar exponential. A Δt → 0 is n0 + β Δt.
+    """
+
+    count = len(law.species)
+    columns: list[list[float]] = []
+    for index in range(count):
+        column = _jacobian_column(law, n0, index, piece_key, beta)
+        if column is None:
+            return None
+        columns.append(column)
+    if count == 1:
+        species = law.species[0]
+        amount = n0[species]
+        # df/dn = −a. On a through-origin piece a = Q/n, and the
+        # stencil's leftover is not that a.
+        chord = outflow[species] / amount if amount > 0.0 else 0.0
+        alpha = _select_decay_rate(chord, -columns[0][0])
+        updated = _scalar_drain(amount, beta[0], alpha, dt_s)
+        end_values = [updated]
+    else:
+        alphas: list[float] | None = []
+        for index, species in enumerate(law.species):
+            amount = n0[species]
+            if amount <= 0.0:
+                alphas = None
+                break
+            chord = outflow[species] / amount
+            # Chosen equals Q/n only on a through-origin line. A curved
+            # piece keeps the full matrix below.
+            chosen = _select_decay_rate(chord, -columns[index][index])
+            if chosen != chord:
+                alphas = None
+                break
+            alphas.append(chosen)
+        if alphas is not None:
+            end_values = [
+                _scalar_drain(n0[species], beta[index], alphas[index], dt_s)
+                for index, species in enumerate(law.species)
+            ]
+        else:
+            import numpy as np
+            from scipy.linalg import expm
+
+            augmented = np.zeros((count + 1, count + 1))
+            for row in range(count):
+                for col in range(count):
+                    augmented[row, col] = columns[col][row] * dt_s
+                augmented[row, count] = beta[row] * dt_s
+            try:
+                advanced = expm(augmented)
+            except (ValueError, OverflowError, FloatingPointError):
+                return None
+            end_values = []
+            for row, species in enumerate(law.species):
+                moved = float(advanced[row, count])
+                end_values.append(n0[species] + moved)
+    end: dict[str, float] = {}
+    for species, updated in zip(law.species, end_values):
+        if not math.isfinite(updated):
+            return None
+        # A roundoff undershoot of an empty inventory is 0. A real
+        # negative step is not this linear drain.
+        floor = -1.0e-12 * max(1.0, abs(n0[species]))
+        if updated < floor:
+            return None
+        end[species] = 0.0 if updated < 0.0 else updated
+    return end
 
 
 def _linear_advance(
@@ -1321,36 +1565,32 @@ def _linear_advance(
     n0: Mapping[str, float],
     dt_s: float,
 ) -> dict[str, float] | None:
-    """Exact step of dn/dt = β - α (n - n0), frozen on the current piece.
+    """Coupled step of the linearised drain, frozen on the current piece.
 
-    Premise: backward Euler on this linear drain converges to
-    n(Δt) = n_eq + (n0 - n_eq) exp(-α Δt) as the substep goes to 0,
-    and that is also the solution of the ODE.
-    Algebra: β = (q + S - Q) at n0, α = -d(q + S - Q)/dn,
-    n_eq = n0 + β/α, n(Δt) = n0 + (β/α) (1 - exp(-α Δt)).
-    Unit check: β/α is mol, and (1 - exp) is dimensionless.
-    Limit: α Δt → 0 gives n0 + β Δt, the closed line and the flat cap.
-    α Δt → ∞ lands on n_eq. A step that leaves the piece, or drives a
-    species negative, is not this formula.
+    Continuum with no source uses the mole-fraction split, which is
+    exact. A through-origin piece uses one exponential per species.
+    A curved piece uses the full Jacobian. A step that leaves the
+    piece is not any of those formulas.
     """
 
-    source, outflow, _binding, piece = law._flows(law.partials_of(n0))
-    end: dict[str, float] = {}
-    for species in law.species:
-        beta = source[species] + law.redox_mol_s[species] - outflow[species]
-        alpha = _linear_slope(law, n0, species, piece, beta)
-        if not math.isfinite(alpha) or not math.isfinite(beta):
-            return None
-        product = alpha * dt_s
-        if alpha <= 0.0 or abs(product) < 1.0e-8:
-            updated = n0[species] + beta * dt_s * (1.0 - 0.5 * max(alpha, 0.0) * dt_s)
-        elif product >= _ADMISSION_EXP_UNDERFLOW:
-            updated = n0[species] + beta / alpha
-        else:
-            updated = n0[species] + (beta / alpha) * (1.0 - math.exp(-product))
-        if not math.isfinite(updated) or updated < 0.0:
-            return None
-        end[species] = updated
+    rated = _net_rates(law, n0)
+    if rated is None:
+        return None
+    beta, piece = rated
+    _source, outflow, _binding, piece_again = law._flows(law.partials_of(n0))
+    if _piece_key(piece_again) != _piece_key(piece):
+        return None
+    split = _continuum_split_step(law, n0, dt_s, piece, outflow)
+    end = split if split is not None else _jacobian_step(
+        law,
+        n0,
+        dt_s,
+        beta,
+        _piece_key(piece),
+        outflow,
+    )
+    if end is None:
+        return None
     _source_end, _outflow_end, _binding_end, end_piece = law._flows(
         law.partials_of(end)
     )
@@ -1396,25 +1636,6 @@ def _analytic_pair(
     return coarse, first, second
 
 
-def _substep_relative(
-    start_pressure: float,
-    coarse: _HeadspaceStep,
-    first: _HeadspaceStep,
-    second: _HeadspaceStep,
-) -> bool:
-    # Pair against the change on this substep. The absolute floors are
-    # the design pair, used when that change is already small.
-    change_p = abs(start_pressure - second.pressure_Pa)
-    if abs(coarse.pressure_Pa - second.pressure_Pa) > max(
-        DEFAULT_ABS_TOL_PA,
-        _SUBSTEP_REL * change_p,
-    ):
-        return False
-    change_m = abs(first.mass_start_kg - second.mass_end_kg)
-    fine_bled = first.bled_kg + second.bled_kg
-    return abs(coarse.bled_kg - fine_bled) <= max(1.0e-12, _SUBSTEP_REL * change_m)
-
-
 def _slow_converge(
     law: _HeadspaceLaw,
     n0: Mapping[str, float],
@@ -1425,9 +1646,9 @@ def _slow_converge(
     One backward-Euler step is the commit when its pair already meets
     the design floors. A closed line and a flat cap do. The stranded
     inventory does not: that pair stays outside 1e-6 Pa down to a
-    nanosecond substep. The integral is then the linearised drain,
-    re-linearised until the pair is inside the substep tolerance.
-    The halving count is not the refusal.
+    nanosecond substep. The integral is then the coupled drain,
+    re-linearised until |P(Δt) − P(Δt/2)| and the bled-mass pair meet
+    the design floors. The halving count is not the refusal.
     """
 
     coarse = _one_euler(law, n0, dt_s)
@@ -1472,13 +1693,17 @@ def _integrate_linearised(
                 raise _BalanceRefused("headspace_balance_nonconvergence")
             continue
         coarse, first, second = pair
-        start_p = law.pressure_of(state)
-        agreed = _halves_agree(coarse, first, second)
-        if not agreed and not _substep_relative(start_p, coarse, first, second):
-            change_p = abs(start_p - second.pressure_Pa)
-            err_p = abs(coarse.pressure_Pa - second.pressure_Pa)
-            tol_p = max(DEFAULT_ABS_TOL_PA, _SUBSTEP_REL * change_p)
-            ratio = err_p / tol_p if tol_p > 0.0 else math.inf
+        err_p = abs(coarse.pressure_Pa - second.pressure_Pa)
+        fine_bled = first.bled_kg + second.bled_kg
+        mass_tol = max(1.0e-12, 1.0e-9 * abs(coarse.bled_kg))
+        mass_err = abs(coarse.bled_kg - fine_bled)
+        # Absolute floors only. A relative 1e-4 of this substep's own
+        # change certified the regime crossing 3.87e-4 Pa off the pipe.
+        pressure_limit = _SUBSTEP_PRESSURE_PA
+        if err_p > pressure_limit or mass_err > mass_tol:
+            ratio = err_p / pressure_limit if pressure_limit > 0.0 else math.inf
+            if mass_tol > 0.0:
+                ratio = max(ratio, mass_err / mass_tol)
             shrink = (
                 0.5
                 if not math.isfinite(ratio) or ratio <= 1.0
@@ -1504,16 +1729,7 @@ def _integrate_linearised(
         remaining -= h
         if remaining <= 0.0:
             break
-        if agreed:
-            h = remaining
-        else:
-            err_p = abs(coarse.pressure_Pa - second.pressure_Pa)
-            change_p = abs(start_p - second.pressure_Pa)
-            tol_p = max(DEFAULT_ABS_TOL_PA, _SUBSTEP_REL * change_p)
-            if tol_p > 0.0 and err_p < 0.25 * tol_p:
-                h = min(remaining, h * 2.0)
-            else:
-                h = min(remaining, h)
+        h = remaining
     if last is None or mass_start is None:
         raise _BalanceRefused("headspace_balance_nonconvergence")
     return _HeadspaceStep(
