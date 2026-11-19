@@ -1078,7 +1078,7 @@ def test_b2131_formation_gibbs_cells_land_at_printed_temperature(tmp_path):
     assert _landed_formation_points(acanthite[0]) == []
 
 
-def _b2131_formation_observation_serialization(tmp_path):
+def _b2131_formation_observations(tmp_path):
     source_id = "robie-hemingway-1995-usgs-b2131"
     root = _write_min_tree(tmp_path / "tree")
     source_dir = REPO_ROOT / "data/literature/compilations" / source_id
@@ -1099,10 +1099,7 @@ def _b2131_formation_observation_serialization(tmp_path):
         ),
         key=lambda obs: obs["observation_id"],
     )
-    payload = json.dumps(
-        observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    ).encode("utf-8")
-    return len(observations), hashlib.sha256(payload).hexdigest()
+    return observations
 
 
 def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
@@ -1113,8 +1110,63 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     # changes. The new page-level rows are p069/p075/p085/p099/p102's two
     # unavailable windows, p089/p115's one unavailable window, plus the
     # restored p274/p367 formula rows; reference p005-05/p005-11/p006-05/
-    # p007-13 are typed unavailable. These are source-page grounded changes.
-    assert _b2131_formation_observation_serialization(tmp_path) == (
+    # p007-13 are typed unavailable. The shared phase parser also resolves
+    # printed glass windows; these source-page grounded identities affect the
+    # serialization digest. Green does not carry t-1832's generator provenance
+    # change, so this car pins identity changes only.
+    observations = _b2131_formation_observations(tmp_path)
+    stored = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "data/literature/observations-v2/compilations-robie-hemingway-1995-usgs-b2131.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    baseline = {
+        row["observation_id"]: row
+        for row in stored["observations"]
+        if row["identity"]["quantity"].get("value") == "delta_fG"
+    }
+    baseline_rows = sorted(
+        baseline.values(), key=lambda row: row["observation_id"]
+    )
+    baseline_payload = json.dumps(
+        baseline_rows, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    assert (len(baseline_rows), hashlib.sha256(baseline_payload).hexdigest()) == (
+        945,
+        "13187d096dd3ffcc4079d147484c31edbfb8e432be9f2def01393a4cf1a2c2d7",
+    )
+    candidate = {row["observation_id"]: row for row in observations}
+    assert set(candidate) == set(baseline)
+    non_admission_diffs = {
+        observation_id: sorted(
+            key
+            for key in row.keys() | baseline[observation_id].keys()
+            if key != "admission" and row.get(key) != baseline[observation_id].get(key)
+        )
+        for observation_id, row in candidate.items()
+    }
+    non_admission_diffs = {
+        observation_id: fields
+        for observation_id, fields in non_admission_diffs.items()
+        if fields
+    }
+    assert non_admission_diffs
+    assert {
+        field for fields in non_admission_diffs.values() for field in fields
+    } == {"identity"}, json.dumps(non_admission_diffs, sort_keys=True)
+    changed_admissions = {
+        observation_id: (baseline[observation_id]["admission"], row["admission"])
+        for observation_id, row in candidate.items()
+        if row["admission"] != baseline[observation_id]["admission"]
+    }
+    assert not changed_admissions
+    payload = json.dumps(
+        observations, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    # Green's pre-parser digest is the pending pin until the Studio regen gives
+    # the candidate digest for this green base.
+    assert (len(observations), hashlib.sha256(payload).hexdigest()) == (
         945,
         "13187d096dd3ffcc4079d147484c31edbfb8e432be9f2def01393a4cf1a2c2d7",
     )
