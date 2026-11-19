@@ -26,62 +26,70 @@ def undefined_names(path: Path) -> tuple[tuple[str, int], ...]:
         and any(alias.name == "annotations" for alias in node.names)
         for node in tree.body
     )
-    loads, augmented_loads = _runtime_loads(tree, top, postponed)
-    runtime, type_only, runtime_without_augassign = _scope_bindings(
-        tree, top, postponed
-    )
+    loads = _runtime_loads(tree, top, postponed)
+    runtime = _scope_bindings(tree, top, postponed)
     module = _scope_key(top)
     defined = runtime.get(module, set())
     missing: set[tuple[str, int]] = set()
+    tables: dict[_ScopeKey, symtable.SymbolTable] = {}
+
+    def collect_tables(table: symtable.SymbolTable) -> None:
+        tables[_scope_key(table)] = table
+        for child in table.get_children():
+            collect_tables(child)
+
+    collect_tables(top)
+
+    def has_global_binding(name: str) -> bool:
+        return (
+            name in defined
+            or hasattr(builtins, name)
+            or name in _IMPLICIT
+        )
+
+    def unresolved(
+        name: str,
+        table: symtable.SymbolTable,
+        scope: _ScopeKey,
+        enclosing_functions: tuple[_ScopeKey, ...],
+    ) -> bool:
+        kind = table.get_type()
+        if kind == "module":
+            return not has_global_binding(name)
+
+        symbol = table.lookup(name) if name in table.get_identifiers() else None
+        if symbol is not None and symbol.is_local():
+            if name in runtime.get(scope, set()):
+                return False
+            # Function locals never fall back to an outer scope. Class bodies
+            # use their globals when a class-local name has no runtime value.
+            return kind == "function" or not has_global_binding(name)
+
+        if symbol is not None and symbol.is_free():
+            for enclosing in reversed(enclosing_functions):
+                outer = tables.get(enclosing)
+                if outer is None or name not in outer.get_identifiers():
+                    continue
+                if outer.lookup(name).is_local():
+                    return name not in runtime.get(enclosing, set())
+
+        return not has_global_binding(name)
 
     def walk(
         table: symtable.SymbolTable,
-        class_only: set[str] | None = None,
         enclosing_functions: tuple[_ScopeKey, ...] = (),
     ) -> None:
         scope = _scope_key(table)
         scope_loads = loads.get(scope, {})
-        scope_augmented_loads = augmented_loads.get(scope, {})
-        if table.get_type() == "class":
-            class_only = type_only.get(scope, set()) - runtime.get(scope, set()) - defined
-        elif table.get_type() != "annotation":
-            class_only = None
         missing.update(
-            (name, scope_loads[name])
-            for name in (class_only or set()) & scope_loads.keys()
+            (name, line)
+            for name, line in scope_loads.items()
+            if name in table.get_identifiers()
+            and unresolved(name, table, scope, enclosing_functions)
         )
-        for symbol in table.get_symbols():
-            name = symbol.get_name()
-            global_load = symbol.is_global() or table.get_type() == "module"
-            if (
-                global_load and name not in defined and not hasattr(builtins, name)
-                and name not in _IMPLICIT and name in scope_loads
-            ):
-                missing.add((name, scope_loads[name]))
-            if (
-                global_load and name in scope_augmented_loads
-                and name not in runtime_without_augassign.get(module, set())
-                and not hasattr(builtins, name) and name not in _IMPLICIT
-            ):
-                missing.add((name, scope_augmented_loads[name]))
-            if symbol.is_free() and name in scope_loads:
-                for enclosing in reversed(enclosing_functions):
-                    if name not in runtime.get(enclosing, set()) and name not in type_only.get(
-                        enclosing, set()
-                    ):
-                        continue
-                    if (
-                        name in type_only.get(enclosing, set())
-                        and name not in runtime.get(enclosing, set())
-                    ):
-                        missing.add((name, scope_loads[name]))
-                    break
         for child in table.get_children():
             walk(
                 child,
-                class_only
-                if table.get_type() == "class" and child.get_type() == "annotation"
-                else None,
                 enclosing_functions
                 + ((scope,) if table.get_type() == "function" else ()),
             )
@@ -96,9 +104,8 @@ def _scope_key(table: symtable.SymbolTable) -> _ScopeKey:
 
 def _runtime_loads(
     tree: ast.Module, top: symtable.SymbolTable, postponed: bool
-) -> tuple[dict[_ScopeKey, dict[str, int]], dict[_ScopeKey, dict[str, int]]]:
+) -> dict[_ScopeKey, dict[str, int]]:
     loads: dict[_ScopeKey, dict[str, int]] = {}
-    augmented_loads: dict[_ScopeKey, dict[str, int]] = {}
     tables: set[_ScopeKey] = set()
     variable_annotations: dict[_ScopeKey, _ScopeKey] = {}
 
@@ -124,10 +131,6 @@ def _runtime_loads(
             visit(node.target, scope, local)
             if isinstance(node.target, ast.Name) and node.target.id not in local:
                 names = loads.setdefault(scope, {})
-                names[node.target.id] = min(
-                    names.get(node.target.id, node.target.lineno), node.target.lineno
-                )
-                names = augmented_loads.setdefault(scope, {})
                 names[node.target.id] = min(
                     names.get(node.target.id, node.target.lineno), node.target.lineno
                 )
@@ -198,20 +201,14 @@ def _runtime_loads(
             visit(child, scope, local)
 
     visit(tree, _scope_key(top))
-    return loads, augmented_loads
+    return loads
 
 
 def _scope_bindings(
     tree: ast.Module, top: symtable.SymbolTable, postponed: bool
-) -> tuple[
-    dict[_ScopeKey, set[str]],
-    dict[_ScopeKey, set[str]],
-    dict[_ScopeKey, set[str]],
-]:
+) -> dict[_ScopeKey, set[str]]:
     module = _scope_key(top)
     runtime: dict[_ScopeKey, set[str]] = {}
-    type_only: dict[_ScopeKey, set[str]] = {}
-    runtime_without_augassign: dict[_ScopeKey, set[str]] = {}
     tables: dict[_ScopeKey, symtable.SymbolTable] = {}
 
     def collect_tables(table: symtable.SymbolTable) -> None:
@@ -276,12 +273,9 @@ def _scope_bindings(
                 self.nonlocals: set[str] = set()
                 self.guarded = False
 
-            def bind(
-                self, name: str, imported: bool = False, augmented: bool = False
-            ) -> None:
-                (self.type_only if self.guarded and imported else self.runtime).add(name)
-                if not augmented and not (self.guarded and imported):
-                    self.runtime_without_augassign.add(name)
+            def bind(self, name: str, augmented: bool = False) -> None:
+                if not self.guarded and not augmented:
+                    self.runtime.add(name)
 
             def visit_Name(self, node: ast.Name) -> None:
                 if isinstance(node.ctx, ast.Store):
@@ -296,13 +290,13 @@ def _scope_bindings(
 
             def visit_Import(self, node: ast.Import) -> None:
                 for alias in node.names:
-                    self.bind(alias.asname or alias.name.split(".", 1)[0], True)
+                    self.bind(alias.asname or alias.name.split(".", 1)[0])
 
             def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
                 if node.module != "__future__":
                     for alias in node.names:
                         if alias.name != "*":
-                            self.bind(alias.asname or alias.name, True)
+                            self.bind(alias.asname or alias.name)
 
             def visit_If(self, node: ast.If) -> None:
                 self.visit(node.test)
@@ -403,22 +397,9 @@ def _scope_bindings(
         for node in nodes:
             collector.visit(node)
         global_runtime = collector.runtime & collector.globals
-        global_runtime_without_augassign = (
-            collector.runtime_without_augassign & collector.globals
-        )
-        global_type_only = collector.type_only & collector.globals
-        for names, destination in (
-            (collector.runtime, runtime),
-            (collector.type_only, type_only),
-            (collector.runtime_without_augassign, runtime_without_augassign),
-        ):
-            names.difference_update(collector.nonlocals | collector.globals)
-            destination.setdefault(scope, set()).update(names)
+        collector.runtime.difference_update(collector.nonlocals | collector.globals)
+        runtime.setdefault(scope, set()).update(collector.runtime)
         runtime.setdefault(module, set()).update(global_runtime)
-        type_only.setdefault(module, set()).update(global_type_only)
-        runtime_without_augassign.setdefault(module, set()).update(
-            global_runtime_without_augassign
-        )
 
     scan(tree.body, module)
-    return runtime, type_only, runtime_without_augassign
+    return runtime

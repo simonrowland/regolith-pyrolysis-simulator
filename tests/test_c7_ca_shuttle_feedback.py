@@ -58,6 +58,18 @@ def test_c7_ca_shuttle_feedback_commits_surplus_from_real_profile() -> None:
 
         sim._step_c7_ca_aluminothermic()
 
+        capture_transition = next(
+            transition
+            for transition in sim.atom_ledger.transitions[transitions_before:]
+            if transition.name == "ca_condenser_capture"
+        )
+        ledger_captured_ca_mol = _transition_account_species_mol(
+            sim,
+            capture_transition,
+            side="credits",
+            species="Ca",
+            account="process.condensation_train",
+        )
         diagnostic = sim._last_c7_diagnostic
         captured_ca_mol = float(diagnostic["captured_ca_mol"])
         ca_shuttle = setpoints["campaigns"]["C7"]["ca_shuttle"]
@@ -66,6 +78,7 @@ def test_c7_ca_shuttle_feedback_commits_surplus_from_real_profile() -> None:
         )
         reserve_fraction = float(ca_shuttle["reserve_ca_product_fraction"])
         rate_fraction = float(ca_shuttle["rate_fraction"])
+        assert captured_ca_mol == pytest.approx(ledger_captured_ca_mol)
         assert captured_ca_mol > 0.0
         assert rate_fraction > 0.0
         assert initial_condensation_ca_mol == pytest.approx(0.0)
@@ -79,11 +92,11 @@ def test_c7_ca_shuttle_feedback_commits_surplus_from_real_profile() -> None:
 
         # The fixture starts with no Ca in process.condensation_train. Extraction
         # moves the captured Ca there before dispatch; the provider reserves
-        # min(available_train_Ca, captured_ca_mol * reserve_fraction), which is
-        # captured_ca_mol * reserve_fraction for this fixture. The C7 reduction's
-        # limiting cap is its 10% recipe extent_fraction; its Al spend is below
-        # the 20 kg credit budget. It consumes CaO + Al and credits Ca + slag,
-        # leaving this profile's Al2O3 inventory available to the shuttle. Thus
+        # min(available_train_Ca, ledger_captured_ca_mol * reserve_fraction),
+        # which is ledger_captured_ca_mol * reserve_fraction for this fixture.
+        # The C7 reduction's limiting cap is its 10% recipe extent_fraction; its
+        # Al spend is below the 20 kg credit budget. It consumes CaO + Al,
+        # credits Ca + slag, and leaves this profile's Al2O3 available. Thus
         # surplus Ca [mol] = captured Ca [mol] * (1 - 0.7), then rate-limited Ca
         # [mol] = surplus Ca [mol] * rate_fraction. For 3 Ca + Al2O3 -> 3 CaO +
         # 2 Al, extent [mol Al2O3] = min(rate-limited Ca [mol] / 3 [mol Ca / mol
@@ -91,7 +104,7 @@ def test_c7_ca_shuttle_feedback_commits_surplus_from_real_profile() -> None:
         # extent, so surplus Ca is binding; expected Ca and Al debits/credits
         # are 3*extent, extent, and 2*extent mol respectively.
         ca_after_reserve_mol = max(
-            0.0, captured_ca_mol * (1.0 - reserve_fraction)
+            0.0, ledger_captured_ca_mol * (1.0 - reserve_fraction)
         )
         rate_limited_ca_mol = ca_after_reserve_mol * rate_fraction
         expected_extent_mol = min(

@@ -277,6 +277,54 @@ def test_augmented_assignment_requires_an_existing_module_binding(
     assert undefined_names(path) == (("total", 1),)
 
 
+@pytest.mark.parametrize(
+    ("source", "expected"),
+    [
+        (
+            "class Counter:\n"
+            "    total += 1\n",
+            (("total", 2),),
+        ),
+        (
+            "def outer():\n"
+            "    total = 0\n"
+            "    class Counter:\n"
+            "        total += 1\n",
+            (("total", 4),),
+        ),
+        (
+            "def increment():\n"
+            "    x += 1\n",
+            (("x", 2),),
+        ),
+        (
+            "from typing import TYPE_CHECKING\n"
+            "def read():\n"
+            "    if TYPE_CHECKING:\n"
+            "        from math import sqrt\n"
+            "    return sqrt(4)\n",
+            (("sqrt", 5),),
+        ),
+        (
+            "from typing import TYPE_CHECKING\n"
+            "if TYPE_CHECKING:\n"
+            "    T = int\n"
+            "print(T)\n",
+            (("T", 4),),
+        ),
+    ],
+)
+def test_scope_lookup_reports_unbound_augassign_and_type_checking_bindings(
+    tmp_path: Path,
+    source: str,
+    expected: tuple[tuple[str, int], ...],
+) -> None:
+    path = tmp_path / "scope_lookup.py"
+    path.write_text(source)
+
+    assert undefined_names(path) == expected
+
+
 def test_comprehension_target_subexpressions_are_loads(tmp_path: Path) -> None:
     path = tmp_path / "comprehension_target_subexpressions.py"
     path.write_text("value = [None for slots[missing] in (1,)]\n")
