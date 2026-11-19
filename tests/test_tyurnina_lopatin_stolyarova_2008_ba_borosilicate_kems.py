@@ -74,6 +74,22 @@ def test_tyurnina_activities_migrate_with_temperature_series_and_composition():
     assert {observation.experiment_id for observation in activity_observations} == {
         experiment.experiment_id
     }
+    bao_activity_observations = [
+        observation
+        for observation in activity_observations
+        if observation.identity.species.formula == "BaO"
+    ]
+    assert len(bao_activity_observations) == 60
+    for observation in bao_activity_observations:
+        reference_state = observation.identity.reference_state
+        assert reference_state.is_value
+        assert reference_state.value.convention.value == "raoultian_pure_endmember"
+        assert reference_state.value.component_basis == "BaO"
+        endmember = reference_state.value.endmember
+        assert endmember.formula == "BaO"
+        assert endmember.phase.is_value
+        assert endmember.phase.value.value == "cr"
+        assert endmember.polymorph.is_unknown
     for source_id, source in rows_by_id.items():
         matches = [
             observation
