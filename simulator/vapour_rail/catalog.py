@@ -3897,7 +3897,19 @@ def _association_executed_law_notice(
         evaluator=evaluator,
         base_row=base_row,
     ):
-        return True, None
+        # The association executes Fe's cited pure-component sidecar, but its
+        # admission is grounded in Fe's primary diagnostic law. Keep that
+        # identity on the notice so recording FeO does not create a second,
+        # carrier-named copy of Fe's law or replace Fe's own evaluator.
+        notice = _diagnostic_notice_from_model_coefficients(
+            executed_species_id=base_species_id,
+            model=base_model,
+            coefficients=_mapping(
+                base_model.get("coefficients"),
+                f"{base_species_id}.pressure_models[0].coefficients",
+            ),
+        )
+        return notice is not None, notice
     if _claims_diagnostic_only(base_species_id, base_model):
         notice = _diagnostic_notice_from_model_coefficients(
             executed_species_id=base_species_id,
