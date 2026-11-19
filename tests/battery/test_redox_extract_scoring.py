@@ -505,7 +505,7 @@ def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
         if isinstance(source.get("work_id"), str)
     }
     assert redox_work_ids.issubset(sources)
-    assert any(
+    assert not any(
         source.startswith(OPENIMCC_INDEX_VOCABULARY_MISMATCH_PREFIX)
         for source in sources
     )

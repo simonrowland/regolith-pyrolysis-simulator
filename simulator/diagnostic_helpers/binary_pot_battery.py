@@ -3531,6 +3531,7 @@ class _OpenImccBatteryBackend:
         reported_gammas = {
             str(name): float(row["value"])
             for name, row in result.activity_coefficients.items()
+            if "value" in row
         }
         return SimpleNamespace(
             status="ok",
