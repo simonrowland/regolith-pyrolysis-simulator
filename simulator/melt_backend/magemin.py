@@ -695,11 +695,19 @@ _MAGEMIN_BULK_ECHO_TOL = 3.0e-3
 # endmember's property, not a noisy proxy.
 _MAGEMIN_FD_DELTA_K = 10.0
 
-# ds62 Landau temperature of ig quartz (TC_endmembers.c "q", 847.0 K).
-# The experimental α–β point is 573 °C = 846.15 K, inside the same ±δ
-# window.  A stencil that contains it mixes the two branches and
-# misattributes the lambda Cp spike; the result is still returned, flagged.
-_MAGEMIN_QUARTZ_LAMBDA_K = 847.0
+# Tabulated Landau Tc of the mapped ig endmembers (TC_endmembers.c
+# input_3 flag 1, Tc at input_3[5]). The same three temperatures are in
+# arr_em_db_tc_ds62 through arr_em_db_tc_ds636: q 847 K, ne 467 K, sph
+# 485 K. Equilibrium Gibbs shifts Tc by P*Vmax/Smax; this flag uses the
+# tabulated Tc. The experimental quartz α–β point is 573 °C = 846.15 K,
+# inside the same ±δ window. A stencil that contains Tc mixes the two
+# branches and misattributes the lambda Cp spike; the result is still
+# returned, flagged.
+_MAGEMIN_LANDAU_TC_K: Mapping[str, tuple[float, str]] = {
+    'q': (847.0, 'the alpha-beta quartz'),
+    'ne': (467.0, 'the nepheline'),
+    'sph': (485.0, 'the titanite'),
+}
 
 
 @dataclass(frozen=True)
@@ -862,15 +870,19 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
         polymorph='',
         bulk_wt_pct={'SiO2': 30.6468, 'CaO': 28.6064, 'TiO2': 40.7468},
     ),
-    # ig pure phase ne. ds636 Comp line 10355 is 1 SiO2 + 0.5 Al2O3
-    # + 0.5 Na2O (atoms 7). cg and cgh share that composition and are
-    # not ig pure phases. wt% use the oxide masses and 4 d.p. half-up
-    # above; the 0.0001 excess lands on Na2O, the largest |remainder|.
+    # ig pure phase ne. TC_endmembers.c::arr_em_db_tc_ds636, record ne,
+    # is 1 SiO2 + 0.5 Al2O3 + 0.5 Na2O (atoms 7). cg and cgh share that
+    # composition and are not ig pure phases. wt% use the oxide masses
+    # and 4 d.p. half-up above; the 0.0001 excess lands on Na2O, the
+    # largest |remainder|.
     'ne': _MAGEMinPurePhaseSpec(
         host_phase=None,
         endmember='ne',
         formula='NaAlSiO4',
-        formula_basis='per 1 mol NaAlSiO4 (ds636 Comp line 10355, atoms 7)',
+        formula_basis=(
+            'per 1 mol NaAlSiO4 '
+            '(TC_endmembers.c::arr_em_db_tc_ds636, record ne, atoms 7)'
+        ),
         formula_divisor=1.0,
         polymorph='nepheline',
         bulk_wt_pct={'SiO2': 42.2950, 'Al2O3': 35.8888, 'Na2O': 21.8162},
@@ -1423,23 +1435,24 @@ def _magemin_endmember_gbase_kJ(
 
 
 def _lambda_stencil_warning(endmember: str, temperature_K: float) -> Optional[str]:
-    """Flag a finite-difference stencil straddling a known lambda point.
+    """Flag a finite-difference stencil straddling a known Landau Tc.
 
-    Only quartz carries a lambda term in the ig (ds62) phase map over this
-    accessor's domain; the centred stencil across 846.15 K mixes the alpha
-    and beta branches' G(T) and misattributes the lambda Cp spike.
+    Mapped ig endmembers with a Landau term are quartz (847 K), nepheline
+    (467 K) and titanite (485 K). The centred stencil across that
+    temperature mixes the two branches' G(T) and misattributes the lambda
+    Cp spike. The predicted value is still returned.
     """
-    if (
-        endmember == 'q'
-        and abs(temperature_K - _MAGEMIN_QUARTZ_LAMBDA_K)
-        <= _MAGEMIN_FD_DELTA_K
-    ):
-        return (
-            'finite-difference stencil straddles the alpha-beta quartz '
-            f'lambda transition ({_MAGEMIN_QUARTZ_LAMBDA_K:g} K); S/Cp/H '
-            'mix the two branches and Cp is misattributed across the spike'
-        )
-    return None
+    entry = _MAGEMIN_LANDAU_TC_K.get(endmember)
+    if entry is None:
+        return None
+    transition_K, label = entry
+    if abs(temperature_K - transition_K) > _MAGEMIN_FD_DELTA_K:
+        return None
+    return (
+        f'finite-difference stencil straddles {label} '
+        f'lambda transition ({transition_K:g} K); S/Cp/H '
+        'mix the two branches and Cp is misattributed across the spike'
+    )
 
 
 def _parse_magemin_sys_oxide_row(
@@ -3930,8 +3943,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     # assemblage row (that row is a slightly impure solution: MAGEMin
     # substitutes trace oxides, and its S/H do not match this G).  Because
     # the derivative does not need the phase to be stable, en/crst/trd and
-    # metastable quartz return S/Cp/H too.  A stencil across the quartz
-    # lambda is flagged, not dropped.
+    # metastable quartz return S/Cp/H too.  A stencil across a mapped
+    # Landau Tc (q, ne, sph) is flagged, not dropped.
 
     def pure_phase_properties(
         self,

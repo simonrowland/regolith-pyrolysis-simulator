@@ -768,10 +768,20 @@ def test_solver_status_success_is_silent_and_failure_refuses():
             _check_magemin_solver_status(text, [])
 
 
-def test_quartz_lambda_stencil_is_flagged_only_when_straddled():
-    assert _lambda_stencil_warning("q", 847.0) is not None
-    assert _lambda_stencil_warning("q", 1000.0) is None
-    assert _lambda_stencil_warning("fo", 847.0) is None
+def test_landau_stencil_is_flagged_only_when_straddled():
+    """q, ne, and sph warn only while the ±10 K stencil contains Tc."""
+
+    for endmember, transition_K in (("q", 847.0), ("ne", 467.0), ("sph", 485.0)):
+        note = _lambda_stencil_warning(endmember, transition_K)
+        assert note is not None
+        assert "lambda" in note
+        assert f"{transition_K:g} K" in note
+        assert _lambda_stencil_warning(endmember, 1000.0) is None
+        assert _lambda_stencil_warning("fo", transition_K) is None
+    assert _lambda_stencil_warning("ne", 477.0) is not None
+    assert _lambda_stencil_warning("ne", 457.0) is not None
+    assert _lambda_stencil_warning("ne", 478.0) is None
+    assert _lambda_stencil_warning("ne", 456.0) is None
 
 
 # --- ThermoEngine: live access path ----------------------------------------

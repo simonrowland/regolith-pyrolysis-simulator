@@ -8,6 +8,7 @@ log10 Kf = 0.092. The Ellingham segment at that temperature is
 from __future__ import annotations
 
 import functools
+import math
 import re
 import signal
 from dataclasses import replace
@@ -8623,6 +8624,41 @@ def test_magemin_unlabeled_naalsio4_entropy_matches_schumm_s298() -> None:
     assert attempt.refusal_reason is None
     assert attempt.unit == "J_per_declared_mol_basis_per_K"
     assert float(attempt.value) == pytest.approx(float(expected), rel=0.02)
+
+
+def test_magemin_landau_stencil_is_flagged_on_the_accessor() -> None:
+    """A stencil on q, ne, or sph Tc carries the lambda flag and the value.
+
+    1000 K sits outside every ±10 K window. The accessor still returns
+    S, Cp, and H at both temperatures.
+    """
+
+    if not magemin_binary_available():
+        pytest.skip("no MAGEMin binary")
+    from simulator.battery import compilation_tier
+
+    cases = (("q", 847.0), ("ne", 467.0), ("sph", 485.0))
+    try:
+        for symbol, transition_K in cases:
+            straddling = compilation_tier.default_pure_phase(
+                Engine.MAGEMIN, symbol, transition_K, 1.0
+            )
+            quiet = compilation_tier.default_pure_phase(
+                Engine.MAGEMIN, symbol, 1000.0, 1.0
+            )
+            for props in (straddling, quiet):
+                assert math.isfinite(props.S_J_K_mol)
+                assert math.isfinite(props.Cp_J_K_mol)
+                assert math.isfinite(props.H_J_mol)
+            assert any(
+                "lambda" in warning and f"{transition_K:g} K" in warning
+                for warning in straddling.warnings
+            ), straddling.warnings
+            assert not any("lambda" in warning for warning in quiet.warnings), (
+                quiet.warnings
+            )
+    finally:
+        _close_cached_backend(Engine.MAGEMIN)
 
 
 @pytest.mark.parametrize(
