@@ -23100,8 +23100,21 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
-        endmember=LiO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: &sossi_table4_reference_convention raoultian_pure_endmember
+            endmember:
+              formula: LiO0.5
+              phase:
+                tag: value
+                value: &sossi_table4_liquid_phase l
+            component_basis: LiO0.5
+        inferred: false
+        locator: &sossi_table4_reference_locator
+          page: 9
+          equation: '6'
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -23263,8 +23276,19 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
-        endmember=RbO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: *sossi_table4_reference_convention
+            endmember:
+              formula: RbO0.5
+              phase:
+                tag: value
+                value: *sossi_table4_liquid_phase
+            component_basis: RbO0.5
+        inferred: false
+        locator: *sossi_table4_reference_locator
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -23482,8 +23506,19 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
-        endmember=CuO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: *sossi_table4_reference_convention
+            endmember:
+              formula: CuO0.5
+              phase:
+                tag: value
+                value: *sossi_table4_liquid_phase
+            component_basis: CuO0.5
+        inferred: false
+        locator: *sossi_table4_reference_locator
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -23729,8 +23764,19 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
-        endmember=AgO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: *sossi_table4_reference_convention
+            endmember:
+              formula: AgO0.5
+              phase:
+                tag: value
+                value: *sossi_table4_liquid_phase
+            component_basis: AgO0.5
+        inferred: false
+        locator: *sossi_table4_reference_locator
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -23888,8 +23934,19 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
-        endmember=ZnO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: *sossi_table4_reference_convention
+            endmember:
+              formula: ZnO
+              phase:
+                tag: value
+                value: *sossi_table4_liquid_phase
+            component_basis: ZnO
+        inferred: false
+        locator: *sossi_table4_reference_locator
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -24128,8 +24185,19 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
-        endmember=GeO2; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: *sossi_table4_reference_convention
+            endmember:
+              formula: GeO2
+              phase:
+                tag: value
+                value: *sossi_table4_liquid_phase
+            component_basis: GeO2
+        inferred: false
+        locator: *sossi_table4_reference_locator
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -24518,8 +24586,19 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
-        endmember=PbO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: *sossi_table4_reference_convention
+            endmember:
+              formula: PbO
+              phase:
+                tag: value
+                value: *sossi_table4_liquid_phase
+            component_basis: PbO
+        inferred: false
+        locator: *sossi_table4_reference_locator
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -24606,8 +24685,19 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
-        endmember=PbO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: *sossi_table4_reference_convention
+            endmember:
+              formula: PbO
+              phase:
+                tag: value
+                value: *sossi_table4_liquid_phase
+            component_basis: PbO
+        inferred: false
+        locator: *sossi_table4_reference_locator
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:

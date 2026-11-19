@@ -1099,6 +1099,73 @@ def test_sossi_table4_successors_supersede_predecessors_in_full_extract(
     assert len(oxide_points) == 23
     assert actual == expected
 
+    target_formulas = set(predecessors) - {"CdO"}
+    target_successors = {
+        successor_id
+        for formula, local_ids in successors.items()
+        if formula in target_formulas
+        for successor_id in local_ids
+    }
+
+    def target_points(observations):
+        return [
+            observation
+            for observation in observations
+            if observation.value.kind is ValueKind.POINT
+            and any(
+                observation.observation_id.startswith(
+                    f"{source_id}::{successor_id}::"
+                )
+                for successor_id in target_successors
+            )
+        ]
+
+    def assert_target_references(observations) -> None:
+        rows = target_points(observations)
+        assert len(rows) == 22
+        for observation in rows:
+            formula = observation.identity.species.formula
+            assert formula in target_formulas
+            reference = observation.identity.reference_state
+            assert reference.is_value
+            assert (
+                reference.value.convention
+                is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+            )
+            assert reference.value.endmember.formula == formula
+            assert reference.value.endmember.phase.value is Phase.L
+            assert reference.value.component_basis == formula
+
+    assert_target_references(all_observations)
+
+    source_doc = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "data"
+            / "literature"
+            / "extracts"
+            / name
+        ).read_text(encoding="utf-8")
+    )
+    mutated_doc = deepcopy(source_doc)
+    li_successor = next(
+        row
+        for row in mutated_doc["species"]["LiO0.5"]["observations"]
+        if row["observation_id"]
+        == "sossi_2019_li_table4_gamma_this_work_quoted_20260906"
+    )
+    li_successor["standard_state"]["state"]["value"]["endmember"]["phase"][
+        "value"
+    ] = "s"
+    mutated_result = _migrate_real_extract(
+        tmp_path / "mutated",
+        name,
+        use_repository_index_row=True,
+        extract_doc=mutated_doc,
+    )
+    with pytest.raises(AssertionError):
+        assert_target_references(list(mutated_result.observations.values()))
+
     element_species = {"Li", "Rb", "Cu", "Ag", "Zn", "Ge", "Cd", "Pb"}
     element_keyed_gamma = [
         observation
