@@ -25,8 +25,8 @@ inferred or invalid pressure as ambient.
 from __future__ import annotations
 
 import re
-from collections.abc import Iterator, Sequence
-from dataclasses import dataclass
+from collections.abc import Iterator, Mapping, Sequence
+from dataclasses import dataclass, fields, is_dataclass
 from decimal import Decimal
 
 from simulator.battery.enums import MethodToken, NoticeKind, Quantity
@@ -45,11 +45,14 @@ AMBIENT_PRESSURE_ASSUMED_REASON = "ambient pressure assumed, not printed"
 
 # Closed apparatus class from d-280. Optional plurals are the same words.
 # A separator run covers the hyphen, space, underscore, and jammed forms.
-# Bare "cylinder", "press", "GPa", and "kbar" are not this class.
+# Bare "cylinder", "press", "GPa", "kbar", and "IHPV" are not this class.
+# Internally heated pressure vessels are the same class: an unprinted
+# run in one is not an ambient 1 bar experiment.
 _HIGH_PRESSURE_APPARATUS = re.compile(
     r"piston[\s_-]*cylinders?"
     r"|multi[\s_-]*anvils?"
     r"|diamond[\s_-]*anvils?"
+    r"|internally[\s_-]*heated[\s_-]*pressure[\s_-]*vessels?"
     r"|\bautoclaves?\b",
     re.IGNORECASE,
 )
@@ -167,22 +170,65 @@ def _names_high_pressure_apparatus(text: str) -> bool:
     return _HIGH_PRESSURE_APPARATUS.search(text) is not None
 
 
-def _located_str(located: object) -> str | None:
-    if not isinstance(located, Located):
-        return None
-    state = located.state
-    if not state.is_value or not isinstance(state.value, str):
-        return None
-    text = state.value.strip()
-    return text or None
-
-
 def _locator_prose(locator: Locator | None) -> Iterator[str]:
     if locator is None:
         return
     for text in (locator.note, locator.section):
         if isinstance(text, str) and text.strip():
             yield text
+
+
+def _source_value_prose(value: object) -> Iterator[str]:
+    """Printed prose. Unknown-state reasons are migrator boilerplate.
+
+    A ``State`` reason is the key list the migrator writes when a field
+    is absent. The source's own sentence is a located value, such as
+    ``pressure_environment.cell_internal_pressure_note``.
+    """
+
+    if isinstance(value, State):
+        return
+    if isinstance(value, Located):
+        if value.state.is_value:
+            yield from _source_value_prose(value.state.value)
+        if isinstance(value.locator, Locator):
+            yield from _locator_prose(value.locator)
+        return
+    if isinstance(value, Locator):
+        yield from _locator_prose(value)
+        return
+    if isinstance(value, str):
+        text = value.strip()
+        if text:
+            yield text
+        return
+    if isinstance(value, Mapping):
+        for item in value.values():
+            yield from _source_value_prose(item)
+        return
+    if isinstance(value, tuple):
+        for item in value:
+            yield from _source_value_prose(item)
+        return
+    if is_dataclass(value) and not isinstance(value, type):
+        for item in fields(value):
+            yield from _source_value_prose(getattr(value, item.name))
+
+
+def _bench_prose(bench: Bench) -> Iterator[str]:
+    """Equipment and pressure prose. Bench ids and citation titles are not it.
+
+    ``identity.reason`` is the embedded-evidence sentence required when the
+    bench was inferred. ``identity.ref.cited_as`` is another paper's title.
+    """
+
+    for item in fields(bench):
+        if item.name in {"id", "work_id", "identity"}:
+            continue
+        yield from _source_value_prose(getattr(bench, item.name))
+    reason = bench.identity.reason
+    if isinstance(reason, str) and reason.strip():
+        yield reason.strip()
 
 
 def _method_texts(
@@ -192,9 +238,9 @@ def _method_texts(
 ) -> Iterator[str]:
     """Prose on this experiment, this observation, and its bench.
 
-    Point-condition state reasons are omitted: they are the migrator's
-    key list, not the apparatus. ``pressure_environment`` is omitted for
-    the same reason.
+    Unknown-state reasons stay out: they are the migrator's key list.
+    Source-backed equipment and pressure values stay in, including the
+    cell-internal pressure note the migrator stores beside that list.
     """
 
     if experiment is not None:
@@ -204,33 +250,21 @@ def _method_texts(
         yield from _locator_prose(experiment.locator)
         sample = experiment.sample
         for name in ("form", "container", "characterization", "pretreatment"):
-            text = _located_str(getattr(sample, name))
-            if text is not None:
-                yield text
-        apparatus = experiment.apparatus
-        if apparatus is not None:
-            text = _located_str(apparatus.cell_material_and_liner)
-            if text is not None:
-                yield text
-        schedule = experiment.thermal_schedule
-        if schedule is not None:
-            for name in ("method", "cooling_or_quench"):
-                text = _located_str(getattr(schedule, name))
-                if text is not None:
-                    yield text
+            yield from _source_value_prose(getattr(sample, name))
+        if experiment.apparatus is not None:
+            yield from _source_value_prose(experiment.apparatus)
+        yield from _source_value_prose(experiment.pressure_environment)
+        if experiment.ambient_pressure_evidence is not None:
+            yield from _source_value_prose(experiment.ambient_pressure_evidence)
+        if experiment.thermal_schedule is not None:
+            yield from _source_value_prose(experiment.thermal_schedule)
     yield from _locator_prose(observation.locator)
+    # Point-condition values are the printed number or composition. Their
+    # unknown-state reasons are the migrator's key list. Locator notes on
+    # those conditions are source prose and stay in.
     for located in (observation.point_conditions or {}).values():
         locator = getattr(located, "locator", None)
         if isinstance(locator, Locator):
             yield from _locator_prose(locator)
-    if bench is None:
-        return
-    for name in (
-        "apparatus_family",
-        "method",
-        "heating_method",
-        "cell_material_and_liner",
-    ):
-        text = _located_str(getattr(bench, name))
-        if text is not None:
-            yield text
+    if bench is not None:
+        yield from _bench_prose(bench)

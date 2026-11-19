@@ -12,13 +12,22 @@ from decimal import Decimal
 import pytest
 
 from simulator.battery.enums import (
+    AmbientPressureEvidenceClass,
     BenchIdentityBasis,
     EvidenceClass,
     MethodToken,
     NoticeKind,
     Quantity,
 )
-from simulator.battery.records import Bench, BenchIdentity, Located, State
+from simulator.battery.records import (
+    AmbientPressureEvidence,
+    Apparatus,
+    ApparatusGeometry,
+    Bench,
+    BenchIdentity,
+    Located,
+    State,
+)
 from simulator.battery.score import flagged_strata
 from simulator.battery.transition_pressure import (
     unprinted_liquidus_pressure_block,
@@ -136,6 +145,8 @@ def test_absent_experiment_still_assumes_one_bar() -> None:
         "multi-anvils",
         "diamond-anvil",
         "diamond anvil cell",
+        "internally heated pressure vessel",
+        "internally-heated pressure vessels",
         "Autoclave",
         "cold-seal autoclaves",
     ),
@@ -238,3 +249,154 @@ def test_bench_apparatus_family_refuses() -> None:
     block, decision = _decision(bench_text="end-loaded piston-cylinder")
     assert block == "high_pressure_apparatus"
     assert decision is None
+
+
+_PRESSURE_NOTE = "Run in a piston-cylinder; total pressure was not reported"
+
+
+def _pressure_note_row(field: str):
+    experiment, observation, bench = _row()
+    environment = experiment.pressure_environment
+    if field == "cell_internal_pressure_note":
+        environment = replace(
+            environment,
+            cell_internal_pressure_note=F.located(_PRESSURE_NOTE),
+        )
+    elif field == "gauge":
+        environment = replace(
+            environment,
+            gauge={"pressure_gauge": F.located(_PRESSURE_NOTE)},
+        )
+    elif field == "pumping":
+        environment = replace(
+            environment,
+            pumping={"pump": F.located(_PRESSURE_NOTE)},
+        )
+    elif field == "total_pressure_reason":
+        environment = replace(
+            environment,
+            total_pressure_Pa=Located(
+                State.unknown(_PRESSURE_NOTE),
+                locator=F.loc(page=1),
+            ),
+        )
+    experiment = replace(experiment, pressure_environment=environment)
+    if field == "ambient_quote":
+        experiment = replace(
+            experiment,
+            ambient_pressure_evidence=AmbientPressureEvidence(
+                AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+                _PRESSURE_NOTE,
+                F.loc(page=3, section="methods"),
+            ),
+        )
+    elif field == "thermocouple_note":
+        experiment = replace(
+            experiment,
+            apparatus=Apparatus(
+                temperature_measurement={
+                    "thermocouple_note": F.located(_PRESSURE_NOTE),
+                },
+            ),
+        )
+    elif field == "orifice_shape":
+        experiment = replace(
+            experiment,
+            apparatus=Apparatus(
+                geometry=ApparatusGeometry(
+                    orifice_shape=F.located(_PRESSURE_NOTE),
+                ),
+            ),
+        )
+    elif field == "bench_pumping_type":
+        bench = Bench(
+            "bench-1",
+            experiment.work_id or "work-1",
+            BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+            pumping_type=F.located(_PRESSURE_NOTE),
+        )
+    elif field == "bench_identity_reason":
+        bench = Bench(
+            "bench-1",
+            experiment.work_id or "work-1",
+            BenchIdentity(
+                BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE,
+                reason=_PRESSURE_NOTE,
+            ),
+        )
+    elif field not in {
+        "cell_internal_pressure_note",
+        "gauge",
+        "pumping",
+        "total_pressure_reason",
+    }:
+        raise AssertionError(field)
+    return experiment, observation, bench
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "cell_internal_pressure_note",
+        "gauge",
+        "pumping",
+        "ambient_quote",
+        "thermocouple_note",
+        "orifice_shape",
+        "bench_pumping_type",
+        "bench_identity_reason",
+    ),
+)
+def test_source_backed_pressure_field_names_the_apparatus(field: str) -> None:
+    experiment, observation, bench = _pressure_note_row(field)
+    before = observation.identity
+    block = unprinted_liquidus_pressure_block(observation, experiment, bench)
+    decision = unprinted_liquidus_solidus_pressure(observation, experiment, bench)
+    assert observation.identity is before
+    assert block == "high_pressure_apparatus"
+    assert decision is None
+
+
+def test_pressure_note_without_apparatus_still_assumes_one_bar() -> None:
+    experiment, observation, bench = _row()
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            cell_internal_pressure_note=F.located(
+                "total pressure was not reported"
+            ),
+        ),
+    )
+    block = unprinted_liquidus_pressure_block(observation, experiment, bench)
+    decision = unprinted_liquidus_solidus_pressure(observation, experiment, bench)
+    assert block is None
+    assert decision is not None
+    assert decision.pressure_bar == 1.0
+
+
+def test_pressure_key_list_in_the_note_is_not_an_apparatus() -> None:
+    experiment, observation, bench = _row()
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            cell_internal_pressure_note=F.located(
+                "no pressure field under keys piston-cylinder / P_GPa"
+            ),
+        ),
+    )
+    block = unprinted_liquidus_pressure_block(observation, experiment, bench)
+    decision = unprinted_liquidus_solidus_pressure(observation, experiment, bench)
+    assert block is None
+    assert decision is not None
+    assert decision.pressure_bar == 1.0
+
+
+def test_unknown_pressure_reason_is_not_source_apparatus_prose() -> None:
+    experiment, observation, bench = _pressure_note_row("total_pressure_reason")
+    block = unprinted_liquidus_pressure_block(observation, experiment, bench)
+    decision = unprinted_liquidus_solidus_pressure(observation, experiment, bench)
+    assert block is None
+    assert decision is not None
+    assert decision.pressure_bar == 1.0

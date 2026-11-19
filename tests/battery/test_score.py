@@ -20792,6 +20792,45 @@ def test_high_pressure_token_without_pressure_still_refuses(
     assert stored is not None and stored.is_unknown
 
 
+def test_cell_internal_pressure_note_without_pressure_still_refuses(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    experiment = F.tabulation_experiment()
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            cell_internal_pressure_note=F.located(
+                "Run in a piston-cylinder; total pressure was not reported"
+            ),
+        ),
+    )
+    reference = _unprinted_transition_reference(experiment)
+
+    def unexpected_open(*_args):
+        pytest.fail(
+            "a piston-cylinder pressure note must refuse before opening an engine"
+        )
+
+    monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
+    prediction = predict_with_engine(
+        Engine.MAGEMIN, reference, experiment=experiment
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {
+        "reason": "missing_input",
+        "input": "total_pressure_Pa",
+    }
+    assert not any(
+        notice.kind is NoticeKind.AMBIENT_PRESSURE_ASSUMED
+        for notice in prediction.notices
+    )
+    stored = reference.identity.total_pressure_Pa
+    assert stored is not None and stored.is_unknown
+
+
 def test_high_pressure_prose_without_pressure_still_refuses(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
