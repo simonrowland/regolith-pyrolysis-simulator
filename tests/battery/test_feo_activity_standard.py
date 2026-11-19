@@ -42,7 +42,7 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = (
 # The byte pin includes the active OpenIMCC redox-pack identity and FeO
 # standard-normalization provenance as well as the residual value.
 _DISTIN_1880_RESIDUAL_SHA256 = (
-    "81e85ac23b93dc9b5c6a17f2daa6011fc2e494271e1d67178b373a0df75a2f4f"
+    "61f8fef33de9476e6c0899be0db89111164238dccd82dcc5f655f588390beebc"
 )
 # At 2153.15 K, the pinned MELT expression gives
 # 27778.965828 - 10.961554232*2153.15 = 4177.0953 J/mol.
@@ -597,7 +597,7 @@ def test_distin_closed_redox_residual_pins_green_value_and_serialized_line(
     # The serialized line includes the shifted residual above and the
     # feo_standard_normalisation provenance, including its extrapolated
     # authority, certified band, and pack range flags.
-    # d-445 changes only source-relation/eligibility metadata; the Decimal pin above is unchanged.
+    # t-1874 changes serialized coefficient_sources, source_relation, and lineage-caveat notices; the Decimal pin above is unchanged.
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
     assert sha256(serialized).hexdigest() == _DISTIN_1880_RESIDUAL_SHA256
 
