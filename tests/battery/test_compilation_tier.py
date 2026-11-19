@@ -8687,6 +8687,28 @@ def test_magemin_landau_stencil_is_flagged_on_the_accessor() -> None:
         _close_cached_backend(Engine.MAGEMIN)
 
 
+def test_magemin_serialized_pressure_boundary_keeps_the_nepheline_flag() -> None:
+    """2000.0004 bar serializes to 2 kbar and still flags 473.000001 K.
+
+    The CLI pressure token is 2.000000 kbar. The stencil contains the
+    ds636 nepheline point at that pressure, 483 K. Cp stays finite.
+    """
+
+    if not magemin_binary_available():
+        pytest.skip("no MAGEMin binary")
+    from simulator.battery import compilation_tier
+    from simulator.melt_backend.magemin import _landau_stencil_notes
+
+    try:
+        props = compilation_tier.default_pure_phase(
+            Engine.MAGEMIN, "ne", 473.000001, 2000.0004
+        )
+    finally:
+        _close_cached_backend(Engine.MAGEMIN)
+    assert math.isfinite(props.Cp_J_K_mol)
+    assert _landau_stencil_notes(props.warnings)
+
+
 def test_landau_reference_read_reaches_the_scored_attempt() -> None:
     """A lambda sentence on the enthalpy anchor is a scoring notice."""
 

@@ -827,6 +827,73 @@ def test_landau_stencil_is_flagged_only_when_straddled():
     assert _lambda_stencil_warning("sph", 521.0, two_kbar) is None
 
 
+def test_landau_boundary_flag_uses_the_cli_temperature_and_pressure(monkeypatch):
+    """473.000001 K and 2000.0004 bar flags on the values the binary stores.
+
+    Captured argv: ``--Pres=2.000000`` and stencil Celsius tokens
+    189.850001, 199.850001, 209.850001. Parsed back, those endpoints
+    contain the ds636 nepheline point at 2 kbar, 483 K. The argv
+    builder and the warning both read ``_magemin_cli_scalar``.
+    """
+
+    from decimal import Decimal
+
+    from simulator.melt_backend import magemin as magemin_module
+
+    pressure_kbar = _probe_kbar(2000.0004)
+    temperature_K = 473.000001
+    seen: list[float] = []
+    original = magemin_module._magemin_cli_scalar
+
+    def spy(value: float) -> tuple[str, float]:
+        seen.append(float(value))
+        return original(value)
+
+    monkeypatch.setattr(magemin_module, "_magemin_cli_scalar", spy)
+    backend = MAGEMinBackend()
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._database = "ig"
+    backend._config = {"fO2_buffer": "nno"}
+    projection = backend._build_db_bulk_projection({"SiO2": 60.0, "MgO": 40.0})
+    args, _buffer_name, _buffer_n, _warnings = (
+        backend._build_magemin_subprocess_args(
+            bulk_projection=projection,
+            temperature_C=temperature_K - 273.15,
+            pressure_kbar=pressure_kbar,
+            fO2_log=-8.0,
+        )
+    )
+    assert "--Temp=199.850001" in args
+    assert "--Pres=2.000000" in args
+    assert (temperature_K - 273.15) in seen
+    assert pressure_kbar in seen
+
+    seen.clear()
+    note = magemin_module._lambda_stencil_warning(
+        "ne", temperature_K, pressure_kbar
+    )
+    assert note is not None
+    assert "483 K" in note
+    low_c = float(temperature_K - magemin_module._MAGEMIN_FD_DELTA_K) - 273.15
+    high_c = float(temperature_K + magemin_module._MAGEMIN_FD_DELTA_K) - 273.15
+    assert low_c in seen
+    assert high_c in seen
+    assert pressure_kbar in seen
+    low_token = original(low_c)[0]
+    high_token = original(high_c)[0]
+    assert low_token == "189.850001"
+    assert high_token == "209.850001"
+    assert (
+        Decimal(low_token) + Decimal("273.15")
+        < Decimal("483")
+        < Decimal(high_token) + Decimal("273.15")
+    )
+    assert (
+        magemin_module._lambda_stencil_warning("ne", 472.000001, pressure_kbar)
+        is None
+    )
+
+
 # --- ThermoEngine: live access path ----------------------------------------
 
 

@@ -1447,8 +1447,8 @@ def _landau_equilibrium_tc_K(
         Tc = Tc0 + P * Vmax / Smax      otherwise
 
     ``P`` is that function's pressure argument. ``p0 = 0.001`` kbar is
-    the volume-integral reference and is not subtracted. The pure-phase
-    probe passes this same kbar value to ``--Pres``.
+    the volume-integral reference and is not subtracted. Callers pass
+    the kbar parsed back from the ``--Pres`` token.
 
     Algebra. ``Tc(P) = Tc0 + P_kbar * Vmax / Smax``.
 
@@ -1484,6 +1484,17 @@ def _magemin_cli_scalar(value: float) -> tuple[str, float]:
 _LANDAU_STENCIL_PREFIX = 'finite-difference stencil straddles '
 
 
+def _magemin_engine_kelvin(temperature_K: float) -> float:
+    """Kelvin stored from the ``--Temp`` token of this request.
+
+    MAGEMin does ``strtold(--Temp) + 273.15`` into a double. ``--Temp``
+    is the six-decimal Celsius token from ``_magemin_cli_scalar``.
+    """
+
+    celsius = _magemin_cli_scalar(float(temperature_K) - 273.15)[1]
+    return celsius + 273.15
+
+
 def _lambda_stencil_warning(
     endmember: str,
     temperature_K: float,
@@ -1491,17 +1502,22 @@ def _lambda_stencil_warning(
 ) -> Optional[str]:
     """Flag a finite-difference stencil that contains the equilibrium Tc.
 
-    ``pressure_kbar`` is the pressure the pure-phase probe sends to
-    MAGEMin. The centred stencil mixes the two branches' G(T) when it
-    contains Tc(P) and misattributes the lambda Cp spike. The predicted
-    value is still returned.
+    ``temperature_K`` and ``pressure_kbar`` are the pure-phase request.
+    The check uses the ``--Temp`` and ``--Pres`` values the binary
+    stores, from ``_magemin_cli_scalar``, not the unrounded request.
+    A stencil that contains Tc(P) mixes the two branches' G(T) and
+    misattributes the lambda Cp spike. The predicted value is still
+    returned.
     """
 
     record = _MAGEMIN_LANDAU.get(endmember)
     if record is None:
         return None
-    transition_K = _landau_equilibrium_tc_K(record, pressure_kbar)
-    if abs(temperature_K - transition_K) > _MAGEMIN_FD_DELTA_K:
+    pressure_engine_kbar = _magemin_cli_scalar(pressure_kbar)[1]
+    transition_K = _landau_equilibrium_tc_K(record, pressure_engine_kbar)
+    low_K = _magemin_engine_kelvin(temperature_K - _MAGEMIN_FD_DELTA_K)
+    high_K = _magemin_engine_kelvin(temperature_K + _MAGEMIN_FD_DELTA_K)
+    if not low_K <= transition_K <= high_K:
         return None
     label = record[3]
     return (
