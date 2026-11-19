@@ -3658,6 +3658,74 @@ def _captured_association_base(
     return None
 
 
+def _uses_cited_fe_pure_component_base(
+    *,
+    species_id: str,
+    model: Mapping[str, Any],
+    evaluator: CompiledPressureEvaluator,
+    base_row: Mapping[str, Any],
+) -> bool:
+    """Match the FeO association's captured curve to Fe's sourced sidecar."""
+
+    if (
+        species_id != "FeO_association_gas"
+        or model.get("base_vapor_formula") != "Fe"
+        or model.get("composition_mode") != "gas_association_from_effective_base"
+        or base_row.get("formula") != "Fe"
+    ):
+        return False
+    pure = base_row.get("pure_component_antoine")
+    provenance = _normalised_provenance(species_id, model)
+    if not isinstance(pure, Mapping) or not any(
+        item.get("source_id") == "metals_fe_family"
+        and item.get("observation_id") == "pure_component_antoine"
+        and item.get("status") == "status_bearing_non_authoritative"
+        for item in provenance
+    ):
+        return False
+    if (
+        pure.get("provenance_class") != "derived_from_evaluation"
+        or not isinstance(pure.get("source"), str)
+        or not pure["source"].strip()
+    ):
+        return False
+    support = pure.get("construction_support_range_K")
+    captured_raw = model.get("base_reference_pressure_model")
+    if not isinstance(support, (list, tuple)) or len(support) != 2:
+        return False
+    if not isinstance(captured_raw, Mapping):
+        return False
+    if not all(key in pure for key in ("A", "B", "C")):
+        return False
+    try:
+        support_low = _finite_positive(support[0], f"{species_id}.Fe_support_low")
+        support_high = _finite_positive(support[1], f"{species_id}.Fe_support_high")
+        _observable, association_domain = _model_surface(species_id, model)
+        captured_oxygen = _stored_oxygen_executable_law(
+            f"{species_id}.base_reference_pressure_model",
+            captured_raw,
+        )
+        pure_reference = _compile_reference_model(
+            "Fe",
+            {
+                "evaluator_family": "antoine",
+                "coefficients": {key: pure[key] for key in ("A", "B", "C")},
+            },
+        )
+    except CatalogCompileError:
+        return False
+    captured = _captured_association_base(evaluator)
+    return bool(
+        captured is not None
+        and captured_oxygen == (0.0, 1.0, None)
+        and support_low <= association_domain[0]
+        and support_high >= association_domain[1]
+        and captured.evaluator_family == pure_reference.evaluator_family
+        and captured.coefficients == pure_reference.coefficients
+        and captured.points == pure_reference.points
+    )
+
+
 def _verified_gas_association_base_has_fit_evidence(
     *,
     species_id: str,
@@ -3692,6 +3760,13 @@ def _verified_gas_association_base_has_fit_evidence(
     base_row = species_rows_by_id.get(base_species_id)
     if base_row is None or base_row.get("formula") != base_species_id:
         return False
+    if _uses_cited_fe_pure_component_base(
+        species_id=species_id,
+        model=model,
+        evaluator=evaluator,
+        base_row=base_row,
+    ):
+        return True
 
     base_models = base_row.get("pressure_models")
     if not isinstance(base_models, list) or len(base_models) != 1:
@@ -3785,6 +3860,7 @@ def _direct_diagnostic_notice(
 
 def _association_executed_law_notice(
     *,
+    species_id: str,
     model: Mapping[str, Any],
     evaluator: CompiledPressureEvaluator,
     species_rows_by_id: Mapping[str, Mapping[str, Any]],
@@ -3815,6 +3891,13 @@ def _association_executed_law_notice(
     if not isinstance(base_models[0], Mapping):
         return False, None
     base_model = base_models[0]
+    if _uses_cited_fe_pure_component_base(
+        species_id=species_id,
+        model=model,
+        evaluator=evaluator,
+        base_row=base_row,
+    ):
+        return True, None
     if _claims_diagnostic_only(base_species_id, base_model):
         notice = _diagnostic_notice_from_model_coefficients(
             executed_species_id=base_species_id,
@@ -3906,6 +3989,7 @@ def _zero_activity_melt_executable_is_evidenced(
         ):
             return False, None
         return _association_executed_law_notice(
+            species_id=species_id,
             model=model,
             evaluator=evaluator,
             species_rows_by_id=species_rows_by_id,

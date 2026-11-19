@@ -1243,6 +1243,7 @@ def test_t609_feo_association_tracks_pure_fe_and_janaf_k() -> None:
     catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
     feo = catalog.species["FeO_association_gas"].evaluator
     assert feo is not None
+    assert getattr(feo, "diagnostic_admission_notice", None) is None
     fe_row = payload["families"]["metals_fe_family"]["physical_properties"][
         "species"
     ]["Fe"]
@@ -1635,7 +1636,7 @@ def test_effective_pressure_reference_fit_compiles_with_fit_evidence() -> None:
     assert compiled.species["K"].evaluator is not None
 
 
-def test_gas_association_base_must_match_evidenced_effective_fit() -> None:
+def test_gas_association_base_must_match_its_evidenced_source() -> None:
     payload = _yaml("vapor_pressures.yaml")
     compiled = compile_vapour_rail_catalog(payload)
     assert compiled.species["FeO_association_gas"].evaluator is not None
@@ -3346,11 +3347,24 @@ def _fe_feo_payload_cached() -> tuple:
 
 def _fe_feo_payload() -> dict:
     schema_version, fe_family, feo_family = _fe_feo_payload_cached()
+    fe_family = deepcopy(fe_family)
+    feo_family = deepcopy(feo_family)
+    # These focused gate fixtures exercise an association over Fe's effective
+    # fit. The landed b265 catalog instead captures Fe's pure-component sidecar.
+    fe_model = fe_family["physical_properties"]["species"]["Fe"][
+        "pressure_models"
+    ][0]
+    captured = feo_family["physical_properties"]["species"][
+        "FeO_association_gas"
+    ]["pressure_models"][0]["base_reference_pressure_model"]
+    captured["coefficients"] = {
+        key: fe_model["coefficients"][key] for key in ("A", "B", "C")
+    }
     return {
         "schema_version": schema_version,
         "families": {
-            "metals_fe_family": deepcopy(fe_family),
-            "oxide_vapors_feo_association_family": deepcopy(feo_family),
+            "metals_fe_family": fe_family,
+            "oxide_vapors_feo_association_family": feo_family,
         },
     }
 
