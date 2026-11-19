@@ -441,6 +441,28 @@ def test_magemin_activity_score_passes_printed_row_pressure(monkeypatch):
         basis="Al2O3",
         phase=Phase.CR,
     )
+    from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+    identity = observation.identity
+    reference_state = identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert reference_state.value is not None
+    native_polymorph = MAGEMIN_NATIVE_MELT_ACTIVITIES["Al2O3"][1]
+    observation = replace(
+        observation,
+        identity=replace(
+            identity,
+            reference_state=State.of(
+                replace(
+                    reference_state.value,
+                    endmember=replace(
+                        reference_state.value.endmember,
+                        polymorph=State.of(native_polymorph),
+                    ),
+                )
+            ),
+        ),
+    )
     observation = replace(
         observation,
         point_conditions={
@@ -453,7 +475,7 @@ def test_magemin_activity_score_passes_printed_row_pressure(monkeypatch):
         Engine.MAGEMIN, observation, experiment=experiment, isolated=False,
     )
 
-    assert prediction.value is not None
+    assert prediction.value is not None, prediction.refusal_detail
     assert seen["pressure_bar"] == pytest.approx(1.0)
 
 
