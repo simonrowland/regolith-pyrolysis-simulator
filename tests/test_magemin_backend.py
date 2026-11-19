@@ -4047,7 +4047,8 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(
             capture_native_activities=True,
         )
     )
-    assert "--Pres=1e-09" in direct_args
+    assert "--Pres=9.999999999999999e-10" in direct_args
+    assert float("9.999999999999999e-10") == pressure_kbar
     from simulator.melt_backend.alphamelts import _run_alphamelts_subprocess
 
     with _magemin_subprocess_slot(20.0):
@@ -4537,7 +4538,9 @@ def test_magemin_native_activity_unavailable_reference_stays_typed():
 
 @pytest.mark.parametrize(
     ("pressure_bar", "expected_argument"),
-    [(1.0e-6, "--Pres=1e-09"), (1.0e-4, "--Pres=1e-07")],
+    # 1e-6 bar becomes 1e-6/1e4*10 kbar, one ulp below 1e-9. The six-digit
+    # form 1e-09 does not parse back to that float; 1e-4 bar does land on 1e-7.
+    [(1.0e-6, "--Pres=9.999999999999999e-10"), (1.0e-4, "--Pres=1e-07")],
 )
 def test_magemin_native_activity_subprocess_preserves_low_pressure(
     pressure_bar, expected_argument,
@@ -4556,7 +4559,9 @@ def test_magemin_native_activity_subprocess_preserves_low_pressure(
         capture_native_activities=True,
     )
 
-    assert expected_argument in args
+    token = next(item for item in args if item.startswith("--Pres="))
+    assert token == expected_argument
+    assert float(token.removeprefix("--Pres=")) == pressure_kbar
 
 
 def test_magemin_subprocess_pressure_keeps_non_power_of_ten_round_trip():
@@ -4593,7 +4598,7 @@ def test_fixed_six_pressure_mutation_turns_low_pressure_pin_red(monkeypatch):
     )
     with pytest.raises(AssertionError):
         test_magemin_native_activity_subprocess_preserves_low_pressure(
-            1.0e-6, "--Pres=1e-09"
+            1.0e-6, "--Pres=9.999999999999999e-10"
         )
     with pytest.raises(AssertionError):
         test_magemin_native_activity_subprocess_preserves_low_pressure(
@@ -4619,6 +4624,10 @@ def test_six_sig_pressure_mutation_turns_round_trip_pin_red(monkeypatch):
     monkeypatch.setattr(
         MAGEMinBackend, "_build_magemin_subprocess_args", collapse_to_six_sig
     )
+    with pytest.raises(AssertionError):
+        test_magemin_native_activity_subprocess_preserves_low_pressure(
+            1.0e-6, "--Pres=9.999999999999999e-10"
+        )
     with pytest.raises(AssertionError):
         test_magemin_subprocess_pressure_keeps_non_power_of_ten_round_trip()
 
