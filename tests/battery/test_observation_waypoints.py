@@ -209,7 +209,7 @@ def test_readiness_keeps_raw_printed_composition_out_of_sample_charge(source_id)
     assert sample_inputs.waypoints["normalized_composition"].absence is not None
 
 
-def test_unknown_point_composition_suppresses_typed_sample_charge():
+def test_unknown_point_composition_preserves_typed_sample_charge():
     extract = REPO_ROOT / "data/literature/extracts/cottrell-2009-iron-xanes.yaml"
     migrator = factories.migrate_one_extract(REPO_ROOT, extract)
     migrator.finalize()
@@ -242,7 +242,8 @@ def test_unknown_point_composition_suppresses_typed_sample_charge():
 
     inputs = collect_consumer_inputs(experiment_with_sample, bench, observation)
 
-    assert not inputs.charges
+    assert list(inputs.charges) == ["MgO"]
+    assert inputs.charges["MgO"].selected is not None
     assert inputs.waypoints["normalized_composition"].selected is None
     absence = inputs.waypoints["normalized_composition"].absence
     assert absence is not None
