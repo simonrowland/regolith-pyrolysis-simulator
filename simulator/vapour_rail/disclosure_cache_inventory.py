@@ -26,7 +26,6 @@ CONTROLLER_CACHE_REGEX = re.compile(
 
 # Sites whose cached value can be a flagged vapour-law result.
 DISCLOSURE_CARRYING = frozenset({
-    "store:simulator/reduced_real_determinism.py:_entries",
     "class:simulator/reduced_real_determinism.py:PT1PersistentEquilibriumStore",
     "class:simulator/optimize/results_store.py:ResultStore",
     "fn:simulator/optimize/study.py:_scored_result_from_journal_payload",
@@ -41,7 +40,6 @@ DISCLOSURE_CARRYING = frozenset({
     "store:simulator/battery/score_run.py:residue_prediction_cache",
     "store:simulator/battery/score.py:residue_prediction_cache",
     "store:simulator/diagnostic_helpers/extract_reproduction.py:_MELT_PSAT_CACHE",
-    "store:simulator/diagnostic_helpers/kems.py:_surface_cache",
     "store:simulator/engine_cache.py:_MEMORY_CACHE",
     "sqlite:simulator/engine_cache.py:engine_outputs",
 })
@@ -242,14 +240,6 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "name": 'runtime_identity',
         "carries_disclosure": False,
         "how": 'Memoizes diagnostic engine identity metadata. It does not cache chemistry outputs or skip a law execution.',
-    },
-    'lru:simulator/engine_cache.py:_engine_cache_input_identity_digest': {
-        "path": 'simulator/engine_cache.py',
-        "line": 525,
-        "kind": 'lru',
-        "name": '_engine_cache_input_identity_digest',
-        "carries_disclosure": False,
-        "how": 'Memoizes the source-input digest used to construct engine request keys. It returns key bytes, not an evaluated vapour-law result.',
     },
     'store:simulator/battery/score_run.py:residue_prediction_cache': {
         "path": 'simulator/battery/score_run.py',
@@ -963,14 +953,6 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Deepcopy cycle map for refusal state. It never stores a vapour pressure.',
     },
-    'store:simulator/core.py:published_cache': {
-        "path": 'simulator/core.py',
-        "line": 5357,
-        "kind": 'store',
-        "name": 'published_cache',
-        "carries_disclosure": False,
-        "how": 'Local name for the list accept_stored_memo just returned. Not a store.',
-    },
     'store:simulator/core.py:rates_cache': {
         "path": 'simulator/core.py',
         "line": 7570,
@@ -1003,13 +985,13 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Compiled provider object. Dispatch still evaluates the law, so the cached object is not a flagged pressure.',
     },
-    'store:simulator/diagnostic_helpers/kems.py:_surface_cache': {
+    'store:simulator/diagnostic_helpers/kems.py:surface_cache': {
         "path": 'simulator/diagnostic_helpers/kems.py',
         "line": 596,
         "kind": 'store',
-        "name": '_surface_cache',
-        "carries_disclosure": True,
-        "how": 'KEMS provider pressures for one case and temperature. _read_kems_surface_cache is the only read and calls accept_stored_memo. A row with no law_disclosures is a miss. The published runtime row carries that disclosure.',
+        "name": 'surface_cache',
+        "carries_disclosure": False,
+        "how": 'Request-local KEMS surface results keyed by temperature for one comparison case; no persistent memoization.',
     },
     'store:simulator/engine_binding_admission.py:grouped_entries': {
         "path": 'simulator/engine_binding_admission.py',
@@ -1050,22 +1032,6 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "name": 'computing_cache',
         "carries_disclosure": False,
         "how": 'In-progress freeze-gate placeholder. It is replaced before a hit is published.',
-    },
-    'store:simulator/liner_corrosion.py:_point_cache': {
-        "path": 'simulator/liner_corrosion.py',
-        "line": 4064,
-        "kind": 'store',
-        "name": '_point_cache',
-        "carries_disclosure": False,
-        "how": 'MAGEMin request key includes engine/version, oxide composition, temperature, pressure, and fO2; the value is a liquid-fraction sample, not a vapour-law result.',
-    },
-    'store:simulator/liner_corrosion.py:_curve_cache': {
-        "path": 'simulator/liner_corrosion.py',
-        "line": 4066,
-        "kind": 'store',
-        "name": '_curve_cache',
-        "carries_disclosure": False,
-        "how": 'Keyed by MAGEMin engine/version, liner and deposit compositions, temperature, pressure, and fO2; the value is an interpolated liquid-fraction curve, not a vapour-law result.',
     },
     'store:simulator/liner_life.py:monotonicity_evidence_cache': {
         "path": 'simulator/liner_life.py',
@@ -1115,14 +1081,6 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Local scratch for rates, equilibrium constants, metadata, or validation. It does not store a vapour-law disclosure.',
     },
-    'store:simulator/optimize/physics.py:shared_authority_cache': {
-        "path": 'simulator/optimize/physics.py',
-        "line": 3013,
-        "kind": 'store',
-        "name": 'shared_authority_cache',
-        "carries_disclosure": False,
-        "how": 'Local to one coating margin build, keyed by id(authority) while retaining the source mapping. It memoizes converted authority and flags metadata, not vapour-law results, and does not skip law execution.',
-    },
     'store:simulator/optimize/study.py:prefix_replay_cache': {
         "path": 'simulator/optimize/study.py',
         "line": 732,
@@ -1130,14 +1088,6 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "name": 'prefix_replay_cache',
         "carries_disclosure": False,
         "how": 'Equality copy of a staged prefix. The value returned to the study is ResultStore.lookup, which re-registers.',
-    },
-    'store:simulator/reduced_real_determinism.py:_entries': {
-        "path": 'simulator/reduced_real_determinism.py',
-        "line": 439,
-        "kind": 'store',
-        "name": '_entries',
-        "carries_disclosure": True,
-        "how": 'PT0 memory rows. The only read is _accept_cached_hit, which calls accept_stored_memo. The dict is _entries.',
     },
     'store:simulator/reduced_real_determinism.py:physics_bucket_entries': {
         "path": 'simulator/reduced_real_determinism.py',
