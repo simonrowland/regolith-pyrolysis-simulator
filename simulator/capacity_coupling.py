@@ -545,13 +545,26 @@ def solve_capacity_shadow(
 #
 # Fast commits G = q_head + S - Q = 0 when that scalar has one sign
 # change and the admission bound holds. Slow commits one backward-Euler
-# residual R = 0, then halves Δt. Newton proposes on the equation of the
+# step when that step already agrees with its two halves, and otherwise
+# the linearised drain over Δt. Newton proposes on the equation of the
 # branch it is called for. Brent publishes the root. There is no seam
 # that injects a Newton step: a returned Newton value is discarded.
 
-_HALVING_DEPTH = 12
 _ADMISSION_EXP_UNDERFLOW = 745.0
 _SIGN_SCAN_POINTS = 4096
+# Relative pair for one linearised substep. On a piece where
+# d(Q - q)/dn = a is constant, the exponential below is exact and the
+# pair is 0. Where a changes inside the step, accept when the
+# re-linearised halves land within 1e-4 of that step's own change, or
+# within the design floors when the change is already that small.
+# Premise: one backward-Euler step of dm/dt = -a (m - m_eq) against
+# its two halves leaves a pressure gap |P - P_eq| (a h)^2 / 4.
+# Algebra: |P - P_eq| ≈ 5.6e7 Pa and a gap of 1e-6 Pa give
+# (a h)^2 / 4 * 5.6e7 = 1e-6, so a h ≈ 2.7e-7.
+# Unit check: a h is dimensionless. With a ≈ 64 s^-1, h ≈ 4e-9 s.
+# Limit: a h → 0 and the gap → 0. That nanosecond step is not the
+# refusal. The exponential on a frozen piece is the converged step.
+_SUBSTEP_REL = 1.0e-4
 
 
 class _BalanceRefused(Exception):
@@ -843,12 +856,15 @@ class _HeadspaceLaw:
         # a = dQ/dm. For one ideal-gas species dm = dP * M * V / (R T),
         # so a = (dQ_kg/dP) * R * T / (M * V).
         # Unit check: (kg/s/Pa) * (J/(mol·K)) * K / ((kg/mol) * m^3)
-        # = 1/s. Limit: a flat cap has dQ/dP = 0, so a_min = 0 and the
-        # admission bound does not hold. A stencil that changes piece
-        # (sonic kink, blend knot, cap, or the empty-holdup floor) is
-        # skipped. Under-estimating a_min fails admission and would
-        # publish the slow pressure, so the low-pressure end of the
-        # interval, where this pipe's slope is smallest, is included.
+        # = 1/s. A flat sample has dQ/dP = 0, so a_min = 0 and the
+        # step does not admit, even when another sample on the same
+        # interval is steep. A pipe below P_down is that flat piece.
+        # Skipping the zero and keeping the steep sample would admit
+        # a fast root the holdup has not reached. A stencil that
+        # changes piece (sonic kink, blend knot, cap, or the
+        # empty-holdup floor) is not a measured slope and is skipped.
+        # The low-pressure end, where this pipe's positive slope is
+        # smallest, stays in the grid.
         lo = min(pressure_a, pressure_b)
         hi = max(pressure_a, pressure_b)
         start = lo if lo > 0.0 else max(hi * 1.0e-8, 1.0e-8)
@@ -869,8 +885,11 @@ class _HeadspaceLaw:
         slopes: list[float] = []
         for pressure in points:
             slope = self._dq_kg_dp(pressure)
-            if slope is not None and slope > 0.0 and math.isfinite(slope):
-                slopes.append(slope * scale)
+            if slope is None or not math.isfinite(slope):
+                continue
+            if slope <= 0.0:
+                return 0.0
+            slopes.append(slope * scale)
         if not slopes:
             return 0.0
         return min(slopes)
@@ -1195,7 +1214,14 @@ def _euler_one(
     dt_s: float,
 ) -> _HeadspaceStep:
     species = law.species[0]
-    p_lo = law.downstream_pa if law.downstream_pa > 0.0 else 0.0
+    # No reverse flow. §1 sets the outflow to 0 when P_up <= P_down, so
+    # a holdup already below downstream stays there and the root of R
+    # is outside a bracket that opens at P_down. Vacuum downstream is
+    # already 0. A holdup above P_down keeps that floor.
+    if law.pressure_of(n0) <= law.downstream_pa:
+        p_lo = 0.0
+    else:
+        p_lo = law.downstream_pa if law.downstream_pa > 0.0 else 0.0
     zero = law.partials_of(law.moles_at_pressure(0.0))
     source0, _outflow0, _binding0, _piece0 = law._flows(zero)
     n_hi = n0[species] + max(
@@ -1245,43 +1271,265 @@ def _halves_agree(coarse: _HeadspaceStep, first: _HeadspaceStep, second: _Headsp
     return abs(coarse.bled_kg - fine_bled) <= tolerance
 
 
-def _combine(left: _HeadspaceStep, right: _HeadspaceStep) -> _HeadspaceStep:
-    bled_mol = {
-        species: left.bled_mol[species] + right.bled_mol[species]
-        for species in left.bled_mol
-    }
-    return _HeadspaceStep(
-        moles=dict(right.moles),
-        partials=dict(right.partials),
-        flux_kg_hr=dict(right.flux_kg_hr),
-        bled_mol=bled_mol,
-        bled_kg=left.bled_kg + right.bled_kg,
-        source_kg=left.source_kg + right.source_kg,
-        mass_end_kg=right.mass_end_kg,
-        mass_start_kg=left.mass_start_kg,
-        pressure_Pa=right.pressure_Pa,
-        iterations=left.iterations + right.iterations,
-        binding=right.binding,
-        residual_Pa=max(left.residual_Pa, right.residual_Pa),
+def _piece_key(piece: tuple) -> tuple:
+    # The last flag is the empty-holdup kink. Leaving n = 0 is the step
+    # a fill has to take. Binding, blend bucket, and the cap flag are
+    # the kinks a linear step must not cross.
+    return piece[:3]
+
+
+def _linear_slope(
+    law: _HeadspaceLaw,
+    moles: Mapping[str, float],
+    species: str,
+    piece: tuple,
+    beta: float,
+) -> float:
+    """α = -d(q + S - Q)/dn on this piece. 0 when the stencil leaves it.
+
+    Unit check: (mol/s) / mol = 1/s. Limit: a flat outflow and a
+    pressure-independent source have α = 0, and the advance is n + β Δt.
+    """
+
+    dn = max(abs(moles[species]), 1.0) * 1.0e-6
+    up = dict(moles)
+    up[species] = moles[species] + dn
+    source_up, outflow_up, _binding, piece_up = law._flows(law.partials_of(up))
+    if _piece_key(piece_up) != _piece_key(piece):
+        return 0.0
+    rate_up = (
+        source_up[species] + law.redox_mol_s[species] - outflow_up[species]
     )
+    if moles[species] > dn:
+        down = dict(moles)
+        down[species] = moles[species] - dn
+        source_dn, outflow_dn, _binding_dn, piece_dn = law._flows(
+            law.partials_of(down)
+        )
+        if _piece_key(piece_dn) == _piece_key(piece):
+            rate_dn = (
+                source_dn[species]
+                + law.redox_mol_s[species]
+                - outflow_dn[species]
+            )
+            return -(rate_up - rate_dn) / (2.0 * dn)
+    return -(rate_up - beta) / dn
+
+
+def _linear_advance(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+) -> dict[str, float] | None:
+    """Exact step of dn/dt = β - α (n - n0), frozen on the current piece.
+
+    Premise: backward Euler on this linear drain converges to
+    n(Δt) = n_eq + (n0 - n_eq) exp(-α Δt) as the substep goes to 0,
+    and that is also the solution of the ODE.
+    Algebra: β = (q + S - Q) at n0, α = -d(q + S - Q)/dn,
+    n_eq = n0 + β/α, n(Δt) = n0 + (β/α) (1 - exp(-α Δt)).
+    Unit check: β/α is mol, and (1 - exp) is dimensionless.
+    Limit: α Δt → 0 gives n0 + β Δt, the closed line and the flat cap.
+    α Δt → ∞ lands on n_eq. A step that leaves the piece, or drives a
+    species negative, is not this formula.
+    """
+
+    source, outflow, _binding, piece = law._flows(law.partials_of(n0))
+    end: dict[str, float] = {}
+    for species in law.species:
+        beta = source[species] + law.redox_mol_s[species] - outflow[species]
+        alpha = _linear_slope(law, n0, species, piece, beta)
+        if not math.isfinite(alpha) or not math.isfinite(beta):
+            return None
+        product = alpha * dt_s
+        if alpha <= 0.0 or abs(product) < 1.0e-8:
+            updated = n0[species] + beta * dt_s * (1.0 - 0.5 * max(alpha, 0.0) * dt_s)
+        elif product >= _ADMISSION_EXP_UNDERFLOW:
+            updated = n0[species] + beta / alpha
+        else:
+            updated = n0[species] + (beta / alpha) * (1.0 - math.exp(-product))
+        if not math.isfinite(updated) or updated < 0.0:
+            return None
+        end[species] = updated
+    _source_end, _outflow_end, _binding_end, end_piece = law._flows(
+        law.partials_of(end)
+    )
+    if _piece_key(end_piece) != _piece_key(piece):
+        return None
+    return end
+
+
+def _euler_pair(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+) -> tuple[_HeadspaceStep, _HeadspaceStep, _HeadspaceStep] | None:
+    # The linear step refuses to cross a kink. One backward-Euler step
+    # is allowed to: the residual is still monotone, and the pair test
+    # below is what limits that step.
+    try:
+        coarse = _one_euler(law, n0, dt_s)
+        first = _one_euler(law, n0, dt_s / 2.0)
+        second = _one_euler(law, first.moles, dt_s / 2.0)
+    except _BalanceRefused:
+        return None
+    return coarse, first, second
+
+
+def _analytic_pair(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+) -> tuple[_HeadspaceStep, _HeadspaceStep, _HeadspaceStep] | None:
+    end = _linear_advance(law, n0, dt_s)
+    if end is None:
+        return None
+    mid = _linear_advance(law, n0, dt_s / 2.0)
+    if mid is None:
+        return None
+    end_half = _linear_advance(law, mid, dt_s / 2.0)
+    if end_half is None:
+        return None
+    coarse = law.step_from_moles(n0, dt_s, end, 1, 0.0)
+    first = law.step_from_moles(n0, dt_s / 2.0, mid, 1, 0.0)
+    second = law.step_from_moles(mid, dt_s / 2.0, end_half, 1, 0.0)
+    return coarse, first, second
+
+
+def _substep_relative(
+    start_pressure: float,
+    coarse: _HeadspaceStep,
+    first: _HeadspaceStep,
+    second: _HeadspaceStep,
+) -> bool:
+    # Pair against the change on this substep. The absolute floors are
+    # the design pair, used when that change is already small.
+    change_p = abs(start_pressure - second.pressure_Pa)
+    if abs(coarse.pressure_Pa - second.pressure_Pa) > max(
+        DEFAULT_ABS_TOL_PA,
+        _SUBSTEP_REL * change_p,
+    ):
+        return False
+    change_m = abs(first.mass_start_kg - second.mass_end_kg)
+    fine_bled = first.bled_kg + second.bled_kg
+    return abs(coarse.bled_kg - fine_bled) <= max(1.0e-12, _SUBSTEP_REL * change_m)
 
 
 def _slow_converge(
     law: _HeadspaceLaw,
     n0: Mapping[str, float],
     dt_s: float,
-    depth: int,
 ) -> _HeadspaceStep:
+    """Integrated headspace state at dt_s.
+
+    One backward-Euler step is the commit when its pair already meets
+    the design floors. A closed line and a flat cap do. The stranded
+    inventory does not: that pair stays outside 1e-6 Pa down to a
+    nanosecond substep. The integral is then the linearised drain,
+    re-linearised until the pair is inside the substep tolerance.
+    The halving count is not the refusal.
+    """
+
     coarse = _one_euler(law, n0, dt_s)
     half = dt_s / 2.0
     first = _one_euler(law, n0, half)
     second = _one_euler(law, first.moles, half)
     if _halves_agree(coarse, first, second):
         return coarse
-    if depth >= _HALVING_DEPTH:
+    return _integrate_linearised(law, n0, dt_s)
+
+
+def _integrate_linearised(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+) -> _HeadspaceStep:
+    h = dt_s
+    remaining = dt_s
+    state = {species: n0[species] for species in law.species}
+    bled_mol = {species: 0.0 for species in law.species}
+    bled_kg = 0.0
+    source_kg = 0.0
+    iterations = 0
+    residual = 0.0
+    mass_start: float | None = None
+    last: _HeadspaceStep | None = None
+    while remaining > dt_s * 1.0e-15:
+        h = min(h, remaining)
+        if h <= 0.0 or remaining - h == remaining:
+            raise _BalanceRefused("headspace_balance_nonconvergence")
+        pair = _analytic_pair(law, state, h)
+        if pair is None:
+            # A long step that would leave the piece is shortened.
+            # A probe that also fails is a kink under the state: the
+            # exponential will not cross it, and one backward-Euler
+            # step may. The pair test still limits that step.
+            if _linear_advance(law, state, min(h, 1.0e-8)) is None:
+                pair = _euler_pair(law, state, h)
+        if pair is None:
+            h *= 0.5
+            if h <= dt_s * 1.0e-18:
+                raise _BalanceRefused("headspace_balance_nonconvergence")
+            continue
+        coarse, first, second = pair
+        start_p = law.pressure_of(state)
+        agreed = _halves_agree(coarse, first, second)
+        if not agreed and not _substep_relative(start_p, coarse, first, second):
+            change_p = abs(start_p - second.pressure_Pa)
+            err_p = abs(coarse.pressure_Pa - second.pressure_Pa)
+            tol_p = max(DEFAULT_ABS_TOL_PA, _SUBSTEP_REL * change_p)
+            ratio = err_p / tol_p if tol_p > 0.0 else math.inf
+            shrink = (
+                0.5
+                if not math.isfinite(ratio) or ratio <= 1.0
+                else min(0.5, 0.9 / math.sqrt(ratio))
+            )
+            h *= shrink
+            if h <= dt_s * 1.0e-18:
+                raise _BalanceRefused("headspace_balance_nonconvergence")
+            continue
+        if mass_start is None:
+            mass_start = first.mass_start_kg
+        for species in bled_mol:
+            bled_mol[species] += first.bled_mol[species] + second.bled_mol[species]
+        bled_kg += first.bled_kg + second.bled_kg
+        source_kg += first.source_kg + second.source_kg
+        iterations += 1
+        residual = max(
+            residual,
+            abs(coarse.pressure_Pa - second.pressure_Pa),
+        )
+        state = dict(second.moles)
+        last = second
+        remaining -= h
+        if remaining <= 0.0:
+            break
+        if agreed:
+            h = remaining
+        else:
+            err_p = abs(coarse.pressure_Pa - second.pressure_Pa)
+            change_p = abs(start_p - second.pressure_Pa)
+            tol_p = max(DEFAULT_ABS_TOL_PA, _SUBSTEP_REL * change_p)
+            if tol_p > 0.0 and err_p < 0.25 * tol_p:
+                h = min(remaining, h * 2.0)
+            else:
+                h = min(remaining, h)
+    if last is None or mass_start is None:
         raise _BalanceRefused("headspace_balance_nonconvergence")
-    left = _slow_converge(law, n0, half, depth + 1)
-    return _combine(left, _slow_converge(law, left.moles, half, depth + 1))
+    return _HeadspaceStep(
+        moles=dict(last.moles),
+        partials=dict(last.partials),
+        flux_kg_hr=dict(last.flux_kg_hr),
+        bled_mol=bled_mol,
+        bled_kg=bled_kg,
+        source_kg=source_kg,
+        mass_end_kg=last.mass_end_kg,
+        mass_start_kg=mass_start,
+        pressure_Pa=last.pressure_Pa,
+        iterations=max(iterations, 1),
+        binding=last.binding,
+        residual_Pa=residual,
+    )
 
 
 def _commit_one(
@@ -1315,7 +1563,7 @@ def _commit_one(
                 iterations,
                 residual_pa,
             )
-    return _slow_converge(law, n0, dt_s, 0)
+    return _slow_converge(law, n0, dt_s)
 
 
 def _slice_value(
@@ -1518,8 +1766,12 @@ def _state_slope(law: _HeadspaceLaw, moles: Mapping[str, float]) -> float | None
     if delta_mass <= 0.0 or mass_0 <= 0.0:
         return None
     slope = (flow_up - flow_down) / delta_mass
-    if not math.isfinite(slope) or slope <= 0.0:
+    if not math.isfinite(slope):
         return None
+    # A flat piece is a measured 0, not a missing stencil. Admission
+    # treats 0 as a_min = 0. A kink above still returns None.
+    if slope <= 0.0:
+        return 0.0
     return slope
 
 
@@ -1529,10 +1781,10 @@ def _admits_mixture(
     n_root: Mapping[str, float],
     dt_s: float,
 ) -> bool:
-    # Same bound as the one-species test. a_min is the smallest positive
-    # dQ/dm on the segment between the two states. A missing slope does
-    # not admit: the slow branch then publishes the backward-Euler state
-    # instead of a fast root the bound did not support.
+    # Same bound as the one-species test. a_min is the smallest
+    # positive dQ/dm on the segment. A flat sample is 0 and does not
+    # admit. A kink (None) is skipped. No measured positive slope does
+    # not admit: the slow branch then publishes the backward-Euler state.
     gap = abs(law.pressure_of(n0) - law.pressure_of(n_root))
     if gap <= DEFAULT_ABS_TOL_PA:
         return True
@@ -1543,8 +1795,11 @@ def _admits_mixture(
             for species in law.species
         }
         slope = _state_slope(law, state)
-        if slope is not None:
-            slopes.append(slope)
+        if slope is None:
+            continue
+        if slope <= 0.0:
+            return False
+        slopes.append(slope)
     if not slopes:
         return False
     product = min(slopes) * dt_s
@@ -1580,24 +1835,19 @@ def _commit_many(
     if len(crossings) >= 2:
         raise _BalanceRefused("headspace_balance_multiple_roots")
     if len(crossings) == 1:
-        try:
-            moles, iterations, residual_pa = _sweep(
-                law,
-                n0,
-                dt_s,
-                "fast",
-                rel_tol=rel_tol,
-                max_iterations=max_iterations,
-            )
-        except _BalanceRefused as refused:
-            if refused.reason == "headspace_balance_multiple_roots":
-                raise
-            moles = None
-            iterations = 0
-            residual_pa = 0.0
-        if moles is not None and _admits_mixture(law, n0, moles, dt_s):
+        # A sweep that misses its tolerance refuses. It does not publish
+        # the backward-Euler state of the slow branch.
+        moles, iterations, residual_pa = _sweep(
+            law,
+            n0,
+            dt_s,
+            "fast",
+            rel_tol=rel_tol,
+            max_iterations=max_iterations,
+        )
+        if _admits_mixture(law, n0, moles, dt_s):
             return law.step_from_moles(n0, dt_s, moles, iterations, residual_pa)
-    return _slow_converge(law, n0, dt_s, 0)
+    return _slow_converge(law, n0, dt_s)
 
 
 def _publish(

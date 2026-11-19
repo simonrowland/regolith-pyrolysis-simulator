@@ -2522,3 +2522,199 @@ def test_source_above_the_sonic_crossing_returns_the_sonic_root():
     assert pressure == pytest.approx(_CREDIT_ROOT_PA, abs=5.0e-8)
     assert result.saturation.binding_cause == "choked_throat"
     assert _pipe_o2_kg_h(pressure) == pytest.approx(_CREDIT_KG_H, abs=1.0e-8)
+
+
+def _integrated_stranded_kg(dt_s: float) -> float:
+    """Holdup after dt_s from the production pipe. Not the linearised step.
+
+    scipy's BDF integrates dm/dt = q - Q(P(m)) on pipe_species_outflow_mol_s.
+    The commit is accepted when it lands on that trajectory.
+    """
+
+    from scipy.integrate import solve_ivp
+
+    q_kg_s = _SOURCE_02_KG_H / 3600.0
+    molar = _o2_molar_mass_kg()
+
+    def rhs(_time, state):
+        mass = max(float(state[0]), 0.0)
+        partial = mass * GAS_CONSTANT * _HS_T_K / (molar * _HS_V_M3)
+        outflow = pipe_species_outflow_mol_s(
+            partial,
+            0.0,
+            _HS_T_K,
+            {"O2": max(mass / molar, 1.0e-30)},
+            _HS_D_M,
+            _HS_L_M,
+        )
+        return [q_kg_s - outflow.species_mol_s["O2"] * molar]
+
+    integrated = solve_ivp(
+        rhs,
+        (0.0, dt_s),
+        [_STRANDED_O2_KG],
+        method="BDF",
+        rtol=1.0e-8,
+        atol=1.0e-14,
+    )
+    assert integrated.success
+    return float(integrated.y[0, -1])
+
+
+@pytest.mark.parametrize("dt_s", [1.0, 0.05, 1.0e-4])
+def test_stiff_slow_step_commits_the_integrated_drain(dt_s: float):
+    # Hour-103 inventory, classified slow: the one-step residual has a
+    # root, and the commit is the integral, not a refusal and not that
+    # single backward-Euler pressure.
+    result = _as_result(
+        _commit_o2(_STRANDED_O2_KG, _SOURCE_02_KG_H, dt_s / 3600.0)
+    )
+    pressure = result.partial_pressures_Pa["O2"]
+    holdup = _holdup_kg(pressure)
+    bled = result.bled_species_mol["O2"] * _o2_molar_mass_kg()
+    source_kg = _SOURCE_02_KG_H * dt_s / 3600.0
+    arrived = _integrated_stranded_kg(dt_s)
+    arrived_pa = (
+        arrived * GAS_CONSTANT * _HS_T_K / (_o2_molar_mass_kg() * _HS_V_M3)
+    )
+    diagnostic = _as_result(
+        _diagnostic_o2(_STRANDED_O2_KG, _SOURCE_02_KG_H, dt_s / 3600.0)
+    )
+    diagnostic_pa = diagnostic.partial_pressures_Pa["O2"]
+
+    assert pressure == pytest.approx(arrived_pa, abs=1.0)
+    assert abs(pressure - diagnostic_pa) > abs(pressure - arrived_pa)
+    assert bled == pytest.approx(
+        _STRANDED_O2_KG + source_kg - holdup,
+        abs=1.0e-9,
+    )
+    if arrived_pa > 1000.0:
+        assert result.saturation.binding_cause == "choked_throat"
+    if arrived_pa < 100.0:
+        assert result.saturation.binding_cause == "pipe"
+
+
+def test_holdup_below_downstream_keeps_its_mass():
+    # No source and P_up <= P_down: outflow is 0, so the holdup stays
+    # and the bleed is 0. The fast root at P_down is not this step.
+    held = _as_result(
+        _commit_o2(_holdup_kg(10.0), 0.0, 1.0, downstream_pa=1000.0)
+    )
+    assert held.partial_pressures_Pa["O2"] == pytest.approx(10.0, abs=1.0e-6)
+    assert held.bled_species_mol["O2"] * _o2_molar_mass_kg() == pytest.approx(
+        0.0,
+        abs=1.0e-12,
+    )
+
+    empty = _as_result(_commit_o2(0.0, 0.0, 1.0, downstream_pa=1.0))
+    assert empty.partial_pressures_Pa["O2"] == pytest.approx(0.0, abs=1.0e-9)
+    assert empty.bled_species_mol["O2"] * _o2_molar_mass_kg() == pytest.approx(
+        0.0,
+        abs=1.0e-12,
+    )
+
+
+def _commit_o2_n2(
+    mass_o2_kg: float,
+    n2_mol: float,
+    source_kg_hr: float,
+    dt_hr: float,
+    *,
+    flux=None,
+):
+    molar_n2 = MOLAR_MASS["N2"] / 1000.0
+    if flux is None:
+        def flux(_partials, rate=source_kg_hr):
+            return {"O2": rate}
+
+    return solve_capacity_shadow(
+        pre_holdup_mol={
+            "O2": _moles_of_kg(mass_o2_kg),
+            "N2": n2_mol,
+        },
+        molar_mass_kg_mol={"O2": _o2_molar_mass_kg(), "N2": molar_n2},
+        flux_kg_hr_at_partials=flux,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=_HS_T_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=dt_hr,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=0.0,
+        k_relief_kg_hr_Pa=0.0,
+        p_open_Pa=1.0,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+    )
+
+
+def test_failed_fast_sweep_on_two_species_refuses():
+    # The unforced hour is the pure-O2 root. A fast sweep that misses
+    # its tolerance refuses. It does not publish the slow state.
+    unforced = _as_result(_commit_o2_n2(_FLOOR_O2_KG, 1.0e-6, _SOURCE_02_KG_H, 1.0))
+    assert unforced.partial_pressures_Pa["O2"] == pytest.approx(_ROOT_02_PA, abs=5.0e-9)
+    assert unforced.partial_pressures_Pa["N2"] == pytest.approx(0.0, abs=1.0e-9)
+
+    entered: list[str] = []
+
+    def sweep(*args, **kwargs):
+        mode = args[3] if len(args) > 3 else kwargs["mode"]
+        entered.append(mode)
+        if mode == "fast":
+            raise capacity_coupling._BalanceRefused("headspace_balance_nonconvergence")
+        raise AssertionError(mode)
+
+    def slow(*args, **kwargs):
+        entered.append("slow")
+        raise AssertionError("slow branch")
+
+    with (
+        patch.object(capacity_coupling, "_sweep", sweep),
+        patch.object(capacity_coupling, "_slow_converge", slow),
+    ):
+        refused = _commit_o2_n2(_FLOOR_O2_KG, 1.0e-6, _SOURCE_02_KG_H, 1.0)
+
+    assert isinstance(refused, CapacityShadowRefusal)
+    assert refused.reason == "headspace_balance_nonconvergence"
+    assert entered == ["fast"]
+
+
+def _two_root_flux(partials: dict) -> dict[str, float]:
+    # 1e8 kg/h below 2e8 Pa. The test requires the production pipe at
+    # 1e8 Pa to lie under that rate, so a grid that stops at 1e8 Pa has
+    # no sign change. The drop to 0 at 2e8 Pa and the step to 1e20 kg/h
+    # at 5e8 Pa are the two crossings, both in the extension to 1e12 Pa.
+    total = math.fsum(partials.values())
+    if total < 2.0e8:
+        rate = 1.0e8
+    elif total < 5.0e8:
+        rate = 0.0
+    else:
+        rate = 1.0e20
+    return {"O2": rate}
+
+
+def test_second_root_above_1e8_pa_refuses_on_both_paths():
+    assert _pipe_o2_kg_h(1.0e8) < 1.0e8
+    assert _pipe_o2_kg_h(3.0e8) > 0.0
+    assert _pipe_o2_kg_h(6.0e8) < 1.0e20
+
+    one = _commit_o2(
+        _FLOOR_O2_KG,
+        0.0,
+        1.0,
+        flux=_two_root_flux,
+    )
+    assert isinstance(one, CapacityShadowRefusal)
+    assert one.reason == "headspace_balance_multiple_roots"
+
+    two = _commit_o2_n2(
+        _FLOOR_O2_KG,
+        1.0e-6,
+        0.0,
+        1.0,
+        flux=_two_root_flux,
+    )
+    assert isinstance(two, CapacityShadowRefusal)
+    assert two.reason == "headspace_balance_multiple_roots"
