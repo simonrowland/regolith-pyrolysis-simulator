@@ -2669,12 +2669,18 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
         except Exception as exc:  # OpenIMCC engine boundary
             if type(exc).__name__ == "ImccGasTemperatureOutsideDomainError":
                 interval = getattr(exc, "declared_interval_K", None)
-                if interval is None:
+                if not isinstance(interval, (tuple, list)):
                     interval = getattr(exc, "T_interval", None)
-                if interval is None:
+                if not isinstance(interval, (tuple, list)):
                     low = getattr(exc, "T_min", None)
                     high = getattr(exc, "T_max", None)
                     interval = None if low is None or high is None else (low, high)
+                if not isinstance(interval, (tuple, list)):
+                    bounds = re.search(r"\[([^,\]]+),\s*([^\]]+)\]", str(exc))
+                    if bounds is not None:
+                        low = _finite_number(bounds.group(1))
+                        high = _finite_number(bounds.group(2))
+                        interval = None if low is None or high is None else (low, high)
                 row_id = getattr(exc, "source_row_id", getattr(exc, "row_id", None))
                 # The current pin refuses outside the declared interval; a
                 # later species_thermo(..., allow_extrapolation=True) API can
@@ -2689,7 +2695,10 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
                      "upstream_error": f"{type(exc).__name__}: {exc}",
                      "certification_backlog": True},
                 )
-            if isinstance(exc, KeyError):
+            if (
+                isinstance(exc, KeyError)
+                or type(exc).__name__ == "ImccGasSpeciesNotFoundError"
+            ):
                 return refuse(
                     RefusalReason.UNSUPPORTED, "openimcc_species_missing",
                     {"species": formula, "phase": phase_label},

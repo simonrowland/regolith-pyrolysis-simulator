@@ -1398,7 +1398,11 @@ def species_thermo(species: str, phase: str, temperature_K: float) -> dict[str, 
             "G_J_mol": getattr(props, "G_J_mol", None),
             "source_row_id": source_row_id,
             "source_table_id": getattr(props, "source_table_id", None),
-            "T_interval": None if interval is None else tuple(interval),
+            "T_interval": (
+                tuple(interval)
+                if isinstance(interval, (tuple, list))
+                else None
+            ),
             "T_min": getattr(props, "T_min", None),
             "T_max": getattr(props, "T_max", None),
             "derivatives_fit_implied": getattr(
