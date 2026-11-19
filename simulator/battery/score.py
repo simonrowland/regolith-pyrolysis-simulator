@@ -9298,6 +9298,13 @@ def _predict_redox(
                 {"reason": "invalid_redox_composition", "detail": str(exc)},
             )
         candidate_fields = _openimcc_candidate_valence_fields(identity)
+        # The default d066-v4 melt pack uses DG46; the unversioned candidate
+        # redox pack uses Fe-019 and OpenIMCC now rejects that mixed basis.
+        candidate_redox_pack = (
+            "openimcc-redox-cr-ti-candidate-v4.json"
+            if candidate_fields is not None
+            else None
+        )
         redox_element = (
             identity.species.formula
             if candidate_fields is not None and identity.species is not None
@@ -9335,12 +9342,12 @@ def _predict_redox(
         redox_kwargs: dict[str, object] = {
             "lambda_imposed": float(fo2_log) * math.log(10.0)
         }
-        if candidate_fields is not None:
+        if candidate_redox_pack is not None:
             redox_kwargs["redox_pack_path"] = (
                 Path(openimcc.__file__).resolve().parent
                 / "data"
                 / "packs"
-                / "openimcc-redox-cr-ti-candidate.json"
+                / candidate_redox_pack
             )
         try:
             from simulator.melt_backend.openimcc_bridge import evaluate_redox
@@ -9411,8 +9418,8 @@ def _predict_redox(
             certified_band={"temperature_K": band},
             identity=prediction_identity,
             version=(
-                "openimcc-redox-cr-ti-candidate"
-                if candidate_fields is not None
+                candidate_redox_pack.removesuffix(".json")
+                if candidate_redox_pack is not None
                 else "openimcc-redox"
             ),
         )

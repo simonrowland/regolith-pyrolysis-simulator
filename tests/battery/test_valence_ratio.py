@@ -748,7 +748,7 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
     assert len(calls) == 1
     args, kwargs, output = calls[0]
     assert args[0]["Cr"] > 0.0
-    assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
+    assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate-v4.json"
     expected_fraction = output.chromous_cr_mol / (
         output.chromous_cr_mol + output.chromic_cr_mol
     )
@@ -818,7 +818,7 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
     assert len(calls) == 1
     args, kwargs, output = calls[0]
     assert args[0]["Ti"] > 0.0
-    assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
+    assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate-v4.json"
     expected_ratio = output.titanous_ti_mol / output.titanic_ti_mol
     assert float(prediction.value) == pytest.approx(expected_ratio, rel=1e-12)
 
