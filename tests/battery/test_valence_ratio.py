@@ -736,14 +736,15 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
     experiment = result.experiments[observation.experiment_id]
     # Table 1 AD+En is SiO2, Al2O3, MgO, CaO. The 0.5 wt% Cr2O3 addition is a
     # side condition, not a composition component, and the bulk has no Fe.
-    # The scored element is the missing input.
+    # The scored element is the missing input. The token is the species
+    # symbol, the same string the inventory key uses.
     missing_chromium = predict_with_engine(
         Engine.OPENIMCC, observation, experiment=experiment
     )
     assert missing_chromium.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert missing_chromium.refusal_detail == {
         "reason": "missing_input",
-        "input": "total_chromium",
+        "input": "total_cr",
     }
     chromium_without_iron = predict_with_engine(
         Engine.OPENIMCC,
@@ -867,7 +868,7 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
     )
     assert iron_without_titanium.refusal_detail == {
         "reason": "missing_input",
-        "input": "total_titanium",
+        "input": "total_ti",
     }
 
     composition = Composition(
