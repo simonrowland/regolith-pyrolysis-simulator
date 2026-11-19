@@ -4045,6 +4045,7 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(
             capture_native_activities=True,
         )
     )
+    assert "--Pres=1e-09" in direct_args
     from simulator.melt_backend.alphamelts import _run_alphamelts_subprocess
 
     with _magemin_subprocess_slot(20.0):
@@ -4276,6 +4277,146 @@ def test_magemin_live_native_feo_activity_refuses_iron_free_projected_bulk(
     )
     assert result.diagnostics["magemin_native_formula"] == "FeO"
     assert result.diagnostics["magemin_native_bulk_component"] == "FeOt"
+
+
+def _native_activity_pressure_test_backend():
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._database = "ig"
+    backend._config = {}
+    backend._subprocess_pool = None
+    return backend
+
+
+@pytest.mark.parametrize("pressure_bar", [1.0e-6, 1.0])
+def test_magemin_native_activity_pressure_admits_verified_window_endpoints(
+    pressure_bar,
+):
+    backend = _native_activity_pressure_test_backend()
+    solve_pressures = []
+
+    def reached_solve(*, pressure_bar, **_kwargs):
+        solve_pressures.append(pressure_bar)
+        raise RuntimeError("test solve reached")
+
+    backend._call_magemin = reached_solve
+
+    with pytest.raises(RuntimeError, match="test solve reached"):
+        backend.equilibrate(
+            1429.85,
+            composition_kg={"SiO2": 60.0, "MgO": 40.0},
+            pressure_bar=pressure_bar,
+            native_activity_formula="MgO",
+        )
+
+    assert solve_pressures == [pressure_bar]
+
+
+@pytest.mark.parametrize("pressure_bar", [1.0e-7, 2.0])
+def test_magemin_native_activity_pressure_outside_window_runs_and_flags(
+    pressure_bar,
+):
+    backend = _native_activity_pressure_test_backend()
+    solve_pressures = []
+
+    def solved(*, pressure_bar, **_kwargs):
+        solve_pressures.append(pressure_bar)
+        return {
+            "native_activities": {"MgO": 0.8},
+            "solver_status": 0,
+            "native_phase": "liq",
+            "native_mode": 1.0,
+            "iterations": 1,
+        }
+
+    backend._call_magemin = solved
+    backend._phase_assemblage_payload = lambda *_args, **_kwargs: (
+        [], {}, {}, 1.0, {"SiO2": 60.0, "MgO": 40.0},
+    )
+
+    result = backend.equilibrate(
+        1429.85,
+        composition_kg={"SiO2": 60.0, "MgO": 40.0},
+        pressure_bar=pressure_bar,
+        native_activity_formula="MgO",
+    )
+
+    assert result.status == "ok", result.warnings
+    assert solve_pressures == [pressure_bar]
+    assert result.pressure_bar == pressure_bar
+    assert result.activity_coefficients["MgO"] == pytest.approx(0.8)
+    notice = result.diagnostics["commissioning_notice"]
+    assert notice["kind"] == "out_of_certified_band"
+    assert notice["authority"] == "extrapolated"
+    assert notice["certified_band"] == {"pressure_bar": [1.0e-6, 1.0]}
+    assert "magemin_native_activity_pressure_outside_certified_band" in (
+        notice["reason"]
+    )
+
+
+@pytest.mark.parametrize("pressure_bar", [0.0, -1.0, float("nan"), float("inf")])
+def test_magemin_native_activity_invalid_pressure_stays_typed(
+    pressure_bar,
+):
+    backend = _native_activity_pressure_test_backend()
+    solve_calls = []
+    backend._call_magemin = lambda **kwargs: solve_calls.append(kwargs)
+
+    result = backend.equilibrate(
+        1429.85,
+        composition_kg={"SiO2": 60.0, "MgO": 40.0},
+        pressure_bar=pressure_bar,
+        native_activity_formula="MgO",
+    )
+
+    assert result.status == "out_of_domain"
+    assert solve_calls == []
+    assert result.diagnostics["backend_status_reason"] == "invalid_input"
+
+
+def test_magemin_native_activity_unavailable_reference_stays_typed():
+    backend = _native_activity_pressure_test_backend()
+    solve_calls = []
+    backend._call_magemin = lambda **kwargs: solve_calls.append(kwargs)
+
+    result = backend.equilibrate(
+        1429.85,
+        composition_kg={"SiO2": 60.0, "MgO": 40.0},
+        pressure_bar=2.0,
+        native_activity_formula="Na2O",
+    )
+
+    assert result.status == "out_of_domain"
+    assert solve_calls == []
+    assert result.diagnostics["backend_status_reason"] == (
+        "magemin_native_activity_reference_unavailable"
+    )
+
+
+@pytest.mark.parametrize(
+    ("pressure_bar", "expected_argument"),
+    [(1.0e-6, "--Pres=1e-09"), (1.0e-4, "--Pres=1e-07")],
+)
+def test_magemin_native_activity_subprocess_preserves_low_pressure(
+    pressure_bar, expected_argument,
+):
+    backend = _native_activity_pressure_test_backend()
+    bulk = backend._build_db_bulk_projection({"SiO2": 70.0, "MgO": 30.0})
+    pressure_kbar = backend._GPa_to_kbar(
+        backend._pressure_bar_to_GPa(pressure_bar)
+    )
+
+    args, *_ = backend._build_magemin_subprocess_args(
+        bulk_projection=bulk,
+        temperature_C=1429.85,
+        pressure_kbar=pressure_kbar,
+        fO2_log=-8.0,
+        capture_native_activities=True,
+    )
+
+    assert expected_argument in args
 
 
 def test_magemin_nonfinite_requested_native_activity_returns_not_converged(

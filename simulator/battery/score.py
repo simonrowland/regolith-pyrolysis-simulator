@@ -7407,8 +7407,7 @@ def cell_notices(
                     band=band,
                     authority=(
                         Authority.EXTRAPOLATED
-                        if kind == "openimcc_temperature_extrapolated"
-                        and row.get("authority") == AUTHORITY_EXTRAPOLATED
+                        if row.get("authority") == AUTHORITY_EXTRAPOLATED
                         else None
                     ),
                 )
@@ -14455,6 +14454,38 @@ def _predict_with_engine(
         # printed pressure when it is available. Other activity engines keep
         # their existing condensed-phase pressure omission.
         pressure_bar = activity_payload.get("pressure_bar")
+        if quantity is Quantity.ACTIVITY and pressure_bar is None:
+            from engines.magemin.domain import (
+                MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW,
+            )
+            from simulator.diagnostic_helpers.binary_pot_battery import (
+                _DEFAULT_PRESSURE_BAR,
+            )
+
+            pressure_min_bar, pressure_max_bar = (
+                MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW
+            )
+            # equilibrate_cell owns the default pressure used when a row has
+            # no typed point. At a 1 bar pressure separation and 1600 K,
+            # (ΔV·ΔP)/(RT) with a typical
+            # ΔV=1e-5 m³/mol is (1e-5·1e5)/(8.314·1600)=7.5e-5 in ln(a),
+            # about 1e-4. The default is inside the certified pressure window.
+            input_notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        "row printed no total pressure; MAGEMin native "
+                        f"activity evaluated at its {_DEFAULT_PRESSURE_BAR:g} "
+                        "bar default inside certified inclusive pressure window "
+                        f"[{pressure_min_bar:g}, {pressure_max_bar:g}] bar; "
+                        "for a 1 bar pressure separation, the condensed-phase "
+                        "correction is estimated at about 1e-4 in ln(a) at "
+                        "1600 K"
+                    ),
+                    origin="engine:magemin",
+                )
+            )
 
     printed_fo2 = _has_printed_fo2(observation, identity)
     source_pressure = (

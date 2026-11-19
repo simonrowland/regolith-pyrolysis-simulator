@@ -756,6 +756,16 @@ def test_every_chemistry_version_has_changelog_and_runtime_identity() -> None:
     )
 
 
+def test_magemin_native_activity_pressure_policy_has_fresh_cache_version() -> None:
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["magemin"]
+    assert version == 6
+    request = {"pressure_bar": 2.0, "native_activity_formula": "Al2O3"}
+
+    assert engine_cache_key("magemin", 5, request) != engine_cache_key(
+        "magemin", version, request
+    )
+
+
 def test_stale_runtime_warns_once_without_changing_hits_or_results(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

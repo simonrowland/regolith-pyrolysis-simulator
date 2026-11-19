@@ -38,6 +38,10 @@ MAGEMIN_NATIVE_MELT_ACTIVITIES = {
     'TiO2': ('aTiO2', 'rutile', 'TiO2'),
 }
 
+# Inclusive certified verification band for MAGEMin native activities.
+# Valid pressures outside this band are solved and flagged as extrapolated.
+MAGEMIN_NATIVE_ACTIVITY_PRESSURE_BAR_WINDOW = (1.0e-6, 1.0)
+
 # Canonical MELTS 14-oxide basis, sourced from
 # ``simulator.state.OXIDE_SPECIES`` (the single source of truth; also the
 # basis declared in
