@@ -658,9 +658,6 @@ def test_openimcc_species_thermo_scores_native_condensate_derivatives() -> None:
         assert "derivatives_fit_implied=True" in prediction.execution.call_evidence
 
 
-# This pin has no positive named-polymorph case to test: native crystal rows
-# expose generic ``state="s"`` plus source ids, but no named solid form. A
-# mocked polymorph would not test whether the selected OpenIMCC row matches.
 def test_openimcc_named_crystal_refuses_unmatched_source_polymorph() -> None:
     _require_openimcc()
     from openimcc import load_gas_datapack, species_thermo
@@ -669,8 +666,19 @@ def test_openimcc_named_crystal_refuses_unmatched_source_polymorph() -> None:
     native = species_thermo(
         "SiO2", "cr", float(temperature_K), datapack=load_gas_datapack()
     )
-    assert native.source_row_id == "LAM1987"
-    assert native.source_table_id == "LH87 Table 2"
+    assert native.source_row_id == "O-035"
+    matching_observation = _openimcc_thermo_observation(
+        "openimcc-sio2-high-cristobalite-source-match",
+        "SiO2",
+        Phase.CR,
+        Quantity.CP,
+        temperature_K,
+        polymorph=Polymorph.CRISTOBALITE_HIGH,
+    )
+    matching_prediction = predict_with_engine(Engine.OPENIMCC, matching_observation)
+    assert matching_prediction.execution.state is ExecutionState.PRODUCED
+    assert matching_prediction.value == Decimal(str(native.Cp_J_molK))
+
     observation = _openimcc_thermo_observation(
         "openimcc-sio2-quartz-source-unresolved",
         "SiO2",
@@ -755,6 +763,7 @@ def test_openimcc_enthalpy_source_anchor_is_resolved_after_native_cache_hit(
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "")
     engine_cache._close_connections()
     engine_cache._MEMORY_CACHE.clear()
     native_calls = []

@@ -70,6 +70,7 @@ from simulator.battery.identity import (
 )
 from simulator.battery.polymorph_dictionary import (
     canonical_element_allotrope,
+    polymorph_for_janaf_table_id,
     unrecognised_polymorph_spelling,
 )
 from simulator.battery.records import (
@@ -2837,10 +2838,10 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
 
     identity_poly = _poly_name(identity)
     if phase is Phase.CR and identity_poly is not None:
-        # This pinned SpeciesThermo source reports only a generic crystal
-        # phase, not a named polymorph. Keep named crystals off that row until
-        # the selected OpenIMCC source identity explicitly names its form.
-        source_polymorph = None
+        # OpenIMCC's crystal rows identify the JANAF table rather than a
+        # polymorph label. Resolve that table through the canonical dictionary
+        # before comparing it with the requested named crystal.
+        source_polymorph = polymorph_for_janaf_table_id(formula, row_id)
         if not _same_mineral(source_polymorph, identity_poly):
             return refuse(
                 RefusalReason.UNSUPPORTED,

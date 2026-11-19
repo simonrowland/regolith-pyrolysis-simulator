@@ -24,6 +24,7 @@ from simulator.battery.polymorph_dictionary import (
     canonicalize_janaf_transition,
     classify_printed_qualifier,
     coerce_polymorph_token,
+    polymorph_for_janaf_table_id,
     printed_qualifier_from_name,
     unrecognised_polymorph_spelling,
 )
@@ -437,6 +438,12 @@ def test_dictionary_excludes_ion_isomer_and_pressure() -> None:
     assert ("H2O", "1 Bar") not in JANAF_CRYSTAL_DICTIONARY
     assert JANAF_CRYSTAL_DICTIONARY[("Al2O3", "Alpha")] is Polymorph.CORUNDUM
     assert JANAF_CRYSTAL_TABLE_IDS[("Al2O3", "Alpha")] == ("Al-096",)
+    assert (
+        polymorph_for_janaf_table_id("SiO2", "O-035")
+        is Polymorph.CRISTOBALITE_HIGH
+    )
+    assert polymorph_for_janaf_table_id("SiO2", "O-037") is Polymorph.QUARTZ
+    assert polymorph_for_janaf_table_id("SiO2", "O-999") is None
     assert printed_qualifier_from_name("Barium Hydroxide, Alpha (Ba(OH)2)") == "Alpha"
     for formula, janaf_qual, b1544_name, token in CROSS_SOURCE_EQUIVALENCES:
         assert JANAF_CRYSTAL_DICTIONARY[(formula, janaf_qual)] is token
