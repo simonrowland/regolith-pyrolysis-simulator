@@ -47,6 +47,7 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import (
+    THERMOCHEMICAL_CALORIE_J,
     assumed_crystal_standard_pressure_Pa,
     bar_to_pa,
     identity_equal,
@@ -84,6 +85,7 @@ from tests.engine_availability import (
     magemin_binary_available,
     thermoengine_package_available,
 )
+from tests.test_pure_phase_janaf_score import THERMOENGINE_ABSENT_FORMULAS
 
 _PRINTED_DFG = Decimal("-3.886")
 _PRINTED_LOGK = Decimal("0.092")
@@ -8285,6 +8287,43 @@ def _printed_janaf_entropy(table_id: str, temperature_K: float) -> Decimal:
     raise AssertionError(f"{table_id} has no entropy row at {temperature_K} K")
 
 
+def _printed_schumm_nepheline_s298_cal() -> Decimal:
+    """Schumm 1981 S298 cell for the nepheline heading, in cal/mol/K.
+
+    The YAML float tag is kept as the printed token. A float round-trip
+    would not be the cell Schumm printed.
+    """
+
+    import yaml
+
+    class _Loader(yaml.SafeLoader):
+        pass
+
+    def _keep_decimal(loader, node):
+        return Decimal(loader.construct_scalar(node))
+
+    _Loader.add_constructor("tag:yaml.org,2002:float", _keep_decimal)
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "data"
+        / "literature"
+        / "extracts"
+        / "schumm-1981-alkali-aluminosilicate-thermochemical-tables.yaml"
+    )
+    document = yaml.load(path.read_text(encoding="utf-8"), Loader=_Loader)
+    observations = document["species"]["NaAlSiO4"]["observations"]
+    observation = next(
+        item
+        for item in observations
+        if item["observation_id"] == "schumm81_nepheline_S298"
+    )
+    assert observation["values"]["quantity"] == "S"
+    row = next(item for item in observation["values"]["series"] if item["T_K"] == 298)
+    printed = row["entropy"]
+    assert isinstance(printed, Decimal)
+    return printed
+
+
 def _crystal_thermo_identity(formula: str, polymorph: str | None, temperature_K: Decimal):
     identity = F.oxide_identity(
         formula,
@@ -8471,6 +8510,121 @@ def test_ambiguous_pure_phase_cases_stay_refused() -> None:
     assert held.refusal_detail["symbol"] == "Wo"
 
 
+def _naalsio4_spelled(name: str, polymorph_state):
+    identity = _crystal_thermo_identity("NaAlSiO4", None, Decimal("298"))
+    identity = replace(
+        identity,
+        species=replace(identity.species, polymorph=polymorph_state),
+    )
+    return F.observation(name, "exp-1", identity, Decimal("0"))
+
+
+def test_magemin_nepheline_spelling_resolves_to_ne() -> None:
+    """Unrecognised spelling nepheline is ig pure phase ``ne``.
+
+    invoke_pure_phase is false, so the hold returns before the engine.
+    The callback raises if resolution skips that hold.
+    """
+
+    from simulator.battery.polymorph_dictionary import unrecognised_polymorph_state
+
+    observation = _naalsio4_spelled(
+        "naalsio4-nepheline", unrecognised_polymorph_state("nepheline")
+    )
+
+    def forbid_engine(*_args, **_kwargs):
+        raise AssertionError("nepheline spelling must not call the engine")
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        observation,
+        invoke_pure_phase=False,
+        pure_phase=forbid_engine,
+    )
+    assert attempt.value is None
+    assert attempt.refusal_detail["reason"] == "pure-phase-call-required"
+    assert attempt.refusal_detail["symbol"] == "ne"
+
+
+def test_magemin_carnegieite_spelling_stays_polymorph_unresolved() -> None:
+    """Carnegieite is not ig ``ne``. cg and cgh are not on the map.
+
+    The row's polymorph is nepheline, so this spelling never reaches the
+    engine. Alpha, beta, and gamma stay off the same row.
+    """
+
+    from simulator.battery.polymorph_dictionary import unrecognised_polymorph_state
+
+    def forbid_engine(*_args, **_kwargs):
+        raise AssertionError("non-nepheline spelling must not call the engine")
+
+    observation = _naalsio4_spelled(
+        "naalsio4-carnegieite", unrecognised_polymorph_state("carnegieite")
+    )
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN, observation, pure_phase=forbid_engine
+    )
+    assert attempt.value is None
+    assert attempt.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
+
+    for spelling in (
+        Polymorph.ALPHA.value,
+        Polymorph.BETA.value,
+        Polymorph.GAMMA.value,
+    ):
+        named = F.observation(
+            f"naalsio4-{spelling}",
+            "exp-1",
+            _crystal_thermo_identity("NaAlSiO4", spelling, Decimal("298")),
+            Decimal("0"),
+        )
+        refused = predict_thermo_attempt(
+            Engine.MAGEMIN, named, pure_phase=forbid_engine
+        )
+        assert refused.value is None
+        assert refused.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
+
+
+def test_magemin_unlabeled_naalsio4_entropy_matches_schumm_s298() -> None:
+    """Unlabeled NaAlSiO4 scores on ig ``ne`` once that row is unique.
+
+    Same one-candidate rule as unlabeled TiO2 on ``ru``. That branch is
+    unchanged. A nepheline spelling is the named row; carnegieite and the
+    alpha, beta, and gamma tokens stay unresolved because the row's
+    polymorph is nepheline. Schumm's own alpha series is not this identity.
+
+    The printed cell is schumm81_nepheline_S298 at 298 K (Kelley 1953,
+    cal/mol/K). The joule value is that cell times THERMOCHEMICAL_CALORIE_J.
+    298 K is far from the nepheline lambda at 467 K. The 2% band is the
+    accessor's S band.
+    """
+
+    expected = _printed_schumm_nepheline_s298_cal() * THERMOCHEMICAL_CALORIE_J
+    observation = F.observation(
+        "naalsio4-unset-s-298",
+        "exp-1",
+        _crystal_thermo_identity("NaAlSiO4", None, Decimal("298")),
+        expected,
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="schumm-1981-alkali-aluminosilicate-thermochemical-tables",
+    )
+    held = predict_thermo_attempt(
+        Engine.MAGEMIN, observation, invoke_pure_phase=False
+    )
+    assert held.value is None
+    assert held.refusal_detail["reason"] == "pure-phase-call-required"
+    assert held.refusal_detail["symbol"] == "ne"
+    if not magemin_binary_available():
+        pytest.skip("no MAGEMin binary")
+    try:
+        attempt = predict_thermo_attempt(Engine.MAGEMIN, observation)
+    finally:
+        _close_cached_backend(Engine.MAGEMIN)
+    assert attempt.refusal_reason is None
+    assert attempt.unit == "J_per_declared_mol_basis_per_K"
+    assert float(attempt.value) == pytest.approx(float(expected), rel=0.02)
+
+
 @pytest.mark.parametrize(
     "engine, formula",
     (
@@ -8491,7 +8645,6 @@ def test_ambiguous_pure_phase_cases_stay_refused() -> None:
                 "Na2O",
                 "Na4CaSi3O9",
                 "NaAlSi3O8",
-                "NaAlSiO4",
                 "NaFeO2",
                 "CoTiO3",
                 "NiTiO3",
@@ -8504,25 +8657,7 @@ def test_ambiguous_pure_phase_cases_stay_refused() -> None:
         ),
         *(
             (Engine.THERMOENGINE, formula)
-            for formula in (
-                "Ca2Fe2O5",
-                "CaFe2O4",
-                "KAlO2",
-                "KAlSi2O6",
-                "Na2Ca2Si2O7",
-                "Na2Ca2Si3O9",
-                "Na2CaSiO4",
-                "Na2O",
-                "Na4CaSi3O9",
-                "NaFeO2",
-                "CoTiO3",
-                "NiTiO3",
-                "CoCO3",
-                "NiCO3",
-                "MgTi2O5",
-                "Ca2SiO4",
-                "Ca3Si2O7",
-            )
+            for formula in THERMOENGINE_ABSENT_FORMULAS
         ),
     ),
 )

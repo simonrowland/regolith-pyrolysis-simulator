@@ -862,6 +862,19 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
         polymorph='',
         bulk_wt_pct={'SiO2': 30.6468, 'CaO': 28.6064, 'TiO2': 40.7468},
     ),
+    # ig pure phase ne. ds636 Comp line 10355 is 1 SiO2 + 0.5 Al2O3
+    # + 0.5 Na2O (atoms 7). cg and cgh share that composition and are
+    # not ig pure phases. wt% use the oxide masses and 4 d.p. half-up
+    # above; the 0.0001 excess lands on Na2O, the largest |remainder|.
+    'ne': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='ne',
+        formula='NaAlSiO4',
+        formula_basis='per 1 mol NaAlSiO4 (ds636 Comp line 10355, atoms 7)',
+        formula_divisor=1.0,
+        polymorph='nepheline',
+        bulk_wt_pct={'SiO2': 42.2950, 'Al2O3': 35.8888, 'Na2O': 21.8162},
+    ),
     'cats': _MAGEMinPurePhaseSpec(
         host_phase='cpx',
         endmember='cats',
@@ -3932,7 +3945,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         ``phase_id`` is an ig-database symbol: ``fo`` (olivine endmember),
         ``per`` (ferropericlase endmember), ``en`` (orthopyroxene endmember,
         Mg2Si2O6 basis), the pure phases ``q`` / ``crst`` / ``trd`` /
-        ``cor`` / ``and`` / ``ky`` / ``sill`` / ``ru`` / ``sph``, or the
+        ``cor`` / ``and`` / ``ky`` / ``sill`` / ``ru`` / ``sph`` / ``ne``, or the
         solution endmembers ``an`` (fsp), ``cats`` / ``jd`` (cpx),
         ``gr`` / ``py`` (g), and ``mont`` (ol). There is no plain spinel id.
         Cold subprocess: same binary and slot discipline as the production
