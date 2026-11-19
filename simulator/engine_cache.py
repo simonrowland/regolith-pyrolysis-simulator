@@ -309,7 +309,7 @@ ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
     "internal-analytical": 1,
     "vaporock": 1,
-    "magemin": 2,
+    "magemin": 5,
     "alphamelts": 2,
     "thermoengine": 2,
 }
@@ -322,6 +322,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # thermoengine v2: 2026-11-11 ThermoEngine df7a5f4609116a83bf40a5a352a19e3826a822d9 - apply configured redox buffer, fO2 offset and Fe3Fet ratio during backend initialization (bd99e209c)
 # magemin v1: 2026-11-08 MAGEMin commit 40ed109d07d4246001cab59382596d33fed79086 - initial cache version
 # magemin v2: 2026-11-11 MAGEMin binary pin unchanged, b257r landing 982a8d9fa - d-367 mode-vector closure before liquid-fraction and composition extraction (cd48a78fe)
+# magemin v5: 2026-11-18 MAGEMin matlab oxide, property, and Gamma phase maps on ordinary solves (Comp_wt times 100, native FeO+O, buffer non-finite rows dropped)
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
