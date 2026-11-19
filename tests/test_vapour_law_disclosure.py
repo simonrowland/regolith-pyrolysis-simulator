@@ -5627,9 +5627,10 @@ def test_ordering_publishes_one_disclosure_per_rank_evaluation(monkeypatch) -> N
         pO2=1.0e-8,
     )
 
-    assert compared_runtimes[0]["law_disclosures"] == [
-        {"law_id": "test:one-rank", "evaluation_count": 2}
-    ]
+    published = compared_runtimes[0]["law_disclosures"]
+    assert len(published) == 1
+    assert published[0]["law_id"] == "test:one-rank"
+    assert published[0]["evaluation_count"] == 1
 
 
 # Table-3 runs whose (temperature, duration) pair is unique, so the

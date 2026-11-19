@@ -4542,6 +4542,9 @@ def _evaluate_ordering(
     violations: list[dict[str, Any]] = []
     metric_by_T: list[dict[str, Any]] = []
     ranked_disclosures: list[Any] = []
+    # A shared row object is the same evaluator result surfaced by multiple
+    # species metrics; publishing it again would count one evaluation twice.
+    seen_rank_disclosure_rows: list[Mapping[str, Any]] = []
     for T_K in T_grid:
         metrics: dict[str, float] = {}
         refusals: dict[str, str] = {}
@@ -4550,10 +4553,21 @@ def _evaluate_ordering(
             value, refusal, rank_runtime = _engine_species_rank_metric(
                 species, T_K, diagnostic_pO2, vp, melt_recipe
             )
-            ranked_disclosures = _published_law_disclosures(
-                ranked_disclosures,
-                rank_runtime.get("law_disclosures"),
-            )
+            rank_disclosure_rows = rank_runtime.get("law_disclosures")
+            new_rank_disclosure_rows = []
+            if isinstance(rank_disclosure_rows, (list, tuple)):
+                for row in rank_disclosure_rows:
+                    if not isinstance(row, Mapping):
+                        continue
+                    if any(row is seen for seen in seen_rank_disclosure_rows):
+                        continue
+                    seen_rank_disclosure_rows.append(row)
+                    new_rank_disclosure_rows.append(row)
+            if new_rank_disclosure_rows:
+                ranked_disclosures = _published_law_disclosures(
+                    ranked_disclosures,
+                    new_rank_disclosure_rows,
+                )
             if value is None:
                 refusals[species] = refusal or "engine_rank_unavailable"
                 continue
