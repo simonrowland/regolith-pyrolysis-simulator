@@ -225,6 +225,7 @@ from simulator.battery.score_report import (
     _e15_markdown_lines,
     _e15_number,
     _score_shard_failure_report_lines,
+    append_source_relation_diagnostics,
     format_element_retention_diagnostics,
     format_store_stamp_report_lines,
     render_legacy_score_report_markdown,
@@ -234,6 +235,8 @@ from simulator.battery.score_report import (
 from simulator.battery.score_report_data import (
     eligibility_failure_census,
     element_retention_report_data,
+    eligible_source_relation_breakdown,
+    suspected_calibration_overlaps,
 )
 from simulator.battery.score_run import (
     _ScoreShardResult,
@@ -287,6 +290,7 @@ from simulator.battery.source_lineage import (
     coefficient_lineage_sources,
     openimcc_engine_identity_sources,
     openimcc_pack_coefficient_sources,
+    openimcc_redox_coefficient_sources,
 )
 from simulator.battery.validate import (
     Ancestry,
@@ -522,8 +526,11 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.NASA_CEA_9: ("nasa-glenn",),
     Engine.PROPRIETARY_REMOTE: (),
     # Empty: a catalog row is not an Antoine or Ellingham coefficient source.
-    # lineage_complete stays false, so the numeric residual is not labelled
-    # independent of the catalogue it was read from.
+    # The relation stays unknown. Eligibility does not follow from that
+    # token. catalog_evaluator reads the catalogue compiled from our own
+    # measured rows, so its circularity is known by construction and an
+    # unknown relation stays ineligible. See
+    # ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE.
     Engine.CATALOG_EVALUATOR: (),
 }
 
@@ -543,8 +550,8 @@ def _attempt_coefficient_sources(
 # Engine-facing aliases → work/source/table identities in the v2.1 store.
 # Unmapped aliases (MELTS calibration DBs) stay incomplete; do not invent
 # a work. VapoRock/Ellingham consume JANAF; Antoine sidecar is NIST WebBook;
-# OpenIMCC row refs resolve through its packaged source declarations. Older
-# packs without those declarations retain their explicit version aliases.
+# OpenIMCC packs with manifests resolve through INDEX work IDs. Only packs
+# without a manifest retain explicit version aliases here.
 COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "vaporock": ("janaf-4th",),
     "nasa-glenn": ("nasa-glenn",),
@@ -562,18 +569,10 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "openimcc-v1.0.3-d066-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-ext-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-v1-kcaalsi2o7": ("sf04-magma-companion-workbook",),
-    "openimcc-source-ref:DarkenGurry1946": ("doi:10.1021/ja01209a030",),
-    "openimcc-source-ref:FC87": ("doi:10.1016/j.icarus.2003.08.023",),
-    "openimcc-source-ref:Masson1965": ("doi:10.1098/rspa.1965.0176",),
-    "openimcc-source-ref:SF04": ("doi:10.1016/j.icarus.2003.08.023",),
-    "openimcc-source-ref:Shornikov2017": (
-        "doi:10.1134/s0036024417020303",
-    ),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
 )
-
 
 def _unmapped_coefficient_source_aliases(
     sources: Sequence[str],
@@ -587,9 +586,33 @@ def _unmapped_coefficient_source_aliases(
         and (
             source in _ENGINE_SOURCE_ALIASES
             or source.startswith("openimcc-v")
-            or source.startswith("openimcc-source-ref:")
         )
     )
+# d-445. These engines read a catalogue compiled from our own measured
+# rows, so an unknown relation is known circularity, not an unmapped
+# external calibration database. Their residuals stay ineligible unless
+# the relation resolves independent.
+ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE: frozenset[Engine] = frozenset({
+    Engine.CATALOG_EVALUATOR,
+})
+
+def source_relation_not_same_input(
+    relation: SourceRelation,
+    *,
+    engine: Engine | None = None,
+) -> bool:
+    """Whether this relation may enter score_eligible (d-445).
+
+    Unknown origin does not block. A resolved ``same_input`` does.
+    ``training``, ``quoted_overlap``, and ``correlated`` are resolved
+    relations other than independent, so they stay out. The relation
+    token itself is unchanged. ``catalog_evaluator`` stays ineligible
+    unless the relation resolves independent.
+    """
+
+    if engine in ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE:
+        return relation is SourceRelation.INDEPENDENT
+    return relation in {SourceRelation.INDEPENDENT, SourceRelation.UNKNOWN}
 
 # score_eligible conjuncts (v2.1 YAML score_eligible). Tests mutate each.
 SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
@@ -601,7 +624,7 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
     "extract_review_permits_use",
     "validity_gates_pass",
     "identity_equal",
-    "source_relation_independent_complete_ancestry",
+    "source_relation_not_same_input",
     "candidate_engine_prediction_authority_allowed",
     "no_blocking_qualification",
     "selected_independent_lineage_level",
@@ -1000,7 +1023,7 @@ class EligibleConjuncts:
     extract_review_permits_use: bool
     validity_gates_pass: bool
     identity_equal: bool
-    source_relation_independent_complete_ancestry: bool
+    source_relation_not_same_input: bool
     candidate_engine_prediction_authority_allowed: bool
     no_blocking_qualification: bool
     selected_independent_lineage_level: bool
@@ -1020,9 +1043,7 @@ class EligibleConjuncts:
             "extract_review_permits_use": self.extract_review_permits_use,
             "validity_gates_pass": self.validity_gates_pass,
             "identity_equal": self.identity_equal,
-            "source_relation_independent_complete_ancestry": (
-                self.source_relation_independent_complete_ancestry
-            ),
+            "source_relation_not_same_input": self.source_relation_not_same_input,
             "candidate_engine_prediction_authority_allowed": (
                 self.candidate_engine_prediction_authority_allowed
             ),
@@ -5535,11 +5556,11 @@ def build_conjuncts(
     candidate: Observation | None,
     numeric: ResidualNumeric | None,
     source_relation: SourceRelation,
-    lineage_complete: bool,
     gates: GateOutcome,
     extract_review_status: str | None,
     comparison_ids: set[str],
     notices: Sequence[Notice],
+    engine: Engine,
     oxygen_balance_effusion_solved: bool = False,
 ) -> EligibleConjuncts:
     quantity = quantity_token(reference.identity) if isinstance(reference.identity, Identity) else None
@@ -5566,8 +5587,8 @@ def build_conjuncts(
             and cev.value is EvidenceClass.ENGINE_PREDICTION
             and authority_allowed(quantity, candidate.authority)
         )
-    independent = (
-        source_relation is SourceRelation.INDEPENDENT and lineage_complete
+    not_same_input = source_relation_not_same_input(
+        source_relation, engine=engine
     )
     # Engine band notices remain visible to the measured report's flagged
     # population. Prediction authority is already gated separately.
@@ -5581,7 +5602,7 @@ def build_conjuncts(
         extract_review_permits_use=extract_review_permits(extract_review_status),
         validity_gates_pass=gates.passed,
         identity_equal=identity_ok,
-        source_relation_independent_complete_ancestry=independent,
+        source_relation_not_same_input=not_same_input,
         candidate_engine_prediction_authority_allowed=cand_ok,
         no_blocking_qualification=not blocking_qualifications(
             quantity,
@@ -8993,6 +9014,12 @@ def _distin_has_fe_metal_saturation(
     )
 
 
+def _openimcc_identity_species_symbol(identity: object) -> str | None:
+    if not isinstance(identity, Identity) or identity.species is None:
+        return None
+    return canonical_element_symbol(identity.species.formula)
+
+
 def _predict_distin_closed_feo_activity(
     engine: Engine,
     observation: Observation,
@@ -9126,14 +9153,11 @@ def _predict_distin_closed_feo_activity(
     )
     # MELT owns the activity standard; the FeO standard owner validates that
     # this redox pack's FeO(l) row is compatible with the returned MELT digest.
-    coefficient_sources = [
-        f"openimcc-redox-pack:sha256:{result.redox_pack_digest}"
-    ]
-    if result.melt_pack_binding_digest:
-        coefficient_sources.append(
-            "openimcc-melt-binding:sha256:"
-            f"{result.melt_pack_binding_digest}"
-        )
+    coefficient_sources = openimcc_redox_coefficient_sources(
+        result.redox_pack_digest,
+        result.melt_pack_binding_digest,
+        species_symbol=_openimcc_identity_species_symbol(identity),
+    )
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -9145,8 +9169,8 @@ def _predict_distin_closed_feo_activity(
         unit="dimensionless",
         authority=authority,
         notices=(*notices, oxygen_notice),
-        coefficient_sources=tuple(coefficient_sources),
-        lineage_complete=False,
+        coefficient_sources=coefficient_sources,
+        lineage_complete=bool(coefficient_lineage_sources(coefficient_sources)),
         certified_band={"temperature_K": band},
         identity=prediction_identity,
         requested_composition=composition_state,
@@ -9400,6 +9424,11 @@ def _predict_redox(
             composition=material.composition_state,
             fO2_Pa=State.of(log10_fo2_to_pa(fo2_log)),
         )
+        coefficient_sources = openimcc_redox_coefficient_sources(
+            result.redox_pack_digest,
+            result.melt_pack_binding_digest,
+            species_symbol=_openimcc_identity_species_symbol(identity),
+        )
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -9411,10 +9440,8 @@ def _predict_redox(
             unit="dimensionless",
             authority=authority,
             notices=tuple(material_notices) + notices,
-            coefficient_sources=(
-                f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
-            ),
-            lineage_complete=False,
+            coefficient_sources=coefficient_sources,
+            lineage_complete=bool(coefficient_lineage_sources(coefficient_sources)),
             certified_band={"temperature_K": band},
             identity=prediction_identity,
             version=(
@@ -14622,6 +14649,9 @@ def _predict_with_engine(
                         *openimcc_pack_coefficient_sources(
                             identity_block.get("pack_version"),
                             identity_block.get("pack_digest"),
+                            species_symbol=_openimcc_identity_species_symbol(
+                                identity
+                            ),
                         ),
                         *openimcc_engine_identity_sources(
                             identity_block.get("engine_binding_identity")
@@ -16103,6 +16133,7 @@ def _hashimoto_residue_prediction(
                 primary_provenance.get("pack_digest", {}).get("melt_datapack")
                 if isinstance(primary_provenance.get("pack_digest"), Mapping)
                 else None,
+                species_symbol=_openimcc_identity_species_symbol(reference.identity),
             ),
             *openimcc_engine_identity_sources(
                 primary_provenance.get("engine_binding_identity")
@@ -16715,6 +16746,7 @@ def _sossi_residue_prediction(
                 melt_pack_identity.get("pack_digest")
                 if isinstance(melt_pack_identity, Mapping)
                 else None,
+                species_symbol=_openimcc_identity_species_symbol(reference.identity),
             ),
             *openimcc_engine_identity_sources(
                 provenance.get("engine_binding_identity")
@@ -18611,7 +18643,6 @@ def _compile_residual_with_lineage(
         candidate=eligibility_candidate,
         numeric=numeric,
         source_relation=source_relation,
-        lineage_complete=prediction.lineage_complete,
         gates=scoring_gates,
         extract_review_status=review_status,
         comparison_ids=comparison_ids,
@@ -18619,6 +18650,7 @@ def _compile_residual_with_lineage(
         oxygen_balance_effusion_solved=has_own_engine_solved_oxygen_balance(
             prediction.engine, prediction.notices
         ),
+        engine=engine,
     )
     if is_internal_consistency(origin) or compilation:
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
@@ -23333,7 +23365,32 @@ def _render_score_report_from_payloads_legacy(
             + "\n".join(_score_shard_failure_report_lines(shard_failures))
             + "\n"
         )
-    return report
+    return _append_source_relation_diagnostics(report, rows, context.observations)
+
+
+def _append_source_relation_diagnostics(
+    report: str,
+    rows: Iterable[Mapping[str, object]],
+    observations: Mapping[str, Observation] | None,
+) -> str:
+    """Append the d-445 breakdown and the overlap diagnostic.
+
+    Both terminal report builders call this once. ``render_score_report``
+    does not call it again: the legacy builder already has.
+    """
+
+    return append_source_relation_diagnostics(
+        report,
+        eligible_source_relation_breakdown(
+            rows,
+            engine_for_row=_engine_from_payload,
+        ),
+        suspected_calibration_overlaps(
+            rows,
+            observations,
+            engine_for_row=_engine_from_payload,
+        ),
+    )
 
 
 def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
@@ -25152,6 +25209,7 @@ def render_score_report_from_payloads(
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
     )
+    report = _append_source_relation_diagnostics(report, rows, observations)
     if observations is None:
         return report
     pair_context = ScoreContext({}, {}, observations, origins or {})

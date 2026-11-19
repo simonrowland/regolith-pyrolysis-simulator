@@ -216,10 +216,13 @@ kind is a certification project that new measurements close.
 **Measured headline.** A residual is `score_eligible` only when every conjunct in
 `SCORE_ELIGIBLE_CONJUNCTS` holds: a finite numeric comparison in a valid metric domain, measured
 reference evidence, an admitted source whose review permits use, passing validity gates, the
-same identity on both sides, independent lineage with complete ancestry, an allowed prediction
-authority, and no blocking qualification or flagged stratum. The `exclusions` field names every
-conjunct a row fails. An engine is never validated against a table it consumes: comparisons with
-assessed compilations sit in their own compilation tier and are never added to the measured tier.
+same identity on both sides, a source relation that is independent or unknown (a proven
+same-input relation stays out, as do training, quoted overlap, and correlated; `catalog_evaluator`
+stays out unless the relation resolves independent, because its rows are the catalogue compiled
+from our measured rows), an allowed prediction authority, and no blocking qualification or
+flagged stratum. The `exclusions` field names every conjunct a row fails. An engine is never
+validated against a table it consumes: comparisons with assessed compilations sit in their own
+compilation tier and are never added to the measured tier.
 
 ## The score report
 

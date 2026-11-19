@@ -22,11 +22,16 @@ Ambiguity resolutions:
   not admitted, evidence is not measured_*, identity_equal is not
   equal, or a vapour-equilibrium residual carries a blocking pressure
   qualification (floor_inversion / fallback / pressure_provenance_unknown
-  on p_sat, p_partial, or p_reference). Independent scoring requires
-  complete resolved observation/table lineage with no overlap; incomplete
-  or unresolvable sources imply unknown, never independence; same work
-  alone is not circular. Work/source/file aliases expand to registered
-  observation/table inputs and are not independence. Direct resolution
+  on p_sat, p_partial, or p_reference). A score_eligible row's source
+  relation is independent or unknown. Proven same_input, training,
+  quoted_overlap, and correlated stay out. catalog_evaluator stays out
+  unless the relation resolves independent, because its rows are the
+  catalogue compiled from our measured rows. A claimed independent relation
+  still requires complete resolved observation/table lineage
+  with no overlap; incomplete or unresolvable sources imply unknown,
+  never independence; same work alone is not circular. Work/source/file
+  aliases expand to registered observation/table inputs and are not
+  independence. Direct resolution
   and alias expansion use one corpus asset registry. Reference lineage
   includes TABLE_CSV assets consumed through read_from; any other
   nonempty read_from that is not a registered source asset is
@@ -2673,14 +2678,37 @@ def _validate_residual_with_indexes(
                     )
                 )
     if residual.score_eligible:
-        if residual.source_relation is not SourceRelation.INDEPENDENT:
+        # score imports this module. The predicate stays in score.py, the
+        # owner of score_eligible, and is imported only when a residual is
+        # checked.
+        from simulator.battery.score import (
+            ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE,
+            source_relation_not_same_input,
+        )
+
+        relation_engine = None
+        if candidate is not None and candidate.engine is not None:
+            relation_engine = candidate.engine.name
+        elif residual.candidate_request is not None:
+            relation_engine = residual.candidate_request.engine
+        if not source_relation_not_same_input(
+            residual.source_relation, engine=relation_engine
+        ):
+            if relation_engine in ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE:
+                relation_detail = (
+                    "catalog_evaluator score_eligible requires "
+                    "source_relation independent"
+                )
+            else:
+                relation_detail = (
+                    "score_eligible blocks source_relation same_input, "
+                    "training, quoted_overlap, and correlated"
+                )
             issues.append(
                 _issue(
                     f"{path}.score_eligible",
-                    RefusalReason.LINEAGE_UNKNOWN
-                    if residual.source_relation is SourceRelation.UNKNOWN
-                    else RefusalReason.CONDITIONAL_FIELD,
-                    "score_eligible requires source_relation independent",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    relation_detail,
                 )
             )
         if residual.status is ResidualStatus.REFUSED:

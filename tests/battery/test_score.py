@@ -138,7 +138,7 @@ def _green_conjuncts() -> EligibleConjuncts:
         extract_review_permits_use=True,
         validity_gates_pass=True,
         identity_equal=True,
-        source_relation_independent_complete_ancestry=True,
+        source_relation_not_same_input=True,
         candidate_engine_prediction_authority_allowed=True,
         no_blocking_qualification=True,
         selected_independent_lineage_level=True,
@@ -164,6 +164,125 @@ def test_score_eligible_conjunct_red_then_green(conjunct: str) -> None:
     assert score_eligible_from_conjuncts(red) is False
     assert conjunct in red.exclusions()
     assert score_eligible_from_conjuncts(green) is True
+
+
+def _d445_o2(coefficient_sources, *, engine=Engine.INTERNAL_ANALYTICAL):
+    experiment = F.tabulation_experiment()
+    identity = F.o2_identity()
+    reference = F.observation(
+        "d445-o2",
+        experiment.experiment_id,
+        identity,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="d445-source",
+    )
+    prediction = replace(
+        _predict(Decimal("0"), identity, coefficient_sources=coefficient_sources),
+        engine=engine,
+        channel=engine.value,
+    )
+    residual, candidate = compile_residual(
+        reference,
+        engine,
+        context=_context(F.work(), experiment, reference),
+        prediction=prediction,
+        comparison_ids={reference.observation_id},
+    )
+    return residual, candidate, reference, experiment
+
+
+def test_unknown_source_relation_is_eligible_when_other_conjuncts_pass() -> None:
+    """d-445: an unmapped coefficient alias stays unknown and can score."""
+
+    from simulator.battery.score import (
+        ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE,
+        source_relation_not_same_input,
+    )
+
+    residual, _candidate, reference, experiment = _d445_o2(("alphamelts",))
+    assert residual.source_relation is SourceRelation.UNKNOWN
+    assert residual.score_eligible is True
+    assert "source_relation_not_same_input" not in residual.exclusions
+    before = residual.score_eligible
+
+    control, *_rest = _d445_o2(("nasa-cea-thermo",))
+    assert control.source_relation is SourceRelation.INDEPENDENT
+    assert control.score_eligible is True
+
+    same, *_rest = _d445_o2((reference.observation_id,))
+    assert same.source_relation is SourceRelation.SAME_INPUT
+    assert same.score_eligible is False
+    assert "source_relation_not_same_input" in same.exclusions
+
+    catalog, *_rest = _d445_o2((), engine=Engine.CATALOG_EVALUATOR)
+    assert catalog.source_relation is SourceRelation.UNKNOWN
+    assert catalog.score_eligible is False
+    assert catalog.exclusions == ("source_relation_not_same_input",)
+
+    catalog_independent, *_rest = _d445_o2(
+        ("nasa-cea-thermo",), engine=Engine.CATALOG_EVALUATOR
+    )
+    assert catalog_independent.source_relation is SourceRelation.INDEPENDENT
+    assert catalog_independent.score_eligible is True
+
+    assert source_relation_not_same_input(
+        SourceRelation.UNKNOWN, engine=Engine.ALPHAMELTS
+    ) is True
+    for melts_engine in (
+        Engine.ALPHAMELTS,
+        Engine.THERMOENGINE,
+        Engine.MAGEMIN,
+    ):
+        melts, *_rest = _d445_o2((melts_engine.value,), engine=melts_engine)
+        assert melts.source_relation is SourceRelation.UNKNOWN
+        assert melts.score_eligible is True
+    openimcc_unknown, *_rest = _d445_o2((), engine=Engine.OPENIMCC)
+    assert openimcc_unknown.source_relation is SourceRelation.UNKNOWN
+    assert openimcc_unknown.score_eligible is True
+    assert "source_relation_not_same_input" not in openimcc_unknown.exclusions
+    openimcc_independent, *_rest = _d445_o2(
+        ("nasa-cea-thermo",), engine=Engine.OPENIMCC
+    )
+    assert openimcc_independent.source_relation is SourceRelation.INDEPENDENT
+    assert openimcc_independent.score_eligible is True
+    assert source_relation_not_same_input(
+        SourceRelation.TRAINING, engine=Engine.THERMOENGINE
+    ) is False
+    assert source_relation_not_same_input(
+        SourceRelation.QUOTED_OVERLAP, engine=Engine.MAGEMIN
+    ) is False
+    assert source_relation_not_same_input(
+        SourceRelation.CORRELATED, engine=Engine.ALPHAMELTS
+    ) is False
+    assert source_relation_not_same_input(
+        SourceRelation.UNKNOWN, engine=Engine.CATALOG_EVALUATOR
+    ) is False
+    assert source_relation_not_same_input(
+        SourceRelation.INDEPENDENT, engine=Engine.CATALOG_EVALUATOR
+    ) is True
+    assert Engine.CATALOG_EVALUATOR in ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE
+    assert Engine.ALPHAMELTS not in ENGINES_REQUIRING_RESOLVED_INDEPENDENT_SOURCE
+
+    from simulator.battery.score import render_score_report
+
+    report = render_score_report(
+        (residual, control, same, catalog, openimcc_unknown),
+        context=_context(F.work(), experiment, reference),
+        engines=(
+            Engine.INTERNAL_ANALYTICAL,
+            Engine.CATALOG_EVALUATOR,
+            Engine.OPENIMCC,
+        ),
+    )
+    assert residual.score_eligible is before
+    assert "## Eligible rows by source relation" in report
+    assert "## Suspected calibration overlap" in report
+    assert "| internal-analytical | 1 | 1 |" in report
+    assert "| openimcc | 0 | 1 |" in report
+    assert "catalog_evaluator" not in report.split(
+        "## Eligible rows by source relation", 1
+    )[1].split("## Suspected calibration overlap", 1)[0]
 
 
 def test_retired_imcc_engines_are_excluded_from_score_set() -> None:
@@ -3835,7 +3954,19 @@ def test_compile_mutates_each_conjunct_off() -> None:
             lineage_complete=False,
         ),
     )
-    assert residual.score_eligible is False
+    # d-445: an unmapped incomplete coefficient walk is unknown, and unknown
+    # no longer blocks. A proven same input still does.
+    assert residual.source_relation is SourceRelation.UNKNOWN
+    assert residual.score_eligible is True
+    assert "source_relation_not_same_input" not in residual.exclusions
+    same_input, _ = _compile(
+        ref,
+        exp,
+        _predict(Decimal("0"), ident, coefficient_sources=(ref.observation_id,)),
+    )
+    assert same_input.source_relation is SourceRelation.SAME_INPUT
+    assert same_input.score_eligible is False
+    assert "source_relation_not_same_input" in same_input.exclusions
 
     residual, _ = _compile(
         ref, exp, _predict(Decimal("0"), ident, authority=Authority.REFUSED)
@@ -11439,8 +11570,10 @@ def test_printed_unresolved_redox_reference_stays_unknown() -> None:
     )
     residual, _candidate = _compile_redox(printed)
     assert residual.source_relation is SourceRelation.UNKNOWN
+    # The source-relation conjunct now passes. Another conjunct still excludes
+    # this row, so eligibility stays false (w1118d445-score).
     assert residual.score_eligible is False
-    assert "source_relation_independent_complete_ancestry" in residual.exclusions
+    assert "source_relation_not_same_input" not in residual.exclusions
 
     complete = F.observation(
         "redox-complete",
@@ -12559,10 +12692,10 @@ def test_unresolved_read_from_is_incomplete() -> None:
     )
     redox_residual, redox_candidate = _compile_redox(redox)
     assert redox_residual.source_relation is SourceRelation.UNKNOWN
+    # The source-relation conjunct now passes. Another conjunct still excludes
+    # this redox row (w1118d445-score).
     assert redox_residual.score_eligible is False
-    assert (
-        "source_relation_independent_complete_ancestry" in redox_residual.exclusions
-    )
+    assert "source_relation_not_same_input" not in redox_residual.exclusions
     assert redox_candidate is not None and redox_candidate.engine is not None
     assert redox_candidate.engine.lineage_complete is True
 
@@ -12600,7 +12733,10 @@ def test_unresolved_read_from_is_incomplete() -> None:
         ),
     )
     assert plain_residual.source_relation is SourceRelation.UNKNOWN
+    # The source-relation conjunct now passes. Another conjunct still
+    # excludes this dangling-read row (w1118d445-score2).
     assert plain_residual.score_eligible is False
+    assert "source_relation_not_same_input" not in plain_residual.exclusions
     assert plain_candidate is not None and plain_candidate.engine is not None
     assert plain_candidate.engine.lineage_complete is True
 
@@ -12846,7 +12982,10 @@ def test_printed_unresolved_redox_coefficient_stays_unknown() -> None:
                 ),
             )
             assert residual.source_relation is SourceRelation.UNKNOWN
+            # The source-relation conjunct now passes. Another conjunct still
+            # excludes these redox rows (w1118d445-score).
             assert residual.score_eligible is False
+            assert "source_relation_not_same_input" not in residual.exclusions
             assert candidate is not None
             assert candidate.engine is not None
             assert candidate.engine.lineage_complete is False
@@ -12872,85 +13011,166 @@ def test_printed_unresolved_redox_coefficient_stays_unknown() -> None:
     assert table_residual.source_relation is SourceRelation.INDEPENDENT
 
 
-def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
-    from importlib.resources import as_file, files
-
-    from simulator.battery.score import (
-        COEFFICIENT_SOURCE_STORE_IDS,
-        ENGINE_COEFFICIENT_SOURCES,
-        expand_coefficient_sources,
-        lineage_complete_for,
-    )
+def test_openimcc_pack_alias_is_only_used_without_a_manifest() -> None:
+    from simulator.battery.score import expand_coefficient_sources, lineage_complete_for
     from simulator.battery.source_lineage import openimcc_pack_coefficient_sources
 
-    candidate_sources = (
-        *ENGINE_COEFFICIENT_SOURCES[Engine.OPENIMCC],
-        *openimcc_pack_coefficient_sources("1.0.2"),
-        "openimcc-pack-version:1.0.2",
-        "openimcc-pack-digest:sha256:test",
-        "openimcc-engine-binding:sha256:test",
-        "openimcc-melt-binding:sha256:test",
-        "openimcc-condensate-table:sha256:test",
-        "openimcc-gas-table:sha256:test",
-    )
-    expanded = expand_coefficient_sources(candidate_sources)
-    assert "openimcc-v1.0.2" in candidate_sources
-    assert "sf04-magma-companion-workbook" in expanded
-    assert lineage_complete_for(candidate_sources) is True
-    d066_source = openimcc_pack_coefficient_sources("1.0.3-d066-v1")
-    assert d066_source == ("openimcc-v1.0.3-d066-v1",)
+    legacy_sources = openimcc_pack_coefficient_sources("1.0.2")
+
+    assert legacy_sources == ("openimcc-v1.0.2",)
     assert "sf04-magma-companion-workbook" in expand_coefficient_sources(
-        d066_source
+        legacy_sources
     )
+    assert lineage_complete_for(legacy_sources) is True
+
+
+def test_every_openimcc_manifest_source_resolves_to_same_input() -> None:
     openimcc = pytest.importorskip("openimcc")
-    pack_resources = files(openimcc).joinpath("data", "packs")
-    manifest = json.loads(
-        pack_resources.joinpath("MANIFEST.json").read_text(encoding="utf-8")
+    from simulator.battery.source_lineage import (
+        openimcc_pack_coefficient_sources,
+        openimcc_redox_coefficient_sources,
     )
-    default_melt_file = manifest["DEFAULT-COMBINATION"]["melt"]["file"]
-    packaged_default_files = tuple(
-        entry["file"]
-        for entry in manifest["packs"]
-        if entry.get("kind") == "melt" and entry.get("role") == "default"
+
+    artifacts = openimcc.coefficient_ancestry()
+    context = load_score_context()
+    resolver = score_mod._ScoringLineageResolver(context)
+    checked: set[tuple[str, str, str]] = set()
+    works_by_artifact: dict[str, set[str]] = {}
+
+    for artifact in artifacts:
+        artifact_id = str(artifact["identity"])
+        artifact_digest = artifact.get("runtime_digest") or artifact.get("digest")
+        assert isinstance(artifact_digest, str)
+        species_symbol = (
+            artifact_id.rsplit(":", 1)[-1] if ":" in artifact_id else None
+        )
+        resolved_sources = set(
+            openimcc_pack_coefficient_sources(
+                None, artifact_digest, species_symbol=species_symbol
+            )
+        )
+        for row in artifact.get("rows", ()):
+            row_id = str(row["id"])
+            row_work_ids = {
+                str(source["work_id"])
+                for source in row.get("sources", ())
+                if isinstance(source.get("work_id"), str)
+            }
+            if not row_work_ids:
+                continue
+            assert row_work_ids.issubset(resolved_sources), (
+                artifact_id,
+                row.get("id"),
+                row_work_ids - resolved_sources,
+            )
+            works_by_artifact.setdefault(artifact_id, set()).update(row_work_ids)
+            for work_id in row_work_ids:
+                assert work_id in context.works, (artifact_id, row_id, work_id)
+                complete, ancestry = resolver._candidate_lineage((work_id,))
+                assert (
+                    complete
+                    and ancestry is not None
+                    and ancestry.ids is not None
+                    and work_id in ancestry.ids
+                )
+                reference = next(
+                    observation
+                    for observation in context.observations.values()
+                    if context.experiments[observation.experiment_id].work_id
+                    == work_id
+                )
+                complete, relation = resolver.for_reference(reference, (work_id,))
+                assert complete
+                assert relation is SourceRelation.SAME_INPUT, (
+                    artifact_id,
+                    row_id,
+                    work_id,
+                )
+                checked.add((artifact_id, row_id, work_id))
+
+    assert checked
+    assert "1.8.0" in works_by_artifact
+    assert any(identity.startswith("IMCC-SF04-D066@") for identity in works_by_artifact)
+    redox_artifact = next(
+        artifact for artifact in artifacts if artifact["identity"] == "1.8.0"
     )
-    assert packaged_default_files
-    assert default_melt_file in packaged_default_files
-    for default_file in packaged_default_files:
-        with as_file(pack_resources.joinpath(default_file)) as pack_path:
-            packaged_default = openimcc.load_datapack(pack_path)
-        packaged_default_sources = openimcc_pack_coefficient_sources(
-            packaged_default.version, packaged_default.binding_digest
-        )
-        assert packaged_default_sources
-        declared_source_refs = {
-            source_ref
-            for row_sources in packaged_default._row_source_refs.values()
-            for source_ref in row_sources
-        }
-        assert packaged_default_sources == tuple(
-            f"openimcc-source-ref:{source_ref}"
-            for source_ref in sorted(declared_source_refs)
-        )
-        assert all(
-            source in COEFFICIENT_SOURCE_STORE_IDS
-            for source in packaged_default_sources
-        )
-        assert lineage_complete_for(packaged_default_sources) is True
+    redox_sources = openimcc_redox_coefficient_sources(
+        redox_artifact["runtime_digest"], None, species_symbol="Fe"
+    )
+    assert works_by_artifact["1.8.0"].issubset(redox_sources)
 
-
-def test_openimcc_shornikov_lineage_is_same_source_in_full_and_restricted_contexts() -> None:
-    """Pack and Shornikov-only lineages resolve in source-filtered contexts."""
-
-    openimcc = pytest.importorskip("openimcc")
-    from simulator.battery.source_lineage import openimcc_pack_coefficient_sources
+    mo = next(
+        artifact for artifact in artifacts
+        if artifact["identity"] == "openimcc-review-gamma-activity.v1:mo"
+    )
+    assert works_by_artifact[mo["identity"]] == {
+        "oneill-2002-feo-activity-coefficients-cmas"
+    }
+    for symbol in ("as", "bi", "ge"):
+        artifact = next(
+            item for item in artifacts
+            if item["identity"] == f"openimcc-review-gamma-activity.v1:{symbol}"
+        )
+        assert "kems-041-sossi-fegley-2018" in works_by_artifact[artifact["identity"]]
+    copper = next(
+        artifact for artifact in artifacts
+        if artifact["identity"] == "openimcc-review-gamma-activity.v1:cu"
+    )
+    assert "kems-041-sossi-fegley-2018" in works_by_artifact[copper["identity"]]
+    assert "holzheid-lodders-2001-copper-solubility" in works_by_artifact[
+        copper["identity"]
+    ]
+    assert "oneill-2002-feo-activity-coefficients-cmas" in openimcc_pack_coefficient_sources(
+        None, mo["runtime_digest"], species_symbol="Mo"
+    )
+    for symbol in ("As", "Bi", "Ge", "Cu"):
+        fragment = next(
+            item for item in artifacts
+            if item["identity"] == f"openimcc-review-gamma-activity.v1:{symbol.casefold()}"
+        )
+        assert "kems-041-sossi-fegley-2018" in openimcc_pack_coefficient_sources(
+            None, fragment["runtime_digest"], species_symbol=symbol
+        )
 
     pack = openimcc.load_datapack()
-    packaged_sources = openimcc_pack_coefficient_sources(
-        pack.version, pack.binding_digest
+    sources = openimcc_pack_coefficient_sources(
+        pack.version, pack.binding_digest, species_symbol="Cu"
     )
-    shornikov_source = "openimcc-source-ref:Shornikov2017"
-    assert shornikov_source in packaged_sources
-    coefficient_sources = packaged_sources
+    assert works_by_artifact[
+        f"{pack.model_id}@{pack.version}"
+    ].issubset(sources)
+    assert "holzheid-lodders-2001-copper-solubility" in sources
+    assert "kems-041-sossi-fegley-2018" in sources
+    assert not any(source.startswith("openimcc-v") for source in sources)
+    assert any(source.startswith("openimcc-index-vocabulary:mismatch;") for source in sources)
+    assert score_mod.lineage_complete_for(
+        sources,
+        works=context.works,
+        observations=context.observations,
+        experiments=context.experiments,
+    ) is True
+
+    copper_reference = next(
+        observation for observation in context.observations.values()
+        if context.experiments[observation.experiment_id].work_id
+        == "holzheid-lodders-2001-copper-solubility"
+    )
+    complete, relation = resolver.for_reference(copper_reference, sources)
+    assert complete
+    assert relation is SourceRelation.SAME_INPUT
+
+    assert openimcc_pack_coefficient_sources(
+        "1.0.6-d066-v4", "wrong-runtime-digest"
+    ) == ()
+    assert openimcc_pack_coefficient_sources(
+        "wrong-pack-version", pack.binding_digest
+    ) == ()
+
+
+def test_openimcc_manifest_work_id_lineage_resolves_in_full_and_filtered_contexts() -> None:
+    """Manifest work IDs resolve in both full and source-filtered stores."""
+
+    coefficient_sources = ("shornikov-2017-spinel-thermodynamics",)
     source_context = load_score_context(
         sources=("shornikov-2017-spinel-thermodynamics",)
     )
@@ -12975,23 +13195,22 @@ def test_openimcc_shornikov_lineage_is_same_source_in_full_and_restricted_contex
         ),
         restricted_stores,
     )
-    for sources in (coefficient_sources, (shornikov_source,)):
-        for works, observations, experiments in contexts:
-            complete = score_mod.lineage_complete_for(
-                sources,
-                works=works,
-                observations=observations,
-                experiments=experiments,
-            )
-            assert complete is True
-            assert resolve_source_relation(
-                reference,
-                sources,
-                complete,
-                works=works,
-                observations=observations,
-                experiments=experiments,
-            ) is SourceRelation.SAME_INPUT
+    for works, observations, experiments in contexts:
+        complete = score_mod.lineage_complete_for(
+            coefficient_sources,
+            works=works,
+            observations=observations,
+            experiments=experiments,
+        )
+        assert complete is True
+        assert resolve_source_relation(
+            reference,
+            coefficient_sources,
+            complete,
+            works=works,
+            observations=observations,
+            experiments=experiments,
+        ) is SourceRelation.SAME_INPUT
 
 
 def test_openimcc_canonical_doi_is_a_terminal_source_root() -> None:
@@ -13284,16 +13503,8 @@ def test_memberless_table_work_is_same_source_in_full_and_filtered_contexts() ->
         assert relation is SourceRelation.SAME_INPUT
 
 
-@pytest.mark.parametrize(
-    "unknown_alias",
-    (
-        "openimcc-v9.9.9-unknown",
-        "openimcc-source-ref:FutureSource",
-    ),
-)
-def test_unknown_openimcc_pack_alias_is_a_typed_lineage_refusal(
-    unknown_alias: str,
-) -> None:
+def test_unknown_openimcc_pack_alias_is_a_typed_lineage_refusal() -> None:
+    unknown_alias = "openimcc-v9.9.9-unknown"
     experiment = F.tabulation_experiment()
     identity = F.activity_identity()
     reference = F.observation(
@@ -13482,6 +13693,48 @@ def test_openimcc_lineage_metadata_passes_residual_validation() -> None:
         experiments,
         works,
     ) == []
+
+
+@pytest.mark.parametrize(
+    ("engine", "expected_detail"),
+    (
+        (Engine.OPENIMCC, None),
+        (
+            Engine.CATALOG_EVALUATOR,
+            "catalog_evaluator score_eligible requires source_relation independent",
+        ),
+    ),
+)
+def test_unknown_score_eligible_validation_follows_engine_policy(
+    engine: Engine, expected_detail: str | None
+) -> None:
+    residual, observations, experiments, works = _openimcc_lineage_validation_case(
+        ("openimcc-pack-version:unresolved",)
+    )
+    residual = replace(residual, source_relation=SourceRelation.UNKNOWN)
+    assert residual.candidate is not None
+    candidate = observations[residual.candidate]
+    assert candidate.engine is not None
+    observations[residual.candidate] = replace(
+        candidate,
+        engine=replace(
+            candidate.engine,
+            name=engine,
+            channel=engine.value,
+            lineage_complete=False,
+        ),
+    )
+
+    issues = validate_residual(residual, observations, experiments, works)
+
+    if expected_detail is None:
+        assert issues == []
+    else:
+        assert any(
+            issue.path == "residual.score_eligible"
+            and issue.detail == expected_detail
+            for issue in issues
+        )
 
 
 def test_openimcc_metadata_only_lineage_fails_residual_validation() -> None:

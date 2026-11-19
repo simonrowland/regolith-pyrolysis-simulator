@@ -486,9 +486,25 @@ def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
     assert len(redox_results) == 1
     digest = redox_results[0].redox_pack_digest
     assert len(digest) == 64 and all(char in "0123456789abcdef" for char in digest)
-    assert prediction.coefficient_sources == (
-        f"openimcc-redox-pack:sha256:{digest}",
+    sources = set(prediction.coefficient_sources)
+    assert f"openimcc-redox-pack:sha256:{digest}" in sources
+    redox_artifact = next(
+        artifact
+        for artifact in openimcc.coefficient_ancestry()
+        if artifact["runtime_digest"] == digest
     )
+    redox_work_ids = {
+        source["work_id"]
+        for row in redox_artifact["rows"]
+        for source in row["sources"]
+        if isinstance(source.get("work_id"), str)
+    }
+    assert redox_work_ids.issubset(sources)
+    assert any(
+        source.startswith("openimcc-index-vocabulary:mismatch;")
+        for source in sources
+    )
+    assert not any(source.startswith("openimcc-v") for source in sources)
 
 
 def test_openimcc_redox_predicts_and_flags_temperature_extrapolation():

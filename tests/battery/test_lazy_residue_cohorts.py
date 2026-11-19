@@ -315,7 +315,11 @@ def test_residue_cohort_caches_are_scoped_by_selected_experiments(
         "run",
         lambda *_args, **_kwargs: SimpleNamespace(stdout="test-revision\n"),
     )
-    monkeypatch.setattr(score, "openimcc_pack_coefficient_sources", lambda *_args: ())
+    monkeypatch.setattr(
+        score,
+        "openimcc_pack_coefficient_sources",
+        lambda *_args, **_kwargs: (),
+    )
     monkeypatch.setattr(score, "openimcc_engine_identity_sources", lambda *_args: ())
 
     hashimoto_calls: list[frozenset[str] | None] = []

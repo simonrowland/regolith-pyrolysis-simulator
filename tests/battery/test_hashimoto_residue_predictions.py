@@ -40,6 +40,11 @@ def _hashimoto_prediction_tuple_digest(predictions) -> str:
     records = []
     for prediction in predictions:
         record = copy.deepcopy(vars(prediction))
+        # Pin-only OpenIMCC reissues do not move this numeric cohort golden.
+        record["provenance"]["openimcc_pin"] = (
+            "openimcc @ git+https://github.com/simonrowland/openimcc"
+            "@979adb26079c8b94ab8dfc9586cef2e2120cf818"
+        )
         integration = record["provenance"]["integration"]
         integration.pop("process_cpu_seconds", None)
         integration.pop("process_cpu_seconds_by_geometry", None)
@@ -316,13 +321,11 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
     )
     predictions = copy.deepcopy(cohort)
     # The pin-port comparison covered 38,482 values and found zero numeric
-    # changes. This cohort digest moves because each record's
-    # provenance.openimcc_pin changes from 9c327c2 to 979adb2; OpenIMCC's
-    # bisect found zero numeric changes across four text/identity commits,
-    # including c75456f's v5-to-v6 default redox-pack reissue. The primary
-    # numeric outputs remain pinned below as float.hex (digest
-    # a4eec091ae9bbf962ba3667f8726eb5ca570d48250697614dc5b0898550cec0d
-    # -> ed1e1b31f5ec0d2420decb7f5283ffe176f4066b7207f07ccc926aa6c90bc787).
+    # changes. The tuple digest normalizes the pin-only provenance field to
+    # the recorded 979adb2 baseline; all other record fields remain pinned.
+    # OpenIMCC's bisect found zero numeric changes across four text/identity
+    # commits, including c75456f's v5-to-v6 default redox-pack reissue. The
+    # previous pin-port digest was a4eec091ae9bbf962ba3667f8726eb5ca570d48250697614dc5b0898550cec0d.
     assert _hashimoto_prediction_tuple_digest(predictions) == (
         "ed1e1b31f5ec0d2420decb7f5283ffe176f4066b7207f07ccc926aa6c90bc787"
     )

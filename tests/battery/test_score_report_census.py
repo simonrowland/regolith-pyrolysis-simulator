@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from decimal import Decimal
 from types import SimpleNamespace
 
 from simulator.battery.score import (
@@ -12,10 +13,14 @@ from simulator.battery.score import (
 from simulator.battery.score_report import (
     _all_numeric_markdown_lines,
     _eligibility_failure_census_lines,
+    format_source_relation_diagnostics,
 )
 from simulator.battery.score_report_data import (
     EligibilityFailureCensus,
+    EligibleSourceRelationCount,
     eligibility_failure_census,
+    eligible_source_relation_breakdown,
+    suspected_calibration_overlaps,
 )
 
 
@@ -240,7 +245,7 @@ def _eligible_conjuncts(**overrides: object) -> EligibleConjuncts:
         "extract_review_permits_use": True,
         "validity_gates_pass": True,
         "identity_equal": True,
-        "source_relation_independent_complete_ancestry": True,
+        "source_relation_not_same_input": True,
         "candidate_engine_prediction_authority_allowed": True,
         "no_blocking_qualification": True,
         "selected_independent_lineage_level": True,
@@ -291,3 +296,116 @@ def test_eligibility_census_preserves_real_first_failure_precedence() -> None:
     assert failures["admission_admitted"] == (2, 1)
     assert failures["identity_equal"] == (2, 0)
     assert sum(first for _events, first in failures.values()) == len(rows)
+
+
+def _overlap_row(
+    reference: str,
+    value: str,
+    band: str | None,
+    *,
+    engine: str = "alphamelts",
+    eligible: bool = True,
+    relation: str = "unknown",
+    unit: str = "dimensionless",
+    band_unit: str | None = None,
+) -> dict[str, object]:
+    numeric: dict[str, object] = {"value": value, "unit": unit}
+    if band is not None:
+        numeric["decision_band"] = {
+            "value": band,
+            "unit": unit if band_unit is None else band_unit,
+            "rule": "test",
+        }
+    return {
+        "reference": reference,
+        "score_eligible": eligible,
+        "source_relation": relation,
+        "candidate_request": {"engine": engine},
+        "numeric": numeric,
+    }
+
+
+def test_eligible_rows_break_down_by_source_relation() -> None:
+    rows = [
+        _overlap_row("ref-a", "0", "1", relation="independent"),
+        _overlap_row("ref-b", "0", "1", relation="unknown"),
+        _overlap_row("ref-c", "0", "1", relation="unknown", eligible=False),
+        _overlap_row("ref-d", "0", "1", relation="same_input", eligible=False),
+        _overlap_row(
+            "ref-e", "0", "1", engine="openimcc", relation="unknown"
+        ),
+    ]
+
+    counts = eligible_source_relation_breakdown(
+        rows,
+        engine_for_row=_engine_from_payload,
+    )
+
+    assert counts == (
+        EligibleSourceRelationCount("alphamelts", 1, 1),
+        EligibleSourceRelationCount("openimcc", 0, 1),
+    )
+    section = format_source_relation_diagnostics(counts, ())
+    assert "## Eligible rows by source relation" in section
+    assert "| alphamelts | 1 | 1 |" in section
+    assert "| openimcc | 0 | 1 |" in section
+    assert "## Suspected calibration overlap" in section
+    assert section.endswith("None.")
+
+
+def test_suspected_calibration_overlap_flags_only_the_tight_pair() -> None:
+    """Diagnostic only: a perfect fit is flagged and a normal fit is not."""
+
+    observations = {
+        reference: SimpleNamespace(source_id=reference.removeprefix("ref-"))
+        for reference in (
+            "ref-tight",
+            "ref-normal",
+            "ref-short",
+            "ref-gap",
+            "ref-noband",
+            "ref-units",
+            "ref-edge",
+            "ref-eight",
+            "ref-seven",
+            "ref-ineligible",
+        )
+    }
+    rows: list[dict[str, object]] = []
+    rows.extend(_overlap_row("ref-tight", "0", "1") for _ in range(10))
+    rows.extend(_overlap_row("ref-normal", "0.5", "1") for _ in range(10))
+    rows.extend(_overlap_row("ref-short", "0", "1") for _ in range(9))
+    rows.extend(_overlap_row("ref-gap", "0", "1") for _ in range(9))
+    rows.append(_overlap_row("ref-gap", "0", None))
+    rows.extend(_overlap_row("ref-noband", "0", None) for _ in range(10))
+    rows.extend(
+        _overlap_row("ref-units", "0", "1", band_unit="other") for _ in range(10)
+    )
+    rows.extend(_overlap_row("ref-edge", "0.1", "1") for _ in range(10))
+    rows.extend(_overlap_row("ref-eight", "0", "1") for _ in range(8))
+    rows.extend(_overlap_row("ref-eight", "0.5", "1") for _ in range(2))
+    rows.extend(_overlap_row("ref-seven", "0", "1") for _ in range(7))
+    rows.extend(_overlap_row("ref-seven", "0.5", "1") for _ in range(3))
+    rows.extend(
+        _overlap_row("ref-ineligible", "0", "1", eligible=False) for _ in range(10)
+    )
+    eligible_before = [row["score_eligible"] for row in rows]
+
+    overlaps = suspected_calibration_overlaps(
+        rows,
+        observations,  # type: ignore[arg-type]
+        engine_for_row=_engine_from_payload,
+    )
+
+    assert [row["score_eligible"] for row in rows] == eligible_before
+    assert {(row.source_id, row.engine) for row in overlaps} == {
+        ("tight", "alphamelts"),
+        ("eight", "alphamelts"),
+    }
+    tight = next(row for row in overlaps if row.source_id == "tight")
+    assert tight.n == 10
+    assert tight.median_abs_residual == Decimal(0)
+    assert tight.median_band_half_width == Decimal(1)
+    assert tight.fraction_inside_tight_band == Decimal(1)
+    eight = next(row for row in overlaps if row.source_id == "eight")
+    assert eight.fraction_inside_tight_band == Decimal("0.8")
