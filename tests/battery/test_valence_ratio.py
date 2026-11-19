@@ -686,6 +686,22 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
     }
 
 
+def _candidate_oxide_composition(*components: tuple[str, str]) -> Composition:
+    return Composition(
+        basis="test_candidate_oxide_mass_percent",
+        components=tuple((name, Decimal(amount)) for name, amount in components),
+        amount_basis=AmountBasis.MASS_PERCENT,
+        input_provenance=PRINTED_STARTING_BULK,
+    )
+
+
+def _with_composition(observation, composition: Composition):
+    return replace(
+        observation,
+        identity=replace(observation.identity, composition=State.of(composition)),
+    )
+
+
 def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
     monkeypatch: pytest.MonkeyPatch,
 ):
@@ -702,17 +718,38 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
         )
     )
     experiment = result.experiments[observation.experiment_id]
-    missing_iron = predict_with_engine(
+    # Table 1 AD+En is SiO2, Al2O3, MgO, CaO. The 0.5 wt% Cr2O3 addition is a
+    # side condition, not a composition component, and the bulk has no Fe.
+    # The scored element is the missing input.
+    missing_chromium = predict_with_engine(
         Engine.OPENIMCC, observation, experiment=experiment
     )
-    assert missing_iron.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert missing_iron.refusal_detail == {
+    assert missing_chromium.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert missing_chromium.refusal_detail == {
+        "reason": "missing_input",
+        "input": "total_chromium",
+    }
+    chromium_without_iron = predict_with_engine(
+        Engine.OPENIMCC,
+        _with_composition(
+            observation,
+            _candidate_oxide_composition(
+                ("CaO", "36"),
+                ("SiO2", "36"),
+                ("Al2O3", "12"),
+                ("MgO", "14"),
+                ("Cr2O3", "2"),
+            ),
+        ),
+        experiment=experiment,
+    )
+    assert chromium_without_iron.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert chromium_without_iron.refusal_detail == {
         "reason": "missing_input",
         "input": "total_iron",
     }
 
-    # The extracted Berry bulk is Fe-free. This fixture supplies Fe because
-    # the pinned OpenIMCC solver requires it even for its Cr candidate row.
+    # The pinned OpenIMCC solver requires Fe even for its Cr candidate row.
     composition = Composition(
         basis="test_candidate_oxide_mass_percent",
         components=(
@@ -779,6 +816,43 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
     assert missing_composition.refusal_detail == {
         "reason": "missing_input",
         "input": "composition",
+    }
+    experiment = migrator.result.experiments[observation.experiment_id]
+    titanium_without_iron = predict_with_engine(
+        Engine.OPENIMCC,
+        _with_composition(
+            observation,
+            _candidate_oxide_composition(
+                ("CaO", "33"),
+                ("SiO2", "35"),
+                ("Al2O3", "10"),
+                ("MgO", "20"),
+                ("TiO2", "2"),
+            ),
+        ),
+        experiment=experiment,
+    )
+    assert titanium_without_iron.refusal_detail == {
+        "reason": "missing_input",
+        "input": "total_iron",
+    }
+    iron_without_titanium = predict_with_engine(
+        Engine.OPENIMCC,
+        _with_composition(
+            observation,
+            _candidate_oxide_composition(
+                ("CaO", "33"),
+                ("SiO2", "35"),
+                ("Al2O3", "12"),
+                ("MgO", "10"),
+                ("FeO", "10"),
+            ),
+        ),
+        experiment=experiment,
+    )
+    assert iron_without_titanium.refusal_detail == {
+        "reason": "missing_input",
+        "input": "total_titanium",
     }
 
     composition = Composition(

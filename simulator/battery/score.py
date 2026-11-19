@@ -9307,14 +9307,10 @@ def _predict_redox(
             if candidate_fields is not None and identity.species is not None
             else "Fe"
         )
-        if inventory.get("Fe", 0.0) <= 0.0:
-            return refused(
-                RefusalReason.IDENTITY_INCOMPLETE,
-                {
-                    "reason": "missing_input",
-                    "input": "total_iron",
-                },
-            )
+        # The scored element is the missing input for this row. Iron is a
+        # solver requirement (openimcc refuses a zero Fe inventory), checked
+        # after the scored element so a Cr or Ti row that also lacks iron is
+        # not reported as total_iron.
         if (
             redox_element != "Fe"
             and inventory.get(redox_element, 0.0) <= 0.0
@@ -9324,6 +9320,14 @@ def _predict_redox(
                 {
                     "reason": "missing_input",
                     "input": f"total_{redox_element.lower()}",
+                },
+            )
+        if inventory.get("Fe", 0.0) <= 0.0:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {
+                    "reason": "missing_input",
+                    "input": "total_iron",
                 },
             )
         try:
