@@ -12,7 +12,7 @@ counts:
   sources: 857
   extracts: 854
   pdfs_present_in_worktree: 0
-  extracts_with_private_locators: 87
+  extracts_with_private_locators: 88
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
   extracts_without_pdf: 854
@@ -877,6 +877,7 @@ gaps:
   untracked_files: []
   extracts_with_private_locators:
   - 1997jonesthermo
+  - aithala-2026-magmatic-iron-redox-to-2100c
   - ammin-73-470-oneill-1988
   - ammin-75-781-hemingway-1990
   - ammin-76-904
@@ -2122,6 +2123,7 @@ sources:
   - path: data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml
     review_status: draft
     rows: 89
+    locator_status: private_path
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -2129,9 +2131,9 @@ sources:
   corpus_status: available
   corpus:
     raw:
-      path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+      path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
       present: true
-      sha256: 4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261
+      sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
       matches_simulator: null
     sidecar:
       path: raw/aithala-2026-magmatic-iron-redox-to-2100c/sidecar.yaml
@@ -2154,7 +2156,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-10-03'
-    commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+    commit: e1dbb239851508a1a3635ff8a7eec9400953b826
 - source_id: albertsson-2013-cr-slag-thesis
   aliases: []
   citation: Albertsson, G. J. (2013), Abatement of Chromium Emissions from Steelmaking Slags—Cr Stabilization
