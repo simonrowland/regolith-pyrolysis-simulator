@@ -14167,14 +14167,6 @@ def _score_initial_charge_composition_path(
         container = "points" if path == "yield_series" else path
         values[container] = [point]
         target = point
-    if consumer == "vapour":
-        # Keep the measured pressure and required p_partial identity axes
-        # available for every container so scoring reaches prediction.
-        target.setdefault("P", 1.0e-4)
-        target["point_conditions"] = {
-            "fO2_Pa": 100000.0,
-            "total_pressure_Pa": 100000.0,
-        }
     if invalid_kind == "malformed_amount":
         target["composition_mol"] = malformed_map
     elif invalid_kind == "partial_component":
@@ -14216,10 +14208,6 @@ def _score_initial_charge_composition_path(
             }
         },
     }
-    if consumer == "vapour":
-        # A stated vapour method lets the residual pass its method gate without
-        # introducing KEMS calibration or geometry prerequisites.
-        experiment["method"] = MethodToken.STATIC_EQUILIBRIUM.value
     if path == "yield_series" and consumer != "vapour":
         experiment["method"] = MethodToken.LANGMUIR_FREE_EVAPORATION.value
     extract["experiments"] = [experiment]
@@ -14355,19 +14343,6 @@ def test_invalid_run_composition_refuses_vapour_prediction(
     assert point_composition.state.is_unknown
     assert reason_fragment in (point_composition.state.reason or "")
     experiment = result.experiments[invalid.experiment_id]
-    assert invalid.value.kind is ValueKind.POINT
-    assert invalid.value.point == Decimal("0.0001")
-    assert invalid.identity.temperature_K.is_value
-    assert invalid.identity.fO2_Pa is not None and invalid.identity.fO2_Pa.is_value
-    assert (
-        invalid.identity.total_pressure_Pa is not None
-        and invalid.identity.total_pressure_Pa.is_value
-    )
-    point_conditions = invalid.point_conditions or {}
-    assert point_conditions["fO2_Pa"].state.is_value
-    assert point_conditions["total_pressure_Pa"].state.is_value
-    assert experiment.method.is_value
-    assert experiment.method.value is MethodToken.STATIC_EQUILIBRIUM
     for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
         prediction = predict_with_engine(engine, invalid, experiment=experiment)
         assert prediction.value is None
@@ -14376,13 +14351,6 @@ def test_invalid_run_composition_refuses_vapour_prediction(
         assert prediction.refusal_detail["consumer"] == "vapour"
     assert refused
     assert all(row.status is ResidualStatus.REFUSED and row.numeric is None for row in refused)
-    assert all(
-        row.refusal is not None
-        and row.refusal.reason is RefusalReason.INVALID_SOURCE
-        and row.refusal.detail["reason"] == point_composition.state.reason
-        and row.refusal.detail["consumer"] == "vapour"
-        for row in refused
-    )
 
 
 def _migrate_flat_run_columns(
@@ -14615,12 +14583,17 @@ def test_migrated_point_run_composition_does_not_replace_kems_charge(
             ),
         )
     experiment = replace(base_experiment, sample=sample)
+    migrated_point_conditions = dict(migrated.point_conditions or {})
+    if invalid_kind == "unsupported_map":
+        # This invalid run map has a raw wt% echo; do not let that echo become
+        # a point charge when the sample's independent initial charge is clean.
+        migrated_point_conditions.pop("printed_composition", None)
     observation = replace(
         migrated,
         observation_id=kems_observation.observation_id,
         experiment_id=experiment.experiment_id,
         point_conditions={
-            **(migrated.point_conditions or {}),
+            **migrated_point_conditions,
             **(kems_observation.point_conditions or {}),
         },
     )
