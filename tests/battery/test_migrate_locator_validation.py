@@ -80,14 +80,16 @@ def test_real_source_locator_refusals_preserve_independent_anchors(source_id, re
     ("subsection", "fredrickson-chasanov-1973-na2o-enthalpy-1300k"),
     ("pages", "gibbons-1963-thesis-cas-slags-cas"),
     ("pages", "mathieu-2009-sodium-solubility-thesis"),
-    ("anchors", "oishi-1986-cu2o-cao-activities"),
+    ("validation", "oishi-1986-cu2o-cao-activities"),
     ("anchors", "wood-wade-2013-trace-activities"),
     ("anchors", "stolyarova-2021-ti-al-kems-ru"),
     ("grid", "pickrell-1994-gaseous-alkali-corrosion"),
 ])
 def test_real_source_regressions_detect_reverted_emission(failure, source_id, monkeypatch) -> None:
     with monkeypatch.context() as mutation:
-        if failure in {"table_key", "subsection"}:
+        if failure == "validation":
+            mutation.setattr(m.Migrator, "_validate_extract_locators", lambda *_args, **_kwargs: None)
+        elif failure in {"table_key", "subsection"}:
             mutation.setattr(m, "_LOCATOR_EXTRA_KEYS", m._LOCATOR_EXTRA_KEYS - {failure})
             mutation.setitem(m._LOCATOR_FIELD_ALIASES, failure, "table" if failure == "table_key" else "section")
         elif failure == "pages":
