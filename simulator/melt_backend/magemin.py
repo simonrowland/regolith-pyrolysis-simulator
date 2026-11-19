@@ -951,6 +951,7 @@ _MAGEMIN_STATUS_RE = re.compile(
     r'^\s*Status\s+:\s+(-?\d+)(?:\s+\[([^\]]+)\])?\s*$',
     re.MULTILINE,
 )
+_MAGEMIN_ACCEPTED_SOLVER_STATUSES = frozenset((0, 1, 2))
 # PrintOutput writes this whenever verbose is not -1, including --Verb=0.
 # Example: "Mass residual      : +5.34576e-06" (non-negative BR_norm).
 _MAGEMIN_MASS_RESIDUAL_RE = re.compile(
@@ -1548,17 +1549,21 @@ def _landau_stencil_notes(warnings: Sequence[str]) -> Tuple[str, ...]:
     )
 
 
-def _parse_magemin_sys_oxide_row(
+def _magemin_oxide_weight_fraction_rows(
     matlab_text: str,
-) -> Optional[Dict[str, float]]:
-    """The SYS row of the matlab 'Oxide compositions [wt fr]' block.
+) -> Tuple[str, List[str], List[Tuple[str, Optional[List[float]]]]]:
+    """Walk the matlab ``Oxide compositions [wt fr]`` block once.
 
-    Unparsable or non-finite values make the row unparseable (None) so the
-    bulk-echo guard refuses typed instead of comparing against a NaN (a NaN
-    comparison is False and would pass the guard silently).
+    Returns ``('absent', [], [])`` when the title is missing, otherwise
+    ``('present', oxides, rows)``. Each row is ``(name, values)``. ``values``
+    stays on the printed weight-fraction scale (0–1). ``None`` means that
+    row is non-numeric, non-finite, or a different width than the header.
+    The SYS bulk-echo guard reads only the SYS row and still returns None
+    for an unparsable SYS row; it does not inspect later phase rows.
     """
     in_block = False
     header: List[str] = []
+    rows: List[Tuple[str, Optional[List[float]]]] = []
     for line in matlab_text.splitlines():
         if line.startswith('Oxide compositions'):
             in_block = True
@@ -1571,19 +1576,585 @@ def _parse_magemin_sys_oxide_row(
                 break
             continue
         if not header:
-            header = tokens
+            header = list(tokens)
             continue
-        if tokens[0] == 'SYS':
-            try:
-                values = [float(t) for t in tokens[1:]]
-            except ValueError:
-                return None
-            if len(values) != len(header):
-                return None
-            if not all(math.isfinite(v) for v in values):
-                return None
-            return dict(zip(header, values))
+        name = tokens[0]
+        try:
+            values = [float(token) for token in tokens[1:]]
+        except ValueError:
+            rows.append((name, None))
+            continue
+        if (
+            len(values) != len(header)
+            or not all(math.isfinite(value) for value in values)
+        ):
+            rows.append((name, None))
+            continue
+        rows.append((name, values))
+    if not in_block:
+        return 'absent', [], []
+    return 'present', header, rows
+
+
+def _parse_magemin_sys_oxide_row(
+    matlab_text: str,
+) -> Optional[Dict[str, float]]:
+    """The SYS row of the matlab 'Oxide compositions [wt fr]' block.
+
+    Unparsable or non-finite values make the row unparseable (None) so the
+    bulk-echo guard refuses typed instead of comparing against a NaN (a NaN
+    comparison is False and would pass the guard silently). Values stay
+    weight fractions; the phase-composition consumer scales by 100 itself.
+    """
+    status, header, rows = _magemin_oxide_weight_fraction_rows(matlab_text)
+    if status != 'present':
+        return None
+    for name, values in rows:
+        if name != 'SYS':
+            continue
+        if values is None or len(values) != len(header):
+            return None
+        return dict(zip(header, values))
     return None
+
+
+def _magemin_table_rows_after(
+    matlab_text: str,
+    title_prefix: str,
+    stop_prefixes: Tuple[str, ...],
+) -> List[str]:
+    """Lines after ``title_prefix`` until a blank line following content or a stop title."""
+    in_block = False
+    saw_content = False
+    lines: List[str] = []
+    for line in matlab_text.splitlines():
+        stripped = line.strip()
+        if not in_block:
+            if stripped.startswith(title_prefix):
+                in_block = True
+            continue
+        if any(stripped.startswith(prefix) for prefix in stop_prefixes):
+            break
+        if not stripped:
+            if saw_content:
+                break
+            continue
+        saw_content = True
+        lines.append(stripped)
+    return lines
+
+
+def _magemin_endmember_weight_fractions(
+    matlab_text: str,
+) -> List[Tuple[str, Dict[str, float]]]:
+    """End-member rows from ``End-members fractions[wt fr]``.
+
+    Printed tokens stay weight fractions. They are not oxide wt% and are
+    not multiplied by 100. A present non-numeric token refuses; a missing
+    section returns an empty list.
+    """
+    if 'End-members fractions' not in matlab_text:
+        return []
+    lines = _magemin_table_rows_after(
+        matlab_text,
+        'End-members fractions',
+        ('Site fractions', 'Oxide compositions'),
+    )
+    rows: List[Tuple[str, Dict[str, float]]] = []
+    pending: Optional[List[str]] = None
+    for line in lines:
+        tokens = line.split()
+        if pending is None:
+            pending = tokens
+            continue
+        phase = tokens[0]
+        if phase.lower() in MAGEMinBackend._BUFFER_CHOICES:
+            pending = None
+            continue
+        parsed: Dict[str, float] = {}
+        for name, raw in zip(pending, tokens[1:]):
+            if name == '-' or raw == '-':
+                continue
+            try:
+                value = float(raw)
+            except ValueError as exc:
+                _raise_magemin_output_invalid(
+                    'MAGEMin end-member fraction is not numeric: '
+                    f'{phase} {name}={raw!r}',
+                    exc,
+                )
+            if not math.isfinite(value):
+                _raise_magemin_output_invalid(
+                    'MAGEMin end-member fraction is not finite: '
+                    f'{phase} {name}={raw!r}'
+                )
+            parsed[name] = value
+        rows.append((phase, parsed))
+        pending = None
+    return rows
+
+
+def _magemin_stable_assemblage_rows(
+    matlab_text: str,
+) -> Tuple[str, List[Tuple[str, Dict[str, float]]]]:
+    """Phase rows of ``Stable mineral assemblage``.
+
+    The header supplies the column names and therefore the units. SYS is
+    skipped: its printed blanks do not align under ``split``. A phase row
+    whose width or tokens do not match the header refuses. A missing
+    section returns ``('', [])``.
+    """
+    if 'Stable mineral assemblage' not in matlab_text:
+        return '', []
+    lines = _magemin_table_rows_after(
+        matlab_text,
+        'Stable mineral assemblage',
+        ('Gamma[J]',),
+    )
+    if not lines:
+        _raise_magemin_output_invalid(
+            'MAGEMin stable-assemblage block has no header'
+        )
+    header_line = lines[0]
+    header = header_line.split()
+    if 'fraction[wt]' not in header or header[0] != 'phase':
+        _raise_magemin_output_invalid(
+            'MAGEMin stable-assemblage header lacks phase/fraction[wt]: '
+            f'{header_line!r}'
+        )
+    rows: List[Tuple[str, Dict[str, float]]] = []
+    for line in lines[1:]:
+        tokens = line.split()
+        if not tokens:
+            continue
+        # SYS blanks do not align under split. Buffer pseudo-phases are
+        # dropped with the mode vector; a non-finite Vp on qfm (zero
+        # density) must not refuse the material assemblage.
+        if (
+            tokens[0] == 'SYS'
+            or tokens[0].lower() in MAGEMinBackend._BUFFER_CHOICES
+        ):
+            continue
+        if len(tokens) != len(header):
+            if len(tokens) < 2 or not _magemin_token_is_float(tokens[1]):
+                break
+            _raise_magemin_output_invalid(
+                'MAGEMin stable-assemblage row width does not match the '
+                f'header: {line!r}'
+            )
+        parsed: Dict[str, float] = {}
+        for name, raw in zip(header[1:], tokens[1:]):
+            try:
+                value = float(raw)
+            except ValueError as exc:
+                _raise_magemin_output_invalid(
+                    'MAGEMin stable-assemblage value is not numeric: '
+                    f'{tokens[0]} {name}={raw!r}',
+                    exc,
+                )
+            if not math.isfinite(value):
+                _raise_magemin_output_invalid(
+                    'MAGEMin stable-assemblage value is not finite: '
+                    f'{tokens[0]} {name}={raw!r}'
+                )
+            parsed[name] = value
+        rows.append((tokens[0], parsed))
+    return header_line, rows
+
+
+def _magemin_token_is_float(token: str) -> bool:
+    try:
+        float(token)
+    except ValueError:
+        return False
+    return True
+
+
+def _magemin_gamma_components(
+    matlab_text: str,
+) -> Dict[str, float]:
+    """System ``Gamma[J]`` oxide chemical potentials, as printed.
+
+    The coordinate is MAGEMin's native oxide list, including FeO and O.
+    It is not rewritten onto the MELTS FeO/Fe2O3 basis. A missing section
+    returns an empty dict; a present non-finite token refuses.
+    """
+    if 'Gamma[J]' not in matlab_text:
+        return {}
+    lines = _magemin_table_rows_after(
+        matlab_text,
+        'Gamma[J]',
+        ('System fugacity',),
+    )
+    components: Dict[str, float] = {}
+    for line in lines:
+        tokens = line.split()
+        if len(tokens) != 2:
+            _raise_magemin_output_invalid(
+                f'MAGEMin Gamma row is not oxide + value: {line!r}'
+            )
+        try:
+            value = float(tokens[1])
+        except ValueError as exc:
+            _raise_magemin_output_invalid(
+                f'MAGEMin Gamma value is not numeric: {line!r}',
+                exc,
+            )
+        if not math.isfinite(value):
+            _raise_magemin_output_invalid(
+                f'MAGEMin Gamma value is not finite: {line!r}'
+            )
+        components[tokens[0]] = value
+    return components
+
+
+def _magemin_positive_wt_pct(
+    weight_fractions: Mapping[str, float],
+) -> Dict[str, float]:
+    """Weight fraction → wt% for the scorer's phase-composition consumer.
+
+    Premise: ``Oxide compositions [wt fr]`` prints ``Comp_wt`` on [0, 1]
+    (``dump_function.c`` ``output_matlab``). ``phase_compositions`` and
+    ``liquid_composition_wt_pct`` are weight percent, the same scale as
+    the alphaMELTS oxide table.
+    Algebra: wt% = weight_fraction * 100.
+    Units: (mass/mass) * 100 = g/100 g.
+    Limiting case: a pure-SiO2 row prints SiO2 = 1 and the other oxides
+    0. The map reports SiO2 = 100. A printed 0 stays absent (the existing
+    composition extractor drops non-positive entries). FeO and O stay the
+    printed native columns; they are not remapped onto MELTS Fe2O3.
+    """
+    scaled: Dict[str, float] = {}
+    for oxide, fraction in weight_fractions.items():
+        wt_pct = float(fraction) * 100.0
+        if wt_pct > 0.0:
+            scaled[str(oxide)] = wt_pct
+    return scaled
+
+
+def _magemin_phase_maps_from_matlab(
+    matlab_text: str,
+) -> Optional[Dict[str, Any]]:
+    """Phase compositions, properties, and system Gamma from one matlab dump.
+
+    Returns None when the oxide block is absent: ordinary fakes that only
+    print Phase/Mode stay successful, and the scorer then reports the
+    phase as present without composition. A present oxide block with a
+    non-finite or width-mismatched row refuses. Buffer pseudo-phases are
+    dropped, matching the stdout mode parser.
+
+    Property units come from the stable-assemblage header. Rho is
+    intensive kg/m3 and is not multiplied by the phase fraction or the
+    caller batch mass. ``V_partial[cm3]`` is the phase amount's volume
+    (``volume*10*ss_n_mol*factor`` in ``output_matlab``) and converts by
+    cm3 * 1e-6 = m3. G, Cp, S, and H are per formula amount, not the
+    alphaMELTS extensive solver-mass fields: Cp stays kJ/K as printed.
+    Duplicate phase names keep one instance each; the name-keyed
+    composition is the fraction-weighted mean, not the last row.
+    """
+    if 'Oxide compositions' not in matlab_text:
+        return None
+    status, oxides, rows = _magemin_oxide_weight_fraction_rows(matlab_text)
+    if status != 'present':
+        return None
+    if not oxides:
+        _raise_magemin_output_invalid(
+            'MAGEMin matlab oxide block has no oxide header'
+        )
+    buffers = MAGEMinBackend._BUFFER_CHOICES
+    for name, values in rows:
+        if name == 'SYS' or name.lower() in buffers:
+            continue
+        if values is None:
+            _raise_magemin_output_invalid(
+                'MAGEMin matlab oxide row is non-finite or '
+                f'width-mismatched: {name}'
+            )
+    grouped: Dict[str, List[Dict[str, float]]] = {}
+    order: List[str] = []
+    for name, values in rows:
+        if name == 'SYS' or name.lower() in buffers:
+            continue
+        assert values is not None
+        grouped.setdefault(name, [])
+        if name not in order:
+            order.append(name)
+        grouped[name].append(dict(zip(oxides, values)))
+
+    header_line, property_rows = _magemin_stable_assemblage_rows(matlab_text)
+    properties: Dict[str, List[Dict[str, float]]] = {}
+    for name, parsed in property_rows:
+        if name.lower() in buffers:
+            continue
+        properties.setdefault(name, []).append(parsed)
+        if name not in order:
+            order.append(name)
+    endmembers: Dict[str, List[Dict[str, float]]] = {}
+    for name, parsed in _magemin_endmember_weight_fractions(matlab_text):
+        if name == 'SYS' or name.lower() in buffers:
+            continue
+        endmembers.setdefault(name, []).append(parsed)
+
+    phase_compositions: Dict[str, Dict[str, float]] = {}
+    phase_thermo: Dict[str, Dict[str, Any]] = {}
+    phase_instances: List[Dict[str, Any]] = []
+    for name in order:
+        compositions = grouped.get(name, [])
+        props = properties.get(name, [])
+        members = endmembers.get(name, [])
+        count = max(len(compositions), len(props), len(members), 1)
+        instance_weights: List[float] = []
+        instance_comps: List[Dict[str, float]] = []
+        instance_thermo: List[Dict[str, Any]] = []
+        for index in range(count):
+            composition = (
+                compositions[index] if index < len(compositions) else {}
+            )
+            prop = props[index] if index < len(props) else {}
+            member = members[index] if index < len(members) else {}
+            fraction = prop.get('fraction[wt]')
+            if fraction is not None and math.isfinite(fraction) and fraction > 0.0:
+                fraction_weight = float(fraction)
+            else:
+                fraction_weight = 0.0
+            wt_pct = _magemin_positive_wt_pct(composition)
+            thermo = _magemin_formula_thermo(prop, header_line)
+            instance_id = name if index == 0 else f'{name}#{index + 1}'
+            instance = {
+                'instance_id': instance_id,
+                'phase': name,
+                'reference_basis': 'magemin_formula_amount',
+            }
+            if wt_pct:
+                instance['composition_wt_pct'] = dict(wt_pct)
+            if member:
+                instance['endmember_weight_fraction'] = dict(member)
+                instance['endmember_basis'] = 'wt_fr'
+            if fraction is not None and math.isfinite(fraction):
+                instance['reference_mass_fraction'] = float(fraction)
+            instance.update(thermo)
+            phase_instances.append(instance)
+            instance_weights.append(fraction_weight)
+            instance_comps.append(wt_pct)
+            instance_thermo.append(thermo)
+        if not any(weight > 0.0 for weight in instance_weights):
+            # No fraction[wt] column: each printed row is one instance.
+            instance_weights = [1.0] * len(instance_weights)
+        combined_comp = _magemin_weighted_wt_pct(
+            instance_comps, instance_weights
+        )
+        if combined_comp:
+            phase_compositions[name] = combined_comp
+        combined_thermo = _magemin_combine_formula_thermo(
+            instance_thermo, instance_weights
+        )
+        if combined_thermo:
+            phase_thermo[name] = combined_thermo
+
+    gamma = _magemin_gamma_components(matlab_text)
+    chem_potentials = None
+    if gamma:
+        chem_potentials = {
+            'system': {
+                'basis': 'chemical_potential',
+                'units': 'J',
+                'coordinate': 'magemin_native_oxide',
+                'source_header': 'Gamma[J] (chemical potential of oxides)',
+                'components': gamma,
+            }
+        }
+    if not phase_compositions and not phase_thermo and chem_potentials is None:
+        return {
+            'phase_compositions': {},
+            'phase_thermo': {},
+            'phase_instances': phase_instances,
+            'chem_potentials': None,
+        }
+    return {
+        'phase_compositions': phase_compositions,
+        'phase_thermo': phase_thermo,
+        'phase_instances': phase_instances,
+        'chem_potentials': chem_potentials,
+    }
+
+
+def _magemin_formula_thermo(
+    prop: Mapping[str, float],
+    source_header: str,
+) -> Dict[str, Any]:
+    """One stable-assemblage row, header units, formula-amount basis.
+
+    Premise: ``Rho[kg/m3]`` is ``phase_density`` from toolkit.c,
+    ``(mass_g_per_mol * 1000) / (volume * 10)``, independent of the
+    caller's batch mass. ``V_partial[cm3]`` already includes the phase
+    amount (``volume*10*ss_n_mol*factor``). G, Cp, S, and H are per
+    formula (not multiplied by ``ss_n_mol``). The header says
+    ``Cp[kJ/K]`` and ``G[J]`` / ``Entropy[J/K]`` / ``Enthalpy[J]``.
+    Algebra: rho_out = Rho; V_m3 = V_partial_cm3 * 1e-6;
+    molar_volume_m3_mol = V_molar_cm3_mol * 1e-6. Cp is stored in kJ/K,
+    not converted, so it is not mistaken for the alphaMELTS extensive
+    J/K field.
+    Units: kg/m3 stays kg/m3; cm3 * 1e-6 m3/cm3 = m3.
+    Limiting case: forsterite near 3200 kg/m3 stays 3200, not 3.2 and
+    not 3200 times the mode fraction. A 10 cm3 partial volume is
+    1e-5 m3. Printed Cp 0.2 stays 0.2 kJ/K.
+    """
+    if not prop:
+        return {}
+    thermo: Dict[str, Any] = {
+        'reference_basis': 'magemin_formula_amount',
+    }
+    if source_header:
+        thermo['source_header'] = source_header
+    rho = prop.get('Rho[kg/m3]')
+    if rho is not None:
+        thermo['density_kg_m3'] = float(rho)
+    partial = prop.get('V_partial[cm3]')
+    if partial is not None:
+        thermo['volume_m3'] = float(partial) * 1.0e-6
+    molar = prop.get('V_molar[cm3/mol]')
+    if molar is not None:
+        thermo['molar_volume_m3_mol'] = float(molar) * 1.0e-6
+    gibbs = prop.get('G[J]')
+    if gibbs is not None:
+        thermo['gibbs_J'] = float(gibbs)
+    heat_capacity = prop.get('Cp[kJ/K]')
+    if heat_capacity is not None:
+        thermo['heat_capacity_kJ_K'] = float(heat_capacity)
+    entropy = prop.get('Entropy[J/K]')
+    if entropy is not None:
+        thermo['entropy_J_K'] = float(entropy)
+    enthalpy = prop.get('Enthalpy[J]')
+    if enthalpy is not None:
+        thermo['enthalpy_J'] = float(enthalpy)
+    if set(thermo) <= {'reference_basis', 'source_header'}:
+        return {}
+    return thermo
+
+
+def _magemin_weighted_wt_pct(
+    compositions: Sequence[Mapping[str, float]],
+    weights: Sequence[float],
+) -> Dict[str, float]:
+    usable = [
+        (composition, weight)
+        for composition, weight in zip(compositions, weights)
+        if composition and weight > 0.0
+    ]
+    if not usable:
+        return {}
+    total = sum(weight for _composition, weight in usable)
+    oxides = {
+        oxide
+        for composition, _weight in usable
+        for oxide in composition
+    }
+    combined: Dict[str, float] = {}
+    for oxide in oxides:
+        value = sum(
+            float(composition.get(oxide, 0.0)) * weight
+            for composition, weight in usable
+        ) / total
+        if value > 0.0:
+            combined[oxide] = value
+    return combined
+
+
+def _magemin_combine_formula_thermo(
+    rows: Sequence[Mapping[str, Any]],
+    weights: Sequence[float],
+) -> Dict[str, Any]:
+    """Average formula-amount properties; sum the extensive partial volume.
+
+    Density is intensive, so the name-keyed value is the fraction-weighted
+    mean, never rho times the batch mass. Partial volume is the phase
+    amount's volume, so instances add.
+    """
+    present = [row for row in rows if row]
+    if not present:
+        return {}
+    combined: Dict[str, Any] = {
+        'reference_basis': 'magemin_formula_amount',
+    }
+    header = next(
+        (row.get('source_header') for row in present if row.get('source_header')),
+        None,
+    )
+    if header:
+        combined['source_header'] = header
+    intensive_keys = (
+        'density_kg_m3',
+        'molar_volume_m3_mol',
+        'gibbs_J',
+        'heat_capacity_kJ_K',
+        'entropy_J_K',
+        'enthalpy_J',
+    )
+    for key in intensive_keys:
+        total_weight = 0.0
+        total_value = 0.0
+        seen = False
+        for row, weight in zip(rows, weights):
+            value = row.get(key)
+            if value is None or weight <= 0.0:
+                continue
+            total_value += float(value) * weight
+            total_weight += weight
+            seen = True
+        if seen and total_weight > 0.0:
+            combined[key] = total_value / total_weight
+    volume = 0.0
+    saw_volume = False
+    for row in rows:
+        value = row.get('volume_m3')
+        if value is None:
+            continue
+        volume += float(value)
+        saw_volume = True
+    if saw_volume:
+        combined['volume_m3'] = volume
+    return combined
+
+
+def _attach_magemin_phase_maps(
+    phases: Dict[str, Dict[str, Any]],
+    maps: Mapping[str, Any],
+) -> None:
+    """Put wt% compositions on the stdout phase dict. Do not invent masses."""
+    compositions = maps.get('phase_compositions') or {}
+    if not isinstance(compositions, Mapping):
+        return
+    for name, composition in compositions.items():
+        state = phases.get(str(name))
+        if isinstance(state, dict) and isinstance(composition, Mapping) and composition:
+            state['composition_wt_pct'] = dict(composition)
+
+
+def _magemin_assemblage_extras(raw: Any) -> Dict[str, Any]:
+    """Thermo, instances, and Gamma already parsed onto the subprocess payload."""
+    if not isinstance(raw, Mapping):
+        return {}
+    extras: Dict[str, Any] = {}
+    thermo = raw.get('phase_thermo')
+    if isinstance(thermo, Mapping) and thermo:
+        extras['phase_thermo'] = {
+            str(name): dict(payload)
+            for name, payload in thermo.items()
+            if isinstance(payload, Mapping)
+        }
+    instances = raw.get('phase_instances')
+    if isinstance(instances, list) and instances:
+        extras['phase_instances'] = [
+            dict(instance) for instance in instances if isinstance(instance, Mapping)
+        ]
+    chem = raw.get('chem_potentials')
+    if isinstance(chem, Mapping) and chem:
+        extras['chem_potentials'] = {
+            str(name): dict(payload)
+            for name, payload in chem.items()
+            if isinstance(payload, Mapping)
+        }
+    return extras
 
 
 def _assert_magemin_bulk_echo(
@@ -2349,7 +2920,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             except (TypeError, ValueError, OverflowError):
                 activity_value = math.nan
             if (
-                solver_status not in {0, 1, 2}
+                solver_status not in _MAGEMIN_ACCEPTED_SOLVER_STATUSES
                 or not math.isfinite(activity_value)
                 or activity_value <= 0.0
             ):
@@ -2384,6 +2955,33 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     continue
                 if math.isfinite(value) and value > 0.0:
                     native_activities[formula] = value
+        if isinstance(raw, Mapping):
+            solver_status = raw.get('solver_status')
+            if (
+                solver_status is not None
+                and 'magemin_solver_status' not in result_diagnostics
+            ):
+                result_diagnostics['magemin_solver_status'] = solver_status
+            if (
+                solver_status is not None
+                and solver_status not in _MAGEMIN_ACCEPTED_SOLVER_STATUSES
+            ):
+                message = (
+                    'MAGEMin ordinary solve did not converge: '
+                    f'solver_status={solver_status}'
+                )
+                result_diagnostics.update({
+                    'backend_status': 'not_converged',
+                    'backend_status_reason': 'engine_not_converged',
+                })
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=result_fO2_log,
+                    status='not_converged',
+                    warnings=[*all_warnings, message],
+                    diagnostics=result_diagnostics,
+                )
         repair_notices: List[str] = []
         (
             phases_present,
@@ -2409,6 +3007,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             status=result_status,
             warnings=all_warnings,
             diagnostics=result_diagnostics,
+            **_magemin_assemblage_extras(raw),
         )
         return result
 
@@ -3582,7 +4181,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         fO2_log: float,
         capture_native_activities: bool = False,
     ) -> Tuple[List[str], str, float, Tuple[str, ...]]:
-        """Build MAGEMin argv, optionally requesting native activities."""
+        """Build MAGEMin argv.
+
+        ``--out_matlab=1`` is always set so the oxide and property tables
+        are written. ``--Verb`` stays 0 unless native activities are
+        requested; Verb=1 changes the stdout the Phase/Mode parser reads.
+        """
         if self._binary_path is None:
             raise RuntimeError('MAGEMin subprocess bridge has no binary path')
         binary_path = self._binary_path.resolve()
@@ -3608,7 +4212,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 '--Verb=1' if item == '--Verb=0' else item
                 for item in args
             ]
-            args.append('--out_matlab=1')
+        args.append('--out_matlab=1')
         return args, buffer_name, buffer_n, tuple(buffer_warnings)
 
     def _call_magemin_subprocess(
@@ -3735,13 +4339,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         f'MAGEMin binary could not be executed: {exc}',
                         failure_disposition='environment',
                     ) from exc
-                if capture_native_activities:
-                    matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
-                    matlab_text = (
-                        matlab_path.read_text()
-                        if matlab_path.exists()
-                        else ''
-                    )
+                matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
+                if matlab_path.is_file():
+                    matlab_text = matlab_path.read_text()
 
         if completed.returncode != 0:
             stderr = (completed.stderr or '').strip()
@@ -3793,6 +4393,18 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             ),
             'operating_point_diagnostics': operating_point_diagnostics,
         }
+        solver_status = stdout_metadata.get('solver_status')
+        if solver_status is not None:
+            result['solver_status'] = solver_status
+        phase_maps = _magemin_phase_maps_from_matlab(matlab_text)
+        if phase_maps is not None:
+            _attach_magemin_phase_maps(phases, phase_maps)
+            if phase_maps.get('phase_thermo'):
+                result['phase_thermo'] = phase_maps['phase_thermo']
+            if phase_maps.get('phase_instances'):
+                result['phase_instances'] = phase_maps['phase_instances']
+            if phase_maps.get('chem_potentials'):
+                result['chem_potentials'] = phase_maps['chem_potentials']
         if capture_native_activities:
             from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
 
@@ -4411,6 +5023,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         result.liquid_fraction = liquid_fraction
         if liquid_composition_wt_pct:
             result.liquid_composition_wt_pct = liquid_composition_wt_pct
+        extras = _magemin_assemblage_extras(raw)
+        if extras.get('phase_thermo'):
+            result.phase_thermo.update(extras['phase_thermo'])
+        if extras.get('phase_instances'):
+            result.phase_instances.extend(extras['phase_instances'])
+        if extras.get('chem_potentials'):
+            result.chem_potentials = extras['chem_potentials']
         result.warnings.extend(repair_notices)
 
     def _phase_assemblage_payload(

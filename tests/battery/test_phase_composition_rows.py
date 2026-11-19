@@ -3041,3 +3041,168 @@ def test_fe3_fe2_ratio_form_keeps_the_printed_ratio(
     assert residual.numeric.value == compute_metric(
         MetricOperation.DEX, Decimal("0.2"), Decimal("0.179")
     )
+
+
+def _hooked_phase_prediction(
+    monkeypatch: pytest.MonkeyPatch,
+    result: EquilibriumResult,
+    *,
+    formula: str = "SiO2",
+    subtype: str = "wt_percent",
+    role: PhaseRole = PhaseRole.MELT,
+    reference: str = "1",
+    phase_siblings: dict[str, Decimal] | None = None,
+    observation_id: str = "phase-map-row",
+):
+    def hook(*_args, **_kwargs):
+        return result
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", hook
+    )
+    identity = _phase_identity(
+        formula,
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=role,
+        subtype=subtype,
+    )
+    observation = F.observation(
+        observation_id,
+        "sample-1",
+        identity,
+        Decimal(reference),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    return predict_with_engine(
+        Engine.MAGEMIN,
+        observation,
+        phase_siblings=phase_siblings,
+    )
+
+
+def test_phase_present_without_composition_is_not_phase_absence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A solved phase with no composition is not an absent phase.
+
+    ``bulk_composition_wt_pct`` is populated so a bulk fallback would
+    return 99. The scorer must not read it.
+    """
+    present = EquilibriumResult(
+        liquid_fraction=1.0,
+        phases_present=["liquid1"],
+        bulk_composition_wt_pct={"SiO2": 99.0, "MgO": 1.0},
+    )
+    prediction = _hooked_phase_prediction(
+        monkeypatch, present, observation_id="present-no-composition"
+    )
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == (
+        "phase_present_composition_not_reported"
+    )
+
+    present_empty_map = EquilibriumResult(
+        liquid_fraction=1.0,
+        phases_present=["liquid"],
+        phase_compositions={"liquid": {}},
+        bulk_composition_wt_pct={"SiO2": 99.0},
+    )
+    empty_map = _hooked_phase_prediction(
+        monkeypatch, present_empty_map, observation_id="empty-composition-map"
+    )
+    assert empty_map.value is None
+    assert empty_map.refusal_detail["reason"] == (
+        "phase_present_composition_not_reported"
+    )
+
+
+def test_absent_phase_stays_refused_when_the_bulk_is_populated(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    absent = EquilibriumResult(
+        liquid_fraction=1.0,
+        phases_present=["olivine"],
+        phase_compositions={"olivine": {"SiO2": 40.0, "MgO": 60.0}},
+        bulk_composition_wt_pct={"SiO2": 99.0, "MgO": 1.0},
+    )
+    prediction = _hooked_phase_prediction(
+        monkeypatch, absent, observation_id="absent-melt"
+    )
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == "phase_not_in_assemblage"
+
+
+def test_liquid1_composition_is_the_melt_row_not_the_bulk(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    result = EquilibriumResult(
+        liquid_fraction=1.0,
+        phases_present=["liquid1", "olivine1"],
+        phase_compositions={
+            "liquid1": {"SiO2": 42.0, "MgO": 10.0},
+            "olivine1": {"SiO2": 40.0, "MgO": 50.0},
+        },
+        liquid_composition_wt_pct={"SiO2": 1.0},
+        bulk_composition_wt_pct={"SiO2": 99.0},
+    )
+    wt = _hooked_phase_prediction(
+        monkeypatch, result, observation_id="liquid1-wt"
+    )
+    assert wt.execution.state is ExecutionState.PRODUCED
+    assert wt.value == Decimal("42")
+    mole = _hooked_phase_prediction(
+        monkeypatch,
+        result,
+        subtype="mole_fraction",
+        reference="0.5",
+        phase_siblings={"SiO2": Decimal("0.5"), "MgO": Decimal("0.5")},
+        observation_id="liquid1-mole",
+    )
+    assert mole.execution.state is ExecutionState.PRODUCED
+    assert mole.value == Decimal("42")
+    ppm = _hooked_phase_prediction(
+        monkeypatch,
+        result,
+        subtype="ppm_mass",
+        reference="10000",
+        observation_id="liquid1-ppm",
+    )
+    assert ppm.execution.state is ExecutionState.PRODUCED
+    assert ppm.value == Decimal("42")
+
+
+def test_liquidus_label_is_not_a_melt_composition(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    result = EquilibriumResult(
+        liquid_fraction=1.0,
+        phases_present=["liquidus"],
+        phase_compositions={"liquidus": {"SiO2": 42.0}},
+        bulk_composition_wt_pct={"SiO2": 99.0},
+    )
+    prediction = _hooked_phase_prediction(
+        monkeypatch, result, observation_id="liquidus-not-melt"
+    )
+    assert prediction.value is None
+    assert prediction.refusal_detail["reason"] == "phase_not_in_assemblage"
+
+
+def test_two_liquid_compositions_stay_ambiguous(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    result = EquilibriumResult(
+        liquid_fraction=1.0,
+        phases_present=["liquid1", "liquid2"],
+        phase_compositions={
+            "liquid1": {"SiO2": 42.0},
+            "liquid2": {"SiO2": 55.0},
+        },
+    )
+    prediction = _hooked_phase_prediction(
+        monkeypatch, result, observation_id="two-liquids"
+    )
+    assert prediction.value is None
+    assert prediction.refusal_detail["reason"] == "ambiguous_phase"

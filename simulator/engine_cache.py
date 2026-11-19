@@ -310,7 +310,7 @@ ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
     "internal-analytical": 4,
     "vaporock": 3,
-    "magemin": 7,
+    "magemin": 8,
     "alphamelts": 3,
     "thermoengine": 3,
 }
@@ -331,6 +331,9 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v7: 2026-11-19 refuse out-of-band silica whose reference phase is
 #   unreported, and round-trip subprocess pressures six decimals cannot keep
 #   (w1119eAh)
+# magemin v8: 2026-11-19 retain matlab oxide, property, and Gamma phase maps
+#   on ordinary solves (Comp_wt times 100, native FeO+O, buffer non-finite
+#   rows dropped). Ordinary Status outside {0, 1, 2} is not stored.
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # vaporock v2: 2026-11-18 retain requested oxide activities and standard-state diagnostics
 # vaporock v3: 2026-11-19 oxygen-independent oxide activities are computed; do not replay v2 out_of_basis refusals or pressure notices that named the 1e-6 bar call default as the requested pressure
