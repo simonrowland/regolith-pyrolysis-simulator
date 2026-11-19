@@ -501,10 +501,13 @@ def test_phaseobjc_loader_marks_runtime_and_spawns(
 
     monkeypatch.setattr(config, "_THERMOENGINE_PHASEOBJC_LOADED", False)
     loaded: list[str] = []
+    real_cdll = config.ctypes.CDLL
 
     def fake_cdll(path, *args, **kwargs):
-        loaded.append(str(path))
-        return object()
+        if str(path).endswith("libphaseobjc.dylib"):
+            loaded.append(str(path))
+            return object()
+        return real_cdll(path, *args, **kwargs)
 
     monkeypatch.setattr(config.ctypes, "CDLL", fake_cdll)
     monkeypatch.setattr(
@@ -527,9 +530,12 @@ def test_failed_phaseobjc_load_does_not_mark_runtime(
     from simulator.battery.score_run import _score_fork_blockers
 
     monkeypatch.setattr(config, "_THERMOENGINE_PHASEOBJC_LOADED", False)
+    real_cdll = config.ctypes.CDLL
 
     def boom(path, *args, **kwargs):
-        raise OSError("dlopen failed")
+        if str(path).endswith("libphaseobjc.dylib"):
+            raise OSError("dlopen failed")
+        return real_cdll(path, *args, **kwargs)
 
     monkeypatch.setattr(config.ctypes, "CDLL", boom)
     monkeypatch.setattr(
@@ -575,6 +581,22 @@ for reason in _score_fork_blockers():
     assert result.returncode == 0, output
     assert "FLAG 1" in result.stdout
     assert "REASON native_runtime:thermoengine_phaseobjc" in result.stdout
+
+
+def test_mach_probe_failure_does_not_abort_fork_classification(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A ctypes stand-in with no library handle must not raise."""
+
+    import ctypes
+
+    from simulator.battery.score_run import _score_fork_blockers
+
+    def broken_cdll(path, *args, **kwargs):
+        return object()
+
+    monkeypatch.setattr(ctypes, "CDLL", broken_cdll)
+    assert isinstance(_score_fork_blockers(), tuple)
 
 
 def test_open_engine_cache_sqlite_spawns(

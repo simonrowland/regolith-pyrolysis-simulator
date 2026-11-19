@@ -893,7 +893,8 @@ def _mach_thread_count() -> int | None:
     """OS threads, the count macOS ``os.fork`` uses for its warning.
 
     ``mach_task_self_`` is a variable, not a function. Returns None when the
-    count is unavailable; the caller then uses interpreter frames.
+    count is unavailable; the caller then uses interpreter frames. A failed
+    probe must not abort scoring.
     """
 
     if sys.platform != "darwin":
@@ -903,34 +904,34 @@ def _mach_thread_count() -> int | None:
     try:
         libc = ctypes.CDLL("/usr/lib/libSystem.B.dylib", use_errno=True)
         task = ctypes.c_uint32.in_dll(libc, "mach_task_self_").value
-    except (OSError, ValueError):
+        thread_t = ctypes.c_uint32
+        libc.task_threads.restype = ctypes.c_int32
+        libc.task_threads.argtypes = [
+            ctypes.c_uint32,
+            ctypes.POINTER(ctypes.POINTER(thread_t)),
+            ctypes.POINTER(ctypes.c_uint32),
+        ]
+        threads = ctypes.POINTER(thread_t)()
+        count = ctypes.c_uint32(0)
+        if libc.task_threads(task, ctypes.byref(threads), ctypes.byref(count)) != 0:
+            return None
+        total = int(count.value)
+        if total < 1:
+            return None
+        libc.mach_port_deallocate.restype = ctypes.c_int32
+        libc.mach_port_deallocate.argtypes = [ctypes.c_uint32, ctypes.c_uint32]
+        for index in range(total):
+            libc.mach_port_deallocate(task, threads[index])
+        libc.vm_deallocate.restype = ctypes.c_int32
+        libc.vm_deallocate.argtypes = [
+            ctypes.c_uint32,
+            ctypes.c_uint64,
+            ctypes.c_uint64,
+        ]
+        address = ctypes.cast(threads, ctypes.c_void_p).value or 0
+        libc.vm_deallocate(task, address, total * ctypes.sizeof(thread_t))
+    except (AttributeError, OSError, TypeError, ValueError):
         return None
-    thread_t = ctypes.c_uint32
-    libc.task_threads.restype = ctypes.c_int32
-    libc.task_threads.argtypes = [
-        ctypes.c_uint32,
-        ctypes.POINTER(ctypes.POINTER(thread_t)),
-        ctypes.POINTER(ctypes.c_uint32),
-    ]
-    threads = ctypes.POINTER(thread_t)()
-    count = ctypes.c_uint32(0)
-    if libc.task_threads(task, ctypes.byref(threads), ctypes.byref(count)) != 0:
-        return None
-    total = int(count.value)
-    if total < 1:
-        return None
-    libc.mach_port_deallocate.restype = ctypes.c_int32
-    libc.mach_port_deallocate.argtypes = [ctypes.c_uint32, ctypes.c_uint32]
-    for index in range(total):
-        libc.mach_port_deallocate(task, threads[index])
-    libc.vm_deallocate.restype = ctypes.c_int32
-    libc.vm_deallocate.argtypes = [
-        ctypes.c_uint32,
-        ctypes.c_uint64,
-        ctypes.c_uint64,
-    ]
-    address = ctypes.cast(threads, ctypes.c_void_p).value or 0
-    libc.vm_deallocate(task, address, total * ctypes.sizeof(thread_t))
     return total
 
 
