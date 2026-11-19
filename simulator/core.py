@@ -5118,6 +5118,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             {'melt_redox_gate_authority': provenance},
         )
 
+    def _melt_redox_gate_authority_pin_for_current_hour(
+        self,
+    ) -> tuple[bool, object]:
+        current_hour = int(self.melt.hour)
+        pinned_authority = getattr(
+            self,
+            '_melt_redox_gate_authority_this_tick',
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
+        )
+        if (
+            getattr(self, '_melt_redox_gate_authority_tick_hour', None)
+            == current_hour
+            and pinned_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ):
+            return True, pinned_authority
+        return False, _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+
     def _resolved_melt_redox_gate_authority(
         self,
         gate_authority: _MeltRedoxGateAuthority | object = (
@@ -5128,20 +5145,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> _MeltRedoxGateAuthority:
         redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         if gate_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY:
-            pinned_hour = getattr(
-                self,
-                '_melt_redox_gate_authority_tick_hour',
-                None,
+            has_pin, pinned_authority = (
+                self._melt_redox_gate_authority_pin_for_current_hour()
             )
-            pinned_authority = getattr(
-                self,
-                '_melt_redox_gate_authority_this_tick',
-                _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
-            )
-            if (
-                pinned_hour == int(self.melt.hour)
-                and pinned_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
-            ):
+            if has_pin:
                 if self._melt_redox_gate_record_is_admitted(
                     pinned_authority,
                     **redox_state_kwargs,
@@ -5201,20 +5208,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
     ) -> _MeltRedoxGateAuthority:
         current_hour = int(self.melt.hour)
-        pinned_hour = getattr(
-            self,
-            '_melt_redox_gate_authority_tick_hour',
-            None,
+        has_pin, pinned_authority = (
+            self._melt_redox_gate_authority_pin_for_current_hour()
         )
-        pinned_authority = getattr(
-            self,
-            '_melt_redox_gate_authority_this_tick',
-            _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
-        )
-        if (
-            pinned_hour == current_hour
-            and pinned_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
-        ):
+        if has_pin:
             if self._melt_redox_gate_record_is_admitted(pinned_authority):
                 return pinned_authority['curve']
             if not isinstance(pinned_authority, Mapping):

@@ -776,8 +776,9 @@ class EvaporationMixin:
         actual curve repairs, and admits a composition-projected MAGEMin curve
         only with its typed extrapolation notice and projection-only source
         refusal. Its source-label notice is provenance, not a curve repair.
-        This lookup is lazy: a cache miss invokes the same gate-curve resolver
-        that freeze-gate consumers use, and subsequent reads reuse its memo.
+        Reuse a current-hour authority pin when present. Without one, a cache
+        miss invokes the same gate-curve resolver that freeze-gate consumers
+        use, and subsequent reads reuse its memo.
         """
         from engines.domain_reason import OutOfDomainReason
 
@@ -857,7 +858,10 @@ class EvaporationMixin:
                 phase_detail_payload("gate_resolver_missing"),
             )
         try:
-            record = resolve()
+            has_pin, pinned_authority = (
+                self._melt_redox_gate_authority_pin_for_current_hour()
+            )
+            record = pinned_authority if has_pin else resolve()
         except (EvaporationFluxRefusal, ProviderUnavailableError) as exc:
             return refused(exc)
         if not isinstance(record, Mapping):
