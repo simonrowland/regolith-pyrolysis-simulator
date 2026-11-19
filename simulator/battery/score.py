@@ -9414,20 +9414,6 @@ def _predict_redox(
                     RefusalReason.METRIC_DOMAIN,
                     {"reason": "predicted_valence_nonfinite"},
                 )
-            # log10(ratio) is negative when the ratio is below 1, and
-            # log10(1) is 0. Those are scores. A fraction or straight ratio
-            # of 0 is an empty valence state, not a measured zero.
-            basis_state = identity.valence_basis
-            logged = (
-                basis_state is not None
-                and basis_state.is_value
-                and basis_state.value.value_form is ValenceValueForm.LOG10_RATIO
-            )
-            if not logged:
-                return refused(
-                    RefusalReason.METRIC_DOMAIN,
-                    {"reason": "predicted_valence_nonpositive"},
-                )
 
         authority, band, notices = _openimcc_redox_result_evidence(
             result,

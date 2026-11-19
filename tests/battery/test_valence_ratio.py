@@ -788,8 +788,8 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
 
     def capture(*args, **kwargs):
         calls.append((args, kwargs))
-        # 5 mol Cr(II) and 95 mol Cr(III): Cr(II)/total = 0.050.
-        return _candidate_redox_result(chromous_cr_mol=5.0, chromic_cr_mol=95.0)
+        # 37 mol Cr(II) and 963 mol Cr(III): Cr(II)/total = 0.037.
+        return _candidate_redox_result(chromous_cr_mol=37.0, chromic_cr_mol=963.0)
 
     monkeypatch.setattr(openimcc, "evaluate_redox", capture)
     prediction = predict_with_engine(
@@ -803,9 +803,9 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
     assert args[0]["Cr"] > 0.0
     assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
     # Berry and O'Neill 2004, American Mineralogist 89, Table 3, published
-    # page 794 (PDF page 5), AD column, log fO2 = -0.68 (air): printed
-    # Cr2+/ΣCr = 0.050. The expected value is that printed fraction.
-    assert prediction.value == Decimal("0.050")
+    # page 794 (PDF page 5), AD + En column, log fO2 = -0.68 (air): printed
+    # Cr2+/ΣCr = 0.037. The expected value is that printed fraction.
+    assert prediction.value == Decimal("0.037")
 
 
 def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
@@ -914,7 +914,7 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
     assert prediction.value == Decimal("0.023")
 
 
-def test_openimcc_candidate_zero_fraction_and_ratio_are_refusals(
+def test_openimcc_candidate_zero_fraction_and_ratio_are_scored_but_empty_inputs_refuse(
     monkeypatch: pytest.MonkeyPatch,
 ):
     pytest.importorskip("openimcc")
@@ -949,11 +949,21 @@ def test_openimcc_candidate_zero_fraction_and_ratio_are_refusals(
     chromium_prediction = predict_with_engine(
         Engine.OPENIMCC, chromium, experiment=chromium_experiment
     )
-    assert chromium_prediction.value is None
-    assert chromium_prediction.execution.state is not ExecutionState.PRODUCED
-    assert chromium_prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
-    assert chromium_prediction.refusal_detail == {
-        "reason": "predicted_valence_nonpositive",
+    assert chromium_prediction.value == Decimal("0")
+    assert chromium_prediction.execution.state is ExecutionState.PRODUCED
+    assert chromium_prediction.refusal_reason is None
+
+    def chromium_empty(*args, **kwargs):
+        return _candidate_redox_result(chromous_cr_mol=0.0, chromic_cr_mol=0.0)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", chromium_empty)
+    empty_chromium_prediction = predict_with_engine(
+        Engine.OPENIMCC, chromium, experiment=chromium_experiment
+    )
+    assert empty_chromium_prediction.value is None
+    assert empty_chromium_prediction.execution.state is not ExecutionState.PRODUCED
+    assert empty_chromium_prediction.refusal_detail == {
+        "reason": "openimcc_valence_abundance_undefined",
     }
 
     migrator = Migrator(ROOT)
@@ -985,11 +995,56 @@ def test_openimcc_candidate_zero_fraction_and_ratio_are_refusals(
     titanium_prediction = predict_with_engine(
         Engine.OPENIMCC, titanium, experiment=titanium_experiment
     )
-    assert titanium_prediction.value is None
-    assert titanium_prediction.execution.state is not ExecutionState.PRODUCED
-    assert titanium_prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
-    assert titanium_prediction.refusal_detail == {
-        "reason": "predicted_valence_nonpositive",
+    assert titanium_prediction.value == Decimal("0")
+    assert titanium_prediction.execution.state is ExecutionState.PRODUCED
+    assert titanium_prediction.refusal_reason is None
+
+    def titanium_empty_denominator(*args, **kwargs):
+        return _candidate_redox_result(titanous_ti_mol=1.0, titanic_ti_mol=0.0)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", titanium_empty_denominator)
+    empty_titanium_prediction = predict_with_engine(
+        Engine.OPENIMCC, titanium, experiment=titanium_experiment
+    )
+    assert empty_titanium_prediction.value is None
+    assert empty_titanium_prediction.execution.state is not ExecutionState.PRODUCED
+    assert empty_titanium_prediction.refusal_detail == {
+        "reason": "openimcc_valence_abundance_undefined",
+    }
+
+    log10_chromium = next(
+        row
+        for row in berry.observations.values()
+        if row.identity.valence_basis.is_value
+        and row.identity.valence_basis.value.value_form is ValenceValueForm.LOG10_RATIO
+    )
+    log10_chromium = _with_composition(
+        log10_chromium,
+        _candidate_oxide_composition(
+            ("CaO", "34"),
+            ("SiO2", "34"),
+            ("Al2O3", "10"),
+            ("MgO", "10"),
+            ("FeO", "10"),
+            ("Cr2O3", "2"),
+        ),
+    )
+    monkeypatch.setattr(
+        openimcc,
+        "evaluate_redox",
+        lambda *args, **kwargs: _candidate_redox_result(
+            chromous_cr_mol=1.0, chromic_cr_mol=0.0
+        ),
+    )
+    nonpositive_log_ratio = predict_with_engine(
+        Engine.OPENIMCC,
+        log10_chromium,
+        experiment=berry.experiments[log10_chromium.experiment_id],
+    )
+    assert nonpositive_log_ratio.value is None
+    assert nonpositive_log_ratio.execution.state is not ExecutionState.PRODUCED
+    assert nonpositive_log_ratio.refusal_detail == {
+        "reason": "openimcc_valence_abundance_undefined",
     }
 
 
