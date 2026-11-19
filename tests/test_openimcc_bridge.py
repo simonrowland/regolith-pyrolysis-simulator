@@ -489,7 +489,15 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
         expected_parent_oxides = (
             "SiO2", "MgO", "FeO", "CaO", "Al2O3", "TiO2", "Na2O", "K2O"
         ) + (("S", "P2O5") if pack_name == "published-ext" else ())
-        assert tuple(bridge_result.parent_oxides) == expected_parent_oxides
+        expected_active_parents = tuple(
+            name
+            for name in expected_parent_oxides
+            if float(composition.get(name, 0.0)) > 0.0
+        )
+        assert tuple(bridge_result.parent_oxides) == expected_active_parents
+        assert set(bridge_result.parent_oxides) == set(
+            bridge_result.parent_oxide_activities
+        )
         _assert_activity_parity(
             actual, row, _activity_bounds_for_row(row, bounds_by_key)
         )
@@ -693,6 +701,101 @@ def test_trace_activity_models_read_public_supported_trace_metadata() -> None:
     }
 
     assert openimcc_bridge.openimcc_trace_activity_models() == expected
+
+
+def test_full_component_trace_keeps_only_active_parent_activities() -> None:
+    package = pytest.importorskip("openimcc")
+    supported_trace_oxides = getattr(package, "supported_trace_oxides", None)
+    if not callable(supported_trace_oxides):
+        pytest.skip("installed OpenIMCC pin has no trace-component API")
+    if "MnO" not in {
+        str(component.oxide) for component in supported_trace_oxides()
+    }:
+        pytest.skip("installed OpenIMCC pin has no MnO trace model")
+
+    from simulator.melt_backend import openimcc_bridge
+
+    composition = {
+        "Na2O": 0.05,
+        "K2O": 0.01,
+        "SiO2": 0.55,
+        "FeO": 0.12,
+        "MgO": 0.12,
+        "CaO": 0.08,
+        "Al2O3": 0.05,
+        "TiO2": 0.01,
+        "MnO": 0.001,
+        "NiO": 0.001,
+    }
+    temperature_K = 1800.0
+    result = bridge_evaluate(
+        composition_mol=composition,
+        temperature_K=temperature_K,
+    )
+    raw_result = package.evaluate(
+        composition,
+        temperature_K,
+        _load_pack(openimcc_bridge.DEFAULT_BACKEND_PACK_NAME),
+        basis_type="mol",
+        enable_sp_extension=(
+            openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+            in {"published-ext", "d066-ext"}
+        ),
+    )
+    raw_parent_activities = dict(
+        zip(raw_result.parent_oxides, raw_result.parent_activity, strict=True)
+    )
+
+    assert result.parent_oxide_activities["FeO"] > 0.0
+    assert "MnO" in result.parent_oxide_activities
+    assert result.parent_oxide_activities["NiO"] == pytest.approx(
+        raw_parent_activities["NiO"]
+    )
+    assert "Cr2O3" not in result.parent_oxide_activities
+    assert set(result.parent_oxides) == set(result.parent_oxide_activities)
+
+
+def test_gas_boundary_does_not_select_absent_cr2o3_as_parent(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    package = pytest.importorskip("openimcc")
+    from simulator.melt_backend import openimcc_bridge
+
+    gas_calls = []
+
+    def capture_gas(
+        activities,
+        temperature_K,
+        pressure_bar,
+        gas_pack,
+        *,
+        parent_oxides,
+        allow_extrapolation=False,
+    ):
+        gas_calls.append(
+            {
+                "activities": dict(activities),
+                "parent_oxides": tuple(parent_oxides),
+            }
+        )
+        return {}
+
+    monkeypatch.setattr(package, "evaluate_gas", capture_gas)
+    melt = evaluate_cleaned_melt({"Na2O": 0.5, "SiO2": 0.5}, 1800.0)
+    openimcc_bridge.evaluate_gas(
+        melt.bridge.parent_oxide_activities,
+        1800.0,
+        1.0,
+        object(),
+        parent_oxides=melt.bridge.parent_oxides,
+        gas_pack_selection="t1877_absent_cr2o3_boundary",
+    )
+
+    assert gas_calls
+    assert "Cr2O3" not in gas_calls[-1]["parent_oxides"]
+    assert set(gas_calls[-1]["activities"]) == set(
+        gas_calls[-1]["parent_oxides"]
+    )
 
 
 def test_unresolvable_molar_mass_is_a_typed_composition_refusal() -> None:
