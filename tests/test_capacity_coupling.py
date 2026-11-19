@@ -5,6 +5,7 @@ import math
 from dataclasses import asdict, replace
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import pytest
 import yaml
@@ -24,6 +25,7 @@ from simulator.capacity_coupling import (
     CapacityShadowRefusal,
     CapacityShadowResult,
     combined_saturation,
+    diagnostic_backward_euler_headspace_step,
     partition_melt_oxygen,
     solve_capacity_shadow,
 )
@@ -37,8 +39,9 @@ from simulator.evaporation import (
     _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS,
     _pre_rg_effective_pressure_source,
 )
+from simulator.overhead import pipe_species_outflow_mol_s
 from simulator.physical_constants import GAS_CONSTANT
-from simulator.state import CampaignPhase, EvaporationFlux
+from simulator.state import MOLAR_MASS, CampaignPhase, EvaporationFlux
 from simulator.vapour_rail.activity import ActivityVerdictKind
 from simulator.vapour_rail.batch import FluxEligible, PressureRefusal, PressureValue
 from simulator.vapour_rail.catalog import OUT_OF_RANGE_STATUS
@@ -1562,32 +1565,33 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
     assert captured[0]["overhead_pressure_pa"] == pytest.approx(500.0)
 
 
-def test_no_cold_train_reuses_head_bleed_without_evaluating_shadow_flux():
-    head = {"O2": 1.25, "N2": 0.75}
+def test_no_cold_train_solves_end_partial_from_pipe_geometry():
+    # The old early return handed head_bled back and never called the
+    # flux. With a pipe, the end partial is the quasi-steady root.
+    calls = {"n": 0}
 
-    def forbidden_flux(_partials):
-        raise AssertionError("NoColdTrain must not recompute HEAD operations")
+    def flux(_partials):
+        calls["n"] += 1
+        return {"O2": _SOURCE_02_KG_H}
 
-    result = solve_capacity_shadow(
-        pre_holdup_mol=head,
-        molar_mass_kg_mol={"O2": M_O2, "N2": M_N2},
-        flux_kg_hr_at_partials=forbidden_flux,
-        capacity=NoColdTrain(),
-        head_bled_species_mol=head,
-        external_o2_holdup_mol=0.0,
-        temperature_K=300.0,
-        volume_m3=1.0,
-        dt_hr=1.0,
-        bleed_conductance_kg_s=1.0,
-        downstream_pressure_Pa=0.0,
-        k_relief_kg_hr_Pa=0.0,
-        p_open_Pa=1.0,
+    result = _commit_o2(
+        _STRANDED_O2_KG,
+        _SOURCE_02_KG_H,
+        1.0,
+        flux=flux,
+        head_bled={"O2": 1.25},
     )
 
     assert isinstance(result, CapacityShadowResult)
-    assert result.bled_species_mol == head
-    assert result.terminal_offgas_mol == {"N2": 0.75}
-    assert result.iterations == 0
+    assert calls["n"] > 0
+    assert result.iterations != 0
+    assert result.authoritative is False
+    assert result.bled_species_mol["O2"] != pytest.approx(1.25, rel=1.0e-6)
+    assert result.partial_pressures_Pa["O2"] == pytest.approx(
+        _ROOT_02_PA,
+        abs=5.0e-9,
+    )
+    assert result.partial_pressures_Pa["O2"] != pytest.approx(20.0, abs=1.0)
 
 
 def test_invalid_capacity_tag_is_typed_refusal_before_flux_arithmetic():
@@ -1998,3 +2002,523 @@ def test_overhead_model_leaves_provider_partition_mirrors_unset(
     assert gas.O2_vented_kg_hr == 0.0
     assert gas.turbine_flow_kg_hr == 0.0
     assert gas.melt_offgas_O2_mol_hr == pytest.approx(1.0 / M_O2)
+
+
+# d-450 chunk 2. Canonical O2 headspace. Masses use MOLAR_MASS, not the
+# Picard fixture's 0.032 kg/mol. Roots below are checked against a
+# bisection of pipe_species_outflow_mol_s, not against a re-derived pipe.
+_HS_T_K = 1904.7700354769336
+_HS_V_M3 = 0.08538380762699734
+_HS_D_M = 0.12
+_HS_L_M = 1.0
+_STRANDED_O2_KG = 9.661691571909952
+_FLOOR_O2_KG = 3.5e-6
+_SOURCE_02_KG_H = 0.2
+_CREDIT_KG_H = 8.83
+_ROOT_02_PA = 25.695650006
+_ROOT_02_BLED_KG = 9.8616871391
+_ROOT_02_HOLD_KG = 4.4328315148e-6
+_ONE_STEP_PA = 248.85783689
+_SONIC_CROSSING_KG_H = 5.4971906841
+_CREDIT_ROOT_PA = 222.82427409
+_CREDIT_BLED_KG = 8.8299650599
+_CREDIT_HOLD_KG = 3.8440065311e-5
+
+
+def _o2_molar_mass_kg() -> float:
+    return MOLAR_MASS["O2"] / 1000.0
+
+
+def _holdup_kg(partial_pa: float) -> float:
+    return (
+        partial_pa
+        * _HS_V_M3
+        * _o2_molar_mass_kg()
+        / (GAS_CONSTANT * _HS_T_K)
+    )
+
+
+def _moles_of_kg(mass_kg: float) -> float:
+    return mass_kg / _o2_molar_mass_kg()
+
+
+def _pipe_o2_kg_h(pressure_pa: float) -> float:
+    outflow = pipe_species_outflow_mol_s(
+        pressure_pa,
+        0.0,
+        _HS_T_K,
+        {"O2": 1.0},
+        _HS_D_M,
+        _HS_L_M,
+    )
+    return outflow.species_mol_s["O2"] * _o2_molar_mass_kg() * 3600.0
+
+
+def _bisect_pipe_pa(target_kg_h: float, low_pa: float, high_pa: float) -> float:
+    low, high = low_pa, high_pa
+    for _ in range(80):
+        mid = 0.5 * (low + high)
+        if _pipe_o2_kg_h(mid) < target_kg_h:
+            low = mid
+        else:
+            high = mid
+    return 0.5 * (low + high)
+
+
+def _commit_o2(
+    mass_kg: float,
+    source_kg_hr: float,
+    dt_hr: float,
+    *,
+    flux=None,
+    head_bled=None,
+    pipe: bool = True,
+    cap_kg_s=None,
+    downstream_pa: float = 0.0,
+):
+    if flux is None:
+        def flux(_partials, rate=source_kg_hr):
+            return {"O2": rate}
+
+    kwargs = dict(
+        pre_holdup_mol={"O2": _moles_of_kg(mass_kg)},
+        molar_mass_kg_mol={"O2": _o2_molar_mass_kg()},
+        flux_kg_hr_at_partials=flux,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        head_bled_species_mol={} if head_bled is None else head_bled,
+        external_o2_holdup_mol=0.0,
+        temperature_K=_HS_T_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=dt_hr,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=downstream_pa,
+        k_relief_kg_hr_Pa=0.0,
+        p_open_Pa=1.0,
+    )
+    if pipe:
+        kwargs["pipe_diameter_m"] = _HS_D_M
+        kwargs["pipe_length_m"] = _HS_L_M
+    if cap_kg_s is not None:
+        kwargs["outflow_cap_kg_s"] = cap_kg_s
+    return solve_capacity_shadow(**kwargs)
+
+
+def _diagnostic_o2(
+    mass_kg: float,
+    source_kg_hr: float,
+    dt_hr: float,
+    *,
+    flux=None,
+    pipe: bool = True,
+    cap_kg_s=None,
+):
+    if flux is None:
+        def flux(_partials, rate=source_kg_hr):
+            return {"O2": rate}
+
+    kwargs = dict(
+        pre_holdup_mol={"O2": _moles_of_kg(mass_kg)},
+        molar_mass_kg_mol={"O2": _o2_molar_mass_kg()},
+        flux_kg_hr_at_partials=flux,
+        temperature_K=_HS_T_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=dt_hr,
+        downstream_pressure_Pa=0.0,
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+    )
+    if pipe:
+        kwargs["pipe_diameter_m"] = _HS_D_M
+        kwargs["pipe_length_m"] = _HS_L_M
+    if cap_kg_s is not None:
+        kwargs["outflow_cap_kg_s"] = cap_kg_s
+    return diagnostic_backward_euler_headspace_step(**kwargs)
+
+
+def _as_result(result) -> CapacityShadowResult:
+    assert isinstance(result, CapacityShadowResult)
+    assert not isinstance(result, CapacityShadowRefusal)
+    return result
+
+
+def _partition_commit(steps: int, dt_hr: float, mass_kg: float, source_kg_hr: float):
+    moles = _moles_of_kg(mass_kg)
+    bled_kg = 0.0
+    substep_bled: list[float] = []
+    result = None
+    for _ in range(steps):
+        result = _as_result(
+            _commit_o2(moles * _o2_molar_mass_kg(), source_kg_hr, dt_hr)
+        )
+        step_bled = result.bled_species_mol["O2"] * _o2_molar_mass_kg()
+        substep_bled.append(step_bled)
+        bled_kg += step_bled
+        moles = (
+            result.partial_pressures_Pa["O2"]
+            * _HS_V_M3
+            / (GAS_CONSTANT * _HS_T_K)
+        )
+    assert result is not None
+    return result, bled_kg, moles * _o2_molar_mass_kg(), substep_bled
+
+
+def test_stiff_holdup_converges_to_quasi_steady_root():
+    root_pa = _bisect_pipe_pa(_SOURCE_02_KG_H, 1.0, 100.0)
+    result = _as_result(_commit_o2(_STRANDED_O2_KG, _SOURCE_02_KG_H, 1.0))
+    pressure = result.partial_pressures_Pa["O2"]
+    holdup = _holdup_kg(pressure)
+    bled = result.bled_species_mol["O2"] * _o2_molar_mass_kg()
+
+    assert pressure == pytest.approx(root_pa, rel=1.0e-10, abs=1.0e-9)
+    assert pressure == pytest.approx(_ROOT_02_PA, abs=5.0e-9)
+    assert holdup == pytest.approx(_ROOT_02_HOLD_KG, rel=1.0e-9)
+    assert bled == pytest.approx(
+        _STRANDED_O2_KG + _SOURCE_02_KG_H - holdup,
+        rel=1.0e-12,
+    )
+    assert bled == pytest.approx(_ROOT_02_BLED_KG, abs=5.0e-10)
+    assert pressure != pytest.approx(_ONE_STEP_PA, abs=1.0)
+    assert result.saturation.binding_cause == "pipe"
+    assert result.authoritative is False
+
+
+def test_one_backward_euler_step_is_not_the_root():
+    # Independent bisection of R = 0 on the production pipe. Not the commit.
+    n0 = _moles_of_kg(_STRANDED_O2_KG)
+    q_mol_s = _SOURCE_02_KG_H / _o2_molar_mass_kg() / 3600.0
+    dt_s = 3600.0
+
+    def residual(pressure: float) -> float:
+        moles = pressure * _HS_V_M3 / (GAS_CONSTANT * _HS_T_K)
+        outflow_mol_s = _pipe_o2_kg_h(pressure) / _o2_molar_mass_kg() / 3600.0
+        return moles - n0 - dt_s * (q_mol_s - outflow_mol_s)
+
+    low, high = 1.0, 1.0e4
+    assert residual(low) < 0.0 < residual(high)
+    for _ in range(80):
+        mid = 0.5 * (low + high)
+        if residual(mid) < 0.0:
+            low = mid
+        else:
+            high = mid
+    bisected = 0.5 * (low + high)
+
+    one = _as_result(_diagnostic_o2(_STRANDED_O2_KG, _SOURCE_02_KG_H, 1.0))
+    assert one.partial_pressures_Pa["O2"] == pytest.approx(bisected, abs=1.0e-6)
+    assert one.partial_pressures_Pa["O2"] == pytest.approx(_ONE_STEP_PA, abs=1.0e-8)
+
+    moles = n0
+    for _ in range(4):
+        step = _as_result(_diagnostic_o2(moles * _o2_molar_mass_kg(), _SOURCE_02_KG_H, 0.25))
+        moles = (
+            step.partial_pressures_Pa["O2"]
+            * _HS_V_M3
+            / (GAS_CONSTANT * _HS_T_K)
+        )
+    assert abs(step.partial_pressures_Pa["O2"] - one.partial_pressures_Pa["O2"]) > 1.0e-6
+    assert step.partial_pressures_Pa["O2"] == pytest.approx(_ROOT_02_PA, abs=1.0e-6)
+
+
+def test_fixed_boundary_end_pressure_is_timestep_independent():
+    partitions = ((1, 1.0), (4, 0.25), (8, 0.125))
+    triples = [
+        _partition_commit(steps, dt_hr, _STRANDED_O2_KG, _SOURCE_02_KG_H)
+        for steps, dt_hr in partitions
+    ]
+    for (_steps, dt_hr), (result, bled, holdup, substeps) in zip(partitions, triples):
+        assert result.partial_pressures_Pa["O2"] == pytest.approx(_ROOT_02_PA, abs=5.0e-9)
+        assert bled == pytest.approx(_ROOT_02_BLED_KG, abs=5.0e-10)
+        assert holdup == pytest.approx(_ROOT_02_HOLD_KG, rel=1.0e-9)
+        # First slice books the stranded holdup plus this slice of the
+        # source, minus the root holdup. The gap is the source slice
+        # (~0.2 kg/h * dt), so it is not a 1 kg departure from m0.
+        assert substeps[0] == pytest.approx(
+            _STRANDED_O2_KG + _SOURCE_02_KG_H * dt_hr - _ROOT_02_HOLD_KG,
+            abs=5.0e-10,
+        )
+        for later in substeps[1:]:
+            assert later == pytest.approx(_SOURCE_02_KG_H * dt_hr, abs=5.0e-10)
+    # A later substep, already at the root, books only its own source.
+    _result, _bled, _holdup, quarter_steps = triples[1]
+    assert quarter_steps[0] == pytest.approx(
+        _STRANDED_O2_KG + 0.05 - _ROOT_02_HOLD_KG,
+        abs=5.0e-10,
+    )
+    for later in quarter_steps[1:]:
+        assert later == pytest.approx(0.05, abs=5.0e-10)
+
+    # Previous-hour map: a partial at or above P_eq drops the species, so
+    # the next step sees a zero partial and the full forward rate. One
+    # long step alternates. A short step does not drain back through P_eq.
+    p_eq = 10.0
+    floor_moles = _moles_of_kg(_FLOOR_O2_KG)
+
+    def map_hours(dt_hr: float, hours: int):
+        prev = 0.0
+        moles = floor_moles
+        sources = []
+        pressures = []
+        for _ in range(hours):
+            source = 0.0 if prev >= p_eq else _SOURCE_02_KG_H
+            sources.append(source)
+            step = _as_result(
+                _diagnostic_o2(moles * _o2_molar_mass_kg(), source, dt_hr)
+            )
+            prev = step.partial_pressures_Pa["O2"]
+            moles = prev * _HS_V_M3 / (GAS_CONSTANT * _HS_T_K)
+            pressures.append(prev)
+        return sources, pressures
+
+    long_sources, long_pressures = map_hours(1.0, 4)
+    short_sources, short_pressures = map_hours(0.001 / 3600.0, 4)
+    assert long_sources == [_SOURCE_02_KG_H, 0.0, _SOURCE_02_KG_H, 0.0]
+    assert max(long_pressures) - min(long_pressures) > 1.0
+    assert long_pressures[0] > p_eq > long_pressures[1]
+    assert short_sources[0] == _SOURCE_02_KG_H
+    assert short_sources[1:] == [0.0, 0.0, 0.0]
+    assert min(short_pressures) > p_eq
+    assert long_sources != short_sources
+
+    # The commit of a source that really depends on the trial partial
+    # does not alternate. Every partition ends on the same pressure.
+    def true_flux(partials, _p_eq=p_eq):
+        partial = partials["O2"]
+        return {"O2": _SOURCE_02_KG_H * max(0.0, (_p_eq - partial) / _p_eq)}
+
+    committed = []
+    for steps, dt_hr in ((1, 1.0), (4, 0.25)):
+        moles = floor_moles
+        last = None
+        for _ in range(steps):
+            last = _as_result(
+                _commit_o2(
+                    moles * _o2_molar_mass_kg(),
+                    _SOURCE_02_KG_H,
+                    dt_hr,
+                    flux=true_flux,
+                )
+            )
+            moles = (
+                last.partial_pressures_Pa["O2"]
+                * _HS_V_M3
+                / (GAS_CONSTANT * _HS_T_K)
+            )
+        assert last is not None
+        committed.append(last.partial_pressures_Pa["O2"])
+    assert committed[0] == pytest.approx(committed[1], abs=1.0e-6)
+    assert committed[0] < p_eq
+
+
+def test_credit_hour_root():
+    root_pa = _bisect_pipe_pa(_CREDIT_KG_H, 100.0, 400.0)
+    result = _as_result(_commit_o2(_FLOOR_O2_KG, _CREDIT_KG_H, 1.0))
+    pressure = result.partial_pressures_Pa["O2"]
+    holdup = _holdup_kg(pressure)
+    bled = result.bled_species_mol["O2"] * _o2_molar_mass_kg()
+
+    assert pressure == pytest.approx(root_pa, rel=1.0e-10, abs=1.0e-8)
+    assert pressure == pytest.approx(_CREDIT_ROOT_PA, abs=5.0e-8)
+    assert holdup == pytest.approx(_CREDIT_HOLD_KG, rel=1.0e-9)
+    assert bled == pytest.approx(_FLOOR_O2_KG + _CREDIT_KG_H - holdup, rel=1.0e-12)
+    assert bled == pytest.approx(_CREDIT_BLED_KG, abs=5.0e-10)
+    assert result.saturation.binding_cause == "choked_throat"
+
+
+def test_fast_branch_matches_resolved_transient():
+    from scipy.integrate import solve_ivp
+
+    result = _as_result(_commit_o2(_STRANDED_O2_KG, _SOURCE_02_KG_H, 1.0))
+    pressure = result.partial_pressures_Pa["O2"]
+    holdup = _holdup_kg(pressure)
+    bled = result.bled_species_mol["O2"] * _o2_molar_mass_kg()
+    assert bled == pytest.approx(_STRANDED_O2_KG + _SOURCE_02_KG_H - holdup, rel=1.0e-12)
+
+    q_kg_s = _SOURCE_02_KG_H / 3600.0
+    molar = _o2_molar_mass_kg()
+
+    def rhs(_time, state):
+        mass = max(state[0], 0.0)
+        partial = mass * GAS_CONSTANT * _HS_T_K / (molar * _HS_V_M3)
+        outflow = pipe_species_outflow_mol_s(
+            partial,
+            0.0,
+            _HS_T_K,
+            {"O2": max(mass / molar, 1.0e-30)},
+            _HS_D_M,
+            _HS_L_M,
+        )
+        return [q_kg_s - outflow.species_mol_s["O2"] * molar]
+
+    integrated = solve_ivp(
+        rhs,
+        (0.0, 5.0),
+        [_STRANDED_O2_KG],
+        method="DOP853",
+        rtol=1.0e-8,
+        atol=1.0e-14,
+    )
+    assert integrated.success
+    arrived = float(integrated.y[0, -1])
+    arrived_pa = arrived * GAS_CONSTANT * _HS_T_K / (molar * _HS_V_M3)
+    assert arrived_pa == pytest.approx(pressure, abs=1.0e-4)
+    assert float(integrated.t[-1]) < 3600.0
+    # Tail books the root rate for the rest of the hour. The integrated
+    # holdup is what the pipe trajectory actually reached.
+    tail_bled = (
+        (_STRANDED_O2_KG - arrived)
+        + q_kg_s * float(integrated.t[-1])
+        + q_kg_s * (3600.0 - float(integrated.t[-1]))
+    )
+    assert tail_bled == pytest.approx(bled, rel=1.0e-9)
+
+    coarse = _as_result(_diagnostic_o2(_STRANDED_O2_KG, _SOURCE_02_KG_H, 1.0))
+    coarse_bled = coarse.bled_species_mol["O2"] * molar
+    assert abs(coarse_bled - bled) > 1.0e-5
+
+    # Pressure-dependent source. Summing the end-state rate of four
+    # coarse steps is not the hour's 0.2 kg. The commit's identity is.
+    def shaped(partials, root=pressure):
+        partial = partials["O2"]
+        if partial >= 100.0:
+            return {"O2": 0.0}
+        return {"O2": _SOURCE_02_KG_H * (100.0 - partial) / (100.0 - root)}
+
+    moles = _moles_of_kg(_STRANDED_O2_KG)
+    booked = 0.0
+    for _ in range(4):
+        step = _as_result(
+            _diagnostic_o2(
+                moles * molar,
+                _SOURCE_02_KG_H,
+                0.25,
+                flux=shaped,
+            )
+        )
+        end = step.partial_pressures_Pa["O2"]
+        booked += shaped({"O2": end})["O2"] * 0.25
+        moles = end * _HS_V_M3 / (GAS_CONSTANT * _HS_T_K)
+    assert abs(booked - _SOURCE_02_KG_H) > 0.01
+
+
+def test_closed_line_accumulates_the_source():
+    mass0 = 0.01
+    source = _SOURCE_02_KG_H
+    commit = _as_result(
+        _commit_o2(mass0, source, 1.0, pipe=False, cap_kg_s=0.0)
+    )
+    assert _holdup_kg(commit.partial_pressures_Pa["O2"]) == pytest.approx(
+        mass0 + source,
+        rel=1.0e-12,
+    )
+    assert commit.bled_species_mol["O2"] * _o2_molar_mass_kg() == pytest.approx(
+        0.0,
+        abs=1.0e-12,
+    )
+    assert commit.saturation.binding_cause == "line_closed"
+
+    one = _as_result(_diagnostic_o2(mass0, source, 1.0, pipe=False, cap_kg_s=0.0))
+    half = _as_result(_diagnostic_o2(mass0, source, 0.5, pipe=False, cap_kg_s=0.0))
+    second = _as_result(
+        _diagnostic_o2(
+            _holdup_kg(half.partial_pressures_Pa["O2"]),
+            source,
+            0.5,
+            pipe=False,
+            cap_kg_s=0.0,
+        )
+    )
+    assert abs(one.partial_pressures_Pa["O2"] - second.partial_pressures_Pa["O2"]) <= 1.0e-6
+    bled_one = one.bled_species_mol["O2"] * _o2_molar_mass_kg()
+    bled_halves = (half.bled_species_mol["O2"] + second.bled_species_mol["O2"]) * _o2_molar_mass_kg()
+    assert abs(bled_one - bled_halves) <= max(1.0e-12, 1.0e-9 * abs(bled_one))
+    assert commit.partial_pressures_Pa["O2"] == pytest.approx(
+        one.partial_pressures_Pa["O2"],
+        abs=1.0e-6,
+    )
+
+
+def test_cap_below_source_is_exact_in_one_step():
+    mass0 = 0.01
+    source = _SOURCE_02_KG_H
+    cap_kg_h = 0.05
+    commit = _as_result(
+        _commit_o2(mass0, source, 1.0, pipe=False, cap_kg_s=cap_kg_h / 3600.0)
+    )
+    assert _holdup_kg(commit.partial_pressures_Pa["O2"]) == pytest.approx(
+        mass0 + source - cap_kg_h,
+        rel=1.0e-12,
+    )
+    assert commit.bled_species_mol["O2"] * _o2_molar_mass_kg() == pytest.approx(
+        cap_kg_h,
+        rel=1.0e-12,
+    )
+    assert commit.saturation.binding_cause == "controlled_o2_equipment"
+
+    one = _as_result(
+        _diagnostic_o2(mass0, source, 1.0, pipe=False, cap_kg_s=cap_kg_h / 3600.0)
+    )
+    half = _as_result(
+        _diagnostic_o2(mass0, source, 0.5, pipe=False, cap_kg_s=cap_kg_h / 3600.0)
+    )
+    second = _as_result(
+        _diagnostic_o2(
+            _holdup_kg(half.partial_pressures_Pa["O2"]),
+            source,
+            0.5,
+            pipe=False,
+            cap_kg_s=cap_kg_h / 3600.0,
+        )
+    )
+    assert abs(one.partial_pressures_Pa["O2"] - second.partial_pressures_Pa["O2"]) <= 1.0e-6
+    bled_one = one.bled_species_mol["O2"] * _o2_molar_mass_kg()
+    bled_halves = (
+        half.bled_species_mol["O2"] + second.bled_species_mol["O2"]
+    ) * _o2_molar_mass_kg()
+    assert abs(bled_one - bled_halves) <= max(1.0e-12, 1.0e-9 * abs(bled_one))
+    assert commit.partial_pressures_Pa["O2"] == pytest.approx(
+        one.partial_pressures_Pa["O2"],
+        abs=1.0e-6,
+    )
+
+
+def test_outflow_argument_is_trial_pressure():
+    recorded: list[tuple[float, float]] = []
+    real = pipe_species_outflow_mol_s
+
+    def spy(upstream_pa, downstream_pa, temperature_K, holdup_mol, diameter_m, length_m):
+        recorded.append((float(upstream_pa), math.fsum(holdup_mol.values())))
+        return real(
+            upstream_pa,
+            downstream_pa,
+            temperature_K,
+            holdup_mol,
+            diameter_m,
+            length_m,
+        )
+
+    with patch("simulator.capacity_coupling.pipe_species_outflow_mol_s", spy):
+        result = _as_result(_commit_o2(_STRANDED_O2_KG, _SOURCE_02_KG_H, 1.0))
+
+    assert recorded
+    stranded_mol = _moles_of_kg(_STRANDED_O2_KG)
+    commanded_pa = max(0.2 * 100.0, 1.0)
+    for upstream_pa, moles in recorded:
+        reconstructed = moles * GAS_CONSTANT * _HS_T_K / _HS_V_M3
+        assert abs(upstream_pa - reconstructed) <= max(1.0e-6, 1.0e-12 * upstream_pa)
+        at_command = abs(upstream_pa - commanded_pa) <= 1.0e-9
+        at_stranded = abs(moles - stranded_mol) <= 1.0e-6 * stranded_mol
+        assert not (at_command and at_stranded)
+    assert result.partial_pressures_Pa["O2"] == pytest.approx(_ROOT_02_PA, abs=5.0e-9)
+    assert result.partial_pressures_Pa["O2"] != pytest.approx(commanded_pa, abs=1.0)
+
+
+def test_source_above_the_sonic_crossing_returns_the_sonic_root():
+    crossing_pa = _bisect_pipe_pa(_SONIC_CROSSING_KG_H, 50.0, 300.0)
+    sonic_pa = _bisect_pipe_pa(_CREDIT_KG_H, crossing_pa, 400.0)
+    result = _as_result(_commit_o2(_FLOOR_O2_KG, _CREDIT_KG_H, 1.0))
+    pressure = result.partial_pressures_Pa["O2"]
+
+    assert sonic_pa > crossing_pa
+    assert pressure == pytest.approx(sonic_pa, rel=1.0e-10, abs=1.0e-8)
+    assert pressure == pytest.approx(_CREDIT_ROOT_PA, abs=5.0e-8)
+    assert result.saturation.binding_cause == "choked_throat"
+    assert _pipe_o2_kg_h(pressure) == pytest.approx(_CREDIT_KG_H, abs=1.0e-8)

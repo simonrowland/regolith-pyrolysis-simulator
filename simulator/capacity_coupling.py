@@ -12,8 +12,10 @@ from engines.builtin.overhead_bleed import (
     compressible_pressure_capacity_fraction,
     controlled_flow_capacity,
 )
+from simulator.overhead import pipe_species_outflow_mol_s
 from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
+from simulator.transport_regime import TransportRegimeRefusal
 
 
 OXYGEN_SPECIES = "O2"
@@ -195,6 +197,10 @@ def solve_capacity_shadow(
     cistern_fill_kg: float = 0.0,
     cavern_capacity_kg: float = 0.0,
     controlled_flow: bool = False,
+    pipe_diameter_m: float | None = None,
+    pipe_length_m: float | None = None,
+    outflow_cap_kg_s: float | None = None,
+    redox_source_mol_s: Mapping[str, float] | None = None,
     rel_tol: float = DEFAULT_REL_TOL,
     max_iterations: int = DEFAULT_MAX_ITERATIONS,
 ) -> CapacityShadowResult | CapacityShadowRefusal:
@@ -239,6 +245,31 @@ def solve_capacity_shadow(
         return CapacityShadowRefusal(
             "vessel_rating_Pa must be finite and positive",
             0,
+        )
+    # Geometry, or an explicit outflow cap (0 is a closed line), is the
+    # §2 balance. The Picard loop below is the no-geometry conductance
+    # shadow. It stays until chunk 3 rewires the live hour.
+    if (
+        pipe_diameter_m is not None
+        or pipe_length_m is not None
+        or outflow_cap_kg_s is not None
+    ):
+        return _commit_headspace_balance(
+            pre_holdup_mol=pre_holdup_mol,
+            molar_mass_kg_mol=molar_mass_kg_mol,
+            flux_kg_hr_at_partials=flux_kg_hr_at_partials,
+            capacity=capacity,
+            temperature_K=temperature_K,
+            volume_m3=volume_m3,
+            dt_hr=dt_hr,
+            downstream_pressure_Pa=downstream_pressure_Pa,
+            vessel_rating_Pa=vessel_rating_Pa,
+            pipe_diameter_m=pipe_diameter_m,
+            pipe_length_m=pipe_length_m,
+            outflow_cap_kg_s=outflow_cap_kg_s,
+            redox_source_mol_s=redox_source_mol_s,
+            rel_tol=rel_tol,
+            max_iterations=max_iterations,
         )
     if not isinstance(capacity, FiniteCapacity):
         oxygen = OxygenShadowPartition(0.0, 0.0, 0.0, 0.0, 0.0)
@@ -508,3 +539,1345 @@ def solve_capacity_shadow(
         max_delta_history_Pa=tuple(delta_history),
         mass_closure_error_pct=closure_pct,
     )
+
+
+# --- Headspace balance (§2). One owner, two equations. ---
+#
+# Fast commits G = q_head + S - Q = 0 when that scalar has one sign
+# change and the admission bound holds. Slow commits one backward-Euler
+# residual R = 0, then halves Δt. Newton proposes on the equation of the
+# branch it is called for. Brent publishes the root. There is no seam
+# that injects a Newton step: a returned Newton value is discarded.
+
+_HALVING_DEPTH = 12
+_ADMISSION_EXP_UNDERFLOW = 745.0
+_SIGN_SCAN_POINTS = 4096
+
+
+class _BalanceRefused(Exception):
+    def __init__(self, reason: str) -> None:
+        self.reason = reason
+        super().__init__(reason)
+
+
+@dataclass
+class _HeadspaceStep:
+    moles: dict[str, float]
+    partials: dict[str, float]
+    flux_kg_hr: dict[str, float]
+    bled_mol: dict[str, float]
+    bled_kg: float
+    source_kg: float
+    mass_end_kg: float
+    mass_start_kg: float
+    pressure_Pa: float
+    iterations: int
+    binding: str
+    residual_Pa: float
+
+
+def _ideal_gas_partials_Pa(
+    moles: Mapping[str, float],
+    *,
+    temperature_K: float,
+    volume_m3: float,
+) -> dict[str, float]:
+    # Premise: isothermal ideal gas. The inventory is the partial.
+    # Algebra: p_i = n_i * R * T / V. R is GAS_CONSTANT, the full
+    # CODATA value this module already imports. The 6-significant-figure
+    # reader misses the 25.695650006 Pa pin by about 8e-6 Pa.
+    # Unit check: mol * J/(mol·K) * K / m^3 = Pa.
+    # Limit: n_i = 0 gives p_i = 0. The commanded millibar is not added.
+    factor = GAS_CONSTANT * temperature_K / volume_m3
+    return {species: moles[species] * factor for species in moles}
+
+
+def _as_finite(value: object, reason: str) -> float:
+    try:
+        number = float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError) as exc:
+        raise _BalanceRefused(reason) from exc
+    if not math.isfinite(number):
+        raise _BalanceRefused(reason)
+    return number
+
+
+class _HeadspaceLaw:
+    """Trial-pressure source and outflow for one headspace step.
+
+    S_redox is stored as a molar rate (mol/s). A partition of the hour
+    passes the hour's rate N/3600 s into every substep, including a
+    halved substep. N/dt_substep would put the substep length into G
+    and move the fast root. This chunk passes zeros. Chunk 3 inherits
+    the rate.
+    """
+
+    def __init__(
+        self,
+        *,
+        species: tuple[str, ...],
+        masses: Mapping[str, float],
+        flux: Callable[[Mapping[str, float]], Mapping[str, float]],
+        temperature_K: float,
+        volume_m3: float,
+        downstream_pa: float,
+        diameter_m: float | None,
+        length_m: float | None,
+        cap_kg_s: float | None,
+        redox_mol_s: Mapping[str, float],
+    ) -> None:
+        self.species = species
+        self.masses = dict(masses)
+        self.flux = flux
+        self.temperature_K = temperature_K
+        self.volume_m3 = volume_m3
+        self.downstream_pa = downstream_pa
+        self.diameter_m = diameter_m
+        self.length_m = length_m
+        self.cap_kg_s = cap_kg_s
+        self.redox_mol_s = {
+            species_name: float(redox_mol_s.get(species_name, 0.0))
+            for species_name in species
+        }
+
+    def partials_of(self, moles: Mapping[str, float]) -> dict[str, float]:
+        return _ideal_gas_partials_Pa(
+            moles,
+            temperature_K=self.temperature_K,
+            volume_m3=self.volume_m3,
+        )
+
+    def pressure_of(self, moles: Mapping[str, float]) -> float:
+        return math.fsum(self.partials_of(moles).values())
+
+    def moles_at_pressure(self, pressure_pa: float) -> dict[str, float]:
+        # One species carries the whole pressure. Several species use
+        # the sweep's own mole vector, not this inversion.
+        species = self.species[0]
+        if pressure_pa <= 0.0:
+            return {species: 0.0}
+        # n = p * V / (R T). Unit check: Pa * m^3 / (J/(mol·K) * K) = mol.
+        moles = (
+            pressure_pa
+            * self.volume_m3
+            / (GAS_CONSTANT * self.temperature_K)
+        )
+        return {species: moles}
+
+    def _flux_kg_hr(self, partials: Mapping[str, float]) -> dict[str, float]:
+        from simulator.evaporation import EvaporationFluxRefusal
+
+        try:
+            raw = self.flux(partials)
+        except EvaporationFluxRefusal:
+            raise
+        except _BalanceRefused:
+            raise
+        except Exception as exc:
+            raise _BalanceRefused(
+                f"evaporation_flux_refused:{type(exc).__name__}:{exc}"
+            ) from exc
+        out: dict[str, float] = {}
+        for name, rate in raw.items():
+            if name not in self.masses or name not in self.redox_mol_s:
+                raise _BalanceRefused(f"missing_molar_mass:{name}")
+            number = _as_finite(rate, f"evaporation_flux_not_finite:{name}")
+            # Chunk 4 removes the one-sided clamp. This chunk still
+            # publishes max(0, rate).
+            out[str(name)] = max(0.0, number)
+        return out
+
+    def _source_mol_s(self, partials: Mapping[str, float]) -> dict[str, float]:
+        # kg/h / (kg/mol) / (s/h) = mol/s. 3600 is exact in binary64.
+        # Limit: a non-positive published rate contributes no moles.
+        flux = self._flux_kg_hr(partials)
+        return {
+            species: flux.get(species, 0.0) / self.masses[species] / 3600.0
+            for species in self.species
+        }
+
+    def _flows(
+        self,
+        partials: Mapping[str, float],
+    ) -> tuple[dict[str, float], dict[str, float], str, tuple]:
+        source = self._source_mol_s(partials)
+        pressure = math.fsum(partials[species] for species in self.species)
+        moles = {
+            species: partials[species]
+            * self.volume_m3
+            / (GAS_CONSTANT * self.temperature_K)
+            for species in self.species
+        }
+        total_mol = math.fsum(max(0.0, moles[species]) for species in self.species)
+        pipe_mol = {species: 0.0 for species in self.species}
+        binding = "pipe"
+        blend = 0.0
+        if (
+            self.diameter_m is not None
+            and self.length_m is not None
+            and total_mol > 0.0
+            and pressure > 0.0
+        ):
+            holdup = {
+                species: moles[species]
+                for species in self.species
+                if moles[species] > 0.0
+            }
+            try:
+                outflow = pipe_species_outflow_mol_s(
+                    pressure,
+                    self.downstream_pa,
+                    self.temperature_K,
+                    holdup,
+                    self.diameter_m,
+                    self.length_m,
+                )
+            except TransportRegimeRefusal as exc:
+                raise _BalanceRefused(str(exc)) from exc
+            pipe_mol = {
+                species: float(outflow.species_mol_s.get(species, 0.0))
+                for species in self.species
+            }
+            binding = outflow.binding_cause
+            blend = float(outflow.blend_weight)
+        mass_kg_s = math.fsum(
+            pipe_mol[species] * self.masses[species] for species in self.species
+        )
+        capped = False
+        outflow_mol = pipe_mol
+        if self.cap_kg_s is not None and self.diameter_m is None:
+            # Constant cap, no duct. Q is that mass flow for any n > 0
+            # and zero at an empty holdup, so one backward-Euler step of
+            # a cap below the source is exact.
+            if total_mol <= 0.0 or pressure <= 0.0 or self.cap_kg_s == 0.0:
+                outflow_mol = {species: 0.0 for species in self.species}
+            elif len(self.species) == 1:
+                species = self.species[0]
+                outflow_mol = {species: self.cap_kg_s / self.masses[species]}
+            else:
+                outflow_mol = {
+                    species: self.cap_kg_s
+                    * (moles[species] / total_mol)
+                    / self.masses[species]
+                    for species in self.species
+                }
+            binding = (
+                "line_closed" if self.cap_kg_s == 0.0 else "controlled_o2_equipment"
+            )
+            capped = self.cap_kg_s > 0.0
+            blend = 0.0
+        elif self.cap_kg_s is not None and mass_kg_s > self.cap_kg_s:
+            scale = 0.0 if mass_kg_s <= 0.0 else self.cap_kg_s / mass_kg_s
+            outflow_mol = {
+                species: pipe_mol[species] * scale for species in self.species
+            }
+            capped = True
+            binding = "controlled_o2_equipment"
+        if blend <= 0.0:
+            bucket = 0
+        elif blend >= 1.0:
+            bucket = 2
+        else:
+            bucket = 1
+        # The floor flag is the n_i = 0 kink. A difference that steps
+        # off zero is not a derivative of the smooth piece.
+        piece = (binding, bucket, capped, pressure <= 0.0)
+        return source, outflow_mol, binding, piece
+
+    def _scalar_g(self, pressure_pa: float) -> float:
+        # G = q_head + S - Q. n0 and Δt are not arguments.
+        # Unit check: each term is mol/s. Limit: Q = 0 and q + S > 0
+        # leaves G positive, so a closed line has no fast root.
+        moles = self.moles_at_pressure(pressure_pa)
+        source, outflow, _binding, _piece = self._flows(self.partials_of(moles))
+        species = self.species[0]
+        return (
+            source[species]
+            + self.redox_mol_s[species]
+            - outflow[species]
+        )
+
+    def _scalar_residual(
+        self,
+        n0: Mapping[str, float],
+        dt_s: float,
+        pressure_pa: float,
+    ) -> float:
+        # Premise: backward Euler, end-state rates over the whole substep.
+        # Algebra: R = n - n0 - Δt (q + S - Q).
+        # Unit check: (mol/s) * s = mol.
+        # Limit: Q = 0 and constant q gives n = n0 + (q + S) Δt.
+        moles = self.moles_at_pressure(pressure_pa)
+        source, outflow, _binding, _piece = self._flows(self.partials_of(moles))
+        species = self.species[0]
+        return (
+            moles[species]
+            - n0[species]
+            - dt_s
+            * (
+                source[species]
+                + self.redox_mol_s[species]
+                - outflow[species]
+            )
+        )
+
+    def g_samples(self) -> list[tuple[float, float]]:
+        lo = self.downstream_pa if self.downstream_pa > 0.0 else 1.0e-8
+        hi = max(1.0e8, lo * 10.0)
+        samples: list[tuple[float, float]] = []
+        if self.downstream_pa <= 0.0:
+            samples.append((0.0, self._scalar_g(0.0)))
+        samples.extend(self._pressure_grid(lo, hi, _SIGN_SCAN_POINTS))
+        if samples[-1][1] > 0.0:
+            samples.extend(self._pressure_grid(hi, 1.0e12, 1024)[1:])
+        return samples
+
+    def _pressure_grid(
+        self,
+        lo: float,
+        hi: float,
+        count: int,
+    ) -> list[tuple[float, float]]:
+        log_lo = math.log(lo)
+        log_hi = math.log(hi)
+        samples: list[tuple[float, float]] = []
+        crossings = 0
+        previous: float | None = None
+        for index in range(count):
+            pressure = math.exp(log_lo + (log_hi - log_lo) * index / (count - 1))
+            value = self._scalar_g(pressure)
+            if not math.isfinite(value):
+                raise _BalanceRefused("headspace_balance_nonconvergence")
+            if previous is not None and previous * value < 0.0:
+                crossings += 1
+            if value == 0.0 and previous not in (None, 0.0):
+                crossings += 1
+            previous = value
+            samples.append((pressure, value))
+            if crossings >= 2:
+                break
+        return samples
+
+    def piece_at(self, pressure_pa: float) -> tuple:
+        _source, _outflow, _binding, piece = self._flows(
+            self.partials_of(self.moles_at_pressure(max(pressure_pa, 0.0)))
+        )
+        return piece
+
+    def outflow_kg_s(self, pressure_pa: float) -> tuple[float, tuple]:
+        _source, outflow, _binding, piece = self._flows(
+            self.partials_of(self.moles_at_pressure(max(pressure_pa, 0.0)))
+        )
+        mass = math.fsum(
+            outflow[species] * self.masses[species] for species in self.species
+        )
+        return mass, piece
+
+    def a_min(self, pressure_a: float, pressure_b: float) -> float:
+        # a = dQ/dm. For one ideal-gas species dm = dP * M * V / (R T),
+        # so a = (dQ_kg/dP) * R * T / (M * V).
+        # Unit check: (kg/s/Pa) * (J/(mol·K)) * K / ((kg/mol) * m^3)
+        # = 1/s. Limit: a flat cap has dQ/dP = 0, so a_min = 0 and the
+        # admission bound does not hold. A stencil that changes piece
+        # (sonic kink, blend knot, cap, or the empty-holdup floor) is
+        # skipped. Under-estimating a_min fails admission and would
+        # publish the slow pressure, so the low-pressure end of the
+        # interval, where this pipe's slope is smallest, is included.
+        lo = min(pressure_a, pressure_b)
+        hi = max(pressure_a, pressure_b)
+        start = lo if lo > 0.0 else max(hi * 1.0e-8, 1.0e-8)
+        points = [start, hi]
+        if hi > start * (1.0 + 1.0e-12):
+            log_lo = math.log(start)
+            log_hi = math.log(hi)
+            points.extend(
+                math.exp(log_lo + (log_hi - log_lo) * index / 64.0)
+                for index in range(1, 64)
+            )
+        species = self.species[0]
+        scale = (
+            GAS_CONSTANT
+            * self.temperature_K
+            / (self.masses[species] * self.volume_m3)
+        )
+        slopes: list[float] = []
+        for pressure in points:
+            slope = self._dq_kg_dp(pressure)
+            if slope is not None and slope > 0.0 and math.isfinite(slope):
+                slopes.append(slope * scale)
+        if not slopes:
+            return 0.0
+        return min(slopes)
+
+    def _dq_kg_dp(self, pressure_pa: float) -> float | None:
+        if pressure_pa <= 0.0:
+            return None
+        # Central relative 1e-6, the same step the design probe used
+        # for a(P). One-sided when the other side would leave the piece.
+        step = max(abs(pressure_pa) * 1.0e-6, 1.0e-9)
+        mass_0, piece_0 = self.outflow_kg_s(pressure_pa)
+        mass_up: float | None = None
+        mass_down: float | None = None
+        if pressure_pa + step > 0.0:
+            mass, piece = self.outflow_kg_s(pressure_pa + step)
+            if piece == piece_0:
+                mass_up = mass
+        if pressure_pa - step > 0.0:
+            mass, piece = self.outflow_kg_s(pressure_pa - step)
+            if piece == piece_0:
+                mass_down = mass
+        if mass_up is not None and mass_down is not None:
+            return (mass_up - mass_down) / (2.0 * step)
+        if mass_up is not None:
+            return (mass_up - mass_0) / step
+        if mass_down is not None:
+            return (mass_0 - mass_down) / step
+        return None
+
+    def step_from_moles(
+        self,
+        n0: Mapping[str, float],
+        dt_s: float,
+        moles: Mapping[str, float],
+        iterations: int,
+        residual_Pa: float,
+    ) -> _HeadspaceStep:
+        partials = self.partials_of(moles)
+        source, outflow, binding, _piece = self._flows(partials)
+        flux = self._flux_kg_hr(partials)
+        mass_start = math.fsum(
+            n0[species] * self.masses[species] for species in self.species
+        )
+        mass_end = math.fsum(
+            moles[species] * self.masses[species] for species in self.species
+        )
+        # m_source = (q + S) * M * Δt. At a fast root q + S = Q, so the
+        # bled mass is the hour's source plus the drained holdup.
+        # Unit check: mol/s * kg/mol * s = kg.
+        # Limit: already at the root, m0 = m_end and bled = (q + S) Δt.
+        source_kg = math.fsum(
+            (source[species] + self.redox_mol_s[species])
+            * self.masses[species]
+            * dt_s
+            for species in self.species
+        )
+        bled_mol = {
+            species: n0[species]
+            + (source[species] + self.redox_mol_s[species]) * dt_s
+            - moles[species]
+            for species in self.species
+        }
+        bled_kg = math.fsum(
+            bled_mol[species] * self.masses[species] for species in self.species
+        )
+        return _HeadspaceStep(
+            moles=dict(moles),
+            partials=partials,
+            flux_kg_hr=flux,
+            bled_mol=bled_mol,
+            bled_kg=bled_kg,
+            source_kg=source_kg,
+            mass_end_kg=mass_end,
+            mass_start_kg=mass_start,
+            pressure_Pa=math.fsum(partials.values()),
+            iterations=iterations,
+            binding=binding,
+            residual_Pa=residual_Pa,
+        )
+
+
+def _crossings(
+    samples: list[tuple[float, float]],
+) -> list[tuple[str, float, float]]:
+    """One entry per sign change. A run of exact zeros is not a run of roots.
+
+    product < 0 is a bracket. An isolated 0 with a nonzero neighbor is
+    one exact root. A function that is 0 everywhere has no nonzero
+    neighbor, so it is not a sign change: the slow branch then keeps
+    a closed, sourceless holdup where it is.
+    """
+
+    found: list[tuple[str, float, float]] = []
+    count = len(samples)
+    for index, (pressure, value) in enumerate(samples):
+        if value == 0.0:
+            previous = samples[index - 1][1] if index else None
+            nxt = samples[index + 1][1] if index + 1 < count else None
+            neighbors = [item for item in (previous, nxt) if item is not None]
+            if any(item != 0.0 for item in neighbors) and previous != 0.0:
+                found.append(("exact", pressure, pressure))
+            continue
+        if index == 0:
+            continue
+        previous_p, previous_g = samples[index - 1]
+        if previous_g == 0.0:
+            continue
+        if previous_g * value < 0.0:
+            found.append(("bracket", previous_p, pressure))
+    return found
+
+
+def _newton_propose(
+    func: Callable[[float], float],
+    piece_at: Callable[[float], tuple],
+    guess: float,
+    lo: float,
+    hi: float,
+) -> float | None:
+    """Damped Newton on one smooth piece. The caller discards the return.
+
+    A step that leaves the piece (sonic kink, blend knot, cold-train
+    cap, or n = 0) is rejected and shortened. Backtracking that only
+    asks the residual to fall can stall on a kink; stalling returns
+    None and is not a commit. The first guess may be the pressure of
+    n0, clamped into the bracket. It is not the commanded pressure.
+    """
+
+    if not hi > lo:
+        return None
+    trial_x = min(max(guess, lo), hi)
+    for _iteration in range(DEFAULT_MAX_ITERATIONS):
+        value = func(trial_x)
+        if value == 0.0:
+            return trial_x
+        piece = piece_at(trial_x)
+        step_h = max(abs(trial_x) * 1.0e-6, 1.0e-9)
+        right: float | None = None
+        left: float | None = None
+        if trial_x + step_h <= hi and piece_at(trial_x + step_h) == piece:
+            right = func(trial_x + step_h)
+        if trial_x - step_h >= lo and piece_at(trial_x - step_h) == piece:
+            left = func(trial_x - step_h)
+        if right is None and left is None:
+            return None
+        if right is not None and left is not None:
+            derivative = (right - left) / (2.0 * step_h)
+        elif right is not None:
+            derivative = (right - value) / step_h
+        else:
+            derivative = (value - left) / step_h  # type: ignore[operator]
+        if derivative == 0.0 or not math.isfinite(derivative):
+            return None
+        step = -value / derivative
+        if not math.isfinite(step):
+            return None
+        accepted = False
+        taken = step
+        for _back in range(8):
+            candidate = trial_x + step
+            if lo <= candidate <= hi and piece_at(candidate) == piece:
+                trial_value = func(candidate)
+                if abs(trial_value) < abs(value):
+                    trial_x = candidate
+                    taken = step
+                    accepted = True
+                    break
+            step *= 0.5
+        if not accepted:
+            return None
+        if abs(taken) <= max(DEFAULT_ABS_TOL_PA, DEFAULT_REL_TOL * abs(trial_x)):
+            return trial_x
+    return None
+
+
+def _brent(func: Callable[[float], float], lo: float, hi: float) -> tuple[float, int]:
+    """Publish the root. An endpoint that is already 0 is that root.
+
+    brentq needs a strict sign change, so an exact zero is returned
+    before the call. xtol 1e-12 Pa and rtol 1e-14 sit under the
+    shadow's 1e-6 Pa pressure tolerance.
+    """
+
+    if hi < lo:
+        lo, hi = hi, lo
+    low = func(lo)
+    high = func(hi)
+    if low == 0.0:
+        return lo, 1
+    if high == 0.0:
+        return hi, 1
+    if low * high > 0.0 or not hi > lo:
+        raise _BalanceRefused("headspace_balance_nonconvergence")
+    from scipy.optimize import brentq
+
+    try:
+        root, info = brentq(
+            func,
+            lo,
+            hi,
+            xtol=1.0e-12,
+            rtol=1.0e-14,
+            maxiter=200,
+            full_output=True,
+            disp=False,
+        )
+    except ValueError as exc:
+        raise _BalanceRefused("headspace_balance_nonconvergence") from exc
+    return float(root), max(int(info.iterations), 1)
+
+
+def _solve_bracket(
+    func: Callable[[float], float],
+    piece_at: Callable[[float], tuple],
+    crossing: tuple[str, float, float],
+    guess: float,
+) -> tuple[float, int]:
+    # Newton first, including when it converges. Brent then publishes.
+    # The last Newton iterate is not the commit.
+    lo, hi = crossing[1], crossing[2]
+    _newton_propose(func, piece_at, guess, min(lo, hi), max(lo, hi))
+    if crossing[0] == "exact":
+        return crossing[1], 1
+    return _brent(func, lo, hi)
+
+
+def _admits(law: _HeadspaceLaw, p0: float, p_root: float, dt_s: float) -> bool:
+    # Premise: a linear drain dm/dt = -a (m - m_root) leaves a gap
+    # |P(m0) - P_root| * exp(-a_min Δt). Admit when that gap is at
+    # most 1e-6 Pa. exp underflows to 0 in binary64 once a Δt is
+    # about 745 or more, and that underflow admits.
+    # Limit: a gap already inside 1e-6 Pa admits with a_min unused.
+    # A non-positive a_min (flat cap) does not admit.
+    gap = abs(p0 - p_root)
+    if gap <= DEFAULT_ABS_TOL_PA:
+        return True
+    a_min = law.a_min(p0, p_root)
+    if a_min <= 0.0:
+        return False
+    product = a_min * dt_s
+    if product >= _ADMISSION_EXP_UNDERFLOW:
+        return True
+    factor = math.exp(-product)
+    if factor == 0.0:
+        return True
+    return gap * factor <= DEFAULT_ABS_TOL_PA
+
+
+def _one_euler(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+) -> _HeadspaceStep:
+    """One backward-Euler step. Never the fast root of G."""
+
+    if len(law.species) == 1:
+        return _euler_one(law, n0, dt_s)
+    return _euler_many(law, n0, dt_s, DEFAULT_REL_TOL, DEFAULT_MAX_ITERATIONS)
+
+
+def _euler_one(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+) -> _HeadspaceStep:
+    species = law.species[0]
+    p_lo = law.downstream_pa if law.downstream_pa > 0.0 else 0.0
+    zero = law.partials_of(law.moles_at_pressure(0.0))
+    source0, _outflow0, _binding0, _piece0 = law._flows(zero)
+    n_hi = n0[species] + max(
+        0.0,
+        source0[species] + law.redox_mol_s[species],
+    ) * dt_s
+    p_hi = n_hi * GAS_CONSTANT * law.temperature_K / law.volume_m3
+    if p_hi <= p_lo:
+        p_hi = p_lo + max(DEFAULT_ABS_TOL_PA, abs(p_lo))
+
+    def residual(pressure: float) -> float:
+        return law._scalar_residual(n0, dt_s, pressure)
+
+    low = residual(p_lo)
+    high = residual(p_hi)
+    expands = 0
+    while low * high > 0.0 and expands < 40:
+        p_hi = p_hi * 2.0 if p_hi > 0.0 else 1.0
+        high = residual(p_hi)
+        expands += 1
+    if low * high > 0.0 and low != 0.0 and high != 0.0:
+        raise _BalanceRefused("headspace_balance_nonconvergence")
+    guess = law.pressure_of(n0)
+    # Discarded. Brent, or an endpoint that is already 0, publishes.
+    _newton_propose(residual, law.piece_at, guess, p_lo, p_hi)
+    if low == 0.0:
+        root, iterations = p_lo, 1
+    elif high == 0.0:
+        root, iterations = p_hi, 1
+    else:
+        root, iterations = _brent(residual, p_lo, p_hi)
+    moles = law.moles_at_pressure(root)
+    residual_pa = abs(residual(root)) * (
+        GAS_CONSTANT * law.temperature_K / law.volume_m3
+    )
+    return law.step_from_moles(n0, dt_s, moles, iterations, residual_pa)
+
+
+def _halves_agree(coarse: _HeadspaceStep, first: _HeadspaceStep, second: _HeadspaceStep) -> bool:
+    # |P(Δt) - P(Δt/2)| <= 1e-6 Pa, and the summed bled mass of the two
+    # half steps agrees with the coarse bled mass to 1e-12 kg or a
+    # relative 1e-9, whichever is looser.
+    if abs(coarse.pressure_Pa - second.pressure_Pa) > DEFAULT_ABS_TOL_PA:
+        return False
+    fine_bled = first.bled_kg + second.bled_kg
+    tolerance = max(1.0e-12, 1.0e-9 * abs(coarse.bled_kg))
+    return abs(coarse.bled_kg - fine_bled) <= tolerance
+
+
+def _combine(left: _HeadspaceStep, right: _HeadspaceStep) -> _HeadspaceStep:
+    bled_mol = {
+        species: left.bled_mol[species] + right.bled_mol[species]
+        for species in left.bled_mol
+    }
+    return _HeadspaceStep(
+        moles=dict(right.moles),
+        partials=dict(right.partials),
+        flux_kg_hr=dict(right.flux_kg_hr),
+        bled_mol=bled_mol,
+        bled_kg=left.bled_kg + right.bled_kg,
+        source_kg=left.source_kg + right.source_kg,
+        mass_end_kg=right.mass_end_kg,
+        mass_start_kg=left.mass_start_kg,
+        pressure_Pa=right.pressure_Pa,
+        iterations=left.iterations + right.iterations,
+        binding=right.binding,
+        residual_Pa=max(left.residual_Pa, right.residual_Pa),
+    )
+
+
+def _slow_converge(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    depth: int,
+) -> _HeadspaceStep:
+    coarse = _one_euler(law, n0, dt_s)
+    half = dt_s / 2.0
+    first = _one_euler(law, n0, half)
+    second = _one_euler(law, first.moles, half)
+    if _halves_agree(coarse, first, second):
+        return coarse
+    if depth >= _HALVING_DEPTH:
+        raise _BalanceRefused("headspace_balance_nonconvergence")
+    left = _slow_converge(law, n0, half, depth + 1)
+    return _combine(left, _slow_converge(law, left.moles, half, depth + 1))
+
+
+def _commit_one(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+) -> _HeadspaceStep:
+    samples = law.g_samples()
+    crossings = _crossings(samples)
+    if len(crossings) >= 2:
+        raise _BalanceRefused("headspace_balance_multiple_roots")
+    if len(crossings) == 1:
+        root, iterations = _solve_bracket(
+            law._scalar_g,
+            law.piece_at,
+            crossings[0],
+            law.pressure_of(n0),
+        )
+        if _admits(law, law.pressure_of(n0), root, dt_s):
+            moles = law.moles_at_pressure(root)
+            # |G| * Δt * R T / V is the pressure that imbalance would
+            # accumulate. At the published root it is under 1e-6 Pa.
+            imbalance = abs(law._scalar_g(root)) * dt_s
+            residual_pa = imbalance * (
+                GAS_CONSTANT * law.temperature_K / law.volume_m3
+            )
+            return law.step_from_moles(
+                n0,
+                dt_s,
+                moles,
+                iterations,
+                residual_pa,
+            )
+    return _slow_converge(law, n0, dt_s, 0)
+
+
+def _slice_value(
+    law: _HeadspaceLaw,
+    moles: Mapping[str, float],
+    species: str,
+    n_i: float,
+    n0: Mapping[str, float],
+    dt_s: float,
+    mode: str,
+) -> float:
+    trial = dict(moles)
+    trial[species] = n_i
+    source, outflow, _binding, _piece = law._flows(law.partials_of(trial))
+    redox = law.redox_mol_s[species]
+    if mode == "fast":
+        return source[species] + redox - outflow[species]
+    return (
+        n_i
+        - n0[species]
+        - dt_s * (source[species] + redox - outflow[species])
+    )
+
+
+def _solve_slice(
+    law: _HeadspaceLaw,
+    moles: Mapping[str, float],
+    species: str,
+    n0: Mapping[str, float],
+    dt_s: float,
+    mode: str,
+) -> tuple[dict[str, float], float, int]:
+    def func(n_i: float) -> float:
+        return _slice_value(law, moles, species, n_i, n0, dt_s, mode)
+
+    if mode == "slow":
+        frozen = dict(moles)
+        frozen[species] = 0.0
+        source0, _outflow, _binding, _piece = law._flows(law.partials_of(frozen))
+        n_hi = n0[species] + max(
+            0.0,
+            source0[species] + law.redox_mol_s[species],
+        ) * dt_s
+    else:
+        n_hi = max(
+            1.0e8 * law.volume_m3 / (GAS_CONSTANT * law.temperature_K),
+            n0[species],
+            moles[species],
+            1.0e-12,
+        )
+    samples = [(0.0, func(0.0))]
+    if n_hi > 0.0:
+        log_lo = math.log(1.0e-16)
+        log_hi = math.log(max(n_hi, 1.0e-16))
+        for index in range(1, 257):
+            amount = math.exp(log_lo + (log_hi - log_lo) * index / 256.0)
+            samples.append((amount, func(amount)))
+            if len(_crossings(samples)) >= 2:
+                raise _BalanceRefused("headspace_balance_multiple_roots")
+    crossings = _crossings(samples)
+    if len(crossings) >= 2:
+        raise _BalanceRefused("headspace_balance_multiple_roots")
+    if len(crossings) == 0:
+        raise _BalanceRefused("headspace_balance_nonconvergence")
+
+    def piece_at(n_i: float) -> tuple:
+        trial = dict(moles)
+        trial[species] = max(n_i, 0.0)
+        _source, _outflow, _binding, piece = law._flows(law.partials_of(trial))
+        return piece
+
+    root, iterations = _solve_bracket(
+        func,
+        piece_at,
+        crossings[0],
+        moles[species],
+    )
+    updated = dict(moles)
+    old_partial = law.partials_of(moles)[species]
+    updated[species] = root
+    new_partial = law.partials_of(updated)[species]
+    return updated, abs(new_partial - old_partial), iterations
+
+
+def _sweep(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    mode: str,
+    *,
+    rel_tol: float,
+    max_iterations: int,
+) -> tuple[dict[str, float], int, float]:
+    moles = {species: max(0.0, n0[species]) for species in law.species}
+    total_iterations = 0
+    last_move = math.inf
+    for _sweep_index in range(max_iterations):
+        last_move = 0.0
+        for species in law.species:
+            moles, move, iterations = _solve_slice(
+                law,
+                moles,
+                species,
+                n0,
+                dt_s,
+                mode,
+            )
+            last_move = max(last_move, move)
+            total_iterations += iterations
+        scale = max(law.pressure_of(moles), 1.0)
+        if last_move <= max(DEFAULT_ABS_TOL_PA, rel_tol * scale):
+            return moles, max(total_iterations, 1), last_move
+    raise _BalanceRefused("headspace_balance_nonconvergence")
+
+
+def _euler_many(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    rel_tol: float,
+    max_iterations: int,
+) -> _HeadspaceStep:
+    moles, iterations, residual_pa = _sweep(
+        law,
+        n0,
+        dt_s,
+        "slow",
+        rel_tol=rel_tol,
+        max_iterations=max_iterations,
+    )
+    return law.step_from_moles(n0, dt_s, moles, iterations, residual_pa)
+
+
+def _ray_samples(
+    law: _HeadspaceLaw,
+    fractions: Mapping[str, float],
+) -> list[tuple[float, float]]:
+    lo = law.downstream_pa if law.downstream_pa > 0.0 else 1.0e-8
+    hi = max(1.0e8, lo * 10.0)
+
+    def total_g(pressure: float) -> float:
+        if pressure <= 0.0:
+            partials = {species: 0.0 for species in law.species}
+        else:
+            partials = {
+                species: pressure * fractions[species] for species in law.species
+            }
+        source, outflow, _binding, _piece = law._flows(partials)
+        return math.fsum(
+            source[species] + law.redox_mol_s[species] - outflow[species]
+            for species in law.species
+        )
+
+    samples: list[tuple[float, float]] = []
+    if law.downstream_pa <= 0.0:
+        samples.append((0.0, total_g(0.0)))
+    log_lo = math.log(lo)
+    log_hi = math.log(hi)
+    for index in range(_SIGN_SCAN_POINTS):
+        pressure = math.exp(log_lo + (log_hi - log_lo) * index / (_SIGN_SCAN_POINTS - 1))
+        samples.append((pressure, total_g(pressure)))
+        if len(_crossings(samples)) >= 2:
+            return samples
+    if samples[-1][1] > 0.0:
+        log_lo = math.log(hi)
+        log_hi = math.log(1.0e12)
+        for index in range(1, 1024):
+            pressure = math.exp(log_lo + (log_hi - log_lo) * index / 1023.0)
+            samples.append((pressure, total_g(pressure)))
+            if len(_crossings(samples)) >= 2:
+                break
+    return samples
+
+
+def _fractions_of(
+    law: _HeadspaceLaw,
+    moles: Mapping[str, float],
+) -> dict[str, float] | None:
+    total = math.fsum(max(0.0, moles[species]) for species in law.species)
+    if total <= 0.0:
+        return None
+    return {
+        species: max(0.0, moles[species]) / total for species in law.species
+    }
+
+
+def _state_slope(law: _HeadspaceLaw, moles: Mapping[str, float]) -> float | None:
+    """dQ_kg/dm at fixed composition. None when the stencil crosses a kink.
+
+    Algebra: a = (Q(m(1+ε)) - Q(m(1-ε))) / (m(1+ε) - m(1-ε)).
+    Unit check: (kg/s) / kg = 1/s. This is the mixture form of a_min.
+    The one-species commit uses the pressure form instead, which the
+    stranded-hour pins already exercise. Limit: an empty holdup has
+    no slope.
+    """
+
+    total = math.fsum(max(0.0, moles[species]) for species in law.species)
+    if total <= 0.0:
+        return None
+    epsilon = 1.0e-6
+
+    def evaluate(scale: float) -> tuple[float, float, tuple]:
+        scaled = {
+            species: max(0.0, moles[species]) * scale for species in law.species
+        }
+        _source, outflow, _binding, piece = law._flows(law.partials_of(scaled))
+        mass = math.fsum(
+            scaled[species] * law.masses[species] for species in law.species
+        )
+        flow = math.fsum(
+            outflow[species] * law.masses[species] for species in law.species
+        )
+        return mass, flow, piece
+
+    mass_0, _flow_0, piece_0 = evaluate(1.0)
+    mass_up, flow_up, piece_up = evaluate(1.0 + epsilon)
+    mass_down, flow_down, piece_down = evaluate(1.0 - epsilon)
+    if piece_up != piece_0 or piece_down != piece_0:
+        return None
+    delta_mass = mass_up - mass_down
+    if delta_mass <= 0.0 or mass_0 <= 0.0:
+        return None
+    slope = (flow_up - flow_down) / delta_mass
+    if not math.isfinite(slope) or slope <= 0.0:
+        return None
+    return slope
+
+
+def _admits_mixture(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    n_root: Mapping[str, float],
+    dt_s: float,
+) -> bool:
+    # Same bound as the one-species test. a_min is the smallest positive
+    # dQ/dm on the segment between the two states. A missing slope does
+    # not admit: the slow branch then publishes the backward-Euler state
+    # instead of a fast root the bound did not support.
+    gap = abs(law.pressure_of(n0) - law.pressure_of(n_root))
+    if gap <= DEFAULT_ABS_TOL_PA:
+        return True
+    slopes: list[float] = []
+    for weight in (0.0, 0.25, 0.5, 0.75, 1.0):
+        state = {
+            species: (1.0 - weight) * n0[species] + weight * n_root[species]
+            for species in law.species
+        }
+        slope = _state_slope(law, state)
+        if slope is not None:
+            slopes.append(slope)
+    if not slopes:
+        return False
+    product = min(slopes) * dt_s
+    if product >= _ADMISSION_EXP_UNDERFLOW:
+        return True
+    factor = math.exp(-product)
+    if factor == 0.0:
+        return True
+    return gap * factor <= DEFAULT_ABS_TOL_PA
+
+
+def _commit_many(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    *,
+    rel_tol: float,
+    max_iterations: int,
+) -> _HeadspaceStep:
+    fractions = _fractions_of(law, n0)
+    if fractions is None:
+        zero = {species: 0.0 for species in law.species}
+        source, _outflow, _binding, _piece = law._flows(law.partials_of(zero))
+        weights = {
+            species: max(0.0, source[species] + law.redox_mol_s[species])
+            for species in law.species
+        }
+        total = math.fsum(weights.values())
+        if total <= 0.0:
+            raise _BalanceRefused("headspace_balance_nonconvergence")
+        fractions = {species: weights[species] / total for species in law.species}
+    crossings = _crossings(_ray_samples(law, fractions))
+    if len(crossings) >= 2:
+        raise _BalanceRefused("headspace_balance_multiple_roots")
+    if len(crossings) == 1:
+        try:
+            moles, iterations, residual_pa = _sweep(
+                law,
+                n0,
+                dt_s,
+                "fast",
+                rel_tol=rel_tol,
+                max_iterations=max_iterations,
+            )
+        except _BalanceRefused as refused:
+            if refused.reason == "headspace_balance_multiple_roots":
+                raise
+            moles = None
+            iterations = 0
+            residual_pa = 0.0
+        if moles is not None and _admits_mixture(law, n0, moles, dt_s):
+            return law.step_from_moles(n0, dt_s, moles, iterations, residual_pa)
+    return _slow_converge(law, n0, dt_s, 0)
+
+
+def _publish(
+    law: _HeadspaceLaw,
+    step: _HeadspaceStep,
+    capacity: NoColdTrain | FiniteCapacity,
+    vessel_rating_Pa: float | None,
+) -> CapacityShadowResult | CapacityShadowRefusal:
+    if (
+        vessel_rating_Pa is not None
+        and step.pressure_Pa > vessel_rating_Pa
+    ):
+        return CapacityShadowRefusal(
+            "vessel_total_pressure_exceeds_rating:"
+            f"{step.pressure_Pa:.17g}>{vessel_rating_Pa:.17g}",
+            step.iterations,
+        )
+    evap_kg_hr = math.fsum(step.flux_kg_hr.values())
+    oxygen_evap = step.flux_kg_hr.get(OXYGEN_SPECIES, 0.0)
+    _source, outflow, _binding, _piece = law._flows(step.partials)
+    pipe_kg_hr = (
+        math.fsum(
+            outflow[species] * law.masses[species] for species in law.species
+        )
+        * 3600.0
+    )
+    if pipe_kg_hr > 0.0:
+        pipe_saturation = evap_kg_hr / pipe_kg_hr
+    else:
+        pipe_saturation = math.inf if evap_kg_hr > 0.0 else 0.0
+    oxygen_saturation = (
+        oxygen_evap / capacity.value_kg_hr
+        if isinstance(capacity, FiniteCapacity)
+        else None
+    )
+    if oxygen_saturation is None or pipe_saturation >= oxygen_saturation:
+        combined = pipe_saturation
+    else:
+        combined = oxygen_saturation
+    bled = dict(step.bled_mol)
+    terminal = {
+        species: moles
+        for species, moles in bled.items()
+        if species != OXYGEN_SPECIES
+    }
+    booked = step.mass_start_kg + step.source_kg
+    accounted = step.mass_end_kg + step.bled_kg
+    closure = (
+        abs(booked - accounted) / booked * 100.0 if booked > 0.0 else 0.0
+    )
+    return CapacityShadowResult(
+        capacity=capacity,
+        partial_pressures_Pa=step.partials,
+        evaporation_flux_kg_hr=step.flux_kg_hr,
+        bled_species_mol=bled,
+        terminal_offgas_mol=terminal,
+        oxygen=OxygenShadowPartition(0.0, 0.0, 0.0, 0.0, 0.0),
+        saturation=SaturationShadow(
+            pipe_saturation,
+            oxygen_saturation,
+            combined,
+            step.binding,
+        ),
+        iterations=step.iterations,
+        max_delta_history_Pa=(step.residual_Pa,),
+        mass_closure_error_pct=closure,
+    )
+
+
+def _build_law(
+    *,
+    pre_holdup_mol: Mapping[str, float],
+    molar_mass_kg_mol: Mapping[str, float],
+    flux_kg_hr_at_partials: Callable[[Mapping[str, float]], Mapping[str, float]],
+    capacity: NoColdTrain | FiniteCapacity,
+    temperature_K: float,
+    volume_m3: float,
+    dt_hr: float,
+    downstream_pressure_Pa: float,
+    pipe_diameter_m: float | None,
+    pipe_length_m: float | None,
+    outflow_cap_kg_s: float | None,
+    redox_source_mol_s: Mapping[str, float] | None,
+) -> tuple[_HeadspaceLaw, dict[str, float]] | CapacityShadowRefusal:
+    try:
+        if not all(
+            math.isfinite(value) and value > 0.0
+            for value in (temperature_K, volume_m3, dt_hr)
+        ):
+            raise _BalanceRefused(
+                "temperature_K, volume_m3, and dt_hr must be finite and positive"
+            )
+        downstream = _as_finite(
+            downstream_pressure_Pa,
+            "downstream_pressure_Pa must be finite and >= 0",
+        )
+        if downstream < 0.0:
+            raise _BalanceRefused(
+                "downstream_pressure_Pa must be finite and >= 0"
+            )
+        has_diameter = pipe_diameter_m is not None
+        has_length = pipe_length_m is not None
+        if has_diameter != has_length:
+            raise _BalanceRefused("pipe_geometry_incomplete")
+        diameter: float | None = None
+        length: float | None = None
+        if has_diameter:
+            diameter = _as_finite(
+                pipe_diameter_m,
+                "pipe_diameter_m and pipe_length_m must be finite and positive",
+            )
+            length = _as_finite(
+                pipe_length_m,
+                "pipe_diameter_m and pipe_length_m must be finite and positive",
+            )
+            if diameter <= 0.0 or length <= 0.0:
+                raise _BalanceRefused(
+                    "pipe_diameter_m and pipe_length_m must be finite and positive"
+                )
+        cap_kg_s: float | None = None
+        if isinstance(capacity, FiniteCapacity):
+            # value_kg_hr is kg/h. / 3600 is kg/s. Unit check: kg/h / (s/h) = kg/s.
+            cap_kg_s = capacity.value_kg_hr / 3600.0
+        if outflow_cap_kg_s is not None:
+            explicit = _as_finite(
+                outflow_cap_kg_s,
+                "outflow_cap_kg_s must be finite and >= 0",
+            )
+            if explicit < 0.0:
+                raise _BalanceRefused("outflow_cap_kg_s must be finite and >= 0")
+            cap_kg_s = explicit if cap_kg_s is None else min(cap_kg_s, explicit)
+        if diameter is None and cap_kg_s is None:
+            raise _BalanceRefused("headspace_balance_no_outflow")
+        redox: dict[str, float] = {}
+        if redox_source_mol_s is not None:
+            for name, rate in redox_source_mol_s.items():
+                redox[str(name)] = _as_finite(
+                    rate,
+                    f"redox_source_mol_s must be finite:{name}",
+                )
+        names = set(pre_holdup_mol) | set(redox)
+        if not names:
+            raise _BalanceRefused("headspace_balance_no_species")
+        masses: dict[str, float] = {}
+        n0: dict[str, float] = {}
+        for name in sorted(names):
+            if name not in molar_mass_kg_mol:
+                raise _BalanceRefused(f"missing_molar_mass:{name}")
+            mass = _as_finite(
+                molar_mass_kg_mol[name],
+                f"missing_molar_mass:{name}",
+            )
+            if mass <= 0.0:
+                raise _BalanceRefused(f"missing_molar_mass:{name}")
+            masses[name] = mass
+            amount = _as_finite(
+                pre_holdup_mol.get(name, 0.0),
+                "pre_holdup_mol must be finite and >= 0",
+            )
+            if amount < 0.0:
+                raise _BalanceRefused("pre_holdup_mol must be finite and >= 0")
+            n0[name] = amount
+        law = _HeadspaceLaw(
+            species=tuple(sorted(names)),
+            masses=masses,
+            flux=flux_kg_hr_at_partials,
+            temperature_K=temperature_K,
+            volume_m3=volume_m3,
+            downstream_pa=downstream,
+            diameter_m=diameter,
+            length_m=length,
+            cap_kg_s=cap_kg_s,
+            redox_mol_s=redox,
+        )
+        return law, n0
+    except _BalanceRefused as refused:
+        return CapacityShadowRefusal(refused.reason, 0)
+
+
+def _commit_headspace_balance(
+    *,
+    pre_holdup_mol: Mapping[str, float],
+    molar_mass_kg_mol: Mapping[str, float],
+    flux_kg_hr_at_partials: Callable[[Mapping[str, float]], Mapping[str, float]],
+    capacity: NoColdTrain | FiniteCapacity,
+    temperature_K: float,
+    volume_m3: float,
+    dt_hr: float,
+    downstream_pressure_Pa: float,
+    vessel_rating_Pa: float | None,
+    pipe_diameter_m: float | None,
+    pipe_length_m: float | None,
+    outflow_cap_kg_s: float | None,
+    redox_source_mol_s: Mapping[str, float] | None,
+    rel_tol: float,
+    max_iterations: int,
+) -> CapacityShadowResult | CapacityShadowRefusal:
+    built = _build_law(
+        pre_holdup_mol=pre_holdup_mol,
+        molar_mass_kg_mol=molar_mass_kg_mol,
+        flux_kg_hr_at_partials=flux_kg_hr_at_partials,
+        capacity=capacity,
+        temperature_K=temperature_K,
+        volume_m3=volume_m3,
+        dt_hr=dt_hr,
+        downstream_pressure_Pa=downstream_pressure_Pa,
+        pipe_diameter_m=pipe_diameter_m,
+        pipe_length_m=pipe_length_m,
+        outflow_cap_kg_s=outflow_cap_kg_s,
+        redox_source_mol_s=redox_source_mol_s,
+    )
+    if isinstance(built, CapacityShadowRefusal):
+        return built
+    law, n0 = built
+    dt_s = dt_hr * 3600.0
+    from simulator.evaporation import EvaporationFluxRefusal
+
+    try:
+        if len(law.species) == 1:
+            step = _commit_one(law, n0, dt_s)
+        else:
+            step = _commit_many(
+                law,
+                n0,
+                dt_s,
+                rel_tol=rel_tol,
+                max_iterations=max_iterations,
+            )
+    except EvaporationFluxRefusal:
+        raise
+    except _BalanceRefused as refused:
+        return CapacityShadowRefusal(refused.reason, 0)
+    return _publish(law, step, capacity, vessel_rating_Pa)
+
+
+def diagnostic_backward_euler_headspace_step(
+    *,
+    pre_holdup_mol: Mapping[str, float],
+    molar_mass_kg_mol: Mapping[str, float],
+    flux_kg_hr_at_partials: Callable[[Mapping[str, float]], Mapping[str, float]],
+    temperature_K: float,
+    volume_m3: float,
+    dt_hr: float,
+    downstream_pressure_Pa: float,
+    pipe_diameter_m: float | None = None,
+    pipe_length_m: float | None = None,
+    outflow_cap_kg_s: float | None = None,
+    redox_source_mol_s: Mapping[str, float] | None = None,
+    capacity: NoColdTrain | FiniteCapacity | None = None,
+    vessel_rating_Pa: float | None = None,
+) -> CapacityShadowResult | CapacityShadowRefusal:
+    """One R = 0 step. Not the fast root, and not halved.
+
+    The commit solves G = 0 when admission holds. This function always
+    solves the backward-Euler residual, so a single 3600 s step of the
+    stranded hour stays at 248.85783689 Pa.
+    """
+
+    if capacity is None:
+        capacity = NoColdTrain()
+    built = _build_law(
+        pre_holdup_mol=pre_holdup_mol,
+        molar_mass_kg_mol=molar_mass_kg_mol,
+        flux_kg_hr_at_partials=flux_kg_hr_at_partials,
+        capacity=capacity,
+        temperature_K=temperature_K,
+        volume_m3=volume_m3,
+        dt_hr=dt_hr,
+        downstream_pressure_Pa=downstream_pressure_Pa,
+        pipe_diameter_m=pipe_diameter_m,
+        pipe_length_m=pipe_length_m,
+        outflow_cap_kg_s=outflow_cap_kg_s,
+        redox_source_mol_s=redox_source_mol_s,
+    )
+    if isinstance(built, CapacityShadowRefusal):
+        return built
+    law, n0 = built
+    from simulator.evaporation import EvaporationFluxRefusal
+
+    try:
+        step = _one_euler(law, n0, dt_hr * 3600.0)
+    except EvaporationFluxRefusal:
+        raise
+    except _BalanceRefused as refused:
+        return CapacityShadowRefusal(refused.reason, 0)
+    return _publish(law, step, capacity, vessel_rating_Pa)
