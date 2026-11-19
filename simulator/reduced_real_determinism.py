@@ -112,6 +112,7 @@ GATE_CURVE_NOTICE_KEYS = (
     'composition_projected_notice', 'gate_provider_refusal',
     'gate_provider_step_down', 'alphamelts_reference_pressure',
 )
+GATE_CURVE_DOMAIN_KEYS = ('authority', 'certified_band')
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
@@ -4279,6 +4280,10 @@ def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
         notice = curve.get(notice_key)
         if isinstance(notice, Mapping):
             payload[notice_key] = _json_ready(notice)
+    for domain_key in GATE_CURVE_DOMAIN_KEYS:
+        value = curve.get(domain_key)
+        if value is not None:
+            payload[domain_key] = _json_ready(value)
     return payload
 
 
@@ -4296,6 +4301,10 @@ def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         notice = payload.get(notice_key)
         if isinstance(notice, Mapping):
             curve[notice_key] = dict(notice)
+    for domain_key in GATE_CURVE_DOMAIN_KEYS:
+        value = payload.get(domain_key)
+        if value is not None:
+            curve[domain_key] = dict(value) if isinstance(value, Mapping) else value
     return curve
 
 

@@ -263,6 +263,12 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         valid, gate_warnings, gate_reason = (
             MAGEMinDomainGate.validate_with_reason(composition_wt_pct)
         )
+        domain_diagnostic = (
+            MAGEMinDomainGate.silica_extrapolation_diagnostic(
+                composition_wt_pct
+            )
+            or {}
+        )
         if not valid:
             return IntentResult(
                 intent=request.intent,
@@ -275,6 +281,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                     backend_status='out_of_domain',
                     backend_status_reason=gate_reason,
                     backend_warnings=tuple(gate_warnings),
+                    **domain_diagnostic,
                 ).as_diagnostic(),
                 warnings=tuple(gate_warnings),
             )
@@ -290,6 +297,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                     mode='unavailable',
                     engine_version=self._engine_version(),
                     backend_status='unavailable',
+                    **domain_diagnostic,
                 ).as_diagnostic(),
                 warnings=(
                     'MAGEMin adapter not available (binary not located '
@@ -321,6 +329,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         diagnostics = replace(
             diagnostics,
             backend_warnings=tuple(gate_warnings) + diagnostics.backend_warnings,
+            **domain_diagnostic,
         )
 
         # Hand the adapter's status to the vocabulary owner unchanged.

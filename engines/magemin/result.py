@@ -61,6 +61,8 @@ class MAGEMinShadowDiagnostics:
     backend_warnings: Tuple[str, ...] = ()
     backend_diagnostics: Mapping[str, Any] = field(default_factory=dict)
     backend_status_reason: Optional[str] = None
+    authority: Optional[str] = None
+    certified_band: Optional[Mapping[str, Any]] = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -96,6 +98,12 @@ class MAGEMinShadowDiagnostics:
             'backend_diagnostics',
             dict(self.backend_diagnostics or {}),
         )
+        if self.certified_band is not None:
+            object.__setattr__(
+                self,
+                'certified_band',
+                dict(self.certified_band),
+            )
         object.__setattr__(self, 'mode', str(self.mode))
         object.__setattr__(self, 'engine_version', str(self.engine_version))
         object.__setattr__(self, 'backend_status', str(self.backend_status))
@@ -122,6 +130,10 @@ class MAGEMinShadowDiagnostics:
         ``LiquidusSolidusResult.diagnostics`` shape.
         """
         payload = asdict(self)
+        if self.authority is None:
+            payload.pop('authority', None)
+        if self.certified_band is None:
+            payload.pop('certified_band', None)
         backend = dict(payload.get('backend_diagnostics') or {})
         for key in (
             'reason',

@@ -3099,7 +3099,10 @@ class EvaporationMixin:
         *,
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
     ) -> float:
-        from simulator.reduced_real_determinism import GATE_CURVE_NOTICE_KEYS
+        from simulator.reduced_real_determinism import (
+            GATE_CURVE_DOMAIN_KEYS,
+            GATE_CURVE_NOTICE_KEYS,
+        )
 
         if gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:
             curve = self._resolved_melt_redox_gate_authority()
@@ -3135,6 +3138,12 @@ class EvaporationMixin:
             notice = curve.get(notice_key)
             if isinstance(notice, Mapping):
                 self._last_freeze_gate_diagnostic[notice_key] = dict(notice)
+        for domain_key in GATE_CURVE_DOMAIN_KEYS:
+            value = curve.get(domain_key)
+            if value is not None:
+                self._last_freeze_gate_diagnostic[domain_key] = (
+                    dict(value) if isinstance(value, Mapping) else value
+                )
         self._last_freeze_gate_diagnostic.update(regime_diagnostic)
         return factor
 
@@ -3623,6 +3632,9 @@ class EvaporationMixin:
                 isinstance(held, Mapping)
                 and held.get('hour') == int(self.melt.hour)
                 and held.get('provider') == self._liquid_fraction_provider
+                and held.get('domain_verdict') == getattr(
+                    key, 'magemin_domain_verdict', None
+                )
             ):
                 held_record = held.get('record')
                 published = accept_stored_memo(held_record, owner=self)
@@ -3860,6 +3872,9 @@ class EvaporationMixin:
                     self._freeze_gate_held_curve_record = {
                         'hour': int(self.melt.hour),
                         'provider': self._liquid_fraction_provider,
+                        'domain_verdict': getattr(
+                            key, 'magemin_domain_verdict', None
+                        ),
                         'record': copy.deepcopy(record),
                     }
                     return record

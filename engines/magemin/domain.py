@@ -226,6 +226,26 @@ class MAGEMinDomainGate:
         return reason is None, warnings, reason_value(reason)
 
     @staticmethod
+    def silica_extrapolation_diagnostic(
+        composition_wt_pct: Mapping[str, float],
+    ) -> Dict[str, object] | None:
+        """Return structured authority for positive SiO2 outside its band."""
+        from simulator.scalar_boundary import is_finite
+
+        raw_sio2 = composition_wt_pct.get('SiO2', 0.0)
+        if not is_finite(raw_sio2):
+            return None
+        sio2 = float(raw_sio2)
+        if sio2 <= 0.0 or _SIO2_MIN_WT_PCT <= sio2 <= _SIO2_MAX_WT_PCT:
+            return None
+        return {
+            'authority': 'extrapolated',
+            'certified_band': {
+                'sio2_wt_pct': [_SIO2_MIN_WT_PCT, _SIO2_MAX_WT_PCT],
+            },
+        }
+
+    @staticmethod
     def oxide_basis() -> Tuple[str, ...]:
         """Return the canonical MELTS 14-oxide basis."""
         from simulator.state import OXIDE_SPECIES

@@ -5345,6 +5345,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_curve_memo_reuse_eligible,
         )
         from simulator.reduced_real_determinism import (
+            GATE_CURVE_DOMAIN_KEYS,
             GATE_CURVE_NOTICE_KEYS,
             gate_curve_memo_record,
             gate_curve_memo_is_cacheable,
@@ -5635,6 +5636,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             notice = normalized_curve.get(notice_key)
             if isinstance(notice, Mapping):
                 gate_diagnostic[notice_key] = dict(notice)
+        for domain_key in GATE_CURVE_DOMAIN_KEYS:
+            value = normalized_curve.get(domain_key)
+            if value is not None:
+                gate_diagnostic[domain_key] = (
+                    dict(value) if isinstance(value, Mapping) else value
+                )
         self._stamp_kress_floor_diagnostic(gate_diagnostic)
         self._last_melt_redox_liquidus_gate_diagnostic = gate_diagnostic
         return normalized_record

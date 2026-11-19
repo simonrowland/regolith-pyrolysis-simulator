@@ -1522,11 +1522,19 @@ def test_freeze_gate_dispatches_intrinsic_fo2_to_declared_gate(
 
 
 def test_magemin_freeze_gate_curve_keeps_provider_warning_and_flags(
-    monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
 ):
+    from pathlib import Path
+
+    from engines.magemin import MAGEMinShadowProvider
+    from simulator.reduced_real_determinism import (
+        _curve_from_payload,
+        _curve_payload,
+    )
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
         feedstocks_data,
@@ -1534,42 +1542,95 @@ def test_magemin_freeze_gate_curve_keeps_provider_warning_and_flags(
         enabled=True,
         liquid_fraction_provider='magemin',
     )
-    warning = (
-        'MAGEMinDomainGate: SiO2 = 29.99 wt% outside MELTS calibration '
-        'range [30, 80] wt%; reason=silicate_window; '
-        'authority=extrapolated; certified_band=SiO2 [30, 80] wt%.'
+    composition_wt_pct = {'SiO2': 29.999, 'MgO': 50.001, 'FeO': 20.0}
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    ledger.load_external_mol(
+        _CLEANED_MELT_ACCOUNT,
+        composition_mol,
+        source='d-447 provider diagnostic pin',
+        material_origin='feedstock',
     )
-    certified_band = {'sio2_wt_pct': [30.0, 80.0]}
-    monkeypatch.setattr(
-        sim,
-        '_register_freeze_gate_liquid_fraction_providers',
-        lambda: None,
+    sim.atom_ledger = ledger
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
     )
-    monkeypatch.setattr(
-        sim,
-        '_dispatch_only',
-        lambda *_args, **_kwargs: SimpleNamespace(
-            status='ok',
-            diagnostic={
-                'solidus_T_C': 900.0,
-                'liquidus_T_C': 1300.0,
-                'liquid_fraction_path': (
-                    {'temperature_C': 900.0, 'liquid_fraction': 0.0},
-                    {'temperature_C': 1300.0, 'liquid_fraction': 1.0},
-                ),
-                'authority': 'extrapolated',
-                'certified_band': certified_band,
-            },
-            warnings=(warning,),
-        ),
-    )
+    assert isinstance(provider, MAGEMinShadowProvider)
 
-    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-9.0)
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._config = {'liquidus_finder_budget_s': 30.0}
+    backend.get_engine_version = lambda: 'magemin-test-subprocess'
 
-    assert curve is not None
-    assert curve['gate_provider_warnings'] == [warning]
+    def subprocess_result(**kwargs):
+        projection = kwargs['bulk_projection']
+        fraction = min(
+            1.0,
+            max(0.0, (float(kwargs['temperature_C']) - 1000.0) / 200.0),
+        )
+        phases = {}
+        if fraction > 0.0:
+            phases['liq'] = {'mass_kg': fraction}
+        if fraction < 1.0:
+            phases['ol'] = {'mass_kg': 1.0 - fraction}
+        operating_point = backend._fo2_operating_point(
+            kwargs['fO2_log'],
+            kwargs['fO2_log'],
+            True,
+            database=projection.database,
+            bulk_components=projection.composition_wt_pct,
+        )
+        operating_point.update({
+            'applied_fO2_buffer': 'qfm',
+            'applied_fO2_buffer_n': 0.0,
+        })
+        return {
+            'phases': phases,
+            'buffer_warnings': (),
+            'operating_point_diagnostics': operating_point,
+        }
+
+    backend._call_magemin = subprocess_result
+    provider._backend = backend
+    provider._backend_initialised = True
+    provider._backend_initialization_error = None
+
+    record = sim._freeze_gate_curve_record()
+    curve = record['curve']
+    expected_band = {'sio2_wt_pct': [30.0, 80.0]}
     assert curve['authority'] == 'extrapolated'
-    assert curve['certified_band'] == certified_band
+    assert curve['certified_band'] == expected_band
+    assert any(
+        'authority=extrapolated' in warning
+        for warning in curve['gate_provider_warnings']
+    )
+
+    payload = _curve_payload(curve)
+    assert payload['authority'] == 'extrapolated'
+    assert payload['certified_band'] == expected_band
+    assert _curve_from_payload(payload)['certified_band'] == expected_band
+
+    sim._melt_redox_liquidus_gate_record()
+    redox_diagnostic = sim._last_melt_redox_liquidus_gate_diagnostic
+    assert redox_diagnostic['authority'] == 'extrapolated'
+    assert redox_diagnostic['certified_band'] == expected_band
+    sim._freeze_gate_liquid_fraction_factor(gate_authority=curve)
+    snapshot = sim._make_snapshot()
+    assert snapshot.liquid_fraction_gate['evaporation']['authority'] == (
+        'extrapolated'
+    )
+    assert snapshot.liquid_fraction_gate['evaporation']['certified_band'] == (
+        expected_band
+    )
 
 
 def test_freeze_gate_enabled_refuses_instead_of_using_backend_liquidus(
@@ -3984,6 +4045,93 @@ def test_magemin_out_of_domain_bulk_bypasses_freeze_gate_caches(
     monkeypatch.setattr(sim, '_freeze_gate_curve_record', fail_live_record)
     with pytest.raises(RuntimeError, match='live gate record reached'):
         sim._melt_redox_liquidus_gate_record()
+
+
+def test_same_hour_held_magemin_curve_is_bound_to_its_domain_verdict(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+
+    def set_bulk(silica_wt_pct):
+        composition_wt_pct = {
+            'SiO2': silica_wt_pct,
+            'MgO': 50.0,
+            'FeO': 100.0 - silica_wt_pct - 50.0,
+        }
+        composition_mol = {
+            species: amount / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            _CLEANED_MELT_ACCOUNT,
+            composition_mol,
+            source='same-hour held MAGEMin domain test',
+            material_origin='feedstock',
+        )
+        sim.atom_ledger = ledger
+
+    set_bulk(30.001)
+    sim._remember_freeze_gate_provider_curve({
+        'source': 'gate_liquid_fraction',
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1300.0,
+        'path': ((900.0, 0.0), (1300.0, 1.0)),
+    })
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda *_args, **_kwargs: SimpleNamespace(
+            status='not_converged',
+            warnings=('numerical failure after an in-band solve',),
+            diagnostic={
+                'backend_status': 'not_converged',
+                'backend_status_reason': 'engine_not_converged',
+                'backend_failure_disposition': 'numerical',
+            },
+        ),
+    )
+
+    failed_record = sim._freeze_gate_curve_record()
+    assert failed_record['curve']['gate_provider_refusal'][
+        'qualification'
+    ] == 'held_last_good_curve'
+    assert sim._freeze_gate_held_curve_record['domain_verdict'] is None
+
+    set_bulk(29.999)
+    dispatches = []
+
+    def out_of_band_success(*_args, **_kwargs):
+        dispatches.append(True)
+        return SimpleNamespace(
+            status='ok',
+            warnings=('authority=extrapolated',),
+            diagnostic={
+                'backend_status': 'ok',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1300.0,
+            },
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', out_of_band_success)
+    recomputed = sim._freeze_gate_curve_record()
+
+    assert dispatches == [True]
+    assert recomputed['curve'].get('gate_provider_refusal', {}).get(
+        'qualification'
+    ) != 'held_last_good_curve'
 
 
 @pytest.mark.parametrize(
