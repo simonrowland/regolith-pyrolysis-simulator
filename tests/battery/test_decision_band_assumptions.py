@@ -1,19 +1,36 @@
 """d-443: literature method bands are additive, never headline evidence."""
 
 import json
+from collections import Counter
 from dataclasses import replace
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 
 from simulator.battery import method_class_bands as owner
 from simulator.battery import score
-from simulator.battery.enums import EvidenceClass, MethodToken, Quantity, UncertaintyKind
-from simulator.battery.migrate import to_plain
-from simulator.battery.records import State, Uncertainty
+from simulator.battery.enums import (
+    MEASURED_EVIDENCE,
+    AmountBasis,
+    EvidenceClass,
+    MethodToken,
+    Phase,
+    Quantity,
+    UncertaintyKind,
+)
+from simulator.battery.identity import Identity, quantity_token
+from simulator.battery.migrate import Migrator, to_plain
+from simulator.battery.records import Composition, State, Uncertainty
+from simulator.battery.score import ScoreContext
 from simulator.battery.score_metrics import metric_operation_for_identity
 from tests.battery import factories as F
-from tests.battery.test_score import _compile, _context, _predict
+from tests.battery.test_score import (
+    _compile,
+    _context,
+    _predict,
+    _with_activity_reference_polymorph,
+)
 
 
 def _fixture(class_id="kems_absolute_pressure_weight_loss_calibrated"):
@@ -294,3 +311,257 @@ def test_belton_fruehan_activity_and_out_of_range_drop_have_no_default():
     for temperature in ("597", "1011"):
         outside = replace(observation, identity=replace(observation.identity, temperature_K=State.of(Decimal(temperature))))
         assert "band" not in score._assumed_method_class_band(outside, experiment, Decimal("100"))
+
+
+def _crystal_cao(uncertainty):
+    """CaO(cr, lime) activity with the direct-comparison applicability facts."""
+
+    observation, experiment = _fixture("kems_direct_comparison_activity")
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.8")), ("Al2O3", Decimal("0.2"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=Decimal("2000"),
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+            composition=composition,
+        ),
+        "lime",
+    )
+    return replace(observation, identity=identity, uncertainty=uncertainty), experiment
+
+
+def _compile_with_prediction(observation, experiment, prediction):
+    return score.compile_residual(
+        observation,
+        score.Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, observation),
+        prediction=prediction,
+    )
+
+
+def _fused_prediction(observation):
+    converted = score.fusion_comparison_reference(
+        observation, engine=score.Engine.INTERNAL_ANALYTICAL
+    )
+    return converted, _predict(converted.value.point, converted.identity)
+
+
+def test_crystal_activity_fusion_refusal_is_not_a_printed_uncertainty(monkeypatch):
+    """Kind NONE has no measurement refusal. Fusion's JANAF-sigma refusal must not block d-443.
+
+    Restoring the gate's ``printed.refusal is None`` conjunct makes this red:
+    the headline refusal is ``conversion_uncertainty_unprinted`` and the
+    assumed stratum would stay empty.
+    """
+
+    observation, experiment = _crystal_cao(Uncertainty(kind=UncertaintyKind.NONE))
+    converted, prediction = _fused_prediction(observation)
+    assert converted.value.point != observation.value.point
+    enabled, candidate = _compile_with_prediction(observation, experiment, prediction)
+    assert enabled.assumed_band is True
+    assert enabled.assumed_band_details["class_id"] == "kems_direct_comparison_activity"
+    assert enabled.assumed_band_details["band"].band_basis == "method_class_assumed"
+    assert enabled.numeric is not None and enabled.numeric.decision_band is None
+    assert enabled.status is score.ResidualStatus.NO_BAND
+    assert enabled.refusal is not None
+    assert enabled.refusal.detail["reason"] == "conversion_uncertainty_unprinted"
+    monkeypatch.setattr(owner, "method_class_bands", lambda: {})
+    disabled, _candidate = _compile_with_prediction(observation, experiment, prediction)
+    assert disabled.assumed_band is None
+    assert disabled.assumed_band_details is not None
+    assert "band" not in disabled.assumed_band_details
+    assert enabled.numeric == disabled.numeric
+    assert enabled.status == disabled.status
+    assert enabled.score_eligible == disabled.score_eligible
+    assert enabled.refusal == disabled.refusal
+    context = _context(F.work(), experiment, observation, candidate)
+    engines = (score.Engine.INTERNAL_ANALYTICAL,)
+    assert _headline_bytes(
+        score.headline_records((enabled,), context=context, engines=engines)
+    ) == _headline_bytes(
+        score.headline_records((disabled,), context=context, engines=engines)
+    )
+
+
+def test_printed_activity_width_still_blocks_the_assumed_stratum():
+    observation, experiment = _crystal_cao(
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="±0.10 standard deviation of log10(a) as printed",
+            locator=F.loc(page=4, table="2"),
+        )
+    )
+    _converted, prediction = _fused_prediction(observation)
+    residual, _candidate = _compile_with_prediction(observation, experiment, prediction)
+    assert residual.assumed_band is None
+    assert residual.assumed_band_details is None
+    assert residual.numeric is not None and residual.numeric.decision_band is None
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == "conversion_uncertainty_unprinted"
+
+
+def test_failed_reference_phase_resolution_blocks_precomputed_prediction_assumption():
+    observation, experiment = _fixture("kems_direct_comparison_activity")
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("SiO2", Decimal("0.8")), ("CaO", Decimal("0.2"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("2000"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+            composition=composition,
+        ),
+        None,
+    )
+    observation = replace(observation, identity=identity)
+    engine = score.Engine.OPENIMCC
+    converted = score.fusion_comparison_reference(observation, engine=engine)
+    assert converted.value.point == observation.value.point
+    assert any(
+        notice.reason == score.REFERENCE_POLYMORPH_ABOVE_MELTING_REASON
+        for notice in converted.notices
+    )
+    prediction = replace(
+        _predict(converted.value.point, converted.identity), engine=engine
+    )
+    residual, _candidate = score.compile_residual(
+        observation,
+        engine,
+        context=_context(F.work(), experiment, observation),
+        prediction=prediction,
+    )
+    assert residual.status is score.ResidualStatus.NO_BAND
+    assert residual.refusal is not None
+    assert (
+        residual.refusal.detail["reason"]
+        == score.REFERENCE_POLYMORPH_ABOVE_MELTING_REASON
+    )
+    assert residual.assumed_band is None
+    assert residual.assumed_band_details is None
+
+
+_SURVEY_SOURCES = (
+    "kems-055-kambayashi-1983",
+    "kems-012-sossi-2019",
+    "kems-053-stolyarova-1991",
+    "kambayashi-kato-1984-mgo-sio2-1973k",
+    "kems-ms2000-044",
+)
+# AlphaMELTS is not a single-liquid engine, so a two-phase bulk activity
+# reaches the band gate. Internal-analytical refuses those rows first.
+_SURVEY_ENGINE = score.Engine.ALPHAMELTS
+
+
+def _survey_context():
+    root = Path(__file__).resolve().parents[2]
+    migrator = Migrator(root=root)
+    extracts = root / "data" / "literature" / "extracts"
+    for source_id in _SURVEY_SOURCES:
+        migrator._migrate_extract(extracts / f"{source_id}.yaml")
+    migrator.finalize()
+    return ScoreContext(
+        works=migrator.result.works,
+        experiments=migrator.result.experiments,
+        observations=migrator.result.observations,
+        benches=migrator.result.benches,
+        root=root,
+    )
+
+
+def _derived_band_for(observation, bands, empirical_ids):
+    if observation.observation_id not in empirical_ids:
+        return None
+    key = score._source_alignment_group_key(observation, tier="empirical")
+    if key is None:
+        return None
+    return bands.get(score._group_token(key))
+
+
+def test_real_source_rows_assert_scorer_owned_assumption_outcomes():
+    """Pin positive and negative d-443 outcomes from real migrated rows."""
+
+    context = _survey_context()
+    entries, _missing, _history = score._read_decision_band_ratchet(context.root)
+    bands, _rows, _reasons = score._source_band_catalog(context, entries)
+    empirical_ids = {
+        row.observation_id for row in score.comparison_candidates(context)
+    }
+    counts = Counter()
+    for observation in context.observations.values():
+        if observation.source_id not in _SURVEY_SOURCES:
+            continue
+        evidence = observation.evidence.class_
+        identity = observation.identity
+        token = quantity_token(identity) if isinstance(identity, Identity) else None
+        if (
+            observation.source_id == "kems-055-kambayashi-1983"
+            and (
+                token is not Quantity.ACTIVITY
+                or not evidence.is_value
+                or evidence.value is not EvidenceClass.MEASURED_REDUCED
+            )
+        ):
+            continue
+        converted = score.fusion_comparison_reference(
+            observation, engine=_SURVEY_ENGINE
+        )
+        magnitude = score.point_magnitude(converted.value)
+        if magnitude is None or not isinstance(converted.identity, Identity):
+            continue
+        residual, _candidate = score.compile_residual(
+            observation,
+            _SURVEY_ENGINE,
+            context=context,
+            prediction=replace(
+                _predict(magnitude, converted.identity), engine=_SURVEY_ENGINE
+            ),
+            derived_band=_derived_band_for(observation, bands, empirical_ids),
+        )
+        reason = (
+            None
+            if residual.refusal is None
+            else residual.refusal.detail.get("reason")
+        )
+        if observation.source_id == "kems-055-kambayashi-1983":
+            counts["kambayashi"] += 1
+            assert evidence.is_value and evidence.value in MEASURED_EVIDENCE
+            assert residual.assumed_band_details is not None
+            assert "band" not in residual.assumed_band_details
+            assert (
+                residual.assumed_band_details["refusal"]["reason"]
+                == "method_class_applicability_unknown"
+            )
+            assert residual.assumed_band is None
+            assert reason == "conversion_uncertainty_unprinted"
+            continue
+        if reason not in {
+            "printed_uncertainty_unit_unmapped",
+            "unparseable_printed_uncertainty",
+        }:
+            continue
+        if observation.source_id == "kems-012-sossi-2019":
+            counts[(observation.source_id, reason)] += 1
+            assert evidence.is_value and evidence.value in MEASURED_EVIDENCE
+            assert residual.assumed_band_details is None
+        else:
+            cohort = (
+                "measured"
+                if evidence.is_value and evidence.value in MEASURED_EVIDENCE
+                else "other"
+            )
+            counts[(observation.source_id, reason, cohort)] += 1
+            assert residual.assumed_band_details is None
+    assert counts["kambayashi"] == 20
+    assert counts[("kems-012-sossi-2019", "printed_uncertainty_unit_unmapped")] == 430
+    assert counts[("kems-012-sossi-2019", "unparseable_printed_uncertainty")] == 86
+    assert counts[("kems-ms2000-044", "unparseable_printed_uncertainty", "measured")] == 24
+    assert counts[("kems-ms2000-044", "unparseable_printed_uncertainty", "other")] == 24
