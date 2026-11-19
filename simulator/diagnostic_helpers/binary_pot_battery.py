@@ -2578,6 +2578,7 @@ def _solve_vapor_engine_cell_oxygen_balance(
     fixed_point_activities: bool = False,
 ) -> tuple[float, Mapping[str, float], Mapping[str, Any], float, dict[str, Any]]:
     from simulator.accounting.formulas import resolve_species_formula
+    from simulator.melt_backend.alphamelts import ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH
 
     cells_by_po2: dict[float, Any] = {}
     last_admitted_po2_bar: float | None = None
@@ -2636,10 +2637,11 @@ def _solve_vapor_engine_cell_oxygen_balance(
     # tie. Rows admitted at -6 therefore keep the same anchor and solver path.
     # Nearest-to-seed window selection is an algorithmic convention, not a
     # physical branch choice; expansion never jumps across a refused gap.
-    for candidate_logp in sorted(
+    starting_grid = sorted(
         range(-30, 1),
         key=lambda logp: (abs(logp - start_logp), logp < start_logp),
-    ):
+    )
+    for candidate_logp in starting_grid:
         try:
             start_cell = cell_at_po2(10.0**candidate_logp)
         except _OxygenBalanceEngineTrialRefusal as exc:
@@ -2651,6 +2653,15 @@ def _solve_vapor_engine_cell_oxygen_balance(
             engine_reason = getattr(exc.cell, "engine_reason", None)
             if engine_reason:
                 guard_reason = f"{guard_reason}: {engine_reason}"
+            if (
+                candidate_logp == start_logp
+                and exc.reason_code == REFUSAL_ENGINE_CRASH
+                and engine_reason == ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH
+            ):
+                # AlphaMELTS refuses this composition at any pO2. Keep the
+                # number of rejected grid points in the residual diagnostic.
+                starting_refusal_counts[guard_reason] = len(starting_grid)
+                break
             starting_refusal_counts[guard_reason] = (
                 starting_refusal_counts.get(guard_reason, 0) + 1
             )
