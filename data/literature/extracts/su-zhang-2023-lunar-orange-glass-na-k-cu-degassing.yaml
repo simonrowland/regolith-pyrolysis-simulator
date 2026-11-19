@@ -10,8 +10,22 @@ source:
   supplementary_document:
     corpus_asset: raw/su-zhang-2023-lunar-orange-glass-na-k-cu-degassing/supplement.docx
     sha256: 18afaf45a603291100c46cbb8143ff79fd473fc7e9bc0f81d072334f1f91d818
-  source_pdf_status: Article PDF not present in the corpus; this extract uses the supplementary workbook and supplementary
-    DOCX only.
+  corpus_source_id: su-2024-lunar-volatiles-thesis
+  article_text:
+    corpus_asset: raw/su-2024-lunar-volatiles-thesis/su-2024-lunar-volatiles-thesis.pdf
+    sha256: 471f14fd7cf2c51aacb54d7104b94b893512c9bda1936b519e6fb03675eaa401
+    holding: Chapter 3 of the dissertation is the published EPSL article.
+    printed_page_start: 44
+    printed_page_end: 71
+    physical_pdf_page_start: 59
+    physical_pdf_page_end: 86
+    pdf_page_index_start: 58
+    pdf_page_index_end: 85
+    page_mapping: printed_page = physical_pdf_page - 15
+    identification: >-
+      Footnote 2 on printed page 44 states that Chapter 3 is published as
+      Su, Zhang, Liu and Holder (2023), Earth and Planetary Science Letters 602, 117924.
+  source_pdf_status: The journal PDF is not a separate file under this source id. The complete article is Chapter 3 of the dissertation PDF named in article_text (printed pages 44-71; physical PDF pages 59-86). Analytical tables remain the supplementary workbook and DOCX.
 extraction:
   method: Workbook numeric cells transcribed from displayed cell values with number formats. Every numeric cell in Tables
     S1–S5 was independently read from openpyxl and the XLSX OOXML numeric value; the displayed table labels and row/column

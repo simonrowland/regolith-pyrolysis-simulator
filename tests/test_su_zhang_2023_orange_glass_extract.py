@@ -6,8 +6,11 @@ import csv
 from collections import Counter
 from copy import deepcopy
 from decimal import Decimal, ROUND_HALF_UP
+import hashlib
 from pathlib import Path
 import re
+import shutil
+import subprocess
 from time import perf_counter
 
 from openpyxl import load_workbook
@@ -29,6 +32,34 @@ EXTRACT = ROOT / "data/literature/extracts" / f"{SID}.yaml"
 AUDIT = ROOT / "data/literature/extracts/audits"
 TABLE_ASSET = f"tables:{SID}"
 SOURCE_XLSX = Path.home() / "Repos/regolith-corpus/raw" / SID / f"{SID}.xlsx"
+THESIS_SID = "su-2024-lunar-volatiles-thesis"
+THESIS_SHA = "471f14fd7cf2c51aacb54d7104b94b893512c9bda1936b519e6fb03675eaa401"
+THESIS_ASSET = f"raw/{THESIS_SID}/{THESIS_SID}.pdf"
+THESIS_PDF = Path.home() / "Repos/regolith-corpus" / THESIS_ASSET
+
+
+def _assert_thesis_chapter(document: dict) -> None:
+    source = document["source"]
+    article = source["article_text"]
+    assert source["corpus_source_id"] == THESIS_SID
+    assert article["corpus_asset"] == THESIS_ASSET
+    assert article["sha256"] == THESIS_SHA
+    assert article["printed_page_start"] == 44
+    assert article["printed_page_end"] == 71
+    assert article["physical_pdf_page_start"] == 59
+    assert article["physical_pdf_page_end"] == 86
+    assert article["pdf_page_index_start"] == 58
+    assert article["pdf_page_index_end"] == 85
+    assert article["printed_page_start"] == article["physical_pdf_page_start"] - 15
+    assert article["printed_page_end"] == article["physical_pdf_page_end"] - 15
+    assert article["pdf_page_index_start"] == article["physical_pdf_page_start"] - 1
+    assert article["pdf_page_index_end"] == article["physical_pdf_page_end"] - 1
+    assert "117924" in article["identification"]
+    status = source["source_pdf_status"]
+    assert "Article PDF not present" not in status
+    assert "Chapter 3" in status
+    assert "44-71" in status
+    assert "59-86" in status
 
 
 def _document() -> dict:
@@ -632,3 +663,68 @@ def test_isolated_migration_pins_values_conditions_and_schema_gaps() -> None:
     assert Counter(
         issue.path.rsplit(".", 1)[-1] for issue in result.validation.issues
     ) == expected_validation_counts
+
+
+def _pdf_page_text(page_number: int) -> str:
+    completed = subprocess.run(
+        [
+            "pdftotext",
+            "-f",
+            str(page_number),
+            "-l",
+            str(page_number),
+            "-layout",
+            str(THESIS_PDF),
+            "-",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return completed.stdout
+
+
+def _pdf_footer(page_text: str) -> str:
+    lines = [line.strip() for line in page_text.splitlines() if line.strip()]
+    assert lines
+    return lines[-1]
+
+
+def test_article_text_points_at_thesis_chapter_3() -> None:
+    _assert_thesis_chapter(_document())
+
+
+def test_article_text_page_mapping_mutation_is_detected() -> None:
+    shifted = deepcopy(_document())
+    shifted["source"]["article_text"]["printed_page_start"] = 43
+    with pytest.raises(AssertionError):
+        _assert_thesis_chapter(shifted)
+
+    absent = deepcopy(_document())
+    absent["source"]["source_pdf_status"] = (
+        "Article PDF not present in the corpus; this extract uses the "
+        "supplementary workbook and supplementary DOCX only."
+    )
+    with pytest.raises(AssertionError):
+        _assert_thesis_chapter(absent)
+
+
+def test_thesis_pdf_sha_and_chapter_page_map() -> None:
+    if not THESIS_PDF.is_file():
+        pytest.skip(f"thesis PDF not available: {THESIS_PDF}")
+
+    digest = hashlib.sha256(THESIS_PDF.read_bytes()).hexdigest()
+    assert digest == THESIS_SHA
+    if shutil.which("pdftotext") is None:
+        pytest.skip("pdftotext is not available")
+
+    chapter = _pdf_page_text(59)
+    assert "Chapter 3" in chapter
+    assert "117924" in chapter
+    assert _pdf_footer(chapter) == "44"
+    table = _pdf_page_text(78)
+    assert "Table 3.1" in table
+    assert "0.145(3)" in table
+    assert _pdf_footer(table) == "63"
+    assert _pdf_footer(_pdf_page_text(76)) == "61"
+    assert _pdf_footer(_pdf_page_text(86)) == "71"
