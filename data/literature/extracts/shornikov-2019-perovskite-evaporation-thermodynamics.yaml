@@ -20,27 +20,45 @@ experiments:
 - experiment_id: shornikov-2019-eg-fig2a-perovskite
   kind: kems
   locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '2'
+    panel: a
+  method: knudsen_effusion
+  method_locator:
     page: 1
     pdf_page_index: 0
     published_page: 38
-    note: The paper states that perovskite evaporation was studied by Knudsen effusion mass spectrometry.
-  method: knudsen_effusion
+    note: The paper states that perovskite evaporation was studied by Knudsen effusion mass spectrometric method.
 - experiment_id: shornikov-2019-eg-fig2b-2300k
   kind: kems
   locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '2'
+    panel: b
+  method: knudsen_effusion
+  method_locator:
     page: 1
     pdf_page_index: 0
     published_page: 38
-    note: The paper states that CaO–TiO2 melt evaporation was studied by Knudsen effusion mass spectrometry.
-  method: knudsen_effusion
+    note: The paper states that CaO–TiO2 melt evaporation was studied by Knudsen effusion mass spectrometric method.
 - experiment_id: shornikov-2019-eg-fig3a-2250k
   kind: kems
   locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 39
+    figure: '3'
+    panel: a
+  method: knudsen_effusion
+  method_locator:
     page: 1
     pdf_page_index: 0
     published_page: 38
-    note: The paper states that CaO–TiO2 melt evaporation was studied by Knudsen effusion mass spectrometry.
-  method: knudsen_effusion
+    note: The paper states that CaO–TiO2 melt evaporation was studied by Knudsen effusion mass spectrometric method.
 fidelity_samples:
 - species: Ca
   observation_id: shornikov_2019_eg_fig2a_Ca_1790_3

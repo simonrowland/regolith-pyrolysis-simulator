@@ -433,13 +433,35 @@ def test_this_study_experiments_migrate_with_reported_method(tmp_path: Path) -> 
         experiment_id.rsplit("::", 1)[-1]: experiment
         for experiment_id, experiment in result.experiments.items()
     }
+    source_experiments = {
+        experiment["experiment_id"]: experiment for experiment in doc["experiments"]
+    }
 
     for row in rows:
-        experiment = experiments[f"worksheet-row-{row}"]
+        experiment_id = f"worksheet-row-{row}"
+        experiment = experiments[experiment_id]
         assert experiment.method.is_value
         assert experiment.method.value is MethodToken.PISTON_CYLINDER
-        assert experiment.locator.page == 3
-        assert experiment.locator.section == "Experimental procedure"
+        assert experiment.locator.source_path == (
+            "corpus/raw/rusiecka-2026-chlorine-data/"
+            "rusiecka-2026-chlorine-data.xlsx"
+        )
+        assert experiment.locator.record == f"sheet data, cell AC{row}"
+        assert source_experiments[experiment_id]["locator"] == {
+            "source_path": (
+                "corpus/raw/rusiecka-2026-chlorine-data/"
+                "rusiecka-2026-chlorine-data.xlsx"
+            ),
+            "record": f"sheet data, cell AC{row}",
+        }
+        assert source_experiments[experiment_id]["method_locator"] == {
+            "source_path": (
+                "corpus/raw/rusiecka-wood-2026-chlorine-hcl/"
+                "rusiecka-wood-2026-chlorine-hcl.pdf"
+            ),
+            "page": 3,
+            "section": "Experimental procedure",
+        }
 
     mutated_doc = deepcopy(doc)
     experiment = next(
