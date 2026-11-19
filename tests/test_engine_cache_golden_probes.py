@@ -29,11 +29,11 @@ from simulator import engine_cache
 # result. Update the pair together after a reviewed numeric engine change.
 ENGINE_GOLDEN_PROBES = {
     "openimcc": (1, "0656d169b9fb045ebfc2455b7c725cf716817bfac00247d8406f2d24692ecf5d"),
-    "internal-analytical": (3, "6488cf895fec7e3520b72a9fe57812f74311fb0be6bbe7ffff54b389415a2c4e"),
+    "internal-analytical": (5, "6488cf895fec7e3520b72a9fe57812f74311fb0be6bbe7ffff54b389415a2c4e"),
     "vaporock": (1, "673a8c5ac16725e21c985b585a5320f08bc2bf31f785d9f68e7c1cd3f9753f3b"),
-    "magemin": (4, "59eb4ffd0c28195b79b5fdfb1f212fe0f13ed1c1112afa1ae724ce60797cbac8"),
-    "alphamelts": (4, "3d6e809e84c119afc0341d5bcec193fd0c0886e027c16d0fcf247035f3547af4"),
-    "thermoengine": (4, "3db7ad76c46e3130880e2782b235e739a7de72b825180c84fa94e46ec68bfb53"),
+    "magemin": (5, "59eb4ffd0c28195b79b5fdfb1f212fe0f13ed1c1112afa1ae724ce60797cbac8"),
+    "alphamelts": (5, "3d6e809e84c119afc0341d5bcec193fd0c0886e027c16d0fcf247035f3547af4"),
+    "thermoengine": (5, "3db7ad76c46e3130880e2782b235e739a7de72b825180c84fa94e46ec68bfb53"),
 }
 
 def _numeric_leaves(value, path=()):
