@@ -735,16 +735,16 @@ def test_openimcc_phase_identity_matches_janaf_dictionary_for_default_crystals()
             continue
         source_polymorph, subtype_unspecified = (
             _resolve_openimcc_phase_identity_polymorph(
-                formula, phase_identity.get("polymorph")
+                phase_identity.get("polymorph")
             )
         )
         assert not subtype_unspecified
+        assert source_polymorph is not None
         janaf_polymorph = polymorph_for_janaf_table_id(
             formula, native.source_row_id
         )
         if janaf_polymorph is None:
             continue
-        assert source_polymorph is not None
         assert source_polymorph is janaf_polymorph, (
             formula,
             native.source_row_id,
@@ -929,6 +929,38 @@ def test_openimcc_species_thermo_uses_source_dfh298_for_enthalpy_increment() -> 
     assert "H(T)-H(T_ref)" in prediction.execution.call_evidence
 
 
+def test_openimcc_gas_formation_anchors_match_every_regolith_janaf_table() -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack, species_thermo
+    from simulator.battery.generators.janaf import (
+        _janaf_gas_dfh298_kJ_per_mol,
+        _janaf_gas_table_ids,
+    )
+
+    table_ids_by_formula = _janaf_gas_table_ids()
+    assert sum(len(table_ids) for table_ids in table_ids_by_formula.values()) == 238
+    datapack = load_gas_datapack()
+    compared = 0
+    for formula, table_ids in table_ids_by_formula.items():
+        assert len(table_ids) == 1, (formula, table_ids)
+        table_id = table_ids[0]
+        janaf_anchor = _janaf_gas_dfh298_kJ_per_mol(formula, table_id)
+        assert janaf_anchor is not None, (formula, table_id)
+        native = species_thermo(
+            formula,
+            "g",
+            298.15,
+            datapack=datapack,
+            allow_extrapolation=True,
+        )
+        assert native.source_table_id == table_id, (formula, native.source_table_id)
+        assert native.formation_enthalpy_source_id == table_id
+        assert native.formation_enthalpy_298_kJ_mol is not None
+        assert Decimal(str(native.formation_enthalpy_298_kJ_mol)) == janaf_anchor
+        compared += 1
+    assert compared == 238
+
+
 def test_openimcc_enthalpy_source_anchor_is_resolved_after_native_cache_hit(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -1034,6 +1066,113 @@ def test_openimcc_stable_crystal_continuation_is_predicted_and_flagged() -> None
     assert "declared_interval_K=[1200.0, 3000.0]" in notice.band
     assert native.continuation in notice.reason
     assert str(native.authority) in notice.reason
+
+
+def test_openimcc_stable_crystal_continuation_scores_h_minus_h298() -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack, species_thermo
+
+    datapack = load_gas_datapack()
+    reference = species_thermo(
+        "Os", "cr", 298.15, datapack=datapack, allow_extrapolation=True
+    )
+    target = species_thermo(
+        "Os", "cr", 3100.0, datapack=datapack, allow_extrapolation=True
+    )
+    assert reference.extrapolated is True
+    assert target.extrapolated is True
+    assert reference.source_row_id == target.source_row_id == "BURCAT-OS-CR"
+    observation = _openimcc_thermo_observation(
+        "openimcc-os-cr-continuation-h-minus-h298",
+        "Os",
+        Phase.CR,
+        Quantity.H_MINUS_H298,
+        Decimal("3100"),
+        polymorph=Polymorph.REFERENCE,
+        subtype=(
+            "H(T)-H(298.15 K); reference phase: crystal; "
+            "reference polymorph: reference"
+        ),
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    expected = Decimal(str(target.H_app_kJ_mol)) - Decimal(
+        str(reference.H_app_kJ_mol)
+    )
+    assert prediction.execution.state is ExecutionState.PRODUCED, (
+        prediction.refusal_detail
+    )
+    assert prediction.value == expected
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert len(prediction.notices) == 2
+    assert all(
+        notice.authority is Authority.EXTRAPOLATED
+        for notice in prediction.notices
+    )
+    assert all(
+        "declared_interval_K=[1200.0, 3000.0]" in notice.band
+        for notice in prediction.notices
+    )
+    assert any("T_ref_K=298.15" in notice.reason for notice in prediction.notices)
+
+
+def test_openimcc_crystal_enthalpy_refuses_a_different_reference_row() -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack, species_thermo
+
+    datapack = load_gas_datapack()
+    target = species_thermo(
+        "Re", "cr", 2500.0, datapack=datapack, allow_extrapolation=True
+    )
+    reference = species_thermo(
+        "Re", "cr", 298.15, datapack=datapack, allow_extrapolation=True
+    )
+    assert target.source_row_id != reference.source_row_id
+    observation = _openimcc_thermo_observation(
+        "openimcc-re-cr-cross-row-h-minus-h298-refuses",
+        "Re",
+        Phase.CR,
+        Quantity.H_MINUS_H298,
+        Decimal("2500"),
+        polymorph=Polymorph.REFERENCE,
+        subtype=(
+            "H(T)-H(298.15 K); reference phase: crystal; "
+            "reference polymorph: reference"
+        ),
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == (
+        "openimcc_enthalpy_reference_outside_selected_row"
+    )
+    assert prediction.refusal_detail["source_row_id"] == target.source_row_id
+    assert (
+        prediction.refusal_detail["reference_source_row_id"]
+        == reference.source_row_id
+    )
+
+
+def test_openimcc_re_at_printed_melting_point_keeps_typed_refusal() -> None:
+    _require_openimcc()
+    observation = _openimcc_thermo_observation(
+        "openimcc-re-cr-at-printed-melting-point",
+        "Re",
+        Phase.CR,
+        Quantity.CP,
+        Decimal("3453"),
+        polymorph=Polymorph.REFERENCE,
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == (
+        "openimcc_species_thermo_outside_interval"
+    )
+    assert prediction.refusal_detail["requested_T_K"] == "3453"
 
 
 def test_openimcc_species_thermo_gas_extrapolation_is_predicted_and_flagged() -> None:

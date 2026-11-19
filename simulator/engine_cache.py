@@ -335,7 +335,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # internal-analytical v3: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f); d-207 - phase-basis liquidus authority can lower the adapter vapour switch
 # openimcc v3: 2026-11-19 OpenIMCC 979adb2 re-pin (text/identity only) and species_thermo scoring (d-446)
 # openimcc v4: 2026-11-19 OpenIMCC a13801f adds coefficient ancestry metadata; no numeric prediction change
-# openimcc v5: 2026-11-19 OpenIMCC 7e202a3 adds gas/crystal thermo identity and source-anchor metadata consumed by scoring; crystal continuation can now change scored rows
+# openimcc v5: 2026-11-19 OpenIMCC 7e202a3 adds gas/crystal thermo identity and source-anchor metadata, crystal continuation, and coefficient-ancestry work-id mappings surfaced by source_lineage.py as provenance
 
 
 @dataclass(frozen=True)

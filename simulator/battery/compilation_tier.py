@@ -2727,10 +2727,6 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
     table_id = props.get("source_table_id")
     low, high = _finite_number(props.get("T_min")), _finite_number(props.get("T_max"))
     derivatives_fit = props.get("derivatives_fit_implied")
-    extrapolated = props.get("extrapolated")
-    declared_interval = props.get("declared_interval_K")
-    continuation = props.get("continuation")
-    native_authority = props.get("authority")
     if (
         not isinstance(row_id, str)
         or not row_id
@@ -2772,28 +2768,6 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
             "openimcc_species_thermo_provenance_incomplete",
             {"species": formula, "phase": phase_label, "source_row_id": row_id},
         )
-    if not isinstance(extrapolated, bool):
-        return refuse(
-            RefusalReason.ATTEMPTED_UNAVAILABLE,
-            "openimcc_species_thermo_extrapolation_status_missing",
-            {"species": formula, "phase": phase_label, "source_row_id": row_id},
-        )
-    if extrapolated:
-        if (
-            not isinstance(declared_interval, (tuple, list))
-            or len(declared_interval) != 2
-            or _finite_number(declared_interval[0]) is None
-            or _finite_number(declared_interval[1]) is None
-            or not isinstance(continuation, str)
-            or not continuation.strip()
-            or not isinstance(native_authority, str)
-            or not native_authority.strip()
-        ):
-            return refuse(
-                RefusalReason.ATTEMPTED_UNAVAILABLE,
-                "openimcc_species_thermo_extrapolation_notice_incomplete",
-                {"species": formula, "phase": phase_label, "source_row_id": row_id},
-            )
     enthalpy_metadata_evidence = (
         f":formation_enthalpy_298_kJ_mol={source_dfh298_kJ_mol}"
         if source_dfh298_kJ_mol is not None
@@ -2814,23 +2788,75 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
         f"derivatives_fit_implied={derivatives_fit}"
         f"{enthalpy_metadata_evidence}"
     )
+
+    def extrapolation_notice_for(
+        source_props: Mapping[str, object], *, reference_endpoint: bool = False
+    ) -> Notice | ThermoAttempt | None:
+        status = source_props.get("extrapolated")
+        endpoint = "H298 reference" if reference_endpoint else "requested temperature"
+        if not isinstance(status, bool):
+            return refuse(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                "openimcc_species_thermo_extrapolation_status_missing",
+                {
+                    "species": formula,
+                    "phase": phase_label,
+                    "source_row_id": source_props.get("source_row_id"),
+                    "endpoint": endpoint,
+                },
+                evidence=evidence,
+            )
+        if not status:
+            return None
+        interval = source_props.get("declared_interval_K")
+        continuation_reason = source_props.get("continuation")
+        authority = source_props.get("authority")
+        if (
+            not isinstance(interval, (tuple, list))
+            or len(interval) != 2
+            or _finite_number(interval[0]) is None
+            or _finite_number(interval[1]) is None
+            or not isinstance(continuation_reason, str)
+            or not continuation_reason.strip()
+            or not isinstance(authority, str)
+            or not authority.strip()
+        ):
+            return refuse(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                "openimcc_species_thermo_extrapolation_notice_incomplete",
+                {
+                    "species": formula,
+                    "phase": phase_label,
+                    "source_row_id": source_props.get("source_row_id"),
+                    "endpoint": endpoint,
+                },
+                evidence=evidence,
+            )
+        prefix = (
+            "openimcc_species_thermo_reference_extrapolated"
+            if reference_endpoint
+            else "openimcc_species_thermo_extrapolated"
+        )
+        reference_temperature = f"; T_ref_K={t_ref_K}" if reference_endpoint else ""
+        return Notice(
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            affected_quantities=(quantity,),
+            reason=(
+                f"{prefix}; continuation={continuation_reason}; "
+                f"authority={authority}{reference_temperature}"
+            ),
+            origin=origin,
+            band=f"declared_interval_K=[{interval[0]}, {interval[1]}]",
+            authority=Authority.EXTRAPOLATED,
+        )
+
     extrapolation_notices: tuple[Notice, ...] = ()
     result_authority = Authority.BRIDGE
-    if extrapolated:
-        declared_low, declared_high = declared_interval
-        extrapolation_notices = (
-            Notice(
-                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(quantity,),
-                reason=(
-                    "openimcc_species_thermo_extrapolated; "
-                    f"continuation={continuation}; authority={native_authority}"
-                ),
-                origin=origin,
-                band=f"declared_interval_K=[{declared_low}, {declared_high}]",
-                authority=Authority.EXTRAPOLATED,
-            ),
-        )
+    target_notice = extrapolation_notice_for(props)
+    if isinstance(target_notice, ThermoAttempt):
+        return target_notice
+    if target_notice is not None:
+        extrapolation_notices = (target_notice,)
         result_authority = Authority.EXTRAPOLATED
 
     if phase is Phase.CR and identity_poly is not None:
@@ -2840,7 +2866,7 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
             else None
         )
         source_polymorph, cristobalite_subtype_unspecified = (
-            _resolve_openimcc_phase_identity_polymorph(formula, source_phase_name)
+            _resolve_openimcc_phase_identity_polymorph(source_phase_name)
         )
         janaf_polymorph = polymorph_for_janaf_table_id(formula, row_id)
         if (
@@ -2948,7 +2974,7 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
     reference_call_required = (
         phase is not Phase.G or t_ref_K != _ENGINE_ENTHALPY_ANCHOR_K
     )
-    if reference_call_required and (
+    if reference_call_required and phase is not Phase.CR and (
         float(t_ref_K) < low or float(t_ref_K) > high
     ):
         return refuse(
@@ -2989,6 +3015,28 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
             reference.get("source_row_id") != row_id
             or reference.get("source_table_id") != table_id
         ):
+            if phase is Phase.CR:
+                # Crystal H_app is a source-row polynomial. Re's 7e202a3
+                # segments are discontinuous at their joins, so do not bridge
+                # a reference call that selected another row.
+                return refuse(
+                    RefusalReason.UNSUPPORTED,
+                    "openimcc_enthalpy_reference_outside_selected_row",
+                    {
+                        "species": formula,
+                        "phase": phase_label,
+                        "source_row_id": row_id,
+                        "reference_source_row_id": reference.get("source_row_id"),
+                        "source_table_id": table_id,
+                        "reference_source_table_id": reference.get("source_table_id"),
+                        "T_ref_K": str(t_ref_K),
+                        "declared_interval_K": [
+                            props.get("T_min"),
+                            props.get("T_max"),
+                        ],
+                    },
+                    evidence=evidence,
+                )
             return refuse(
                 RefusalReason.UNSUPPORTED,
                 "openimcc_enthalpy_reference_source_mismatch",
@@ -2997,21 +3045,30 @@ def _openimcc_species_thermo_attempt(observation: Observation) -> ThermoAttempt:
                  "reference_source_row_id": reference.get("source_row_id")},
                 evidence=evidence,
             )
+        reference_notice = extrapolation_notice_for(
+            reference, reference_endpoint=True
+        )
+        if isinstance(reference_notice, ThermoAttempt):
+            return reference_notice
+        if reference_notice is not None:
+            extrapolation_notices += (reference_notice,)
+            result_authority = Authority.EXTRAPOLATED
         h_reference = _finite_number(reference.get("H_app_kJ_mol"))
         if h_reference is None:
             return refuse(
-                RefusalReason.UNSUPPORTED, "openimcc_reference_enthalpy_absent",
+                RefusalReason.UNSUPPORTED,
+                "openimcc_reference_enthalpy_absent",
                 {"species": formula, "phase": phase_label, "source_row_id": row_id},
                 evidence=evidence,
             )
         h_reference_increment = as_decimal(str(h_reference)) - anchor_kJ
 
-    # Premise: gas H_app contains source dfH298; condensate rows need a
-    # same-phase H_app(T_ref) call within that row's interval. Algebra for
-    # gas: H(T)-H(T_ref) = [H_app(T)-dfH298] - [H_app(T_ref)-dfH298]. For
-    # condensates, subtract the same-source H_app(T_ref), so its stable-phase
-    # anchor cancels. Units: H_app and dfH298 are both kJ/mol. Sanity:
-    # 3.0 kJ/mol - 1.0 kJ/mol = 2.0 kJ/mol.
+    # Premise: gas H_app contains source dfH298. Condensate rows subtract
+    # same-row H_app(T_ref); crystal T_ref may use the same row's opt-in
+    # continuation within its stability range. Algebra for gas:
+    # H(T)-H(T_ref) = [H_app(T)-dfH298] - [H_app(T_ref)-dfH298]. The same-row
+    # condensate anchor cancels. Units: H_app and dfH298 are both kJ/mol.
+    # Sanity: 3.0 kJ/mol - 1.0 kJ/mol = 2.0 kJ/mol.
     value = as_decimal(str(h_target)) - anchor_kJ - h_reference_increment
     return ThermoAttempt(
         value=value, unit=QUANTITY_UNITS[quantity], authority=result_authority,

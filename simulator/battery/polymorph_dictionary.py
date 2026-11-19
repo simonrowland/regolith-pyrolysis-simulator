@@ -173,6 +173,8 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "alpha_quartz": Polymorph.ALPHA_QUARTZ,
     "alpha-quartz": Polymorph.ALPHA_QUARTZ,
     "tridymite": Polymorph.TRIDYMITE,
+    "high cristobalite": Polymorph.CRISTOBALITE_HIGH,
+    "low cristobalite": Polymorph.CRISTOBALITE_LOW,
     "cristobalite_high": Polymorph.CRISTOBALITE_HIGH,
     "cristobalite, high": Polymorph.CRISTOBALITE_HIGH,
     "cristobalite_low": Polymorph.CRISTOBALITE_LOW,
@@ -243,6 +245,31 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "arsenolite": Polymorph.ARSENOLITE,
     "crystalline": Polymorph.CRYSTALLINE,
     "reference": Polymorph.REFERENCE,
+    "c1(ref)": Polymorph.REFERENCE,
+    "gold elemental reference crystal (crystal structure not specified)": (
+        Polymorph.REFERENCE
+    ),
+    "iridium elemental reference crystal (crystal structure not specified)": (
+        Polymorph.REFERENCE
+    ),
+    "osmium elemental reference crystal (crystal structure not specified)": (
+        Polymorph.REFERENCE
+    ),
+    "palladium elemental reference crystal (crystal structure not specified)": (
+        Polymorph.REFERENCE
+    ),
+    "platinum elemental reference crystal (crystal structure not specified)": (
+        Polymorph.REFERENCE
+    ),
+    "rhenium elemental reference crystal (crystal structure not specified)": (
+        Polymorph.REFERENCE
+    ),
+    "rhodium elemental reference crystal (crystal structure not specified)": (
+        Polymorph.REFERENCE
+    ),
+    "ruthenium elemental reference crystal (crystal structure not specified)": (
+        Polymorph.REFERENCE
+    ),
 }
 
 # Named phases whose tokens are valid only beside their mineral formula.
@@ -449,7 +476,7 @@ def polymorph_for_janaf_table_id(
 
 
 def _resolve_openimcc_phase_identity_polymorph(
-    formula: str, source_identity: object
+    source_identity: object,
 ) -> tuple[Polymorph | None, bool]:
     """Resolve a source phase label and report an unspecified cristobalite subtype."""
 
@@ -457,19 +484,9 @@ def _resolve_openimcc_phase_identity_polymorph(
         return None, False
     text = source_identity.strip()
     folded = text.casefold()
-    if folded == "reference":
-        return Polymorph.REFERENCE, False
     if folded == "cristobalite (low/high subtype not specified)":
         return None, True
-    if folded == "high cristobalite":
-        return Polymorph.CRISTOBALITE_HIGH, False
-    if folded == "low cristobalite":
-        return Polymorph.CRISTOBALITE_LOW, False
-    if folded == "c1(ref)" or folded.endswith(
-        " elemental reference crystal (crystal structure not specified)"
-    ):
-        return Polymorph.REFERENCE, False
-    return resolve_formula_polymorph(formula, text), False
+    return resolve_printed_name_polymorph(text), False
 
 
 def resolve_janaf_polymorph(
