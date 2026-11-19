@@ -5630,6 +5630,64 @@ def test_aithala_s5_preserves_all_61_row_addressable_series_summaries():
     assert "two experiments" in table["values"]["asterisk_note_as_printed"]
 
 
+def test_aithala_locators_resolve_to_their_pdf_asset():
+    from simulator.battery.migrate import Migrator, choose_read_from
+    from simulator.battery.records import Locator
+
+    source_id = "aithala-2026-magmatic-iron-redox-to-2100c"
+    extract_path = EXTRACTS / f"{source_id}.yaml"
+    doc = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
+    index = yaml.safe_load((REPO_ROOT / "data/literature/INDEX.yaml").read_text())
+    index_row = next(row for row in index["sources"] if row["source_id"] == source_id)
+    migrator = Migrator(root=REPO_ROOT, index={source_id: index_row}, aliases={})
+    migrator._migrate_extract(extract_path)
+    work = next(
+        work for work in migrator.result.works.values() if source_id in work.source_ids
+    )
+    assets = {asset.asset_id: asset for asset in work.source_files.files}
+    article_path = index_row["corpus"]["raw"]["path"]
+    article_sha256 = index_row["corpus"]["raw"]["sha256"]
+    si_asset_id = f"pdf:{source_id}-si"
+    si_path = (
+        "raw/aithala-2026-magmatic-iron-redox-to-2100c/"
+        "aithala-2026-magmatic-iron-redox-to-2100c-si.pdf"
+    )
+    si_sha256 = "ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa"
+    assert assets[si_asset_id].path == si_path
+    assert assets[si_asset_id].sha256.value == si_sha256
+
+    def assert_assets_resolve(extract):
+        locators = list(iter_locators(extract))
+        assert len(locators) == 437
+        for locator in locators:
+            is_si = str(locator.get("published_page", "")).startswith("SI-")
+            expected_path, expected_sha, expected_asset = (
+                (si_path, si_sha256, si_asset_id)
+                if is_si
+                else (article_path, article_sha256, f"pdf:{source_id}")
+            )
+            read_from = choose_read_from(
+                work, Locator(source_path=locator["source_path"])
+            )
+            assert read_from == expected_asset
+            assert locator["source_path"] == expected_path
+            assert locator["source_sha256"] == expected_sha
+            assert assets[read_from].path == expected_path
+            assert assets[read_from].sha256.value == expected_sha
+
+    assert_assets_resolve(doc)
+    mutated = copy.deepcopy(doc)
+    si_locator = next(
+        locator
+        for locator in iter_locators(mutated)
+        if str(locator.get("published_page", "")).startswith("SI-")
+    )
+    si_locator["source_path"] = article_path
+    assert_regression_raises_assertion_without_skip(
+        lambda: assert_assets_resolve(mutated)
+    )
+
+
 # Measured on this corpus. Six ``observations[<integer>]`` pins are positions
 # and do not cover; counting them would report 46,335 observations in 524
 # extracts. Equipment pins also do not cover a measured payload

@@ -9,11 +9,19 @@ source:
   year: 2026
 extraction:
   method: Manual extraction from publisher PDFs decoded with pdftotext -layout; all five supplementary data tables
-    transcribed to CSV and checked against page renders. Tables II and III print log pO2 in atm; article p. 1 defines
-    1 atm = 1 × 10^5 Pa, the exact 1-bar scale used for conversion.
+    transcribed to CSV and checked against page renders.
   date: '2026-10-03'
   worker: t1107-aithala
   provenance_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+source_files:
+  corpus_repo: regolith-corpus
+  files:
+  - asset_id: pdf:aithala-2026-magmatic-iron-redox-to-2100c-si
+    role: pdf
+    path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    sha256:
+      tag: value
+      value: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
 review_status: draft
 fidelity_samples:
 - path: species.Fe.observations[aithala_2026_vf271_xanes].values.Fe3_over_FeT
@@ -22,6 +30,8 @@ fidelity_samples:
     page: 13
     table: S-1
     published_page: SI-7
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
 - species: Fe
   observable: recalculation_table
   observation_id: aithala_2026_1800_30_air_recalculated
@@ -31,6 +41,8 @@ fidelity_samples:
     page: 15
     table: S-3
     published_page: SI-9
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
 - path: species.Fe.observations[aithala_2026_s5_humphrey].values.h_c.as_printed
   value: "4894±232.5"
   locator:
@@ -63,72 +75,72 @@ benches:
   identity: {basis: described_in_this_work}
   apparatus_family:
     state: {tag: value, value: Deltech VT-28 HN-C vertical gas-mixing furnace}
-    locator: {page: 7, published_page: 'SI-1', section: Methods}
+    locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   heating_method:
     state: {tag: value, value: Gas-mixing furnace}
-    locator: {page: 7, published_page: 'SI-1', section: Methods}
+    locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   temperature_measurement:
     thermocouples:
       state: {tag: value, value: Type S and Type B thermocouples}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: The paper does not assign either type to individual runs}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: The paper does not assign either type to individual runs, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     run_specific_type_assignment:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Both types are named without run-specific assignment}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Both types are named without run-specific assignment, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   temperature_calibration:
     checks:
       state: {tag: value, value: Calibration details referred to Aithala et al. (2026)}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   other_facts:
   - name: oxygen_fugacity_sensor
     unit: as_printed
     value:
       state: {tag: value, value: {kind: categorical, categorical: SIRO2 C700+ zirconia oxygen sensor}}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 - id: aithala-allf-laser-levitation
   identity: {basis: described_in_this_work}
   apparatus_family:
     state: {tag: value, value: Aerodynamic laser levitation}
-    locator: {page: 8, published_page: 'SI-2', section: Methods}
+    locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   heating_method:
     state: {tag: value, value: 400 W CO2 laser; aerodynamic levitation}
-    locator: {page: 8, published_page: 'SI-2', section: Methods}
+    locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   temperature_measurement:
     instrument:
       state: {tag: value, value: Chino IR-CAS single-wavelength pyrometer}
-      locator: {page: 8, published_page: 'SI-2', section: Methods}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     wavelength_um:
       state: {tag: value, value: {kind: point, point: '0.9'}}
-      locator: {page: 8, published_page: 'SI-2', section: Methods}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     emissivity_setting:
       state: {tag: value, value: {kind: point, point: '0.92'}}
-      locator: {page: 8, published_page: 'SI-2', section: Methods}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     feedback_control:
       state: {tag: value, value: Closed-loop feedback control}
-      locator: {page: 8, published_page: 'SI-2', section: Methods}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     temperature_uncertainty_K:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical pyrometric temperature uncertainty is supplied}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical pyrometric temperature uncertainty is supplied, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   other_facts:
   - name: oxygen_purity
     unit: percent
     value:
       state: {tag: value, value: {kind: point, point: '99.994'}}
-      locator: {page: 8, published_page: 'SI-2', section: Methods}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   - name: oxygen_flow
     unit: cc/min
     value:
       state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '340'}}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Flow retained in the printed cc/min unit}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Flow retained in the printed cc/min unit, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   - name: laser_power
     unit: W
     value:
       state: {tag: value, value: {kind: point, point: '400'}}
-      locator: {page: 8, published_page: 'SI-2', section: Methods}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   - name: laser_power_ramp_rate
     unit: degrees_C_per_s
     value:
       state: {tag: value, value: {kind: point, point: '100'}}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Printed as 100 °C/s}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Printed as 100 °C/s, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 experiments:
 - experiment_id: aithala-2026-vf271
   series: Vertical Furnace
@@ -138,20 +150,22 @@ experiments:
     page: 13
     table: S-1
     published_page: SI-7
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
     note: Run conditions for vf271.
   sample:
     characterization:
       state: {tag: value, value: Humphrey single martian-relevant basaltic composition}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     form:
       state: {tag: value, value: Melt charge suspended on Pt wire}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.00003', interval_high: '0.000035'}}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Approximately 30–35 mg as printed; SI conversion only}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Approximately 30–35 mg as printed; SI conversion only, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   conditions:
     temperature_K:
       state: {tag: value, value: {kind: point, point: '1523.15'}}
@@ -159,6 +173,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed 1250 °C; converted with K = °C + 273.15.'
     temperature_uncertainty_K:
@@ -166,6 +182,8 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'No numerical ±T uncertainty is tabulated'
     log_fO2:
@@ -174,6 +192,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed log fO2 -0.68; reported for the imposed air atmosphere, not a sensor reading. Absolute log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).'
     log_fO2_as_printed:
@@ -182,6 +202,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed form for the air atmosphere'
   pressure_environment:
@@ -197,7 +219,7 @@ experiments:
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
     sweep_gas:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
@@ -207,6 +229,8 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Reported air condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement'
   thermal_schedule:
@@ -215,14 +239,16 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Furnace, atmosphere, charge and quench conditions'
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '259200'}}
-      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 72 h; seconds conversion only'}
+      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 72 h; seconds conversion only', source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     cooling_or_quench:
       state: {tag: value, value: 'Terminated by deionized-water quench'}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 - experiment_id: aithala-2026-vf267
   series: Vertical Furnace
   bench_id: aithala-vf-gas-mixing-furnace
@@ -231,20 +257,22 @@ experiments:
     page: 13
     table: S-1
     published_page: SI-7
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
     note: Run conditions for vf267.
   sample:
     characterization:
       state: {tag: value, value: Humphrey single martian-relevant basaltic composition}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     form:
       state: {tag: value, value: Melt charge suspended on Pt wire}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.00003', interval_high: '0.000035'}}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Approximately 30–35 mg as printed; SI conversion only}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Approximately 30–35 mg as printed; SI conversion only, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   conditions:
     temperature_K:
       state: {tag: value, value: {kind: point, point: '1573.15'}}
@@ -252,6 +280,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed 1300 °C; converted with K = °C + 273.15.'
     temperature_uncertainty_K:
@@ -259,6 +289,8 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'No numerical ±T uncertainty is tabulated'
     log_fO2:
@@ -267,6 +299,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed log fO2 -0.68; reported for the imposed air atmosphere, not a sensor reading. Absolute log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).'
     log_fO2_as_printed:
@@ -275,6 +309,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed form for the air atmosphere'
   pressure_environment:
@@ -290,7 +326,7 @@ experiments:
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
     sweep_gas:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
@@ -300,6 +336,8 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Reported air condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement'
   thermal_schedule:
@@ -308,14 +346,16 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Furnace, atmosphere, charge and quench conditions'
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '86400'}}
-      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 24 h; seconds conversion only'}
+      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 24 h; seconds conversion only', source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     cooling_or_quench:
       state: {tag: value, value: 'Terminated by deionized-water quench'}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 - experiment_id: aithala-2026-vf231
   series: Vertical Furnace
   bench_id: aithala-vf-gas-mixing-furnace
@@ -324,20 +364,22 @@ experiments:
     page: 13
     table: S-1
     published_page: SI-7
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
     note: Run conditions for vf231.
   sample:
     characterization:
       state: {tag: value, value: Humphrey single martian-relevant basaltic composition}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     form:
       state: {tag: value, value: Melt charge suspended on Pt wire}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.00003', interval_high: '0.000035'}}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Approximately 30–35 mg as printed; SI conversion only}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Approximately 30–35 mg as printed; SI conversion only, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   conditions:
     temperature_K:
       state: {tag: value, value: {kind: point, point: '1638.15'}}
@@ -345,6 +387,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed 1365 °C; converted with K = °C + 273.15.'
     temperature_uncertainty_K:
@@ -352,6 +396,8 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'No numerical ±T uncertainty is tabulated'
     log_fO2:
@@ -360,6 +406,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed log fO2 -0.68; reported for the imposed air atmosphere, not a sensor reading. Absolute log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).'
     log_fO2_as_printed:
@@ -368,6 +416,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed form for the air atmosphere'
   pressure_environment:
@@ -383,7 +433,7 @@ experiments:
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
     sweep_gas:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
@@ -393,6 +443,8 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Reported air condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement'
   thermal_schedule:
@@ -401,14 +453,16 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Furnace, atmosphere, charge and quench conditions'
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '21600'}}
-      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 6 h; seconds conversion only'}
+      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 6 h; seconds conversion only', source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     cooling_or_quench:
       state: {tag: value, value: 'Terminated by deionized-water quench'}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 - experiment_id: aithala-2026-vf268
   series: Vertical Furnace
   bench_id: aithala-vf-gas-mixing-furnace
@@ -417,20 +471,22 @@ experiments:
     page: 13
     table: S-1
     published_page: SI-7
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
     note: Run conditions for vf268.
   sample:
     characterization:
       state: {tag: value, value: Humphrey single martian-relevant basaltic composition}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     form:
       state: {tag: value, value: Melt charge suspended on Pt wire}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.00003', interval_high: '0.000035'}}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Approximately 30–35 mg as printed; SI conversion only}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Approximately 30–35 mg as printed; SI conversion only, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   conditions:
     temperature_K:
       state: {tag: value, value: {kind: point, point: '1673.15'}}
@@ -438,6 +494,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed 1400 °C; converted with K = °C + 273.15.'
     temperature_uncertainty_K:
@@ -445,6 +503,8 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'No numerical ±T uncertainty is tabulated'
     log_fO2:
@@ -453,6 +513,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed log fO2 -0.68; reported for the imposed air atmosphere, not a sensor reading. Absolute log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).'
     log_fO2_as_printed:
@@ -461,6 +523,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed form for the air atmosphere'
   pressure_environment:
@@ -476,7 +540,7 @@ experiments:
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
     sweep_gas:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
@@ -486,6 +550,8 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Reported air condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement'
   thermal_schedule:
@@ -494,14 +560,16 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Furnace, atmosphere, charge and quench conditions'
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '21600'}}
-      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 6 h; seconds conversion only'}
+      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 6 h; seconds conversion only', source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     cooling_or_quench:
       state: {tag: value, value: 'Terminated by deionized-water quench'}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 - experiment_id: aithala-2026-vf270
   series: Vertical Furnace
   bench_id: aithala-vf-gas-mixing-furnace
@@ -510,20 +578,22 @@ experiments:
     page: 13
     table: S-1
     published_page: SI-7
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
     note: Run conditions for vf270.
   sample:
     characterization:
       state: {tag: value, value: Humphrey single martian-relevant basaltic composition}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     form:
       state: {tag: value, value: Melt charge suspended on Pt wire}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.00003', interval_high: '0.000035'}}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Approximately 30–35 mg as printed; SI conversion only}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Approximately 30–35 mg as printed; SI conversion only, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   conditions:
     temperature_K:
       state: {tag: value, value: {kind: point, point: '1723.15'}}
@@ -531,6 +601,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed 1450 °C; converted with K = °C + 273.15.'
     temperature_uncertainty_K:
@@ -538,6 +610,8 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'No numerical ±T uncertainty is tabulated'
     log_fO2:
@@ -546,6 +620,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed log fO2 -0.68; reported for the imposed air atmosphere, not a sensor reading. Absolute log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).'
     log_fO2_as_printed:
@@ -554,6 +630,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed form for the air atmosphere'
   pressure_environment:
@@ -569,7 +647,7 @@ experiments:
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
     sweep_gas:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
@@ -579,6 +657,8 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Reported air condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement'
   thermal_schedule:
@@ -587,14 +667,16 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Furnace, atmosphere, charge and quench conditions'
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '7200'}}
-      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 2 h; seconds conversion only'}
+      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 2 h; seconds conversion only', source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     cooling_or_quench:
       state: {tag: value, value: 'Terminated by deionized-water quench'}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 - experiment_id: aithala-2026-vf274
   series: Vertical Furnace
   bench_id: aithala-vf-gas-mixing-furnace
@@ -603,20 +685,22 @@ experiments:
     page: 13
     table: S-1
     published_page: SI-7
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
     note: Run conditions for vf274.
   sample:
     characterization:
       state: {tag: value, value: Humphrey single martian-relevant basaltic composition}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     form:
       state: {tag: value, value: Melt charge suspended on Pt wire}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.00003', interval_high: '0.000035'}}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Approximately 30–35 mg as printed; SI conversion only}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Approximately 30–35 mg as printed; SI conversion only, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   conditions:
     temperature_K:
       state: {tag: value, value: {kind: point, point: '1773.15'}}
@@ -624,6 +708,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed 1500 °C; converted with K = °C + 273.15.'
     temperature_uncertainty_K:
@@ -631,6 +717,8 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'No numerical ±T uncertainty is tabulated'
     log_fO2:
@@ -639,6 +727,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed log fO2 -0.68; reported for the imposed air atmosphere, not a sensor reading. Absolute log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).'
     log_fO2_as_printed:
@@ -647,6 +737,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed form for the air atmosphere'
   pressure_environment:
@@ -662,7 +754,7 @@ experiments:
         note: 'Article reports 100 kPa; conversion only, not 101325 Pa'
     sweep_gas:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
@@ -672,6 +764,8 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Reported air condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement'
   thermal_schedule:
@@ -680,14 +774,16 @@ experiments:
       locator:
         page: 7
         published_page: 'SI-1'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Furnace, atmosphere, charge and quench conditions'
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '3600'}}
-      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 1 h; seconds conversion only'}
+      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 1 h; seconds conversion only', source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     cooling_or_quench:
       state: {tag: value, value: 'Terminated by deionized-water quench'}
-      locator: {page: 7, published_page: 'SI-1', section: Methods}
+      locator: {page: 7, published_page: 'SI-1', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 - experiment_id: aithala-2026-1800-30
   series: ALLF Temp. Series
   bench_id: aithala-allf-laser-levitation
@@ -696,17 +792,19 @@ experiments:
     page: 13
     table: S-1
     published_page: SI-7
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
     note: Run conditions for 1800-30.
   sample:
     characterization:
       state: {tag: value, value: Humphrey single martian-relevant basaltic composition}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     form:
       state: {tag: value, value: Laser-levitated melt droplet}
-      locator: {page: 8, published_page: 'SI-2', section: Methods}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   conditions:
     temperature_K:
       state: {tag: value, value: {kind: point, point: '2073.15'}}
@@ -714,6 +812,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed 1800 °C; converted with K = °C + 273.15.'
     temperature_uncertainty_K:
@@ -721,6 +821,8 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'No numerical pyrometric ±T uncertainty is supplied'
     log_fO2:
@@ -729,6 +831,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed log fO2 0; reported for the imposed ultra-high-purity O2 gas atmosphere, not a sensor reading. Absolute log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).'
     log_fO2_as_printed:
@@ -737,6 +841,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed form for the ultra-high-purity O2 gas atmosphere'
   pressure_environment:
@@ -757,7 +863,7 @@ experiments:
           species: O2
           flow_sccm: {tag: unknown, reason: would_invent}
           partial_pressure_Pa: {tag: unknown, reason: not_published}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading is supplied}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading is supplied, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
@@ -767,6 +873,8 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Reported ultra-high-purity O2 gas condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement'
   thermal_schedule:
@@ -775,14 +883,16 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Aerodynamic laser-levitation, gas, heating and quench conditions'
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '30'}}
-      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 30 s; seconds conversion only'}
+      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 30 s; seconds conversion only', source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     cooling_or_quench:
       state: {tag: value, value: 'Laser-off free quench'}
-      locator: {page: 10, published_page: 'SI-4', section: Quenching}
+      locator: {page: 10, published_page: 'SI-4', section: Quenching, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 - experiment_id: aithala-2026-1900-30
   series: ALLF Temp. Series
   bench_id: aithala-allf-laser-levitation
@@ -791,17 +901,19 @@ experiments:
     page: 13
     table: S-1
     published_page: SI-7
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
     note: Run conditions for 1900-30.
   sample:
     characterization:
       state: {tag: value, value: Humphrey single martian-relevant basaltic composition}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     form:
       state: {tag: value, value: Laser-levitated melt droplet}
-      locator: {page: 8, published_page: 'SI-2', section: Methods}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   conditions:
     temperature_K:
       state: {tag: value, value: {kind: point, point: '2173.15'}}
@@ -809,6 +921,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed 1900 °C; converted with K = °C + 273.15.'
     temperature_uncertainty_K:
@@ -816,6 +930,8 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'No numerical pyrometric ±T uncertainty is supplied'
     log_fO2:
@@ -824,6 +940,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed log fO2 0; reported for the imposed ultra-high-purity O2 gas atmosphere, not a sensor reading. Absolute log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).'
     log_fO2_as_printed:
@@ -832,6 +950,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed form for the ultra-high-purity O2 gas atmosphere'
   pressure_environment:
@@ -852,7 +972,7 @@ experiments:
           species: O2
           flow_sccm: {tag: unknown, reason: would_invent}
           partial_pressure_Pa: {tag: unknown, reason: not_published}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading is supplied}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading is supplied, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
@@ -862,6 +982,8 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Reported ultra-high-purity O2 gas condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement'
   thermal_schedule:
@@ -870,14 +992,16 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Aerodynamic laser-levitation, gas, heating and quench conditions'
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '30'}}
-      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 30 s; seconds conversion only'}
+      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 30 s; seconds conversion only', source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     cooling_or_quench:
       state: {tag: value, value: 'Laser-off free quench'}
-      locator: {page: 10, published_page: 'SI-4', section: Quenching}
+      locator: {page: 10, published_page: 'SI-4', section: Quenching, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 - experiment_id: aithala-2026-2000-30
   series: ALLF Temp. Series
   bench_id: aithala-allf-laser-levitation
@@ -886,17 +1010,19 @@ experiments:
     page: 13
     table: S-1
     published_page: SI-7
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
     note: Run conditions for 2000-30.
   sample:
     characterization:
       state: {tag: value, value: Humphrey single martian-relevant basaltic composition}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     form:
       state: {tag: value, value: Laser-levitated melt droplet}
-      locator: {page: 8, published_page: 'SI-2', section: Methods}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   conditions:
     temperature_K:
       state: {tag: value, value: {kind: point, point: '2273.15'}}
@@ -904,6 +1030,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed 2000 °C; converted with K = °C + 273.15.'
     temperature_uncertainty_K:
@@ -911,6 +1039,8 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'No numerical pyrometric ±T uncertainty is supplied'
     log_fO2:
@@ -919,6 +1049,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed log fO2 0; reported for the imposed ultra-high-purity O2 gas atmosphere, not a sensor reading. Absolute log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).'
     log_fO2_as_printed:
@@ -927,6 +1059,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed form for the ultra-high-purity O2 gas atmosphere'
   pressure_environment:
@@ -947,7 +1081,7 @@ experiments:
           species: O2
           flow_sccm: {tag: unknown, reason: would_invent}
           partial_pressure_Pa: {tag: unknown, reason: not_published}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading is supplied}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading is supplied, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
@@ -957,6 +1091,8 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Reported ultra-high-purity O2 gas condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement'
   thermal_schedule:
@@ -965,14 +1101,16 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Aerodynamic laser-levitation, gas, heating and quench conditions'
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '30'}}
-      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 30 s; seconds conversion only'}
+      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 30 s; seconds conversion only', source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     cooling_or_quench:
       state: {tag: value, value: 'Laser-off free quench'}
-      locator: {page: 10, published_page: 'SI-4', section: Quenching}
+      locator: {page: 10, published_page: 'SI-4', section: Quenching, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 - experiment_id: aithala-2026-2100-30
   series: ALLF Temp. Series
   bench_id: aithala-allf-laser-levitation
@@ -981,17 +1119,19 @@ experiments:
     page: 13
     table: S-1
     published_page: SI-7
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
     note: Run conditions for 2100-30.
   sample:
     characterization:
       state: {tag: value, value: Humphrey single martian-relevant basaltic composition}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     form:
       state: {tag: value, value: Laser-levitated melt droplet}
-      locator: {page: 8, published_page: 'SI-2', section: Methods}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   conditions:
     temperature_K:
       state: {tag: value, value: {kind: point, point: '2373.15'}}
@@ -999,6 +1139,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed 2100 °C; converted with K = °C + 273.15.'
     temperature_uncertainty_K:
@@ -1006,6 +1148,8 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'No numerical pyrometric ±T uncertainty is supplied'
     log_fO2:
@@ -1014,6 +1158,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed log fO2 0; reported for the imposed ultra-high-purity O2 gas atmosphere, not a sensor reading. Absolute log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).'
     log_fO2_as_printed:
@@ -1022,6 +1168,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed form for the ultra-high-purity O2 gas atmosphere'
   pressure_environment:
@@ -1042,7 +1190,7 @@ experiments:
           species: O2
           flow_sccm: {tag: unknown, reason: would_invent}
           partial_pressure_Pa: {tag: unknown, reason: not_published}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading is supplied}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading is supplied, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
@@ -1052,6 +1200,8 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Reported ultra-high-purity O2 gas condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement'
   thermal_schedule:
@@ -1060,14 +1210,16 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Aerodynamic laser-levitation, gas, heating and quench conditions'
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '30'}}
-      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 30 s; seconds conversion only'}
+      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 30 s; seconds conversion only', source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     cooling_or_quench:
       state: {tag: value, value: 'Laser-off free quench'}
-      locator: {page: 10, published_page: 'SI-4', section: Quenching}
+      locator: {page: 10, published_page: 'SI-4', section: Quenching, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 - experiment_id: aithala-2026-2000-10
   series: ALLF Time Series
   bench_id: aithala-allf-laser-levitation
@@ -1076,17 +1228,19 @@ experiments:
     page: 13
     table: S-1
     published_page: SI-7
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
     note: Run conditions for 2000-10.
   sample:
     characterization:
       state: {tag: value, value: Humphrey single martian-relevant basaltic composition}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     form:
       state: {tag: value, value: Laser-levitated melt droplet}
-      locator: {page: 8, published_page: 'SI-2', section: Methods}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   conditions:
     temperature_K:
       state: {tag: value, value: {kind: point, point: '2273.15'}}
@@ -1094,6 +1248,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed 2000 °C; converted with K = °C + 273.15.'
     temperature_uncertainty_K:
@@ -1101,6 +1257,8 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'No numerical pyrometric ±T uncertainty is supplied'
     log_fO2:
@@ -1109,6 +1267,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed log fO2 0; reported for the imposed ultra-high-purity O2 gas atmosphere, not a sensor reading. Absolute log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).'
     log_fO2_as_printed:
@@ -1117,6 +1277,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed form for the ultra-high-purity O2 gas atmosphere'
   pressure_environment:
@@ -1137,7 +1299,7 @@ experiments:
           species: O2
           flow_sccm: {tag: unknown, reason: would_invent}
           partial_pressure_Pa: {tag: unknown, reason: not_published}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading is supplied}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading is supplied, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
@@ -1147,6 +1309,8 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Reported ultra-high-purity O2 gas condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement'
   thermal_schedule:
@@ -1155,14 +1319,16 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Aerodynamic laser-levitation, gas, heating and quench conditions'
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '10'}}
-      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 10 s; seconds conversion only'}
+      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 10 s; seconds conversion only', source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     cooling_or_quench:
       state: {tag: value, value: 'Laser-off free quench'}
-      locator: {page: 10, published_page: 'SI-4', section: Quenching}
+      locator: {page: 10, published_page: 'SI-4', section: Quenching, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 - experiment_id: aithala-2026-2000-120
   series: ALLF Time Series
   bench_id: aithala-allf-laser-levitation
@@ -1171,17 +1337,19 @@ experiments:
     page: 13
     table: S-1
     published_page: SI-7
+    source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+    source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
     note: Run conditions for 2000-120.
   sample:
     characterization:
       state: {tag: value, value: Humphrey single martian-relevant basaltic composition}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: Starting-material name; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: No numerical initial composition is given here; synthesis details are referred to an earlier paper, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     form:
       state: {tag: value, value: Laser-levitated melt droplet}
-      locator: {page: 8, published_page: 'SI-2', section: Methods}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
   conditions:
     temperature_K:
       state: {tag: value, value: {kind: point, point: '2273.15'}}
@@ -1189,6 +1357,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed 2000 °C; converted with K = °C + 273.15.'
     temperature_uncertainty_K:
@@ -1196,6 +1366,8 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'No numerical pyrometric ±T uncertainty is supplied'
     log_fO2:
@@ -1204,6 +1376,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed log fO2 0; reported for the imposed ultra-high-purity O2 gas atmosphere, not a sensor reading. Absolute log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).'
     log_fO2_as_printed:
@@ -1212,6 +1386,8 @@ experiments:
         page: 13
         table: 'S-1'
         published_page: 'SI-7'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Table S-1'
         note: 'Printed form for the ultra-high-purity O2 gas atmosphere'
   pressure_environment:
@@ -1232,7 +1408,7 @@ experiments:
           species: O2
           flow_sccm: {tag: unknown, reason: would_invent}
           partial_pressure_Pa: {tag: unknown, reason: not_published}
-      locator: {page: 8, published_page: 'SI-2', section: Methods, note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading is supplied}
+      locator: {page: 8, published_page: 'SI-2', section: Methods, note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading is supplied, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
@@ -1242,6 +1418,8 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Reported ultra-high-purity O2 gas condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement'
   thermal_schedule:
@@ -1250,14 +1428,16 @@ experiments:
       locator:
         page: 8
         published_page: 'SI-2'
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         section: 'Methods'
         note: 'Aerodynamic laser-levitation, gas, heating and quench conditions'
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '120'}}
-      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 120 s; seconds conversion only'}
+      locator: {page: 13, table: S-1, published_page: 'SI-7', note: 'Printed duration 120 s; seconds conversion only', source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
     cooling_or_quench:
       state: {tag: value, value: 'Laser-off free quench'}
-      locator: {page: 10, published_page: 'SI-4', section: Quenching}
+      locator: {page: 10, published_page: 'SI-4', section: Quenching, source_path: 'raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa}
 - experiment_id: aithala-2026-s5-humphrey
   method:
     tag: unknown
@@ -3045,6 +3225,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: "XANES determination for VF271. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses (SI-2–SI-3, PDF pp. 8–9). The 1250 °C VF271 sample was partially crystallised and below the starting composition's liquidus (SI-3, PDF p. 9). Table S-3 (PDF p. 15, SI-9) prints 0.816 ± 0.022 (S-1: ±0.019); this is the same measurement and not a second observation."
       T_range_K:
       - 1523.15
@@ -3070,6 +3252,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: Mössbauer determination for VF267. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as noted in SI-1–SI-3 (PDF pp. 7–9).
       T_range_K:
       - 1573.15
@@ -3095,6 +3279,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: XANES determination for VF231. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses (SI-2–SI-3, PDF pp. 8–9).
       T_range_K:
       - 1638.15
@@ -3120,6 +3306,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: Mössbauer determination for VF231. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as noted in SI-1–SI-3 (PDF pp. 7–9).
       T_range_K:
       - 1638.15
@@ -3145,6 +3333,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: XANES determination for VF268. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses (SI-2–SI-3, PDF pp. 8–9).
       T_range_K:
       - 1673.15
@@ -3170,6 +3360,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: Mössbauer determination for VF268. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as noted in SI-1–SI-3 (PDF pp. 7–9).
       T_range_K:
       - 1673.15
@@ -3195,6 +3387,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: XANES determination for VF270. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses (SI-2–SI-3, PDF pp. 8–9).
       T_range_K:
       - 1723.15
@@ -3220,6 +3414,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: Mössbauer determination for VF270. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as noted in SI-1–SI-3 (PDF pp. 7–9).
       T_range_K:
       - 1723.15
@@ -3245,6 +3441,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: XANES determination for VF274. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses (SI-2–SI-3, PDF pp. 8–9).
       T_range_K:
       - 1773.15
@@ -3270,6 +3468,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: Mössbauer determination for VF274. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as noted in SI-1–SI-3 (PDF pp. 7–9).
       T_range_K:
       - 1773.15
@@ -3295,6 +3495,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: XANES determination for 1800-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses (SI-2–SI-3, PDF pp. 8–9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration applies to glasses synthesised at ALLF temperatures.
       T_range_K:
       - 2073.15
@@ -3320,6 +3522,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: XANES determination for 1900-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses (SI-2–SI-3, PDF pp. 8–9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration applies to glasses synthesised at ALLF temperatures.
       T_range_K:
       - 2173.15
@@ -3345,6 +3549,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: XANES determination for 2000-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses (SI-2–SI-3, PDF pp. 8–9). The authors identify 2000-30 as anomalous; their 2000 °C equilibrium interpretation and fitted series use 2000-10 as the anchor (SI-3, PDF p. 9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration applies to glasses synthesised at ALLF temperatures.
       T_range_K:
       - 2273.15
@@ -3370,6 +3576,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: XANES determination for 2100-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses (SI-2–SI-3, PDF pp. 8–9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration applies to glasses synthesised at ALLF temperatures.
       T_range_K:
       - 2373.15
@@ -3395,6 +3603,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: XANES determination for 2000-10. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses (SI-2–SI-3, PDF pp. 8–9). The authors use 2000-10 as their 2000 °C equilibrium anchor for the fitted temperature series (SI-3, PDF p. 9). SI-3 prose values for 2000-10 and 2000-120 differ from Tables S-1/S-3; table values remain unchanged. SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration applies to glasses synthesised at ALLF temperatures.
       T_range_K:
       - 2273.15
@@ -3420,6 +3630,8 @@ species:
         page: 13
         table: S-1
         published_page: SI-7
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: XANES determination for 2000-120. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses (SI-2–SI-3, PDF pp. 8–9). SI-3 prose values for 2000-10 and 2000-120 differ from Tables S-1/S-3; table values remain unchanged and no additional determinations are added. SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration applies to glasses synthesised at ALLF temperatures.
       T_range_K:
       - 2273.15
@@ -5031,6 +5243,8 @@ species:
           page: 14
           table: S-2
           published_page: SI-8
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: 'Footnote a: average of VF267, VF231, VF268, VF270, and VF274.'
         units: wt.% oxide
         values:
@@ -5065,6 +5279,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: "Raw series duplicates typed Table S-1 (11/12 identical; VF271 uncertainty differs and is noted on the S-1 row); adjusted columns are model_derived. VF271 is partially crystallised and below its liquidus; run 2000-30 is anomalous and 2000-10 is the authors' 2000 °C anchor (SI-3, PDF p. 9)."
         units: fraction (Fe3+/FeT)
         values:
@@ -5149,6 +5365,8 @@ species:
           page: 15
           table: S-4
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Equation Eq 7 fit row.
         units: h in K; ΔCp in J/K; c dimensionless; χ² as printed
         values:
@@ -5168,6 +5386,8 @@ species:
           page: 15
           table: S-4
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Equation Eq 8 fit row.
         units: h in K; ΔCp in J/K; c dimensionless; χ² as printed
         values:
@@ -5189,6 +5409,8 @@ species:
           page: 15
           table: S-4
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Equation Eq 9 fit row.
         units: h in K; ΔCp in J/K; c dimensionless; χ² as printed
         values:
@@ -5285,6 +5507,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT A_sub. for VF271. VF271 is partially crystallised and below the starting composition's liquidus (SI-3, PDF p. 9).
         T_range_K:
         - 1523.15
@@ -5316,6 +5540,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT B18 for VF271. VF271 is partially crystallised and below the starting composition's liquidus (SI-3, PDF p. 9).
         T_range_K:
         - 1523.15
@@ -5347,6 +5573,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT air recalculated for 1800-30.
         T_range_K:
         - 2073.15
@@ -5376,6 +5604,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT A_sub. for 1800-30.
         T_range_K:
         - 2073.15
@@ -5407,6 +5637,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT B18 for 1800-30.
         T_range_K:
         - 2073.15
@@ -5438,6 +5670,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT air recalculated for 1900-30.
         T_range_K:
         - 2173.15
@@ -5467,6 +5701,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT A_sub. for 1900-30.
         T_range_K:
         - 2173.15
@@ -5498,6 +5734,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT B18 for 1900-30.
         T_range_K:
         - 2173.15
@@ -5529,6 +5767,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT air recalculated for 2000-30. This recalculation derives from the authors' anomalous run 2000-30 (SI-3, PDF p. 9).
         T_range_K:
         - 2273.15
@@ -5558,6 +5798,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT A_sub. for 2000-30. This recalculation derives from the authors' anomalous run 2000-30 (SI-3, PDF p. 9).
         T_range_K:
         - 2273.15
@@ -5589,6 +5831,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT B18 for 2000-30. This recalculation derives from the authors' anomalous run 2000-30 (SI-3, PDF p. 9).
         T_range_K:
         - 2273.15
@@ -5620,6 +5864,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT air recalculated for 2100-30.
         T_range_K:
         - 2373.15
@@ -5649,6 +5895,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT A_sub. for 2100-30.
         T_range_K:
         - 2373.15
@@ -5680,6 +5928,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT B18 for 2100-30.
         T_range_K:
         - 2373.15
@@ -5711,6 +5961,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT air recalculated for 2000-10. This recalculation derives from the authors' 2000 °C equilibrium anchor run 2000-10 (SI-3, PDF p. 9).
         T_range_K:
         - 2273.15
@@ -5740,6 +5992,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT A_sub. for 2000-10. This recalculation derives from the authors' 2000 °C equilibrium anchor run 2000-10 (SI-3, PDF p. 9).
         T_range_K:
         - 2273.15
@@ -5771,6 +6025,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT B18 for 2000-10. This recalculation derives from the authors' 2000 °C equilibrium anchor run 2000-10 (SI-3, PDF p. 9).
         T_range_K:
         - 2273.15
@@ -5802,6 +6058,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT air recalculated for 2000-120.
         T_range_K:
         - 2273.15
@@ -5831,6 +6089,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT A_sub. for 2000-120.
         T_range_K:
         - 2273.15
@@ -5862,6 +6122,8 @@ species:
           page: 15
           table: S-3
           published_page: SI-9
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           note: Fe3+/FeT B18 for 2000-120.
         T_range_K:
         - 2273.15
@@ -5891,6 +6153,8 @@ species:
         locator:
           page: 7
           published_page: SI-1
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           section: Methods
         units: as printed
         values:
@@ -5910,6 +6174,8 @@ species:
         locator:
           page: 8
           published_page: SI-2
+          source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+          source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
           section: Methods
         units: as printed
         values:
@@ -5934,6 +6200,8 @@ species:
         page: 14
         table: S-2
         published_page: SI-8
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published in Aithala, Lange & Hirschmann (2026).
       units: wt.% oxide
       values:
@@ -5960,6 +6228,8 @@ species:
         page: 14
         table: S-2
         published_page: SI-8
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
       units: wt.% oxide
       values:
@@ -5986,6 +6256,8 @@ species:
         page: 14
         table: S-2
         published_page: SI-8
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
       units: wt.% oxide
       values:
@@ -6012,6 +6284,8 @@ species:
         page: 14
         table: S-2
         published_page: SI-8
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
       units: wt.% oxide
       values:
@@ -6038,6 +6312,8 @@ species:
         page: 14
         table: S-2
         published_page: SI-8
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
       units: wt.% oxide
       values:
@@ -6064,6 +6340,8 @@ species:
         page: 14
         table: S-2
         published_page: SI-8
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
       units: wt.% oxide
       values:
@@ -6090,6 +6368,8 @@ species:
         page: 14
         table: S-2
         published_page: SI-8
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: WDS EPMA composition for 1800-30; all oxide columns in wt.% as printed.
       units: wt.% oxide
       values:
@@ -6116,6 +6396,8 @@ species:
         page: 14
         table: S-2
         published_page: SI-8
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: WDS EPMA composition for 1900-30; all oxide columns in wt.% as printed.
       units: wt.% oxide
       values:
@@ -6142,6 +6424,8 @@ species:
         page: 14
         table: S-2
         published_page: SI-8
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: WDS EPMA composition for 2000-30; all oxide columns in wt.% as printed. Run 2000-30 is identified by the authors as anomalous; 2000-10 is their 2000 °C equilibrium anchor (SI-3, PDF p. 9).
       units: wt.% oxide
       values:
@@ -6168,6 +6452,8 @@ species:
         page: 14
         table: S-2
         published_page: SI-8
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: WDS EPMA composition for 2100-30; all oxide columns in wt.% as printed.
       units: wt.% oxide
       values:
@@ -6194,6 +6480,8 @@ species:
         page: 14
         table: S-2
         published_page: SI-8
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: WDS EPMA composition for 2000-10; all oxide columns in wt.% as printed. The associated 2000 °C Fe determination, run 2000-10, is the authors' equilibrium anchor (SI-3, PDF p. 9).
       units: wt.% oxide
       values:
@@ -6220,6 +6508,8 @@ species:
         page: 14
         table: S-2
         published_page: SI-8
+        source_path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c-si.pdf
+        source_sha256: ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa
         note: WDS EPMA composition for 2000-120; all oxide columns in wt.% as printed.
       units: wt.% oxide
       values:
