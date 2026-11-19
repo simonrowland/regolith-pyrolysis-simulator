@@ -620,31 +620,63 @@ def _compilation_series_point_count(
     return 1 if pairs is None else len(pairs)
 
 
+def _series_point_cell(
+    observation: Observation,
+    temperature: Decimal,
+    magnitude: Decimal,
+    occurrence: int,
+) -> _CompilationSeriesCell:
+    """One printed series cell. The catalog and the scorer share this constructor."""
+
+    identity = replace(observation.identity, temperature_K=State.of(temperature))
+    return _CompilationSeriesCell(
+        parent=observation,
+        observation_id=compilation_point_id(
+            observation.observation_id, temperature, magnitude, occurrence
+        ),
+        identity=identity,
+        value=Value.point_of(magnitude),
+        notices=observation.notices,
+    )
+
+
+def _compilation_series_slots(
+    observation: Observation,
+    origin: str | None = None,
+):
+    """Yield ``(temperature, magnitude, occurrence)`` without building cells.
+
+    ``None`` means this observation is not a compilation series. Occurrence
+    matches ``_series_point_cell`` so a later caller can build one cell.
+    """
+
+    pairs = _compilation_series_pairs(observation, origin)
+    if pairs is None:
+        return None
+    seen: dict[str, int] = {}
+
+    def generate():
+        for temperature, magnitude in pairs:
+            temp_d = as_decimal(temperature)
+            mag_d = as_decimal(magnitude)
+            key = f"{_decimal_token(temp_d)}|{_decimal_token(mag_d)}"
+            occurrence = seen.get(key, 0)
+            seen[key] = occurrence + 1
+            yield temp_d, mag_d, occurrence
+
+    return generate()
+
+
 def _iter_compilation_series_cells(
     observation: Observation,
     origin: str | None = None,
 ) -> Iterable[Observation | _CompilationSeriesCell]:
-    pairs = _compilation_series_pairs(observation, origin)
-    if pairs is None:
+    slots = _compilation_series_slots(observation, origin)
+    if slots is None:
         yield observation
         return
-    seen: dict[str, int] = {}
-    for temperature, magnitude in pairs:
-        temp_d = as_decimal(temperature)
-        mag_d = as_decimal(magnitude)
-        key = f"{_decimal_token(temp_d)}|{_decimal_token(mag_d)}"
-        occurrence = seen.get(key, 0)
-        seen[key] = occurrence + 1
-        identity = replace(observation.identity, temperature_K=State.of(temp_d))
-        yield _CompilationSeriesCell(
-            parent=observation,
-            observation_id=compilation_point_id(
-                observation.observation_id, temp_d, mag_d, occurrence
-            ),
-            identity=identity,
-            value=Value.point_of(mag_d),
-            notices=observation.notices,
-        )
+    for temperature, magnitude, occurrence in slots:
+        yield _series_point_cell(observation, temperature, magnitude, occurrence)
 
 
 def _state_value(state: object) -> object | None:
