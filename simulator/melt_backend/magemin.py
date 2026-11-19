@@ -4314,13 +4314,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     if engine_not_converged
                     else 'clamped_operating_point'
                 ),
-                'backend_failure_disposition': 'numerical',
                 'fO2_control_notice': {
                     'requested_fO2_log': requested, 'native_fO2_log': solved,
                     'delta_log10': delta, 'buffer_phase_present': buffer_present,
                     'reason': 'native fO2 or buffer does not honour requested controls',
                 },
             })
+            if engine_not_converged:
+                diagnostics['backend_failure_disposition'] = 'numerical'
         return diagnostics
 
     @staticmethod
