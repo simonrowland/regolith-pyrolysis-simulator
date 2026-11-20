@@ -15,6 +15,7 @@ import simulator.condensation as condensation_module  # noqa: E402
 from simulator.condensation import (  # noqa: E402
     STAGE_AREA_KEY_BY_STAGE_KEY,
     STAGE_AREA_KEY_BY_STAGE_NUMBER,
+    WallSaturationPressureRefusal,
     antoine_dew_temperature_diagnostic,
     _try_antoine_psat_pa,
     stage_purity_report,
@@ -408,14 +409,23 @@ def _production_psat(
     key = (species, round(float(temperature_C), 9))
     if key not in cache:
         notes: dict = {}
-        pressure, refused = _try_antoine_psat_pa(
-            species,
-            float(temperature_C) + 273.15,
-            vapor_pressure_data=vapor_pressure_data,
-            antoine_extrapolations=notes,
-            antoine_extrapolation_warnings=[],
-            enforce_hot_train_applicability=False,
-        )
+        try:
+            pressure, refused = _try_antoine_psat_pa(
+                species,
+                float(temperature_C) + 273.15,
+                vapor_pressure_data=vapor_pressure_data,
+                antoine_extrapolations=notes,
+                antoine_extrapolation_warnings=[],
+                enforce_hot_train_applicability=False,
+            )
+        except WallSaturationPressureRefusal as exc:
+            cache[key] = (
+                None,
+                True,
+                False,
+                f"{type(exc).__name__}: {exc}",
+            )
+            return cache[key]
         cache[key] = (
             None if pressure is None else float(pressure),
             bool(refused),
@@ -458,11 +468,19 @@ def _dewpoint_in_wall_band(
     if pressure == 0.0:
         return {"status": "absent", "temperature_C": None}
 
-    owner_dewpoint = antoine_dew_temperature_diagnostic(
-        species,
-        pressure,
-        vapor_pressure_data=vapor_pressure_data,
-    )
+    try:
+        owner_dewpoint = antoine_dew_temperature_diagnostic(
+            species,
+            pressure,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+    except WallSaturationPressureRefusal as exc:
+        return {
+            "status": "psat_refused",
+            "temperature_C": None,
+            "extrapolated": False,
+            "reason": f"{type(exc).__name__}: {exc}",
+        }
     if owner_dewpoint.get("status") == "diagnostic_only":
         owner_temperature_C = (
             float(owner_dewpoint["temperature_K"]) - 273.15
