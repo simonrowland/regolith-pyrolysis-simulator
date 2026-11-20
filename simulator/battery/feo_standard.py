@@ -38,6 +38,9 @@ _INTERNAL_ANALYTICAL_FEO_STANDARD = _FeOActivityStandard(
 _OPENIMCC_PUBLISHED_CORE_PACK_DIGEST = (
     "ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c"
 )
+_OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST = (
+    "b9c497901404b03b1d1e20bec58f2d4c0903f481af17ae82bfcf97ea7f4bf5e8"
+)
 _FEO_ACTIVITY_CANONICAL_STANDARD = "Fe-019"
 _OPENIMCC_DEFAULT_PACK_VERSION = "1.0.6-d066-v4"
 _OPENIMCC_DEFAULT_PACK_DIGEST = (
@@ -170,6 +173,24 @@ def _resolve_feo_activity_standard(
             {
                 "reason": "feo_activity_standard_not_declared",
                 "engine": engine.value,
+            },
+        )
+
+    condensate_digest = _source_value(
+        coefficient_sources,
+        "openimcc-condensate-table:sha256:",
+    )
+    if condensate_digest is not None and condensate_digest != (
+        _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+    ):
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "openimcc_feo_condensate_table_digest_mismatch",
+                "expected_condensate_table_digest": (
+                    _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+                ),
+                "actual_condensate_table_digest": condensate_digest,
             },
         )
 
@@ -484,7 +505,7 @@ def normalize_openimcc_feo_activity_value(
         Decimal(0), temperature_K, standard.offset_j_mol
     )
     normalized_value = value
-    if value.is_finite() and value > 0:
+    if value.is_finite() and value > 0 and standard.offset_j_mol != 0:
         normalized_value = Decimal(10) ** _canonical_log10_feo_activity(
             value.log10(), temperature_K, standard.offset_j_mol
         )

@@ -33,9 +33,14 @@ import simulator.battery.score as score_module
 from tests.battery import factories as F
 
 
-_RESIDUAL_SHA256_BEFORE_STANDARD_STEP = (
-    "61b0c0bb1105c233265d2e0175899f2c28bb0db324798c8e850025c8864acac0"
-)
+_RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
+    Engine.INTERNAL_ANALYTICAL: (
+        "61b0c0bb1105c233265d2e0175899f2c28bb0db324798c8e850025c8864acac0"
+    ),
+    Engine.OPENIMCC: (
+        "87e4d99db4de9feed4a80902d51b1ef2f8c137b548b07ab44fc768dd6bcee33e"
+    ),
+}
 # b217 pinned the N_Fe2+^0 multiply:
 # sha 3b1518942a5ca7524b6e4be8e2c98fd375db44c5835bd830a4acff0a54e32ce0
 # dex -0.013180332034779389
@@ -46,10 +51,12 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = (
 _DISTIN_1880_RESIDUAL_SHA256 = (
     "4018b7071882dfaca4eca46512ad7357f48e461bc4c4ed1feacedf2c3a420097"
 )
-# At 2153.15 K, the pinned MELT expression gives
-# 27778.965828 - 10.961554232*2153.15 = 4177.0953 J/mol.
-# Dividing by R*T*ln(10) gives +0.1013328 dex; adding this to the prior
-# -0.10531292782444457 residual yields -0.0039800848499234 dex.
+# Green (OpenIMCC 66ec4a3) pinned this residual at -0.10057837869175247 dex.
+# The 9c327c2 repin (series commit 5c670398e0) moved it by -0.0047345491326921
+# dex to -0.10531292782444457. At 2153.15 K, the v4 MELT expression gives
+# 27778.965828 - 10.961554232*2153.15 = 4177.0953 J/mol, or +0.1013328 dex
+# (unrounded +0.10133284297452116) against R*T*ln(10). The final pin is
+# -0.003980084849923409 dex, a net +0.09659829384182906 dex from green.
 _DISTIN_1880_RESIDUAL_DEX = Decimal("-0.003980084849923409")
 
 
@@ -135,27 +142,69 @@ def _case(
     return context, experiment, reference, prediction
 
 
-def test_declared_zero_offset_feo_standards_preserve_residual_bytes() -> None:
-    engine = Engine.INTERNAL_ANALYTICAL
-    sources = ("nasa-cea-thermo",)
-    expected_digest = _RESIDUAL_SHA256_BEFORE_STANDARD_STEP
-    context, _experiment, reference, prediction = _case(engine, sources)
+@pytest.mark.parametrize(
+    ("engine", "pack_name"),
+    (
+        (Engine.INTERNAL_ANALYTICAL, None),
+        (Engine.OPENIMCC, "published-core"),
+    ),
+    ids=("internal-analytical", "openimcc-published-core"),
+)
+def test_declared_zero_offset_feo_standards_preserve_residual_bytes(
+    engine: Engine,
+    pack_name: str | None,
+) -> None:
+    identity = None
+    if engine is Engine.OPENIMCC:
+        pytest.importorskip("openimcc")
+        assert pack_name is not None
+        identity = _melt_pack_identity(pack_name)
+        sources = _openimcc_sources(
+            pack_version=identity["pack_version"],
+            pack_digest=identity["binding_digest"],
+            condensate_digest=(
+                feo_standard_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+            ),
+        )
+    else:
+        sources = ("nasa-cea-thermo",)
+    expected_digest = _RESIDUAL_SHA256_BEFORE_STANDARD_STEP[engine]
+    context, _experiment, reference, prediction = _case(
+        engine,
+        sources,
+        provenance=(
+            {"melt_pack_identity": identity} if identity is not None else None
+        ),
+    )
     resolver = getattr(feo_standard_module, "_resolve_feo_activity_standard", None)
     converter = getattr(score_module, "_canonicalize_feo_activity_prediction", None)
     assert callable(resolver)
     assert callable(converter)
 
-    standard, refusal = resolver(engine, prediction.coefficient_sources)
+    standard, refusal = resolver(
+        engine,
+        prediction.coefficient_sources,
+        melt_pack_identity=identity,
+        temperature_K=Decimal("1643.15"),
+    )
     assert refusal is None
     assert standard is not None
     assert standard.name == "Fe-019"
     assert standard.offset_j_mol == Decimal(0)
 
-    canonical_prediction, refusal = converter(prediction)
+    before_prediction = (
+        score_module._normalize_openimcc_feo_activity_prediction(prediction)
+        if engine is Engine.OPENIMCC
+        else prediction
+    )
+    if engine is Engine.OPENIMCC:
+        assert before_prediction.value is prediction.value
+        assert before_prediction.value.as_tuple() == prediction.value.as_tuple()
+    canonical_prediction, refusal = converter(before_prediction)
     assert refusal is None
-    assert canonical_prediction.value is prediction.value
+    assert canonical_prediction.value == prediction.value
     before, before_candidate = compile_residual(
-        reference, engine, context=context, prediction=prediction
+        reference, engine, context=context, prediction=before_prediction
     )
     after, after_candidate = compile_residual(
         reference, engine, context=context, prediction=canonical_prediction
@@ -169,16 +218,17 @@ def test_declared_zero_offset_feo_standards_preserve_residual_bytes() -> None:
     assert sha256(before_bytes).hexdigest() == expected_digest
 
 
-def test_openimcc_feo_row_refuses_a_changed_condensate_digest() -> None:
-    """A legacy condensate identity without the current melt binding is refused."""
+def test_openimcc_feo_row_refuses_missing_melt_binding() -> None:
+    """A condensate identity without the current melt binding is refused."""
     identity = _melt_pack_identity("default")
-    actual_digest = "a" * 64
     sources = tuple(
         source
         for source in _openimcc_sources(
             pack_version=identity["pack_version"],
             pack_digest=identity["binding_digest"],
-            condensate_digest=actual_digest,
+            condensate_digest=(
+                feo_standard_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+            ),
         )
         if not source.startswith("openimcc-melt-binding:")
     )
@@ -195,6 +245,34 @@ def test_openimcc_feo_row_refuses_a_changed_condensate_digest() -> None:
     assert refusal.detail["reason"] == (
         "openimcc_feo_standard_melt_pack_identity_missing"
     )
+
+
+def test_openimcc_feo_row_refuses_a_changed_condensate_digest() -> None:
+    identity = _melt_pack_identity("default")
+    actual_digest = "a" * 64
+    expected_digest = (
+        "b9c497901404b03b1d1e20bec58f2d4c0903f481af17ae82bfcf97ea7f4bf5e8"
+    )
+    sources = _openimcc_sources(
+        pack_version=identity["pack_version"],
+        pack_digest=identity["binding_digest"],
+        condensate_digest=actual_digest,
+    )
+    standard, refusal = feo_standard_module._resolve_feo_activity_standard(
+        Engine.OPENIMCC,
+        sources,
+        melt_pack_identity=identity,
+        temperature_K=Decimal("1643.15"),
+    )
+
+    assert standard is None
+    assert refusal is not None
+    assert refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert refusal.detail == {
+        "reason": "openimcc_feo_condensate_table_digest_mismatch",
+        "expected_condensate_table_digest": expected_digest,
+        "actual_condensate_table_digest": actual_digest,
+    }
 
 
 def test_openimcc_feo_row_refuses_when_gas_load_loses_condensate_identity(
@@ -253,7 +331,9 @@ def test_openimcc_feo_shift_uses_the_pinned_melt_pack_at_temperature(
         _openimcc_sources(
             pack_version=identity["pack_version"],
             pack_digest=identity["binding_digest"],
-            condensate_digest="a" * 64,
+            condensate_digest=(
+                feo_standard_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+            ),
         ),
         melt_pack_identity=identity,
         temperature_K=temperature_K,
@@ -304,7 +384,9 @@ def test_melt_pack_shift_matches_condensate_gibbs_rows_as_crosscheck() -> None:
             _openimcc_sources(
                 pack_version=identity["pack_version"],
                 pack_digest=identity["binding_digest"],
-                condensate_digest="f" * 64,
+                condensate_digest=(
+                    feo_standard_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+                ),
             ),
             melt_pack_identity=identity,
             temperature_K=temperature_K,
@@ -326,7 +408,9 @@ def test_openimcc_published_v1_feo_standard_has_an_explicit_zero_record() -> Non
     sources = _openimcc_sources(
         pack_version=identity["pack_version"],
         pack_digest=identity["binding_digest"],
-        condensate_digest="b" * 64,
+        condensate_digest=(
+            feo_standard_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+        ),
     )
     _context, _experiment, _reference, prediction = _case(
         Engine.OPENIMCC,
@@ -339,7 +423,8 @@ def test_openimcc_published_v1_feo_standard_has_an_explicit_zero_record() -> Non
         prediction
     )
 
-    assert normalized.value == prediction.value
+    assert normalized.value is prediction.value
+    assert normalized.value.as_tuple() == prediction.value.as_tuple()
     assert normalized.provenance["feo_standard_normalisation"] == {
         "from_standard": "Fe-019",
         "to_standard": "Fe-019",
@@ -364,7 +449,9 @@ def test_non_v1_pack_without_feo_liquid_candidate_refuses(
         _openimcc_sources(
             pack_version=identity["pack_version"],
             pack_digest=identity["binding_digest"],
-            condensate_digest="1" * 64,
+            condensate_digest=(
+                feo_standard_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+            ),
         ),
         melt_pack_identity=identity,
         temperature_K=Decimal("1600"),
@@ -491,7 +578,9 @@ def test_openimcc_redox_feo_normalisation_flags_extrapolation() -> None:
         *_openimcc_sources(
             pack_version=identity["pack_version"],
             pack_digest=identity["binding_digest"],
-            condensate_digest="e" * 64,
+            condensate_digest=(
+                feo_standard_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+            ),
         ),
         f"openimcc-redox-pack:sha256:{_default_redox_pack_digest()}",
     )
@@ -633,7 +722,9 @@ def test_nondefault_openimcc_profile_refuses_an_undeclared_feo_standard() -> Non
     sources = _openimcc_sources(
         pack_version="1.0.3-d066-ext-v1",
         pack_digest="b" * 64,
-        condensate_digest="d" * 64,
+        condensate_digest=(
+            feo_standard_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+        ),
     )
     standard, refusal = feo_standard_module._resolve_feo_activity_standard(
         Engine.OPENIMCC,
@@ -752,7 +843,9 @@ def test_openimcc_feo_prediction_is_normalized_and_carries_notice_and_provenance
     sources = _openimcc_sources(
         pack_version=identity["pack_version"],
         pack_digest=identity["binding_digest"],
-        condensate_digest="c" * 64,
+        condensate_digest=(
+            feo_standard_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+        ),
     )
     context, _experiment, reference, prediction = _case(
         Engine.OPENIMCC,
@@ -789,7 +882,9 @@ def test_scorer_refuses_an_openimcc_feo_prediction_without_normalisation_record(
     sources = _openimcc_sources(
         pack_version=feo_standard_module._OPENIMCC_DEFAULT_PACK_VERSION,
         pack_digest=feo_standard_module._OPENIMCC_DEFAULT_PACK_DIGEST,
-        condensate_digest="e" * 64,
+        condensate_digest=(
+            feo_standard_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+        ),
     )
     context, _experiment, reference, prediction = _case(Engine.OPENIMCC, sources)
 
