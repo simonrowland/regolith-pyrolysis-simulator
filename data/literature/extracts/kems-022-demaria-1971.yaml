@@ -65,6 +65,108 @@ experiments:
 - experiment_id: demaria-1971-main-kems
   bench_id: demaria-1971-re-kems
   method: knudsen_effusion
+  apparatus:
+    calibration:
+      "standard@all_species":
+        state:
+          tag: value
+          value: 'silver vapor calibration (Inghram and Drowart 1960); reported ion-derived species'
+        locator:
+          record: demaria_1971_silver_and_o_o2_calibration
+          page: 2
+          published_page: 1368
+          pdf_page_index: 1
+          paragraph: silver calibration used to convert ion intensities into pressures
+      "standard@species=O":
+        state:
+          tag: value
+          value: 'O+/O2+ intensity ratio with O2 dissociation equilibrium (Brix and Herzberg 1954; JANAF 1965)'
+        locator:
+          record: demaria_1971_silver_and_o_o2_calibration
+          page: 2
+          published_page: 1368
+          pdf_page_index: 1
+          paragraph: O/O2 calibration based on the direct ion-intensity ratio and O2 dissociation equilibrium
+      "standard@species=O2":
+        state:
+          tag: value
+          value: 'O+ and O2+ intensity ratio with O2 dissociation equilibrium (Brix and Herzberg 1954; JANAF 1965)'
+        locator:
+          record: demaria_1971_silver_and_o_o2_calibration
+          page: 2
+          published_page: 1368
+          pdf_page_index: 1
+          paragraph: O/O2 calibration based on the direct ion-intensity ratio and O2 dissociation equilibrium
+      "method@all_species":
+        state:
+          tag: value
+          value: 'Equation (1): P = I_i^+ T / (S sigma gamma a_i)'
+        locator:
+          record: demaria_1971_silver_and_o_o2_calibration
+          page: 2
+          published_page: 1368
+          pdf_page_index: 1
+          equation: '1'
+      "sensitivity_factor@all_species":
+        state:
+          tag: unknown
+          reason: source defines S but reports no numeric factor by ion species
+        locator:
+          record: demaria_1971_silver_and_o_o2_calibration
+          page: 2
+          published_page: 1368
+          pdf_page_index: 1
+          equation: '1'
+      "sensitivity_factor_units@all_species":
+        state:
+          tag: unknown
+          reason: source does not report sensitivity-factor units
+        locator:
+          record: demaria_1971_silver_and_o_o2_calibration
+          page: 2
+          published_page: 1368
+          pdf_page_index: 1
+          equation: '1'
+      "cross_section_source@all_species":
+        state:
+          tag: value
+          value: Mann 1967 peak ionization-efficiency values adjusted to 30 or 70 eV using experimental curves
+        locator:
+          record: demaria_1971_silver_and_o_o2_calibration
+          page: 2
+          published_page: 1368
+          pdf_page_index: 1
+          equation: '1'
+      "fragment_correction_state@all_species":
+        state:
+          tag: value
+          value: applied; fragmentation-pattern and secondary-electron corrections were included
+        locator:
+          record: demaria_1971_silver_and_o_o2_calibration
+          page: 2
+          published_page: 1368
+          pdf_page_index: 1
+      "fragment_correction_state@species=O2":
+        state:
+          tag: value
+          value: applied; low-temperature O+ fragment contribution made the O/O2 calibration less reliable
+        locator:
+          record: demaria_1971_silver_and_o_o2_calibration
+          page: 2
+          published_page: 1368
+          pdf_page_index: 1
+      "pressure_uncertainty@all_species":
+        state:
+          tag: value
+          value: at least a factor of 2; mainly from calibration errors
+        locator:
+          record: demaria_1971_silver_and_o_o2_calibration
+          source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
+          page: 9
+          published_page: 1375
+          pdf_page_index: 8
+          line_range: '294'
+          paragraph: SAMPLE 12065 absolute-pressure calibration uncertainty
   locator:
     published_page: 1368
     pdf_page_index: 2
@@ -79,14 +181,6 @@ source_caveats:
     paragraph: Alkaline components; molecular oxygen in Table 1 range
   quote: '“far below the stoichiometric amount”; “interaction of oxygen with the rhenium container”'
   note: Authors attribute the low O2 pressure partly to oxygen interaction with Re; passivated Re cells used for 12065 produced a higher O2+/Me+ ratio.
-- locator:
-    source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
-    published_page: 1375
-    pdf_page_index: 9
-    line_range: '294'
-    paragraph: SAMPLE 12065; absolute pressure calibration uncertainty
-  quote: '“an uncertainty of at least a factor 2”'
-  note: The authors attribute this absolute-pressure uncertainty mainly to calibration errors.
 species:
   O2:
     observations:
@@ -762,60 +856,6 @@ species:
       uncertainty:
         note: printed ± on Table 6; third-law inclusive of calibration errors; second-law is the
           standard deviation (authors)
-      equipment:
-        orifice_area:
-          value: 4.154756e-06
-          units: m2
-          diameter_m: 0.0023
-          orifice_shape: knife_edge
-          inferred: true
-          inference: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
-          locator:
-            published_page: 1368
-            pdf_page_index: 2
-            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
-        cell_material:
-          value: Re
-          locator:
-            published_page: 1368
-            pdf_page_index: 2
-            paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
-    - observation_id: demaria_1971_silver_and_o_o2_calibration
-      type: rate_series
-      locator:
-        published_page: 1368
-        pdf_page_index: 2
-        paragraph: To convert ion intensities into pressures, the silver calibration (INGHRAM and DROWART, 1960), and, whenever possible, the O/O2 calibration, were utilized.
-      T_range_K:
-      - 1250.0
-      - 2500.0
-      phase: gas
-      regime: kems_effusion
-      units: as published
-      values:
-        quantity: pressure_calibration_standard
-        method_class: measured_direct
-        gas_species: Fe(g)
-        material: Apollo_12_lunar_basalt
-        calibration_standards:
-        - silver
-        - O_over_O2_dissociation
-        silver_reference: Inghram and Drowart 1960
-        o_o2_references:
-        - Brix and Herzberg 1954
-        - JANAF 1965
-        o_o2_basis: ratio of O+ and O2+ ion intensities and the O2 dissociation equilibrium constant
-        agreement_note: agreement between silver and O/O2 calibrations satisfactory at high temperatures;
-          at lower temperatures O+ fragment contribution makes O/O2 less reliable
-        ion_energy_eV:
-        - 30
-        - 70
-        ionization_cross_section_source: Mann 1967 (maxima, reduced to operating electron energy via
-          experimental ionization-efficiency curves)
-        absolute_P_formula: P = I_i^+ T / (S σ γ a_i)
-      uncertainty:
-        note: authors state at least a factor 2 uncertainty in absolute pressure values from the
-          calibration procedure (p. 1375)
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -3023,15 +3063,6 @@ fidelity_samples:
     published_page: 1368
     pdf_page_index: 2
     paragraph: On the whole 680.2 mg of sample 12022,57
-- species: Fe
-  observable: rate_series
-  observation_id: demaria_1971_silver_and_o_o2_calibration
-  field: silver_reference
-  value: Inghram and Drowart 1960
-  locator:
-    published_page: 1368
-    pdf_page_index: 2
-    paragraph: the silver calibration (INGHRAM and DROWART, 1960)
 - species: SiO2
   observable: gibbs_table
   observation_id: demaria_1971_table6_sio2_dissociation
