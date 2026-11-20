@@ -24,9 +24,25 @@ from simulator import engine_cache
         "INVALID_FO2_LOG",
         "SUM_PRESSURE_SANITY",
         "SPECIATION_NO_FINITE_VALUES",
+        "SILICATE_WINDOW",
+        "INVALID_INPUT",
+        "UNSUPPORTED_INPUT",
+        "CLAMPED_OPERATING_POINT",
     ],
 )
 def test_cache_refusal_literal_matches_domain_reason(name: str) -> None:
     literal = getattr(engine_cache, f"REFUSAL_{name}")
     assert literal == OutOfDomainReason[name].value
     assert literal in engine_cache.CACHEABLE_REFUSAL_CODES
+
+
+def test_domain_major_sum_literal_is_not_the_wt_pct_token() -> None:
+    """OutOfDomainReason.MAJOR_SUM is "major_sum". REFUSAL_MAJOR_SUM is the
+    older sum_below_95_wt_pct token. Both stay on the allowlist.
+    """
+
+    assert engine_cache.REFUSAL_DOMAIN_MAJOR_SUM == OutOfDomainReason.MAJOR_SUM.value
+    assert engine_cache.REFUSAL_DOMAIN_MAJOR_SUM == "major_sum"
+    assert engine_cache.REFUSAL_MAJOR_SUM == "sum_below_95_wt_pct"
+    assert engine_cache.REFUSAL_DOMAIN_MAJOR_SUM in engine_cache.CACHEABLE_REFUSAL_CODES
+    assert engine_cache.REFUSAL_MAJOR_SUM in engine_cache.CACHEABLE_REFUSAL_CODES

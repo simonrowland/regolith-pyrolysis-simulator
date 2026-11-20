@@ -11,19 +11,39 @@ from simulator.melt_backend.base import _call_with_hard_timeout
 def test_deterministic_refusal_allowlist_is_explicit():
     from simulator.engine_cache import (
         CACHEABLE_REFUSAL_CODES,
+        REFUSAL_COMPOSITION_PROJECTED,
+        REFUSAL_MAJOR_SUM,
+        REFUSAL_NO_LIQUID,
+        REFUSAL_OUT_OF_BASIS,
         EngineCacheValue,
         cacheable_refusal,
+    )
+    from simulator.melt_backend.alphamelts import (
+        ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH,
+        ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH,
+        ALPHAMELTS_REASON_FE_FREE_SILICATE_IMPOSED_FO2_CRASH,
     )
     from simulator.melt_backend.vaporock import EMPTY_SPECIATION_STATUS_REASON
 
     assert CACHEABLE_REFUSAL_CODES == frozenset({
-        "out_of_basis", "composition_projected", "sum_below_95_wt_pct", "no_liquid",
+        REFUSAL_OUT_OF_BASIS,
+        REFUSAL_COMPOSITION_PROJECTED,
+        REFUSAL_MAJOR_SUM,
+        REFUSAL_NO_LIQUID,
         OutOfDomainReason.FORBIDDEN_SPECIES.value,
         OutOfDomainReason.LIQUID_STATE.value,
         OutOfDomainReason.INVALID_PRESSURE_BAR.value,
         OutOfDomainReason.INVALID_FO2_LOG.value,
         OutOfDomainReason.SUM_PRESSURE_SANITY.value,
         EMPTY_SPECIATION_STATUS_REASON,
+        OutOfDomainReason.SILICATE_WINDOW.value,
+        OutOfDomainReason.MAJOR_SUM.value,
+        OutOfDomainReason.INVALID_INPUT.value,
+        OutOfDomainReason.UNSUPPORTED_INPUT.value,
+        OutOfDomainReason.CLAMPED_OPERATING_POINT.value,
+        ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH,
+        ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH,
+        ALPHAMELTS_REASON_FE_FREE_SILICATE_IMPOSED_FO2_CRASH,
     })
     assert OutOfDomainReason.SPECIATION_NO_FINITE_VALUES in (
         STABLE_OUT_OF_DOMAIN_REASONS
@@ -37,11 +57,34 @@ def test_deterministic_refusal_allowlist_is_explicit():
         "refusal_reason": reason,
         "engine_status": "not_converged",
     })
+    assert cacheable_refusal(EngineCacheValue(
+        {},
+        refusal_reason=ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH,
+        refusal_status="not_converged",
+    ))
+    assert not cacheable_refusal(EngineCacheValue(
+        {},
+        refusal_reason=ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH,
+        refusal_status="process_failure",
+    ))
     assert not cacheable_refusal(EngineCacheValue(
         {},
         refusal_reason=OutOfDomainReason.NOT_CONVERGED.value,
         refusal_status="not_converged",
     ))
+    for transient in (
+        OutOfDomainReason.NOT_CONVERGED.value,
+        OutOfDomainReason.BACKEND_UNAVAILABLE.value,
+        OutOfDomainReason.OUT_OF_DOMAIN.value,
+        "no_convergence",
+        "negative_convergence_evidence",
+        "engine_not_converged",
+        "magemin_mode_vector_mass_deficit",
+        "timeout",
+        "subprocess_died",
+        "nonzero_exit",
+    ):
+        assert transient not in CACHEABLE_REFUSAL_CODES
 
 
 def _vaporock_equilibrium_cache_call(kwargs, tmp_path, monkeypatch, *, available=True):
@@ -444,3 +487,372 @@ def test_real_engine_basis_refusal_hits_before_the_worker_pipe(engine, compositi
     finally:
         _close_isolated_cell_workers()
         close_battery_engine_handle(handle)
+
+
+def _enable_disk_cache(tmp_path, monkeypatch):
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache.engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+
+
+def _assert_returned_miss_accounting(engine):
+    counts = engine_cache.engine_cache_counters()[engine]
+    accounted = sum(
+        value for key, value in counts.items()
+        if key.startswith("not_stored:") or key.startswith("uncacheable:")
+    )
+    assert counts["misses"] == counts["stores"] + accounted
+    return counts
+
+
+def _equilibrate_through_cache(engine_name, backend, kwargs, tmp_path, monkeypatch):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        _call_cached_backend_equilibrate,
+        normalize_engine_settings,
+    )
+
+    _enable_disk_cache(tmp_path, monkeypatch)
+    handle = EngineHandle(
+        name=engine_name,
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=bool(getattr(backend, "supports_intrinsic_fo2", False)),
+        engine_settings=normalize_engine_settings(engine_name, {}),
+    )
+    calls = []
+
+    def solve():
+        calls.append(1)
+        return backend.equilibrate(**kwargs)
+
+    return _call_cached_backend_equilibrate, handle, calls, solve
+
+
+def _assert_disk_round_trip(cached_call, handle, kwargs, calls, code):
+    cold = cached_call(handle, kwargs, calls["solve"])
+    engine_cache._MEMORY_CACHE.clear()
+    warm = cached_call(
+        handle, kwargs, lambda: pytest.fail("refusal was not stored"),
+    )
+    assert cold.status == warm.status
+    assert cold.diagnostics["backend_status_reason"] == code
+    assert warm.diagnostics["backend_status_reason"] == code
+    assert len(calls["calls"]) == 1
+    counts = _assert_returned_miss_accounting(handle.name)
+    assert counts["hits"] == counts["misses"] == counts["stores"] == 1
+    return cold, warm
+
+
+@pytest.mark.parametrize(
+    ("engine_name", "backend_type"),
+    [("alphamelts", "alphamelts"), ("thermoengine", "thermoengine")],
+)
+def test_melts_silicate_window_refusal_hits_after_disk_round_trip(
+    engine_name, backend_type, tmp_path, monkeypatch,
+):
+    if backend_type == "alphamelts":
+        from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+        backend = AlphaMELTSBackend()
+    else:
+        from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+        backend = ThermoEngineBackend()
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {"Al2O3": 1.0},
+        "fO2_log": -8.0,
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        engine_name, backend, kwargs, tmp_path, monkeypatch,
+    )
+    cold, _warm = _assert_disk_round_trip(
+        cached_call, handle, kwargs,
+        {"solve": solve, "calls": calls},
+        OutOfDomainReason.SILICATE_WINDOW.value,
+    )
+    assert cold.status == "out_of_domain"
+
+
+def test_alphamelts_prelaunch_crash_family_hits_after_disk_round_trip(
+    tmp_path, monkeypatch,
+):
+    from simulator.melt_backend.alphamelts import (
+        ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH,
+        AlphaMELTSBackend,
+    )
+
+    backend = AlphaMELTSBackend()
+    backend._mode = "subprocess"
+    backend._configure_subprocess_calc_mode(None)
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {"CaO": 0.4, "SiO2": 0.6},
+        "fO2_log": -8.0,
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "alphamelts", backend, kwargs, tmp_path, monkeypatch,
+    )
+    cold, warm = _assert_disk_round_trip(
+        cached_call, handle, kwargs,
+        {"solve": solve, "calls": calls},
+        ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH,
+    )
+    assert cold.status == warm.status == "not_converged"
+    assert cold.diagnostics["backend_failure_category"] == "engine_crash"
+    assert warm.diagnostics["backend_failure_category"] == "engine_crash"
+
+
+def test_alphamelts_empty_composition_major_sum_hits_after_disk_round_trip(
+    tmp_path, monkeypatch,
+):
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    backend = AlphaMELTSBackend()
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {},
+        "fO2_log": -8.0,
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "alphamelts", backend, kwargs, tmp_path, monkeypatch,
+    )
+    cold, _warm = _assert_disk_round_trip(
+        cached_call, handle, kwargs,
+        {"solve": solve, "calls": calls},
+        OutOfDomainReason.MAJOR_SUM.value,
+    )
+    assert cold.status == "out_of_domain"
+
+
+def test_alphamelts_other_redox_without_iron_hits_after_disk_round_trip(
+    tmp_path, monkeypatch,
+):
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    backend = AlphaMELTSBackend()
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {"SiO2": 0.8, "TiO2": 0.2},
+        "fO2_log": -8.0,
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "alphamelts", backend, kwargs, tmp_path, monkeypatch,
+    )
+    cold, _warm = _assert_disk_round_trip(
+        cached_call, handle, kwargs,
+        {"solve": solve, "calls": calls},
+        OutOfDomainReason.UNSUPPORTED_INPUT.value,
+    )
+    assert cold.status == "out_of_domain"
+
+
+def test_alphamelts_uninitialized_refusal_is_not_stored(tmp_path, monkeypatch):
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    backend = AlphaMELTSBackend()
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {"SiO2": 0.6, "FeO": 0.4},
+        "fO2_log": -8.0,
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "alphamelts", backend, kwargs, tmp_path, monkeypatch,
+    )
+    for _ in range(2):
+        result = cached_call(handle, kwargs, solve)
+        assert result.status == "unavailable"
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("alphamelts")
+    assert counts["misses"] == 2
+    assert counts["stores"] == 0
+    assert counts["not_stored:refusal:backend_unavailable"] == 2
+
+
+def test_alphamelts_process_failure_with_allowlisted_reason_is_not_stored(
+    tmp_path, monkeypatch,
+):
+    from simulator.melt_backend.alphamelts import (
+        ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH,
+        AlphaMELTSBackend,
+    )
+
+    backend = AlphaMELTSBackend()
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {"CaO": 0.4, "SiO2": 0.6},
+        "fO2_log": -8.0,
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, _ = _equilibrate_through_cache(
+        "alphamelts", backend, kwargs, tmp_path, monkeypatch,
+    )
+
+    def solve():
+        calls.append(1)
+        return backend._subprocess_operational_failure_result(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+            warnings=[],
+            diagnostics={},
+            reason_code=ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH,
+            failure={"returncode": 1},
+            detail="injected nonzero exit",
+        )
+
+    for _ in range(2):
+        result = cached_call(handle, kwargs, solve)
+        assert result.status == "out_of_domain"
+        assert (
+            result.diagnostics["backend_status_reason"]
+            == ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH
+        )
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("alphamelts")
+    assert counts["stores"] == 0
+    assert counts[
+        f"not_stored:refusal:{ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH}"
+    ] == 2
+    with sqlite3.connect(tmp_path / "cache.sqlite") as connection:
+        assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 0
+
+
+def test_thermoengine_uninitialized_valid_melt_raises_and_is_not_stored(
+    tmp_path, monkeypatch,
+):
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    backend = ThermoEngineBackend()
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {"SiO2": 0.6, "MgO": 0.4},
+        "fO2_log": -8.0,
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "thermoengine", backend, kwargs, tmp_path, monkeypatch,
+    )
+    for _ in range(2):
+        with pytest.raises(ImportError, match="ThermoEngine transport not initialized"):
+            cached_call(handle, kwargs, solve)
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+    counts = engine_cache.engine_cache_counters()["thermoengine"]
+    # The raise leaves solve() before a return, so the miss is not a
+    # not_stored bucket. The invariant below is for returned values.
+    assert counts["misses"] == 2
+    assert counts["stores"] == 0
+    assert not any(key.startswith("not_stored:") for key in counts)
+
+
+def test_magemin_unavailable_refusal_is_not_stored(tmp_path, monkeypatch):
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {"SiO2": 0.6, "MgO": 0.4},
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "magemin", backend, kwargs, tmp_path, monkeypatch,
+    )
+    for _ in range(2):
+        result = cached_call(handle, kwargs, solve)
+        assert result.status == "unavailable"
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("magemin")
+    assert counts["stores"] == 0
+    assert counts["not_stored:refusal:backend_unavailable"] == 2
+
+
+def test_magemin_empty_composition_invalid_input_hits_after_disk_round_trip(
+    tmp_path, monkeypatch,
+):
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {},
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "magemin", backend, kwargs, tmp_path, monkeypatch,
+    )
+    cold, _warm = _assert_disk_round_trip(
+        cached_call, handle, kwargs,
+        {"solve": solve, "calls": calls},
+        OutOfDomainReason.INVALID_INPUT.value,
+    )
+    assert cold.status == "out_of_domain"
+
+
+def test_magemin_forbidden_species_hits_after_disk_round_trip(
+    tmp_path, monkeypatch,
+):
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_mol": {"Fe": 1.0, "FeS": 0.5, "NaCl": 0.2},
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "magemin", backend, kwargs, tmp_path, monkeypatch,
+    )
+    cold, _warm = _assert_disk_round_trip(
+        cached_call, handle, kwargs,
+        {"solve": solve, "calls": calls},
+        OutOfDomainReason.FORBIDDEN_SPECIES.value,
+    )
+    assert cold.status == "out_of_domain"
+
+
+def test_magemin_negative_convergence_is_not_stored(tmp_path, monkeypatch):
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    monkeypatch.setattr(
+        backend, "_call_magemin", lambda *_args, **_kwargs: {"converged": False},
+    )
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {"SiO2": 0.6, "MgO": 0.4},
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "magemin", backend, kwargs, tmp_path, monkeypatch,
+    )
+    for _ in range(2):
+        result = cached_call(handle, kwargs, solve)
+        assert result.status == "not_converged"
+        assert result.diagnostics["backend_status_reason"] == (
+            "negative_convergence_evidence"
+        )
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("magemin")
+    assert counts["stores"] == 0
+    assert counts["not_stored:refusal:negative_convergence_evidence"] == 2

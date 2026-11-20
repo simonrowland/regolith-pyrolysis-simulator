@@ -304,6 +304,23 @@ REFUSAL_INVALID_PRESSURE_BAR = "invalid_pressure_bar"
 REFUSAL_INVALID_FO2_LOG = "invalid_fo2_log"
 REFUSAL_SUM_PRESSURE_SANITY = "sum_pressure_sanity"
 REFUSAL_SPECIATION_NO_FINITE_VALUES = "speciation_no_finite_values"
+# Distinct from REFUSAL_MAJOR_SUM ("sum_below_95_wt_pct"). This is
+# OutOfDomainReason.MAJOR_SUM.
+REFUSAL_DOMAIN_MAJOR_SUM = "major_sum"
+REFUSAL_SILICATE_WINDOW = "silicate_window"
+REFUSAL_INVALID_INPUT = "invalid_input"
+REFUSAL_UNSUPPORTED_INPUT = "unsupported_input"
+REFUSAL_CLAMPED_OPERATING_POINT = "clamped_operating_point"
+
+# Wire tokens owned by alphamelts.py. Repeated here so this module does not
+# import the adapter. The allowlist pin binds each token to that constant.
+# These three are composition predicates evaluated before the binary starts,
+# so not_converged here is the guard's status, not a solver outcome.
+_PRELAUNCH_CRASH_REFUSAL_CODES = frozenset({
+    "subprocess_fe_free_absolute_fo2_crash",
+    "subprocess_cao_sio2_binary_crash",
+    "subprocess_fe_free_silicate_imposed_fo2_crash",
+})
 
 CACHEABLE_REFUSAL_CODES = frozenset({
     REFUSAL_OUT_OF_BASIS, REFUSAL_COMPOSITION_PROJECTED, REFUSAL_MAJOR_SUM,
@@ -314,6 +331,17 @@ CACHEABLE_REFUSAL_CODES = frozenset({
     REFUSAL_INVALID_FO2_LOG,
     REFUSAL_SUM_PRESSURE_SANITY,
     REFUSAL_SPECIATION_NO_FINITE_VALUES,
+    REFUSAL_SILICATE_WINDOW,
+    REFUSAL_DOMAIN_MAJOR_SUM,
+    REFUSAL_INVALID_INPUT,
+    REFUSAL_UNSUPPORTED_INPUT,
+    REFUSAL_CLAMPED_OPERATING_POINT,
+    *_PRELAUNCH_CRASH_REFUSAL_CODES,
+})
+
+_NOT_CONVERGED_CACHEABLE_REASONS = frozenset({
+    REFUSAL_SPECIATION_NO_FINITE_VALUES,
+    *_PRELAUNCH_CRASH_REFUSAL_CODES,
 })
 
 
@@ -324,8 +352,10 @@ def _cacheable_refusal_status(
         None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok",
     }:
         return True
+    # process_failure is intentionally absent: a returncode, signal, or
+    # timeout on the result stays unstored even when the reason is listed.
     return (
-        refusal_reason == REFUSAL_SPECIATION_NO_FINITE_VALUES
+        refusal_reason in _NOT_CONVERGED_CACHEABLE_REASONS
         and status == "not_converged"
     )
 
