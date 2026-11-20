@@ -23,7 +23,10 @@ from simulator.condensation_routing import (
     stage_list_index_for_destination,
     target_species_for_stage_number,
 )
+from simulator.account_ids import MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
+from simulator.evaporation import EvaporationMixin
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
+from simulator.accounting import AccountingError
 
 
 @pytest.mark.parametrize("stage_number", [1, 2, 3, 4])
@@ -201,6 +204,158 @@ def test_stage_purity_report_pins_empty_stage_four_collapse():
             "warning": "non-designated condensate present",
         },
     }
+
+
+def test_stage4_net_unique_purity_uses_disjoint_current_ledger_balances():
+    train = _populated_stage_four_purity_train()
+    collector = train.stages[0]
+    collector.collected_kg.update({
+        "Na": 0.4,
+        "Mg": 2.0,
+        "SiO2": 0.25,
+        "Si": 0.25,
+        "Ca": 1.5,
+    })
+
+    class LedgerView:
+        def kg_by_account(self):
+            return {
+                "process.reagent_inventory": {"Na": 0.6, "Mg": 3.0},
+            }
+
+        def origin_atom_moles_by_account(self):
+            return {
+                "process.reagent_inventory": {
+                    "Na": {"feedstock": 0.6},
+                    "Mg": {"feedstock": 3.0},
+                },
+            }
+
+        def unresolved_origin_atom_moles_by_account(self):
+            return {}
+
+    stage = stage_purity_report(train, LedgerView())[
+        NA_COLLECTOR_STAGE_KEY
+    ]
+
+    # Na is 0.4 kg in the collector now and 0.6 kg recovered in inventory;
+    # earlier recovery/recollection events do not add another copy.
+    assert stage["net_unique_designated_species_kg"] == {
+        "Na": pytest.approx(1.0),
+        "Mg": pytest.approx(5.0),
+    }
+    assert stage["net_unique_designated_kg"] == pytest.approx(6.0)
+    assert stage["sio_impurity_kg"] == pytest.approx(0.5)
+    assert stage["sio_impurity_to_designated_ratio"] == pytest.approx(1 / 12)
+    assert stage["net_unique_impurity_kg"] == pytest.approx(2.0)
+    assert stage["net_unique_purity_fraction"] == pytest.approx(0.75)
+
+
+def test_stage3_report_splits_mn_cartridge_from_silica_window():
+    train = CondensationTrain.create_default()
+    train.stages[3].collected_kg.update({"SiO2": 3.0, "Si": 1.0, "Mn": 1.0})
+
+    class LedgerView:
+        def kg_by_account(self):
+            return {
+                MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: {
+                    "Mn": 0.5,
+                    "SiO2": 0.25,
+                },
+            }
+
+        def origin_atom_moles_by_account(self):
+            return {}
+
+        def unresolved_origin_atom_moles_by_account(self):
+            return {}
+
+    stage = stage_purity_report(train, LedgerView())[STAGE_KEY_BY_NUMBER[3]]
+
+    assert stage["mn_cartridge_mass_kg"] == pytest.approx(0.75)
+    assert stage["mn_cartridge_mn_mass_kg"] == pytest.approx(0.5)
+    assert stage["mn_cartridge_purity_fraction"] == pytest.approx(2 / 3)
+    assert stage["mn_cartridge_capture_status"] == "FLAGGED_UNCERTIFIED"
+    assert stage["silica_without_mn_purity_fraction"] == pytest.approx(3.75 / 4.25)
+
+
+@pytest.mark.parametrize(
+    ("elapsed_hour", "expected_fraction"),
+    [(10, 0.0), (11, 0.6), (29, 0.6), (30, 0.0)],
+)
+def test_stage3_mn_cartridge_schedule_uses_inclusive_run_hours(
+    elapsed_hour, expected_fraction
+):
+    host = SimpleNamespace(
+        setpoints={
+            "condensation_train": {
+                "metals_train": {
+                    STAGE_KEY_BY_NUMBER[3]: {
+                        "stage3_cartridge_schedule": {
+                            "mn_cartridge_run_hour_window": [12, 30],
+                        },
+                    },
+                },
+            },
+        },
+        melt=SimpleNamespace(hour=elapsed_hour),
+    )
+    route = SimpleNamespace(
+        condensed_by_stage_species={STAGE_KEY_BY_NUMBER[3]: {"Mn": 6.0}},
+        condensed_for_species=lambda _species: 10.0,
+    )
+
+    assert EvaporationMixin._stage3_mn_cartridge_fraction(
+        host, route, "Mn"
+    ) == pytest.approx(expected_fraction)
+
+
+def test_stage3_mn_cartridge_schedule_rejects_bool_hour_bounds():
+    host = SimpleNamespace(
+        setpoints={
+            "condensation_train": {
+                "metals_train": {
+                    STAGE_KEY_BY_NUMBER[3]: {
+                        "stage3_cartridge_schedule": {
+                            "mn_cartridge_run_hour_window": [True, 30],
+                        },
+                    },
+                },
+            },
+        },
+        melt=SimpleNamespace(hour=11),
+    )
+    route = SimpleNamespace(
+        condensed_by_stage_species={STAGE_KEY_BY_NUMBER[3]: {"Mn": 6.0}},
+        condensed_for_species=lambda _species: 10.0,
+    )
+
+    with pytest.raises(AccountingError, match="hour bounds must be real numbers"):
+        EvaporationMixin._stage3_mn_cartridge_fraction(host, route, "Mn")
+
+
+def test_stage3_mn_cartridge_schedule_ignores_wall_only_routes():
+    host = SimpleNamespace(
+        setpoints={
+            "condensation_train": {
+                "metals_train": {
+                    STAGE_KEY_BY_NUMBER[3]: {
+                        "stage3_cartridge_schedule": {
+                            "mn_cartridge_run_hour_window": [12, 30],
+                        },
+                    },
+                },
+            },
+        },
+        melt=SimpleNamespace(hour=11),
+    )
+    route = SimpleNamespace(
+        wall_deposit_fraction_by_species={"organic_tar": 1.0},
+    )
+
+    assert EvaporationMixin._stage3_mn_cartridge_fraction(
+        host, route, "organic_tar"
+    ) == 0.0
 
 
 def test_stage_purity_activity_uses_explicit_accepted_species_capture_state():
