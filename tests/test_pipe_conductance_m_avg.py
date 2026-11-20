@@ -848,6 +848,9 @@ def test_default_stage_geometry_provenance_reaches_coating_authority():
         assert area_text in source
         assert by_stage[key]["source_class"] == "engineering-default"
         assert by_stage[key]["status"] == "provisional"
+        if key in {"alkali_stage4", "k_stage4b"}:
+            assert "provisional" in source
+            assert "b-588" in source and "b-599" in source
     assert "Cr2O3 capture ceiling-limited" in by_stage["cr_stage2"]["source"]
 
 

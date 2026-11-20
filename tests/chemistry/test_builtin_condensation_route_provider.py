@@ -41,6 +41,8 @@ import simulator.chemistry.phase_context as phase_context_module
 from engines.builtin.condensation_route import (
     BuiltinCondensationRouteProvider,
 )
+from simulator.accounting import AccountingError
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.kernel import (
     AtomBalanceError,
     ChemistryIntent,
@@ -49,7 +51,6 @@ from simulator.chemistry.kernel import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.accounting.formulas import resolve_species_formula
 from simulator.account_ids import MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
 from simulator.condensation import (
     C4B_WALL_ROUTE_ORDER,
@@ -517,6 +518,36 @@ def test_simulator_condensed_product_projection_omits_overhead_gas_coproduct(
     )
 
     assert set(products) == {"Cr2O3"}
+
+
+def test_simulator_surfaces_provider_fraction_refusal(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    with pytest.raises(
+        AccountingError,
+        match="invalid_condensation_product_account_fractions",
+    ):
+        sim._dispatch_condensation_route(
+            "CrO2",
+            1.0,
+            {
+                "condensation_products_mol_per_mol_vapor": {
+                    "Cr2O3": 0.5,
+                    "O2": 0.25,
+                },
+                "condensation_product_accounts": {
+                    "Cr2O3": "terminal.chromium_condensed_oxide_stored",
+                    "O2": "process.overhead_gas",
+                },
+                "condensation_product_account_fractions": {
+                    "Cr2O3": "invalid",
+                },
+            },
+            CondensationRouteResult(),
+        )
 
 
 @pytest.mark.parametrize("ratio", [0.0, -1.0, math.nan])
