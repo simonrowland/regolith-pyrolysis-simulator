@@ -52,7 +52,7 @@ def test_reduced_real_cache_accepts_cache_tier_ceiling() -> None:
     )
 
 
-def test_d452_hero_optimizes_completed_cycle_under_flagged_duration_gate() -> None:
+def test_d452_hero_optimizes_completed_cycle_under_owner_duration_gate() -> None:
     path = (
         DEFAULT_DATA_DIR
         / "optimize_profiles"
@@ -65,13 +65,13 @@ def test_d452_hero_optimizes_completed_cycle_under_flagged_duration_gate() -> No
 
     assert profile["run"]["until_campaign_complete"] is True
     assert profile["run"]["hours"] == 360
-    assert profile["constraints"]["cycle_time_max_h"] == pytest.approx(360.0)
+    assert profile["constraints"]["cycle_time_max_h"] == pytest.approx(300.0)
     assert profile["constraints"]["cycle_time_max_h_source"] == (
-        "owner to set (d-452); 'no 1000-hour runs'"
+        "owner 2026-11-19 (d-452)"
     )
-    assert constraints.cycle_time_max_h.value == pytest.approx(360.0)
+    assert constraints.cycle_time_max_h.value == pytest.approx(300.0)
     assert constraints.cycle_time_max_h.source_ref == (
-        "owner to set (d-452); 'no 1000-hour runs'"
+        "owner 2026-11-19 (d-452)"
     )
     assert "cycle_time" in profile["constraints"]["gates"]
     assert "delivered_stream_purity" in profile["constraints"]["gates"]
