@@ -1807,6 +1807,9 @@ class VapoRockBackend(MeltBackend):
                 warnings=['VapoRock backend not initialized'],
                 diagnostics={
                     **melt_envelope_diagnostics,
+                    'backend_status_reason': (
+                        OutOfDomainReason.BACKEND_UNAVAILABLE.value
+                    ),
                     **(
                         {
                             'backend_failure_disposition': (
@@ -2142,6 +2145,9 @@ class VapoRockBackend(MeltBackend):
                 warnings=[*prior_warnings, message],
                 diagnostics={
                     **projection_diagnostics,
+                    'backend_status_reason': (
+                        OutOfDomainReason.NOT_CONVERGED.value
+                    ),
                     'engine_exception': external_type,
                     'engine_exception_message': external_message,
                     **(

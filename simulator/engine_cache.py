@@ -30,11 +30,18 @@ from pathlib import Path
 from typing import Any, cast
 from urllib.parse import quote
 
+from engines.domain_reason import OutOfDomainReason
+
 @dataclass(frozen=True)
 class EngineCacheValue:
     hot: object
     cold: Mapping = field(default_factory=dict)
     cacheable: bool = True
+    # Ephemeral refusal metadata: the stored HOT value keeps its existing
+    # projection and wire shape. These fields only let the cache apply its
+    # refusal allowlist before encoding that projection.
+    refusal_reason: str | None = None
+    refusal_status: str | None = None
 
 
 @dataclass(frozen=True)
@@ -292,10 +299,25 @@ REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
 CACHEABLE_REFUSAL_CODES = frozenset({
     REFUSAL_OUT_OF_BASIS, REFUSAL_COMPOSITION_PROJECTED, REFUSAL_MAJOR_SUM,
     REFUSAL_NO_LIQUID,
+    OutOfDomainReason.FORBIDDEN_SPECIES.value,
+    OutOfDomainReason.TEMPERATURE_RANGE.value,
+    OutOfDomainReason.LIQUID_STATE.value,
+    OutOfDomainReason.INVALID_PRESSURE_BAR.value,
+    OutOfDomainReason.INVALID_FO2_LOG.value,
+    OutOfDomainReason.NON_FINITE_COMPOSITION.value,
+    OutOfDomainReason.SUM_PRESSURE_SANITY.value,
 })
 
 
 def cacheable_refusal(result) -> bool:
+    if isinstance(result, EngineCacheValue):
+        return (
+            result.cacheable
+            and result.refusal_reason in CACHEABLE_REFUSAL_CODES
+            and result.refusal_status in {
+                None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok",
+            }
+        )
     return (
         isinstance(result, Mapping)
         and result.get("status") == "refusal"
@@ -1538,10 +1560,19 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 "not_stored:cacheable_false", 0
             ) + 1
         return hot
-    refusal_not_cacheable = _is_refusal(hot) and not cacheable_refusal(hot)
+    wrapped_refusal = (
+        isinstance(solved, EngineCacheValue)
+        and solved.refusal_reason is not None
+    )
+    refusal_not_cacheable = (
+        wrapped_refusal and not cacheable_refusal(solved)
+    ) or (
+        _is_refusal(hot) and not cacheable_refusal(hot)
+    )
     if refusal_not_cacheable:
         refusal_reason = (
-            hot.get("refusal_reason") if isinstance(hot, Mapping)
+            solved.refusal_reason if wrapped_refusal
+            else hot.get("refusal_reason") if isinstance(hot, Mapping)
             else getattr(hot, "refusal_reason", None)
         )
         reason_label = str(refusal_reason) if refusal_reason is not None else "untyped"
@@ -1639,6 +1670,12 @@ def load_cache_rows(
     for digest, hot, engine, version, source_box, row_seq in rows:
         if isinstance(hot, EngineCacheValue) and not hot.cacheable:
             raise ValueError("transient engine results are not cacheable")
+        if (
+            isinstance(hot, EngineCacheValue)
+            and hot.refusal_reason is not None
+            and not cacheable_refusal(hot)
+        ):
+            raise ValueError("refusal code is not cacheable")
         if not isinstance(digest, bytes) or not 4 <= len(digest) <= _NATURAL_KEY_LIMIT:
             raise ValueError("cache keys must be natural packed keys or 16-byte request digests")
         if engine not in ENGINE_CHEMISTRY_VERSION:
