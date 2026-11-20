@@ -6146,12 +6146,56 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 candidate_fO2_log = min(
                     candidate_fO2_log, self._melt_redox_fO2_upper_bound_log(),
                 )
-                saturation_floor = self._melt_metal_saturation_fO2_floor_log(
-                    T_K
-                )
-                if saturation_floor is not None:
-                    floor_fO2_log, _, _ = saturation_floor
-                    candidate_fO2_log = max(candidate_fO2_log, floor_fO2_log)
+                # Melt oxide/metal saturation constrains each vapor-pressure
+                # evaluation. Applying that composition-dependent floor to
+                # every evaporation-source tangent lets changing oxide
+                # activities steer the reservoir without a matching oxygen
+                # source, so keep it out of this ledger-backed update.
+                if (
+                    float(
+                        terms.get('redox_source:c3_na_shuttle_reduction', 0.0)
+                        or 0.0
+                    ) < -OXYGEN_RESERVOIR_NOOP_MOL
+                    and float(
+                        self.atom_ledger.mol_by_account(
+                            'process.reagent_inventory'
+                        ).get('Na', 0.0)
+                        or 0.0
+                    ) > OXYGEN_RESERVOIR_NOOP_MOL
+                    and float(
+                        self.atom_ledger.mol_by_account(
+                            'process.spent_reductant_residue'
+                        ).get('Na2O', 0.0)
+                        or 0.0
+                    ) > OXYGEN_RESERVOIR_NOOP_MOL
+                ):
+                    # For 4 Na + O2 <-> 2 Na2O, K = a_Na2O**2 /
+                    # (a_Na**4 * (fO2/bar)). Coexisting pure condensed Na and
+                    # Na2O have unit activities, so the JANAF dissociation
+                    # resolver gives their buffer pressure directly in bar;
+                    # log10 is the dimensionless fO2/bar value stored here.
+                    # Keep this independent bound alongside melt oxide/metal
+                    # saturation: that floor is weaker while these alkali
+                    # products remain outside the cleaned-melt account.
+                    from simulator.chemistry.ellingham_graph import (
+                        dissociation_pO2_threshold,
+                    )
+
+                    buffer_pO2_bar = dissociation_pO2_threshold(
+                        'Na',
+                        T_K,
+                        a_oxide=1.0,
+                    )
+                    buffer_fO2_log = math.log10(buffer_pO2_bar)
+                    if buffer_fO2_log > upper_bound:
+                        raise AccountingError(
+                            'active Na/Na2O redox buffer exceeds the melt fO2 '
+                            f'pressure ceiling: buffer={buffer_fO2_log:.12g}, '
+                            f'ceiling={upper_bound:.12g}'
+                        )
+                    # This is an independent reservoir constraint tied to
+                    # coexisting Na and Na2O outside the cleaned-melt account.
+                    candidate_fO2_log = max(candidate_fO2_log, buffer_fO2_log)
                 applied_delta_ln = (
                     candidate_fO2_log - base_fO2_log
                 ) * math.log(10.0)
@@ -10563,24 +10607,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
         intrinsic_fO2_log = float(intrinsic_fO2_log)
         source_metal_saturation_floor = None
-        campaign = getattr(self.melt, 'campaign', None)
-        if str(getattr(campaign, 'name', '') or '') == 'C3_NA':
-            saturation_floor = self._melt_metal_saturation_fO2_floor_log(
-                T_C + 273.15
-            )
-            if saturation_floor is not None:
-                floor_fO2_log, binding_oxide, binding_activity = saturation_floor
-                if intrinsic_fO2_log < floor_fO2_log:
-                    # This is a dispatch constraint for the active C3 source
-                    # reaction, not an oxygen transfer. Keep the reservoir's
-                    # ledger-backed redox state unchanged; elemental pressure
-                    # ceilings enforce saturation in every campaign.
-                    intrinsic_fO2_log = floor_fO2_log
-                source_metal_saturation_floor = {
-                    'log10_fO2_bar': floor_fO2_log,
-                    'binding_oxide': binding_oxide,
-                    'binding_oxide_activity': binding_activity,
-                }
+        saturation_floor = self._melt_metal_saturation_fO2_floor_log(
+            T_C + 273.15
+        )
+        if saturation_floor is not None:
+            floor_fO2_log, binding_oxide, binding_activity = saturation_floor
+            if intrinsic_fO2_log < floor_fO2_log:
+                # Apply the saturation floor to this vapor-pressure evaluation
+                # only. It constrains elemental pressure without creating an
+                # unledgered oxygen transfer in the melt reservoir.
+                intrinsic_fO2_log = floor_fO2_log
+            source_metal_saturation_floor = {
+                'log10_fO2_bar': floor_fO2_log,
+                'binding_oxide': binding_oxide,
+                'binding_oxide_activity': binding_activity,
+            }
         vacuum_floor = (
             float(self._oxygen_numerical_floor_bar())
             if callable(getattr(self, '_oxygen_numerical_floor_bar', None))

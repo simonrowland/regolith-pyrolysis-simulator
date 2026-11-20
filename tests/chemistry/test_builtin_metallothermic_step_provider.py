@@ -2911,6 +2911,13 @@ def test_c6_static_hold_exercises_c6_proceed_decision_path(
     assert sim.atom_ledger.mol_by_account(
         "terminal.drain_tap_material"
     ).get("Al", 0.0) > 0.0
+    final_melt_kg = sim.atom_ledger.project_account_kg("process.cleaned_melt")
+    assert final_melt_kg.get("CaO", 0.0) > 0.0, (
+        "C6 static hold evaporated the retained CaO melt"
+    )
+    assert final_melt_kg.get("Al2O3", 0.0) > 0.0, (
+        "C6 static hold exhausted the alumina before completing Al tap"
+    )
     drain_tap_kg = sim.atom_ledger.project_account_kg(
         "terminal.drain_tap_material"
     )
