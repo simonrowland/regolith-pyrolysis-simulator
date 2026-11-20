@@ -101,6 +101,165 @@ class CapacityCouplingRefusalError(RuntimeError):
         super().__init__(refusal.reason)
 
 
+def headspace_partial_key(
+    partials: Mapping[str, float] | None,
+) -> tuple[tuple[str, float], ...]:
+    """Sorted (species, pressure) identity of one partial vector."""
+
+    return tuple(sorted(
+        (str(species), float(pressure))
+        for species, pressure in dict(partials or {}).items()
+    ))
+
+
+def headspace_capture_fractions(
+    gross: Mapping[str, float],
+    partials_Pa: Mapping[str, float] | None,
+    *,
+    capture_C: Mapping[str, float] | None,
+    fractions_frozen: Mapping[str, float] | None,
+) -> dict[str, float]:
+    """Capture fraction at this total pressure from the C/P scale.
+
+    Premise: a captured vapor's headspace remainder is C/P, with C
+    measured once. An uncaptured vapor stays at its gross.
+    Algebra: q = min(gross, C/P), f = 1 - q/gross,
+    C = gross_ref * (1 - f_ref) * P_ref.
+    Unit check: (kg/h) / Pa * Pa = kg/h.
+    Limit: P <= 0 is an empty inventory, so f = 0 and the gross
+    enters the headspace. q is never above the gross. Oxygen is
+    not a captured vapor.
+    """
+
+    total = math.fsum(
+        max(0.0, float(pressure))
+        for pressure in dict(partials_Pa or {}).values()
+    )
+    scale = dict(capture_C or {})
+    frozen = dict(fractions_frozen or {})
+    fractions: dict[str, float] = {}
+    for species, raw_rate in gross.items():
+        label = str(species)
+        if label == OXYGEN_SPECIES:
+            continue
+        rate = max(0.0, float(raw_rate or 0.0))
+        if rate <= 0.0 or total <= 0.0:
+            fractions[label] = 0.0
+            continue
+        remainder_Pa = scale.get(label)
+        if remainder_Pa is None:
+            fractions[label] = min(
+                1.0,
+                max(0.0, float(frozen.get(label, 0.0) or 0.0)),
+            )
+            continue
+        remaining = min(rate, max(0.0, float(remainder_Pa)) / total)
+        fractions[label] = 1.0 - remaining / rate
+    return fractions
+
+
+def headspace_capture_scale(
+    gross: Mapping[str, float],
+    measured: Mapping[str, float],
+    total_Pa: float,
+    *,
+    fractions_frozen: Mapping[str, float] | None,
+    capture_C: Mapping[str, float] | None,
+) -> tuple[dict[str, float], dict[str, float]]:
+    """Install C = gross * (1 - f) * P from one measured capture.
+
+    Returns the frozen fractions and the scale. Oxygen is skipped.
+    A non-positive capture drops that species from the scale.
+    """
+
+    frozen = dict(fractions_frozen or {})
+    scale = dict(capture_C or {})
+    for species, raw_rate in gross.items():
+        label = str(species)
+        if label == OXYGEN_SPECIES:
+            continue
+        rate = max(0.0, float(raw_rate or 0.0))
+        captured = min(
+            1.0,
+            max(0.0, float(measured.get(label, 0.0) or 0.0)),
+        )
+        frozen[label] = captured
+        if rate > 0.0 and captured > 0.0 and total_Pa > 0.0:
+            scale[label] = rate * (1.0 - captured) * total_Pa
+        elif captured <= 0.0:
+            scale.pop(label, None)
+    return frozen, scale
+
+
+def headspace_capture_move_Pa(
+    previous: Mapping[str, float],
+    current: Mapping[str, float],
+    gross: Mapping[str, float],
+    partials_Pa: Mapping[str, float] | None,
+    *,
+    molar_mass_kg_mol: Mapping[str, float],
+    temperature_K: float,
+    volume_m3: float,
+    rate_floor_kg_hr: float,
+) -> float:
+    """Inventory pressure move from a capture change, in pascals.
+
+    Premise: each species' pipe flow tracks its own partial. Captured
+    vapor leaves q_i = C_i / P, so a remainder change moves that
+    partial by Δp_i = p_i |Δq_i| / q_i. The inventory move is the sum
+    of those partials. Summing P |Δq_i| / q_i prices a trace vapor as
+    if it held the whole headspace, and |Σ Δq_i| lets one species'
+    extra remainder cancel another's.
+    Algebra: q_i = gross_i (1 - f_i), Δp_i = p_i |Δq_i| / q_i.
+    The sum is math.fsum over species names in sorted order. A set
+    walk plus += changes the bit next to 1e-6 Pa when PYTHONHASHSEED
+    changes, and that bit decides the re-solve.
+    Unit check: Pa * (kg/h) / (kg/h) = Pa.
+    Limit: a species with no solved partial, or a carried source at
+    the rate floor, adds the sealed accumulation |Δq| R T / (M V).
+    A non-positive volume cannot judge the figure and returns +inf,
+    which fails any finite agreement test. Oxygen is not a captured
+    vapor.
+    """
+
+    if volume_m3 <= 0.0:
+        return math.inf
+    partials = {
+        str(species): max(0.0, float(pressure))
+        for species, pressure in dict(partials_Pa or {}).items()
+    }
+    names = sorted(
+        {str(name) for name in previous}
+        | {str(name) for name in current}
+        | {str(name) for name in gross}
+    )
+    terms: list[float] = []
+    for name in names:
+        if name == OXYGEN_SPECIES:
+            continue
+        rate = max(0.0, float(gross.get(name, 0.0) or 0.0))
+        before_f = min(
+            1.0, max(0.0, float(previous.get(name, 0.0) or 0.0)),
+        )
+        after_f = min(
+            1.0, max(0.0, float(current.get(name, 0.0) or 0.0)),
+        )
+        # Δq = q_after - q_before = rate * (before_f - after_f).
+        delta_q = rate * (before_f - after_f)
+        flowing = rate * (1.0 - before_f)
+        partial = partials.get(name, 0.0)
+        if flowing > rate_floor_kg_hr and partial > 0.0:
+            terms.append(partial * abs(delta_q) / flowing)
+            continue
+        mass = float(molar_mass_kg_mol.get(name, 0.0) or 0.0)
+        if mass <= 0.0:
+            continue
+        terms.append(
+            abs(delta_q) / mass * GAS_CONSTANT * temperature_K / volume_m3
+        )
+    return math.fsum(terms)
+
+
 def partition_melt_oxygen(
     *,
     bled_o2_mol: float,
@@ -593,6 +752,14 @@ _MONOTONE_ABS = 1.0e-15
 # BDF at 1e-12 is still ~1e-4 Pa high on the choked megapascal piece.
 _SLOW_ATOL_PA = 1.0e-7
 _SLOW_RTOL = 1.0e-12
+# One 1250 C hour dispatches the flux about 1253 times, and the
+# sign-scan fallback walks 4096 points. Hour 21 of the canonical
+# lunar walk stayed inside one Radau call for 34 minutes. The caps
+# sit above a healthy hour plus one fallback scan, and they stop
+# that stall. A closed pipe below downstream does not spend them:
+# its accumulation is exact.
+_MAX_FLUX_EVALUATIONS = 250_000
+_MAX_INTEGRATOR_EVALUATIONS = 100_000
 
 
 class _BalanceRefused(Exception):
@@ -688,6 +855,8 @@ class _HeadspaceLaw:
         # First notice per (species, reason). The sweep calls the pipe
         # on every trial; the hour keeps one flag, not one per sample.
         self.species_notices: dict[tuple[str, str], Mapping[str, Any]] = {}
+        self.flux_evaluations = 0
+        self.integrator_evaluations = 0
 
     def _remember_species_notices(
         self,
@@ -752,6 +921,9 @@ class _HeadspaceLaw:
     def _flux_kg_hr(self, partials: Mapping[str, float]) -> dict[str, float]:
         from simulator.evaporation import EvaporationFluxRefusal
 
+        self.flux_evaluations += 1
+        if self.flux_evaluations > _MAX_FLUX_EVALUATIONS:
+            raise _BalanceRefused("headspace_balance_work_cap")
         try:
             raw = self.flux(partials)
         except EvaporationFluxRefusal:
@@ -1019,8 +1191,12 @@ class _HeadspaceLaw:
         mass_start = math.fsum(
             n0[species] * self.masses[species] for species in self.species
         )
+        published = {
+            species: float(moles[species]) for species in self.species
+        }
         mass_end = math.fsum(
-            moles[species] * self.masses[species] for species in self.species
+            published[species] * self.masses[species]
+            for species in self.species
         )
         if added_mol is None:
             # Fast root. m_source = (q + S) * M * Δt. At the root
@@ -1036,12 +1212,35 @@ class _HeadspaceLaw:
                 * dt_s
                 for species in self.species
             )
-            bled_mol = {
-                species: n0[species]
-                + (source[species] + redox[species]) * dt_s
-                - moles[species]
-                for species in self.species
-            }
+            # q(end) = 0 with n_end a trace above n0 makes bled
+            # negative. The slow integral zeros a bleed under the
+            # 1e-6 Pa floor and publishes n_end = n0 + added, which
+            # is the holdup a zero bleed leaves on the ledger. A
+            # larger negative is not that trace: the caller still
+            # sees it. Rewriting it would delete a real holdup.
+            # Algebra: under the floor, bled = 0 and n_end = n0 + added.
+            # Unit check: mol * R * T / V = Pa.
+            # Limit: a positive drain is unchanged.
+            pa_per_mol = GAS_CONSTANT * self.temperature_K / self.volume_m3
+            bled_mol = {}
+            rewrote = False
+            for species in self.species:
+                added = (source[species] + redox[species]) * dt_s
+                bled = float(n0[species]) + added - published[species]
+                if (
+                    bled < 0.0
+                    and -bled * pa_per_mol <= DEFAULT_ABS_TOL_PA
+                ):
+                    published[species] = float(n0[species]) + added
+                    bled = 0.0
+                    rewrote = True
+                bled_mol[species] = bled
+            if rewrote:
+                partials = self.partials_of(published)
+                mass_end = math.fsum(
+                    published[species] * self.masses[species]
+                    for species in self.species
+                )
         else:
             # Slow branch. added_mol is A_i(Δt) = ∫ (q_i + S_i) dt and
             # bled_mol_in is B_i(Δt) = ∫ Q_i dt, both in mol. The caller
@@ -1059,7 +1258,7 @@ class _HeadspaceLaw:
             bled_mol[species] * self.masses[species] for species in self.species
         )
         return _HeadspaceStep(
-            moles=dict(moles),
+            moles=dict(published),
             partials=partials,
             flux_kg_hr=flux,
             bled_mol=bled_mol,
@@ -1605,6 +1804,9 @@ def _slow_converge(
         return net, added, bled, piece[:3]
 
     def rhs(_time: float, state) -> list[float]:
+        law.integrator_evaluations += 1
+        if law.integrator_evaluations > _MAX_INTEGRATOR_EVALUATIONS:
+            raise _BalanceRefused("headspace_balance_work_cap")
         net, added, bled, _piece = rates_of(moles_of(state))
         return net + added + bled
 
@@ -1738,11 +1940,399 @@ def _slow_converge(
     )
 
 
+def _closed_pipe_accumulation(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+) -> _HeadspaceStep | None:
+    """Exact holdup when the pipe stays shut for the whole step.
+
+    Premise: Q is 0 whenever P <= P_down, because the pipe law has no
+    reverse flow. A source that cannot lift the inventory to P_down
+    never opens the pipe, so dn_i/dt = q_i + S_i. On the vacuum
+    plateau q does not depend on P, and the hour is
+    n_end = n0 + (q + S) Δt with bleed 0. That is the closed-pipe
+    case under a downstream pressure. Integrating it with Radau walks
+    a kink the trajectory never reaches.
+    Algebra: P_end = P(n0 + (q(n0) + S(n0)) Δt). Admit that step when
+    it stays shut and the pressure of |q(n_end) - q(n0)| Δt is at
+    most 1e-6 Pa. A 1/P source at a few hundredths of a pascal makes
+    that extrapolation cross P_down, and an 8-step grid does too,
+    while the hour integral stays shut. Those attempts use a finer
+    RK4, then implicit midpoint, instead of the slow solver. A shut
+    grid that still disagrees at the last spacing is a work-cap
+    refusal. A grid that opens the pipe returns None.
+    Unit check: mol/s * s = mol, and mol * R * T / V = Pa.
+    Limit: q = 0 leaves the opening holdup. P_down = 0 is open at
+    every positive pressure, so this returns None. A sealed cap with
+    no duct is closed at every pressure.
+    """
+
+    sealed = law.diameter_m is None and law.cap_kg_s == 0.0
+    below_downstream = (
+        law.diameter_m is not None and law.downstream_pa > 0.0
+    )
+    if not sealed and not below_downstream:
+        return None
+    if below_downstream and law.pressure_of(n0) > law.downstream_pa:
+        return None
+    partials_0 = law.partials_of(n0)
+    source_0, outflow_0, _binding_0, _piece_0 = law._flows(partials_0)
+    redox_0 = law._redox_rates(partials_0)
+    if any(outflow_0[species] > 0.0 for species in law.species):
+        return None
+    added: dict[str, float] = {}
+    n_end: dict[str, float] = {}
+    euler_usable = True
+    for species in law.species:
+        rate = source_0[species] + redox_0[species]
+        if not math.isfinite(rate):
+            return None
+        grown = rate * dt_s
+        amount = float(n0[species]) + grown
+        if amount < 0.0:
+            # The opening rate would drain the holdup. The integral
+            # can still stay non-negative, so this is not a refusal
+            # of the closed pipe.
+            euler_usable = False
+        added[species] = grown
+        n_end[species] = amount
+    if (
+        euler_usable
+        and below_downstream
+        and law.pressure_of(n_end) > law.downstream_pa
+    ):
+        # q(n0) * Δt crosses P_down. A source that falls as 1/P does
+        # that at a near-empty opening and still finishes shut.
+        euler_usable = False
+    if euler_usable:
+        partials_1 = law.partials_of(n_end)
+        source_1, outflow_1, _binding_1, _piece_1 = law._flows(partials_1)
+        redox_1 = law._redox_rates(partials_1)
+        if any(outflow_1[species] > 0.0 for species in law.species):
+            euler_usable = False
+        else:
+            pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
+            mismatch_pa = math.fsum(
+                abs(
+                    (source_1[species] + redox_1[species])
+                    - (source_0[species] + redox_0[species])
+                )
+                * dt_s
+                * pa_per_mol
+                for species in sorted(law.species)
+            )
+            if mismatch_pa <= DEFAULT_ABS_TOL_PA:
+                return law.step_from_moles(
+                    n0,
+                    dt_s,
+                    n_end,
+                    1,
+                    mismatch_pa,
+                    added_mol=added,
+                    bled_mol_in={species: 0.0 for species in law.species},
+                )
+    # The pipe can still be shut for the whole hour. An Euler step
+    # that stays shut uses explicit RK4. One that would cross
+    # downstream goes straight to the midpoint: the explicit ladder
+    # is a full evaporation at every stage, and on the C3_NA hour
+    # that ladder in front of Radau was the multi-minute stall.
+    return _closed_pipe_refined(
+        law,
+        n0,
+        dt_s,
+        below_downstream=below_downstream,
+        explicit=euler_usable,
+    )
+
+
+def _closed_pipe_refined(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    *,
+    below_downstream: bool,
+    explicit: bool = True,
+) -> _HeadspaceStep | None:
+    """Closed-pipe accumulation when q changes inside the hour.
+
+    RK4 on dn/dt = q + S with Q held at 0. Each stage that opens
+    the pipe, crosses downstream, or drives a mole negative rejects
+    that spacing. A rejected spacing is not the end of the case:
+    the opening rate of a 1/P source steps over P_down on a coarse
+    grid and stays under it on a finer one. Doubling stops at the
+    first pair within 1e-6 Pa. 64 steps is the last explicit
+    spacing; a pair that still disagrees uses implicit midpoint.
+    """
+
+    def rates(amount: Mapping[str, float]) -> dict[str, float] | None:
+        if any(value < 0.0 for value in amount.values()):
+            return None
+        if below_downstream and law.pressure_of(amount) > law.downstream_pa:
+            return None
+        partials = law.partials_of(amount)
+        source, outflow, _binding, _piece = law._flows(partials)
+        redox = law._redox_rates(partials)
+        if any(outflow[species] > 0.0 for species in law.species):
+            return None
+        out: dict[str, float] = {}
+        for species in law.species:
+            rate = source[species] + redox[species]
+            if not math.isfinite(rate):
+                return None
+            out[species] = rate
+        return out
+
+    def integrate(steps: int) -> dict[str, float] | None:
+        amount = {species: float(n0[species]) for species in law.species}
+        span = dt_s / steps
+        for _step in range(steps):
+            k1 = rates(amount)
+            if k1 is None:
+                return None
+            k2 = rates({
+                species: amount[species] + 0.5 * span * k1[species]
+                for species in law.species
+            })
+            if k2 is None:
+                return None
+            k3 = rates({
+                species: amount[species] + 0.5 * span * k2[species]
+                for species in law.species
+            })
+            if k3 is None:
+                return None
+            k4 = rates({
+                species: amount[species] + span * k3[species]
+                for species in law.species
+            })
+            if k4 is None:
+                return None
+            nxt: dict[str, float] = {}
+            for species in law.species:
+                grown = amount[species] + span * (
+                    k1[species] + 2.0 * k2[species] + 2.0 * k3[species] + k4[species]
+                ) / 6.0
+                if grown < 0.0:
+                    return None
+                nxt[species] = grown
+            amount = nxt
+        if rates(amount) is None:
+            return None
+        return amount
+
+    def gap_pa(left: Mapping[str, float], right: Mapping[str, float]) -> float:
+        pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
+        # Sorted names. A set walk would move the bit next to 1e-6 Pa.
+        return math.fsum(
+            abs(left[species] - right[species]) * pa_per_mol
+            for species in sorted(law.species)
+        )
+
+    # 8 steps is the first spacing. A spacing that crosses downstream
+    # is discarded and the next doubling is tried on its own. Two
+    # consecutive shut grids within 1e-6 Pa publish the finer one.
+    # 64 * 4 stages is 256 flux calls on the last grid. Past that,
+    # a 1/P source still has a large local error while P is small,
+    # and the midpoint below is the exact integral of that rate.
+    # An opening rate that already crosses downstream skips this
+    # ladder and uses the midpoint below.
+    previous: dict[str, float] | None = None
+    steps = 8
+    while explicit and steps <= 64:
+        current = integrate(steps)
+        if current is None:
+            previous = None
+            steps *= 2
+            continue
+        if previous is not None:
+            gap = gap_pa(previous, current)
+            if gap <= DEFAULT_ABS_TOL_PA:
+                return law.step_from_moles(
+                    n0,
+                    dt_s,
+                    current,
+                    steps,
+                    gap,
+                    added_mol={
+                        species: current[species] - float(n0[species])
+                        for species in law.species
+                    },
+                    bled_mol_in={species: 0.0 for species in law.species},
+                )
+        previous = current
+        steps *= 2
+    # Explicit grids through 64 steps still disagree, or the opening
+    # rate already crosses downstream. A 1/P source at a few
+    # hundredths of a pascal is that case: the local error is large
+    # while P is small, and Radau then walks the downstream kink the
+    # trajectory never reaches. Implicit midpoint takes
+    # n1 = n0 + h r((n0+n1)/2). For r proportional to 1/n that step
+    # is the exact integral, so a coarse pair agrees.
+    return _closed_pipe_midpoint(
+        law,
+        n0,
+        dt_s,
+        rates,
+        gap_pa,
+    )
+
+
+def _closed_pipe_midpoint(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    rates,
+    gap_pa,
+) -> _HeadspaceStep | None:
+    """Implicit midpoint while the pipe stays shut.
+
+    Premise: the stage state m satisfies m = n + (h/2) r(m), and the
+    end state is 2m − n. For r = a/n the identity m^2 − n^2 = a h is
+    the separated integral, so one step has no truncation error.
+    Algebra: P_end^2 − P^2 = 2 K h when dP/dt = K/P.
+    Unit check: mol/s * s = mol.
+    The stage equation is a damped fixed point, one rate evaluation
+    per pass. The blend that stays shut is chosen from the pressure,
+    which is linear in the moles, so a rejected blend does not call
+    the flux. A finite-difference Jacobian would repeat the
+    evaporation once per species per pass, which is the stall.
+    Limit: a step that would open the pipe, or a fixed point that
+    does not settle in 80 passes, rejects that spacing. Two shut
+    grids within 1e-6 Pa publish the finer one. 64 steps is the
+    last spacing. A shut grid that is still apart there refuses
+    with the work cap. Falling through to Radau on a pipe that
+    never opened is the unbounded hour. A spacing sequence that
+    never stays shut returns None, and the open-pipe solver runs.
+    """
+
+    names = tuple(law.species)
+    pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
+    # Each accepted step may stop this far from the stage equation.
+    # Sixty-four steps at the 1e-6 Pa gate would accumulate past it.
+    # 1e-12 Pa times 64 steps stays under the gate.
+    mole_tol = DEFAULT_ABS_TOL_PA * 1.0e-6 / pa_per_mol
+
+    def trial_shut(amount: Mapping[str, float]) -> bool:
+        # P = n R T / V is linear, so the shut set is convex and
+        # this check is algebraic. Q is 0 on that set: the pipe
+        # law has no reverse flow, and a sealed cap has no duct.
+        # Calling rates() here was one evaporation per damp halving.
+        if any(value < 0.0 for value in amount.values()):
+            return False
+        if (
+            law.diameter_m is not None
+            and law.downstream_pa > 0.0
+            and law.pressure_of(amount) > law.downstream_pa
+        ):
+            return False
+        return True
+
+    def one_step(amount: Mapping[str, float], span: float):
+        base = {name: float(amount[name]) for name in names}
+        mid = dict(base)
+        # Damping 1/2. On r = a/n the undamped map's slope is near
+        # −1 for a full-hour step, so it rings. Half the update
+        # settles in about 15 passes, and the fixed point is exact.
+        # The first blend of a huge opening rate can step over
+        # downstream even though the fixed point is shut. Shrink
+        # that blend until the trial stays shut. 2^-40 is past a
+        # full-hour step of any rate that still finishes under
+        # 100 Pa on a finer spacing.
+        # The stage residual has to fall under ~1e-12 Pa. Halving
+        # from a hundred-pascal residual takes about 50 passes.
+        # Forty returned no shut grid, and the hour then paid for
+        # Radau. Eighty covers that halving.
+        for _pass in range(80):
+            rate = rates(mid)
+            if rate is None:
+                return None
+            target = {
+                name: base[name] + 0.5 * span * rate[name]
+                for name in names
+            }
+            error = max(
+                abs(mid[name] - target[name]) for name in names
+            )
+            damp = 0.5
+            placed = False
+            while damp >= 1.0e-12:
+                trial = {
+                    name: (1.0 - damp) * mid[name] + damp * target[name]
+                    for name in names
+                }
+                if trial_shut(trial):
+                    mid = trial
+                    placed = True
+                    break
+                damp *= 0.5
+            if not placed:
+                return None
+            if error <= mole_tol:
+                break
+        else:
+            return None
+        end = {
+            name: 2.0 * mid[name] - base[name]
+            for name in names
+        }
+        if any(end[name] < 0.0 for name in names):
+            return None
+        if rates(end) is None:
+            return None
+        return end
+
+    def grid(steps: int):
+        span = dt_s / steps
+        amount = {name: float(n0[name]) for name in names}
+        for _step in range(steps):
+            amount = one_step(amount, span)
+            if amount is None:
+                return None
+        return amount
+
+    previous = None
+    saw_shut = False
+    steps = 1
+    while steps <= 64:
+        current = grid(steps)
+        if current is None:
+            previous = None
+            steps *= 2
+            continue
+        saw_shut = True
+        if previous is not None and gap_pa(previous, current) <= DEFAULT_ABS_TOL_PA:
+            return law.step_from_moles(
+                n0,
+                dt_s,
+                current,
+                steps,
+                gap_pa(previous, current),
+                added_mol={
+                    name: current[name] - float(n0[name])
+                    for name in names
+                },
+                bled_mol_in={name: 0.0 for name in names},
+            )
+        previous = current
+        steps *= 2
+    # The pipe stayed shut on a grid and the two finest still
+    # differ by more than 1e-6 Pa. Radau on that trajectory is the
+    # hour that ran for tens of minutes. The open-pipe solver is
+    # only for a sequence that never stayed shut.
+    if saw_shut:
+        raise _BalanceRefused("headspace_balance_work_cap")
+    return None
+
+
 def _commit_one(
     law: _HeadspaceLaw,
     n0: Mapping[str, float],
     dt_s: float,
 ) -> _HeadspaceStep:
+    closed = _closed_pipe_accumulation(law, n0, dt_s)
+    if closed is not None:
+        return closed
     samples = law.g_samples()
     crossings = _crossings(samples)
     if len(crossings) >= 2:
@@ -2297,6 +2887,9 @@ def _commit_many(
     rel_tol: float,
     max_iterations: int,
 ) -> _HeadspaceStep:
+    closed = _closed_pipe_accumulation(law, n0, dt_s)
+    if closed is not None:
+        return closed
     fractions = _fractions_of(law, n0)
     if fractions is None:
         zero = {species: 0.0 for species in law.species}

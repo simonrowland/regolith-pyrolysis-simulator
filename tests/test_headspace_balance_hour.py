@@ -510,3 +510,100 @@ def _buffer_o2(sim) -> float:
         sim.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(OXYGEN_SPECIES, 0.0)
         or 0.0
     )
+
+
+def _kg_of(sim, moles: float, species: str) -> float:
+    from simulator.accounting import resolve_species_formula
+
+    formula = resolve_species_formula(species, sim.species_formula_registry)
+    return moles * formula.molar_mass_kg_per_mol()
+
+
+def test_reducing_fe2o3_pressure_matches_the_inventory():
+    """Fe2O3 -> 2 FeO + 1/2 O2, and that O2 is credited to the gas.
+
+    The parents of the elemental vapors are parked, so the internal-O2
+    counter stays 0 and the settle's else branch credits overhead.
+    SiO2 remains, which keeps a debiting vapor. The published root is
+    the ledger inventory. The oracle is that inventory helper, which
+    is n R T / V with the full gas constant.
+    """
+
+    sim = _lunar()
+    temperature_C = 1240.0
+    _hold_temperature(sim, temperature_C)
+    melt = {
+        name: float(mass)
+        for name, mass in sim.atom_ledger.kg_by_account(
+            "process.cleaned_melt"
+        ).items()
+    }
+    parents = ("Na2O", "K2O", "MgO", "CaO", "MnO", "Cr2O3", "Al2O3", "TiO2")
+    keep_feo = _kg_of(sim, 0.04, "FeO")
+    moves = {
+        name: melt[name]
+        for name in parents
+        if melt.get(name, 0.0) > 0.0
+    }
+    feo_out = melt.get("FeO", 0.0) - keep_feo
+    if feo_out > 1.0e-9:
+        moves["FeO"] = feo_out
+    sim.atom_ledger.transfer(
+        "reducing-park",
+        [MaterialLot("process.cleaned_melt", moves)],
+        [MaterialLot("terminal.slag", dict(moves))],
+        reason="park elemental parents",
+    )
+    sim.atom_ledger.load_external_mol(
+        FO2_BUFFER_ACCOUNT,
+        {OXYGEN_SPECIES: 0.01},
+        source="reducing fe2o3 oxygen",
+        material_origin="feedstock",
+    )
+    sim.atom_ledger.transfer(
+        "reducing-fe2o3",
+        [
+            MaterialLot("process.cleaned_melt", {"FeO": keep_feo}),
+            MaterialLot(
+                FO2_BUFFER_ACCOUNT,
+                {OXYGEN_SPECIES: _kg_of(sim, 0.01, "O2")},
+            ),
+        ],
+        [MaterialLot("process.cleaned_melt", {"Fe2O3": _kg_of(sim, 0.02, "Fe2O3")})],
+        reason="2 FeO + 1/2 O2 -> Fe2O3",
+    )
+    sim._project_cleaned_melt_from_atom_ledger()
+    sim.melt.p_total_mbar = 0.2
+    reservoir = sim.melt.oxygen_reservoir
+    reservoir.reference_T_K = temperature_C + 273.15
+    reservoir.melt_intrinsic_fO2_log = (
+        sim._melt_redox_fO2_upper_bound_log() - 10.0
+    )
+    reservoir.melt_redox_capacity_mol_per_ln_fO2 = 1.0
+    reservoir.exchange_o2_mol = 0.0
+    fe_before = float(
+        sim.atom_ledger.mol_by_account("process.cleaned_melt").get("Fe2O3", 0.0)
+        or 0.0
+    )
+
+    sim._step_one_hour()
+
+    published_pa = float(sim.overhead.pressure_mbar) * 100.0
+    inventory_pa = float(sim._headspace_inventory_pressure_Pa())
+    assert abs(published_pa - inventory_pa) <= 1.0e-6
+    fe_after = float(
+        sim.atom_ledger.mol_by_account("process.cleaned_melt").get("Fe2O3", 0.0)
+        or 0.0
+    )
+    assert fe_after < fe_before
+    credited = [
+        item
+        for item in list(
+            getattr(sim, "_fe_redox_respeciation_diagnostics_this_hr", []) or []
+        )
+        if item.get("direction") == "reducing"
+        and item.get("o2_account") == "process.overhead_gas"
+    ]
+    assert credited
+    assert float(credited[-1]["o2_credit_mol"]) > OXYGEN_RESERVOIR_NOOP_MOL
+    assert _buffer_o2(sim) <= OXYGEN_RESERVOIR_NOOP_MOL

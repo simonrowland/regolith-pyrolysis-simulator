@@ -3319,3 +3319,314 @@ def test_slow_bleed_integrates_a_source_that_jumps_inside_the_step():
     # over the booked mass. Constant-source rows keep the same
     # telescope; this row must not need q(end) to close.
     assert result.mass_closure_error_pct <= 5.0e-12
+
+
+def test_capture_move_does_not_depend_on_insertion_order():
+    # The published gate is 1e-6 Pa. A set walk plus += changed the
+    # bit next to that gate when PYTHONHASHSEED changed.
+    from simulator.capacity_coupling import headspace_capture_move_Pa
+
+    masses = {"K": MOLAR_MASS["K"] / 1000.0, "Na": MOLAR_MASS["Na"] / 1000.0}
+    kwargs = dict(
+        molar_mass_kg_mol=masses,
+        temperature_K=_HS_T_K,
+        volume_m3=_HS_V_M3,
+        rate_floor_kg_hr=1.0e-12,
+    )
+    first = headspace_capture_move_Pa(
+        {"K": 0.2, "Na": 0.4},
+        {"Na": 0.5, "K": 0.1},
+        {"K": 1.0e-4, "Na": 2.0e-4},
+        {"K": 0.01, "Na": 0.02},
+        **kwargs,
+    )
+    second = headspace_capture_move_Pa(
+        {"Na": 0.4, "K": 0.2},
+        {"K": 0.1, "Na": 0.5},
+        {"Na": 2.0e-4, "K": 1.0e-4},
+        {"Na": 0.02, "K": 0.01},
+        **kwargs,
+    )
+    assert first == second
+    assert first > 1.0e-6
+
+
+def test_fast_root_trace_bleed_matches_the_ledger():
+    # q(end) = 0 and n_end a trace above n0 reconstructs a negative
+    # bleed. Under 1e-6 Pa that bleed is 0 and the published holdup
+    # is n0 + added. A larger negative is left for the caller.
+    built = capacity_coupling._build_law(
+        pre_holdup_mol={"O2": 1.0e-6},
+        molar_mass_kg_mol={"O2": _o2_molar_mass_kg()},
+        flux_kg_hr_at_partials=lambda _partials: {"O2": 0.0},
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        temperature_K=_HS_T_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=1.0,
+        downstream_pressure_Pa=0.0,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        outflow_cap_kg_s=None,
+        redox_source_mol_s=None,
+    )
+    assert not isinstance(built, CapacityShadowRefusal)
+    law, n0 = built
+    pa_per_mol = GAS_CONSTANT * _HS_T_K / _HS_V_M3
+    trace = 0.5e-6 / pa_per_mol
+    step = law.step_from_moles(
+        n0,
+        3600.0,
+        {"O2": n0["O2"] + trace},
+        1,
+        0.0,
+    )
+    assert step.bled_mol["O2"] == 0.0
+    assert step.moles["O2"] == n0["O2"]
+    assert step.partials["O2"] == pytest.approx(n0["O2"] * pa_per_mol, abs=1.0e-6)
+    assert step.pressure_Pa == pytest.approx(step.partials["O2"], abs=0.0)
+
+    large = 1.0e-4 / pa_per_mol
+    kept = law.step_from_moles(
+        n0,
+        3600.0,
+        {"O2": n0["O2"] + large},
+        1,
+        0.0,
+    )
+    assert kept.bled_mol["O2"] < 0.0
+    assert kept.moles["O2"] == n0["O2"] + large
+    assert -kept.bled_mol["O2"] * pa_per_mol == pytest.approx(1.0e-4, rel=1.0e-12)
+
+
+def test_closed_pipe_small_source_matches_the_inventory():
+    # P_up stays below P_down, so Q is 0. The hour is
+    # n_end = n0 + q Δt. The oracle is that ideal-gas pressure,
+    # not a root of G at P_down.
+    opening_pa = 0.015
+    downstream_pa = 100.0
+    source_kg_hr = 1.0e-6
+    n0 = opening_pa * _HS_V_M3 / (GAS_CONSTANT * _HS_T_K)
+    added_mol = source_kg_hr / _o2_molar_mass_kg()
+    expected_pa = (n0 + added_mol) * GAS_CONSTANT * _HS_T_K / _HS_V_M3
+    assert expected_pa < downstream_pa
+    result = _as_result(
+        _commit_o2(
+            n0 * _o2_molar_mass_kg(),
+            source_kg_hr,
+            1.0,
+            downstream_pa=downstream_pa,
+        )
+    )
+    assert result.partial_pressures_Pa["O2"] == pytest.approx(
+        expected_pa,
+        abs=1.0e-6,
+    )
+    assert result.bled_species_mol["O2"] == pytest.approx(0.0, abs=0.0)
+    assert result.saturation.pipe == 0.0
+
+
+def test_flux_cap_refuses_instead_of_running_on():
+    with patch.object(capacity_coupling, "_MAX_FLUX_EVALUATIONS", 3):
+        refused = _commit_o2(_FLOOR_O2_KG, _SOURCE_02_KG_H, 1.0)
+    assert isinstance(refused, CapacityShadowRefusal)
+    assert refused.reason == "headspace_balance_work_cap"
+
+
+def test_integrator_cap_refuses_instead_of_running_on():
+    # Downstream is 0, so the closed-pipe case does not apply. The
+    # source is 0 above 100 Pa, and the stranded holdup starts far
+    # above that, so the fast root does not admit the jump. Radau
+    # integrates it. The cap has to leave that call.
+    dt_s = 0.25
+    threshold_pa = 100.0
+
+    def flux(partials: dict[str, float]) -> dict[str, float]:
+        if partials["O2"] >= threshold_pa:
+            return {"O2": 0.0}
+        return {"O2": _SOURCE_02_KG_H}
+
+    with patch.object(capacity_coupling, "_MAX_INTEGRATOR_EVALUATIONS", 2):
+        refused = _commit_o2(
+            _STRANDED_O2_KG,
+            _SOURCE_02_KG_H,
+            dt_s / 3600.0,
+            flux=flux,
+        )
+    assert isinstance(refused, CapacityShadowRefusal)
+    assert refused.reason == "headspace_balance_work_cap"
+
+
+def test_closed_pipe_varying_source_matches_an_independent_integral():
+    # q falls as 1/P, so the constant-rate accumulation misses the
+    # 1e-6 Pa gate. The pipe stays shut. The oracle is a 256-step
+    # RK4 of the same callback. It does not call the production grid.
+    opening_pa = 10.0
+    downstream_pa = 100.0
+    mass = _o2_molar_mass_kg()
+    n0 = opening_pa * _HS_V_M3 / (GAS_CONSTANT * _HS_T_K)
+    scale_kg_h_pa = 2.0e-6 * 20.0
+
+    def flux(partials: dict[str, float]) -> dict[str, float]:
+        total = max(math.fsum(partials.values()), 1.0)
+        return {"O2": scale_kg_h_pa / total}
+
+    def rate_mol_s(moles: float) -> float:
+        pressure = moles * GAS_CONSTANT * _HS_T_K / _HS_V_M3
+        return flux({"O2": pressure})["O2"] / mass / 3600.0
+
+    steps = 256
+    span = 3600.0 / steps
+    oracle = n0
+    for _step in range(steps):
+        k1 = rate_mol_s(oracle)
+        k2 = rate_mol_s(oracle + 0.5 * span * k1)
+        k3 = rate_mol_s(oracle + 0.5 * span * k2)
+        k4 = rate_mol_s(oracle + span * k3)
+        oracle += span * (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0
+    oracle_pa = oracle * GAS_CONSTANT * _HS_T_K / _HS_V_M3
+    assert oracle_pa < downstream_pa
+    assert oracle_pa > opening_pa
+    end_out = pipe_species_outflow_mol_s(
+        oracle_pa,
+        downstream_pa,
+        _HS_T_K,
+        {"O2": oracle},
+        _HS_D_M,
+        _HS_L_M,
+        molar_mass_kg_mol={"O2": mass},
+    )
+    assert float(end_out.species_mol_s["O2"]) == 0.0
+    result = _as_result(
+        _commit_o2(
+            n0 * mass,
+            0.0,
+            1.0,
+            flux=flux,
+            downstream_pa=downstream_pa,
+        )
+    )
+    assert result.partial_pressures_Pa["O2"] == pytest.approx(
+        oracle_pa,
+        abs=1.0e-6,
+    )
+    assert result.bled_species_mol["O2"] == pytest.approx(0.0, abs=0.0)
+    assert result.iterations == 64
+
+
+def test_closed_pipe_steep_source_stays_on_the_grid():
+    # q = C/P. At 0.015 Pa the opening rate times one hour crosses
+    # the 100 Pa downstream, and so does an 8-step step. The
+    # integral stays shut: P^2 = P0^2 + 2 K t.
+    # Premise: dP/dt = (C/P) / M / 3600 * (R T / V) = K / P,
+    # with K = 0.02 Pa^2/s.
+    # Algebra: Euler ΔP = K/P0 * 3600 = 4800 Pa. The integral is
+    # P = sqrt(P0^2 + 2 K * 3600) ≈ 12 Pa.
+    # Unit check: (kg/h) / (kg/mol) * (Pa/mol) = Pa over one hour,
+    # and K has Pa^2/s.
+    # Limit: K = 0 leaves the opening pressure. A trajectory that
+    # really crosses downstream is not this grid.
+    opening_pa = 0.015
+    downstream_pa = 100.0
+    mass = _o2_molar_mass_kg()
+    pa_per_mol = GAS_CONSTANT * _HS_T_K / _HS_V_M3
+    n0 = opening_pa / pa_per_mol
+    k_pa2_s = 0.02
+    scale_kg_h_pa = k_pa2_s * mass * 3600.0 / pa_per_mol
+
+    def flux(partials: dict[str, float]) -> dict[str, float]:
+        total = max(math.fsum(partials.values()), 1.0e-6)
+        return {"O2": scale_kg_h_pa / total}
+
+    euler_pa = opening_pa + (
+        (scale_kg_h_pa / opening_pa) / mass * pa_per_mol
+    )
+    assert euler_pa > downstream_pa
+    # Separated integral of dP/dt = K/P. A 256-step explicit RK4 is
+    # still about 1.5 Pa high on this opening, so it is not the oracle.
+    oracle_pa = math.sqrt(opening_pa * opening_pa + 2.0 * k_pa2_s * 3600.0)
+    assert opening_pa < oracle_pa < downstream_pa
+    result = _as_result(
+        _commit_o2(
+            n0 * mass,
+            0.0,
+            1.0,
+            flux=flux,
+            downstream_pa=downstream_pa,
+        )
+    )
+    assert result.partial_pressures_Pa["O2"] == pytest.approx(
+        oracle_pa,
+        abs=1.0e-6,
+    )
+    assert result.bled_species_mol["O2"] == pytest.approx(0.0, abs=0.0)
+    assert result.saturation.pipe == 0.0
+    # The slow solver on this opening took 1619 steps. The shut-pipe
+    # grid is the coarse midpoint pair.
+    assert result.iterations <= 64
+
+
+def _pure_o2_root_pa(source_kg_hr: float) -> float:
+    """Bisection of q = Q on the production pipe. Not the residual."""
+
+    target = source_kg_hr / _o2_molar_mass_kg() / 3600.0
+    lo = 1.0e-8
+    hi = 1.0e6
+
+    def gap(pressure: float) -> float:
+        moles = pressure * _HS_V_M3 / (GAS_CONSTANT * _HS_T_K)
+        outflow = pipe_species_outflow_mol_s(
+            pressure,
+            0.0,
+            _HS_T_K,
+            {"O2": moles},
+            _HS_D_M,
+            _HS_L_M,
+            molar_mass_kg_mol={"O2": _o2_molar_mass_kg()},
+        )
+        return target - float(outflow.species_mol_s["O2"])
+
+    assert gap(lo) > 0.0
+    assert gap(hi) < 0.0
+    for _step in range(80):
+        mid = 0.5 * (lo + hi)
+        if gap(mid) > 0.0:
+            lo = mid
+        else:
+            hi = mid
+    return 0.5 * (lo + hi)
+
+
+def test_sign_scan_fallback_publishes_the_one_root():
+    # The source steps up inside a low-pressure band the geometric
+    # walk samples, then returns to the base rate. G rises there, so
+    # the bracket is not monotone. The root is the base rate's pipe
+    # balance, above the band, and there is only one.
+    base_kg_hr = 0.2
+    oracle_pa = _pure_o2_root_pa(base_kg_hr)
+    assert oracle_pa > 4.0
+
+    def flux(partials: dict[str, float]) -> dict[str, float]:
+        total = math.fsum(partials.values())
+        rate = 5.0 if 1.0 <= total < 4.0 else base_kg_hr
+        return {"O2": rate, "N2": 0.0}
+
+    result = _as_result(
+        _commit_o2_n2(
+            _FLOOR_O2_KG,
+            1.0e-8,
+            base_kg_hr,
+            1.0,
+            flux=flux,
+        )
+    )
+    notices = [
+        notice
+        for notice in result.species_notices
+        if notice.get("reason") == "sign_scan_fallback"
+    ]
+    assert notices
+    assert result.partial_pressures_Pa["O2"] == pytest.approx(
+        oracle_pa,
+        abs=1.0e-6,
+    )
+    assert result.partial_pressures_Pa["N2"] == pytest.approx(0.0, abs=1.0e-6)
