@@ -3417,10 +3417,6 @@ def test_internal_source_reaction_metal_pressure_never_exceeds_pure_saturation(
     class _CrOnlyMelt:
         temperature_C = 1423.15 - 273.15
         p_total_mbar = 1e-3
-        # EquilibriumMixin reads the live intrinsic value from the melt when
-        # no redox reservoir is attached; _compute_intrinsic_melt_fO2 is not
-        # this seam.
-        melt_fO2_log = -28.0
 
         def composition_wt_pct(self):
             return {"Cr2O3": 100.0}
@@ -3440,12 +3436,22 @@ def test_internal_source_reaction_metal_pressure_never_exceeds_pure_saturation(
             return {"K2O": 100.0}
 
     temperature_K = 1423.15
-    for species, melt in (
+    species_melts = (
         ("Cr", _CrOnlyMelt()),
         ("Mg", _MgOnlyMelt(temperature_K)),
         ("Na", _NaOnlyMelt()),
         ("K", _KOnlyMelt()),
-    ):
+    )
+    # EquilibriumMixin reads the live intrinsic value from the melt when no
+    # redox reservoir is attached; _compute_intrinsic_melt_fO2 is not this
+    # seam. Apply the same pinned condition to every species fake.
+    for _, melt in species_melts:
+        melt.melt_fO2_log = -28.0
+
+    # At unit oxide activity (100 wt% single oxide) and pO2=1e-28 bar, the
+    # Na and K reactions give raw pressures ~5.05e8 Pa and ~9.47e9 Pa. Their
+    # independent pure-metal Antoine caps are ~3.98e5 Pa and ~1.64e6 Pa.
+    for species, melt in species_melts:
         result = _LegacyInternalAnalyticalModel(
             vapor_pressure_data,
             melt=melt,

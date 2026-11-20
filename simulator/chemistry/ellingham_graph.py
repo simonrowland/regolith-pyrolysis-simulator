@@ -402,6 +402,8 @@ def effective_equilibrium_pressure_Pa(
     if is_schema_v2_catalog and requires_catalog_source:
         catalog = compiled_catalog_for(catalog_payload)
         catalog_species = catalog.species.get(species)
+        # b-189-exempt: availability probe only; evaluation uses
+        # evaluator_for_hot_train below.
         if catalog_species is not None and catalog_species.evaluator is not None:
             reaction_evaluator = catalog.evaluator_for_hot_train(species)
     if reaction_evaluator is not None:
