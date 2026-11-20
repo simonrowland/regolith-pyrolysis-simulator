@@ -2752,6 +2752,16 @@ class GateCurveProviderOutcome(str, Enum):
     FAILED = "failed"
 
 
+def gate_curve_provider_outcome_token(
+    outcome: GateCurveProviderOutcome | str | None,
+) -> str | None:
+    """JSON payloads store the enum's value. ``type(member) is str`` is false."""
+
+    if outcome is None:
+        return None
+    return GateCurveProviderOutcome(outcome).value
+
+
 _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS = frozenset({
     "engine_crash",
     "engine_worker_unavailable",
