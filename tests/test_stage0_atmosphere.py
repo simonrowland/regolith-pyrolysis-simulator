@@ -690,8 +690,10 @@ def test_air_atmosphere_projects_oxygen_fraction_without_assuming_co2(
         sim.melt.ambient_atmosphere,
         sim.melt.ambient_pressure_mbar,
     )
-    assert partial_pressures['O2'] == 210.0
-    assert partial_pressures['N2'] == 790.0
+    # NOAA's 20.95% dry-air O2 changes the rounded 210/790 mbar split to
+    # 209.5/790.5 mbar in this two-species projection.
+    assert partial_pressures['O2'] == 209.5
+    assert partial_pressures['N2'] == 790.5
     assert 'CO2' not in partial_pressures
     projection_melt = deepcopy(sim.melt)
     projection_melt.atmosphere = Atmosphere.CO2_BACKPRESSURE
@@ -704,8 +706,9 @@ def test_air_atmosphere_projects_oxygen_fraction_without_assuming_co2(
     )
     # The CO2_BACKPRESSURE arm must project the declared ambient gas. Reverting
     # it to the former hard-coded 96% CO2 cover removes these O2/N2 partials.
-    assert gas.composition['O2'] == 210.0
-    assert gas.composition['N2'] == 790.0
+    assert gas.composition['O2'] == 209.5
+    assert gas.composition['N2'] == 790.5
     assert 'CO2' not in gas.composition
-    assert sim._headspace_transport_pO2_bar_from_ledger(0.0) == pytest.approx(0.21)
-    assert sim._commanded_pO2_bar() == pytest.approx(0.21)
+    # Before: both projections pinned to rounded 0.21 bar; now they use 0.2095.
+    assert sim._headspace_transport_pO2_bar_from_ledger(0.0) == pytest.approx(0.2095)
+    assert sim._commanded_pO2_bar() == pytest.approx(0.2095)

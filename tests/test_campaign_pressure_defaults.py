@@ -1031,6 +1031,75 @@ def test_lab_schedule_background_mole_fraction_above_one_refuses_typed():
         )
 
 
+def test_incomplete_air_lab_schedule_refuses_before_writing_cover_state():
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["gas_boundary"]["background_gas"].update({
+        "species": "air",
+        "mole_fraction": 0.5,
+    })
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = {"lab_schedule": schedule}
+    melt = MeltState(campaign=CampaignPhase.C2A)
+    original_state = (
+        melt.p_total_mbar,
+        melt.pO2_mbar,
+        melt.background_gas_species,
+        melt.background_gas_mole_fraction,
+    )
+
+    with pytest.raises(
+        LabScheduleValidationError,
+        match="lab_schedule_background_gas_composition_incomplete",
+    ):
+        manager.apply_lab_schedule_controls(
+            melt, CampaignPhase.C2A, sample_time_h=0.0,
+        )
+
+    assert (
+        melt.p_total_mbar,
+        melt.pO2_mbar,
+        melt.background_gas_species,
+        melt.background_gas_mole_fraction,
+    ) == original_state
+
+
+def test_lab_schedule_oxygen_carrier_alias_sets_its_oxygen_partial():
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["gas_boundary"]["background_gas"].update({
+        "species": "pO2",
+        "mole_fraction": 1.0,
+    })
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = {"lab_schedule": schedule}
+    melt = MeltState(campaign=CampaignPhase.C2A)
+
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+
+    assert melt.pO2_mbar == pytest.approx(10.0)
+    assert melt.background_gas_species == ""
+    assert melt.background_gas_mole_fraction == pytest.approx(0.0)
+
+
+def test_lab_schedule_not_reported_background_rejects_retained_species():
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["gas_boundary"]["background_gas"].update({
+        "reported_status": "not_reported",
+        "species": "air",
+        "digest": "n/a",
+        "reason": "test conflicting source evidence",
+    })
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = {"lab_schedule": schedule}
+
+    with pytest.raises(
+        LabScheduleValidationError,
+        match="lab_schedule_background_gas_not_reported_conflicts_with_species",
+    ):
+        manager.configure_campaign(
+            MeltState(campaign=CampaignPhase.C2A), CampaignPhase.C2A,
+        )
+
+
 def test_lab_schedule_positive_oxygen_requires_named_balance_gas():
     schedule = deepcopy(_n2_lab_schedule())
     schedule["gas_boundary"]["background_gas"] = {

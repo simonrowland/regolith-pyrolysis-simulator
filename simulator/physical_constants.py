@@ -58,6 +58,11 @@ ATM_PA = STANDARD_ATMOSPHERE_PA
 # Exact decimal. 101325 is an integer below 2^53, so the float is exact.
 ATM_PA_DECIMAL = Decimal(101325)
 
+# NOAA dry-air composition gives 20.95% O2 by volume
+# (https://www.nesdis.noaa.gov/news/peeling-back-the-layers-of-the-atmosphere);
+# the two-species atmosphere projection assigns the remainder to N2.
+DRY_AIR_O2_MOLE_FRACTION_DECIMAL = Decimal("0.2095")
+
 # Printed-precision table self-check floor shared by battery validity and
 # compilation diagnostics. This is a policy scalar, not a physical constant.
 TABLE_SELF_CHECK_FINDING_DEX = Decimal("0.1")
@@ -92,6 +97,7 @@ __all__ = (
     "BOLTZMANN",
     "CATALOG_PHYSICAL_PRESSURE_CEILING_PA",
     "CELSIUS_TO_KELVIN_OFFSET",
+    "DRY_AIR_O2_MOLE_FRACTION_DECIMAL",
     "ELEMENTARY_CHARGE",
     "FARADAY",
     "FARADAY_10SIG",

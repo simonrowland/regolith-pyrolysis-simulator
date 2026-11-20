@@ -19,6 +19,7 @@ from __future__ import annotations
 import ast
 import math
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Literal, Optional, Tuple, TypedDict
@@ -30,11 +31,10 @@ from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LAB_SCHEDULE_PO2_SETPOINT_KEY,
     LabScheduleValidationError,
-    _background_gas_mole_fraction,
+    _finite_non_negative,
     interpolate_schedule_points,
     normalize_lab_schedule,
     pO2_enforcement_row,
-    pO2_setpoint_mbar_from_schedule,
     schedule_sample_time_h,
 )
 from simulator.environment import (
@@ -118,6 +118,133 @@ C4_PROCESS_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
 C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
     'c4_preheat_wall_clock_exhausted'
 )
+
+
+@dataclass(frozen=True)
+class _ResolvedLabScheduleCover:
+    pO2_setpoint_mbar: float
+    background_gas_species: str
+    background_gas_mole_fraction: float
+
+
+def _resolve_lab_schedule_cover(
+    lab_schedule: Mapping[str, object],
+    overrides: Mapping[str, object],
+    total_pressure_mbar: float,
+) -> _ResolvedLabScheduleCover:
+    """Resolve one declared schedule cover for both pO2 and balance gas."""
+    gas_boundary = lab_schedule.get('gas_boundary', {})
+    background_gas = (
+        gas_boundary.get('background_gas', {})
+        if isinstance(gas_boundary, Mapping) else {}
+    )
+    declared_species = ''
+    background_fraction = 0.0
+    partials: dict[str, float] = {}
+    carrier_species = ''
+    air_cover = False
+    if isinstance(background_gas, Mapping) and str(
+        background_gas.get('reported_status', '') or ''
+    ) != 'not_reported':
+        declared_species = str(background_gas.get('species') or '').strip()
+        if declared_species:
+            background_fraction = _finite_non_negative(
+                background_gas.get('mole_fraction', 1.0),
+                'background_gas.mole_fraction',
+            )
+            try:
+                carrier_species = _canonical_carrier_gas_key(declared_species)
+            except ValueError:
+                # AIR has an environment composition, not a single condensation
+                # carrier token. All other aliases must resolve through the
+                # existing carrier owner before the environment projection.
+                carrier_species = ''
+            try:
+                partials = cover_gas_partial_pressures(
+                    declared_species, total_pressure_mbar,
+                )
+            except CoverGasCompositionUnavailable:
+                if not carrier_species:
+                    raise LabScheduleValidationError(
+                        'lab_schedule_background_gas_species_unsupported'
+                    ) from None
+                try:
+                    partials = cover_gas_partial_pressures(
+                        carrier_species, total_pressure_mbar,
+                    )
+                except CoverGasCompositionUnavailable as exc:
+                    raise LabScheduleValidationError(
+                        'lab_schedule_background_gas_species_unsupported'
+                    ) from exc
+            air_cover = not carrier_species and {'O2', 'N2'} <= partials.keys()
+            if partials and not math.isclose(
+                sum(partials.values()), total_pressure_mbar,
+                rel_tol=1e-9, abs_tol=1e-12,
+            ):
+                raise LabScheduleValidationError(
+                    'lab_schedule_background_gas_composition_incomplete'
+                )
+            if air_cover and not math.isclose(
+                background_fraction, 1.0, rel_tol=0.0, abs_tol=1e-12,
+            ):
+                raise LabScheduleValidationError(
+                    'lab_schedule_background_gas_composition_incomplete'
+                )
+
+    explicit_po2 = False
+    if LAB_SCHEDULE_PO2_SETPOINT_KEY in overrides:
+        pO2_setpoint = _finite_non_negative(
+            overrides[LAB_SCHEDULE_PO2_SETPOINT_KEY],
+            LAB_SCHEDULE_PO2_SETPOINT_KEY,
+        )
+        explicit_po2 = True
+    elif 'pO2_mbar' in overrides:
+        pO2_setpoint = _finite_non_negative(
+            overrides['pO2_mbar'], 'pO2_mbar',
+        )
+        explicit_po2 = True
+    else:
+        cover = lab_schedule.get('pO2_cover')
+        if isinstance(cover, Mapping) and bool(cover.get('enabled', False)):
+            pO2_setpoint = _finite_non_negative(
+                cover.get('setpoint_mbar'), 'pO2_cover.setpoint_mbar',
+            )
+            explicit_po2 = True
+        else:
+            pO2_setpoint = partials.get('O2', 0.0) * background_fraction
+
+    if (air_cover or carrier_species == 'O2') and explicit_po2:
+        declared_o2 = partials.get('O2', 0.0) * background_fraction
+        if not math.isclose(
+            pO2_setpoint, declared_o2, rel_tol=0.0, abs_tol=1e-9,
+        ):
+            raise LabScheduleValidationError(
+                'lab_schedule_background_gas_conflicts_with_pO2_setpoint'
+            )
+
+    if air_cover:
+        balance_species = 'N2'
+        balance_fraction = 1.0
+    elif carrier_species == 'O2':
+        balance_species = ''
+        balance_fraction = 0.0
+    else:
+        balance_species = carrier_species
+        balance_fraction = background_fraction
+    achieved_po2 = min(pO2_setpoint, total_pressure_mbar)
+    if (
+        achieved_po2 > 0.0
+        and achieved_po2 < total_pressure_mbar
+        and (not balance_species or balance_fraction <= 0.0)
+    ):
+        raise LabScheduleValidationError(
+            'lab_schedule_positive_pO2_requires_named_balance_gas'
+        )
+    return _ResolvedLabScheduleCover(
+        pO2_setpoint_mbar=pO2_setpoint,
+        background_gas_species=balance_species,
+        background_gas_mole_fraction=balance_fraction,
+    )
 
 
 class C0ForecastAdjustmentNotice(TypedDict):
@@ -2499,84 +2626,26 @@ class CampaignManager:
             lab_schedule['chamber_pressure_mbar'],
             sample_time_h,
         )
-        pO2_setpoint = pO2_setpoint_mbar_from_schedule(
-            lab_schedule,
-            ovr,
-            total_pressure,
+        cover = _resolve_lab_schedule_cover(
+            lab_schedule, ovr, total_pressure,
         )
         row = pO2_enforcement_row(
             hour=int(melt.hour) + (0 if sample_time_h <= 0.0 else 1),
             schedule=lab_schedule,
             schedule_time_h=float(sample_time_h),
-            setpoint_mbar=pO2_setpoint,
+            setpoint_mbar=cover.pO2_setpoint_mbar,
             total_pressure_mbar=total_pressure,
         )
-        background_gas = lab_schedule.get('gas_boundary', {}).get(
-            'background_gas', {})
-        background_species = ''
-        background_fraction = 0.0
-        if (
-            isinstance(background_gas, Mapping)
-            and str(background_gas.get('reported_status', '') or '') != 'not_reported'
-        ):
-            declared_species = str(background_gas.get('species') or '').strip()
-            background_fraction = _background_gas_mole_fraction(background_gas)
-            try:
-                partials = cover_gas_partial_pressures(
-                    declared_species,
-                    total_pressure,
-                )
-            except CoverGasCompositionUnavailable:
-                partials = {}
-            if partials and not math.isclose(
-                sum(partials.values()), total_pressure,
-                rel_tol=1e-9, abs_tol=1e-12,
-            ):
-                raise LabScheduleValidationError(
-                    'lab_schedule_background_gas_composition_incomplete'
-                )
-            if {'O2', 'N2'} <= partials.keys():
-                # Air is represented by its O2 partial and an N2 balance.
-                # OverheadGasModel applies this fraction to (P_total - pO2),
-                # so a unit fraction writes the complete nitrogen remainder.
-                expected_pO2 = partials['O2'] * background_fraction
-                if not math.isclose(
-                    float(row['achieved_mbar']), expected_pO2,
-                    rel_tol=0.0, abs_tol=1e-9,
-                ):
-                    raise LabScheduleValidationError(
-                        'lab_schedule_air_cover_conflicts_with_pO2_setpoint'
-                    )
-                background_species = 'N2'
-                background_fraction = 1.0
-            else:
-                try:
-                    background_species = _canonical_carrier_gas_key(
-                        declared_species,
-                    )
-                except ValueError as exc:
-                    raise LabScheduleValidationError(
-                        'lab_schedule_background_gas_species_unsupported'
-                    ) from exc
-        if (
-            float(row['achieved_mbar']) > 0.0
-            and float(row['achieved_mbar']) < total_pressure
-            and (
-                not background_species
-                or background_species.upper() == 'O2'
-                or background_fraction <= 0.0
-            )
-        ):
-            raise LabScheduleValidationError(
-                'lab_schedule_positive_pO2_requires_named_balance_gas'
-            )
         melt.p_total_mbar = float(total_pressure)
         melt.pO2_mbar = float(row['achieved_mbar'])
-        melt.background_gas_species = background_species
-        melt.background_gas_mole_fraction = background_fraction
+        melt.background_gas_species = cover.background_gas_species
+        melt.background_gas_mole_fraction = cover.background_gas_mole_fraction
         if melt.pO2_mbar > 0.0:
             melt.atmosphere = Atmosphere.CONTROLLED_O2
-        elif background_species and background_species.upper() not in {'N2', 'O2'}:
+        elif (
+            cover.background_gas_species
+            and cover.background_gas_species.upper() not in {'N2', 'O2'}
+        ):
             # F-080: a positive-pressure zero-O2 inert schedule is a measured
             # background cover, not a nitrogen sweep. Keep it on the controlled
             # pressure path so overhead composes the declared species instead

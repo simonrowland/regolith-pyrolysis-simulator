@@ -22,7 +22,10 @@ from typing import Any, Mapping, Sequence
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
 from simulator.battery.enums import ValueKind
 from simulator.battery.records import Located, Value
-from simulator.physical_constants import BAR_PA_DECIMAL
+from simulator.physical_constants import (
+    BAR_PA_DECIMAL,
+    DRY_AIR_O2_MOLE_FRACTION_DECIMAL,
+)
 
 # 1 bar = 1e5 Pa exactly. An atmosphere frame passes 101325 Pa instead.
 BAR_PA = BAR_PA_DECIMAL
@@ -43,7 +46,6 @@ def log10_fo2_to_pa(
 
 
 _ATM_BAR = Decimal("1.01325")
-_AIR_O2_MOLE_FRACTION = Decimal("0.2095")
 
 
 def _gas_mixture_evaluation_temperature(
@@ -113,7 +115,7 @@ def _atmosphere_kind(
         total_pressure_bar = (
             _ATM_BAR if unit == "atm" else Decimal(1) if unit == "bar" else None
         )
-        return "air", _AIR_O2_MOLE_FRACTION, total_pressure_bar
+        return "air", DRY_AIR_O2_MOLE_FRACTION_DECIMAL, total_pressure_bar
     oxygen = re.fullmatch(
         r"(?:pure )?(?:o2|oxygen)(?: at 1(?:\.0+)? (atm|bar))?", compact
     )

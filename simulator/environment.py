@@ -6,6 +6,7 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
+from simulator.physical_constants import DRY_AIR_O2_MOLE_FRACTION_DECIMAL
 from simulator.scalar_boundary import is_declared_real_scalar
 
 DEFAULT_VACUUM_FLOOR_BAR = 1.0e-9
@@ -59,10 +60,11 @@ def cover_gas_partial_pressures(
     Output pressure units match the input (bar or mbar).
 
     A percentage specifies that species only; the unreported balance is not
-    invented as oxygen. The two-species dry-air approximation uses 20.95% O2,
-    with the remainder represented as N2. NOAA reports dry air at 20.95% O2
-    by volume (https://www.nesdis.noaa.gov/news/peeling-back-the-layers-of-the-atmosphere);
-    the audit's 0.21 is rounded.
+    invented as oxygen. The two-species dry-air approximation uses the shared
+    exact decimal for 20.95% O2 by volume, with the remainder represented as
+    N2. NOAA source:
+    https://www.nesdis.noaa.gov/news/peeling-back-the-layers-of-the-atmosphere.
+    The audit's 0.21 is rounded.
     """
     pressure = float(total_pressure)
     if not math.isfinite(pressure) or pressure < 0.0:
@@ -71,7 +73,7 @@ def cover_gas_partial_pressures(
         return {}
     token = str(atmosphere).strip().upper().replace(" ", "")
     if token == "AIR":
-        oxygen_fraction = 0.2095
+        oxygen_fraction = float(DRY_AIR_O2_MOLE_FRACTION_DECIMAL)
         return {"O2": pressure * oxygen_fraction, "N2": pressure * (1.0 - oxygen_fraction)}
     if token in {"CO2", "O2", "N2", "AR", "KR", "HE"}:
         species = {"AR": "Ar", "KR": "Kr", "HE": "He"}.get(token, token)

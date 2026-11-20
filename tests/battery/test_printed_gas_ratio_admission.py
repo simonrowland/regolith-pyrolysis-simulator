@@ -14,10 +14,12 @@ from simulator.battery.migrate import (
     _quoted_atmosphere_values,
 )
 from simulator.battery.oxygen_identity import (
+    _atmosphere_kind,
     _printed_sccm_gas_mixture,
     _row_printed_atmospheres,
     log10_fo2_to_pa,
 )
+from simulator.physical_constants import DRY_AIR_O2_MOLE_FRACTION_DECIMAL
 from simulator.chemistry.offgas_fo2 import (
     _full_balance_fo2_with_janaf_band,
     _full_element_balance_fo2,
@@ -26,6 +28,12 @@ from simulator.chemistry.offgas_fo2 import (
 
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_printed_air_identity_uses_shared_exact_dry_air_fraction() -> None:
+    assert _atmosphere_kind("air") == (
+        "air", DRY_AIR_O2_MOLE_FRACTION_DECIMAL, None,
+    )
 
 
 def _source_doc(name: str) -> dict:

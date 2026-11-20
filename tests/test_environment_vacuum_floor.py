@@ -225,13 +225,15 @@ def test_airless_numerical_oxygen_guards_preserve_existing_resolution(body):
 
 
 def test_earth_air_oxygen_is_a_mole_fraction_not_total_pressure():
-    assert cover_gas_partial_pressures('air', 1.0)['O2'] == 0.21
+    # NOAA's 20.95% dry-air O2 revises the rounded 0.21 pin to 0.2095 bar.
+    assert cover_gas_partial_pressures('air', 1.0)['O2'] == 0.2095
     assert cover_gas_partial_pressures('96% CO2', 6.0) == {'CO2': 5.76}
     sim = _mars_sim()
     sim.melt.body = 'earth'
     sim.melt.ambient_atmosphere = 'air'
     sim.melt.ambient_pressure_mbar = 1000.0
-    assert sim._headspace_transport_pO2_bar_from_ledger(0.01) == pytest.approx(0.22)
+    # Before: 0.21 ambient + 0.01 ledger = 0.22 bar; now 0.2095 + 0.01 = 0.2195.
+    assert sim._headspace_transport_pO2_bar_from_ledger(0.01) == pytest.approx(0.2195)
 
 
 @pytest.mark.parametrize('species', ['Ar', 'Kr', 'He', 'N2', 'O2', 'CO2'])

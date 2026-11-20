@@ -15,12 +15,6 @@ from types import MappingProxyType
 from typing import Any
 
 from simulator.canonical import canonical_json_dumps, normalize_canonical_value
-from simulator.environment import (
-    CoverGasCompositionUnavailable,
-    cover_gas_partial_pressures,
-)
-
-
 LAB_SCHEDULE_OVERRIDE_KEY = "lab_schedule"
 LAB_SCHEDULE_PO2_SETPOINT_KEY = "lab_schedule_pO2_setpoint_mbar"
 LAB_SCHEDULE_PRESSURE_FLOOR_MBAR = 1.0e-3
@@ -171,46 +165,6 @@ def interpolate_schedule_points(
 def schedule_sample_time_h(schedule: Mapping[str, Any], campaign_hour: int) -> float:
     duration_h = float(schedule["duration_h"])
     return min(duration_h, max(0.0, float(campaign_hour) + 1.0))
-
-
-def pO2_setpoint_mbar_from_schedule(
-    schedule: Mapping[str, Any],
-    overrides: Mapping[str, Any],
-    total_pressure_mbar: float,
-) -> float:
-    if LAB_SCHEDULE_PO2_SETPOINT_KEY in overrides:
-        return _finite_non_negative(
-            overrides[LAB_SCHEDULE_PO2_SETPOINT_KEY],
-            LAB_SCHEDULE_PO2_SETPOINT_KEY,
-        )
-    if "pO2_mbar" in overrides:
-        return _finite_non_negative(overrides["pO2_mbar"], "pO2_mbar")
-    cover = schedule.get("pO2_cover")
-    if isinstance(cover, Mapping) and bool(cover.get("enabled", False)):
-        return _finite_non_negative(cover.get("setpoint_mbar"), "pO2_cover.setpoint_mbar")
-    gas = schedule.get("gas_boundary", {}).get("background_gas", {})
-    if isinstance(gas, Mapping) and str(gas.get("species", "")).strip():
-        mole_fraction = _background_gas_mole_fraction(gas)
-        try:
-            partials = cover_gas_partial_pressures(
-                str(gas["species"]), total_pressure_mbar,
-            )
-        except CoverGasCompositionUnavailable:
-            return 0.0
-        return partials.get("O2", 0.0) * mole_fraction
-    return 0.0
-
-
-def _background_gas_mole_fraction(gas: Mapping[str, Any]) -> float:
-    """Validate and return a declared background gas mole fraction."""
-    mole_fraction = _finite_non_negative(
-        gas.get("mole_fraction", 1.0), "background_gas.mole_fraction",
-    )
-    if mole_fraction > 1.0:
-        raise LabScheduleValidationError(
-            "lab_schedule_background_gas_mole_fraction_out_of_range"
-        )
-    return mole_fraction
 
 
 def pO2_enforcement_row(
@@ -569,6 +523,10 @@ def _normalize_gas_boundary_field(
         raise LabScheduleValidationError(f"missing_gas_boundary_{field}")
     reported_status = str(raw.get("reported_status", "") or "").strip()
     if reported_status == "not_reported":
+        if field == "background_gas" and str(raw.get("species", "") or "").strip():
+            raise LabScheduleValidationError(
+                "lab_schedule_background_gas_not_reported_conflicts_with_species"
+            )
         for key in ("source_class", "citation_id", "digest"):
             if not str(raw.get(key, "") or "").strip():
                 raise LabScheduleValidationError(
@@ -583,6 +541,14 @@ def _normalize_gas_boundary_field(
     for key in required:
         if raw.get(key) in (None, ""):
             raise LabScheduleValidationError(f"missing_gas_boundary_{field}_{key}")
+    if field == "background_gas":
+        mole_fraction = _finite_non_negative(
+            raw.get("mole_fraction", 1.0), "background_gas.mole_fraction",
+        )
+        if mole_fraction > 1.0:
+            raise LabScheduleValidationError(
+                "lab_schedule_background_gas_mole_fraction_out_of_range"
+            )
     if not str(raw.get("source_class", "") or "").strip():
         raise LabScheduleValidationError("gas_boundary_missing_source_class")
     if not (
