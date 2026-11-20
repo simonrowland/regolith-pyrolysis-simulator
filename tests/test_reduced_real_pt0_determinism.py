@@ -1254,13 +1254,20 @@ def test_magemin_freeze_gate_memo_key_preserves_extrapolated_boundary_identity()
             pressure_bar=1.0,
             fO2_log=-9.0,
         )
-        return key, reason, composition_wt_pct
+        return (
+            key,
+            reason,
+            composition_wt_pct,
+            sim._freeze_gate_current_magemin_domain_identity,
+        )
 
-    inside, inside_reason, _inside_composition = key_for(30.001)
+    inside, inside_reason, _inside_composition, inside_identity = key_for(30.001)
     # PT-0 capture uses six significant figures before the gate sees this
     # binary bulk. d-447 keeps positive 29.999 wt% silica on the flagged
     # extrapolation path even though both compositions share a quantized key.
-    outside, outside_reason, outside_composition = key_for(29.999)
+    outside, outside_reason, outside_composition, outside_identity = key_for(
+        29.999
+    )
 
     from engines.magemin.domain import MAGEMinDomainGate
 
@@ -1271,13 +1278,9 @@ def test_magemin_freeze_gate_memo_key_preserves_extrapolated_boundary_identity()
     assert inside.composition_mol_fractions == outside.composition_mol_fractions
     assert inside_reason is None
     assert outside_reason is None
-    clean_verdict = (True, (), None)
-    inside_verdict = getattr(inside, 'magemin_domain_verdict', clean_verdict)
-    outside_verdict = outside.magemin_domain_verdict
-    assert inside_verdict == clean_verdict
-    assert outside_verdict[0] is True
-    assert outside_verdict[2] is None
-    assert inside_verdict != outside_verdict
+    assert inside_identity.silica_verdict == 'in_band'
+    assert outside_identity.silica_verdict == 'extrapolated'
+    assert not inside_identity.matches(outside_identity)
     assert valid is True
     assert reason is None
     assert any(
@@ -1332,33 +1335,39 @@ def test_magemin_freeze_gate_key_carries_projection_threshold_verdict(
             material_origin="feedstock",
         )
         sim.atom_ledger = ledger
-        return sim._freeze_gate_cache_key_and_domain(
+        key = sim._freeze_gate_cache_key_and_domain(
             pressure_bar=1.0,
             fO2_log=-9.0,
         )[0]
+        return key, sim._freeze_gate_current_magemin_domain_identity
 
-    admitted = key_for(0.999)
-    refused = key_for(1.001)
+    admitted, admitted_identity = key_for(0.999)
+    refused, refused_identity = key_for(1.001)
 
     assert admitted.composition_mol_fractions == (
         refused.composition_mol_fractions
     )
-    admitted_verdict = getattr(
-        admitted, 'magemin_domain_verdict', (True, (), None),
-    )
-    assert admitted_verdict == (True, (), None)
-    assert refused.magemin_domain_verdict is not None
-    assert refused.magemin_domain_verdict[2].startswith(
+    assert admitted_identity.projection_threshold_verdict == 'clear'
+    assert refused_identity.projection_threshold_verdict == 'refused'
+    assert refused_identity.refusal_reason.startswith(
         "composition_projected_over_threshold:"
     )
     assert admitted != refused
-    assert len(gate_inputs) == 4
     # The exact submitted P2O5 bulk reaches the live domain gate before the
     # subsequent ig-order projection drops it.
+    assert len(gate_inputs) == 4
     assert "P2O5" in gate_inputs[0]
     assert "P2O5" not in gate_inputs[1]
     assert "P2O5" in gate_inputs[2]
     assert "P2O5" not in gate_inputs[3]
+    submitted_p2o5 = [
+        float(bulk["P2O5"])
+        for bulk in gate_inputs
+        if "P2O5" in bulk
+    ]
+    assert len(submitted_p2o5) == 2
+    assert submitted_p2o5[0] < 1.0 < submitted_p2o5[1]
+    assert any("P2O5" not in bulk for bulk in gate_inputs)
 
 
 def test_amount_is_present_only_for_extensive_alphamelts_composite() -> None:
@@ -3415,10 +3424,7 @@ def test_gate_replay_uses_evaluated_silica_verdict_for_flag_requirement(
             fO2_log=capture_fO2_log,
         ),
     )
-    assert getattr(key, "magemin_domain_verdict", None) in (
-        None,
-        (True, (), None),
-    )
+    assert getattr(key, "magemin_domain_identity", None) is None
     seed_gate_curve_memo_record(capture_sim, curve_payload)
     capture.capture_gate_curve(
         capture_sim,

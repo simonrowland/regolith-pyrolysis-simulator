@@ -1925,15 +1925,13 @@ def test_same_hour_magemin_pin_never_resurrects_a_refused_bulk(
         sim._melt_redox_gate_current_pin_verdict()
     )
     assert submitted_bulk_passes
-    assert current_verdict[0] == 'magemin'
-    assert current_verdict[2] == ('certified-in-band',)
+    assert current_verdict.silica_verdict == 'in_band'
     sim._establish_melt_redox_gate_authority_for_current_hour()
     assert sim._melt_redox_gate_verdict_matches_current()
-    unknown_identity = (
-        'magemin',
-        True,
-        None,
-        current_verdict[-1],
+    from simulator.melt_backend.magemin import MAGEMinDomainIdentity
+
+    unknown_identity = MAGEMinDomainIdentity(
+        'unknown', 'unknown', None, None,
     )
     assert not sim._melt_redox_gate_pin_verdicts_match(
         unknown_identity,
@@ -1981,7 +1979,6 @@ def test_same_hour_floor_fallback_pin_rechecks_projection_threshold_verdict(
     feedstocks_data,
     setpoints_data,
 ):
-    from simulator.core import _MeltRedoxLiquidusFloorFallback
     from simulator.physical_constants import MBAR_PER_BAR
 
     sim = _build_freeze_gate_sim(
@@ -2032,25 +2029,16 @@ def test_same_hour_floor_fallback_pin_rechecks_projection_threshold_verdict(
     baseline_identity, baseline_passes = (
         sim._melt_redox_gate_current_pin_verdict()
     )
-    baseline_key, baseline_reason = current_cache_verdict()
+    _baseline_key, baseline_reason = current_cache_verdict()
     assert baseline_passes and baseline_reason is None
-    baseline_key_verdict = getattr(
-        baseline_key,
-        'magemin_domain_verdict',
-        None,
-    )
-    assert baseline_identity[-1] == (
-        baseline_key_verdict[2]
-        if isinstance(baseline_key_verdict, tuple)
-        and len(baseline_key_verdict) > 2
-        else None
-    )
+    assert baseline_identity.projection_threshold_verdict == 'clear'
 
-    fallback = _MeltRedoxLiquidusFloorFallback(
-        'test floor fallback',
-        'liquidus unavailable',
-        'unavailable',
+    fallback = sim._melt_redox_liquidus_floor_fallback(
+        source='test floor fallback',
+        reason='liquidus unavailable',
+        liquidus_status='unavailable',
     )
+    assert fallback.verdict_identity.matches(baseline_identity)
     sim._melt_redox_gate_authority_this_tick = fallback
     sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
     sim._melt_redox_gate_authority_tick_verdict_identity = baseline_identity
@@ -2064,9 +2052,11 @@ def test_same_hour_floor_fallback_pin_rechecks_projection_threshold_verdict(
     )
     current_key, _current_reason = current_cache_verdict()
     assert not current_passes
-    assert current_key.magemin_domain_verdict[2] is not None
-    assert current_identity[-1] == current_key.magemin_domain_verdict[2]
-    assert current_identity != baseline_identity
+    assert current_key.magemin_domain_identity.projection_threshold_verdict == (
+        'refused'
+    )
+    assert current_identity.projection_threshold_verdict == 'refused'
+    assert not current_identity.matches(baseline_identity)
 
     redispatched = {'source': 'fresh gate resolution'}
     calls = []
@@ -2182,32 +2172,29 @@ def test_ferric_fold_silica_boundary_splits_the_real_freeze_gate_memo_key(
             material_origin='feedstock',
         )
         sim.atom_ledger = ledger
-        return sim._freeze_gate_cache_key_and_domain(
+        key = sim._freeze_gate_cache_key_and_domain(
             pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
             fO2_log=sim._freeze_gate_redox_key_fO2_log(
                 fO2_log=sim._compute_intrinsic_melt_fO2(),
             ),
         )[0]
+        return key, sim._freeze_gate_current_magemin_domain_identity
 
-    below = key_for(79.19845)
-    above = key_for(79.19851)
+    below, below_identity = key_for(79.19845)
+    above, above_identity = key_for(79.19851)
 
     assert below != above
-    assert getattr(below, 'magemin_domain_verdict', None) in (
-        None,
-        (True, (), None),
-    )
+    assert below_identity.silica_verdict == 'in_band'
+    assert below_identity.reusable
     from engines.magemin.domain import MAGEMinDomainGate
 
     canonical_diagnostic = MAGEMinDomainGate.silica_extrapolation_diagnostic(
         {'SiO2': 81.0}
     )
     assert canonical_diagnostic is not None
-    assert above.magemin_domain_verdict[3] == (
-        canonical_diagnostic['authority'],
-        tuple(
-            canonical_diagnostic['certified_band']['sio2_wt_pct']
-        ),
+    assert above_identity.silica_verdict == canonical_diagnostic['authority']
+    assert above_identity.certified_band == tuple(
+        canonical_diagnostic['certified_band']['sio2_wt_pct']
     )
 
 
@@ -2908,24 +2895,12 @@ def test_over_limit_projection_steps_down_to_hold_or_floor(
         vapor_pressure_data, feedstocks_data, setpoints_data, enabled=True,
     )
     if held:
-        held_key, _reason = sim._freeze_gate_cache_key_and_domain(
+        _held_key, _reason = sim._freeze_gate_cache_key_and_domain(
             pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
             fO2_log=sim._freeze_gate_redox_key_fO2_log(
                 fO2_log=float(sim._current_melt_redox_fO2_log()),
             ),
         )
-        sim._freeze_gate_current_magemin_domain_verdict = getattr(
-            held_key, 'magemin_domain_verdict', None,
-        )
-        if (
-            isinstance(sim._freeze_gate_current_magemin_domain_verdict, tuple)
-            and len(sim._freeze_gate_current_magemin_domain_verdict) > 3
-        ):
-            sim._freeze_gate_current_magemin_domain_verdict = (
-                sim._freeze_gate_current_magemin_domain_verdict[3]
-            )
-        else:
-            sim._freeze_gate_current_magemin_domain_verdict = (None, ())
         sim._remember_freeze_gate_provider_curve({
             'source': 'gate_liquid_fraction',
             'solidus_T_C': 1200.0, 'liquidus_T_C': 1500.0,
@@ -4691,8 +4666,8 @@ def test_same_hour_held_magemin_curve_is_bound_to_its_domain_verdict(
     assert failed_record['curve']['gate_provider_refusal'][
         'qualification'
     ] == 'held_last_good_curve'
-    assert sim._freeze_gate_held_curve_record['domain_verdict'] == (
-        None, (),
+    assert sim._freeze_gate_held_curve_record['domain_identity'].matches(
+        sim._freeze_gate_current_magemin_domain_identity
     )
 
     set_bulk(29.999)
@@ -4746,10 +4721,10 @@ def test_worker_timeout_last_good_matches_current_evaluated_silica_verdict(
     set_bulk(30.001)
     successful_record = sim._freeze_gate_curve_record()
     assert successful_record['curve'].get('authority') is None
-    last_good_verdict = sim._freeze_gate_last_good_curve[
-        'magemin_domain_verdict'
+    last_good_identity = sim._freeze_gate_last_good_curve[
+        'magemin_domain_identity'
     ]
-    assert last_good_verdict == (None, ())
+    assert last_good_identity.silica_verdict == 'in_band'
 
     set_bulk(29.999)
     provider = sim._chem_registry.fallback_for(
@@ -4771,11 +4746,35 @@ def test_worker_timeout_last_good_matches_current_evaluated_silica_verdict(
     assert failed_record['curve']['gate_provider_refusal'][
         'qualification'
     ] == 'first_call_kress91_floor_prediction'
+    assert failed_record['curve']['gate_provider_refusal']['authority'] == (
+        'extrapolated (lower-rung)'
+    )
+    assert failed_record['curve']['gate_provider_refusal']['certified_band'] == {
+        'sio2_wt_pct': [30.0, 80.0],
+    }
     assert failed_record['curve'] != successful_record['curve']
-    assert sim._freeze_gate_held_curve_record['domain_verdict'] is not None
-    assert (
-        sim._freeze_gate_held_curve_record['domain_verdict']
-        != last_good_verdict
+    held_identity = sim._freeze_gate_held_curve_record['domain_identity']
+    assert held_identity.silica_verdict == 'extrapolated'
+    assert not held_identity.matches(last_good_identity)
+
+    # A floor is a tick-local answer to the identity that produced it. A new
+    # in-band request must run through the provider again instead of reading
+    # the out-of-band held floor.
+    sim._freeze_gate_last_good_curve = None
+    sim._freeze_gate_liquid_fraction_cache = None
+    sim._freeze_gate_liquid_fraction_curve_memo.clear()
+    set_bulk(30.001)
+    timeout_count = len(timeout_calls)
+    other_identity_record = sim._freeze_gate_curve_record()
+    assert len(timeout_calls) == timeout_count + 2
+    assert other_identity_record['curve']['gate_provider_refusal'][
+        'qualification'
+    ] == 'first_call_kress91_floor_prediction'
+    assert 'certified_band' not in other_identity_record['curve'][
+        'gate_provider_refusal'
+    ]
+    assert sim._freeze_gate_held_curve_record['domain_identity'].silica_verdict == (
+        'in_band'
     )
 
 

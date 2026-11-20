@@ -1251,6 +1251,103 @@ def test_tier_b_saturation_uses_continuity_corrected_curve_for_x_star():
     assert refused.value.reason == "tier_b_saturation_continuity_unresolved"
 
 
+def test_magemin_tier_b_x_star_unions_continuity_neighbour_identity(monkeypatch):
+    backend = _FakeMageminBackend()
+    liner = {"SiO2": 30.0, "Al2O3": 25.0, "MgO": 25.0, "CaO": 20.0}
+    deposit_silica_wt_pct = 30.01
+    si_oxide_mass = liner_corrosion._oxide_equivalent_kg_by_species(
+        {"SiO": 1.0}
+    )["SiO"]
+    mg_oxide_mass = liner_corrosion._oxide_equivalent_kg_by_species(
+        {"Mg": 1.0}
+    )["Mg"]
+    deposit = {
+        "SiO": 1.0,
+        "Mg": (
+            si_oxide_mass
+            * (100.0 - deposit_silica_wt_pct)
+            / (deposit_silica_wt_pct * mg_oxide_mass)
+        ),
+    }
+    deposit_composition = liner_corrosion.deposit_oxide_composition(deposit)
+    unstable_nominal = liner_corrosion._composition_at_fraction(
+        liner,
+        deposit_composition,
+        1.0 / liner_corrosion.MAGEMIN_PHI_CURVE_INTERVALS,
+    )
+
+    def temperature_curve(
+        temperature_C,
+        *,
+        pressure_bar,
+        fO2_log,
+        projected_oxide_wt_pct,
+    ):
+        composition = dict(projected_oxide_wt_pct)
+        fraction = (20.0 - composition.get("CaO", 20.0)) / 20.0
+        is_unstable_nominal = all(
+            math.isclose(
+                float(composition.get(oxide, 0.0)), value,
+                rel_tol=0.0,
+                abs_tol=1.0e-8,
+            )
+            for oxide, value in unstable_nominal.items()
+        )
+        if temperature_C < 1400.0:
+            liquid_fraction = 0.0
+        elif temperature_C == 1400.0 and is_unstable_nominal:
+            liquid_fraction = 1.0
+        elif temperature_C < 1425.0:
+            liquid_fraction = 1.0 if fraction >= 0.95 else 0.0
+        else:
+            liquid_fraction = 1.0
+        backend.calls.append(
+            (temperature_C, pressure_bar, fO2_log, composition)
+        )
+        return SimpleNamespace(
+            status="ok",
+            liquid_fraction=liquid_fraction,
+            phase_masses_kg={
+                "liq": liquid_fraction,
+                "solid": 1.0 - liquid_fraction,
+            },
+            phase_compositions={"liq": composition, "solid": composition},
+            warnings=[],
+        )
+
+    backend.equilibrate = temperature_curve
+    sampler = MageminLinerSampler(backend)
+    monkeypatch.setattr(liner_corrosion, "TIER_B_MELT_SCAN_MIN_C", 1375.0)
+    monkeypatch.setattr(liner_corrosion, "TIER_B_MELT_SCAN_MAX_C", 1425.0)
+    pure_reference = liner_corrosion._tier_b_reference_profile(
+        sampler, liner, pressure_bar=1.0
+    )
+
+    x_star, continuity_evidence, curve_metadata = (
+        liner_corrosion._tier_b_saturated_deposit_fraction(
+            sampler,
+            liner,
+            deposit,
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            pure_reference_profile=pure_reference,
+            invariant_table=None,
+        )
+    )
+
+    assert x_star > 0.9
+    assert any(
+        evidence["deposit_fraction"]
+        == pytest.approx(1.0 / liner_corrosion.MAGEMIN_PHI_CURVE_INTERVALS)
+        for evidence in continuity_evidence
+    )
+    assert curve_metadata["authority"] == "extrapolated"
+    assert curve_metadata["certified_band"] == {
+        "sio2_wt_pct": [30.0, 80.0],
+    }
+    sampler.close()
+
+
 def test_tier_b_saturation_accepts_agreeing_all_liquid_profile():
     liner = {"CaO": 20.0, "Al2O3": 30.0, "SiO2": 50.0}
     deposit = {"Na2O": 100.0}
@@ -1465,7 +1562,7 @@ def test_liner_segment_keeps_silica_metadata_from_averaged_neighbours():
 
     backend.equilibrate = temperature_curve
     sampler = MageminLinerSampler(backend)
-    liner = {"SiO2": 30.0, "MgO": 70.0}
+    liner = {"SiO2": 30.0, "Al2O3": 25.0, "MgO": 25.0, "CaO": 20.0}
     selected_reference = liner_corrosion._tier_b_reference_profile_for_liner(
         sampler,
         liner,

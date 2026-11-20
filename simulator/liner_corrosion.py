@@ -12,10 +12,21 @@ import math
 from pathlib import Path
 import re
 from types import SimpleNamespace
-from typing import Any, Callable, Mapping, Protocol, Sequence, runtime_checkable
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Mapping,
+    Protocol,
+    Sequence,
+    runtime_checkable,
+)
 import warnings
 
 import yaml
+
+if TYPE_CHECKING:
+    from simulator.melt_backend.magemin import MAGEMinDomainIdentity
 
 from simulator.accounting.formulas import parse_formula, resolve_species_formula
 from simulator.melt_backend.liquidus import (
@@ -680,16 +691,27 @@ def _magemin_curve_metadata_from_samples(
         (
             detail
             for detail in samples
-            if detail.get("authority") == "extrapolated"
+            if (
+                getattr(detail.get("domain_identity"), "silica_verdict", None)
+                == "extrapolated"
+                or detail.get("authority") == "extrapolated"
+            )
         ),
         None,
     )
     metadata: dict[str, Any] = {}
     if extrapolated is not None:
         metadata["authority"] = "extrapolated"
-        metadata["certified_band"] = dict(
-            extrapolated.get("certified_band") or {}
-        )
+        identity = extrapolated.get("domain_identity")
+        identity_band = getattr(identity, "certified_band", None)
+        if identity_band is not None:
+            metadata["certified_band"] = {
+                "sio2_wt_pct": list(identity_band),
+            }
+        elif extrapolated.get("certified_band"):
+            metadata["certified_band"] = dict(
+                extrapolated.get("certified_band") or {}
+            )
     if gate_warnings:
         metadata["gate_warnings"] = gate_warnings
     metadata_flags = list(dict.fromkeys(
@@ -2950,6 +2972,13 @@ def _tier_b_saturated_deposit_fraction(
         raise LinerCorrosionRefusal("tier_b_saturated_liquid_fraction_not_reached")
     corrected_points: list[tuple[float, float]] = []
     continuity_evidence: list[dict[str, Any]] = []
+    continuity_curve_metadata: list[Mapping[str, Any]] = []
+
+    def combined_curve_metadata() -> dict[str, Any]:
+        return _magemin_curve_metadata_from_samples(
+            (curve_metadata, *continuity_curve_metadata)
+        )
+
     for raw_fraction, raw_liquid_fraction in points:
         fraction = _liner_real(raw_fraction, "deposit_fraction")
         if (
@@ -2988,6 +3017,11 @@ def _tier_b_saturated_deposit_fraction(
                     context=f"saturation curve at deposit fraction {fraction:g}",
                 )
                 sensitivity = reference_profile.get("engine_composition_sensitive")
+                reference_curve_metadata = reference_profile.get(
+                    "curve_metadata"
+                )
+                if isinstance(reference_curve_metadata, Mapping):
+                    continuity_curve_metadata.append(reference_curve_metadata)
                 if not isinstance(sensitivity, Mapping):
                     raise LinerCorrosionRefusal(
                         "tier_b_saturation_continuity_unresolved",
@@ -3017,10 +3051,14 @@ def _tier_b_saturated_deposit_fraction(
                     "tier_b_saturated_liquid_deposit_fraction_invalid"
                 )
             if len(corrected_points) == 1:
-                return fraction, continuity_evidence, curve_metadata
+                return fraction, continuity_evidence, combined_curve_metadata()
             low_fraction, low_signal = corrected_points[-2]
             if low_signal >= target:
-                return low_fraction, continuity_evidence, curve_metadata
+                return (
+                    low_fraction,
+                    continuity_evidence,
+                    combined_curve_metadata(),
+                )
             low = low_fraction
             high = fraction
             for _ in range(52):
@@ -3032,7 +3070,7 @@ def _tier_b_saturated_deposit_fraction(
                     high = midpoint
                 else:
                     low = midpoint
-            return high, continuity_evidence, curve_metadata
+            return high, continuity_evidence, combined_curve_metadata()
     raise LinerCorrosionRefusal("tier_b_saturated_liquid_fraction_not_reached")
 
 
@@ -3878,25 +3916,17 @@ def magemin_request_cache_key(
 
 def _magemin_silica_verdict_and_cache_identity(
     composition_wt_pct: Mapping[str, Any],
-) -> tuple[dict[str, Any] | None, tuple[Any, ...]]:
+) -> tuple[dict[str, Any] | None, MAGEMinDomainIdentity]:
     from simulator.melt_backend.magemin import (
         DEFAULT_MAGEMIN_DATABASE,
-        evaluated_silica_verdict,
+        evaluated_magemin_domain_identity,
     )
 
-    diagnostic = evaluated_silica_verdict(
+    identity, diagnostic = evaluated_magemin_domain_identity(
         composition_wt_pct,
         DEFAULT_MAGEMIN_DATABASE,
     )
-    if diagnostic is None:
-        return None, ("in_band",)
-    certified_band = diagnostic.get("certified_band") or {}
-    silica_band = tuple(certified_band.get("sio2_wt_pct") or ())
-    return diagnostic, (
-        "extrapolated",
-        diagnostic.get("authority"),
-        silica_band,
-    )
+    return diagnostic, identity
 
 
 def _magemin_last_valid_curve_fraction(
@@ -4284,7 +4314,7 @@ class MageminLinerSampler:
             )
         from simulator.melt_backend.magemin import DEFAULT_MAGEMIN_DATABASE
 
-        silica_diagnostic, silica_cache_identity = (
+        silica_diagnostic, domain_identity = (
             _magemin_silica_verdict_and_cache_identity(composition)
         )
         key = (*magemin_request_cache_key(
@@ -4294,8 +4324,8 @@ class MageminLinerSampler:
             temperature_C=temperature,
             pressure_bar=pressure,
             fO2_log=MAGEMIN_FO2_LOG,
-        ), silica_cache_identity)
-        if key in self._point_cache:
+        ), domain_identity)
+        if domain_identity.reusable and key in self._point_cache:
             return self._point_cache[key]
         if not self._initialized:
             if not self._backend.initialize(
@@ -4355,14 +4385,17 @@ class MageminLinerSampler:
                 or getattr(result, "liquid_composition_wt_pct", None)
             ),
             "gate_warnings": gate_warnings,
+            "domain_identity": domain_identity,
         }
         sample_diagnostic.update(silica_diagnostic or {})
-        self._sample_diagnostics[key] = sample_diagnostic
+        if domain_identity.reusable:
+            self._sample_diagnostics[key] = sample_diagnostic
         _append_magemin_curve_metadata_flag(
             self.flags,
             _magemin_curve_metadata_from_samples((sample_diagnostic,)),
         )
-        self._point_cache[key] = liquid_fraction
+        if domain_identity.reusable:
+            self._point_cache[key] = liquid_fraction
         return liquid_fraction
 
     def sample_diagnostics(
@@ -4384,7 +4417,7 @@ class MageminLinerSampler:
                 reason or ENGINE_OUT_OF_DOMAIN_FLAG,
                 "; ".join(warnings),
             )
-        _silica_diagnostic, silica_cache_identity = (
+        _silica_diagnostic, domain_identity = (
             _magemin_silica_verdict_and_cache_identity(composition)
         )
         key = (*magemin_request_cache_key(
@@ -4394,7 +4427,7 @@ class MageminLinerSampler:
             temperature_C=_liner_real(temperature_C, "temperature_C"),
             pressure_bar=_positive(pressure_bar, "pressure_bar"),
             fO2_log=MAGEMIN_FO2_LOG,
-        ), silica_cache_identity)
+        ), domain_identity)
         return dict(self._sample_diagnostics.get(key, {}))
 
     def curve(
@@ -4435,7 +4468,7 @@ class MageminLinerSampler:
                 reason or ENGINE_OUT_OF_DOMAIN_FLAG,
                 "; ".join(warnings),
             )
-        endpoint_silica_identity: list[tuple[Any, ...]] = []
+        endpoint_silica_identity: list[tuple[float | str, Any]] = []
         last_valid_fraction = 0.0
         for index in range(MAGEMIN_PHI_CURVE_INTERVALS + 1):
             deposit_fraction = index / MAGEMIN_PHI_CURVE_INTERVALS
@@ -4487,7 +4520,11 @@ class MageminLinerSampler:
             round(MAGEMIN_FO2_LOG, MAGEMIN_CACHE_DECIMAL_PLACES),
             tuple(endpoint_silica_identity),
         )
-        if key in self._curve_cache:
+        curve_identity_reusable = all(
+            identity.reusable
+            for _fraction, identity in endpoint_silica_identity
+        )
+        if curve_identity_reusable and key in self._curve_cache:
             curve, metadata = self._curve_cache[key]
             return curve, dict(metadata)
 
@@ -4550,7 +4587,8 @@ class MageminLinerSampler:
             pressure_bar=pressure,
             points=tuple(points),
         )
-        self._curve_cache[key] = (curve, curve_metadata)
+        if curve_identity_reusable:
+            self._curve_cache[key] = (curve, curve_metadata)
         return curve, dict(curve_metadata)
 
     def close(self) -> None:

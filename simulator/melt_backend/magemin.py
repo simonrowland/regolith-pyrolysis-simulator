@@ -1664,6 +1664,98 @@ def _liquidus_inputs_on_feo_total_iron_basis(
     return kg, mol, accounts
 
 
+@dataclass(frozen=True)
+class MAGEMinDomainIdentity:
+    """Structured reuse identity for the evaluated MAGEMin bulk."""
+
+    silica_verdict: str
+    projection_threshold_verdict: str
+    certified_band: Tuple[float, float] | None
+    refusal_reason: str | None
+
+    @property
+    def reusable(self) -> bool:
+        return (
+            self.silica_verdict in {'in_band', 'extrapolated'}
+            and self.projection_threshold_verdict in {'clear', 'refused'}
+            and (
+                self.silica_verdict != 'extrapolated'
+                or self.certified_band is not None
+            )
+        )
+
+    def matches(self, other: object) -> bool:
+        return (
+            isinstance(other, MAGEMinDomainIdentity)
+            and self.reusable
+            and other.reusable
+            and self.silica_verdict == other.silica_verdict
+            and self.projection_threshold_verdict
+            == other.projection_threshold_verdict
+            and self.certified_band == other.certified_band
+            and self.refusal_reason == other.refusal_reason
+        )
+
+
+def magemin_domain_identity_from_evaluated_bulk(
+    evaluated_bulk: Mapping[str, Any] | None,
+    *,
+    projection_threshold_verdict: str = 'clear',
+    refusal_reason: str | None = None,
+    domain_verdict: tuple[bool, str | None] | None = None,
+) -> tuple[MAGEMinDomainIdentity, Dict[str, object] | None]:
+    """Classify one already-evaluated bulk without projecting it again."""
+
+    from engines.magemin.domain import MAGEMinDomainGate
+
+    if evaluated_bulk is None:
+        verdict = 'refused' if refusal_reason else 'unknown'
+        return (
+            MAGEMinDomainIdentity(
+                verdict,
+                projection_threshold_verdict,
+                None,
+                refusal_reason,
+            ),
+            None,
+        )
+
+    if domain_verdict is None:
+        valid, _warnings, gate_reason = (
+            MAGEMinDomainGate.validate_with_reason(evaluated_bulk)
+        )
+    else:
+        valid, gate_reason = domain_verdict
+    diagnostic = MAGEMinDomainGate.silica_extrapolation_diagnostic(
+        evaluated_bulk
+    )
+    if diagnostic is not None:
+        silica_verdict = 'extrapolated'
+        raw_band = (diagnostic.get('certified_band') or {}).get(
+            'sio2_wt_pct'
+        )
+        certified_band = (
+            (float(raw_band[0]), float(raw_band[1]))
+            if isinstance(raw_band, (list, tuple)) and len(raw_band) == 2
+            else None
+        )
+    elif valid:
+        silica_verdict = 'in_band'
+        certified_band = None
+    else:
+        silica_verdict = 'refused'
+        certified_band = None
+    return (
+        MAGEMinDomainIdentity(
+            silica_verdict,
+            projection_threshold_verdict,
+            certified_band,
+            refusal_reason or gate_reason,
+        ),
+        diagnostic,
+    )
+
+
 def _evaluated_magemin_oxide_bulk(
     bulk: Mapping[str, Any],
     database: str,
@@ -1733,8 +1825,40 @@ def evaluated_silica_verdict(
     )
     if evaluated_bulk is None:
         return None
-    return MAGEMinDomainGate.silica_extrapolation_diagnostic(
-        evaluated_bulk
+    return MAGEMinDomainGate.silica_extrapolation_diagnostic(evaluated_bulk)
+
+
+def evaluated_magemin_domain_identity(
+    bulk: Mapping[str, Any],
+    database: str,
+    *,
+    species_formula_registry: Optional[Mapping[str, Any]] = None,
+    composition_mol_by_account: bool = False,
+    projection_threshold_verdict: str = 'clear',
+    refusal_reason: str | None = None,
+    domain_verdict: tuple[bool, str | None] | None = None,
+) -> tuple[MAGEMinDomainIdentity, Dict[str, object] | None]:
+    """Evaluate and classify a bulk once for MAGEMin reuse decisions."""
+
+    try:
+        evaluated_bulk = _evaluated_magemin_oxide_bulk(
+            bulk,
+            database,
+            species_formula_registry=species_formula_registry,
+            composition_mol_by_account=composition_mol_by_account,
+        )
+    except MeltCompositionError as exc:
+        return magemin_domain_identity_from_evaluated_bulk(
+            None,
+            projection_threshold_verdict=projection_threshold_verdict,
+            refusal_reason=refusal_reason or str(exc),
+            domain_verdict=domain_verdict,
+        )
+    return magemin_domain_identity_from_evaluated_bulk(
+        evaluated_bulk,
+        projection_threshold_verdict=projection_threshold_verdict,
+        refusal_reason=refusal_reason,
+        domain_verdict=domain_verdict,
     )
 
 
