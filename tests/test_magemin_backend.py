@@ -1476,7 +1476,10 @@ def _magemin_failure_exit_result(monkeypatch, failure_kind):
         monkeypatch.setattr(
             backend, '_submitted_bulk_and_domain_verdict',
             lambda *_args, **_kwargs: (
-                None, (False, ['forbidden source species'], 'forbidden_species'),
+                None,
+                (False, ['forbidden source species'], 'forbidden_species'),
+                None,
+                None,
             ),
         )
     elif failure_kind == 'empty_composition':
@@ -1484,7 +1487,12 @@ def _magemin_failure_exit_result(monkeypatch, failure_kind):
     elif failure_kind == 'missing_bulk_projection':
         monkeypatch.setattr(
             backend, '_submitted_bulk_and_domain_verdict',
-            lambda *_args, **_kwargs: (None, (False, [], None)),
+            lambda *_args, **_kwargs: (
+                None,
+                (False, [], None),
+                None,
+                None,
+            ),
         )
     elif failure_kind in {'dropped_bulk_component', 'invalid_domain'}:
         bulk_projection = types.SimpleNamespace(
@@ -1504,6 +1512,8 @@ def _magemin_failure_exit_result(monkeypatch, failure_kind):
             lambda *_args, **_kwargs: (
                 bulk_projection,
                 (valid, ['synthetic domain verdict'], reason),
+                None,
+                None,
             ),
         )
         monkeypatch.setattr(

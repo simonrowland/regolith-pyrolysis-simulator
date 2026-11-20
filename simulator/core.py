@@ -5470,6 +5470,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             curve = authority['curve']
             self._liquid_feo_resolved_curve_hour = current_hour
             self._liquid_feo_resolved_curve = curve
+            self._liquid_feo_resolved_curve_domain_identity = getattr(
+                self,
+                '_freeze_gate_current_magemin_domain_identity',
+                None,
+            )
             return curve
         return authority
 
@@ -6009,10 +6014,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             hour = int(self.melt.hour)
         except (TypeError, ValueError, AttributeError):
             hour = None
+        retained_identity_matches = True
         if (
             hour is not None
             and retained_hour == hour
             and retained is not _LIQUID_FEO_GATE_NOT_ESTABLISHED
+            and getattr(self, '_liquid_fraction_provider', None) == 'magemin'
+        ):
+            current_identity, submitted_bulk_passes = (
+                self._melt_redox_gate_current_pin_verdict()
+            )
+            retained_identity = getattr(
+                self,
+                '_liquid_feo_resolved_curve_domain_identity',
+                None,
+            )
+            retained_identity_matches = (
+                submitted_bulk_passes
+                and current_identity is not None
+                and current_identity.matches(retained_identity)
+            )
+        if (
+            hour is not None
+            and retained_hour == hour
+            and retained is not _LIQUID_FEO_GATE_NOT_ESTABLISHED
+            and retained_identity_matches
         ):
             curve = retained
         elif (
@@ -9241,6 +9267,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # a missing retain is "not established", not below-liquidus.
         self._liquid_feo_resolved_curve_hour = None
         self._liquid_feo_resolved_curve = _LIQUID_FEO_GATE_NOT_ESTABLISHED
+        self._liquid_feo_resolved_curve_domain_identity = None
         self._poisoned_hour = None
         label = str(feedstock.get('label', feedstock_key))
         oxidation_specs, oxidized_offgas_kg = (

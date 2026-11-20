@@ -2033,15 +2033,22 @@ def test_same_hour_floor_fallback_pin_rechecks_projection_threshold_verdict(
     assert baseline_passes and baseline_reason is None
     assert baseline_identity.projection_threshold_verdict == 'clear'
 
-    fallback = sim._melt_redox_liquidus_floor_fallback(
-        source='test floor fallback',
-        reason='liquidus unavailable',
-        liquidus_status='unavailable',
+    from simulator.chemistry.kernel import ProviderUnavailableError
+
+    def fail_gate_dispatch(**_kwargs):
+        raise ProviderUnavailableError('test provider unavailable')
+
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_record',
+        fail_gate_dispatch,
     )
+    fallback = sim._establish_melt_redox_gate_authority_for_current_hour()
+    assert fallback is sim._melt_redox_gate_authority_this_tick
     assert fallback.verdict_identity.matches(baseline_identity)
-    sim._melt_redox_gate_authority_this_tick = fallback
-    sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
-    sim._melt_redox_gate_authority_tick_verdict_identity = baseline_identity
+    assert sim._melt_redox_gate_authority_tick_verdict_identity.matches(
+        baseline_identity
+    )
 
     load_bulk(
         {'SiO2': 50.0, 'MgO': 48.999, 'P2O5': 1.001},
@@ -2058,16 +2065,14 @@ def test_same_hour_floor_fallback_pin_rechecks_projection_threshold_verdict(
     assert current_identity.projection_threshold_verdict == 'refused'
     assert not current_identity.matches(baseline_identity)
 
-    redispatched = {'source': 'fresh gate resolution'}
-    calls = []
-
-    def dispatch_again(**_kwargs):
-        calls.append(True)
-        return redispatched
-
-    monkeypatch.setattr(sim, '_melt_redox_liquidus_gate_curve', dispatch_again)
-    assert sim._resolved_melt_redox_gate_authority() is redispatched
-    assert calls == [True]
+    crossing_fallback = (
+        sim._establish_melt_redox_gate_authority_for_current_hour()
+    )
+    assert crossing_fallback is not fallback
+    assert crossing_fallback.verdict_identity.matches(current_identity)
+    assert sim._melt_redox_gate_authority_tick_verdict_identity.matches(
+        current_identity
+    )
 
     mapping_pin = {'disposition': 'live', 'curve': {'source': 'pinned curve'}}
     sim._melt_redox_gate_authority_this_tick = mapping_pin
@@ -2084,8 +2089,69 @@ def test_same_hour_floor_fallback_pin_rechecks_projection_threshold_verdict(
         '_melt_redox_liquidus_gate_curve',
         lambda **_kwargs: redispatched_mapping,
     )
-
     assert sim._resolved_melt_redox_gate_authority() is redispatched_mapping
+
+
+def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.physical_constants import MBAR_PER_BAR
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    _install_magemin_subprocess_gate(sim, monkeypatch)
+
+    def set_bulk(silica_wt_pct):
+        composition_wt_pct = {
+            'SiO2': silica_wt_pct,
+            'MgO': 100.0 - silica_wt_pct,
+        }
+        composition_mol = {
+            species: amount / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            _CLEANED_MELT_ACCOUNT,
+            composition_mol,
+            source='r23 retained liquid-FeO identity regression',
+            material_origin='feedstock',
+        )
+        sim.atom_ledger = ledger
+
+    set_bulk(50.0)
+    record = sim._freeze_gate_curve_record()
+    sim._freeze_gate_cache_key_and_domain(
+        pressure_bar=float(sim.melt.p_total_mbar) / MBAR_PER_BAR,
+        fO2_log=sim._freeze_gate_redox_key_fO2_log(
+            fO2_log=float(sim._current_melt_redox_fO2_log()),
+        ),
+    )
+    retained_identity = sim._freeze_gate_current_magemin_domain_identity
+    sim._liquid_feo_resolved_curve_hour = int(sim.melt.hour)
+    sim._liquid_feo_resolved_curve = record['curve']
+    sim._liquid_feo_resolved_curve_domain_identity = retained_identity
+
+    set_bulk(81.0)
+    changed_key, _reason = sim._freeze_gate_cache_key_and_domain(
+        pressure_bar=float(sim.melt.p_total_mbar) / MBAR_PER_BAR,
+        fO2_log=sim._freeze_gate_redox_key_fO2_log(
+            fO2_log=float(sim._current_melt_redox_fO2_log()),
+        ),
+    )
+    assert not changed_key.magemin_domain_identity.matches(retained_identity)
+    assert sim.liquid_feo_domain_at(1800.0 + 273.15) is None
 
 
 def test_magemin_ferric_fold_clears_request_silica_flag_when_evaluated_in_band(
@@ -4976,9 +5042,13 @@ def test_magemin_cache_classifier_matches_live_gate_decision(
 
     def capture_owner(self, *args, **kwargs):
         gate_start = len(gate_inputs)
-        bulk, verdict = original_owner(self, *args, **kwargs)
+        bulk, verdict, domain_projection, threshold_reason = original_owner(
+            self,
+            *args,
+            **kwargs,
+        )
         owner_calls.append((bulk, verdict, gate_inputs[gate_start:]))
-        return bulk, verdict
+        return bulk, verdict, domain_projection, threshold_reason
 
     monkeypatch.setattr(
         magemin_module,

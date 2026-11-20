@@ -1370,6 +1370,105 @@ def test_magemin_freeze_gate_key_carries_projection_threshold_verdict(
     assert any("P2O5" not in bulk for bulk in gate_inputs)
 
 
+def test_magemin_freeze_gate_projection_threshold_uses_ferric_folded_bulk():
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.accounting.ledger import AtomLedger
+
+    sim = _build_pt0_sim(PT0DeterminismStore("capture"))
+    sim._liquid_fraction_provider = "magemin"
+
+    def identity_for(p2o5_wt_pct: float):
+        composition_wt_pct = {
+            "SiO2": 50.0,
+            "Fe2O3": 10.0,
+            "MgO": 40.0 - p2o5_wt_pct,
+            "P2O5": p2o5_wt_pct,
+        }
+        composition_mol = {
+            species: amount
+            / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            "process.cleaned_melt",
+            composition_mol,
+            source="r23 ferric projection-threshold regression",
+            material_origin="feedstock",
+        )
+        sim.atom_ledger = ledger
+        sim._freeze_gate_cache_key_and_domain(
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+        )
+        return sim._freeze_gate_current_magemin_domain_identity
+
+    below_threshold = identity_for(0.985)
+    above_threshold = identity_for(0.995)
+
+    assert below_threshold.projection_threshold_verdict == "clear"
+    assert above_threshold.projection_threshold_verdict == "refused"
+    assert above_threshold.refusal_reason.startswith(
+        "composition_projected_over_threshold:"
+    )
+    assert not below_threshold.matches(above_threshold)
+
+
+@pytest.mark.parametrize(
+    "sio2_wt_pct",
+    [[], [30.0], [30.0, "80"]],
+    ids=["empty", "wrong-arity", "non-numeric"],
+)
+def test_gate_replay_rejects_malformed_required_silica_diagnostic(
+    sio2_wt_pct,
+):
+    store = PT0DeterminismStore("capture")
+    valid_key = _freeze_gate_key()
+    valid_payload = {
+        "curve": {
+            "authority": "extrapolated",
+            "certified_band": {"sio2_wt_pct": [30.0, 80.0]},
+        },
+    }
+    store._store(
+        "freeze_gate_curve",
+        valid_key,
+        valid_payload,
+        law_disclosures=[],
+    )
+    assert store._lookup_first_available(
+        "freeze_gate_curve",
+        (valid_key,),
+        require_gate_curve_domain_diagnostic=True,
+    ) == valid_payload
+
+    key = {
+        **valid_key,
+        "replay_identity": f"malformed-silica-diagnostic-{sio2_wt_pct!r}",
+    }
+    store._store(
+        "freeze_gate_curve",
+        key,
+        {
+            "curve": {
+                "authority": "extrapolated",
+                "certified_band": {"sio2_wt_pct": sio2_wt_pct},
+            },
+        },
+        law_disclosures=[],
+    )
+
+    with pytest.raises(PT0CacheMiss):
+        store._lookup_first_available(
+            "freeze_gate_curve",
+            (key,),
+            require_gate_curve_domain_diagnostic=True,
+        )
+
+
 def test_amount_is_present_only_for_extensive_alphamelts_composite() -> None:
     extensive = _alphamelts_silicate_equilibrium_key()
     intensive_magemin = _freeze_gate_key()
@@ -3435,6 +3534,16 @@ def test_gate_replay_uses_evaluated_silica_verdict_for_flag_requirement(
 
     replay = PT0DeterminismStore("replay", db_path=db_path)
     replay_sim = configure_sim(replay)
+    import simulator.melt_backend.magemin as magemin_module
+
+    def unexpected_second_silica_projection(*_args, **_kwargs):
+        pytest.fail("replay must consume the identity built for its cache key")
+
+    monkeypatch.setattr(
+        magemin_module,
+        "evaluated_silica_verdict",
+        unexpected_second_silica_projection,
+    )
     replayed = replay.replay_gate_curve(
         replay_sim,
         fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
@@ -3442,6 +3551,113 @@ def test_gate_replay_uses_evaluated_silica_verdict_for_flag_requirement(
     assert replayed["source"] == curve_payload["source"]
     assert replayed["path"] == ((1000.0, 0.0), (1300.0, 1.0))
     assert replay.last_cache_state == "cached_exact"
+
+
+def test_retained_replayed_gate_curve_rejects_a_changed_magemin_identity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.accounting.ledger import AtomLedger
+    from simulator.physical_constants import MBAR_PER_BAR
+
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
+    db_path = tmp_path / "retained-domain-identity.db"
+    composition_wt_pct = {"SiO2": 79.999, "MgO": 20.001}
+    curve_payload = {
+        "source": "gate_liquid_fraction:fallback:magemin-shadow",
+        "status": "ok",
+        "solidus_T_C": 1000.0,
+        "liquidus_T_C": 1300.0,
+        "path": ((1000.0, 0.0), (1300.0, 1.0)),
+    }
+
+    def configure_sim(store):
+        sim = _build_pt0_sim(store)
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        sim._liquid_fraction_provider = "magemin"
+        register_synthetic_gate_curve_producer(sim)
+        composition_mol = {
+            species: amount
+            / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            "process.cleaned_melt",
+            composition_mol,
+            source="r23 retained replay curve identity regression",
+            material_origin="feedstock",
+        )
+        sim.atom_ledger = ledger
+        sim._chem_kernel = sim._build_chemistry_kernel()
+        sim.inventory.inert_melt_components_kg.clear()
+        sim._project_cleaned_melt_from_atom_ledger()
+        return sim
+
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture_sim = configure_sim(capture)
+    fO2_log = capture_sim._compute_intrinsic_melt_fO2()
+    capture_sim._freeze_gate_cache_key_and_domain(
+        pressure_bar=float(capture_sim.melt.p_total_mbar) / MBAR_PER_BAR,
+        fO2_log=capture_sim._freeze_gate_redox_key_fO2_log(
+            fO2_log=fO2_log,
+        ),
+    )
+    seed_gate_curve_memo_record(capture_sim, curve_payload)
+    capture.capture_gate_curve(
+        capture_sim,
+        fO2_log=fO2_log,
+        curve=curve_payload,
+    )
+    assert capture.last_cache_state == "live_fill"
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim = configure_sim(replay)
+    retained_curve = (
+        replay_sim._establish_melt_redox_gate_authority_for_current_hour()
+    )
+    retained_identity = replay_sim._freeze_gate_current_magemin_domain_identity
+    assert retained_identity.silica_verdict == "in_band"
+    assert replay_sim._liquid_feo_resolved_curve == retained_curve
+    assert replay_sim._liquid_feo_resolved_curve_domain_identity.matches(
+        retained_identity
+    )
+
+    composition_wt_pct.update({"SiO2": 80.001, "MgO": 19.999})
+    composition_mol = {
+        species: amount
+        / resolve_species_formula(
+            species,
+            replay_sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    ledger = AtomLedger(registry=replay_sim.atom_ledger.registry)
+    ledger.load_external_mol(
+        "process.cleaned_melt",
+        composition_mol,
+        source="r23 post-char replay curve identity regression",
+        material_origin="feedstock",
+    )
+    replay_sim.atom_ledger = ledger
+    replay_sim._chem_kernel = replay_sim._build_chemistry_kernel()
+    replay_sim._project_cleaned_melt_from_atom_ledger()
+    _key, domain_reason = replay_sim._freeze_gate_cache_key_and_domain(
+        pressure_bar=float(replay_sim.melt.p_total_mbar) / MBAR_PER_BAR,
+        fO2_log=replay_sim._freeze_gate_redox_key_fO2_log(
+            fO2_log=float(replay_sim._current_melt_redox_fO2_log()),
+        ),
+    )
+    assert domain_reason is None
+    assert (
+        replay_sim._freeze_gate_current_magemin_domain_identity.silica_verdict
+        == "extrapolated"
+    )
+    assert replay_sim.liquid_feo_domain_at(1800.0 + 273.15) is None
 
 
 def test_pt1_persistent_store_round_trips_exact_payload(

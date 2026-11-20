@@ -2266,7 +2266,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 species_formula_registry=species_formula_registry,
             )
 
-        bulk_projection, domain_verdict = (
+        (
+            bulk_projection,
+            domain_verdict,
+            _domain_projection,
+            _projection_threshold_reason,
+        ) = (
             self._submitted_bulk_and_domain_verdict(
                 domain_source_projection,
                 species_formula_registry=species_formula_registry,
@@ -4400,13 +4405,20 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     ) -> tuple[
         Optional[_MAGEMinBulkProjection],
         tuple[bool, List[str], str | None],
+        Optional[MeltOxideProjection],
+        str | None,
     ]:
         """Build the solver bulk and gate that same projected bulk."""
         source_dropped = dict(source_projection.dropped_mass_kg_by_species)
         if source_dropped or refuse_source:
-            return None, _validate_magemin_projection_with_reason(
-                source_projection.oxide_wt_pct,
-                dropped_mass_kg_by_species=source_dropped,
+            return (
+                None,
+                _validate_magemin_projection_with_reason(
+                    source_projection.oxide_wt_pct,
+                    dropped_mass_kg_by_species=source_dropped,
+                ),
+                None,
+                None,
             )
 
         bulk_input = (
@@ -4415,15 +4427,15 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             else submitted_oxide_wt_pct
         )
         if not bulk_input:
-            return None, _validate_magemin_projection_with_reason({})
+            return (
+                None,
+                _validate_magemin_projection_with_reason({}),
+                None,
+                None,
+            )
 
         try:
             bulk_projection = self._build_db_bulk_projection(bulk_input)
-            if projected_retry and submitted_oxide_wt_pct is None:
-                if bulk_projection.dropped_components:
-                    bulk_projection = self._build_db_bulk_projection(
-                        bulk_projection.composition_wt_pct
-                    )
         except MeltCompositionError as exc:
             return (
                 None,
@@ -4432,7 +4444,38 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     [f'MAGEMin bulk projection failed: {exc}'],
                     COMPOSITION_PROJECTED,
                 ),
+                None,
+                None,
             )
+
+        # Preserve the threshold decision from the submitted bulk even when
+        # the solver retries with its normalized projection. The retry bulk
+        # is the exact evaluated input below; this reason records whether the
+        # original request crossed the reviewed projection threshold.
+        projection_threshold_reason = None
+        if bulk_projection.dropped_components:
+            from simulator.composition_projection import (
+                _projected_liquidus_refusal_reason,
+            )
+
+            projection_notice = {
+                'dropped_components': [
+                    {
+                        'component': species,
+                        'mass_fraction': mass_fraction,
+                    }
+                    for species, mass_fraction
+                    in bulk_projection.dropped_component_mass_fractions
+                ],
+            }
+            projection_threshold_reason = (
+                _projected_liquidus_refusal_reason(projection_notice)
+            )
+        if projected_retry and submitted_oxide_wt_pct is None:
+            if bulk_projection.dropped_components:
+                bulk_projection = self._build_db_bulk_projection(
+                    bulk_projection.composition_wt_pct
+                )
         if bulk_projection.dropped_components:
             return (
                 bulk_projection,
@@ -4441,6 +4484,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     list(bulk_projection.warnings),
                     COMPOSITION_PROJECTED,
                 ),
+                None,
+                projection_threshold_reason,
             )
 
         # The exact submitted bulk represents iron as FeOt+O. Fold that pair
@@ -4461,7 +4506,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             domain_projection.oxide_wt_pct,
             dropped_mass_kg_by_species=dropped_mass,
         )
-        return bulk_projection, verdict
+        return (
+            bulk_projection,
+            verdict,
+            domain_projection,
+            projection_threshold_reason,
+        )
 
     @staticmethod
     def _qfm_logfo2_oneill(temperature_C: float) -> float:

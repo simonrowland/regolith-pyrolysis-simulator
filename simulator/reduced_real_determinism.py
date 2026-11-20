@@ -49,7 +49,6 @@ from simulator.fidelity_vocabulary import EvidenceClass
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.melt_backend.base import (
     EquilibriumResult,
-    MeltCompositionError,
     RealBackendAuthority,
     RealBackendFamily,
     project_melt_to_oxide_projection,
@@ -999,42 +998,21 @@ class PT0DeterminismStore:
                 fO2_log=redox_key_builder(fO2_log=fO2_log),
                 **redox_state_kwargs,
             )
-            if getattr(sim, "_liquid_fraction_provider", None) == "magemin":
-                provider_input_builder = getattr(
+        if getattr(sim, "_liquid_fraction_provider", None) == "magemin":
+            require_domain_diagnostic = True
+            if callable(domain_key_builder) and callable(redox_key_builder):
+                from simulator.melt_backend.magemin import MAGEMinDomainIdentity
+
+                identity = getattr(
                     sim,
-                    "_silicate_provider_melt_inputs",
+                    "_freeze_gate_current_magemin_domain_identity",
                     None,
                 )
-                provider_inputs = (
-                    provider_input_builder(ChemistryIntent.GATE_LIQUID_FRACTION)
-                    if callable(provider_input_builder)
-                    else None
-                )
-                if provider_inputs is None:
-                    require_domain_diagnostic = True
-                else:
-                    from simulator.melt_backend.magemin import (
-                        MAGEMinBackend,
-                        evaluated_silica_verdict,
-                    )
-
-                    try:
-                        evaluated_domain_diagnostic = evaluated_silica_verdict(
-                            {
-                                "process.cleaned_melt": (
-                                    provider_inputs.composition_mol
-                                ),
-                            },
-                            MAGEMinBackend._DEFAULT_DATABASE,
-                            species_formula_registry=sim.species_formula_registry,
-                            composition_mol_by_account=True,
-                        )
-                    except (MeltCompositionError, TypeError, ValueError):
-                        require_domain_diagnostic = True
-                    else:
-                        require_domain_diagnostic = bool(
-                            evaluated_domain_diagnostic
-                        )
+                if (
+                    isinstance(identity, MAGEMinDomainIdentity)
+                    and identity.silica_verdict == "in_band"
+                ):
+                    require_domain_diagnostic = False
         keys = tuple(
             canonical_replay_key(
                 sim,
@@ -1322,11 +1300,27 @@ class PT0DeterminismStore:
                     if isinstance(curve_payload, Mapping)
                     else None
                 )
+                silica_bounds = (
+                    certified_band.get("sio2_wt_pct")
+                    if isinstance(certified_band, Mapping)
+                    else None
+                )
+                valid_silica_bounds = (
+                    isinstance(silica_bounds, (list, tuple))
+                    and len(silica_bounds) == 2
+                    and all(
+                        isinstance(bound, (int, float))
+                        and not isinstance(bound, bool)
+                        and math.isfinite(float(bound))
+                        for bound in silica_bounds
+                    )
+                    and float(silica_bounds[0]) < float(silica_bounds[1])
+                )
                 if (
                     not isinstance(curve_payload, Mapping)
                     or curve_payload.get("authority") != "extrapolated"
                     or not isinstance(certified_band, Mapping)
-                    or "sio2_wt_pct" not in certified_band
+                    or not valid_silica_bounds
                 ):
                     continue
             if not _disclosures_known(entry):

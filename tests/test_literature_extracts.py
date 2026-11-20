@@ -5527,7 +5527,7 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # the non-finite-evidence ceiling remains independent and may only fall.
 _UNCOVERED_OBSERVATIONS_CEILING = 50791
 _UNCOVERED_EXTRACTS_CEILING = 639
-_UNATTESTED_SAMPLES_CEILING = 3386
+_UNATTESTED_SAMPLES_CEILING = 3385
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
 # A second pilot pin inside an already-affected extract must still fail.
@@ -5690,6 +5690,31 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     uncovered_obs = unmounted["uncovered_observation"]
     uncovered_extracts = unmounted_extract_counts["uncovered_observation"]
     unattested_samples = unmounted["unattested_sample"]
+    shults_label = "shults-1995-calcium-aluminate-thermodynamics"
+    shults_doc = next(
+        doc for label, doc in documents if label == shults_label
+    )
+    shults_sample = shults_doc["fidelity_samples"][0]
+    assert shults_doc["source_id"] == shults_label
+    assert shults_sample["path"] == (
+        "species.Ca.observations[shults_1995_vapor_species_identified]"
+        ".values.gaseous_phase_components_as_printed"
+    )
+    shults_warning = next(
+        warning
+        for warning in vle.fidelity_source_warnings(
+            shults_doc,
+            label=shults_label,
+        )
+        if warning.kind == "unattested_sample"
+    )
+    assert shults_warning.count == 1
+    assert "fidelity_samples[0]" in shults_warning.detail
+    assert "reviewed_by is required" in shults_warning.detail
+    assert "reviewed_on must be an ISO YYYY-MM-DD date" in shults_warning.detail
+    # This one source sample is pinned separately by identity; the aggregate
+    # ceiling remains at the pre-merge 3,385 for every other unattested sample.
+    unattested_samples -= shults_warning.count
     pilot_pins = unmounted["auto_migrated_pilot_pin"]
     pilot_extracts = unmounted_extract_counts["auto_migrated_pilot_pin"]
     source_blind_pins = unmounted["source_blind_pin"]

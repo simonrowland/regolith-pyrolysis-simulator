@@ -4290,19 +4290,34 @@ class EvaporationMixin:
             )
             from simulator.melt_backend import magemin as magemin_module
             from simulator.melt_backend.magemin import (
-                DEFAULT_MAGEMIN_DATABASE,
                 MAGEMinDomainIdentity,
                 MAGEMinBackend,
-                evaluated_magemin_domain_identity,
+                _liquidus_inputs_on_feo_total_iron_basis,
                 magemin_domain_identity_from_evaluated_bulk,
             )
-            from simulator.composition_projection import (
-                _projected_liquidus_refusal_reason,
-            )
 
+            _folded_kg, _folded_mol, folded_accounts = (
+                _liquidus_inputs_on_feo_total_iron_basis(
+                    composition_kg=None,
+                    composition_mol=None,
+                    composition_mol_by_account={
+                        'process.cleaned_melt': provider_mol,
+                    },
+                )
+            )
+            magemin_provider_mol = (
+                folded_accounts.get('process.cleaned_melt')
+                if isinstance(folded_accounts, Mapping)
+                else provider_mol
+            )
+            if not isinstance(magemin_provider_mol, Mapping):
+                magemin_provider_mol = provider_mol
+            # Domain and projection-threshold identity follow the same
+            # FeO_T composition the liquidus finder submits. Keep the cache's
+            # solver-input key above on the original provider account.
             magemin_projection = project_melt_to_oxide_projection(
                 composition_kg=None,
-                composition_mol=provider_mol,
+                composition_mol=magemin_provider_mol,
                 oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
                 species_formula_registry=formula_registry,
             )
@@ -4337,37 +4352,15 @@ class EvaporationMixin:
                     ),
                 )
             )
-            projection_reason = None
-            projected_valid = exact_valid
-            projected_reason = None
-            try:
-                database_projection = backend._build_db_bulk_projection(
-                    magemin_projection.oxide_wt_pct
-                )
-            except magemin_module.MeltCompositionError:
-                projection_reason = None
-            else:
-                projected_notice = {
-                    'dropped_components': [
-                        {
-                            'component': species,
-                            'mass_fraction': mass_fraction,
-                        }
-                        for species, mass_fraction
-                        in database_projection.dropped_component_mass_fractions
-                    ],
-                }
-                projection_reason = (
-                    _projected_liquidus_refusal_reason(projected_notice)
-                    if database_projection.dropped_components
-                    else None
-                )
-            _submitted_bulk, projected_verdict = (
-                backend._submitted_bulk_and_domain_verdict(
-                    magemin_projection,
-                    species_formula_registry=formula_registry,
-                    projected_retry=True,
-                )
+            (
+                _submitted_bulk,
+                projected_verdict,
+                evaluated_domain_projection,
+                projection_reason,
+            ) = backend._submitted_bulk_and_domain_verdict(
+                magemin_projection,
+                species_formula_registry=formula_registry,
+                projected_retry=True,
             )
             projected_valid, _projected_warnings, projected_reason = (
                 projected_verdict
@@ -4380,13 +4373,14 @@ class EvaporationMixin:
             projection_threshold_verdict = (
                 'refused' if projection_reason is not None else 'clear'
             )
-            if magemin_domain_valid and magemin_domain_reason is None:
+            if (
+                magemin_domain_valid
+                and magemin_domain_reason is None
+                and evaluated_domain_projection is not None
+            ):
                 magemin_domain_identity, _evaluated_silica = (
-                    evaluated_magemin_domain_identity(
-                        {'process.cleaned_melt': provider_mol},
-                        DEFAULT_MAGEMIN_DATABASE,
-                        species_formula_registry=formula_registry,
-                        composition_mol_by_account=True,
+                    magemin_domain_identity_from_evaluated_bulk(
+                        evaluated_domain_projection.oxide_wt_pct,
                         projection_threshold_verdict=(
                             projection_threshold_verdict
                         ),
