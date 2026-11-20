@@ -2694,7 +2694,8 @@ def _commit_o2_n2(
 
 def test_failed_fast_sweep_on_two_species_refuses():
     # The unforced hour is the pure-O2 root. A fast sweep that misses
-    # its tolerance refuses. It does not publish the slow state.
+    # its tolerance falls through to the slow branch. The slow refusal
+    # still surfaces. Two roots are not this path.
     unforced = _as_result(_commit_o2_n2(_FLOOR_O2_KG, 1.0e-6, _SOURCE_02_KG_H, 1.0))
     assert unforced.partial_pressures_Pa["O2"] == pytest.approx(_ROOT_02_PA, abs=5.0e-9)
     assert unforced.partial_pressures_Pa["N2"] == pytest.approx(0.0, abs=1.0e-9)
@@ -2710,7 +2711,7 @@ def test_failed_fast_sweep_on_two_species_refuses():
 
     def slow(*args, **kwargs):
         entered.append("slow")
-        raise AssertionError("slow branch")
+        raise capacity_coupling._BalanceRefused("headspace_balance_nonconvergence")
 
     with (
         patch.object(capacity_coupling, "_sweep", sweep),
@@ -2720,7 +2721,7 @@ def test_failed_fast_sweep_on_two_species_refuses():
 
     assert isinstance(refused, CapacityShadowRefusal)
     assert refused.reason == "headspace_balance_nonconvergence"
-    assert entered == ["fast"]
+    assert entered == ["fast", "slow"]
 
 
 def _two_root_flux(partials: dict) -> dict[str, float]:

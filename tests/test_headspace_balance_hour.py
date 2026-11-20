@@ -15,7 +15,12 @@ from dataclasses import replace
 
 import pytest
 
+from simulator.accounting.lots import MaterialLot
+from simulator.accounting.run_artifact import (
+    CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT,
+)
 from simulator.capacity_coupling import (
+    CapacityCouplingRefusalError,
     CapacityShadowRefusal,
     CapacityShadowResult,
     solve_capacity_shadow,
@@ -27,7 +32,7 @@ from simulator.core import (
     OXYGEN_SPECIES,
 )
 from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
-from simulator.state import CampaignPhase
+from simulator.state import MOLAR_MASS, CampaignPhase
 from simulator.thermal_train import NoColdTrain
 from tests.chemistry.conftest import _build_sim, _load_yaml
 from tests.test_capacity_coupling import (
@@ -195,15 +200,16 @@ def test_snapshot_pressure_is_the_inventory_partial():
 
 
 def test_redox_credit_and_bleed_share_one_hour():
-    """A saturated hot hour commits, and flagged Al stays in the flux.
+    """A saturated hour with FeO too thin to absorb the credit exchanges once.
 
-    fO2 is on the upper bound, so a trial credit above the noop makes
-    the saturated predicate true. The buffer is empty, so the
-    pre-evaporation exchange cannot post. The fast sweep still holds
-    Al. Al has no certified diameter, so the pipe flags it and keeps
-    the species. Fe uptake consumes this hour's evaporative credit, so
-    the post-uptake excess is at the noop floor and the settle does
-    not exchange. One respeciation is the ledger redox commit.
+    2 FeO + 1/2 O2 = Fe2O3, so the uptake cannot exceed a quarter of
+    the FeO inventory. Leaving 0.4 mol FeO keeps that cap under the
+    evaporative credit, and the post-uptake excess is positive. The
+    settle posts that sourced excess once. The respeciation debit is
+    the uptake. The published pressure is the solved inventory. A
+    constant-rate re-solve of the booked sources, and the pure-O2
+    root of that O2 rate, are the production solver's numbers. The
+    live root uses q(P), so those two are not forced onto it.
     """
 
     sim = _lunar()
@@ -214,7 +220,35 @@ def test_redox_credit_and_bleed_share_one_hour():
     reservoir.reference_T_K = temperature_C + 273.15
     upper = sim._melt_redox_fO2_upper_bound_log()
     reservoir.melt_intrinsic_fO2_log = upper
+    feo_kg = float(
+        sim.atom_ledger.kg_by_account("process.cleaned_melt").get("FeO", 0.0)
+        or 0.0
+    )
+    leave_kg = 0.4 * MOLAR_MASS["FeO"] / 1000.0
+    assert feo_kg > leave_kg
+    sim.atom_ledger.transfer(
+        "hsc3f_feo_aside",
+        debits=(
+            MaterialLot(
+                "process.cleaned_melt",
+                {"FeO": feo_kg - leave_kg},
+                source="leave a thin FeO inventory",
+            ),
+        ),
+        credits=(
+            MaterialLot(
+                "terminal.slag",
+                {"FeO": feo_kg - leave_kg},
+                source="leave a thin FeO inventory",
+            ),
+        ),
+        reason="saturate Fe uptake below the evaporative credit",
+    )
+    sim._project_cleaned_melt_from_atom_ledger()
     _seed(sim, "process.overhead_gas", {"N2": 1.0}, "hsc3 redox carrier")
+    # The seed is an input. Leaving it out of the stage-0 total makes
+    # the closure the seed's mass, not the hour's.
+    sim.inventory.stage0_external_inputs_kg["N2"] = MOLAR_MASS["N2"] / 1000.0
     assert sim.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
         OXYGEN_SPECIES, 0.0
     ) <= OXYGEN_RESERVOIR_NOOP_MOL
@@ -229,14 +263,105 @@ def test_redox_credit_and_bleed_share_one_hour():
 
     names = _names(sim, before)
     assert names.count(ChemistryIntent.FE_REDOX_RESPECIATION.value) == 1
-    assert ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE.value not in names
-    assert _buffer_o2(sim) <= OXYGEN_RESERVOIR_NOOP_MOL
+    assert names.count(ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE.value) == 1
     credit = float(sim._fe_redox_internal_o2_capacity_mol_this_hr)
     consumed = float(sim._fe_redox_internal_o2_consumed_mol_this_hr)
-    assert credit > OXYGEN_RESERVOIR_NOOP_MOL
-    assert consumed == pytest.approx(credit)
+    assert credit - consumed > OXYGEN_RESERVOIR_NOOP_MOL
+    m_o2 = _o2_mass()
+    exchange_kg = 0.0
+    respeciation_kg = 0.0
+    for transition in sim.atom_ledger.transitions[before:]:
+        moved = sum(
+            float(lot.species_kg.get(OXYGEN_SPECIES, 0.0) or 0.0)
+            for lot in transition.debits
+        )
+        if transition.name == ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE.value:
+            exchange_kg += moved
+        if transition.name == ChemistryIntent.FE_REDOX_RESPECIATION.value:
+            respeciation_kg += moved
+    exchange_mol = exchange_kg / m_o2
+    assert exchange_mol > OXYGEN_RESERVOIR_NOOP_MOL
+    # The buffer after the settle plus the one exchange is the
+    # post-uptake excess. The respeciation debit is that uptake.
+    assert exchange_mol + _buffer_o2(sim) == pytest.approx(credit - consumed)
+    assert respeciation_kg / m_o2 == pytest.approx(consumed)
+    assert abs(snapshot.mass_balance_error_pct) <= (
+        CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT
+    )
     cap = sim._headspace_capacity_result
     assert cap is not None and cap.authoritative is True
+    solved = math.fsum(float(p) for p in cap.partial_pressures_Pa.values())
+    assert snapshot.overhead.pressure_mbar == pytest.approx(solved / 100.0)
+    end_o2 = float(
+        sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+            OXYGEN_SPECIES, 0.0
+        )
+        or 0.0
+    )
+    # The exchange is the sourced excess. The hour's O2 bleed is
+    # larger: the evaporation projector also puts O2 in the headspace.
+    # Do not force the bleed onto the exchange.
+    assert float(cap.bled_species_mol[OXYGEN_SPECIES]) > (
+        exchange_mol - end_o2
+    )
+    rates = {}
+    end_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")
+    for species, bled in cap.bled_species_mol.items():
+        if species not in MOLAR_MASS:
+            continue
+        n0 = 1.0 if species == "N2" else 0.0
+        source_mol = (
+            float(bled) + float(end_mol.get(species, 0.0) or 0.0) - n0
+        )
+        if source_mol > 0.0:
+            rates[species] = source_mol * MOLAR_MASS[species] / 1000.0
+    assert rates[OXYGEN_SPECIES] > 0.0
+    capacity, cold = sim._cold_train_capacity_policy()
+    masses = {
+        species: MOLAR_MASS[species] / 1000.0
+        for species in set(rates) | {"N2", OXYGEN_SPECIES}
+    }
+    shared = dict(
+        pre_holdup_mol={"N2": 1.0},
+        capacity=capacity,
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=sim._headspace_temperature_K(),
+        volume_m3=sim._headspace_volume_m3(),
+        dt_hr=1.0,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=(
+            sim._headspace_downstream_pressure_bar() * PA_PER_BAR
+        ),
+        k_relief_kg_hr_Pa=float(cold.relief["k_relief_kg_hr_Pa"]),
+        p_open_Pa=float(cold.relief["p_open_Pa"]),
+        vessel_rating_Pa=float(cold.relief["vessel_rating_Pa"]),
+        pipe_diameter_m=float(sim.overhead_model.pipe_diameter_m),
+        pipe_length_m=float(sim.overhead_model.pipe_length_m),
+        authoritative=True,
+    )
+    booked = solve_capacity_shadow(
+        molar_mass_kg_mol=masses,
+        flux_kg_hr_at_partials=lambda _partials: dict(rates),
+        **shared,
+    )
+    pure = solve_capacity_shadow(
+        molar_mass_kg_mol={"O2": m_o2, "N2": MOLAR_MASS["N2"] / 1000.0},
+        flux_kg_hr_at_partials=lambda _partials: {
+            OXYGEN_SPECIES: rates[OXYGEN_SPECIES],
+        },
+        **shared,
+    )
+    assert isinstance(booked, CapacityShadowResult) and booked.authoritative
+    assert isinstance(pure, CapacityShadowResult) and pure.authoritative
+    booked_pa = math.fsum(float(p) for p in booked.partial_pressures_Pa.values())
+    pure_pa = math.fsum(float(p) for p in pure.partial_pressures_Pa.values())
+    # q(P) on the live hour and the constant booked rate are one
+    # balance. They stay in the same pascal range and are not one number.
+    assert booked_pa == pytest.approx(solved, rel=1.0e-3)
+    assert pure_pa == pytest.approx(solved, rel=1.0e-3)
+    assert abs(booked_pa - solved) > 1.0e-6
+    assert abs(pure_pa - solved) > 1.0e-6
     _al_notice(cap.species_notices)
     _al_notice(snapshot.headspace_species_notices)
     assert "Al" in cap.evaporation_flux_kg_hr
@@ -351,30 +476,33 @@ def test_vessel_rating_still_refuses():
     quoted = float(refused.reason.split(":", 1)[1].split(">", 1)[0])
     assert quoted == pytest.approx(solved, abs=1.0e-6)
 
-    import simulator.capacity_coupling as capacity_coupling
-
     sim = _lunar()
     _hold_temperature(sim, 25.0)
-    _seed(sim, "process.overhead_gas", {"O2": 1.0}, "hsc3 rating wiring")
+    # 50 Pa is above the 1 Pa rating and below the 0.01 bar downstream,
+    # so the pipe stays shut and the relief does not have to be the
+    # thing that keeps the pressure. n = P V / (R T).
+    # Unit check: Pa * m^3 / (J/(mol·K) * K) = mol.
+    sim._overhead_headspace_config["downstream_pressure_bar"] = 0.01
+    seeded_pa = 50.0
+    moles = seeded_pa * sim._headspace_volume_m3() / (
+        GAS_CONSTANT * sim._headspace_temperature_K()
+    )
+    _seed(sim, "process.overhead_gas", {"O2": moles}, "hsc3 rating wiring")
     capacity, cold = sim._cold_train_capacity_policy()
     relief = dict(cold.relief)
     relief["vessel_rating_Pa"] = 1.0
     relief["p_open_Pa"] = 0.1
     cold = replace(cold, relief=relief)
     sim._cold_train_capacity_policy = lambda: (capacity, cold)
-    seen: dict[str, float] = {}
-    real = capacity_coupling.solve_capacity_shadow
-
-    def _record(**kwargs):
-        seen["vessel_rating_Pa"] = float(kwargs["vessel_rating_Pa"])
-        return real(**kwargs)
-
-    capacity_coupling.solve_capacity_shadow = _record
-    try:
+    with pytest.raises(CapacityCouplingRefusalError) as exc_info:
         sim._step_one_hour()
-    finally:
-        capacity_coupling.solve_capacity_shadow = real
-    assert seen["vessel_rating_Pa"] == pytest.approx(1.0)
+    reason = exc_info.value.refusal.reason
+    assert reason.startswith("vessel_total_pressure_exceeds_rating:")
+    quoted = float(reason.split(":", 1)[1].split(">", 1)[0])
+    rating = float(reason.split(">", 1)[1])
+    assert quoted == pytest.approx(seeded_pa)
+    assert rating == pytest.approx(1.0)
+    assert quoted > rating
 
 
 def _buffer_o2(sim) -> float:

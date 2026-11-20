@@ -574,7 +574,16 @@ def solve_capacity_shadow(
 # pressure is not the acceptance test: two partials can cancel there.
 
 _ADMISSION_EXP_UNDERFLOW = 745.0
+# The log grid is the fallback when a geometric sample reverses.
+# A monotone bracket does not walk it.
 _SIGN_SCAN_POINTS = 4096
+_GEOMETRIC_CAP_PA = 1.0e12
+# A step the wrong way by more than this is a kink, not a rounding.
+# Relative to the larger sample, and at least this absolute amount
+# (mol/s for G, mol for the slow residual). A few ulps of a rate near
+# 1 sit under 1e-15. A rise of the two-root well does not.
+_MONOTONE_REL = 1.0e-9
+_MONOTONE_ABS = 1.0e-15
 # Absolute partial tolerance imposed on every species. The solver's
 # local test is rtol * |n_i| + atol_i, with atol_i this pressure times
 # V / (R T). rtol is 1e-12. On the stranded N2 trace the frozen-initial
@@ -904,7 +913,12 @@ class _HeadspaceLaw:
         )
 
     def g_samples(self) -> list[tuple[float, float]]:
-        return _pressure_sign_scan(self.downstream_pa, self._scalar_g)
+        return _g_pressure_samples(
+            self,
+            self._scalar_g,
+            "G(P) rose on the geometric bracket; the log sign scan "
+            "published the crossings",
+        )
 
     def piece_at(self, pressure_pa: float) -> tuple:
         _source, _outflow, _binding, piece = self._flows(
@@ -1114,7 +1128,157 @@ def _pressure_sign_scan(
         samples.append((0.0, value_at(0.0)))
     samples.extend(_log_pressure_samples(lo, hi, _SIGN_SCAN_POINTS, value_at))
     if samples[-1][1] > 0.0:
-        samples.extend(_log_pressure_samples(hi, 1.0e12, 1024, value_at)[1:])
+        samples.extend(
+            _log_pressure_samples(hi, _GEOMETRIC_CAP_PA, 1024, value_at)[1:]
+        )
+    return samples
+
+
+def _remember_sign_scan_fallback(law: _HeadspaceLaw, detail: str) -> None:
+    # One flag per hour. The sweep samples every species; the notice
+    # is the fallback, not one row per flux call.
+    law._remember_species_notices((
+        {
+            "species": "headspace",
+            "reason": "sign_scan_fallback",
+            "detail": detail,
+        },
+    ))
+
+
+def _geometric_pressures(downstream_pa: float) -> list[float]:
+    """Factor-of-two pressures from the downstream floor through 1e12 Pa.
+
+    Premise: G(P) = q_head + S − Q. Along one composition, q_head is
+    non-increasing in P and Q is non-decreasing once the mean free path
+    is continuous. A choked throat has dQ/dP = 0, which is still
+    non-decreasing. S is fixed on a trial. G is therefore non-increasing,
+    and one confirming sample past the first strictly negative value
+    cannot hide a second root unless G rises.
+    Algebra: P_0 = max(P_down, 1e-8 Pa), P_{k+1} = min(2 P_k, 1e12 Pa).
+    Vacuum downstream also samples P = 0, the closed end of the pipe.
+    The named two-root well is negative only on [2e8, 5e8) Pa. Factor 2
+    places a sample in that well (2^55 × 1e-8 = 3.60e8) and the next
+    sample past it (7.21e8). Factor 4 jumps 1.80e8 to 7.21e8 and skips
+    the well, so the factor stays 2.
+    Unit check: each node is a pressure in Pa.
+    Limit: a run of exact zeros is not a root and does not stop the
+    walk. The closed-pipe plateau stays a plateau.
+    """
+
+    points: list[float] = []
+    if downstream_pa <= 0.0:
+        points.append(0.0)
+    pressure = downstream_pa if downstream_pa > 0.0 else 1.0e-8
+    while True:
+        points.append(pressure)
+        if pressure >= _GEOMETRIC_CAP_PA:
+            break
+        nxt = pressure * 2.0
+        if nxt > _GEOMETRIC_CAP_PA:
+            nxt = _GEOMETRIC_CAP_PA
+        if nxt <= pressure:
+            break
+        pressure = nxt
+    return points
+
+
+def _geometric_sign_samples(
+    points: list[float],
+    value_at: Callable[[float], float],
+    *,
+    direction: str,
+    crossings_of: Callable[
+        [list[tuple[float, float]]],
+        list[tuple[str, float, float]],
+    ] | None = None,
+) -> tuple[list[tuple[float, float]], bool]:
+    """Walk `points` until one confirmed root, or report a reversal.
+
+    direction "down" is a non-increasing residual (G). The far side of
+    its one root is strictly negative. direction "up" is a
+    non-decreasing residual (R). Its far side is strictly positive.
+    A reversal returns fallback True and the samples taken so far are
+    not a bracket: the caller scans. Two filtered crossings are
+    multiple roots, the same refusal as the scan.
+    One confirming sample past the first far-side value is what catches
+    a well that is negative for less than one factor-of-two step and
+    then positive. Stopping on the first negative sample would commit
+    that well's first root.
+    """
+
+    classify = crossings_of if crossings_of is not None else _crossings
+    samples: list[tuple[float, float]] = []
+    previous: float | None = None
+    armed = False
+    for point in points:
+        value = value_at(point)
+        if not math.isfinite(value):
+            raise _BalanceRefused("headspace_balance_nonconvergence")
+        if previous is not None:
+            if direction == "down":
+                adverse = value - previous
+            else:
+                adverse = previous - value
+            scale = max(abs(previous), abs(value))
+            limit = max(_MONOTONE_ABS, _MONOTONE_REL * scale)
+            if adverse > limit:
+                return samples, True
+        samples.append((point, value))
+        previous = value
+        found = classify(samples)
+        if len(found) >= 2:
+            raise _BalanceRefused("headspace_balance_multiple_roots")
+        far = value < 0.0 if direction == "down" else value > 0.0
+        if len(found) == 1 and far:
+            if armed:
+                return samples, False
+            armed = True
+        else:
+            armed = False
+    return samples, False
+
+
+def _g_pressure_samples(
+    law: _HeadspaceLaw,
+    value_at: Callable[[float], float],
+    detail: str,
+) -> list[tuple[float, float]]:
+    samples, fallback = _geometric_sign_samples(
+        _geometric_pressures(law.downstream_pa),
+        value_at,
+        direction="down",
+    )
+    if not fallback:
+        return samples
+    _remember_sign_scan_fallback(law, detail)
+    return _pressure_sign_scan(law.downstream_pa, value_at)
+
+
+def _species_log_scan(
+    func: Callable[[float], float],
+    n_hi: float,
+    roots_of: Callable[
+        [list[tuple[float, float]]],
+        list[tuple[str, float, float]],
+    ],
+) -> list[tuple[float, float]]:
+    """The 257-point mole grid. Fallback only, when the bracket reverses."""
+
+    samples = [(0.0, func(0.0))]
+    if not math.isfinite(samples[0][1]):
+        raise _BalanceRefused("headspace_balance_nonconvergence")
+    if n_hi > 0.0:
+        log_lo = math.log(1.0e-16)
+        log_hi = math.log(max(n_hi, 1.0e-16))
+        for index in range(1, 257):
+            amount = math.exp(log_lo + (log_hi - log_lo) * index / 256.0)
+            value = func(amount)
+            if not math.isfinite(value):
+                raise _BalanceRefused("headspace_balance_nonconvergence")
+            samples.append((amount, value))
+            if len(roots_of(samples)) >= 2:
+                raise _BalanceRefused("headspace_balance_multiple_roots")
     return samples
 
 
@@ -1631,6 +1795,170 @@ def _slice_value(
     )
 
 
+def _expand_from_guess(
+    func: Callable[[float], float],
+    guess: float,
+    n_hi: float,
+    *,
+    direction: str,
+    crossings_of: Callable[
+        [list[tuple[float, float]]],
+        list[tuple[str, float, float]],
+    ],
+    empty_below: float | None = None,
+) -> tuple[list[tuple[float, float]], bool]:
+    """Factor-of-two expansion from `guess` until one confirmed root.
+
+    Premise: the fast residual decreases in n_i and the slow residual
+    increases, once the capture fraction is held fixed. The root is
+    then on one side of the guess. Endpoints of the other side are
+    one sample, not a walk from 1e-16 mol. A far-side sample at or
+    below `empty_below` is the empty root: the caller drops a
+    crossing whose upper mole is inside the pressure floor, so
+    doubling on up to 1e8 Pa cannot publish a different root.
+    Algebra: n_{k+1} = min(2 n_k, n_hi). The first far-side sample
+    arms the stop; the next sample confirms it, so a well narrower
+    than one factor of two still shows a second crossing.
+    Unit check: each node is moles.
+    Limit: a non-positive guess starts at 1e-16 mol when n_hi is
+    positive. A reversal does not append the bad sample. The caller
+    then uses the log mole scan.
+    """
+
+    hi = max(0.0, float(n_hi))
+    center = min(max(float(guess), 0.0), hi) if hi > 0.0 else 0.0
+    samples: list[tuple[float, float]] = []
+
+    def evaluate(point: float) -> float:
+        value = func(point)
+        if not math.isfinite(value):
+            raise _BalanceRefused("headspace_balance_nonconvergence")
+        return value
+
+    def adverse(earlier: float, later: float) -> bool:
+        # earlier is the residual at the lower mole.
+        if direction == "down":
+            step = later - earlier
+        else:
+            step = earlier - later
+        scale = max(abs(earlier), abs(later))
+        return step > max(_MONOTONE_ABS, _MONOTONE_REL * scale)
+
+    def append(point: float, value: float) -> bool:
+        if samples and point < samples[-1][0]:
+            raise _BalanceRefused("headspace_balance_nonconvergence")
+        if samples and point == samples[-1][0]:
+            return False
+        if samples and adverse(samples[-1][1], value):
+            return True
+        samples.append((point, value))
+        if len(crossings_of(samples)) >= 2:
+            raise _BalanceRefused("headspace_balance_multiple_roots")
+        return False
+
+    def far(value: float) -> bool:
+        return value < 0.0 if direction == "down" else value > 0.0
+
+    def confirmed() -> bool:
+        found = crossings_of(samples)
+        return len(found) == 1 and far(samples[-1][1])
+
+    g0 = evaluate(0.0)
+    if append(0.0, g0):
+        return samples, True
+    if center > 0.0:
+        g_center = evaluate(center)
+        if append(center, g_center):
+            return samples, True
+    else:
+        g_center = g0
+    # A zero at the empty holdup that never crosses has no bracket.
+    # The closed-pipe plateau is that state. Halving down to it
+    # would only repeat the zero.
+    if direction == "down" and g0 == 0.0 and g_center <= 0.0:
+        return samples, False
+    if direction == "up" and g0 == 0.0 and g_center >= 0.0:
+        return samples, False
+    if direction == "down":
+        upward = g_center > 0.0
+    else:
+        upward = g_center < 0.0
+    if not upward:
+        # The sign change sits between 0 and the guess. Halve until
+        # the bracket is one factor of two. Brent on [0, guess]
+        # spends an evaluation per bit of that range.
+        # Algebra: n_{k+1} = n_k / 2. Stop at the first far-side
+        # sample, or after 16 steps.
+        # Unit check: moles.
+        # Limit: a same-sign pair is not a bracket and is not halved.
+        crossed_below = (
+            (direction == "down" and g0 > 0.0 and g_center < 0.0)
+            or (direction == "up" and g0 < 0.0 and g_center > 0.0)
+        )
+        if center > 0.0 and crossed_below:
+            chain = [(0.0, g0), (center, g_center)]
+            point = center
+            previous_value = g_center
+            for _step in range(16):
+                nxt = point * 0.5
+                value = evaluate(nxt)
+                if adverse(value, previous_value):
+                    return samples, True
+                chain.append((nxt, value))
+                chain.sort()
+                samples = list(chain)
+                if len(crossings_of(samples)) >= 2:
+                    raise _BalanceRefused("headspace_balance_multiple_roots")
+                point = nxt
+                previous_value = value
+                crossed = (
+                    value >= 0.0 if direction == "down" else value <= 0.0
+                )
+                if crossed:
+                    break
+                # Still on the near side at the pressure floor. The
+                # root is under that floor. The caller commits the
+                # empty root. Further halvings do not move it.
+                if empty_below is not None and nxt <= empty_below:
+                    break
+            return samples, False
+        return samples, False
+    point = center
+    if point <= 0.0 and hi > 0.0:
+        point = min(1.0e-16, hi)
+        if append(point, evaluate(point)):
+            return samples, True
+    floor = None if empty_below is None else max(0.0, float(empty_below))
+    if floor is not None and point < floor < hi:
+        # One sample at the floor mole. A far-side residual there
+        # means the only sign change is under the floor.
+        # Algebra: the next walk node is max(2 point, n_floor).
+        # Unit check: moles. Limit: a near-side residual at the
+        # floor means the root is above it, and doubling continues.
+        if append(floor, evaluate(floor)):
+            return samples, True
+        point = floor
+        if far(samples[-1][1]):
+            return samples, False
+    armed = confirmed()
+    while point < hi:
+        nxt = point * 2.0
+        if nxt >= hi or nxt <= point:
+            nxt = hi
+        if append(nxt, evaluate(nxt)):
+            return samples, True
+        point = nxt
+        if confirmed():
+            if armed:
+                return samples, False
+            armed = True
+        else:
+            armed = False
+        if point >= hi:
+            break
+    return samples, False
+
+
 def _solve_slice(
     law: _HeadspaceLaw,
     moles: Mapping[str, float],
@@ -1638,6 +1966,7 @@ def _solve_slice(
     n0: Mapping[str, float],
     dt_s: float,
     mode: str,
+    guess: float | None = None,
 ) -> tuple[dict[str, float], float, int]:
     def func(n_i: float) -> float:
         return _slice_value(law, moles, species, n_i, n0, dt_s, mode)
@@ -1681,15 +2010,27 @@ def _solve_slice(
             kept.append((kind, lo, hi))
         return kept
 
-    samples = [(0.0, func(0.0))]
-    if n_hi > 0.0:
-        log_lo = math.log(1.0e-16)
-        log_hi = math.log(max(n_hi, 1.0e-16))
-        for index in range(1, 257):
-            amount = math.exp(log_lo + (log_hi - log_lo) * index / 256.0)
-            samples.append((amount, func(amount)))
-            if len(roots_of(samples)) >= 2:
-                raise _BalanceRefused("headspace_balance_multiple_roots")
+    # Fast G is non-increasing in n_i. Slow R is non-decreasing.
+    # A reversal keeps the 257-point grid and flags the hour.
+    # The expansion center is the ray-root mole on the first pass
+    # and the current mole after that. It is not a walk from 1e-16.
+    direction = "up" if mode == "slow" else "down"
+    center = float(moles[species]) if guess is None else max(0.0, float(guess))
+    samples, fallback = _expand_from_guess(
+        func,
+        center,
+        n_hi,
+        direction=direction,
+        crossings_of=roots_of,
+        empty_below=n_floor,
+    )
+    if fallback:
+        _remember_sign_scan_fallback(
+            law,
+            "the species residual reversed on the geometric bracket; "
+            "the log mole scan published the crossings",
+        )
+        samples = _species_log_scan(func, n_hi, roots_of)
     crossings = roots_of(samples)
     if len(crossings) >= 2:
         raise _BalanceRefused("headspace_balance_multiple_roots")
@@ -1753,13 +2094,20 @@ def _sweep(
     *,
     rel_tol: float,
     max_iterations: int,
+    seed: Mapping[str, float] | None = None,
 ) -> tuple[dict[str, float], int, float]:
+    # The mole vector starts at n0. A ray seed is only the first
+    # pass's expansion center. The plateau commits n0 when q + S = 0,
+    # and a seed must not replace that holdup.
     moles = {species: max(0.0, n0[species]) for species in law.species}
     total_iterations = 0
     last_move = math.inf
-    for _sweep_index in range(max_iterations):
+    for sweep_index in range(max_iterations):
         last_move = 0.0
         for species in law.species:
+            hint = None
+            if seed is not None and sweep_index == 0:
+                hint = seed[species]
             moles, move, iterations = _solve_slice(
                 law,
                 moles,
@@ -1767,6 +2115,7 @@ def _sweep(
                 n0,
                 dt_s,
                 mode,
+                guess=hint,
             )
             last_move = max(last_move, move)
             total_iterations += iterations
@@ -1794,25 +2143,56 @@ def _euler_many(
     return law.step_from_moles(n0, dt_s, moles, iterations, residual_pa)
 
 
+def _mixture_partials(
+    law: _HeadspaceLaw,
+    fractions: Mapping[str, float],
+    pressure: float,
+) -> dict[str, float]:
+    if pressure <= 0.0:
+        return {species: 0.0 for species in law.species}
+    return {
+        species: pressure * fractions[species] for species in law.species
+    }
+
+
+def _mixture_g(
+    law: _HeadspaceLaw,
+    fractions: Mapping[str, float],
+    pressure: float,
+) -> float:
+    # G = Σ (q_i + S_i − Q_i) along one composition. Capture is held
+    # outside this walk: a capture that jumps with P is not a
+    # continuous mean free path, and the bracket would fall back.
+    partials = _mixture_partials(law, fractions, pressure)
+    source, outflow, _binding, _piece = law._flows(partials)
+    redox = law._redox_rates(partials)
+    return math.fsum(
+        source[species] + redox[species] - outflow[species]
+        for species in law.species
+    )
+
+
+def _mixture_piece(
+    law: _HeadspaceLaw,
+    fractions: Mapping[str, float],
+    pressure: float,
+) -> tuple:
+    _source, _outflow, _binding, piece = law._flows(
+        _mixture_partials(law, fractions, max(pressure, 0.0))
+    )
+    return piece
+
+
 def _ray_samples(
     law: _HeadspaceLaw,
     fractions: Mapping[str, float],
 ) -> list[tuple[float, float]]:
-    def total_g(pressure: float) -> float:
-        if pressure <= 0.0:
-            partials = {species: 0.0 for species in law.species}
-        else:
-            partials = {
-                species: pressure * fractions[species] for species in law.species
-            }
-        source, outflow, _binding, _piece = law._flows(partials)
-        redox = law._redox_rates(partials)
-        return math.fsum(
-            source[species] + redox[species] - outflow[species]
-            for species in law.species
-        )
-
-    return _pressure_sign_scan(law.downstream_pa, total_g)
+    return _g_pressure_samples(
+        law,
+        lambda pressure: _mixture_g(law, fractions, pressure),
+        "G(P) rose on the geometric bracket; the log sign scan "
+        "published the crossings",
+    )
 
 
 def _fractions_of(
@@ -1942,16 +2322,47 @@ def _commit_many(
     if len(crossings) >= 2:
         raise _BalanceRefused("headspace_balance_multiple_roots")
     if len(crossings) == 1:
-        # A sweep that misses its tolerance refuses. It does not publish
-        # the backward-Euler state of the slow branch.
-        moles, iterations, residual_pa = _sweep(
-            law,
-            n0,
-            dt_s,
-            "fast",
-            rel_tol=rel_tol,
-            max_iterations=max_iterations,
+        # Brent the mixture residual on the geometric bracket, then
+        # seed the species sweep at that composition. The seed is
+        # n_i = y_i P V / (R T). The sweep still starts from n0, so
+        # a closed-pipe plateau keeps the opening holdup.
+        # Unit check: Pa * m^3 / (J/(mol·K) * K) = mol.
+        # Limit: an exact root at 0 Pa seeds an empty composition.
+        def total_g(pressure: float) -> float:
+            return _mixture_g(law, fractions, pressure)
+
+        root_pressure, _ray_iterations = _solve_bracket(
+            total_g,
+            lambda pressure: _mixture_piece(law, fractions, pressure),
+            crossings[0],
+            law.pressure_of(n0),
         )
+        per_pascal = law.volume_m3 / (GAS_CONSTANT * law.temperature_K)
+        seed = {
+            species: (
+                max(0.0, root_pressure)
+                * max(0.0, fractions[species])
+                * per_pascal
+            )
+            for species in law.species
+        }
+        # A fast sweep that finds no bracket, or misses its tolerance,
+        # is a state the slow branch can still solve. Two roots already
+        # raised above. Any other refusal still propagates.
+        try:
+            moles, iterations, residual_pa = _sweep(
+                law,
+                n0,
+                dt_s,
+                "fast",
+                rel_tol=rel_tol,
+                max_iterations=max_iterations,
+                seed=seed,
+            )
+        except _BalanceRefused as refused:
+            if refused.reason != "headspace_balance_nonconvergence":
+                raise
+            return _slow_converge(law, n0, dt_s)
         if _admits_mixture(law, n0, moles, dt_s):
             return law.step_from_moles(n0, dt_s, moles, iterations, residual_pa)
     return _slow_converge(law, n0, dt_s)
@@ -1984,6 +2395,17 @@ def _publish(
         * 3600.0
     )
     if pipe_kg_hr > 0.0:
+        # Premise: saturation = evaporation / pipe flow. At the
+        # quasi-steady root Q = q, so the ratio is 1. That is the
+        # root, not spare capacity and not an overload. The hour ramp
+        # throttles only when the combined ratio is above 1. A reported
+        # 1.012 is a real excess on a binding conductance and stays
+        # 1.012. Do not clamp a root of 1 down onto a spare-capacity
+        # reading, and do not clamp a real excess onto 1.
+        # Algebra: saturation = evap_kg_hr / pipe_kg_hr.
+        # Unit check: (kg/h) / (kg/h) = 1.
+        # Limit: Q = q gives 1. Q slightly under q gives a number
+        # above 1, and the ramp scales that hour.
         pipe_saturation = evap_kg_hr / pipe_kg_hr
     elif (
         evap_kg_hr > 0.0

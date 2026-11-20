@@ -3373,9 +3373,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
                 fO2_log_override=self._melt_redox_fO2_upper_bound_log(),
             )
-            excess_o2_mol = max(0.0, float(
+            buffer_o2_mol = max(0.0, float(
                 self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(OXYGEN_SPECIES, 0.0)
             ))
+            # The headspace hour sources one excess. The exchange is
+            # that parcel, clamped to the buffer. A later credit the
+            # residual did not book stays in the buffer: it is not gas
+            # the solved pressure ignores. None means this settle is
+            # not the headspace hour, and the buffer remainder is the
+            # exchange, as before.
+            # Unit check: both amounts are mol.
+            # Limit: a sourced excess of 0 posts no exchange.
+            sourced = getattr(self, "_headspace_sourced_excess_mol", None)
+            if sourced is None:
+                excess_o2_mol = buffer_o2_mol
+            else:
+                excess_o2_mol = min(buffer_o2_mol, max(0.0, float(sourced)))
             if excess_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL:
                 # Drain only this evaporation-owned carrier, including a
                 # solid/no-capacity or hot-band refusal. Bubbler passthrough
@@ -3948,11 +3961,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             max(0.0, float(value))
             for value in upstream_partials_mbar.values()
         )
-        commanded_mbar = max(
-            0.0,
-            float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0),
-        )
-        return max(partial_sum_mbar, commanded_mbar) / 1000.0
+        # The inventory partial sum is the total. The commanded
+        # millibar is not a pressure the gas has.
+        # Algebra: P_bar = (Σ p_i) / 1000, with p_i in mbar.
+        # Unit check: mbar / 1000 = bar.
+        # Limit: an empty composition is 0 bar.
+        return partial_sum_mbar / 1000.0
 
     @staticmethod
     def _normalize_condensation_carrier_gas(
@@ -4014,6 +4028,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         evap_flux: EvaporationFlux,
         *,
         model=None,
+        inventory_partials_Pa: Mapping[str, float] | None = None,
     ) -> None:
         # The trial route configures a copy. The commit configures the
         # live model. One function, so the Knudsen policy is not a
@@ -4036,18 +4051,57 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         species_formula_registry = getattr(
             self, "species_formula_registry", {}
         )
-        partial_pressure_args = (
-            (evap_flux, transport['vapor_pressure_mbar'], species_formula_registry)
-            if species_formula_registry
-            else (evap_flux, transport['vapor_pressure_mbar'])
-        )
+        if inventory_partials_Pa is None:
+            # Display and non-headspace callers keep the transport
+            # state's commanded floor. The headspace capture path
+            # passes the inventory and does not read these two fields.
+            overhead_pressure_mbar = transport['pressure_mbar']
+            partial_pressure_args = (
+                (evap_flux, transport['vapor_pressure_mbar'], species_formula_registry)
+                if species_formula_registry
+                else (evap_flux, transport['vapor_pressure_mbar'])
+            )
+            species_partials_mbar = (
+                self.overhead_model.species_partial_pressures(*partial_pressure_args)
+            )
+        else:
+            # Premise: the condenser Knudsen number is the inventory
+            # total, not the commanded millibar. The inlet partials are
+            # the arriving flux at that same total. The solved
+            # composition is the outlet: a captured vapor is absent
+            # from it, and an explicit zero inlet partial is "this
+            # vapor is not arriving", so the wall does not collect it.
+            # Algebra: P_mbar = (Σ p_i) / 100 with p_i in Pa, then
+            # p_j,mbar = y_j * P_mbar from species_partial_pressures.
+            # Unit check: Pa / 100 = mbar. y is 1.
+            # Limit: an empty inventory is P = 0 and every inlet
+            # partial is 0. That is free-molecular, not the 1 Pa
+            # floor and not the command.
+            overhead_pressure_mbar = math.fsum(
+                max(0.0, float(pressure)) / 100.0
+                for pressure in inventory_partials_Pa.values()
+            )
+            species_partials_mbar = (
+                self.overhead_model.species_partial_pressures(
+                    evap_flux,
+                    overhead_pressure_mbar,
+                    species_formula_registry,
+                )
+            )
+            # A vapor with no molar mass is omitted above. The
+            # condenser refuses a missing key. Zero keeps the sum.
+            # O2 in the map keeps this mixture; an omitted O2 is
+            # rebuilt from the evaporation rates.
+            for species, raw_rate in evap_flux.species_kg_hr.items():
+                if max(0.0, float(raw_rate or 0.0)) <= 0.0:
+                    continue
+                species_partials_mbar.setdefault(str(species), 0.0)
+            species_partials_mbar.setdefault(OXYGEN_SPECIES, 0.0)
         condensation = self.condensation_model if model is None else model
         condensation.configure_operating_conditions(
             wall_temperature_C=transport['pipe_temperature_C'],
-            overhead_pressure_mbar=transport['pressure_mbar'],
-            species_partial_pressures_mbar=(
-                self.overhead_model.species_partial_pressures(*partial_pressure_args)
-            ),
+            overhead_pressure_mbar=overhead_pressure_mbar,
+            species_partial_pressures_mbar=species_partials_mbar,
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
             # The upstream vapor is evaluated at the melt-side temperature used
             # by the conductance model; the independently scheduled pipe and
@@ -7740,6 +7794,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         import copy as _copy
 
+        # None until this hour's residual publishes an excess. The
+        # settle reads it and then clears it, so a later non-headspace
+        # settle is not clamped to a stale parcel.
+        self._headspace_sourced_excess_mol = None
+
         from engines.builtin.evaporation_flux import (
             BuiltinEvaporationFluxProvider,
         )
@@ -7862,6 +7921,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'owned': set(),
             'gross': {},
             'credit_mol': {},
+            'excess_mol': {},
+            # None until one route at the reference pressure
+            # publishes a remainder. The bracket scales that
+            # remainder as C/P. It does not route per sample.
+            'fractions_frozen': None,
+            'capture_C': None,
         }
         reservoir = self.melt.oxygen_reservoir
         saturation_possible = (
@@ -7952,9 +8017,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             overhead_o2 = max(0.0, float(overhead.get(OXYGEN_SPECIES, 0.0) or 0.0))
             return max(0.0, positive_mol - overhead_o2)
 
-        def _capture_fractions(gross):
+        def _capture_fractions(gross, partials_Pa):
             # One route on a copy. The copy's route does not commit and
             # is not the stage-collection projection. f = 1 - remaining/gross.
+            # f is the capture at these partials, not at the command.
             # Limit: a non-positive gross has no capture.
             trial = _copy.copy(self.condensation_model)
             # The copy must not append to the live model's history.
@@ -7970,7 +8036,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             flux.update_totals()
             if flux.total_kg_hr <= 0.0:
                 return {}
-            self._configure_condensation_operating_conditions(flux, model=trial)
+            self._configure_condensation_operating_conditions(
+                flux,
+                model=trial,
+                inventory_partials_Pa=partials_Pa,
+            )
             routed = trial.route(flux, self.melt)
             remaining = dict(getattr(routed, 'remaining_by_species', {}) or {})
             fractions = {}
@@ -8027,9 +8097,80 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 source[OXYGEN_SPECIES] = source.get(OXYGEN_SPECIES, 0.0)
             return source
 
+        # Deep free-molecular reference. At 1 Pa on this train the
+        # remainder-pressure product has already left the low-pressure
+        # plateau (1.44e-11 versus 4.41e-11 kg/h·Pa). 1e-3 Pa is on
+        # that plateau for the 1250 C hour, and the root check
+        # replaces C if a hotter hour is not.
+        capture_ref_Pa = 1.0e-3
+
+        def _fractions_for(gross, partials_Pa):
+            # Premise: a captured vapor's headspace remainder is
+            # C / P, with C measured at capture_ref_Pa. An uncaptured
+            # vapor (f = 0 at the reference) stays at its gross.
+            # Algebra: q = min(gross, C / P), f = 1 - q / gross.
+            # C = gross_ref * (1 - f_ref) * P_ref.
+            # Unit check: (kg/h) / Pa * Pa = kg/h.
+            # Limit: P <= 0 is an empty inventory, so f = 0 and the
+            # gross enters the headspace. q is never above the gross.
+            total = math.fsum(
+                max(0.0, float(pressure))
+                for pressure in dict(partials_Pa or {}).values()
+            )
+            capture_C = state.get('capture_C') or {}
+            frozen = state.get('fractions_frozen') or {}
+            fractions = {}
+            for species, raw_rate in gross.items():
+                label = str(species)
+                if label == OXYGEN_SPECIES:
+                    continue
+                rate = max(0.0, float(raw_rate or 0.0))
+                if rate <= 0.0 or total <= 0.0:
+                    fractions[label] = 0.0
+                    continue
+                remainder_Pa = capture_C.get(label)
+                if remainder_Pa is None:
+                    fractions[label] = min(
+                        1.0,
+                        max(0.0, float(frozen.get(label, 0.0) or 0.0)),
+                    )
+                    continue
+                remaining = min(rate, max(0.0, float(remainder_Pa)) / total)
+                fractions[label] = 1.0 - remaining / rate
+            return fractions
+
+        def _install_capture(gross, measured, total_Pa):
+            frozen = dict(state.get('fractions_frozen') or {})
+            capture_C = dict(state.get('capture_C') or {})
+            for species, raw_rate in gross.items():
+                label = str(species)
+                if label == OXYGEN_SPECIES:
+                    continue
+                rate = max(0.0, float(raw_rate or 0.0))
+                captured = min(
+                    1.0,
+                    max(0.0, float(measured.get(label, 0.0) or 0.0)),
+                )
+                frozen[label] = captured
+                if rate > 0.0 and captured > 0.0 and total_Pa > 0.0:
+                    capture_C[label] = rate * (1.0 - captured) * total_Pa
+                elif captured <= 0.0:
+                    capture_C.pop(label, None)
+            state['fractions_frozen'] = frozen
+            state['capture_C'] = capture_C
+
         def flux_at_partials(partials_Pa):
             key = _partial_key(partials_Pa)
             gross = _dispatch_gross(partials_Pa)
+            # One route defines C. Later trials scale C/P. A pass
+            # that remeasured C at the root replaces capture_C
+            # before the next solve.
+            if state['capture_C'] is None:
+                measured = _capture_fractions(
+                    gross, {"ref": capture_ref_Pa},
+                )
+                _install_capture(gross, measured, capture_ref_Pa)
+            state['fractions'] = _fractions_for(gross, partials_Pa)
             if not state['recorded']:
                 # The first call is the opening inventory. Later root
                 # and admission calls must not overwrite it.
@@ -8042,7 +8183,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     str(species): float(rate)
                     for species, rate in gross.items()
                 }
-                state['fractions'] = _capture_fractions(gross)
                 # Opening route, the frozen vapor map, and O2. A species
                 # quiet at this partial can be the source at vacuum.
                 # Publishing it at 0 here is what puts it in the law.
@@ -8063,6 +8203,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if not self._evaporative_redox_is_saturated(
                 internal_o2_capacity_mol=credit_mol,
             ):
+                state['excess_mol'][key] = 0.0
                 return {OXYGEN_SPECIES: 0.0}
             diagnostic = self._apply_fe_redox_respeciation(
                 oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
@@ -8076,10 +8217,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             excess_mol = pre_buffer_mol + credit_mol - uptake_mol
             if excess_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
+                state['excess_mol'][key] = 0.0
                 return {OXYGEN_SPECIES: 0.0}
+            state['excess_mol'][key] = excess_mol
             return {OXYGEN_SPECIES: excess_mol / 3600.0}
 
         def _solve():
+            # Keep fractions_frozen. Clearing it here routed the
+            # condenser again on the next bracket and dropped the
+            # capture the outer pass had just measured.
             return solve_capacity_shadow(
                 pre_holdup_mol=pre_holdup,
                 molar_mass_kg_mol=molar_masses,
@@ -8131,47 +8277,133 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 CapacityShadowRefusal('headspace_result_not_authoritative', 0)
             )
         else:
-            root_key = _partial_key(solved.partial_pressures_Pa)
-            gross_at_root = dict(state['gross'].get(root_key) or {})
-            reclosed = self._reclose_langmuir_pressures(
-                solved.partial_pressures_Pa
-            )
-            updated = False
-            if reclosed is not None and getattr(reclosed, 'pressures_Pa', None):
-                trial_pressures = dict(state['pressures'])
-                state['pressures'] = dict(reclosed.pressures_Pa)
-                state['owns_oxygen'] = bool(
-                    reclosed.applied and reclosed.surface_pO2_bar is not None
+            # The bracket held one capture. This pass routes at the
+            # solved partials. A Langmuir move, a new remainder, or a
+            # capture gap above 1e-6 Pa solves again with that capture
+            # frozen. Three passes bound the fixed point. The live
+            # route then uses the solved partials, which is the
+            # pressure this capture was measured at when the gap closed.
+            def _capture_moves_pressure(previous, current, gross, partials_Pa):
+                # Premise: each species' pipe flow tracks its own
+                # partial. Captured vapor leaves q_i = C_i / P, so a
+                # remainder change moves that partial by
+                # Δp_i = p_i |Δq_i| / q_i. Summing those is the
+                # inventory move. Summing P |Δq_i| / q_i instead prices
+                # a trace vapor as if it held the whole headspace, and
+                # |Σ Δq_i| lets one species' extra remainder cancel
+                # another's. On the 1250 C hour the total-sum gate
+                # stayed under 1e-6 Pa while the potassium ledger was
+                # 0.00906 Pa against a solved 0.00499 Pa.
+                # Algebra: q_i = gross_i (1 - f_i),
+                #   Δp_i = p_i |Δq_i| / q_i.
+                # Unit check: Pa * (kg/h) / (kg/h) = Pa.
+                # Limit: a species with no solved partial, or a
+                # carried source at the rate floor, adds the sealed
+                # accumulation |Δq| R T / (M V). A zero volume cannot
+                # judge either figure.
+                temperature = self._headspace_temperature_K()
+                volume = self._headspace_volume_m3()
+                if volume <= 0.0:
+                    return True
+                partials = {
+                    str(species): max(0.0, float(pressure))
+                    for species, pressure in dict(partials_Pa or {}).items()
+                }
+                delta_pa = 0.0
+                names = set(previous) | set(current) | set(gross)
+                for name in names:
+                    if str(name) == OXYGEN_SPECIES:
+                        continue
+                    rate = max(0.0, float(gross.get(name, 0.0) or 0.0))
+                    before_f = min(
+                        1.0, max(0.0, float(previous.get(name, 0.0) or 0.0)),
+                    )
+                    after_f = min(
+                        1.0, max(0.0, float(current.get(name, 0.0) or 0.0)),
+                    )
+                    # Δq = q_after - q_before = rate * (before_f - after_f).
+                    delta_q = rate * (before_f - after_f)
+                    flowing = rate * (1.0 - before_f)
+                    partial = partials.get(str(name), 0.0)
+                    if flowing > rate_floor_kg_hr and partial > 0.0:
+                        delta_pa += partial * abs(delta_q) / flowing
+                        continue
+                    mass = float(molar_masses.get(str(name), 0.0) or 0.0)
+                    if mass <= 0.0:
+                        continue
+                    delta_pa += (
+                        abs(delta_q) / mass * GAS_CONSTANT * temperature / volume
+                    )
+                return delta_pa > 1.0e-6
+
+            for _capture_pass in range(3):
+                saved_pressures = dict(state['pressures'])
+                saved_owns_oxygen = bool(state['owns_oxygen'])
+                saved_capture = (
+                    dict(state.get('capture_C') or {}),
+                    dict(state.get('fractions_frozen') or {}),
+                    dict(state.get('fractions') or {}),
+                    set(state.get('owned') or ()),
                 )
-                refreshed = _dispatch_gross(solved.partial_pressures_Pa)
-                if _moved(gross_at_root, refreshed):
+                root_key = _partial_key(solved.partial_pressures_Pa)
+                gross_at_root = dict(state['gross'].get(root_key) or {})
+                reclosed = self._reclose_langmuir_pressures(
+                    solved.partial_pressures_Pa
+                )
+                updated = False
+                if reclosed is not None and getattr(reclosed, 'pressures_Pa', None):
+                    trial_pressures = dict(state['pressures'])
+                    state['pressures'] = dict(reclosed.pressures_Pa)
+                    state['owns_oxygen'] = bool(
+                        reclosed.applied and reclosed.surface_pO2_bar is not None
+                    )
+                    refreshed = _dispatch_gross(solved.partial_pressures_Pa)
+                    if _moved(gross_at_root, refreshed):
+                        updated = True
+                        gross_at_root = dict(refreshed)
+                    else:
+                        state['pressures'] = trial_pressures
+                refreshed_f = _capture_fractions(
+                    gross_at_root,
+                    solved.partial_pressures_Pa,
+                )
+                # A species the opening route missed can still have a
+                # headspace remainder at the root. f = 0 against a missing
+                # key is not "unchanged": the remainder is new source.
+                # Unit: kg/h. Limit: at or below the rate floor it stays out.
+                new_remaining = False
+                for species, raw_rate in gross_at_root.items():
+                    if str(species) == OXYGEN_SPECIES:
+                        continue
+                    if str(species) in state['fractions']:
+                        continue
+                    captured = min(
+                        1.0,
+                        max(0.0, float(refreshed_f.get(species, 0.0) or 0.0)),
+                    )
+                    remaining = max(0.0, float(raw_rate)) * (1.0 - captured)
+                    if remaining > rate_floor_kg_hr:
+                        new_remaining = True
+                        break
+                predicted = _fractions_for(
+                    gross_at_root, solved.partial_pressures_Pa,
+                )
+                solved_total = math.fsum(
+                    max(0.0, float(pressure))
+                    for pressure in solved.partial_pressures_Pa.values()
+                )
+                if new_remaining or _capture_moves_pressure(
+                    predicted, refreshed_f, gross_at_root,
+                    solved.partial_pressures_Pa,
+                ):
+                    # C = remaining * P at this root. The next
+                    # bracket scales that C, so it does not keep
+                    # the reference pressure's fraction.
+                    _install_capture(gross_at_root, refreshed_f, solved_total)
+                    state['fractions'] = refreshed_f
                     updated = True
-                    gross_at_root = dict(refreshed)
-                else:
-                    state['pressures'] = trial_pressures
-            refreshed_f = _capture_fractions(gross_at_root)
-            # A species the opening route missed can still have a
-            # headspace remainder at the root. f = 0 against a missing
-            # key is not "unchanged": the remainder is new source.
-            # Unit: kg/h. Limit: at or below the rate floor it stays out.
-            new_remaining = False
-            for species, raw_rate in gross_at_root.items():
-                if str(species) == OXYGEN_SPECIES:
-                    continue
-                if str(species) in state['fractions']:
-                    continue
-                captured = min(
-                    1.0,
-                    max(0.0, float(refreshed_f.get(species, 0.0) or 0.0)),
-                )
-                remaining = max(0.0, float(raw_rate)) * (1.0 - captured)
-                if remaining > rate_floor_kg_hr:
-                    new_remaining = True
+                if not updated:
                     break
-            if new_remaining or _moved(state['fractions'], refreshed_f):
-                state['fractions'] = refreshed_f
-                updated = True
-            if updated:
                 for species in state['fractions']:
                     state['owned'].add(str(species))
                     if str(species) not in molar_masses:
@@ -8179,15 +8411,54 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                             str(species),
                             self.species_formula_registry,
                         ).molar_mass_kg_per_mol()
-                solved = _solve()
-                if isinstance(solved, CapacityShadowRefusal):
-                    raise CapacityCouplingRefusalError(solved)
+                retried = _solve()
+                if isinstance(retried, CapacityShadowRefusal):
+                    if retried.reason != 'headspace_balance_nonconvergence':
+                        raise CapacityCouplingRefusalError(retried)
+                    # This pass has no root. The previous pass already
+                    # has one. Put its capture and vapor map back.
+                    # Raising here drops a root the balance has solved.
+                    state['pressures'] = saved_pressures
+                    state['owns_oxygen'] = saved_owns_oxygen
+                    (
+                        state['capture_C'],
+                        state['fractions_frozen'],
+                        state['fractions'],
+                        state['owned'],
+                    ) = saved_capture
+                    break
+                solved = retried
                 if not solved.authoritative:
                     raise CapacityCouplingRefusalError(
                         CapacityShadowRefusal(
                             'headspace_result_not_authoritative', 0
                         )
                     )
+
+        if solved is None:
+            self._headspace_sourced_excess_mol = None
+        elif saturation_possible:
+            # Read the excess the residual just booked, before
+            # evaporation commits move the reservoir. mol this hour.
+            # The slow integral stores S at the stages it visited.
+            # The published partials are not one of those keys: on
+            # the C3_NA injection hour that lookup was 0 against
+            # 17195 stored vectors, the settle exchanged nothing,
+            # and the snapshot still reported the solved 100 Pa.
+            # One evaluation at the published partials is the parcel
+            # the fast booking uses, S = N/3600 s at that state.
+            # Algebra: N = pre_buffer + credit(P) − uptake(P).
+            # Unit check: mol this hour.
+            # Limit: an unsaturated partial stores 0 and posts nothing.
+            root_key = _partial_key(solved.partial_pressures_Pa)
+            if root_key not in state['excess_mol']:
+                flux_at_partials(solved.partial_pressures_Pa)
+                redox_at_partials(solved.partial_pressures_Pa)
+            self._headspace_sourced_excess_mol = float(
+                state['excess_mol'].get(root_key, 0.0) or 0.0
+            )
+        else:
+            self._headspace_sourced_excess_mol = 0.0
 
         if solved is None:
             evap_flux = self._calculate_evaporation(equilibrium)
@@ -8242,7 +8513,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             evap_flux.total_kg_hr > 0.0
             or bool(evap_flux.carrier_authority_by_species)
         ):
-            self._configure_condensation_operating_conditions(evap_flux)
+            self._configure_condensation_operating_conditions(
+                evap_flux,
+                inventory_partials_Pa=(
+                    None if solved is None else solved.partial_pressures_Pa
+                ),
+            )
             self._apply_lab_surface_temperatures(
                 sample_time_h=float(sample_time_h)
             )
@@ -8250,6 +8526,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             evap_flux = self._ledger_committed_evap_flux_this_tick
         self._headspace_overhead_flux_kg_hr = dict(overhead_flux.species_kg_hr)
         self._settle_evaporative_redox_after_batch()
+        self._headspace_sourced_excess_mol = None
         self._headspace_hour_settled = True
         inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
         return solved, evap_flux, overhead_flux, inlet_flux
@@ -17180,8 +17457,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if finite_headspace_enabled:
             solved_bled_mol = None
             if headspace_hour and capacity_result is not None:
+                # A fast root can leave n_end above n0+(q+S)Δt by a
+                # trace when q at the end partial is 0. That negative
+                # is not a flow into the headspace. The bleed refuses
+                # the whole map if any mole is negative, so one trace
+                # drops the hour's real drain and the published
+                # pressure no longer matches the inventory.
+                # Algebra: bled_i = max(0, n0_i + (q_i+S_i)Δt − n_end_i).
+                # Unit check: mol.
+                # Limit: a positive drain is unchanged.
                 solved_bled_mol = {
-                    str(species): float(moles)
+                    str(species): max(0.0, float(moles))
                     for species, moles in capacity_result.bled_species_mol.items()
                 }
             bleed_result = self._dispatch_overhead_bleed(
