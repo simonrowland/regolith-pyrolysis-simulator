@@ -10,6 +10,8 @@ import pytest
 
 from simulator.reduced_real_determinism import (
     failed_provider_attempt_is_environment,
+    gate_curve_provider_diagnostic_reasons,
+    gate_curve_provider_timeout_reason,
 )
 
 from simulator.condensation import CondensationModel
@@ -312,6 +314,83 @@ def deterministic_gate_payload(value):
     return _without_environment_attempts(value)
 
 
+def _planner_attempt(diagnostic, provider="magemin-shadow"):
+    """The attempt record ``planner._dispatch_gate_provider_order`` stores."""
+
+    reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
+    return {
+        "provider": provider,
+        "status": "not_converged",
+        "reason": "; ".join(reasons) or "not_converged",
+        "diagnostic": diagnostic,
+    }
+
+
+def _timeout_escape_diagnostics():
+    """The four shapes that retry and used to miss the digest predicate."""
+
+    from simulator.engine_pool import EngineWorkerTimeout
+    from simulator.melt_backend.liquidus import liquidus_sample_error_from_exception
+
+    warm = liquidus_sample_error_from_exception(
+        EngineWorkerTimeout("thermoengine", 15.0, phase="equilibrium"),
+    )
+    return {
+        "alphamelts_gate_cooling_path_timeout": {"reason": "timeout"},
+        "liquidus_aggregate_budget_exceeded": {
+            "reason": "aggregate_budget_exceeded",
+        },
+        "magemin_aggregate_budget_exceeded": {
+            "backend_status": "not_converged",
+            "backend_failure_exception": "MAGEMinAggregateBudgetExceeded",
+        },
+        "magemin_subprocess_slot_timeout": {
+            "backend_status": "not_converged",
+            "backend_failure_exception": "MAGEMinSubprocessSlotTimeout",
+        },
+        "thermoengine_warm_call_equilibrium_timeout": dict(warm.diagnostics),
+    }
+
+
+def _timeout_escape_attempts():
+    return [
+        _planner_attempt(diagnostic)
+        for diagnostic in _timeout_escape_diagnostics().values()
+    ]
+
+
+def test_timeout_escape_shapes_match_the_retry_predicate():
+    for name, diagnostic in _timeout_escape_diagnostics().items():
+        attempt = _planner_attempt(diagnostic)
+        assert gate_curve_provider_timeout_reason(diagnostic) is not None, name
+        assert failed_provider_attempt_is_environment(attempt) is (
+            gate_curve_provider_timeout_reason(attempt) is not None
+            or gate_curve_provider_timeout_reason(diagnostic) is not None
+        ), name
+        assert failed_provider_attempt_is_environment(attempt) is True, name
+
+
+@pytest.mark.parametrize(
+    "reason",
+    [
+        "composition_projected",
+        "incomplete_cooling_path",
+        "no_convergence",
+        "not_converged",
+    ],
+)
+def test_physics_gate_reason_is_not_an_environment_attempt(reason):
+    diagnostic = {
+        "reason": reason,
+        "backend_status_reason": reason,
+        "backend_failure_disposition": "environment",
+    }
+    attempt = _planner_attempt(diagnostic)
+    attempt["disposition"] = "environment"
+    assert gate_curve_provider_timeout_reason(diagnostic) is None
+    assert failed_provider_attempt_is_environment(attempt) is False
+
+
 def test_deterministic_gate_payload_drops_only_environment_attempts():
     clean = {
         "gate_provider_step_down": {
@@ -386,15 +465,17 @@ def test_deterministic_gate_payload_drops_only_environment_attempts():
                     "diagnostic": {"backend_failure_disposition": "environment"},
                 },
                 {"provider": "magemin-shadow", "reason": "composition_projected"},
+                *_timeout_escape_attempts(),
             ],
         },
     }
     stripped = _without_environment_attempts(timed_out)
     assert stripped["gate_provider_refusal"]["qualification"] == "held_last_good_curve"
+    # A non-timeout disposition stays. The retry predicate does not match it.
     assert [
         item["reason"]
         for item in stripped["gate_provider_step_down"]["failed_providers"]
-    ] == ["incomplete_cooling_path", "composition_projected"]
+    ] == ["incomplete_cooling_path", "unavailable", "composition_projected"]
     with pytest.raises(AssertionError, match="environment"):
         deterministic_gate_payload(timed_out)
 

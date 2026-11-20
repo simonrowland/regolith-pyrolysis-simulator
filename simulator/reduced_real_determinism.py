@@ -2821,40 +2821,24 @@ def gate_curve_provider_timeout_reason(
     )
 
 
-def _mapping_carries_environment_disposition(value: Mapping[str, Any]) -> bool:
-    if value.get("backend_failure_disposition") == "environment":
-        return True
-    for field in (
-        "diagnostic",
-        "backend_diagnostics",
-        "projected_liquidus_diagnostics",
-        "provider_diagnostic",
-    ):
-        nested = value.get(field)
-        if isinstance(nested, Mapping) and _mapping_carries_environment_disposition(nested):
-            return True
-    return False
-
-
 def failed_provider_attempt_is_environment(attempt: Mapping[str, Any] | None) -> bool:
-    """A worker timeout stays in the payload and is not a deterministic input.
+    """True exactly when this attempt would trigger the freeze-gate retry.
 
-    True for ``disposition: environment``, a reason token
-    ``engine_worker_timeout``, or ``backend_failure_disposition: environment``
-    on the attempt or its diagnostic. Other step-down reasons, including
-    ``incomplete_cooling_path``, stay in every digest.
+    The retry calls ``gate_curve_provider_timeout_reason``. An attempt stores
+    that diagnostic under ``diagnostic`` and the same reason codes, joined,
+    on ``reason``. A physics reason (``composition_projected``,
+    ``incomplete_cooling_path``) does not match, and a bare environment
+    disposition does not either.
     """
 
     if not isinstance(attempt, Mapping):
         return False
-    if attempt.get("disposition") == "environment":
+    if gate_curve_provider_timeout_reason(attempt) is not None:
         return True
-    reason = attempt.get("reason")
-    if isinstance(reason, str) and "engine_worker_timeout" in {
-        part.strip().lower() for part in reason.split(";")
-    }:
-        return True
-    return _mapping_carries_environment_disposition(attempt)
+    diagnostic = attempt.get("diagnostic")
+    return isinstance(diagnostic, Mapping) and (
+        gate_curve_provider_timeout_reason(diagnostic) is not None
+    )
 
 
 def gate_curve_provider_has_terminal_input(reasons: Sequence[str]) -> bool:
