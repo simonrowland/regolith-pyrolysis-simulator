@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run a VapoRock score pass and print cache results that were not stored."""
+"""Run a VapoRock score pass and print its score-summary cache counters."""
 
 from __future__ import annotations
 
@@ -44,15 +44,30 @@ def main() -> int:
         limit=None,
         species_formulas=(),
     )
-    summary_path = _scoring_output_directory(root, filters, subset=True) / "score-summary.json"
+    summary_path = (
+        _scoring_output_directory(root, filters, subset=True) / "score-summary.json"
+    )
     payload = json.loads(summary_path.read_text(encoding="utf-8"))
-    counts = payload["engine_cache"]["by_engine"]["vaporock"]
-    reportable = {
-        name: value
-        for name, value in sorted(counts.items())
-        if name.startswith(("not_stored:", "uncacheable:"))
-    }
-    print(json.dumps({"summary": str(summary_path), "vaporock": reportable}, indent=2))
+    engine_cache = payload.get("engine_cache")
+    by_engine = (
+        engine_cache.get("by_engine") if isinstance(engine_cache, dict) else None
+    )
+    counts = by_engine.get("vaporock") if isinstance(by_engine, dict) else None
+    print(
+        json.dumps(
+            {
+                "summary": str(summary_path),
+                "summary_keys": sorted(payload),
+                "engine_cache_keys": (
+                    sorted(engine_cache) if isinstance(engine_cache, dict) else None
+                ),
+                "vaporock_cache_counters": counts,
+                "acceptance": payload.get("acceptance"),
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
     return 0
 
 
