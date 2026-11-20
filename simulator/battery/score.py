@@ -134,6 +134,7 @@ from simulator.battery.source_oxygen import (
     SourceOxygenCondition,
     linked_source_pressure,
     oxygen_pressure_point,
+    persisted_printed_oxygen_located,
     printed_source_pressure,
     resolve_source_oxygen,
     source_oxygen_closure_notice,
@@ -228,6 +229,7 @@ from simulator.battery.records import (
     ApproxPressure,
     approximate_pressure_band_reason,
     as_decimal,
+    identity_pressure_state,
     nominal_pressure_pa,
     charge_value,
     phase_token,
@@ -279,9 +281,11 @@ from simulator.battery.score_metrics import (
     populate_numeric,
 )
 from simulator.transport_regime import KnudsenRegime, high_edge_knudsen_clause
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.melt_backend.base import (
     MULTIVALENT_MELT_ELEMENTS,
     EquilibriumResult,
+    battery_adapter_class,
     multivalent_components,
 )
 from simulator.battery.oxygen_balance import (
@@ -889,6 +893,21 @@ def _is_quantity_not_predicted(quantity: Quantity | None) -> bool:
     return quantity is Quantity.LOG10_K_REACTION
 
 
+def _engine_supports_liquidus_transition(
+    engine: Engine,
+    phase_basis: str | None,
+) -> bool:
+    from simulator.melt_backend.liquidus import _LIQUIDUS_TRANSITION_SUBTYPES
+
+    if phase_basis not in _LIQUIDUS_TRANSITION_SUBTYPES:
+        return False
+    # Solidus support depends on the opened transport. The subprocess
+    # liquidus-start route refuses after that handle exists; the Python
+    # API runs the fraction finder and can return a solidus.
+    adapter = battery_adapter_class(engine.value)
+    return callable(getattr(adapter, "find_liquidus_solidus", None))
+
+
 def _engine_lacks_quantity_capability(
     engine: Engine,
     quantity: Quantity,
@@ -898,6 +917,11 @@ def _engine_lacks_quantity_capability(
 
     if _is_quantity_not_predicted(quantity):
         return True
+    if quantity is Quantity.TRANSITION_TEMPERATURE:
+        # Dew point is the wall-deposition route, not a liquidus capability.
+        if phase_basis == "dew_point":
+            return False
+        return not _engine_supports_liquidus_transition(engine, phase_basis)
     if (
         quantity in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
         or (engine is Engine.MAGEMIN and quantity in _VAPOUR_EQUILIBRIUM)
@@ -905,7 +929,6 @@ def _engine_lacks_quantity_capability(
         or quantity is Quantity.VALENCE_RATIO
         or quantity in {
             Quantity.WALL_DEPOSIT_AREAL_RATE,
-            Quantity.TRANSITION_TEMPERATURE,
         }
         or quantity in PRINTED_CAPACITY_QUANTITIES
         or quantity is Quantity.DISTRIBUTION_RATIO
@@ -3990,7 +4013,7 @@ _CITED_SATURATION_NOTICE = "fe_saturation_composition_from_cited_standard"
 _DERIVED_SATURATION_NOTICE = "composition_derived_from_source_analyses"
 _OWNER_SATURATION_NOTICE = "fe_saturation_composition_owner_supplied"
 _FE_PER_O_FORMULA = re.compile(r"^Fe([0-9]+(?:\.[0-9]+)?)O$")
-_KELVIN_FROM_CELSIUS = Decimal("273.15")
+_KELVIN_FROM_CELSIUS = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 _IRON_SATURATED_FEO_MISSING_INPUT = "iron-saturated FeO conversion missing input:"
 # Cold and hot ends of the Holzheid and Distin rows this conversion scores.
 _FEO_SCORED_SPAN_K = (Decimal("1578"), Decimal("2233.15"))
@@ -6405,7 +6428,7 @@ def _temperature_envelope_value(
         try:
             keyed_temperature = Decimal(match.group(1))
             if match.group(2) == "C":
-                keyed_temperature += Decimal("273.15")
+                keyed_temperature += _KELVIN_FROM_CELSIUS
             if keyed_temperature == temperature:
                 try:
                     parsed = abs(as_decimal(value))
@@ -8660,6 +8683,9 @@ def _comparison_identity(
     knudsen_total_pressure = _knudsen_total_pressure_details(
         prediction.notices
     )
+    transition_temperature = (
+        quantity_token(identity) is Quantity.TRANSITION_TEMPERATURE
+    )
     if (
         not resolved_oxygen
         and not shared_oxygen_condition
@@ -8669,6 +8695,7 @@ def _comparison_identity(
         and knudsen_total_pressure is None
         and melt_identity is identity
         and not fusion_polymorph_flag
+        and not transition_temperature
     ):
         return identity
     updates: dict[str, State] = {}
@@ -8704,6 +8731,27 @@ def _comparison_identity(
         point, _notice = _printed_point_composition(reference)
         if point is not None:
             updates["composition"] = point
+    if transition_temperature and (
+        identity.total_pressure_Pa is None
+        or not identity.total_pressure_Pa.is_value
+    ):
+        # The located point is the pressure both sides were solved at.
+        # identity_pressure_state is that axis: an exact point stays a
+        # decimal, and an approximate point becomes the band. Copying the
+        # raw State[Value] raises IdentityRefusal after a successful solve.
+        # Do not convert the point again, and do not put the oxygen command
+        # on the identity: the transition profile forbids it.
+        located_pressure = (reference.point_conditions or {}).get(
+            "total_pressure_Pa"
+        )
+        if (
+            isinstance(located_pressure, Located)
+            and located_pressure.inference is None
+            and located_pressure.state.is_value
+        ):
+            bound = identity_pressure_state(located_pressure.state)
+            if bound is not None:
+                updates["total_pressure_Pa"] = bound
     if (
         selected_oxygen is not None
         and selected_oxygen[0] is not None
@@ -9858,7 +9906,9 @@ def _predict_redox(
         # Identity fO2_Pa is log10_fo2_to_pa of that printed log. The predictor
         # still receives the printed log, with no frame shift.
         assert fo2_log is not None
-        band = kress91_temperature_band_case(float(material.temperature) - 273.15)
+        band = kress91_temperature_band_case(
+            float(material.temperature) - CELSIUS_TO_KELVIN_OFFSET
+        )
         try:
             split = kress91_split(
                 fO2_log=float(fo2_log),
@@ -9881,16 +9931,19 @@ def _predict_redox(
         authority = Authority.BRIDGE
         if not band["authoritative"]:
             authority = Authority.EXTRAPOLATED
+        minimum_K = (
+            KRESS91_LIQUID_CALIBRATION_MIN_T_C + CELSIUS_TO_KELVIN_OFFSET
+        )
+        maximum_K = (
+            KRESS91_LIQUID_CALIBRATION_MAX_T_C + CELSIUS_TO_KELVIN_OFFSET
+        )
         certified_band = {
             "temperature_K": (
-                Decimal(str(KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15)),
-                Decimal(str(KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15)),
+                Decimal(str(minimum_K)),
+                Decimal(str(maximum_K)),
             )
         }
-        certified_band_text = (
-            f"[{KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15:g}, "
-            f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
-        )
+        certified_band_text = f"[{minimum_K:g}, {maximum_K:g}] K"
         notices: tuple[Notice, ...] = ()
         if kress_basis.dropped_components and kress_basis.dropped_mass_fraction is not None:
             notices = (
@@ -9921,10 +9974,7 @@ def _predict_redox(
                         f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C:g}]"
                     ),
                     origin="simulator.fe_redox:kress91_split",
-                    band=(
-                        f"[{KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15:g}, "
-                        f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
-                    ),
+                    band=certified_band_text,
                     authority=authority,
                 ),
             )
@@ -11320,17 +11370,28 @@ def _printed_total_pressure_bar(
     return pa / PA_PER_BAR_DEC
 
 
-def _printed_fo2_log10_bar(identity: Identity) -> float | None:
+def _printed_fo2_log10_bar(
+    identity: Identity,
+    observation: Observation | None = None,
+) -> float | None:
     state = identity.fO2_Pa
-    if state is None or not state.is_value or state.value is None:
-        return None
-    try:
-        pa = as_decimal(state.value)
-    except (TypeError, ValueError, ArithmeticError):
+    if state is not None and state.is_value and state.value is not None:
+        try:
+            pa = as_decimal(state.value)
+        except (TypeError, ValueError, ArithmeticError):
+            return None
+    elif observation is not None:
+        pa = printed_source_pressure(observation)
+        if pa is None:
+            return None
+    else:
         return None
     if not pa.is_finite() or pa <= 0:
         return None
-    return float(pa.log10() - PA_PER_BAR_DEC.log10())
+    # Premise: the printed oxygen pressure is in Pa. Divide by Pa/bar,
+    # then take log10; the pressure units cancel. At 1 bar the result is 0.
+    value = float(pa.log10() - PA_PER_BAR_DEC.log10())
+    return value if math.isfinite(value) else None
 
 
 def _select_phase_composition(
@@ -11879,7 +11940,7 @@ def _predict_element_mass_fraction_phase(
     try:
         result = _equilibrate_phase_assemblage(
             engine,
-            temperature_C=float(temperature - Decimal("273.15")),
+            temperature_C=float(temperature - _KELVIN_FROM_CELSIUS),
             composition_kg={
                 name: float(amount) / 1000.0 for name, amount in weights
             },
@@ -12305,7 +12366,7 @@ def _predict_phase_row(
             call_kwargs["handles"] = handles
         result = _equilibrate_phase_assemblage(
             engine,
-            temperature_C=float(temperature - Decimal("273.15")),
+            temperature_C=float(temperature - _KELVIN_FROM_CELSIUS),
             composition_kg={name: amount / 1000.0 for name, amount in wt.items()},
             fO2_log=fo2_log,
             pressure_bar=float(pressure_bar),
@@ -13176,8 +13237,6 @@ def _wall_areal_rate_from_existing_flux(
         _species_condensation_temperature_C,
         reactive_product_backstop_enabled,
     )
-    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
-
     missing: list[str] = []
     temperature = _identity_decimal(identity.temperature_K)
     pressure = nominal_pressure_pa(identity.total_pressure_Pa)
@@ -14074,6 +14133,490 @@ def _predict_catalog_evaluator(observation: Observation) -> EnginePrediction:
     )
 
 
+_LIQUIDUS_SCORE_AUTHORITY = {
+    Authority.CERTIFIED.value: Authority.CERTIFIED,
+    Authority.BRIDGE.value: Authority.BRIDGE,
+    Authority.EXTRAPOLATED.value: Authority.EXTRAPOLATED,
+}
+
+
+def _decimal_certified_band(
+    band: object,
+) -> dict[str, tuple[Decimal, Decimal]] | None:
+    intervals = _interval_certified_band(band)
+    if not intervals:
+        return None
+    return {
+        str(key): (as_decimal(low), as_decimal(high))
+        for key, (low, high) in intervals.items()
+    }
+
+
+def _liquidus_native_score(
+    result: object,
+    engine: Engine,
+) -> tuple[
+    Authority,
+    dict[str, tuple[Decimal, Decimal]] | None,
+    tuple[Notice, ...],
+    dict[str, object] | None,
+]:
+    """Map finder diagnostics onto existing authority and notice kinds.
+
+    Absent authority stays bridge. A present token that is not certified,
+    bridge, or extrapolated stays bridge and keeps the token as a caveat.
+    Empty diagnostics contribute no refusal payload.
+    """
+
+    raw_diagnostics = getattr(result, "diagnostics", None)
+    diagnostics = raw_diagnostics if isinstance(raw_diagnostics, Mapping) else {}
+    raw_authority = diagnostics.get("authority")
+    if raw_authority is None:
+        authority = Authority.BRIDGE
+        unrecognized = False
+    else:
+        token = str(raw_authority)
+        authority = _LIQUIDUS_SCORE_AUTHORITY.get(token, Authority.BRIDGE)
+        unrecognized = token not in _LIQUIDUS_SCORE_AUTHORITY
+    certified_band = _decimal_certified_band(diagnostics.get("certified_band"))
+    rows: list[Mapping[str, object]] = []
+    commissioning = diagnostics.get("commissioning_notice")
+    if isinstance(commissioning, Mapping):
+        rows.append(commissioning)
+    mode_notices = diagnostics.get("magemin_mode_token_notices")
+    if isinstance(mode_notices, (list, tuple)):
+        for notice in mode_notices:
+            if not isinstance(notice, Mapping):
+                continue
+            row = dict(notice)
+            if row.get("kind") == "mode_vector_renormalised":
+                row["kind"] = NoticeKind.ENGINE_MODEL_CAVEAT.value
+                row.setdefault("reason", "mode_vector_renormalised")
+            rows.append(row)
+    from types import SimpleNamespace
+
+    notices = list(
+        cell_notices(
+            Quantity.TRANSITION_TEMPERATURE,
+            engine,
+            SimpleNamespace(notices=rows),
+        )
+    )
+    if authority is Authority.EXTRAPOLATED and not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND for notice in notices
+    ):
+        notices.append(
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.TRANSITION_TEMPERATURE,),
+                reason="native authority extrapolated",
+                origin=f"engine:{engine.value}",
+            )
+        )
+    if unrecognized:
+        notices.append(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.TRANSITION_TEMPERATURE,),
+                reason=str(raw_authority),
+                origin=f"engine:{engine.value}",
+            )
+        )
+    carried = dict(diagnostics) if diagnostics else None
+    return authority, certified_band, tuple(notices), carried
+
+
+def _predict_liquidus_transition_temperature(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    *,
+    handles: Mapping[str, object] | None,
+    experiment: Experiment | None,
+) -> EnginePrediction:
+    from simulator.melt_backend.liquidus import _LIQUIDUS_TRANSITION_SUBTYPES
+
+    subtype = _subtype_text(identity)
+    requested = identity.composition
+    notices: list[Notice] = []
+    if subtype not in _LIQUIDUS_TRANSITION_SUBTYPES:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail=_quantity_not_predicted_detail(
+                Quantity.TRANSITION_TEMPERATURE
+            ),
+            identity=identity,
+        )
+
+    composition_state = identity.composition
+    if composition_state is None or not composition_state.is_value:
+        composition_state, point_notice = _printed_point_composition(observation)
+        if point_notice is not None:
+            notices.append(point_notice)
+    if (
+        composition_state is None
+        or not composition_state.is_value
+        or not isinstance(composition_state.value, Composition)
+    ):
+        has_value = (
+            composition_state is not None and composition_state.is_value
+        )
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=(
+                RefusalReason.INVALID_IDENTITY
+                if has_value
+                else RefusalReason.IDENTITY_INCOMPLETE
+            ),
+            detail={
+                "reason": "invalid_input" if has_value else "missing_input",
+                "input": "composition",
+            },
+            notices=tuple(notices),
+        )
+    requested = composition_state
+    identity = replace(identity, composition=composition_state)
+    identity, refusal, detail, rewrite = _gate_input_composition(
+        observation,
+        identity,
+        experiment,
+    )
+    if refusal is not None:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=refusal,
+            detail=dict(detail or {}),
+            notices=tuple(notices),
+        )
+
+    pressure_bar = _printed_total_pressure_bar(identity, observation)
+    if pressure_bar is None:
+        point_pressure = (observation.point_conditions or {}).get(
+            "total_pressure_Pa"
+        )
+        identity_pressure = identity.total_pressure_Pa
+        has_value = (
+            identity_pressure is not None and identity_pressure.is_value
+        ) or (
+            isinstance(point_pressure, Located) and point_pressure.state.is_value
+        )
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=(
+                RefusalReason.INVALID_IDENTITY
+                if has_value
+                else RefusalReason.IDENTITY_INCOMPLETE
+            ),
+            detail={
+                "reason": "invalid_input" if has_value else "missing_input",
+                "input": "total_pressure_Pa",
+            },
+            notices=tuple(notices),
+        )
+    try:
+        pressure_bar_value = float(pressure_bar)
+    except (TypeError, ValueError, OverflowError):
+        pressure_bar_value = math.nan
+    if not math.isfinite(pressure_bar_value) or pressure_bar_value <= 0.0:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=RefusalReason.INVALID_IDENTITY,
+            detail={"reason": "invalid_input", "input": "total_pressure_Pa"},
+            notices=tuple(notices),
+        )
+
+    if printed_source_pressure(observation) is None:
+        # The persisted store dropped the printed unit. The extract still
+        # has it, and the migration collector converts that boundary.
+        # Splice the converted pascal pressure onto this scoring copy.
+        # Do not write it onto the identity: the transition profile
+        # forbids oxygen there. Other rails still read the store as it is.
+        recovered = persisted_printed_oxygen_located(observation)
+        if recovered is not None:
+            recovered_points = dict(observation.point_conditions or {})
+            recovered_points["oxygen_partial_pressure_Pa"] = recovered
+            observation = replace(observation, point_conditions=recovered_points)
+
+    if not _has_printed_fo2(observation, identity):
+        identity_fo2 = identity.fO2_Pa
+        point_fo2 = oxygen_pressure_point(observation)
+        has_value = (
+            identity_fo2 is not None and identity_fo2.is_value
+        ) or (point_fo2 is not None and point_fo2.state.is_value)
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=(
+                RefusalReason.INVALID_IDENTITY
+                if has_value
+                else RefusalReason.IDENTITY_INCOMPLETE
+            ),
+            detail={
+                "reason": "invalid_input" if has_value else "missing_input",
+                "input": "fO2_Pa",
+            },
+            notices=tuple(notices),
+        )
+    fO2_log = _printed_fo2_log10_bar(identity, observation)
+    if fO2_log is None:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=RefusalReason.INVALID_IDENTITY,
+            detail={"reason": "invalid_input", "input": "fO2_Pa"},
+            notices=tuple(notices),
+        )
+
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+
+    composition = identity.composition.value
+    try:
+        if composition.amount_basis is AmountBasis.MASS_PERCENT:
+            weights = {
+                name: float(amount)
+                for name, amount in composition.components
+            }
+        else:
+            weights = composition_wt_pct(composition)
+        if weights is None or not weights:
+            raise ValueError("composition has no positive oxide mass")
+        if any(
+            not math.isfinite(amount) or amount < 0.0
+            for amount in weights.values()
+        ):
+            raise ValueError("composition contains invalid oxide mass")
+    except (
+        UnparseableCompositionComponent,
+        ArithmeticError,
+        KeyError,
+        TypeError,
+        ValueError,
+        OverflowError,
+    ) as exc:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=RefusalReason.INVALID_IDENTITY,
+            detail={
+                "reason": "invalid_composition",
+                "detail": str(exc),
+            },
+            notices=tuple(notices),
+        )
+
+    if rewrite is not None:
+        formula = identity.species.formula if identity.species is not None else ""
+        weights, excluded = analysed_melt_weight_map(
+            weights,
+            formula=formula,
+            redox=False,
+        )
+        notices.extend(
+            input_rewrite_notices(
+                quantity=Quantity.TRANSITION_TEMPERATURE,
+                origin=observation.observation_id,
+                evidence_reason=rewrite.evidence_reason,
+                quote=rewrite.quote,
+                excluded=excluded,
+            )
+        )
+        if not weights:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=RefusalReason.IDENTITY_INCOMPLETE,
+                detail={"reason": "missing_input", "input": "composition"},
+                notices=tuple(notices),
+            )
+
+    # On a 1 kg reference basis, each printed mass percentage gives
+    # m_i = (wt_i / 100) * 1 kg. The result is kg; a pure 100 wt% oxide is
+    # exactly 1 kg.
+    composition_kg = {
+        oxide: amount / 100.0
+        for oxide, amount in weights.items()
+        if amount > 0.0
+    }
+    if not composition_kg:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=RefusalReason.INVALID_IDENTITY,
+            detail={"reason": "invalid_composition"},
+            notices=tuple(notices),
+        )
+
+    def unavailable(detail: dict[str, object]) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                call_evidence="melt_backend.find_liquidus_solidus",
+            ),
+            authority=Authority.REFUSED,
+            notices=tuple(notices),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+            refusal_detail=detail,
+            identity=identity,
+            requested_composition=requested,
+        )
+
+    handle, owns_handle = _open_cached_battery_handle(engine, handles)
+    try:
+        backend = getattr(handle, "backend", None)
+        if not getattr(handle, "available", False) or backend is None:
+            return unavailable(
+                {
+                    "reason": "liquidus_finder_engine_unavailable",
+                    "engine_reason": str(
+                        getattr(handle, "unavailable_reason", None) or ""
+                    ),
+                }
+            )
+        finder = getattr(backend, "find_liquidus_solidus", None)
+        if not callable(finder):
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.UNSUPPORTED),
+                authority=Authority.REFUSED,
+                notices=tuple(notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={
+                    "reason": "engine_missing_observable",
+                    "engine": engine.value,
+                    "observable": "liquidus/solidus temperature",
+                },
+                identity=identity,
+                requested_composition=requested,
+            )
+        # The opened backend names a liquidus-only transport. Absence of
+        # the method is not a refusal: MAGEMin and a fraction-finder
+        # AlphaMELTS transport both run the finder. Do not read ``_mode``.
+        transport_refusal = getattr(backend, "liquidus_transition_refusal", None)
+        transport = (
+            transport_refusal(subtype) if callable(transport_refusal) else None
+        )
+        if isinstance(transport, str) and transport:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.UNSUPPORTED),
+                authority=Authority.REFUSED,
+                notices=tuple(notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={
+                    "reason": "liquidus_only_transport",
+                    "transport": transport,
+                },
+                identity=identity,
+                requested_composition=requested,
+            )
+        result = finder(
+            composition_kg=composition_kg,
+            fO2_log=fO2_log,
+            pressure_bar=pressure_bar_value,
+        )
+    except Exception as exc:  # noqa: BLE001 - keep native failures typed
+        return unavailable(
+            {
+                "reason": "liquidus_finder_failed",
+                "engine_error": f"{type(exc).__name__}: {exc}",
+            }
+        )
+    finally:
+        if owns_handle:
+            from simulator.diagnostic_helpers.binary_pot_battery import (
+                close_battery_engine_handle,
+            )
+
+            close_battery_engine_handle(handle)
+
+    from simulator.melt_backend.liquidus import liquidus_transition_decision
+
+    temperature_K, decision_reason = liquidus_transition_decision(result, subtype)
+    authority, certified_band, native_notices, carried = _liquidus_native_score(
+        result, engine
+    )
+    notices.extend(native_notices)
+    if temperature_K is None:
+        detail: dict[str, object] = {"reason": decision_reason}
+        if decision_reason == "liquidus_finder_requested_transition_missing":
+            detail["subtype"] = subtype
+            detail["status"] = result.status
+        elif decision_reason not in {
+            "liquidus_finder_result_invalid",
+            "unsupported_subtype",
+        }:
+            detail["status"] = result.status
+            detail["warnings"] = list(result.warnings)
+        if carried:
+            detail["diagnostics"] = carried
+        return unavailable(detail)
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="melt_backend.find_liquidus_solidus",
+        ),
+        value=Decimal(str(temperature_K)),
+        unit=QUANTITY_UNITS[Quantity.TRANSITION_TEMPERATURE],
+        authority=authority,
+        notices=tuple(notices),
+        coefficient_sources=sources,
+        lineage_complete=False,
+        certified_band=certified_band,
+        identity=identity,
+        requested_composition=requested,
+    )
+
+
 def _predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -14158,6 +14701,19 @@ def _predict_with_engine(
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "quantity_unknown"},
         )
+    if quantity is Quantity.TRANSITION_TEMPERATURE:
+        from simulator.melt_backend.liquidus import _LIQUIDUS_TRANSITION_SUBTYPES
+
+        if _subtype_text(identity) in _LIQUIDUS_TRANSITION_SUBTYPES:
+            return _predict_liquidus_transition_temperature(
+                engine,
+                observation,
+                identity,
+                channel,
+                sources,
+                handles=handles,
+                experiment=experiment,
+            )
     if quantity in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES:
         return _predict_mass_loss_with_residue(
             engine,

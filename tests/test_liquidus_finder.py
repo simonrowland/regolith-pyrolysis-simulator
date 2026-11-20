@@ -13,11 +13,14 @@ from engines.alphamelts.thermoengine import (
     ThermoEngineNonFiniteField,
 )
 from simulator.melt_backend.liquidus import (
+    EquilibriumCrystallizationPathResult,
     LiquidusSampleError,
     LiquidusSolidusResult,
     MeltFractionSample,
+    _liquidus_transition_temperature_K,
     build_equilibrium_crystallization_path,
     find_liquidus_solidus_by_fraction,
+    liquidus_transition_decision,
 )
 
 
@@ -61,6 +64,312 @@ def test_liquidus_finder_bisects_monotone_fraction_curve():
     assert frac_M(result.solidus_T_C) <= 1.0e-3
     assert frac_M(result.liquidus_T_C) >= 1.0 - 1.0e-3
     assert result.iterations <= 64
+
+
+def test_liquidus_result_celsius_kelvin_conversion_is_pinned():
+    at_zero_celsius = LiquidusSolidusResult(liquidus_T_C=0.0)
+    at_zero_celsius_kelvin = LiquidusSolidusResult(liquidus_T_K=273.15)
+
+    assert at_zero_celsius.liquidus_T_K == pytest.approx(273.15)
+    assert at_zero_celsius_kelvin.liquidus_T_C == pytest.approx(0.0)
+
+
+def test_equilibrium_crystallization_temperature_conversion_is_pinned():
+    at_zero_celsius = EquilibriumCrystallizationPathResult(
+        liquidus_T_C=0.0,
+        solidus_T_C=0.0,
+        liquid_fraction=1.0,
+        status="ok",
+    )
+    at_zero_celsius_kelvin = EquilibriumCrystallizationPathResult(
+        liquidus_T_K=273.15,
+        solidus_T_C=0.0,
+        liquid_fraction=1.0,
+        status="ok",
+    )
+
+    assert at_zero_celsius.liquidus_T_K == pytest.approx(273.15)
+    assert at_zero_celsius_kelvin.liquidus_T_C == pytest.approx(0.0)
+
+
+def test_liquidus_transition_selector_uses_exact_subtype_in_kelvin():
+    # USGS Professional Paper 440-L, Fig. 8: CaO-SiO2 eutectic at 1436 °C.
+    result = LiquidusSolidusResult(
+        liquidus_T_C=1436.0,
+        solidus_T_C=1400.0,
+        liquid_fraction=1.0,
+        status="ok",
+    )
+
+    assert _liquidus_transition_temperature_K(result, "liquidus") == pytest.approx(
+        1709.15
+    )
+    assert _liquidus_transition_temperature_K(result, "solidus") == pytest.approx(
+        1673.15
+    )
+
+
+def test_liquidus_transition_decision_names_the_existing_refusal():
+    located = LiquidusSolidusResult(
+        liquidus_T_C=1436.0,
+        solidus_T_C=1400.0,
+        liquid_fraction=1.0,
+        status="ok",
+    )
+    temperature_K, reason = liquidus_transition_decision(located, "solidus")
+    assert reason is None
+    assert temperature_K == pytest.approx(
+        _liquidus_transition_temperature_K(located, "solidus")
+    )
+    missing_solidus = LiquidusSolidusResult(
+        liquidus_T_C=1436.0,
+        liquid_fraction=1.0,
+        status="ok",
+    )
+    assert liquidus_transition_decision(missing_solidus, "solidus") == (
+        None,
+        "liquidus_finder_requested_transition_missing",
+    )
+    refused = LiquidusSolidusResult(
+        status="not_converged",
+        warnings=("solidus bracket absent",),
+    )
+    assert liquidus_transition_decision(refused, "liquidus") == (
+        None,
+        "liquidus_finder_not_converged",
+    )
+    assert liquidus_transition_decision(located, "glass_transition") == (
+        None,
+        "unsupported_subtype",
+    )
+    assert liquidus_transition_decision(object(), "liquidus") == (
+        None,
+        "liquidus_finder_result_invalid",
+    )
+
+
+def test_transition_decision_owns_status_when_the_helper_returns_kelvin(
+    monkeypatch,
+):
+    """A refused result stays refused even if field extraction returns a temperature."""
+
+    refused = LiquidusSolidusResult(
+        liquidus_T_C=1436.0,
+        liquid_fraction=1.0,
+        status="not_converged",
+    )
+    assert liquidus_transition_decision(refused, "liquidus") == (
+        None,
+        "liquidus_finder_not_converged",
+    )
+
+    def temperature_anyway(_result, _subtype):
+        return 1709.15
+
+    monkeypatch.setattr(
+        liquidus_module,
+        "_liquidus_transition_temperature_K",
+        temperature_anyway,
+    )
+    assert liquidus_transition_decision(refused, "liquidus") == (
+        None,
+        "liquidus_finder_not_converged",
+    )
+
+
+def _scan_transition(anchors: dict[float, float]):
+    return find_liquidus_solidus_by_fraction(
+        _piecewise_fraction(anchors),
+        min_T_C=800.0,
+        max_T_C=1200.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+
+
+def _assert_interior_threshold_equality(anchors, field, anchor_C):
+    result = _scan_transition(anchors)
+    assert result.status == "ok"
+    found = getattr(result, field)
+    assert found == pytest.approx(anchor_C, abs=1.0)
+    if field == "solidus_T_C":
+        assert _piecewise_fraction(anchors)(found) <= 1.0e-3
+    else:
+        assert _piecewise_fraction(anchors)(found) >= 1.0 - 1.0e-3
+
+
+@pytest.mark.parametrize(
+    ("anchors", "field", "anchor_C"),
+    (
+        (
+            {800.0: 0.0, 900.0: 0.001, 1000.0: 0.2, 1100.0: 0.5, 1200.0: 1.0},
+            "solidus_T_C",
+            900.0,
+        ),
+        (
+            {800.0: 0.0, 900.0: 0.1, 1000.0: 0.5, 1100.0: 0.999, 1200.0: 1.0},
+            "liquidus_T_C",
+            1100.0,
+        ),
+        (
+            {800.0: 0.0, 900.0: 0.001, 1000.0: 0.5, 1100.0: 0.999, 1200.0: 1.0},
+            "solidus_T_C",
+            900.0,
+        ),
+        (
+            {800.0: 0.0, 900.0: 0.001, 1000.0: 0.5, 1100.0: 0.999, 1200.0: 1.0},
+            "liquidus_T_C",
+            1100.0,
+        ),
+    ),
+)
+def test_interior_threshold_equality_keeps_a_one_step_bracket(
+    anchors: dict[float, float],
+    field: str,
+    anchor_C: float,
+):
+    _assert_interior_threshold_equality(anchors, field, anchor_C)
+
+
+def _cold_plateau_residue_C() -> float:
+    """Highest temperature the equality-on-low bisection returns below 900 °C.
+
+    A 100 °C bracket that stays at or below the threshold until its warm
+    sample halves until the width is within the 1 °C tolerance. The
+    returned sample is the cold sample of that last step.
+    """
+
+    width = 100.0
+    while width > 1.0:
+        width /= 2.0
+    return 900.0 - width
+
+
+def test_threshold_plateau_uses_the_warm_solidus_and_the_cold_liquidus():
+    """A flat threshold is entered at one edge, not reported at the other."""
+
+    solidus_anchors = {
+        800.0: 0.0,
+        900.0: 0.001,
+        1000.0: 0.001,
+        1100.0: 0.5,
+        1200.0: 1.0,
+    }
+    liquidus_anchors = {
+        800.0: 0.0,
+        900.0: 0.5,
+        1000.0: 0.999,
+        1100.0: 0.999,
+        1200.0: 1.0,
+    }
+    solidus = _scan_transition(solidus_anchors)
+    assert solidus.status == "ok"
+    assert solidus.solidus_T_C == pytest.approx(1000.0, abs=1.0)
+    assert _piecewise_fraction(solidus_anchors)(solidus.solidus_T_C) <= 1.0e-3
+    liquidus = _scan_transition(liquidus_anchors)
+    assert liquidus.status == "ok"
+    assert liquidus.liquidus_T_C == pytest.approx(1000.0, abs=1.0)
+    assert _piecewise_fraction(liquidus_anchors)(liquidus.liquidus_T_C) >= (
+        1.0 - 1.0e-3
+    )
+
+
+def test_solidus_plateau_collapses_to_the_cold_edge_without_the_warm_pair(
+    monkeypatch,
+):
+    """Forcing the cold pair restores the cold residue of the same plateau."""
+
+    anchors = {
+        800.0: 0.0,
+        900.0: 0.001,
+        1000.0: 0.001,
+        1100.0: 0.5,
+        1200.0: 1.0,
+    }
+    produced = _scan_transition(anchors)
+    assert produced.solidus_T_C == pytest.approx(1000.0, abs=1.0)
+    original = liquidus_module._threshold_bracket
+
+    def cold_edge_only(points, threshold, *, edge):
+        del edge
+        return original(points, threshold, edge="cold")
+
+    monkeypatch.setattr(liquidus_module, "_threshold_bracket", cold_edge_only)
+    mutated = _scan_transition(anchors)
+    cold_edge = _cold_plateau_residue_C()
+    assert mutated.status == "ok"
+    assert mutated.solidus_T_C == pytest.approx(cold_edge, abs=1.0e-6)
+    assert mutated.solidus_T_C != pytest.approx(1000.0, abs=1.0)
+    assert _piecewise_fraction(anchors)(mutated.solidus_T_C) <= 1.0e-3
+
+
+def test_threshold_edge_refuses_an_unknown_name():
+    with pytest.raises(ValueError, match="cold"):
+        liquidus_module._threshold_bracket((), 0.001, edge="both")
+
+
+def test_interior_threshold_equality_dies_without_both_side_evidence(monkeypatch):
+    """Restoring a strict-only crossing erases the interior equal sample."""
+
+    examples = (
+        (
+            {800.0: 0.0, 900.0: 0.001, 1000.0: 0.2, 1100.0: 0.5, 1200.0: 1.0},
+            "solidus_T_C",
+            900.0,
+        ),
+        (
+            {800.0: 0.0, 900.0: 0.1, 1000.0: 0.5, 1100.0: 0.999, 1200.0: 1.0},
+            "liquidus_T_C",
+            1100.0,
+        ),
+    )
+    for anchors, field, anchor_C in examples:
+        _assert_interior_threshold_equality(anchors, field, anchor_C)
+
+    def strict_only(points, threshold, *, edge):
+        del edge
+        for index in range(1, len(points)):
+            previous = points[index - 1]
+            current = points[index]
+            if previous.frac_M < threshold < current.frac_M:
+                return previous, current
+        return None
+
+    monkeypatch.setattr(liquidus_module, "_threshold_bracket", strict_only)
+    for anchors, field, anchor_C in examples:
+        with pytest.raises(AssertionError):
+            _assert_interior_threshold_equality(anchors, field, anchor_C)
+
+
+@pytest.mark.parametrize(
+    ("anchors", "missing_bracket"),
+    (
+        (
+            {800.0: 0.001, 900.0: 0.2, 1000.0: 0.5, 1100.0: 0.8, 1200.0: 1.0},
+            "solidus bracket absent",
+        ),
+        (
+            {800.0: 0.0, 900.0: 0.0, 1000.0: 0.0, 1100.0: 0.0, 1200.0: 0.001},
+            "solidus bracket absent",
+        ),
+        (
+            {800.0: 0.999, 900.0: 1.0, 1000.0: 1.0, 1100.0: 1.0, 1200.0: 1.0},
+            "liquidus bracket absent",
+        ),
+        (
+            {800.0: 0.0, 900.0: 0.1, 1000.0: 0.5, 1100.0: 0.8, 1200.0: 0.999},
+            "liquidus bracket absent",
+        ),
+    ),
+)
+def test_threshold_equality_at_an_outer_boundary_is_not_a_crossing(
+    anchors: dict[float, float],
+    missing_bracket: str,
+):
+    result = _scan_transition(anchors)
+
+    assert result.status == "not_converged"
+    assert any(missing_bracket in warning for warning in result.warnings)
 
 
 @pytest.mark.parametrize(
@@ -994,13 +1303,13 @@ def test_renormalised_sample_on_flat_bracket_is_flagged():
         if temperature_C <= 1050.0:
             return 0.5 * (temperature_C - 1000.0) / 50.0
         if temperature_C <= 1100.0:
-            return 0.5 + 0.498 * (temperature_C - 1050.0) / 50.0
-        return 0.998 + 0.002 * (temperature_C - 1100.0) / 500.0
+            return 0.5 + 0.4979 * (temperature_C - 1050.0) / 50.0
+        return 0.9979 + 0.002 * (temperature_C - 1100.0) / 500.0
 
     def sample(temperature_C: float):
         temperature_C = float(temperature_C)
         frac = fraction(temperature_C)
-        if temperature_C == 1350.0:
+        if temperature_C == 1375.0:
             return frac, notice
         return frac
 
@@ -1013,7 +1322,7 @@ def test_renormalised_sample_on_flat_bracket_is_flagged():
     )
 
     assert result.status == 'ok'
-    assert result.liquidus_T_C == pytest.approx(1350.0, abs=2.0)
+    assert result.liquidus_T_C == pytest.approx(1375.0, abs=2.0)
     assert notice['delta_T_bound'] == pytest.approx(250.0)
     assert notice['renormalisation_may_shift_bracket'] is True
 

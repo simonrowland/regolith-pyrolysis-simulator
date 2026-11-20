@@ -11,6 +11,7 @@ from simulator.melt_backend.base import (
     LiquidFractionInvalidError,
     MeltBackendError,
 )
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.melt_regime import liquid_fraction_invalidity
 
@@ -27,6 +28,7 @@ MAX_LIQUIDUS_SCAN_POINTS = 100_000
 # liquidus fraction to 1 only inside this band. One owner: do not copy
 # the literal. The solid threshold is a different rule and stays separate.
 LIQUIDUS_LIQUID_EPSILON = 1.0e-3
+_LIQUIDUS_TRANSITION_SUBTYPES = frozenset({'liquidus', 'solidus'})
 # The statuses a SAMPLE may refuse with and still be carried out through the
 # finder, so the caller learns WHICH refusal occurred rather than a generic
 # solver failure.
@@ -201,9 +203,17 @@ class LiquidusSolidusResult:
         if self.liquidus_T_K is not None:
             object.__setattr__(self, 'liquidus_T_K', _declared_float(self.liquidus_T_K, 'liquidus_T_K'))
         if self.liquidus_T_K is None and self.liquidus_T_C is not None:
-            object.__setattr__(self, 'liquidus_T_K', self.liquidus_T_C + 273.15)
+            object.__setattr__(
+                self,
+                'liquidus_T_K',
+                self.liquidus_T_C + CELSIUS_TO_KELVIN_OFFSET,
+            )
         if self.liquidus_T_C is None and self.liquidus_T_K is not None:
-            object.__setattr__(self, 'liquidus_T_C', self.liquidus_T_K - 273.15)
+            object.__setattr__(
+                self,
+                'liquidus_T_C',
+                self.liquidus_T_K - CELSIUS_TO_KELVIN_OFFSET,
+            )
         if self.solidus_T_C is not None:
             object.__setattr__(self, 'solidus_T_C', _declared_float(self.solidus_T_C, 'solidus_T_C'))
         if self.liquid_fraction is not None:
@@ -241,6 +251,59 @@ class LiquidusSolidusResult:
                 raise ValueError('status=ok requires liquidus_T_C')
             if self.liquid_fraction is None:
                 raise ValueError('status=ok requires liquid_fraction')
+
+
+def _liquidus_transition_temperature_K(
+    result: object,
+    subtype: str,
+) -> float | None:
+    """Kelvin of one field on a result the decision has already accepted.
+
+    ``liquidus_transition_decision`` owns the result type, the status, and
+    the subtype. This only reads the accepted field. The solidus field is
+    degrees Celsius. T_K = t_C + 273.15; the interval unit is the same.
+    At 0 °C the limiting value is 273.15 K.
+    """
+
+    if not isinstance(result, LiquidusSolidusResult):
+        return None
+    if subtype == 'liquidus':
+        temperature_K = result.liquidus_T_K
+    elif subtype == 'solidus' and result.solidus_T_C is not None:
+        temperature_K = result.solidus_T_C + CELSIUS_TO_KELVIN_OFFSET
+    else:
+        return None
+    if (
+        temperature_K is None
+        or not math.isfinite(temperature_K)
+        or temperature_K <= 0.0
+    ):
+        return None
+    return temperature_K
+
+
+def liquidus_transition_decision(
+    result: object,
+    subtype: str,
+) -> tuple[float | None, str | None]:
+    """Kelvin of the requested transition, or the existing refusal reason.
+
+    The scorer builds the prediction envelope. This is the only owner of
+    which result field is the transition and which status is a refusal.
+    The helper does not repeat those checks: a temperature from a refused
+    result is still a refusal.
+    """
+
+    if not isinstance(result, LiquidusSolidusResult):
+        return None, "liquidus_finder_result_invalid"
+    if subtype not in _LIQUIDUS_TRANSITION_SUBTYPES:
+        return None, "unsupported_subtype"
+    if result.status != "ok":
+        return None, f"liquidus_finder_{result.status}"
+    temperature_K = _liquidus_transition_temperature_K(result, subtype)
+    if temperature_K is None:
+        return None, "liquidus_finder_requested_transition_missing"
+    return temperature_K, None
 
 
 @dataclass(frozen=True)
@@ -282,9 +345,17 @@ class EquilibriumCrystallizationPathResult:
         if self.liquidus_T_K is not None:
             object.__setattr__(self, 'liquidus_T_K', _declared_float(self.liquidus_T_K, 'liquidus_T_K'))
         if self.liquidus_T_K is None and self.liquidus_T_C is not None:
-            object.__setattr__(self, 'liquidus_T_K', self.liquidus_T_C + 273.15)
+            object.__setattr__(
+                self,
+                'liquidus_T_K',
+                self.liquidus_T_C + CELSIUS_TO_KELVIN_OFFSET,
+            )
         if self.liquidus_T_C is None and self.liquidus_T_K is not None:
-            object.__setattr__(self, 'liquidus_T_C', self.liquidus_T_K - 273.15)
+            object.__setattr__(
+                self,
+                'liquidus_T_C',
+                self.liquidus_T_K - CELSIUS_TO_KELVIN_OFFSET,
+            )
         if self.solidus_T_C is not None:
             object.__setattr__(self, 'solidus_T_C', _declared_float(self.solidus_T_C, 'solidus_T_C'))
         if self.liquid_fraction is not None:
@@ -352,6 +423,65 @@ def _equilibrium_path_from_cooling(
             'completed_rows': len(points), 'cooling_step_C': step_C,
         },
     )
+
+
+def _threshold_bracket(
+    points: Tuple[MeltFractionSample, ...],
+    threshold: float,
+    *,
+    edge: str,
+) -> tuple[MeltFractionSample, MeltFractionSample] | None:
+    """One-step bracket at one edge of a threshold plateau.
+
+    Convention: a threshold plateau is entered at one edge. Liquidus is
+    the cold edge (the first temperature at or above the liquid
+    threshold): the transition into the all-liquid plateau on heating.
+    Solidus is the warm edge (the last temperature at or below the solid
+    threshold): the transition into the all-solid plateau on cooling.
+
+    Limiting case: frac_M equals the solid threshold from 900 °C to
+    1000 °C and is above it afterwards. The solidus bracket is the
+    equal-to-above pair at 1000 °C. Equality-on-the-low-side bisection
+    then returns that warm edge within tolerance. The liquidus of a
+    plateau sitting on the liquid threshold is the below-to-equal pair
+    at the cold edge. A one-point equality has both edges at that sample.
+
+    Equality only at an outer scan boundary, with no sample strictly on
+    the far side, is not a crossing. Comparison is exact: a near miss is
+    not equality. ``edge`` is ``cold`` or ``warm``; any other name raises.
+    """
+
+    if edge not in {"cold", "warm"}:
+        raise ValueError(
+            f"threshold edge must be 'cold' or 'warm', not {edge!r}"
+        )
+    strict: tuple[MeltFractionSample, MeltFractionSample] | None = None
+    cold: tuple[MeltFractionSample, MeltFractionSample] | None = None
+    warm: tuple[MeltFractionSample, MeltFractionSample] | None = None
+    for index in range(1, len(points)):
+        previous = points[index - 1]
+        current = points[index]
+        if (
+            strict is None
+            and previous.frac_M < threshold < current.frac_M
+        ):
+            strict = (previous, current)
+        if (
+            cold is None
+            and previous.frac_M < threshold
+            and current.frac_M == threshold
+            and any(point.frac_M > threshold for point in points[index + 1:])
+        ):
+            cold = (previous, current)
+        if (
+            previous.frac_M == threshold
+            and threshold < current.frac_M
+            and any(point.frac_M < threshold for point in points[:index - 1])
+        ):
+            warm = (previous, current)
+    if edge == "cold":
+        return cold if cold is not None else strict
+    return warm if warm is not None else strict
 
 
 def find_liquidus_solidus_by_fraction(
@@ -533,37 +663,26 @@ def find_liquidus_solidus_by_fraction(
     try:
         grid_points = [sample(T) for T in grid]
 
-        solidus_bracket = None
-        liquidus_bracket = None
-        previous = grid_points[0]
-        for current in grid_points[1:]:
-            if (
-                solidus_bracket is None
-                and previous.frac_M <= solid_threshold
-                and current.frac_M > solid_threshold
-            ):
-                solidus_bracket = (previous, current)
-                _annotate_renormalised_threshold(
-                    (previous, current),
-                    previous,
-                    current,
-                    tolerance,
-                    closure_notices,
-                )
-            if (
-                liquidus_bracket is None
-                and previous.frac_M < liquid_threshold
-                and current.frac_M >= liquid_threshold
-            ):
-                liquidus_bracket = (previous, current)
-                _annotate_renormalised_threshold(
-                    (previous, current),
-                    previous,
-                    current,
-                    tolerance,
-                    closure_notices,
-                )
-            previous = current
+        solidus_bracket = _threshold_bracket(
+            tuple(grid_points),
+            solid_threshold,
+            edge="warm",
+        )
+        liquidus_bracket = _threshold_bracket(
+            tuple(grid_points),
+            liquid_threshold,
+            edge="cold",
+        )
+        for bracket in (solidus_bracket, liquidus_bracket):
+            if bracket is None:
+                continue
+            _annotate_renormalised_threshold(
+                bracket,
+                bracket[0],
+                bracket[1],
+                tolerance,
+                closure_notices,
+            )
 
         missing = []
         if solidus_bracket is None:
@@ -881,6 +1000,11 @@ def _bisect_solidus(
     max_iterations: int,
     closure_notices: dict[float, dict] | None = None,
 ) -> tuple[MeltFractionSample, int]:
+    # Equality stays on the low side, so the returned sample is the highest
+    # temperature still at or below the threshold. The bracket must be the
+    # warm-edge pair from ``_threshold_bracket``; otherwise this is the cold
+    # edge of the same plateau. Do not flip the inequality: a sample above
+    # the solid threshold would break frac_M(solidus) <= solid_epsilon.
     iterations = 0
     while high.temperature_C - low.temperature_C > tolerance_C:
         if iterations >= max_iterations:
@@ -913,6 +1037,8 @@ def _bisect_liquidus(
     max_iterations: int,
     closure_notices: dict[float, dict] | None = None,
 ) -> tuple[MeltFractionSample, int]:
+    # Equality stays on the high side: the lowest temperature still at or
+    # above the liquid threshold. The bracket is the cold-edge pair.
     iterations = 0
     while high.temperature_C - low.temperature_C > tolerance_C:
         if iterations >= max_iterations:
@@ -1204,7 +1330,7 @@ def _validate_optional_fraction(value: Optional[float], name: str) -> None:
 
 def _validate_temperature_C(value: Optional[float], name: str) -> None:
     _validate_optional_finite(value, name)
-    if value is not None and float(value) < -273.15:
+    if value is not None and float(value) < -CELSIUS_TO_KELVIN_OFFSET:
         raise ValueError(f'{name} must not be below absolute zero')
 
 
@@ -1220,13 +1346,13 @@ def _validate_temperature_pair(
         raise ValueError(f'{context}_T_K must not be below absolute zero')
     if temperature_C is None or temperature_K is None:
         return
-    # Premise: T_K = T_C + 273.15 by thermodynamic temperature definition.
-    # Algebra: residual = T_K - T_C - 273.15; unit check: kelvin increments
+    # Premise: T_K = T_C + offset by thermodynamic temperature definition.
+    # Algebra: residual = T_K - T_C - offset; unit check: kelvin increments
     # and Celsius increments are identical. Sanity: contradictory serialized
-    # unit fields must fail rather than let consumers choose different physics.
+    # unit fields must fail; at 0 °C the offset is 273.15 K.
     if not math.isclose(
         float(temperature_K),
-        float(temperature_C) + 273.15,
+        float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
         rel_tol=0.0,
         abs_tol=1.0e-9,
     ):

@@ -787,6 +787,108 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
     assert not mismatches, repr(mismatches)
 
 
+def test_liquidus_finder_does_not_use_the_equilibrium_chemistry_version(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The finder is uncached, so a chemistry-version bump only moves other keys.
+
+    The pin is the merged green table. This car does not bump it: the
+    finder never reads or writes an existing equilibrium key.
+    """
+
+    from simulator.engine_cache import ENGINE_CHEMISTRY_VERSION, engine_cache_key
+    from simulator.melt_backend.alphamelts import (
+        AlphaMELTSBackend,
+        AlphaMELTSSubprocessRunMode,
+    )
+    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.melt_backend.magemin import MAGEMinBackend
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    engines = ("magemin", "alphamelts", "thermoengine")
+    assert [ENGINE_CHEMISTRY_VERSION[engine] for engine in engines] == [3, 3, 3]
+    request = {"seam": "equilibrium-cell"}
+    pinned = {
+        engine: engine_cache_key(engine, 3, request)
+        for engine in engines
+    }
+    for engine, key in pinned.items():
+        assert engine_cache_key(
+            engine,
+            ENGINE_CHEMISTRY_VERSION[engine],
+            request,
+        ) == key
+
+    def forbid_equilibrium_key(*_args, **_kwargs):
+        raise AssertionError(
+            "liquidus finder must not build an equilibrium cache key"
+        )
+
+    monkeypatch.setattr(
+        "simulator.engine_cache.engine_cache_key",
+        forbid_equilibrium_key,
+    )
+
+    class _NativeLiquidus(AlphaMELTSBackend):
+        def __init__(self):
+            super().__init__()
+            self._mode = "subprocess"
+
+        def equilibrate(self, temperature_C, **kwargs):
+            assert kwargs["subprocess_run_mode"] is (
+                AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER
+            )
+            return EquilibriumResult(
+                temperature_C=1300.0,
+                pressure_bar=1.0,
+                liquid_fraction=1.0,
+                phases_present=["liq"],
+                phase_masses_kg={"liq": 1.0},
+                liquidus_T_C=1300.0,
+                status="ok",
+            )
+
+    composition = {"SiO2": 50.0, "Al2O3": 15.0, "MgO": 15.0, "CaO": 20.0}
+    native = _NativeLiquidus().find_liquidus_solidus(
+        composition_kg=composition,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+    assert native.status == "ok"
+    assert native.liquidus_T_C == pytest.approx(1300.0)
+    assert MAGEMinBackend().find_liquidus_solidus(
+        composition_kg=composition,
+    ).status == "unavailable"
+    assert ThermoEngineBackend().find_liquidus_solidus(
+        composition_kg=composition,
+    ).status == "unavailable"
+
+    def version_five(engine, _version, payload):
+        return engine_cache_key(engine, 5, payload)
+
+    monkeypatch.setattr(
+        "simulator.engine_cache.engine_cache_key",
+        version_five,
+    )
+
+    def pinned_key_matches(engine: str) -> None:
+        from simulator import engine_cache as engine_cache_module
+
+        assert engine_cache_module.engine_cache_key(
+            engine,
+            engine_cache_module.ENGINE_CHEMISTRY_VERSION[engine],
+            request,
+        ) == pinned[engine]
+
+    for engine in engines:
+        with pytest.raises(AssertionError):
+            pinned_key_matches(engine)
+
+
 def test_default_alphamelts_projection_matches_resolved_opener_settings(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

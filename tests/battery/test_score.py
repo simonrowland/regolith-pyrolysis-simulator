@@ -20813,94 +20813,643 @@ def test_score_store_records_each_in_scope_observation_in_small_fixture() -> Non
     assert all(records_by_reference[obs.observation_id] >= 1 for obs in (activity, figure))
 
 
-def test_transition_temperature_refuses_before_generic_engine_pot(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    from simulator.diagnostic_helpers import binary_pot_battery as battery
-    from simulator.diagnostic_helpers.binary_pot_battery import (
-        EngineHandle,
-        EquilibrateCell,
+def _transition_temperature_observation(
+    *,
+    subtype: str | None = "liquidus",
+    composition: Composition | None = None,
+) -> Observation:
+    composition = composition or Composition(
+        basis="printed_CaO_SiO2_binary_wt_percent",
+        components=(("CaO", Decimal("36.1")), ("SiO2", Decimal("63.9"))),
+        amount_basis=AmountBasis.MASS_PERCENT,
     )
-
     identity = replace(
         F.activity_identity(
             formula="CaO",
             component_basis="CaO",
-            composition=Composition(
-                basis="ordered_complete_mole_inventory",
-                components=(("SiO2", Decimal("0.5")), ("CaO", Decimal("0.5"))),
-                amount_basis=AmountBasis.MOLE_FRACTION,
-            ),
+            T_K=Decimal("1709.15"),
+            composition=composition,
+            fO2_Pa=Decimal("1e-4"),
+            total_P=Decimal("100000"),
         ),
         quantity=Quantity.TRANSITION_TEMPERATURE,
-        subtype=State.of("liquidus"),
+        subtype=(
+            State.of(subtype)
+            if subtype is not None
+            else State.unknown("transition subtype not printed")
+        ),
     )
-    reference = F.observation(
-        "transition-temperature-generic-fallthrough",
+    return F.observation(
+        f"transition-temperature-{subtype or 'unknown'}",
         F.tabulation_experiment().experiment_id,
         identity,
-        Decimal("1673.15"),
+        Decimal("1709.15"),
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="work-1",
     )
-    opened: list[str] = []
-    pots = []
 
-    def open_probe_engine(name: str) -> EngineHandle:
-        opened.append(name)
-        return EngineHandle(
-            name=name,
-            backend=object(),
+
+def test_transition_temperature_dispatches_exact_native_result_and_inputs(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    reference = _transition_temperature_observation(subtype="solidus")
+    identity = reference.identity
+    assert isinstance(identity, Identity)
+    reference = replace(
+        reference,
+        identity=replace(
+            identity,
+            composition=State.unknown("composition is in point conditions"),
+            fO2_Pa=State.unknown("oxygen boundary is in point conditions"),
+            total_pressure_Pa=State.unknown("pressure is in point conditions"),
+        ),
+        point_conditions={
+            "composition": Located(State.of(identity.composition.value)),
+            "total_pressure_Pa": Located(State.of(Decimal("100000"))),
+            "oxygen_partial_pressure_Pa": Located(State.of(Decimal("1e-4"))),
+        },
+    )
+    received: dict[str, object] = {}
+
+    def find_liquidus_solidus(**kwargs):
+        received.update(kwargs)
+        return LiquidusSolidusResult(
+            liquidus_T_C=1450.0,
+            solidus_T_C=1400.0,
+            liquid_fraction=1.0,
+            status="ok",
+        )
+
+    handle = SimpleNamespace(
+        name=Engine.MAGEMIN.value,
+        backend=SimpleNamespace(find_liquidus_solidus=find_liquidus_solidus),
+        available=True,
+        unavailable_reason=None,
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_open_cached_battery_handle",
+        lambda *_args: (handle, False),
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "parse_species_formula",
+        lambda *_args, **_kwargs: pytest.fail(
+            "transition-temperature dispatch must bypass the generic engine path"
+        ),
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, reference)
+
+    assert received == {
+        "composition_kg": {"CaO": 0.361, "SiO2": 0.639},
+        "fO2_log": -9.0,
+        "pressure_bar": 1.0,
+    }
+    assert prediction.value == Decimal("1673.15")
+    assert prediction.unit == "K"
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.refusal_reason is None
+
+    def drop_the_owner(_result, _subtype):
+        return None, "liquidus_finder_requested_transition_missing"
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.liquidus.liquidus_transition_decision",
+        drop_the_owner,
+    )
+    with pytest.raises(AssertionError):
+        mutated = predict_with_engine(Engine.MAGEMIN, reference)
+        assert mutated.value == Decimal("1673.15")
+        assert mutated.refusal_reason is None
+
+
+def _transition_pressure_state(form: str) -> State:
+    point = Decimal("100000")
+    if form == "decimal":
+        return State.of(point)
+    if form == "exact":
+        return State.of(Value(ValueKind.POINT, point=point, approximate=False))
+    if form == "approximate":
+        return State.of(Value(ValueKind.POINT, point=point, approximate=True))
+    raise AssertionError(form)
+
+
+def _assert_located_transition_residual(
+    monkeypatch,
+    *,
+    form: str = "decimal",
+    identities: list | None = None,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    composition = Composition(
+        basis="printed_CaO_SiO2_binary_wt_percent",
+        components=(("CaO", Decimal("36.1")), ("SiO2", Decimal("63.9"))),
+        amount_basis=AmountBasis.MASS_PERCENT,
+    )
+    na = "transition temperature has no duplicate coordinate"
+    identity = replace(
+        F.activity_identity(
+            formula="CaO",
+            component_basis="CaO",
+            composition=composition,
+        ),
+        quantity=Quantity.TRANSITION_TEMPERATURE,
+        subtype=State.of("solidus"),
+        temperature_K=State.not_applicable(na),
+        per=State.not_applicable(na),
+        reference_state=State.not_applicable(na),
+        composition=State.unknown("composition is printed on the point"),
+        fO2_Pa=State.not_applicable("oxygen stays a located command"),
+        total_pressure_Pa=State.unknown("total pressure is printed on the point"),
+    )
+    experiment = F.tabulation_experiment()
+    reference = replace(
+        F.observation(
+            "transition-located-solidus",
+            experiment.experiment_id,
+            identity,
+            Decimal("1709.15"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        ),
+        point_conditions={
+            "composition": Located(State.of(composition)),
+            "total_pressure_Pa": Located(_transition_pressure_state(form)),
+            "oxygen_partial_pressure_Pa": Located(State.of(Decimal("1e-4"))),
+        },
+    )
+
+    def find_liquidus_solidus(**kwargs):
+        assert kwargs["composition_kg"] == {"CaO": 0.361, "SiO2": 0.639}
+        assert kwargs["fO2_log"] == -9.0
+        assert kwargs["pressure_bar"] == 1.0
+        return LiquidusSolidusResult(
+            liquidus_T_C=1450.0,
+            solidus_T_C=1400.0,
+            liquid_fraction=0.0,
+            status="ok",
+        )
+
+    handle = SimpleNamespace(
+        name=Engine.MAGEMIN.value,
+        backend=SimpleNamespace(find_liquidus_solidus=find_liquidus_solidus),
+        available=True,
+        unavailable_reason=None,
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_open_cached_battery_handle",
+        lambda *_args: (handle, False),
+    )
+    if identities is not None:
+        real_comparison = score_mod._comparison_identity
+
+        def remember(identity, reference, prediction):
+            compared = real_comparison(identity, reference, prediction)
+            identities.append(compared)
+            return compared
+
+        monkeypatch.setattr(score_mod, "_comparison_identity", remember)
+    residuals, _candidates = score_store(
+        _context(
+            F.work(),
+            experiment,
+            reference,
+            review="reviewed",
+        ),
+        engines=(Engine.MAGEMIN,),
+        rail=Rail.THERMOCHEMISTRY,
+        include_diagnostics=False,
+    )
+    assert len(residuals) == 1
+    residual = residuals[0]
+    assert residual.refusal is None
+    assert residual.numeric is not None
+    assert residual.numeric.value == Decimal("-36")
+    assert residual.status is ResidualStatus.NO_BAND
+
+
+def test_located_transition_point_scores_a_numeric_residual(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _assert_located_transition_residual(monkeypatch)
+
+    def unchanged(identity, _reference, _prediction):
+        return identity
+
+    monkeypatch.setattr(score_mod, "_comparison_identity", unchanged)
+    with pytest.raises(AssertionError):
+        _assert_located_transition_residual(monkeypatch)
+
+
+def _assert_same_half_decade_band(compared: Identity) -> None:
+    from simulator.battery.records import ApproxPressure, BandBasis
+
+    pressure = compared.total_pressure_Pa
+    assert pressure is not None and pressure.is_value
+    band = pressure.value
+    assert isinstance(band, ApproxPressure)
+    assert band.band_basis is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
+    assert band.point == Decimal("100000")
+    assert band.low < band.point < band.high
+    assert band.high / band.low == Decimal(10)
+    assert band.low * band.high == band.point ** 2
+    assert compared.fO2_Pa is None or not compared.fO2_Pa.is_value
+
+
+@pytest.mark.parametrize("form", ("exact", "approximate"))
+def test_located_value_pressure_scores_without_dropping_the_band(
+    monkeypatch: pytest.MonkeyPatch,
+    form: str,
+) -> None:
+    from simulator.battery.identity import IdentityRefusal
+
+    identities: list[Identity] = []
+    _assert_located_transition_residual(
+        monkeypatch,
+        form=form,
+        identities=identities,
+    )
+    assert len(identities) == 2
+    if form == "exact":
+        for compared in identities:
+            pressure = compared.total_pressure_Pa
+            assert pressure is not None and pressure.is_value
+            assert pressure.value == Decimal("100000")
+            assert type(pressure.value) is Decimal
+            assert compared.fO2_Pa is None or not compared.fO2_Pa.is_value
+    else:
+        _assert_same_half_decade_band(identities[0])
+        assert identities[0].total_pressure_Pa == identities[1].total_pressure_Pa
+
+    def copy_the_raw_state(value):
+        return value if isinstance(value, State) else None
+
+    monkeypatch.setattr(score_mod, "identity_pressure_state", copy_the_raw_state)
+    with pytest.raises(IdentityRefusal):
+        _assert_located_transition_residual(monkeypatch, form=form)
+
+
+def _kushiro_transition_rows(migrator_cls):
+    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+
+    root = Path(__file__).resolve().parents[2]
+    extract = (
+        root
+        / "data/literature/extracts"
+        / "kushiro-1971-apollo12-phase-equilibria.yaml"
+    )
+    migrator = migrator_cls(root=root)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    wanted = {
+        "kushiro_1971_mixture_b_chromite_liquidus": Decimal("1330"),
+        "kushiro_1971_mixture_b_solidus": Decimal("1070"),
+    }
+    found = {}
+    for row in migrator.result.observations.values():
+        for suffix, celsius in wanted.items():
+            if row.observation_id.endswith("::" + suffix):
+                found[suffix] = (
+                    row,
+                    celsius + Decimal(str(CELSIUS_TO_KELVIN_OFFSET)),
+                )
+    assert set(found) == set(wanted)
+    return found
+
+
+def _assert_kushiro_po2_reaches_the_scorer(monkeypatch) -> None:
+    from simulator.battery.migrate import Migrator
+    from simulator.physical_constants import ATM_PA_DECIMAL
+
+    rows = _kushiro_transition_rows(Migrator)
+    expected_pa = Decimal("1e-13") * ATM_PA_DECIMAL
+    for _suffix, (row, temperature_K) in rows.items():
+        points = row.point_conditions or {}
+        oxygen = points.get("oxygen_partial_pressure_Pa")
+        assert isinstance(oxygen, Located)
+        assert oxygen.state.is_value
+        amount = oxygen.state.value
+        amount = amount.point if isinstance(amount, Value) else amount
+        assert amount == expected_pa
+        fugacity = points["fO2_Pa"]
+        assert fugacity.state.is_unknown
+        assert "PO2" in (fugacity.state.reason or "")
+        identity = row.identity
+        assert isinstance(identity, Identity)
+        assert identity.fO2_Pa is None or not identity.fO2_Pa.is_value
+        assert row.value.point == temperature_K
+        assert identity.subtype is not None and identity.subtype.is_value
+        pressure = identity.total_pressure_Pa
+        point_pressure = points.get("total_pressure_Pa")
+        assert (pressure is not None and pressure.is_value) or (
+            isinstance(point_pressure, Located) and point_pressure.state.is_value
+        )
+        composition = identity.composition
+        point_composition = points.get("composition")
+        assert (composition is not None and composition.is_value) or (
+            isinstance(point_composition, Located)
+            and point_composition.state.is_value
+        )
+        received: dict[str, object] = {}
+
+        def find_liquidus_solidus(**kwargs):
+            received.clear()
+            received.update(kwargs)
+            from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+            return LiquidusSolidusResult(
+                liquidus_T_C=1330.0,
+                solidus_T_C=1070.0,
+                liquid_fraction=1.0,
+                status="ok",
+            )
+
+        from types import SimpleNamespace
+
+        handle = SimpleNamespace(
+            name=Engine.MAGEMIN.value,
+            backend=SimpleNamespace(find_liquidus_solidus=find_liquidus_solidus),
             available=True,
             unavailable_reason=None,
-            takes_fo2=False,
-            supports_intrinsic_fo2=True,
         )
+        monkeypatch.setattr(
+            score_mod,
+            "_open_cached_battery_handle",
+            lambda *_args: (handle, False),
+        )
+        prediction = predict_with_engine(Engine.MAGEMIN, row)
+        assert received, prediction.refusal_detail
+        assert received["fO2_log"] == score_mod._printed_fo2_log10_bar(
+            identity, row
+        )
+        assert received["pressure_bar"] == pytest.approx(1.01325)
+        # Table 3 Mixture B sums to 100.08 wt%. The identity stores mole
+        # fractions, so the finder receives that bulk closed to 1 kg.
+        printed_wt = {
+            "SiO2": Decimal("46.0"),
+            "Al2O3": Decimal("9.7"),
+            "TiO2": Decimal("3.0"),
+            "Cr2O3": Decimal("0.6"),
+            "FeO": Decimal("20.0"),
+            "MnO": Decimal("0.25"),
+            "MgO": Decimal("10.2"),
+            "CaO": Decimal("10.0"),
+            "Na2O": Decimal("0.27"),
+            "K2O": Decimal("0.06"),
+        }
+        printed_total = sum(printed_wt.values(), Decimal("0"))
+        composition_kg = received["composition_kg"]
+        assert set(composition_kg) == set(printed_wt)
+        for oxide, weight in printed_wt.items():
+            assert composition_kg[oxide] == pytest.approx(
+                float(weight / printed_total)
+            )
+        assert prediction.refusal_reason is None
+        assert prediction.value is not None
 
-    def equilibrate_probe(handle, pot, **kwargs):
-        pots.append(pot)
-        return EquilibrateCell(
-            pot_id="transition-probe",
-            engine=handle.name,
-            temperature_K=kwargs["temperature_K"],
-            po2=kwargs["po2"],
-            status="ok",
-            refusal_reason=None,
-            engine_status="ok",
-            engine_reason=None,
-            melt_activities={"CaO": 0.25},
-            gas_partial_pressures_Pa={},
+
+def test_kushiro_printed_po2_lands_beside_unknown_fugacity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.migrate import Migrator
+
+    _assert_kushiro_po2_reaches_the_scorer(monkeypatch)
+
+    def drop_partial_pressure(self, merged, partial):
+        return None
+
+    monkeypatch.setattr(
+        Migrator,
+        "_land_partial_pressure_beside_non_value_fugacity",
+        drop_partial_pressure,
+    )
+    with pytest.raises(AssertionError):
+        _assert_kushiro_po2_reaches_the_scorer(monkeypatch)
+
+
+_KUSHIRO_PERSISTED_TRANSITIONS = frozenset({
+    "kushiro_1971_mixture_b_chromite_liquidus",
+    "kushiro_1971_mixture_b_solidus",
+})
+_KUSHIRO_PERSISTED_APPEARANCE = frozenset({
+    "kushiro_1971_mixture_b_augite_plagioclase_first_appearance",
+    "kushiro_1971_mixture_b_ca_poor_pyroxene_first_appearance",
+    "kushiro_1971_mixture_b_ilmenite_first_appearance",
+    "kushiro_1971_mixture_b_olivine_first_appearance",
+})
+_KUSHIRO_PERSISTED_UNKNOWN_OXYGEN = frozenset({
+    "kushiro_1971_mixture_a_chromite_first_appearance_bracket",
+    "kushiro_1971_mixture_a_pigeonite_first_appearance_near_1170",
+})
+
+
+def _kushiro_suffix(observation: Observation) -> str:
+    return observation.observation_id.rsplit("::", 1)[-1]
+
+
+def _persisted_kushiro_observations() -> list[Observation]:
+    from simulator.battery.migrate import load_yaml, observation_from_plain
+
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "data/literature/extracts-v2"
+        / "kushiro-1971-apollo12-phase-equilibria.yaml"
+    )
+    document = load_yaml(path)
+    assert isinstance(document, dict)
+    return [observation_from_plain(raw) for raw in document["observations"]]
+
+
+def _stub_transition_finder(monkeypatch, calls: list[dict[str, object]]):
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    def find_liquidus_solidus(**kwargs):
+        calls.append(dict(kwargs))
+        return LiquidusSolidusResult(
+            liquidus_T_C=1330.0,
+            solidus_T_C=1070.0,
             liquid_fraction=1.0,
-            wall_s=0.0,
-            cpu_s=0.0,
-            hostname="test",
+            status="ok",
         )
 
-    monkeypatch.setattr(battery, "open_battery_engine", open_probe_engine)
-    monkeypatch.setattr(battery, "equilibrate_cell", equilibrate_probe)
-    from simulator.battery import score as score_module
+    handle = SimpleNamespace(
+        name=Engine.MAGEMIN.value,
+        backend=SimpleNamespace(find_liquidus_solidus=find_liquidus_solidus),
+        available=True,
+        unavailable_reason=None,
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_open_cached_battery_handle",
+        lambda *_args: (handle, False),
+    )
 
-    parsed_formulas: list[str] = []
-    parse_formula = score_module.parse_species_formula
 
-    def track_formula_parse(formula: str, *, species: Species | None = None):
-        parsed_formulas.append(formula)
-        return parse_formula(formula, species=species)
+def _assert_persisted_kushiro_transitions_score(monkeypatch) -> dict[str, Observation]:
+    from simulator.battery.migrate import Migrator
+    from simulator.battery.source_oxygen import persisted_printed_oxygen_located
+    from simulator.physical_constants import ATM_PA_DECIMAL, BAR_PA_DECIMAL
 
-    monkeypatch.setattr(score_module, "parse_species_formula", track_formula_parse)
+    rows = _persisted_kushiro_observations()
+    by_suffix = {_kushiro_suffix(row): row for row in rows}
+    assert set(by_suffix) == (
+        _KUSHIRO_PERSISTED_TRANSITIONS
+        | _KUSHIRO_PERSISTED_APPEARANCE
+        | _KUSHIRO_PERSISTED_UNKNOWN_OXYGEN
+    )
+    printed_pa = Decimal("1e-13") * ATM_PA_DECIMAL
+    expected_log = float(printed_pa.log10() - BAR_PA_DECIMAL.log10())
+    fresh = _kushiro_transition_rows(Migrator)
+    for suffix in _KUSHIRO_PERSISTED_TRANSITIONS:
+        row = by_suffix[suffix]
+        points = row.point_conditions or {}
+        printed = points["oxygen_partial_pressure"]
+        assert isinstance(printed, Located) and printed.state.is_value
+        stored = points.get("oxygen_partial_pressure_Pa")
+        assert stored is None or not (
+            isinstance(stored, Located) and stored.state.is_value
+        )
+        assert points["fO2_Pa"].state.is_unknown
+        recovered = persisted_printed_oxygen_located(row)
+        assert isinstance(recovered, Located) and recovered.state.is_value
+        amount = recovered.state.value
+        amount = amount.point if isinstance(amount, Value) else amount
+        assert amount == printed_pa
+        calls: list[dict[str, object]] = []
+        _stub_transition_finder(monkeypatch, calls)
+        prediction = predict_with_engine(Engine.MAGEMIN, row)
+        assert len(calls) == 1, prediction.refusal_detail
+        fresh_row, _temperature_K = fresh[suffix]
+        fresh_log = score_mod._printed_fo2_log10_bar(fresh_row.identity, fresh_row)
+        assert calls[0]["fO2_log"] == fresh_log
+        assert calls[0]["fO2_log"] == pytest.approx(expected_log)
+        assert calls[0]["pressure_bar"] == pytest.approx(
+            float(score_mod._printed_total_pressure_bar(fresh_row.identity, fresh_row))
+        )
+        assert prediction.refusal_reason is None
+        assert prediction.value is not None
+        scored_identity = prediction.identity
+        assert isinstance(scored_identity, Identity)
+        assert scored_identity.fO2_Pa is None or not scored_identity.fO2_Pa.is_value
+    for suffix in _KUSHIRO_PERSISTED_UNKNOWN_OXYGEN:
+        row = by_suffix[suffix]
+        printed = (row.point_conditions or {})["oxygen_partial_pressure"]
+        assert isinstance(printed, Located) and printed.state.is_unknown
+        assert persisted_printed_oxygen_located(row) is None
+    missing = replace(
+        by_suffix["kushiro_1971_mixture_b_solidus"],
+        source_id="no-such-extract-w1119",
+    )
+    assert persisted_printed_oxygen_located(missing) is None
+    for suffix in _KUSHIRO_PERSISTED_APPEARANCE:
+        row = by_suffix[suffix]
+        printed = (row.point_conditions or {})["oxygen_partial_pressure"]
+        assert isinstance(printed, Located) and printed.state.is_value
+        calls = []
+        _stub_transition_finder(monkeypatch, calls)
+        prediction = predict_with_engine(Engine.MAGEMIN, row)
+        assert calls == []
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
+    return by_suffix
 
-    predictions = {
-        engine: predict_with_engine(engine, reference)
-        for engine in score_module.SCORE_ENGINE_SET
-    }
 
-    assert opened == []
-    assert pots == []
-    assert parsed_formulas == []
-    prediction = predictions[Engine.OPENIMCC]
+def test_persisted_kushiro_transitions_score_from_the_extract_unit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rows = _assert_persisted_kushiro_transitions_score(monkeypatch)
+
+    def drop_recovery(_row):
+        return None
+
+    monkeypatch.setattr(score_mod, "persisted_printed_oxygen_located", drop_recovery)
+    calls: list[dict[str, object]] = []
+    _stub_transition_finder(monkeypatch, calls)
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        rows["kushiro_1971_mixture_b_chromite_liquidus"],
+    )
+    assert calls == []
     assert prediction.value is None
-    assert prediction.unit is None
-    assert prediction.coefficient_sources == ()
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {"reason": "missing_input", "input": "fO2_Pa"}
+
+
+@pytest.mark.parametrize(
+    ("missing", "identity_field"),
+    (
+        ("composition", "composition"),
+        ("total_pressure_Pa", "total_pressure_Pa"),
+        ("fO2_Pa", "fO2_Pa"),
+    ),
+)
+def test_transition_temperature_missing_printed_input_refuses_without_solve(
+    monkeypatch: pytest.MonkeyPatch,
+    missing: str,
+    identity_field: str,
+) -> None:
+    from simulator.battery.identity import Identity
+
+    reference = _transition_temperature_observation()
+    identity = reference.identity
+    assert isinstance(identity, Identity)
+    identity = replace(
+        identity,
+        **{identity_field: State.unknown("source omits this condition")},
+    )
+    missing_point_keys = {
+        "composition": {"composition"},
+        "total_pressure_Pa": {"total_pressure_Pa"},
+        "fO2_Pa": {"fO2_Pa", "oxygen_partial_pressure_Pa"},
+    }[identity_field]
+    point_conditions = {
+        key: condition
+        for key, condition in (reference.point_conditions or {}).items()
+        if key not in missing_point_keys
+    }
+    reference = replace(
+        reference,
+        identity=identity,
+        point_conditions=point_conditions or None,
+    )
+
+    def unexpected_open(*_args):
+        pytest.fail("missing printed input must refuse before opening an engine")
+
+    monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
+    prediction = predict_with_engine(Engine.MAGEMIN, reference)
+
+    assert prediction.value is None
+    assert prediction.execution.state is ExecutionState.NOT_PROBED
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {"reason": "missing_input", "input": missing}
+
+
+@pytest.mark.parametrize("subtype", (None, "glass_transition", "liquidus/solidus"))
+def test_unsupported_transition_kind_refuses_before_engine_open(
+    monkeypatch: pytest.MonkeyPatch,
+    subtype: str | None,
+) -> None:
+    reference = _transition_temperature_observation(subtype=subtype)
+
+    def unexpected_open(*_args):
+        pytest.fail("unsupported transition kind must not open an engine")
+
+    monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
+    prediction = predict_with_engine(Engine.MAGEMIN, reference)
+
+    assert prediction.value is None
     assert prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
     assert prediction.refusal_detail == {
@@ -20909,34 +21458,504 @@ def test_transition_temperature_refuses_before_generic_engine_pot(
     }
 
 
-    for prediction in predictions.values():
-        assert prediction.value is None
-        assert prediction.unit is None
-        assert prediction.execution.state is ExecutionState.UNSUPPORTED
-        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
-        assert prediction.refusal_detail == {
-            "reason": "quantity_not_predicted",
-            "quantity": Quantity.TRANSITION_TEMPERATURE.value,
-        }
+def test_openimcc_liquidus_refuses_before_engine_open(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    reference = _transition_temperature_observation(subtype="liquidus")
 
-    monkeypatch.setattr(
-        score_module,
-        "_ENGINE_CELL_PREDICTED_QUANTITIES",
-        score_module._ENGINE_CELL_PREDICTED_QUANTITIES
-        | {Quantity.TRANSITION_TEMPERATURE},
-    )
+    def unexpected_open(*_args):
+        pytest.fail("OpenIMCC has no liquidus finder and must not open")
+
+    monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
     prediction = predict_with_engine(Engine.OPENIMCC, reference)
 
-    assert len(opened) == 1
-    assert len(pots) == 1
-    assert "CaO" in parsed_formulas
     assert prediction.value is None
-    assert prediction.unit is None
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
     assert prediction.refusal_detail == {
         "reason": "quantity_not_predicted",
         "quantity": Quantity.TRANSITION_TEMPERATURE.value,
     }
+
+
+def _subprocess_solidus_refusal(_subtype: str) -> str:
+    return "subprocess"
+
+
+def _run_solidus_transport(monkeypatch, *, mode, refusal):
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    reference = _transition_temperature_observation(subtype="solidus")
+    calls: list[dict[str, object]] = []
+
+    def find_liquidus_solidus(**kwargs):
+        calls.append(kwargs)
+        return LiquidusSolidusResult(
+            liquidus_T_C=1450.0,
+            solidus_T_C=1400.0,
+            liquid_fraction=0.0,
+            status="ok",
+        )
+
+    backend_fields: dict[str, object] = {
+        "find_liquidus_solidus": find_liquidus_solidus,
+    }
+    if mode is not None:
+        backend_fields["_mode"] = mode
+    if refusal is not None:
+        backend_fields["liquidus_transition_refusal"] = refusal
+    handle = SimpleNamespace(
+        name=Engine.ALPHAMELTS.value,
+        backend=SimpleNamespace(**backend_fields),
+        available=True,
+        unavailable_reason=None,
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_open_cached_battery_handle",
+        lambda *_args: (handle, False),
+    )
+    return predict_with_engine(Engine.ALPHAMELTS, reference), calls
+
+
+def _assert_subprocess_solidus_refuses_without_finder(monkeypatch) -> None:
+    prediction, seen = _run_solidus_transport(
+        monkeypatch,
+        mode="subprocess",
+        refusal=_subprocess_solidus_refusal,
+    )
+    assert seen == []
+    assert prediction.value is None
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.refusal_detail == {
+        "reason": "liquidus_only_transport",
+        "transport": "subprocess",
+    }
+
+
+def test_alphamelts_subprocess_solidus_refuses_without_the_finder(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _assert_subprocess_solidus_refuses_without_finder(monkeypatch)
+
+    # The opened backend owns the refusal. ``_mode`` stays subprocess, and
+    # a method that allows the finder is called.
+    prediction, calls = _run_solidus_transport(
+        monkeypatch,
+        mode="subprocess",
+        refusal=lambda _subtype: None,
+    )
+    assert len(calls) == 1
+    assert prediction.value == Decimal("1673.15")
+    assert prediction.refusal_reason is None
+
+    # The same method refuses even when ``_mode`` is a fraction-finder mode.
+    prediction, calls = _run_solidus_transport(
+        monkeypatch,
+        mode="python_api",
+        refusal=_subprocess_solidus_refusal,
+    )
+    assert calls == []
+    assert prediction.refusal_detail == {
+        "reason": "liquidus_only_transport",
+        "transport": "subprocess",
+    }
+
+
+@pytest.mark.parametrize("mode", ("python_api", None))
+def test_alphamelts_fraction_finder_solidus_runs_when_transport_can(
+    monkeypatch: pytest.MonkeyPatch,
+    mode: str | None,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    reference = _transition_temperature_observation(subtype="solidus")
+    calls: list[dict[str, object]] = []
+
+    def find_liquidus_solidus(**kwargs):
+        calls.append(kwargs)
+        return LiquidusSolidusResult(
+            liquidus_T_C=1450.0,
+            solidus_T_C=1400.0,
+            liquid_fraction=0.0,
+            status="ok",
+        )
+
+    backend_fields: dict[str, object] = {
+        "find_liquidus_solidus": find_liquidus_solidus,
+    }
+    if mode is not None:
+        backend_fields["_mode"] = mode
+    handle = SimpleNamespace(
+        name=Engine.ALPHAMELTS.value,
+        backend=SimpleNamespace(**backend_fields),
+        available=True,
+        unavailable_reason=None,
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_open_cached_battery_handle",
+        lambda *_args: (handle, False),
+    )
+    prediction = predict_with_engine(Engine.ALPHAMELTS, reference)
+    assert len(calls) == 1
+    assert prediction.value == Decimal("1673.15")
+    assert prediction.refusal_reason is None
+
+
+def _dew_point_observation() -> Observation:
+    na = "dew point is not a melt-transition identity"
+    identity = Identity(
+        quantity=Quantity.TRANSITION_TEMPERATURE,
+        species=Species("Na2SO4", Phase.G),
+        subtype=State.of("dew_point"),
+        temperature_K=State.not_applicable(na),
+        per=State.not_applicable(na),
+        reference_state=State.not_applicable(na),
+        fO2_Pa=State.not_applicable(na),
+        standard_pressure_Pa=State.not_applicable(na),
+        reaction=State.not_applicable(na),
+        formation_elements=State.not_applicable(na),
+        reservoir=State.not_applicable(na),
+        sweep_gas=State.not_applicable(na),
+        exposure=State.not_applicable(na),
+        sample_mass_kg=State.not_applicable(na),
+        wall=State.not_applicable(na),
+    )
+    return F.observation(
+        "beerkens-dew-na2so4",
+        F.tabulation_experiment().experiment_id,
+        identity,
+        Decimal("900"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+
+def _assert_dew_point_keeps_gas_thermo(monkeypatch) -> None:
+    def unexpected_open(*_args):
+        pytest.fail("dew point must not open a liquidus engine")
+
+    monkeypatch.setattr(score_mod, "_open_cached_battery_handle", unexpected_open)
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        _dew_point_observation(),
+    )
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == "antoine_data_unavailable"
+    assert prediction.refusal_detail["species"] == ("Na2SO4", "NaOH")
+
+
+def test_dew_point_keeps_the_gas_thermo_route(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _assert_dew_point_keeps_gas_thermo(monkeypatch)
+
+    original = score_mod._engine_lacks_quantity_capability
+
+    def legacy_gate(engine, quantity, phase_basis):
+        if (
+            quantity is Quantity.TRANSITION_TEMPERATURE
+            and phase_basis == "dew_point"
+        ):
+            return True
+        return original(engine, quantity, phase_basis)
+
+    monkeypatch.setattr(
+        score_mod,
+        "_engine_lacks_quantity_capability",
+        legacy_gate,
+    )
+    with pytest.raises(AssertionError):
+        _assert_dew_point_keeps_gas_thermo(monkeypatch)
+
+
+def _native_transition_prediction(monkeypatch, diagnostics, *, status="ok"):
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    reference = _transition_temperature_observation()
+    result = LiquidusSolidusResult(
+        liquidus_T_C=None if status != "ok" else 1400.0,
+        liquid_fraction=None if status != "ok" else 1.0,
+        status=status,
+        warnings=() if status == "ok" else ("bracket absent",),
+        diagnostics=diagnostics,
+    )
+    handle = SimpleNamespace(
+        name=Engine.MAGEMIN.value,
+        backend=SimpleNamespace(
+            find_liquidus_solidus=lambda **_kwargs: result
+        ),
+        available=True,
+        unavailable_reason=None,
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_open_cached_battery_handle",
+        lambda *_args: (handle, False),
+    )
+    return predict_with_engine(Engine.MAGEMIN, reference)
+
+
+def _assert_extrapolated_success_keeps_native_authority(monkeypatch) -> None:
+    band = {"temperature_K": (1000.0, 1500.0), "sio2_wt_pct": (35.0, 55.0)}
+    commissioning = {
+        "kind": "engine_commissioning",
+        "reason": "silicate_window",
+        "authority": "extrapolated",
+        "certified_band": band,
+    }
+    prediction = _native_transition_prediction(
+        monkeypatch,
+        {
+            "authority": "extrapolated",
+            "certified_band": band,
+            "commissioning_notice": commissioning,
+        },
+    )
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert prediction.certified_band is not None
+    assert prediction.certified_band["temperature_K"] == (
+        Decimal("1000.0"),
+        Decimal("1500.0"),
+    )
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.reason == "silicate_window"
+        for notice in prediction.notices
+    )
+    bare = _native_transition_prediction(
+        monkeypatch,
+        {"authority": "extrapolated"},
+    )
+    assert bare.authority is Authority.EXTRAPOLATED
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in bare.notices
+    )
+    certified = _native_transition_prediction(
+        monkeypatch,
+        {"authority": "certified"},
+    )
+    assert certified.authority is Authority.CERTIFIED
+    mode = _native_transition_prediction(
+        monkeypatch,
+        {
+            "magemin_mode_token_notices": (
+                {"kind": "mode_vector_renormalised", "raw_sum": 1.001},
+            ),
+        },
+    )
+    assert mode.authority is Authority.BRIDGE
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason == "mode_vector_renormalised"
+        for notice in mode.notices
+    )
+    unknown = _native_transition_prediction(
+        monkeypatch,
+        {"authority": "guessed"},
+    )
+    assert unknown.authority is Authority.BRIDGE
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason == "guessed"
+        for notice in unknown.notices
+    )
+    refused = _native_transition_prediction(
+        monkeypatch,
+        {"authority": "extrapolated", "reason": "out_of_domain"},
+        status="out_of_domain",
+    )
+    assert refused.authority is Authority.REFUSED
+    assert refused.refusal_detail["reason"] == "liquidus_finder_out_of_domain"
+    assert refused.refusal_detail["diagnostics"] == {
+        "authority": "extrapolated",
+        "reason": "out_of_domain",
+    }
+
+
+def test_liquidus_success_keeps_native_authority_and_diagnostics(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _assert_extrapolated_success_keeps_native_authority(monkeypatch)
+
+    def stamp_bridge(_result, _engine):
+        return Authority.BRIDGE, None, (), None
+
+    monkeypatch.setattr(score_mod, "_liquidus_native_score", stamp_bridge)
+    with pytest.raises(AssertionError):
+        _assert_extrapolated_success_keeps_native_authority(monkeypatch)
+
+
+def test_transition_temperature_out_of_domain_bracket_is_typed_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    reference = _transition_temperature_observation()
+    unavailable_result = LiquidusSolidusResult(
+        status="not_converged",
+        warnings=("liquidus bracket absent: frac_M never reached 0.999",),
+    )
+    handle = SimpleNamespace(
+        name=Engine.MAGEMIN.value,
+        backend=SimpleNamespace(
+            find_liquidus_solidus=lambda **_kwargs: unavailable_result
+        ),
+        available=True,
+        unavailable_reason=None,
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_open_cached_battery_handle",
+        lambda *_args: (handle, False),
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, reference)
+
+    assert prediction.value is None
+    assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail == {
+        "reason": "liquidus_finder_not_converged",
+        "status": "not_converged",
+        "warnings": ["liquidus bracket absent: frac_M never reached 0.999"],
+    }
+
+
+@pytest.mark.parametrize(
+    "engine",
+    (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.MAGEMIN),
+)
+def test_transition_temperature_real_engine_matches_source_anchor_and_library(
+    monkeypatch: pytest.MonkeyPatch,
+    engine: Engine,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        close_battery_engine_handle,
+        open_battery_engine,
+    )
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    lunar_mare_low_ti = Composition(
+        basis="printed_Apollo_12_12009_lunar_mare_low_ti_wt_percent",
+        components=(
+            ("SiO2", Decimal("44.5")),
+            ("TiO2", Decimal("1.5")),
+            ("Al2O3", Decimal("13.5")),
+            ("FeO", Decimal("16.5")),
+            ("MgO", Decimal("9.0")),
+            ("CaO", Decimal("11.0")),
+            ("Na2O", Decimal("0.4")),
+            ("K2O", Decimal("0.10")),
+            ("Cr2O3", Decimal("0.35")),
+        ),
+        amount_basis=AmountBasis.MASS_PERCENT,
+    )
+    # Green, Ware, Hibberson and Major (1971), Apollo 12 sample 12009:
+    # crystallization begins near 1230 °C. This lunar mare analog admits
+    # model spread around that anchor.
+    reference = _transition_temperature_observation(
+        composition=lunar_mare_low_ti
+    )
+    handle = open_battery_engine(engine.value)
+    assert handle.available, handle.unavailable_reason
+    backend = handle.backend
+    assert backend is not None
+    native_finder = backend.find_liquidus_solidus
+    calls: list[dict[str, object]] = []
+    native_results: list[LiquidusSolidusResult] = []
+
+    def recorded_finder(**kwargs):
+        calls.append(dict(kwargs))
+        result = native_finder(**kwargs)
+        native_results.append(result)
+        return result
+
+    monkeypatch.setattr(backend, "find_liquidus_solidus", recorded_finder)
+    try:
+        prediction = predict_with_engine(
+            engine,
+            reference,
+            handles={engine.value: handle},
+        )
+    finally:
+        close_battery_engine_handle(handle)
+
+    assert len(calls) == 1
+    expected_composition_kg = {
+        "SiO2": 0.445,
+        "TiO2": 0.015,
+        "Al2O3": 0.135,
+        "FeO": 0.165,
+        "MgO": 0.09,
+        "CaO": 0.11,
+        "Na2O": 0.004,
+        "K2O": 0.001,
+        "Cr2O3": 0.0035,
+    }
+    assert set(calls[0]) == {
+        "composition_kg",
+        "fO2_log",
+        "pressure_bar",
+    }
+    assert calls[0]["composition_kg"].keys() == expected_composition_kg.keys()
+    for oxide, amount_kg in expected_composition_kg.items():
+        assert calls[0]["composition_kg"][oxide] == pytest.approx(amount_kg)
+    assert calls[0]["fO2_log"] == -9.0
+    assert calls[0]["pressure_bar"] == 1.0
+    assert len(native_results) == 1
+    native_result = native_results[0]
+    if native_result.status != "ok":
+        assert prediction.value is None
+        assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
+        assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+        expected_detail = {
+            "reason": f"liquidus_finder_{native_result.status}",
+            "status": native_result.status,
+            "warnings": list(native_result.warnings),
+        }
+        if native_result.diagnostics:
+            expected_detail["diagnostics"] = dict(native_result.diagnostics)
+        assert prediction.refusal_detail == expected_detail
+        return
+    assert native_result.liquidus_T_C is not None
+    assert 1100.0 <= native_result.liquidus_T_C <= 1450.0
+    assert prediction.value == Decimal(str(native_result.liquidus_T_K))
+    assert prediction.unit == "K"
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    native_authority = (
+        native_result.diagnostics.get("authority")
+        if isinstance(native_result.diagnostics, Mapping)
+        else None
+    )
+    if native_authority == "extrapolated":
+        assert prediction.authority is Authority.EXTRAPOLATED
+        assert any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            for notice in prediction.notices
+        )
+    elif native_authority == "certified":
+        assert prediction.authority is Authority.CERTIFIED
+    elif native_authority in (None, "bridge"):
+        assert prediction.authority is Authority.BRIDGE
+    else:
+        assert prediction.authority is Authority.BRIDGE
+        assert any(
+            notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and notice.reason == str(native_authority)
+            for notice in prediction.notices
+        )
 
 
 @pytest.mark.parametrize(
