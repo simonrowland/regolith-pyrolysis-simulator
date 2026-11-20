@@ -276,7 +276,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=29b014fbe2a5
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -383,6 +388,24 @@ observations:
         table: 2a and 2b
         note: Table 2a, row V-59; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-59; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -850,7 +873,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=4a464a049117
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -946,6 +974,24 @@ observations:
         table: 2a and 2b
         note: Table 2a, row V-46; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-46; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -1218,7 +1264,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=7f1b5342e970
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -1314,6 +1365,24 @@ observations:
         table: 2a and 2b
         note: Table 2a, row V-43; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-43; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -1781,7 +1850,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=bd19c39edec4
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -1877,6 +1951,24 @@ observations:
         table: 2a and 2b
         note: Table 2a, row V-45; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-45; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -1965,7 +2057,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=cfc7d09a9900
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -2061,6 +2158,24 @@ observations:
         table: 2a and 2b
         note: Table 2a, row V-44; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-44; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -2149,7 +2264,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=d6cd77ce2934
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -2256,6 +2376,24 @@ observations:
         table: 2a and 2b
         note: Table 2a, row V-60; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-60; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -2506,7 +2644,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=024253e29b68
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -2602,6 +2745,24 @@ observations:
         table: 2a and 2b
         note: Table 2b, row V-88; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-88; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -2690,7 +2851,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=08270daa7ea9
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -2786,6 +2952,24 @@ observations:
         table: 2a and 2b
         note: Table 2b, row V-92; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-92; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -3058,7 +3242,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=406a2cf78e09
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -3154,6 +3343,24 @@ observations:
         table: 2a and 2b
         note: Table 2b, row V-91; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-91; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -3242,7 +3449,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=4863724860c7
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -3338,6 +3550,24 @@ observations:
         table: 2a and 2b
         note: Table 2b, row V-93; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-93; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -3794,7 +4024,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=671df1f252ff
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -3890,6 +4125,24 @@ observations:
         table: 2a and 2b
         note: Table 2b, row V-103; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-103; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -4714,7 +4967,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=951584db29e3
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -4810,6 +5068,24 @@ observations:
         table: 2a and 2b
         note: Table 2b, row V-89; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-89; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -4898,7 +5174,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=9bf77df8f1c2
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -4994,6 +5275,24 @@ observations:
         table: 2a and 2b
         note: Table 2b, row V-87; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-87; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -5082,7 +5381,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=bb6657667652
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -5178,6 +5482,24 @@ observations:
         table: 2a and 2b
         note: Table 2b, row V-86; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-86; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -5634,7 +5956,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=f359befaf8c7
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -5730,6 +6057,24 @@ observations:
         table: 2a and 2b
         note: Table 2b, row V-90; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-90; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:
@@ -5818,7 +6163,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - isotope_delta
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=f375e7dcdd33
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -5914,6 +6264,24 @@ observations:
         table: 2a and 2b
         note: Table 2b, row V-85; printed δ41K and err.
         source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-85; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: as_published
     inputs:

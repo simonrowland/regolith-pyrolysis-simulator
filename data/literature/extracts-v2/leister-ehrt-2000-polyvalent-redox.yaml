@@ -55,7 +55,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -85,7 +85,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a::T=1873.15:row=1:h=ad6d3f98d591
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 5
@@ -151,6 +156,22 @@ observations:
         published_page: 198
         pdf_page_index: 4
         table: Tab. 1
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derived_from:
   - pdf:leister-ehrt-2000-polyvalent-redox
   derivation:
@@ -225,7 +246,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -255,7 +276,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a::T=1873.15:row=2:h=0eb58827bfd8
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 5
@@ -321,6 +347,22 @@ observations:
         published_page: 198
         pdf_page_index: 4
         table: Tab. 1
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derived_from:
   - pdf:leister-ehrt-2000-polyvalent-redox
   derivation:
@@ -565,7 +607,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -595,7 +637,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1773.15:row=iron:h=62d1fb7bb45d
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 3
@@ -663,6 +710,23 @@ observations:
         pdf_page_index: 2
         paragraph: Iron
         section: Results and Discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 3
+        published_page: 196
+        pdf_page_index: 2
+        paragraph: Iron
+        section: Results and Discussion
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derived_from:
   - pdf:leister-ehrt-2000-polyvalent-redox
   derivation:
@@ -737,7 +801,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -767,7 +831,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1873.15:row=1:h=0729256e08e2
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 5
@@ -833,6 +902,22 @@ observations:
         published_page: 198
         pdf_page_index: 4
         table: Tab. 1
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derived_from:
   - pdf:leister-ehrt-2000-polyvalent-redox
   derivation:
@@ -907,7 +992,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -937,7 +1022,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1873.15:row=2:h=a6361cadef9c
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 5
@@ -1003,6 +1093,22 @@ observations:
         published_page: 198
         pdf_page_index: 4
         table: Tab. 1
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derived_from:
   - pdf:leister-ehrt-2000-polyvalent-redox
   derivation:
@@ -1591,7 +1697,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -1621,7 +1727,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=1873.15:row=1:h=ac46444fa1a6
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 5
@@ -1687,6 +1798,22 @@ observations:
         published_page: 198
         pdf_page_index: 4
         table: Tab. 1
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derived_from:
   - pdf:leister-ehrt-2000-polyvalent-redox
   derivation:
@@ -1765,7 +1892,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -1795,7 +1922,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=1873.15:row=2:h=18497705bdc4
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 5
@@ -1861,6 +1993,22 @@ observations:
         published_page: 198
         pdf_page_index: 4
         table: Tab. 1
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derived_from:
   - pdf:leister-ehrt-2000-polyvalent-redox
   derivation:

@@ -404,7 +404,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -442,7 +442,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: schreiber-1977-tetravalent-cr-diopside::schreiber_1977_crvi_fraction_blue_diopside_melt::points:h=86a741fb926b
   source_id: schreiber-1977-tetravalent-cr-diopside
   locator:
     page: 3
@@ -454,13 +459,14 @@ observations:
     fO2_log:
       state:
         tag: unknown
-        reason: The melt is described as the one from which blue diopside crystallizes in air; no numeric oxygen fugacity
-          is printed for this range.
-      locator:
-        page: 3
-        published_page: 524
-        pdf_page_index: 2
-        section: Results and discussion
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere_as_published=air, for melts that crystallize blue diopside
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     temperature_K:
       state:
         tag: unknown
