@@ -15,6 +15,7 @@ from simulator.accounting.formulas import (
     resolve_species_formula,
 )
 from simulator.account_ids import (
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
@@ -74,6 +75,7 @@ TARGET_YIELD_PRODUCT_ACCOUNTS = (
     "terminal.stage0_sulfide_matte",
     "terminal.drain_tap_material",
     "terminal.chromium_condensed_oxide_stored",
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
     "process.metal_phase",
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,

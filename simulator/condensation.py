@@ -125,6 +125,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.core import (
     CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
 )
+from simulator.account_ids import MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
 from simulator.lab_geometry import (
     LabGeometry,
     LabGeometryError,
@@ -135,6 +136,7 @@ from simulator.condensation_routing import (
     DESIGNATED_STAGE,
     K_TRAP_STAGE_KEY,
     NA_COLLECTOR_STAGE_KEY,
+    STAGE_KEY_BY_NUMBER,
     accepted_species_for_stage_key,
     accepted_species_for_stage_number,
     coproduct_species_for_stage_number,
@@ -8094,10 +8096,34 @@ STAGE_PURITY_VERDICTS = frozenset((
 STAGE_PURITY_NO_CAPTURED_MASS = 'no_captured_mass'
 
 
-def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
-    """Classify each stage's accumulated product as designated or impurity."""
+def stage_purity_report(
+    train: CondensationTrain,
+    ledger: Any | None = None,
+) -> dict[str, dict[str, Any]]:
+    """Classify stage inventory, plus current ledger-backed cartridge products."""
 
     report: dict[str, dict[str, Any]] = {}
+    ledger_accounts = ledger.kg_by_account() if ledger is not None else {}
+    mn_cartridge_kg = dict(
+        ledger_accounts.get(MANGANESE_STAGE3_CARTRIDGE_ACCOUNT, {})
+    )
+    reagent_inventory_kg = dict(
+        ledger_accounts.get('process.reagent_inventory', {})
+    )
+    reagent_origins = (
+        ledger.origin_atom_moles_by_account().get(
+            'process.reagent_inventory', {}
+        )
+        if ledger is not None
+        else {}
+    )
+    reagent_unresolved = (
+        ledger.unresolved_origin_atom_moles_by_account().get(
+            'process.reagent_inventory', {}
+        )
+        if ledger is not None
+        else {}
+    )
     for stage in train.stages:
         stage_number = int(stage.stage_number)
         explicit_key = getattr(stage, 'stage_key', '') or ''
@@ -8113,6 +8139,15 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
             )
             for species, raw_kg in stage.collected_kg.items()
         }
+        if stage_key == STAGE_KEY_BY_NUMBER[3] and ledger is not None:
+            # Stage 3's projection includes both cartridges. The dedicated
+            # ledger account holds the Mn-window cartridge; subtract its live
+            # species balances to report the silica-window cartridge alone.
+            for species, raw_kg in mn_cartridge_kg.items():
+                if species in collected_kg:
+                    collected_kg[species] = max(
+                        0.0, collected_kg[species] - float(raw_kg)
+                    )
         if explicit_key:
             accepted_species = accepted_species_for_stage_key(explicit_key)
             coproduct_species = frozenset(
@@ -8179,5 +8214,101 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
             stage_report['reason'] = STAGE_PURITY_NO_CAPTURED_MASS
         if activity:
             stage_report['activity'] = activity
+        if stage_key == STAGE_KEY_BY_NUMBER[3] and ledger is not None:
+            cartridge_total_kg = sum(
+                max(0.0, float(value)) for value in mn_cartridge_kg.values()
+            )
+            manganese_kg = max(0.0, float(mn_cartridge_kg.get('Mn', 0.0)))
+            # Every Mn-cartridge capture remains uncertified: at h19 the Si
+            # dew point (1163.1 C) exceeds Mn (1133.9 C); the proposed
+            # 800-925 C Mn Psat band is below the certified 1228 K floor;
+            # alpha_s(Mn)=0.85 is UNCERTIFIED
+            # (no_direct_mn_sticking_coefficient); and the SiO wall-Psat
+            # refusal at 1400 K leaves 56 clean-window profiles indeterminate.
+            stage_report.update({
+                'silica_cartridge_mass_kg': total_kg,
+                'silica_without_mn_purity_fraction': purity_fraction,
+                'mn_cartridge_mass_kg': cartridge_total_kg,
+                'mn_cartridge_mn_mass_kg': manganese_kg,
+                'mn_cartridge_purity_fraction': (
+                    manganese_kg / cartridge_total_kg
+                    if cartridge_total_kg > 1e-12
+                    else None
+                ),
+                'mn_cartridge_capture_status': 'FLAGGED_UNCERTIFIED',
+            })
+        if stage_key == NA_COLLECTOR_STAGE_KEY and ledger is not None:
+            recovered_designated_kg: dict[str, float] = {}
+            recovered_origin_complete = True
+            for species in ('Na', 'Mg'):
+                current_reagent_kg = max(
+                    0.0, float(reagent_inventory_kg.get(species, 0.0))
+                )
+                origin_moles = dict(reagent_origins.get(species, {}) or {})
+                known_origin_moles = sum(
+                    max(0.0, float(value)) for value in origin_moles.values()
+                )
+                feedstock_share = (
+                    max(0.0, float(origin_moles.get('feedstock', 0.0)))
+                    / known_origin_moles
+                    if known_origin_moles > 1e-12
+                    else 0.0
+                )
+                if (
+                    current_reagent_kg > 1e-12
+                    and (
+                        known_origin_moles <= 1e-12
+                        or float(reagent_unresolved.get(species, 0.0)) > 1e-12
+                    )
+                ):
+                    recovered_origin_complete = False
+                recovered_designated_kg[species] = (
+                    current_reagent_kg * feedstock_share
+                )
+            net_designated_species_kg = {
+                species: max(0.0, float(collected_kg.get(species, 0.0)))
+                + recovered_designated_kg[species]
+                for species in ('Na', 'Mg')
+            }
+            net_designated_kg = sum(net_designated_species_kg.values())
+            sio_impurity_kg = sum(
+                max(0.0, float(collected_kg.get(species, 0.0)))
+                for species in ('SiO2', 'Si')
+            )
+            net_impurity_kg = sum(
+                max(0.0, float(value))
+                for species, value in collected_kg.items()
+                if species not in {'Na', 'Mg'}
+            )
+            net_unique_total_kg = net_designated_kg + net_impurity_kg
+            stage_report.update({
+                'net_unique_designated_species_kg': net_designated_species_kg,
+                'net_unique_designated_kg': net_designated_kg,
+                'net_unique_recovered_species_kg': recovered_designated_kg,
+                'net_unique_impurity_kg': net_impurity_kg,
+                'net_unique_total_kg': net_unique_total_kg,
+                'net_unique_purity_fraction': (
+                    net_designated_kg / net_unique_total_kg
+                    if recovered_origin_complete and net_unique_total_kg > 1e-12
+                    else None
+                ),
+                'sio_impurity_kg': sio_impurity_kg,
+                'sio_impurity_to_designated_ratio': (
+                    sio_impurity_kg / net_designated_kg
+                    if recovered_origin_complete and net_designated_kg > 1e-12
+                    else None
+                ),
+                'net_unique_basis_status': (
+                    'complete'
+                    if recovered_origin_complete
+                    else 'indeterminate_reagent_origin'
+                ),
+                'sio_impurity_basis': (
+                    'current Stage-4 SiO2+Si plus current feedstock-origin '
+                    'Na/Mg in reagent inventory; disjoint live ledger balances'
+                    if ledger is not None
+                    else 'current Stage-4 inventory only; ledger unavailable'
+                ),
+            })
         report[stage_key] = stage_report
     return report

@@ -30,6 +30,7 @@ from simulator.accounting.lots import (
 )
 from simulator.account_ids import (
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
     OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
     SOLID_CHAR_CARBON_ACCOUNT,
 )
@@ -97,6 +98,7 @@ KNOWN_LEDGER_ACCOUNTS: frozenset[str] = frozenset({
     "terminal.drain_tap_material",
     "terminal.offgas",
     "terminal.chromium_condensed_oxide_stored",
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
     "terminal.oxygen_stage0_stored",
     "terminal.oxygen_mre_anode_stored",
     "terminal.oxygen_melt_offgas_stored",

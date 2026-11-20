@@ -48,6 +48,7 @@ objectives:
 constraints:
   gates:
     - delivered_stream_purity
+    - stage4_sio_impurity
     - coating
     - extraction_completeness
     - knudsen_viscous
@@ -95,7 +96,6 @@ seed_recipes:
         stage_areas_m2:
           fe_stage1: 0.236
           cr_stage2: 0.050893800988154644
-          sio_stage3: 0.06785840131753954
           alkali_stage4: 0.05099999999999999
           k_stage4b: 0.064
       campaigns:

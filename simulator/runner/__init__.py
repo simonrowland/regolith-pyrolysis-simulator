@@ -1887,7 +1887,9 @@ class PyrolysisRun:
                 section="thermal_train_report",
             ),
             "stage_purity_report": _safe_failure_value(
-                lambda: _json_safe(stage_purity_report(sim.train)),
+                lambda: _json_safe(
+                    stage_purity_report(sim.train, sim.atom_ledger)
+                ),
                 section="stage_purity_report",
             ),
             "vapor_pressure_source_report": _safe_failure_value(
@@ -6094,7 +6096,9 @@ def _runner_failure_result(
         )
     stage_report = (
         _safe_failure_value(
-            lambda: _json_safe(stage_purity_report(sim.train)),
+            lambda: _json_safe(
+                stage_purity_report(sim.train, sim.atom_ledger)
+            ),
             section="stage_purity_report",
         )
         if sim is not None

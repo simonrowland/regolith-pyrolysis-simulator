@@ -15,6 +15,7 @@ METAL_PHASE_ACCOUNTS = (
 TERMINAL_DRAIN_TAP_ACCOUNT = "terminal.drain_tap_material"
 EXTRACTED_METAL_PRODUCT_ACCOUNTS = (TERMINAL_DRAIN_TAP_ACCOUNT,)
 CHROMIUM_CONDENSED_OXIDE_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
+MANGANESE_STAGE3_CARTRIDGE_ACCOUNT = "terminal.mn_cartridge_stored"
 # Writer sweep (2026-07-12): evaporation._project_condensed_stage_collection
 # projects condensation-train credits; extraction._project_condensed_species
 # projects condensation-train, dedicated terminal chromium-product, or
@@ -23,6 +24,7 @@ STAGE_COLLECTION_SOURCE_ACCOUNTS = (
     *METAL_PHASE_ACCOUNTS,
     "process.condensation_train",
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
 )
 # Only these ledger accounts always back the condenser-train UI projection.
 # Metal-phase accounts also hold intentionally unprojected products. Their
@@ -30,6 +32,7 @@ STAGE_COLLECTION_SOURCE_ACCOUNTS = (
 STAGE_COLLECTION_BACKING_ACCOUNTS = (
     "process.condensation_train",
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
 )
 OXYGEN_STAGE0_ACCOUNT = "terminal.oxygen_stage0_stored"
 OXYGEN_MELT_OFFGAS_ACCOUNT = "terminal.oxygen_melt_offgas_stored"

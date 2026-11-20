@@ -43,6 +43,7 @@ from simulator.account_ids import (
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     EXTRACTED_METAL_PRODUCT_ACCOUNTS,
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
     METAL_PHASE_ACCOUNTS,
     OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
     OXYGEN_CAPTURED_ACCOUNTS,
@@ -757,6 +758,7 @@ def _metal_product_accounting(sim, *, products):
     allowed_stage_sources = set(METAL_PHASE_ACCOUNTS) | {
         CONDENSATION_TRAIN_ACCOUNT,
         CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+        MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
     }
     for key, raw_mass in stage_collections.items():
         if not isinstance(key, tuple) or len(key) != 3:

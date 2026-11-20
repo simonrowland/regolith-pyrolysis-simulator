@@ -740,6 +740,7 @@ completion_contracts:
       - "process.condensation_train"
       - "process.overhead_gas"
       - "terminal.chromium_condensed_oxide_stored"
+      - "terminal.mn_cartridge_stored"
     residual_accounts: &vapor_residual_accounts
       - "process.cleaned_melt"
       - "terminal.slag"
@@ -1142,6 +1143,9 @@ condensation_train:
       label: "SiO Condensation Zone"
       temp_range_C: [900, 1200]
       material: "fused silica baffles (removable cartridge)"
+      stage3_cartridge_schedule:
+        mn_cartridge_run_hour_window: [12, 30]
+        source: "FLAGGED D452_HOUR seed rows; inclusive run-hour bounds"
       max_service_T_C: 1300
       product: "fused silica glass (SiO2 capture on fused-silica substrate)"
       note: >
@@ -1202,11 +1206,12 @@ condenser_geometry:
     max_throat_area_source: "FLAGGED provisional (d-452): 0.05-0.50 m aperture bounds; owner ratification pending"
     slider_vane_open_fraction: [0.01, 1.0]
     slider_vane_open_fraction_source: "FLAGGED provisional (d-452): owner requires 0 < f <= 1; 0.01 search floor pending ratification"
-    # Positive lower bound enables log sampling; upper headroom includes the
-    # d-283 Fe 90% estimate of 3.5-4.6 m2. These are hardware bounds, not a
-    # capture target.
-    stage_area_m2: [0.001, 10.0]
-    stage_area_m2_source: "FLAGGED provisional d-283/d-452: 0.001-10 m2 collector envelope; bounds pending owner ratification"
+    # The d-283 10 m2 ceiling was a probe limit, not a hardware bound. No
+    # structural hardware limit is sourced, so this flagged envelope extends
+    # beyond the d-452 1,142.635 m2 screening estimate and remains priced by
+    # the shared d-283 material basis below.
+    stage_area_m2: [0.001, 2000.0]
+    stage_area_m2_source: "FLAGGED provisional d-283/d-452: 0.001-2,000 m2 search envelope; no owner hardware maximum"
 
   # Owner-set fixed maximum aperture is pi * (0.25 m)^2. Since the
   # compressible-Poiseuille capacity scales as d^4, (0.50/0.12)^4 = 301x the
@@ -1245,11 +1250,19 @@ condenser_geometry:
   stage_areas_m2:
     fe_stage1: 0.236
     cr_stage2: 0.050893800988154644
-    sio_stage3: 0.06785840131753954
+    sio_stage3: 466.975
     alkali_stage4: 0.05099999999999999
     k_stage4b: 0.064
     terminal: 0.02261946710584651
-  stage_areas_m2_source: "FLAGGED d-283 (d-452): 12 cm-anchor areas pending peak-flux sizing probe"
+  stage_areas_m2_source: "FLAGGED d-452 measured converged 90.009% peak-capture fixed point for SiO zone; other collector anchors unchanged"
+  # Stage-4 purity gate: allow at most 5 kg of SiO2+Si impurity per 100 kg of
+  # net unique designated Na+Mg product. Algebra: (m_SiO2 + m_Si) / m_Na+Mg
+  # <= 0.05; numerator and denominator are kg, so the ratio is dimensionless.
+  # Sanity: 100 kg designated product permits 5 kg SiO-derived carryover.
+  # FLAGGED provisional controller value, pending owner ratification.
+  stage4_sio_impurity_gate:
+    max_impurity_to_designated_ratio: 0.05
+    source: "FLAGGED engineering-default controller limit; provisional, not owner-certified"
   # This configured 12 cm hydraulic diameter is shared by condenser transfer
   # fallbacks and the physical wall segments; it is independent of the throat.
   condenser_hydraulic_diameter_m: 0.12
