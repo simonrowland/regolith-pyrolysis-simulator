@@ -91,6 +91,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_101_p002_t01_r03_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id002
         page: 2
         pdf_page_index: 1
@@ -104,14 +111,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -159,7 +166,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.100'
         a_FetO_as_printed: '0.100'
         Fe3_over_Fe2: '0.076'
@@ -220,6 +228,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_102_p002_t01_r04_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id005
         page: 2
         pdf_page_index: 1
@@ -233,14 +248,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -283,7 +298,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.100'
         a_FetO_as_printed: '0.100'
         Fe3_over_Fe2: '0.120'
@@ -342,6 +358,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_103_p002_t01_r05_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id006
         page: 2
         pdf_page_index: 1
@@ -355,14 +378,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -405,7 +428,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.100'
         a_FetO_as_printed: '0.100'
         Fe3_over_Fe2: '0.123'
@@ -464,6 +488,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_104_p002_t01_r06_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id007
         page: 2
         pdf_page_index: 1
@@ -477,14 +508,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -527,7 +558,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.101'
         a_FetO_as_printed: '0.101'
         Fe3_over_Fe2: '0.362'
@@ -586,6 +618,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_301_p002_t01_r07_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id008
         page: 2
         pdf_page_index: 1
@@ -599,14 +638,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -649,7 +688,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.299'
         a_FetO_as_printed: '0.299'
         Fe3_over_Fe2: '0.025'
@@ -708,6 +748,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_302_p002_t01_r08_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id009
         page: 2
         pdf_page_index: 1
@@ -721,14 +768,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -771,7 +818,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.299'
         a_FetO_as_printed: '0.299'
         Fe3_over_Fe2: '0.039'
@@ -830,6 +878,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_303_p002_t01_r09_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id010
         page: 2
         pdf_page_index: 1
@@ -843,14 +898,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -893,7 +948,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.299'
         a_FetO_as_printed: '0.299'
         Fe3_over_Fe2: '0.072'
@@ -952,6 +1008,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_304_p002_t01_r10_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id011
         page: 2
         pdf_page_index: 1
@@ -965,14 +1028,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -1015,7 +1078,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.298'
         a_FetO_as_printed: '0.298'
         Fe3_over_Fe2: '0.093'
@@ -1074,6 +1138,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_306_p002_t01_r11_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id012
         page: 2
         pdf_page_index: 1
@@ -1087,14 +1158,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -1137,7 +1208,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.297'
         a_FetO_as_printed: '0.297'
         Fe3_over_Fe2: '0.087'
@@ -1196,6 +1268,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_501_p002_t01_r12_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id013
         page: 2
         pdf_page_index: 1
@@ -1209,14 +1288,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -1259,7 +1338,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.499'
         a_FetO_as_printed: '0.499'
         Fe3_over_Fe2: '0.054'
@@ -1318,6 +1398,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_502_p002_t01_r13_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id014
         page: 2
         pdf_page_index: 1
@@ -1331,14 +1418,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -1381,7 +1468,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.500'
         a_FetO_as_printed: '0.500'
         Fe3_over_Fe2: '0.070'
@@ -1440,6 +1528,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_504_p002_t01_r14_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id015
         page: 2
         pdf_page_index: 1
@@ -1453,14 +1548,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -1503,7 +1598,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.496'
         a_FetO_as_printed: '0.496'
         Fe3_over_Fe2: '0.061'
@@ -1562,6 +1658,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_505_p002_t01_r15_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id016
         page: 2
         pdf_page_index: 1
@@ -1575,14 +1678,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -1625,7 +1728,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.499'
         a_FetO_as_printed: '0.499'
         Fe3_over_Fe2: '0.040'
@@ -1684,6 +1788,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_506_p002_t01_r16_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id017
         page: 2
         pdf_page_index: 1
@@ -1697,14 +1808,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -1747,7 +1858,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.499'
         a_FetO_as_printed: '0.499'
         Fe3_over_Fe2: '0.041'
@@ -1806,6 +1918,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_508_p002_t01_r17_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id018
         page: 2
         pdf_page_index: 1
@@ -1819,14 +1938,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -1869,7 +1988,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.500'
         a_FetO_as_printed: '0.500'
         Fe3_over_Fe2: '0.104'
@@ -1928,6 +2048,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_509_p002_t01_r18_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id019
         page: 2
         pdf_page_index: 1
@@ -1941,14 +2068,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -1991,7 +2118,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.501'
         a_FetO_as_printed: '0.501'
         Fe3_over_Fe2: '0.063'
@@ -2050,6 +2178,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_510_p002_t01_r19_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id020
         page: 2
         pdf_page_index: 1
@@ -2063,14 +2198,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -2113,7 +2248,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.499'
         a_FetO_as_printed: '0.499'
         Fe3_over_Fe2: '0.096'
@@ -2172,6 +2308,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_575_p002_t01_r20_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id021
         page: 2
         pdf_page_index: 1
@@ -2185,14 +2328,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -2235,7 +2378,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.499'
         a_FetO_as_printed: '0.499'
         Fe3_over_Fe2: '0.079'
@@ -2294,6 +2438,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_500_p002_t01_r21_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id022
         page: 2
         pdf_page_index: 1
@@ -2307,14 +2458,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -2357,7 +2508,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.502'
         a_FetO_as_printed: '0.502'
         Fe3_over_Fe2: '0.100'
@@ -2416,6 +2568,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_701_p002_t01_r22_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id023
         page: 2
         pdf_page_index: 1
@@ -2429,14 +2588,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -2479,7 +2638,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.702'
         a_FetO_as_printed: '0.702'
         Fe3_over_Fe2: '0.075'
@@ -2538,6 +2698,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_702_p002_t01_r23_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id024
         page: 2
         pdf_page_index: 1
@@ -2551,14 +2718,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -2601,7 +2768,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.700'
         a_FetO_as_printed: '0.700'
         Fe3_over_Fe2: '0.066'
@@ -2660,6 +2828,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_703_p002_t01_r24_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id025
         page: 2
         pdf_page_index: 1
@@ -2673,14 +2848,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -2723,7 +2898,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.699'
         a_FetO_as_printed: '0.699'
         Fe3_over_Fe2: '0.065'
@@ -2782,6 +2958,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_704_p002_t01_r25_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id026
         page: 2
         pdf_page_index: 1
@@ -2795,14 +2978,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -2845,7 +3028,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.700'
         a_FetO_as_printed: '0.700'
         Fe3_over_Fe2: '0.085'
@@ -2904,6 +3088,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_705_p002_t01_r26_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id027
         page: 2
         pdf_page_index: 1
@@ -2917,14 +3108,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -2967,7 +3158,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.700'
         a_FetO_as_printed: '0.700'
         Fe3_over_Fe2: '0.110'
@@ -3026,6 +3218,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_706_p002_t01_r27_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id028
         page: 2
         pdf_page_index: 1
@@ -3039,14 +3238,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -3089,7 +3288,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.700'
         a_FetO_as_printed: '0.700'
         Fe3_over_Fe2: '0.080'
@@ -3148,6 +3348,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_901_p002_t01_r28_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id029
         page: 2
         pdf_page_index: 1
@@ -3161,14 +3368,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -3211,7 +3418,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.899'
         a_FetO_as_printed: '0.899'
         Fe3_over_Fe2: '0.093'
@@ -3270,6 +3478,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_902_p002_t01_r29_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id030
         page: 2
         pdf_page_index: 1
@@ -3283,14 +3498,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -3333,7 +3548,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.901'
         a_FetO_as_printed: '0.901'
         Fe3_over_Fe2: '0.106'
@@ -3392,6 +3608,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_903_p002_t01_r30_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id031
         page: 2
         pdf_page_index: 1
@@ -3405,14 +3628,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -3455,7 +3678,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.899'
         a_FetO_as_printed: '0.899'
         Fe3_over_Fe2: '0.108'
@@ -3514,6 +3738,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_904_p002_t01_r31_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id032
         page: 2
         pdf_page_index: 1
@@ -3527,14 +3758,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -3577,7 +3808,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.896'
         a_FetO_as_printed: '0.896'
         Fe3_over_Fe2: '0.120'
@@ -3636,6 +3868,13 @@ species:
     - observation_id: banya_hino_yuge_1985_t1_run_905_p002_t01_r32_c08
       experiment: banya_hino_yuge_1985_table1_equilibrium
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator: &id033
         page: 2
         pdf_page_index: 1
@@ -3649,14 +3888,14 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
         note: Table 2 reaction (1) names Fe_tO(l), the printed FetO liquid standard state. The paper defines N_FetO = N_FeO
           + N_Fe2O3; no Masson N_Fe2+ conversion is applied.
@@ -3699,7 +3938,8 @@ species:
       values:
         quantity: activity
         method_class: measured_tabulated
-        component: FetO
+        formula: FeO
+        component: FeO
         activity: '0.902'
         a_FetO_as_printed: '0.902'
         Fe3_over_Fe2: '0.113'
