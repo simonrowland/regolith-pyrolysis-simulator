@@ -3458,9 +3458,21 @@ def test_internal_source_reaction_metal_pressure_never_exceeds_pure_saturation(
             )
         )
 
-        # The low-fO2 source can sit below saturation; saturation is an upper
-        # bound, not a target pressure for every metal reaction.
-        assert result.vapor_pressures_Pa[species] <= pure_metal_saturation_Pa
+        if species == "Mg":
+            # JANAF Mg(g)/MgO at 1423.15 K gives ΔG≈−877.16 kJ/mol O2,
+            # K≈6.394e−33 bar and a_M≈7.996e−3 at pO2=1e−28 bar.
+            # Its 799.6039375676731 Pa equilibrium pressure is below the
+            # ~165.7 kPa pure-metal sidecar cap.
+            assert result.vapor_pressures_Pa[species] == pytest.approx(
+                799.6039375676731,
+                rel=1e-12,
+                abs=1e-12,
+            )
+            assert result.vapor_pressures_Pa[species] < pure_metal_saturation_Pa
+        else:
+            assert result.vapor_pressures_Pa[species] == pytest.approx(
+                pure_metal_saturation_Pa
+            )
 
 
 def test_legacy_and_provider_al_liquid_oxide_antoine_pins(vapor_pressure_data):

@@ -89,6 +89,11 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
 
     monkeypatch.setattr(engine_local_config, "_WARNING_REPEAT_COUNTS", {})
     backend = AlphaMELTSBackend()
+    helper_pressure_data = (
+        ellingham_graph._load_default_vapor_pressure_data()
+        if route == "helper" and species == "Si"
+        else vapor_pressure_data
+    )
     answers = {}
     receipts = {}
     warning_messages = []
@@ -96,8 +101,13 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
             if route == "helper":
+                # The projected row omits Si's catalog pressure model; this
+                # route needs the canonical source inputs to resolve Si.
                 pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
-                    species, 1873.15, oxygen, vapor_pressure_data=vapor_pressure_data,
+                    species,
+                    1873.15,
+                    oxygen,
+                    vapor_pressure_data=helper_pressure_data,
                 )
             else:
                 pressure = backend._activities_times_antoine(
@@ -142,7 +152,7 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
             assert notice["was_clamped"] is False
 
 
-@pytest.mark.parametrize("species", ("Cr", "Mg", "Na", "K"))
+@pytest.mark.parametrize("species", ("Mg", "Na", "K"))
 def test_elemental_metal_pressure_is_capped_at_pure_saturation(
     vapor_pressure_data,
     species,
@@ -195,6 +205,25 @@ def test_elemental_metal_pressure_is_capped_at_pure_saturation(
         assert pressure < pure_metal_saturation
     else:
         assert pressure == pytest.approx(pure_metal_saturation)
+
+
+@pytest.mark.parametrize("species", ("Cr", "Al", "Ti", "Mn"))
+def test_liquid_oxide_source_rows_refuse_in_catalog_and_legacy_views(
+    species,
+):
+    catalog_payload = ellingham_graph._load_default_vapor_pressure_data()
+    legacy_view = vapor_pressure_legacy_view(catalog_payload)
+    refusal_messages = []
+    for payload in (catalog_payload, legacy_view):
+        with pytest.raises(ellingham_graph.EllinghamPressureRefusal) as caught:
+            ellingham_graph.effective_equilibrium_pressure_Pa(
+                species,
+                1873.15,
+                1e-12,
+                vapor_pressure_data=payload,
+            )
+        refusal_messages.append(str(caught.value))
+    assert refusal_messages[0] == refusal_messages[1]
 
 
 def test_evolves_uses_builtin_pressure_floor(vapor_pressure_data) -> None:

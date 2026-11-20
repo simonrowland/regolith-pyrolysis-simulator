@@ -3351,6 +3351,7 @@ def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    monkeypatch,
 ):
     from simulator.chemistry.ellingham_graph import (
         dissociation_pO2_threshold,
@@ -3370,6 +3371,25 @@ def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
         additives_kg={"K": 30.0, "Na": 25.0, "Mg": 60.0},
     )
     sim.start_campaign(CampaignPhase.C0)
+    # Source pressure is resolved after the C3 reaction and native-Fe split,
+    # before evaporation debits the melt. Capture that exact owner input so
+    # the independent activity calculation does not compare different states.
+    source_snapshots = []
+    refresh_vapor_pressures = sim._refresh_vapor_pressures_from_kernel
+
+    def capture_vapor_source(result, **kwargs):
+        if sim.melt.campaign == CampaignPhase.C3_NA:
+            source_snapshots.append((
+                dict(sim.atom_ledger.mol_by_account("process.cleaned_melt")),
+                sim.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET,
+            ))
+        return refresh_vapor_pressures(result, **kwargs)
+
+    monkeypatch.setattr(
+        sim,
+        "_refresh_vapor_pressures_from_kernel",
+        capture_vapor_source,
+    )
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
         DecisionType.PATH_AB: "A_staged",
@@ -3385,12 +3405,6 @@ def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
                 choice = (decision.options or [None])[0]
             sim.apply_decision(decision.decision_type, choice)
             continue
-        source_composition_mol = dict(
-            sim.atom_ledger.mol_by_account("process.cleaned_melt")
-        )
-        source_temperature_K = (
-            sim.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
-        )
         sim.step()
         steps += 1
         saturation_floor = sim._melt_metal_saturation_fO2_floor_log(
@@ -3412,6 +3426,8 @@ def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
 
     assert sim.melt.campaign == CampaignPhase.C3_NA
     assert sim.melt.campaign_hour == 3, "run did not reach C3_NA hour 3"
+    assert source_snapshots
+    source_composition_mol, source_temperature_K = source_snapshots[-1]
     diagnostic = sim._last_vapor_pressure_diagnostic
     source_fO2_log = diagnostic["source_reaction_fO2_log10"]
     temperature_K = source_temperature_K

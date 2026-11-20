@@ -387,6 +387,16 @@ def effective_equilibrium_pressure_Pa(
         row = (data.get("oxide_vapors", {}) or {}).get(species, {}) or {}
     if str(row.get("consumer_status", "")).lower() == "inactive":
         return 0.0
+
+    # This Ellingham API has no liquid-source evaluator inputs. Its pure
+    # component sidecar cannot stand in for the declared melt reaction, no
+    # matter whether the caller supplied the catalog or its legacy projection.
+    if row.get("liquid_oxide_standard_reaction"):
+        raise EllinghamPressureRefusal(
+            f"{species!r} declares a liquid-oxide source reaction; "
+            "resolve its pressure through the catalog vapor-pressure owner"
+        )
+
     catalog_payload = getattr(payload, "catalog_payload", payload)
     has_catalog_source = (
         isinstance(catalog_payload, Mapping)
@@ -394,10 +404,7 @@ def effective_equilibrium_pressure_Pa(
         and "families" in catalog_payload
     )
     reaction_evaluator = None
-    if (
-        has_catalog_source
-        and (row.get("reference_pressure_model") or row.get("liquid_oxide_standard_reaction"))
-    ):
+    if has_catalog_source and row.get("reference_pressure_model"):
         reaction_evaluator = compiled_catalog_for(catalog_payload).evaluator_for_hot_train(species)
     if reaction_evaluator is not None:
         if a_ox == 0.0:
@@ -422,13 +429,7 @@ def effective_equilibrium_pressure_Pa(
             evaluation.pressure_pa,
             vapor_pressure_data=data,
         )
-    if (
-        has_catalog_source
-        and (
-            row.get("reference_pressure_model")
-            or row.get("liquid_oxide_standard_reaction")
-        )
-    ):
+    if not has_catalog_source and row.get("reference_pressure_model"):
         raise EllinghamPressureRefusal(
             f"{species!r} requires its catalog melt-source reaction; "
             "the legacy projection alone lacks source inputs"
