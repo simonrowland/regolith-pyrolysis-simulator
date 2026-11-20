@@ -3507,10 +3507,13 @@ class EvaporationMixin:
     def _remember_freeze_gate_provider_curve(
         self, curve: dict[str, Any],
     ) -> dict[str, Any]:
+        from simulator.reduced_real_determinism import _identity_gate_curve
+
+        # Kept past this hour. The live publication still returns ``curve``.
         self._freeze_gate_last_good_curve = {
             'provider': self._liquid_fraction_provider,
             'realized_provider': curve.get('gate_provider_step_down', {}).get('realized_provider'),
-            'curve': copy.deepcopy(curve),
+            'curve': copy.deepcopy(_identity_gate_curve(curve)),
             'computed_hour': int(self.melt.hour),
             'composition_wt_pct': self.melt.composition_wt_pct(),
         }
@@ -3520,6 +3523,8 @@ class EvaporationMixin:
     def _hold_freeze_gate_provider_curve(
         self, failure: Mapping[str, Any], *, timeout_reason: str | None = None,
     ) -> dict[str, Any] | None:
+        from simulator.reduced_real_determinism import _identity_gate_curve
+
         previous = self._freeze_gate_last_good_curve
         if previous is None or previous['provider'] != self._liquid_fraction_provider:
             return None
@@ -3541,7 +3546,9 @@ class EvaporationMixin:
             abs(composition.get(oxide, 0.0) - previous_composition.get(oxide, 0.0))
             for oxide in sorted(composition.keys() | previous_composition.keys())
         )
-        curve = copy.deepcopy(previous['curve'])
+        # Identity of the solved curve. Callers attach this hour's own
+        # environment record when this dispatch retried.
+        curve = copy.deepcopy(_identity_gate_curve(previous['curve']))
         diagnostic = failure['provider_diagnostic']
         curve['gate_provider_refusal'] = {
             **failure,
@@ -3568,6 +3575,7 @@ class EvaporationMixin:
         from simulator.reduced_real_determinism import (
             GateCurveProviderOutcome,
             _gate_curve_live_publication,
+            _identity_gate_curve,
             gate_curve_memo_record,
             gate_curve_memo_is_cacheable,
             gate_curve_provider_outcome_token,
@@ -3897,7 +3905,11 @@ class EvaporationMixin:
             )
             origin = record['origin']
             last_good = self._freeze_gate_last_good_curve
-            if last_good is not None and last_good['curve'] == curve:
+            if (
+                last_good is not None
+                and _identity_gate_curve(last_good['curve'])
+                == _identity_gate_curve(curve)
+            ):
                 last_good['origin'] = origin
             if cache_eligible:
                 self._freeze_gate_liquid_fraction_cache = {
@@ -4284,6 +4296,7 @@ class EvaporationMixin:
             'disposition': 'environment',
             'reason': timeout_reason,
             'status': status,
+            'hour': int(self.melt.hour),
         }
         record.update(self._gate_dispatch_curve_notices(owned))
         return record

@@ -653,6 +653,173 @@ def test_later_hour_memo_hit_omits_environment_retries(
     assert other_calls == []
 
 
+def _clear_gate_memos(sim):
+    sim._freeze_gate_liquid_fraction_cache = None
+    memo = sim._freeze_gate_liquid_fraction_curve_memo
+    if isinstance(memo, dict):
+        memo.clear()
+    shared = getattr(sim, '_freeze_gate_shared_curve_cache', None)
+    if isinstance(shared, dict):
+        shared.clear()
+    sim._freeze_gate_held_curve_record = None
+
+
+def _hold_snapshot(sim, record):
+    sim._freeze_gate_liquid_fraction_factor(gate_authority=record['curve'])
+    return sim._make_snapshot()
+
+
+def test_held_last_good_omits_prior_environment_retries(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """A later hold publishes this hour's retry, not an earlier hour's.
+
+    Last-good is kept past the hour, so it stores the identity curve.
+    A hold that did not retry has no environment_retries. A hold that
+    did retry carries only the record this dispatch abandoned.
+    """
+
+    from simulator.melt_backend.magemin import (
+        MAGEMinBackend,
+        _magemin_bulk_projection_details,
+    )
+
+    def recovered():
+        sim, record, _calls = _run_gate_shape(
+            'recovered', monkeypatch, vapor_pressure_data, feedstocks_data,
+            setpoints_data, core=True,
+        )
+        assert record['curve']['environment_retries']['reason'] == (
+            'engine_worker_timeout'
+        )
+        assert 'environment_retries' not in sim._freeze_gate_last_good_curve['curve']
+        _clear_gate_memos(sim)
+        sim.melt.hour = int(sim.melt.hour) + 1
+        return sim
+
+    # (1) Later miss, no_convergence, hold. This hour did not retry.
+    sim = recovered()
+    calls = []
+
+    def no_convergence(request):
+        calls.append(request)
+        return IntentResult(intent=request.intent, status='not_converged', diagnostic={
+            'backend_status_reason': 'no_convergence',
+        })
+
+    magemin, alpha = _bind_gate_providers(sim, no_convergence, no_convergence)
+    monkeypatch.setattr(magemin, 'dispatch', no_convergence)
+    monkeypatch.setattr(alpha, 'dispatch', no_convergence)
+    record = sim._melt_redox_liquidus_gate_record()
+    assert calls
+    assert record['disposition'] == 'live'
+    assert record['curve']['gate_provider_refusal']['qualification'] == (
+        'held_last_good_curve'
+    )
+    assert record['curve']['gate_provider_refusal']['reason'] == 'no_convergence'
+    assert 'environment_retries' not in record['curve']
+    assert 'environment_retries' not in sim._last_melt_redox_liquidus_gate_diagnostic
+    snapshot = _hold_snapshot(sim, record)
+    assert 'environment_retries' not in snapshot.liquid_fraction_gate['redox']
+    assert 'environment_retries' not in snapshot.liquid_fraction_gate['evaporation']
+
+    # (2) This hour retried, then held. Only its own abandoned dispatch.
+    sim = recovered()
+
+    def retried_then_numerical(request):
+        calls.append('magemin')
+        if calls.count('magemin') == 1:
+            return IntentResult(
+                intent=request.intent, status='not_converged', diagnostic={
+                    'backend_status_reason': 'aggregate_budget_exceeded',
+                },
+            )
+        return IntentResult(intent=request.intent, status='not_converged', diagnostic={
+            'backend_status_reason': 'no_convergence',
+        })
+
+    def numerical_alternate(request):
+        calls.append('alphamelts')
+        return IntentResult(intent=request.intent, status='not_converged', diagnostic={
+            'backend_status_reason': 'no_convergence',
+        })
+
+    calls = []
+    magemin, alpha = _bind_gate_providers(
+        sim, retried_then_numerical, numerical_alternate,
+    )
+    monkeypatch.setattr(magemin, 'dispatch', retried_then_numerical)
+    monkeypatch.setattr(alpha, 'dispatch', numerical_alternate)
+    record = sim._melt_redox_liquidus_gate_record()
+    abandoned = record['curve']['environment_retries']
+    assert abandoned['reason'] == 'aggregate_budget_exceeded'
+    assert abandoned['hour'] == int(sim.melt.hour)
+    assert 'engine_worker_timeout' not in json.dumps(abandoned)
+    assert record['curve']['gate_provider_refusal']['qualification'] == (
+        'held_last_good_curve'
+    )
+    snapshot = _hold_snapshot(sim, record)
+    assert snapshot.liquid_fraction_gate['redox']['environment_retries']['hour'] == (
+        int(sim.melt.hour)
+    )
+    assert snapshot.liquid_fraction_gate['evaporation']['environment_retries'][
+        'reason'
+    ] == 'aggregate_budget_exceeded'
+
+    # (3) Stable-refusal hold, with and without a retry on this hour.
+    projection = MAGEMinBackend()._build_db_bulk_projection({
+        'SiO2': 85.0, 'Al2O3': 10.0, 'CaO': 3.0, 'MnO': 2.0,
+    })
+    projected = {
+        'backend_status_reason': 'composition_projected',
+        'input_composition_projection': _magemin_bulk_projection_details(projection),
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1100.0,
+    }
+
+    def stable_dispatch(intent, **kwargs):
+        return IntentResult(intent=intent, status='out_of_domain', diagnostic=projected)
+
+    sim = recovered()
+    monkeypatch.setattr(sim, '_dispatch_only', stable_dispatch)
+    record = sim._melt_redox_liquidus_gate_record()
+    assert 'composition_projected_over_threshold' in record['curve'][
+        'composition_projected_notice'
+    ]['reason']
+    assert 'environment_retries' not in record['curve']
+    assert 'environment_retries' not in sim._last_melt_redox_liquidus_gate_diagnostic
+    snapshot = _hold_snapshot(sim, record)
+    assert 'environment_retries' not in snapshot.liquid_fraction_gate['redox']
+    assert 'environment_retries' not in snapshot.liquid_fraction_gate['evaporation']
+
+    sim = recovered()
+    attempt = {'n': 0}
+
+    def retried_then_stable(intent, **kwargs):
+        attempt['n'] += 1
+        if attempt['n'] == 1:
+            return IntentResult(
+                intent=intent, status='not_converged', diagnostic={
+                    'backend_status_reason': 'aggregate_budget_exceeded',
+                },
+            )
+        return IntentResult(intent=intent, status='out_of_domain', diagnostic=projected)
+
+    monkeypatch.setattr(sim, '_dispatch_only', retried_then_stable)
+    record = sim._melt_redox_liquidus_gate_record()
+    abandoned = record['curve']['environment_retries']
+    assert abandoned['reason'] == 'aggregate_budget_exceeded'
+    assert abandoned['hour'] == int(sim.melt.hour)
+    assert 'engine_worker_timeout' not in json.dumps(abandoned)
+    assert 'composition_projected_over_threshold' in record['curve'][
+        'composition_projected_notice'
+    ]['reason']
+    snapshot = _hold_snapshot(sim, record)
+    assert snapshot.liquid_fraction_gate['redox']['environment_retries']['hour'] == (
+        int(sim.melt.hour)
+    )
+
+
 def test_engine_worker_timeout_outside_planner_keeps_its_row(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
