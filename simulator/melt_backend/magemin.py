@@ -1664,22 +1664,14 @@ def _liquidus_inputs_on_feo_total_iron_basis(
     return kg, mol, accounts
 
 
-def evaluated_silica_verdict(
+def _evaluated_magemin_oxide_bulk(
     bulk: Mapping[str, Any],
     database: str,
     *,
     species_formula_registry: Optional[Mapping[str, Any]] = None,
     composition_mol_by_account: bool = False,
-) -> Dict[str, object] | None:
-    """Classify SiO2 on the exact projected bulk MAGEMin evaluates.
-
-    ``bulk`` is either the submitted oxide wt% mapping or, when
-    ``composition_mol_by_account`` is true, the liquidus finder's account
-    mapping. The latter follows the same Fe2O3-to-FeO_T mole fold as the live
-    liquidus path before applying the database projection. This is a pure
-    projection: it does not initialize or call the engine.
-    """
-    from engines.magemin.domain import MAGEMinDomainGate
+) -> Dict[str, float] | None:
+    """Return the exact oxide bulk evaluated by MAGEMin without the engine."""
 
     if composition_mol_by_account:
         _kg, _mol, folded_accounts = _liquidus_inputs_on_feo_total_iron_basis(
@@ -1713,8 +1705,36 @@ def evaluated_silica_verdict(
         oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
         species_formula_registry=species_formula_registry,
     )
+    return dict(evaluated_projection.oxide_wt_pct)
+
+
+def evaluated_silica_verdict(
+    bulk: Mapping[str, Any],
+    database: str,
+    *,
+    species_formula_registry: Optional[Mapping[str, Any]] = None,
+    composition_mol_by_account: bool = False,
+) -> Dict[str, object] | None:
+    """Classify SiO2 on the exact projected bulk MAGEMin evaluates.
+
+    ``bulk`` is either the submitted oxide wt% mapping or, when
+    ``composition_mol_by_account`` is true, the liquidus finder's account
+    mapping. The latter follows the same Fe2O3-to-FeO_T mole fold as the live
+    liquidus path before applying the database projection. This is a pure
+    projection: it does not initialize or call the engine.
+    """
+    from engines.magemin.domain import MAGEMinDomainGate
+
+    evaluated_bulk = _evaluated_magemin_oxide_bulk(
+        bulk,
+        database,
+        species_formula_registry=species_formula_registry,
+        composition_mol_by_account=composition_mol_by_account,
+    )
+    if evaluated_bulk is None:
+        return None
     return MAGEMinDomainGate.silica_extrapolation_diagnostic(
-        evaluated_projection.oxide_wt_pct
+        evaluated_bulk
     )
 
 

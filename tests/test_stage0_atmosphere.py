@@ -174,9 +174,9 @@ def _forecast_gate_parent_state_bytes(sim):
             "provider_outcome": getattr(
                 sim, "_freeze_gate_provider_outcome", None
             ),
-            "pinned_silica_verdict": getattr(
+            "pinned_verdict_identity": getattr(
                 sim,
-                "_melt_redox_gate_authority_tick_silica_out_of_band",
+                "_melt_redox_gate_authority_tick_verdict_identity",
                 None,
             ),
             "replay_reasons": getattr(
@@ -469,15 +469,15 @@ def test_missing_pinned_silica_verdict_check_is_read_only(monkeypatch):
     )
     sim.load_batch("lunar")
     sim._liquid_fraction_provider = "magemin"
-    sim._melt_redox_gate_authority_tick_silica_out_of_band = None
+    sim._melt_redox_gate_authority_tick_verdict_identity = None
     monkeypatch.setattr(
         sim,
-        "_melt_redox_gate_current_silica_verdict",
-        lambda: (None, True),
+        "_melt_redox_gate_current_pin_verdict",
+        lambda: (("magemin", True, None, None), True),
     )
 
-    assert not sim._melt_redox_gate_silica_verdict_matches_current()
-    assert sim._melt_redox_gate_authority_tick_silica_out_of_band is None
+    assert not sim._melt_redox_gate_verdict_matches_current()
+    assert sim._melt_redox_gate_authority_tick_verdict_identity is None
 
 
 def test_c0_forecast_without_registered_gate_provider_does_not_register(

@@ -582,16 +582,26 @@ def test_magemin_liner_silica_verdict_splits_rounded_cache_keys(cache_layer):
     ({"MgO": 100.0}, {"MnO": 100.0}, {}),
     ids=("zero-silica-mgo", "no-positive-ig-mno", "empty-liner"),
 )
-def test_magemin_tier_b_curve_prechecks_zero_silica_before_projection(liner):
+@pytest.mark.parametrize("entrypoint", ("curve", "sample_diagnostics"))
+def test_magemin_liner_entrypoints_precheck_zero_silica_before_projection(
+    liner, entrypoint
+):
     sampler = MageminLinerSampler(_FakeMageminBackend())
 
     with pytest.raises(LinerCorrosionRefusal) as refusal:
-        sampler._curve_with_metadata(
-            liner,
-            {"Na": 0.01},
-            temperature_C=1500.0,
-            pressure_bar=1.0e-6,
-        )
+        if entrypoint == "curve":
+            sampler._curve_with_metadata(
+                liner,
+                {"Na": 0.01},
+                temperature_C=1500.0,
+                pressure_bar=1.0e-6,
+            )
+        else:
+            sampler.sample_diagnostics(
+                liner,
+                temperature_C=1500.0,
+                pressure_bar=1.0e-6,
+            )
 
     if liner == {"MnO": 100.0}:
         assert refusal.value.reason == "silicate_window"
@@ -606,6 +616,10 @@ def test_published_liner_segment_silica_flag_matches_curve_endpoint_verdicts(
     liner_silica,
 ):
     from engines.magemin.domain import MAGEMinDomainGate
+    from simulator.melt_backend.magemin import (
+        DEFAULT_MAGEMIN_DATABASE,
+        evaluated_silica_verdict,
+    )
 
     backend = _FakeMageminBackend()
 
@@ -666,23 +680,29 @@ def test_published_liner_segment_silica_flag_matches_curve_endpoint_verdicts(
             temperature_C=temperature,
             pressure_bar=pressure,
         )
-        curve, metadata = sampler._curve_with_metadata(
+        _curve, metadata = sampler._curve_with_metadata(
             liner,
             target_deposit,
             temperature_C=temperature,
             pressure_bar=pressure,
         )
+        deposit_oxides = liner_corrosion.deposit_oxide_composition(
+            target_deposit
+        )
         endpoint_diagnostics = []
-        for fraction, _liquid_fraction in curve.points:
+        for index in range(liner_corrosion.MAGEMIN_PHI_CURVE_INTERVALS + 1):
             composition = liner_corrosion._composition_at_fraction(
                 liner,
-                curve.deposit_composition_wt_pct,
-                fraction,
+                deposit_oxides,
+                index / liner_corrosion.MAGEMIN_PHI_CURVE_INTERVALS,
             )
             valid, _, reason = MAGEMinDomainGate.validate_with_reason(composition)
             assert valid, reason
             endpoint_diagnostics.append(
-                MAGEMinDomainGate.silica_extrapolation_diagnostic(composition)
+                evaluated_silica_verdict(
+                    composition,
+                    DEFAULT_MAGEMIN_DATABASE,
+                )
             )
         expected_diagnostic = next(
             (diagnostic for diagnostic in endpoint_diagnostics if diagnostic),
@@ -1405,6 +1425,82 @@ def test_tier_b_contaminated_profile_checks_composition_continuity():
         1025.0,
     ]
     assert len(samples) > 3
+
+
+def test_liner_segment_keeps_silica_metadata_from_averaged_neighbours():
+    backend = _FakeMageminBackend()
+
+    def temperature_curve(
+        temperature_C,
+        *,
+        pressure_bar,
+        fO2_log,
+        projected_oxide_wt_pct,
+    ):
+        composition = dict(projected_oxide_wt_pct)
+        threshold = (
+            1200.0
+            if math.isclose(
+                composition.get("SiO2", 0.0),
+                30.0,
+                rel_tol=0.0,
+                abs_tol=1.0e-8,
+            )
+            else 1300.0
+        )
+        liquid_fraction = 1.0 if temperature_C >= threshold else 0.0
+        backend.calls.append(
+            (temperature_C, pressure_bar, fO2_log, composition)
+        )
+        return SimpleNamespace(
+            status="ok",
+            liquid_fraction=liquid_fraction,
+            phase_masses_kg={
+                "liq": liquid_fraction,
+                "solid": 1.0 - liquid_fraction,
+            },
+            phase_compositions={"liq": composition, "solid": composition},
+            warnings=[],
+        )
+
+    backend.equilibrate = temperature_curve
+    sampler = MageminLinerSampler(backend)
+    liner = {"SiO2": 30.0, "MgO": 70.0}
+    selected_reference = liner_corrosion._tier_b_reference_profile_for_liner(
+        sampler,
+        liner,
+        pressure_bar=1.0e-6,
+        invariant_table=None,
+    )
+
+    assert selected_reference["composition_continuity"]["status"] == "sensitive"
+    assert selected_reference["curve_metadata"]["authority"] == "extrapolated"
+
+    state = build_liner_state_segment(
+        {
+            "composition": liner,
+            "criterion_tier": "B",
+            "density_kg_m3": 1000.0,
+            "reacted_layer_depth_m": 0.001,
+            "margin_C": 0.0,
+            "horizon_campaigns": 0,
+            "porosity_fraction": 0.0,
+        },
+        {},
+        area_m2=1.0,
+        service_temperature_C=1500.0,
+        pressure_bar=1.0e-6,
+        sampler=sampler,
+        deposit_inert_kg_by_species={},
+        deposit_reactive_kg_by_species={},
+    )
+
+    assert liner_corrosion.MAGEMIN_SILICA_EXTRAPOLATED_FLAG in state["flags"]
+    assert any(
+        "certified_band=SiO2 [30, 80] wt%" in flag
+        for flag in state["flags"]
+    )
+    sampler.close()
 
 
 def test_tier_b_neighbour_disagreement_uses_tier_a_or_refuses():

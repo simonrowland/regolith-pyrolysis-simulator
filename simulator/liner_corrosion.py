@@ -624,6 +624,21 @@ def _sample_liquid_fraction(
         return sampler(composition_wt_pct, temperature_C, pressure_bar)
     if pressure_bar is None:
         raise LinerCorrosionRefusal("liner_service_pressure_missing")
+
+    def remember_sample_diagnostic() -> None:
+        if curve_metadata_samples is None:
+            return
+        diagnostic_reader = getattr(sampler, "sample_diagnostics", None)
+        if not callable(diagnostic_reader):
+            return
+        detail = diagnostic_reader(
+            composition_wt_pct,
+            temperature_C,
+            pressure_bar,
+        )
+        if isinstance(detail, Mapping) and detail:
+            curve_metadata_samples.append(detail)
+
     if isinstance(sampler, CurveLiquidFractionSampler) and any(
         float(kg) > 0.0 for kg in deposit_kg_by_species.values()
     ):
@@ -637,6 +652,9 @@ def _sample_liquid_fraction(
             )
             if curve_metadata_samples is not None and metadata:
                 curve_metadata_samples.append(metadata)
+            fraction = curve(composition_wt_pct, temperature_C, pressure_bar)
+            remember_sample_diagnostic()
+            return fraction
         else:
             curve = sampler.curve(
                 liner_composition_wt_pct,
@@ -645,7 +663,9 @@ def _sample_liquid_fraction(
                 pressure_bar=pressure_bar,
             )
         return curve(composition_wt_pct, temperature_C, pressure_bar)
-    return sampler(composition_wt_pct, temperature_C, pressure_bar)
+    fraction = sampler(composition_wt_pct, temperature_C, pressure_bar)
+    remember_sample_diagnostic()
+    return fraction
 
 
 def _magemin_curve_metadata_from_samples(
@@ -1193,6 +1213,12 @@ def _average_neighbour_profiles(
         result["bulk_melt_liquid_fraction_jump"] = averaged[high] - averaged[low]
     result["flags"] = list(
         dict.fromkeys([*left.get("flags", ()), *right.get("flags", ())])
+    )
+    result["curve_metadata"] = _magemin_curve_metadata_from_samples(
+        (
+            left.get("curve_metadata") or {},
+            right.get("curve_metadata") or {},
+        )
     )
     return result
 
@@ -3205,7 +3231,9 @@ def build_liner_state_segment(
                     pure_reference_profile=interface_state["pure_reference"],
                     invariant_table=table,
                 )
-                segment_curve_metadata.update(saturation_curve_metadata)
+                segment_curve_metadata = _magemin_curve_metadata_from_samples(
+                    (segment_curve_metadata, saturation_curve_metadata)
+                )
         except LinerCorrosionRefusal as exc:
             refusals.append(exc.as_dict())
     if x_star is not None:
@@ -3871,6 +3899,29 @@ def _magemin_silica_verdict_and_cache_identity(
     )
 
 
+def _magemin_last_valid_curve_fraction(
+    liner: Mapping[str, float],
+    deposit: Mapping[str, float],
+    admissible_fraction: float,
+    invalid_fraction: float,
+) -> float:
+    """Return the last MAGEMin-domain-valid fraction at a curve boundary."""
+
+    from engines.magemin.domain import MAGEMinDomainGate
+
+    low = float(admissible_fraction)
+    high = float(invalid_fraction)
+    for _ in range(52):
+        midpoint = (low + high) / 2.0
+        candidate = _composition_at_fraction(liner, deposit, midpoint)
+        valid, _, _ = MAGEMinDomainGate.validate_with_reason(candidate)
+        if valid:
+            low = midpoint
+        else:
+            high = midpoint
+    return low
+
+
 def _element_moles_from_oxide_weights(
     composition_wt_pct: Mapping[str, float],
 ) -> dict[str, float]:
@@ -4323,6 +4374,16 @@ class MageminLinerSampler:
         """Return metadata for the matching cached single-point solve."""
 
         composition = validate_oxide_composition(composition_wt_pct)
+        from engines.magemin.domain import MAGEMinDomainGate
+
+        valid, warnings, reason = MAGEMinDomainGate.validate_with_reason(
+            composition
+        )
+        if not valid:
+            raise LinerCorrosionRefusal(
+                reason or ENGINE_OUT_OF_DOMAIN_FLAG,
+                "; ".join(warnings),
+            )
         _silica_diagnostic, silica_cache_identity = (
             _magemin_silica_verdict_and_cache_identity(composition)
         )
@@ -4388,17 +4449,12 @@ class MageminLinerSampler:
             )
             if not valid:
                 invalid_fraction = deposit_fraction
-                admissible_fraction = last_valid_fraction
-                for _ in range(52):
-                    midpoint = (admissible_fraction + invalid_fraction) / 2.0
-                    candidate = _composition_at_fraction(liner, deposit, midpoint)
-                    candidate_valid, _, _ = (
-                        MAGEMinDomainGate.validate_with_reason(candidate)
-                    )
-                    if candidate_valid:
-                        admissible_fraction = midpoint
-                    else:
-                        invalid_fraction = midpoint
+                admissible_fraction = _magemin_last_valid_curve_fraction(
+                    liner,
+                    deposit,
+                    last_valid_fraction,
+                    invalid_fraction,
+                )
                 if admissible_fraction > last_valid_fraction:
                     boundary_composition = _composition_at_fraction(
                         liner,
@@ -4457,19 +4513,20 @@ class MageminLinerSampler:
             except LinerCorrosionRefusal as exc:
                 # The table ends at the first domain boundary. No extrapolation
                 # or result from outside the MAGEMin gate is used.
-                if exc.reason == ENGINE_OUT_OF_DOMAIN_FLAG and points:
+                if exc.reason in {
+                    ENGINE_OUT_OF_DOMAIN_FLAG,
+                    "silicate_window",
+                } and points:
                     from engines.magemin.domain import MAGEMinDomainGate
 
                     invalid_fraction = deposit_fraction
                     admissible_fraction = last_valid_fraction
-                    for _ in range(52):
-                        midpoint = (admissible_fraction + invalid_fraction) / 2.0
-                        candidate = _composition_at_fraction(liner, deposit, midpoint)
-                        valid, _, _ = MAGEMinDomainGate.validate_with_reason(candidate)
-                        if valid:
-                            admissible_fraction = midpoint
-                        else:
-                            invalid_fraction = midpoint
+                    admissible_fraction = _magemin_last_valid_curve_fraction(
+                        liner,
+                        deposit,
+                        admissible_fraction,
+                        invalid_fraction,
+                    )
                     if admissible_fraction > last_valid_fraction:
                         boundary_composition = _composition_at_fraction(
                             liner, deposit, admissible_fraction
