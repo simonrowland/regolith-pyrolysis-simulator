@@ -43,6 +43,34 @@ def test_transient_and_unknown_refusals_are_never_stored(code, tmp_path, monkeyp
         assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 0
 
 
+def test_not_stored_paths_are_counted_by_reason(tmp_path, monkeypatch):
+    path = tmp_path / "cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache.engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+
+    from simulator.engine_cache import EngineCacheValue
+
+    engine_cache.cached_engine_call(
+        "alphamelts", {"case": "cacheable-false"},
+        lambda: EngineCacheValue({"answer": 1}, cacheable=False),
+    )
+    engine_cache.cached_engine_call(
+        "alphamelts", {"case": "refusal"},
+        lambda: {"status": "refusal", "refusal_reason": "engine_timeout"},
+    )
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    engine_cache.cached_engine_call(
+        "alphamelts", {"case": "readonly"}, lambda: {"answer": 2},
+    )
+
+    counts = engine_cache.engine_cache_counters()["alphamelts"]
+    assert counts["not_stored:cacheable_false"] == 1
+    assert counts["not_stored:refusal:engine_timeout"] == 1
+    assert counts["not_stored:readonly"] == 1
+
+
 def test_abandoned_timeout_thread_cannot_insert_a_late_result(tmp_path, monkeypatch):
     path = tmp_path / "cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))

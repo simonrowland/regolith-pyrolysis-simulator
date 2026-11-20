@@ -1530,8 +1530,28 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     solved = solve()
     hot = live_hot(solved)
     if isinstance(solved, EngineCacheValue) and not solved.cacheable:
+        with _LOCK:
+            counts = _counter_bucket(engine_id)
+            counts["not_stored:cacheable_false"] = counts.get(
+                "not_stored:cacheable_false", 0
+            ) + 1
         return hot
-    if (_is_refusal(hot) and not cacheable_refusal(hot)) or readonly or connection is None:
+    refusal_not_cacheable = _is_refusal(hot) and not cacheable_refusal(hot)
+    if refusal_not_cacheable:
+        refusal_reason = (
+            hot.get("refusal_reason") if isinstance(hot, Mapping)
+            else getattr(hot, "refusal_reason", None)
+        )
+        reason_label = str(refusal_reason) if refusal_reason is not None else "untyped"
+        with _LOCK:
+            counter = f"not_stored:refusal:{reason_label}"
+            counts = _counter_bucket(engine_id)
+            counts[counter] = counts.get(counter, 0) + 1
+    if readonly or connection is None:
+        with _LOCK:
+            counts = _counter_bucket(engine_id)
+            counts["not_stored:readonly"] = counts.get("not_stored:readonly", 0) + 1
+    if refusal_not_cacheable or readonly or connection is None:
         return hot
     try:
         if not isinstance(solved, EngineCacheValue) and (

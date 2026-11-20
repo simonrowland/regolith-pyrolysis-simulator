@@ -541,10 +541,9 @@ def _engine_cache_summary(
             if not isinstance(counts, Mapping):
                 continue
             target = by_engine.setdefault(str(engine), {"hits": 0, "misses": 0, "stores": 0})
-            for name in target:
-                value = counts.get(name, 0)
+            for name, value in counts.items():
                 if isinstance(value, int):
-                    target[name] += value
+                    target[name] = target.get(name, 0) + value
     runtime_identities = dict(local_runtime_identities or {})
     if studio_cache_summary is not None:
         studio_identities = studio_cache_summary.get("runtime_identities", {})
