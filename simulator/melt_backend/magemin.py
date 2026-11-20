@@ -110,7 +110,7 @@ import tempfile
 import threading
 import time
 import warnings
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
@@ -2269,8 +2269,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         (
             bulk_projection,
             domain_verdict,
-            _domain_projection,
-            _projection_threshold_reason,
+            domain_projection,
+            projection_threshold_reason,
         ) = (
             self._submitted_bulk_and_domain_verdict(
                 domain_source_projection,
@@ -2365,13 +2365,27 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 bulk_projection
             ),
         )
-        evaluated_silica_diagnostic = evaluated_silica_verdict(
-            bulk_projection.composition_wt_pct,
-            bulk_projection.database,
-            species_formula_registry=species_formula_registry,
+        domain_valid, _domain_warnings, domain_reason = domain_verdict
+        domain_identity, evaluated_silica_diagnostic = (
+            magemin_domain_identity_from_evaluated_bulk(
+                None if domain_projection is None
+                else domain_projection.oxide_wt_pct,
+                projection_threshold_verdict=(
+                    'refused' if projection_threshold_reason else 'clear'
+                ),
+                refusal_reason=projection_threshold_reason or domain_reason,
+                domain_verdict=(domain_valid, domain_reason),
+            )
         )
         if evaluated_silica_diagnostic is not None:
             result_diagnostics.update(evaluated_silica_diagnostic)
+        result_diagnostics['projection_threshold_verdict'] = (
+            domain_identity.projection_threshold_verdict
+        )
+        if projection_threshold_reason is not None:
+            result_diagnostics['projection_threshold_reason'] = (
+                projection_threshold_reason
+            )
         if bulk_projection.dropped_components:
             # A result for a different (projected) bulk is not a result for
             # this one. Do not call MAGEMin on the truncated vector.
@@ -2843,7 +2857,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             if isinstance(result.diagnostics, Mapping):
                 evaluated_domain_diagnostic.update({
                     field: result.diagnostics[field]
-                    for field in ('authority', 'certified_band')
+                    for field in (
+                        'authority',
+                        'certified_band',
+                        'projection_threshold_verdict',
+                        'projection_threshold_reason',
+                    )
                     if field in result.diagnostics
                 })
             if result.status != 'ok':
@@ -2928,7 +2947,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 _projected_liquidus_refusal_reason,
             )
 
-            refusal = _projected_liquidus_refusal_reason(notice)
+            refusal = (
+                diagnostics.get('projection_threshold_reason')
+                or _projected_liquidus_refusal_reason(notice)
+            )
             if refusal is not None:
                 diagnostics['composition_projected_notice'] = {
                     **notice, 'reason': refusal,
@@ -2964,22 +2986,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 projected_retry=True,
                 projected_oxide_wt_pct=projected_bulk_wt_pct,
             )
-            if (
-                projected.status == 'ok'
-                and isinstance(projected_bulk_wt_pct, Mapping)
-            ):
-                projected_domain = evaluated_silica_verdict(
-                    projected_bulk_wt_pct,
-                    str(self._effective_database()),
-                    species_formula_registry=species_formula_registry,
-                )
-                projected = replace(
-                    projected,
-                    diagnostics={
-                        **dict(projected.diagnostics or {}),
-                        **(projected_domain or {}),
-                    },
-                )
             diagnostics['projected_liquidus_status'] = projected.status
             diagnostics['projected_liquidus_diagnostics'] = dict(
                 projected.diagnostics or {}

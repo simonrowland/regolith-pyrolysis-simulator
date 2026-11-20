@@ -981,38 +981,6 @@ class PT0DeterminismStore:
                 "PT-0 cached replay miss: no admitted gate candidates"
             )
         redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
-        require_domain_diagnostic = False
-        domain_key_builder = getattr(
-            sim,
-            "_freeze_gate_cache_key_and_domain",
-            None,
-        )
-        redox_key_builder = getattr(
-            sim,
-            "_freeze_gate_redox_key_fO2_log",
-            None,
-        )
-        if callable(domain_key_builder) and callable(redox_key_builder):
-            domain_key_builder(
-                pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
-                fO2_log=redox_key_builder(fO2_log=fO2_log),
-                **redox_state_kwargs,
-            )
-        if getattr(sim, "_liquid_fraction_provider", None) == "magemin":
-            require_domain_diagnostic = True
-            if callable(domain_key_builder) and callable(redox_key_builder):
-                from simulator.melt_backend.magemin import MAGEMinDomainIdentity
-
-                identity = getattr(
-                    sim,
-                    "_freeze_gate_current_magemin_domain_identity",
-                    None,
-                )
-                if (
-                    isinstance(identity, MAGEMinDomainIdentity)
-                    and identity.silica_verdict == "in_band"
-                ):
-                    require_domain_diagnostic = False
         keys = tuple(
             canonical_replay_key(
                 sim,
@@ -1026,6 +994,13 @@ class PT0DeterminismStore:
             )
             for provider_role in roles
         )
+        require_domain_diagnostic = False
+        if getattr(sim, "_liquid_fraction_provider", None) == "magemin":
+            identity = _magemin_identity_from_replay_key(keys[0])
+            require_domain_diagnostic = (
+                identity is not None
+                and identity.silica_verdict != "in_band"
+            )
         payload = self._lookup_first_available(
             "freeze_gate_curve",
             keys,
@@ -1294,6 +1269,7 @@ class PT0DeterminismStore:
             ):
                 continue
             if require_gate_curve_domain_diagnostic:
+                identity = _magemin_identity_from_replay_key(key)
                 curve_payload = (entry.get("payload") or {}).get("curve")
                 certified_band = (
                     curve_payload.get("certified_band")
@@ -1305,22 +1281,36 @@ class PT0DeterminismStore:
                     if isinstance(certified_band, Mapping)
                     else None
                 )
-                valid_silica_bounds = (
+                parsed_silica_bounds = None
+                if (
                     isinstance(silica_bounds, (list, tuple))
                     and len(silica_bounds) == 2
                     and all(
                         isinstance(bound, (int, float))
                         and not isinstance(bound, bool)
-                        and math.isfinite(float(bound))
                         for bound in silica_bounds
                     )
-                    and float(silica_bounds[0]) < float(silica_bounds[1])
+                ):
+                    try:
+                        parsed_silica_bounds = tuple(
+                            float(bound) for bound in silica_bounds
+                        )
+                    except (OverflowError, TypeError, ValueError):
+                        parsed_silica_bounds = None
+                valid_silica_bounds = (
+                    parsed_silica_bounds is not None
+                    and all(math.isfinite(bound) for bound in parsed_silica_bounds)
+                    and parsed_silica_bounds[0] < parsed_silica_bounds[1]
                 )
                 if (
-                    not isinstance(curve_payload, Mapping)
+                    identity is None
+                    or identity.silica_verdict != "extrapolated"
+                    or identity.certified_band is None
+                    or not isinstance(curve_payload, Mapping)
                     or curve_payload.get("authority") != "extrapolated"
                     or not isinstance(certified_band, Mapping)
                     or not valid_silica_bounds
+                    or parsed_silica_bounds != identity.certified_band
                 ):
                     continue
             if not _disclosures_known(entry):
@@ -3611,6 +3601,16 @@ def _expand_compatible_replay_keys(
             seen.add(digest)
             expanded.append(candidate)
     return tuple(expanded)
+
+
+def _magemin_identity_from_replay_key(
+    key: Mapping[str, Any],
+) -> Any | None:
+    freeze_gate_key = key.get("freeze_gate_cache_key")
+    identity = getattr(freeze_gate_key, "magemin_domain_identity", None)
+    from simulator.melt_backend.magemin import MAGEMinDomainIdentity
+
+    return identity if isinstance(identity, MAGEMinDomainIdentity) else None
 
 
 def canonical_physics_bucket_key(

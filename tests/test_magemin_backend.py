@@ -3054,6 +3054,33 @@ def test_magemin_equilibrate_refuses_zero_silica_and_flags_extrapolation(
         assert len(engine_calls) == 1
 
 
+def test_magemin_equilibrate_uses_its_evaluated_projection_for_domain_flag(
+    monkeypatch,
+):
+    backend, engine_calls = _magemin_backend_with_spied_engine_call(monkeypatch)
+
+    def unexpected_second_projection(*_args, **_kwargs):
+        pytest.fail('equilibrate must classify its returned domain projection')
+
+    monkeypatch.setattr(
+        magemin_module,
+        'evaluated_silica_verdict',
+        unexpected_second_projection,
+    )
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg=_basalt_like_bulk_at_sio2(80.1),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'ok'
+    assert result.diagnostics['authority'] == 'extrapolated'
+    assert result.diagnostics['certified_band']['sio2_wt_pct'] == [30.0, 80.0]
+    assert result.diagnostics['projection_threshold_verdict'] == 'clear'
+    assert len(engine_calls) == 1
+
+
 def test_magemin_projected_equilibrate_gates_submitted_bulk(monkeypatch):
     backend, engine_calls = _magemin_backend_with_spied_engine_call(monkeypatch)
 

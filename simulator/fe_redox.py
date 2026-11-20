@@ -996,6 +996,7 @@ def _calphad_authority_weight(delta_iw_log10: float) -> float:
 
 
 LIQUID_MODEL_BELOW_LIQUIDUS_KIND = "liquid_model_below_liquidus"
+MAGEMIN_DOMAIN_IDENTITY_KIND = "magemin_domain_identity"
 
 
 def _finite_domain_float(value: object, name: str) -> float:
@@ -1071,10 +1072,11 @@ def _with_liquid_model_below_liquidus_notice(
     the domain, or a domain the owner marks liquid, leaves the dict unchanged.
     """
 
-    if liquid_domain is None or liquid_domain.below_liquidus is False:
+    if liquid_domain is None:
         return components
-    components["notices"] = [
-        {
+    notices: list[dict[str, object]] = []
+    if liquid_domain.below_liquidus:
+        notices.append({
             "type": "typed_notice",
             "kind": LIQUID_MODEL_BELOW_LIQUIDUS_KIND,
             "temperature_K": liquid_domain.temperature_K,
@@ -1082,8 +1084,42 @@ def _with_liquid_model_below_liquidus_notice(
             "solidus_T_C": liquid_domain.solidus_T_C,
             "source": liquid_domain.source,
             "authority": "extrapolated",
-        }
-    ]
+        })
+    identity = getattr(liquid_domain, "domain_identity", None)
+    silica_verdict = getattr(identity, "silica_verdict", None)
+    certified_band = getattr(identity, "certified_band", None)
+    identity_notice = {
+        "type": "typed_notice",
+        "kind": MAGEMIN_DOMAIN_IDENTITY_KIND,
+        "silica_verdict": silica_verdict,
+        "projection_threshold_verdict": getattr(
+            identity, "projection_threshold_verdict", None,
+        ),
+        "certified_band": (
+            {"sio2_wt_pct": list(certified_band)}
+            if isinstance(certified_band, (tuple, list))
+            else None
+        ),
+        "refusal_reason": getattr(identity, "refusal_reason", None),
+        "temperature_K": liquid_domain.temperature_K,
+        "liquidus_T_C": liquid_domain.liquidus_T_C,
+        "solidus_T_C": liquid_domain.solidus_T_C,
+        "source": liquid_domain.source,
+        "authority": (
+            "unknown"
+            if getattr(liquid_domain, "liquidus_unknown", False)
+            else "extrapolated"
+            if silica_verdict == "extrapolated"
+            else "in_domain"
+        ),
+    }
+    if getattr(liquid_domain, "liquidus_unknown", False):
+        identity_notice["liquidus_status"] = "unknown"
+        notices.append(identity_notice)
+    elif silica_verdict == "extrapolated":
+        notices.append(identity_notice)
+    if notices:
+        components["notices"] = notices
     return components
 
 

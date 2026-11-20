@@ -1979,7 +1979,7 @@ def test_same_hour_floor_fallback_pin_rechecks_projection_threshold_verdict(
     feedstocks_data,
     setpoints_data,
 ):
-    from simulator.physical_constants import MBAR_PER_BAR
+    from simulator.engine_pool import EngineWorkerTimeout
 
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
@@ -1988,6 +1988,7 @@ def test_same_hour_floor_fallback_pin_rechecks_projection_threshold_verdict(
         enabled=True,
         liquid_fraction_provider='magemin',
     )
+    _install_magemin_subprocess_gate(sim, monkeypatch)
 
     def load_bulk(composition, source):
         composition_mol = {
@@ -2008,88 +2009,52 @@ def test_same_hour_floor_fallback_pin_rechecks_projection_threshold_verdict(
         sim._chem_kernel = sim._build_chemistry_kernel()
         sim._project_cleaned_melt_from_atom_ledger()
 
-    def current_cache_verdict():
-        from simulator.chemistry.kernel.capabilities import ChemistryIntent
-
-        provider_inputs = sim._silicate_provider_melt_inputs(
-            ChemistryIntent.GATE_LIQUID_FRACTION
-        )
-        return sim._freeze_gate_cache_key_and_domain(
-            pressure_bar=float(sim.melt.p_total_mbar) / MBAR_PER_BAR,
-            fO2_log=sim._freeze_gate_redox_key_fO2_log(
-                fO2_log=float(sim._current_melt_redox_fO2_log()),
-            ),
-            provider_melt_inputs=provider_inputs,
-        )
-
     load_bulk(
         {'SiO2': 50.0, 'MgO': 49.001, 'P2O5': 0.999},
         'floor pin projection-threshold baseline',
     )
-    baseline_identity, baseline_passes = (
-        sim._melt_redox_gate_current_pin_verdict()
-    )
-    _baseline_key, baseline_reason = current_cache_verdict()
-    assert baseline_passes and baseline_reason is None
-    assert baseline_identity.projection_threshold_verdict == 'clear'
+    successful = sim._freeze_gate_curve_record()
+    assert successful['curve'].get('gate_provider_refusal') is None
+    last_good_identity = sim._freeze_gate_last_good_curve[
+        'magemin_domain_identity'
+    ]
+    assert last_good_identity.projection_threshold_verdict == 'clear'
 
-    from simulator.chemistry.kernel import ProviderUnavailableError
-
-    def fail_gate_dispatch(**_kwargs):
-        raise ProviderUnavailableError('test provider unavailable')
-
-    monkeypatch.setattr(
-        sim,
-        '_freeze_gate_curve_record',
-        fail_gate_dispatch,
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
     )
-    fallback = sim._establish_melt_redox_gate_authority_for_current_hour()
-    assert fallback is sim._melt_redox_gate_authority_this_tick
-    assert fallback.verdict_identity.matches(baseline_identity)
-    assert sim._melt_redox_gate_authority_tick_verdict_identity.matches(
-        baseline_identity
-    )
+    backend = provider._backend
+    timeout_calls = []
+
+    def timeout_worker(**kwargs):
+        timeout_calls.append(kwargs['bulk_projection'].composition_wt_pct)
+        raise EngineWorkerTimeout('MAGEMin worker', 0.01, phase='job')
+
+    monkeypatch.setattr(backend, '_call_magemin', timeout_worker)
+    # Force a real provider call while preserving the successful last-good
+    # record. The timeout fallback fills the real held slot for this request.
+    sim._freeze_gate_liquid_fraction_cache = None
+    sim._freeze_gate_liquid_fraction_curve_memo.clear()
+    held_record = sim._freeze_gate_curve_record()
+    assert len(timeout_calls) == 2
+    assert held_record['curve']['gate_provider_refusal'][
+        'qualification'
+    ] == 'held_last_good_curve'
+    held_identity = sim._freeze_gate_held_curve_record['domain_identity']
+    assert held_identity.matches(last_good_identity)
 
     load_bulk(
         {'SiO2': 50.0, 'MgO': 48.999, 'P2O5': 1.001},
         'floor pin projection-threshold crossing',
     )
-    current_identity, current_passes = (
-        sim._melt_redox_gate_current_pin_verdict()
-    )
-    current_key, _current_reason = current_cache_verdict()
-    assert not current_passes
-    assert current_key.magemin_domain_identity.projection_threshold_verdict == (
-        'refused'
-    )
+    crossing_record = sim._freeze_gate_curve_record()
+    assert crossing_record['curve'] != held_record['curve']
+    assert crossing_record['curve'].get('gate_provider_refusal', {}).get(
+        'qualification'
+    ) != 'held_last_good_curve'
+    current_identity = sim._freeze_gate_current_magemin_domain_identity
     assert current_identity.projection_threshold_verdict == 'refused'
-    assert not current_identity.matches(baseline_identity)
-
-    crossing_fallback = (
-        sim._establish_melt_redox_gate_authority_for_current_hour()
-    )
-    assert crossing_fallback is not fallback
-    assert crossing_fallback.verdict_identity.matches(current_identity)
-    assert sim._melt_redox_gate_authority_tick_verdict_identity.matches(
-        current_identity
-    )
-
-    mapping_pin = {'disposition': 'live', 'curve': {'source': 'pinned curve'}}
-    sim._melt_redox_gate_authority_this_tick = mapping_pin
-    sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
-    sim._melt_redox_gate_authority_tick_verdict_identity = baseline_identity
-    monkeypatch.setattr(
-        sim,
-        '_melt_redox_gate_record_is_admitted',
-        lambda *_args, **_kwargs: True,
-    )
-    redispatched_mapping = {'source': 'fresh mapping resolution'}
-    monkeypatch.setattr(
-        sim,
-        '_melt_redox_liquidus_gate_curve',
-        lambda **_kwargs: redispatched_mapping,
-    )
-    assert sim._resolved_melt_redox_gate_authority() is redispatched_mapping
+    assert not current_identity.matches(held_identity)
 
 
 def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
@@ -2098,6 +2063,7 @@ def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
     feedstocks_data,
     setpoints_data,
 ):
+    from simulator.engine_pool import EngineWorkerTimeout
     from simulator.physical_constants import MBAR_PER_BAR
 
     sim = _build_freeze_gate_sim(
@@ -2112,7 +2078,8 @@ def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
     def set_bulk(silica_wt_pct):
         composition_wt_pct = {
             'SiO2': silica_wt_pct,
-            'MgO': 100.0 - silica_wt_pct,
+            'MgO': 90.0 - silica_wt_pct,
+            'FeO': 10.0,
         }
         composition_mol = {
             species: amount / resolve_species_formula(
@@ -2129,6 +2096,7 @@ def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
             material_origin='feedstock',
         )
         sim.atom_ledger = ledger
+        return composition_wt_pct
 
     set_bulk(50.0)
     record = sim._freeze_gate_curve_record()
@@ -2143,7 +2111,7 @@ def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
     sim._liquid_feo_resolved_curve = record['curve']
     sim._liquid_feo_resolved_curve_domain_identity = retained_identity
 
-    set_bulk(81.0)
+    current_bulk = set_bulk(81.0)
     changed_key, _reason = sim._freeze_gate_cache_key_and_domain(
         pressure_bar=float(sim.melt.p_total_mbar) / MBAR_PER_BAR,
         fO2_log=sim._freeze_gate_redox_key_fO2_log(
@@ -2151,7 +2119,36 @@ def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
         ),
     )
     assert not changed_key.magemin_domain_identity.matches(retained_identity)
-    assert sim.liquid_feo_domain_at(1800.0 + 273.15) is None
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    timeout_calls = []
+
+    def timeout_worker(**kwargs):
+        timeout_calls.append(kwargs['bulk_projection'].composition_wt_pct)
+        raise EngineWorkerTimeout('MAGEMin worker', 0.01, phase='job')
+
+    monkeypatch.setattr(provider._backend, '_call_magemin', timeout_worker)
+    sim._freeze_gate_liquid_fraction_cache = None
+    sim._freeze_gate_liquid_fraction_curve_memo.clear()
+    activity = sim._native_fe_saturation_state(
+        current_bulk,
+        fe3_over_sigma_fe=0.1,
+        T_K=1800.0 + 273.15,
+        pressure_bar=float(sim.melt.p_total_mbar) / MBAR_PER_BAR,
+        fO2_log=float(sim._current_melt_redox_fO2_log()),
+    )
+    identity_notice = next(
+        notice
+        for notice in activity['notices']
+        if notice.get('kind') == 'magemin_domain_identity'
+    )
+    assert identity_notice['silica_verdict'] == 'extrapolated'
+    assert identity_notice['certified_band'] == {
+        'sio2_wt_pct': [30.0, 80.0],
+    }
+    assert identity_notice['liquidus_status'] == 'unknown'
+    assert len(timeout_calls) == 2
 
 
 def test_magemin_ferric_fold_clears_request_silica_flag_when_evaluated_in_band(

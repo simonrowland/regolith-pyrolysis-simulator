@@ -1419,14 +1419,38 @@ def test_magemin_freeze_gate_projection_threshold_uses_ferric_folded_bulk():
 
 @pytest.mark.parametrize(
     "sio2_wt_pct",
-    [[], [30.0], [30.0, "80"]],
-    ids=["empty", "wrong-arity", "non-numeric"],
+    [[], [30.0], [30.0, "80"], [10**400, 80.0], [0.0, 100.0]],
+    ids=["empty", "wrong-arity", "non-numeric", "float-overflow", "wrong-band"],
 )
 def test_gate_replay_rejects_malformed_required_silica_diagnostic(
     sio2_wt_pct,
 ):
     store = PT0DeterminismStore("capture")
-    valid_key = _freeze_gate_key()
+    from simulator.evaporation import _FlaggedFreezeGateCurveCacheKey
+    from simulator.melt_backend.magemin import MAGEMinDomainIdentity
+
+    def key_with_required_identity():
+        key = _freeze_gate_key()
+        original = key["freeze_gate_cache_key"]
+        identity = MAGEMinDomainIdentity(
+            "extrapolated", "clear", (30.0, 80.0), None,
+        )
+        return {
+            **key,
+            "freeze_gate_cache_key": _FlaggedFreezeGateCurveCacheKey(
+                schema=original.schema,
+                pressure_bar=original.pressure_bar,
+                fO2_log=original.fO2_log,
+                composition_mol_fractions=original.composition_mol_fractions,
+                water_mol_fraction=original.water_mol_fraction,
+                formula_registry_digest=original.formula_registry_digest,
+                inert_species=original.inert_species,
+                magemin_domain_identity=identity,
+                redox_state_identity=original.redox_state_identity,
+            ),
+        }
+
+    valid_key = key_with_required_identity()
     valid_payload = {
         "curve": {
             "authority": "extrapolated",
@@ -3544,6 +3568,18 @@ def test_gate_replay_uses_evaluated_silica_verdict_for_flag_requirement(
         "evaluated_silica_verdict",
         unexpected_second_silica_projection,
     )
+    original_domain_key_builder = replay_sim._freeze_gate_cache_key_and_domain
+    domain_key_calls = []
+
+    def count_domain_key_builds(**kwargs):
+        domain_key_calls.append(kwargs)
+        return original_domain_key_builder(**kwargs)
+
+    monkeypatch.setattr(
+        replay_sim,
+        "_freeze_gate_cache_key_and_domain",
+        count_domain_key_builds,
+    )
     replayed = replay.replay_gate_curve(
         replay_sim,
         fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
@@ -3551,9 +3587,10 @@ def test_gate_replay_uses_evaluated_silica_verdict_for_flag_requirement(
     assert replayed["source"] == curve_payload["source"]
     assert replayed["path"] == ((1000.0, 0.0), (1300.0, 1.0))
     assert replay.last_cache_state == "cached_exact"
+    assert len(domain_key_calls) == 1
 
 
-def test_retained_replayed_gate_curve_rejects_a_changed_magemin_identity(
+def test_retained_replayed_gate_curve_redispatches_and_flags_changed_identity(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ):
@@ -3563,7 +3600,11 @@ def test_retained_replayed_gate_curve_rejects_a_changed_magemin_identity(
 
     _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
     db_path = tmp_path / "retained-domain-identity.db"
-    composition_wt_pct = {"SiO2": 79.999, "MgO": 20.001}
+    composition_wt_pct = {
+        "SiO2": 79.999,
+        "MgO": 10.001,
+        "FeO": 10.0,
+    }
     curve_payload = {
         "source": "gate_liquid_fraction:fallback:magemin-shadow",
         "status": "ok",
@@ -3627,7 +3668,7 @@ def test_retained_replayed_gate_curve_rejects_a_changed_magemin_identity(
         retained_identity
     )
 
-    composition_wt_pct.update({"SiO2": 80.001, "MgO": 19.999})
+    composition_wt_pct.update({"SiO2": 80.001, "MgO": 9.999})
     composition_mol = {
         species: amount
         / resolve_species_formula(
@@ -3657,7 +3698,22 @@ def test_retained_replayed_gate_curve_rejects_a_changed_magemin_identity(
         replay_sim._freeze_gate_current_magemin_domain_identity.silica_verdict
         == "extrapolated"
     )
-    assert replay_sim.liquid_feo_domain_at(1800.0 + 273.15) is None
+    activity = replay_sim._native_fe_saturation_state(
+        composition_wt_pct,
+        fe3_over_sigma_fe=0.1,
+        T_K=1800.0 + 273.15,
+        pressure_bar=float(replay_sim.melt.p_total_mbar) / MBAR_PER_BAR,
+        fO2_log=float(replay_sim._current_melt_redox_fO2_log()),
+    )
+    identity_notice = next(
+        notice
+        for notice in activity["notices"]
+        if notice.get("kind") == "magemin_domain_identity"
+    )
+    assert identity_notice["silica_verdict"] == "extrapolated"
+    assert identity_notice["certified_band"] == {
+        "sio2_wt_pct": [30.0, 80.0],
+    }
 
 
 def test_pt1_persistent_store_round_trips_exact_payload(
