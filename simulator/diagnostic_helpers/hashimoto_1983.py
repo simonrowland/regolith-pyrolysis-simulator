@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from decimal import Decimal
 import json
 import math
 from pathlib import Path
@@ -19,6 +20,7 @@ from typing import Any
 
 import yaml
 
+from simulator.battery.migrate import torr_to_pa
 from simulator.lab_schedule import _pressure_floor_notice_mbar
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -135,10 +137,8 @@ def require_runtime_inputs(preset: Mapping[str, Any]) -> None:
     vacuum = preset.get("vacuum")
     if not isinstance(vacuum, Mapping) or vacuum.get("units") != "Torr":
         raise Hashimoto1983Refusal("unsupported_runtime_pressure_unit")
-    pressure_mbar = _finite_number(
-        vacuum.get("runtime_pressure_mbar"),
-        "vacuum.runtime_pressure_mbar",
-    )
+    pressure_torr = _finite_number(vacuum.get("value"), "vacuum.value")
+    pressure_mbar = float(torr_to_pa(pressure_torr) / Decimal("100"))
     floor_notice = _pressure_floor_notice_mbar(pressure_mbar)
     if floor_notice is not None:
         _, detail = floor_notice

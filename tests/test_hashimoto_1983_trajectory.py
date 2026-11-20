@@ -32,6 +32,8 @@ def test_preset_loads_printed_inputs_and_missing_area_refuses() -> None:
         "CaO": 2.53,
     }
     assert preset["vacuum"]["value"] == 1.0e-4
+    assert preset["vacuum"]["units"] == "Torr"
+    assert "runtime_pressure_mbar" not in preset["vacuum"]
     assert preset["isothermal_holds"]["temperatures_C"] == [1700, 1800, 1900, 2000]
     assert preset["free_evaporation_geometry"]["exposed_melt_area_m2"] is None
     with pytest.raises(Hashimoto1983Refusal) as exc_info:
@@ -91,6 +93,7 @@ def test_runtime_pressure_override_cannot_bypass_printed_pressure_floor() -> Non
     with pytest.raises(Hashimoto1983Refusal) as exc_info:
         require_runtime_inputs(preset)
     assert exc_info.value.reason == "runtime_pressure_below_implemented_floor"
+    assert exc_info.value.detail == "0.000133322 mbar < 0.001 mbar"
 
 
 def test_admitted_rows_have_pinned_record_count_and_skip_superseded_rows() -> None:
