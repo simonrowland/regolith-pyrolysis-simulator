@@ -115,7 +115,13 @@ def _legacy_ti_ratio(output) -> float:
 
 
 def _assert_ledger_matches_named_field(projected, legacy) -> None:
-    assert projected is not None
+    """Float ledger projection versus the named-field formula.
+
+    Public EnginePrediction.value stays a direct Decimal comparison.
+    Decimal(str(...)) is only for this raw float.
+    """
+
+    assert type(projected) is float
     assert Decimal(str(projected)) == Decimal(str(legacy)), (
         "ledger projection left the named-field formula"
     )
@@ -170,38 +176,6 @@ def test_openimcc_candidate_ledger_matches_pre_move_cr_ti_projection():
         _assert_ledger_matches_named_field(
             projected, legacy_projection(output)
         )
-
-
-@pytest.mark.parametrize(
-    "pin",
-    (
-        "formula",
-        "chromium",
-    ),
-)
-def test_named_field_pin_turns_red_when_ledger_drifts(monkeypatch, pin):
-    """Drifting the ledger reader restores the post-move pin defect."""
-
-    from simulator.battery import score as score_module
-
-    original = score_module._openimcc_candidate_valence_value
-
-    def drifted(identity, result, states):
-        value = original(identity, result, states)
-        return None if value is None else value + 1.0
-
-    monkeypatch.setattr(
-        score_module, "_openimcc_candidate_valence_value", drifted
-    )
-    with pytest.raises(
-        AssertionError, match="ledger projection left the named-field formula"
-    ):
-        if pin == "formula":
-            test_openimcc_candidate_ledger_matches_pre_move_cr_ti_projection()
-        else:
-            test_openimcc_candidate_pins_legacy_cr_output_and_refuses_unmodelled_total(
-                monkeypatch
-            )
 
 
 @pytest.mark.parametrize(
@@ -1034,8 +1008,10 @@ def test_openimcc_candidate_pins_legacy_cr_output_and_refuses_unmodelled_total(
     assert len(calls) == 2
     pair_output = calls[1][2]
     legacy_pair = _legacy_cr_pair_ratio(pair_output)
-    _assert_ledger_matches_named_field(pair_prediction.value, legacy_pair)
-    assert Decimal(str(legacy_pair)) == Decimal("106.6739184496613")
+    assert pair_prediction.value == Decimal(str(legacy_pair)), (
+        "ledger projection left the named-field formula"
+    )
+    assert pair_prediction.value == Decimal("106.6739184496613")
 
 
 def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
@@ -1162,29 +1138,67 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
     assert output.titanous_ti_mol == 0.0002885915704367488
     assert output.titanic_ti_mol == 0.024753667241308078
     legacy_ratio = _legacy_ti_ratio(output)
-    _assert_ledger_matches_named_field(real_prediction.value, legacy_ratio)
-    assert Decimal(str(legacy_ratio)) == Decimal("0.011658538010689464")
+    assert real_prediction.value == Decimal(str(legacy_ratio)), (
+        "ledger projection left the named-field formula"
+    )
+    assert real_prediction.value == Decimal("0.011658538010689464")
+
+
+@pytest.mark.parametrize(
+    ("element", "denominator", "regression"),
+    (
+        (
+            "Cr",
+            None,
+            test_openimcc_candidate_pins_legacy_cr_output_and_refuses_unmodelled_total,
+        ),
+        (
+            "Cr",
+            2,
+            test_openimcc_candidate_pins_legacy_cr_output_and_refuses_unmodelled_total,
+        ),
+        (
+            "Ti",
+            4,
+            test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger,
+        ),
+    ),
+    ids=("cr-total", "cr-pair", "ti-pair"),
+)
+def test_live_pin_rejects_isolated_ledger_drift(
+    monkeypatch, element, denominator, regression
+):
+    """One drifted live call must fail that call's existing pin."""
+
     from simulator.battery import score as score_module
 
     original = score_module._openimcc_candidate_valence_value
+    mutated: list[float] = []
 
     def drifted(identity, result, states):
         value = original(identity, result, states)
-        return None if value is None else value + 1.0
+        basis = identity.valence_basis
+        if (
+            value is not None
+            and identity.species is not None
+            and identity.species.formula == element
+            and basis is not None
+            and basis.is_value
+            and basis.value.denominator_oxidation_state == denominator
+            and not isinstance(result, SimpleNamespace)
+        ):
+            mutated.append(value)
+            return value + 1.0
+        return value
 
     monkeypatch.setattr(
         score_module, "_openimcc_candidate_valence_value", drifted
     )
-    drifted_ratio = score_module._openimcc_candidate_valence_value(
-        observation.identity, output, (3, 4)
-    )
     with pytest.raises(
         AssertionError, match="ledger projection left the named-field formula"
     ):
-        _assert_ledger_matches_named_field(drifted_ratio, legacy_ratio)
-    monkeypatch.setattr(
-        score_module, "_openimcc_candidate_valence_value", original
-    )
+        regression(monkeypatch)
+    assert len(mutated) == 1
 
 
 def test_openimcc_candidate_zero_fraction_and_ratio_are_scored_but_empty_inputs_refuse(
