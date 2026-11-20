@@ -2,6 +2,7 @@
 
 from types import SimpleNamespace
 
+from simulator.account_ids import MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
 from simulator.accounting.queries import AccountingQueries
 from simulator.accounting.yield_disposition import _ACCOUNT_TO_BIN
 from simulator.state import CondensationTrain
@@ -43,6 +44,19 @@ def test_fully_escaped_product_has_explicit_zero_recovery():
     )
     assert AccountingQueries(sim).product_ledger()["Na"] == 0.0
     assert accounts["terminal.offgas"] == {"Na": 3.0}
+
+
+def test_mn_cartridge_is_in_condensed_product_ledger():
+    accounts = {MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: {"Mn": 0.5}}
+    sim = SimpleNamespace(
+        atom_ledger=SimpleNamespace(project_account_kg=lambda account: accounts.get(account, {})),
+        _unspent_additive_reagents_kg=lambda: {},
+    )
+
+    assert AccountingQueries(sim).product_ledger() == {"Mn": 0.5}
+    assert _ACCOUNT_TO_BIN[MANGANESE_STAGE3_CARTRIDGE_ACCOUNT] == (
+        "product_condensed"
+    )
 
 
 def test_later_available_capture_does_not_certify_earlier_unavailable_parcel():
