@@ -792,8 +792,9 @@ def test_liquidus_finder_does_not_use_the_equilibrium_chemistry_version(
 ) -> None:
     """The finder is uncached, so a chemistry-version bump only moves other keys.
 
-    The pin is the merged green table. This car does not bump it: the
-    finder never reads or writes an existing equilibrium key.
+    The pin is b271's table: magemin, alphamelts, and thermoengine at v4
+    from b265. This car does not bump it: the finder never reads or
+    writes an existing equilibrium key.
     """
 
     from simulator.engine_cache import ENGINE_CHEMISTRY_VERSION, engine_cache_key
@@ -806,10 +807,10 @@ def test_liquidus_finder_does_not_use_the_equilibrium_chemistry_version(
     from simulator.melt_backend.thermoengine import ThermoEngineBackend
 
     engines = ("magemin", "alphamelts", "thermoengine")
-    assert [ENGINE_CHEMISTRY_VERSION[engine] for engine in engines] == [3, 3, 3]
+    assert [ENGINE_CHEMISTRY_VERSION[engine] for engine in engines] == [4, 4, 4]
     request = {"seam": "equilibrium-cell"}
     pinned = {
-        engine: engine_cache_key(engine, 3, request)
+        engine: engine_cache_key(engine, 4, request)
         for engine in engines
     }
     for engine, key in pinned.items():
