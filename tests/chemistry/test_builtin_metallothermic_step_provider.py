@@ -3717,6 +3717,53 @@ def test_melt_metal_saturation_buffer_without_capacity_predicts_and_flags(
     )
 
 
+def test_melt_metal_saturation_partial_buffer_commits_best_reachable_fO2(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    monkeypatch,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        _hkl_only_setpoints(copy.deepcopy(setpoints_data)),
+    )
+    sim.start_campaign(CampaignPhase.C0)
+    temperature_K = 1600.0
+    floor = sim._melt_metal_saturation_fO2_floor_log(temperature_K)
+    assert floor is not None
+    candidate_fO2_log = floor[0] - 0.5
+    best_bound_fO2_log = candidate_fO2_log + 0.1
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_fO2_upper_bound_log",
+        lambda: best_bound_fO2_log,
+    )
+    transitions_before = len(sim.atom_ledger.transitions)
+
+    best_reachable_fO2_log = sim._apply_melt_metal_saturation_buffer(
+        candidate_fO2_log=candidate_fO2_log,
+        redox_capacity_mol_per_ln=1.0,
+        temperature_K=temperature_K,
+        source_terms={},
+        gate_authority=None,
+    )
+
+    assert best_reachable_fO2_log == pytest.approx(best_bound_fO2_log)
+    assert len(sim.atom_ledger.transitions) > transitions_before
+    updated_floor = sim._melt_metal_saturation_fO2_floor_log(temperature_K)
+    assert updated_floor is not None
+    assert best_reachable_fO2_log < updated_floor[0]
+    notices = getattr(sim, "_reduced_real_repair_notices", [])
+    assert any(
+        notice.get("kind") == "melt_metal_saturation_buffer_not_reached"
+        and notice.get("best_reachable_fO2_log")
+        == best_reachable_fO2_log
+        for notice in notices
+    )
+
+
 def test_mars_basalt_c3_shuttle_conserves_total_elemental_fe(
     vapor_pressure_data,
     feedstocks_data,
