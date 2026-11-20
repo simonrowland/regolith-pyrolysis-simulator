@@ -1,9 +1,17 @@
 from __future__ import annotations
 
+from collections import Counter
 from decimal import Decimal
 from pathlib import Path
 
-from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
+import yaml
+
+from simulator.battery.enums import (
+    EvidenceClass,
+    Quantity,
+    UncertaintyKind,
+    ValueKind,
+)
 from simulator.battery.migrate import Migrator
 from tests.battery.test_migrate import _migrate_real_extract
 
@@ -16,6 +24,7 @@ HASHIMOTO_SID = "kems-015-hashimoto-1983"
 HASHIMOTO_EXTRACT = f"{HASHIMOTO_SID}.yaml"
 RICHTER07_SID = "kems-010-richter-2007"
 RICHTER07_EXTRACT = f"{RICHTER07_SID}.yaml"
+ROOT = Path(__file__).resolve().parents[2]
 TABLE2_RUNS = {
     "sossi-2019-run-2m-16-07-16e": Decimal("848.9"),
     "sossi-2019-run-2m-16-07-16a": Decimal("742.5"),
@@ -83,14 +92,51 @@ def _assert_sossi_pins(result) -> None:
     observations = [
         row
         for row in result.observations.values()
-        if "table2_open_furnace_residue_ppm" in row.observation_id
+        if row.source_id == SID
+        and row.value.kind is ValueKind.POINT
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
     ]
-    assert observations
+    assert len(observations) == 516
     assert all(row.value.kind is ValueKind.POINT for row in observations)
     assert all(row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION for row in observations)
+    assert all(row.uncertainty.kind is UncertaintyKind.NONE for row in observations)
     assert all(row.identity.temperature_K.is_value for row in observations)
     assert all(row.identity.fO2_Pa is not None and row.identity.fO2_Pa.is_value for row in observations)
     assert all(row.identity.total_pressure_Pa is not None and row.identity.total_pressure_Pa.is_value for row in observations)
+
+    source_document = yaml.safe_load(
+        (ROOT / "data/literature/extracts" / f"{SID}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    source_points: Counter[tuple[str, Decimal]] = Counter()
+    source_rows = []
+    for formula, body in source_document["species"].items():
+        for source_row in body.get("observations", []):
+            values = source_row.get("values") or {}
+            if (
+                source_row.get("type") != "rate_series"
+                or values.get("quantity")
+                != "open_furnace_residue_composition_vs_time"
+            ):
+                continue
+            points = [
+                point
+                for point in values.get("series", [])
+                if isinstance(point, dict) and point.get("residue_ppm") is not None
+            ]
+            if not points:
+                continue
+            source_rows.append(source_row)
+            assert source_row.get("uncertainty") is None
+            for point in points:
+                source_points[(formula, Decimal(str(point["residue_ppm"])))] += 1
+    assert len(source_rows) == 96
+    assert sum(source_points.values()) == 516
+    assert Counter(
+        (row.identity.species.formula, row.value.point) for row in observations
+    ) == source_points
 
     manganese = [
         row
