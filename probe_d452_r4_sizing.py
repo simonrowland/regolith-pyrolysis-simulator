@@ -46,6 +46,7 @@ AREA_RELATIVE_TOLERANCE = 0.01
 MAX_FIXED_POINT_PASSES = 8
 DIAGNOSTIC_SPECIES = ("Mn", "SiO", "Si")
 TIME_OVERLAP_SPECIES = ("Mn", "SiO", "Si", "Fe")
+ROUTING_AUDIT_SPECIES = ("Mn", "Cr")
 MODEL_STATE_FIELDS = (
     "wall_species_partial_pressures_pa",
     "vapor_pressure_data",
@@ -748,13 +749,14 @@ def _print_purity_and_mn_accounts(run: dict, label: str) -> None:
                 f"D452_PURITY label={label} stage={stage_key} "
                 f"row={json.dumps(row, sort_keys=True, separators=(',', ':'))}"
             )
-    for index, stage in enumerate(run["model"].train.stages):
-        mn_kg = float(stage.collected_kg.get("Mn", 0.0) or 0.0)
-        if mn_kg > 0.0:
+    for species in ROUTING_AUDIT_SPECIES:
+        stage_marker = f"D452_{species.upper()}_STAGE"
+        for index, stage in enumerate(run["model"].train.stages):
+            captured_kg = float(stage.collected_kg.get(species, 0.0) or 0.0)
             print(
-                f"D452_MN_STAGE label={label} index={index} "
+                f"{stage_marker} label={label} index={index} "
                 f"stage={getattr(stage, 'stage_key', '') or stage.stage_number} "
-                f"Mn_kg={mn_kg:.12g}"
+                f"{species}_kg={captured_kg:.12g}"
             )
     for account in (
         "process.wall_deposit",
@@ -762,10 +764,12 @@ def _print_purity_and_mn_accounts(run: dict, label: str) -> None:
         "process.overhead_gas",
     ):
         balances = sim.atom_ledger.kg_by_account(account)
-        print(
-            f"D452_MN_ACCOUNT label={label} account={account} "
-            f"Mn_kg={float(balances.get('Mn', 0.0)):.12g}"
-        )
+        for species in ROUTING_AUDIT_SPECIES:
+            account_marker = f"D452_{species.upper()}_ACCOUNT"
+            print(
+                f"{account_marker} label={label} account={account} "
+                f"{species}_kg={float(balances.get(species, 0.0)):.12g}"
+            )
     notice = sim.condensation_model.last_sticking_alpha_provenance_notice
     mn_alpha = notice.get("alpha_s_provenance_by_species", {}).get("Mn", {})
     print(
