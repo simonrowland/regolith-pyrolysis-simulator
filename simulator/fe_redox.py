@@ -1021,10 +1021,18 @@ class LiquidFeODomain:
     liquidus_T_C: float | None
     solidus_T_C: float | None
     source: str
+    domain_identity: "MAGEMinDomainIdentity"
+    liquidus_unknown: bool = False
 
     def __post_init__(self) -> None:
+        from simulator.melt_backend.magemin import MAGEMinDomainIdentity
+
         if not isinstance(self.below_liquidus, bool):
             raise TypeError("below_liquidus must be bool")
+        if not isinstance(self.domain_identity, MAGEMinDomainIdentity):
+            raise TypeError("domain_identity must be MAGEMinDomainIdentity")
+        if not isinstance(self.liquidus_unknown, bool):
+            raise TypeError("liquidus_unknown must be bool")
         temperature_K = _finite_domain_float(self.temperature_K, "temperature_K")
         if temperature_K <= 0.0:
             raise ValueError("temperature_K must be positive")
@@ -1085,38 +1093,35 @@ def _with_liquid_model_below_liquidus_notice(
             "source": liquid_domain.source,
             "authority": "extrapolated",
         })
-    identity = getattr(liquid_domain, "domain_identity", None)
-    silica_verdict = getattr(identity, "silica_verdict", None)
-    certified_band = getattr(identity, "certified_band", None)
+    identity = liquid_domain.domain_identity
+    silica_verdict = identity.silica_verdict
+    certified_band = identity.certified_band
     identity_notice = {
         "type": "typed_notice",
         "kind": MAGEMIN_DOMAIN_IDENTITY_KIND,
         "silica_verdict": silica_verdict,
-        "projection_threshold_verdict": getattr(
-            identity, "projection_threshold_verdict", None,
-        ),
+        "projection_threshold_verdict": identity.projection_threshold_verdict,
         "certified_band": (
             {"sio2_wt_pct": list(certified_band)}
             if isinstance(certified_band, (tuple, list))
             else None
         ),
-        "refusal_reason": getattr(identity, "refusal_reason", None),
+        "refusal_reason": identity.refusal_reason,
         "temperature_K": liquid_domain.temperature_K,
         "liquidus_T_C": liquid_domain.liquidus_T_C,
         "solidus_T_C": liquid_domain.solidus_T_C,
         "source": liquid_domain.source,
         "authority": (
-            "unknown"
-            if getattr(liquid_domain, "liquidus_unknown", False)
-            else "extrapolated"
+            "extrapolated"
             if silica_verdict == "extrapolated"
+            else "unknown"
+            if liquid_domain.liquidus_unknown or silica_verdict != "in_band"
             else "in_domain"
         ),
     }
-    if getattr(liquid_domain, "liquidus_unknown", False):
+    if liquid_domain.liquidus_unknown:
         identity_notice["liquidus_status"] = "unknown"
-        notices.append(identity_notice)
-    elif silica_verdict == "extrapolated":
+    if liquid_domain.liquidus_unknown or silica_verdict != "in_band":
         notices.append(identity_notice)
     if notices:
         components["notices"] = notices

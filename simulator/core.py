@@ -863,12 +863,6 @@ def _canonicalize_condenser_geometry_stage_keys(
 _MeltRedoxLiquidusStatus = BackendStatusRanked | Literal['invalid']
 
 
-@dataclass(frozen=True, slots=True)
-class _MageminLiquidFeODomain(LiquidFeODomain):
-    domain_identity: Any
-    liquidus_unknown: bool = False
-
-
 @dataclass(frozen=True)
 class _MeltRedoxLiquidusFloorFallback:
     source: str
@@ -5977,15 +5971,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_melt_regime_diagnostic = regime_diagnostic
         return regime != MeltRegime.FROZEN
 
-    def liquid_feo_domain_at(self, temperature_K: float) -> LiquidFeODomain | None:
-        """Liquid-state fact for the FeO activity owner.
+    def liquid_feo_domain_at(self, temperature_K: float) -> LiquidFeODomain:
+        """Liquid-state fact and MAGEMin identity for the FeO activity owner.
 
-        The silicate liquidus on the melt-redox gate curve is the bound.
-        The Kress91 calibration floor applies only when that curve is the
-        floor fallback and no silicate liquidus exists. This method does
-        not evaluate a liquid activity coefficient. An hour that has not
-        established the gate returns None: that is not a below-liquidus
-        claim, and it does not start a liquidus solve.
+        The silicate liquidus on the melt-redox gate curve is the bound. The
+        Kress91 calibration floor applies only when that curve is the floor
+        fallback and no silicate liquidus exists. This method does not evaluate
+        a liquid activity coefficient or start a liquidus solve. If the gate
+        has no established liquidus, the returned domain marks it unknown.
         """
 
         if isinstance(temperature_K, bool):
@@ -5997,6 +5990,44 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if not math.isfinite(T_K) or T_K <= 0.0:
             raise ValueError("temperature_K must be finite and positive")
         T_C = T_K - 273.15
+        from simulator.melt_backend.magemin import MAGEMinDomainIdentity
+
+        domain_identity = None
+        unknown_identity = MAGEMinDomainIdentity(
+            'unknown', 'unknown', None, 'liquidus_domain_identity_unavailable',
+        )
+
+        def domain(
+            *,
+            below_liquidus: bool,
+            liquidus_T_C: float | None,
+            solidus_T_C: float | None,
+            source: str,
+            liquidus_unknown: bool = False,
+        ) -> LiquidFeODomain:
+            identity = domain_identity
+            if (
+                not isinstance(identity, MAGEMinDomainIdentity)
+                and getattr(self, '_liquid_fraction_provider', None)
+                == 'magemin'
+            ):
+                identity = getattr(
+                    self,
+                    '_freeze_gate_current_magemin_domain_identity',
+                    None,
+                )
+            if not isinstance(identity, MAGEMinDomainIdentity):
+                identity = unknown_identity
+            return LiquidFeODomain(
+                below_liquidus=below_liquidus,
+                temperature_K=T_K,
+                liquidus_T_C=liquidus_T_C,
+                solidus_T_C=solidus_T_C,
+                source=source,
+                domain_identity=identity,
+                liquidus_unknown=liquidus_unknown,
+            )
+
         # The step establishes the gate before these callers. Read the curve
         # that call already resolved, or the redox pin. Do not dispatch a
         # liquidus solve from inside the activity diagnostic.
@@ -6020,10 +6051,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             hour = int(self.melt.hour)
         except (TypeError, ValueError, AttributeError):
             hour = None
+
         retained_identity_matches = True
         current_identity = None
         submitted_bulk_passes = True
         retained_identity_changed = False
+        retained_identity = None
         if (
             hour is not None
             and retained_hour == hour
@@ -6044,15 +6077,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 and current_identity.matches(retained_identity)
             )
             retained_identity_changed = not retained_identity_matches
+
         mismatch_identity = None
         if retained_identity_changed:
             mismatch_identity = current_identity
-            if mismatch_identity is None:
-                from simulator.melt_backend.magemin import MAGEMinDomainIdentity
-
-                mismatch_identity = MAGEMinDomainIdentity(
-                    'unknown', 'unknown', None, None,
-                )
+            if not isinstance(mismatch_identity, MAGEMinDomainIdentity):
+                mismatch_identity = unknown_identity
+            domain_identity = mismatch_identity
+            resolved_identity = mismatch_identity
             if submitted_bulk_passes:
                 # A retained replay belongs to the old evaluated bulk. Resolve
                 # authority through the same current-hour path as a fresh
@@ -6064,17 +6096,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     curve = (
                         self._establish_melt_redox_gate_authority_for_current_hour()
                     )
-                except PT0CacheMiss:
+                except (PT0CacheMiss, EvaporationFluxRefusal):
                     curve = _LIQUID_FEO_GATE_NOT_ESTABLISHED
                 resolved_identity = getattr(
                     self,
                     '_freeze_gate_current_magemin_domain_identity',
                     None,
                 )
-                if resolved_identity is not None:
+                if isinstance(resolved_identity, MAGEMinDomainIdentity):
                     mismatch_identity = resolved_identity
+                    domain_identity = resolved_identity
+                else:
+                    resolved_identity = mismatch_identity
             else:
                 curve = _LIQUID_FEO_GATE_NOT_ESTABLISHED
+            # A second activity read in this hour must use the verdict just
+            # resolved above, including an unknown result. Otherwise a failed
+            # replay replacement repeats the same provider dispatch forever.
+            self._liquid_feo_resolved_curve_hour = hour
+            self._liquid_feo_resolved_curve = (
+                None
+                if curve is _LIQUID_FEO_GATE_NOT_ESTABLISHED
+                else curve
+            )
+            self._liquid_feo_resolved_curve_domain_identity = resolved_identity
         elif (
             hour is not None
             and retained_hour == hour
@@ -6082,6 +6127,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and retained_identity_matches
         ):
             curve = retained
+            if isinstance(retained_identity, MAGEMinDomainIdentity):
+                domain_identity = retained_identity
         elif (
             hour is None
             or pinned_hour != hour
@@ -6089,57 +6136,59 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ):
             curve = _LIQUID_FEO_GATE_NOT_ESTABLISHED
         else:
-            curve = self._resolved_melt_redox_gate_authority(pinned)
-        if curve is _LIQUID_FEO_GATE_NOT_ESTABLISHED:
-            if retained_identity_changed and mismatch_identity is not None:
-                return _MageminLiquidFeODomain(
-                    below_liquidus=True,
-                    temperature_K=T_K,
-                    liquidus_T_C=None,
-                    solidus_T_C=None,
-                    source='none:liquidus_unknown_after_domain_identity_change',
-                    domain_identity=mismatch_identity,
-                    liquidus_unknown=True,
-                )
-            return None
-        if isinstance(curve, _MeltRedoxLiquidusFloorFallback):
-            floor_C = float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
-            # Same strict bound the redox gate uses when the silicate
-            # liquidus is unavailable: liquid only above the floor.
-            # The object source names why the silicate liquidus is missing.
-            # The bound itself is the Kress91 calibration floor, and the
-            # analytical floor curve already cites that source.
-            domain_type = (
-                _MageminLiquidFeODomain
-                if mismatch_identity is not None
-                else LiquidFeODomain
+            pinned_identity = getattr(
+                self,
+                '_melt_redox_gate_authority_tick_verdict_identity',
+                None,
             )
-            domain_values = dict(
+            if (
+                getattr(self, '_liquid_fraction_provider', None) == 'magemin'
+                and isinstance(pinned_identity, MAGEMinDomainIdentity)
+            ):
+                domain_identity = pinned_identity
+            curve = self._resolved_melt_redox_gate_authority(pinned)
+            if getattr(self, '_liquid_fraction_provider', None) == 'magemin':
+                resolved_identity = getattr(
+                    self,
+                    '_freeze_gate_current_magemin_domain_identity',
+                    None,
+                )
+                if isinstance(resolved_identity, MAGEMinDomainIdentity):
+                    domain_identity = resolved_identity
+            if (
+                isinstance(curve, _MeltRedoxLiquidusFloorFallback)
+                and isinstance(curve.verdict_identity, MAGEMinDomainIdentity)
+            ):
+                domain_identity = curve.verdict_identity
+
+        if curve is _LIQUID_FEO_GATE_NOT_ESTABLISHED:
+            return domain(
+                below_liquidus=True,
+                liquidus_T_C=None,
+                solidus_T_C=None,
+                source=(
+                    'none:liquidus_unknown_after_domain_identity_change'
+                    if retained_identity_changed
+                    else 'none:liquidus_gate_not_established'
+                ),
+                liquidus_unknown=True,
+            )
+        if isinstance(curve, _MeltRedoxLiquidusFloorFallback):
+            if isinstance(curve.verdict_identity, MAGEMinDomainIdentity):
+                domain_identity = curve.verdict_identity
+            floor_C = float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
+            # The floor is a Kress91 activity bound, not a resolved silicate
+            # liquidus, so preserve the typed unknown-liquidus qualification.
+            return domain(
                 below_liquidus=not (T_C > floor_C),
-                temperature_K=T_K,
                 liquidus_T_C=floor_C,
                 solidus_T_C=floor_C,
                 source=_KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+                liquidus_unknown=True,
             )
-            if mismatch_identity is not None:
-                return domain_type(
-                    **domain_values,
-                    domain_identity=mismatch_identity,
-                    liquidus_unknown=True,
-                )
-            return domain_type(**domain_values)
         if curve is None:
-            # The gate record is absent while the curve is still being
-            # built. The redox gate treats that read as not liquid, and
-            # there is no silicate liquidus to cite.
-            domain_type = (
-                _MageminLiquidFeODomain
-                if mismatch_identity is not None
-                else LiquidFeODomain
-            )
-            domain_values = dict(
+            return domain(
                 below_liquidus=True,
-                temperature_K=T_K,
                 liquidus_T_C=None,
                 solidus_T_C=None,
                 source=(
@@ -6147,27 +6196,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if mismatch_identity is not None
                     else 'none:liquidus_gate_in_progress'
                 ),
+                liquidus_unknown=True,
             )
-            if mismatch_identity is not None:
-                return domain_type(
-                    **domain_values,
-                    domain_identity=mismatch_identity,
-                    liquidus_unknown=True,
-                )
-            return domain_type(**domain_values)
         if isinstance(curve, Mapping) and "liquidus_T_C" not in curve:
             nested = curve.get("curve")
             if isinstance(nested, Mapping):
                 curve = nested
         if not isinstance(curve, Mapping) or curve.get("liquidus_T_C") is None:
-            domain_type = (
-                _MageminLiquidFeODomain
-                if mismatch_identity is not None
-                else LiquidFeODomain
-            )
-            domain_values = dict(
+            return domain(
                 below_liquidus=True,
-                temperature_K=T_K,
                 liquidus_T_C=None,
                 solidus_T_C=None,
                 source=(
@@ -6175,14 +6212,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if mismatch_identity is not None
                     else 'none:liquidus_unresolved'
                 ),
+                liquidus_unknown=True,
             )
-            if mismatch_identity is not None:
-                return domain_type(
-                    **domain_values,
-                    domain_identity=mismatch_identity,
-                    liquidus_unknown=True,
-                )
-            return domain_type(**domain_values)
+
         liquidus_T_C = float(curve["liquidus_T_C"])
         raw_solidus = curve.get("solidus_T_C")
         solidus_T_C = None if raw_solidus is None else float(raw_solidus)
@@ -6195,20 +6227,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         # Valid at and above the silicate liquidus. The Kress91 floor
         # (max(liquidus, 1200 C)) is a redox-capacity gate, not this bound.
-        domain_values = dict(
+        return domain(
             below_liquidus=T_C < liquidus_T_C,
-            temperature_K=T_K,
             liquidus_T_C=liquidus_T_C,
             solidus_T_C=solidus_T_C,
             source=source,
+            liquidus_unknown=liquidus_unknown,
         )
-        if mismatch_identity is not None:
-            return _MageminLiquidFeODomain(
-                **domain_values,
-                domain_identity=mismatch_identity,
-                liquidus_unknown=liquidus_unknown,
-            )
-        return LiquidFeODomain(**domain_values)
 
     def _re_reference_melt_fO2_to_temperature(
         self,

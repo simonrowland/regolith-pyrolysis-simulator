@@ -2943,13 +2943,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             notice is not None
             and result.status == 'out_of_domain'
         ):
-            from simulator.composition_projection import (
-                _projected_liquidus_refusal_reason,
+            threshold_verdict = diagnostics.get(
+                'projection_threshold_verdict'
             )
-
-            refusal = (
+            refusal = None if threshold_verdict == 'clear' else (
                 diagnostics.get('projection_threshold_reason')
-                or _projected_liquidus_refusal_reason(notice)
+                or COMPOSITION_PROJECTED
             )
             if refusal is not None:
                 diagnostics['composition_projected_notice'] = {
