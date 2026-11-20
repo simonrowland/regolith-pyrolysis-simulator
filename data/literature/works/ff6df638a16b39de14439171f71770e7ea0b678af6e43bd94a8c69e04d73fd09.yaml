@@ -1,0 +1,20 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: ff6df638a16b39de14439171f71770e7ea0b678af6e43bd94a8c69e04d73fd09
+  citation: Bergman, G. A. & Gusarov, A. V. (n.d.). IVTANTHERMO electronic table 1603, zinc oxide ZnO(s, l), Moscow State
+    University, Faculty of Chemistry. https://www.chem.msu.ru/rus/tsiv/Zn/print-ZnO_c.html
+  source_ids:
+  - ivtan-zno-thermo
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e1dbb239851508a1a3635ff8a7eec9400953b826
+    files:
+    - asset_id: unknown:ivtan-zno-thermo
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
