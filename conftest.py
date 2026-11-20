@@ -317,13 +317,12 @@ def runner_golden_loader(tmp_path_factory):
     return load
 
 
-# Golden producers share one MAGEMin chain. The machine-wide flock default
-# is 2 slots, and the slot wait is inside the 15s warm-call timeout, so a
-# focused -n 6 run of these files used to time the gate out twice and hold
-# the last curve. Tests that already have a group (serial, an existing
-# magemin chain) are left on it. This is not a guarantee under arbitrary
-# CPU load from other jobs: a held curve still fails as an environment
-# error before the digest compare.
+# Golden producers share one dedicated group, serial among themselves and
+# parallel with magemin_fullrun_a..d. They used to join chain a. That chain
+# is already the long one, and the 15s warm-call timeout is not raised.
+# Tests that already have a group (serial, an existing magemin chain, the
+# lunar pin and lunar C0 consumers) stay on it. A held curve still fails
+# as an environment error before the digest compare.
 _GOLDEN_MAGEMIN_GROUP_FILES = frozenset({
     "test_coating_rate.py",
     "test_condensation_green_pins.py",
@@ -344,7 +343,7 @@ def _group_golden_magemin_producers(items: list[pytest.Item]) -> None:
             continue
         if any(mark.name == "xdist_group" for mark in item.iter_markers()):
             continue
-        item.add_marker(pytest.mark.xdist_group("magemin_fullrun_a"))
+        item.add_marker(pytest.mark.xdist_group("magemin_golden"))
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
