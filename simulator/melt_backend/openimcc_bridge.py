@@ -1261,14 +1261,30 @@ def _evaluate_with_timeout(
         allow_out_of_envelope=allow_out_of_envelope,
     )
     def solve() -> Any:
-        return _evaluate_uncached(
-            composition_mol=composition_mol,
-            temperature_K=temperature_K,
-            composition_kg=composition_kg,
-            pack=pack,
-            allow_extrapolation=allow_extrapolation,
-            allow_out_of_envelope=allow_out_of_envelope,
-        ).to_hot()
+        try:
+            return _evaluate_uncached(
+                composition_mol=composition_mol,
+                temperature_K=temperature_K,
+                composition_kg=composition_kg,
+                pack=pack,
+                allow_extrapolation=allow_extrapolation,
+                allow_out_of_envelope=allow_out_of_envelope,
+            ).to_hot()
+        except OpenImccCompositionPolicyRefusal as exc:
+            from simulator.engine_cache import CACHEABLE_REFUSAL_CODES
+
+            if exc.code not in CACHEABLE_REFUSAL_CODES:
+                raise
+            detail = str(exc)
+            prefix = f"reason={exc.code}: "
+            if detail.startswith(prefix):
+                detail = detail[len(prefix):]
+            return {
+                "status": "refusal",
+                "refusal_reason": exc.code,
+                "engine_status": "out_of_domain",
+                "detail": detail,
+            }
 
     payload = cached_engine_call(
         "openimcc",
@@ -1279,6 +1295,15 @@ def _evaluate_with_timeout(
             else lambda: _call_with_hard_timeout(solve, solve_timeout_s)
         ),
     )
+    if (
+        isinstance(payload, Mapping)
+        and payload.get("status") == "refusal"
+        and payload.get("refusal_reason")
+    ):
+        raise OpenImccCompositionPolicyRefusal(
+            str(payload["refusal_reason"]),
+            str(payload.get("detail") or ""),
+        )
     return OpenImccBridgeResult.from_hot(payload)
 
 

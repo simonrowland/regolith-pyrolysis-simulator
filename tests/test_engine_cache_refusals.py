@@ -44,7 +44,17 @@ def test_deterministic_refusal_allowlist_is_explicit():
         ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH,
         ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH,
         ALPHAMELTS_REASON_FE_FREE_SILICATE_IMPOSED_FO2_CRASH,
+        "internal_analytical_missing_composition",
+        "internal_analytical_invalid_temperature",
+        "internal_analytical_invalid_total_pressure",
+        "internal_analytical_invalid_composition",
+        "internal_analytical_missing_oxygen_condition",
+        "internal_analytical_invalid_oxygen_condition",
+        "openimcc_composition_canonicalization",
     })
+    assert "internal_analytical_oxygen_balance_unavailable" not in (
+        CACHEABLE_REFUSAL_CODES
+    )
     assert OutOfDomainReason.SPECIATION_NO_FINITE_VALUES in (
         STABLE_OUT_OF_DOMAIN_REASONS
     )
@@ -856,3 +866,131 @@ def test_magemin_negative_convergence_is_not_stored(tmp_path, monkeypatch):
     counts = _assert_returned_miss_accounting("magemin")
     assert counts["stores"] == 0
     assert counts["not_stored:refusal:negative_convergence_evidence"] == 2
+
+
+@pytest.mark.parametrize(
+    ("code", "kwargs"),
+    [
+        (
+            "internal_analytical_missing_composition",
+            {"composition_kg": None, "temperature_C": 1400.0, "pressure_bar": 1.0,
+             "po2_request": ("commanded", 1.0e-8)},
+        ),
+        (
+            "internal_analytical_invalid_temperature",
+            {"composition_kg": {"SiO2": 1.0}, "temperature_C": -300.0,
+             "pressure_bar": 1.0, "po2_request": ("commanded", 1.0e-8)},
+        ),
+        (
+            "internal_analytical_invalid_total_pressure",
+            {"composition_kg": {"SiO2": 1.0}, "temperature_C": 1400.0,
+             "pressure_bar": -1.0, "po2_request": ("commanded", 1.0e-8)},
+        ),
+        (
+            "internal_analytical_invalid_composition",
+            {"composition_kg": {"SiO2": -1.0}, "temperature_C": 1400.0,
+             "pressure_bar": 1.0, "po2_request": ("commanded", 1.0e-8)},
+        ),
+        (
+            "internal_analytical_missing_oxygen_condition",
+            {"composition_kg": {"SiO2": 1.0}, "temperature_C": 1400.0,
+             "pressure_bar": 1.0, "po2_request": None},
+        ),
+        (
+            "internal_analytical_invalid_oxygen_condition",
+            {"composition_kg": {"SiO2": 1.0}, "temperature_C": 1400.0,
+             "pressure_bar": 1.0, "po2_request": ("commanded", 0.0)},
+        ),
+    ],
+)
+def test_internal_analytical_input_refusal_hits_after_disk_round_trip(
+    code, kwargs, tmp_path, monkeypatch,
+):
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        Po2Request,
+        _InternalAnalyticalInputRefusal,
+        internal_analytical_residue_vapor_pressure,
+    )
+
+    _enable_disk_cache(tmp_path, monkeypatch)
+    po2 = kwargs["po2_request"]
+    po2_request = None if po2 is None else Po2Request(mode=po2[0], po2_bar=po2[1])
+    calls = []
+    original = binary_pot_battery._internal_analytical_vapor_pressure_adapter
+
+    def wrapped(**adapter_kwargs):
+        calls.append(1)
+        return original(**adapter_kwargs)
+
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_internal_analytical_vapor_pressure_adapter",
+        wrapped,
+    )
+    core = SimpleNamespace(_high_t_melt_activity="openimcc")
+
+    def run():
+        return internal_analytical_residue_vapor_pressure(
+            core=core,
+            temperature_C=kwargs["temperature_C"],
+            pressure_bar=kwargs["pressure_bar"],
+            composition_kg=kwargs["composition_kg"],
+            composition_mol=None,
+            fO2_log=None,
+            po2_request=po2_request,
+            include_diagnostic_shadows=False,
+        )
+
+    with pytest.raises(_InternalAnalyticalInputRefusal) as first:
+        run()
+    engine_cache._MEMORY_CACHE.clear()
+    with pytest.raises(_InternalAnalyticalInputRefusal) as second:
+        run()
+
+    assert first.value.code == second.value.code == code
+    assert first.value.category == second.value.category
+    assert str(first.value) == str(second.value)
+    assert len(calls) == 1
+    counts = _assert_returned_miss_accounting("internal-analytical")
+    assert counts["hits"] == counts["misses"] == counts["stores"] == 1
+    assert counts.get(f"not_stored:refusal:{code}", 0) == 0
+
+
+def test_openimcc_canonicalization_refusal_hits_after_disk_round_trip(
+    tmp_path, monkeypatch,
+):
+    pytest.importorskip("openimcc")
+    from simulator.melt_backend import openimcc_bridge
+
+    _enable_disk_cache(tmp_path, monkeypatch)
+    calls = []
+    original = openimcc_bridge._evaluate_uncached
+
+    def wrapped(**adapter_kwargs):
+        calls.append(1)
+        return original(**adapter_kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "_evaluate_uncached", wrapped)
+
+    def run():
+        return openimcc_bridge.evaluate(
+            composition_mol={"FeO": 1.0, "FeO_total": 1.0},
+            temperature_K=1600.0,
+        )
+
+    with pytest.raises(openimcc_bridge.OpenImccCompositionPolicyRefusal) as first:
+        run()
+    engine_cache._MEMORY_CACHE.clear()
+    with pytest.raises(openimcc_bridge.OpenImccCompositionPolicyRefusal) as second:
+        run()
+
+    assert first.value.code == second.value.code == (
+        "openimcc_composition_canonicalization"
+    )
+    assert str(first.value) == str(second.value)
+    assert len(calls) == 1
+    counts = _assert_returned_miss_accounting("openimcc")
+    assert counts["hits"] == counts["misses"] == counts["stores"] == 1
