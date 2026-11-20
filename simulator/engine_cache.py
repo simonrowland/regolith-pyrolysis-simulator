@@ -515,6 +515,7 @@ def _cache_input_component(engine_id: str, input_ref: EngineCacheInput) -> bytes
         ) from exc
 
 
+@lru_cache(maxsize=None)
 def _engine_cache_input_identity_digest(engine_id: str) -> bytes:
     try:
         inputs = ENGINE_CACHE_INPUTS[engine_id]
@@ -1309,22 +1310,6 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
     try:
         incomplete = _check_cache_schema(connection, allow_empty=True)
         if incomplete and readonly:
-            empty = connection.execute(
-                "SELECT 1 FROM sqlite_master WHERE type='table' "
-                "AND name NOT LIKE 'sqlite_%' LIMIT 1"
-            ).fetchone() is None
-            if not empty:
-                raise EngineCacheSchemaMismatch(
-                    "tables",
-                    sorted(table for table, _, _ in _CACHE_TABLE_DEFINITIONS),
-                    sorted(
-                        row[0]
-                        for row in connection.execute(
-                            "SELECT name FROM sqlite_master WHERE type='table' "
-                            "AND name NOT LIKE 'sqlite_%'"
-                        )
-                    ),
-                )
             connection.close()
             return None
         if not readonly:

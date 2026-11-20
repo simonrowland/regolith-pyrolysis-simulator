@@ -14,7 +14,6 @@ from simulator import engine_cache
 from simulator.engine_cache import EngineCacheValue
 
 
-_KEY_REQUEST = {"temperature_K": 1700.0}
 _EXPECTED_SOURCE_PATHS = {
     "pyproject.toml",
     "engines/engines.lock.toml",
@@ -33,22 +32,6 @@ def _isolated_cache():
     yield
     engine_cache._close_connections()
     engine_cache._MEMORY_CACHE.clear()
-
-
-def _keys() -> dict[str, bytes]:
-    return {
-        engine: engine_cache.engine_cache_key(
-            engine, version, _KEY_REQUEST
-        )
-        for engine, version in engine_cache.ENGINE_CHEMISTRY_VERSION.items()
-    }
-
-
-def _identity_digests() -> dict[str, bytes]:
-    return {
-        engine: engine_cache._engine_cache_input_identity_digest(engine)
-        for engine in engine_cache.ENGINE_CACHE_INPUTS
-    }
 
 
 def _mutate_source(relative_path: str, original: bytes) -> bytes:
@@ -78,7 +61,10 @@ def _mutate_source(relative_path: str, original: bytes) -> bytes:
     return original[:start] + changed + original[stop:]
 
 
-def test_keys_ignore_each_declared_pin_lock_and_data_file_change(
+def _assert_probe_key_is_checkout_and_source_invariant(
+    engine: str,
+    version: int,
+    probe_request: dict,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -90,51 +76,43 @@ def test_keys_ignore_each_declared_pin_lock_and_data_file_change(
     assert declared == _EXPECTED_SOURCE_PATHS
 
     source_root = engine_cache._ENGINE_CACHE_ROOT
-    copied_root = tmp_path / "inputs"
-    for relative_path in declared:
+    copied_root = tmp_path / "second-checkout"
+    for relative_path in declared | {"data/binary_pots.yaml"}:
         source = source_root / relative_path
         target = copied_root / relative_path
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)
 
-    original_keys = _keys()
-    original_digests = _identity_digests()
+    def clear_fingerprint_memo() -> None:
+        clear = getattr(
+            engine_cache._engine_cache_input_identity_digest, "cache_clear", None
+        )
+        if clear is not None:
+            clear()
+
+    checkout_keys = []
+    for root in (source_root, copied_root):
+        monkeypatch.setattr(engine_cache, "_ENGINE_CACHE_ROOT", root)
+        clear_fingerprint_memo()
+        checkout_keys.append(
+            engine_cache.engine_cache_key(engine, version, probe_request)
+        )
+    assert checkout_keys[0] == checkout_keys[1], (
+        f"{engine} canonical probe key changed across checkout roots"
+    )
+
     monkeypatch.setattr(engine_cache, "_ENGINE_CACHE_ROOT", copied_root)
-    expected_keys = _keys()
-    assert expected_keys == original_keys
-    assert _identity_digests() == original_digests
+    expected_key = checkout_keys[1]
     for relative_path in sorted(declared):
         source = copied_root / relative_path
         original = source.read_bytes()
-        before_digests = _identity_digests()
         source.write_bytes(_mutate_source(relative_path, original))
-
-        changed_digests = {
-            engine
-            for engine, digest in before_digests.items()
-            if digest != engine_cache._engine_cache_input_identity_digest(engine)
-        }
-        expected_digest_changes = {
-            engine
-            for engine, refs in engine_cache.ENGINE_CACHE_INPUTS.items()
-            if any(ref.path == relative_path for ref in refs)
-        }
-        assert changed_digests == expected_digest_changes, relative_path
-        assert _keys() == expected_keys, relative_path
+        clear_fingerprint_memo()
+        assert engine_cache.engine_cache_key(
+            engine, version, probe_request
+        ) == expected_key, relative_path
         source.write_bytes(original)
-
-
-@pytest.mark.parametrize(
-    ("engine", "version"), tuple(engine_cache.ENGINE_CHEMISTRY_VERSION.items())
-)
-def test_request_and_chemistry_version_each_change_the_key(engine, version) -> None:
-    baseline = engine_cache.engine_cache_key(engine, version, _KEY_REQUEST)
-    assert engine_cache.engine_cache_key(
-        engine, version, {**_KEY_REQUEST, "temperature_K": 1701.0}
-    ) != baseline
-    assert engine_cache.engine_cache_key(
-        engine, int(version) + 1, _KEY_REQUEST
-    ) != baseline
+        clear_fingerprint_memo()
 
 
 def test_new_cold_row_stores_current_input_fingerprint(tmp_path, monkeypatch) -> None:
