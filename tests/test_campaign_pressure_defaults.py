@@ -792,18 +792,77 @@ def test_c2a_staged_one_atm_override_and_lab_schedule_keep_total_and_notice():
     assert evidence_gas["pn2_band_notice"] == notice
 
 
-def test_c2a_staged_pn2_sweep_refuses_total_below_oxygen_partial():
+@pytest.mark.parametrize("fallback_source", ["runtime_override", "lab_schedule"])
+def test_c2a_staged_inherited_total_uses_current_fallback_after_explicit_stage(
+    fallback_source,
+):
+    setpoints = deepcopy(_setpoints())
+    _stage(setpoints, "alkali_early_fe")["p_total_mbar"] = 10.0
+    _stage(setpoints, "sio_window").pop("p_total_mbar", None)
+    manager = CampaignManager(setpoints)
+    manager.overrides["C2A_staged"] = {"p_total_mbar": 10.0}
+    if fallback_source == "lab_schedule":
+        lab_schedule = _n2_lab_schedule()
+        lab_schedule["duration_h"] = 4.0
+        lab_schedule["melt_temperature_C"][1]["t_h"] = 4.0
+        lab_schedule["chamber_pressure_mbar"] = [
+            {"t_h": 0.0, "value": 10.0, "unit": "mbar"},
+            {"t_h": 4.0, "value": 1013.25, "unit": "mbar"},
+        ]
+        manager.overrides["C2A_staged"] = {"lab_schedule": lab_schedule}
+
+    melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
+    manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
+    assert melt.p_total_mbar == pytest.approx(10.0)
+
+    if fallback_source == "runtime_override":
+        manager.overrides["C2A_staged"]["p_total_mbar"] = 1013.25
+    else:
+        manager.apply_lab_schedule_controls(
+            melt,
+            CampaignPhase.C2A_STAGED,
+            sample_time_h=4.0,
+        )
+    melt.campaign_hour = 4
+    manager.apply_c2a_staged_gas_controls(melt)
+
+    gas = manager.last_c2a_staged_gas_control
+    assert gas is not None
+    assert gas["stage_name"] == "sio_window"
+    assert gas["p_total_mbar"] == pytest.approx(1013.25)
+    assert gas["requested_p_total_mbar"] == pytest.approx(1013.25)
+    assert gas["pn2_band_action"] == "honored_outside_band"
+    assert gas["pn2_band_notice"]["requested_p_total_mbar"] == pytest.approx(
+        1013.25
+    )
+
+
+@pytest.mark.parametrize(
+    ("p_total_mbar", "pO2_mbar"),
+    [(1.0, 2.0), (0.9999999995, 1.0)],
+)
+def test_c2a_staged_pn2_sweep_refuses_total_below_oxygen_partial(
+    p_total_mbar,
+    pO2_mbar,
+):
     setpoints = deepcopy(_setpoints())
     _stage(setpoints, "alkali_early_fe").update({
         "gas_cover_mode": "pn2_sweep",
-        "pO2_mbar": 2.0,
-        "p_total_mbar": 1.0,
+        "pO2_mbar": pO2_mbar,
+        "p_total_mbar": p_total_mbar,
     })
 
     manager = CampaignManager(setpoints)
     melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
-    with pytest.raises(ValueError, match="melt_pressure_partial_exceeds_total"):
+    with pytest.raises(CampaignPressureSetpointRefusal) as exc_info:
         manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
+    assert exc_info.value.reason == (
+        campaigns_module.C2A_STAGED_PRESSURE_PARTIAL_EXCEEDS_TOTAL_REASON
+    )
+    assert exc_info.value.diagnostic["p_total_mbar"] == pytest.approx(
+        p_total_mbar
+    )
+    assert exc_info.value.diagnostic["pO2_mbar"] == pytest.approx(pO2_mbar)
 
 
 def test_c2a_staged_pn2_sweep_refuses_invalid_empty_band(monkeypatch):

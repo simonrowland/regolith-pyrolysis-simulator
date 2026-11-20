@@ -96,8 +96,14 @@ C2A_STAGED_GAS_COVER_MODES = frozenset({
 })
 C2A_STAGED_PN2_SWEEP_MIN_MBAR = 5.0
 C2A_STAGED_PN2_SWEEP_MAX_MBAR = 15.0
+C2A_STAGED_PN2_KNUDSEN_FLOOR_ACTION = (
+    'adjusted_by_knudsen_pressure_floor'
+)
 C2A_STAGED_PN2_BAND_REFUSAL_REASON = (
     'c2a_staged_pn2_outside_operating_band'
+)
+C2A_STAGED_PRESSURE_PARTIAL_EXCEEDS_TOTAL_REASON = (
+    'c2a_staged_pressure_partial_exceeds_total'
 )
 C6_HOLD_TARGET_INVALID_REFUSAL_REASON = 'c6_hold_target_nonfinite'
 C6_HOLD_ACQUISITION_REFUSAL_REASON = 'c6_hold_target_not_acquired'
@@ -155,6 +161,12 @@ class CampaignPressureSetpointRefusal(ValueError):
         super().__init__(
             f'{self.reason}: {detail}' if detail else self.reason
         )
+
+
+class CampaignStagedPressurePairRefusal(CampaignPressureSetpointRefusal):
+    """A staged sweep cannot have an oxygen partial above total pressure."""
+
+    reason = C2A_STAGED_PRESSURE_PARTIAL_EXCEEDS_TOTAL_REASON
 
 
 class CampaignEndCapMissing(ValueError):
@@ -1766,15 +1778,21 @@ class CampaignManager:
 
         default_pO2 = self._pressure_config_float(
             CampaignPhase.C2A_STAGED, 'pO2_mbar', 'pO2_mbar_default')
-        default_total = (
-            float(current_total_mbar)
-            if current_total_mbar is not None
-            else self._pressure_config_float(
-                CampaignPhase.C2A_STAGED,
-                'p_total_mbar',
-                'p_total_mbar_default',
+        if current_total_mbar is not None:
+            default_total = float(current_total_mbar)
+        else:
+            override_total = self._campaign_overrides(
+                CampaignPhase.C2A_STAGED
+            ).get('p_total_mbar')
+            default_total = (
+                float(override_total)
+                if override_total is not None
+                else self._pressure_config_float(
+                    CampaignPhase.C2A_STAGED,
+                    'p_total_mbar',
+                    'p_total_mbar_default',
+                )
             )
-        )
         pO2_mbar, pO2_present = self._c2a_staged_stage_float(
             stage, 'pO2_mbar', default_pO2)
         p_total_mbar, p_total_present = self._c2a_staged_stage_float(
@@ -1830,6 +1848,21 @@ class CampaignManager:
                         C2A_STAGED_PN2_SWEEP_MIN_MBAR,
                         C2A_STAGED_PN2_SWEEP_MAX_MBAR,
                     ],
+                })
+            if pN2_mbar < 0.0:
+                raise CampaignStagedPressurePairRefusal({
+                    'status': 'refused',
+                    'reason': (
+                        C2A_STAGED_PRESSURE_PARTIAL_EXCEEDS_TOTAL_REASON
+                    ),
+                    'stage_name': stage_name,
+                    'gas_cover_mode': mode,
+                    'detail': (
+                        'p_total_mbar must be greater than or equal to '
+                        'pO2_mbar for a pN2 sweep'
+                    ),
+                    'p_total_mbar': float(p_total_mbar),
+                    'pO2_mbar': float(pO2_mbar),
                 })
             if (
                 pN2_mbar < C2A_STAGED_PN2_SWEEP_MIN_MBAR
@@ -1889,14 +1922,11 @@ class CampaignManager:
         stage = self._c2a_staged_active_stage(melt.campaign_hour)
         if not isinstance(stage, Mapping):
             raise ValueError('C2A_staged.stages did not select a stage')
-        has_requested_total = (
-            'p_total_mbar' in self._campaign_overrides(active_campaign)
-            or self._lab_schedule(active_campaign) is not None
-        )
+        has_lab_schedule = self._lab_schedule(active_campaign) is not None
         atmosphere, diagnostic = self._c2a_staged_stage_gas_control(
             stage,
             current_total_mbar=(
-                float(melt.p_total_mbar) if has_requested_total else None
+                float(melt.p_total_mbar) if has_lab_schedule else None
             ),
         )
         melt.atmosphere = atmosphere
