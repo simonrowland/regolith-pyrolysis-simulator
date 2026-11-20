@@ -634,9 +634,16 @@ def test_setpoint_condenser_geometry_defaults_anchor_throat_and_stage_areas():
 
     assert math.sqrt(4.0 * throat_area_m2 / math.pi) == pytest.approx(0.5)
     assert model.pipe_diameter_m == pytest.approx(0.5)
-    assert model.stage_area_m2("fe_stage1") == pytest.approx(0.236, abs=0.0)
-    assert model.stage_area_m2("alkali_stage4") == pytest.approx(0.051, abs=1e-15)
-    assert model.stage_area_m2("k_stage4b") == pytest.approx(0.064, abs=0.0)
+    # d-283 r4's three-pass fixed point pins the live absolute areas.
+    assert model.stage_area_m2("fe_stage1") == pytest.approx(
+        38.829406624, abs=0.0
+    )
+    assert model.stage_area_m2("alkali_stage4") == pytest.approx(
+        106.439821811, abs=1e-15
+    )
+    assert model.stage_area_m2("k_stage4b") == pytest.approx(
+        0.0661518735017, abs=0.0
+    )
     assert model.condenser_hydraulic_diameter_m == pytest.approx(0.12)
     assert "k_stage4b" not in model.stage_hydraulic_diameter_m
     assert model.stage_hydraulic_diameter_m["fe_stage1"] == pytest.approx(0.020)
@@ -827,20 +834,21 @@ def test_default_stage_geometry_provenance_reaches_coating_authority():
     assert surface_geometry["provisional"] is True
     assert surface_geometry["source_class"] == "engineering-default"
     by_stage = surface_geometry["stage_area_ratio_provenance_by_stage"]
-    fe_source = by_stage["fe_stage1"]["source"]
-    assert fe_source.startswith("owner-ruling-d137:")
-    assert "0.236 m2" in fe_source
-    assert "provisional" not in fe_source
     for key, area_text in (
-        ("alkali_stage4", "0.051 m2"),
-        ("k_stage4b", "0.064 m2"),
+        ("fe_stage1", "38.829406624 m2"),
+        ("cr_stage2", "350.525053773 m2"),
+        ("sio_stage3", "466.975203985 m2"),
+        ("alkali_stage4", "106.439821811 m2"),
+        ("k_stage4b", "0.0661518735017 m2"),
     ):
         source = by_stage[key]["source"]
-        assert source.startswith("owner-ruling-d137:")
-        assert "provisional" in source
-        assert "b-588" in source and "b-599" in source
+        assert source.startswith("engineering-default:")
+        assert "FLAGGED" in source
+        assert "d-283 r4 three-pass fixed point" in source
         assert area_text in source
+        assert by_stage[key]["source_class"] == "engineering-default"
         assert by_stage[key]["status"] == "provisional"
+    assert "Cr2O3 capture ceiling-limited" in by_stage["cr_stage2"]["source"]
 
 
 def test_legacy_headspace_conductance_alias_survives_new_none_key():

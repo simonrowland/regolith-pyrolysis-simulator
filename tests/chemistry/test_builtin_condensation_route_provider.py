@@ -495,6 +495,30 @@ def test_provider_allows_declared_oxygen_gaseous_coproduct(
     ]["Cr2O3"] > 0.0
 
 
+def test_simulator_condensed_product_projection_omits_overhead_gas_coproduct(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    products = sim._condensed_products_kg(
+        "CrO2",
+        1.0,
+        {
+            "condensation_products_mol_per_mol_vapor": {
+                "Cr2O3": 0.5,
+                "O2": 0.25,
+            },
+            "condensation_product_accounts": {
+                "Cr2O3": "terminal.chromium_condensed_oxide_stored",
+                "O2": "process.overhead_gas",
+            },
+        },
+    )
+
+    assert set(products) == {"Cr2O3"}
+
+
 @pytest.mark.parametrize("ratio", [0.0, -1.0, math.nan])
 def test_provider_refuses_invalid_condensation_product_ratio(
     ratio, vapor_pressure_data, feedstocks_data, setpoints_data
