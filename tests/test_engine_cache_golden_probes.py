@@ -33,7 +33,7 @@ ENGINE_GOLDEN_PROBES = {
     "vaporock": (1, "673a8c5ac16725e21c985b585a5320f08bc2bf31f785d9f68e7c1cd3f9753f3b"),
     "magemin": (3, "0e83b5a7f28e74ac77f2f763636e5ed042e450411faf200f9f62e02e357e4497"),
     "alphamelts": (3, "ff6a0568162891d88ef8924d6317eb5bd53c932717c5bde9acdc7fc4feb49c11"),
-    "thermoengine": (3, "3db7ad76c46e3130880e2782b235e739a7de72b825180c84fa94e46ec68bfb53"),
+    "thermoengine": (4, "e02472bc9cae52a718a40fcfffa3b24dd442e20033b1f6a892d120a8342377e2"),
 }
 
 def _numeric_leaves(value, path=()):

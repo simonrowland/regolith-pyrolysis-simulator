@@ -312,7 +312,7 @@ ENGINE_CHEMISTRY_VERSION = {
     "vaporock": 1,
     "magemin": 3,
     "alphamelts": 3,
-    "thermoengine": 3,
+    "thermoengine": 4,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
@@ -330,6 +330,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
+# thermoengine v4: 2026-11-19 ThermoEngine df7a5f4609116a83bf40a5a352a19e3826a822d9 - adds per-component partial molar enthalpy
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 
 

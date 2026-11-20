@@ -618,6 +618,10 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 ),
             )
             eq.fe_redox_split = dict(payload.fe_redox_split)
+            partial_rows = getattr(payload, "partial_molar_enthalpy_J_per_mol", ())
+            eq.partial_molar_enthalpy_J_per_mol = (
+                [list(row) for row in partial_rows] or None
+            )
             return self._fail_closed_on_clamped_operating_point(eq)
         except EngineWorkerTimeout as exc:
             # Warm-call wall: unfinished computation, not absence and

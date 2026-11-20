@@ -1027,6 +1027,84 @@ class ThermoEnginePayload:
     solver_converged: Optional[bool] = None
     solver_iterations: Optional[int] = None
     warnings: tuple[str, ...] = ()
+    # Compact rows from simulator.chemistry.partial_molar_enthalpy.
+    # Empty means this solve did not report a component.
+    partial_molar_enthalpy_J_per_mol: tuple[tuple[Any, ...], ...] = ()
+
+
+def _partial_enthalpy_phase_refusals(
+    transport: "ThermoEngineTransport",
+    phase_names: tuple[str, ...],
+    reason: str,
+) -> list[list[Any]]:
+    from simulator.chemistry.partial_molar_enthalpy import (
+        PHASE_CRYSTAL,
+        refusal_records,
+    )
+
+    rows: list[list[Any]] = []
+    names = phase_names or ("assemblage",)
+    for phase_name in names:
+        token = transport._partial_enthalpy_phase_token(phase_name) or PHASE_CRYSTAL
+        rows.extend(refusal_records((phase_name,), token, reason))
+    return rows
+
+
+def _partial_enthalpy_phase_object(
+    transport: "ThermoEngineTransport",
+    phase_table: Any,
+    phase_name: str,
+    token: str,
+    liquid_token: str,
+) -> Any:
+    phase_obj = None
+    try:
+        phase_obj = phase_table[phase_name].phaseClassInstance
+    except (AttributeError, KeyError, TypeError):
+        phase_obj = None
+    if phase_obj is None and token == liquid_token:
+        phase_obj = transport._liq_phase
+    return phase_obj
+
+
+def _partial_enthalpy_moles(
+    melts: Any,
+    root: Any,
+    phase_name: str,
+    phase_obj: Any,
+) -> tuple[tuple[str, ...], list[float] | None]:
+    """Fixed endmember moles. ``None`` moles means the phase reported none."""
+
+    from simulator.chemistry.partial_molar_enthalpy import (
+        PartialMolarEnthalpyRefusal,
+        REASON_NONFINITE,
+    )
+
+    names = tuple(
+        str(name) for name in (getattr(phase_obj, "endmember_names", ()) or ())
+    )
+    if not names:
+        return (phase_name,), [1.0]
+    raw = _thermoengine_native_call(
+        lambda: melts.get_composition_of_phase(root, phase_name, "component")
+    )
+    if not isinstance(raw, Mapping):
+        raw = {}
+    moles: list[float] = []
+    for name in names:
+        try:
+            moles.append(float(raw.get(name, 0.0) or 0.0))
+        except (TypeError, ValueError) as exc:
+            raise PartialMolarEnthalpyRefusal(REASON_NONFINITE) from exc
+    if any(not math.isfinite(value) or value < 0.0 for value in moles):
+        raise PartialMolarEnthalpyRefusal(REASON_NONFINITE)
+    try:
+        total = math.fsum(moles)
+    except OverflowError as exc:
+        raise PartialMolarEnthalpyRefusal(REASON_NONFINITE) from exc
+    if not math.isfinite(total) or total <= 0.0:
+        return names, None
+    return names, [value / total for value in moles]
 
 
 class ThermoEngineTransport:
@@ -1850,6 +1928,14 @@ print('ok')
             activities = {}
             fe_redox_split = {}
 
+        partial_molar_enthalpy = self._partial_molar_enthalpy_records(
+            melts=melts,
+            root=root,
+            phases=phases,
+            temperature_C=float(temperature_C),
+            pressure_bar=float(pressure_bar),
+        )
+
         return ThermoEnginePayload(
             phases_present=phases,
             phase_masses_kg=phase_masses_kg,
@@ -1886,6 +1972,9 @@ print('ok')
             solver_iterations=None,
             warnings=tuple(warnings) + tuple(dict.fromkeys(repair_notices)) + tuple(extra_warnings) + (
                 f'ThermoEngine status: {status_text}',
+            ),
+            partial_molar_enthalpy_J_per_mol=tuple(
+                tuple(row) for row in partial_molar_enthalpy
             ),
         )
 
@@ -2543,6 +2632,140 @@ print('ok')
                 f'refusing measured-looking 0.0 mol for positive wt%'
             ) from exc
         return wt / molar_mass_g_per_mol if molar_mass_g_per_mol > 0.0 else 0.0
+
+    def _partial_enthalpy_phase_token(self, phase_name: str) -> str | None:
+        """Liquid names use ``_select_liquid_phase``. Gas is not a crystal."""
+
+        from simulator.chemistry.partial_molar_enthalpy import (
+            PHASE_CRYSTAL,
+            PHASE_GAS,
+            PHASE_LIQUID,
+        )
+
+        if self._select_liquid_phase((phase_name,)) is not None:
+            return PHASE_LIQUID
+        folded = phase_name.strip().casefold()
+        if not folded:
+            return None
+        if (
+            folded in {"fluid", "gas", "water"}
+            or folded.startswith("fluid")
+            or folded.startswith("gas")
+        ):
+            return PHASE_GAS
+        return PHASE_CRYSTAL
+
+    def _partial_molar_enthalpy_records(
+        self,
+        *,
+        melts: Any,
+        root: Any,
+        phases: tuple[str, ...],
+        temperature_C: float,
+        pressure_bar: float,
+    ) -> list[list[Any]]:
+        """Hbar on the solved phase objects. Does not call equilibrate.
+
+        The formula and the 1 K step live in
+        ``simulator.chemistry.partial_molar_enthalpy``. This method only
+        holds the mole vector and the phase object fixed and refuses when
+        the assemblage name list changes across that stencil.
+        """
+
+        from simulator.chemistry.partial_molar_enthalpy import (
+            PHASE_CRYSTAL,
+            PHASE_LIQUID,
+            PartialMolarEnthalpyRefusal,
+            REASON_ASSEMBLAGE_CHANGED,
+            REASON_NO_CHEM_POTENTIAL,
+            REASON_NONFINITE,
+            REASON_STENCIL_FAILED,
+            partial_molar_enthalpies_from_phase,
+            refusal_records,
+            temperature_K_from_celsius,
+        )
+
+        phase_names = tuple(str(phase) for phase in phases)
+        temperature_K = temperature_K_from_celsius(temperature_C)
+        pressure = max(float(pressure_bar), 1.0e-6)
+        if (
+            not math.isfinite(temperature_K)
+            or temperature_K <= 0.0
+            or not math.isfinite(pressure)
+        ):
+            return _partial_enthalpy_phase_refusals(
+                self, phase_names, REASON_NONFINITE
+            )
+
+        try:
+            phase_table = melts.melts.dictionaryOfPhasesInSystem
+        except Exception:
+            return _partial_enthalpy_phase_refusals(
+                self, phase_names, REASON_STENCIL_FAILED
+            )
+
+        records: list[list[Any]] = []
+        for phase_name in phase_names:
+            token = self._partial_enthalpy_phase_token(phase_name)
+            if token is None:
+                continue
+            components: tuple[str, ...] = (phase_name,)
+            try:
+                phase_obj = _partial_enthalpy_phase_object(
+                    self, phase_table, phase_name, token, PHASE_LIQUID
+                )
+                if phase_obj is None:
+                    records.extend(
+                        refusal_records(components, token, REASON_STENCIL_FAILED)
+                    )
+                    continue
+                components, moles = _partial_enthalpy_moles(
+                    melts, root, phase_name, phase_obj
+                )
+                if moles is None:
+                    continue
+                if not callable(getattr(phase_obj, "chem_potential", None)):
+                    records.extend(
+                        refusal_records(components, token, REASON_NO_CHEM_POTENTIAL)
+                    )
+                    continue
+                records.extend(
+                    partial_molar_enthalpies_from_phase(
+                        phase_obj,
+                        temperature_K=temperature_K,
+                        pressure_bar=pressure,
+                        moles=moles,
+                        components=components,
+                        phase_token=token,
+                        phase_name=phase_name,
+                    )
+                )
+            except PartialMolarEnthalpyRefusal as exc:
+                records.extend(refusal_records(components, token, exc.reason))
+            except Exception:
+                records.extend(
+                    refusal_records(components, token, REASON_STENCIL_FAILED)
+                )
+
+        try:
+            after = tuple(
+                str(phase)
+                for phase in _thermoengine_native_call(
+                    lambda: melts.get_list_of_phases_in_assemblage(root)
+                )
+            )
+        except Exception:
+            after = None
+        if after != phase_names:
+            if records:
+                return [
+                    refusal_records((row[0],), row[1] or PHASE_CRYSTAL, REASON_ASSEMBLAGE_CHANGED)[0]
+                    for row in records
+                ]
+            return _partial_enthalpy_phase_refusals(
+                self, phase_names, REASON_ASSEMBLAGE_CHANGED
+            )
+        return records
 
     def _select_liquid_phase(self, phases: tuple[str, ...]) -> Optional[str]:
         for phase in phases:

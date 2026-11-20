@@ -551,6 +551,9 @@ class EquilibrateCell:
     liquid_composition_wt_pct: dict[str, float] = field(default_factory=dict)
     fe_redox_split: dict[str, float] = field(default_factory=dict)
     backend_failure_disposition: str | None = None
+    # Empty means this cell has no partial molar enthalpy. Omitted from
+    # as_payload and from the HOT tail so other engines' bytes stay put.
+    partial_molar_enthalpy_J_per_mol: list[list[Any]] = field(default_factory=list)
 
     def to_cache_payload(self) -> str:
         """Serialize the cell without losing its Python value types."""
@@ -566,7 +569,7 @@ class EquilibrateCell:
         return value
 
     def as_payload(self) -> dict[str, Any]:
-        return {
+        payload = {
             "pot_id": self.pot_id,
             "engine": self.engine,
             "temperature_K": self.temperature_K,
@@ -616,6 +619,11 @@ class EquilibrateCell:
             "fe_redox_split": dict(self.fe_redox_split),
             "backend_failure_disposition": self.backend_failure_disposition,
         }
+        if self.partial_molar_enthalpy_J_per_mol:
+            payload["partial_molar_enthalpy_J_per_mol"] = [
+                list(row) for row in self.partial_molar_enthalpy_J_per_mol
+            ]
+        return payload
 
     @classmethod
     def from_payload(cls, payload: Mapping[str, Any]) -> "EquilibrateCell":
@@ -729,6 +737,9 @@ class EquilibrateCell:
                 if payload.get("backend_failure_disposition") is None
                 else str(payload.get("backend_failure_disposition"))
             ),
+            partial_molar_enthalpy_J_per_mol=_partial_enthalpy_rows_from_payload(
+                payload.get("partial_molar_enthalpy_J_per_mol")
+            ),
         )
 
     def to_engine_cache_value(self) -> Any:
@@ -747,6 +758,9 @@ class EquilibrateCell:
                 "vapor_pressures_source": self.vapor_pressures_source,
                 "liquid_composition_wt_pct": self.liquid_composition_wt_pct,
                 "fe_redox_split": self.fe_redox_split,
+                "partial_molar_enthalpy_J_per_mol": (
+                    self.partial_molar_enthalpy_J_per_mol
+                ),
             },
             engine_id=self.engine,
         )
@@ -787,8 +801,9 @@ class EquilibrateCell:
         if self.backend_failure_disposition:
             return EngineCacheValue(self.as_payload(), cacheable=False)
         payload = _intern_equilibrium_source_provenance(self.to_engine_cache_value())
+        flags = payload[-1]
         if self.model_id is not None:
-            payload[11][8] = Provenance(self.model_id)
+            flags[8] = Provenance(self.model_id)
         if self.status == "refusal":
             return EngineCacheValue({
                 "status": self.status, "refusal_reason": self.refusal_reason,
@@ -822,12 +837,12 @@ class EquilibrateCell:
         """Restore the scorer-visible fields from the compact HOT cache value."""
         from simulator.melt_backend.base import equilibrium_cache_from_value
 
-        if not isinstance(payload, list) or len(payload) != 12:
+        if not isinstance(payload, list) or not 12 <= len(payload) <= 14:
             raise ValueError("invalid compact EquilibrateCell cache value")
-        base = equilibrium_cache_from_value(payload[:11])
-        flags = payload[11]
+        flags = payload[-1]
         if not isinstance(flags, list) or len(flags) != 11:
             raise ValueError("invalid compact EquilibrateCell flags")
+        base = equilibrium_cache_from_value(payload[:-1])
         (
             engine_status,
             engine_reason,
@@ -874,6 +889,10 @@ class EquilibrateCell:
             "liquid_composition_wt_pct": base.get("liquid_composition_wt_pct") or {},
             "fe_redox_split": base.get("fe_redox_split") or {},
             "backend_failure_disposition": failure_disposition,
+            "partial_molar_enthalpy_J_per_mol": base.get(
+                "partial_molar_enthalpy_J_per_mol"
+            )
+            or [],
         }
         return cls.from_payload(values)
 
@@ -1460,6 +1479,18 @@ def pairwise_residuals(
 # ---------------------------------------------------------------------------
 # Classification / extraction
 # ---------------------------------------------------------------------------
+
+
+def _partial_enthalpy_rows_from_payload(value: Any) -> list[list[Any]]:
+    """Copy compact partial-enthalpy rows. Missing means none."""
+
+    if not value:
+        return []
+    from simulator.chemistry.partial_molar_enthalpy import (
+        parse_partial_molar_enthalpy_records,
+    )
+
+    return [list(row) for row in parse_partial_molar_enthalpy_records(value)]
 
 
 def _finite_component_map(value: Any) -> dict[str, float]:
@@ -5453,6 +5484,9 @@ def _equilibrate_cell_uncached(
             ),
             fe_redox_split=_finite_component_map(
                 getattr(result, "fe_redox_split", None)
+            ),
+            partial_molar_enthalpy_J_per_mol=_partial_enthalpy_rows_from_payload(
+                getattr(result, "partial_molar_enthalpy_J_per_mol", None)
             ),
             backend_failure_disposition=(
                 None

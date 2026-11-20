@@ -287,8 +287,21 @@ def equilibrium_cache_from_value(
     engine_id: str | None = None,
 ) -> dict[str, Any]:
     """Restore the fixed scorer projection from its compact JSON array."""
-    if not isinstance(payload, list) or len(payload) not in {11, 12}:
+    if not isinstance(payload, list) or len(payload) not in {11, 12, 13}:
         raise ValueError('invalid compact equilibrium cache value')
+    records_payload = None
+    metadata = None
+    for extra in payload[11:]:
+        if isinstance(extra, list):
+            if records_payload is not None:
+                raise ValueError('invalid compact equilibrium partial enthalpy')
+            records_payload = extra
+        elif isinstance(extra, Mapping):
+            if metadata is not None:
+                raise ValueError('invalid compact equilibrium consumer metadata')
+            metadata = extra
+        else:
+            raise ValueError('invalid compact equilibrium cache tail')
 
     def restore_pairs(pairs: Any) -> dict[str, Any]:
         if isinstance(pairs, Mapping):
@@ -345,10 +358,15 @@ def equilibrium_cache_from_value(
         details[_name] = detail
     if details:
         restored['activity_coefficient_details'] = details
-    if len(payload) == 12:
-        metadata = payload[11]
-        if not isinstance(metadata, Mapping):
-            raise ValueError('invalid compact equilibrium consumer metadata')
+    if records_payload is not None:
+        from simulator.chemistry.partial_molar_enthalpy import (
+            parse_partial_molar_enthalpy_records,
+        )
+
+        restored['partial_molar_enthalpy_J_per_mol'] = [
+            list(row) for row in parse_partial_molar_enthalpy_records(records_payload)
+        ]
+    if metadata is not None:
         diagnostics = metadata.get('diagnostics')
         diagnostics = dict(diagnostics) if isinstance(diagnostics, Mapping) else {}
         notice_codes = metadata.get('notice_codes', ())
@@ -496,6 +514,15 @@ def equilibrium_cache_value(
         _cache_map(values.get('liquid_composition_wt_pct')),
         _cache_map(values.get('fe_redox_split')),
     ]
+    partial = values.get('partial_molar_enthalpy_J_per_mol')
+    if partial:
+        from simulator.chemistry.partial_molar_enthalpy import (
+            compact_partial_molar_enthalpy_records,
+        )
+
+        partial_records = compact_partial_molar_enthalpy_records(partial)
+        if partial_records:
+            hot.append(partial_records)
     metadata = _equilibrium_cache_consumer_metadata(values, engine_id=engine_id)
     if metadata:
         hot.append(metadata)
@@ -1337,6 +1364,12 @@ class EquilibriumResult:
     # Other backends leave these fields unset.
     requested_fO2_log: Optional[float] = None
     printed_fO2_echo_log: Optional[float] = None
+
+    # Per-component partial molar enthalpy, J/mol, on the chemical-potential
+    # reference. None means this engine does not provide the facet. An empty
+    # list means the stencil ran and reported no component. Rows are the
+    # compact records from simulator.chemistry.partial_molar_enthalpy.
+    partial_molar_enthalpy_J_per_mol: Optional[List[List[Any]]] = None
 
     def to_engine_cache_value(self, *, engine_id: str | None = None) -> Any:
         """Return the compact scorer-consumed equilibrium payload."""

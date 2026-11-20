@@ -894,6 +894,7 @@ def _engine_lacks_quantity_capability(
             and effective_phase_basis(phase_basis) is not None
         )
         or quantity in _ENGINE_CELL_PREDICTED_QUANTITIES
+        or _thermoengine_partial_molar_enthalpy(engine, quantity)
     ):
         return False
     if quantity in FUSION_QUANTITIES:
@@ -920,6 +921,154 @@ def _engine_quantity_not_predicted_detail(
     if not _engine_lacks_quantity_capability(engine, quantity, phase_basis):
         return None
     return _quantity_not_predicted_detail(quantity)
+
+
+def _thermoengine_partial_molar_enthalpy(engine: Engine, quantity: Quantity) -> bool:
+    """ThermoEngine is the only engine that carries this quantity on the cell."""
+
+    return (
+        engine is Engine.THERMOENGINE
+        and quantity is Quantity.PARTIAL_MOLAR_ENTHALPY
+    )
+
+
+def _predict_thermoengine_partial_molar_enthalpy(
+    *,
+    engine: Engine,
+    identity: Identity,
+    cell: object,
+    channel: str,
+    sources: tuple[str, ...],
+    notices: tuple[Notice, ...],
+    call_evidence: str,
+    requested: State[Composition] | None,
+    version: str | None,
+    authority: Authority | None,
+    certified_band: Mapping[str, tuple[Decimal, Decimal]] | None,
+) -> EnginePrediction:
+    """Wire a cached Hbar row onto the observation. The formula is not here."""
+
+    from simulator.chemistry.partial_molar_enthalpy import (
+        BASIS_MOL_SPECIES,
+        REASON_AMBIGUOUS,
+        REASON_BASIS_MISMATCH,
+        REASON_COMPONENT_MISMATCH,
+        REASON_NONFINITE,
+        REASON_PHASE_MISMATCH,
+        REASON_REFERENCE_MISMATCH,
+        partial_molar_enthalpy_kJ_per_mol,
+        select_partial_molar_enthalpy_j_per_mol,
+    )
+    from simulator.reference_data.janaf import formula_composition
+
+    identity_reasons = {
+        REASON_AMBIGUOUS,
+        REASON_BASIS_MISMATCH,
+        REASON_COMPONENT_MISMATCH,
+        REASON_PHASE_MISMATCH,
+        REASON_REFERENCE_MISMATCH,
+    }
+
+    def refuse(reason: str) -> EnginePrediction:
+        if reason == REASON_NONFINITE:
+            refusal_reason = RefusalReason.METRIC_DOMAIN
+        elif reason in identity_reasons:
+            refusal_reason = RefusalReason.IDENTITY_MISMATCH
+        else:
+            refusal_reason = RefusalReason.UNSUPPORTED
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence=call_evidence,
+            ),
+            authority=Authority.REFUSED,
+            notices=notices,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            certified_band=certified_band,
+            refusal_reason=refusal_reason,
+            refusal_detail={
+                "reason": reason,
+                "formula": (
+                    None if identity.species is None else identity.species.formula
+                ),
+            },
+            identity=identity,
+            requested_composition=requested,
+            version=version,
+        )
+
+    species = identity.species
+    component = (
+        None if species is None else formula_composition(species.formula)
+    )
+    reference_state = identity.reference_state
+    standard = (
+        reference_state.value
+        if reference_state is not None
+        and reference_state.is_value
+        and isinstance(reference_state.value, StandardState)
+        else None
+    )
+    if component is None:
+        return refuse(REASON_COMPONENT_MISMATCH)
+    if standard is None:
+        return refuse(REASON_REFERENCE_MISMATCH)
+    endmember = formula_composition(standard.endmember.formula)
+    basis_composition = formula_composition(standard.component_basis)
+    species_phase = phase_token(species) if species is not None else None
+    endmember_phase = phase_token(standard.endmember)
+    if (
+        species_phase is None
+        or endmember_phase is None
+        or species_phase is not endmember_phase
+    ):
+        return refuse(REASON_PHASE_MISMATCH)
+    per_state = identity.per
+    basis = (
+        per_state.value.value
+        if per_state is not None
+        and per_state.is_value
+        and isinstance(per_state.value, PerBasis)
+        else ""
+    )
+    if basis != BASIS_MOL_SPECIES:
+        # Still match the reported row so a real mol_species record refuses
+        # as a basis mismatch rather than as a missing component.
+        pass
+    value_j, reason = select_partial_molar_enthalpy_j_per_mol(
+        getattr(cell, "partial_molar_enthalpy_J_per_mol", ()),
+        component=component,
+        endmember=endmember if endmember is not None else (),
+        component_basis=basis_composition,
+        phase=species_phase.value,
+        basis=basis,
+        reference=standard.convention.value,
+    )
+    if reason or value_j is None:
+        return refuse(reason or REASON_NONFINITE)
+    if basis != BASIS_MOL_SPECIES:
+        return refuse(REASON_BASIS_MISMATCH)
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence=call_evidence,
+        ),
+        value=partial_molar_enthalpy_kJ_per_mol(value_j),
+        unit=QUANTITY_UNITS[Quantity.PARTIAL_MOLAR_ENTHALPY],
+        authority=authority,
+        notices=notices,
+        coefficient_sources=expand_coefficient_sources(sources),
+        lineage_complete=lineage_complete_for(sources),
+        certified_band=certified_band,
+        identity=identity,
+        requested_composition=requested,
+        version=version,
+    )
 
 
 @dataclass(frozen=True)
@@ -13788,7 +13937,9 @@ def _predict_with_engine(
     )
     if wall_prediction is not None:
         return wall_prediction
-    if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
+    if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES and not (
+        _thermoengine_partial_molar_enthalpy(engine, quantity)
+    ):
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
         if (
@@ -15181,6 +15332,21 @@ def _predict_with_engine(
             identity=identity,
             requested_composition=requested,
             version=engine_version,
+        )
+
+    if _thermoengine_partial_molar_enthalpy(engine, quantity):
+        return _predict_thermoengine_partial_molar_enthalpy(
+            engine=engine,
+            identity=identity,
+            cell=cell,
+            channel=channel,
+            sources=sources,
+            notices=notices,
+            call_evidence=call_evidence,
+            requested=requested,
+            version=engine_version,
+            authority=authority,
+            certified_band=certified_band,
         )
 
     activities = dict(getattr(cell, "melt_activities", None) or {})

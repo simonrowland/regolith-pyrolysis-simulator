@@ -3579,7 +3579,13 @@ def canonical_replay_output_projection(
             for field in dataclasses.fields(EquilibriumResult)
             if field.name != "ledger_transition"
             and not (
-                field.name in {"requested_fO2_log", "printed_fO2_echo_log"}
+                field.name in {
+                    "requested_fO2_log",
+                    "printed_fO2_echo_log",
+                    # Absent means this engine did not report the facet, so
+                    # replay bytes of every other engine stay on their pin.
+                    "partial_molar_enthalpy_J_per_mol",
+                }
                 and getattr(result, field.name) is None
             )
         },
