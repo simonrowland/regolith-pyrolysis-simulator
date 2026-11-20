@@ -5104,17 +5104,6 @@ class CondensationModel:
             carrier_gas=carrier_gas,
         )
         if current.get('regime') != KnudsenRegime.FREE_MOLECULAR.value:
-            prior = self.last_knudsen_pressure_adjustment
-            if (
-                    prior.get('status') == 'applied'
-                    and math.isclose(
-                        float(prior.get('applied_p_total_mbar', -1.0)),
-                        float(requested_p_total_mbar),
-                        rel_tol=0.0,
-                        abs_tol=1.0e-12,
-                    )
-            ):
-                return dict(prior)
             self.last_knudsen_pressure_adjustment = {}
             return {}
 
