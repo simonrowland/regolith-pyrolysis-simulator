@@ -94,6 +94,33 @@ def _identity(basis: ValenceBasis) -> Identity:
     )
 
 
+def _legacy_cr_total_fraction(output) -> float:
+    """Named-field Cr2+/ΣCr projection the ledger move has to preserve."""
+
+    return output.chromous_cr_mol / (
+        output.chromous_cr_mol + output.chromic_cr_mol
+    )
+
+
+def _legacy_cr_pair_ratio(output) -> float:
+    """Named-field Cr3+/Cr2+ projection the ledger move has to preserve."""
+
+    return output.chromic_cr_mol / output.chromous_cr_mol
+
+
+def _legacy_ti_ratio(output) -> float:
+    """Named-field Ti3+/Ti4+ projection the ledger move has to preserve."""
+
+    return output.titanous_ti_mol / output.titanic_ti_mol
+
+
+def _assert_ledger_matches_named_field(projected, legacy) -> None:
+    assert projected is not None
+    assert Decimal(str(projected)) == Decimal(str(legacy)), (
+        "ledger projection left the named-field formula"
+    )
+
+
 def test_openimcc_candidate_ledger_matches_pre_move_cr_ti_projection():
     from simulator.battery.score import _openimcc_candidate_valence_value
 
@@ -108,8 +135,19 @@ def test_openimcc_candidate_ledger_matches_pre_move_cr_ti_projection():
                 },
             ),
             (2, 3),
-            lambda output: output.chromous_cr_mol
-            / (output.chromous_cr_mol + output.chromic_cr_mol),
+            _legacy_cr_total_fraction,
+        ),
+        (
+            _identity(parse_valence_basis("Cr3plus_over_Cr2plus")),
+            SimpleNamespace(
+                chromous_cr_mol=0.0002444200024627717,
+                chromic_cr_mol=0.026073239410179725,
+                element_moles_by_oxidation_state={
+                    "Cr": {2: 0.0002444200024627717, 3: 0.026073239410179725}
+                },
+            ),
+            (2, 3),
+            _legacy_cr_pair_ratio,
         ),
         (
             replace(
@@ -124,13 +162,46 @@ def test_openimcc_candidate_ledger_matches_pre_move_cr_ti_projection():
                 },
             ),
             (3, 4),
-            lambda output: output.titanous_ti_mol / output.titanic_ti_mol,
+            _legacy_ti_ratio,
         ),
     )
     for identity, output, states, legacy_projection in cases:
         projected = _openimcc_candidate_valence_value(identity, output, states)
-        assert projected is not None
-        assert Decimal(str(projected)) == Decimal(str(legacy_projection(output)))
+        _assert_ledger_matches_named_field(
+            projected, legacy_projection(output)
+        )
+
+
+@pytest.mark.parametrize(
+    "pin",
+    (
+        "formula",
+        "chromium",
+    ),
+)
+def test_named_field_pin_turns_red_when_ledger_drifts(monkeypatch, pin):
+    """Drifting the ledger reader restores the post-move pin defect."""
+
+    from simulator.battery import score as score_module
+
+    original = score_module._openimcc_candidate_valence_value
+
+    def drifted(identity, result, states):
+        value = original(identity, result, states)
+        return None if value is None else value + 1.0
+
+    monkeypatch.setattr(
+        score_module, "_openimcc_candidate_valence_value", drifted
+    )
+    with pytest.raises(
+        AssertionError, match="ledger projection left the named-field formula"
+    ):
+        if pin == "formula":
+            test_openimcc_candidate_ledger_matches_pre_move_cr_ti_projection()
+        else:
+            test_openimcc_candidate_pins_legacy_cr_output_and_refuses_unmodelled_total(
+                monkeypatch
+            )
 
 
 @pytest.mark.parametrize(
@@ -931,8 +1002,9 @@ def test_openimcc_candidate_pins_legacy_cr_output_and_refuses_unmodelled_total(
     ledger_fraction = score_module._openimcc_candidate_valence_value(
         observation.identity, output, (2, 3)
     )
-    assert ledger_fraction is not None
-    assert Decimal(str(ledger_fraction)) == Decimal("0.009287300159578668")
+    legacy_fraction = _legacy_cr_total_fraction(output)
+    _assert_ledger_matches_named_field(ledger_fraction, legacy_fraction)
+    assert Decimal(str(legacy_fraction)) == Decimal("0.009287300159578668")
     chromium_coverage = next(
         entry
         for entry in output.unmodelled_redox_couples
@@ -959,7 +1031,11 @@ def test_openimcc_candidate_pins_legacy_cr_output_and_refuses_unmodelled_total(
     pair_prediction = predict_with_engine(
         Engine.OPENIMCC, pair_observation, experiment=experiment
     )
-    assert pair_prediction.value == Decimal("106.6739184496613")
+    assert len(calls) == 2
+    pair_output = calls[1][2]
+    legacy_pair = _legacy_cr_pair_ratio(pair_output)
+    _assert_ledger_matches_named_field(pair_prediction.value, legacy_pair)
+    assert Decimal(str(legacy_pair)) == Decimal("106.6739184496613")
 
 
 def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
@@ -1085,7 +1161,30 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
     _real_args, _real_kwargs, output = real_calls[0]
     assert output.titanous_ti_mol == 0.0002885915704367488
     assert output.titanic_ti_mol == 0.024753667241308078
-    assert real_prediction.value == Decimal("0.011658538010689464")
+    legacy_ratio = _legacy_ti_ratio(output)
+    _assert_ledger_matches_named_field(real_prediction.value, legacy_ratio)
+    assert Decimal(str(legacy_ratio)) == Decimal("0.011658538010689464")
+    from simulator.battery import score as score_module
+
+    original = score_module._openimcc_candidate_valence_value
+
+    def drifted(identity, result, states):
+        value = original(identity, result, states)
+        return None if value is None else value + 1.0
+
+    monkeypatch.setattr(
+        score_module, "_openimcc_candidate_valence_value", drifted
+    )
+    drifted_ratio = score_module._openimcc_candidate_valence_value(
+        observation.identity, output, (3, 4)
+    )
+    with pytest.raises(
+        AssertionError, match="ledger projection left the named-field formula"
+    ):
+        _assert_ledger_matches_named_field(drifted_ratio, legacy_ratio)
+    monkeypatch.setattr(
+        score_module, "_openimcc_candidate_valence_value", original
+    )
 
 
 def test_openimcc_candidate_zero_fraction_and_ratio_are_scored_but_empty_inputs_refuse(
