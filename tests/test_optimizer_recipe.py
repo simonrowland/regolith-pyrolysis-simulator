@@ -1561,7 +1561,7 @@ def test_c2a_staged_depletion_log_slope_neutral_fixed_schedule() -> None:
             )
         ]
 
-        assert targets == pytest.approx(expected_targets)
+        assert targets == expected_targets
         assert end_hours[0] == 8
         assert manager._c2a_staged_stage_idx == 0
 
