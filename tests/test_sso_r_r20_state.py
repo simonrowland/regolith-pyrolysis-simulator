@@ -1469,9 +1469,19 @@ def test_c3_na_source_term_comes_from_committed_transition() -> None:
         sim.melt.temperature_C + 273.15
     )
     assert floor_after_buffer is not None
-    assert reservoir.melt_intrinsic_fO2_log >= floor_after_buffer[0] - 1e-12
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        floor_after_buffer[0],
+        rel=0.0,
+        abs=1e-8,
+    )
+    expected_net_delta_ln = (
+        floor_after_buffer[0] - before_fO2
+    ) * math.log(10.0)
+    # Convert the planner's 1e-8 log10 floor bound to natural-log units.
     assert reservoir.redox_source_delta_ln_fO2 == pytest.approx(
-        (reservoir.melt_intrinsic_fO2_log - before_fO2) * math.log(10.0)
+        expected_net_delta_ln,
+        rel=1e-12,
+        abs=2.4e-8,
     )
     assert reservoir.redox_source_terms_applied is True
     assert reservoir.redox_source_skipped_terms_mol_o2_equiv == {}

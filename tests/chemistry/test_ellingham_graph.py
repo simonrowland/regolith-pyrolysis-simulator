@@ -181,20 +181,17 @@ def test_elemental_metal_pressure_is_capped_at_pure_saturation(
         temperature_K,
     )
     if species == "Mg":
-        # At 1423.15 K the JANAF Mg(g)/MgO line gives K ~= 6.4e-33 bar.
-        # With pO2=1e-28 bar, a_M=sqrt(K/pO2) ~= 8e-3, so the equilibrium
-        # pressure is about 800 Pa, well below the ~166 kPa pure-metal sidecar
-        # cap (extrapolated above its 1361 K certified range). The cap is an
-        # upper bound; this Mg point does not reach saturation.
-        pressure_from_janaf = (
-            ellingham_graph.metal_activity_factor(
-                species,
-                temperature_K,
-                1e-28,
-            )
-            * ellingham_graph.ELLINGHAM_STANDARD_PRESSURE_PA
+        # The JANAF Mg(g)/MgO fit gives ΔG≈−877 kJ/mol O2 at 1423.15 K,
+        # hence K≈6.4e-33 bar. At pO2=1e-28 bar, a_M=sqrt(K/pO2)≈0.008
+        # and p_Mg≈799.6039375676731 Pa. This is below the ~166 kPa
+        # pure-metal sidecar cap, extrapolated above its 1361 K certified
+        # range; the cap is not binding here. Pin the JANAF-derived result so
+        # a change to the activity resolver cannot move the expectation.
+        assert pressure == pytest.approx(
+            799.6039375676731,
+            rel=1e-12,
+            abs=1e-12,
         )
-        assert pressure == pytest.approx(pressure_from_janaf)
         assert pressure < pure_metal_saturation
     else:
         assert pressure == pytest.approx(pure_metal_saturation)
