@@ -1466,7 +1466,6 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
         or quantity in PURE_STANDARD_THERMO
         or quantity in FUSION_QUANTITIES
         or quantity in VAPORIZATION_ENTHALPIES
-        or quantity is Quantity.PARTIAL_MOLAR_ENTHALPY
     ):
         return Rail.THERMOCHEMISTRY
     if quantity in {Quantity.WALL_DEPOSIT_MASS, Quantity.WALL_DEPOSIT_AREAL_RATE}:
@@ -10390,6 +10389,28 @@ def _oxygen_input_request(
     if not oxygen_required:
         input_notices.append(_omission_notice(quantity, oxygen_why))
         return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+    if (
+        observation is not None
+        and quantity is Quantity.FUGACITY
+        and identity.species is not None
+        and identity.species.formula == "O2"
+        and _has_printed_fo2(observation, identity)
+    ):
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=RefusalReason.CYCLIC_DERIVATION,
+            detail={
+                "reason": "circular_oxygen_input",
+                "quantity": quantity.value,
+                "species": identity.species.formula,
+                "input": "fO2_Pa",
+            },
+            notices=tuple(input_notices),
+        )
     if observation is None:
         fo2_state = identity.fO2_Pa
         if (
@@ -14132,29 +14153,6 @@ def _predict_with_engine(
                 },
                 identity=identity,
             )
-    if quantity is Quantity.PARTIAL_MOLAR_ENTHALPY:
-        refusal_detail = None
-        if engine in {Engine.MAGEMIN, Engine.ALPHAMELTS}:
-            refusal_detail = {
-                "reason": "partial_enthalpy_requires_fixed_phase_model",
-                "engine": engine.value,
-            }
-        elif engine in {Engine.VAPOROCK, Engine.OPENIMCC}:
-            refusal_detail = {
-                "reason": "partial_enthalpy_no_liquid_route",
-                "engine": engine.value,
-            }
-        if refusal_detail is not None:
-            return EnginePrediction(
-                engine=engine,
-                channel=ENGINE_CHANNELS[engine],
-                execution=Execution(state=ExecutionState.UNSUPPORTED),
-                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
-                lineage_complete=False,
-                refusal_reason=RefusalReason.UNSUPPORTED,
-                refusal_detail=refusal_detail,
-                identity=identity,
-            )
     if engine is Engine.NASA_CEA_9 and quantity is not None:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
@@ -15041,6 +15039,30 @@ def _predict_with_engine(
     pressure_bar: float | None = None
     knudsen_seed_pressure_bar: float | None = None
     if activity_payload is None:
+        if quantity is Quantity.FUGACITY and (
+            total_pressure_state is None
+            or not total_pressure_state.is_value
+            or total_pressure_state.value is None
+        ):
+            reason = RefusalReason.IDENTITY_INCOMPLETE
+            detail = "missing_total_pressure"
+            if total_pressure_state is not None and total_pressure_state.reason:
+                detail = f"{detail}: {total_pressure_state.reason}"
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=reason,
+                detail={
+                    "reason": "missing_total_pressure",
+                    "quantity": quantity.value,
+                    "fields": ["total_pressure_Pa"],
+                    "detail": detail,
+                },
+                notices=tuple(input_notices),
+            )
         if derive_knudsen_total_pressure:
             # Knudsen premise: P_total=sum_i p_i. From dG/dP=V,
             # d ln(a)/dP~V_m/RT. At V_m=2e-5 m3/mol and T=1800 K,

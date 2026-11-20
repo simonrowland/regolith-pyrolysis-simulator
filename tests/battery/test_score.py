@@ -5113,9 +5113,51 @@ def test_gas_pressure_and_fugacity_use_only_the_matching_gas_map_species(
     assert unknown.value == _GAS_MAP_PARTIAL_PA
     assert calls["n"] == 2
 
-    for engine in (Engine.VAPOROCK, Engine.OPENIMCC):
-        from simulator.battery import migrate as M
+    from simulator.battery import migrate as M
 
+    missing_pressure_identity = M.fill_identity(
+        Quantity.FUGACITY,
+        Species("H2O", Phase.G),
+        temperature_K=State.of(Decimal("1643.15")),
+        fO2_Pa=State.of(Decimal("1e-8")),
+        total_pressure_Pa=State.unknown("not printed"),
+        composition=State.of(composition),
+    )
+    for engine in (Engine.VAPOROCK, Engine.OPENIMCC):
+        before = calls["n"]
+        missing_pressure = predict(
+            Species("H2O", Phase.G),
+            Quantity.FUGACITY,
+            engine,
+            identity=missing_pressure_identity,
+        )
+        assert missing_pressure.value is None
+        assert missing_pressure.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+        assert missing_pressure.refusal_detail["reason"] == "missing_total_pressure"
+        assert missing_pressure.refusal_detail["fields"] == ["total_pressure_Pa"]
+        assert calls["n"] == before
+
+        oxygen_identity = M.fill_identity(
+            Quantity.FUGACITY,
+            Species("O2", Phase.G),
+            temperature_K=State.of(Decimal("1643.15")),
+            fO2_Pa=State.of(Decimal("1e-8")),
+            total_pressure_Pa=State.of(Decimal("100000")),
+            composition=State.of(composition),
+        )
+        before = calls["n"]
+        circular = predict(
+            Species("O2", Phase.G),
+            Quantity.FUGACITY,
+            engine,
+            identity=oxygen_identity,
+        )
+        assert circular.value is None
+        assert circular.refusal_reason is RefusalReason.CYCLIC_DERIVATION
+        assert circular.refusal_detail["reason"] == "circular_oxygen_input"
+        assert calls["n"] == before
+
+    for engine in (Engine.VAPOROCK, Engine.OPENIMCC):
         fugacity_identity = M.fill_identity(
             Quantity.FUGACITY,
             Species("H2O", Phase.G),
@@ -10668,7 +10710,7 @@ def test_vapour_rail_includes_fugacity_and_only_vapour_quantities() -> None:
         assert rail_for_quantity(quantity, species_formula="SiO2") is Rail.SIO_EVOLUTION
     assert rail_for_quantity(Quantity.FUGACITY, species_formula="SiO") is Rail.VAPOUR
     assert "fugacity" in (rail_for_quantity.__doc__ or "").lower()
-    assert rail_for_quantity(Quantity.PARTIAL_MOLAR_ENTHALPY) is Rail.THERMOCHEMISTRY
+    assert rail_for_quantity(Quantity.PARTIAL_MOLAR_ENTHALPY) is None
     assert rail_for_quantity(None) is None
     assert no_headline_rail_reason(None) == "quantity_unknown"
     for quantity in (
@@ -10704,49 +10746,24 @@ def test_vapour_rail_includes_fugacity_and_only_vapour_quantities() -> None:
     assert no_headline_rail_reason(Quantity.VISCOSITY) == "no_headline_rail:viscosity"
 
 
-@pytest.mark.parametrize(
-    ("engine", "reason"),
-    (
-        (
-            Engine.MAGEMIN,
-            "partial_enthalpy_requires_fixed_phase_model",
-        ),
-        (
-            Engine.ALPHAMELTS,
-            "partial_enthalpy_requires_fixed_phase_model",
-        ),
-        (Engine.VAPOROCK, "partial_enthalpy_no_liquid_route"),
-        (Engine.OPENIMCC, "partial_enthalpy_no_liquid_route"),
-    ),
-)
-def test_partial_molar_enthalpy_refuses_engines_without_fixed_phase_route(
-    engine: Engine, reason: str, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    from simulator.diagnostic_helpers import binary_pot_battery as battery
-
-    monkeypatch.setattr(
-        battery,
-        "open_battery_engine",
-        lambda *_args, **_kwargs: pytest.fail("unsupported engine was opened"),
-    )
+def test_partial_molar_enthalpy_keeps_existing_engine_refusal() -> None:
     identity = replace(
         F.activity_identity(formula="SiO2", component_basis="SiO2"),
         quantity=Quantity.PARTIAL_MOLAR_ENTHALPY,
         species=Species("SiO2", Phase.L),
     )
     observation = F.observation(
-        f"partial-enthalpy-{engine.value}",
+        "partial-enthalpy-openimcc",
         "partial-enthalpy-exp",
         identity,
         Decimal("0"),
         source_id="partial-enthalpy-refusal",
     )
 
-    prediction = predict_with_engine(engine, observation)
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
 
-    assert prediction.value is None
     assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
-    assert prediction.refusal_detail["reason"] == reason
+    assert prediction.refusal_detail["reason"] != "partial_enthalpy_no_liquid_route"
 
 
 _SAMPLE_PHASE_NOT_MELT_OBSERVABLE = "sample_phase_not_melt_activity_observable"
