@@ -158,12 +158,19 @@ def dissociation_pO2_threshold(
 
 def ellingham_oxide_stoichiometry_for_formula(
     oxide: str,
+    *,
+    oxide_to_metal: Mapping[str, tuple[str, float, float]],
 ) -> tuple[float, float] | None:
-    """Return Ellingham ``(n_M, n_ox)`` for a ledger oxide formula."""
+    """Return the ledger oxide's Ellingham ``(n_M, n_ox)`` per mol O2.
 
-    from simulator.state import OXIDE_TO_METAL
+    ``OXIDE_TO_METAL`` stores ``M_n O_m -> n M + m/2 O2``. Normalizing to
+    one mol O2 gives ``n_M=2n/m`` and ``n_ox=2/m``. These are dimensionless
+    molar ratios; the dissociation resolver evaluates ``K*a_oxide**n_ox`` in
+    bar. FeO gives ``(2, 2)`` and Al2O3 gives ``(4/3, 2/3)``. The mapping is
+    supplied by the caller so this chemistry owner does not depend on state.
+    """
 
-    stoich = OXIDE_TO_METAL.get(str(oxide))
+    stoich = oxide_to_metal.get(str(oxide))
     if stoich is None:
         return None
     _metal, n_metal, n_oxygen = stoich

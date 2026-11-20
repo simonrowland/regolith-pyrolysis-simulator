@@ -31,7 +31,6 @@ from simulator.fe_redox import (
 
 CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
 OXYGEN_ACCOUNT = "process.overhead_gas"
-FO2_BUFFER_ACCOUNT = "reservoir.fo2_buffer"
 OXYGEN_SPECIES = "O2"
 OXYGEN_SOURCE_OVERHEAD = "overhead_gas"
 OXYGEN_SOURCE_FO2_BUFFER = "fo2_buffer"
@@ -50,20 +49,20 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
     """Authoritative ``FE_REDOX_RESPECIATION`` provider."""
 
     name = "builtin-fe-redox-respeciation"
-    DECLARED_ACCOUNTS = frozenset({
-        CLEANED_MELT_ACCOUNT,
-        OXYGEN_ACCOUNT,
-        FO2_BUFFER_ACCOUNT,
-    })
-
     def capability_profile(self) -> CapabilityProfile:
+        from simulator.account_ids import OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
+
         return CapabilityProfile(
             provider_id=self.name,
             intents=frozenset({ChemistryIntent.FE_REDOX_RESPECIATION}),
             is_authoritative_for=frozenset({
                 ChemistryIntent.FE_REDOX_RESPECIATION,
             }),
-            declared_accounts=self.DECLARED_ACCOUNTS,
+            declared_accounts=frozenset({
+                CLEANED_MELT_ACCOUNT,
+                OXYGEN_ACCOUNT,
+                OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT,
+            }),
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
@@ -74,6 +73,9 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         """
 
         from simulator.accounting.formulas import resolve_species_formula
+        from simulator.account_ids import (
+            OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT as FO2_BUFFER_ACCOUNT,
+        )
 
         wrong_intent = reject_wrong_intent(
             request,

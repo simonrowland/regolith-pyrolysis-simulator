@@ -15,6 +15,7 @@ from simulator.accounting.lots import allocate_pool_withdrawal
 from simulator.accounting.queries import (
     TERMINAL_RUMP_REFRACTORY_OXIDES,
 )
+from simulator.account_ids import OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
 
 
 YIELD_DISPOSITION_SCHEMA_VERSION = "5.0"
@@ -77,7 +78,7 @@ _ACCOUNT_TO_BIN: Mapping[str, str] = {
     "process.reagent_inventory": "product_condensed",
     "process.solid_char_carbon": "melt_retained",
     "process.spent_reductant_residue": "melt_retained",
-    "reservoir.fo2_buffer": "redox_buffer_retained",
+    OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT: "redox_buffer_retained",
     "reservoir.oxygen_cistern_liquid_inventory": "product_oxygen",
     "reservoir.reagent.C": "charge_unprocessed",
     "reservoir.reagent.K": "charge_unprocessed",

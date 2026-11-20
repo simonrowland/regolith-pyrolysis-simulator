@@ -556,6 +556,7 @@ from simulator.account_ids import (
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
     OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
     OXYGEN_MRE_ANODE_ACCOUNT,
+    OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT as FO2_BUFFER_ACCOUNT,
     OXYGEN_SPECIES,
     OXYGEN_STAGE0_ACCOUNT,
     OXYGEN_STORED_ACCOUNTS,
@@ -969,12 +970,15 @@ STAGE0_TERMINAL_SLAG_COMPONENTS = {
     'rare_earth_oxide', 'rare_earth_oxides', 'th', 'tho2', 'u', 'uo2',
     'unreported_loi_residual', 'unreported_residual', 'loi_residual',
 }
-FO2_BUFFER_ACCOUNT = 'reservoir.fo2_buffer'
 FE_REDOX_OXYGEN_SOURCE_OVERHEAD = 'overhead_gas'
 FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER = 'fo2_buffer'
 FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS = (
     'evaporative_metal_loss_internal'
 )
+REDOX_SOURCE_EVAPORATIVE_METAL_LOSS = (
+    'redox_source:evaporative_metal_loss'
+)
+REDOX_SOURCE_O2_BUBBLER = 'redox_source:o2_bubbler'
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
 KRESS_CARMICHAEL_1991_REFERENCE = (
     'Kress and Carmichael 1991 Contrib Mineral Petrol 108:82-92 '
@@ -2139,8 +2143,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'BuiltinNativeFeSaturationProvider',
             (ChemistryIntent.NATIVE_FE_SATURATION,),
             False,
-            'NATIVE_FE_SATURATION -- AUTHORITATIVE: FeO -> Fe + 0.5 O2 '
-            'pre-storm native-metal exsolution.',
+            'NATIVE_FE_SATURATION -- AUTHORITATIVE: FeO/NiO/CoO oxide-to-metal '
+            'buffering plus pre-storm native-Fe exsolution.',
         ),
         (
             'engines.builtin.native_fe_metallic_tap',
@@ -3233,7 +3237,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if abs(metal_loss_o2_equiv_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
             return {}
-        return {'redox_source:evaporative_metal_loss': metal_loss_o2_equiv_mol}
+        return {REDOX_SOURCE_EVAPORATIVE_METAL_LOSS: metal_loss_o2_equiv_mol}
 
     def _apply_evaporative_redox_source_terms(
         self,
@@ -3246,7 +3250,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return None
         internal_o2_mol = max(
             0.0,
-            float(terms.get('redox_source:evaporative_metal_loss', 0.0) or 0.0),
+            float(terms.get(REDOX_SOURCE_EVAPORATIVE_METAL_LOSS, 0.0) or 0.0),
         )
         if internal_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL:
             self._fe_redox_internal_o2_capacity_mol_this_hr = (
@@ -5820,6 +5824,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> tuple[float, str, float] | None:
         """Return the highest supported oxide/metal saturation floor."""
 
+        rows = self._melt_metal_saturation_fO2_floor_rows(temperature_K)
+        return rows[0] if rows else None
+
+    def _melt_metal_saturation_fO2_floor_rows(
+        self,
+        temperature_K: float,
+        *,
+        composition_mol: Mapping[str, float] | None = None,
+    ) -> list[tuple[float, str, float]]:
+        """Resolve all supported oxide floors in descending threshold order."""
+
         from simulator.chemistry.ellingham_graph import (
             dissociation_pO2_threshold,
             ellingham_oxide_stoichiometry_for_formula,
@@ -5829,10 +5844,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ellingham_stoichiometry,
         )
         from simulator.chemistry.melt_activity import melt_oxide_activity
-        from simulator.state import OXIDE_TO_METAL
 
         T_K = float(temperature_K)
-        composition = self.atom_ledger.mol_by_account("process.cleaned_melt")
+        composition = dict(
+            composition_mol
+            if composition_mol is not None
+            else self.atom_ledger.mol_by_account("process.cleaned_melt")
+        )
         floors: list[tuple[float, str, float]] = []
         for oxide, (metal, _, _) in OXIDE_TO_METAL.items():
             if float(composition.get(oxide, 0.0) or 0.0) <= 0.0:
@@ -5841,7 +5859,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 continue
             # The JANAF resolver only applies when its metal/oxide reaction
             # has the same stoichiometry as the ledger oxide being examined.
-            expected = ellingham_oxide_stoichiometry_for_formula(oxide)
+            expected = ellingham_oxide_stoichiometry_for_formula(
+                oxide,
+                oxide_to_metal=OXIDE_TO_METAL,
+            )
             if expected is None:
                 continue
             actual = ellingham_stoichiometry(metal)
@@ -5878,17 +5899,298 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     f"{oxide}: pO2_bar={threshold_bar!r}"
                 )
             floors.append((math.log10(threshold_bar), oxide, parent_activity))
-        floor = max(floors, key=lambda row: row[0], default=None)
-        if floor is not None:
-            floor_log, binding_oxide, _ = floor
-            upper_bound = self._melt_redox_fO2_upper_bound_log()
-            if floor_log > upper_bound:
-                raise AccountingError(
-                    'melt metal-saturation fO2 floor exceeds the '
-                    f'pressure ceiling for {binding_oxide}: '
-                    f'floor={floor_log:.12g}, ceiling={upper_bound:.12g}'
+        return sorted(floors, key=lambda row: row[0], reverse=True)
+
+    def _plan_melt_metal_saturation_buffer(
+        self,
+        *,
+        candidate_fO2_log: float,
+        redox_capacity_mol_per_ln: float,
+        temperature_K: float,
+        composition_mol: Mapping[str, float],
+    ) -> dict[str, Any]:
+        """Plan an oxide buffer against the live melt floor.
+
+        For an Ellingham reaction normalized to one mol O2, reducing ``n_ox``
+        mol oxide produces ``n_M`` mol metal and releases that O2 once, so
+        ``Delta n_O = -2 * n_O2``. For a dilute monoxide, ``a_MO`` is
+        approximately ``gamma * X_MO``; reducing NiO or CoO lowers its actual
+        activity and its threshold. Recompute the full floor after each trial
+        reduction. The production resolver orders the lunar C2A binders NiO,
+        CoO, then FeO, so inventory exhaustion moves the buffer down that
+        sequence without hard-coding an oxide order. ``n_M`` and ``n_ox`` are
+        dimensionless molar ratios; oxygen amounts and redox capacity use mol
+        O2-equivalent, with capacity measured per natural-log fO2. Thus the
+        candidate shift is ``Delta log10(fO2/bar) = n_O2 / (C_m * ln(10))``.
+        """
+
+        from simulator.chemistry.ellingham_graph import (
+            ellingham_oxide_stoichiometry_for_formula,
+        )
+
+        candidate = float(candidate_fO2_log)
+        capacity = float(redox_capacity_mol_per_ln)
+        if not math.isfinite(candidate):
+            raise AccountingError(
+                "melt metal-saturation buffer candidate fO2 must be finite, "
+                f"got {candidate_fO2_log!r}"
+            )
+        if not math.isfinite(capacity) or capacity <= 0.0:
+            raise AccountingError(
+                "melt metal-saturation buffer redox capacity must be finite "
+                f"and positive, got {redox_capacity_mol_per_ln!r}"
+            )
+        floor_rows = self._melt_metal_saturation_fO2_floor_rows(
+            temperature_K,
+            composition_mol=composition_mol,
+        )
+        if not floor_rows or candidate >= floor_rows[0][0]:
+            return {
+                "oxide_extent_mol_by_oxide": {},
+                "reduction_order": [],
+                "oxygen_deficit_o2_mol": 0.0,
+                "oxygen_buffered_o2_mol": 0.0,
+                "oxygen_unbuffered_o2_mol": 0.0,
+                "candidate_fO2_log_after_buffer": candidate,
+                "floor_log_after_buffer": floor_rows[0][0] if floor_rows else None,
+            }
+        initial_deficit_o2_mol = (
+            (floor_rows[0][0] - candidate)
+            * math.log(10.0)
+            * capacity
+        )
+        remaining_o2_mol = initial_deficit_o2_mol
+        current_fO2_log = candidate
+        upper_bound_log = max(
+            candidate,
+            self._melt_redox_fO2_upper_bound_log(),
+        )
+        working_composition = {
+            str(oxide): float(amount)
+            for oxide, amount in composition_mol.items()
+        }
+        extents: dict[str, float] = {}
+        order: list[str] = []
+        while floor_rows and floor_rows[0][0] > current_fO2_log + 1.0e-12:
+            if remaining_o2_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
+                break
+            _floor_log, oxide, _activity = floor_rows[0]
+            stoichiometry = ellingham_oxide_stoichiometry_for_formula(
+                oxide,
+                oxide_to_metal=OXIDE_TO_METAL,
+            )
+            if stoichiometry is None:
+                break
+            n_metal_per_o2, n_oxide_per_o2 = stoichiometry
+            if n_metal_per_o2 <= 0.0 or n_oxide_per_o2 <= 0.0:
+                break
+            available_oxide_mol = max(
+                0.0,
+                float(working_composition.get(oxide, 0.0) or 0.0),
+            )
+            capacity_o2_mol = available_oxide_mol / n_oxide_per_o2
+            max_buffer_o2_mol = min(remaining_o2_mol, capacity_o2_mol)
+            if max_buffer_o2_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
+                break
+
+            def candidate_and_floor_after(
+                buffered_o2_mol: float,
+            ) -> tuple[float, list[tuple[float, str, float]]]:
+                composition_after = dict(working_composition)
+                composition_after[oxide] = max(
+                    0.0,
+                    available_oxide_mol
+                    - buffered_o2_mol * n_oxide_per_o2,
                 )
-        return floor
+                candidate_after = min(
+                    upper_bound_log,
+                    current_fO2_log
+                    + buffered_o2_mol / (capacity * math.log(10.0)),
+                )
+                rows_after = self._melt_metal_saturation_fO2_floor_rows(
+                    temperature_K,
+                    composition_mol=composition_after,
+                )
+                return candidate_after, rows_after
+
+            max_candidate_log, max_floor_rows = candidate_and_floor_after(
+                max_buffer_o2_mol
+            )
+            reaches_live_floor = (
+                not max_floor_rows
+                or max_candidate_log >= max_floor_rows[0][0] - 1.0e-12
+            )
+            if reaches_live_floor:
+                low_o2_mol = 0.0
+                high_o2_mol = max_buffer_o2_mol
+                for _ in range(60):
+                    middle_o2_mol = (low_o2_mol + high_o2_mol) / 2.0
+                    middle_candidate_log, middle_floor_rows = (
+                        candidate_and_floor_after(middle_o2_mol)
+                    )
+                    if (
+                        not middle_floor_rows
+                        or middle_candidate_log
+                        >= middle_floor_rows[0][0] - 1.0e-12
+                    ):
+                        high_o2_mol = middle_o2_mol
+                    else:
+                        low_o2_mol = middle_o2_mol
+                buffered_o2_mol = high_o2_mol
+            else:
+                buffered_o2_mol = max_buffer_o2_mol
+
+            oxide_debit_mol = buffered_o2_mol * n_oxide_per_o2
+            if (
+                capacity_o2_mol <= remaining_o2_mol
+                and buffered_o2_mol
+                >= capacity_o2_mol
+                - max(
+                    OXYGEN_RESERVOIR_NOOP_MOL,
+                    1.0e-12 * capacity_o2_mol,
+                )
+            ):
+                buffered_o2_mol = capacity_o2_mol
+                oxide_debit_mol = available_oxide_mol
+            extents[oxide] = extents.get(oxide, 0.0) + (
+                buffered_o2_mol * n_metal_per_o2
+            )
+            order.append(oxide)
+            working_composition[oxide] = max(
+                0.0,
+                available_oxide_mol - oxide_debit_mol,
+            )
+            current_fO2_log, floor_rows = candidate_and_floor_after(
+                buffered_o2_mol
+            )
+            remaining_o2_mol = max(0.0, remaining_o2_mol - buffered_o2_mol)
+            if not floor_rows or current_fO2_log >= floor_rows[0][0] - 1.0e-12:
+                break
+        floor_log_after = floor_rows[0][0] if floor_rows else None
+        return {
+            "oxide_extent_mol_by_oxide": extents,
+            "reduction_order": order,
+            "oxygen_deficit_o2_mol": initial_deficit_o2_mol,
+            "oxygen_buffered_o2_mol": initial_deficit_o2_mol - remaining_o2_mol,
+            "oxygen_unbuffered_o2_mol": max(0.0, remaining_o2_mol),
+            "candidate_fO2_log_after_buffer": current_fO2_log,
+            "floor_log_after_buffer": floor_log_after,
+        }
+
+    def _apply_melt_metal_saturation_buffer(
+        self,
+        *,
+        candidate_fO2_log: float,
+        redox_capacity_mol_per_ln: float,
+        temperature_K: float,
+        source_terms: Mapping[str, float],
+        gate_authority: _MeltRedoxGateAuthority | object,
+    ) -> float:
+        """Commit oxide-to-metal buffering when a redox candidate crosses its floor."""
+
+        saturation_floor = self._melt_metal_saturation_fO2_floor_log(
+            temperature_K
+        )
+        if (
+            saturation_floor is None
+            or candidate_fO2_log >= saturation_floor[0]
+        ):
+            return candidate_fO2_log
+        floor_log, binding_oxide, binding_activity = saturation_floor
+        if redox_capacity_mol_per_ln <= OXYGEN_RESERVOIR_NOOP_MOL:
+            raise AccountingError(
+                'melt metal-saturation buffer cannot resolve a floor crossing '
+                f'without redox capacity: binding={binding_oxide}, '
+                f'activity={binding_activity:.12g}'
+            )
+        plan = self._plan_melt_metal_saturation_buffer(
+            candidate_fO2_log=candidate_fO2_log,
+            redox_capacity_mol_per_ln=redox_capacity_mol_per_ln,
+            temperature_K=temperature_K,
+            composition_mol=self.atom_ledger.mol_by_account(
+                'process.cleaned_melt'
+            ),
+        )
+        if not plan['oxide_extent_mol_by_oxide']:
+            raise AccountingError(
+                'melt metal-saturation buffer could not reduce '
+                f'binding oxide {binding_oxide}: '
+                f'oxygen deficit={plan["oxygen_deficit_o2_mol"]:.12g} '
+                f'mol O2-equivalent, activity={binding_activity:.12g}'
+            )
+        planned_fO2_log = float(plan['candidate_fO2_log_after_buffer'])
+        planned_floor_log = plan['floor_log_after_buffer']
+        if (
+            planned_floor_log is not None
+            and planned_fO2_log < float(planned_floor_log) - 1.0e-10
+        ):
+            raise AccountingError(
+                'melt metal-saturation buffer exhausted its oxide capacity '
+                'before reaching the live floor: '
+                f'binding={binding_oxide}, '
+                f'candidate={planned_fO2_log:.12g}, '
+                f'floor={float(planned_floor_log):.12g}, '
+                f'unbuffered={plan["oxygen_unbuffered_o2_mol"]:.12g} '
+                'mol O2-equivalent'
+            )
+
+        # Fe redox re-speciation sends oxygen released from the melt to the FO2
+        # buffer for internally carried evaporative metal loss and bubbler
+        # uptake; all other source paths use overhead gas. This ledger
+        # transition moves oxygen from its oxide debit once and does not also
+        # debit the redox-source term.
+        buffer_backed_sources = {
+            REDOX_SOURCE_EVAPORATIVE_METAL_LOSS,
+            REDOX_SOURCE_O2_BUBBLER,
+        }
+        oxygen_account = (
+            FO2_BUFFER_ACCOUNT
+            if any(label in buffer_backed_sources for label in source_terms)
+            else 'process.overhead_gas'
+        )
+        control_inputs = {
+            'metal_extent_mol_by_oxide': plan['oxide_extent_mol_by_oxide'],
+            'oxygen_account': oxygen_account,
+        }
+        buffer_result = self._dispatch_only(
+            ChemistryIntent.NATIVE_FE_SATURATION,
+            control_inputs=control_inputs,
+        )
+        buffer_proposal = buffer_result.transition
+        if buffer_result.status != 'ok' or buffer_proposal is None:
+            diagnostic = dict(buffer_result.diagnostic or {})
+            raise AccountingError(
+                'melt metal-saturation buffer refused the binding oxide '
+                f'{binding_oxide}: '
+                f'{diagnostic.get("reason", buffer_result.status)}'
+            )
+        transition_source, transition_meta = (
+            self._melt_redox_transition_provenance(gate_authority)
+        )
+        self._commit_proposal(
+            ChemistryIntent.NATIVE_FE_SATURATION,
+            buffer_proposal,
+            diagnostic=dict(buffer_result.diagnostic or {}),
+            control_inputs=control_inputs,
+            transition_source=transition_source,
+            transition_meta=transition_meta,
+        )
+        self._project_cleaned_melt_from_atom_ledger()
+        self._project_drain_tap_from_atom_ledger()
+        updated_floor = self._melt_metal_saturation_fO2_floor_log(
+            temperature_K
+        )
+        if (
+            updated_floor is not None
+            and planned_fO2_log < updated_floor[0] - 1.0e-8
+        ):
+            raise AccountingError(
+                'committed melt metal-saturation buffer did not reach the '
+                f'live floor for {updated_floor[1]}: '
+                f'candidate={planned_fO2_log:.12g}, '
+                f'floor={updated_floor[0]:.12g}'
+            )
+        return planned_fO2_log
 
     def _melt_fO2_reference_state_at_temperature(
         self,
@@ -6092,6 +6394,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._effective_headspace_floor_o2_mol(),
         )
         applied_delta_ln = 0.0
+        candidate_fO2_log = base_fO2_log
         skip_reason = ''
         refusal_context: Dict[str, Any] = {}
         if C_m <= OXYGEN_RESERVOIR_NOOP_MOL:
@@ -6133,6 +6436,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     candidate_fO2_log=candidate_fO2_log,
                 )
                 applied_delta_ln = 0.0
+                candidate_fO2_log = base_fO2_log
             else:
                 # The derivative is a local tangent, not an unlimited oxygen
                 # capacity. Stop its prediction at the gas pressure ceiling;
@@ -6141,70 +6445,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 candidate_fO2_log = min(
                     candidate_fO2_log, self._melt_redox_fO2_upper_bound_log(),
                 )
-                # Melt oxide/metal saturation constrains each vapor-pressure
-                # evaluation. Applying that composition-dependent floor to
-                # every evaporation-source tangent lets changing oxide
-                # activities steer the reservoir without a matching oxygen
-                # source, so keep it out of this ledger-backed update.
-                if (
-                    float(
-                        terms.get('redox_source:c3_na_shuttle_reduction', 0.0)
-                        or 0.0
-                    ) < -OXYGEN_RESERVOIR_NOOP_MOL
-                    and float(
-                        self.atom_ledger.mol_by_account(
-                            'process.reagent_inventory'
-                        ).get('Na', 0.0)
-                        or 0.0
-                    ) > OXYGEN_RESERVOIR_NOOP_MOL
-                    and float(
-                        self.atom_ledger.mol_by_account(
-                            'process.spent_reductant_residue'
-                        ).get('Na2O', 0.0)
-                        or 0.0
-                    ) > OXYGEN_RESERVOIR_NOOP_MOL
-                ):
-                    # For 4 Na + O2 <-> 2 Na2O, K = a_Na2O**2 /
-                    # (a_Na**4 * (fO2/bar)). Coexisting pure condensed Na and
-                    # Na2O have unit activities, so the JANAF dissociation
-                    # resolver gives their buffer pressure directly in bar;
-                    # log10 is the dimensionless fO2/bar value stored here.
-                    # Keep this independent bound alongside melt oxide/metal
-                    # saturation: that floor is weaker while these alkali
-                    # products remain outside the cleaned-melt account.
-                    from simulator.chemistry.ellingham_graph import (
-                        dissociation_pO2_threshold,
-                    )
-
-                    buffer_pO2_bar = dissociation_pO2_threshold(
-                        'Na',
-                        T_K,
-                        a_oxide=1.0,
-                    )
-                    buffer_fO2_log = math.log10(buffer_pO2_bar)
-                    if buffer_fO2_log > upper_bound:
-                        raise AccountingError(
-                            'active Na/Na2O redox buffer exceeds the melt fO2 '
-                            f'pressure ceiling: buffer={buffer_fO2_log:.12g}, '
-                            f'ceiling={upper_bound:.12g}'
-                        )
-                    # This is an independent reservoir constraint tied to
-                    # coexisting Na and Na2O outside the cleaned-melt account.
-                    candidate_fO2_log = max(candidate_fO2_log, buffer_fO2_log)
-                applied_delta_ln = (
-                    candidate_fO2_log - base_fO2_log
-                ) * math.log(10.0)
-                reservoir.melt_intrinsic_fO2_log = (
-                    self._finite_oxygen_reservoir_fO2_log(
-                        candidate_fO2_log,
-                        context='redox_source_terms',
-                        source_terms_mol_o2_equiv=terms,
-                        net_o2_equiv_mol=net_o2_equiv_mol,
-                        melt_redox_capacity_mol_per_ln_fO2=C_m,
-                        delta_ln_fO2=applied_delta_ln,
-                        candidate_fO2_log=candidate_fO2_log,
-                    )
-                )
+        candidate_fO2_log = self._apply_melt_metal_saturation_buffer(
+            candidate_fO2_log=candidate_fO2_log,
+            redox_capacity_mol_per_ln=C_m,
+            temperature_K=T_K,
+            source_terms=terms,
+            gate_authority=gate_authority,
+        )
+        applied_delta_ln = (
+            candidate_fO2_log - base_fO2_log
+        ) * math.log(10.0)
+        reservoir.melt_intrinsic_fO2_log = (
+            self._finite_oxygen_reservoir_fO2_log(
+                candidate_fO2_log,
+                context='redox_source_terms',
+                source_terms_mol_o2_equiv=terms,
+                net_o2_equiv_mol=net_o2_equiv_mol,
+                melt_redox_capacity_mol_per_ln_fO2=C_m,
+                delta_ln_fO2=applied_delta_ln,
+                candidate_fO2_log=candidate_fO2_log,
+            )
+        )
         if terms:
             if skip_reason:
                 self._accumulate_redox_source_terms_for_hour(
@@ -6490,8 +6751,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             reason = 'no_melt_redox_capacity'
             if requested_absorbed_mol > OXYGEN_RESERVOIR_NOOP_MOL:
                 reservoir = self._apply_oxygen_reservoir_redox_source_terms(
-                    {'redox_source:o2_bubbler': requested_absorbed_mol},
-                    exchange_direction='redox_source:o2_bubbler',
+                    {REDOX_SOURCE_O2_BUBBLER: requested_absorbed_mol},
+                    exchange_direction=REDOX_SOURCE_O2_BUBBLER,
                     temperature_K=T_K,
                     gate_authority=gate_authority,
                 )
@@ -6579,7 +6840,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if applied_absorbed_mol > OXYGEN_RESERVOIR_NOOP_MOL:
                 absorbed_mol = min(applied_absorbed_mol, requested_absorbed_mol)
                 applied_delta_ln = absorbed_mol / C_m
-                terms = {'redox_source:o2_bubbler': absorbed_mol}
+                terms = {REDOX_SOURCE_O2_BUBBLER: absorbed_mol}
                 self._accumulate_redox_source_terms_for_hour(
                     '_redox_source_terms_this_hr',
                     terms,
@@ -6615,7 +6876,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 reservoir.exchange_direction = (
                     self._composed_oxygen_reservoir_direction(
                         str(getattr(reservoir, 'exchange_direction', '') or ''),
-                        'redox_source:o2_bubbler',
+                        REDOX_SOURCE_O2_BUBBLER,
                     )
                 )
                 self.melt.oxygen_reservoir = reservoir
@@ -6668,7 +6929,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'injected_mol': actual_injected_mol,
                     'absorbed_mol': total_sink_mol,
                     'passthrough_mol': passthrough_mol,
-                    'source': 'redox_source:o2_bubbler',
+                    'source': REDOX_SOURCE_O2_BUBBLER,
                 },
                 transition_source=transition_source,
                 transition_meta=transition_meta,
@@ -6676,7 +6937,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if result.transition is None:
                 self._chem_no_op_dispatch_count += 1
             self._refresh_oxygen_reservoir_without_exchange(
-                exchange_direction='redox_source:o2_bubbler:passthrough',
+                exchange_direction=f'{REDOX_SOURCE_O2_BUBBLER}:passthrough',
             )
 
         injected_kg = actual_injected_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
@@ -10607,11 +10868,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if saturation_floor is not None:
             floor_fO2_log, binding_oxide, binding_activity = saturation_floor
-            if intrinsic_fO2_log < floor_fO2_log:
-                # Apply the saturation floor to this vapor-pressure evaluation
-                # only. It constrains elemental pressure without creating an
-                # unledgered oxygen transfer in the melt reservoir.
-                intrinsic_fO2_log = floor_fO2_log
             source_metal_saturation_floor = {
                 'log10_fO2_bar': floor_fO2_log,
                 'binding_oxide': binding_oxide,

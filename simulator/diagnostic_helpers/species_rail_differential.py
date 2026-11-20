@@ -892,7 +892,7 @@ def ellingham_oxide_stoichiometry_for_formula(
         ellingham_oxide_stoichiometry_for_formula as resolve_stoichiometry,
     )
 
-    return resolve_stoichiometry(oxide)
+    return resolve_stoichiometry(oxide, oxide_to_metal=OXIDE_TO_METAL)
 
 
 def oxide_identity_mismatch_applies(oxide: str) -> bool:

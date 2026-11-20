@@ -24,7 +24,6 @@ from simulator.scalar_boundary import is_declared_real_scalar
 
 
 PROCESS_OVERHEAD_GAS_ACCOUNT = "process.overhead_gas"
-RESERVOIR_FO2_BUFFER_ACCOUNT = "reservoir.fo2_buffer"
 OXYGEN_SPECIES = "O2"
 TRANSITION_NAME = "oxygen_bubbler_passthrough"
 
@@ -46,22 +45,24 @@ class BuiltinOxygenBubblerProvider(ChemistryProvider):
     """Authoritative pure O2 move for unabsorbed bubbler pass-through."""
 
     name = "builtin-oxygen-bubbler"
-    DECLARED_ACCOUNTS = frozenset({
-        PROCESS_OVERHEAD_GAS_ACCOUNT,
-        RESERVOIR_FO2_BUFFER_ACCOUNT,
-    })
 
     def capability_profile(self) -> CapabilityProfile:
+        from simulator.account_ids import OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
+
         return CapabilityProfile(
             provider_id=self.name,
             intents=frozenset({ChemistryIntent.OXYGEN_BUBBLER}),
             is_authoritative_for=frozenset({ChemistryIntent.OXYGEN_BUBBLER}),
-            declared_accounts=self.DECLARED_ACCOUNTS,
+            declared_accounts=frozenset({
+                PROCESS_OVERHEAD_GAS_ACCOUNT,
+                OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT,
+            }),
             consumes_fO2=False,
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
         from simulator.accounting.formulas import resolve_species_formula
+        from simulator.account_ids import OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
 
         wrong_intent = reject_wrong_intent(request, ChemistryIntent.OXYGEN_BUBBLER)
         if wrong_intent is not None:
@@ -90,7 +91,11 @@ class BuiltinOxygenBubblerProvider(ChemistryProvider):
                 diagnostic=diagnostic,
             )
 
-        debits = {RESERVOIR_FO2_BUFFER_ACCOUNT: {OXYGEN_SPECIES: passthrough_mol}}
+        debits = {
+            OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT: {
+                OXYGEN_SPECIES: passthrough_mol
+            }
+        }
         credits = {PROCESS_OVERHEAD_GAS_ACCOUNT: {OXYGEN_SPECIES: passthrough_mol}}
         atom_proof = build_atom_balance_proof(
             debits,

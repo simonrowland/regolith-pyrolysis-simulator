@@ -156,6 +156,7 @@ def test_native_fe_proposal_balances_atoms(formula_registry):
 
     assert result.status == "ok"
     assert result.transition is not None
+    assert result.transition.reason == "native_fe_saturation_split"
     assert dict(result.transition.debits) == {
         "process.cleaned_melt": {"FeO": 1.25},
     }
@@ -220,6 +221,8 @@ def test_native_fe_alias_matches_per_oxide_extent_map(formula_registry):
     assert legacy.status == mapped.status == "ok"
     assert legacy.transition is not None
     assert mapped.transition is not None
+    assert legacy.transition.reason == "native_fe_saturation_split"
+    assert mapped.transition.reason == "melt_metal_saturation_buffer"
     assert dict(legacy.transition.debits) == dict(mapped.transition.debits)
     assert dict(legacy.transition.credits) == dict(mapped.transition.credits)
     _atom_check(mapped.transition, formula_registry, tol=1e-12)
@@ -302,14 +305,21 @@ def test_metal_extent_map_refuses_invalid_or_unsupported_oxide(
     assert result.diagnostic["reason"] == reason
 
 
-def test_metal_extent_map_refuses_ambiguous_oxygen_account(formula_registry):
+@pytest.mark.parametrize(
+    "oxygen_account",
+    ["process.cleaned_melt", "", None, 1],
+)
+def test_metal_extent_map_refuses_invalid_oxygen_account(
+    formula_registry,
+    oxygen_account,
+):
     result = BuiltinNativeFeSaturationProvider().dispatch(
         _request(
             formula_registry,
             {"process.cleaned_melt": {"NiO": 1.0}},
             control_inputs={
                 "metal_extent_mol_by_oxide": {"NiO": 0.1},
-                "oxygen_account": "process.cleaned_melt",
+                "oxygen_account": oxygen_account,
             },
         )
     )

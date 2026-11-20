@@ -23,7 +23,6 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 
 
 PROCESS_OVERHEAD_GAS_ACCOUNT = "process.overhead_gas"
-RESERVOIR_FO2_BUFFER_ACCOUNT = "reservoir.fo2_buffer"
 OXYGEN_SPECIES = "O2"
 TRANSITION_NAME = "oxygen_reservoir_exchange"
 
@@ -32,24 +31,26 @@ class BuiltinOxygenReservoirExchangeProvider(ChemistryProvider):
     """Authoritative pure O2 move between melt redox buffer and headspace."""
 
     name = "builtin-oxygen-reservoir-exchange"
-    DECLARED_ACCOUNTS = frozenset({
-        PROCESS_OVERHEAD_GAS_ACCOUNT,
-        RESERVOIR_FO2_BUFFER_ACCOUNT,
-    })
 
     def capability_profile(self) -> CapabilityProfile:
+        from simulator.account_ids import OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
+
         return CapabilityProfile(
             provider_id=self.name,
             intents=frozenset({ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE}),
             is_authoritative_for=frozenset({
                 ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
             }),
-            declared_accounts=self.DECLARED_ACCOUNTS,
+            declared_accounts=frozenset({
+                PROCESS_OVERHEAD_GAS_ACCOUNT,
+                OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT,
+            }),
             consumes_fO2=False,
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
         from simulator.accounting.formulas import resolve_species_formula
+        from simulator.account_ids import OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
 
         wrong_intent = reject_wrong_intent(
             request, ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE
@@ -84,7 +85,9 @@ class BuiltinOxygenReservoirExchangeProvider(ChemistryProvider):
         amount_mol = abs(dn_to_headspace_mol)
         if dn_to_headspace_mol > 0.0:
             debits = {
-                RESERVOIR_FO2_BUFFER_ACCOUNT: {OXYGEN_SPECIES: amount_mol}
+                OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT: {
+                    OXYGEN_SPECIES: amount_mol
+                }
             }
             credits = {
                 PROCESS_OVERHEAD_GAS_ACCOUNT: {OXYGEN_SPECIES: amount_mol}
@@ -95,7 +98,9 @@ class BuiltinOxygenReservoirExchangeProvider(ChemistryProvider):
                 PROCESS_OVERHEAD_GAS_ACCOUNT: {OXYGEN_SPECIES: amount_mol}
             }
             credits = {
-                RESERVOIR_FO2_BUFFER_ACCOUNT: {OXYGEN_SPECIES: amount_mol}
+                OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT: {
+                    OXYGEN_SPECIES: amount_mol
+                }
             }
             direction = "headspace_to_melt"
 
