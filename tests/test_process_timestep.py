@@ -405,6 +405,8 @@ def _write_lab_preset(
               equipment_sizing: lab_fixed_geometry
               sample:
                 mass_g: 2.0
+                # Printed face. A null area must not borrow size_crucible.
+                exposed_melt_area_m2: 0.000123
               surfaces:
                 - id: witness
                   role: condenser
