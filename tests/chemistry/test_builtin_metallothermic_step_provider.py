@@ -3221,9 +3221,23 @@ def test_full_run_mass_balance_holds_with_kernel_committed_metallothermic(
             transition.name == "c6_mg_thermite_primary"
             for transition in metallothermic_transitions
         ), "lunar C0-C6 run did not reach the C6 thermite step"
-        assert sim.atom_ledger.project_account_kg("process.metal_phase").get(
-            "Fe", 0.0
-        ) > 0.0, "lunar C0-C6 run lost its extracted Fe metal"
+        c2a_fe_product_floor_kg = float(
+            setpoints_data["campaigns"]["C2A_continuous"]["products"]["Fe"]
+            ["mass_kg"][0]
+        )
+        stage1_fe_kg = next(
+            (
+                stage.collected_kg.get("Fe", 0.0)
+                for stage in sim.train.stages
+                if stage.stage_number == 1
+            ),
+            0.0,
+        )
+        assert stage1_fe_kg >= c2a_fe_product_floor_kg, (
+            "lunar C0-C6 Path A run missed the documented C2A continuous "
+            "Stage 1 Fe product floor: "
+            f"{stage1_fe_kg:.3f} kg < {c2a_fe_product_floor_kg:.3f} kg"
+        )
 
 
 @pytest.mark.nightly
