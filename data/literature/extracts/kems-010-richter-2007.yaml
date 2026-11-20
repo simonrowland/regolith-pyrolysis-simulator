@@ -11650,542 +11650,6 @@ species:
             source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
             figure: '2'
             line_range: '191'
-    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-12
-      type: rate_series
-      locator:
-        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-        table: '1'
-        paragraph: Init/Final area mm2 columns
-        row: R3-12
-      T_range_K:
-      - 1973.15
-      - 2173.15
-      phase: l
-      regime: langmuir_free_evaporation
-      units: as published
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: '2173.15'
-          locator:
-            page: 6
-            published_page: 5549
-            table: '1'
-            row: 'R3-12'
-        atmosphere:
-          state:
-            tag: value
-            value: vacuum
-          locator:
-            page: 5
-            published_page: 5548
-            section: '3.1 Starting materials and experimental procedure'
-        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
-        fO2_Pa: *richter_2007_unknown_fo2
-      values:
-        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
-        quantity: sample_surface_area_series
-        method_class: measured_direct
-        system_class: silicate_melt
-        samples:
-        - sample: R3-12
-          diam_mm: 2.5
-          T_C: 1900
-          init_area_mm2: 22.4
-          final_area_mm2: 21.3
-        area_uncertainty_pct: 10.0
-        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
-          exclude them. Not Knudsen orifice geometry.
-        missing_for_motzfeldt:
-        - orifice_area
-        - clausing_factor
-        - P_eq
-      equipment:
-        sample_surface_area:
-          value: 2.24e-05
-          units: m2
-          inferred: true
-          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            table: '1'
-            paragraph: R3-12 Init area 22.4 mm2
-        cell_material:
-          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            paragraph: iridium loops
-      experiment: cai-r3-12
-    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-10
-      type: rate_series
-      locator:
-        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-        table: '1'
-        paragraph: Init/Final area mm2 columns
-        row: R3-10
-      T_range_K:
-      - 1973.15
-      - 2173.15
-      phase: l
-      regime: langmuir_free_evaporation
-      units: as published
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: '2173.15'
-          locator:
-            page: 6
-            published_page: 5549
-            table: '1'
-            row: 'R3-10'
-        atmosphere:
-          state:
-            tag: value
-            value: vacuum
-          locator:
-            page: 5
-            published_page: 5548
-            section: '3.1 Starting materials and experimental procedure'
-        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
-        fO2_Pa: *richter_2007_unknown_fo2
-      values:
-        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
-        quantity: sample_surface_area_series
-        method_class: measured_direct
-        system_class: silicate_melt
-        samples:
-        - sample: R3-10
-          diam_mm: 2.5
-          T_C: 1900
-          init_area_mm2: 24.0
-          final_area_mm2: 18.9
-        area_uncertainty_pct: 10.0
-        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
-          exclude them. Not Knudsen orifice geometry.
-        missing_for_motzfeldt:
-        - orifice_area
-        - clausing_factor
-        - P_eq
-      equipment:
-        sample_surface_area:
-          value: 2.24e-05
-          units: m2
-          inferred: true
-          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            table: '1'
-            paragraph: R3-12 Init area 22.4 mm2
-        cell_material:
-          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            paragraph: iridium loops
-      experiment: cai-r3-10
-    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-11
-      type: rate_series
-      locator:
-        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-        table: '1'
-        paragraph: Init/Final area mm2 columns
-        row: R3-11
-      T_range_K:
-      - 1973.15
-      - 2173.15
-      phase: l
-      regime: langmuir_free_evaporation
-      units: as published
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: '2173.15'
-          locator:
-            page: 6
-            published_page: 5549
-            table: '1'
-            row: 'R3-11'
-        atmosphere:
-          state:
-            tag: value
-            value: vacuum
-          locator:
-            page: 5
-            published_page: 5548
-            section: '3.1 Starting materials and experimental procedure'
-        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
-        fO2_Pa: *richter_2007_unknown_fo2
-      values:
-        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
-        quantity: sample_surface_area_series
-        method_class: measured_direct
-        system_class: silicate_melt
-        samples:
-        - sample: R3-11
-          diam_mm: 2.5
-          T_C: 1900
-          init_area_mm2: 20.9
-          final_area_mm2: 15.9
-        area_uncertainty_pct: 10.0
-        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
-          exclude them. Not Knudsen orifice geometry.
-        missing_for_motzfeldt:
-        - orifice_area
-        - clausing_factor
-        - P_eq
-      equipment:
-        sample_surface_area:
-          value: 2.24e-05
-          units: m2
-          inferred: true
-          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            table: '1'
-            paragraph: R3-12 Init area 22.4 mm2
-        cell_material:
-          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            paragraph: iridium loops
-      experiment: cai-r3-11
-    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r-8
-      type: rate_series
-      locator:
-        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-        table: '1'
-        paragraph: Init/Final area mm2 columns
-        row: R-8
-      T_range_K:
-      - 1973.15
-      - 2173.15
-      phase: l
-      regime: langmuir_free_evaporation
-      units: as published
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: '2073.15'
-          locator:
-            page: 6
-            published_page: 5549
-            table: '1'
-            row: 'R-8'
-        atmosphere:
-          state:
-            tag: value
-            value: vacuum
-          locator:
-            page: 5
-            published_page: 5548
-            section: '3.1 Starting materials and experimental procedure'
-        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
-        fO2_Pa: *richter_2007_unknown_fo2
-      values:
-        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
-        quantity: sample_surface_area_series
-        method_class: measured_direct
-        system_class: silicate_melt
-        samples:
-        - sample: R-8
-          diam_mm: 6.0
-          T_C: 1800
-          init_area_mm2: 87.5
-          final_area_mm2: 83.4
-        area_uncertainty_pct: 10.0
-        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
-          exclude them. Not Knudsen orifice geometry.
-        missing_for_motzfeldt:
-        - orifice_area
-        - clausing_factor
-        - P_eq
-      equipment:
-        sample_surface_area:
-          value: 2.24e-05
-          units: m2
-          inferred: true
-          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            table: '1'
-            paragraph: R3-12 Init area 22.4 mm2
-        cell_material:
-          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            paragraph: iridium loops
-      experiment: cai-r-8
-    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r-9
-      type: rate_series
-      locator:
-        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-        table: '1'
-        paragraph: Init/Final area mm2 columns
-        row: R-9
-      T_range_K:
-      - 1973.15
-      - 2173.15
-      phase: l
-      regime: langmuir_free_evaporation
-      units: as published
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: '2073.15'
-          locator:
-            page: 6
-            published_page: 5549
-            table: '1'
-            row: 'R-9'
-        atmosphere:
-          state:
-            tag: value
-            value: vacuum
-          locator:
-            page: 5
-            published_page: 5548
-            section: '3.1 Starting materials and experimental procedure'
-        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
-        fO2_Pa: *richter_2007_unknown_fo2
-      values:
-        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
-        quantity: sample_surface_area_series
-        method_class: measured_direct
-        system_class: silicate_melt
-        samples:
-        - sample: R-9
-          diam_mm: 6.0
-          T_C: 1800
-          init_area_mm2: 82.6
-          final_area_mm2: 76.6
-        area_uncertainty_pct: 10.0
-        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
-          exclude them. Not Knudsen orifice geometry.
-        missing_for_motzfeldt:
-        - orifice_area
-        - clausing_factor
-        - P_eq
-      equipment:
-        sample_surface_area:
-          value: 2.24e-05
-          units: m2
-          inferred: true
-          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            table: '1'
-            paragraph: R3-12 Init area 22.4 mm2
-        cell_material:
-          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            paragraph: iridium loops
-      experiment: cai-r-9
-    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r-11
-      type: rate_series
-      locator:
-        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-        table: '1'
-        paragraph: Init/Final area mm2 columns
-        row: R-11
-      T_range_K:
-      - 1973.15
-      - 2173.15
-      phase: l
-      regime: langmuir_free_evaporation
-      units: as published
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: '2073.15'
-          locator:
-            page: 6
-            published_page: 5549
-            table: '1'
-            row: 'R-11'
-        atmosphere:
-          state:
-            tag: value
-            value: vacuum
-          locator:
-            page: 5
-            published_page: 5548
-            section: '3.1 Starting materials and experimental procedure'
-        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
-        fO2_Pa: *richter_2007_unknown_fo2
-      values:
-        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
-        quantity: sample_surface_area_series
-        method_class: measured_direct
-        system_class: silicate_melt
-        samples:
-        - sample: R-11
-          diam_mm: 6.0
-          T_C: 1800
-          init_area_mm2: 91.3
-          final_area_mm2: 80.0
-        area_uncertainty_pct: 10.0
-        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
-          exclude them. Not Knudsen orifice geometry.
-        missing_for_motzfeldt:
-        - orifice_area
-        - clausing_factor
-        - P_eq
-      equipment:
-        sample_surface_area:
-          value: 2.24e-05
-          units: m2
-          inferred: true
-          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            table: '1'
-            paragraph: R3-12 Init area 22.4 mm2
-        cell_material:
-          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            paragraph: iridium loops
-      experiment: cai-r-11
-    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r2-4
-      type: rate_series
-      locator:
-        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-        table: '1'
-        paragraph: Init/Final area mm2 columns
-        row: R2-4
-      T_range_K:
-      - 1973.15
-      - 2173.15
-      phase: l
-      regime: langmuir_free_evaporation
-      units: as published
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: '2073.15'
-          locator:
-            page: 6
-            published_page: 5549
-            table: '1'
-            row: 'R2-4'
-        atmosphere:
-          state:
-            tag: value
-            value: vacuum
-          locator:
-            page: 5
-            published_page: 5548
-            section: '3.1 Starting materials and experimental procedure'
-        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
-        fO2_Pa: *richter_2007_unknown_fo2
-      values:
-        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
-        quantity: sample_surface_area_series
-        method_class: measured_direct
-        system_class: silicate_melt
-        samples:
-        - sample: R2-4
-          diam_mm: 6.0
-          T_C: 1800
-          init_area_mm2: 88.5
-          final_area_mm2: 75.5
-        area_uncertainty_pct: 10.0
-        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
-          exclude them. Not Knudsen orifice geometry.
-        missing_for_motzfeldt:
-        - orifice_area
-        - clausing_factor
-        - P_eq
-      equipment:
-        sample_surface_area:
-          value: 2.24e-05
-          units: m2
-          inferred: true
-          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            table: '1'
-            paragraph: R3-12 Init area 22.4 mm2
-        cell_material:
-          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            paragraph: iridium loops
-      experiment: cai-r2-4
-    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r-16
-      type: rate_series
-      locator:
-        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-        table: '1'
-        paragraph: Init/Final area mm2 columns
-        row: R-16
-      T_range_K:
-      - 1973.15
-      - 2173.15
-      phase: l
-      regime: langmuir_free_evaporation
-      units: as published
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: '2073.15'
-          locator:
-            page: 6
-            published_page: 5549
-            table: '1'
-            row: 'R-16'
-        atmosphere:
-          state:
-            tag: value
-            value: vacuum
-          locator:
-            page: 5
-            published_page: 5548
-            section: '3.1 Starting materials and experimental procedure'
-        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
-        fO2_Pa: *richter_2007_unknown_fo2
-      values:
-        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
-        quantity: sample_surface_area_series
-        method_class: measured_direct
-        system_class: silicate_melt
-        samples:
-        - sample: R-16
-          diam_mm: 1.0
-          T_C: 1800
-          init_area_mm2: 5.9
-          final_area_mm2: 5.8
-        area_uncertainty_pct: 10.0
-        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
-          exclude them. Not Knudsen orifice geometry.
-        missing_for_motzfeldt:
-        - orifice_area
-        - clausing_factor
-        - P_eq
-      equipment:
-        sample_surface_area:
-          value: 2.24e-05
-          units: m2
-          inferred: true
-          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            table: '1'
-            paragraph: R3-12 Init area 22.4 mm2
-        cell_material:
-          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
-          locator:
-            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
-            paragraph: iridium loops
-      experiment: cai-r-16
     - observation_id: richter_2007_mg_table1_quoted_series_r3-12
       type: rate_series
       class_tag: measured
@@ -64856,6 +64320,566 @@ species:
           E_J_per_mol: 121000.0
           E_uncertainty_J_per_mol: 53000.0
           R_J_per_mol_K: 8.314
+    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-12
+      type: sample_geometry
+      locator:
+        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+        page: 6
+        published_page: 5549
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Init/Final area mm2 columns
+        row: R3-12
+      T_range_K:
+      - 1973.15
+      - 2173.15
+      phase: l
+      regime: langmuir_free_evaporation
+      units: as published
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2173.15'
+          locator:
+            page: 6
+            published_page: 5549
+            table: '1'
+            row: 'R3-12'
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum
+          locator:
+            page: 5
+            published_page: 5548
+            section: '3.1 Starting materials and experimental procedure'
+        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
+        fO2_Pa: *richter_2007_unknown_fo2
+      values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
+        quantity: sample_surface_area_series
+        method_class: measured_direct
+        system_class: silicate_melt
+        samples:
+        - sample: R3-12
+          diam_mm: 2.5
+          T_C: 1900
+          init_area_mm2: 22.4
+          final_area_mm2: 21.3
+        area_uncertainty_pct: 10.0
+        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
+          exclude them. Not Knudsen orifice geometry.
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - P_eq
+      equipment:
+        sample_surface_area:
+          value: 2.24e-05
+          units: m2
+          inferred: true
+          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            table: '1'
+            paragraph: R3-12 Init area 22.4 mm2
+        cell_material:
+          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            paragraph: iridium loops
+      experiment: cai-r3-12
+    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-10
+      type: sample_geometry
+      locator:
+        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+        page: 6
+        published_page: 5549
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Init/Final area mm2 columns
+        row: R3-10
+      T_range_K:
+      - 1973.15
+      - 2173.15
+      phase: l
+      regime: langmuir_free_evaporation
+      units: as published
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2173.15'
+          locator:
+            page: 6
+            published_page: 5549
+            table: '1'
+            row: 'R3-10'
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum
+          locator:
+            page: 5
+            published_page: 5548
+            section: '3.1 Starting materials and experimental procedure'
+        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
+        fO2_Pa: *richter_2007_unknown_fo2
+      values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
+        quantity: sample_surface_area_series
+        method_class: measured_direct
+        system_class: silicate_melt
+        samples:
+        - sample: R3-10
+          diam_mm: 2.5
+          T_C: 1900
+          init_area_mm2: 24.0
+          final_area_mm2: 18.9
+        area_uncertainty_pct: 10.0
+        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
+          exclude them. Not Knudsen orifice geometry.
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - P_eq
+      equipment:
+        sample_surface_area:
+          value: 2.24e-05
+          units: m2
+          inferred: true
+          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            table: '1'
+            paragraph: R3-12 Init area 22.4 mm2
+        cell_material:
+          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            paragraph: iridium loops
+      experiment: cai-r3-10
+    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-11
+      type: sample_geometry
+      locator:
+        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+        page: 6
+        published_page: 5549
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Init/Final area mm2 columns
+        row: R3-11
+      T_range_K:
+      - 1973.15
+      - 2173.15
+      phase: l
+      regime: langmuir_free_evaporation
+      units: as published
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2173.15'
+          locator:
+            page: 6
+            published_page: 5549
+            table: '1'
+            row: 'R3-11'
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum
+          locator:
+            page: 5
+            published_page: 5548
+            section: '3.1 Starting materials and experimental procedure'
+        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
+        fO2_Pa: *richter_2007_unknown_fo2
+      values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
+        quantity: sample_surface_area_series
+        method_class: measured_direct
+        system_class: silicate_melt
+        samples:
+        - sample: R3-11
+          diam_mm: 2.5
+          T_C: 1900
+          init_area_mm2: 20.9
+          final_area_mm2: 15.9
+        area_uncertainty_pct: 10.0
+        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
+          exclude them. Not Knudsen orifice geometry.
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - P_eq
+      equipment:
+        sample_surface_area:
+          value: 2.24e-05
+          units: m2
+          inferred: true
+          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            table: '1'
+            paragraph: R3-12 Init area 22.4 mm2
+        cell_material:
+          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            paragraph: iridium loops
+      experiment: cai-r3-11
+    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r-8
+      type: sample_geometry
+      locator:
+        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+        page: 6
+        published_page: 5549
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Init/Final area mm2 columns
+        row: R-8
+      T_range_K:
+      - 1973.15
+      - 2173.15
+      phase: l
+      regime: langmuir_free_evaporation
+      units: as published
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2073.15'
+          locator:
+            page: 6
+            published_page: 5549
+            table: '1'
+            row: 'R-8'
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum
+          locator:
+            page: 5
+            published_page: 5548
+            section: '3.1 Starting materials and experimental procedure'
+        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
+        fO2_Pa: *richter_2007_unknown_fo2
+      values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
+        quantity: sample_surface_area_series
+        method_class: measured_direct
+        system_class: silicate_melt
+        samples:
+        - sample: R-8
+          diam_mm: 6.0
+          T_C: 1800
+          init_area_mm2: 87.5
+          final_area_mm2: 83.4
+        area_uncertainty_pct: 10.0
+        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
+          exclude them. Not Knudsen orifice geometry.
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - P_eq
+      equipment:
+        sample_surface_area:
+          value: 2.24e-05
+          units: m2
+          inferred: true
+          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            table: '1'
+            paragraph: R3-12 Init area 22.4 mm2
+        cell_material:
+          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            paragraph: iridium loops
+      experiment: cai-r-8
+    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r-9
+      type: sample_geometry
+      locator:
+        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+        page: 6
+        published_page: 5549
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Init/Final area mm2 columns
+        row: R-9
+      T_range_K:
+      - 1973.15
+      - 2173.15
+      phase: l
+      regime: langmuir_free_evaporation
+      units: as published
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2073.15'
+          locator:
+            page: 6
+            published_page: 5549
+            table: '1'
+            row: 'R-9'
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum
+          locator:
+            page: 5
+            published_page: 5548
+            section: '3.1 Starting materials and experimental procedure'
+        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
+        fO2_Pa: *richter_2007_unknown_fo2
+      values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
+        quantity: sample_surface_area_series
+        method_class: measured_direct
+        system_class: silicate_melt
+        samples:
+        - sample: R-9
+          diam_mm: 6.0
+          T_C: 1800
+          init_area_mm2: 82.6
+          final_area_mm2: 76.6
+        area_uncertainty_pct: 10.0
+        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
+          exclude them. Not Knudsen orifice geometry.
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - P_eq
+      equipment:
+        sample_surface_area:
+          value: 2.24e-05
+          units: m2
+          inferred: true
+          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            table: '1'
+            paragraph: R3-12 Init area 22.4 mm2
+        cell_material:
+          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            paragraph: iridium loops
+      experiment: cai-r-9
+    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r-11
+      type: sample_geometry
+      locator:
+        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+        page: 6
+        published_page: 5549
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Init/Final area mm2 columns
+        row: R-11
+      T_range_K:
+      - 1973.15
+      - 2173.15
+      phase: l
+      regime: langmuir_free_evaporation
+      units: as published
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2073.15'
+          locator:
+            page: 6
+            published_page: 5549
+            table: '1'
+            row: 'R-11'
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum
+          locator:
+            page: 5
+            published_page: 5548
+            section: '3.1 Starting materials and experimental procedure'
+        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
+        fO2_Pa: *richter_2007_unknown_fo2
+      values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
+        quantity: sample_surface_area_series
+        method_class: measured_direct
+        system_class: silicate_melt
+        samples:
+        - sample: R-11
+          diam_mm: 6.0
+          T_C: 1800
+          init_area_mm2: 91.3
+          final_area_mm2: 80.0
+        area_uncertainty_pct: 10.0
+        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
+          exclude them. Not Knudsen orifice geometry.
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - P_eq
+      equipment:
+        sample_surface_area:
+          value: 2.24e-05
+          units: m2
+          inferred: true
+          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            table: '1'
+            paragraph: R3-12 Init area 22.4 mm2
+        cell_material:
+          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            paragraph: iridium loops
+      experiment: cai-r-11
+    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r2-4
+      type: sample_geometry
+      locator:
+        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+        page: 6
+        published_page: 5549
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Init/Final area mm2 columns
+        row: R2-4
+      T_range_K:
+      - 1973.15
+      - 2173.15
+      phase: l
+      regime: langmuir_free_evaporation
+      units: as published
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2073.15'
+          locator:
+            page: 6
+            published_page: 5549
+            table: '1'
+            row: 'R2-4'
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum
+          locator:
+            page: 5
+            published_page: 5548
+            section: '3.1 Starting materials and experimental procedure'
+        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
+        fO2_Pa: *richter_2007_unknown_fo2
+      values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
+        quantity: sample_surface_area_series
+        method_class: measured_direct
+        system_class: silicate_melt
+        samples:
+        - sample: R2-4
+          diam_mm: 6.0
+          T_C: 1800
+          init_area_mm2: 88.5
+          final_area_mm2: 75.5
+        area_uncertainty_pct: 10.0
+        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
+          exclude them. Not Knudsen orifice geometry.
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - P_eq
+      equipment:
+        sample_surface_area:
+          value: 2.24e-05
+          units: m2
+          inferred: true
+          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            table: '1'
+            paragraph: R3-12 Init area 22.4 mm2
+        cell_material:
+          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            paragraph: iridium loops
+      experiment: cai-r2-4
+    - observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r-16
+      type: sample_geometry
+      locator:
+        source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+        page: 6
+        published_page: 5549
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Init/Final area mm2 columns
+        row: R-16
+      T_range_K:
+      - 1973.15
+      - 2173.15
+      phase: l
+      regime: langmuir_free_evaporation
+      units: as published
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2073.15'
+          locator:
+            page: 6
+            published_page: 5549
+            table: '1'
+            row: 'R-16'
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum
+          locator:
+            page: 5
+            published_page: 5548
+            section: '3.1 Starting materials and experimental procedure'
+        total_pressure_Pa: *richter_2007_vacuum_pressure_bound
+        fO2_Pa: *richter_2007_unknown_fo2
+      values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
+        quantity: sample_surface_area_series
+        method_class: measured_direct
+        system_class: silicate_melt
+        samples:
+        - sample: R-16
+          diam_mm: 1.0
+          T_C: 1800
+          init_area_mm2: 5.9
+          final_area_mm2: 5.8
+        area_uncertainty_pct: 10.0
+        note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often
+          exclude them. Not Knudsen orifice geometry.
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - P_eq
+      equipment:
+        sample_surface_area:
+          value: 2.24e-05
+          units: m2
+          inferred: true
+          inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            table: '1'
+            paragraph: R3-12 Init area 22.4 mm2
+        cell_material:
+          value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+          locator:
+            source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+            paragraph: iridium loops
+      experiment: cai-r-16
   SiO:
     observations:
     - observation_id: richter_2007_sio_table1_quoted_series_r3-10
@@ -68188,7 +68212,7 @@ fidelity_samples:
   path: species.SiO.context[0].values.alpha_form.c0
   value: 25.3
 - species: Mg
-  observable: rate_series
+  observable: sample_geometry
   observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-12
   field: samples
   value:
@@ -68199,6 +68223,9 @@ fidelity_samples:
     final_area_mm2: 21.3
   locator:
     source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+    page: 6
+    published_page: 5549
+    pdf_page_index: 5
     table: '1'
 - species: Ca
   observable: rate_series
