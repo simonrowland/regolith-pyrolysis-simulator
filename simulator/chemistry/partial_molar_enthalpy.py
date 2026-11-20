@@ -40,13 +40,15 @@ from simulator.reference_data.janaf import formula_composition
 # phase-boundary argument. Not a cache dimension.
 PARTIAL_MOLAR_ENTHALPY_DT_K = 1.0
 
-# Spellings of PerBasis.MOL_SPECIES, ReferenceStateConvention
-# .CONDENSED_ELEMENT_REFERENCE, and Phase.L / CR / G. The simulation
-# import closure cannot import simulator.battery, so this module holds
-# the strings. tests/test_partial_molar_enthalpy.py pins the produced
-# tokens to those enum values.
+# Spellings of PerBasis.MOL_SPECIES, Phase.L / CR / G, and
+# GIBBS_CONVENTION_APPARENT_298 / ReferenceStateConvention
+# .APPARENT_ELEMENTS_298_15K. The simulation import closure cannot import
+# simulator.battery or the melt_backend package, so this module holds the
+# strings. tests/test_partial_molar_enthalpy.py pins them to those owners.
+# The apparent token is the engine zero (elements at 298.15 K). It is not
+# the JANAF condensed-element frame at the measurement temperature.
 BASIS_MOL_SPECIES = "mol_species"
-REFERENCE_CONDENSED_ELEMENT = "condensed_element_reference"
+REFERENCE_APPARENT_ELEMENTS_298 = "apparent_gibbs_formation_Tref_298.15K"
 PHASE_LIQUID = "l"
 PHASE_CRYSTAL = "cr"
 PHASE_GAS = "g"
@@ -62,16 +64,35 @@ REASON_COMPONENT_NOT_REPORTED = "partial_enthalpy_component_not_reported"
 REASON_AMBIGUOUS = "partial_enthalpy_ambiguous_component"
 REASON_NO_CHEM_POTENTIAL = "partial_enthalpy_no_chem_potential"
 REASON_STENCIL_FAILED = "partial_enthalpy_stencil_failed"
+REASON_COMPOSITION_MISSING = "partial_enthalpy_composition_missing"
+REASON_NO_ENDMEMBERS = "partial_enthalpy_endmembers_missing"
+REASON_MOLE_TOTAL = "partial_enthalpy_mole_total_not_positive"
+REASON_ELEMENT_REFERENCE_UNAVAILABLE = (
+    "partial_enthalpy_element_reference_unavailable"
+)
 
 # [component, phase, basis, reference, value_J_per_mol or None, reason or None]
 _RECORD_LENGTH = 6
 
 
 class PartialMolarEnthalpyRefusal(Exception):
-    """The stencil has no partial molar enthalpy. ``reason`` is the token."""
+    """The stencil has no partial molar enthalpy. ``reason`` is the token.
 
-    def __init__(self, reason: str) -> None:
+    ``components`` names the endmembers the refusal applies to. Absent
+    means the caller already knows the component, usually the phase name.
+    """
+
+    def __init__(
+        self,
+        reason: str,
+        components: Sequence[str] | None = None,
+    ) -> None:
         self.reason = str(reason)
+        self.components = (
+            None
+            if components is None
+            else tuple(str(component) for component in components)
+        )
         super().__init__(self.reason)
 
 
@@ -120,7 +141,11 @@ def enthalpy_record(
         str(component),
         str(phase),
         BASIS_MOL_SPECIES,
-        REFERENCE_CONDENSED_ELEMENT,
+        # chem_potential is the apparent potential on the 298.15 K element
+        # zero. JANAF condensed-element-at-T is not this number; scoring
+        # subtracts the elemental enthalpy increments through
+        # formation_h_from_apparent_kJ_mol when that frame is requested.
+        REFERENCE_APPARENT_ELEMENTS_298,
         value,
         None if reason is None else str(reason),
     ]

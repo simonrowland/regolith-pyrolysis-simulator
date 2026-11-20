@@ -949,15 +949,21 @@ def _predict_thermoengine_partial_molar_enthalpy(
     """Wire a cached Hbar row onto the observation. The formula is not here."""
 
     from simulator.chemistry.partial_molar_enthalpy import (
-        BASIS_MOL_SPECIES,
         REASON_AMBIGUOUS,
         REASON_BASIS_MISMATCH,
         REASON_COMPONENT_MISMATCH,
+        REASON_ELEMENT_REFERENCE_UNAVAILABLE,
         REASON_NONFINITE,
         REASON_PHASE_MISMATCH,
         REASON_REFERENCE_MISMATCH,
+        REFERENCE_APPARENT_ELEMENTS_298,
         partial_molar_enthalpy_kJ_per_mol,
         select_partial_molar_enthalpy_j_per_mol,
+    )
+    from simulator.melt_backend.pure_phase_janaf_score import (
+        element_reference_enthalpy_increments_kJ_mol,
+        formation_element_counts,
+        formation_h_from_apparent_kJ_mol,
     )
     from simulator.reference_data.janaf import formula_composition
 
@@ -1034,10 +1040,18 @@ def _predict_thermoengine_partial_molar_enthalpy(
         and isinstance(per_state.value, PerBasis)
         else ""
     )
-    if basis != BASIS_MOL_SPECIES:
-        # Still match the reported row so a real mol_species record refuses
-        # as a basis mismatch rather than as a missing component.
-        pass
+    # Engine rows are the apparent enthalpy on the 298.15 K element zero.
+    # A condensed-element observation is that number after the elemental
+    # term is removed. Any other convention is matched on its own token.
+    lookup_apparent = standard.convention in (
+        ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE,
+        ReferenceStateConvention.APPARENT_ELEMENTS_298_15K,
+    )
+    reference = (
+        REFERENCE_APPARENT_ELEMENTS_298
+        if lookup_apparent
+        else standard.convention.value
+    )
     value_j, reason = select_partial_molar_enthalpy_j_per_mol(
         getattr(cell, "partial_molar_enthalpy_J_per_mol", ()),
         component=component,
@@ -1045,12 +1059,32 @@ def _predict_thermoengine_partial_molar_enthalpy(
         component_basis=basis_composition,
         phase=species_phase.value,
         basis=basis,
-        reference=standard.convention.value,
+        reference=reference,
     )
     if reason or value_j is None:
         return refuse(reason or REASON_NONFINITE)
-    if basis != BASIS_MOL_SPECIES:
-        return refuse(REASON_BASIS_MISMATCH)
+    apparent_kJ = partial_molar_enthalpy_kJ_per_mol(value_j)
+    if standard.convention is ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE:
+        # DERIVATION lives on formation_h_from_apparent_kJ_mol. H_a(T) uses
+        # the engine zero (elements at 298.15 K). JANAF Delta_fH(T) is
+        # H_a(T) minus sum n_el * [H_el(T) - H_el(298.15)]. The subtraction
+        # owner is formation_g_from_apparent_kJ_mol; this call passes
+        # enthalpy increments, not g_ref. A missing element or an unprinted
+        # temperature is a typed refusal, never a zero.
+        temperature = temperature_of(identity)
+        if temperature is None or temperature <= 0:
+            return refuse(REASON_ELEMENT_REFERENCE_UNAVAILABLE)
+        try:
+            converted = formation_h_from_apparent_kJ_mol(
+                float(apparent_kJ),
+                formation_element_counts(component),
+                element_reference_enthalpy_increments_kJ_mol(float(temperature)),
+            )
+        except (KeyError, ValueError):
+            return refuse(REASON_ELEMENT_REFERENCE_UNAVAILABLE)
+        value = Decimal(str(converted))
+    else:
+        value = apparent_kJ
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -1058,7 +1092,7 @@ def _predict_thermoengine_partial_molar_enthalpy(
             state=ExecutionState.PRODUCED,
             call_evidence=call_evidence,
         ),
-        value=partial_molar_enthalpy_kJ_per_mol(value_j),
+        value=value,
         unit=QUANTITY_UNITS[Quantity.PARTIAL_MOLAR_ENTHALPY],
         authority=authority,
         notices=notices,

@@ -1072,11 +1072,19 @@ def _partial_enthalpy_moles(
     root: Any,
     phase_name: str,
     phase_obj: Any,
-) -> tuple[tuple[str, ...], list[float] | None]:
-    """Fixed endmember moles. ``None`` moles means the phase reported none."""
+) -> tuple[tuple[str, ...], list[float]]:
+    """Fixed endmember mole fractions.
+
+    A phase with no endmember names, a missing composition entry, and a
+    non-positive mole total are typed refusals. They are not a mole
+    fraction of 1, a filled zero, or a dropped phase.
+    """
 
     from simulator.chemistry.partial_molar_enthalpy import (
         PartialMolarEnthalpyRefusal,
+        REASON_COMPOSITION_MISSING,
+        REASON_MOLE_TOTAL,
+        REASON_NO_ENDMEMBERS,
         REASON_NONFINITE,
     )
 
@@ -1084,7 +1092,7 @@ def _partial_enthalpy_moles(
         str(name) for name in (getattr(phase_obj, "endmember_names", ()) or ())
     )
     if not names:
-        return (phase_name,), [1.0]
+        raise PartialMolarEnthalpyRefusal(REASON_NO_ENDMEMBERS)
     raw = _thermoengine_native_call(
         lambda: melts.get_composition_of_phase(root, phase_name, "component")
     )
@@ -1092,8 +1100,10 @@ def _partial_enthalpy_moles(
         raw = {}
     moles: list[float] = []
     for name in names:
+        if name not in raw:
+            raise PartialMolarEnthalpyRefusal(REASON_COMPOSITION_MISSING, names)
         try:
-            moles.append(float(raw.get(name, 0.0) or 0.0))
+            moles.append(float(raw[name]))
         except (TypeError, ValueError) as exc:
             raise PartialMolarEnthalpyRefusal(REASON_NONFINITE) from exc
     if any(not math.isfinite(value) or value < 0.0 for value in moles):
@@ -1103,7 +1113,7 @@ def _partial_enthalpy_moles(
     except OverflowError as exc:
         raise PartialMolarEnthalpyRefusal(REASON_NONFINITE) from exc
     if not math.isfinite(total) or total <= 0.0:
-        return names, None
+        raise PartialMolarEnthalpyRefusal(REASON_MOLE_TOTAL, names)
     return names, [value / total for value in moles]
 
 
@@ -2722,8 +2732,6 @@ print('ok')
                 components, moles = _partial_enthalpy_moles(
                     melts, root, phase_name, phase_obj
                 )
-                if moles is None:
-                    continue
                 if not callable(getattr(phase_obj, "chem_potential", None)):
                     records.extend(
                         refusal_records(components, token, REASON_NO_CHEM_POTENTIAL)
@@ -2741,7 +2749,8 @@ print('ok')
                     )
                 )
             except PartialMolarEnthalpyRefusal as exc:
-                records.extend(refusal_records(components, token, exc.reason))
+                named = exc.components if exc.components else components
+                records.extend(refusal_records(named, token, exc.reason))
             except Exception:
                 records.extend(
                     refusal_records(components, token, REASON_STENCIL_FAILED)

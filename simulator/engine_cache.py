@@ -312,7 +312,7 @@ ENGINE_CHEMISTRY_VERSION = {
     "vaporock": 1,
     "magemin": 3,
     "alphamelts": 3,
-    "thermoengine": 4,
+    "thermoengine": 5,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
@@ -331,6 +331,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v4: 2026-11-19 ThermoEngine df7a5f4609116a83bf40a5a352a19e3826a822d9 - adds per-component partial molar enthalpy
+# thermoengine v5: 2026-11-19 ThermoEngine df7a5f4609116a83bf40a5a352a19e3826a822d9 - partial molar enthalpy reference is the 298.15 K element zero
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 
 

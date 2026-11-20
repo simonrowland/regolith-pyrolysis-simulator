@@ -412,6 +412,9 @@ class ReferenceStateConvention(StrEnum):
     HENRIAN_LIQUID = "henrian_liquid"
     HYPOTHETICAL_1WT_PCT = "hypothetical_1wt_pct"
     CONDENSED_ELEMENT_REFERENCE = "condensed_element_reference"
+    # Same spelling as GIBBS_CONVENTION_APPARENT_298. Elements at 298.15 K,
+    # not the JANAF element reference state at the measurement temperature.
+    APPARENT_ELEMENTS_298_15K = "apparent_gibbs_formation_Tref_298.15K"
     TEMKIN = "temkin"
 
 

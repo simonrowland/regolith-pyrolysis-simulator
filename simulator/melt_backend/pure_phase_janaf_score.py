@@ -481,6 +481,86 @@ def formation_g_from_apparent_kJ_mol(
     return apparent_g_kJ_mol - correction
 
 
+def formation_element_counts(
+    composition: Iterable[Tuple[str, float]],
+) -> dict:
+    """Element counts for ``formation_g_from_apparent_kJ_mol``.
+
+    Oxygen atoms are the O2 reference species at half the atom count, as
+    that function's derivation states. Any other symbol is kept. O and
+    O2 together, or an empty composition, is a ValueError. A later
+    missing element table is a KeyError, never a zero.
+    """
+
+    counts: dict = {}
+    saw_oxygen_atom = False
+    saw_dioxygen = False
+    for element, count in composition:
+        symbol = str(element)
+        amount = float(count)
+        if symbol == "O":
+            saw_oxygen_atom = True
+            symbol = "O2"
+            amount = amount / 2.0
+        elif symbol == "O2":
+            saw_dioxygen = True
+        if saw_oxygen_atom and saw_dioxygen:
+            raise ValueError("oxygen is both O and O2")
+        counts[symbol] = counts.get(symbol, 0.0) + amount
+    if not counts:
+        raise ValueError("formation element counts are empty")
+    return counts
+
+
+def element_reference_enthalpy_increments_kJ_mol(
+    temperature_K: float,
+) -> dict:
+    """[H_el(T) - H_el(298.15)] from ``ELEMENT_REFERENCE_TABLES``, kJ/mol.
+
+    The row must be printed at ``temperature_K``. A missing table row or
+    a missing increment is a KeyError, never a zero.
+    """
+
+    increments = {}
+    for element, table_id in ELEMENT_REFERENCE_TABLES.items():
+        values = janaf_values_at(load_janaf_table(table_id), float(temperature_K))
+        if values is None or values.enthalpy_increment_kJ_mol is None:
+            raise KeyError(element)
+        increments[element] = values.enthalpy_increment_kJ_mol
+    return increments
+
+
+def formation_h_from_apparent_kJ_mol(
+    apparent_h_kJ_mol: float,
+    element_counts: Mapping[str, float],
+    element_enthalpy_increment_kJ_mol_by_element: Mapping[str, float],
+) -> float:
+    """JANAF Delta_fH(T) from an apparent enthalpy, kJ/mol.
+
+    DERIVATION. Engine enthalpies use the same 298.15 K element zero as
+    the apparent Gibbs energy above:
+
+        H_a(T) = dfH(298.15) + int_298.15^T Cp dT
+               = H_phase(T) - sum_el n_el * H_el(298.15)
+
+    with H_el(298.15) = 0. JANAF Delta_fH(T) references each element in
+    its reference state at T (``ELEMENT_REFERENCE_TABLES``):
+
+        dfH(T) = H_a(T) - sum_el n_el * [H_el(T) - H_el(298.15)]
+
+    The subtraction is ``formation_g_from_apparent_kJ_mol``. The element
+    term here is the enthalpy increment, not g_ref: g_ref also removes
+    T*S_el and is not Delta_fH. Oxygen is O2. A missing element is a
+    KeyError, never a zero.
+    """
+
+    return formation_g_from_apparent_kJ_mol(
+        apparent_h_kJ_mol,
+        element_counts,
+        element_enthalpy_increment_kJ_mol_by_element,
+    )
+
+
 def enthalpy_increment_kJ_mol(H_T_J_mol: float, H_298_J_mol: float) -> float:
     """H(T) - H(298.15) in kJ/mol from two same-convention engine H values."""
 

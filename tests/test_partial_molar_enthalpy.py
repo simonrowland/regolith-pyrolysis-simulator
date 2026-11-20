@@ -191,7 +191,7 @@ def test_dt_is_a_code_constant_and_not_a_cache_input() -> None:
     )
     from engines.alphamelts.thermoengine import ThermoEngineTransport
 
-    assert engine_cache.ENGINE_CHEMISTRY_VERSION["thermoengine"] == 4
+    assert engine_cache.ENGINE_CHEMISTRY_VERSION["thermoengine"] == 5
     projection = engine_cache._ENGINE_CACHE_SETTINGS_PROJECTIONS["thermoengine"]
     assert set(projection) == {
         "model",
@@ -207,6 +207,10 @@ def test_dt_is_a_code_constant_and_not_a_cache_input() -> None:
     source = Path(engine_cache.__file__).read_text(encoding="utf-8")
     assert "adds per-component partial molar enthalpy" in source
     assert "thermoengine v4:" in source
+    assert "thermoengine v5:" in source
+    assert (
+        "partial molar enthalpy reference is the 298.15 K element zero" in source
+    )
     default = inspect.signature(
         central_difference_partial_molar_enthalpies
     ).parameters["dt_K"].default
@@ -257,13 +261,16 @@ class _Native:
 
 
 class _Melts:
-    def __init__(self, phases, assemblage=None):
+    def __init__(self, phases, assemblage=None, composition=None):
         self.melts = _Native(phases)
         self.assemblage = list(assemblage if assemblage is not None else phases)
         self.equilibrate_count = 0
+        self.composition = composition
 
     def get_composition_of_phase(self, _root, phase_name, kind):
         assert kind == "component"
+        if self.composition is not None:
+            return dict(self.composition)
         assert phase_name == "liquid"
         return {"SiO2": 3.0, "MgO": 1.0}
 
@@ -305,7 +312,11 @@ def test_adapter_stencil_does_not_reequilibrate() -> None:
     assert by_name["SiO2"][2] == PerBasis.MOL_SPECIES.value
     assert (
         by_name["SiO2"][3]
-        == ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE.value
+        == ReferenceStateConvention.APPARENT_ELEMENTS_298_15K.value
+    )
+    assert (
+        by_name["SiO2"][3]
+        != ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE.value
     )
     assert by_name["SiO2"][5] is None
 
@@ -355,9 +366,12 @@ def test_endmember_list_change_is_a_phase_model_refusal() -> None:
 def test_missing_chem_potential_is_a_typed_refusal() -> None:
     from simulator.chemistry.partial_molar_enthalpy import REASON_NO_CHEM_POTENTIAL
 
-    phase = _Phase(names=())
+    phase = _Phase(names=("forsterite",))
     phase.chem_potential = None
-    melts = _Melts({"forsterite": phase})
+    melts = _Melts(
+        {"forsterite": phase},
+        composition={"forsterite": 1.0},
+    )
     rows = _transport()._partial_molar_enthalpy_records(
         melts=melts,
         root=object(),
@@ -370,6 +384,113 @@ def test_missing_chem_potential_is_a_typed_refusal() -> None:
     assert rows[0][1] == Phase.CR.value
     assert rows[0][4] is None
     assert rows[0][5] == REASON_NO_CHEM_POTENTIAL
+
+
+def test_no_endmembers_is_a_typed_refusal() -> None:
+    from simulator.chemistry.partial_molar_enthalpy import REASON_NO_ENDMEMBERS
+
+    phase = _Phase(names=())
+
+    def one_potential(temperature, pressure, mol=None):
+        return [_ideal_mu(float(temperature), _H0_MGO, 1.0)]
+
+    phase.chem_potential = one_potential
+    melts = _Melts({"forsterite": phase})
+    rows = _transport()._partial_molar_enthalpy_records(
+        melts=melts,
+        root=object(),
+        phases=("forsterite",),
+        temperature_C=1500.0 - 273.15,
+        pressure_bar=1.0,
+    )
+    assert len(rows) == 1
+    assert rows[0][0] == "forsterite"
+    assert rows[0][4] is None
+    assert rows[0][5] == REASON_NO_ENDMEMBERS
+
+
+def test_missing_composition_entry_is_a_typed_refusal() -> None:
+    from simulator.chemistry.partial_molar_enthalpy import (
+        REASON_COMPOSITION_MISSING,
+    )
+
+    phase = _Phase()
+    melts = _Melts({"liquid": phase}, composition={"SiO2": 3.0})
+    rows = _transport()._partial_molar_enthalpy_records(
+        melts=melts,
+        root=object(),
+        phases=("liquid",),
+        temperature_C=1500.0 - 273.15,
+        pressure_bar=1.0,
+    )
+    assert [row[0] for row in rows] == ["SiO2", "MgO"]
+    assert all(row[4] is None for row in rows)
+    assert {row[5] for row in rows} == {REASON_COMPOSITION_MISSING}
+
+
+def test_non_mapping_composition_is_a_missing_entry() -> None:
+    from simulator.chemistry.partial_molar_enthalpy import (
+        REASON_COMPOSITION_MISSING,
+    )
+
+    phase = _Phase()
+    melts = _Melts({"liquid": phase}, composition={"SiO2": 3.0, "MgO": 1.0})
+
+    def not_a_mapping(_root, _phase_name, kind):
+        assert kind == "component"
+        return None
+
+    melts.get_composition_of_phase = not_a_mapping
+    rows = _transport()._partial_molar_enthalpy_records(
+        melts=melts,
+        root=object(),
+        phases=("liquid",),
+        temperature_C=1500.0 - 273.15,
+        pressure_bar=1.0,
+    )
+    assert [row[0] for row in rows] == ["SiO2", "MgO"]
+    assert all(row[4] is None for row in rows)
+    assert {row[5] for row in rows} == {REASON_COMPOSITION_MISSING}
+
+
+def test_none_composition_value_is_not_a_zero() -> None:
+    from simulator.chemistry.partial_molar_enthalpy import REASON_NONFINITE
+
+    phase = _Phase()
+    melts = _Melts(
+        {"liquid": phase},
+        composition={"SiO2": None, "MgO": 1.0},
+    )
+    rows = _transport()._partial_molar_enthalpy_records(
+        melts=melts,
+        root=object(),
+        phases=("liquid",),
+        temperature_C=1500.0 - 273.15,
+        pressure_bar=1.0,
+    )
+    assert rows
+    assert all(row[4] is None for row in rows)
+    assert {row[5] for row in rows} == {REASON_NONFINITE}
+
+
+def test_non_positive_mole_total_is_a_typed_refusal() -> None:
+    from simulator.chemistry.partial_molar_enthalpy import REASON_MOLE_TOTAL
+
+    phase = _Phase()
+    melts = _Melts(
+        {"liquid": phase},
+        composition={"SiO2": 0.0, "MgO": 0.0},
+    )
+    rows = _transport()._partial_molar_enthalpy_records(
+        melts=melts,
+        root=object(),
+        phases=("liquid",),
+        temperature_C=1500.0 - 273.15,
+        pressure_bar=1.0,
+    )
+    assert [row[0] for row in rows] == ["SiO2", "MgO"]
+    assert all(row[4] is None for row in rows)
+    assert {row[5] for row in rows} == {REASON_MOLE_TOTAL}
 
 
 def test_phase_tokens_follow_the_existing_liquid_rule() -> None:
@@ -573,7 +694,9 @@ def test_score_converts_joules_to_kilojoules(monkeypatch) -> None:
 
     prediction, calls = _score(
         monkeypatch,
-        _partial_identity(),
+        _partial_identity(
+            convention=ReferenceStateConvention.APPARENT_ELEMENTS_298_15K
+        ),
         [enthalpy_record("O2Si", Phase.L.value, 9600.0, None)],
     )
     assert calls == 1
@@ -588,7 +711,7 @@ def test_reference_mismatch_refuses(monkeypatch) -> None:
         enthalpy_record,
     )
 
-    # The record is the engine's condensed-element reference. A Raoultian
+    # The record is the engine's 298.15 K element zero. A Raoultian
     # observation is a different reference and must not receive that number.
     prediction, calls = _score(
         monkeypatch,
@@ -653,12 +776,10 @@ def test_component_phase_basis_and_duplicate_refuse(monkeypatch) -> None:
     assert species_phase.value is None
     assert species_phase.refusal_detail["reason"] == REASON_PHASE_MISMATCH
 
-    other_basis = enthalpy_record("SiO2", Phase.L.value, 9600.0, None)
-    other_basis[2] = PerBasis.MOL_O2.value
     basis, _calls = _score(
         monkeypatch,
         _partial_identity(per=PerBasis.MOL_O2),
-        [other_basis],
+        [enthalpy_record("SiO2", Phase.L.value, 9600.0, None)],
     )
     assert basis.value is None
     assert basis.refusal_reason is RefusalReason.IDENTITY_MISMATCH
@@ -779,7 +900,7 @@ def test_mutation_mismatched_reference_is_detected(monkeypatch) -> None:
     original = owner.select_partial_molar_enthalpy_j_per_mol
 
     def forced(records, **kwargs):
-        kwargs["reference"] = owner.REFERENCE_CONDENSED_ELEMENT
+        kwargs["reference"] = owner.REFERENCE_APPARENT_ELEMENTS_298
         return original(records, **kwargs)
 
     monkeypatch.setattr(owner, "select_partial_molar_enthalpy_j_per_mol", forced)
@@ -797,3 +918,226 @@ def test_mutation_kilojoules_treated_as_joules_is_detected(monkeypatch) -> None:
     )
     with pytest.raises(AssertionError):
         test_score_converts_joules_to_kilojoules(monkeypatch)
+
+
+def _janaf_row(table_id: str, temperature_K: float):
+    from simulator.melt_backend.pure_phase_janaf_score import (
+        janaf_values_at,
+        load_janaf_table,
+    )
+
+    values = janaf_values_at(load_janaf_table(table_id), temperature_K)
+    assert values is not None
+    assert values.formation_enthalpy_kJ_mol is not None
+    assert values.enthalpy_increment_kJ_mol is not None
+    return values
+
+
+def _apparent_h_from_printed_cells(table_id: str, temperature_K: float) -> float:
+    """H_a(T) = dfH(298.15) + [H(T) - H(298.15)], from printed JANAF cells."""
+
+    phase = _janaf_row(table_id, temperature_K)
+    reference = _janaf_row(table_id, 298.15)
+    return reference.formation_enthalpy_kJ_mol + phase.enthalpy_increment_kJ_mol
+
+
+def test_apparent_token_matches_the_engine_zero() -> None:
+    from simulator.chemistry.partial_molar_enthalpy import (
+        REFERENCE_APPARENT_ELEMENTS_298,
+        enthalpy_record,
+    )
+    from simulator.melt_backend.pure_phase import GIBBS_CONVENTION_APPARENT_298
+
+    assert REFERENCE_APPARENT_ELEMENTS_298 == GIBBS_CONVENTION_APPARENT_298
+    assert (
+        ReferenceStateConvention.APPARENT_ELEMENTS_298_15K.value
+        == GIBBS_CONVENTION_APPARENT_298
+    )
+    assert (
+        REFERENCE_APPARENT_ELEMENTS_298
+        != ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE.value
+    )
+    row = enthalpy_record("MgO", Phase.CR.value, -1.0, None)
+    assert row[3] == GIBBS_CONVENTION_APPARENT_298
+
+
+def test_apparent_enthalpy_converts_to_printed_formation_enthalpy() -> None:
+    """1500 K element and compound. The expected dfH is the printed cell."""
+
+    from simulator.melt_backend.pure_phase_janaf_score import (
+        element_reference_enthalpy_increments_kJ_mol,
+        formation_element_counts,
+        formation_h_from_apparent_kJ_mol,
+    )
+    from simulator.reference_data.janaf import formula_composition
+
+    temperature_K = 1500.0
+    increments = element_reference_enthalpy_increments_kJ_mol(temperature_K)
+    for table_id, formula in (("Mg-001", "Mg"), ("Mg-008", "MgO")):
+        printed = _janaf_row(table_id, temperature_K)
+        apparent = _apparent_h_from_printed_cells(table_id, temperature_K)
+        composition = formula_composition(formula)
+        assert composition is not None
+        converted = formation_h_from_apparent_kJ_mol(
+            apparent,
+            formation_element_counts(composition),
+            increments,
+        )
+        assert converted == pytest.approx(
+            printed.formation_enthalpy_kJ_mol, abs=0.003
+        )
+        assert abs(apparent - printed.formation_enthalpy_kJ_mol) > 1.0
+    assert abs(_janaf_row("Mg-001", temperature_K).formation_enthalpy_kJ_mol) < 0.003
+
+
+def test_score_converts_condensed_element_mgo_at_1500(monkeypatch) -> None:
+    from simulator.chemistry.partial_molar_enthalpy import enthalpy_record
+
+    temperature_K = 1500.0
+    apparent_kJ = _apparent_h_from_printed_cells("Mg-008", temperature_K)
+    printed = _janaf_row("Mg-008", temperature_K).formation_enthalpy_kJ_mol
+    prediction, calls = _score(
+        monkeypatch,
+        _partial_identity(
+            formula="MgO",
+            phase=Phase.CR,
+            convention=ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE,
+        ),
+        [enthalpy_record("MgO", Phase.CR.value, apparent_kJ * 1000.0, None)],
+    )
+    assert calls == 1
+    assert prediction.refusal_reason is None, prediction.refusal_detail
+    assert float(prediction.value) == pytest.approx(printed, abs=0.003)
+    assert abs(float(prediction.value) - apparent_kJ) > 1.0
+
+
+def test_missing_element_reference_refuses(monkeypatch) -> None:
+    from simulator.chemistry.partial_molar_enthalpy import (
+        REASON_ELEMENT_REFERENCE_UNAVAILABLE,
+        enthalpy_record,
+    )
+
+    prediction, calls = _score(
+        monkeypatch,
+        _partial_identity(
+            formula="CaO",
+            phase=Phase.CR,
+            convention=ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE,
+        ),
+        [enthalpy_record("CaO", Phase.CR.value, -600000.0, None)],
+    )
+    assert calls == 1
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == REASON_ELEMENT_REFERENCE_UNAVAILABLE
+
+
+def test_mol_species_row_refuses_a_mol_o2_observation(monkeypatch) -> None:
+    from simulator.chemistry.partial_molar_enthalpy import (
+        REASON_BASIS_MISMATCH,
+        enthalpy_record,
+    )
+
+    prediction, _calls = _score(
+        monkeypatch,
+        _partial_identity(per=PerBasis.MOL_O2),
+        [enthalpy_record("SiO2", Phase.L.value, 9600.0, None)],
+    )
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert prediction.refusal_detail["reason"] == REASON_BASIS_MISMATCH
+
+
+def test_score_has_no_second_basis_gate() -> None:
+    from simulator.battery.score import _predict_thermoengine_partial_molar_enthalpy
+
+    source = inspect.getsource(_predict_thermoengine_partial_molar_enthalpy)
+    assert "if basis !=" not in source
+
+
+def test_mutation_skipped_element_subtraction_is_detected(monkeypatch) -> None:
+    import simulator.melt_backend.pure_phase_janaf_score as owner
+
+    monkeypatch.setattr(
+        owner,
+        "formation_h_from_apparent_kJ_mol",
+        lambda apparent, *_args, **_kwargs: apparent,
+    )
+    with pytest.raises(AssertionError):
+        test_apparent_enthalpy_converts_to_printed_formation_enthalpy()
+
+
+def test_mutation_condensed_stamp_is_detected(monkeypatch) -> None:
+    import simulator.chemistry.partial_molar_enthalpy as owner
+
+    monkeypatch.setattr(
+        owner,
+        "REFERENCE_APPARENT_ELEMENTS_298",
+        ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE.value,
+    )
+    with pytest.raises(AssertionError):
+        test_apparent_token_matches_the_engine_zero()
+
+
+def test_mutation_mole_fraction_one_for_missing_endmembers(monkeypatch) -> None:
+    import engines.alphamelts.thermoengine as owner
+
+    def invented(_melts, _root, phase_name, phase_obj):
+        names = tuple(
+            str(name)
+            for name in (getattr(phase_obj, "endmember_names", ()) or ())
+        )
+        if not names:
+            return (phase_name,), [1.0]
+        raise AssertionError("the empty-endmember mutation was not the path")
+
+    monkeypatch.setattr(owner, "_partial_enthalpy_moles", invented)
+    with pytest.raises(AssertionError):
+        test_no_endmembers_is_a_typed_refusal()
+
+
+def test_mutation_missing_composition_zero_fill_is_detected(monkeypatch) -> None:
+    import engines.alphamelts.thermoengine as owner
+
+    def zero_filled(melts, root, phase_name, phase_obj):
+        names = tuple(
+            str(name)
+            for name in (getattr(phase_obj, "endmember_names", ()) or ())
+        )
+        raw = melts.get_composition_of_phase(root, phase_name, "component")
+        if not isinstance(raw, dict):
+            raw = {}
+        moles = [float(raw.get(name, 0.0) or 0.0) for name in names]
+        total = math.fsum(moles)
+        return names, [value / total for value in moles]
+
+    monkeypatch.setattr(owner, "_partial_enthalpy_moles", zero_filled)
+    with pytest.raises(AssertionError):
+        test_missing_composition_entry_is_a_typed_refusal()
+
+
+def test_mutation_non_positive_total_drop_is_detected(monkeypatch) -> None:
+    import engines.alphamelts.thermoengine as owner
+
+    def dropped(_melts, _root, _phase_name, phase_obj):
+        names = tuple(
+            str(name)
+            for name in (getattr(phase_obj, "endmember_names", ()) or ())
+        )
+        return names, None
+
+    monkeypatch.setattr(owner, "_partial_enthalpy_moles", dropped)
+    with pytest.raises(AssertionError):
+        test_non_positive_mole_total_is_a_typed_refusal()
+
+
+def test_mutation_second_basis_gate_is_not_the_refusal(monkeypatch) -> None:
+    import simulator.chemistry.partial_molar_enthalpy as owner
+
+    monkeypatch.setattr(
+        owner,
+        "select_partial_molar_enthalpy_j_per_mol",
+        lambda *_args, **_kwargs: (9600.0, ""),
+    )
+    with pytest.raises(AssertionError):
+        test_mol_species_row_refuses_a_mol_o2_observation(monkeypatch)
