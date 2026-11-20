@@ -301,7 +301,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'class:simulator/reduced_real_determinism.py:PT1PersistentEquilibriumStore': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 1748,
+        "line": 1738,
         "kind": 'class',
         "name": 'PT1PersistentEquilibriumStore',
         "carries_disclosure": True,
@@ -933,7 +933,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_held_curve_record': {
         "path": 'simulator/core.py',
-        "line": 1467,
+        "line": 1473,
         "kind": 'store',
         "name": '_freeze_gate_held_curve_record',
         "carries_disclosure": True,
@@ -941,7 +941,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_liquid_fraction_cache': {
         "path": 'simulator/core.py',
-        "line": 1465,
+        "line": 1471,
         "kind": 'store',
         "name": '_freeze_gate_liquid_fraction_cache',
         "carries_disclosure": True,
@@ -949,7 +949,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_liquid_fraction_curve_memo': {
         "path": 'simulator/core.py',
-        "line": 1468,
+        "line": 1474,
         "kind": 'store',
         "name": '_freeze_gate_liquid_fraction_curve_memo',
         "carries_disclosure": True,
@@ -965,7 +965,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:published_cache': {
         "path": 'simulator/core.py',
-        "line": 5595,
+        "line": 5601,
         "kind": 'store',
         "name": 'published_cache',
         "carries_disclosure": False,
@@ -973,7 +973,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:rates_cache': {
         "path": 'simulator/core.py',
-        "line": 7837,
+        "line": 7945,
         "kind": 'store',
         "name": 'rates_cache',
         "carries_disclosure": False,
