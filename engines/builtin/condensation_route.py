@@ -106,6 +106,10 @@ from simulator.state import (
     declared_wall_deposit_accounts,
 )
 
+_INVALID_CONDENSATION_PRODUCT_ACCOUNT_FRACTIONS = (
+    "invalid_condensation_product_account_fractions"
+)
+
 
 class BuiltinCondensationRouteProvider(ChemistryProvider):
     """Authoritative ``CONDENSATION_ROUTE`` provider.
@@ -639,7 +643,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             )
             if not isinstance(raw_account_fractions, Mapping):
                 return self._route_refusal(
-                    "invalid_condensation_product_account_fractions",
+                    _INVALID_CONDENSATION_PRODUCT_ACCOUNT_FRACTIONS,
                     control_audit,
                     field="condensation_product_account_fractions",
                 )
@@ -652,7 +656,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                     or not raw_fractions
                 ):
                     return self._route_refusal(
-                        "invalid_condensation_product_account_fractions",
+                        _INVALID_CONDENSATION_PRODUCT_ACCOUNT_FRACTIONS,
                         control_audit,
                         field="condensation_product_account_fractions",
                         product=product_name,
@@ -677,7 +681,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                         or not 0.0 < fraction <= 1.0
                     ):
                         reason = account_refusal or (
-                            "invalid_condensation_product_account_fractions"
+                            _INVALID_CONDENSATION_PRODUCT_ACCOUNT_FRACTIONS
                         )
                         return self._route_refusal(
                             reason,
@@ -689,7 +693,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                     total_fraction += fraction
                 if total_fraction > 1.0:
                     return self._route_refusal(
-                        "invalid_condensation_product_account_fractions",
+                        _INVALID_CONDENSATION_PRODUCT_ACCOUNT_FRACTIONS,
                         control_audit,
                         field="condensation_product_account_fractions",
                         product=product_name,

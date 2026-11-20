@@ -4627,6 +4627,7 @@ class EvaporationMixin:
         account_fractions = self._stage3_mn_cartridge_account_fractions(
             route_result, species, sp_data
         )
+        defer_fraction_refusal = account_fractions is None
         if account_fractions:
             sp_data = dict(sp_data or {})
             sp_data["condensation_product_account_fractions"] = account_fractions
@@ -4667,6 +4668,16 @@ class EvaporationMixin:
             },
         )
         if kernel_result.transition is None:
+            if defer_fraction_refusal:
+                reason = dict(kernel_result.diagnostic or {}).get(
+                    "reason_refused"
+                )
+                if not isinstance(reason, str) or not reason:
+                    raise AccountingError(
+                        "provider refused malformed condensation product "
+                        "account fractions without a refusal reason"
+                    )
+                raise AccountingError(reason)
             return 0.0
 
         diagnostic = dict(kernel_result.diagnostic or {})
@@ -4770,7 +4781,7 @@ class EvaporationMixin:
         route_result,
         species: str,
         sp_data: Mapping[str, Any],
-    ) -> dict[str, dict[str, float]]:
+    ) -> dict[str, dict[str, float]] | None:
         """Split deposited product accounts while preserving gaseous coproducts."""
         raw_account_fractions = sp_data.get(
             "condensation_product_account_fractions", {}
@@ -4786,9 +4797,10 @@ class EvaporationMixin:
             elif isinstance(raw_fractions, Mapping):
                 account_fractions[str(product)] = dict(raw_fractions)
             else:
-                raise AccountingError(
-                    "invalid_condensation_product_account_fractions"
-                )
+                # The condensation provider owns this refusal code. Preserve
+                # the malformed map for provider validation and let its
+                # diagnostic supply the code to the simulator caller.
+                return None
         stage3_fraction = self._stage3_mn_cartridge_fraction(
             route_result, species
         )
