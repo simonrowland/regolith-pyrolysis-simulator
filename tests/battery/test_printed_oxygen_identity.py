@@ -73,6 +73,20 @@ def test_sato_hickling_atm_fugacity_identity_matches_the_reported_series() -> No
     migrated_ids = {observation.observation_id for observation in rows}
     assert len(stored_ids) == len(migrated_ids) == 75
     assert migrated_ids == stored_ids
+    queue = yaml.safe_load(
+        (ROOT / "data" / "battery" / "migration-queue.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    queued_ids = {
+        observation["observation_id"]
+        for entry in queue["entries"]
+        if entry["source"]
+        == "data/literature/extracts/sato-hickling-mclane-1973-lunar-fo2.yaml"
+        for observation in entry["observations"]
+    }
+    assert len(queued_ids) == 15
+    assert queued_ids <= migrated_ids
 
     for observation in rows:
         oxygen = observation.identity.fO2_Pa
