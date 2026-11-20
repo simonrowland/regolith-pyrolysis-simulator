@@ -866,6 +866,9 @@ def _stage_gas_payload_from_raw(
     for key in ("stage_name", "gas_cover_mode", "atmosphere", "pn2_band_action"):
         if raw.get(key) is not None:
             payload[key] = str(raw.get(key))
+    band_notice = raw.get("pn2_band_notice")
+    if isinstance(band_notice, Mapping):
+        payload["pn2_band_notice"] = dict(band_notice)
     for key in (
         "pO2_mbar",
         "pN2_mbar",

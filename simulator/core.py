@@ -4068,6 +4068,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return
 
         from simulator.campaigns import (
+            C2A_STAGED_PN2_KNUDSEN_FLOOR_ACTION,
             C2A_STAGED_PN2_SWEEP_MAX_MBAR,
             C2A_STAGED_PN2_SWEEP_MIN_MBAR,
         )
@@ -4101,6 +4102,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if isinstance(staged_control, dict):
             staged_control['pN2_mbar'] = applied_pN2_mbar
             staged_control['p_total_mbar'] = applied_total_mbar
+            staged_control['pn2_band_action'] = C2A_STAGED_PN2_KNUDSEN_FLOOR_ACTION
             staged_control['knudsen_pressure_adjustment'] = dict(adjustment)
         self.melt.validate_melt_pressures()
 
