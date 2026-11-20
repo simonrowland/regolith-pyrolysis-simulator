@@ -347,6 +347,24 @@ CACHEABLE_REFUSAL_CODES = frozenset({
     "internal_analytical_missing_oxygen_condition",
     "internal_analytical_invalid_oxygen_condition",
     "openimcc_composition_canonicalization",
+    # OpenIMCC input refusals. Each is a predicate of the request
+    # (composition, temperature, oxygen fugacity, pack, and the two allow
+    # flags) and the version-pinned datapack. Repeated here so this module
+    # does not import openimcc; the importorskip pin binds each token to
+    # the package class. Nonconvergence, gas oxygen-balance failure, and
+    # datapack-load errors stay off this set. imcc_species_not_found is
+    # the parent-name lookup on the solved parent list, still fixed by
+    # that request.
+    "imcc_composition_incomplete",
+    "imcc_ferric_input_unsupported",
+    "imcc_component_outside_domain",
+    "imcc_species_not_found",
+    "imcc_sp_extension_required",
+    "imcc_composition_outside_validated_envelope",
+    "imcc_T_outside_datapack_domain",
+    "imcc_gas_species_not_found",
+    "imcc_gas_T_outside_domain",
+    "imcc_gas_invalid_fO2",
 })
 
 _NOT_CONVERGED_CACHEABLE_REASONS = frozenset({
