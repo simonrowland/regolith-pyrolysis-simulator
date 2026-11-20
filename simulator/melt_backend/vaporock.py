@@ -1910,7 +1910,7 @@ class VapoRockBackend(MeltBackend):
                 pressure_diag = repr(pressure_bar)
             diagnostics = {
                 **melt_envelope_diagnostics,
-                'backend_status_reason': 'invalid_pressure_bar',
+                'backend_status_reason': OutOfDomainReason.INVALID_PRESSURE_BAR.value,
                 'temperature_K': float(temperature_K),
                 'requested_pressure_bar': pressure_diag,
                 'pressure_control_authoritative': False,
@@ -1939,7 +1939,7 @@ class VapoRockBackend(MeltBackend):
                 fo2_diag = repr(fO2_log)
             diagnostics = {
                 **melt_envelope_diagnostics,
-                'backend_status_reason': 'invalid_fo2_log',
+                'backend_status_reason': OutOfDomainReason.INVALID_FO2_LOG.value,
                 'temperature_K': float(temperature_K),
                 'requested_pressure_bar': float(pressure_bar),
                 'fO2_log': fo2_diag,
@@ -2006,7 +2006,9 @@ class VapoRockBackend(MeltBackend):
         )))
         if nonfinite_keys:
             diagnostics = dict(projection_diagnostics)
-            diagnostics['backend_status_reason'] = 'non_finite_composition'
+            diagnostics['backend_status_reason'] = (
+                OutOfDomainReason.NON_FINITE_COMPOSITION.value
+            )
             diagnostics['temperature_K'] = float(temperature_K)
             diagnostics['non_finite_composition_keys'] = nonfinite_keys
             diagnostics['pressure_control_authoritative'] = False

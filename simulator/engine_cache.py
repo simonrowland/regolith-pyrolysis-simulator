@@ -1568,6 +1568,13 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
 
     solved = solve()
     hot = live_hot(solved)
+    if readonly or connection is None:
+        # Readonly state takes precedence: a refusal or uncacheable value
+        # cannot be stored either way, so count this miss in one bucket.
+        with _LOCK:
+            counts = _counter_bucket(engine_id)
+            counts["not_stored:readonly"] = counts.get("not_stored:readonly", 0) + 1
+        return hot
     if isinstance(solved, EngineCacheValue) and not solved.cacheable:
         with _LOCK:
             counts = _counter_bucket(engine_id)
@@ -1595,11 +1602,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             counter = f"not_stored:refusal:{reason_label}"
             counts = _counter_bucket(engine_id)
             counts[counter] = counts.get(counter, 0) + 1
-    if readonly or connection is None:
-        with _LOCK:
-            counts = _counter_bucket(engine_id)
-            counts["not_stored:readonly"] = counts.get("not_stored:readonly", 0) + 1
-    if refusal_not_cacheable or readonly or connection is None:
+    if refusal_not_cacheable:
         return hot
     try:
         if not isinstance(solved, EngineCacheValue) and (

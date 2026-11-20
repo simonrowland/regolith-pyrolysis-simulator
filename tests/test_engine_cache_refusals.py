@@ -310,6 +310,30 @@ def test_not_stored_paths_are_counted_by_reason(tmp_path, monkeypatch):
     assert counts["not_stored:readonly"] == 1
 
 
+def test_readonly_refusal_miss_is_counted_in_exactly_one_bucket(tmp_path, monkeypatch):
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    engine_cache.engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+
+    engine_cache.cached_engine_call(
+        "alphamelts", {"case": "readonly-refusal"},
+        lambda: {"status": "refusal", "refusal_reason": "engine_timeout"},
+    )
+
+    counts = engine_cache.engine_cache_counters()["alphamelts"]
+    not_stored = sum(
+        value for key, value in counts.items()
+        if key.startswith("not_stored:") or key.startswith("uncacheable:")
+    )
+    assert counts["misses"] == 1
+    assert counts["stores"] == 0
+    assert counts["not_stored:readonly"] == 1
+    assert counts.get("not_stored:refusal:engine_timeout", 0) == 0
+    assert counts["misses"] == counts["stores"] + not_stored
+
+
 def test_connection_open_failure_counts_as_no_connection(tmp_path, monkeypatch):
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
