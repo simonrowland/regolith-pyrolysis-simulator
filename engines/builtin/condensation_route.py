@@ -288,7 +288,9 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             )
         )
 
-        credits = self._credits_by_product_account(condensed_product_mol, sp_data)
+        credits = self._credits_by_product_account(
+            condensed_product_mol, sp_data, vapor_species=species
+        )
         # Prior retained vapor retries only through stable baffle chemistry;
         # newly arriving vapor keeps this tick's physical wall split. Merging
         # identical product/account components lets prior+current cross the
@@ -301,7 +303,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             resolve_species_formula,
         )
         prior_credits = self._credits_by_product_account(
-            prior_product_mol, sp_data
+            prior_product_mol, sp_data, vapor_species=species
         )
         prior_credits_materializable = bool(prior_credits) and all(
             float(mol)
@@ -606,23 +608,12 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             for product, raw_account in raw_product_accounts.items():
                 product_name = str(product)
                 account = str(raw_account or "")
-                if account not in self._declared_accounts():
+                refusal_reason = self._product_account_refusal_reason(
+                    product_name, account, species
+                )
+                if refusal_reason is not None:
                     return self._route_refusal(
-                        "undeclared_condensation_product_account",
-                        control_audit,
-                        field="condensation_product_accounts",
-                        product=product_name,
-                        account=account,
-                    )
-                if (
-                    account == "process.overhead_gas"
-                    and (
-                        product_name == species
-                        or product_name not in self.GASEOUS_CONDENSATION_COPRODUCTS
-                    )
-                ):
-                    return self._route_refusal(
-                        "invalid_gaseous_condensation_coproduct",
+                        refusal_reason,
                         control_audit,
                         field="condensation_product_accounts",
                         product=product_name,
@@ -1316,6 +1307,8 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         self,
         condensed_product_mol: Mapping[str, float],
         sp_data: Mapping[str, Any],
+        *,
+        vapor_species: str,
     ) -> dict[str, dict[str, float]]:
         product_accounts = dict(
             sp_data.get("condensation_product_accounts") or {}
@@ -1325,16 +1318,37 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             account = str(
                 product_accounts.get(product) or "process.condensation_train"
             )
-            if account not in self._declared_accounts():
+            refusal_reason = self._product_account_refusal_reason(
+                str(product), account, vapor_species
+            )
+            if refusal_reason == "undeclared_condensation_product_account":
                 raise ValueError(
                     f"undeclared condensation product account {account!r}"
                 )
+            if refusal_reason is not None:
+                raise ValueError(refusal_reason)
             species_mol = credits.setdefault(account, {})
             species_mol[str(product)] = species_mol.get(str(product), 0.0) + mol
         return credits
 
     def _declared_accounts(self) -> frozenset[str]:
         return self.BASE_DECLARED_ACCOUNTS | self._declared_wall_deposit_accounts
+
+    def _product_account_refusal_reason(
+        self,
+        product_name: str,
+        account: str,
+        vapor_species: str,
+    ) -> str | None:
+        """Own the shared destination-account and gaseous-product rules."""
+        if account not in self._declared_accounts():
+            return "undeclared_condensation_product_account"
+        if account == "process.overhead_gas" and (
+            product_name == vapor_species
+            or product_name not in self.GASEOUS_CONDENSATION_COPRODUCTS
+        ):
+            return "invalid_gaseous_condensation_coproduct"
+        return None
 
     @staticmethod
     def _undeclared_wall_deposit_account(
