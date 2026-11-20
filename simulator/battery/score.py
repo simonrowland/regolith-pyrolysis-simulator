@@ -2177,7 +2177,7 @@ def _unverified_apparatus_notices(
     experiment: Experiment | None,
     gates: GateOutcome,
 ) -> tuple[Notice, ...]:
-    """Return apparatus notices for KEMS rows and unknown-method figure pressures."""
+    """Return apparatus notices for KEMS rows."""
 
     if experiment is None:
         return ()
@@ -2228,12 +2228,7 @@ def _unverified_apparatus_notices(
         and author_reported_activity
         and typed_condensed_reference
     )
-    unknown_method_figure_only_pressure = (
-        experiment.method.is_unknown
-        and gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-        and figure_only_partial_pressure
-    )
-    if not unknown_method_activity and not unknown_method_figure_only_pressure and (
+    if not unknown_method_activity and (
         not experiment.method.is_value
         or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
     ):
@@ -2312,9 +2307,7 @@ def _unverified_apparatus_notices(
             allow_calibration=allow_calibration,
             allow_missing_calibration=kems_activity,
             allow_missing_geometry=kems_activity,
-            allow_unknown_method=(
-                unknown_method_activity or unknown_method_figure_only_pressure
-            ),
+            allow_unknown_method=unknown_method_activity,
         )
         if fact is None:
             return ()
@@ -18067,6 +18060,20 @@ def _compile_residual_with_lineage(
         )
         if pressure_check is not None:
             pressure_detail = pressure_check.detail
+            if gates.reason is RefusalReason.METHOD_UNKNOWN:
+                method_check = next(
+                    (
+                        check
+                        for check in gates.checks
+                        if check.name == "method" and not check.passed
+                    ),
+                    None,
+                )
+                if method_check is not None:
+                    refusal_detail["missing_facts"] = {
+                        "method": method_check.detail.get("reason"),
+                        "in_cell_partial_pressure_sum": pressure_detail.get("reason"),
+                    }
             lower_bound = pressure_detail.get(
                 "printed_partial_pressure_lower_bound_Pa"
             )

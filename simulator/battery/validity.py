@@ -981,7 +981,11 @@ def effusion_regime_unverified(
             )
         )
         return _fail(
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+            (
+                RefusalReason.METHOD_UNKNOWN
+                if method_state.is_unknown
+                else RefusalReason.EFFUSION_REGIME_UNVERIFIED
+            ),
             checks,
             "in_cell_partial_pressure_sum",
         )
