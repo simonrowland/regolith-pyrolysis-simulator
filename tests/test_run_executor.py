@@ -67,7 +67,11 @@ def test_run_executor_returns_structured_execution():
 def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     run = _run()
     execution = RunExecutor().execute(run._session_config())
-    payload = run._build_output(execution)
+    from tests.chemistry.test_condensation_green_pins import (
+        deterministic_gate_payload,
+    )
+
+    payload = deterministic_gate_payload(run._build_output(execution))
     payload_bytes = (
         json.dumps(payload, sort_keys=True, indent=2, allow_nan=False) + "\n"
     ).encode("utf-8")

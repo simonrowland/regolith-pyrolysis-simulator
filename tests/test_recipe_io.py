@@ -481,7 +481,13 @@ def test_no_recipe_run_matches_committed_golden_text(
     # broken-liquidus job tree. docs-private/research/2026-08-02-train13-adjudication.md
     from tests.test_runner_smoke import SCENARIOS
 
+    from tests.chemistry.test_condensation_green_pins import (
+        deterministic_gate_payload,
+    )
+
     payload, _, expected = runner_golden_loader(SCENARIOS[0])
-    actual = json.dumps(payload, indent=2, sort_keys=False)
+    actual = json.dumps(
+        deterministic_gate_payload(payload), indent=2, sort_keys=False,
+    )
     assert expected.endswith("\n")
     assert actual == expected.removesuffix("\n")

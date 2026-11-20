@@ -24,6 +24,11 @@ def produce_coating_golden() -> tuple[bytes, dict]:
     # b-238: this counter depends on the cross-run freeze-gate cache. Only
     # this block is excluded; the consumer separately checks its shape.
     engagement = payload.pop("melt_redox_gate_floor_fallback_engagement")
+    from tests.chemistry.test_condensation_green_pins import (
+        deterministic_gate_payload,
+    )
+
+    payload = deterministic_gate_payload(payload)
     preimage = (
         json.dumps(payload, indent=2, sort_keys=False, allow_nan=False) + "\n"
     ).encode("utf-8")

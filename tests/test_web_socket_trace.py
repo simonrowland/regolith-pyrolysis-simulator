@@ -6,6 +6,7 @@ import web.events as web_events
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from tests.chemistry.test_condensation_green_pins import (
     _without_engine_versions,
+    deterministic_gate_payload,
 )
 
 
@@ -81,7 +82,7 @@ def _without_host_engine_versions(trace):
     # liquid-fraction gate's step-down record
     # (oxygen_reservoir.liquid_fraction_gate.redox.gate_provider_step_down).
     # Count = campaigns * oxygen-reservoir copies per campaign * failed
-    # providers per copy:
+    # providers per copy, after dropping environment attempts:
     # - two one-hour campaigns;
     # - two copies each: the tick's per_hour_summary_delta and the
     #   per_hour_summary event. The tick used to carry a third, top-level
@@ -91,7 +92,9 @@ def _without_host_engine_versions(trace):
     # - two failed providers per copy: magemin-shadow (composition_projected,
     #   MnO and P2O5 have no ig endmember) and alphamelts-diagnostic.
     # 2 * 2 * 2 = 8 (was 2 * 3 * 2 = 12 before that dedup).
-    stripped, count = _without_engine_versions(trace)
+    # A recovered engine_worker_timeout is an environment attempt. It stays
+    # in the production payload and is omitted here, so the count stays 8.
+    stripped, count = _without_engine_versions(deterministic_gate_payload(trace))
     assert count == 8
     return stripped
 

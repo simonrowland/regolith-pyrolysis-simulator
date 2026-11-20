@@ -606,7 +606,11 @@ def test_opt_in_diagnostics_are_golden_neutral() -> None:
         row.pop("wall_deposit_rate_by_segment_species_kg_h")
         row.pop("wall_deposit_rate_by_species_kg_h")
 
-    assert stripped == baseline
+    from tests.chemistry.test_condensation_green_pins import (
+        deterministic_gate_payload,
+    )
+
+    assert deterministic_gate_payload(stripped) == deterministic_gate_payload(baseline)
     assert lifespan["input_basis"] == (
         "execution_local_committed_rate_per_campaign"
     )

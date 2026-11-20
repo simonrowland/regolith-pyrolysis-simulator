@@ -2,10 +2,15 @@
 
 import json
 import hashlib
+from collections.abc import Mapping
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+
+from simulator.reduced_real_determinism import (
+    failed_provider_attempt_is_environment,
+)
 
 from simulator.condensation import CondensationModel
 from simulator.condensation_routing import stage_key_for_stage
@@ -189,7 +194,125 @@ def _runner_digest_payload(runner_output):
     del engines_used["registry"]
     metadata["engines_used"] = engines_used
     payload["run_metadata"] = metadata
-    return _without_engine_versions(payload)
+    return _without_engine_versions(deterministic_gate_payload(payload))
+
+
+def _without_environment_attempts(value):
+    """Drop load-timeout failed-provider attempts from a deterministic compare.
+
+    Returns the same object when nothing is removed, so ``sort_keys=False``
+    golden text stays byte-identical on a clean run. The production payload
+    still carries the attempt.
+    """
+
+    if isinstance(value, dict):
+        rebuilt = None
+        for key, item in value.items():
+            if key == "failed_providers" and isinstance(item, (list, tuple)):
+                kept = []
+                changed = False
+                for attempt in item:
+                    if (
+                        isinstance(attempt, Mapping)
+                        and failed_provider_attempt_is_environment(attempt)
+                    ):
+                        changed = True
+                        continue
+                    stripped_attempt = _without_environment_attempts(attempt)
+                    if stripped_attempt is not attempt:
+                        changed = True
+                    kept.append(stripped_attempt)
+                if changed:
+                    if rebuilt is None:
+                        rebuilt = dict(value)
+                    rebuilt[key] = kept if isinstance(item, list) else type(item)(kept)
+                continue
+            stripped_item = _without_environment_attempts(item)
+            if stripped_item is not item:
+                if rebuilt is None:
+                    rebuilt = dict(value)
+                rebuilt[key] = stripped_item
+        return value if rebuilt is None else rebuilt
+    if isinstance(value, list):
+        rebuilt = None
+        for index, item in enumerate(value):
+            stripped_item = _without_environment_attempts(item)
+            if stripped_item is not item:
+                if rebuilt is None:
+                    rebuilt = list(value)
+                rebuilt[index] = stripped_item
+        return value if rebuilt is None else rebuilt
+    if isinstance(value, tuple):
+        rebuilt = None
+        for index, item in enumerate(value):
+            stripped_item = _without_environment_attempts(item)
+            if stripped_item is not item:
+                if rebuilt is None:
+                    rebuilt = list(value)
+                rebuilt[index] = stripped_item
+        return value if rebuilt is None else tuple(rebuilt)
+    return value
+
+
+def deterministic_gate_payload(value):
+    """Gate payload a golden or digest compares.
+
+    Load-timeout attempts stay in the production payload and are omitted here.
+    """
+
+    return _without_environment_attempts(value)
+
+
+def test_deterministic_gate_payload_drops_only_environment_attempts():
+    clean = {
+        "gate_provider_step_down": {
+            "failed_providers": [
+                {"provider": "magemin-shadow", "reason": "composition_projected"},
+                {
+                    "provider": "alphamelts-diagnostic",
+                    "reason": "incomplete_cooling_path",
+                },
+            ],
+        },
+    }
+    assert deterministic_gate_payload(clean) is clean
+    assert json.dumps(clean, sort_keys=False) == json.dumps(
+        deterministic_gate_payload(clean), sort_keys=False,
+    )
+
+    timed_out = {
+        "gate_provider_refusal": {
+            "disposition": "environment",
+            "qualification": "held_last_good_curve",
+        },
+        "gate_provider_step_down": {
+            "failed_providers": [
+                {
+                    "provider": "magemin-shadow",
+                    "reason": "engine_worker_timeout",
+                    "disposition": "environment",
+                    "engine_version": "magemin-timeout",
+                },
+                {
+                    "provider": "alphamelts-diagnostic",
+                    "reason": "incomplete_cooling_path",
+                },
+                {
+                    "provider": "magemin-shadow",
+                    "reason": "unavailable",
+                    "diagnostic": {"backend_failure_disposition": "environment"},
+                },
+                {"provider": "magemin-shadow", "reason": "composition_projected"},
+            ],
+        },
+    }
+    stripped = deterministic_gate_payload(timed_out)
+    assert stripped is not timed_out
+    assert stripped["gate_provider_refusal"]["qualification"] == "held_last_good_curve"
+    assert [
+        item["reason"]
+        for item in stripped["gate_provider_step_down"]["failed_providers"]
+    ] == ["incomplete_cooling_path", "composition_projected"]
 
 
 def _without_engine_versions(value):

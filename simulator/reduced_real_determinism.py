@@ -2821,6 +2821,42 @@ def gate_curve_provider_timeout_reason(
     )
 
 
+def _mapping_carries_environment_disposition(value: Mapping[str, Any]) -> bool:
+    if value.get("backend_failure_disposition") == "environment":
+        return True
+    for field in (
+        "diagnostic",
+        "backend_diagnostics",
+        "projected_liquidus_diagnostics",
+        "provider_diagnostic",
+    ):
+        nested = value.get(field)
+        if isinstance(nested, Mapping) and _mapping_carries_environment_disposition(nested):
+            return True
+    return False
+
+
+def failed_provider_attempt_is_environment(attempt: Mapping[str, Any] | None) -> bool:
+    """A worker timeout stays in the payload and is not a deterministic input.
+
+    True for ``disposition: environment``, a reason token
+    ``engine_worker_timeout``, or ``backend_failure_disposition: environment``
+    on the attempt or its diagnostic. Other step-down reasons, including
+    ``incomplete_cooling_path``, stay in every digest.
+    """
+
+    if not isinstance(attempt, Mapping):
+        return False
+    if attempt.get("disposition") == "environment":
+        return True
+    reason = attempt.get("reason")
+    if isinstance(reason, str) and "engine_worker_timeout" in {
+        part.strip().lower() for part in reason.split(";")
+    }:
+        return True
+    return _mapping_carries_environment_disposition(attempt)
+
+
 def gate_curve_provider_has_terminal_input(reasons: Sequence[str]) -> bool:
     """Missing or invalid inputs cannot be repaired by changing engines."""
     return any(reason in {
