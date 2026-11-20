@@ -81,11 +81,13 @@ from simulator.physical_constants import (
 )
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.transport_constants import (
+    COLLISION_DIAMETERS_M,
     FREE_MOLECULAR_KNUDSEN_MIN,
     VISCOUS_KNUDSEN_MAX,
 )
 from simulator.transport_regime import (
     LONG_TUBE_L_OVER_D_MIN,
+    MOLAR_MASSES_KG_PER_MOL,
     KnudsenRegime,
     MeanFreePathResult,
     TransportRegimeRefusal,
@@ -190,6 +192,7 @@ class PipeSpeciesOutflow:
     binding_cause: str
     notices: tuple[str, ...]
     mass_flow_kg_s: float = 0.0
+    species_notices: tuple[Mapping[str, Any], ...] = ()
 
 
 def _pipe_scalar(
@@ -266,18 +269,108 @@ def _pipe_transmission(diameter_m: float, length_m: float) -> float:
     return short_tube_dushman_transmission(diameter_m, length_m)
 
 
+def _pipe_resolved_transport(
+    fractions: Mapping[str, float],
+    supplied_masses: Mapping[str, float] | None,
+) -> tuple[dict[str, float], dict[str, float], tuple[Mapping[str, Any], ...], str]:
+    """Diameters and molar masses for one pipe state.
+
+    Premise: the hard-sphere path needs a diameter. The P0a table is
+    the certified band. A species outside it has no certified sigma.
+    Algebra: if certified holdup mole fraction X_c > 0,
+    sigma = sum_j x_j sigma_j / X_c over certified j. If X_c = 0,
+    sigma is the unweighted mean of the certified table. The notice
+    keeps the original reason, the extrapolated authority, and that
+    band. A molar mass in the P0a table uses that row. A species
+    outside it uses the caller mass. Absent from both is missing
+    input and still refuses.
+    Unit check: x is dimensionless, sigma is metres, so the mean is
+    metres. Limit: a certified species uses its table row and is not
+    flagged. A pure certified gas is that row.
+    """
+
+    certified = [
+        species
+        for species in fractions
+        if species in COLLISION_DIAMETERS_M
+    ]
+    if certified:
+        weight = math.fsum(fractions[species] for species in certified)
+        anchor = math.fsum(
+            fractions[species] * COLLISION_DIAMETERS_M[species]
+            for species in certified
+        ) / weight
+        extrapolation = "holdup_certified_mole_fraction_mean"
+    else:
+        table = tuple(COLLISION_DIAMETERS_M.values())
+        anchor = math.fsum(table) / len(table)
+        extrapolation = "certified_table_mean"
+    band_values = tuple(COLLISION_DIAMETERS_M.values())
+    band = {
+        "species": tuple(sorted(COLLISION_DIAMETERS_M)),
+        "collision_diameter_m": (min(band_values), max(band_values)),
+    }
+    diameters: dict[str, float] = {}
+    masses: dict[str, float] = {}
+    notices: list[Mapping[str, Any]] = []
+    for species in fractions:
+        if species in COLLISION_DIAMETERS_M:
+            diameters[species] = COLLISION_DIAMETERS_M[species]
+        else:
+            diameters[species] = anchor
+            notices.append({
+                "species": species,
+                "reason": "uncertified_collision_diameter",
+                "detail": (
+                    "no P0a collision diameter certified for "
+                    f"{species!r}"
+                ),
+                "authority_level": "extrapolated",
+                "certified_band": band,
+                "collision_diameter_m_used": anchor,
+                "extrapolation": extrapolation,
+                "was_clamped": False,
+            })
+        if species in MOLAR_MASSES_KG_PER_MOL:
+            # Certified row. The caller's formula mass is not a second
+            # molar mass for a gas the pipe table already names.
+            mass = MOLAR_MASSES_KG_PER_MOL[species]
+        elif supplied_masses is not None and species in supplied_masses:
+            mass = float(supplied_masses[species])
+        else:
+            raise TransportRegimeRefusal(
+                "uncertified_molar_mass",
+                f"no P0a molar mass available for {species!r}",
+            )
+        if not math.isfinite(mass) or mass <= 0.0:
+            raise TransportRegimeRefusal(
+                "uncertified_molar_mass",
+                f"no P0a molar mass available for {species!r}",
+            )
+        masses[species] = mass
+    source = (
+        "extrapolated_from_p0a_certified_band"
+        if notices
+        else "Poling et al., Lennard-Jones sigma"
+    )
+    return diameters, masses, tuple(notices), source
+
+
 def _pipe_knudsen(
     fractions: Mapping[str, float],
     pressure_pa: float,
     temperature_K: float,
     diameter_m: float,
+    *,
+    collision_diameters_m: Mapping[str, float],
+    molar_masses_kg_mol: Mapping[str, float],
+    collision_diameter_source: str,
 ) -> MeanFreePathResult:
     """Regime at the upstream state. Characteristic length is the diameter.
 
     One species calls single_species_mean_free_path. More than one calls
-    mole_fraction_mean_free_path: the mole-fraction average of each
-    species' hard-sphere path, divided by the diameter. A missing
-    collision diameter or molar mass is that helper's typed refusal.
+    mole_fraction_mean_free_path. The diameters and masses are already
+    resolved, including an extrapolated diameter the caller flagged.
     """
 
     if len(fractions) == 1:
@@ -287,12 +380,18 @@ def _pipe_knudsen(
             pressure_pa,
             temperature_K,
             diameter_m,
+            collision_diameter_m=collision_diameters_m[species],
+            molar_mass_kg_mol=molar_masses_kg_mol[species],
+            collision_diameter_source=collision_diameter_source,
         )
     return mole_fraction_mean_free_path(
         fractions,
         pressure_pa,
         temperature_K,
         diameter_m,
+        collision_diameters_m=collision_diameters_m,
+        molar_masses_kg_mol=molar_masses_kg_mol,
+        collision_diameter_source=collision_diameter_source,
     )
 
 
@@ -460,6 +559,7 @@ def _pipe_outflow_result(
     binding_cause: str,
     notices: tuple[str, ...],
     masses: Mapping[str, float] | None = None,
+    species_notices: tuple[Mapping[str, Any], ...] = (),
 ) -> PipeSpeciesOutflow:
     # Premise: the split moles are the regime law. One mass flow is
     # their sum with the molar masses already used to build that split.
@@ -482,6 +582,7 @@ def _pipe_outflow_result(
         binding_cause=binding_cause,
         notices=notices,
         mass_flow_kg_s=mass_flow_kg_s,
+        species_notices=species_notices,
     )
 
 
@@ -492,6 +593,8 @@ def pipe_species_outflow_mol_s(
     holdup_mol: Mapping[str, float],
     diameter_m: float,
     length_m: float,
+    *,
+    molar_mass_kg_mol: Mapping[str, float] | None = None,
 ) -> PipeSpeciesOutflow:
     """Molar outflow of each holdup species through one pipe.
 
@@ -535,8 +638,22 @@ def pipe_species_outflow_mol_s(
         allow_zero=False,
     )
     fractions = _pipe_mole_fractions(holdup_mol)
+    (
+        collision_diameters_m,
+        resolved_masses,
+        species_notices,
+        diameter_source,
+    ) = _pipe_resolved_transport(fractions, molar_mass_kg_mol)
     transmission = _pipe_transmission(diameter, length)
-    state = _pipe_knudsen(fractions, upstream_pa, temperature_K, diameter)
+    state = _pipe_knudsen(
+        fractions,
+        upstream_pa,
+        temperature_K,
+        diameter,
+        collision_diameters_m=collision_diameters_m,
+        molar_masses_kg_mol=resolved_masses,
+        collision_diameter_source=diameter_source,
+    )
     knudsen_number = state.knudsen_number
     blend_weight = _molecular_blend_weight(knudsen_number)
     # Printed Kn = 10 is 0.041036662569 Pa. binary64 Kn there is just
@@ -549,10 +666,7 @@ def pipe_species_outflow_mol_s(
         if blend_weight == 1.0
         else state.regime
     )
-    masses = {
-        carrier.species: carrier.molar_mass_kg_mol
-        for carrier in state.carriers
-    }
+    masses = dict(resolved_masses)
     mean_molar_mass = math.fsum(
         fraction * masses[species] for species, fraction in fractions.items()
     )
@@ -575,6 +689,7 @@ def pipe_species_outflow_mol_s(
             binding_cause=binding,
             notices=notice_tuple,
             masses=masses,
+            species_notices=species_notices,
         )
 
     choked = False
@@ -629,6 +744,7 @@ def pipe_species_outflow_mol_s(
         binding_cause=binding,
         notices=notice_tuple,
         masses=masses,
+        species_notices=species_notices,
     )
 
 
@@ -1396,6 +1512,7 @@ class OverheadGasModel:
         holdup_mol: Mapping[str, float] | None = None,
         downstream_pressure_Pa: float = 0.0,
         temperature_K: float | None = None,
+        molar_mass_kg_mol: Mapping[str, float] | None = None,
     ) -> Optional[EffectiveTransportCapacity]:
         """Return the one-tick flow boundary for controlled-pO2 operation.
 
@@ -1458,6 +1575,7 @@ class OverheadGasModel:
                     positive,
                     self.pipe_diameter_m,
                     self.pipe_length_m,
+                    molar_mass_kg_mol=molar_mass_kg_mol,
                 )
                 pipe_kg_s = outflow.mass_flow_kg_s
             upstream_pressure_bar = upstream_pa / PA_PER_BAR

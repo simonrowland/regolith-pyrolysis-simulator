@@ -2,10 +2,10 @@
 
 The seven tests named in the approved design. Goldens are not
 regenerated here. A cold O2 inventory commits. A hot lunar mixture
-puts Al into the fast sweep, and the pipe's existing
-``uncertified_collision_diameter`` refusal fires before a root is
-committed. That refusal is the assertion. This chunk does not add a
-collision diameter and does not drop the vapor.
+puts Al into the fast sweep. Al has no certified collision diameter.
+The pipe extrapolates one from the P0a band, flags that species, and
+the hour still commits. A missing molar mass still refuses. This
+chunk does not add a collision diameter and does not drop the vapor.
 """
 
 from __future__ import annotations
@@ -16,7 +16,6 @@ from dataclasses import replace
 import pytest
 
 from simulator.capacity_coupling import (
-    CapacityCouplingRefusalError,
     CapacityShadowRefusal,
     CapacityShadowResult,
     solve_capacity_shadow,
@@ -104,13 +103,32 @@ def _o2_mass() -> float:
     return MOLAR_MASS["O2"] / 1000.0
 
 
+def _al_notice(notices):
+    matched = [
+        notice
+        for notice in notices
+        if notice["species"] == "Al"
+        and notice["reason"] == "uncertified_collision_diameter"
+    ]
+    assert matched
+    notice = matched[0]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["was_clamped"] is False
+    band = notice["certified_band"]
+    assert "O2" in band["species"]
+    assert "Al" not in band["species"]
+    low, high = band["collision_diameter_m"]
+    assert low > 0.0
+    assert high >= low
+    assert low <= notice["collision_diameter_m_used"] <= high
+    return notice
+
+
 def test_evaporation_bulk_partial_is_the_solved_inventory():
     """The opening publisher call sees the seeded inventory, not the map.
 
-    The clamp zeros Na at that partial. Na is then in the inventory
-    ray, and the pipe's existing uncertified-diameter refusal fires
-    before a root is committed. The committed rate is not frozen to 0
-    to hide that refusal.
+    The clamp zeros Na at that partial. Na has no certified diameter.
+    The hour commits with that flag, and the opening rate stays 0.
     """
 
     sim = _lunar()
@@ -126,15 +144,27 @@ def test_evaporation_bulk_partial_is_the_solved_inventory():
     sim._melt_headspace_composition_mbar = {"Na": 0.0}
     sim._evaporation_bulk_partial_pressure_pa = lambda _species: 0.0
 
-    with pytest.raises(CapacityCouplingRefusalError) as exc_info:
-        sim._step_one_hour()
+    snapshot = sim._step_one_hour()
 
-    reason = exc_info.value.refusal.reason
-    assert "uncertified_collision_diameter" in reason
     recorded = sim._headspace_publisher_partials_Pa
     assert recorded["Na"] == pytest.approx(seeded_pa)
     assert recorded["Na"] != pytest.approx(0.0)
     assert sim._headspace_publisher_rates_at_open_kg_hr.get("Na", 0.0) == 0.0
+    cap = sim._headspace_capacity_result
+    assert cap is not None and cap.authoritative is True
+    na = [
+        notice
+        for notice in cap.species_notices
+        if notice["species"] == "Na"
+        and notice["reason"] == "uncertified_collision_diameter"
+    ]
+    assert na
+    assert na[0]["authority_level"] == "extrapolated"
+    assert "Na" not in na[0]["certified_band"]["species"]
+    assert math.isfinite(float(cap.evaporation_flux_kg_hr["Na"]))
+    assert any(
+        notice["species"] == "Na" for notice in snapshot.headspace_species_notices
+    )
 
 
 def test_snapshot_pressure_is_the_inventory_partial():
@@ -154,6 +184,9 @@ def test_snapshot_pressure_is_the_inventory_partial():
         solved_o2 / 100.0
     )
     assert sim.overhead.pressure_mbar != pytest.approx(10000.0)
+    assert all(
+        notice["species"] != OXYGEN_SPECIES for notice in cap.species_notices
+    )
     notice = snapshot.headspace_carry_shortfall
     assert notice["direction"] == "below_command"
     assert notice["commanded_pressure_bar"] == pytest.approx(10000.0 * 100.0 / PA_PER_BAR)
@@ -162,17 +195,15 @@ def test_snapshot_pressure_is_the_inventory_partial():
 
 
 def test_redox_credit_and_bleed_share_one_hour():
-    """The saturated fixture refuses before the shared commit.
+    """A saturated hot hour commits, and flagged Al stays in the flux.
 
     fO2 is on the upper bound, so a trial credit above the noop makes
     the saturated predicate true. The buffer is empty, so the
-    pre-evaporation exchange cannot post. N2 keeps Al off the
-    inventory ray. The fast sweep still assigns Al a positive trial
-    amount, and the pipe refuses ``uncertified_collision_diameter``.
-    No respeciation and no exchange are posted. The campaign hour
-    does not advance. The design's end-pressure identity is the
-    chunk-2 root of the post-uptake source; this publisher does not
-    reach it.
+    pre-evaporation exchange cannot post. The fast sweep still holds
+    Al. Al has no certified diameter, so the pipe flags it and keeps
+    the species. Fe uptake consumes this hour's evaporative credit, so
+    the post-uptake excess is at the noop floor and the settle does
+    not exchange. One respeciation is the ledger redox commit.
     """
 
     sim = _lunar()
@@ -194,34 +225,37 @@ def test_redox_credit_and_bleed_share_one_hour():
     hour_before = int(sim.melt.campaign_hour)
     before = len(sim.atom_ledger.transitions)
 
-    with pytest.raises(CapacityCouplingRefusalError) as exc_info:
-        sim._step_one_hour()
+    snapshot = sim._step_one_hour()
 
-    reason = exc_info.value.refusal.reason
-    assert "uncertified_collision_diameter" in reason
-    assert "'Al'" in reason
-    assert _names(sim, before) == []
+    names = _names(sim, before)
+    assert names.count(ChemistryIntent.FE_REDOX_RESPECIATION.value) == 1
+    assert ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE.value not in names
     assert _buffer_o2(sim) <= OXYGEN_RESERVOIR_NOOP_MOL
-    assert sim._headspace_capacity_result is None
-    assert int(sim.melt.campaign_hour) == hour_before
-    assert sim._evaporative_redox_is_saturated(
-        internal_o2_capacity_mol=1.0,
-    )
+    credit = float(sim._fe_redox_internal_o2_capacity_mol_this_hr)
+    consumed = float(sim._fe_redox_internal_o2_consumed_mol_this_hr)
+    assert credit > OXYGEN_RESERVOIR_NOOP_MOL
+    assert consumed == pytest.approx(credit)
+    cap = sim._headspace_capacity_result
+    assert cap is not None and cap.authoritative is True
+    _al_notice(cap.species_notices)
+    _al_notice(snapshot.headspace_species_notices)
+    assert "Al" in cap.evaporation_flux_kg_hr
+    assert math.isfinite(float(cap.evaporation_flux_kg_hr["Al"]))
+    assert int(sim.melt.campaign_hour) == hour_before + 1
 
 
 def test_unsaturated_hour_posts_no_exchange():
-    """The unsaturated settle posts no exchange. The hour refuses first.
+    """The unsaturated settle does not dump the buffer. The hour commits.
 
     fO2 starts two log units under the bound and the buffer starts
     above the noop. The stored melt capacity is still zero before the
     hour, so the predicate's second clause is true until the
     pre-evaporation exchange writes a real capacity. That exchange is
     the carried-in path this design keeps. It does not dump the
-    buffer. The fast sweep then refuses on Al, before respeciation
-    and before the saturated dump. After the refusal the reservoir
-    has a capacity above the noop and fO2 still under the bound, so
-    a trial credit does not saturate. There is no committed bleed
-    for S_redox to enter.
+    buffer. The sweep flags Al and the hour commits. After the hour
+    the reservoir has a capacity above the noop and fO2 still under
+    the bound, so a trial credit does not saturate. S_redox does not
+    take the buffer.
     """
 
     sim = _lunar()
@@ -250,23 +284,22 @@ def test_unsaturated_hour_posts_no_exchange():
     hour_before = int(sim.melt.campaign_hour)
     before = len(sim.atom_ledger.transitions)
 
-    with pytest.raises(CapacityCouplingRefusalError) as exc_info:
-        sim._step_one_hour()
+    snapshot = sim._step_one_hour()
 
-    reason = exc_info.value.refusal.reason
-    assert "uncertified_collision_diameter" in reason
-    assert "'Al'" in reason
     names = _names(sim, before)
-    assert names == [ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE.value]
-    assert ChemistryIntent.FE_REDOX_RESPECIATION.value not in names
+    # The carried-in exchange posts once. The settle does not post
+    # another, and it does not empty the buffer into the headspace.
+    assert names.count(ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE.value) == 1
     buffer_after = _buffer_o2(sim)
     assert buffer_after > OXYGEN_RESERVOIR_NOOP_MOL
-    # The pre-evaporation exchange moves a slice. It does not empty
-    # the buffer into the headspace, which is what S_redox would do
-    # on the saturated branch.
     assert buffer_after > 0.5 * buffer_before
-    assert sim._headspace_capacity_result is None
-    assert int(sim.melt.campaign_hour) == hour_before
+    cap = sim._headspace_capacity_result
+    assert cap is not None and cap.authoritative is True
+    _al_notice(cap.species_notices)
+    _al_notice(snapshot.headspace_species_notices)
+    assert "Al" in cap.evaporation_flux_kg_hr
+    assert math.isfinite(float(cap.evaporation_flux_kg_hr["Al"]))
+    assert int(sim.melt.campaign_hour) == hour_before + 1
     after = sim.melt.oxygen_reservoir
     assert after.melt_intrinsic_fO2_log < upper
     assert after.melt_redox_capacity_mol_per_ln_fO2 > OXYGEN_RESERVOIR_NOOP_MOL

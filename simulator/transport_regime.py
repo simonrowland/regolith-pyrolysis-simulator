@@ -483,6 +483,36 @@ def _require_collision_diameter(species: str) -> float:
         )
 
 
+def _resolved_collision_diameter(
+    species: str,
+    overrides: Mapping[str, float] | None,
+) -> float:
+    # A caller that already chose a diameter, including an extrapolated
+    # one it will flag, does not go through the certified-table refusal.
+    # A missing override is still the table, and a missing table row
+    # still refuses.
+    if overrides is not None and species in overrides:
+        return _require_positive(
+            float(overrides[species]),
+            name="collision_diameter_m",
+            category="invalid_collision_diameter",
+        )
+    return _require_collision_diameter(species)
+
+
+def _resolved_molar_mass(
+    species: str,
+    overrides: Mapping[str, float] | None,
+) -> float:
+    if overrides is not None and species in overrides:
+        return _require_positive(
+            float(overrides[species]),
+            name="molar_mass_kg_mol",
+            category="uncertified_molar_mass",
+        )
+    return _require_molar_mass(species)
+
+
 def _require_molar_mass(species: str) -> float:
     try:
         return MOLAR_MASSES_KG_PER_MOL[species]
@@ -989,14 +1019,28 @@ def single_species_mean_free_path(
     pressure_pa: float,
     temperature_K: float,
     characteristic_length_m: float,
+    *,
+    collision_diameter_m: float | None = None,
+    molar_mass_kg_mol: float | None = None,
+    collision_diameter_source: str | None = None,
 ) -> MeanFreePathResult:
     characteristic_length_m = _require_positive(
         characteristic_length_m,
         name="characteristic_length_m",
         category="invalid_characteristic_length",
     )
-    sigma_m = _require_collision_diameter(carrier_species)
-    molar_mass_kg_mol = _require_molar_mass(carrier_species)
+    diameters = (
+        None
+        if collision_diameter_m is None
+        else {carrier_species: collision_diameter_m}
+    )
+    masses = (
+        None
+        if molar_mass_kg_mol is None
+        else {carrier_species: molar_mass_kg_mol}
+    )
+    sigma_m = _resolved_collision_diameter(carrier_species, diameters)
+    molar_mass_kg_mol = _resolved_molar_mass(carrier_species, masses)
     lambda_m = single_species_mean_free_path_m(
         pressure_pa,
         temperature_K,
@@ -1017,7 +1061,9 @@ def single_species_mean_free_path(
                 molar_mass_kg_mol=molar_mass_kg_mol,
             ),
         ),
-        collision_diameter_source=COLLISION_DIAMETER_SOURCE,
+        collision_diameter_source=(
+            collision_diameter_source or COLLISION_DIAMETER_SOURCE
+        ),
     )
 
 
@@ -1026,6 +1072,9 @@ def mixture_mean_free_path_m(
     carrier_mole_fractions: Mapping[str, float],
     pressure_pa: float,
     temperature_K: float,
+    *,
+    collision_diameters_m: Mapping[str, float] | None = None,
+    molar_masses_kg_mol: Mapping[str, float] | None = None,
 ) -> float:
     if not carrier_mole_fractions:
         _refuse(
@@ -1042,8 +1091,8 @@ def mixture_mean_free_path_m(
         name="temperature_K",
         category="invalid_temperature",
     )
-    sigma_i = _require_collision_diameter(test_species)
-    molar_mass_i = _require_molar_mass(test_species)
+    sigma_i = _resolved_collision_diameter(test_species, collision_diameters_m)
+    molar_mass_i = _resolved_molar_mass(test_species, molar_masses_kg_mol)
     fraction_sum = 0.0
     denominator_sum = 0.0
     for carrier_species, raw_fraction in carrier_mole_fractions.items():
@@ -1053,8 +1102,14 @@ def mixture_mean_free_path_m(
                 "invalid_carrier_mole_fraction",
                 f"{carrier_species!r} mole fraction must be finite and > 0",
             )
-        sigma_j = _require_collision_diameter(carrier_species)
-        molar_mass_j = _require_molar_mass(carrier_species)
+        sigma_j = _resolved_collision_diameter(
+            carrier_species,
+            collision_diameters_m,
+        )
+        molar_mass_j = _resolved_molar_mass(
+            carrier_species,
+            molar_masses_kg_mol,
+        )
         sigma_ij = (sigma_i + sigma_j) / 2.0
         denominator_sum += (
             mole_fraction
@@ -1082,13 +1137,22 @@ def mixture_mean_free_path_m(
 
 def _carrier_collisions(
     carrier_mole_fractions: Mapping[str, float],
+    *,
+    collision_diameters_m: Mapping[str, float] | None = None,
+    molar_masses_kg_mol: Mapping[str, float] | None = None,
 ) -> tuple[CarrierCollision, ...]:
     return tuple(
         CarrierCollision(
             species=species,
             mole_fraction=float(fraction),
-            collision_diameter_m=_require_collision_diameter(species),
-            molar_mass_kg_mol=_require_molar_mass(species),
+            collision_diameter_m=_resolved_collision_diameter(
+                species,
+                collision_diameters_m,
+            ),
+            molar_mass_kg_mol=_resolved_molar_mass(
+                species,
+                molar_masses_kg_mol,
+            ),
         )
         for species, fraction in carrier_mole_fractions.items()
     )
@@ -1098,6 +1162,9 @@ def mole_fraction_mean_free_path_m(
     carrier_mole_fractions: Mapping[str, float],
     pressure_pa: float,
     temperature_K: float,
+    *,
+    collision_diameters_m: Mapping[str, float] | None = None,
+    molar_masses_kg_mol: Mapping[str, float] | None = None,
 ) -> float:
     """Mole-fraction average of each species' hard-sphere mean free path.
 
@@ -1129,6 +1196,8 @@ def mole_fraction_mean_free_path_m(
             carrier_mole_fractions,
             pressure_pa,
             temperature_K,
+            collision_diameters_m=collision_diameters_m,
+            molar_masses_kg_mol=molar_masses_kg_mol,
         )
         if math.isinf(species_lambda_m):
             return math.inf
@@ -1141,6 +1210,10 @@ def mole_fraction_mean_free_path(
     pressure_pa: float,
     temperature_K: float,
     characteristic_length_m: float,
+    *,
+    collision_diameters_m: Mapping[str, float] | None = None,
+    molar_masses_kg_mol: Mapping[str, float] | None = None,
+    collision_diameter_source: str | None = None,
 ) -> MeanFreePathResult:
     """Knudsen state from the mole-fraction mean free path.
 
@@ -1156,8 +1229,14 @@ def mole_fraction_mean_free_path(
         carrier_mole_fractions,
         pressure_pa,
         temperature_K,
+        collision_diameters_m=collision_diameters_m,
+        molar_masses_kg_mol=molar_masses_kg_mol,
     )
-    carriers = _carrier_collisions(carrier_mole_fractions)
+    carriers = _carrier_collisions(
+        carrier_mole_fractions,
+        collision_diameters_m=collision_diameters_m,
+        molar_masses_kg_mol=molar_masses_kg_mol,
+    )
     knudsen_number = lambda_m / characteristic_length_m
     return MeanFreePathResult(
         lambda_m=lambda_m,
@@ -1166,7 +1245,9 @@ def mole_fraction_mean_free_path(
         formula_id=FORMULA_MOLE_FRACTION_MFP,
         test_species="",
         carriers=carriers,
-        collision_diameter_source=COLLISION_DIAMETER_SOURCE,
+        collision_diameter_source=(
+            collision_diameter_source or COLLISION_DIAMETER_SOURCE
+        ),
     )
 
 

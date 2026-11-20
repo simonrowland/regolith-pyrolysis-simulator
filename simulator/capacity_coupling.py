@@ -6,6 +6,7 @@ import math
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
+from typing import Any
 
 from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
@@ -63,6 +64,7 @@ class CapacityShadowResult:
     max_delta_history_Pa: tuple[float, ...]
     mass_closure_error_pct: float
     authoritative: bool = False
+    species_notices: tuple[Mapping[str, Any], ...] = ()
 
     def __post_init__(self) -> None:
         for name in (
@@ -76,6 +78,14 @@ class CapacityShadowResult:
                 name,
                 MappingProxyType(dict(getattr(self, name))),
             )
+        object.__setattr__(
+            self,
+            "species_notices",
+            tuple(
+                MappingProxyType(dict(notice))
+                for notice in self.species_notices
+            ),
+        )
 
 
 @dataclass(frozen=True)
@@ -666,6 +676,20 @@ class _HeadspaceLaw:
             for species_name in species
         }
         self.redox_mol_s_at_partials = redox_mol_s_at_partials
+        # First notice per (species, reason). The sweep calls the pipe
+        # on every trial; the hour keeps one flag, not one per sample.
+        self.species_notices: dict[tuple[str, str], Mapping[str, Any]] = {}
+
+    def _remember_species_notices(
+        self,
+        notices: tuple[Mapping[str, Any], ...] | tuple,
+    ) -> None:
+        for notice in notices:
+            species = str(notice.get("species", ""))
+            reason = str(notice.get("reason", ""))
+            key = (species, reason)
+            if key not in self.species_notices:
+                self.species_notices[key] = dict(notice)
 
     def _redox_rates(self, partials: Mapping[str, float]) -> dict[str, float]:
         # Membership stays on the constant map built with the species
@@ -783,9 +807,13 @@ class _HeadspaceLaw:
                     holdup,
                     self.diameter_m,
                     self.length_m,
+                    molar_mass_kg_mol=self.masses,
                 )
             except TransportRegimeRefusal as exc:
                 raise _BalanceRefused(str(exc)) from exc
+            # The pipe flags an uncertified diameter and still returns
+            # the flow. A missing mass stays a typed refusal above.
+            self._remember_species_notices(outflow.species_notices)
             pipe_mol = {
                 species: float(outflow.species_mol_s.get(species, 0.0))
                 for species in self.species
@@ -1630,6 +1658,29 @@ def _solve_slice(
             moles[species],
             1.0e-12,
         )
+    # Premise: the fast residual cannot tell two partials apart once
+    # both sit inside DEFAULT_ABS_TOL_PA. A sign change whose upper
+    # mole is at or below that floor is the empty root, not a second
+    # physical root. An exact zero at n = 0 stays, so a sourceless
+    # species still commits empty.
+    # Algebra: n_floor = P_floor * V / (R T).
+    # Unit check: Pa * m^3 / (J/(mol·K) * K) = mol.
+    # Limit: a bracket above the floor still counts. Two of those
+    # still refuse.
+    n_floor = (
+        DEFAULT_ABS_TOL_PA
+        * law.volume_m3
+        / (GAS_CONSTANT * law.temperature_K)
+    )
+
+    def roots_of(samples_so_far):
+        kept = []
+        for kind, lo, hi in _crossings(samples_so_far):
+            if hi <= n_floor and not (kind == "exact" and lo == 0.0):
+                continue
+            kept.append((kind, lo, hi))
+        return kept
+
     samples = [(0.0, func(0.0))]
     if n_hi > 0.0:
         log_lo = math.log(1.0e-16)
@@ -1637,13 +1688,27 @@ def _solve_slice(
         for index in range(1, 257):
             amount = math.exp(log_lo + (log_hi - log_lo) * index / 256.0)
             samples.append((amount, func(amount)))
-            if len(_crossings(samples)) >= 2:
+            if len(roots_of(samples)) >= 2:
                 raise _BalanceRefused("headspace_balance_multiple_roots")
-    crossings = _crossings(samples)
+    crossings = roots_of(samples)
     if len(crossings) >= 2:
         raise _BalanceRefused("headspace_balance_multiple_roots")
     if len(crossings) == 0:
-        raise _BalanceRefused("headspace_balance_nonconvergence")
+        # A sign change that lived entirely under the floor was
+        # dropped above. The holdup it would publish is inside
+        # 1e-6 Pa, so the empty root is that root. A scan whose
+        # largest residual cannot accumulate that floor over the
+        # hour is the same state. A residual that stays on one side
+        # and can accumulate more than the floor has no root here.
+        raw = _crossings(samples)
+        under_floor = bool(raw) and all(
+            hi <= n_floor for _kind, _lo, hi in raw
+        )
+        peak = max(abs(value) for _pressure, value in samples)
+        if under_floor or peak * dt_s <= n_floor:
+            crossings = [("exact", 0.0, 0.0)]
+        else:
+            raise _BalanceRefused("headspace_balance_nonconvergence")
 
     def piece_at(n_i: float) -> tuple:
         trial = dict(moles)
@@ -1848,7 +1913,14 @@ def _commit_many(
         }
         total = math.fsum(weights.values())
         if total <= 0.0:
-            raise _BalanceRefused("headspace_balance_nonconvergence")
+            # Premise: n0 = 0 and q + S <= 0 at the zero partial, so
+            # G = q + S - Q is 0 at P = 0. The pipe flow Q is 0 there
+            # because the holdup is empty. A composition ray needs a
+            # positive weight, and this state has none.
+            # Algebra: n_end = 0, bled = 0.
+            # Unit check: 0 mol/s * s = 0 mol.
+            # Limit: a positive source builds the ray below instead.
+            return law.step_from_moles(n0, dt_s, zero, 1, 0.0)
         fractions = {species: weights[species] / total for species in law.species}
     crossings = _crossings(_ray_samples(law, fractions))
     if len(crossings) >= 2:
@@ -1936,6 +2008,7 @@ def _publish(
         max_delta_history_Pa=(step.residual_Pa,),
         mass_closure_error_pct=closure,
         authoritative=authoritative,
+        species_notices=tuple(law.species_notices.values()),
     )
 
 

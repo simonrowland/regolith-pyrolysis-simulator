@@ -4411,6 +4411,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             holdup,
             self.overhead_model.pipe_diameter_m,
             self.overhead_model.pipe_length_m,
+            molar_mass_kg_mol=self._pipe_molar_mass_kg_mol(holdup),
         )
         return max(0.0, float(outflow.mass_flow_kg_s))
 
@@ -4441,6 +4442,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             species_kg[species] = amount_mol * formula.molar_mass_kg_per_mol()
         return species_kg
+
+    def _pipe_molar_mass_kg_mol(
+        self,
+        holdup_mol: Mapping[str, float],
+    ) -> Dict[str, float]:
+        # The pipe table owns a certified gas. This map is the mass an
+        # uncertified holdup species uses. Missing from the registry is
+        # still a typed refusal inside resolve_species_formula.
+        masses: Dict[str, float] = {}
+        for species in holdup_mol:
+            formula = resolve_species_formula(
+                str(species),
+                self.atom_ledger.registry,
+            )
+            masses[str(species)] = formula.molar_mass_kg_per_mol()
+        return masses
 
     def _overhead_gas_equilibrium_diagnostic(self) -> Dict[str, Any]:
         if self._chem_kernel is None:
@@ -7419,6 +7436,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             max(0.0, float(mass_kg))
             for mass_kg in self._overhead_holdup_species_kg(holdup).values()
         )
+        # A certified holdup uses the pipe table. Formula masses are
+        # only for a species that table does not name. A caller with
+        # no ledger, such as the disabled-runtime stand-in, has nothing
+        # to supply and stays on the table.
+        molar_masses = None
+        if getattr(self, "atom_ledger", None) is not None:
+            molar_masses = self._pipe_molar_mass_kg_mol(holdup)
         return self.overhead_model.controlled_o2_transport_capacity(
             evap_flux,
             self.melt,
@@ -7431,6 +7455,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._headspace_downstream_pressure_bar() * PA_PER_BAR
             ),
             temperature_K=self._headspace_temperature_K(),
+            molar_mass_kg_mol=molar_masses,
         )
 
     def _dispatch_overhead_bleed(
@@ -7684,6 +7709,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     holdup,
                     self.overhead_model.pipe_diameter_m,
                     self.overhead_model.pipe_length_m,
+                    molar_mass_kg_mol=self._pipe_molar_mass_kg_mol(holdup),
                 )
                 m_dot = max(0.0, float(outflow.mass_flow_kg_s))
                 for notice in tuple(outflow.notices or ()):
@@ -8192,6 +8218,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             live.update_totals()
             evap_flux = live
             self._headspace_capacity_result = solved
+            self._headspace_species_notices = tuple(
+                dict(notice) for notice in solved.species_notices
+            )
             self._headspace_committed_gross_kg_hr = dict(evap_flux.species_kg_hr)
             self._publish_headspace_carry_shortfall(
                 solved,
@@ -16839,6 +16868,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # The notice and the publisher record are this hour's. A
         # non-headspace hour must not keep the previous one.
         self._headspace_carry_shortfall = None
+        self._headspace_species_notices = None
         self._headspace_publisher_partials_Pa = None
         self._headspace_publisher_rates_at_open_kg_hr = None
         self._headspace_capacity_result = None
@@ -17230,6 +17260,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             notice = getattr(self, '_headspace_carry_shortfall', None)
             if notice is not None:
                 self.overhead.headspace_carry_shortfall = dict(notice)
+            species_notices = getattr(self, '_headspace_species_notices', None)
+            if species_notices is not None:
+                self.overhead.headspace_species_notices = tuple(
+                    dict(item) for item in species_notices
+                )
         else:
             self._melt_headspace_composition_mbar = (
                 self.overhead_model.species_partial_pressures(
@@ -17358,6 +17393,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         notice = getattr(self, '_headspace_carry_shortfall', None)
         if notice is not None:
             snapshot.headspace_carry_shortfall = dict(notice)
+        species_notices = getattr(self, '_headspace_species_notices', None)
+        if species_notices is not None:
+            snapshot.headspace_species_notices = tuple(
+                dict(item) for item in species_notices
+            )
         if getattr(self, "_imcc_activity_shadow_enabled", False):
             snapshot.imcc_activity_shadow = self._imcc_activity_shadow_for_hour(
                 snapshot
