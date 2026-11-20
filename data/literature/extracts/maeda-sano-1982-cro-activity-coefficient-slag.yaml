@@ -14,21 +14,32 @@ extraction:
     Gamma values at 1500 °C were digitized from Fig. 14; equilibrium chromium
     values at 1650 °C and their slag coordinates were read from Fig. 11. The
     activity values a_CrO are transcribed from Eqs. (12) and (13) on published
-    page 764. Figure-reading uncertainty is recorded in the native CSV and each
-    observation; the paper does not print individual measurement uncertainties.
+    page 764. The six 1650 °C gamma values were recalculated from Eq. (13), the
+    printed Cr concentrations, and composition-specific total mole amounts on the AlO1.5
+    basis. Footnote 3's simple ppm conversion is approximate and was not used
+    for these MgO-bearing slags. The Fig. 11 composition coordinates have a
+    ±1 wt% digitization uncertainty; no numeric uncertainty was propagated to
+    gamma or reported for those points. The Fig. 14 digitization uncertainty
+    is ±3 gamma units; the paper reports no point-specific measurement errors.
   date: '2026-11-20'
   worker: w1120maeda
 review_status: draft
 fidelity_samples:
   - path: species.CrO.observations[maeda_sano_1982_f14_al2o3_20_row01].values.activity_coefficient
     value: '134'
-    locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14'}
+    reviewed_by: ror-maedax1120
+    reviewed_on: '2026-11-20'
+    locator: {source_path: docs/references/pdfs/02-thermochemistry/maeda-sano-1982-figure-reading-checks.md, page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '1'}
   - path: species.CrO.observations[maeda_sano_1982_f14_al2o3_10_row01].values.activity_coefficient
     value: '108'
-    locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14'}
+    reviewed_by: ror-maedax1120
+    reviewed_on: '2026-11-20'
+    locator: {source_path: docs/references/pdfs/02-thermochemistry/maeda-sano-1982-figure-reading-checks.md, page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '2'}
   - path: species.CrO.observations[maeda_sano_1982_f11_row01].values.equilibrium_Cr_ppm_as_published
     value: '30.1'
-    locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '1'}
+    reviewed_by: ror-maedax1120
+    reviewed_on: '2026-11-20'
+    locator: {source_path: docs/references/pdfs/02-thermochemistry/maeda-sano-1982-figure-reading-checks.md, page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '1'}
 experiments:
   - experiment_id: maeda_sano_1982_cao_mgo_alumina_silica_cr_equilibrium
     method: static_equilibrium
@@ -59,6 +70,15 @@ experiments:
         locator: {page: 3, published_page: 761, pdf_page_index: 2, equation: '4'}
 species:
   CrO:
+    context:
+      - observation_id: maeda_sano_1982_experiment_cr_valence_convention
+        type: experimental_assumption
+        experiment: 10.2355/tetsutohagane1955.68.7_759::experiment::maeda_sano_1982_cao_mgo_alumina_silica_cr_equilibrium
+        locator: {page: 2, published_page: 760, pdf_page_index: 1, section: '2.1'}
+        units: as stated and translated
+        values:
+          chromium_valence_assumption: 'Because slag chromium and solid carbon coexist, almost all slag chromium is considered divalent; the authors therefore denote all slag chromium as CrO.'
+          chromium_valence_assumption_as_printed: 'スラグ中クロムはほとんどが2価であると考えられる。したがって、本論文では、スラグ中クロムをすべてCrOと表記した。'
     observations:
       - observation_id: maeda_sano_1982_f14_al2o3_20_row01
         type: activity_coefficient
@@ -66,6 +86,7 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '1'}
         phase: l
         units: dimensionless
+        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -73,7 +94,6 @@ species:
           T_C: '1500'
           activity_coefficient: '134'
           activity_coefficient_as_digitized: '134'
-          activity_coefficient_uncertainty_absolute: '3'
           a_CrO_as_published: '3.79e-3'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
@@ -99,6 +119,7 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '2'}
         phase: l
         units: dimensionless
+        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -106,7 +127,6 @@ species:
           T_C: '1500'
           activity_coefficient: '108'
           activity_coefficient_as_digitized: '108'
-          activity_coefficient_uncertainty_absolute: '3'
           a_CrO_as_published: '3.79e-3'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
@@ -132,6 +152,7 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '3'}
         phase: l
         units: dimensionless
+        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -139,7 +160,6 @@ species:
           T_C: '1500'
           activity_coefficient: '88'
           activity_coefficient_as_digitized: '88'
-          activity_coefficient_uncertainty_absolute: '3'
           a_CrO_as_published: '3.79e-3'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
@@ -165,6 +185,7 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '4'}
         phase: l
         units: dimensionless
+        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -172,7 +193,6 @@ species:
           T_C: '1500'
           activity_coefficient: '61'
           activity_coefficient_as_digitized: '61'
-          activity_coefficient_uncertainty_absolute: '3'
           a_CrO_as_published: '3.79e-3'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
@@ -198,6 +218,7 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '5'}
         phase: l
         units: dimensionless
+        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -205,7 +226,6 @@ species:
           T_C: '1500'
           activity_coefficient: '60'
           activity_coefficient_as_digitized: '60'
-          activity_coefficient_uncertainty_absolute: '3'
           a_CrO_as_published: '3.79e-3'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
@@ -231,6 +251,7 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '6'}
         phase: l
         units: dimensionless
+        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -238,7 +259,6 @@ species:
           T_C: '1500'
           activity_coefficient: '33'
           activity_coefficient_as_digitized: '33'
-          activity_coefficient_uncertainty_absolute: '3'
           a_CrO_as_published: '3.79e-3'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
@@ -264,6 +284,7 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '7'}
         phase: l
         units: dimensionless
+        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -271,7 +292,6 @@ species:
           T_C: '1500'
           activity_coefficient: '23'
           activity_coefficient_as_digitized: '23'
-          activity_coefficient_uncertainty_absolute: '3'
           a_CrO_as_published: '3.79e-3'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
@@ -297,6 +317,7 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '8'}
         phase: l
         units: dimensionless
+        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -304,7 +325,6 @@ species:
           T_C: '1500'
           activity_coefficient: '12'
           activity_coefficient_as_digitized: '12'
-          activity_coefficient_uncertainty_absolute: '3'
           a_CrO_as_published: '3.79e-3'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
@@ -336,33 +356,33 @@ species:
           quantity: activity_coefficient
           formula: CrO
           T_C: '1650'
-          activity_coefficient: '40.1'
-          activity_coefficient_as_digitized: '40.1'
-          activity_coefficient_uncertainty_absolute: '1.0'
+          activity_coefficient: '46.45'
+          activity_coefficient_calculated: '46.45'
           a_CrO_as_published: '1.34e-3'
           equilibrium_Cr_ppm_as_published: '30.1'
-          N_CrO_as_calculated: '30.1 × 1.11e-6'
-          N_CrO_conversion_as_printed: 'N_CrO = (ppm Cr) × 1.11 × 10^-6, footnote 3, p. 764'
+          N_CrO_as_calculated: '2.88482231e-5'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
           method_class: model_derived
           evidence_class: model_derived
           admission_status: admitted
-          method_as_printed: 'Graphite crucible in a Tammann furnace; CO at 1 atm and approximately 0.3 L/min; held 20–24 h; Cr determined by diphenylcarbazide colorimetry and other components by JIS methods. gamma_CrO calculated from the Fig. 11 equilibrium Cr concentration using Eq. (13) and footnote 3.'
+          method_as_printed: 'Graphite crucible in a Tammann furnace; CO at 1 atm and approximately 0.3 L/min; held 20–24 h; Cr determined by diphenylcarbazide colorimetry and other components by JIS methods. gamma_CrO recalculated from Fig. 11 Cr and composition using Eq. (13) on an AlO1.5 basis; the §2.1 convention denotes total slag Cr as CrO.'
           composition_wt_pct: &maeda_f11_row01
             basis: printed_mass_percent
             amount_basis: mass_percent
             components: [[CaO, '10'], [MgO, '35'], [Al2O3, '15'], [SiO2, '40']]
           derivation:
-            relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr) × 1.11 × 10^-6'
+            relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr × 10^-6 / 51.996) / total_moles_per_g on the AlO1.5 basis'
             inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
             method:
-              state: {tag: value, value: 'gamma_CrO calculated from the printed equilibrium Cr concentration using Eq. (13) and footnote 3'}
+              state: {tag: value, value: 'gamma_CrO recalculated from the printed Fig. 11 Cr concentration and row composition using Eq. (13); composition-specific total moles are on the AlO1.5 basis, and the footnote-3 shortcut is not used'}
               locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}
-            references: ['Eq. (13)', 'footnote 3']
+            references: ['Eq. (13)', 'Fig. 11', '§2.1 chromium convention']
             parameters:
               - [a_CrO, {state: {tag: value, value: '1.34e-3'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
-              - [N_CrO_conversion_factor, {state: {tag: value, value: '1.11e-6'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, footnote: '3'}}]
+              - [equilibrium_Cr_ppm, {state: {tag: value, value: '30.1'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '1'}}]
+              - [total_moles_per_g_AlO1.5_basis, {state: {tag: value, value: '0.0200667709'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '1', note: 'calculated from the row oxide composition and formula masses'}}]
+              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
             output_unit: dimensionless
         point_conditions:
           temperature_C: {state: {tag: value, value: '1650'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', note: 'caption: 1650°C'}}
@@ -383,33 +403,33 @@ species:
           quantity: activity_coefficient
           formula: CrO
           T_C: '1650'
-          activity_coefficient: '40.2'
-          activity_coefficient_as_digitized: '40.2'
-          activity_coefficient_uncertainty_absolute: '1.0'
+          activity_coefficient: '46.00'
+          activity_coefficient_calculated: '46.00'
           a_CrO_as_published: '1.34e-3'
           equilibrium_Cr_ppm_as_published: '30.0'
-          N_CrO_as_calculated: '30.0 × 1.11e-6'
-          N_CrO_conversion_as_printed: 'N_CrO = (ppm Cr) × 1.11 × 10^-6, footnote 3, p. 764'
+          N_CrO_as_calculated: '2.91295079e-5'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
           method_class: model_derived
           evidence_class: model_derived
           admission_status: admitted
-          method_as_printed: 'Graphite crucible in a Tammann furnace; CO at 1 atm and approximately 0.3 L/min; held 20–24 h; Cr determined by diphenylcarbazide colorimetry and other components by JIS methods. gamma_CrO calculated from the Fig. 11 equilibrium Cr concentration using Eq. (13) and footnote 3.'
+          method_as_printed: 'Graphite crucible in a Tammann furnace; CO at 1 atm and approximately 0.3 L/min; held 20–24 h; Cr determined by diphenylcarbazide colorimetry and other components by JIS methods. gamma_CrO recalculated from Fig. 11 Cr and composition using Eq. (13) on an AlO1.5 basis; the §2.1 convention denotes total slag Cr as CrO.'
           composition_wt_pct: &maeda_f11_row02
             basis: printed_mass_percent
             amount_basis: mass_percent
             components: [[CaO, '10'], [MgO, '30'], [Al2O3, '20'], [SiO2, '40']]
           derivation:
-            relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr) × 1.11 × 10^-6'
+            relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr × 10^-6 / 51.996) / total_moles_per_g on the AlO1.5 basis'
             inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
             method:
-              state: {tag: value, value: 'gamma_CrO calculated from the printed equilibrium Cr concentration using Eq. (13) and footnote 3'}
+              state: {tag: value, value: 'gamma_CrO recalculated from the printed Fig. 11 Cr concentration and row composition using Eq. (13); composition-specific total moles are on the AlO1.5 basis, and the footnote-3 shortcut is not used'}
               locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}
-            references: ['Eq. (13)', 'footnote 3']
+            references: ['Eq. (13)', 'Fig. 11', '§2.1 chromium convention']
             parameters:
               - [a_CrO, {state: {tag: value, value: '1.34e-3'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
-              - [N_CrO_conversion_factor, {state: {tag: value, value: '1.11e-6'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, footnote: '3'}}]
+              - [equilibrium_Cr_ppm, {state: {tag: value, value: '30.0'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '2'}}]
+              - [total_moles_per_g_AlO1.5_basis, {state: {tag: value, value: '0.0198069759'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '2', note: 'calculated from the row oxide composition and formula masses'}}]
+              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
             output_unit: dimensionless
         point_conditions:
           temperature_C: {state: {tag: value, value: '1650'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', note: 'caption: 1650°C'}}
@@ -430,33 +450,33 @@ species:
           quantity: activity_coefficient
           formula: CrO
           T_C: '1650'
-          activity_coefficient: '40.1'
-          activity_coefficient_as_digitized: '40.1'
-          activity_coefficient_uncertainty_absolute: '1.0'
+          activity_coefficient: '45.25'
+          activity_coefficient_calculated: '45.25'
           a_CrO_as_published: '1.34e-3'
           equilibrium_Cr_ppm_as_published: '30.1'
-          N_CrO_as_calculated: '30.1 × 1.11e-6'
-          N_CrO_conversion_as_printed: 'N_CrO = (ppm Cr) × 1.11 × 10^-6, footnote 3, p. 764'
+          N_CrO_as_calculated: '2.96150473e-5'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
           method_class: model_derived
           evidence_class: model_derived
           admission_status: admitted
-          method_as_printed: 'Graphite crucible in a Tammann furnace; CO at 1 atm and approximately 0.3 L/min; held 20–24 h; Cr determined by diphenylcarbazide colorimetry and other components by JIS methods. gamma_CrO calculated from the Fig. 11 equilibrium Cr concentration using Eq. (13) and footnote 3.'
+          method_as_printed: 'Graphite crucible in a Tammann furnace; CO at 1 atm and approximately 0.3 L/min; held 20–24 h; Cr determined by diphenylcarbazide colorimetry and other components by JIS methods. gamma_CrO recalculated from Fig. 11 Cr and composition using Eq. (13) on an AlO1.5 basis; the §2.1 convention denotes total slag Cr as CrO.'
           composition_wt_pct: &maeda_f11_row03
             basis: printed_mass_percent
             amount_basis: mass_percent
             components: [[CaO, '10'], [MgO, '25'], [Al2O3, '25'], [SiO2, '40']]
           derivation:
-            relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr) × 1.11 × 10^-6'
+            relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr × 10^-6 / 51.996) / total_moles_per_g on the AlO1.5 basis'
             inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
             method:
-              state: {tag: value, value: 'gamma_CrO calculated from the printed equilibrium Cr concentration using Eq. (13) and footnote 3'}
+              state: {tag: value, value: 'gamma_CrO recalculated from the printed Fig. 11 Cr concentration and row composition using Eq. (13); composition-specific total moles are on the AlO1.5 basis, and the footnote-3 shortcut is not used'}
               locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}
-            references: ['Eq. (13)', 'footnote 3']
+            references: ['Eq. (13)', 'Fig. 11', '§2.1 chromium convention']
             parameters:
               - [a_CrO, {state: {tag: value, value: '1.34e-3'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
-              - [N_CrO_conversion_factor, {state: {tag: value, value: '1.11e-6'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, footnote: '3'}}]
+              - [equilibrium_Cr_ppm, {state: {tag: value, value: '30.1'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '3'}}]
+              - [total_moles_per_g_AlO1.5_basis, {state: {tag: value, value: '0.0195471808'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '3', note: 'calculated from the row oxide composition and formula masses'}}]
+              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
             output_unit: dimensionless
         point_conditions:
           temperature_C: {state: {tag: value, value: '1650'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', note: 'caption: 1650°C'}}
@@ -477,33 +497,33 @@ species:
           quantity: activity_coefficient
           formula: CrO
           T_C: '1650'
-          activity_coefficient: '40.2'
-          activity_coefficient_as_digitized: '40.2'
-          activity_coefficient_uncertainty_absolute: '1.0'
+          activity_coefficient: '44.79'
+          activity_coefficient_calculated: '44.79'
           a_CrO_as_published: '1.34e-3'
           equilibrium_Cr_ppm_as_published: '30.0'
-          N_CrO_as_calculated: '30.0 × 1.11e-6'
-          N_CrO_conversion_as_printed: 'N_CrO = (ppm Cr) × 1.11 × 10^-6, footnote 3, p. 764'
+          N_CrO_as_calculated: '2.99142386e-5'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
           method_class: model_derived
           evidence_class: model_derived
           admission_status: admitted
-          method_as_printed: 'Graphite crucible in a Tammann furnace; CO at 1 atm and approximately 0.3 L/min; held 20–24 h; Cr determined by diphenylcarbazide colorimetry and other components by JIS methods. gamma_CrO calculated from the Fig. 11 equilibrium Cr concentration using Eq. (13) and footnote 3.'
+          method_as_printed: 'Graphite crucible in a Tammann furnace; CO at 1 atm and approximately 0.3 L/min; held 20–24 h; Cr determined by diphenylcarbazide colorimetry and other components by JIS methods. gamma_CrO recalculated from Fig. 11 Cr and composition using Eq. (13) on an AlO1.5 basis; the §2.1 convention denotes total slag Cr as CrO.'
           composition_wt_pct: &maeda_f11_row04
             basis: printed_mass_percent
             amount_basis: mass_percent
             components: [[CaO, '10'], [MgO, '20'], [Al2O3, '30'], [SiO2, '40']]
           derivation:
-            relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr) × 1.11 × 10^-6'
+            relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr × 10^-6 / 51.996) / total_moles_per_g on the AlO1.5 basis'
             inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
             method:
-              state: {tag: value, value: 'gamma_CrO calculated from the printed equilibrium Cr concentration using Eq. (13) and footnote 3'}
+              state: {tag: value, value: 'gamma_CrO recalculated from the printed Fig. 11 Cr concentration and row composition using Eq. (13); composition-specific total moles are on the AlO1.5 basis, and the footnote-3 shortcut is not used'}
               locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}
-            references: ['Eq. (13)', 'footnote 3']
+            references: ['Eq. (13)', 'Fig. 11', '§2.1 chromium convention']
             parameters:
               - [a_CrO, {state: {tag: value, value: '1.34e-3'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
-              - [N_CrO_conversion_factor, {state: {tag: value, value: '1.11e-6'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, footnote: '3'}}]
+              - [equilibrium_Cr_ppm, {state: {tag: value, value: '30.0'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '4'}}]
+              - [total_moles_per_g_AlO1.5_basis, {state: {tag: value, value: '0.0192873857'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '4', note: 'calculated from the row oxide composition and formula masses'}}]
+              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
             output_unit: dimensionless
         point_conditions:
           temperature_C: {state: {tag: value, value: '1650'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', note: 'caption: 1650°C'}}
@@ -524,33 +544,33 @@ species:
           quantity: activity_coefficient
           formula: CrO
           T_C: '1650'
-          activity_coefficient: '40.1'
-          activity_coefficient_as_digitized: '40.1'
-          activity_coefficient_uncertainty_absolute: '1.0'
+          activity_coefficient: '44.04'
+          activity_coefficient_calculated: '44.04'
           a_CrO_as_published: '1.34e-3'
           equilibrium_Cr_ppm_as_published: '30.1'
-          N_CrO_as_calculated: '30.1 × 1.11e-6'
-          N_CrO_conversion_as_printed: 'N_CrO = (ppm Cr) × 1.11 × 10^-6, footnote 3, p. 764'
+          N_CrO_as_calculated: '3.04237512e-5'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
           method_class: model_derived
           evidence_class: model_derived
           admission_status: admitted
-          method_as_printed: 'Graphite crucible in a Tammann furnace; CO at 1 atm and approximately 0.3 L/min; held 20–24 h; Cr determined by diphenylcarbazide colorimetry and other components by JIS methods. gamma_CrO calculated from the Fig. 11 equilibrium Cr concentration using Eq. (13) and footnote 3.'
+          method_as_printed: 'Graphite crucible in a Tammann furnace; CO at 1 atm and approximately 0.3 L/min; held 20–24 h; Cr determined by diphenylcarbazide colorimetry and other components by JIS methods. gamma_CrO recalculated from Fig. 11 Cr and composition using Eq. (13) on an AlO1.5 basis; the §2.1 convention denotes total slag Cr as CrO.'
           composition_wt_pct: &maeda_f11_row05
             basis: printed_mass_percent
             amount_basis: mass_percent
             components: [[CaO, '10'], [MgO, '15'], [Al2O3, '35'], [SiO2, '40']]
           derivation:
-            relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr) × 1.11 × 10^-6'
+            relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr × 10^-6 / 51.996) / total_moles_per_g on the AlO1.5 basis'
             inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
             method:
-              state: {tag: value, value: 'gamma_CrO calculated from the printed equilibrium Cr concentration using Eq. (13) and footnote 3'}
+              state: {tag: value, value: 'gamma_CrO recalculated from the printed Fig. 11 Cr concentration and row composition using Eq. (13); composition-specific total moles are on the AlO1.5 basis, and the footnote-3 shortcut is not used'}
               locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}
-            references: ['Eq. (13)', 'footnote 3']
+            references: ['Eq. (13)', 'Fig. 11', '§2.1 chromium convention']
             parameters:
               - [a_CrO, {state: {tag: value, value: '1.34e-3'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
-              - [N_CrO_conversion_factor, {state: {tag: value, value: '1.11e-6'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, footnote: '3'}}]
+              - [equilibrium_Cr_ppm, {state: {tag: value, value: '30.1'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '5'}}]
+              - [total_moles_per_g_AlO1.5_basis, {state: {tag: value, value: '0.0190275906'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '5', note: 'calculated from the row oxide composition and formula masses'}}]
+              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
             output_unit: dimensionless
         point_conditions:
           temperature_C: {state: {tag: value, value: '1650'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', note: 'caption: 1650°C'}}
@@ -571,33 +591,33 @@ species:
           quantity: activity_coefficient
           formula: CrO
           T_C: '1650'
-          activity_coefficient: '50.1'
-          activity_coefficient_as_digitized: '50.1'
-          activity_coefficient_uncertainty_absolute: '1.0'
+          activity_coefficient: '57.69'
+          activity_coefficient_calculated: '57.69'
           a_CrO_as_published: '1.34e-3'
           equilibrium_Cr_ppm_as_published: '24.1'
-          N_CrO_as_calculated: '24.1 × 1.11e-6'
-          N_CrO_conversion_as_printed: 'N_CrO = (ppm Cr) × 1.11 × 10^-6, footnote 3, p. 764'
+          N_CrO_as_calculated: '2.32264502e-5'
           standard_state_as_printed: 'CrO(l) = Cr(S) + 1/2 O2(g), Eq. (4)'
           standard_state_translation: 'Equation (4) specifies liquid CrO; the Japanese text says 「スラグ中クロムは CrO の形で存在」 (chromium in slag exists in the form CrO). No separate prose standard-state convention is printed.'
           method_class: model_derived
           evidence_class: model_derived
           admission_status: admitted
-          method_as_printed: 'Graphite crucible in a Tammann furnace; CO at 1 atm and approximately 0.3 L/min; held 20–24 h; Cr determined by diphenylcarbazide colorimetry and other components by JIS methods. gamma_CrO calculated from the Fig. 11 equilibrium Cr concentration using Eq. (13) and footnote 3.'
+          method_as_printed: 'Graphite crucible in a Tammann furnace; CO at 1 atm and approximately 0.3 L/min; held 20–24 h; Cr determined by diphenylcarbazide colorimetry and other components by JIS methods. gamma_CrO recalculated from Fig. 11 Cr and composition using Eq. (13) on an AlO1.5 basis; the §2.1 convention denotes total slag Cr as CrO.'
           composition_wt_pct: &maeda_f11_row06
             basis: printed_mass_percent
             amount_basis: mass_percent
             components: [[CaO, '10'], [MgO, '30'], [Al2O3, '25'], [SiO2, '35']]
           derivation:
-            relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr) × 1.11 × 10^-6'
+            relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr × 10^-6 / 51.996) / total_moles_per_g on the AlO1.5 basis'
             inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
             method:
-              state: {tag: value, value: 'gamma_CrO calculated from the printed equilibrium Cr concentration using Eq. (13) and footnote 3'}
+              state: {tag: value, value: 'gamma_CrO recalculated from the printed Fig. 11 Cr concentration and row composition using Eq. (13); composition-specific total moles are on the AlO1.5 basis, and the footnote-3 shortcut is not used'}
               locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}
-            references: ['Eq. (13)', 'footnote 3']
+            references: ['Eq. (13)', 'Fig. 11', '§2.1 chromium convention']
             parameters:
               - [a_CrO, {state: {tag: value, value: '1.34e-3'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
-              - [N_CrO_conversion_factor, {state: {tag: value, value: '1.11e-6'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, footnote: '3'}}]
+              - [equilibrium_Cr_ppm, {state: {tag: value, value: '24.1'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '6'}}]
+              - [total_moles_per_g_AlO1.5_basis, {state: {tag: value, value: '0.0199555760'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '6', note: 'calculated from the row oxide composition and formula masses'}}]
+              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
             output_unit: dimensionless
         point_conditions:
           temperature_C: {state: {tag: value, value: '1650'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', note: 'caption: 1650°C'}}
