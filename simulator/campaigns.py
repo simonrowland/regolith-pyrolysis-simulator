@@ -37,6 +37,7 @@ from simulator.lab_schedule import (
     pO2_setpoint_mbar_from_schedule,
     schedule_sample_time_h,
 )
+from simulator.process_timestep import advance_hour_counter
 from simulator.furnace_materials import (
     FURNACE_CEILING_FALLBACK_C,
     FURNACE_MAX_T_BOUNDS_C,
@@ -327,6 +328,27 @@ class CampaignC4EndpointRefusal(CampaignEndpointRefusal):
     """Typed refusal when C4 cannot acquire or retain its process window."""
 
 
+class CampaignSubhourHourClockRefusal(ValueError):
+    """A short process step reached a clock that still counts whole hours.
+
+    C2A staged duration stays ``max(1, int(duration_h))`` and C4's
+    in-window time still counts snapshots. Those expressions are the
+    hourly campaign. A step that is not one hour must not walk them.
+    """
+
+    reason = 'subhour_hour_clock_refused'
+    terminal_refusal = True
+
+    def __init__(self, diagnostic: Mapping[str, object]):
+        self.diagnostic = dict(diagnostic)
+        self.diagnostic.setdefault('status', 'refused')
+        self.diagnostic.setdefault('reason', self.reason)
+        detail = self.diagnostic.get('detail')
+        super().__init__(
+            f'{self.reason}: {detail}' if detail else self.reason
+        )
+
+
 @lru_cache(maxsize=None)
 def _species_molar_mass_kg_per_mol(species: str) -> float | None:
     try:
@@ -546,6 +568,8 @@ class CampaignManager:
     def __init__(self, setpoints: dict):
         self.setpoints = setpoints
         self.campaigns = setpoints.get('campaigns', {})
+        # Hours advanced by one process step. 1.0 keeps integer hour counters.
+        self._process_dt_h = 1.0
         # CEILING INHERITS FROM THE PIPE MATERIAL. `furnace_material` names the row
         # in data/furnace_materials.yaml and its max_service_T_C IS the ceiling, so
         # changing the pipe changes the ceiling in exactly one place. An explicit
@@ -1575,10 +1599,26 @@ class CampaignManager:
         label = f"{self._campaign_config_key(campaign)}.{key}"
         return self._required_float(endpoint.get(key), label)
 
+    def _refuse_subhour_hour_clock(self, clock: str) -> None:
+        """Refuse a short step before an hour-counted clock runs.
+
+        ``_process_dt_h == 1.0`` is the hourly path and returns without
+        touching the clock. C0 and C7 do not call this.
+        """
+
+        if self._process_dt_h == 1.0:
+            return
+        raise CampaignSubhourHourClockRefusal({
+            'clock': clock,
+            'process_dt_h': float(self._process_dt_h),
+            'detail': f'{clock} still counts whole hours',
+        })
+
     def _configured_staged_max_hold_hr(self,
                                        campaign: CampaignPhase) -> float:
         max_hold_hr = self._configured_max_hold_hr(campaign)
         stages = self._c2a_staged_enabled_stages()
+        self._refuse_subhour_hour_clock('c2a_staged_duration_clamp')
         total_hours = 0
         for idx, stage in enumerate(stages):
             if not isinstance(stage, dict):
@@ -1736,6 +1776,7 @@ class CampaignManager:
     ) -> dict | None:
         if not isinstance(stages, list) or not stages:
             return None
+        self._refuse_subhour_hour_clock('c2a_staged_duration_clamp')
         hour = max(0, int(campaign_hour))
         elapsed = 0
         selected = stages[-1]
@@ -2400,7 +2441,11 @@ class CampaignManager:
         """Base temperature targets before runtime overrides."""
         lab_schedule = self._lab_schedule(campaign)
         if lab_schedule is not None:
-            sample_time_h = schedule_sample_time_h(lab_schedule, campaign_hour)
+            sample_time_h = schedule_sample_time_h(
+                lab_schedule,
+                campaign_hour,
+                dt_h=self._process_dt_h,
+            )
             target = interpolate_schedule_points(
                 lab_schedule['melt_temperature_C'],
                 sample_time_h,
@@ -2699,10 +2744,16 @@ class CampaignManager:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _completed_campaign_hour_for_endpoint(melt: MeltState) -> float:
-        # check_endpoint runs after the hour's work and before core increments
-        # campaign_hour, so hard duration caps must include the current hour.
-        return float(melt.campaign_hour) + 1.0
+    def _completed_campaign_hour_for_endpoint(
+        melt: MeltState,
+        dt_h: float = 1.0,
+    ) -> float:
+        # check_endpoint runs after the step's work and before core increments
+        # campaign_hour, so hard duration caps must include the current step.
+        # At one hour this is float(campaign_hour) + 1.0.
+        if float(dt_h) == 1.0:
+            return float(melt.campaign_hour) + 1.0
+        return float(melt.campaign_hour) + float(dt_h)
 
     @staticmethod
     def _evap_total_signal_armed(
@@ -2905,7 +2956,10 @@ class CampaignManager:
         ``CampaignEndCapMissing`` rather than ending or continuing silently.
         """
         campaign = melt.campaign
-        completed_campaign_hour = self._completed_campaign_hour_for_endpoint(melt)
+        completed_campaign_hour = self._completed_campaign_hour_for_endpoint(
+            melt,
+            self._process_dt_h,
+        )
 
         # Check user-specified max_hours override first. C6 handles this as a
         # hold-acquisition refusal below so the wall clock cannot claim a
@@ -3097,7 +3151,11 @@ class CampaignManager:
             endpoint = stage.get('endpoint', {})
             if not isinstance(endpoint, Mapping):
                 endpoint = {}
-            stage_elapsed_h = melt.campaign_hour - self._c2a_staged_stage_start_hour + 1
+            stage_elapsed_h = advance_hour_counter(
+                melt.campaign_hour - self._c2a_staged_stage_start_hour,
+                self._process_dt_h,
+            )
+            self._refuse_subhour_hour_clock('c2a_staged_duration_clamp')
             duration_h = max(1, int(self._float(stage.get('duration_h'), 1.0)))
             min_hold_h = self._float(
                 endpoint.get('min_hold_h', endpoint.get('min_hold_hr')),
@@ -3162,7 +3220,11 @@ class CampaignManager:
                     'stage': self._c2a_staged_stage_label(stage),
                     'stage_idx': stage_idx,
                     'campaign_hour': int(melt.campaign_hour),
-                    'stage_elapsed_h': int(stage_elapsed_h),
+                    'stage_elapsed_h': (
+                        int(stage_elapsed_h)
+                        if self._process_dt_h == 1.0
+                        else float(stage_elapsed_h)
+                    ),
                     'cumulative_yield_mol_by_species': dict(
                         self._c2a_staged_cumulative_yield_mol_by_species
                     ),
@@ -3176,7 +3238,10 @@ class CampaignManager:
                         detail=reason,
                     )
                 self._c2a_staged_stage_idx = stage_idx + 1
-                self._c2a_staged_stage_start_hour = melt.campaign_hour + 1
+                self._c2a_staged_stage_start_hour = advance_hour_counter(
+                    melt.campaign_hour,
+                    self._process_dt_h,
+                )
                 self._c2a_staged_peak_flux_by_species = {}
                 self._c2a_staged_cumulative_yield_mol_by_species = {}
                 self._c2a_staged_last_log_slope_by_species = {}
@@ -3427,6 +3492,10 @@ class CampaignManager:
                 # while Loop-3 zeros the ramp for overhead-holdup drain
                 # (see _c4_acquisition_opportunity_hr). Wall campaign hours
                 # remain in the diagnostic for operator forensics.
+                # Empty history returns the campaign hour. A non-empty
+                # history counts snapshots, which is the hourly clock.
+                if c4_snapshots:
+                    self._refuse_subhour_hour_clock('c4_acquisition_count')
                 acquisition_elapsed_hr = self._c4_acquisition_opportunity_hr(
                     completed_campaign_hour=completed_campaign_hour,
                     c4_snapshots=c4_snapshots,
@@ -3513,6 +3582,7 @@ class CampaignManager:
                 <= float(snapshot.temperature_C)
                 <= window_high_C
             ]
+            self._refuse_subhour_hour_clock('c4_snapshot_window')
             completed_window_hr = float(
                 len(prior_in_window) + int(current_in_window)
             )
@@ -3524,9 +3594,16 @@ class CampaignManager:
                 )
             else:
                 acquisition_completed_hour = completed_campaign_hour
-            process_elapsed_hr = (
-                completed_campaign_hour - acquisition_completed_hour + 1.0
-            )
+            if self._process_dt_h == 1.0:
+                process_elapsed_hr = (
+                    completed_campaign_hour - acquisition_completed_hour + 1.0
+                )
+            else:
+                process_elapsed_hr = (
+                    float(completed_campaign_hour)
+                    - float(acquisition_completed_hour)
+                    + float(self._process_dt_h)
+                )
 
             signal_armed = any(
                 window_low_C
@@ -3671,7 +3748,10 @@ class CampaignManager:
                     unit='A',
                 )
                 if current_A < threshold_A:
-                    melt.mre_low_current_hours += 1
+                    melt.mre_low_current_hours = advance_hour_counter(
+                        melt.mre_low_current_hours,
+                        self._process_dt_h,
+                    )
                 else:
                     melt.mre_low_current_hours = 0
             else:
@@ -3764,7 +3844,10 @@ class CampaignManager:
                 and melt.mre_current_A < threshold_A
                 and signal_armed
             ):
-                melt.mre_low_current_hours += 1
+                melt.mre_low_current_hours = advance_hour_counter(
+                    melt.mre_low_current_hours,
+                    self._process_dt_h,
+                )
             else:
                 melt.mre_low_current_hours = 0
             if melt.mre_low_current_hours >= consecutive_hours:

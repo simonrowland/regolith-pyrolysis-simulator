@@ -5560,8 +5560,10 @@ class EvaporationMixin:
                 / total_o2_draw_kg_hr
             )
             current_rate = float(effective_rates.get(species, 0.0))
+            # allowed_draw_kg is this step. The draw beside it is kg/h.
+            # Dividing by dt_hr makes the scale -expm1(-k dt) / (k dt).
             allowed_rate = current_rate * (
-                allowed_draw_kg / by_species_draw[species])
+                allowed_draw_kg / (by_species_draw[species] * dt_hr))
             if allowed_rate <= 1e-12:
                 effective_rates.pop(species, None)
                 _note(species, allowed_rate if allowed_rate > 0.0 else 0.0)
@@ -5780,12 +5782,13 @@ class EvaporationMixin:
 
             # Premise: the ledger delta spans this tick's full vapor credit and
             # every committed removal (baffle, wall, or retained holdup).
-            # Algebra: free-vapor delta = (before + evolved - removals) - before
-            # = evolved - removals. Unit check: kg - kg = kg per one-hour tick,
-            # numerically kg/hr. Sanity: zero removal leaves the evolved rate;
-            # complete committed removal leaves zero, independent of diagnostics.
+            # Algebra: free vapor = evolved - removals. That delta is step
+            # mass. species_kg_hr is kg/h, so divide by the step. At one
+            # hour the divisor is 1.0. Zero removal leaves the evolved rate;
+            # complete removal leaves zero.
             residual_species_kg_hr[species] = max(
-                0.0, overhead_after_kg - overhead_before_kg,
+                0.0,
+                (overhead_after_kg - overhead_before_kg) / self.process_dt_hr(),
             )
 
         # Premise: the finite-capacity redox clamp is sequential and nonlinear;
@@ -5935,8 +5938,11 @@ class EvaporationMixin:
         if evaporation_transition is None:
             return {}
 
+        # rate and remaining are kg/h. The overhead credit is that rate
+        # times dt. The debit has to be the same step mass. The provider
+        # debits the kilograms it is given and does not read dt_hr.
         condensed_kg = max(
-            0.0, rate_kg_hr - remaining_kg_hr,
+            0.0, (rate_kg_hr - remaining_kg_hr) * self.process_dt_hr(),
         )
         credited_condensed_kg = self._dispatch_condensation_route(
             species, condensed_kg, sp_data, route_result,
@@ -5963,7 +5969,16 @@ class EvaporationMixin:
             return {}
         fe_formula = resolve_species_formula('Fe', self.species_formula_registry)
         fe_molar_mass = fe_formula.molar_mass_kg_per_mol()
-        rate_kg_hr = native_fe_vapor_mol * fe_molar_mass
+        if source_account == 'process.cleaned_melt':
+            # The caller passes step moles. The evaporation transition
+            # multiplies a kg/h rate by dt, so this rate is step mass / dt.
+            rate_kg_hr = (
+                native_fe_vapor_mol * fe_molar_mass / self.process_dt_hr()
+            )
+        else:
+            # The metal-phase tap credits these step moles. The debit below
+            # is that step mass, not an hourly rate times dt.
+            rate_kg_hr = native_fe_vapor_mol * fe_molar_mass
         evap_flux = EvaporationFlux(species_kg_hr={'Fe': rate_kg_hr})
         evap_flux.update_totals()
         self._configure_condensation_operating_conditions(evap_flux)
@@ -6065,7 +6080,11 @@ class EvaporationMixin:
                 species='Fe',
             )
             routed_fe_mol = overhead_fe_mol
+        # remaining_kg is the route's kg/h remainder. The debit leaves
+        # remaining_kg * dt in overhead, so the moles are that step mass
+        # over M_Fe. At one hour dt is 1.0 and the moles stay remaining / M.
         remaining_kg = float(route_diag.get('remaining_kg', 0.0) or 0.0)
+        uncondensed_mol = remaining_kg * self.process_dt_hr() / fe_molar_mass
         return {
             'native_fe_vapor_route_status': route_status,
             'native_fe_vapor_mol': float(routed_fe_mol),
@@ -6077,7 +6096,7 @@ class EvaporationMixin:
                 route_diag.get('credited_condensed_kg', 0.0) or 0.0
             ),
             'native_fe_uncondensed_kg': remaining_kg,
-            'native_fe_uncondensed_mol': float(remaining_kg / fe_molar_mass),
+            'native_fe_uncondensed_mol': float(uncondensed_mol),
         }
 
     def _dispatch_condensation_route(
@@ -6158,7 +6177,7 @@ class EvaporationMixin:
                         {},
                     )
                 ),
-                'dt_hr': 1.0,
+                'dt_hr': self.process_dt_hr(),
             },
         )
         if kernel_result.transition is None:
@@ -6353,7 +6372,8 @@ class EvaporationMixin:
             return (0.0, None) if return_transition else 0.0
 
         parent_oxide = stoich['parent_oxide']
-        rate_kg_per_tick = rate_kg_hr * 1.0  # 1-hour tick (see core.py)
+        dt_hr = self.process_dt_hr()
+        rate_kg_per_tick = rate_kg_hr * dt_hr
         oxide_removed = rate_kg_per_tick * stoich['oxide_per_product_kg']
         product_kg = rate_kg_per_tick
 
@@ -6374,7 +6394,7 @@ class EvaporationMixin:
                 f"condensation route for {species!r} returned "
                 "unphysical remaining vapor mass"
             )
-        remaining_kg = max(0.0, remaining_kg_hr) * 1.0
+        remaining_kg = max(0.0, remaining_kg_hr) * dt_hr
         if remaining_kg > product_kg + 1e-12:
             raise AccountingError(
                 f"condensation route for {species!r} exceeds credited vapor"
@@ -6390,7 +6410,7 @@ class EvaporationMixin:
                 'sp_data': dict(sp_data or {}),
                 'rate_kg_hr': float(rate_kg_hr),
                 'remaining_kg_hr': float(remaining_kg_hr),
-                'dt_hr': 1.0,
+                'dt_hr': dt_hr,
                 'available_kg': float(available_kg),
             },
         )
@@ -6406,7 +6426,7 @@ class EvaporationMixin:
             'sp_data': dict(sp_data or {}),
             'rate_kg_hr': float(rate_kg_hr),
             'remaining_kg_hr': float(remaining_kg_hr),
-            'dt_hr': 1.0,
+            'dt_hr': dt_hr,
             'available_kg': float(available_kg),
         }
         transition = self._commit_proposal(

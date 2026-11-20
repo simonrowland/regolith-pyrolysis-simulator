@@ -15,6 +15,7 @@ from types import MappingProxyType
 from typing import Any
 
 from simulator.canonical import canonical_json_dumps, normalize_canonical_value
+from simulator.process_timestep import step_end_sample_h
 
 
 LAB_SCHEDULE_OVERRIDE_KEY = "lab_schedule"
@@ -164,9 +165,13 @@ def interpolate_schedule_points(
     )
 
 
-def schedule_sample_time_h(schedule: Mapping[str, Any], campaign_hour: int) -> float:
+def schedule_sample_time_h(
+    schedule: Mapping[str, Any],
+    campaign_hour: int,
+    dt_h: float = 1.0,
+) -> float:
     duration_h = float(schedule["duration_h"])
-    return min(duration_h, max(0.0, float(campaign_hour) + 1.0))
+    return step_end_sample_h(campaign_hour, dt_h, duration_h)
 
 
 def pO2_setpoint_mbar_from_schedule(
