@@ -20,6 +20,8 @@ from simulator.process_timestep import step_end_sample_h
 
 LAB_SCHEDULE_OVERRIDE_KEY = "lab_schedule"
 LAB_SCHEDULE_PO2_SETPOINT_KEY = "lab_schedule_pO2_setpoint_mbar"
+# The lower edge of the current certified pressure band. Lower positive
+# pressures remain executable and receive an extrapolation notice.
 LAB_SCHEDULE_PRESSURE_FLOOR_MBAR = 1.0e-3
 ASSUMED_WITH_SENSITIVITY = "assumption_with_sensitivity_marker"
 SUPPORTED_INTERPOLATION = "piecewise_linear"
@@ -79,12 +81,20 @@ def normalize_lab_schedule(
         duration_h=duration_h,
         field="chamber_pressure_mbar",
     )
-    for point in chamber_pressure_mbar:
-        if float(point["value"]) < LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:
-            raise LabScheduleValidationError(
-                "lab_schedule_pressure_below_implemented_floor: "
-                f"{point['value']:g} mbar < {LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:g} mbar"
-            )
+    pressure_domain_notices = tuple(
+        {
+            "kind": "lab_schedule_pressure_domain_notice",
+            "reason": "lab_schedule_pressure_below_implemented_floor",
+            "authority": "extrapolated",
+            "pressure_mbar": float(point["value"]),
+            "certified_band": {
+                "minimum_pressure_mbar": LAB_SCHEDULE_PRESSURE_FLOOR_MBAR,
+            },
+            "t_h": float(point["t_h"]),
+        }
+        for point in chamber_pressure_mbar
+        if float(point["value"]) < LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
+    )
 
     gas_boundary = _normalize_gas_boundary(schedule.get("gas_boundary"))
     surface_temperature_C = _normalize_surface_temperatures(
@@ -105,6 +115,7 @@ def normalize_lab_schedule(
         "furnace_ceiling_C": furnace_ceiling_C,
         "melt_temperature_C": melt_temperature_C,
         "chamber_pressure_mbar": chamber_pressure_mbar,
+        "pressure_domain_notices": pressure_domain_notices,
         "gas_boundary": gas_boundary,
         "surface_temperature_C": surface_temperature_C,
         "window_semantics": window_semantics,
@@ -252,7 +263,12 @@ def _normalize_points(raw: Any, *, duration_h: float, field: str) -> tuple[Mappi
                 f"lab_schedule_{field}_time_h_alias_unsupported"
             )
         t_h = _required_finite_non_negative(item.get("t_h"), f"{field}[{index}].t_h")
-        value = _required_finite_non_negative(item.get("value"), f"{field}[{index}].value")
+        value_validator = (
+            _required_finite_positive
+            if field == "chamber_pressure_mbar"
+            else _required_finite_non_negative
+        )
+        value = value_validator(item.get("value"), f"{field}[{index}].value")
         unit = _normalize_point_unit(item, field=field, expected_unit=expected_unit)
         if previous_t is not None and t_h <= previous_t:
             raise LabScheduleValidationError(
