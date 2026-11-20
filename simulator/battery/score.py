@@ -8787,7 +8787,6 @@ def _has_printed_fo2(observation: Observation, identity: Identity) -> bool:
 
 
 def _observation_supplies_commanded_engine_input(
-    engine: Engine,
     observation: Observation,
     identity: Identity,
     quantity: Quantity,
@@ -8805,14 +8804,6 @@ def _observation_supplies_commanded_engine_input(
 
         if is_dioxygen_formula(species.formula):
             return "fO2_Pa"
-    if (
-        engine is Engine.INTERNAL_ANALYTICAL
-        and quantity is Quantity.ACTIVITY
-        and species is not None
-        and species.formula.strip().casefold() == "feo"
-        and _source_rule_enabled(observation.source_id, "distin_fe_metal_saturation")
-    ):
-        return "activity"
     return None
 
 
@@ -14334,7 +14325,7 @@ def _predict_with_engine(
             identity=identity,
         )
     commanded_input = _observation_supplies_commanded_engine_input(
-        engine, observation, identity, quantity
+        observation, identity, quantity
     )
     if commanded_input is not None:
         return _input_refusal(
@@ -14691,6 +14682,24 @@ def _predict_with_engine(
         and quantity is Quantity.ACTIVITY
         and formula.strip().casefold() == "feo"
     )
+    if distin_feo_activity and engine is Engine.INTERNAL_ANALYTICAL:
+        # The Distin activity is an observation, not an engine input. The
+        # internal ladder needs an independent Fe-saturation condition and
+        # activity solve before it can score this target.
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={
+                "reason": "distin_activity_requires_joint_fe_metal_solve",
+                "missing_evidence": "independent Fe-saturation fO2 and a_FeO solve",
+            },
+            identity=identity,
+            requested_composition=identity.composition,
+        )
     if distin_feo_activity and engine is Engine.OPENIMCC:
         if not _distin_has_fe_metal_saturation(observation, experiment):
             return EnginePrediction(

@@ -631,7 +631,7 @@ def test_distin_scored_refusal_by_engine_without_typed_fe_saturation(migration) 
     rows = tuple(row for row in _feo_rows(migration) if row.source_id == _DISTIN)
     assert len(rows) == 24
     expected = {
-        Engine.INTERNAL_ANALYTICAL: RefusalReason.CYCLIC_DERIVATION,
+        Engine.INTERNAL_ANALYTICAL: RefusalReason.IDENTITY_INCOMPLETE,
         Engine.OPENIMCC: RefusalReason.IDENTITY_INCOMPLETE,
         Engine.ALPHAMELTS: RefusalReason.UNSUPPORTED,
         Engine.MAGEMIN: RefusalReason.UNSUPPORTED,
@@ -652,7 +652,7 @@ def test_distin_scored_refusal_by_engine_without_typed_fe_saturation(migration) 
             if engine is Engine.INTERNAL_ANALYTICAL:
                 assert (
                     residual.refusal.detail["reason"]
-                    == "circular_oxygen_input"
+                    == "distin_activity_requires_joint_fe_metal_solve"
                 )
             elif engine is Engine.OPENIMCC:
                 assert (
@@ -715,7 +715,7 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
                 temperature
             )
         for engine, reason in {
-            Engine.INTERNAL_ANALYTICAL: RefusalReason.CYCLIC_DERIVATION,
+            Engine.INTERNAL_ANALYTICAL: RefusalReason.IDENTITY_INCOMPLETE,
             Engine.ALPHAMELTS: RefusalReason.UNSUPPORTED,
             Engine.MAGEMIN: RefusalReason.UNSUPPORTED,
             Engine.THERMOENGINE: RefusalReason.UNSUPPORTED,
@@ -731,7 +731,10 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
             assert refusal.refusal is not None
             assert refusal.refusal.reason is reason
             if engine is Engine.INTERNAL_ANALYTICAL:
-                assert refusal.refusal.detail["reason"] == "circular_oxygen_input"
+                assert (
+                    refusal.refusal.detail["reason"]
+                    == "distin_activity_requires_joint_fe_metal_solve"
+                )
     assert len(residuals) == 24
 
 
