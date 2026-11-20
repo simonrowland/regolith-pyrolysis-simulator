@@ -5818,6 +5818,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             floor_bar=self._vacuum_floor_bar(),
         ))
 
+    def _melt_metal_saturation_call(
+        self,
+        resolver: Any,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        """Translate chemistry-owner refusals at the accounting boundary."""
+
+        from simulator.chemistry.melt_metal_saturation import (
+            MeltMetalSaturationError,
+        )
+
+        try:
+            return resolver(*args, **kwargs)
+        except MeltMetalSaturationError as exc:
+            raise AccountingError(str(exc)) from exc
+
     def _melt_metal_saturation_fO2_floor_log(
         self,
         temperature_K: float,
@@ -5828,7 +5845,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             melt_metal_saturation_fO2_floor_log,
         )
 
-        return melt_metal_saturation_fO2_floor_log(
+        return self._melt_metal_saturation_call(
+            melt_metal_saturation_fO2_floor_log,
             temperature_K,
             self.atom_ledger.mol_by_account("process.cleaned_melt"),
             oxide_to_metal=OXIDE_TO_METAL,
@@ -5851,7 +5869,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if composition_mol is not None
             else self.atom_ledger.mol_by_account("process.cleaned_melt")
         )
-        return melt_metal_saturation_fO2_floor_rows(
+        return self._melt_metal_saturation_call(
+            melt_metal_saturation_fO2_floor_rows,
             temperature_K,
             composition,
             oxide_to_metal=OXIDE_TO_METAL,
@@ -5871,7 +5890,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             plan_melt_metal_saturation_buffer,
         )
 
-        return plan_melt_metal_saturation_buffer(
+        return self._melt_metal_saturation_call(
+            plan_melt_metal_saturation_buffer,
             candidate_fO2_log=candidate_fO2_log,
             redox_capacity_mol_per_ln=redox_capacity_mol_per_ln,
             temperature_K=temperature_K,

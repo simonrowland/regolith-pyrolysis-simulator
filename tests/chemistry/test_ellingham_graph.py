@@ -18,7 +18,9 @@ from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
 @pytest.fixture(scope="module")
 def vapor_pressure_data():
-    return ellingham_graph._load_default_vapor_pressure_data()
+    return vapor_pressure_legacy_view(
+        ellingham_graph._load_default_vapor_pressure_data()
+    )
 
 
 @pytest.mark.parametrize(

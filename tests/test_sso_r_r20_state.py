@@ -1432,9 +1432,15 @@ def test_c3_na_source_term_comes_from_committed_transition() -> None:
 
     sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
 
-    transition = sim.atom_ledger.transitions[-1]
-    assert len(sim.atom_ledger.transitions) == transitions_before + 1
-    assert transition.name == "c3_na_shuttle_reduction"
+    committed = sim.atom_ledger.transitions[transitions_before:]
+    transition = next(
+        item for item in committed
+        if item.name == "c3_na_shuttle_reduction"
+    )
+    assert len(committed) == 2
+    assert any(
+        item.reason == "melt_metal_saturation_buffer" for item in committed
+    ), "the accepted FeO saturation floor commits its native-metal buffer"
     feo_mol = _cleaned_melt_debit_mol(sim, transition, "FeO")
     expected_source = -0.5 * feo_mol
     label = "redox_source:c3_na_shuttle_reduction"

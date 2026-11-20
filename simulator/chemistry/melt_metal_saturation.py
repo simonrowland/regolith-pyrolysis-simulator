@@ -6,7 +6,6 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
-from simulator.accounting import AccountingError
 from simulator.chemistry.ellingham_graph import (
     dissociation_pO2_threshold,
     ellingham_oxide_stoichiometry_for_formula,
@@ -16,6 +15,10 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_stoichiometry,
 )
 from simulator.chemistry.melt_activity import melt_oxide_activity
+
+
+class MeltMetalSaturationError(ValueError):
+    """Typed refusal for invalid melt metal-saturation calculations."""
 
 
 def melt_metal_saturation_fO2_floor_rows(
@@ -65,7 +68,7 @@ def melt_metal_saturation_fO2_floor_rows(
             a_oxide=parent_activity,
         )
         if not math.isfinite(threshold_bar) or threshold_bar <= 0.0:
-            raise AccountingError(
+            raise MeltMetalSaturationError(
                 "metal-saturation fO2 floor is invalid for "
                 f"{oxide}: pO2_bar={threshold_bar!r}"
             )
@@ -92,7 +95,7 @@ def melt_metal_saturation_fO2_floor_log(
 def unsupported_melt_metal_saturation_notice(
     composition_mol: Mapping[str, float],
 ) -> dict[str, str] | None:
-    """Return a typed notice when CoO has no accepted Co Ellingham fit."""
+    """Notice that no citable condensed CoO formation segment is accepted."""
 
     if (
         float(composition_mol.get("CoO", 0.0) or 0.0) <= 0.0
@@ -150,12 +153,12 @@ def plan_melt_metal_saturation_buffer(
     candidate = float(candidate_fO2_log)
     capacity = float(redox_capacity_mol_per_ln)
     if not math.isfinite(candidate):
-        raise AccountingError(
+        raise MeltMetalSaturationError(
             "melt metal-saturation buffer candidate fO2 must be finite, "
             f"got {candidate_fO2_log!r}"
         )
     if not math.isfinite(capacity) or capacity <= 0.0:
-        raise AccountingError(
+        raise MeltMetalSaturationError(
             "melt metal-saturation buffer redox capacity must be finite "
             f"and positive, got {redox_capacity_mol_per_ln!r}"
         )

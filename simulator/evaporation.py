@@ -4644,6 +4644,7 @@ class EvaporationMixin:
             for species, rate_kg_hr in evap_flux.species_kg_hr.items()
         }
         committed_species_kg_hr: dict[str, float] = {}
+        evaporative_redox_transitions = []
         for species in species_order:
             if species not in evap_flux.species_kg_hr:
                 continue
@@ -4658,9 +4659,12 @@ class EvaporationMixin:
                 route_result,
                 species,
                 rate_kg_hr,
+                apply_evaporative_redox_source_terms=False,
             )
-            if route_outcome.get('evaporation_transition') is not None:
+            evaporation_transition = route_outcome.get('evaporation_transition')
+            if evaporation_transition is not None:
                 committed_species_kg_hr[species] = rate_kg_hr
+                evaporative_redox_transitions.append(evaporation_transition)
             overhead_after_kg = float(
                 self.atom_ledger.kg_by_account('process.overhead_gas').get(
                     species, 0.0,
@@ -4676,6 +4680,16 @@ class EvaporationMixin:
             # complete committed removal leaves zero, independent of diagnostics.
             residual_species_kg_hr[species] = max(
                 0.0, overhead_after_kg - overhead_before_kg,
+            )
+
+        # The hourly evaporation flux was planned against one pre-route melt
+        # snapshot. Commit every carrier debit before its redox source can
+        # re-speciate FeO into metal; otherwise an early carrier's buffer
+        # debit makes later carriers from the same batch exceed live stock.
+        for transition in evaporative_redox_transitions:
+            self._apply_evaporative_redox_source_terms(
+                transition,
+                exchange_direction='redox_source:evaporative_loss',
             )
 
         self._apply_organic_tar_wall_deposit()

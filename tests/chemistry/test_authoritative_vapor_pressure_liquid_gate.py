@@ -105,6 +105,8 @@ def _sim_with_vapor_dispatch(
         # transport-pO2 snapshot helper instead of commanded pO2 directly.
         _vapor_pressure_dispatch_pO2_bar=lambda: 1e-9,
         _compute_intrinsic_melt_fO2=lambda: -9.0,
+        _melt_metal_saturation_fO2_floor_log=lambda _temperature_K: None,
+        _melt_redox_gate_authority_pin_for_current_hour=lambda: (False, None),
         _dispatch_only=_dispatch_only,
         _kernel_vapor_pressure_source=(
             PyrolysisSimulator._kernel_vapor_pressure_source
@@ -486,6 +488,7 @@ def test_freeze_gate_phase_fraction_requires_sampled_curve_support(
     sim = types.SimpleNamespace(
         melt=types.SimpleNamespace(temperature_C=temperature_C),
         _register_freeze_gate_liquid_fraction_providers=lambda: None,
+        _melt_redox_gate_authority_pin_for_current_hour=lambda: (False, None),
         _melt_redox_liquidus_gate_record=lambda: {
             'curve': {
                 'source': 'gate_liquid_fraction',

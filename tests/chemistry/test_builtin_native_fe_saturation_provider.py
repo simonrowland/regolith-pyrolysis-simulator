@@ -262,7 +262,9 @@ def test_metal_extent_map_routes_ni_fe_and_oxygen_to_buffer(
         },
     }
     assert dict(result.transition.credits) == {
-        "reservoir.fo2_buffer": {"O2": 0.75},
+        # CoO has no citable condensed formation segment, so only NiO and
+        # FeO contribute: each monoxide releases one half mol O2 per mol metal.
+        "reservoir.fo2_buffer": {"O2": 0.625},
         "terminal.drain_tap_material": {
             "Ni": 0.5,
             "Fe": 0.75,

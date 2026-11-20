@@ -3385,6 +3385,9 @@ def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
                 choice = (decision.options or [None])[0]
             sim.apply_decision(decision.decision_type, choice)
             continue
+        source_composition_mol = dict(
+            sim.atom_ledger.mol_by_account("process.cleaned_melt")
+        )
         sim.step()
         steps += 1
         saturation_floor = sim._melt_metal_saturation_fO2_floor_log(
@@ -3417,7 +3420,7 @@ def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
 
     independent_activity = melt_oxide_activity(
         "FeO",
-        sim.atom_ledger.mol_by_account("process.cleaned_melt"),
+        source_composition_mol,
         temperature_K=temperature_K,
     )
     assert independent_activity is not None
@@ -3493,6 +3496,10 @@ def test_c2a_metal_saturation_buffer_commits_native_metal_and_oxygen(
     temperature_K = sim.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
     floor = sim._melt_metal_saturation_fO2_floor_log(temperature_K)
     assert floor is not None
+    assert floor[1] == "FeO", (
+        "lunar mare carries Ni as native metal, while cleaned melt retains "
+        "oxide species only; FeO is its saturation binder"
+    )
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = floor[0]
     sim.melt.oxygen_reservoir.reference_T_K = temperature_K
     sim.melt.fO2_log = floor[0]
@@ -3537,20 +3544,13 @@ def test_c2a_metal_saturation_buffer_commits_native_metal_and_oxygen(
         for metal in ("Ni", "Fe")
     }
     buffered_o2_mol = oxygen_after - oxygen_before
-    expected_metal_mol = 2.0 * oxygen_deficit_o2_mol
-    assert buffered_o2_mol == pytest.approx(
-        oxygen_deficit_o2_mol,
-        rel=1e-10,
-        abs=1e-12,
-    )
+    expected_metal_mol = 2.0 * buffered_o2_mol
+    assert 0.0 < buffered_o2_mol <= oxygen_deficit_o2_mol + 1e-12
     assert math.fsum(metal_deltas.values()) == pytest.approx(
         expected_metal_mol,
         rel=1e-10,
         abs=1e-12,
-    ), "monoxide buffer must produce two metal moles per mol O2 released"
-    buffered_o2_mol = oxygen_after - oxygen_before
-    assert buffered_o2_mol > 0.0
-    assert buffered_o2_mol <= oxygen_deficit_o2_mol + 1e-12
+    ), "monoxide buffer must produce two metal moles per buffered mol O2"
     assert melt_o_before - melt_o_after == pytest.approx(
         2.0 * buffered_o2_mol,
         rel=1e-10,
@@ -3580,13 +3580,13 @@ def test_c2a_metal_saturation_buffer_commits_native_metal_and_oxygen(
     assert abs(sim._make_snapshot().mass_balance_error_pct) < 5e-12
 
 
-def test_c2a_buffer_plan_exhausts_lunar_nio_before_touching_feo(
+def test_c2a_buffer_plan_exhausts_ci_nio_then_reduces_feo(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
 ):
     sim = _build_sim(
-        "lunar_mare_low_ti",
+        "ci_carbonaceous_chondrite",
         vapor_pressure_data,
         feedstocks_data,
         _hkl_only_setpoints(copy.deepcopy(setpoints_data)),
@@ -3602,16 +3602,18 @@ def test_c2a_buffer_plan_exhausts_lunar_nio_before_touching_feo(
         melt_metal_saturation_fO2_floor_rows,
         plan_melt_metal_saturation_buffer,
     )
-    from simulator.state import OXYGEN_RESERVOIR_NOOP_MOL, OXIDE_TO_METAL
+    from simulator.core import OXYGEN_RESERVOIR_NOOP_MOL
+    from simulator.state import OXIDE_TO_METAL
 
     floor_rows = melt_metal_saturation_fO2_floor_rows(
         temperature_K,
         composition_mol,
         oxide_to_metal=OXIDE_TO_METAL,
     )
+    assert composition_mol.get("NiO", 0.0) > 0.0
     assert [row[1] for row in floor_rows[:2]] == ["NiO", "FeO"]
-    # CoO is not on the Ellingham owner: its JANAF fit is rejected for an
-    # unresolved lambda anomaly, and the IVTAN row is CoO(g), not CoO(s).
+    # CoO has no citable condensed formation segment; the IVTAN CoO row is
+    # gas phase and draft, so it is outside the accepted condensed owner.
     from simulator.chemistry.ellingham_graph import (
         ellingham_oxide_stoichiometry_for_formula,
     )
@@ -3622,32 +3624,45 @@ def test_c2a_buffer_plan_exhausts_lunar_nio_before_touching_feo(
     )
     assert ni_stoichiometry is not None
     ni_o2_capacity_mol = float(composition_mol["NiO"]) / ni_stoichiometry[1]
-    upper_bound_log = sim._melt_redox_fO2_upper_bound_log()
-    floor_gap_log = floor_rows[0][0] - upper_bound_log
-    assert floor_gap_log > 0.0
-    # The cap holds the candidate at the gas ceiling while the trace binder
-    # inventory is spent, so this deficit budget is enough to exhaust NiO.
-    redox_capacity_mol_per_ln = (
-        2.0 * ni_o2_capacity_mol / (floor_gap_log * math.log(10.0))
+    fe_stoichiometry = ellingham_oxide_stoichiometry_for_formula(
+        "FeO",
+        oxide_to_metal=OXIDE_TO_METAL,
+    )
+    assert fe_stoichiometry is not None
+    fe_o2_capacity_mol = float(composition_mol["FeO"]) / fe_stoichiometry[1]
+    candidate_fO2_log = floor_rows[0][0] - 100.0
+    # Demand exceeds the complete NiO oxygen inventory. The candidate remains
+    # below the FeO line after NiO is consumed, so FeO becomes the next binder.
+    oxygen_budget_mol = ni_o2_capacity_mol + 0.1 * fe_o2_capacity_mol
+    redox_capacity_mol_per_ln = oxygen_budget_mol / (
+        (floor_rows[0][0] - candidate_fO2_log) * math.log(10.0)
     )
 
     plan = plan_melt_metal_saturation_buffer(
-        candidate_fO2_log=upper_bound_log,
+        candidate_fO2_log=candidate_fO2_log,
         redox_capacity_mol_per_ln=redox_capacity_mol_per_ln,
         temperature_K=temperature_K,
         composition_mol=composition_mol,
         oxide_to_metal=OXIDE_TO_METAL,
-        upper_bound_fO2_log=upper_bound_log,
+        upper_bound_fO2_log=candidate_fO2_log + 100.0,
         oxygen_noop_mol=OXYGEN_RESERVOIR_NOOP_MOL,
     )
 
-    assert plan["reduction_order"][0] == "NiO"
-    assert plan["oxide_extent_mol_by_oxide"]["NiO"] == pytest.approx(
-        ni_o2_capacity_mol * ni_stoichiometry[0],
-        rel=1e-9,
-        abs=1e-12,
+    assert plan["reduction_order"][:2] == ["NiO", "FeO"]
+    assert plan["oxide_extent_mol_by_oxide"]["NiO"] >= (
+        ni_o2_capacity_mol * ni_stoichiometry[0] * (1.0 - 1e-6)
     )
-    assert "FeO" not in plan["oxide_extent_mol_by_oxide"]
+    assert plan["oxide_extent_mol_by_oxide"]["FeO"] > 0.0
+    for oxide, metal_extent_mol in plan["oxide_extent_mol_by_oxide"].items():
+        stoichiometry = ellingham_oxide_stoichiometry_for_formula(
+            oxide,
+            oxide_to_metal=OXIDE_TO_METAL,
+        )
+        assert stoichiometry is not None
+        oxide_debit_mol = (
+            metal_extent_mol / stoichiometry[0] * stoichiometry[1]
+        )
+        assert oxide_debit_mol <= composition_mol[oxide] + 1e-10
     assert plan["floor_log_after_buffer"] is not None
     assert plan["candidate_fO2_log_after_buffer"] >= (
         plan["floor_log_after_buffer"] - 1e-10

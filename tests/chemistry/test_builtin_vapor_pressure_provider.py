@@ -1282,7 +1282,7 @@ def test_pure_segment_selector_projection_pins(vapor_pressure_data, monkeypatch)
 
 
 @pytest.mark.parametrize("temperature_K", [400.0, 410.0])
-def test_sodium_provider_omits_nonphysical_pole_branch(
+def test_sodium_provider_refuses_unavailable_saturation_cap(
     vapor_pressure_data,
     temperature_K,
 ):
@@ -1298,10 +1298,11 @@ def test_sodium_provider_omits_nonphysical_pole_branch(
         control_inputs={"pO2_bar": 1e-9},
     )
 
-    result = provider.dispatch(request)
-
-    assert result.status == "ok"
-    assert "Na" not in result.diagnostic["vapor_pressures_Pa"]
+    with pytest.raises(
+        ellingham_graph.EllinghamPressureRefusal,
+        match="Antoine saturation pressure unavailable",
+    ):
+        provider.dispatch(request)
 
 
 def test_phosphorus_hot_train_scope_survives_compatibility_projection(
@@ -2508,15 +2509,19 @@ def test_mg_gas_fugacity_is_independent_of_antoine_coefficients(
     vapor_pressure_data,
     temperature_K,
 ):
-    """b-147: high-T gas_fugacity is independent of pure-component Antoine."""
+    """b-147 gas_fugacity ignores the dormant gas-rail Antoine metadata."""
     baseline_data = copy.deepcopy(vapor_pressure_data)
-    no_antoine_data = copy.deepcopy(vapor_pressure_data)
-    no_antoine_data["metals"]["Mg"].pop("pure_component_antoine")
+    without_gas_antoine_data = copy.deepcopy(vapor_pressure_data)
+    without_gas_antoine_data["metals"]["Mg"][
+        "gas_rail_standard_reaction"
+    ].pop("antoine")
 
     baseline = BuiltinVaporPressureProvider(baseline_data).dispatch(
         _mg_vapor_request_at_T_K(temperature_K)
     )
-    without_antoine = BuiltinVaporPressureProvider(no_antoine_data).dispatch(
+    without_antoine = BuiltinVaporPressureProvider(
+        without_gas_antoine_data
+    ).dispatch(
         _mg_vapor_request_at_T_K(temperature_K)
     )
 
@@ -2535,7 +2540,7 @@ def test_mg_gas_fugacity_is_independent_of_antoine_coefficients(
         "Mg",
         temperature_K,
         1e-9,
-        vapor_pressure_data=no_antoine_data,
+        vapor_pressure_data=without_gas_antoine_data,
         a_oxide=1.0,
     )
     baseline_graph_pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
@@ -2609,10 +2614,12 @@ def test_legacy_mg_rails_use_reconstructed_bridge_and_ignore_gas_antoine(
         vapor_pressure_data,
         melt=_MgOnlyMelt(1873.0),
     )._internal_analytical_equilibrium()
-    no_antoine_data = copy.deepcopy(vapor_pressure_data)
-    no_antoine_data["metals"]["Mg"].pop("pure_component_antoine")
+    without_gas_antoine_data = copy.deepcopy(vapor_pressure_data)
+    without_gas_antoine_data["metals"]["Mg"][
+        "gas_rail_standard_reaction"
+    ].pop("antoine")
     without_antoine = _LegacyInternalAnalyticalModel(
-        no_antoine_data,
+        without_gas_antoine_data,
         melt=_MgOnlyMelt(1873.0),
     )._internal_analytical_equilibrium()
 
@@ -3404,7 +3411,7 @@ def test_legacy_fallback_grounds_mn_liquid_oxide_standard_reaction(
     assert "liquid_oxide_standard_reaction" in result.vapor_pressures_source["Mn"]
 
 
-def test_internal_source_reaction_metal_pressure_respects_pure_saturation(
+def test_internal_source_reaction_metal_pressure_never_exceeds_pure_saturation(
     vapor_pressure_data,
 ):
     class _CrOnlyMelt:
@@ -3451,9 +3458,9 @@ def test_internal_source_reaction_metal_pressure_respects_pure_saturation(
             )
         )
 
-        assert result.vapor_pressures_Pa[species] == pytest.approx(
-            pure_metal_saturation_Pa
-        )
+        # The low-fO2 source can sit below saturation; saturation is an upper
+        # bound, not a target pressure for every metal reaction.
+        assert result.vapor_pressures_Pa[species] <= pure_metal_saturation_Pa
 
 
 def test_legacy_and_provider_al_liquid_oxide_antoine_pins(vapor_pressure_data):

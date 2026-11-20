@@ -423,7 +423,7 @@ def test_probe_inherits_engine_resolution_context(request, tmp_path, monkeypatch
         "from pathlib import Path\n"
         "import probe_activation\n"
         "assert probe_activation.activated\n"
-        f"assert Path.cwd() == Path({str(tmp_path)!r})\n"
+        f"assert Path.cwd().samefile(Path({str(tmp_path)!r}))\n"
         f"assert os.environ['DYLD_FALLBACK_LIBRARY_PATH'] == {str(tmp_path / 'lib')!r}\n"
         "assert sys.stdin.read() == ''\n"
         "Path(sys.argv[5]).write_text(json.dumps({\n"
