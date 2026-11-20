@@ -333,3 +333,95 @@ def test_analytical_fo2_argument_is_not_consumed():
         po2_request=battery.Po2Request("commanded", 1e-9),
     )
     assert vars(backend.equilibrate(**kwargs, fO2_log=-9.0)) == vars(backend.equilibrate(**kwargs, fO2_log=-8.0))
+
+
+def test_vaporock_opt_in_cache_misses_the_old_subset_gamma(monkeypatch, tmp_path):
+    """50 kg SiO2 and 3 kg Na2O with only Na2O activity 0.25.
+
+    A v1 cache entry stores gamma 0.25 tagged raoultian_pure_endmember,
+    normalized on the one reported oxide. The current chemistry refuses
+    that set: SiO2 has a positive weight and no activity. The live result
+    and a cache read at the declared version both return no coefficient,
+    keep the gas pressure, and carry the owner's normalization_mismatch.
+    The same entry is still served when the version is left at 1.
+    """
+
+    from types import SimpleNamespace
+
+    from simulator.chemistry.melt_activity import SAME_COMPONENT_REFERENCE_CONVENTION
+    from simulator.engine_cache import (
+        ENGINE_CHEMISTRY_VERSION,
+        _engine_cache_path_scope,
+    )
+    from simulator.melt_backend.vaporock import (
+        VapoRockBackend,
+        _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
+    )
+
+    state = _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = object()
+    monkeypatch.setattr(
+        backend,
+        "_call_vaporock",
+        lambda **kw: ({"Na(g)": 1.0}, {"Na2O": 0.25}, state),
+    )
+    kwargs = dict(
+        temperature_C=1600.0,
+        composition_kg={"SiO2": 50.0, "Na2O": 3.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        include_oxide_activities=True,
+    )
+
+    def live():
+        return backend.equilibrate(**kwargs)
+
+    def previous():
+        result = live()
+        result.reported_activity_coefficients = {"Na2O": 0.25}
+        result.activity_coefficient_details = {"Na2O": {
+            "value": 0.25,
+            "coefficient_basis": "mole_fraction",
+            "standard_state": {
+                "phase": "l",
+                "component_basis": "Na2O",
+                "convention": SAME_COMPONENT_REFERENCE_CONVENTION,
+            },
+        }}
+        return result
+
+    direct = live()
+    assert direct.status == "ok"
+    assert direct.vapor_pressures_Pa["Na(g)"] == pytest.approx(1.0)
+    # An empty map is not stored on the result. Absence is the refusal.
+    assert getattr(direct, "reported_activity_coefficients", {}) == {}
+    refusal = direct.diagnostics["activity_coefficient_refusals"][0]
+    assert refusal["reason"] == "normalization_mismatch"
+    assert "SiO2" in refusal["detail"]
+    assert refusal["reason"] != "unavailable"
+
+    monkeypatch.setattr(engine_cache, "engine_cache_settings", lambda *args: {})
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "s2")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    handle = SimpleNamespace(name="vaporock", engine_settings={})
+    real_version = ENGINE_CHEMISTRY_VERSION["vaporock"]
+    with _engine_cache_path_scope(str(tmp_path / "vaporock.sqlite")):
+        monkeypatch.setitem(ENGINE_CHEMISTRY_VERSION, "vaporock", 1)
+        old = battery._call_cached_backend_equilibrate(handle, kwargs, previous)
+        assert old.reported_activity_coefficients == {"Na2O": 0.25}
+        stale = battery._call_cached_backend_equilibrate(handle, kwargs, live)
+        assert stale.reported_activity_coefficients == {"Na2O": 0.25}
+        assert stale.activity_coefficient_details["Na2O"]["standard_state"]["convention"] == (
+            SAME_COMPONENT_REFERENCE_CONVENTION
+        )
+        monkeypatch.setitem(ENGINE_CHEMISTRY_VERSION, "vaporock", real_version)
+        fresh = battery._call_cached_backend_equilibrate(handle, kwargs, live)
+    assert getattr(fresh, "reported_activity_coefficients", {}) == {}
+    assert "Na2O" not in getattr(fresh, "activity_coefficient_details", {})
+    fresh_refusal = fresh.diagnostics["activity_coefficient_refusals"][0]
+    assert fresh_refusal["reason"] == "normalization_mismatch"
+    assert "SiO2" in fresh_refusal["detail"]
+    assert fresh.vapor_pressures_Pa["Na(g)"] == pytest.approx(1.0)
+    assert getattr(fresh, "vaporock_full_speciation_Pa", {})["Na(g)"] == pytest.approx(1.0)

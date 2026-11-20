@@ -2376,13 +2376,26 @@ class VapoRockBackend(MeltBackend):
             and include_oxide_activities
             and oxide_activity
         ):
-            gammas, details, _refusals = vaporock_oxide_same_component_coefficients(
+            gammas, details, refusals = vaporock_oxide_same_component_coefficients(
                 oxide_activity,
                 comp_wt,
             )
             if gammas:
                 result.reported_activity_coefficients = gammas
                 result.activity_coefficient_details = details
+            # An empty coefficient map is also what an unavailable
+            # activity looks like. The owner's reason is what tells an
+            # opt-in consumer this was an input mismatch. Gas pressures
+            # already on the result stay.
+            if refusals:
+                result.diagnostics['activity_coefficient_refusals'] = [
+                    {
+                        'reason': item.reason,
+                        'component': item.component,
+                        'detail': item.detail,
+                    }
+                    for item in refusals
+                ]
         return result
 
     # ------------------------------------------------------------------

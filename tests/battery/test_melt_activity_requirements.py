@@ -591,6 +591,28 @@ def test_activity_coefficient_uses_the_same_contract():
     assert "vaporock" not in {item.readiness.engine for item in activity}
 
 
+def test_vaporock_does_not_declare_a_pure_liquid_oxide_coefficient():
+    """The admission record and formula branch used to say VapoRock reports
+    a Raoultian pure-liquid-oxide coefficient. The generator refuses that
+    comparison with the transformed-state token instead.
+    """
+
+    from simulator.battery.generators.bench import (
+        _ENGINE_REPORTED_ACTIVITY,
+        _engine_reports_formula,
+    )
+    from simulator.melt_backend.vaporock import (
+        _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
+    )
+
+    assert "vaporock" not in _ENGINE_REPORTED_ACTIVITY
+    for formula in ("SiO2", "H2O", "Na2O"):
+        reports, convention = _engine_reports_formula("vaporock", formula)
+        assert reports is False
+        assert convention == _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
+        assert convention != "raoultian_pure_liquid_oxide"
+
+
 @pytest.mark.parametrize("basis", ["oxide", "SiO2"])
 def test_melts_endmember_gamma_is_not_scored_on_an_oxide_basis_row(monkeypatch, basis):
     """a(SiO2)/X_endmember is not an oxide-basis gamma.

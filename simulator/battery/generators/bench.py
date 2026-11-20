@@ -193,14 +193,6 @@ _ENGINE_REPORTED_ACTIVITY["magemin"] = EngineReportedActivity(
     Phase.CR,
     _PARENT_OXIDE_COMPONENT_BASES,
 )
-# Coefficient rows do not use this record. They are refused with the
-# transformed-oxide standard state. Activity rows do not list vaporock.
-_ENGINE_REPORTED_ACTIVITY["vaporock"] = EngineReportedActivity(
-    "raoultian_pure_liquid_oxide",
-    ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
-    Phase.L,
-    _PARENT_OXIDE_COMPONENT_BASES,
-)
 
 
 def _melts_reports_oxide_endmember(formula: str) -> tuple[bool, str]:
@@ -269,11 +261,14 @@ def _engine_reports_formula(engine: str, formula: str) -> tuple[bool, str]:
             return True, "raoultian_pure_liquid_endmember"
         return False, f"typed-refusal:unsupported_internal_analytical_oxide:{formula}"
     if engine == "vaporock":
-        from simulator.state import OXIDE_SPECIES
+        from simulator.melt_backend.vaporock import (
+            _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
+        )
 
-        if formula in OXIDE_SPECIES or formula in {"H2O", "CO2"}:
-            return True, "raoultian_pure_liquid_oxide"
-        return False, f"typed-refusal:vaporock_no_oxide_activity:{formula}"
+        # VapoRock's liquid activity is the MELTS-endmember transform.
+        # It is not a JANAF pure-liquid-oxide activity, and a coefficient
+        # on that convention is not admitted.
+        return False, _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
     return False, "typed-refusal:engine_does_not_report_parent_oxide_activity"
 
 
@@ -616,42 +611,41 @@ def melt_activity_requests(
             ReadinessStatus.GAP if engine_gaps else ReadinessStatus.READY
         )
         readiness = ConsumerReadiness("melt_activity", engine_status, engine_gaps, engine)
-        reported_activity = _ENGINE_REPORTED_ACTIVITY[engine]
-        single_cation = (
-            inputs.activity_quantity == "activity_coefficient"
-            and engine == "openimcc"
-            and state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
-            and phase_token(state.endmember) is Phase.L
-            and state.component_basis == state.endmember.formula
-            and state.endmember.formula in _IMCC_SINGLE_CATION_COMPONENTS
-        )
-        if single_cation:
-            reported_activity = replace(
-                reported_activity,
-                reported="raoultian_pure_liquid_endmember",
-                component_bases=frozenset({state.component_basis}),
-            )
-            matches = True
-            engine_side = reported_activity.reported
-        else:
-            matches, engine_side = _reference_matches(state, reported_activity, engine)
         if engine == "vaporock":
-            from simulator.melt_backend.vaporock import (
-                _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
+            # Direct refusal. There is no pure-liquid-oxide reporting
+            # record to consult: the formula branch names the transform.
+            matches, engine_side = _engine_reports_formula(
+                engine, state.endmember.formula,
             )
-
-            # The activity this adapter labels is the MELTS-endmember
-            # transform. A JANAF pure-liquid-oxide comparison needs a
-            # standard-Gibbs correction this coefficient does not apply.
-            matches = False
-            engine_side = _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
-        elif (
-            matches
-            and inputs.activity_quantity == "activity_coefficient"
-            and engine in ("alphamelts", "thermoengine")
-        ):
-            matches = False
-            engine_side = _ENDMEMBER_FRACTION_NOT_OXIDE_BASIS
+        else:
+            reported_activity = _ENGINE_REPORTED_ACTIVITY[engine]
+            single_cation = (
+                inputs.activity_quantity == "activity_coefficient"
+                and engine == "openimcc"
+                and state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+                and phase_token(state.endmember) is Phase.L
+                and state.component_basis == state.endmember.formula
+                and state.endmember.formula in _IMCC_SINGLE_CATION_COMPONENTS
+            )
+            if single_cation:
+                reported_activity = replace(
+                    reported_activity,
+                    reported="raoultian_pure_liquid_endmember",
+                    component_bases=frozenset({state.component_basis}),
+                )
+                matches = True
+                engine_side = reported_activity.reported
+            else:
+                matches, engine_side = _reference_matches(
+                    state, reported_activity, engine,
+                )
+            if (
+                matches
+                and inputs.activity_quantity == "activity_coefficient"
+                and engine in ("alphamelts", "thermoengine")
+            ):
+                matches = False
+                engine_side = _ENDMEMBER_FRACTION_NOT_OXIDE_BASIS
         if not matches:
             # Henrian, 1 wt%, a pure solid, a gas endmember, an unadmitted
             # single-cation basis, or an endmember formula this engine does not report.

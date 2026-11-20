@@ -58,6 +58,7 @@ _EQUILIBRIUM_CACHE_CONSUMED_DIAGNOSTICS = frozenset({
     'engine_reason',
     'backend_failure_disposition',
     'reported_activity_coefficients',
+    'activity_coefficient_refusals',
     'subprocess_failure',
     'vapor_pressure_diagnostic',
 })
