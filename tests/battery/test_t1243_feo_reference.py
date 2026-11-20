@@ -32,13 +32,18 @@ from simulator.battery.enums import (
     ReferenceStateConvention,
     ResidualStatus,
 )
+from simulator.battery import score as score_module
 from simulator.battery.generators.janaf import (
     JANAF_R_J_PER_MOL_K,
     _fusion_table_points,
     _interpolate_formation_gibbs,
     load_table_document,
 )
-from simulator.battery.identity import identity_equal, quantity_token
+from simulator.battery.identity import (
+    THERMOCHEMICAL_CALORIE_J,
+    identity_equal,
+    quantity_token,
+)
 from simulator.battery.migrate import (
     REPO_ROOT,
     Migrator,
@@ -69,6 +74,7 @@ from simulator.battery.score import (
     score_store,
     temperature_of,
 )
+from simulator.physical_constants import GAS_CONSTANT_DECIMAL
 from tests.battery import factories as F
 
 ROOT = Path(REPO_ROOT)
@@ -81,6 +87,11 @@ _WINDOW = "1649.15-1766.15 K"
 _EXTRAPOLATED = "D&G iron-boundary line extrapolated"
 _HOLZHEID = "holzheid-1997-feo-nio-coo-activity-metal-saturated"
 _DISTIN = "distin-1971-ferrous-silicate-melts"
+_BANYA_1980 = "banya-chiba-hikosaka-1980-feto-binary-solid-iron"
+_BANYA_1985 = "banya-hino-takezoe-1985-na-fe-silicate-redox"
+_BANYA_YUGE_1985 = "banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity"
+_DOYLE_1988 = "doyle-1988-feo-activity-multicomponent-magma"
+_DOYLE_1989 = "doyle-1989-tio2-feo-activity-magma"
 
 
 def _formation_J(table_id: str, temperature_K: Decimal) -> Decimal:
@@ -174,6 +185,18 @@ def _independent_factor(
     return (
         (delta_g - _formation_J("Fe-019", temperature_K))
         / (JANAF_R_J_PER_MOL_K * temperature_K)
+    ).exp()
+
+
+def _independent_banya_feto_to_feo_rs_factor(
+    temperature_K: Decimal,
+) -> Decimal:
+    """Independent evaluation of Ban-ya's printed relation in cal units."""
+
+    delta_g_cal = Decimal("-2040") + Decimal("1.707") * temperature_K
+    delta_g_J = THERMOCHEMICAL_CALORIE_J * delta_g_cal
+    return (
+        -delta_g_J / (GAS_CONSTANT_DECIMAL * temperature_K)
     ).exp()
 
 
@@ -399,6 +422,24 @@ def _feo_rows(result):
 def migration():
     migrator = Migrator(root=ROOT)
     for name in (_HOLZHEID, _DISTIN):
+        migrator._migrate_extract(ROOT / "data/literature/extracts" / f"{name}.yaml")
+    migrator.finalize()
+    return migrator.result
+
+
+@pytest.fixture(scope="module")
+def banya_migration():
+    migrator = Migrator(root=ROOT)
+    for name in (_BANYA_1980, _BANYA_1985, _BANYA_YUGE_1985):
+        migrator._migrate_extract(ROOT / "data/literature/extracts" / f"{name}.yaml")
+    migrator.finalize()
+    return migrator.result
+
+
+@pytest.fixture(scope="module")
+def doyle_migration():
+    migrator = Migrator(root=ROOT)
+    for name in (_DOYLE_1988, _DOYLE_1989):
         migrator._migrate_extract(ROOT / "data/literature/extracts" / f"{name}.yaml")
     migrator.finalize()
     return migrator.result
@@ -1195,6 +1236,200 @@ def test_distin_oxygen_ratio_converts_by_the_gibbs_factor() -> None:
     )
     vaporock = fusion_comparison_reference(row, engine=Engine.VAPOROCK)
     assert vaporock.value.point == point
+
+
+def test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
+    banya_migration,
+) -> None:
+    rows_by_source = {
+        source_id: tuple(
+            observation
+            for observation in banya_migration.observations.values()
+            if observation.source_id == source_id
+            and observation.identity.reference_state is not None
+            and observation.identity.reference_state.is_value
+            and isinstance(
+                observation.identity.reference_state.value, StandardState
+            )
+            and observation.identity.reference_state.value.endmember.formula
+            in {"Fe(1-x)O", "Fe_tO"}
+            and quantity_token(observation.identity)
+            in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        )
+        for source_id in (_BANYA_1980, _BANYA_1985, _BANYA_YUGE_1985)
+    }
+    assert {source_id: len(rows) for source_id, rows in rows_by_source.items()} == {
+        _BANYA_1980: 69,
+        _BANYA_1985: 19,
+        _BANYA_YUGE_1985: 30,
+    }
+    # The 12 openimcc 66ec4a3 row values at 1673.15 K independently confirm
+    # the source conversion (openimcc-feo-d420.md, reconstructed from Eq. 23).
+    pinned_1980 = {
+        "bch80_t2_c_a_1_activity": ("1.001", "0.783"),
+        "bch80_t2_c_a_2_activity": ("0.976", "0.764"),
+        "bch80_t2_c_a_3_activity": ("0.957", "0.749"),
+        "bch80_t2_c_a_6_activity": ("0.899", "0.703"),
+        "bch80_t2_c_a_7_activity": ("0.819", "0.641"),
+        "bch80_t2_c_a_11_activity": ("0.764", "0.598"),
+        "bch80_t2_c_a_10_activity": ("0.759", "0.594"),
+        "bch80_t2_c_a_12_activity": ("0.698", "0.546"),
+        "bch80_t2_c_a_13_activity": ("0.650", "0.509"),
+        "bch80_t2_c_a_14_activity": ("0.592", "0.463"),
+        "bch80_t2_c_a_16_activity": ("0.536", "0.419"),
+        "bch80_t2_c_a_18_activity": ("0.442", "0.346"),
+    }
+    rows_1980 = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in rows_by_source[_BANYA_1980]
+    }
+    for row_id, (source_text, converted_text) in pinned_1980.items():
+        observation = rows_1980[row_id]
+        assert observation.value.point == Decimal(source_text)
+        temperature_K = temperature_of(observation.identity)
+        assert temperature_K == Decimal("1673.15")
+        independent_value = observation.value.point * (
+            _independent_banya_feto_to_feo_rs_factor(temperature_K)
+        )
+        assert independent_value.quantize(Decimal("0.001")) == Decimal(
+            converted_text
+        )
+        converted = fusion_comparison_reference(
+            observation, engine=Engine.OPENIMCC
+        )
+        assert converted.value.point.quantize(Decimal("0.001")) == Decimal(
+            converted_text
+        )
+        assert converted.value.point.quantize(Decimal("1e-8")) == (
+            independent_value.quantize(Decimal("1e-8"))
+        )
+        assert converted.identity.species.formula == "FeO"
+        assert converted.identity.reference_state.value.endmember.formula == "FeO"
+        conversion = next(
+            notice
+            for notice in converted.notices
+            if notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+            and notice.reason.startswith("source_relation=Ban-ya")
+        )
+        assert "source_standard=Fe_tO(l), Fe-saturated" in conversion.reason
+        assert "destination_standard=FeO(R.S.)" in conversion.reason
+        assert "N0=" not in conversion.reason
+        assert "JANAF" not in conversion.reason
+        assumption = next(
+            notice
+            for notice in converted.notices
+            if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        )
+        assert "FeO(l) D&G/Masson" in assumption.reason
+        assert "FeO(R.S.)" in assumption.reason
+
+    relation_citations = {
+        _BANYA_1980: "Ban-ya, Hino & Takezoe 1985 Eq. 23, p. 1770",
+        _BANYA_1985: "Ban-ya, Hino & Takezoe 1985 Eq. 23, p. 1770",
+        _BANYA_YUGE_1985: "Ban-ya, Hino & Yuge 1985 Eqs. 25–27, p. 4 / folio 856",
+    }
+    yuge_run_101 = next(
+        row
+        for row in rows_by_source[_BANYA_YUGE_1985]
+        if row.observation_id.endswith(
+            "banya_hino_yuge_1985_t1_run_101_p002_t01_r03_c08"
+        )
+    )
+    assert yuge_run_101.value.point == Decimal("0.100")
+    yuge_expected = yuge_run_101.value.point * (
+        _independent_banya_feto_to_feo_rs_factor(Decimal("1723.15"))
+    )
+    assert yuge_expected.quantize(Decimal("1e-8")) == Decimal("0.07685536")
+    for source_id, rows in rows_by_source.items():
+        for observation in rows:
+            converted = fusion_comparison_reference(
+                observation, engine=Engine.OPENIMCC
+            )
+            temperature_K = temperature_of(observation.identity)
+            assert temperature_K is not None
+            expected = observation.value.point * (
+                _independent_banya_feto_to_feo_rs_factor(temperature_K)
+            )
+            assert converted.value.point.quantize(Decimal("1e-8")) == expected.quantize(
+                Decimal("1e-8")
+            )
+            assert converted.identity.reference_state.value.endmember.formula == "FeO"
+            conversion = next(
+                notice
+                for notice in converted.notices
+                if notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+                and notice.reason.startswith("source_relation=Ban-ya")
+            )
+            assert relation_citations[source_id] in conversion.reason
+            assert "source_standard=Fe_tO(l), Fe-saturated" in conversion.reason
+            assert "destination_standard=FeO(R.S.)" in conversion.reason
+            assert any(
+                notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+                and "FeO(R.S.)" in notice.reason
+                for notice in converted.notices
+            ), source_id
+
+
+def test_banya_source_relation_pins_reject_the_old_dg_janaf_conversion(
+    banya_migration, monkeypatch
+) -> None:
+    calibration, _ = score_module._iron_saturated_feo_calibration()
+    monkeypatch.setattr(
+        score_module,
+        "_banya_feto_to_feo_rs_factor",
+        lambda temperature_K: score_module._feo_reference_factor(
+            calibration, temperature_K
+        ),
+    )
+
+    with pytest.raises(AssertionError):
+        test_banya_feto_sources_use_only_the_printed_feto_to_feo_relation(
+            banya_migration
+        )
+
+
+def test_doyle_coughlin_reference_keeps_the_dg_janaf_conversion(
+    doyle_migration,
+) -> None:
+    rows = tuple(
+        observation
+        for observation in doyle_migration.observations.values()
+        if observation.source_id in {_DOYLE_1988, _DOYLE_1989}
+        and observation.identity.reference_state is not None
+        and observation.identity.reference_state.is_value
+        and isinstance(observation.identity.reference_state.value, StandardState)
+        and observation.identity.reference_state.value.endmember.formula
+        == "Fe(1-x)O"
+        and quantity_token(observation.identity)
+        in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+    )
+    assert rows
+    for source_id in (_DOYLE_1988, _DOYLE_1989):
+        observation = next(row for row in rows if row.source_id == source_id)
+        temperature_K = temperature_of(observation.identity)
+        assert temperature_K == Decimal("1600")
+        standard = observation.identity.reference_state.value
+        assert isinstance(standard, StandardState)
+        assert standard.iron_saturation_composition is not None
+        assert standard.iron_saturation_composition.composition_as_printed == "Fe0.947O"
+        converted = fusion_comparison_reference(
+            observation, engine=Engine.OPENIMCC
+        )
+        factor = _independent_factor(temperature_K)
+        assert converted.value.point == observation.value.point * factor
+        assert converted.value.point != observation.value.point * factor * Decimal(
+            "0.888"
+        )
+        assert converted.value.point != observation.value.point * (
+            factor / Decimal("0.888")
+        )
+        notice = _conversion_notice(converted.notices)
+        assert "JANAF chemical-potential equality" in notice.reason
+        assert "N0 records the saturation composition" in notice.reason
+        assert any(
+            item.reason.startswith("fe_saturation_composition_from_cited_standard")
+            for item in converted.notices
+        )
 
 
 def test_recorded_n0_does_not_scale_a_distin_oxygen_ratio() -> None:

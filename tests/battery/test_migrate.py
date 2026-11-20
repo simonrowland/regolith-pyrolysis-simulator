@@ -20123,7 +20123,7 @@ def test_bare_log_accepts_printed_air_atmosphere() -> None:
     assert decision.state.is_value
     assert decision.state.value == Decimal("20892.96130854039483122233736")
     assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
-    assert "expected log10(fO2/bar)=-0.6788" in decision.notice_reason
+    assert "expected log10(fO2/bar)=-0.6789" in decision.notice_reason
     assert "matched 1 bar total-pressure anchor" in decision.notice_reason
     assert "bar-vs-atm unit ambiguity (0.0057 dex)" in decision.notice_reason
 
@@ -20145,8 +20145,52 @@ def test_bare_log_air_at_one_bar_uses_the_bar_frame() -> None:
         Decimal("-0.68"), Decimal("100000")
     )
     assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
-    assert "expected log10(fO2/bar)=-0.6788" in decision.notice_reason
+    assert "expected log10(fO2/bar)=-0.6789" in decision.notice_reason
     assert "matched bar frame" in decision.notice_reason
+
+
+def test_raw_oxygen_pressure_inequality_is_retained_through_migration(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="atm",
+        obs_type="partial_pressure",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "series": [
+                {
+                    "T_K": 1200,
+                    "pressure_atm": "1e-6",
+                    "oxygen_partial_pressure": {
+                        "value": "< 1e-12",
+                        "units": "atm",
+                        "locator": {"page": 2, "table": "I"},
+                    },
+                }
+            ],
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        row
+        for row in result.observations.values()
+        if quantity_token(row.identity) is Quantity.P_PARTIAL
+    )
+
+    condition = observation.point_conditions["fO2_log"]
+    assert condition.state.is_value
+    value = condition.state.value
+    assert value.kind is ValueKind.BOUND
+    assert value.bound_operator == "<"
+    pressure_pa, _trail = convert_pressure_to_pa(Decimal("1e-12"), "atm")
+    assert pressure_pa is not None
+    expected = (pressure_pa / Decimal("100000")).log10()
+    assert value.bound_value == expected
+    assert condition.inference.output_unit == "log10(fO2/bar)"
+    assert "units=atm" in condition.inference.inputs
 
 
 def test_bare_log_accepts_printed_pure_oxygen_at_one_atmosphere() -> None:

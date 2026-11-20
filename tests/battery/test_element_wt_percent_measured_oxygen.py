@@ -371,7 +371,9 @@ def test_printed_oxide_map_keeps_identifiable_components_and_refuses_the_rest() 
         wt_pct_to_mole_fraction({"SiO2": Decimal("90"), "XxO": Decimal("10")})
 
     # Closure refusal runs before formula conversion for unrecognized major
-    # components, including integer and fractional formulas.
+    # components, including integer and unmapped fractional formulas.
+    # FeO1.5 is mapped onto Fe2O3 (mass percent is invariant; the key renames).
+    # Fe2O2 stays unmapped and still refuses.
     with pytest.raises(
         ValueError,
         match="partial analysis contains unsupported component\\(s\\) above 0.5 wt%",
@@ -385,11 +387,13 @@ def test_printed_oxide_map_keeps_identifiable_components_and_refuses_the_rest() 
                 "SiO2": Decimal("20"),
             }
         )
-    with pytest.raises(
-        ValueError,
-        match="partial analysis contains unsupported component\\(s\\) above 0.5 wt%",
-    ):
-        wt_pct_to_mole_fraction({"SiO2": Decimal("90"), "FeO1.5": Decimal("10")})
+    mapped_feo15 = wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("90"), "FeO1.5": Decimal("10")}
+    )
+    canonical_fe2o3 = wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("90"), "Fe2O3": Decimal("10")}
+    )
+    assert mapped_feo15.as_map() == canonical_fe2o3.as_map()
     with pytest.raises(
         ValueError,
         match="partial analysis contains unsupported component\\(s\\) above 0.5 wt%",

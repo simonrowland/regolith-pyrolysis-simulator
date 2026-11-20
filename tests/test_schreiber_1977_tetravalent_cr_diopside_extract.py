@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import QUANTITY_UNITS, Phase, Quantity, ValueKind
+from simulator.battery.enums import QUANTITY_UNITS, NoticeKind, Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -74,7 +74,18 @@ def test_isolated_migration_preserves_each_fraction_unit_and_oxygen_pa() -> None
     assert (str(crvi.value.interval_low), str(crvi.value.interval_high)) == EXPECTED_RANGE
     assert crvi.value.approximate is True
     assert crvi.identity.fO2_Pa.is_unknown
-    assert crvi.notices == ()
+    # The source describes air but gives no total pressure for this condition.
+    oxygen_log = crvi.point_conditions["fO2_log"]
+    assert oxygen_log.state.is_unknown
+    assert oxygen_log.state.reason == (
+        "missing input: printed air fO2 requires stated total pressure"
+    )
+    assert len(crvi.notices) == 1
+    assert crvi.notices[0].kind is NoticeKind.INPUT_OMITTED
+    assert crvi.notices[0].reason == (
+        "missing input: printed air fO2 requires stated total pressure"
+    )
+    assert crvi.notices[0].origin == crvi.observation_id
     for observation_id, expected in ((CRII_ID, "0.30"), (CRIII_ID, "0.70")):
         row = by_id[observation_id]
         assert row.identity.species.formula == "Cr"
