@@ -3465,7 +3465,9 @@ def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
         rel=1e-12,
         abs=1e-12,
     )
-    assert source_fO2_log >= independently_resolved_floor_log
+    # Match the 1e-12 log10 tolerance used by the floor equality assertion
+    # above; the source and independent floor paths differ only by rounding.
+    assert source_fO2_log >= independently_resolved_floor_log - 1e-12
     assert (
         sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
         >= independently_resolved_floor_log - 1e-12

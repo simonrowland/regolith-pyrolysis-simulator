@@ -258,6 +258,43 @@ def test_liquid_oxide_source_rows_use_catalog_evaluator_or_refuse(
         )
 
 
+def test_cr_catalog_source_uses_callers_low_fo2_and_caps_pure_metal():
+    catalog_payload = ellingham_graph._load_default_vapor_pressure_data()
+    temperature_K = 1423.15
+    caller_pO2_bar = 1e-28
+    source_activity = 1.0
+    evaluator = compiled_catalog_for(catalog_payload).evaluator_for_hot_train(
+        "Cr"
+    )
+    uncapped_pressure = evaluator.evaluate(
+        temperature_K,
+        source_activity=source_activity,
+        pO2_bar=caller_pO2_bar,
+    ).pressure_pa
+    pure_metal_cap = ellingham_graph.metal_saturation_pressure_Pa(
+        "Cr",
+        temperature_K,
+        vapor_pressure_data=catalog_payload,
+    )
+
+    # The Cr2O3(s) Ellingham segment gives ΔG≈−508.0 kJ/mol O2 at 1423.15 K,
+    # so K=exp(ΔG/RT)≈2.3e−19 bar. For pure Cr2O3 (a_oxide=1), n_M=4/3 and
+    # n_ox=2/3, giving a_Cr=(K*a_oxide**n_ox/pO2)**(1/n_M)≈1.0e7 at
+    # pO2=1e−28 bar. The catalog Cr(l) source reaction then gives an uncapped
+    # pressure around 2e5 Pa; the pure-metal saturation rail limits it to
+    # 0.10679639619291863 Pa. This pins that the caller's pO2 reaches the
+    # catalog reaction before the shared cap is applied.
+    assert uncapped_pressure > pure_metal_cap
+    assert pure_metal_cap == pytest.approx(0.10679639619291863)
+    assert ellingham_graph.effective_equilibrium_pressure_Pa(
+        "Cr",
+        temperature_K,
+        caller_pO2_bar,
+        vapor_pressure_data=catalog_payload,
+        a_oxide=source_activity,
+    ) == pytest.approx(pure_metal_cap)
+
+
 def test_evolves_uses_builtin_pressure_floor(vapor_pressure_data) -> None:
     T_K = 1600.0
     pO2_bar = 1e-9

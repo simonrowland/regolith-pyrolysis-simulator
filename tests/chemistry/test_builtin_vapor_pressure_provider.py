@@ -3417,13 +3417,13 @@ def test_internal_source_reaction_metal_pressure_never_exceeds_pure_saturation(
     class _CrOnlyMelt:
         temperature_C = 1423.15 - 273.15
         p_total_mbar = 1e-3
+        # EquilibriumMixin reads the live intrinsic value from the melt when
+        # no redox reservoir is attached; _compute_intrinsic_melt_fO2 is not
+        # this seam.
+        melt_fO2_log = -28.0
 
         def composition_wt_pct(self):
             return {"Cr2O3": 100.0}
-
-    class _LowFO2InternalModel(_LegacyInternalAnalyticalModel):
-        def _compute_intrinsic_melt_fO2(self):
-            return -28.0
 
     class _NaOnlyMelt:
         temperature_C = 1423.15 - 273.15
@@ -3446,7 +3446,7 @@ def test_internal_source_reaction_metal_pressure_never_exceeds_pure_saturation(
         ("Na", _NaOnlyMelt()),
         ("K", _KOnlyMelt()),
     ):
-        result = _LowFO2InternalModel(
+        result = _LegacyInternalAnalyticalModel(
             vapor_pressure_data,
             melt=melt,
         )._internal_analytical_equilibrium()
