@@ -36,7 +36,7 @@ from pathlib import Path
 from typing import Any
 
 from simulator.chemistry.graphite_c_co import carbon_delta_g_co_kj_per_mol_o2
-from simulator.oxygen_buffers import CCO_SOURCE, cco_log10_fO2_bar
+from simulator.oxygen_buffers import CCO_SOURCE, cco_buffered_fO2
 from simulator.silent_zero import (
     CATEGORY_MARK,
     CATEGORY_PROVEN_ZERO,
@@ -732,9 +732,9 @@ def char_fate(
 
     a_c = carbon_activity(t_k, p_o2)
     try:
-        log_cco = cco_log10_fO2_bar(t_k, 1.0)
-        pO2_cco = 10.0 ** log_cco
-        cco_status = "inside_or_marked"
+        cco = cco_buffered_fO2(t_k, 1.0, reference_buffer=None)
+        pO2_cco = cco.fO2_bar
+        cco_status = cco.validity
     except (TypeError, ValueError):
         pO2_cco = float("nan")
         cco_status = "refusal"

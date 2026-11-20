@@ -366,21 +366,20 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     assert sim.atom_ledger.kg_by_account("process.metal_phase").get(
         "Na", 0.0
     ) == pytest.approx(0.0)
-    # d-137's 250 C Na/Mg collector is colder than the former 350 C interface,
-    # so a small extra share of this Na flux condenses before the overhead
-    # account. The production value falls from 2.0217140897425274 to
-    # 1.9976229793240146 kg: delta = old - new = 0.0240911104185128 kg and
-    # delta/old = 0.0119 (1.19%, dimensionless). In the non-condensing
-    # hot-wall limit, this overhead tends back to the full 2.0217140897425274 kg flux.
+    # The corrected NaO0.5 liquid activity changes the one-step MRE sodium
+    # overhead to the production value pinned below.
+    # Film-temperature diffusivity and the e-NTU bulk temperature leave
+    # more of that sodium in overhead. The train loses the same
+    # 0.1775043344159135 kg, so overhead plus train stays 2.334791680747916 kg.
+    # Wall, metal, cartridge residue, and offgas stay empty.
     assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
         "Na"
-    ] == pytest.approx(1.9976229793240146)
-    # The same 0.0240911104185125 kg moves into the condenser: capture rises
-    # from 0.31316216606196157 to 0.3372532764804741 kg, exactly balancing the
-    # overhead decrease to the displayed precision. Faraday input is unchanged.
+    ] == pytest.approx(2.1750436668165634)
+    # The corrected activity also changes the condensation-train share;
+    # Faraday input remains independently pinned by the ledger checks below.
     assert sim.atom_ledger.kg_by_account("process.condensation_train")[
         "Na"
-    ] == pytest.approx(0.3372532764804741)
+    ] == pytest.approx(0.15974801393135252)
     wall_na_kg = sum(
         sim.atom_ledger.kg_by_account(account).get("Na", 0.0)
         for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS

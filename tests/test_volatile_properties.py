@@ -634,25 +634,25 @@ def test_same_rail_overlap_is_order_independent(fixture_mapping, reverse):
 
 
 def test_cross_registry_legacy_overlap_fails_loudly(fixture_mapping):
-    fixture_mapping["species"]["Na"] = {
-        "formula": "Na",
+    fixture_mapping["species"]["K"] = {
+        "formula": "K",
         "correlations": [
             {
                 "row_kind": "correlation",
-                "row_id": "fixture:Na:saturation_pressure:direct",
+                "row_id": "fixture:K:saturation_pressure:direct",
                 "property_kind": "saturation_pressure",
                 "correlation_family": "antoine",
                 "coefficients": {
-                    "A": 7.460770,
-                    "B": 1873.728,
-                    "C": -416.372,
+                    "A": 9.45718,
+                    "B": 4691.58,
+                    "C": 24.195,
                 },
                 "phase_branch": "liquid",
                 "pressure_kind": "saturation",
-                "valid_range_K": [924.0, 1118.0],
+                "valid_range_K": [900.0, 1000.0],
                 "valid_range_inclusive": [True, True],
                 "output_units": "Pa",
-                "source": _fixture_source("fixture-na-direct"),
+                "source": _fixture_source("fixture-k-direct"),
                 "evaluation_tolerance": {
                     "relative": 1.0e-12,
                     "absolute_Pa": 1.0e-12,
@@ -663,10 +663,10 @@ def test_cross_registry_legacy_overlap_fails_loudly(fixture_mapping):
     }
     fixture_mapping["legacy_adapter_rows"].append(
         {
-            "adapter_id": "fixture:legacy:Na:overlap",
+            "adapter_id": "fixture:legacy:K:overlap",
             "source_path": "data/vapor_pressures.yaml",
-            "source_selector": "metals.Na.pure_component_antoine",
-            "species": "Na",
+            "source_selector": "metals.K.pure_component_antoine",
+            "species": "K",
             "property_kind": "saturation_pressure",
             "phase_branch": "liquid",
             "pressure_kind": "saturation",
@@ -675,8 +675,8 @@ def test_cross_registry_legacy_overlap_fails_loudly(fixture_mapping):
     with pytest.raises(PropertyCoverageConflictError) as error:
         _load_fixture_mapping(fixture_mapping)
     assert error.value.row_ids == (
-        "fixture:Na:saturation_pressure:direct",
-        "fixture:legacy:Na:overlap",
+        "fixture:K:saturation_pressure:direct",
+        "fixture:legacy:K:overlap",
     )
 
 

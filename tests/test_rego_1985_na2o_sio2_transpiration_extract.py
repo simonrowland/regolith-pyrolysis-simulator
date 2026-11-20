@@ -191,8 +191,11 @@ def _assert_migrated_reductions_and_conditions(observations, experiments, benche
         assert cco.selected.authority.value == "derived"
         assert cco.selected.value.point is not None
         if run == 1:
+            # Table I states a pure-CO atmosphere at 1.015 atm, so pCO is
+            # 1.02844875 bar at 1573.15 K. JANAF C-093 rows 1500/1600 K set
+            # the independent stated-CO equilibrium pin.
             assert float(cco.selected.value.point) == pytest.approx(
-                -9.521520437034766, abs=1e-12
+                -16.576568296482, abs=1e-12
             )
         assert pressure_row.identity.fO2_Pa.is_unknown
 

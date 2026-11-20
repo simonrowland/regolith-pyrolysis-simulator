@@ -108,7 +108,10 @@ APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
     {"cached_interpolated", "cached_physics_bucket"}
 )
 _CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
-GATE_CURVE_NOTICE_KEYS = ('composition_projected_notice', 'gate_provider_refusal')
+GATE_CURVE_NOTICE_KEYS = (
+    'composition_projected_notice', 'gate_provider_refusal',
+    'gate_provider_step_down', 'alphamelts_reference_pressure',
+)
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
@@ -689,6 +692,26 @@ class PT0DeterminismStore:
                 temperature_K=temperature_K,
             )
         sim._last_vapor_pressure_diagnostic = vapor_pressure_diagnostic
+        # d-401. Replay and the write-through hit both adopt the cached
+        # vapour evaluation here, after the hour reset has cleared the
+        # stamp. The restored diagnostic's pO2 is the pressure that
+        # evaluation consumed. Leaving the stamp unset makes the
+        # snapshot ceiling read the post-bleed reservoir. A diagnostic
+        # that omits pO2 records absence: this path does not hold the
+        # live dispatch argument, and the later reservoir is not a
+        # substitute.
+        from simulator.evaporation import (
+            pressure_vapour_evaluation_consumed,
+            remember_evaluated_transport_pO2,
+        )
+
+        remember_evaluated_transport_pO2(
+            sim,
+            pressure_vapour_evaluation_consumed(
+                vapor_pressure_diagnostic,
+                dispatch_pO2_bar=None,
+            ),
+        )
         sulfur = getattr(result, "sulfur_saturation", None)
         sim._last_sulfur_saturation_result = sulfur
         replay_fO2_log = getattr(result, "requested_fO2_log", None)
@@ -2788,6 +2811,14 @@ def gate_curve_provider_timeout_reason(
     )
 
 
+def gate_curve_provider_has_terminal_input(reasons: Sequence[str]) -> bool:
+    """Missing or invalid inputs cannot be repaired by changing engines."""
+    return any(reason in {
+        "missing_input", "invalid_input", "invalid_fo2_log",
+        "invalid_pressure_bar", "non_finite_composition",
+    } for reason in reasons)
+
+
 def gate_curve_provider_timed_out(diagnostic: Mapping[str, Any] | None) -> bool:
     return gate_curve_provider_timeout_reason(diagnostic) is not None
 
@@ -2812,10 +2843,7 @@ def gate_curve_provider_outcome_for_status(
     reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
     if "environment" in reasons:
         return GateCurveProviderOutcome.FAILED
-    if any(reason in {
-        "missing_input", "invalid_input", "invalid_fo2_log",
-        "invalid_pressure_bar", "non_finite_composition",
-    } for reason in reasons):
+    if gate_curve_provider_has_terminal_input(reasons):
         return GateCurveProviderOutcome.FAILED
     numerical_reasons = {
         "not_converged", "engine_not_converged", "negative_convergence_evidence",

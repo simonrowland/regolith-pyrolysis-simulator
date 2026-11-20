@@ -4,6 +4,9 @@ from pathlib import Path
 import app as app_module
 import web.events as web_events
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from tests.chemistry.test_condensation_green_pins import (
+    _without_engine_versions,
+)
 
 
 GOLDEN_TRACE = (
@@ -32,6 +35,30 @@ GOLDEN_TRACE = (
 # byte-identical. VOLATILE_KEYS strip timestamps/run ids; two-pass
 # self-equality still proves determinism of the live path. Do NOT
 # soft-xfail again; rebaseline from the executable only (Hard Invariant 7).
+# Regenerated from the executable after car1 merge bef9af1e7. The
+# pre-merge tree at 4b6555249 matches the previous golden (62233 bytes,
+# 33 refusal species). HEAD matches the merge trace. The C0B hour-1
+# panel is at 225 C (225 + 273.15 = 498.15 K) and now counts 35: the
+# same 33 plus Mg and MnO_gas, both
+# upstream_vapour_carrier_non_authoritative.
+# - 336fac01a evaluates a cold metal source fit below its certified
+#   band and keeps a certification notice. Mg's certified floor is
+#   701 K, so 498.15 K used to raise VaporPressureRangeError
+#   (metal_vapor_pressure_out_of_source_certified_range) and omit
+#   the carrier.
+# - eb49ee6fc continues a declared-domain typed_refusal row with a
+#   notice instead of omitting it. MnO_gas (domain floor 1519 K) is
+#   the only such row this lunar_mare_low_ti feedstock carries;
+#   CoO_gas is the other typed_refusal row and has no flux here.
+# Byte 2218 is the n_species digit 3 -> 5. The remaining growth is the
+# gate_provider_step_down diagnostic. That object carries host
+# engine_version strings (a local alphaMELTS path among them). The byte
+# compare strips those keys with the condensation green-pin helper and
+# requires each value to be a non-empty string. alphamelts_reference_pressure
+# is written once per hour on the liquid-fraction gate
+# (EvaporationMixin._freeze_gate_curve_from_gate_dispatch) and then echoed
+# with the oxygen-reservoir object onto that hour's tick delta and
+# per_hour_summary. It is not per species and not a second emission per tick.
 
 VOLATILE_KEYS = {
     "duration_s",
@@ -47,6 +74,15 @@ VOLATILE_KEYS = {
 
 class StopRunLoop(Exception):
     pass
+
+
+def _without_host_engine_versions(trace):
+    # Two one-hour campaigns, three oxygen-reservoir copies each (the gate
+    # record, the tick's per_hour_summary_delta, and per_hour_summary), and
+    # two engine identities on each copy: 2 * 3 * 2 = 12.
+    stripped, count = _without_engine_versions(trace)
+    assert count == 12
+    return stripped
 
 
 def _canonical_bytes(trace):
@@ -225,7 +261,9 @@ def test_pre_refactor_socket_trace_matches_golden(monkeypatch):
         "make_decision_roundtrip": True,
         "post_decision_no_tick_resume": True,
     }
-    assert _canonical_bytes(first_trace) == _canonical_bytes(second_trace)
-    actual = _canonical_bytes(first_trace)
+    first_comparable = _without_host_engine_versions(first_trace)
+    second_comparable = _without_host_engine_versions(second_trace)
+    assert _canonical_bytes(first_comparable) == _canonical_bytes(second_comparable)
+    actual = _canonical_bytes(first_comparable)
     expected = GOLDEN_TRACE.read_bytes()
     assert actual == expected

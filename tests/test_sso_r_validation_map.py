@@ -27,21 +27,24 @@ CONFIGURED_GOLDEN_PATH = Path(
 CONFIGLESS_GOLDEN_PATH = Path(
     "tests/goldens/sso_r_validation_map_lunar_mare_low_ti_configless.json"
 )
-# Confirmed inside pytest on the test host at green pins.
+# Pool/escape anchors confirmed inside pytest on Mac-Studio-256-2 at green pins;
+# the c3 route-dependent receipt is derived below.
 CONFIGURED_OWNER_PN2_ANCHORS = {
     "native_fe_pool_mol": 1572.6800886957762,
     "native_fe_tap_mol": 1570.5846976173568,
     "native_fe_vapor_mol": 2.095391078419451,
     "native_fe_vapor_escape_fraction_of_pool": 0.0013323695603962018,
-    "stage_3_Fe_wt_pct": 0.04224433363512624,
+    # c3: the exposed native-Fe parcel arrives first; the subsequent alkali-rich
+    # SiO parcel is refused, leaving a Fe-only receipt (100 wt%, no SiO2).
+    "stage_3_Fe_wt_pct": 100.0,
     "SiO_provider_pO2_bar": 1e-09,
     "SiO_flux_kg_hr": 0.0279267607515389,
 }
 # Configless fallback, not canonical. Used when the consumed curve did not
 # come from the gate liquid-fraction path.
 CONFIGLESS_FALLBACK_NOT_CANONICAL = {
-    "native_fe_pool_mol": 1576.0114767733974,
-    "stage_3_Fe_wt_pct": 0.0121860033141556,
+    "native_fe_pool_mol": 786.3400448197306,
+    "stage_3_Fe_wt_pct": 100.0,
 }
 
 _SMOKE_FREEZE_GATE_CURVE_RECORDS = []
@@ -384,7 +387,7 @@ def test_sio_vapor_pressure_responds_to_requested_po2(smoke_payload):
     assert low["SiO_flux_kg_hr"] > high["SiO_flux_kg_hr"] * 100.0
 
 
-def test_exact_full_dose_oxidizing_pn2_row_refuses_absent_melt_redox_capacity():
+def test_exact_full_dose_oxidizing_pn2_row_skips_c3_reduction_without_capacity():
     setpoints, feedstocks, vapor_pressures, calibration = _calibrated_inputs()
 
     row = validation_map.run_row(
@@ -401,11 +404,14 @@ def test_exact_full_dose_oxidizing_pn2_row_refuses_absent_melt_redox_capacity():
     assert math.isfinite(row["post_exchange_fO2_log_diagnostic"])
     assert math.isfinite(row["redox_source_delta_ln_fO2"])
     assert row["redox_source_skip_reason"] == "no_melt_redox_capacity"
-    assert row["redox_source_skipped_terms_mol_o2_equiv_by_label"][
+    assert row["redox_source_applied_terms_mol_o2_equiv_by_label"][
         "redox_source:evaporative_metal_loss"
     ] > 0.0
+    assert row["redox_source_skipped_terms_mol_o2_equiv_by_label"][
+        "redox_source:c3_na_shuttle_reduction"
+    ] < 0.0
     assert row["redox_source_skipped_reasons_by_label"][
-        "redox_source:evaporative_metal_loss"
+        "redox_source:c3_na_shuttle_reduction"
     ] == "no_melt_redox_capacity"
     assert row["redox_source_refusal_context"] == {}
 
@@ -643,6 +649,7 @@ def test_owner_pn2_anchor_reports_current_certification_state(
     assert owner["stage_3_Fe_wt_pct"] == pytest.approx(
         expected_stage_3_Fe_wt_pct, rel=0.0, abs=1.0e-15
     )
+    assert owner["stage_3_SiO2_capture_kg"] == 0.0
     assert owner["ferric_divergence_material"] is False
     assert abs(owner["mass_balance_error_pct"]) <= 5e-12
     assert owner["SiO_provider_pO2_bar"] == pytest.approx(
@@ -759,7 +766,7 @@ def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     assert smoke_payload["live_owner_probe"]["native_split_observed"] is True
     assert parity["passed"] is True
     assert window["passed"] is False
-    assert "first_passing_T_C=1600.0" in window["detail"]
+    assert "first_passing_T_C=None" in window["detail"]
     assert "window under PN2 sweep transport semantics" in window["detail"]
     assert "live parity=confirmed" in window["detail"]
 

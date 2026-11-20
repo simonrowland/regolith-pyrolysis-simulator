@@ -66,11 +66,25 @@ _FLUX_TOLERANCE_REL = 1e-9
 _FLUX_TOLERANCE_ABS_KG_HR = 1e-9
 
 
+@pytest.mark.parametrize("spec", [0.3, {"form": "scalar", "value": 0.3}])
+def test_declared_alpha_without_authority_does_not_claim_measurement(spec):
+    from engines.builtin.evaporation_flux import publisher_effective_alpha
+
+    decision = publisher_effective_alpha(
+        "Na", 1723.15, {"Na": spec},
+        allow_unmeasured_alpha_fallback=True,
+        unmeasured_alpha_fallback_species_allowlist=None,
+    )
+    assert decision.alpha == 0.3
+    assert decision.policy_emits() is True
+    assert decision.evaluation["authority_status"] == "unavailable"
+
+
 def _series_resistance_reference_flux(
     sim: PyrolysisSimulator,
     vapor_pressures_Pa: dict,
 ) -> dict:
-    """Re-invoke the series-resistance source outside ``_calculate_evaporation``.
+    """Re-invoke the publisher law using the surface owner's pressure map.
 
     NOTE (2026-06-29 review): this calls the SAME production helper
     ``_series_resistance_evaporation_flux_kg_m2_s`` (below), so the parity tests
@@ -81,6 +95,18 @@ def _series_resistance_reference_flux(
     double-count guard, stir saturation, and vacuum gas-film limit) are pinned
     independently in ``tests/chemistry/test_evaporation_series_resistance_flux.py``.
     """
+
+    # d-376 amendment 1 closes the persisted mass-action pressures before
+    # publishing flux. Re-enter the same physics owner for the reference
+    # path so this caller-wiring check compares like pressure vectors; the
+    # surface root itself has separate pins.
+    context = getattr(sim, "_langmuir_flux_closure_context", None)
+    if isinstance(context, dict) and context.get("root_closed"):
+        surface = sim._reclose_langmuir_pressures(
+            context.get("film_partials_Pa", {})
+        )
+        if surface is not None and surface.applied:
+            vapor_pressures_Pa = dict(surface.pressures_Pa)
 
     T_K = sim.melt.temperature_C + 273.15
     flux: dict[str, float] = {}
@@ -402,39 +428,18 @@ def test_k_at_1650c_drives_flux_with_extrapolation_status(
 
 
 @pytest.mark.xdist_group("serial")
-def test_unmeasured_alpha_fallback_allowlist_is_scoped_and_loud():
-    allowed = _w3_result_with_controls(
-        1.0,
-        alpha={},
-        allow_unmeasured_alpha_fallback=True,
-        unmeasured_alpha_fallback_species=["Na"],
-    )
-
-    assert allowed.status == "ok"
-    assert allowed.diagnostic["unmeasured_alpha_fallback_species"] == ["Na"]
-    assert any(
-        "WARNING" in warning
-        and "alpha=1.0 prototype fallback" in warning
-        and "Na" in warning
-        for warning in allowed.warnings
-    )
-
-    refused = _w3_result_with_controls(
-        1.0,
-        alpha={},
-        allow_unmeasured_alpha_fallback=True,
-        unmeasured_alpha_fallback_species=["CrO2", "Mn"],
-    )
-
-    assert refused.status == "ok"
-    assert refused.diagnostic["evaporation_flux_kg_hr"] == {}
-    assert set(refused.diagnostic["missing_alpha"]) == {"Na"}
-    assert refused.diagnostic["species_refusals"]["Na"]["status"] == "refused"
-    assert (
-        refused.diagnostic["species_refusals"]["Na"]["disposition"]
-        == "retained_in_condensed_parent_oxide"
-    )
-    assert "unmeasured_alpha_fallback_species" not in refused.diagnostic
+def test_legacy_fallback_allowlist_cannot_suppress_upper_bound():
+    for allowlist in (["Na"], ["CrO2", "Mn"]):
+        result = _w3_result_with_controls(
+            1.0, alpha={},
+            allow_unmeasured_alpha_fallback=True,
+            unmeasured_alpha_fallback_species=allowlist,
+        )
+        assert result.status == "ok"
+        assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] > 0.0
+        assert result.diagnostic["unmeasured_alpha_fallback_species"] == ["Na"]
+        assert result.diagnostic["alpha_authority_status_by_species"]["Na"] == "analytical_upper_bound"
+        assert any("upper bound" in warning for warning in result.warnings)
 
 
 @pytest.mark.xdist_group("serial")
@@ -698,7 +703,7 @@ def test_evaporation_aux_uses_atom_ledger_for_parent_oxide_availability(
 
 
 @pytest.mark.xdist_group("serial")
-def test_evaporation_aux_includes_spent_reductant_residue_projection_domain(
+def test_evaporation_aux_excludes_spent_residue_from_debit_availability(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     sim = _build_sim(
@@ -737,7 +742,8 @@ def test_evaporation_aux_includes_spent_reductant_residue_projection_domain(
         SPENT_REDUCTANT_RESIDUE_ACCOUNT
     )["Na2O"]
 
-    assert available_oxide_kg["Na"] == pytest.approx(
+    assert available_oxide_kg["Na"] == pytest.approx(cleaned_melt_na2o_kg)
+    assert sim.melt.composition_kg["Na2O"] == pytest.approx(
         cleaned_melt_na2o_kg + spent_residue_na2o_kg
     )
 
@@ -814,6 +820,71 @@ def test_provider_matches_safarian_engh_pure_si_hkl_mass_flux():
         * 3600.0
     )
     assert flux_kg_hr == pytest.approx(expected_kg_hr, rel=1e-12)
+
+
+@pytest.mark.xdist_group("serial")
+def test_provider_publishes_zero_net_flux_without_debiting_it():
+    """P_eq <= P_bulk is a computed 0. A missing molar mass stays omitted.
+
+    The debit map does not gain the zero. A positive sibling is unchanged.
+    """
+
+    zero_only = _w3_result_with_controls(
+        1.0,
+        vapour_batch_flux_pressures_Pa={'Na': 0.0, 'Unobtainium': 0.0},
+        molar_mass_kg_mol={'Na': 0.023},
+        stoich_by_species={
+            'Na': {
+                'parent_oxide': 'Na2O',
+                'oxide_per_product_kg': 1.347,
+                'O2_per_product_kg': 0.347,
+            },
+            'Unobtainium': {
+                'parent_oxide': 'Na2O',
+                'oxide_per_product_kg': 1.0,
+                'O2_per_product_kg': 0.0,
+            },
+        },
+        available_oxide_kg={'Na': 10.0, 'Unobtainium': 10.0},
+    )
+    assert zero_only.status == 'ok'
+    assert zero_only.diagnostic['evaporation_flux_kg_hr'] == {}
+    assert zero_only.diagnostic['zero_net_evaporation_flux'] == {'Na': 0.0}
+    assert 'Unobtainium' not in zero_only.diagnostic['zero_net_evaporation_flux']
+    assert 'missing_molar_mass' not in zero_only.diagnostic
+
+    baseline = _w3_result_with_controls(1.0)
+    mixed = _w3_result_with_controls(
+        1.0,
+        vapour_batch_flux_pressures_Pa={'Na': 100.0, 'SiO': 10.0},
+        overhead_partials_Pa={'SiO': 50.0},
+        molar_mass_kg_mol={'Na': 0.023, 'SiO': 0.044085},
+        stoich_by_species={
+            'Na': {
+                'parent_oxide': 'Na2O',
+                'oxide_per_product_kg': 1.347,
+                'O2_per_product_kg': 0.347,
+            },
+            'SiO': {
+                'parent_oxide': 'SiO2',
+                'oxide_per_product_kg': 1.0,
+                'O2_per_product_kg': 0.0,
+            },
+        },
+        available_oxide_kg={'Na': 10.0, 'SiO': 10.0},
+        evaporation_series_resistance={
+            'gas_resistance_enabled': True,
+            'melt_resistance_enabled': False,
+        },
+    )
+    assert mixed.status == 'ok'
+    assert 'SiO' not in mixed.diagnostic['evaporation_flux_kg_hr']
+    assert mixed.diagnostic['zero_net_evaporation_flux']['SiO'] == 0.0
+    assert mixed.diagnostic['evaporation_flux_kg_hr']['Na'] == pytest.approx(
+        baseline.diagnostic['evaporation_flux_kg_hr']['Na'],
+        rel=0,
+        abs=0,
+    )
 
 
 @pytest.mark.xdist_group("serial")
@@ -1045,8 +1116,8 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
         "would be vacuous"
     )
 
-    reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
     kernel_flux = dict(sim._calculate_evaporation(equilibrium).species_kg_hr)
+    reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
     refusals = sim._last_vapour_batch_report["refusals_by_species"]
     refused_reference_species = set(reference_flux) & set(refusals)
 
@@ -1054,32 +1125,11 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
         "series-resistance reference returned no flux -- the test "
         "fixture is not exercising the path it claims to cover"
     )
-    # b-314: MC-4A's numeric CrO2-family alpha rows are tier-2
-    # ``broad_proxy_not_intrinsic`` proxies, not measurements. The restored
-    # gate no longer lets them satisfy the measured-alpha requirement: with
-    # this fixture's explicit ``allow_unmeasured_alpha_fallback`` opt-in they
-    # take the marked alpha=1.0 prototype path (recorded in
-    # ``unmeasured_alpha_fallback_species``) instead of fluxing as measured —
-    # a declared deviation from the reference helper's tagged-proxy value, so
-    # they leave wiring parity. Parity continues for every measured species.
     flux_diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
-    sc67_accounted = set(
-        flux_diagnostic.get("unmeasured_alpha_fallback_species", ())
-    ) | set(flux_diagnostic.get("missing_alpha") or ())
-    non_parity_species = set(reference_flux) & sc67_accounted
-    assert "CrO2" in non_parity_species, (
-        "the broad_proxy_not_intrinsic CrO2 row must not flux as measured; "
-        f"fallback="
-        f"{flux_diagnostic.get('unmeasured_alpha_fallback_species')} "
-        f"missing_alpha={flux_diagnostic.get('missing_alpha')}"
-    )
+    assert flux_diagnostic["alpha_authority_status_by_species"]["CrO2"] == "proxy/bridge"
     assert refused_reference_species == set()
     for species, legacy_value in reference_flux.items():
         if species in refused_reference_species:
-            continue
-        if species in non_parity_species:
-            # Accounted by the restored SC-67 surface (marked fallback or
-            # missing_alpha refusal), not by measured-alpha wiring.
             continue
         kernel_value = kernel_flux.get(species, 0.0)
         tol = max(
@@ -1091,12 +1141,7 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
             f"kg/hr kernel={kernel_value:.6g} kg/hr (tol={tol:.3g})"
         )
 
-    # An explicit prototype alpha can lift a proxy-only reference below its
-    # reporting floor into a positive runtime channel (AlO on this trajectory).
-    extra_runtime_species = set(kernel_flux) - set(reference_flux)
-    assert extra_runtime_species <= set(
-        flux_diagnostic.get("unmeasured_alpha_fallback_species", ())
-    ), f"runtime species lack measured reference or explicit alpha fallback: {extra_runtime_species}"
+    assert set(kernel_flux) == set(reference_flux)
 
 
 # ---------------------------------------------------------------------------
@@ -1187,10 +1232,10 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         if not vapor_pressures_Pa:
             continue
 
-        reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
         kernel_flux = dict(
             sim._calculate_evaporation(equilibrium).species_kg_hr
         )
+        reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
         refusals = sim._last_vapour_batch_report["refusals_by_species"]
         refused_reference_species = set(reference_flux) & set(refusals)
         # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4), later pinned as b-114
@@ -1212,30 +1257,18 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
                 )
         refused_reference_species_seen.update(refused_reference_species)
 
-        # b-314: tier-2 ``broad_proxy_not_intrinsic`` rows no longer satisfy
-        # the measured-alpha requirement. With the fallback explicitly
-        # enabled for this fixture they take the marked alpha=1.0 prototype
-        # path (recorded in ``unmeasured_alpha_fallback_species``) — a
-        # declared deviation from the reference helper's tagged-proxy value,
-        # so they leave wiring parity rather than parrot it.
+        # Both paths now use the same tagged proxy value. Its authority must
+        # remain visible while its numerical flux participates in parity.
         flux_diagnostic = (
             getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
         )
         fallback_reference_species = set(reference_flux) & set(
             flux_diagnostic.get("unmeasured_alpha_fallback_species", ())
         )
-        missing_alpha_reference_species = set(reference_flux) & set(
-            flux_diagnostic.get("missing_alpha") or ()
-        )
-        non_parity_species = (
-            fallback_reference_species | missing_alpha_reference_species
-        )
-        proxy_accounted_species_seen.update(non_parity_species)
+        proxy_accounted_species_seen.update(fallback_reference_species)
 
         for species in set(reference_flux) | set(kernel_flux):
             if species in refused_reference_species:
-                continue
-            if species in non_parity_species:
                 continue
             legacy_value = float(reference_flux.get(species, 0.0))
             kernel_value = float(kernel_flux.get(species, 0.0))
@@ -1488,67 +1521,26 @@ def test_transitional_extrapolation_reports_actual_and_commanded_pressure():
 
 
 @pytest.mark.xdist_group("serial")
-def test_prepass_records_missing_alpha_with_transitional_extrapolation():
-    """b-194: a request-level missing alpha must not stay silent in the
-    transport pre-pass. Unity remains the Hertz-Knudsen screening ceiling
-    (Na still loads ``affected_species``), but the same ``missing_alpha``
-    record the authoritative loop emits must remain on the diagnostic.
-    """
-
+def test_absent_alpha_remains_flagged_with_transitional_extrapolation():
     vacuum = _w3_result_with_controls(1.0, alpha={})
     transitional = _w3_result_with_controls(
-        1.0,
-        alpha={},
-        overhead_pressure_pa=3.632,
-        pipe_diameter_m=0.12,
-        gas_temperature_K=2023.15,
+        1.0, alpha={}, overhead_pressure_pa=3.632,
+        pipe_diameter_m=0.12, gas_temperature_K=2023.15,
     )
-
-    assert vacuum.status == "ok"
-    assert set(vacuum.diagnostic["missing_alpha"]) == {"Na"}
-    vacuum_record = vacuum.diagnostic["missing_alpha"]["Na"]
-    assert vacuum_record["policy"] == "fail_loud_missing_alpha"
-    assert vacuum_record["fallback_control"] == (
-        "chemistry_kernel.allow_unmeasured_alpha_fallback"
-    )
-    assert vacuum_record["P_eq_Pa"] == pytest.approx(100.0)
-    assert vacuum_record["P_bulk_Pa"] == pytest.approx(0.0)
-    assert vacuum_record["baseline_alpha_1_rate_kg_hr"] > 1.0e-12
-    assert vacuum.diagnostic["species_refusals"]["Na"]["reason"] == (
-        "missing_evaporation_alpha"
-    )
-
-    assert transitional.status == "ok"
+    for result in (vacuum, transitional):
+        assert result.status == "ok"
+        assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] > 0.0
+        assert "missing_alpha" not in result.diagnostic
+        assert result.diagnostic["alpha_used_by_species"]["Na"] == 1.0
+        assert result.diagnostic["alpha_authority_status_by_species"]["Na"] == "analytical_upper_bound"
     notice = transitional.diagnostic["continuum_extrapolation_notice"]
-    assert notice["reason"] == (
-        "viscous_p_bulk_transport_out_of_domain"
-    )
+    assert notice["reason"] == "viscous_p_bulk_transport_out_of_domain"
     assert notice["affected_species"] == ("Na",)
     assert notice["authority_level"] == "extrapolated"
-    assert transitional.diagnostic["evaporation_flux_kg_hr"] == {}
-    assert set(transitional.diagnostic["missing_alpha"]) == {"Na"}
-    prepass_record = transitional.diagnostic["missing_alpha"]["Na"]
-    assert prepass_record["policy"] == vacuum_record["policy"]
-    assert prepass_record["fallback_control"] == vacuum_record["fallback_control"]
-    assert prepass_record["P_eq_Pa"] == pytest.approx(vacuum_record["P_eq_Pa"])
-    assert prepass_record["P_bulk_Pa"] == pytest.approx(
-        vacuum_record["P_bulk_Pa"]
-    )
-    assert prepass_record["baseline_alpha_1_rate_kg_hr"] > 1.0e-12
-    refusal = transitional.diagnostic["species_refusals"]["Na"]
-    assert refusal["status"] == "refused"
-    assert refusal["reason"] == "missing_evaporation_alpha"
-    assert refusal["disposition"] == "retained_in_condensed_parent_oxide"
-    assert refusal["parent_oxide"] == "Na2O"
-    assert any(
-        "evaporation_alpha is missing" in warning
-        and "Na" in warning
-        for warning in transitional.warnings
-    )
 
 
 @pytest.mark.xdist_group("serial")
-def test_evaporation_caller_keeps_missing_alpha_unavailable_without_aborting(
+def test_evaporation_caller_keeps_flagged_alpha_prediction(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -1570,8 +1562,8 @@ def test_evaporation_caller_keeps_missing_alpha_unavailable_without_aborting(
     )
     assert result.status == "ok"
     assert result.diagnostic["continuum_extrapolation_notice"]["reason"] == "viscous_p_bulk_transport_out_of_domain"
-    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
-    assert set(result.diagnostic["missing_alpha"]) == {"CrO", "CrO2"}
+    assert set(result.diagnostic["evaporation_flux_kg_hr"]) == {"CrO", "CrO2"}
+    assert "missing_alpha" not in result.diagnostic
     assert any("CrO, CrO2" in warning for warning in result.warnings)
 
     sim = _build_sim(
@@ -1594,7 +1586,7 @@ def test_evaporation_caller_keeps_missing_alpha_unavailable_without_aborting(
         liquid_fraction=1.0,
     )
     sim._calculate_evaporation(equilibrium)
-    for key in ("missing_alpha", "species_refusals"):
+    for key in ("alpha_authority_status_by_species", "unmeasured_alpha_fallback_species"):
         assert sim._last_evaporation_flux_diagnostic[key] == result.diagnostic[key]
 
 

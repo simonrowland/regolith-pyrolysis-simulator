@@ -322,6 +322,43 @@ def test_extended_curves_match_the_survey_table() -> None:
             assert _q4(evaluation.log10_fO2_bar) == Decimal(printed)
 
 
+def test_janaf_routes_keep_current_values_across_the_shared_reader_move() -> None:
+    cases = (
+        (
+            "Mo-MoO2",
+            "janaf_mo_moo2",
+            {
+                1473: "-11.53633613400215726869017509",
+                1873: "-7.270146874359887836692346761",
+                2900: "-1.942045996082594188846622639",
+            },
+        ),
+        (
+            "MH",
+            "janaf_mh_fe3o4_fe2o3",
+            {
+                1473: "-2.523677462426327039996050790",
+                1873: "1.004017188271324461764919348",
+                2900: "5.341085784852332087921037367",
+            },
+        ),
+        (
+            "MW",
+            "janaf_mw_fe0_947o_fe3o4",
+            {
+                1473: "-9.832049882995169623650018833",
+                1873: "-5.098714277199287894495940410",
+                2900: "1.331750271182637990292954274",
+            },
+        ),
+    )
+    for buffer, calibration_id, points in cases:
+        for temperature, expected in points.items():
+            assert _member(
+                buffer, calibration_id, Decimal(temperature)
+            ) == Decimal(expected)
+
+
 def test_region2_bands_equal_the_edge_disagreement_at_each_edge() -> None:
     # At T = edge, d(T) = d(edge), so |d(T) - d(edge)| + |d(edge)|
     # reduces to the edge offset itself. The Mo endpoint literals are the

@@ -71,8 +71,10 @@ species:
         form: arrhenius
         # Tachibana, Nagahara & Ozawa 2001, LPSC XXXII #1767 p. 2 Fig. 1:
         # ln(alpha_c) = 0.61 - 1127 K/T. A = exp(0.61), B = 1127 K.
-        # B/T and alpha are dimensionless. The 1523.15 K stage midpoint
-        # gives alpha_c = 0.878170956. Outside the certified band the
+        # B/T and alpha are dimensionless. At 1523.15 K, inside the
+        # certified band, alpha_c = 0.878170956. That point is not the
+        # Stage-1 wall. The wall is 1100 C = 1373.15 K, below 1443 K;
+        # the continued curve there is 0.809984123. Outside the band the
         # published curve continues, bounded to (0, 1] and flagged:
         # T -> infinity reaches the probability ceiling; T -> 0 tends to zero.
         A: 1.84043139878164

@@ -104,7 +104,13 @@ from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
 )
 from simulator.chemistry.melt_activity import melt_oxide_activity
-from simulator.mre_ladder import DECOMP_VOLTAGES, mre_decomposition_voltage_reference
+from simulator.mre_ladder import (
+    DECOMP_VOLTAGES,
+    MRE_LIQUID_STANDARD_MISSING_INPUT,
+    _mre_raw_graph_requirement,
+    mre_decomposition_voltage_reference,
+    mre_liquid_standard_missing_notice,
+)
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, FARADAY
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -113,7 +119,7 @@ MRE_CURRENT_PARTITION_SOURCE = (
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 
-MRE_DECOMP_VOLTAGE_PROVENANCE = {
+_MRE_DECOMP_VOLTAGE_PROVENANCE = {
     "NiO": {
         "standard_voltage_V": DECOMP_VOLTAGES["NiO"],
         "electrons_per_formula": 2,
@@ -215,36 +221,42 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
     },
 }
 
-for _oxide, _row in MRE_DECOMP_VOLTAGE_PROVENANCE.items():
-    _reference = mre_decomposition_voltage_reference(_oxide)
-    if _reference is None:
-        continue
-    _row["standard_voltage_V"] = _reference.voltage
-    _row["standard_voltage_temperature_K"] = _reference.temperature_K
-    _row["standard_voltage_authority"] = _reference.authority
-    _row["standard_voltage_authoritative"] = _reference.authoritative
-    _row["standard_voltage_status"] = _reference.status
-    _row["ellingham_species"] = _reference.ellingham_species
-    _row["delta_gf_kJ_per_mol_formula"] = (
-        -_reference.voltage
-        * float(_row["electrons_per_formula"])
-        * FARADAY
-        / 1000.0
-    )
-    if _reference.authoritative:
-        _row["status"] = "authoritative_ellingham_graph"
-        _row["delta_g_kJ_per_mol_O2"] = (
-            -_reference.voltage * 4.0 * FARADAY / 1000.0
+def __getattr__(name: str):
+    # Preserve the reference sidecar API without reading JANAF at import.
+    if name != "MRE_DECOMP_VOLTAGE_PROVENANCE":
+        raise AttributeError(name)
+    rows = {oxide: dict(row) for oxide, row in _MRE_DECOMP_VOLTAGE_PROVENANCE.items()}
+    for _oxide, _row in rows.items():
+        _reference = mre_decomposition_voltage_reference(_oxide)
+        if _reference is None:
+            continue
+        _row["standard_voltage_V"] = _reference.voltage
+        _row["standard_voltage_temperature_K"] = _reference.temperature_K
+        _row["standard_voltage_authority"] = _reference.authority
+        _row["standard_voltage_authoritative"] = _reference.authoritative
+        _row["standard_voltage_status"] = _reference.status
+        _row["ellingham_species"] = _reference.ellingham_species
+        _row["delta_gf_kJ_per_mol_formula"] = (
+            -_reference.voltage
+            * float(_row["electrons_per_formula"])
+            * FARADAY
+            / 1000.0
         )
-        _row["delta_g_relation"] = "DeltaG_dissoc = -E*4F"
-    elif _reference.authority == "ellingham_graph":
-        _row["status"] = "diagnostic_ellingham_graph"
-        _row["delta_g_kJ_per_mol_O2"] = (
-            -_reference.voltage * 4.0 * FARADAY / 1000.0
-        )
-        _row["delta_g_relation"] = "DeltaG_dissoc = -E*4F"
-    else:
-        _row["status"] = "ellingham_fallback"
+        if _reference.authoritative:
+            _row["status"] = "authoritative_ellingham_graph"
+            _row["delta_g_kJ_per_mol_O2"] = (
+                -_reference.voltage * 4.0 * FARADAY / 1000.0
+            )
+            _row["delta_g_relation"] = "DeltaG_dissoc = -E*4F"
+        elif _reference.authority == "ellingham_graph":
+            _row["status"] = "diagnostic_ellingham_graph"
+            _row["delta_g_kJ_per_mol_O2"] = (
+                -_reference.voltage * 4.0 * FARADAY / 1000.0
+            )
+            _row["delta_g_relation"] = "DeltaG_dissoc = -E*4F"
+        else:
+            _row["status"] = "ellingham_fallback"
+    return rows
 
 
 class BuiltinElectrolysisStepProvider(ChemistryProvider):
@@ -295,7 +307,6 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             MRE_INVALID_CONTROL_REFUSAL,
             MRE_INVALID_TARGET_REFUSAL,
             MRE_INVALID_GAS_FUGACITY_REFUSAL,
-            MRE_MULTI_OXIDE_PARTITION_REFUSAL,
             MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
             MRE_RAW_MARGIN_REFUSAL,
             MRE_CERTIFICATION_DENYLIST_REASON,
@@ -312,7 +323,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             current_efficiency_diagnostic,
             mre_control_domain_assessment,
             mre_selectivity_weight,
-            uncertified_multi_oxide_partition_targets,
+            multi_oxide_partition_notices,
         )
         from simulator.state import (
             FARADAY,
@@ -559,6 +570,15 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 diagnostic["mre_ellingham_phase_basis_by_oxide"][oxide] = (
                     voltage_reference.ellingham_phase_basis
                 )
+            missing_notice = mre_liquid_standard_missing_notice(voltage_reference)
+            if missing_notice is not None:
+                diagnostic.setdefault(
+                    "mre_liquid_standard_missing_targets", {}
+                )[oxide] = missing_notice
+                diagnostic["notices"] = tuple(
+                    diagnostic.get("notices", ()) or ()
+                ) + (missing_notice,)
+                continue
             metal, cations_per_oxide, _n_oxy = OXIDE_TO_METAL.get(
                 oxide, ("", 1, 0)
             )
@@ -731,6 +751,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             if diagnostic["mre_phase_refused_targets"]:
                 status = "refused"
                 diagnostic["reason_refused"] = MRE_PRODUCT_PHASE_MISMATCH_REFUSAL
+            if diagnostic.get("mre_liquid_standard_missing_targets"):
+                status = "refused"
+                diagnostic["reason_refused"] = MRE_LIQUID_STANDARD_MISSING_INPUT
             if status == "refused":
                 diagnostic = _without_mre_quantities(diagnostic)
             elif voltage_V > 0.0 and current_A > 0.0:
@@ -743,17 +766,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 diagnostic=diagnostic,
             )
 
-        refused_targets = uncertified_multi_oxide_partition_targets(reducible)
-        if refused_targets:
-            diagnostic["reason_refused"] = MRE_MULTI_OXIDE_PARTITION_REFUSAL
-            diagnostic["reducible_oxide_targets"] = refused_targets
-            return IntentResult(
-                intent=ChemistryIntent.ELECTROLYSIS_STEP,
-                status="refused",
-                transition=None,
-                control_audit=control_audit,
-                diagnostic=_without_mre_quantities(diagnostic),
-            )
+        partition_notices = multi_oxide_partition_notices(reducible)
+        if partition_notices:
+            diagnostic["notices"] = tuple(diagnostic.get("notices", ())) + partition_notices
 
         # Partition current among reducible species (selectivity:
         # weight by concentration * exp(F*dV/(R*T)), exponent capped at 3).

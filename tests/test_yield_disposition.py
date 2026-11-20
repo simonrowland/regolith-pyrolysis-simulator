@@ -96,6 +96,76 @@ def test_campaign_snapshot_captures_only_condensation_origin_state() -> None:
     ] == ["inputs"]
 
 
+@pytest.mark.parametrize("element, dimer", [("Na", "Na2"), ("K", "K2")])
+@pytest.mark.parametrize("corrupt_origin", [False, True])
+def test_campaign_snapshot_closure_retains_signed_species_roundoff(
+    element, dimer, corrupt_origin,
+) -> None:
+    ledger = AtomLedger()
+    account = "process.condensation_train"
+    ledger.load_external_mol(
+        account, {element: 1.0, dimer: 5.0e-10},
+        source="feedstock", material_origin="feedstock",
+    )
+    molar_kg = resolve_species_formula(element, ledger.registry).molar_mass_kg_per_mol()
+    # A full withdrawal can leave a few negative ulps in one species while
+    # its dimer keeps the element total positive. Origins follow the signed
+    # total; dropping the residue changes the snapshot being validated.
+    ledger.move(
+        "near_full_withdrawal", account, "terminal.offgas",
+        {element: (1.0 + 2 * math.ulp(1.0)) * molar_kg},
+    )
+    assert ledger.mol_by_account(account)[element] < 0.0
+    sim = _sim(ledger)
+    capture_ledger_snapshot(sim, SimpleNamespace(hour=1, campaign="C2A", campaign_hour=1))
+    # A later refill makes this a historical snapshot, as in the C0 run.
+    ledger.load_external_mol(
+        account, {element: 1.0}, source="feedstock", material_origin="feedstock",
+    )
+    snapshots = ledger_snapshots_from_sim(sim)
+    if corrupt_origin:
+        snapshots[0]["material_origin_atom_moles_by_account"][account][element][
+            "feedstock"
+        ] += 1.0e-12
+        with pytest.raises(OriginUnresolvedError, match="typed-origin snapshot does not close"):
+            build_yield_disposition(sim, snapshots)
+    else:
+        payload = build_yield_disposition(sim, snapshots)
+        assert payload["schema_version"] == "5.0"
+        assert payload["closure"]["maximum_residual_fraction"] <= 5.0e-14
+
+
+def test_yield_disposition_counts_cartridge_residue_mass() -> None:
+    from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+
+    ledger = AtomLedger()
+    ledger.load_external(
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+        {"Fe": 4.0, "SiO2": 3.0, "MgO": 1.0},
+        source="stage-4 cartridge solids",
+        material_origin="feedstock",
+    )
+
+    payload = build_yield_disposition(_sim(ledger))
+
+    fe = _row(payload, "Fe")
+    assert fe["destination_fractions"]["product_condensed"] == pytest.approx(1.0)
+    residue_streams = [
+        stream
+        for stream in payload["terminal_species_streams"]
+        if stream["account"] == ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+    ]
+    assert {stream["species"] for stream in residue_streams} == {
+        "Fe",
+        "MgO",
+        "SiO2",
+    }
+    assert {
+        stream["destination"] for stream in residue_streams
+    } == {"product_condensed"}
+    assert payload["closure"]["maximum_residual_fraction"] <= 5.0e-14
+
+
 def test_clean_feedstock_closes_on_element_basis_with_chart_payload() -> None:
     ledger = AtomLedger()
     ledger.load_external(
@@ -1682,6 +1752,30 @@ def test_native_metal_taps_remain_distinct_from_retained_metal_phase() -> None:
         and row["species"] == "Si"
         for row in streams
     )
+
+
+def test_stage0_salt_feed_is_dispositioned_as_cleanup_sequestered() -> None:
+    account = "process.stage0_salt_feed"
+    ledger = AtomLedger()
+    ledger.load_external(
+        account,
+        {"FeSO4": 0.4, "CaSO4": 0.6},
+        source="retained Stage 0 salts",
+        material_origin="feedstock",
+    )
+
+    payload = build_yield_disposition(_sim(ledger))
+
+    salt_streams = {
+        stream["species"]: stream
+        for stream in payload["terminal_species_streams"]
+        if stream["account"] == account
+    }
+    assert set(salt_streams) == {"FeSO4", "CaSO4"}
+    assert salt_streams["FeSO4"]["destination"] == "cleanup_sequestered"
+    assert salt_streams["FeSO4"]["terminal_kg"] == pytest.approx(0.4)
+    assert salt_streams["CaSO4"]["destination"] == "cleanup_sequestered"
+    assert salt_streams["CaSO4"]["terminal_kg"] == pytest.approx(0.6)
 
 
 def test_known_metal_staging_and_condensation_holdup_accounts_are_mapped() -> None:
