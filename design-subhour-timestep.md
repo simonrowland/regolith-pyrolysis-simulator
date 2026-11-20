@@ -51,7 +51,7 @@ Integrators:
 
 18. Evaporation ledger mass is `rate_kg_hr * 1.0`, and the remaining vapor mass is scaled by the same `1.0`.
 19. The evaporation-transition control dict passes `dt_hr: 1.0` on both the dispatch and the commit.
-20. The condensation-route control dict passes `dt_hr: 1.0`. The provider reads it and does not use it. Wall deposit is a fraction of the vapor mass already integrated for the step, so it follows the evaporation mass.
+20. The condensation-route provider reads `dt_hr` and does not use it. The evaporation caller passes step mass `(rate_kg_hr - remaining_kg_hr) * dt_h`. The provider debits those kilograms. MRE gas already passes step kilograms and is not multiplied again.
 21. Analytic evaporation depletion is called at the default `dt_hr=1.0` from the two live flux sites and from the capacity-shadow rate cache.
 22. The capacity-shadow solver is called with `dt_hr=1.0`.
 23. Overhead bleed controls pass `dt_hr: 1.0`.
@@ -77,7 +77,7 @@ Outputs:
 
 41. `HourSnapshot` is constructed with `duration_h=1.0`.
 42. `build_per_hour_summary` records `"hour"` and no time in seconds.
-43. The thermal-train cost model sets `run_hours` from the snapshot count on the basis `one_hour_per_snapshot`. Left.
+43. The thermal-train cost model sets `run_hours` from the snapshot count on the basis `one_hour_per_snapshot`. A step that is not one hour is refused. The hourly count stays.
 
 Inspected, not a process step:
 
@@ -143,7 +143,7 @@ Faraday charge is `I * dt`. Linear. Stable.
 
 Oxygen exchange is the exponential approach `1 - exp(-dt / tau)`. Stable for every `dt > 0`. At small `dt` the one-hour expression `1 - exp(-3600/tau)` must not be reused, and the short step must use `expm1`, or the exchanged amount underflows to 0. `tau` and the driving pO2 are frozen over the step; that freeze is the truncation, not a stability limit. The hourly call still executes `1 - exp(-3600/tau)` so a large `tau` does not change bits via `expm1`.
 
-Native-Fe vapor taken this step is `min(available, capacity_mol_hr * dt_h)`. The residual the kg/h cap reads stays mol/h: `capacity_mol_hr - step_moles / dt_h` off the hour, and `capacity_mol_hr - vapor_mol` on the hour. C7 transport integrates the configured hold once. A short step does not scale that hold.
+Native-Fe vapor taken this step is `min(available, capacity_mol_hr * dt_h)`. The cleaned-melt route passes that step as a kg/h rate (`step_moles * M_Fe / dt_h`) because the evaporation transition multiplies by `dt`. The metal-phase tap credits the step moles directly, and its condensation debit stays that step mass. The residual the kg/h cap reads stays mol/h: `capacity_mol_hr - step_moles / dt_h` off the hour, and `capacity_mol_hr - vapor_mol` on the hour. C7 transport integrates the configured hold once. A short step does not scale that hold.
 
 Energy is power times `dt`, applied by scaling the one-hour record. Linear.
 
@@ -156,10 +156,10 @@ Wired here: items 1–8, 10, 12–38, 41, and 42. Item 25 keeps the method defau
 Left, with the reason:
 
 - Item 9. `max(1, int(duration_h))` stays, so hourly staged campaigns do not move. A process step that is not one hour and reaches that clamp raises `CampaignSubhourHourClockRefusal` (reason `subhour_hour_clock_refused`, clock `c2a_staged_duration_clamp`).
-- Item 11. C4's in-window clock still counts snapshots on the hour. A process step that is not one hour and reaches that count raises the same refusal with clock `c4_snapshot_window`.
+- Item 11. C4's in-window clock still counts snapshots on the hour. A process step that is not one hour and reaches that count raises the same refusal with clock `c4_snapshot_window`. Below the window, empty history still uses the campaign hour. A non-empty history counts snapshots, and a short step that reaches that count raises the same refusal with clock `c4_acquisition_count`.
 - Item 39. `electrolysis.step_hour` is not on the live plant path.
 - Item 40. The temperature scan is a one-hour probe.
-- Item 43. Thermal-train cost still treats one snapshot as one hour. Hourly cost is unchanged because the snapshot count is still the hour count. A shorter run would over-cost.
+- Item 43. Thermal-train cost still treats one snapshot as one hour, so an hourly report does not move. A process step that is not one hour and asks for that report raises `ThermalTrainSubhourRefusal`.
 - Item 49. MRE reproduction has its own interval grid, and `int(duration_h)` can truncate a fractional program. That is a separate loader.
 - Item 50. An `EvalSpec` cache key grows a dimension only when a recipe can set `dt`. This chunk does not give it one.
 - Item 51. Presentation copy.
@@ -170,4 +170,4 @@ Left, with the reason:
 
 The end-of-step sample, the hour-counter advance, the exponential approach, and the `t_s` product live in `simulator/process_timestep.py`. `schedule_sample_time_h` delegates to that sample. The one-hour pressure sample in `core.py` stays inline, because it is the uncapped rule and the capped sampler is a different rule on that path.
 
-Left in place, and why: the condensation-route `dt_hr` is still passed and still unused inside the provider; the C0 forecast `hold_hr`; the temperature-scan `dt_hr=1`; the `SUBSOLIDUS_STEP_DURATION_HR` constant (the live step passes the process dt, the constant remains for other readers); `electrolysis.step_hour`; the C2A `max(1, int(duration_h))` clamps (a short step that reaches one is refused, the clamp is not retuned); the condensation residence `/3600`; the overhead kg/h unit conversions; the thermal-train snapshot-as-hour basis. The integer `"hour"` key stays the step index.
+Left in place, and why: the condensation-route provider still ignores `dt_hr` (the evaporation caller passes step mass, and MRE already passes step kilograms); the C0 forecast `hold_hr`; the temperature-scan `dt_hr=1`; the `SUBSOLIDUS_STEP_DURATION_HR` constant (the live step passes the process dt, the constant remains for other readers); `electrolysis.step_hour`; the C2A `max(1, int(duration_h))` clamps (a short step that reaches one is refused, the clamp is not retuned); the condensation residence `/3600`; the overhead kg/h unit conversions. The thermal-train snapshot count stays the hourly cost and is refused off the hour. The integer `"hour"` key stays the step index.

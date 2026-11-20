@@ -3252,6 +3252,10 @@ class CampaignManager:
                 # while Loop-3 zeros the ramp for overhead-holdup drain
                 # (see _c4_acquisition_opportunity_hr). Wall campaign hours
                 # remain in the diagnostic for operator forensics.
+                # Empty history returns the campaign hour. A non-empty
+                # history counts snapshots, which is the hourly clock.
+                if c4_snapshots:
+                    self._refuse_subhour_hour_clock('c4_acquisition_count')
                 acquisition_elapsed_hr = self._c4_acquisition_opportunity_hr(
                     completed_campaign_hour=completed_campaign_hour,
                     c4_snapshots=c4_snapshots,

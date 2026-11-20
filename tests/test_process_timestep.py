@@ -34,6 +34,7 @@ from simulator.runner import (
     build_per_hour_summary,
 )
 from simulator.runner import _load_vacuum_preset_run_spec
+from simulator.accounting.queries import AccountingQueries
 from simulator.accounting.run_artifact import (
     CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT,
 )
@@ -41,6 +42,7 @@ from simulator.campaigns import (
     CampaignManager,
     CampaignSubhourHourClockRefusal,
 )
+from simulator.thermal_train import ThermalTrainSubhourRefusal
 from simulator.state import (
     BatchRecord,
     CampaignPhase,
@@ -768,8 +770,8 @@ def test_native_fe_residual_stays_mol_per_hour_on_a_short_step():
     must not be cut down to that step mass.
 
     Mutation: ``capacity_mol_hr - vapor_mol`` in the diagnostic, or
-    ``capacity_mol_hr * dt_h - committed`` in the split, returns the
-    defect residual.
+    dropping ``/ process_dt_hr()`` on the cleaned-melt kg/h rate,
+    commits ``V * dt`` instead of the diagnostic step moles.
     """
 
     short = _native_fe_case(_loaded_sim(), dt_s=900.0)
@@ -797,17 +799,33 @@ def test_native_fe_residual_stays_mol_per_hour_on_a_short_step():
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
     sim._sync_oxygen_reservoir_mirror()
     sim.melt.melt_surface_area_m2 = 1.0e6
+    captured: dict[str, float] = {}
+    diagnose = sim._native_fe_partition_diagnostic
+
+    def _capture(native_fe_mol: float) -> dict:
+        diag = diagnose(native_fe_mol)
+        captured.clear()
+        captured.update(diag)
+        return diag
+
+    sim._native_fe_partition_diagnostic = _capture
     sim._apply_native_fe_saturation_split()
+    vapor_before_route = float(captured["native_fe_vapor_mol"])
+    capacity = float(captured["native_fe_vapor_capacity_mol_hr"])
     partition = sim._last_native_fe_partition_diagnostic
-    capacity = float(partition["native_fe_vapor_capacity_mol_hr"])
     committed = float(partition["native_fe_vapor_mol"])
     stored = float(sim._native_fe_vapor_residual_capacity_mol_this_hr)
-    true_stored = max(0.0, capacity - committed / dt_h)
-    defect_stored = max(0.0, capacity * dt_h - committed)
+    true_stored = max(0.0, capacity - vapor_before_route / dt_h)
+    defect_stored = max(0.0, capacity - vapor_before_route)
     assert capacity > 0.0
+    assert vapor_before_route > 0.0
+    assert committed == pytest.approx(vapor_before_route, rel=1e-9)
+    assert committed != pytest.approx(vapor_before_route * dt_h, rel=1e-6)
     assert true_stored != defect_stored
-    assert stored == true_stored
-    assert partition["ordinary_melt_fe_residual_capacity_mol_hr"] == stored
+    assert stored == pytest.approx(true_stored, rel=1e-9)
+    assert partition["ordinary_melt_fe_residual_capacity_mol_hr"] == pytest.approx(
+        stored, rel=1e-9,
+    )
     molar_mass = (
         float(partition["native_fe_vapor_capacity_kg_hr"]) / capacity
     )
@@ -935,3 +953,193 @@ def test_subhour_c2a_duration_clamp_and_c4_window_are_refused():
     with pytest.raises(CampaignSubhourHourClockRefusal) as duration:
         depletion.check_endpoint(staged, empty, train, BatchRecord())
     assert duration.value.diagnostic["clock"] == "c2a_staged_duration_clamp"
+
+
+def _k_full_condensation_route():
+    from types import SimpleNamespace
+
+    return SimpleNamespace(
+        remaining_by_species={"K": 0.0},
+        retained_in_source_by_species={},
+        wall_deposit_fraction_by_species={"K": 0.0},
+        wall_deposit_account_fractions_by_species={"K": {}},
+        condensation_authority_by_species={},
+        condensed_for_species=lambda _species: 0.0,
+        condensed_by_stage_species={},
+        impurity_by_stage_species={},
+    )
+
+
+def test_short_step_condensation_debit_matches_the_overhead_credit():
+    """Condensed kilograms are the step mass, not the hourly rate.
+
+    Efficiency 1 at ``dt_h = 0.25`` credits ``rate * dt`` and must
+    debit the same mass. The pre-fix debit is the hourly rate, which
+    is larger than the credit and overdraws overhead. At one hour the
+    two masses are the same number.
+
+    Mutation: drop ``* process_dt_hr()`` on ``condensed_kg``. The
+    short step then debits ``rate_kg_hr`` instead of ``rate_kg_hr * dt``.
+    """
+
+    rate_kg_hr = 0.4
+    dt_h = 0.25
+    step_kg = rate_kg_hr * dt_h
+
+    short = _loaded_sim()
+    short.process_timestep = resolve_process_timestep(900.0)
+    short._route_evaporated_species_to_condensation(
+        _k_full_condensation_route(),
+        "K",
+        rate_kg_hr,
+        apply_evaporative_redox_source_terms=False,
+    )
+    train = short.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    ).get("K", 0.0)
+    overhead = short.atom_ledger.kg_by_account(
+        "process.overhead_gas"
+    ).get("K", 0.0)
+    assert train == pytest.approx(step_kg, rel=1e-9)
+    assert overhead == pytest.approx(0.0, abs=1e-9)
+    assert train != pytest.approx(rate_kg_hr, rel=1e-6)
+
+    hourly = _loaded_sim()
+    hourly.process_timestep = resolve_process_timestep(3600.0)
+    hourly._route_evaporated_species_to_condensation(
+        _k_full_condensation_route(),
+        "K",
+        rate_kg_hr,
+        apply_evaporative_redox_source_terms=False,
+    )
+    hourly_train = hourly.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    ).get("K", 0.0)
+    assert hourly_train == pytest.approx(rate_kg_hr, rel=1e-9)
+
+
+def test_metal_phase_native_fe_condensation_debits_the_step_mass():
+    """The metal-phase tap credits step moles. The debit matches them.
+
+    ``native_fe_vapor_mol`` on this branch is moles this step, and the
+    metallic tap credits that count. Multiplying the debit by ``dt``
+    would leave ``1 - dt`` of the vapor in overhead. This is not the
+    evaporation caller, whose rate is kg/h.
+    """
+
+    from types import SimpleNamespace
+
+    from simulator.accounting.formulas import resolve_species_formula
+
+    sim = _loaded_sim()
+    sim.process_timestep = resolve_process_timestep(900.0)
+    step_mol = 0.2
+    formula = resolve_species_formula("Fe", sim.species_formula_registry)
+    molar_mass = formula.molar_mass_kg_per_mol()
+    step_kg = step_mol * molar_mass
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"Fe": step_kg},
+        material_origin="feedstock",
+    )
+
+    def _route(_flux, _melt):
+        return SimpleNamespace(
+            remaining_by_species={"Fe": 0.0},
+            wall_deposit_fraction_by_species={"Fe": 0.0},
+            wall_deposit_account_fractions_by_species={"Fe": {}},
+            condensation_authority_by_species={},
+            condensed_for_species=lambda _species: 0.0,
+            condensed_by_stage_species={},
+            impurity_by_stage_species={},
+        )
+
+    sim.condensation_model.route = _route
+    result = sim._route_native_fe_vapor_to_condensation(
+        step_mol,
+        source_account="process.metal_phase",
+    )
+    overhead = sim.atom_ledger.kg_by_account(
+        "process.overhead_gas"
+    ).get("Fe", 0.0)
+    train = sim.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    ).get("Fe", 0.0)
+    assert result["native_fe_vapor_mol"] == pytest.approx(step_mol)
+    assert overhead == pytest.approx(0.0, abs=1e-9)
+    assert train == pytest.approx(step_kg, rel=1e-9)
+    assert train != pytest.approx(step_kg * sim.process_dt_hr(), rel=1e-6)
+
+
+def test_subhour_c4_acquisition_count_is_refused():
+    """Below-window C4 must not treat snapshots as hours.
+
+    One snapshot at 1150 C is still below the 1580 C window. The
+    hourly call counts that snapshot and stays under the 60 h limit.
+    A 0.25 h step raises ``c4_acquisition_count`` before the count is
+    compared with the limit. Empty history is not this clock.
+
+    Mutation: delete the ``c4_acquisition_count`` refusal. The short
+    call then returns ``False`` or raises ``CampaignC4EndpointRefusal``.
+    """
+
+    manager = CampaignManager(_load_yaml("setpoints.yaml"))
+    record = BatchRecord(snapshots=[
+        HourSnapshot(
+            campaign=CampaignPhase.C4,
+            temperature_C=1150.0,
+            evap_flux=_endpoint_flux(Mg=0.0),
+        )
+    ])
+    melt = _endpoint_melt(CampaignPhase.C4, 1, temperature_C=1150.0)
+    flux = _endpoint_flux(Mg=0.0)
+    train = CondensationTrain()
+    manager._process_dt_h = 1.0
+    assert manager.check_endpoint(melt, flux, train, record) is False
+    manager._process_dt_h = 0.25
+    with pytest.raises(CampaignSubhourHourClockRefusal) as acquired:
+        manager.check_endpoint(melt, flux, train, record)
+    assert acquired.value.reason == "subhour_hour_clock_refused"
+    assert acquired.value.terminal_refusal is True
+    assert acquired.value.diagnostic["clock"] == "c4_acquisition_count"
+    assert acquired.value.diagnostic["process_dt_h"] == 0.25
+
+
+def test_subhour_thermal_train_refuses_snapshot_hours():
+    """A short step must not price one snapshot as one hour.
+
+    The hourly report still sets ``run_hours`` from the snapshot count
+    on the basis ``one_hour_per_snapshot``. A 900 s step raises
+    ``ThermalTrainSubhourRefusal`` before that cost is built.
+
+    Mutation: delete the ``process_dt_h != 1.0`` refusal. The short
+    call then returns ``run_hours == 1``.
+    """
+
+    record = BatchRecord(snapshots=[
+        HourSnapshot(
+            hour=1,
+            temperature_C=1500.0,
+            evap_flux=EvaporationFlux(
+                species_kg_hr={"Na": 1.0},
+                total_kg_hr=1.0,
+            ),
+            melt_offgas_O2_mol_hr=1.0,
+            O2_vented_kg_hr=0.0,
+        )
+    ])
+    short = _loaded_sim()
+    short.record = record
+    short.process_timestep = resolve_process_timestep(900.0)
+    with pytest.raises(ThermalTrainSubhourRefusal) as refused:
+        AccountingQueries(short).thermal_train_report()
+    assert refused.value.reason == "subhour_hour_clock_refused"
+    assert refused.value.process_dt_h == pytest.approx(0.25)
+
+    hourly = _loaded_sim()
+    hourly.record = record
+    hourly.process_timestep = resolve_process_timestep(3600.0)
+    report = AccountingQueries(hourly).thermal_train_report()
+    assert report["snapshot_count"] == 1
+    assert report["run_hours"] == 1
+    assert report["run_hours_basis"] == "one_hour_per_snapshot"

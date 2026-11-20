@@ -4431,8 +4431,11 @@ class EvaporationMixin:
         if evaporation_transition is None:
             return {}
 
+        # rate and remaining are kg/h. The overhead credit is that rate
+        # times dt. The debit has to be the same step mass. The provider
+        # debits the kilograms it is given and does not read dt_hr.
         condensed_kg = max(
-            0.0, rate_kg_hr - remaining_kg_hr,
+            0.0, (rate_kg_hr - remaining_kg_hr) * self.process_dt_hr(),
         )
         credited_condensed_kg = self._dispatch_condensation_route(
             species, condensed_kg, sp_data, route_result,
@@ -4462,7 +4465,16 @@ class EvaporationMixin:
             return {}
         fe_formula = resolve_species_formula('Fe', self.species_formula_registry)
         fe_molar_mass = fe_formula.molar_mass_kg_per_mol()
-        rate_kg_hr = native_fe_vapor_mol * fe_molar_mass
+        if source_account == 'process.cleaned_melt':
+            # The caller passes step moles. The evaporation transition
+            # multiplies a kg/h rate by dt, so this rate is step mass / dt.
+            rate_kg_hr = (
+                native_fe_vapor_mol * fe_molar_mass / self.process_dt_hr()
+            )
+        else:
+            # The metal-phase tap credits these step moles. The debit below
+            # is that step mass, not an hourly rate times dt.
+            rate_kg_hr = native_fe_vapor_mol * fe_molar_mass
         evap_flux = EvaporationFlux(species_kg_hr={'Fe': rate_kg_hr})
         evap_flux.update_totals()
         self._configure_condensation_operating_conditions(evap_flux)
