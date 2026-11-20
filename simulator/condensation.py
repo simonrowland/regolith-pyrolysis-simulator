@@ -118,6 +118,7 @@ from simulator.accounting.queries import (
     wall_deposit_candidate_kg as query_wall_deposit_candidate_kg,
     wall_deposit_candidates_by_segment_kg as query_wall_deposit_candidates_by_segment_kg,
 )
+from simulator.accounting.exceptions import AccountingError
 from simulator.config import load_config_bundle
 from simulator.coating_rate import continuous_wall_deposition_flux
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -8144,10 +8145,19 @@ def stage_purity_report(
             # ledger account holds the Mn-window cartridge; subtract its live
             # species balances to report the silica-window cartridge alone.
             for species, raw_kg in mn_cartridge_kg.items():
-                if species in collected_kg:
-                    collected_kg[species] = max(
-                        0.0, collected_kg[species] - float(raw_kg)
+                cartridge_kg = _finite_nonnegative_value(
+                    raw_kg,
+                    label=f"Mn cartridge ledger balance for {species}",
+                )
+                stage_projection_kg = collected_kg.get(species, 0.0)
+                remaining_kg = stage_projection_kg - cartridge_kg
+                if remaining_kg < -1e-12:
+                    raise AccountingError(
+                        f"Mn cartridge ledger balance for {species} "
+                        f"({cartridge_kg:g} kg) exceeds Stage-3 projection "
+                        f"({stage_projection_kg:g} kg)"
                     )
+                collected_kg[species] = max(0.0, remaining_kg)
         if explicit_key:
             accepted_species = accepted_species_for_stage_key(explicit_key)
             coproduct_species = frozenset(
@@ -8215,20 +8225,21 @@ def stage_purity_report(
         if activity:
             stage_report['activity'] = activity
         if stage_key == STAGE_KEY_BY_NUMBER[3] and ledger is not None:
-            cartridge_total_kg = sum(
-                max(0.0, float(value)) for value in mn_cartridge_kg.values()
-            )
-            manganese_kg = max(0.0, float(mn_cartridge_kg.get('Mn', 0.0)))
-            # Every Mn-cartridge capture remains uncertified: at h19 the Si
-            # dew point (1163.1 C) exceeds Mn (1133.9 C); the proposed
-            # 800-925 C Mn Psat band is below the certified 1228 K floor;
-            # alpha_s(Mn)=0.85 is UNCERTIFIED
-            # (no_direct_mn_sticking_coefficient); and the SiO wall-Psat
-            # refusal at 1400 K leaves 56 clean-window profiles indeterminate.
+            mn_cartridge_kg = {
+                species: _finite_nonnegative_value(
+                    value,
+                    label=f"Mn cartridge ledger balance for {species}",
+                )
+                for species, value in mn_cartridge_kg.items()
+            }
+            cartridge_total_kg = sum(mn_cartridge_kg.values())
+            manganese_kg = mn_cartridge_kg.get('Mn', 0.0)
             stage_report.update({
                 'silica_cartridge_mass_kg': total_kg,
+                'silica_cartridge_species_kg': dict(collected_kg),
                 'silica_without_mn_purity_fraction': purity_fraction,
                 'mn_cartridge_mass_kg': cartridge_total_kg,
+                'mn_cartridge_species_kg': dict(mn_cartridge_kg),
                 'mn_cartridge_mn_mass_kg': manganese_kg,
                 'mn_cartridge_purity_fraction': (
                     manganese_kg / cartridge_total_kg
@@ -8237,6 +8248,12 @@ def stage_purity_report(
                 ),
                 'mn_cartridge_capture_status': 'FLAGGED_UNCERTIFIED',
             })
+            # Every Mn-cartridge capture remains uncertified: at h19 the Si
+            # dew point (1163.1 C) exceeds Mn (1133.9 C); the proposed
+            # 800-925 C Mn Psat band is below the certified 1228 K floor;
+            # alpha_s(Mn)=0.85 is UNCERTIFIED
+            # (no_direct_mn_sticking_coefficient); and the SiO wall-Psat
+            # refusal at 1400 K leaves 56 clean-window profiles indeterminate.
         if stage_key == NA_COLLECTOR_STAGE_KEY and ledger is not None:
             recovered_designated_kg: dict[str, float] = {}
             recovered_origin_complete = True

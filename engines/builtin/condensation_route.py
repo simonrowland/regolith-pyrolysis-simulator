@@ -676,11 +676,8 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                         or not math.isfinite(fraction)
                         or not 0.0 < fraction <= 1.0
                     ):
-                        reason = (
-                            account_refusal
-                            if account_refusal
-                            == "invalid_gaseous_condensation_coproduct"
-                            else "invalid_condensation_product_account_fractions"
+                        reason = account_refusal or (
+                            "invalid_condensation_product_account_fractions"
                         )
                         return self._route_refusal(
                             reason,

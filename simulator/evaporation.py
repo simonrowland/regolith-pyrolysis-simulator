@@ -4624,23 +4624,11 @@ class EvaporationMixin:
             wall_deposit_fraction = 0.0
             wall_deposit_account_fractions = {}
 
-        stage3_fraction = self._stage3_mn_cartridge_fraction(
-            route_result, species
+        account_fractions = self._stage3_mn_cartridge_account_fractions(
+            route_result, species, sp_data
         )
-        if stage3_fraction > 0.0:
-            products = dict(
-                sp_data.get("condensation_products_mol_per_mol_vapor") or {}
-            )
-            if not products:
-                products = {species: 1.0}
+        if account_fractions:
             sp_data = dict(sp_data or {})
-            account_fractions = dict(
-                sp_data.get("condensation_product_account_fractions") or {}
-            )
-            for product in products:
-                fractions = dict(account_fractions.get(str(product), {}) or {})
-                fractions[MANGANESE_STAGE3_CARTRIDGE_ACCOUNT] = stage3_fraction
-                account_fractions[str(product)] = fractions
             sp_data["condensation_product_account_fractions"] = account_fractions
 
         kernel_result = self._dispatch_and_commit(
@@ -4764,6 +4752,57 @@ class EvaporationMixin:
                 "Stage-3 cartridge account fraction is outside [0, 1]"
             )
         return min(1.0, fraction)
+
+    def _stage3_mn_cartridge_account_fractions(
+        self,
+        route_result,
+        species: str,
+        sp_data: Mapping[str, Any],
+    ) -> dict[str, dict[str, float]]:
+        """Split deposited product accounts while preserving gaseous coproducts."""
+        raw_account_fractions = sp_data.get(
+            "condensation_product_account_fractions", {}
+        ) or {}
+        if not isinstance(raw_account_fractions, Mapping):
+            raise AccountingError(
+                "condensation_product_account_fractions must be a mapping"
+            )
+        account_fractions: dict[str, dict[str, float]] = {}
+        for product, raw_fractions in raw_account_fractions.items():
+            if raw_fractions is None:
+                account_fractions[str(product)] = {}
+            elif isinstance(raw_fractions, Mapping):
+                account_fractions[str(product)] = dict(raw_fractions)
+            else:
+                raise AccountingError(
+                    "invalid_condensation_product_account_fractions"
+                )
+        stage3_fraction = self._stage3_mn_cartridge_fraction(
+            route_result, species
+        )
+        if stage3_fraction <= 0.0:
+            return account_fractions
+
+        products = dict(
+            sp_data.get("condensation_products_mol_per_mol_vapor") or {}
+        )
+        if not products:
+            products = {species: 1.0}
+        raw_product_accounts = sp_data.get("condensation_product_accounts", {}) or {}
+        if not isinstance(raw_product_accounts, Mapping):
+            raise AccountingError(
+                "condensation_product_accounts must be a mapping"
+            )
+        for raw_product in products:
+            product = str(raw_product)
+            # A product explicitly routed to overhead gas is a gaseous
+            # coproduct, not material on the removable Stage-3 cartridge.
+            if str(raw_product_accounts.get(product) or "") == "process.overhead_gas":
+                continue
+            fractions = dict(account_fractions.get(product, {}) or {})
+            fractions[MANGANESE_STAGE3_CARTRIDGE_ACCOUNT] = stage3_fraction
+            account_fractions[product] = fractions
+        return account_fractions
 
     def _apply_organic_tar_wall_deposit(self) -> None:
         """Move cold-wall tar from overhead_gas onto process.wall_deposit.

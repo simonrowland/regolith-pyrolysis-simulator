@@ -48,12 +48,6 @@ _REQUIRED_CONTRACT_FIELDS = (
     "aggregation",
 )
 _VAPOR_TERMINAL_OFFGAS_ACCOUNT = "terminal.offgas"
-_VAPOR_PRODUCT_ACCOUNTS = (
-    "process.condensation_train",
-    "process.overhead_gas",
-    _VAPOR_TERMINAL_OFFGAS_ACCOUNT,
-    "terminal.chromium_condensed_oxide_stored",
-)
 _VAPOR_RESIDUAL_ACCOUNTS = (
     "process.cleaned_melt",
     "terminal.slag",

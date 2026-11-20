@@ -1238,23 +1238,23 @@ condenser_geometry:
     alkali_stage4: "owner-ruling-d137: baseline Na collector area 0.051 m2 at the historical 12 cm throat; absolute area is pinned pending d-283 sizing; t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
     k_stage4b: "owner-ruling-d137: baseline K cold-trap area 0.064 m2 at the historical 12 cm throat; absolute area is pinned pending d-283 sizing; t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
     terminal: "engineering-default: terminal vent/capture area is not the constriction; fixed independently of throat for follow-on Kn diagnostics"
-  # d-283 design rule: per stage choose A_stage = max_s inf{A:
-  # eta_prod(s, F_peak,s, A, state_peak,s) >= 0.90}, over its designated
-  # species, using the C0-C6 lunar_mare_low_ti reference at the 0.5 m throat.
-  # F_peak is maximum hourly incident species flow [kg/hr], eta_prod is the
-  # production capture resolver's dimensionless efficiency, and A is [m2].
-  # Size once and run one fixed-point check because upstream area changes
-  # downstream flow. Sanity: at 12 cm the rule should need areas near existing
-  # anchors for species they capture well; the 0.5 m Fe estimate is 3.5-4.6 m2.
-  # Areas are absolute collector hardware and never scale with throat.
+  # d-283 engineering-default design rule: for each collector use the
+  # production resolver to find the minimum A [m2] satisfying
+  # eta_prod(species, peak hourly incident flux [kg/hr], A, peak state) >= 0.90.
+  # Run the area sizing to a fixed point because upstream areas change the
+  # downstream peak fluxes; the controller r4 run converged in three passes at
+  # the 0.5 m throat. Areas are absolute hardware and do not scale with throat.
+  # Price basis is the existing data/optimize_costs.yaml model:
+  # mass [kg] = A [m2] * 0.010 m * material density [kg/m3], then
+  # cost [USD] = mass * $10,000/kg. Thickness and densities remain FLAGGED.
   stage_areas_m2:
-    fe_stage1: 0.236
-    cr_stage2: 0.050893800988154644
-    sio_stage3: 466.975
-    alkali_stage4: 0.05099999999999999
-    k_stage4b: 0.064
+    fe_stage1: 38.829406624 # 90% Fe capture at peak design flux; fixed-point area.
+    cr_stage2: 350.525053773 # Cr2O3 capture ceiling; 90% is unreachable, FLAGGED.
+    sio_stage3: 466.975203985 # 90% SiO capture at peak design flux; fixed-point area.
+    alkali_stage4: 106.439821811 # 90% Na/Mg capture at peak design flux; fixed-point area.
+    k_stage4b: 0.0661518735017 # 90% K capture at peak design flux; fixed-point area.
     terminal: 0.02261946710584651
-  stage_areas_m2_source: "FLAGGED d-452 measured converged 90.009% peak-capture fixed point for SiO zone; other collector anchors unchanged"
+  stage_areas_m2_source: "FLAGGED engineering-default d-283/d-452: controller r4 three-pass fixed point at 0.5 m throat; Cr2O3 remains capture-ceiling-limited; hardware priced via data/optimize_costs.yaml"
   # Stage-4 purity gate: allow at most 5 kg of SiO2+Si impurity per 100 kg of
   # net unique designated Na+Mg product. Algebra: (m_SiO2 + m_Si) / m_Na+Mg
   # <= 0.05; numerator and denominator are kg, so the ratio is dimensionless.

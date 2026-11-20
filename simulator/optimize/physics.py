@@ -65,7 +65,7 @@ SourceKind = Literal[
 # v8: purity is diagnostic-only by default; extraction completeness uses the
 # left-the-melt basis and retains the captured product-ledger ratio as a
 # provisional diagnostic.
-PHYSICS_GATE_VERSION = "physics-feasibility-v9-stage4-sio-purity"
+PHYSICS_GATE_VERSION = "physics-feasibility-v10-stage4-sio-diagnostic"
 DEFAULT_ACTIVE_GATES: tuple[str, ...] = (
     "delivered_stream_purity",
     "coating",
@@ -546,8 +546,7 @@ class PhysicsConstraintSet:
                 trace, "stage4_sio_impurity_to_designated_ratio", None
             )
             if ratio is None:
-                return _fail_closed(
-                    "stage4_sio_impurity",
+                return self._stage4_sio_impurity_unavailable(
                     threshold,
                     "net unique Stage-4 SiO2+Si ratio is unavailable",
                 )
@@ -566,6 +565,7 @@ class PhysicsConstraintSet:
             )
             return replace(
                 result,
+                feasible=True,
                 status="warning" if not result.feasible else "available",
                 authoritative=False,
                 output_status="provisional",
@@ -576,6 +576,7 @@ class PhysicsConstraintSet:
                 ),
                 status_payload={
                     "basis": "net unique Stage-4 designated Na+Mg",
+                    "diagnostic_only": True,
                     "violation_flag": (
                         "stage4_sio_impurity_limit_exceeded"
                         if not result.feasible
@@ -584,7 +585,26 @@ class PhysicsConstraintSet:
                 },
             )
         except (KeyError, TypeError, ValueError) as exc:
-            return _fail_closed("stage4_sio_impurity", threshold, str(exc))
+            return self._stage4_sio_impurity_unavailable(
+                threshold, str(exc)
+            )
+
+    @staticmethod
+    def _stage4_sio_impurity_unavailable(
+        threshold: ThresholdSpec,
+        reason: str,
+    ) -> GateMargin:
+        return replace(
+            _unavailable_gate("stage4_sio_impurity", threshold, reason),
+            feasible=True,
+            detail=f"diagnostic unavailable: {reason}",
+            status_payload={
+                "diagnostic_only": True,
+                "refusal_code": "stage4_sio_impurity_ratio_unavailable",
+                "reason": reason,
+                "violation_flag": "stage4_sio_impurity_ratio_unavailable",
+            },
+        )
 
     def delivered_stream_purity(self, trace: Any) -> GateMargin:
         try:
