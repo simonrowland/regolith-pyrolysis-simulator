@@ -3910,7 +3910,20 @@ def internal_analytical_residue_vapor_pressure(
         return result
 
     def solve():
-        result = solve_live()
+        try:
+            result = solve_live()
+        except _InternalAnalyticalInputRefusal as exc:
+            from simulator.engine_cache import CACHEABLE_REFUSAL_CODES
+
+            if exc.code not in CACHEABLE_REFUSAL_CODES:
+                raise
+            return {
+                "status": "refusal",
+                "refusal_reason": exc.code,
+                "engine_status": "input_refusal",
+                "detail": str(exc),
+                "category": int(exc.category),
+            }
         if getattr(result, "status", None) == "ok" and isinstance(getattr(result, "diagnostics", None), Mapping):
             return equilibrium_to_hot(vars(result), engine_id="internal-analytical", live_value=result)
         return result
@@ -3922,10 +3935,22 @@ def internal_analytical_residue_vapor_pressure(
             "call": "residue_pressure", "temperature_C": temperature_C,
             "pressure_bar": pressure_bar, "composition_kg": composition_kg,
             "composition_mol": composition_mol, "fO2_log": fO2_log,
-            "po2": po2_request.as_payload(),
+            # A missing oxygen condition is the request. Building the key
+            # must not crash before the adapter can refuse it.
+            "po2": None if po2_request is None else po2_request.as_payload(),
             "engine_settings": _internal_analytical_cache_settings(core),
         }
         result = cached_engine_call("internal-analytical", _internal_analytical_cache_inputs(request), solve)
+    if (
+        isinstance(result, Mapping)
+        and result.get("status") == "refusal"
+        and result.get("refusal_reason")
+    ):
+        raise _InternalAnalyticalInputRefusal(
+            int(result["category"]),
+            str(result["refusal_reason"]),
+            str(result.get("detail") or ""),
+        )
     if isinstance(result, list):
         return SimpleNamespace(**equilibrium_cache_from_value(result, engine_id="internal-analytical"))
     return result
