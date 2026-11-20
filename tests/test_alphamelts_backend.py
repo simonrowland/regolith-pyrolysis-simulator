@@ -6982,7 +6982,10 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
             headspace_temperature_K=0.0,
             pressure_mbar=0.0,
         ),
-        overhead_model=types.SimpleNamespace(pipe_diameter_m=0.12),
+        overhead_model=types.SimpleNamespace(
+            pipe_diameter_m=0.12,
+            effective_throat_diameter_m=lambda _melt: 0.12,
+        ),
         setpoints={'chemistry_kernel': {'allow_fallback_vapor': True}},
         vapor_pressures={
             'metals': {'Na': {'evaporation_alpha': {'value': 1.0}}},

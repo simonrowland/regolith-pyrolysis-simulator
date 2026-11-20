@@ -50,6 +50,7 @@ from simulator.recipe import (
     validate_c2a_staged_stage_order,
 )
 from simulator.condensation import _canonical_carrier_gas_key
+from simulator.overhead import resolve_slider_vane_open_fraction
 from simulator.state import (
     Atmosphere,
     BatchRecord,
@@ -1766,6 +1767,12 @@ class CampaignManager:
             CampaignPhase.C2A_STAGED, 'pO2_mbar', 'pO2_mbar_default')
         default_total = self._pressure_config_float(
             CampaignPhase.C2A_STAGED, 'p_total_mbar', 'p_total_mbar_default')
+        default_vane_fraction = resolve_slider_vane_open_fraction(
+            cfg.get('slider_vane_open_fraction', 1.0)
+        )
+        vane_fraction = resolve_slider_vane_open_fraction(
+            stage.get('slider_vane_open_fraction', default_vane_fraction)
+        )
         pO2_mbar, pO2_present = self._c2a_staged_stage_float(
             stage, 'pO2_mbar', default_pO2)
         p_total_mbar, p_total_present = self._c2a_staged_stage_float(
@@ -1849,6 +1856,7 @@ class CampaignManager:
             'atmosphere': atmosphere.name,
             'pO2_mbar': float(pO2_mbar),
             'p_total_mbar': float(p_total_mbar),
+            'slider_vane_open_fraction': vane_fraction,
             'pN2_mbar': float(pN2_mbar),
             'requested_p_total_mbar': float(requested_p_total_mbar),
             'pn2_band_action': band_action,
@@ -1882,6 +1890,9 @@ class CampaignManager:
         melt.atmosphere = atmosphere
         melt.pO2_mbar = float(diagnostic['pO2_mbar'])
         melt.p_total_mbar = float(diagnostic['p_total_mbar'])
+        melt.slider_vane_open_fraction = float(
+            diagnostic['slider_vane_open_fraction']
+        )
         pN2_mbar = float(diagnostic['pN2_mbar'])
         if pN2_mbar > 0.0:
             # Kr audit 2026-07-25: hard-coded 'N2' here silently overwrote a
@@ -2021,6 +2032,10 @@ class CampaignManager:
         """
         # The previous campaign's summary was captured before this start.
         self.last_campaign_stop = None
+        campaign_config = self._campaign_config(campaign)
+        melt.slider_vane_open_fraction = resolve_slider_vane_open_fraction(
+            campaign_config.get('slider_vane_open_fraction', 1.0)
+        )
         self._reset_stage_background_gas(melt)
         self._materialized_target_T_C_by_phase.pop(campaign, None)
         materialized_target = self._materialize_target_from_delta(campaign)

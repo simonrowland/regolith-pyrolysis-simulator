@@ -24,11 +24,12 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     assert generated.read_bytes() == MANIFEST.read_bytes()
     payload = json.loads(MANIFEST.read_text(encoding="utf-8"))
     digest = payload.pop("payload_digest")
-    # d-283 adds five bounded collector-area knobs to both conditional spaces.
+    # d-283 adds five collector areas; d-452 adds throat and per-stage vane
+    # controls.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "6774eddf6317505bee19cef23eba411e8d228e2255c8ce755254d7c95aabd450"
+        "38fdb04742f339a0497d746b073b65197a2e9bc3b1f37472882446836edfadb0"
     )
-    assert digest == "d8e485ac9f07fa5e43574030031c2cbfa3ede8253b7ff1bb3153da74c2956b92"
+    assert digest == "c2d21d74c778db86a161dfc0c1dbf0759a1a7c72a8f00c0ad39ceafde12bff9f"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (
@@ -43,7 +44,7 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
         for path in paths
         for prefix in forbidden_future_prefixes
     )
-    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [64, 70]
+    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [70, 76]
     assert {
         path
         for path in paths
