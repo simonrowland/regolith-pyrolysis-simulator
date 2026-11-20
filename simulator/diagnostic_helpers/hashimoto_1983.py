@@ -19,7 +19,7 @@ from typing import Any
 
 import yaml
 
-from simulator.lab_schedule import LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
+from simulator.lab_schedule import _pressure_floor_notice_mbar
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -139,10 +139,12 @@ def require_runtime_inputs(preset: Mapping[str, Any]) -> None:
         vacuum.get("runtime_pressure_mbar"),
         "vacuum.runtime_pressure_mbar",
     )
-    if pressure_mbar < LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:
+    floor_notice = _pressure_floor_notice_mbar(pressure_mbar)
+    if floor_notice is not None:
+        _, detail = floor_notice
         raise Hashimoto1983Refusal(
             "runtime_pressure_below_implemented_floor",
-            f"{pressure_mbar:g} mbar < {LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:g} mbar",
+            detail,
         )
 
 

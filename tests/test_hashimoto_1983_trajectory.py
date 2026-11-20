@@ -66,6 +66,23 @@ def test_runtime_pressure_floor_is_reported_when_area_is_available() -> None:
     )
 
 
+def test_runtime_pressure_floor_uses_lab_schedule_owner(monkeypatch) -> None:
+    preset = load_hashimoto_preset(DEFAULT_PRESET_PATH)
+    preset["free_evaporation_geometry"]["exposed_melt_area_m2"] = 1.0e-6
+    observed: list[float] = []
+
+    def floor_notice(value: float) -> tuple[str, str]:
+        observed.append(value)
+        return "lab_schedule_pressure_below_implemented_floor", "forced notice"
+
+    monkeypatch.setattr(hashimoto, "_pressure_floor_notice_mbar", floor_notice)
+    with pytest.raises(Hashimoto1983Refusal) as exc_info:
+        require_runtime_inputs(preset)
+    assert exc_info.value.reason == "runtime_pressure_below_implemented_floor"
+    assert exc_info.value.detail == "forced notice"
+    assert observed == [0.00013332236842105264]
+
+
 def test_runtime_pressure_override_cannot_bypass_printed_pressure_floor() -> None:
     preset = load_hashimoto_preset(DEFAULT_PRESET_PATH)
     preset["free_evaporation_geometry"]["exposed_melt_area_m2"] = 1.0e-6
