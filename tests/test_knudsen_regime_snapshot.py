@@ -25,6 +25,7 @@ import pytest
 import yaml
 
 from simulator.backends import BackendSelectionPolicy
+from simulator.condensation import knudsen_regime_diagnostic
 from simulator.session import SimSession, SimSessionConfig
 from simulator.state import EvaporationFlux, HourSnapshot, OverheadGas
 
@@ -128,6 +129,49 @@ def test_snapshot_knudsen_summary_carries_canonical_fields_after_route():
     assert isinstance(summary['warnings'], tuple)
     for w in summary['warnings']:
         assert isinstance(w, str)
+
+
+def test_optimizer_knudsen_summary_uses_duct_diameter_and_keeps_wall_kn():
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+    model = sim.condensation_model
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        gas_temperature_C=1500.0,
+        pipe_diameter_m=0.12,
+        duct_pipe_diameter_m=0.5,
+        carrier_gas="N2",
+        campaign_name="C2A",
+    )
+
+    summary = sim._latest_knudsen_summary()
+    expected_wall = knudsen_regime_diagnostic(
+        overhead_pressure_mbar=10.0,
+        gas_temperature_C=1500.0,
+        pipe_diameter_m=0.12,
+        carrier_gas="N2",
+    )
+    expected_duct = knudsen_regime_diagnostic(
+        overhead_pressure_mbar=10.0,
+        gas_temperature_C=1500.0,
+        pipe_diameter_m=0.5,
+        carrier_gas="N2",
+    )
+
+    assert model.knudsen_number == pytest.approx(
+        expected_wall["knudsen_number"]
+    )
+    assert summary["knudsen_number"] == pytest.approx(
+        expected_duct["knudsen_number"]
+    )
+    duct_segment = next(
+        segment
+        for segment in summary["segments"]
+        if segment["name"] == "collection_duct"
+    )
+    assert duct_segment["knudsen_number"] == pytest.approx(
+        expected_duct["knudsen_number"]
+    )
 
 
 def test_snapshot_knudsen_summary_is_json_serialisable():

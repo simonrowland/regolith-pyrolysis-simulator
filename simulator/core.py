@@ -3949,6 +3949,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             pipe_diameter_m=(
                 self.overhead_model.condenser_hydraulic_diameter_m
             ),
+            duct_pipe_diameter_m=(
+                self.overhead_model.effective_throat_diameter_m(self.melt)
+            ),
             # The upstream vapor is evaluated at the melt-side temperature used
             # by the conductance model; the independently scheduled pipe and
             # segment temperatures are liner-wall states, not gas states.
@@ -16886,14 +16889,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         diag = dict(getattr(model, 'last_knudsen_regime_diagnostic', {}) or {})
         if not diag:
             return {}
+        duct_diag = dict(
+            getattr(model, 'last_duct_knudsen_regime_diagnostic', {}) or {}
+        )
         # Project the diagnostic into the documented summary shape.
         summary: Dict[str, Any] = {}
-        if 'status' in diag:
-            summary['status'] = str(diag['status'])
+        projected_diag = duct_diag or diag
+        if 'status' in projected_diag:
+            summary['status'] = str(projected_diag['status'])
         # Prefer the diagnostic's JSON-safe projection: the model may carry
         # ``math.inf`` for zero-pressure/free-molecular ticks, while runner
         # exports require finite values or omission.
-        kn = diag.get('knudsen_number', getattr(model, 'knudsen_number', None))
+        kn = projected_diag.get(
+            'knudsen_number', getattr(model, 'knudsen_number', None)
+        )
         if kn is not None:
             try:
                 finite_kn = float(kn)
@@ -16901,18 +16910,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 finite_kn = None
             if finite_kn is not None and math.isfinite(finite_kn):
                 summary['knudsen_number'] = finite_kn
-        regime = getattr(model, 'knudsen_regime', None)
+        regime = projected_diag.get('regime')
+        if regime is None:
+            regime = getattr(model, 'knudsen_regime', None)
         if regime is not None:
-            summary['knudsen_regime'] = getattr(
-                regime, 'value', str(regime)
-            )
-        regime_factor = getattr(model, 'regime_factor', None)
+            summary['knudsen_regime'] = str(getattr(regime, 'value', regime))
+        regime_factor = projected_diag.get(
+            'regime_factor', getattr(model, 'regime_factor', None)
+        )
         if regime_factor is not None:
             try:
                 summary['regime_factor'] = float(regime_factor)
             except (TypeError, ValueError):
                 pass
-        warnings = diag.get('warnings', ())
+        if duct_diag:
+            segment = next(
+                (
+                    item
+                    for item in duct_diag.get('segments', ())
+                    if isinstance(item, Mapping)
+                    and item.get('name') == 'collection_duct'
+                ),
+                None,
+            )
+            if segment is not None:
+                summary['segments'] = (dict(segment),)
+        warnings = projected_diag.get('warnings', ())
         summary['warnings'] = tuple(str(w) for w in warnings)
         return summary
 

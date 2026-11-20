@@ -2253,6 +2253,10 @@ class CondensationModel:
             str, dict[str, float]
         ] = {}
         self.pipe_diameter_m = DEFAULT_PIPE_DIAMETER_M
+        # Collection-duct Kn is reported separately from this model's
+        # condenser/wall Kn: the latter continues to control deposition.
+        self.duct_pipe_diameter_m: float | None = None
+        self.last_duct_knudsen_regime_diagnostic: dict[str, Any] = {}
         self.stage_area_m2_by_stage: dict[str, float] = {}
         self.stage_hydraulic_diameter_m_by_stage: dict[str, float] = {}
         self.stage_area_geometry_provenance_notice: dict[str, Any] = {}
@@ -2365,6 +2369,7 @@ class CondensationModel:
         overhead_pressure_mbar: float | None = None,
         species_partial_pressures_mbar: Mapping[str, float] | None = None,
         pipe_diameter_m: float | None = None,
+        duct_pipe_diameter_m: float | None = None,
         gas_temperature_C: float | None = None,
         stage_area_m2_by_stage: Mapping[str, float] | None = None,
         stage_hydraulic_diameter_m_by_stage: Mapping[str, float] | None = None,
@@ -2401,6 +2406,11 @@ class CondensationModel:
         not written onto duct ``inner_diameter_m``. Stages absent from
         the map use ``pipe_diameter_m`` (the configured condenser/wall
         hydraulic diameter), independent of the collection throat.
+
+        ``duct_pipe_diameter_m`` reports the collection throat Kn for
+        optimizer diagnostics. It is deliberately independent of
+        ``pipe_diameter_m``, which remains the condenser/wall diameter
+        used by deposition physics.
         """
 
         # Validate the complete candidate first. A late invalid pressure,
@@ -2423,6 +2433,9 @@ class CondensationModel:
                 )
         if pipe_diameter_m is not None:
             require_lab_pipe_diameter(pipe_diameter_m, 'pipe_diameter_m')
+        if duct_pipe_diameter_m is not None:
+            require_lab_pipe_diameter(
+                duct_pipe_diameter_m, 'duct_pipe_diameter_m')
         if stage_area_m2_by_stage is not None:
             for stage, raw_area in stage_area_m2_by_stage.items():
                 if isinstance(raw_area, bool):
@@ -2516,6 +2529,9 @@ class CondensationModel:
                 replace(segment, inner_diameter_m=self.pipe_diameter_m)
                 for segment in self.pipe_segments
             ]
+        if duct_pipe_diameter_m is not None:
+            self.duct_pipe_diameter_m = require_lab_pipe_diameter(
+                duct_pipe_diameter_m, 'duct_pipe_diameter_m')
         if gas_temperature_C is not None:
             gas_temperature = float(gas_temperature_C)
             if not math.isfinite(gas_temperature) or gas_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
@@ -2648,6 +2664,10 @@ class CondensationModel:
         self.last_knudsen_regime_diagnostic = copy.deepcopy(
             self._current_knudsen_diagnostic()
         )
+        if self.duct_pipe_diameter_m is not None:
+            self.last_duct_knudsen_regime_diagnostic = (
+                self._current_duct_knudsen_diagnostic()
+            )
         # gstack reviewer Phase B P2: previously this snapshot was gated
         # ONLY on ``overhead_pressure_mbar is not None``, so a caller that
         # tweaked wall temperatures or stir_factor without supplying a
@@ -2664,6 +2684,7 @@ class CondensationModel:
                 radial_stir_factor,
                 wall_temperature_C,
                 pipe_diameter_m,
+                duct_pipe_diameter_m,
                 gas_temperature_C,
                 stage_area_m2_by_stage,
                 stage_hydraulic_diameter_m_by_stage,
@@ -2680,6 +2701,7 @@ class CondensationModel:
                     else float(campaign_hour)
                 ),
                 "wall_temperature_C": float(self.wall_temperature_C),
+                "duct_pipe_diameter_m": self.duct_pipe_diameter_m,
                 "pipe_segment_temperatures_C": {
                     segment.name: float(segment.wall_temperature_C)
                     for segment in self.pipe_segments
@@ -2723,6 +2745,8 @@ class CondensationModel:
                         "warnings", ())),
                 "knudsen_regime_diagnostic": copy.deepcopy(
                     self.last_knudsen_regime_diagnostic),
+                "duct_knudsen_regime_diagnostic": copy.deepcopy(
+                    self.last_duct_knudsen_regime_diagnostic),
             }
             # Record the as-requested stir_factor only when it was passed
             # this call; otherwise the field is intentionally omitted so
@@ -4110,6 +4134,20 @@ class CondensationModel:
             'refused.'
         )
         return unconfigured
+
+    def _current_duct_knudsen_diagnostic(self) -> dict[str, Any]:
+        if self.duct_pipe_diameter_m is None:
+            return {}
+        diagnostic = knudsen_regime_diagnostic(
+            overhead_pressure_mbar=self.overhead_pressure_mbar,
+            gas_temperature_C=self.gas_temperature_C,
+            pipe_diameter_m=self.duct_pipe_diameter_m,
+            carrier_gas=self.carrier_gas,
+        )
+        for segment in diagnostic.get('segments', ()):
+            if isinstance(segment, dict):
+                segment['name'] = 'collection_duct'
+        return diagnostic
 
     def _enforce_knudsen_regime(self) -> dict[str, Any]:
         diagnostic = self._current_knudsen_diagnostic()
