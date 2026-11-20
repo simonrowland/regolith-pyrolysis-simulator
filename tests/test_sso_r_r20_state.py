@@ -35,6 +35,7 @@ from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase, EvaporationFlux, MeltState
 from scripts import evaporation_selectivity_map as selectivity_map
+from tests.ledger_test_support import _transition_account_species_mol
 from tests.magemin_test_support import close_test_owned_magemin_backend
 from web.events import _tick_payload
 
@@ -86,12 +87,12 @@ def _make_sim(
 
 
 def _cleaned_melt_debit_mol(sim: PyrolysisSimulator, transition, species: str) -> float:
-    formula = resolve_species_formula(species, sim.species_formula_registry)
-    return sum(
-        float(lot.species_kg.get(species, 0.0))
-        / formula.molar_mass_kg_per_mol()
-        for lot in transition.debits
-        if lot.account == "process.cleaned_melt"
+    return _transition_account_species_mol(
+        sim,
+        transition,
+        side="debits",
+        account="process.cleaned_melt",
+        species=species,
     )
 
 
@@ -335,24 +336,6 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
     assert hot_hours == {167, 168}
     assert c6_releases
     assert c6_moves_toward_gas_split
-
-
-def _transition_account_species_mol(
-    sim: PyrolysisSimulator,
-    transition,
-    *,
-    side: str,
-    account: str,
-    species: str,
-) -> float:
-    formula = resolve_species_formula(species, sim.species_formula_registry)
-    lots = transition.debits if side == "debits" else transition.credits
-    return sum(
-        float(lot.species_kg.get(species, 0.0))
-        / formula.molar_mass_kg_per_mol()
-        for lot in lots
-        if lot.account == account
-    )
 
 
 def _transition_account_o2_equiv_mol(

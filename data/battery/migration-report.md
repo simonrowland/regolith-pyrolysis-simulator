@@ -4,8 +4,8 @@ rows in: 93363
 records out (observations): 192386
 works: 852
 experiments: 8043
-queue size: 123199
-queue backlog: 98793
+queue size: 123198
+queue backlog: 98792
 reference inputs: 24406
 identical-payload dedupe aliases: 342
 metadata files: 50
@@ -218,7 +218,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | absent_admissions | 3511 | 17591 (mismatch) |
 | absent_classes | 2174 | 2100 (mismatch) |
 | range_only_T | 3125 | 3104 (mismatch) |
-| system_like_phases | 1065 | 2875 (mismatch) |
+| system_like_phases | 1065 | 2874 (mismatch) |
 | missing_phases | 237 | 1356 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -19315,7 +19315,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-017-stolyarova-2013.yaml` | 11 | 11 | 44 | 0 |
 | `data/literature/extracts/kems-018-stolyarova-2012.yaml` | 1 | 1 | 4 | 0 |
 | `data/literature/extracts/kems-019-miller-armatys-2013.yaml` | 28 | 28 | 60 | 0 |
-| `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 42 | 112 | 318 | 0 |
+| `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 42 | 112 | 317 | 0 |
 | `data/literature/extracts/kems-021-plante-1992-feo.yaml` | 10 | 25 | 16 | 0 |
 | `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 119 | 0 |
 | `data/literature/extracts/kems-023-demaria-1973.yaml` | 30 | 75 | 45 | 0 |
@@ -19987,11 +19987,11 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 320677
+advisory issues: 320522
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 320677 |
+| `identity_incomplete` | 320522 |
 
 ## Notices
 

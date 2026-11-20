@@ -55,9 +55,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -106,7 +124,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1240.4:row=1:h=d44c086a9d71
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -119,9 +138,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -217,9 +254,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -268,7 +323,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1240.4:row=2:h=55d2b17014bc
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -281,9 +337,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -379,9 +453,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -430,7 +522,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1295.9:row=3:h=9b28f77ec432
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -443,9 +536,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -541,9 +652,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -592,7 +721,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1306.0:row=1:h=fb2f470793da
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -605,9 +735,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -703,9 +851,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -754,7 +920,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1411.6:row=2:h=d5f42a6734ca
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -767,9 +934,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -865,9 +1050,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -916,7 +1119,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1425.2:row=1:h=9bf1da29cbf3
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -929,9 +1133,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -1027,9 +1249,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1078,7 +1318,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1438.3:row=3:h=c97107edf57b
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1091,9 +1332,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -1189,9 +1448,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1240,7 +1517,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1471.3:row=1:h=c9f303cf7da6
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1253,9 +1531,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -1351,9 +1647,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1402,7 +1716,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1499.8:row=2:h=d0f8d36d7d7e
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1415,9 +1730,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -1513,9 +1846,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1564,7 +1915,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1522.8:row=1:h=a9105d7f2ffa
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1577,9 +1929,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -1675,9 +2045,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1726,7 +2114,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1528.6:row=3:h=9dbc586e8df3
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1739,9 +2128,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -1837,9 +2244,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1888,7 +2313,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1557.9:row=2:h=25483c11cf24
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1901,9 +2327,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -1999,9 +2443,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2050,7 +2512,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1578.1:row=1:h=629fd9f26261
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2063,9 +2526,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -2161,9 +2642,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2212,7 +2711,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1588.4:row=3:h=8ca4d4ec761a
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2225,9 +2725,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -2323,9 +2841,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2374,7 +2910,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1603.0:row=1:h=6074cb9531e9
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2387,9 +2924,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -2485,9 +3040,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2536,7 +3109,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1635.3:row=2:h=cc099a368661
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2549,9 +3123,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -2647,9 +3239,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2698,7 +3308,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1657.6:row=3:h=d5692e78dd2e
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2711,9 +3322,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -2809,9 +3438,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2860,7 +3507,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1748.0:row=3:h=7648e07d315d
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2873,9 +3521,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 71
         published_page: 61
@@ -3026,9 +3692,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3077,7 +3761,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_tms_open_square::T=1575.0:row=1:h=86cd1ae944a1
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -3091,9 +3776,27 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 58
         published_page: 52
@@ -3485,12 +4188,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'illite_liquid' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3519,9 +4221,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1797820613723733935429852061'
+        - - Fe2O3
+          - '0.01942612938755720548152465748'
+        - - SiO2
+          - '0.7063956960876583521508856851'
+        - - K2O
+          - '0.05538654380782761733608500688'
+        - - Na2O
+          - '0.002275054614640206303170828876'
+        - - MgO
+          - '0.03673451472994322518534861618'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3547,8 +4265,12 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma
-        on Fig. 4
+      value: '0.1'
+      units: dex
+      scope: every point in this series
+      as_printed: ±0.10 dex
+      note: Archival digitisation uncertainty from tick calibration; pass-2 residual ≤0.002 dex. Authors do not restate a
+        per-point sigma on Fig. 4.
   evidence:
     class:
       tag: value
@@ -3561,7 +4283,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1821.7:h=73d823b8e48e
   - kind: admission_defaulted
     affected_quantities:
@@ -3578,9 +4301,25 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1797820613723733935429852061'
+          - - Fe2O3
+            - '0.01942612938755720548152465748'
+          - - SiO2
+            - '0.7063956960876583521508856851'
+          - - K2O
+            - '0.05538654380782761733608500688'
+          - - Na2O
+            - '0.002275054614640206303170828876'
+          - - MgO
+            - '0.03673451472994322518534861618'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 64
         published_page: 58
@@ -3636,7 +4375,7 @@ observations:
     output_unit: Pa
     references: []
   provenance:
-    printed_phase: illite_liquid
+    printed_phase: g
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1860.8:h=37b8334fa33d
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
@@ -3646,12 +4385,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'illite_liquid' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3680,9 +4418,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1797820613723733935429852061'
+        - - Fe2O3
+          - '0.01942612938755720548152465748'
+        - - SiO2
+          - '0.7063956960876583521508856851'
+        - - K2O
+          - '0.05538654380782761733608500688'
+        - - Na2O
+          - '0.002275054614640206303170828876'
+        - - MgO
+          - '0.03673451472994322518534861618'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3708,8 +4462,12 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma
-        on Fig. 4
+      value: '0.1'
+      units: dex
+      scope: every point in this series
+      as_printed: ±0.10 dex
+      note: Archival digitisation uncertainty from tick calibration; pass-2 residual ≤0.002 dex. Authors do not restate a
+        per-point sigma on Fig. 4.
   evidence:
     class:
       tag: value
@@ -3722,7 +4480,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1860.8:h=37b8334fa33d
   - kind: admission_defaulted
     affected_quantities:
@@ -3739,9 +4498,25 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1797820613723733935429852061'
+          - - Fe2O3
+            - '0.01942612938755720548152465748'
+          - - SiO2
+            - '0.7063956960876583521508856851'
+          - - K2O
+            - '0.05538654380782761733608500688'
+          - - Na2O
+            - '0.002275054614640206303170828876'
+          - - MgO
+            - '0.03673451472994322518534861618'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 64
         published_page: 58
@@ -3797,7 +4572,7 @@ observations:
     output_unit: Pa
     references: []
   provenance:
-    printed_phase: illite_liquid
+    printed_phase: g
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1868.6:h=8ea25bb94003
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
@@ -3807,12 +4582,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'illite_liquid' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3841,9 +4615,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1797820613723733935429852061'
+        - - Fe2O3
+          - '0.01942612938755720548152465748'
+        - - SiO2
+          - '0.7063956960876583521508856851'
+        - - K2O
+          - '0.05538654380782761733608500688'
+        - - Na2O
+          - '0.002275054614640206303170828876'
+        - - MgO
+          - '0.03673451472994322518534861618'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3869,8 +4659,12 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma
-        on Fig. 4
+      value: '0.1'
+      units: dex
+      scope: every point in this series
+      as_printed: ±0.10 dex
+      note: Archival digitisation uncertainty from tick calibration; pass-2 residual ≤0.002 dex. Authors do not restate a
+        per-point sigma on Fig. 4.
   evidence:
     class:
       tag: value
@@ -3883,7 +4677,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1868.6:h=8ea25bb94003
   - kind: admission_defaulted
     affected_quantities:
@@ -3900,9 +4695,25 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1797820613723733935429852061'
+          - - Fe2O3
+            - '0.01942612938755720548152465748'
+          - - SiO2
+            - '0.7063956960876583521508856851'
+          - - K2O
+            - '0.05538654380782761733608500688'
+          - - Na2O
+            - '0.002275054614640206303170828876'
+          - - MgO
+            - '0.03673451472994322518534861618'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 64
         published_page: 58
@@ -3958,7 +4769,7 @@ observations:
     output_unit: Pa
     references: []
   provenance:
-    printed_phase: illite_liquid
+    printed_phase: g
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1911.6:h=d9ef607ec5af
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
@@ -3968,12 +4779,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'illite_liquid' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4002,9 +4812,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1797820613723733935429852061'
+        - - Fe2O3
+          - '0.01942612938755720548152465748'
+        - - SiO2
+          - '0.7063956960876583521508856851'
+        - - K2O
+          - '0.05538654380782761733608500688'
+        - - Na2O
+          - '0.002275054614640206303170828876'
+        - - MgO
+          - '0.03673451472994322518534861618'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4030,8 +4856,12 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma
-        on Fig. 4
+      value: '0.1'
+      units: dex
+      scope: every point in this series
+      as_printed: ±0.10 dex
+      note: Archival digitisation uncertainty from tick calibration; pass-2 residual ≤0.002 dex. Authors do not restate a
+        per-point sigma on Fig. 4.
   evidence:
     class:
       tag: value
@@ -4044,7 +4874,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1911.6:h=d9ef607ec5af
   - kind: admission_defaulted
     affected_quantities:
@@ -4061,9 +4892,25 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1797820613723733935429852061'
+          - - Fe2O3
+            - '0.01942612938755720548152465748'
+          - - SiO2
+            - '0.7063956960876583521508856851'
+          - - K2O
+            - '0.05538654380782761733608500688'
+          - - Na2O
+            - '0.002275054614640206303170828876'
+          - - MgO
+            - '0.03673451472994322518534861618'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 64
         published_page: 58
@@ -4119,7 +4966,7 @@ observations:
     output_unit: Pa
     references: []
   provenance:
-    printed_phase: illite_liquid
+    printed_phase: g
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1914.8:h=96933736e50e
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
@@ -4129,12 +4976,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'illite_liquid' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4163,9 +5009,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1797820613723733935429852061'
+        - - Fe2O3
+          - '0.01942612938755720548152465748'
+        - - SiO2
+          - '0.7063956960876583521508856851'
+        - - K2O
+          - '0.05538654380782761733608500688'
+        - - Na2O
+          - '0.002275054614640206303170828876'
+        - - MgO
+          - '0.03673451472994322518534861618'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4191,8 +5053,12 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma
-        on Fig. 4
+      value: '0.1'
+      units: dex
+      scope: every point in this series
+      as_printed: ±0.10 dex
+      note: Archival digitisation uncertainty from tick calibration; pass-2 residual ≤0.002 dex. Authors do not restate a
+        per-point sigma on Fig. 4.
   evidence:
     class:
       tag: value
@@ -4205,7 +5071,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1914.8:h=96933736e50e
   - kind: admission_defaulted
     affected_quantities:
@@ -4222,9 +5089,25 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1797820613723733935429852061'
+          - - Fe2O3
+            - '0.01942612938755720548152465748'
+          - - SiO2
+            - '0.7063956960876583521508856851'
+          - - K2O
+            - '0.05538654380782761733608500688'
+          - - Na2O
+            - '0.002275054614640206303170828876'
+          - - MgO
+            - '0.03673451472994322518534861618'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 64
         published_page: 58
@@ -4280,7 +5163,7 @@ observations:
     output_unit: Pa
     references: []
   provenance:
-    printed_phase: illite_liquid
+    printed_phase: g
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1946.8:h=865b11871b18
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
@@ -4290,12 +5173,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'illite_liquid' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4324,9 +5206,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1797820613723733935429852061'
+        - - Fe2O3
+          - '0.01942612938755720548152465748'
+        - - SiO2
+          - '0.7063956960876583521508856851'
+        - - K2O
+          - '0.05538654380782761733608500688'
+        - - Na2O
+          - '0.002275054614640206303170828876'
+        - - MgO
+          - '0.03673451472994322518534861618'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4352,8 +5250,12 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma
-        on Fig. 4
+      value: '0.1'
+      units: dex
+      scope: every point in this series
+      as_printed: ±0.10 dex
+      note: Archival digitisation uncertainty from tick calibration; pass-2 residual ≤0.002 dex. Authors do not restate a
+        per-point sigma on Fig. 4.
   evidence:
     class:
       tag: value
@@ -4366,7 +5268,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1946.8:h=865b11871b18
   - kind: admission_defaulted
     affected_quantities:
@@ -4383,9 +5286,25 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1797820613723733935429852061'
+          - - Fe2O3
+            - '0.01942612938755720548152465748'
+          - - SiO2
+            - '0.7063956960876583521508856851'
+          - - K2O
+            - '0.05538654380782761733608500688'
+          - - Na2O
+            - '0.002275054614640206303170828876'
+          - - MgO
+            - '0.03673451472994322518534861618'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 64
         published_page: 58
@@ -4441,7 +5360,7 @@ observations:
     output_unit: Pa
     references: []
   provenance:
-    printed_phase: illite_liquid
+    printed_phase: g
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
@@ -4644,9 +5563,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1642467099008939029808868101'
+        - - CaO
+          - '0.1281402488755988200303977262'
+        - - SiO2
+          - '0.7076130412235072769887154639'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4686,7 +5615,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1333.3:h=0364389ce814
   - kind: admission_defaulted
     affected_quantities:
@@ -4712,9 +5642,19 @@ observations:
         figure: '5'
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1642467099008939029808868101'
+          - - CaO
+            - '0.1281402488755988200303977262'
+          - - SiO2
+            - '0.7076130412235072769887154639'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 65
         published_page: 59
@@ -4765,9 +5705,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1642467099008939029808868101'
+        - - CaO
+          - '0.1281402488755988200303977262'
+        - - SiO2
+          - '0.7076130412235072769887154639'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4807,7 +5757,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1333.3:h=2db4bdbaa4a6
   - kind: admission_defaulted
     affected_quantities:
@@ -4833,9 +5784,19 @@ observations:
         figure: '5'
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1642467099008939029808868101'
+          - - CaO
+            - '0.1281402488755988200303977262'
+          - - SiO2
+            - '0.7076130412235072769887154639'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 65
         published_page: 59
@@ -4885,9 +5846,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1642467099008939029808868101'
+        - - CaO
+          - '0.1281402488755988200303977262'
+        - - SiO2
+          - '0.7076130412235072769887154639'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4927,7 +5898,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1333.3:h=5121ebf96a04
   - kind: admission_defaulted
     affected_quantities:
@@ -4944,9 +5916,19 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1642467099008939029808868101'
+          - - CaO
+            - '0.1281402488755988200303977262'
+          - - SiO2
+            - '0.7076130412235072769887154639'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 65
         published_page: 59
@@ -4956,16 +5938,6 @@ observations:
       state:
         tag: value
         value: '1333.3'
-      locator:
-        page: 65
-        published_page: 59
-        pdf_page_index: 64
-        figure: '5'
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Na2O_wt_pct: 17.0-16.7
       locator:
         page: 65
         published_page: 59
@@ -5040,9 +6012,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1642467099008939029808868101'
+        - - CaO
+          - '0.1281402488755988200303977262'
+        - - SiO2
+          - '0.7076130412235072769887154639'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5082,7 +6064,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1428.6:h=8b93bd735499
   - kind: admission_defaulted
     affected_quantities:
@@ -5099,9 +6082,19 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1642467099008939029808868101'
+          - - CaO
+            - '0.1281402488755988200303977262'
+          - - SiO2
+            - '0.7076130412235072769887154639'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 65
         published_page: 59
@@ -5111,16 +6104,6 @@ observations:
       state:
         tag: value
         value: '1428.6'
-      locator:
-        page: 65
-        published_page: 59
-        pdf_page_index: 64
-        figure: '5'
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Na2O_wt_pct: 15.6-13.3
       locator:
         page: 65
         published_page: 59
@@ -5195,9 +6178,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1642467099008939029808868101'
+        - - CaO
+          - '0.1281402488755988200303977262'
+        - - SiO2
+          - '0.7076130412235072769887154639'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5237,7 +6230,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1488.8:h=5f7a8c15c78e
   - kind: admission_defaulted
     affected_quantities:
@@ -5254,9 +6248,19 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1642467099008939029808868101'
+          - - CaO
+            - '0.1281402488755988200303977262'
+          - - SiO2
+            - '0.7076130412235072769887154639'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 65
         published_page: 59
@@ -5266,16 +6270,6 @@ observations:
       state:
         tag: value
         value: '1488.8'
-      locator:
-        page: 65
-        published_page: 59
-        pdf_page_index: 64
-        figure: '5'
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Na2O_wt_pct: 17.0-16.7
       locator:
         page: 65
         published_page: 59
@@ -5351,9 +6345,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1642467099008939029808868101'
+        - - CaO
+          - '0.1281402488755988200303977262'
+        - - SiO2
+          - '0.7076130412235072769887154639'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5393,7 +6397,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1493.7:h=31e60450532f
   - kind: admission_defaulted
     affected_quantities:
@@ -5419,9 +6424,19 @@ observations:
         figure: '5'
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1642467099008939029808868101'
+          - - CaO
+            - '0.1281402488755988200303977262'
+          - - SiO2
+            - '0.7076130412235072769887154639'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 65
         published_page: 59
@@ -6846,9 +7861,25 @@ observations:
       tag: unknown
       reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.2045119195408229976380291588'
+        - - Al2O3
+          - '0.2041490035607471406601254596'
+        - - Fe2O3
+          - '0.06389659121921674913570573995'
+        - - CaO
+          - '0.02620142865223391464883058042'
+        - - MgO
+          - '0.01215179233269916437383895493'
+        - - SiO2
+          - '0.4890892646942800335434701061'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -6896,9 +7927,25 @@ observations:
         source_path: text/kems-020-hastie-1981-nbsir/ocr-repair/kems-020-hastie-1981-nbsir.md
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.2045119195408229976380291588'
+          - - Al2O3
+            - '0.2041490035607471406601254596'
+          - - Fe2O3
+            - '0.06389659121921674913570573995'
+          - - CaO
+            - '0.02620142865223391464883058042'
+          - - MgO
+            - '0.01215179233269916437383895493'
+          - - SiO2
+            - '0.4890892646942800335434701061'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 29
         published_page: 23
@@ -6930,9 +7977,25 @@ observations:
       tag: unknown
       reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.0612675719211682823093057266'
+        - - Al2O3
+          - '0.07221623745433399488531122602'
+        - - Fe2O3
+          - '0.04984868629996740652431006519'
+        - - CaO
+          - '0.1644265944618444787953834333'
+        - - MgO
+          - '0.1300232372232385380289286028'
+        - - SiO2
+          - '0.5222176726394472994567609464'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -6980,9 +8043,25 @@ observations:
         source_path: text/kems-020-hastie-1981-nbsir/ocr-repair/kems-020-hastie-1981-nbsir.md
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.0612675719211682823093057266'
+          - - Al2O3
+            - '0.07221623745433399488531122602'
+          - - Fe2O3
+            - '0.04984868629996740652431006519'
+          - - CaO
+            - '0.1644265944618444787953834333'
+          - - MgO
+            - '0.1300232372232385380289286028'
+          - - SiO2
+            - '0.5222176726394472994567609464'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 29
         published_page: 23
@@ -7314,9 +8393,25 @@ observations:
       tag: unknown
       reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1795243839737074959159960722'
+        - - Al2O3
+          - '0.1797352073765913067717464412'
+        - - Fe2O3
+          - '0.02472489821265685180340413124'
+        - - CaO
+          - '0.1235453435967127725644059259'
+        - - MgO
+          - '0.06099496612967374599257737967'
+        - - SiO2
+          - '0.4314752007106578269518700501'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -7364,9 +8459,25 @@ observations:
         source_path: text/kems-020-hastie-1981-nbsir/ocr-repair/kems-020-hastie-1981-nbsir.md
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1795243839737074959159960722'
+          - - Al2O3
+            - '0.1797352073765913067717464412'
+          - - Fe2O3
+            - '0.02472489821265685180340413124'
+          - - CaO
+            - '0.1235453435967127725644059259'
+          - - MgO
+            - '0.06099496612967374599257737967'
+          - - SiO2
+            - '0.4314752007106578269518700501'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 29
         published_page: 23
@@ -7448,9 +8559,27 @@ observations:
       tag: unknown
       reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -7499,9 +8628,27 @@ observations:
         source_path: text/kems-020-hastie-1981-nbsir/ocr-repair/kems-020-hastie-1981-nbsir.md
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 29
         published_page: 23

@@ -14,7 +14,7 @@ from simulator.battery.records import (
     State,
     Value,
 )
-from simulator.battery.migrate import REPO_ROOT
+from simulator.battery.migrate import REPO_ROOT, invalid_run_composition
 from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.waypoints import (
     GapReason,
@@ -209,18 +209,62 @@ def test_readiness_keeps_raw_printed_composition_out_of_sample_charge(source_id)
     assert sample_inputs.waypoints["normalized_composition"].absence is not None
 
 
-def test_unknown_point_composition_suppresses_typed_sample_charge():
-    extract = REPO_ROOT / "data/literature/extracts/cottrell-2009-iron-xanes.yaml"
-    migrator = factories.migrate_one_extract(REPO_ROOT, extract)
-    migrator.finalize()
+@pytest.mark.parametrize(
+    ("blank_kind", "source_id", "observation_fragment", "reason_fragment"),
+    [
+        (
+            "cottrell",
+            "cottrell-2009-iron-xanes",
+            "cottrell_2009_moore_wet_chemistry_quotes::point:3",
+            "no DT_29 composition column is printed",
+        ),
+        (
+            "evans",
+            "evans-2009-sulfur-mn-ni-w-xanes",
+            "evans_2009_2c_al_composition::T=1673.15:row=b231205p1:",
+            "not_published",
+        ),
+        (
+            "b716",
+            "fixture-source",
+            "fixture_series",
+            "printed initial charge is unavailable",
+        ),
+    ],
+    ids=["cottrell-no-column", "evans-not-published", "b716-no-charge"],
+)
+def test_unknown_point_composition_suppresses_typed_sample_charge(
+    tmp_path: Path,
+    blank_kind: str,
+    source_id: str,
+    observation_fragment: str,
+    reason_fragment: str,
+) -> None:
+    if blank_kind == "b716":
+        from simulator.battery.migrate import migrate
+        from tests.battery.test_b716_composition_role import _series_extract
+        from tests.battery.test_migrate import _write_min_tree
+
+        extract = _series_extract({"composition_role": "initial_charge_only"})
+        point = extract["species"]["Fe"]["observations"][0]["values"]["points"][0]
+        point.pop("composition_wt_pct")
+        result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    else:
+        extract = REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml"
+        migrator = factories.migrate_one_extract(REPO_ROOT, extract)
+        migrator.finalize()
+        result = migrator.result
     observation = next(
         obs
-        for obs in migrator.result.observations.values()
-        if obs.observation_id.endswith(
-            "cottrell_2009_moore_wet_chemistry_quotes::point:3"
-        )
+        for obs in result.observations.values()
+        if obs.source_id == source_id
+        and observation_fragment in obs.observation_id
     )
-    experiment = migrator.result.experiments[observation.experiment_id]
+    point_composition = observation.point_conditions["composition"]
+    assert point_composition.state.is_unknown
+    assert reason_fragment in (point_composition.state.reason or "")
+    assert not invalid_run_composition(point_composition.state)
+    experiment = result.experiments[observation.experiment_id]
     bench = Bench(
         "work::bench::one",
         "work",
@@ -243,13 +287,15 @@ def test_unknown_point_composition_suppresses_typed_sample_charge():
     inputs = collect_consumer_inputs(experiment_with_sample, bench, observation)
 
     assert not inputs.charges
+    assert inputs.charges.absence is not None
     assert inputs.waypoints["normalized_composition"].selected is None
-    absence = inputs.waypoints["normalized_composition"].absence
-    assert absence is not None
-    assert absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
-    assert absence.missing == (
-        f"observation[{observation.observation_id}].point_conditions.composition",
-    )
+    if blank_kind == "cottrell":
+        absence = inputs.waypoints["normalized_composition"].absence
+        assert absence is not None
+        assert absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        assert absence.missing == (
+            f"observation[{observation.observation_id}].point_conditions.composition",
+        )
 
 
 def test_raw_point_map_suppresses_sample_printed_composition():

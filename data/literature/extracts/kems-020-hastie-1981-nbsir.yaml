@@ -1739,6 +1739,17 @@ species:
           initial 17.0. Time-integrated CO2 and excess Na give 0.45 wt.%
           impurity Na2CO3 (p. 20). Caption: KMS(1) 17.0 to 16.7; KMS(3) 15.6
           to 13.3; TMS(1) 17.0; TMS(2) 16.9 wt.%.
+        caption_depletion_columns:
+          columns: [Na2O_wt_pct]
+          locator:
+            page: 51
+            pdf_page: 57
+            note: >-
+              Fig. 5 caption, folio 51 (physical PDF page 57). Start-to-end
+              Na2O wt% depletion, not the run composition at the pressure
+              point. The depletion discussion is report p. 19.
+          quote: >-
+            KMS(1) 17.0 to 16.7; KMS(3) 15.6 to 13.3; TMS(1) 17.0; TMS(2) 16.9 wt.%.
         points:
         - series: KMS_1
           T_K: 1488.8
@@ -2736,7 +2747,7 @@ species:
       T_range_K:
       - 1702.0
       - 1977.1
-      phase: illite_liquid
+      phase: g
       regime: kems_effusion
       units: atm as published
       values:
@@ -2972,7 +2983,13 @@ species:
           10^4/T~6.3 and 6.6 with large error bars. Not digitized as points
           (error bars larger than the digitization budget).
       uncertainty:
-        note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma on Fig. 4
+        value: 0.10
+        units: dex
+        scope: every point in this series
+        as_printed: ±0.10 dex
+        note: >-
+          Archival digitisation uncertainty from tick calibration; pass-2
+          residual ≤0.002 dex. Authors do not restate a per-point sigma on Fig. 4.
     - observation_id: hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
       supersedes: hastie_1981_fig4_illite_K_SiO_digitized
       type: psat_series

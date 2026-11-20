@@ -102,6 +102,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import (
     Identity,
     SweepIdentity,
+    ValenceBasis,
     WallIdentity,
     IdentityEqualKind,
     IdentityEqualOutcome,
@@ -177,13 +178,17 @@ from simulator.battery.migrate import (
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
+    effective_run_composition,
+    invalid_run_composition,
     ALPHA_GAS_SYSTEM_H2,
     HK_RATIO_ALPHA_DEFINITION,
     evaporation_alpha_family_key,
 )
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
+from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
     SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     Bench,
     CandidateRequest,
@@ -226,12 +231,14 @@ from simulator.battery.score_report import (
     _e15_number,
     _score_shard_failure_report_lines,
     format_element_retention_diagnostics,
+    format_assumed_band_report,
     format_store_stamp_report_lines,
     render_legacy_score_report_markdown,
     render_payload_score_report_markdown,
     store_stamp_has_known_revision,
 )
 from simulator.battery.score_report_data import (
+    AssumedBandReport,
     eligibility_failure_census,
     element_retention_report_data,
 )
@@ -1984,18 +1991,26 @@ def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
         for state in states
     ):
         return None
-    if reference.source_id == "kems-020-hastie-1981-nbsir":
-        reason = (
-            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-            "composition_role=initial_charge_only: composition = printed initial "
-            "charge; run composition evolves during vaporization"
-        )
-    else:
-        reason = (
-            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-            f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: the printed "
-            "composition is the starting charge, not the state of this datum"
-        )
+    existing_proxy_notice = next(
+        (
+            notice
+            for notice in reference.notices
+            if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+            and notice.reason.startswith(SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX)
+            and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+        ),
+        None,
+    )
+    if existing_proxy_notice is not None:
+        # The persisted notice is also the scoring flag that strips bands from
+        # this proxy-backed residual. Keep it in flagged_notices so the band
+        # policy sees it; union_notices deduplicates it in the final row.
+        return existing_proxy_notice
+    reason = (
+        f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+        f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
+        f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
+    )
     return Notice(
         kind=NoticeKind.SOURCE_DISAGREEMENT,
         affected_quantities=(quantity,),
@@ -6401,6 +6416,67 @@ def _metric_uncertainty_width(
     return None
 
 
+def _assumed_method_class_band(
+    observation: Observation, experiment: Experiment | None, reference: Decimal,
+) -> dict[str, object]:
+    selected = select_method_class_band(observation, experiment)
+    if "refusal" in selected:
+        return selected
+    quantity = quantity_token(observation.identity)
+    operation = _residual_metric_operation(quantity, observation)
+    precision = selected["precision"]
+    amount = Decimal(precision["value"])
+    amount_unit = "fraction"
+    if precision["basis"] == "ferric_fraction":
+        fraction_form = (
+            quantity is Quantity.VALENCE_RATIO
+            and _fe_valence_named_form(observation.identity) == "fraction"
+        )
+        if quantity is Quantity.VALENCE_RATIO and _fe_valence_named_form(
+            observation.identity
+        ) not in {"fraction", "ratio"}:
+            return {"refusal": {"reason": "method_class_fe_observable_unmatched"}}
+        fraction = reference if fraction_form else next(
+            (
+                condition.state.value
+                for name, condition in (observation.point_conditions or {}).items()
+                if name in FERRIC_FRACTION_FIELDS
+                and condition.locator is not None and condition.state.is_value
+            ),
+            None,
+        )
+        if not isinstance(fraction, Decimal) or (
+            not fraction_form
+            and fe3_fe2_ratio_from_ferric_fraction(fraction) != reference
+        ):
+            return {"refusal": {"reason": "method_class_ferric_fraction_unknown"}}
+        propagated, reason = _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+            fraction, amount
+        )
+        if propagated is None:
+            return {"refusal": {"reason": reason}}
+        amount, amount_unit = (
+            (amount, "dimensionless") if fraction_form else (propagated, "dex")
+        )
+    width = _metric_uncertainty_width(
+        operation, quantity, reference, amount, amount_unit
+    )
+    if width is None or not width.is_finite() or width <= 0:
+        return {"refusal": {"reason": "method_class_metric_domain"}}
+    return {
+        "class_id": selected["class_id"],
+        "version": selected["version"],
+        "citation": selected["citation"],
+        "precision": precision,
+        "band": DecisionBand(
+            width,
+            "dimensionless" if operation is not MetricOperation.ABSOLUTE else QUANTITY_UNITS[quantity],
+            f"assumed_band: {selected['class_id']}; confidence unstated",
+            band_basis="method_class_assumed",
+        ),
+    }
+
+
 def _combine_independent_standard_uncertainties(
     first: Decimal,
     second: Decimal,
@@ -8541,6 +8617,32 @@ class _FeRedoxRefusal:
     detail: dict[str, object]
 
 
+def _scored_valence_basis_shape(basis: ValenceBasis) -> tuple[int, str] | None:
+    """Single-numerator fraction or oxidation-state ratio, or None.
+
+    A fraction uses the total element as its denominator. A ratio or
+    log10 ratio uses one other oxidation state. Callers still decide
+    which states that element is allowed to score. Iron rejects a
+    log10 printing itself; this shape does not.
+    """
+
+    numerator = basis.numerator_oxidation_states
+    if len(numerator) != 1:
+        return None
+    if (
+        basis.value_form is ValenceValueForm.FRACTION
+        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+    ):
+        return numerator[0], "fraction"
+    if (
+        basis.value_form in {ValenceValueForm.RATIO, ValenceValueForm.LOG10_RATIO}
+        and basis.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
+        and basis.denominator_oxidation_state is not None
+    ):
+        return numerator[0], "ratio"
+    return None
+
+
 def _openimcc_candidate_valence_fields(
     identity: Identity,
 ) -> Mapping[int, str] | None:
@@ -8556,20 +8658,18 @@ def _openimcc_candidate_valence_fields(
     basis_state = identity.valence_basis
     if basis_state is None or not basis_state.is_value:
         return None
-    basis = basis_state.value
-    numerator = basis.numerator_oxidation_states
-    if len(numerator) != 1 or numerator[0] not in fields:
+    shaped = _scored_valence_basis_shape(basis_state.value)
+    if shaped is None:
         return None
-    if (
-        basis.value_form is ValenceValueForm.FRACTION
-        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
-    ):
+    numerator_state, kind = shaped
+    if numerator_state not in fields:
+        return None
+    if kind == "fraction":
         return fields
+    denominator_state = basis_state.value.denominator_oxidation_state
     if (
-        basis.value_form in {ValenceValueForm.RATIO, ValenceValueForm.LOG10_RATIO}
-        and basis.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
-        and basis.denominator_oxidation_state in fields
-        and basis.denominator_oxidation_state != numerator[0]
+        denominator_state in fields
+        and denominator_state != numerator_state
     ):
         return fields
     return None
@@ -9310,14 +9410,10 @@ def _predict_redox(
             if candidate_fields is not None and identity.species is not None
             else "Fe"
         )
-        if inventory.get("Fe", 0.0) <= 0.0:
-            return refused(
-                RefusalReason.IDENTITY_INCOMPLETE,
-                {
-                    "reason": "missing_input",
-                    "input": "total_iron",
-                },
-            )
+        # The scored element is the missing input for this row. Iron is a
+        # solver requirement (openimcc refuses a zero Fe inventory), checked
+        # after the scored element so a Cr or Ti row that also lacks iron is
+        # not reported as total_iron.
         if (
             redox_element != "Fe"
             and inventory.get(redox_element, 0.0) <= 0.0
@@ -9327,6 +9423,14 @@ def _predict_redox(
                 {
                     "reason": "missing_input",
                     "input": f"total_{redox_element.lower()}",
+                },
+            )
+        if inventory.get("Fe", 0.0) <= 0.0:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {
+                    "reason": "missing_input",
+                    "input": "total_iron",
                 },
             )
         try:
@@ -11011,19 +11115,16 @@ def _fe_valence_named_form(identity: Identity) -> str:
     if basis_state is None or not basis_state.is_value:
         return "other_fe"
     basis = basis_state.value
-    numerator = basis.numerator_oxidation_states
+    shaped = _scored_valence_basis_shape(basis)
+    # Iron scores Fe3+/Fe2+ only as a straight ratio. A log10 printing of
+    # the same states stays refused.
     if (
-        numerator == (3,)
+        shaped == (3, "ratio")
         and basis.value_form is ValenceValueForm.RATIO
-        and basis.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
         and basis.denominator_oxidation_state == 2
     ):
         return "ratio"
-    if (
-        numerator == (3,)
-        and basis.value_form is ValenceValueForm.FRACTION
-        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
-    ):
+    if shaped == (3, "fraction"):
         return "fraction"
     return "other_fe"
 
@@ -14334,14 +14435,46 @@ def _predict_with_engine(
                 requested_composition=requested,
                 version=activity.activity_model,
             )
-    elif identity.composition is not None and identity.composition.is_value:
+    elif quantity in _VAPOUR_EQUILIBRIUM and invalid_run_composition(
+        run_composition := effective_run_composition(
+            identity, observation.point_conditions
+        )
+    ):
+        # An invalid printed run map refuses before the pure-reservoir
+        # fallback. The charge proxy is not a substitute for that map.
+        assert run_composition is not None
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=None,
+            reason=RefusalReason.INVALID_SOURCE,
+            detail={
+                "reason": run_composition.reason
+                or RefusalReason.INVALID_SOURCE.value,
+                "consumer": "vapour",
+            },
+            notices=_knudsen_oxygen_refusal_notices(quantity, experiment),
+        )
+    elif (
+        identity.composition is not None
+        and identity.composition.is_value
+        and (
+            run_composition := effective_run_composition(
+                identity, observation.point_conditions
+            )
+        )
+        is not None
+        and run_composition.is_value
+    ):
         if sample_phase_detail is not None:
             return _sample_phase_not_observable_prediction(
                 engine, identity, sample_phase_detail
             )
-        requested = identity.composition
-        assert identity.composition.value is not None
-        composition_value = identity.composition.value
+        requested = run_composition
+        assert run_composition.value is not None
+        composition_value = run_composition.value
     elif quantity in _VAPOUR_EQUILIBRIUM and (
         point_composition := _printed_point_composition(observation)[0]
     ) is not None:
@@ -17540,9 +17673,34 @@ def _compile_residual_with_lineage(
                 execution=Execution(state=ExecutionState.NOT_PROBED),
             )
     if not gates.passed and not apparatus_flagged:
+        refusal_detail: dict[str, object] = {
+            "primary_check": gates.primary_check,
+            "checks": [check.name for check in gates.checks],
+        }
+        pressure_check = next(
+            (
+                check
+                for check in gates.checks
+                if check.name == "in_cell_partial_pressure_sum" and not check.passed
+            ),
+            None,
+        )
+        if pressure_check is not None:
+            pressure_detail = pressure_check.detail
+            lower_bound = pressure_detail.get(
+                "printed_partial_pressure_lower_bound_Pa"
+            )
+            pressure_sum = pressure_detail.get("printed_partial_pressure_sum_Pa")
+            if lower_bound is not None:
+                refusal_detail["in_cell_pressure_lower_bound_Pa"] = lower_bound
+            elif pressure_sum is not None:
+                refusal_detail["in_cell_pressure_sum_Pa"] = pressure_sum
+            limit = pressure_detail.get("pressure_limit_Pa")
+            if limit is not None:
+                refusal_detail["limit_Pa"] = limit
         return _refused(
             gates.reason or RefusalReason.INVALID_SOURCE,
-            {"primary_check": gates.primary_check, "checks": [c.name for c in gates.checks]},
+            refusal_detail,
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("validity_gates_pass", "status_match_or_mismatch"),
         )
@@ -18215,6 +18373,11 @@ def _compile_residual_with_lineage(
         ref_point = _phase_component_reference_wt_percent(identity, ref_point)
     printed = _PrintedBandResolution()
     fusion_band_refusal: Mapping[str, object] | None = None
+    # The measurement's own refusal, captured before a fusion conversion
+    # replaces ``printed.refusal``. ``conversion_uncertainty_unprinted`` is a
+    # missing JANAF sigma, not a printed uncertainty. d-443 still reads the row.
+    measurement_printed_refusal = None
+    reference_phase_resolved = False
     if implied_alpha:
         numeric, metric_reason, metric_detail = _implied_alpha_numeric(prediction.value)
     else:
@@ -18321,6 +18484,7 @@ def _compile_residual_with_lineage(
             notice.reason in _REFERENCE_POLYMORPH_REFUSAL_REASONS
             for notice in reference.notices
         )
+        reference_phase_resolved = not source_phase_missing
         fusion_conversion = any(
             _is_fusion_conversion_notice(notice) for notice in reference.notices
         )
@@ -18409,6 +18573,7 @@ def _compile_residual_with_lineage(
                     standard_uncertainty_dex=sigma_total_dex,
                     two_sigma_band=two_sigma_band,
                 )
+        measurement_printed_refusal = printed.refusal
         if fusion_band_refusal is not None:
             reason = str(fusion_band_refusal["reason"])
             printed = replace(
@@ -18580,6 +18745,21 @@ def _compile_residual_with_lineage(
         NoticeKind.FIGURE_ONLY,
         NoticeKind.REACTIVE_CELL_NOT_MODELLED,
     }
+    initial_charge_figure_band = (
+        numeric.decision_band is not None
+        and numeric.decision_band.band_basis == "row_printed"
+        and evidence_class.is_value
+        and evidence_class.value is EvidenceClass.FIGURE_ONLY
+        and reference.identity.composition is not None
+        and reference.identity.composition.is_value
+        and isinstance(reference.identity.composition.value, Composition)
+        and reference.identity.composition.value.proxy_flag
+        == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    )
+    if initial_charge_figure_band:
+        band_preserving_kinds.update(
+            {NoticeKind.SOURCE_DISAGREEMENT, NoticeKind.UNVERIFIED_APPARATUS}
+        )
     if (
         evidence_class.is_value
         and evidence_class.value is EvidenceClass.FIGURE_ONLY
@@ -18628,6 +18808,37 @@ def _compile_residual_with_lineage(
     if is_sf04_workbook(reference):
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
     eligible = conjuncts.eligible()
+    assumed_details = None
+    # d-443 controller clarification: keep NO_BAND, eligibility and all old
+    # headline contributions intact. A literature band is additive metadata.
+    # Gate on the measurement refusal and successful reference-phase
+    # resolution. A fusion-conversion refusal stays on the headline residual
+    # and is not a printed uncertainty.
+    if (
+        not implied_alpha
+        and evidence_class.is_value and evidence_class.value in MEASURED_EVIDENCE
+        and numeric.decision_band is None
+        and printed.band is None
+        and derived_band is None
+        and measurement_printed_refusal is None
+        and reference_phase_resolved
+        and source_method_uncertainty is None
+        and (
+            source_reference.uncertainty.kind is UncertaintyKind.NONE
+            or _verbatim_denies_printed_uncertainty(source_reference.uncertainty)
+        )
+    ):
+        assumed_details = _assumed_method_class_band(
+            source_reference, experiment, ref_point
+        )
+        assumed_details["eligible"] = (
+            "band" in assumed_details and eligible and not has_no_band_flag
+        )
+        if "band" in assumed_details:
+            assumed_details["inside_band"] = match_status(
+                replace(numeric, decision_band=assumed_details["band"])
+            ) is ResidualStatus.MATCH
+        assumed_details["evidence_class"] = evidence_class.value.value
     return (
         Residual(
             key=_key_for_fo2_mode(key, result_mode),
@@ -18637,6 +18848,8 @@ def _compile_residual_with_lineage(
             status=status,
             source_relation=source_relation,
             score_eligible=eligible,
+            assumed_band=True if assumed_details is not None and "band" in assumed_details else None,
+            assumed_band_details=assumed_details,
             exclusions=conjuncts.exclusions(),
             notices=notices,
             candidate=candidate.observation_id,
@@ -22853,6 +23066,21 @@ def all_numeric_payload_records(
 HEADLINE_SUMMARY_KIND = "battery_headline_summary"
 
 
+def _assumed_band_summary(
+    rows: Iterable[Mapping[str, object]],
+    observations: Mapping[str, Observation] | None = None,
+) -> dict[str, object]:
+    report = AssumedBandReport()
+    for row in rows:
+        observation = (observations or {}).get(str(row.get("reference") or ""))
+        quantity = None if observation is None else quantity_token(observation.identity)
+        report.add(
+            row, engine=_engine_from_payload(row),
+            quantity=quantity.value if quantity is not None else _residual_key_quantity(row.get("key")),
+        )
+    return report.payload()
+
+
 def headline_summary_payload(
     records: Sequence[Mapping[str, object]],
     *,
@@ -22884,6 +23112,9 @@ def write_headline_summary_json(
     payload = headline_summary_payload(
         headline_records(residuals, context=context, engines=engines),
         store_stamp=stamp,
+    )
+    payload["assumed_band"] = _assumed_band_summary(
+        (to_plain(row) for row in residuals), context.observations
     )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -23333,7 +23564,7 @@ def _render_score_report_from_payloads_legacy(
             + "\n".join(_score_shard_failure_report_lines(shard_failures))
             + "\n"
         )
-    return report
+    return format_assumed_band_report(report, aggregate.assumed_bands.payload())
 
 
 def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
@@ -24353,6 +24584,7 @@ class _ScorePayloadAccumulator:
             str, dict[tuple[str, str, str], dict[str, object]]
         ] = {"measured": {}, "compilation": {}}
         self.all_numeric = _AllNumericHeadline()
+        self.assumed_bands = AssumedBandReport()
         self.e15_points: list[_E15ResidualPoint] = []
         self.headline_hulls: dict[tuple[str, str, str], _ConditionHull] = {}
         self.report_engine_names: set[str] = set()
@@ -24630,6 +24862,14 @@ class _ScorePayloadAccumulator:
         from simulator.battery.compilation_tier import _tier_cell_from_payload_fields
 
         metadata = row_metadata or self._row_metadata(row)
+        assumed_quantity = (
+            None if metadata.observation is None
+            else quantity_token(metadata.observation.identity)
+        )
+        self.assumed_bands.add(
+            row, engine=metadata.engine,
+            quantity=assumed_quantity.value if assumed_quantity is not None else _residual_key_quantity(row.get("key")),
+        )
         self.count += 1
         if row.get("score_eligible"):
             self.scored_count += 1
@@ -24927,11 +25167,13 @@ class _ScorePayloadAccumulator:
         )
 
     def summary_payload(self, store_stamp: Mapping[str, object] | None) -> dict[str, object]:
-        return headline_summary_payload(
+        payload = headline_summary_payload(
             self.headline_records(),
             store_stamp=store_stamp,
             static_refusals=self.static_refusals,
         )
+        payload["assumed_band"] = self.assumed_bands.payload()
+        return payload
 
 
 def write_headline_summary_from_payloads_json(
@@ -24943,6 +25185,7 @@ def write_headline_summary_from_payloads_json(
     origins: Mapping[str, str] | None = None,
     store_stamp: Mapping[str, object] | None = None,
 ) -> None:
+    rows = tuple(rows)
     payload = headline_summary_payload(
         headline_payload_records(
             rows,
@@ -24952,6 +25195,7 @@ def write_headline_summary_from_payloads_json(
         ),
         store_stamp=store_stamp,
     )
+    payload["assumed_band"] = _assumed_band_summary(rows, observations)
     _write_headline_summary_payload_json(payload, path)
 
 
@@ -25151,6 +25395,9 @@ def render_score_report_from_payloads(
         status_diff=status_diff,
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
+    )
+    report = format_assumed_band_report(
+        report, _assumed_band_summary(rows, observations)
     )
     if observations is None:
         return report

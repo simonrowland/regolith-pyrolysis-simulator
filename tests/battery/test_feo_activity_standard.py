@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+from dataclasses import replace
 from decimal import Decimal
 from hashlib import sha256
 from importlib import resources
@@ -33,14 +34,15 @@ from tests.battery import factories as F
 
 
 _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = (
-    "eb6b8cce0b5487f44c7f6a0705d92a3f4ffc4a0248af489784610026544f624d"
+    "61b0c0bb1105c233265d2e0175899f2c28bb0db324798c8e850025c8864acac0"
 )
 # b217 pinned the N_Fe2+^0 multiply:
 # sha 3b1518942a5ca7524b6e4be8e2c98fd375db44c5835bd830a4acff0a54e32ce0
 # dex -0.013180332034779389
 # The offer frame is a_D * f from the Darken & Gurry factor.
 # The byte pin includes the active OpenIMCC redox-pack identity and FeO
-# standard-normalization provenance as well as the residual value.
+# standard-normalization provenance as well as the residual value. The
+# candidate v4 FeO standard shifts the green value; see the integration test.
 _DISTIN_1880_RESIDUAL_SHA256 = (
     "4018b7071882dfaca4eca46512ad7357f48e461bc4c4ed1feacedf2c3a420097"
 )
@@ -531,7 +533,7 @@ def distin_migration():
     return migrator.result
 
 
-def test_distin_closed_redox_residual_pins_green_value_and_serialized_line(
+def test_distin_closed_redox_residual_pins_candidate_value_and_band_metadata(
     distin_migration,
 ) -> None:
     observation = next(
@@ -575,6 +577,16 @@ def test_distin_closed_redox_residual_pins_green_value_and_serialized_line(
         None,
     )
     assert candidate.provenance is not None
+    assert residual.assumed_band is None
+    assumed = residual.assumed_band_details
+    assert assumed is not None
+    assert "band" not in assumed
+    assert assumed["eligible"] is False
+    assert assumed["evidence_class"] == EvidenceClass.MEASURED_REDUCED.value
+    assert assumed["refusal"]["reason"] == (
+        "method_class_applicability_unknown"
+    )
+    assert residual.score_eligible is False
     assert candidate.provenance["selected_oxygen_condition"] == {
         "fo2_tier": 3,
         "physics_rung": None,
@@ -605,7 +617,16 @@ def test_distin_closed_redox_residual_pins_green_value_and_serialized_line(
     # 6e99778d67e8e4ac5ea34d58c72eab0e56e538968ffe6f9cb4b69c4208af83c6
     # -> 4018b7071882dfaca4eca46512ad7357f48e461bc4c4ed1feacedf2c3a420097).
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
-    assert sha256(serialized).hexdigest() == _DISTIN_1880_RESIDUAL_SHA256
+    assert '"assumed_band_details"' in serialized.decode("utf-8")
+    # d-443 adds only this metadata to the serialized line. Keep the existing
+    # candidate-value and provenance byte pin with that additive field removed.
+    serialized_without_assumption = dumps_residual_line(
+        replace(residual, assumed_band_details=None), candidate
+    ).encode("utf-8")
+    assert (
+        sha256(serialized_without_assumption).hexdigest()
+        == _DISTIN_1880_RESIDUAL_SHA256
+    )
 
 
 def test_nondefault_openimcc_profile_refuses_an_undeclared_feo_standard() -> None:
