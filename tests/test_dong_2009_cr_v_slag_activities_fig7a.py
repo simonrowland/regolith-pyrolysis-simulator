@@ -42,12 +42,31 @@ def _rows(document: dict) -> dict[str, dict]:
     }
 
 
-def _assert_digitization_pins(document: dict, digitization: dict[str, dict]) -> None:
+def _assert_point_values(
+    document: dict, expected: dict[str, tuple[str, str]]
+) -> None:
     points = _rows(document)
-    assert points.keys() == digitization.keys()
+    assert points.keys() == expected.keys()
+    for row_id, (x_cr_o, activity) in expected.items():
+        point = points[row_id]
+        assert point["x_CrO"] == x_cr_o
+        assert point["activity"] == activity
+        located_x = point["point_conditions"]["x_CrO"]["state"]
+        assert located_x["tag"] == "value"
+        assert located_x["value"] == x_cr_o
+
+
+def _assert_digitization_pins(document: dict, digitization: dict[str, dict]) -> None:
+    _assert_point_values(
+        document,
+        {
+            row_id: (csv_row["x_CrO"], csv_row["activity_CrO"])
+            for row_id, csv_row in digitization.items()
+        },
+    )
+    points = _rows(document)
     for row_id, csv_row in digitization.items():
-        assert points[row_id]["x_CrO"] == csv_row["x_CrO"]
-        assert points[row_id]["activity"] == csv_row["activity_CrO"]
+        point = points[row_id]
         assert points[row_id]["digitization_uncertainty"]["x_CrO"].removeprefix(
             "±"
         ) == csv_row["x_uncertainty"]
@@ -57,18 +76,20 @@ def _assert_digitization_pins(document: dict, digitization: dict[str, dict]) -> 
 
 
 def _assert_literal_pins(document: dict) -> None:
+    _assert_point_values(
+        document,
+        {
+            row_id: (values[2], values[3])
+            for row_id, values in EXPECTED_POINTS.items()
+        },
+    )
     points = _rows(document)
-    assert points.keys() == EXPECTED_POINTS.keys()
-    for row_id, (temperature_k, temperature_c, x_cr_o, activity, p_o2) in (
-        EXPECTED_POINTS.items()
-    ):
+    for row_id, expected in EXPECTED_POINTS.items():
         point = points[row_id]
         conditions = point["point_conditions"]
-        assert point["T_C"] == temperature_c
-        assert point["x_CrO"] == x_cr_o
-        assert point["activity"] == activity
-        assert conditions["temperature_K"]["state"]["value"] == temperature_k
-        assert conditions["pO2_Pa"]["state"]["value"] == p_o2
+        assert point["T_C"] == expected[1]
+        assert conditions["temperature_K"]["state"]["value"] == expected[0]
+        assert conditions["pO2_Pa"]["state"]["value"] == expected[4]
 
 
 def test_all_nine_points_have_corpus_independent_literal_pins_and_mutations() -> None:
@@ -77,19 +98,36 @@ def test_all_nine_points_have_corpus_independent_literal_pins_and_mutations() ->
 
     for row_id, expected in EXPECTED_POINTS.items():
         mutations = (
-            (("T_C",), expected[1]),
-            (("x_CrO",), expected[2]),
-            (("activity",), expected[3]),
-            (("point_conditions", "temperature_K", "state", "value"), expected[0]),
-            (("point_conditions", "pO2_Pa", "state", "value"), expected[4]),
+            (("T_C",), expected[1], False),
+            (("x_CrO",), expected[2], False),
+            (("activity",), expected[3], False),
+            (
+                ("point_conditions", "temperature_K", "state", "value"),
+                expected[0],
+                False,
+            ),
+            (
+                ("point_conditions", "pO2_Pa", "state", "value"),
+                expected[4],
+                False,
+            ),
+            (
+                ("point_conditions", "x_CrO", "state", "value"),
+                expected[2],
+                True,
+            ),
         )
-        for path, expected_value in mutations:
+        for path, expected_value, numeric in mutations:
             mutated = deepcopy(document)
             point = _rows(mutated)[row_id]
             target = point
             for part in path[:-1]:
                 target = target[part]
-            target[path[-1]] = f"{expected_value}-mutated"
+            target[path[-1]] = (
+                str(Decimal(expected_value) + Decimal("0.00001"))
+                if numeric
+                else f"{expected_value}-mutated"
+            )
             with pytest.raises(AssertionError):
                 _assert_literal_pins(mutated)
 
@@ -294,3 +332,5 @@ def test_isolated_migration_preserves_all_nine_located_rows() -> None:
         assert migrated.point_conditions["temperature_K"].state.value == Decimal(
             printed_temp_k
         )
+        expected_x_cr_o = Decimal(EXPECTED_POINTS[point["row_as_digitized"]][2])
+        assert migrated.point_conditions["x_CrO"].state.value == expected_x_cr_o
