@@ -1504,8 +1504,10 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         connection = _connect(path, readonly=readonly)
     except (sqlite3.Error, OSError):
         with _LOCK:
+            counts = _counter_bucket(engine_id)
             counts["read_error"] += 1
             counts["misses"] += 1
+            counts["not_stored:readonly"] = counts.get("not_stored:readonly", 0) + 1
         return live_hot(solve())
     with _LOCK:
         try:

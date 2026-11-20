@@ -100,6 +100,25 @@ def test_not_stored_paths_are_counted_by_reason(tmp_path, monkeypatch):
     assert counts["not_stored:readonly"] == 1
 
 
+def test_connection_open_failure_counts_as_no_connection(tmp_path, monkeypatch):
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache.engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+
+    def fail_connect(*_args, **_kwargs):
+        raise sqlite3.OperationalError("cache unavailable")
+
+    monkeypatch.setattr(engine_cache, "_connect", fail_connect)
+    assert engine_cache.cached_engine_call(
+        "alphamelts", {"case": "connect-error"}, lambda: {"answer": 3},
+    ) == {"answer": 3}
+
+    counts = engine_cache.engine_cache_counters()["alphamelts"]
+    assert counts["read_error"] == 1
+    assert counts["not_stored:readonly"] == 1
+
+
 def test_abandoned_timeout_thread_cannot_insert_a_late_result(tmp_path, monkeypatch):
     path = tmp_path / "cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
