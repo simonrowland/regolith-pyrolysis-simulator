@@ -425,3 +425,63 @@ def test_vaporock_opt_in_cache_misses_the_old_subset_gamma(monkeypatch, tmp_path
     assert "SiO2" in fresh_refusal["detail"]
     assert fresh.vapor_pressures_Pa["Na(g)"] == pytest.approx(1.0)
     assert getattr(fresh, "vaporock_full_speciation_Pa", {})["Na(g)"] == pytest.approx(1.0)
+
+
+def test_vaporock_refusal_survives_persisted_readonly_hit(monkeypatch, tmp_path):
+    """A read-only SQLite hit restores the typed oxide-activity refusal.
+
+    The first cached call writes the miss. Read-only mode uses a different
+    in-memory key and the same row, so a solve callback that fails proves
+    the persisted diagnostic, the empty coefficient map, and the gas
+    pressure all come back from the database.
+    """
+
+    from simulator.engine_cache import _engine_cache_path_scope
+    from simulator.melt_backend.vaporock import (
+        VapoRockBackend,
+        _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
+    )
+
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = object()
+    monkeypatch.setattr(
+        backend,
+        "_call_vaporock",
+        lambda **kw: (
+            {"Na(g)": 1.0},
+            {"Na2O": 0.25},
+            _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
+        ),
+    )
+    kwargs = dict(
+        temperature_C=1600.0,
+        composition_kg={"SiO2": 50.0, "Na2O": 3.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        include_oxide_activities=True,
+    )
+    handle = SimpleNamespace(name="vaporock", engine_settings={})
+    monkeypatch.setattr(engine_cache, "engine_cache_settings", lambda *args: {})
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "s2")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+
+    def forbidden_solve():
+        pytest.fail("the persisted cache row did not hit")
+
+    with _engine_cache_path_scope(tmp_path / "vaporock.sqlite"):
+        stored = battery._call_cached_backend_equilibrate(
+            handle, kwargs, lambda: backend.equilibrate(**kwargs),
+        )
+        monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+        hit = battery._call_cached_backend_equilibrate(
+            handle, kwargs, forbidden_solve,
+        )
+
+    hit_refusal = hit.diagnostics["activity_coefficient_refusals"]
+    assert hit_refusal[0]["reason"] == "normalization_mismatch"
+    assert "SiO2" in hit_refusal[0]["detail"]
+    assert hit_refusal == stored.diagnostics["activity_coefficient_refusals"]
+    assert getattr(hit, "reported_activity_coefficients", {}) == {}
+    assert hit.vapor_pressures_Pa["Na(g)"] == pytest.approx(1.0)
+    assert hit.vaporock_full_speciation_Pa["Na(g)"] == pytest.approx(1.0)
