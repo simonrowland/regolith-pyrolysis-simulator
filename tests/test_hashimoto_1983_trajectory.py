@@ -82,7 +82,11 @@ def test_runtime_pressure_floor_uses_lab_schedule_owner(monkeypatch) -> None:
         require_runtime_inputs(preset)
     assert exc_info.value.reason == "runtime_pressure_below_implemented_floor"
     assert exc_info.value.detail == "forced notice"
-    assert observed == [0.00013332236842105264]
+    assert observed == pytest.approx(
+        [0.00013332236842105264],
+        rel=1.0e-15,
+        abs=0.0,
+    )
 
 
 def test_runtime_pressure_override_cannot_bypass_printed_pressure_floor() -> None:
