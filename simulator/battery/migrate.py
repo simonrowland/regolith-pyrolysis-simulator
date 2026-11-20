@@ -519,6 +519,7 @@ PHASE_MAP: dict[str, Phase] = {
     "cao-al2o3-sio2 liquid oxide melt": Phase.L,
     "(g)": Phase.G,
     "(c)": Phase.CR,
+    "(l)": Phase.L,
 }
 
 # PHASE_MAP keys that name the condensed sample a vapour was measured over.

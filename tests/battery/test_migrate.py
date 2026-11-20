@@ -76,6 +76,7 @@ from simulator.battery.migrate import (
     canonicalize_rail,
     citation_hash,
     compilation_family_from_store_path,
+    compilation_phase_text,
     convert_area_to_m2,
     convert_areal_mass_to_kg_per_m2,
     convert_density_to_kg_per_m3,
@@ -8201,16 +8202,21 @@ def test_t998_plante_reduced_derivation_keeps_registered_table_input(
     }
 
 
-def test_g2_paren_phase_aliases_map_gas_and_condensed() -> None:
+def test_g2_paren_phase_aliases_map_gas_condensed_and_liquid() -> None:
     mapped, why = map_phase("(g)")
     assert mapped.is_value and mapped.value is Phase.G and why is None
     mapped, why = map_phase("(c)")
     assert mapped.is_value and mapped.value is Phase.CR and why is None
+    mapped, why = map_phase("(l)")
+    assert mapped.is_value and mapped.value is Phase.L and why is None
     # Multi-phase spans stay unknown in this lane.
     mapped, why = map_phase("(c,l)")
     assert mapped.is_unknown and why == "(c,l)"
     mapped, why = map_phase("(c, l)")
     assert mapped.is_unknown and why == "(c, l)"
+    for ambiguous in ("condensed", "cr,l", "a/b", "aqueous", "(I)"):
+        mapped, why = map_phase(ambiguous)
+        assert mapped.is_unknown and why == ambiguous
 
 
 def test_g2_paren_phase_alias_mutation_proof() -> None:
@@ -8218,27 +8224,44 @@ def test_g2_paren_phase_alias_mutation_proof() -> None:
 
     live_g, _ = map_phase("(g)")
     live_c, _ = map_phase("(c)")
+    live_l, _ = map_phase("(l)")
     assert live_g.is_value and live_g.value is Phase.G
     assert live_c.is_value and live_c.value is Phase.CR
+    assert live_l.is_value and live_l.value is Phase.L
 
     saved_g = migrate_mod.PHASE_MAP.pop("(g)", None)
     saved_c = migrate_mod.PHASE_MAP.pop("(c)", None)
+    saved_l = migrate_mod.PHASE_MAP.pop("(l)", None)
     try:
         mutant_g, why_g = map_phase("(g)")
         mutant_c, why_c = map_phase("(c)")
+        mutant_l, why_l = map_phase("(l)")
         assert mutant_g.is_unknown and "not in the closed automatic map" in (mutant_g.reason or "")
         assert mutant_c.is_unknown and "not in the closed automatic map" in (mutant_c.reason or "")
-        assert why_g == "(g)" and why_c == "(c)"
+        assert mutant_l.is_unknown and "not in the closed automatic map" in (mutant_l.reason or "")
+        assert why_g == "(g)" and why_c == "(c)" and why_l == "(l)"
     finally:
         if saved_g is not None:
             migrate_mod.PHASE_MAP["(g)"] = saved_g
         if saved_c is not None:
             migrate_mod.PHASE_MAP["(c)"] = saved_c
+        if saved_l is not None:
+            migrate_mod.PHASE_MAP["(l)"] = saved_l
 
     restored_g, _ = map_phase("(g)")
     restored_c, _ = map_phase("(c)")
+    restored_l, _ = map_phase("(l)")
     assert restored_g.is_value and restored_g.value is Phase.G
     assert restored_c.is_value and restored_c.value is Phase.CR
+    assert restored_l.is_value and restored_l.value is Phase.L
+
+
+def test_compilation_published_phase_fills_blank_phase_before_canonicalization():
+    record = {"phase": "", "phase_as_published": "(l)"}
+
+    mapped, why = map_phase(compilation_phase_text(record))
+
+    assert mapped.is_value and mapped.value is Phase.L and why is None
 
 
 def test_g2_paren_phase_migrate_kelley_record(tmp_path: Path) -> None:
