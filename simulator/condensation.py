@@ -50,10 +50,10 @@ Key physics:
 
 The Fe → SiO separation (Stage 1 → Stage 3):
     Default Stage 1 wall is 1150°C; Stage 3 is 900-1200°C
-    (``CondensationTrain.create_default``). Stage 2 is the Cr/CrO2/Mn
-    harvester and isolates non-Cr species
-    (``_cr_stage_isolation_blocks``); SiO's designated destination is
-    Stage 3, not Stage 2.
+    (``CondensationTrain.create_default``). The Cr cartridge keeps
+    non-designated species off its tap; other stages and downstream
+    duct walls use saturation and record off-design capture as impurity.
+    SiO's designated destination is Stage 3, not Stage 2.
     This module does not model Fe melting, a sump, a chevron droplet
     separator, or a radiation-gap thermal break.
     A Stage-1 wall at or above 1100°C keeps SiO off the Fe tap. The
@@ -4252,17 +4252,13 @@ class CondensationModel:
     ) -> list[PipeSegment]:
         if self.lab_geometry is not None:
             return list(self.pipe_segments)
-        target_stage_number = designated_stage_number(species)
-        if target_stage_number is None:
+        if designated_stage_number(species) is None:
             return []
-        segments: list[PipeSegment] = []
-        for segment in self.pipe_segments:
-            downstream_number = _segment_stage_number(segment.downstream_stage)
-            if downstream_number is None:
-                continue
-            if downstream_number <= target_stage_number:
-                segments.append(segment)
-        return segments
+        # A designated stage is a product destination, not a cutoff for
+        # subsequent wall deposition. Any vapor that remains in the train
+        # can freeze out on a later duct; that deposit remains a separate
+        # wall account rather than being relabelled as tap product.
+        return list(self.pipe_segments)
 
     def _wall_deposit_candidate_for_surface_kg(
         self,
@@ -7595,36 +7591,17 @@ def _stage_alpha_surface_key(stage: CondensationStage) -> str:
     return f'stage_{int(stage.stage_number)}'
 
 
-def _cold_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
-    """Own taps on the cold alkali stages only. Not applied to stage 1.
-
-    The Na collector rejects K. The K trap accepts only species designated
-    to that key. Mg and every other species stage 4 captures stay on stage 4.
-    """
-
-    key = getattr(stage, 'stage_key', '') or ''
-    designated = DESIGNATED_STAGE.get(species)
-    if key == NA_COLLECTOR_STAGE_KEY:
-        return designated == K_TRAP_STAGE_KEY
-    if key == K_TRAP_STAGE_KEY:
-        return designated != K_TRAP_STAGE_KEY
-    return False
-
-
 def _stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
-    return (
-        _cr_stage_isolation_blocks(stage, species)
-        or _cold_stage_isolation_blocks(stage, species)
-    )
+    return _cr_stage_isolation_blocks(stage, species)
 
 
 def _cr_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
     chromium_stage = 'CrO2' in stage.target_species
-    designated_stage = designated_stage_number(species)
     if chromium_stage:
         return not is_designated_for_stage(species, stage.stage_number)
-    if designated_stage == 2:
-        return True
+    # Keep non-Cr products off the dedicated Cr cartridge. Outside that
+    # cartridge, saturation governs capture and the existing stage-purity
+    # ledger records non-designated condensate as impurity.
     return False
 
 

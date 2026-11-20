@@ -1,4 +1,5 @@
 import math
+from dataclasses import replace
 from types import SimpleNamespace
 
 import pytest
@@ -239,13 +240,8 @@ def test_route_result_records_scaled_stage_impurity_without_changing_capture():
     assert route.remaining_by_species["K"] == pytest.approx(1.0 - total_deposited)
 
 
-def test_default_k_route_allocation_numeric_pin():
-    """Pin the production band-integrated route, not a calibration target.
-
-    The c679673f5/85fedcb8e capture changes integrate each collector's
-    temperature band and saturation thresholds; the old midpoint pin had
-    more K reaching stage 6 and less captured at stage 5.
-    """
+def test_supersaturated_k_route_records_na_tap_co_deposition():
+    """Supersaturated K can co-deposit on the Na tap and is counted as impurity."""
     model = CondensationModel(CondensationTrain.create_default())
     assert tuple(stage_purity_report(model.train)) == (
         'stage_0', 'stage_1_fe_condenser', 'stage_2_cr_oxide_harvest',
@@ -261,17 +257,18 @@ def test_default_k_route_allocation_numeric_pin():
         EvaporationFlux(species_kg_hr={'K': 1.0}, total_kg_hr=1.0),
         MeltState(temperature_C=1650.0),
     )
-    assert route.condensed_by_stage_species == {
-        K_TRAP_STAGE_KEY: {'K': 0.9999661577804508},
-        'stage_5_vortex_dust_filter': {'K': 3.344749012837271e-05},
-        'stage_6_turbine_compressor': {'K': 3.947289899573387e-07},
-    }
-    assert route.remaining_by_species == {'K': 4.3083272981466337e-13}
-    assert route.wall_deposit_by_species == {}
-    assert route.impurity_by_stage_species == {
-        'stage_5_vortex_dust_filter': {'K': 3.344749012837271e-05},
-        'stage_6_turbine_compressor': {'K': 3.947289899573387e-07},
-    }
+    na_tap_k = route.condensed_by_stage_species[NA_COLLECTOR_STAGE_KEY]['K']
+    assert na_tap_k > 0.0
+    assert route.impurity_by_stage_species[NA_COLLECTOR_STAGE_KEY]['K'] == (
+        pytest.approx(na_tap_k)
+    )
+    assert route.condensed_by_stage_species[K_TRAP_STAGE_KEY]['K'] > 0.0
+    assert sum(
+        values.get('K', 0.0)
+        for values in route.condensed_by_stage_species.values()
+    ) + route.wall_deposit_by_species.get('K', 0.0) + route.remaining_by_species['K'] == (
+        pytest.approx(1.0)
+    )
 
 
 def _visit_labels(train: CondensationTrain) -> list[int | str]:
@@ -348,9 +345,15 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
 
     assert route.condensed_by_stage_species[NA_COLLECTOR_STAGE_KEY]['Na'] > 0.0
     assert route.condensed_by_stage_species[K_TRAP_STAGE_KEY]['K'] > 0.0
-    assert 'Na' not in route.impurity_by_stage_species.get(
-        NA_COLLECTOR_STAGE_KEY, {})
-    assert 'K' not in route.impurity_by_stage_species.get(K_TRAP_STAGE_KEY, {})
+    na_tap_k = route.condensed_by_stage_species[NA_COLLECTOR_STAGE_KEY].get('K', 0.0)
+    assert route.impurity_by_stage_species[NA_COLLECTOR_STAGE_KEY]['K'] == (
+        pytest.approx(na_tap_k)
+    )
+    k_trap_na = route.condensed_by_stage_species[K_TRAP_STAGE_KEY].get('Na', 0.0)
+    if k_trap_na > 0.0:
+        assert route.impurity_by_stage_species[K_TRAP_STAGE_KEY]['Na'] == (
+            pytest.approx(k_trap_na)
+        )
     na_key, na_record = _extrapolated_record_at(route, 'Na', 523.15)
     k_key, k_record = _extrapolated_record_at(route, 'K', 313.15)
     assert na_key == 'Na#67'
@@ -366,6 +369,86 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
     warnings = ' '.join(route.antoine_extrapolation_warnings)
     assert 'valid_range_K [924, 1118] at 523.15 K' in warnings
     assert 'valid_range_K [679.4, 1033] at 313.15 K' in warnings
+
+
+@pytest.mark.parametrize('species', ['Cr', 'Mn'])
+def test_designated_stage_two_species_can_reach_downstream_duct_walls(species):
+    model = CondensationModel(CondensationTrain.create_default())
+
+    candidates = model._mixed_temperature_wall_candidate_segments(species)
+
+    assert candidates
+    assert any(
+        int(segment.downstream_stage.removeprefix('stage_')) > 2
+        for segment in candidates
+    )
+
+
+def test_stage_two_manganese_freezes_out_at_k_trap_as_tap_impurity():
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={'Mn': 0.04254},
+        stage_area_m2_by_stage={
+            'fe_stage1': 0.0,
+            'cr_stage2': 0.0,
+            'sio_stage3': 0.0,
+            'alkali_stage4': 0.0,
+            'k_stage4b': 10.0,
+            'terminal': 0.0,
+        },
+    )
+    # Isolate cold-stage capture from the default interstage duct surfaces.
+    model.pipe_segments = []
+
+    route = model.route(
+        EvaporationFlux(species_kg_hr={'Mn': 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1650.0),
+    )
+
+    trap_capture = route.capture_kg_by_stage_identity[(4, 1)]['Mn']
+    assert trap_capture > 0.0
+    assert route.impurity_by_stage_species[K_TRAP_STAGE_KEY]['Mn'] == (
+        pytest.approx(trap_capture)
+    )
+    assert route.remaining_by_species['Mn'] < 1.0
+
+
+def test_stage_two_manganese_can_deposit_on_downstream_duct_wall():
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={'Mn': 0.04254},
+        stage_area_m2_by_stage={
+            'fe_stage1': 0.0,
+            'cr_stage2': 0.0,
+            'sio_stage3': 0.0,
+            'alkali_stage4': 0.0,
+            'k_stage4b': 0.0,
+            'terminal': 0.0,
+        },
+    )
+    model.pipe_segments = [
+        replace(
+            segment,
+            wall_temperature_C=(
+                250.0 if segment.downstream_stage == 'stage_4' else 1500.0
+            ),
+        )
+        for segment in model.pipe_segments
+    ]
+    cold_duct = next(
+        segment
+        for segment in model.pipe_segments
+        if segment.downstream_stage == 'stage_4'
+    )
+
+    route = model.route(
+        EvaporationFlux(species_kg_hr={'Mn': 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1650.0),
+    )
+
+    assert route.wall_deposit_by_segment_species[cold_duct.name]['Mn'] > 0.0
 
 
 def test_k_moves_to_its_trap_and_other_stage_4_destinations_stay():
