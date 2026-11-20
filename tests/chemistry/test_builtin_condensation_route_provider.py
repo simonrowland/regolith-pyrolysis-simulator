@@ -372,6 +372,36 @@ def test_provider_refuses_undeclared_product_destination(
     )
 
 
+def test_provider_splits_condensate_between_product_accounts_by_fraction(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """A cartridge split remains a single mol-native ledger transition."""
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    result = BuiltinCondensationRouteProvider().dispatch(
+        _route_validation_request(
+            sim,
+            species="SiO",
+            sp_data={
+                "condensation_product_account_fractions": {
+                    "SiO": {"terminal.mn_cartridge": 0.25},
+                },
+            },
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    credits = {
+        credit.account: credit.species_mol["SiO"]
+        for credit in result.transition.credits
+        if "SiO" in credit.species_mol
+    }
+    assert credits["terminal.mn_cartridge"] == pytest.approx(0.25)
+    assert credits["process.condensation_train"] == pytest.approx(0.75)
+
+
 def test_provider_allows_declared_oxygen_gaseous_coproduct(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
