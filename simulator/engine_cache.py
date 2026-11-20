@@ -30,8 +30,6 @@ from pathlib import Path
 from typing import Any, cast
 from urllib.parse import quote
 
-from engines.domain_reason import OutOfDomainReason
-
 
 @dataclass(frozen=True)
 class EngineCacheValue:
@@ -296,16 +294,26 @@ REFUSAL_ENGINE_CRASH = "engine_crash"
 REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
 REFUSAL_UNAVAILABLE = "unavailable"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
+# engine_cache is a standard-library leaf (tests/test_import_boundary.py::
+# test_engine_cache_is_a_standard_library_leaf), so it cannot import
+# engines.domain_reason. These literals mirror the enum's values;
+# tests/test_engine_cache_refusal_codes.py pins each one to it.
+REFUSAL_FORBIDDEN_SPECIES = "forbidden_species"
+REFUSAL_LIQUID_STATE = "liquid_state"
+REFUSAL_INVALID_PRESSURE_BAR = "invalid_pressure_bar"
+REFUSAL_INVALID_FO2_LOG = "invalid_fo2_log"
+REFUSAL_SUM_PRESSURE_SANITY = "sum_pressure_sanity"
+REFUSAL_SPECIATION_NO_FINITE_VALUES = "speciation_no_finite_values"
 
 CACHEABLE_REFUSAL_CODES = frozenset({
     REFUSAL_OUT_OF_BASIS, REFUSAL_COMPOSITION_PROJECTED, REFUSAL_MAJOR_SUM,
     REFUSAL_NO_LIQUID,
-    OutOfDomainReason.FORBIDDEN_SPECIES.value,
-    OutOfDomainReason.LIQUID_STATE.value,
-    OutOfDomainReason.INVALID_PRESSURE_BAR.value,
-    OutOfDomainReason.INVALID_FO2_LOG.value,
-    OutOfDomainReason.SUM_PRESSURE_SANITY.value,
-    OutOfDomainReason.SPECIATION_NO_FINITE_VALUES.value,
+    REFUSAL_FORBIDDEN_SPECIES,
+    REFUSAL_LIQUID_STATE,
+    REFUSAL_INVALID_PRESSURE_BAR,
+    REFUSAL_INVALID_FO2_LOG,
+    REFUSAL_SUM_PRESSURE_SANITY,
+    REFUSAL_SPECIATION_NO_FINITE_VALUES,
 })
 
 
@@ -317,7 +325,7 @@ def _cacheable_refusal_status(
     }:
         return True
     return (
-        refusal_reason == OutOfDomainReason.SPECIATION_NO_FINITE_VALUES.value
+        refusal_reason == REFUSAL_SPECIATION_NO_FINITE_VALUES
         and status == "not_converged"
     )
 
