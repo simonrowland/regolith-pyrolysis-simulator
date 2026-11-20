@@ -1694,6 +1694,22 @@ def _solve_slice(
     if len(crossings) >= 2:
         raise _BalanceRefused("headspace_balance_multiple_roots")
     if len(crossings) == 0:
+        incoming = float(moles[species])
+        # Premise: P_up <= P_down closes the pipe, so Q is 0. A
+        # species with q + S = 0 then has G = 0 at every mole that
+        # leaves the total pressure on that closed side. That plateau
+        # is the root. The scan samples are zero and then negative
+        # once the pipe opens, and a run of zeros is not a sign
+        # change, so the bracket search reports no root.
+        # Algebra: n_end = n_incoming. With q + S = 0,
+        # bled = n0 - n_end.
+        # Unit check: both amounts are moles.
+        # Limit: a positive source on the closed side has G = q > 0,
+        # so this does not fire. A residual that is nonzero at the
+        # incoming mole still falls through.
+        if func(incoming) == 0.0:
+            crossings = [("exact", incoming, incoming)]
+    if len(crossings) == 0:
         # A sign change that lived entirely under the floor was
         # dropped above. The holdup it would publish is inside
         # 1e-6 Pa, so the empty root is that root. A scan whose
@@ -1969,6 +1985,36 @@ def _publish(
     )
     if pipe_kg_hr > 0.0:
         pipe_saturation = evap_kg_hr / pipe_kg_hr
+    elif (
+        evap_kg_hr > 0.0
+        and step.pressure_Pa <= DEFAULT_ABS_TOL_PA
+        and step.bled_kg > 0.0
+    ):
+        # Premise: the ramp stops at infinite saturation. End-state
+        # pipe flow is 0 when the committed holdup is empty. A source
+        # that was booked out (bled_kg > 0) at a pressure inside the
+        # 1e-6 Pa floor did leave through the pipe. That is within
+        # capacity, so the ratio is 1. The throttle starts above 100%.
+        # Algebra: saturation = source / throughput = 1 at a cleared root.
+        # Unit check: both masses are kilograms, so the ratio is 1.
+        # Limit: a line that is idle only because P_up is still below
+        # P_down is the next branch. A sealed end with pressure above
+        # that downstream pressure still reports inf.
+        pipe_saturation = 1.0
+    elif (
+        evap_kg_hr > 0.0
+        and law.diameter_m is not None
+        and step.pressure_Pa <= law.downstream_pa
+    ):
+        # Premise: Q is 0 because P_up <= P_down. The duct is idle,
+        # not full. The hour's source is accumulating toward the
+        # pressure that opens the pipe. Infinite saturation freezes
+        # the ramp on that approach, so the inventory never gets there.
+        # Algebra: saturation = 0 while the forward check is closed.
+        # Unit check: the ratio is dimensionless.
+        # Limit: P_up above P_down with Q still 0 is a sealed end,
+        # and the branch below reports inf.
+        pipe_saturation = 0.0
     else:
         pipe_saturation = math.inf if evap_kg_hr > 0.0 else 0.0
     oxygen_saturation = (
