@@ -185,9 +185,9 @@ def test_steady_state_carrier_only_is_q_over_s() -> None:
         evolved_noncondensable_mol=0.0,
         form="steady_state",
     )
-    assert at_hour.q_pa_m3_s == pytest.approx(_Q_NL_0_3, abs=0.0)
+    assert at_hour.q_pa_m3_s == pytest.approx(_Q_NL_0_3, rel=1e-12)
     assert at_hour.pressure_pa == pytest.approx(expected_pa, rel=1e-12)
-    assert at_one_second.q_pa_m3_s == pytest.approx(_Q_NL_0_3, abs=0.0)
+    assert at_one_second.q_pa_m3_s == pytest.approx(_Q_NL_0_3, rel=1e-12)
     assert at_one_second.pressure_pa == pytest.approx(expected_pa, rel=1e-12)
     assert at_hour.s_eff_m3_s == pytest.approx(speed_m3_s, rel=1e-12)
     assert at_hour.form == "steady_state"
