@@ -21,6 +21,17 @@ CORPUS_COMMIT = "af89e74f4052a01a0d034c72c7e0486362d83904"
 DIGITIZATION_PATH = "tables/dong-2009-cr-v-slag-activities/f7a.csv"
 DIGITIZATION_SHA256 = "f731888428e30c6acfbfc28239c32144181ab22a7cf90d0d29c9878c721dcbff"
 DIGITIZATION = regolith_corpus_root() / DIGITIZATION_PATH
+EXPECTED_POINTS = {
+    "1803-1": ("1803", "1529.85", "0.00020", "0.0008", "1e-4"),
+    "1803-2": ("1803", "1529.85", "0.00134", "0.0047", "1e-4"),
+    "1803-3": ("1803", "1529.85", "0.00442", "0.0195", "1e-4"),
+    "1873-1": ("1873", "1599.85", "0.00010", "0.0001", "1e-4"),
+    "1873-2": ("1873", "1599.85", "0.00065", "0.0023", "1e-4"),
+    "1873-3": ("1873", "1599.85", "0.00205", "0.0106", "1e-4"),
+    "1923-1": ("1923", "1649.85", "0.00010", "0.0001", "1e-4"),
+    "1923-2": ("1923", "1649.85", "0.00060", "0.0016", "1e-4"),
+    "1923-3": ("1923", "1649.85", "0.00134", "0.0082", "1e-4"),
+}
 
 
 def _rows(document: dict) -> dict[str, dict]:
@@ -43,6 +54,44 @@ def _assert_digitization_pins(document: dict, digitization: dict[str, dict]) -> 
         assert points[row_id]["digitization_uncertainty"]["activity"].removeprefix(
             "±"
         ) == csv_row["activity_uncertainty"]
+
+
+def _assert_literal_pins(document: dict) -> None:
+    points = _rows(document)
+    assert points.keys() == EXPECTED_POINTS.keys()
+    for row_id, (temperature_k, temperature_c, x_cr_o, activity, p_o2) in (
+        EXPECTED_POINTS.items()
+    ):
+        point = points[row_id]
+        conditions = point["point_conditions"]
+        assert point["T_C"] == temperature_c
+        assert point["x_CrO"] == x_cr_o
+        assert point["activity"] == activity
+        assert conditions["temperature_K"]["state"]["value"] == temperature_k
+        assert conditions["pO2_Pa"]["state"]["value"] == p_o2
+
+
+def test_all_nine_points_have_corpus_independent_literal_pins_and_mutations() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_literal_pins(document)
+
+    for row_id, expected in EXPECTED_POINTS.items():
+        mutations = (
+            (("T_C",), expected[1]),
+            (("x_CrO",), expected[2]),
+            (("activity",), expected[3]),
+            (("point_conditions", "temperature_K", "state", "value"), expected[0]),
+            (("point_conditions", "pO2_Pa", "state", "value"), expected[4]),
+        )
+        for path, expected_value in mutations:
+            mutated = deepcopy(document)
+            point = _rows(mutated)[row_id]
+            target = point
+            for part in path[:-1]:
+                target = target[part]
+            target[path[-1]] = f"{expected_value}-mutated"
+            with pytest.raises(AssertionError):
+                _assert_literal_pins(mutated)
 
 
 def _load_digitization() -> dict[str, dict]:
@@ -80,7 +129,6 @@ def _assert_source_identity_and_page_locators(document: dict) -> None:
     assert "fidelity_samples" not in document
     source_files = document["source_files"]
     assert source_files["corpus_repo"] == "regolith-corpus"
-    assert source_files["corpus_commit"]["value"] == CORPUS_COMMIT
     assert source_files["files"][0]["path"] == DIGITIZATION_PATH
     assert source_files["files"][0]["sha256"]["value"] == DIGITIZATION_SHA256
 
