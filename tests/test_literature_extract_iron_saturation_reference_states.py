@@ -10,7 +10,11 @@ from simulator.battery.enums import Authority, Quantity
 from simulator.battery.records import Located, StandardState
 from simulator.battery.score import iron_saturation_composition, temperature_of
 from tests.battery.test_migrate import _migrate_real_extract
-from tests.locator_assertions import historical_source_locations, strict_source_locations
+from tests.locator_assertions import (
+    historical_source_locations,
+    mutate_first_serialized_locator,
+    regenerated_source_locations,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -65,7 +69,7 @@ def test_reference_sources_migrate_in_isolation_with_conditions(
         (ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text(encoding="utf-8")
     )
     baseline_rows = historical_source_locations(baseline_rows, extract)
-    isolated_rows = strict_source_locations(isolated_rows)
+    isolated_rows = regenerated_source_locations(isolated_rows)
     mismatches = sorted(
         observation_id
         for observation_id, before in baseline_rows.items()
@@ -135,6 +139,31 @@ def test_reference_fixed_point_detects_corrupt_serialized_location(
         mutation.setitem(globals(), "_isolated_migration", corrupt_output)
         with pytest.raises(AssertionError):
             test_reference_sources_migrate_in_isolation_with_conditions(tmp_path, source_id, expected_count)
+
+
+@pytest.mark.parametrize("mutation", ["drop_coordinate", "page_alias"])
+@pytest.mark.parametrize(("source_id", "expected_count"), SOURCE_COUNTS.items())
+def test_reference_fixed_point_detects_locator_mutation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    source_id: str,
+    expected_count: int,
+    mutation: str,
+) -> None:
+    original = _isolated_migration
+
+    def mutate_output(root, source):
+        result = original(root, source)
+        path = root / source / "tree/data/literature/extracts-v2" / f"{source}.yaml"
+        mutate_first_serialized_locator(path, mutation=mutation)
+        return result
+
+    with monkeypatch.context() as changed_migration:
+        changed_migration.setitem(globals(), "_isolated_migration", mutate_output)
+        with pytest.raises(AssertionError):
+            test_reference_sources_migrate_in_isolation_with_conditions(
+                tmp_path, source_id, expected_count
+            )
 
 
 def test_rule_precedence_uses_roeder_dg_and_doyle_coughlin(tmp_path: Path) -> None:

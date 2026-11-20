@@ -1042,6 +1042,69 @@ def _assert_compilation_conflicting_alias_refusal(
     assert "conflicting locator fields:" in issue.detail
 
 
+@pytest.mark.parametrize("blank_locator", ["", " \t "])
+def test_blank_generator_locator_refuses_and_later_record_migrates(
+    tmp_path: Path, blank_locator: str,
+) -> None:
+    _assert_blank_compilation_locator_refuses_and_continues(
+        tmp_path, blank_locator
+    )
+
+
+def test_blank_generator_locator_abort_mutation_is_detected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery import migrate as migrate_module
+
+    decode = migrate_module._decode_locator_from_plain
+
+    def restore_plain_scalar_value_error(payload, **kwargs):
+        if isinstance(payload, str) and not payload.strip():
+            return Locator(note=payload)
+        return decode(payload, **kwargs)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            migrate_module,
+            "_decode_locator_from_plain",
+            restore_plain_scalar_value_error,
+        )
+        with pytest.raises(AssertionError, match="aborted compilation intake"):
+            _assert_blank_compilation_locator_refuses_and_continues(
+                tmp_path, " \t "
+            )
+
+
+def _assert_blank_compilation_locator_refuses_and_continues(
+    tmp_path: Path, blank_locator: str,
+) -> None:
+    blank_relative, _ = _COMPILATION_GENERATOR_RECORDS[0]
+    later_relative, later_count = _COMPILATION_GENERATOR_RECORDS[1]
+    blank_doc = _load_compilation_document(REPO_ROOT / blank_relative)
+    blank_doc["source_locator"] = blank_locator
+    later_doc = _load_compilation_document(REPO_ROOT / later_relative)
+    blank_path = tmp_path / blank_relative
+    later_path = tmp_path / later_relative
+    blank_path.parent.mkdir(parents=True)
+    later_path.parent.mkdir(parents=True)
+    _write_compilation_document(blank_path, blank_doc)
+    _write_compilation_document(later_path, later_doc)
+    migrator = Migrator(root=tmp_path, index={}, aliases={})
+
+    try:
+        migrator._migrate_compilation_file(blank_path)
+    except Exception as exc:
+        raise AssertionError("blank locator aborted compilation intake") from exc
+    assert migrator.result.observations == {}
+    assert len(migrator.result.registry_issues) == 1
+    issue = migrator.result.registry_issues[0]
+    assert issue.reason is RefusalReason.INVALID_SOURCE
+    assert issue.path.endswith(".source_locator")
+
+    migrator._migrate_compilation_file(later_path)
+    assert len(migrator.result.observations) == later_count
+
+
 def _assert_compilation_generator_refuses_unknown_locator(
     tmp_path: Path, relative_path: str
 ) -> None:

@@ -2,6 +2,9 @@
 
 from dataclasses import fields
 import json
+from pathlib import Path
+
+import yaml
 
 from simulator.battery.migrate import _locator_from_plain, to_plain
 from simulator.battery.records import Locator
@@ -86,17 +89,48 @@ def historical_source_locations(payload: object, extract: dict) -> object:
     return normalize(payload, None, {})
 
 
-def strict_source_locations(payload: object) -> object:
-    """Decode serialized locators without inferring any omitted source facts."""
+def regenerated_source_locations(payload: object) -> object:
+    """Keep each emitted observation locator exact; normalize embedded locators."""
     if isinstance(payload, dict):
-        return {
-            key: (
-                to_plain(_locator_from_plain(value, refuse_invalid=True))
-                if key in {"locator", "source_locator"}
-                else strict_source_locations(value)
-            )
-            for key, value in payload.items()
-        }
+        observation_row = "observation_id" in payload
+        normalized: dict[str, object] = {}
+        for key, value in payload.items():
+            if key in {"locator", "source_locator"}:
+                normalized[key] = (
+                    value
+                    if observation_row
+                    else to_plain(_locator_from_plain(value, refuse_invalid=True))
+                )
+            else:
+                normalized[key] = regenerated_source_locations(value)
+        return normalized
     if isinstance(payload, list):
-        return [strict_source_locations(value) for value in payload]
+        return [regenerated_source_locations(value) for value in payload]
     return payload
+
+
+def mutate_first_serialized_locator(path: Path, *, mutation: str) -> None:
+    """Mutate one emitted locator to exercise exact fixed-point comparisons."""
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    for observation in document.get("observations", []):
+        locator = observation.get("locator") or {}
+        if mutation == "page_alias" and "page" in locator:
+            locator["pdf_page"] = locator.pop("page")
+            break
+        if mutation == "drop_coordinate":
+            coordinate = next(
+                (
+                    key for key in (
+                        "row", "column", "table_row_number",
+                        "table_column_number", "table",
+                    )
+                    if key in locator
+                ),
+                None,
+            )
+            if coordinate is not None:
+                del locator[coordinate]
+                break
+    else:
+        raise AssertionError(f"no locator field available for {mutation} mutation")
+    path.write_text(yaml.safe_dump(document), encoding="utf-8")

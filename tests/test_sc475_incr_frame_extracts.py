@@ -11,7 +11,11 @@ from simulator.battery import schema_gap as schema_gap_module
 from simulator.battery.migrate import Migrator
 from simulator.battery.validate import validate_corpus
 from tests import locator_assertions
-from tests.locator_assertions import historical_source_locations, strict_source_locations
+from tests.locator_assertions import (
+    historical_source_locations,
+    mutate_first_serialized_locator,
+    regenerated_source_locations,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 pytestmark = pytest.mark.timeout(300)
@@ -3069,7 +3073,7 @@ def test_non_sc475_kelley_series_store_matches_green_without_decided_by(tmp_path
     green_store = ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml"
     before = yaml.safe_load(green_store.read_text(encoding="utf-8"))
     after = yaml.safe_load(migrated_store.read_text(encoding="utf-8"))
-    assert strict_source_locations(after) == historical_source_locations(before, extract)
+    assert regenerated_source_locations(after) == historical_source_locations(before, extract)
 
 
 def test_fixed_point_detects_dropped_structured_coordinate(monkeypatch):
@@ -3094,19 +3098,19 @@ def test_fixed_point_detects_dropped_structured_coordinate(monkeypatch):
     }
 
     def assert_coordinate_loss_is_visible() -> None:
-        assert strict_source_locations(correct) != strict_source_locations(dropped)
+        assert regenerated_source_locations(correct) != regenerated_source_locations(dropped)
 
     assert_coordinate_loss_is_visible()
     with monkeypatch.context() as mutation:
         mutation.setattr(
             locator_assertions,
-            "strict_source_locations",
+            "regenerated_source_locations",
             lambda payload: historical_source_locations(payload, extract),
         )
         # The old source-inferred comparison makes both payloads look complete.
         with pytest.raises(AssertionError):
-            assert locator_assertions.strict_source_locations(correct) != (
-                locator_assertions.strict_source_locations(dropped)
+            assert locator_assertions.regenerated_source_locations(correct) != (
+                locator_assertions.regenerated_source_locations(dropped)
             )
 
 
@@ -3124,3 +3128,23 @@ def test_kelley_fixed_point_detects_corrupt_serialized_location(tmp_path, monkey
         mutation.setattr(migrate_module, "write_outputs", corrupt_output)
         with pytest.raises(AssertionError):
             test_non_sc475_kelley_series_store_matches_green_without_decided_by(tmp_path)
+
+
+@pytest.mark.parametrize("mutation", ["drop_coordinate", "page_alias"])
+def test_kelley_fixed_point_detects_locator_mutation(tmp_path, monkeypatch, mutation):
+    write = migrate_module.write_outputs
+
+    def mutate_output(result, *, root):
+        write(result, root=root)
+        path = root / (
+            "data/literature/extracts-v2/"
+            "kelley-1953-alkali-aluminosilicate-thermodynamics.yaml"
+        )
+        mutate_first_serialized_locator(path, mutation=mutation)
+
+    with monkeypatch.context() as changed_writer:
+        changed_writer.setattr(migrate_module, "write_outputs", mutate_output)
+        with pytest.raises(AssertionError):
+            test_non_sc475_kelley_series_store_matches_green_without_decided_by(
+                tmp_path
+            )
