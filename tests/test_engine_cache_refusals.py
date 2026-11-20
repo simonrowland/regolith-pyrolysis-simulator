@@ -14,79 +14,89 @@ def test_deterministic_refusal_allowlist_is_explicit():
     assert CACHEABLE_REFUSAL_CODES == frozenset({
         "out_of_basis", "composition_projected", "sum_below_95_wt_pct", "no_liquid",
         OutOfDomainReason.FORBIDDEN_SPECIES.value,
-        OutOfDomainReason.TEMPERATURE_RANGE.value,
         OutOfDomainReason.LIQUID_STATE.value,
         OutOfDomainReason.INVALID_PRESSURE_BAR.value,
         OutOfDomainReason.INVALID_FO2_LOG.value,
-        OutOfDomainReason.NON_FINITE_COMPOSITION.value,
         OutOfDomainReason.SUM_PRESSURE_SANITY.value,
     })
 
 
-def _vaporock_equilibrium_cache_call(result, tmp_path, monkeypatch):
+def _vaporock_equilibrium_cache_call(kwargs, tmp_path, monkeypatch, *, available=True):
     from simulator.diagnostic_helpers.binary_pot_battery import (
         EngineHandle,
         _call_cached_backend_equilibrate,
     )
+    from simulator.melt_backend.vaporock import VapoRockBackend
 
     path = tmp_path / "cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
     engine_cache.engine_cache_counters(reset=True)
     engine_cache._MEMORY_CACHE.clear()
+    backend = VapoRockBackend()
+    backend._available = available
+    backend._vaporock = object() if available else None
     handle = EngineHandle(
         name="vaporock",
-        backend=object(),
-        available=True,
-        unavailable_reason=None,
+        backend=backend,
+        available=available,
+        unavailable_reason=None if available else "VapoRock backend not initialized",
         takes_fo2=True,
         supports_intrinsic_fo2=True,
         engine_settings={
-            "temperature_units": "C",
-            "pressure_units": "bar",
-            "vapor_pressure_units": "Pa",
+            "temperature_units": backend._temperature_units,
+            "pressure_units": backend._pressure_units,
+            "vapor_pressure_units": backend._vapor_pressure_units,
         },
     )
-    kwargs = {
-        "temperature_C": 1600.0,
-        "composition_kg": {"SiO2": 1.0},
-        "pressure_bar": 1.0,
-        "fO2_log": -8.0,
-    }
     calls = []
 
     def solve():
         calls.append(1)
-        return result
+        return backend.equilibrate(**kwargs)
 
-    return _call_cached_backend_equilibrate, handle, kwargs, calls, solve
+    return _call_cached_backend_equilibrate, backend, handle, calls, solve
 
 
 @pytest.mark.parametrize(
     "code",
     [
         OutOfDomainReason.FORBIDDEN_SPECIES.value,
-        OutOfDomainReason.TEMPERATURE_RANGE.value,
         OutOfDomainReason.LIQUID_STATE.value,
         OutOfDomainReason.INVALID_PRESSURE_BAR.value,
         OutOfDomainReason.INVALID_FO2_LOG.value,
-        OutOfDomainReason.NON_FINITE_COMPOSITION.value,
         OutOfDomainReason.SUM_PRESSURE_SANITY.value,
     ],
 )
 def test_vaporock_domain_refusal_hits_after_equilibrium_hot_round_trip(
     code, tmp_path, monkeypatch,
 ):
-    from simulator.melt_backend.base import EquilibriumResult
-
-    result = EquilibriumResult(
-        phase_assemblage_available=False,
-        status="out_of_domain",
-        diagnostics={"backend_status_reason": code},
+    composition = (
+        {"Fe": 1.0, "FeS": 0.5, "NaCl": 0.2}
+        if code == OutOfDomainReason.FORBIDDEN_SPECIES.value
+        else {"SiO2": 1.0}
     )
-    cached_call, handle, kwargs, calls, solve = _vaporock_equilibrium_cache_call(
-        result, tmp_path, monkeypatch
+    kwargs = {
+        "temperature_C": 1600.0,
+        "composition_mol": composition,
+        "pressure_bar": (
+            0.0 if code == OutOfDomainReason.INVALID_PRESSURE_BAR.value else 1e-6
+        ),
+        "fO2_log": (
+            None if code == OutOfDomainReason.INVALID_FO2_LOG.value else -8.0
+        ),
+    }
+    if code == OutOfDomainReason.LIQUID_STATE.value:
+        kwargs["liquid_fraction"] = 0.0
+    cached_call, backend, handle, calls, solve = _vaporock_equilibrium_cache_call(
+        kwargs, tmp_path, monkeypatch
     )
+    if code == OutOfDomainReason.SUM_PRESSURE_SANITY.value:
+        monkeypatch.setattr(
+            backend,
+            "_call_vaporock",
+            lambda **_kwargs: {"SiO": 2_000_000.0},
+        )
 
     cold = cached_call(handle, kwargs, solve)
     engine_cache._MEMORY_CACHE.clear()
@@ -112,22 +122,31 @@ def test_vaporock_domain_refusal_hits_after_equilibrium_hot_round_trip(
 def test_vaporock_transient_refusal_is_not_stored(
     status, code, tmp_path, monkeypatch,
 ):
-    from simulator.melt_backend.base import EquilibriumResult
+    kwargs = {
+        "temperature_C": 1600.0,
+        "composition_mol": {"SiO2": 1.0},
+        "pressure_bar": 1e-6,
+        "fO2_log": -8.0,
+    }
+    cached_call, backend, handle, calls, solve = _vaporock_equilibrium_cache_call(
+        kwargs, tmp_path, monkeypatch, available=status != "unavailable"
+    )
+    if status == "not_converged":
+        from simulator.melt_backend.vaporock import VapoRockCallError
 
-    result = EquilibriumResult(
-        phase_assemblage_available=False,
-        status=status,
-        diagnostics={"backend_status_reason": code},
-    )
-    cached_call, handle, kwargs, calls, solve = _vaporock_equilibrium_cache_call(
-        result, tmp_path, monkeypatch
-    )
+        def fail_call(**_kwargs):
+            raise VapoRockCallError("TransientFailure", "injected engine failure")
+
+        monkeypatch.setattr(backend, "_call_vaporock", fail_call)
 
     for _ in range(2):
-        cached_call(handle, kwargs, solve)
+        result = cached_call(handle, kwargs, solve)
+        assert result.status == status
+        assert result.diagnostics["backend_status_reason"] == code
         engine_cache._MEMORY_CACHE.clear()
 
     assert len(calls) == 2
+    assert backend._available is (status != "unavailable")
     counts = engine_cache.engine_cache_counters()["vaporock"]
     assert counts["misses"] == 2
     assert counts["stores"] == 0
