@@ -1367,6 +1367,78 @@ def _load_evaporation_alpha_envelope_by_species(
     return envelope_by_species
 
 
+def _scale_mol_map(species_mol: dict, dt_h: float) -> dict[str, float]:
+    return {
+        str(species): float(mol) * dt_h
+        for species, mol in species_mol.items()
+    }
+
+
+def _rescale_wall_reaction_booking(booking: dict, dt_h: float) -> None:
+    """Scale one hour of booked capture mols down to this step.
+
+    The route integrates the kg/h flux. ``condensed_kg`` is already the
+    step mass. The proposal debits that mass and credits these mols, so
+    the mols have to be the same step. Callers skip this on the hour.
+    """
+
+    products = booking.get("baffle_products_mol")
+    if isinstance(products, dict):
+        booking["baffle_products_mol"] = _scale_mol_map(products, dt_h)
+    by_stage = booking.get("baffle_products_mol_by_stage")
+    if isinstance(by_stage, dict):
+        booking["baffle_products_mol_by_stage"] = {
+            stage: _scale_mol_map(species_mol, dt_h)
+            for stage, species_mol in by_stage.items()
+            if isinstance(species_mol, dict)
+        }
+    for key in (
+        "baffle_oxygen_debit_mol",
+        "baffle_oxygen_credit_mol",
+        "wall_oxygen_debit_mol",
+        "wall_oxygen_credit_mol",
+    ):
+        if key in booking:
+            booking[key] = float(booking[key]) * dt_h
+    walls = booking.get("wall_products_mol_by_account")
+    if isinstance(walls, dict):
+        booking["wall_products_mol_by_account"] = {
+            account: _scale_mol_map(species_mol, dt_h)
+            for account, species_mol in walls.items()
+            if isinstance(species_mol, dict)
+        }
+    legs = booking.get("reaction_legs")
+    if not isinstance(legs, list):
+        return
+    scaled_legs = []
+    for leg in legs:
+        if not isinstance(leg, dict):
+            scaled_legs.append(leg)
+            continue
+        scaled = dict(leg)
+        leg_products = scaled.get("products_mol")
+        if isinstance(leg_products, dict):
+            scaled["products_mol"] = _scale_mol_map(leg_products, dt_h)
+        for key in ("oxygen_debit_mol", "oxygen_credit_mol", "vapour_mol"):
+            if key in scaled:
+                scaled[key] = float(scaled[key]) * dt_h
+        scaled_legs.append(scaled)
+    booking["reaction_legs"] = scaled_legs
+
+
+def _rescale_stage3_reactive_alkali(reaction: dict, dt_h: float) -> None:
+    """Scale one hour of reactive-alkali mols down to this step."""
+
+    for key in (
+        "uptake_mol",
+        "oxygen_debit_mol",
+        "oxide_product_mol",
+        "transport_uptake_mol",
+    ):
+        if key in reaction:
+            reaction[key] = float(reaction[key]) * dt_h
+
+
 class EvaporationMixin:
     def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
         """Return upstream melt-headspace backpressure for evaporation."""
@@ -6133,6 +6205,20 @@ class EvaporationMixin:
             wall_deposit_fraction = 0.0
             wall_deposit_account_fractions = {}
 
+        # The route's booking and reactive-alkali mols are one hour of the
+        # kg/h flux. condensed_kg is this step. Each side gets its own
+        # copy. On the hour those copies are unscaled.
+        has_booking = species in route_result.wall_reaction_booking_by_species
+        raw_booking = (
+            route_result.wall_reaction_booking_by_species[species]
+            if has_booking else None
+        )
+        has_alkali = species in route_result.stage3_reactive_alkali_by_species
+        raw_alkali = (
+            route_result.stage3_reactive_alkali_by_species[species]
+            if has_alkali else None
+        )
+
         kernel_result = self._dispatch_and_commit(
             ChemistryIntent.CONDENSATION_ROUTE,
             transition_meta={
@@ -6140,23 +6226,23 @@ class EvaporationMixin:
                     getattr(route_result, 'condensation_authority_by_species', {})
                     .get(species, {})
                 ),
-                **({'wall_reaction_booking': copy.deepcopy(
-                    route_result.wall_reaction_booking_by_species[species])}
-                   if species in route_result.wall_reaction_booking_by_species else {}),
-                **({'stage3_reactive_alkali': dict(
-                    route_result.stage3_reactive_alkali_by_species[species])}
-                   if species in route_result.stage3_reactive_alkali_by_species else {}),
+                **({'wall_reaction_booking':
+                    self._condensation_booking_for_this_step(raw_booking)}
+                   if has_booking else {}),
+                **({'stage3_reactive_alkali':
+                    self._reactive_alkali_for_this_step(raw_alkali)}
+                   if has_alkali else {}),
             },
             control_inputs={
                 'species': species,
                 'condensed_kg': float(condensed_kg),
                 'sp_data': dict(sp_data or {}),
-                **({'stage3_reactive_alkali': dict(
-                    route_result.stage3_reactive_alkali_by_species[species])}
-                   if species in route_result.stage3_reactive_alkali_by_species else {}),
-                **({'wall_reaction_booking': copy.deepcopy(
-                    route_result.wall_reaction_booking_by_species[species])}
-                   if species in route_result.wall_reaction_booking_by_species else {}),
+                **({'stage3_reactive_alkali':
+                    self._reactive_alkali_for_this_step(raw_alkali)}
+                   if has_alkali else {}),
+                **({'wall_reaction_booking':
+                    self._condensation_booking_for_this_step(raw_booking)}
+                   if has_booking else {}),
                 'wall_deposit_fraction': wall_deposit_fraction,
                 'wall_deposit_account_fractions': wall_deposit_account_fractions,
                 'wall_temperature_K': (
@@ -6193,6 +6279,28 @@ class EvaporationMixin:
             self._stage_baffle_product_kg_from_credits(kernel_result.transition)
         )
         return float(diagnostic.get('credited_condensed_kg', 0.0))
+
+    def _condensation_booking_for_this_step(self, booking: dict) -> dict:
+        """Return this step's wall-reaction mols.
+
+        One hour returns a copy of the booked hour. A shorter step scales
+        every booked mol by ``dt_h`` and does not multiply the hour by 1.
+        """
+
+        scaled = copy.deepcopy(booking)
+        if self.process_timestep.is_one_hour:
+            return scaled
+        _rescale_wall_reaction_booking(scaled, self.process_dt_hr())
+        return scaled
+
+    def _reactive_alkali_for_this_step(self, reaction: dict) -> dict:
+        """Return this step's reactive-alkali mols. The hour is unscaled."""
+
+        scaled = dict(reaction)
+        if self.process_timestep.is_one_hour:
+            return scaled
+        _rescale_stage3_reactive_alkali(scaled, self.process_dt_hr())
+        return scaled
 
     def _apply_organic_tar_wall_deposit(self) -> None:
         """Move cold-wall tar from overhead_gas onto process.wall_deposit.

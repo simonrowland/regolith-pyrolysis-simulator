@@ -859,6 +859,36 @@ def _endpoint_flux(**species_kg_hr: float) -> EvaporationFlux:
     )
 
 
+def _c4_feed_ledger_above_the_limit():
+    """Feed Na the C4 endpoint can read, with residual Na above the limit.
+
+    A missing ledger raises ``c4_feed_na_ledger_missing`` before either
+    hour-clock. Residual 1 mol against 1000 mol of feed stays above the
+    0.0005 feed fraction, so the Na residual does not end the phase and
+    the clock under test is reached.
+    """
+
+    from types import SimpleNamespace
+
+    return SimpleNamespace(
+        external_loads=(
+            SimpleNamespace(
+                account="process.raw_feedstock",
+                origin_atom_moles={"feedstock": {"Na": 800.0}},
+            ),
+            SimpleNamespace(
+                account="reservoir.reagent.Na",
+                origin_atom_moles={"reagent": {"Na": 200.0}},
+            ),
+        ),
+        atom_moles_by_account=lambda account: (
+            {"Na": 1.0, "Mg": 500.0}
+            if account == "process.cleaned_melt"
+            else {}
+        ),
+    )
+
+
 def test_subhour_c2a_duration_clamp_and_c4_window_are_refused():
     """A short step must not walk an hour-counted campaign clock.
 
@@ -908,12 +938,16 @@ def test_subhour_c2a_duration_clamp_and_c4_window_are_refused():
     melt = _endpoint_melt(CampaignPhase.C4, 1, temperature_C=1580.0)
     flux = _endpoint_flux(Mg=0.019)
     with pytest.raises(CampaignSubhourHourClockRefusal) as window:
-        manager.check_endpoint(melt, flux, CondensationTrain(), record)
+        manager.check_endpoint(
+            melt, flux, CondensationTrain(), record,
+            atom_ledger=_c4_feed_ledger_above_the_limit(),
+        )
     assert window.value.diagnostic["clock"] == "c4_snapshot_window"
 
     manager._process_dt_h = 1.0
     assert manager.check_endpoint(
-        melt, flux, CondensationTrain(), record
+        melt, flux, CondensationTrain(), record,
+        atom_ledger=_c4_feed_ledger_above_the_limit(),
     ) is False
 
     manager._process_dt_h = 0.25
@@ -967,6 +1001,8 @@ def _k_full_condensation_route():
         condensed_for_species=lambda _species: 0.0,
         condensed_by_stage_species={},
         impurity_by_stage_species={},
+        wall_reaction_booking_by_species={},
+        stage3_reactive_alkali_by_species={},
     )
 
 
@@ -1052,6 +1088,8 @@ def test_metal_phase_native_fe_condensation_debits_the_step_mass():
             condensed_for_species=lambda _species: 0.0,
             condensed_by_stage_species={},
             impurity_by_stage_species={},
+            wall_reaction_booking_by_species={},
+            stage3_reactive_alkali_by_species={},
         )
 
     sim.condensation_model.route = _route
@@ -1086,6 +1124,8 @@ def _partial_species_route(species: str, fraction: float):
             condensed_by_stage_species={},
             impurity_by_stage_species={},
             wall_route_species_order=(species,),
+            wall_reaction_booking_by_species={},
+            stage3_reactive_alkali_by_species={},
         )
 
     return _route
@@ -1277,11 +1317,16 @@ def test_subhour_c4_acquisition_count_is_refused():
     melt = _endpoint_melt(CampaignPhase.C4, 1, temperature_C=1150.0)
     flux = _endpoint_flux(Mg=0.0)
     train = CondensationTrain()
+    ledger = _c4_feed_ledger_above_the_limit()
     manager._process_dt_h = 1.0
-    assert manager.check_endpoint(melt, flux, train, record) is False
+    assert manager.check_endpoint(
+        melt, flux, train, record, atom_ledger=ledger,
+    ) is False
     manager._process_dt_h = 0.25
     with pytest.raises(CampaignSubhourHourClockRefusal) as acquired:
-        manager.check_endpoint(melt, flux, train, record)
+        manager.check_endpoint(
+            melt, flux, train, record, atom_ledger=ledger,
+        )
     assert acquired.value.reason == "subhour_hour_clock_refused"
     assert acquired.value.terminal_refusal is True
     assert acquired.value.diagnostic["clock"] == "c4_acquisition_count"
