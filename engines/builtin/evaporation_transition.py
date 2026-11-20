@@ -91,6 +91,62 @@ from simulator.scalar_boundary import is_declared_real_scalar
 _NUMERICAL_FLOOR_KG = 1.0e-12
 
 
+def evaporation_parent_is_below_floor(
+    oxide_removed_kg: float,
+    available_kg: float,
+    floor_kg: float = _NUMERICAL_FLOOR_KG,
+) -> bool:
+    """The parent debit or the melt stock is at or below the floor.
+
+    The provider and the evaporation caller both refuse the parcel on
+    this comparison. A stock read that is exactly the floor posts nothing.
+    """
+
+    return (
+        float(oxide_removed_kg) <= floor_kg
+        or float(available_kg) <= floor_kg
+    )
+
+
+def coupled_evaporation_legs_kg(
+    *,
+    oxide_removed_kg: float,
+    remaining_vapor_kg: float,
+    oxygen_coproduct_kg: float,
+    condensed_product_kg: Mapping[str, float],
+) -> dict[str, float]:
+    """Kg of each coupled leg the evaporation transition posts together.
+
+    MaterialLot floors a component on its own. A leg in (0, floor] makes
+    the provider skip the whole parcel so one side cannot land alone.
+    The headspace source uses the same legs. The hour's commit passes
+    remaining equal to the rate, so the condensed-product map is empty
+    on that call.
+    """
+
+    legs = {
+        "parent_oxide": float(oxide_removed_kg),
+        "remaining_vapor": float(remaining_vapor_kg),
+        "oxygen_coproduct": abs(float(oxygen_coproduct_kg)),
+    }
+    for product_species, kg in condensed_product_kg.items():
+        legs[f"condensed:{product_species}"] = float(kg)
+    return legs
+
+
+def subfloor_legs_kg(
+    legs: Mapping[str, float],
+    floor_kg: float = _NUMERICAL_FLOOR_KG,
+) -> dict[str, float]:
+    """Legs strictly above zero and at or below the floor."""
+
+    return {
+        name: kg
+        for name, kg in legs.items()
+        if 0.0 < kg <= floor_kg
+    }
+
+
 class BuiltinEvaporationTransitionProvider(ChemistryProvider):
     """Authoritative ``EVAPORATION_TRANSITION`` provider.
 
@@ -204,10 +260,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         product_kg = rate_kg_hr * dt_hr
         O2_kg = rate_kg_hr * dt_hr * O2_per_product_kg
 
-        if (
-            oxide_removed <= _NUMERICAL_FLOOR_KG
-            or available_kg <= _NUMERICAL_FLOOR_KG
-        ):
+        if evaporation_parent_is_below_floor(oxide_removed, available_kg):
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="ok",
@@ -273,26 +326,23 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             species, condensed_kg, sp_data, registry,
             resolve_species_formula,
         )
-        coupled_leg_kg = {
-            "parent_oxide": oxide_removed,
-            "remaining_vapor": remaining_kg,
-            "oxygen_coproduct": abs(O2_kg),
-            **{
-                f"condensed:{product_species}": (
-                    float(product_mol)
-                    * resolve_species_formula(
-                        product_species,
-                        registry,
-                    ).molar_mass_kg_per_mol()
-                )
-                for product_species, product_mol in condensed_product_mol.items()
-            },
+        condensed_product_kg = {
+            product_species: (
+                float(product_mol)
+                * resolve_species_formula(
+                    product_species,
+                    registry,
+                ).molar_mass_kg_per_mol()
+            )
+            for product_species, product_mol in condensed_product_mol.items()
         }
-        subfloor_legs = {
-            name: kg
-            for name, kg in coupled_leg_kg.items()
-            if 0.0 < kg <= _NUMERICAL_FLOOR_KG
-        }
+        coupled_leg_kg = coupled_evaporation_legs_kg(
+            oxide_removed_kg=oxide_removed,
+            remaining_vapor_kg=remaining_kg,
+            oxygen_coproduct_kg=O2_kg,
+            condensed_product_kg=condensed_product_kg,
+        )
+        subfloor_legs = subfloor_legs_kg(coupled_leg_kg)
         if subfloor_legs:
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,

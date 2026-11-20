@@ -103,6 +103,174 @@ from simulator.state import (
 )
 
 
+def committed_wall_deposit_fraction(raw_fraction, account_fractions) -> float:
+    """Fraction the condensation provider is given.
+
+    A fraction at or below the empty-kg tolerance, or a fraction with
+    no account split, is posted as zero. The dispatch and the headspace
+    source both read this, so a real wall split is not credited as a
+    full-mass disproportionation.
+    """
+
+    from simulator.accounting.lots import EMPTY_KG_TOLERANCE
+
+    fraction = float(raw_fraction or 0.0)
+    if fraction <= EMPTY_KG_TOLERANCE or not account_fractions:
+        return 0.0
+    return fraction
+
+
+def baffle_product_is_subfloor(product_kg: float, floor_kg: float) -> bool:
+    """True when a baffle product is in (0, floor].
+
+    Zero is absent, not subfloor. The fold and the headspace oxygen
+    credit share this comparison. A subfloor product that cannot fold
+    onto a same-species wall lot retains the whole baffle parcel, and
+    the overhead oxygen credit does not post.
+    """
+
+    return 0.0 < float(product_kg) <= float(floor_kg)
+
+
+def booked_overhead_oxygen_mol(booking, *, include_wall: bool) -> tuple[float, float]:
+    """(debit_mol, credit_mol) this booking posts to process.overhead_gas.
+
+    Baffle oxygen always moves. Wall oxygen moves only when the booked
+    wall solids are the solids that materialize. A non-positive side is
+    not posted. A booking replaces the static product map, so this
+    oxygen is the whole condensation credit, not an addition to it.
+    """
+
+    debit = float(booking.get("baffle_oxygen_debit_mol") or 0.0)
+    credit = float(booking.get("baffle_oxygen_credit_mol") or 0.0)
+    if include_wall:
+        debit += float(booking.get("wall_oxygen_debit_mol") or 0.0)
+        credit += float(booking.get("wall_oxygen_credit_mol") or 0.0)
+    if debit <= 0.0:
+        debit = 0.0
+    if credit <= 0.0:
+        credit = 0.0
+    return debit, credit
+
+
+def booking_scaled_to_vapour_split(
+    booking,
+    *,
+    baffle_mol: float,
+    wall_mol: float,
+) -> dict[str, Any]:
+    """Booking whose legs sum to the vapour S captured.
+
+    The headspace commit posts this booking, and the residual reads
+    its oxygen. One scale keeps those two from carrying different mols.
+    A side with no booked vapour contributes nothing.
+    """
+
+    import copy
+
+    scaled = copy.deepcopy(dict(booking))
+    baffle_booked = 0.0
+    wall_booked = 0.0
+    for leg in scaled.get("reaction_legs") or ():
+        if not isinstance(leg, Mapping):
+            continue
+        vapour = float(leg.get("vapour_mol") or 0.0)
+        if str(leg.get("surface") or "") == "wall":
+            wall_booked += vapour
+        else:
+            baffle_booked += vapour
+    baffle_scale = (
+        float(baffle_mol) / baffle_booked if baffle_booked > 0.0 else 0.0
+    )
+    wall_scale = float(wall_mol) / wall_booked if wall_booked > 0.0 else 0.0
+
+    def _scale_products(products, scale: float) -> dict[str, float]:
+        return {
+            str(name): float(mol) * scale
+            for name, mol in dict(products or {}).items()
+        }
+
+    scaled["baffle_products_mol"] = _scale_products(
+        scaled.get("baffle_products_mol"),
+        baffle_scale,
+    )
+    by_stage = {}
+    for stage, products in dict(
+        scaled.get("baffle_products_mol_by_stage") or {}
+    ).items():
+        by_stage[str(stage)] = _scale_products(products, baffle_scale)
+    scaled["baffle_products_mol_by_stage"] = by_stage
+    scaled["baffle_oxygen_debit_mol"] = (
+        float(scaled.get("baffle_oxygen_debit_mol") or 0.0) * baffle_scale
+    )
+    scaled["baffle_oxygen_credit_mol"] = (
+        float(scaled.get("baffle_oxygen_credit_mol") or 0.0) * baffle_scale
+    )
+    wall_products = {}
+    for account, products in dict(
+        scaled.get("wall_products_mol_by_account") or {}
+    ).items():
+        wall_products[str(account)] = _scale_products(products, wall_scale)
+    scaled["wall_products_mol_by_account"] = wall_products
+    scaled["wall_oxygen_debit_mol"] = (
+        float(scaled.get("wall_oxygen_debit_mol") or 0.0) * wall_scale
+    )
+    scaled["wall_oxygen_credit_mol"] = (
+        float(scaled.get("wall_oxygen_credit_mol") or 0.0) * wall_scale
+    )
+    legs = []
+    for leg in scaled.get("reaction_legs") or ():
+        if not isinstance(leg, Mapping):
+            legs.append(leg)
+            continue
+        scale = (
+            wall_scale
+            if str(leg.get("surface") or "") == "wall"
+            else baffle_scale
+        )
+        updated = dict(leg)
+        updated["products_mol"] = _scale_products(
+            leg.get("products_mol"),
+            scale,
+        )
+        updated["oxygen_debit_mol"] = (
+            float(leg.get("oxygen_debit_mol") or 0.0) * scale
+        )
+        updated["oxygen_credit_mol"] = (
+            float(leg.get("oxygen_credit_mol") or 0.0) * scale
+        )
+        updated["vapour_mol"] = float(leg.get("vapour_mol") or 0.0) * scale
+        legs.append(updated)
+    scaled["reaction_legs"] = legs
+    return scaled
+
+
+def booking_wall_account_fractions(booking) -> dict[str, float]:
+    """Wall-account shares of the booked wall vapour."""
+
+    totals: dict[str, float] = {}
+    for leg in booking.get("reaction_legs") or ():
+        if not isinstance(leg, Mapping):
+            continue
+        if str(leg.get("surface") or "") != "wall":
+            continue
+        account = str(leg.get("account") or "")
+        if not account:
+            continue
+        totals[account] = totals.get(account, 0.0) + float(
+            leg.get("vapour_mol") or 0.0
+        )
+    total = 0.0
+    for value in totals.values():
+        total += value
+    if total <= 0.0:
+        return {}
+    return {
+        account: value / total
+        for account, value in totals.items()
+    }
+
+
 class BuiltinCondensationRouteProvider(ChemistryProvider):
     """Authoritative ``CONDENSATION_ROUTE`` provider.
 
@@ -522,11 +690,10 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             debits['process.overhead_gas']['O2'] = oxygen_mol
         if isinstance(booking, Mapping):
             wall_survived = self._booked_wall_products_survived(booking, wall_plan)
-            o2_debit = float(booking.get("baffle_oxygen_debit_mol") or 0.0)
-            o2_credit = float(booking.get("baffle_oxygen_credit_mol") or 0.0)
-            if wall_survived:
-                o2_debit += float(booking.get("wall_oxygen_debit_mol") or 0.0)
-                o2_credit += float(booking.get("wall_oxygen_credit_mol") or 0.0)
+            o2_debit, o2_credit = booked_overhead_oxygen_mol(
+                booking,
+                include_wall=wall_survived,
+            )
             if o2_debit > 0.0:
                 overhead = debits['process.overhead_gas']
                 overhead['O2'] = overhead.get('O2', 0.0) + o2_debit
@@ -1165,7 +1332,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                     product_species, registry
                 ).molar_mass_kg_per_mol()
                 product_kg = float(mol) * molar_mass
-                if not (0.0 < product_kg <= floor_kg):
+                if not baffle_product_is_subfloor(product_kg, floor_kg):
                     continue
                 destination = next((
                     account

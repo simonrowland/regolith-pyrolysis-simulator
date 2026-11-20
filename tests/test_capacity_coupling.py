@@ -3351,6 +3351,32 @@ def test_capture_move_does_not_depend_on_insertion_order():
     assert first > 1.0e-6
 
 
+def test_integral_added_mass_is_the_holdup_identity():
+    # A shut hour's endpoint flux is not the integral. The commit
+    # posts (n_end - n0 + bled) M. Factor 1 makes the pressure the
+    # mole count, so the kilograms are that difference times M.
+    from simulator.capacity_coupling import headspace_integral_added_kg
+    from simulator.physical_constants import GAS_CONSTANT
+
+    added = headspace_integral_added_kg(
+        {"K": 3.0, "O2": 9.0},
+        {"K": 1.0},
+        {"K": 0.5},
+        {"K": 1.0},
+        temperature_K=1.0,
+        volume_m3=GAS_CONSTANT,
+    )
+    assert added == {"K": 2.5}
+    assert headspace_integral_added_kg(
+        {"K": 1.0},
+        {},
+        {},
+        {"K": 0.04},
+        temperature_K=0.0,
+        volume_m3=1.0,
+    ) == {}
+
+
 def test_fast_root_trace_bleed_matches_the_ledger():
     # q(end) = 0 and n_end a trace above n0 reconstructs a negative
     # bleed. Under 1e-6 Pa that bleed is 0 and the published holdup
@@ -3630,3 +3656,67 @@ def test_sign_scan_fallback_publishes_the_one_root():
         abs=1.0e-6,
     )
     assert result.partial_pressures_Pa["N2"] == pytest.approx(0.0, abs=1.0e-6)
+
+
+def test_negative_bleed_above_the_gate_refuses_and_inside_rewrites():
+    # The caller used to book max(0, bled). A negative whose pressure
+    # is above 1e-6 Pa then kept the high partial and dropped the
+    # drain. Inside the gate the published holdup is n0 + added and
+    # the bleed is 0. The extra partial is −bled · (R T / V).
+    pa_per_mol = GAS_CONSTANT * _HS_T_K / _HS_V_M3
+    above = -1.0e-4 / pa_per_mol
+    with pytest.raises(CapacityCouplingRefusalError) as caught:
+        capacity_coupling.headspace_committed_bleed_mol(
+            {"O2": above},
+            pa_per_mol=pa_per_mol,
+        )
+    assert caught.value.refusal.reason == "headspace_negative_bleed"
+    with pytest.raises(CapacityCouplingRefusalError) as caught:
+        capacity_coupling.headspace_committed_bleed_mol(
+            {"O2": math.nan},
+            pa_per_mol=pa_per_mol,
+        )
+    assert caught.value.refusal.reason == "headspace_negative_bleed"
+
+    inside = -0.5e-6 / pa_per_mol
+    booked, extra = capacity_coupling.headspace_committed_bleed_mol(
+        {"Na": 1.0e-8, "O2": inside},
+        pa_per_mol=pa_per_mol,
+    )
+    assert booked["O2"] == 0.0
+    assert booked["Na"] == 1.0e-8
+    assert extra["O2"] == -inside * pa_per_mol
+    assert "Na" not in extra
+    # Closure: the rewritten partial is the pressure of the moles
+    # a zero bleed leaves, which is the trace that was not drained.
+    assert extra["O2"] == pytest.approx(0.5e-6, rel=1.0e-12)
+
+
+def test_shut_grid_that_stays_apart_refuses_the_work_cap():
+    # A shut grid whose last pair still disagrees must not fall
+    # through to Radau. Deleting the raise returns None.
+    built = capacity_coupling._build_law(
+        pre_holdup_mol={"O2": 1.0e-6},
+        molar_mass_kg_mol={"O2": _o2_molar_mass_kg()},
+        flux_kg_hr_at_partials=lambda _partials: {"O2": 0.0},
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        temperature_K=_HS_T_K,
+        volume_m3=_HS_V_M3,
+        dt_hr=1.0,
+        downstream_pressure_Pa=0.0,
+        pipe_diameter_m=_HS_D_M,
+        pipe_length_m=_HS_L_M,
+        outflow_cap_kg_s=None,
+        redox_source_mol_s=None,
+    )
+    assert not isinstance(built, CapacityShadowRefusal)
+    law, n0 = built
+    with pytest.raises(capacity_coupling._BalanceRefused) as caught:
+        capacity_coupling._closed_pipe_midpoint(
+            law,
+            n0,
+            3600.0,
+            lambda _amount: {name: 0.0 for name in law.species},
+            lambda _previous, _current: 1.0,
+        )
+    assert caught.value.reason == "headspace_balance_work_cap"

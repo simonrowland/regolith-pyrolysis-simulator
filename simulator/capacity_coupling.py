@@ -112,6 +112,60 @@ def headspace_partial_key(
     ))
 
 
+def headspace_integral_added_kg(
+    partials_Pa: Mapping[str, float] | None,
+    pre_holdup_mol: Mapping[str, float] | None,
+    bled_mol: Mapping[str, float] | None,
+    molar_mass_kg_mol: Mapping[str, float] | None,
+    *,
+    temperature_K: float,
+    volume_m3: float,
+) -> dict[str, float]:
+    """Kilograms the hour integral added to the headspace.
+
+    Premise: the published holdup is n_end = n0 + added − bled.
+    A fast root's added mass is q(end)·Δt. A shut Radau hour's
+    q(end) is not that integral, and the ledger must post the
+    integral or the published pressure is not the inventory.
+    Algebra: added_kg = (P V / RT − n0 + bled) M.
+    Unit check: mol * kg/mol = kg this hour.
+    Limit: no volume or temperature has no pressure, so nothing
+    is added. Oxygen is not a routed vapor and is left out.
+    """
+
+    if (
+        temperature_K <= 0.0
+        or volume_m3 <= 0.0
+        or not math.isfinite(temperature_K)
+        or not math.isfinite(volume_m3)
+    ):
+        return {}
+    factor = GAS_CONSTANT * float(temperature_K) / float(volume_m3)
+    partials = dict(partials_Pa or {})
+    pre = dict(pre_holdup_mol or {})
+    bled = dict(bled_mol or {})
+    masses = dict(molar_mass_kg_mol or {})
+    added: dict[str, float] = {}
+    for species in set(partials) | set(pre) | set(bled):
+        label = str(species)
+        if label == OXYGEN_SPECIES:
+            continue
+        mass = masses.get(label, masses.get(species))
+        if mass is None:
+            continue
+        molar_mass = float(mass)
+        if molar_mass <= 0.0 or not math.isfinite(molar_mass):
+            continue
+        n_end = float(partials.get(label, partials.get(species, 0.0)) or 0.0) / factor
+        n0 = float(pre.get(label, pre.get(species, 0.0)) or 0.0)
+        bleed = float(bled.get(label, bled.get(species, 0.0)) or 0.0)
+        kilograms = (n_end - n0 + bleed) * molar_mass
+        if not math.isfinite(kilograms):
+            continue
+        added[label] = kilograms
+    return added
+
+
 def headspace_capture_fractions(
     gross: Mapping[str, float],
     partials_Pa: Mapping[str, float] | None,
@@ -258,6 +312,49 @@ def headspace_capture_move_Pa(
             abs(delta_q) / mass * GAS_CONSTANT * temperature_K / volume_m3
         )
     return math.fsum(terms)
+
+
+def headspace_committed_bleed_mol(
+    bled_mol: Mapping[str, float] | None,
+    *,
+    pa_per_mol: float,
+) -> tuple[dict[str, float], dict[str, float]]:
+    """Bleed the solver published. A negative above the gate refuses.
+
+    Premise: bled = n0 + added − n_end. The fast root rewrites a
+    negative whose pressure is within ``DEFAULT_ABS_TOL_PA`` before
+    this map is built, so the published holdup is already n0 + added
+    and the bleed is 0. A negative that is still above that gate is
+    not a trace. Booking ``max(0, bled)`` would drop the drain and
+    keep the high partial, and the ledger would not match it.
+    Algebra: refuse when −bled · (R T / V) > 1e-6 Pa. Inside the
+    gate, bled = 0 and the partial grows by −bled · (R T / V), which
+    is the same rewrite. Unit check: mol · Pa/mol = Pa.
+    Limit: a non-negative drain is copied and adds no partial.
+    """
+
+    if not math.isfinite(pa_per_mol) or pa_per_mol < 0.0:
+        raise CapacityCouplingRefusalError(
+            CapacityShadowRefusal("headspace_negative_bleed", 0)
+        )
+    booked: dict[str, float] = {}
+    extra_pa: dict[str, float] = {}
+    for species in sorted(dict(bled_mol or {})):
+        moles = float(dict(bled_mol or {})[species])
+        if not math.isfinite(moles):
+            raise CapacityCouplingRefusalError(
+                CapacityShadowRefusal("headspace_negative_bleed", 0)
+            )
+        if moles < 0.0 and -moles * pa_per_mol > DEFAULT_ABS_TOL_PA:
+            raise CapacityCouplingRefusalError(
+                CapacityShadowRefusal("headspace_negative_bleed", 0)
+            )
+        if moles < 0.0:
+            extra_pa[str(species)] = -moles * pa_per_mol
+            booked[str(species)] = 0.0
+            continue
+        booked[str(species)] = moles
+    return booked, extra_pa
 
 
 def partition_melt_oxygen(

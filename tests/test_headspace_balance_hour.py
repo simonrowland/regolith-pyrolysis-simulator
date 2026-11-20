@@ -10,10 +10,13 @@ chunk does not add a collision diameter and does not drop the vapor.
 
 from __future__ import annotations
 
+import inspect
 import math
 from dataclasses import replace
+from types import SimpleNamespace
 
 import pytest
+from unittest.mock import patch
 
 from simulator.accounting.lots import MaterialLot
 from simulator.accounting.run_artifact import (
@@ -30,6 +33,8 @@ from simulator.core import (
     FO2_BUFFER_ACCOUNT,
     OXYGEN_RESERVOIR_NOOP_MOL,
     OXYGEN_SPECIES,
+    PyrolysisSimulator,
+    _sorted_positive_stoich_o2_mol,
 )
 from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 from simulator.state import MOLAR_MASS, CampaignPhase
@@ -607,3 +612,542 @@ def test_reducing_fe2o3_pressure_matches_the_inventory():
     assert credited
     assert float(credited[-1]["o2_credit_mol"]) > OXYGEN_RESERVOIR_NOOP_MOL
     assert _buffer_o2(sim) <= OXYGEN_RESERVOIR_NOOP_MOL
+
+
+def test_published_pressure_off_the_inventory_refuses():
+    sim = _lunar()
+    inventory_pa = sim._headspace_inventory_pressure_Pa()
+    sim.overhead.pressure_mbar = inventory_pa / 100.0
+    sim._refuse_if_headspace_pressure_is_not_inventory()
+    sim.overhead.pressure_mbar = inventory_pa / 100.0 + 1.0
+    with pytest.raises(CapacityCouplingRefusalError) as caught:
+        sim._refuse_if_headspace_pressure_is_not_inventory()
+    assert (
+        caught.value.refusal.reason
+        == "headspace_published_pressure_not_inventory"
+    )
+
+
+def test_carry_shortfall_and_hour_gates_read_default_abs_tol_pa(monkeypatch):
+    # A 1 Pa gap is outside 1e-6 Pa and inside a patched 10 Pa gate.
+    # The early return is the constant. The hour's capture move and
+    # the reducing re-solve read that same name.
+    sim = _lunar()
+    sim.melt.p_total_mbar = 0.01
+    result = SimpleNamespace(partial_pressures_Pa={"O2": 0.0})
+    try:
+        sim._publish_headspace_carry_shortfall(
+            result,
+            pre_holdup_mol={},
+            molar_mass_kg_mol={},
+        )
+    except AttributeError:
+        continued = True
+    else:
+        continued = sim._headspace_carry_shortfall is not None
+    assert continued
+    monkeypatch.setattr(
+        "simulator.capacity_coupling.DEFAULT_ABS_TOL_PA",
+        10.0,
+    )
+    sim._publish_headspace_carry_shortfall(
+        result,
+        pre_holdup_mol={},
+        molar_mass_kg_mol={},
+    )
+    assert sim._headspace_carry_shortfall is None
+    hour = inspect.getsource(
+        PyrolysisSimulator._solve_and_commit_headspace_hour
+    )
+    assert "move_pa > DEFAULT_ABS_TOL_PA" in hour
+    assert "gap_pa > DEFAULT_ABS_TOL_PA" in hour
+    assert "move_pa > 1.0e-6" not in hour
+    assert "gap_pa > 1.0e-6" not in hour
+
+
+def test_capture_pressure_stays_unresolved_when_the_move_does_not_fall():
+    sim = _lunar()
+    _hold_temperature(sim, 25.0)
+    sim.melt.p_total_mbar = 10000.0
+    _seed(sim, "process.overhead_gas", {"O2": 1.0}, "capture unresolved seed")
+    with patch(
+        "simulator.capacity_coupling.headspace_capture_move_Pa",
+        return_value=1.0e-3,
+    ):
+        with pytest.raises(CapacityCouplingRefusalError) as caught:
+            sim.step()
+    assert (
+        caught.value.refusal.reason
+        == "headspace_capture_pressure_unresolved"
+    )
+
+
+def test_capture_move_inside_a_widened_gate_is_not_unresolved(monkeypatch):
+    sim = _lunar()
+    _hold_temperature(sim, 25.0)
+    sim.melt.p_total_mbar = 10000.0
+    _seed(sim, "process.overhead_gas", {"O2": 1.0}, "capture widened gate")
+    monkeypatch.setattr(
+        "simulator.capacity_coupling.DEFAULT_ABS_TOL_PA",
+        1.0,
+    )
+    monkeypatch.setattr(
+        "simulator.capacity_coupling.headspace_capture_move_Pa",
+        lambda *_args, **_kwargs: 1.0e-3,
+    )
+    sim.step()
+    assert sim._headspace_capacity_result is not None
+    assert sim._headspace_capacity_result.authoritative is True
+
+
+def test_stoich_o2_sum_is_sorted_and_keeps_the_small_term():
+    # Large-first += loses both 1e-16 terms. Sorted fsum keeps them.
+    # Ten 1e-32 terms cross the 1e-15 noop under fsum. += of 1e-15
+    # never does, so that gate would stay closed.
+    stoich = {
+        "Na": {"O2_per_product_kg": 1.0},
+        "K": {"O2_per_product_kg": 1.0},
+        "Fe": {"O2_per_product_kg": 1.0},
+    }
+    forward = {"Na": 1.0, "K": 1.0e-16, "Fe": 1.0e-16}
+    backward = {"Fe": 1.0e-16, "K": 1.0e-16, "Na": 1.0}
+    total = _sorted_positive_stoich_o2_mol(forward, stoich, 1.0)
+    assert total == _sorted_positive_stoich_o2_mol(backward, stoich, 1.0)
+    assert total == math.fsum((1.0e-16, 1.0e-16, 1.0))
+    binary = 1.0
+    binary += 1.0e-16
+    binary += 1.0e-16
+    assert binary == 1.0
+    assert total != binary
+    # One 1e-32 term is under half an ulp of 1e-15, so fsum stays
+    # on the noop. Ten of them cross it. += of 1e-15 never does.
+    small = {f"M{index:02d}": 1.0e-32 for index in range(10)}
+    small["Na"] = 1.0e-15
+    small_stoich = {
+        name: {"O2_per_product_kg": 1.0} for name in small
+    }
+    near = _sorted_positive_stoich_o2_mol(small, small_stoich, 1.0)
+    binary_near = 1.0e-15
+    for _term in range(10):
+        binary_near += 1.0e-32
+    assert binary_near == 1.0e-15
+    assert near > OXYGEN_RESERVOIR_NOOP_MOL
+    assert near == math.fsum((1.0e-15, *([1.0e-32] * 10)))
+    sim = _lunar()
+    assert sim._headspace_reducing_overhead_o2_mol(
+        opening_gross_kg_hr={"Na": 1.0},
+        stoich_by_species={
+            "Na": {
+                "O2_per_product_kg": 1.0,
+                "oxygen_destination": "reservoir.fo2_buffer",
+            },
+        },
+    ) == 0.0
+    hour = inspect.getsource(
+        PyrolysisSimulator._solve_and_commit_headspace_hour
+    )
+    assert "_sorted_positive_stoich_o2_mol(" in hour
+
+
+def test_condensation_overhead_o2_is_the_product_helper():
+    from engines.builtin.condensation_route import (
+        baffle_product_is_subfloor,
+        committed_wall_deposit_fraction,
+    )
+    from simulator.accounting.lots import EMPTY_KG_TOLERANCE
+
+    sim = _lunar()
+    captured_kg = 1.0e-6
+    metals = sim.vapor_pressures.get("metals", {}) or {}
+    oxides = sim.vapor_pressures.get("oxide_vapors", {}) or {}
+    sp_data = dict(metals.get("CrO2") or oxides.get("CrO2") or {})
+    assert sp_data["condensation_product_accounts"]["O2"] == (
+        "process.overhead_gas"
+    )
+    product_mol, product_kg = sim._condensed_products_for_vapor(
+        "CrO2",
+        captured_kg,
+        sp_data,
+    )
+    assert product_kg
+    assert not any(
+        baffle_product_is_subfloor(kg, EMPTY_KG_TOLERANCE)
+        for kg in product_kg.values()
+    )
+    assert sim._condensation_overhead_o2_mol("CrO2", captured_kg) == (
+        float(product_mol["O2"])
+    )
+    # A wall fraction of 1 still disproportionates. The solid moves to
+    # the wall and the oxygen credit stays the full captured mass.
+    assert sim._condensation_overhead_o2_mol(
+        "CrO2",
+        captured_kg,
+        wall_fraction=1.0,
+    ) == float(product_mol["O2"])
+    half_mol, half_kg = sim._condensed_products_for_vapor(
+        "CrO2",
+        captured_kg * 0.5,
+        sp_data,
+    )
+    assert half_kg
+    assert not any(
+        baffle_product_is_subfloor(kg, EMPTY_KG_TOLERANCE)
+        for kg in half_kg.values()
+    )
+    # Both shares clear the floor, so the credit is the whole parcel.
+    assert sim._condensation_overhead_o2_mol(
+        "CrO2",
+        captured_kg,
+        wall_fraction=0.5,
+    ) == float(product_mol["O2"])
+    # Shrink the baffle until a product sits in (0, floor]. The route
+    # retains the parcel and posts no overhead oxygen.
+    fraction = 0.0
+    withheld = False
+    for _ in range(40):
+        baffle_kg = captured_kg * (1.0 - fraction)
+        _mol, kg = sim._condensed_products_for_vapor(
+            "CrO2",
+            baffle_kg,
+            sp_data,
+        )
+        if any(
+            baffle_product_is_subfloor(mass, EMPTY_KG_TOLERANCE)
+            for mass in kg.values()
+        ):
+            withheld = True
+            break
+        fraction = 1.0 - (1.0 - fraction) * 0.1
+    assert withheld
+    assert sim._condensation_overhead_o2_mol(
+        "CrO2",
+        captured_kg,
+        wall_fraction=fraction,
+    ) == 0.0
+    # CrO3 has no static overhead account. Its oxygen is the wall
+    # booking, and a present booking replaces the static map rather
+    # than adding to it. The yield is the posted mols per booked mol
+    # of vapor, applied to the captured mass.
+    from simulator.accounting.formulas import resolve_species_formula
+
+    assert sim._condensation_overhead_o2_mol("CrO3", captured_kg) == 0.0
+    cro3_mol = captured_kg / resolve_species_formula(
+        "CrO3",
+        sim.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+    cro3_booking = {
+        "baffle_oxygen_credit_mol": 1.0e-9,
+        "baffle_oxygen_debit_mol": 2.0e-9,
+        "wall_oxygen_credit_mol": 4.0e-9,
+        "wall_oxygen_debit_mol": 0.0,
+        "baffle_products_mol": {"Cr2O3": 1.0e-4},
+        "wall_products_mol_by_account": {
+            "process.wall_deposit": {"Cr2O3": 1.0e-4},
+        },
+        "reaction_legs": [
+            {"surface": "baffle", "vapour_mol": cro3_mol * 0.5},
+            {"surface": "wall", "vapour_mol": cro3_mol * 0.5},
+        ],
+    }
+    assert sim._condensation_overhead_o2_mol(
+        "CrO3",
+        captured_kg,
+        wall_fraction=0.5,
+        booking=cro3_booking,
+    ) == 3.0e-9
+    half_vapour = {
+        "baffle_oxygen_credit_mol": 1.0e-9,
+        "baffle_products_mol": {"Cr2O3": 1.0e-4},
+        "wall_products_mol_by_account": {},
+        "reaction_legs": [
+            {"surface": "baffle", "vapour_mol": cro3_mol / 2.0},
+        ],
+    }
+    assert sim._condensation_overhead_o2_mol(
+        "CrO3",
+        captured_kg,
+        booking=half_vapour,
+    ) == 2.0e-9
+    assert sim._condensation_overhead_o2_mol(
+        "CrO3",
+        1.0e-13,
+        booking=cro3_booking,
+    ) == 0.0
+    cro2_mol = captured_kg / resolve_species_formula(
+        "CrO2",
+        sim.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+    wall_only_drop = 5.0e-12 / captured_kg
+    assert sim._condensation_overhead_o2_mol(
+        "CrO2",
+        captured_kg,
+        wall_fraction=wall_only_drop,
+        booking={
+            "baffle_oxygen_credit_mol": 1.0e-9,
+            "wall_oxygen_credit_mol": 4.0e-9,
+            "baffle_products_mol": {"Cr2O3": 1.0e-4},
+            "wall_products_mol_by_account": {
+                "process.wall_deposit": {"Cr2O3": 1.0e-14},
+            },
+            "reaction_legs": [
+                {
+                    "surface": "baffle",
+                    "vapour_mol": cro2_mol * (1.0 - wall_only_drop),
+                },
+                {"surface": "wall", "vapour_mol": cro2_mol * wall_only_drop},
+            ],
+        },
+    ) == 1.0e-9
+    # One wall account under the floor retains the whole parcel. The
+    # provider posts no oxygen. Summing that account into its neighbour
+    # would credit oxygen the ledger does not carry.
+    cr2o3_mass = resolve_species_formula(
+        "Cr2O3",
+        sim.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+    cro3_mass = resolve_species_formula(
+        "CrO3",
+        sim.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+    tiny_product_mol = 1.0e-13 / cr2o3_mass
+    tiny_vapour_mol = tiny_product_mol * 2.0
+    assert 0.0 < tiny_vapour_mol * cro3_mass <= EMPTY_KG_TOLERANCE
+    large_vapour_mol = cro3_mol * 0.5 - tiny_vapour_mol
+    assert sim._condensation_overhead_o2_mol(
+        "CrO3",
+        captured_kg,
+        wall_fraction=0.5,
+        booking={
+            "baffle_oxygen_credit_mol": 1.0e-9,
+            "baffle_oxygen_debit_mol": 2.0e-9,
+            "wall_oxygen_credit_mol": 4.0e-9,
+            "baffle_products_mol": {"Cr2O3": 1.0e-4},
+            "wall_products_mol_by_account": {
+                "process.wall_deposit_segment_stage_0_to_stage_1": {
+                    "Cr2O3": 1.0e-4,
+                },
+                "process.wall_deposit_segment_stage_1_to_stage_2": {
+                    "Cr2O3": tiny_product_mol,
+                },
+            },
+            "reaction_legs": [
+                {"surface": "baffle", "vapour_mol": cro3_mol * 0.5},
+                {
+                    "surface": "wall",
+                    "account": (
+                        "process.wall_deposit_segment_stage_0_to_stage_1"
+                    ),
+                    "vapour_mol": large_vapour_mol,
+                },
+                {
+                    "surface": "wall",
+                    "account": (
+                        "process.wall_deposit_segment_stage_1_to_stage_2"
+                    ),
+                    "vapour_mol": tiny_vapour_mol,
+                },
+            ],
+        },
+    ) == 0.0
+    replaced = sim._condensation_overhead_o2_mol(
+        "CrO2",
+        captured_kg,
+        booking={
+            "baffle_oxygen_credit_mol": 3.0e-9,
+            "baffle_products_mol": {"Cr2O3": 1.0e-4},
+            "wall_products_mol_by_account": {},
+            "reaction_legs": [
+                {"surface": "baffle", "vapour_mol": cro2_mol},
+            ],
+        },
+    )
+    assert replaced == 3.0e-9
+    assert replaced != float(product_mol["O2"])
+    # One scale. The commit posts this booking, and S reads its oxygen.
+    # A fresh route booking is a different extent and must not survive.
+    from engines.builtin.condensation_route import (
+        booked_overhead_oxygen_mol,
+        booking_scaled_to_vapour_split,
+        booking_wall_account_fractions,
+    )
+    from simulator.condensation import CondensationRouteResult
+    from simulator.state import EvaporationFlux
+
+    halved = booking_scaled_to_vapour_split(
+        {
+            "baffle_oxygen_credit_mol": 2.0,
+            "baffle_oxygen_debit_mol": 0.5,
+            "baffle_products_mol": {"Cr2O3": 4.0},
+            "wall_oxygen_credit_mol": 1.0,
+            "wall_oxygen_debit_mol": 0.0,
+            "wall_products_mol_by_account": {
+                "process.wall_deposit": {"Cr2O3": 2.0},
+            },
+            "reaction_legs": [
+                {
+                    "surface": "baffle",
+                    "vapour_mol": 4.0,
+                    "products_mol": {"Cr2O3": 4.0},
+                    "oxygen_credit_mol": 2.0,
+                    "oxygen_debit_mol": 0.5,
+                },
+                {
+                    "surface": "wall",
+                    "vapour_mol": 2.0,
+                    "account": "process.wall_deposit",
+                    "products_mol": {"Cr2O3": 2.0},
+                    "oxygen_credit_mol": 1.0,
+                    "oxygen_debit_mol": 0.0,
+                },
+            ],
+        },
+        baffle_mol=2.0,
+        wall_mol=1.0,
+    )
+    debit_mol, credit_mol = booked_overhead_oxygen_mol(
+        halved,
+        include_wall=True,
+    )
+    assert debit_mol == 0.25
+    assert credit_mol == 1.5
+    assert halved["baffle_products_mol"]["Cr2O3"] == 2.0
+    assert halved["reaction_legs"][0]["vapour_mol"] == 2.0
+    assert booking_wall_account_fractions(halved) == {
+        "process.wall_deposit": 1.0,
+    }
+    flux = EvaporationFlux(
+        species_kg_hr={"CrO3": captured_kg, "CrO2": captured_kg},
+    )
+    fresh = CondensationRouteResult(
+        remaining_by_species={"CrO3": 0.0, "CrO2": 0.0},
+        wall_deposit_fraction_by_species={"CrO3": 0.0, "CrO2": 1.0},
+        wall_deposit_account_fractions_by_species={
+            "CrO2": {"process.wall_deposit": 1.0},
+        },
+        wall_reaction_booking_by_species={
+            "CrO3": {
+                "baffle_oxygen_credit_mol": 1.0e-3,
+                "baffle_products_mol": {"Cr2O3": 1.0},
+                "reaction_legs": [
+                    {"surface": "baffle", "vapour_mol": 1.0},
+                ],
+            },
+            "CrO2": {
+                "baffle_oxygen_credit_mol": 9.0,
+                "baffle_products_mol": {"Cr2O3": 9.0},
+                "reaction_legs": [
+                    {"surface": "baffle", "vapour_mol": 9.0},
+                ],
+            },
+        },
+    )
+    committed_route = sim._commit_headspace_vapour_booking(
+        fresh,
+        flux,
+        phase_scalar=1.0,
+        bookings={"CrO3": cro3_booking},
+        wall_fractions={"CrO3": 0.5},
+        wall_accounts={"CrO3": {"process.wall_deposit": 1.0}},
+    )
+    assert "CrO2" not in committed_route.wall_reaction_booking_by_species
+    assert committed_route.wall_deposit_fraction_by_species["CrO2"] == 0.0
+    posted_booking = committed_route.wall_reaction_booking_by_species["CrO3"]
+    assert posted_booking["baffle_oxygen_credit_mol"] == 1.0e-9
+    posted_debit, posted_credit = booked_overhead_oxygen_mol(
+        posted_booking,
+        include_wall=True,
+    )
+    assert posted_credit - posted_debit == sim._condensation_overhead_o2_mol(
+        "CrO3",
+        captured_kg,
+        wall_fraction=0.5,
+        booking=cro3_booking,
+    )
+    # A retained parcel from the previous hour drains when its products
+    # clear the floor. The oxygen is the product helper on that mass,
+    # and on the sum when this parcel also commits.
+    from simulator.account_ids import CONDENSATION_RETAINED_HOLDUP_ACCOUNT
+
+    _seed(
+        sim,
+        CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
+        {"CrO2": 1.0e-8},
+        "prior retained CrO2",
+    )
+    prior_kg = float(
+        sim.atom_ledger.kg_by_account(
+            CONDENSATION_RETAINED_HOLDUP_ACCOUNT
+        ).get("CrO2", 0.0)
+        or 0.0
+    )
+    prior_mol, prior_product_kg = sim._condensed_products_for_vapor(
+        "CrO2",
+        prior_kg,
+        sp_data,
+    )
+    assert prior_kg > 0.0
+    assert not any(
+        baffle_product_is_subfloor(mass, EMPTY_KG_TOLERANCE)
+        for mass in prior_product_kg.values()
+    )
+    assert sim._condensation_overhead_o2_mol(
+        "CrO2",
+        captured_kg,
+        wall_fraction=fraction,
+    ) == float(prior_mol["O2"])
+    summed_mol, _summed_kg = sim._condensed_products_for_vapor(
+        "CrO2",
+        captured_kg + prior_kg,
+        sp_data,
+    )
+    assert sim._condensation_overhead_o2_mol(
+        "CrO2",
+        captured_kg,
+        wall_fraction=0.0,
+    ) == float(summed_mol["O2"])
+    assert sim._condensation_overhead_o2_mol("CrO2", 0.0) == 0.0
+    assert sim._condensation_overhead_o2_mol("SiO", captured_kg) == 0.0
+    assert committed_wall_deposit_fraction(0.35, {"wall": 1.0}) == 0.35
+    assert committed_wall_deposit_fraction(
+        EMPTY_KG_TOLERANCE,
+        {"wall": 1.0},
+    ) == 0.0
+    assert committed_wall_deposit_fraction(0.35, {}) == 0.0
+
+
+def test_subfloor_evaporation_parcel_does_not_post():
+    from engines.builtin.evaporation_transition import (
+        coupled_evaporation_legs_kg,
+        evaporation_parent_is_below_floor,
+        subfloor_legs_kg,
+    )
+
+    legs = coupled_evaporation_legs_kg(
+        oxide_removed_kg=2.0e-12,
+        remaining_vapor_kg=2.0e-12,
+        oxygen_coproduct_kg=-5.0e-13,
+        condensed_product_kg={},
+    )
+    assert subfloor_legs_kg(legs) == {"oxygen_coproduct": 5.0e-13}
+    assert evaporation_parent_is_below_floor(2.0e-12, 1.0) is False
+    assert evaporation_parent_is_below_floor(1.0e-12, 1.0) is True
+    assert evaporation_parent_is_below_floor(2.0e-12, 1.0e-12) is True
+    sim = _lunar()
+    row = {
+        "parent_oxide": "Al2O3",
+        "oxide_per_product_kg": 1.0,
+        "O2_per_product_kg": 0.1,
+    }
+    # 2e-12 kg/h * 0.1 kg O2 / kg vapor = 2e-13 kg O2, below 1e-12 kg.
+    # Parent and vapor are 2e-12 kg, so only the oxygen leg is subfloor.
+    assert sim._evaporation_transition_posts_parcel(
+        2.0e-12,
+        row,
+        1.0,
+    ) is False
+    assert sim._evaporation_transition_posts_parcel(
+        1.0e-9,
+        row,
+        1.0,
+    ) is True
+    assert sim._evaporation_transition_posts_parcel(1.0e-9, {}, 0.0) is True

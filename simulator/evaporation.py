@@ -5329,6 +5329,217 @@ class EvaporationMixin:
         return _project_evaporation_overhead_source_mol_hr(
             rates_kg_hr, resolved_stoich, self.species_formula_registry)
 
+    def _condensation_overhead_o2_mol(
+        self,
+        species,
+        captured_kg,
+        wall_fraction=0.0,
+        booking=None,
+    ):
+        # Premise: the condensation route posts one overhead oxygen
+        # figure. With no booking, captured CrO2 returns 0.25 mol O2
+        # per mol vapor from the static map. The wall share
+        # disproportionates too. With a booking, that map is replaced:
+        # the oxygen is the booking yield times this captured mass.
+        # A baffle product in (0, floor] retains the whole parcel, so
+        # neither share posts. A wall share whose own products are in
+        # (0, floor] rolls back and does not return its oxygen.
+        # The evaporation projector already debited the oxygen. S adds
+        # back only the credit the route will post.
+        # Algebra: baffle = captured * (1 - f), wall = captured * f.
+        # Booking: n = (credit - debit) * captured_mol / booked_mol.
+        # Unit check: mol O2 per mol vapor, times mol vapor, is mol.
+        # Limit: no captured mass is 0. A retained parcel returns the
+        # prior credit only when that prior itself clears the floor.
+        from engines.builtin.condensation_route import (
+            baffle_product_is_subfloor,
+            booked_overhead_oxygen_mol,
+            booking_scaled_to_vapour_split,
+        )
+        from simulator.account_ids import CONDENSATION_RETAINED_HOLDUP_ACCOUNT
+        from simulator.accounting.lots import EMPTY_KG_TOLERANCE
+
+        if captured_kg <= 0.0:
+            return 0.0
+        metals = self.vapor_pressures.get('metals', {}) or {}
+        oxides = self.vapor_pressures.get('oxide_vapors', {}) or {}
+        sp_data = dict(metals.get(species) or oxides.get(species) or {})
+        fraction = min(1.0, max(0.0, float(wall_fraction or 0.0)))
+        captured = float(captured_kg)
+        baffle_kg = captured * (1.0 - fraction)
+        wall_kg = captured - baffle_kg
+        # Prior retained vapor is disproportionated with this parcel
+        # through the static map. The booking does not contain it.
+        # A prior that clears the floor drains even when this parcel is
+        # retained. A prior that does not is merged into a committing
+        # parcel, so its oxygen still posts. It stays put when both are
+        # retained.
+        prior_kg = 0.0
+        if sp_data:
+            prior_kg = float(
+                self.atom_ledger.kg_by_account(
+                    CONDENSATION_RETAINED_HOLDUP_ACCOUNT
+                ).get(species, 0.0)
+                or 0.0
+            )
+
+        def _subfloor(mass_kg: float) -> bool:
+            if not sp_data or mass_kg <= 0.0:
+                return False
+            _mol, product_kg = self._condensed_products_for_vapor(
+                species,
+                mass_kg,
+                sp_data,
+            )
+            return any(
+                baffle_product_is_subfloor(kg, EMPTY_KG_TOLERANCE)
+                for kg in product_kg.values()
+            )
+
+        def _oxygen_mol(mass_kg: float) -> float:
+            if not sp_data or mass_kg <= 0.0:
+                return 0.0
+            product_mol, _product_kg = self._condensed_products_for_vapor(
+                species,
+                mass_kg,
+                sp_data,
+            )
+            if not product_mol:
+                return 0.0
+            return max(0.0, float(product_mol.get('O2', 0.0) or 0.0))
+
+        prior_clears = prior_kg > 0.0 and not _subfloor(prior_kg)
+
+        if isinstance(booking, Mapping):
+            # The route does not dispatch a parcel at or below the
+            # numerical floor, so its booking oxygen does not post.
+            # The scaled booking is the one the commit dispatches.
+            if captured <= EMPTY_KG_TOLERANCE:
+                return 0.0
+            vapor_mass = resolve_species_formula(
+                str(species),
+                self.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            if vapor_mass <= 0.0:
+                return 0.0
+            scaled = booking_scaled_to_vapour_split(
+                booking,
+                baffle_mol=baffle_kg / vapor_mass,
+                wall_mol=wall_kg / vapor_mass,
+            )
+
+            def _held(products) -> bool:
+                for name, mol in dict(products or {}).items():
+                    solid_mass = resolve_species_formula(
+                        str(name),
+                        self.species_formula_registry,
+                    ).molar_mass_kg_per_mol()
+                    if baffle_product_is_subfloor(
+                        float(mol) * solid_mass,
+                        EMPTY_KG_TOLERANCE,
+                    ):
+                        return True
+                return False
+
+            # The provider retains the whole parcel when any one wall
+            # account's solids are in (0, floor] and that account's
+            # arrival is too. Summing the accounts first hides the
+            # small one inside the large one, and S then credits
+            # oxygen the ledger never posts. A subfloor solid on a
+            # heavier arrival rolls that reaction back and drops
+            # every wall oxygen credit; the baffle credit still posts.
+            vapour_mol_by_account: dict[str, float] = {}
+            for leg in scaled.get("reaction_legs") or ():
+                if not isinstance(leg, Mapping):
+                    continue
+                if str(leg.get("surface") or "") != "wall":
+                    continue
+                account = str(leg.get("account") or "")
+                vapour_mol_by_account[account] = (
+                    vapour_mol_by_account.get(account, 0.0)
+                    + float(leg.get("vapour_mol") or 0.0)
+                )
+            baffle_held = _held(scaled.get("baffle_products_mol"))
+            retained_account = False
+            rolled_account = False
+            for account, products in dict(
+                scaled.get("wall_products_mol_by_account") or {}
+            ).items():
+                if not _held(products):
+                    continue
+                if str(account) in vapour_mol_by_account:
+                    arrival_kg = (
+                        vapour_mol_by_account[str(account)] * vapor_mass
+                    )
+                else:
+                    arrival_kg = wall_kg
+                if 0.0 < arrival_kg <= EMPTY_KG_TOLERANCE:
+                    retained_account = True
+                else:
+                    rolled_account = True
+            if baffle_held or retained_account:
+                return _oxygen_mol(prior_kg) if prior_clears else 0.0
+            debit_mol, credit_mol = booked_overhead_oxygen_mol(
+                scaled,
+                include_wall=not rolled_account,
+            )
+            posted = credit_mol - debit_mol
+            if prior_kg > 0.0:
+                posted += _oxygen_mol(prior_kg)
+            return posted
+        if not sp_data:
+            return 0.0
+        accounts = dict(sp_data.get('condensation_product_accounts') or {})
+        if accounts.get('O2') != 'process.overhead_gas':
+            return 0.0
+        if _subfloor(baffle_kg):
+            return _oxygen_mol(prior_kg) if prior_clears else 0.0
+        credit_kg = captured if not _subfloor(wall_kg) else baffle_kg
+        if prior_kg > 0.0:
+            credit_kg += prior_kg
+        return _oxygen_mol(credit_kg)
+
+    def _evaporation_transition_posts_parcel(
+        self,
+        rate_kg_hr: float,
+        stoich_row,
+        available_kg: float,
+    ) -> bool:
+        """True when this hour's evaporation commit will post the parcel.
+
+        The commit dispatches remaining equal to the rate, so the
+        condensed-product legs are empty. A row with no parent is not
+        this transition and is left in place.
+        """
+
+        from engines.builtin.evaporation_transition import (
+            coupled_evaporation_legs_kg,
+            evaporation_parent_is_below_floor,
+            subfloor_legs_kg,
+        )
+
+        row = dict(stoich_row or {})
+        parent = str(row.get('parent_oxide') or '')
+        oxide_per = float(row.get('oxide_per_product_kg') or 0.0)
+        if not parent or oxide_per <= 0.0:
+            return True
+        # Premise: oxide_kg = rate * oxide_per * dt and O2_kg = rate * O2_per * dt.
+        # The hour's dt is 1 h. Remaining vapor kg equals the rate because
+        # the commit credits the whole parcel to overhead before condensation.
+        # Limit: a parent at the floor, or any leg in (0, floor], posts nothing.
+        oxide_removed = float(rate_kg_hr) * oxide_per
+        if evaporation_parent_is_below_floor(oxide_removed, available_kg):
+            return False
+        legs = coupled_evaporation_legs_kg(
+            oxide_removed_kg=oxide_removed,
+            remaining_vapor_kg=float(rate_kg_hr),
+            oxygen_coproduct_kg=(
+                float(rate_kg_hr) * float(row.get('O2_per_product_kg') or 0.0)
+            ),
+            condensed_product_kg={},
+        )
+        return not subfloor_legs_kg(legs)
+
     def _scale_wall_supply_computed(self, scale: float) -> None:
         """Apply one physical scale to every computed supply rate.
 
@@ -5571,8 +5782,130 @@ class EvaporationMixin:
                 _note(species, applied)
         return effective_rates
 
+    def _commit_headspace_vapour_booking(
+        self,
+        route_result,
+        evap_flux,
+        *,
+        phase_scalar: float,
+        bookings: Mapping,
+        wall_fractions: Mapping,
+        wall_accounts: Mapping,
+    ):
+        """Replace the commit route's booking with the one S scaled.
+
+        S credits oxygen from one booking scaled to the captured
+        vapour. The commit's own route has a different extent, and its
+        products can sit under the floor while S's do not. The provider
+        then retains the parcel and posts no oxygen. This puts S's
+        scaled booking on the dispatch, so the ledger posts those mols.
+        A species S treated as static loses the fresh booking.
+        """
+
+        from dataclasses import replace
+
+        from engines.builtin.condensation_route import (
+            booking_scaled_to_vapour_split,
+            booking_wall_account_fractions,
+        )
+
+        quoted_bookings = {
+            str(species): booking
+            for species, booking in dict(bookings or {}).items()
+            if isinstance(booking, Mapping)
+        }
+        quoted_fractions = {
+            str(species): float(fraction)
+            for species, fraction in dict(wall_fractions or {}).items()
+        }
+        quoted_accounts: dict[str, dict[str, float]] = {}
+        for species, accounts in dict(wall_accounts or {}).items():
+            if not isinstance(accounts, Mapping):
+                continue
+            quoted_accounts[str(species)] = {
+                str(account): float(share)
+                for account, share in accounts.items()
+            }
+        fresh_bookings = dict(
+            getattr(route_result, 'wall_reaction_booking_by_species', {})
+            or {}
+        )
+        new_fractions = dict(
+            getattr(route_result, 'wall_deposit_fraction_by_species', {})
+            or {}
+        )
+        new_accounts = {
+            str(species): dict(accounts)
+            for species, accounts in dict(
+                getattr(
+                    route_result,
+                    'wall_deposit_account_fractions_by_species',
+                    {},
+                )
+                or {}
+            ).items()
+            if isinstance(accounts, Mapping)
+        }
+        new_bookings: dict[str, dict] = {}
+        scale = 1.0 if phase_scalar is None else float(phase_scalar)
+        for species, raw_rate in evap_flux.species_kg_hr.items():
+            label = str(species)
+            if label == 'O2':
+                if label in fresh_bookings:
+                    new_bookings[label] = fresh_bookings[label]
+                continue
+            fraction = min(
+                1.0,
+                max(0.0, float(quoted_fractions.get(label, 0.0) or 0.0)),
+            )
+            accounts = dict(quoted_accounts.get(label) or {})
+            if fraction <= 0.0:
+                accounts = {}
+            new_fractions[label] = fraction
+            new_accounts[label] = accounts
+            booking = quoted_bookings.get(label)
+            if booking is None:
+                continue
+            rate_kg = float(raw_rate) * scale
+            remaining_kg = float(
+                route_result.remaining_by_species.get(label, 0.0) or 0.0
+            )
+            condensed_kg = max(0.0, rate_kg - remaining_kg)
+            if condensed_kg <= 1.0e-12:
+                continue
+            vapor_mass = resolve_species_formula(
+                label,
+                self.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            if vapor_mass <= 0.0:
+                continue
+            condensed_mol = condensed_kg / vapor_mass
+            wall_mol = condensed_mol * fraction
+            baffle_mol = condensed_mol - wall_mol
+            scaled = booking_scaled_to_vapour_split(
+                booking,
+                baffle_mol=baffle_mol,
+                wall_mol=wall_mol,
+            )
+            wall_split = booking_wall_account_fractions(scaled)
+            if wall_split:
+                new_accounts[label] = wall_split
+            new_bookings[label] = scaled
+        return replace(
+            route_result,
+            wall_reaction_booking_by_species=new_bookings,
+            wall_deposit_fraction_by_species=new_fractions,
+            wall_deposit_account_fractions_by_species=new_accounts,
+        )
+
     def _route_to_condensation(
-        self, evap_flux: EvaporationFlux
+        self,
+        evap_flux: EvaporationFlux,
+        *,
+        headspace_remaining_kg_hr: Mapping[str, float] | None = None,
+        headspace_booking_by_species: Mapping | None = None,
+        headspace_wall_fraction_by_species: Mapping | None = None,
+        headspace_wall_accounts_by_species: Mapping | None = None,
     ) -> EvaporationFlux:
         """
         Route evaporated species through the condensation train.
@@ -5660,6 +5993,40 @@ class EvaporationMixin:
             )
         route_result = self.condensation_model.route(
             evap_flux, self.melt)
+        if headspace_remaining_kg_hr is not None:
+            # Premise: the residual's vapor source is the mass that
+            # stays in the headspace. The route's own remaining is a
+            # second capture. The committed hour posts the residual.
+            # Algebra: remaining_i = max(0, S_i) for each committed
+            # vapor, and 0 when S has no entry. O2 is the coproduct,
+            # not a routed vapor. Unit check: kg/h.
+            # Limit: no override leaves the route's remaining.
+            from dataclasses import replace
+
+            routed = dict(route_result.remaining_by_species)
+            quoted = dict(headspace_remaining_kg_hr)
+            for species in evap_flux.species_kg_hr:
+                if str(species) == 'O2':
+                    continue
+                routed[str(species)] = max(
+                    0.0,
+                    float(quoted.get(species, 0.0) or 0.0),
+                )
+            route_result = replace(
+                route_result,
+                remaining_by_species=routed,
+            )
+        if headspace_booking_by_species is not None:
+            # The remaining override above is S's vapour. The booking
+            # override is S's oxygen. Both are the residual's figures.
+            route_result = self._commit_headspace_vapour_booking(
+                route_result,
+                evap_flux,
+                phase_scalar=phase_scalar,
+                bookings=headspace_booking_by_species,
+                wall_fractions=headspace_wall_fraction_by_species or {},
+                wall_accounts=headspace_wall_accounts_by_species or {},
+            )
 
         antoine_extrapolations = dict(
             getattr(route_result, 'antoine_extrapolations', {}) or {}
@@ -5907,7 +6274,13 @@ class EvaporationMixin:
             return {}
         available_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt').get(stoich['parent_oxide'], 0.0)
-        if available_kg <= 1e-12:
+        from engines.builtin.evaporation_transition import (
+            evaporation_parent_is_below_floor,
+        )
+        if evaporation_parent_is_below_floor(
+            rate_kg_hr * stoich['oxide_per_product_kg'],
+            available_kg,
+        ):
             return {}
         remaining_kg_hr = route_result.remaining_by_species.get(
             species, 0.0)
@@ -6101,17 +6474,21 @@ class EvaporationMixin:
         actually deposited onto ``process.condensation_train``, used by
         the caller to drive ``_project_condensed_stage_collection``.
         """
-        self._last_condensation_baffle_product_kg_by_account = {}
-        wall_deposit_fraction = float(
-            route_result.wall_deposit_fraction_by_species.get(species, 0.0)
+        from engines.builtin.condensation_route import (
+            committed_wall_deposit_fraction,
         )
+
+        self._last_condensation_baffle_product_kg_by_account = {}
         wall_deposit_account_fractions = dict(
             route_result
             .wall_deposit_account_fractions_by_species
             .get(species, {})
         )
-        if wall_deposit_fraction <= 1.0e-12 or not wall_deposit_account_fractions:
-            wall_deposit_fraction = 0.0
+        wall_deposit_fraction = committed_wall_deposit_fraction(
+            route_result.wall_deposit_fraction_by_species.get(species, 0.0),
+            wall_deposit_account_fractions,
+        )
+        if wall_deposit_fraction == 0.0:
             wall_deposit_account_fractions = {}
 
         kernel_result = self._dispatch_and_commit(
@@ -6352,17 +6729,18 @@ class EvaporationMixin:
         if stoich is None:
             return (0.0, None) if return_transition else 0.0
 
+        from engines.builtin.evaporation_transition import (
+            evaporation_parent_is_below_floor,
+        )
+
         parent_oxide = stoich['parent_oxide']
         rate_kg_per_tick = rate_kg_hr * 1.0  # 1-hour tick (see core.py)
         oxide_removed = rate_kg_per_tick * stoich['oxide_per_product_kg']
         product_kg = rate_kg_per_tick
 
-        if oxide_removed <= 1e-12:
-            return (0.0, None) if return_transition else 0.0
-
         available_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt').get(parent_oxide, 0.0)
-        if available_kg <= 1e-12:
+        if evaporation_parent_is_below_floor(oxide_removed, available_kg):
             return (0.0, None) if return_transition else 0.0
 
         # Mirror the legacy validation: the AccountingError surface is
