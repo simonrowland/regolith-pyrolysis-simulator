@@ -109,12 +109,20 @@ APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
 )
 _CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
 # One production record for an abandoned freeze-gate dispatch. Digests drop
-# this key whole; the final dispatch is not rewritten to match.
+# this key whole. It is not curve identity: cache and store payloads omit
+# the environment keys, and replay does not restore them.
 ENVIRONMENT_RETRIES_KEY = 'environment_retries'
+GATE_CURVE_ENVIRONMENT_KEYS = (
+    ENVIRONMENT_RETRIES_KEY,
+)
 GATE_CURVE_NOTICE_KEYS = (
     'composition_projected_notice', 'gate_provider_refusal',
     'gate_provider_step_down', 'alphamelts_reference_pressure',
-    ENVIRONMENT_RETRIES_KEY,
+    *GATE_CURVE_ENVIRONMENT_KEYS,
+)
+GATE_CURVE_IDENTITY_NOTICE_KEYS = tuple(
+    key for key in GATE_CURVE_NOTICE_KEYS
+    if key not in GATE_CURVE_ENVIRONMENT_KEYS
 )
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
@@ -3995,7 +4003,7 @@ def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
             for point in tuple(curve.get("path") or ())
         ],
     }
-    for notice_key in GATE_CURVE_NOTICE_KEYS:
+    for notice_key in GATE_CURVE_IDENTITY_NOTICE_KEYS:
         notice = curve.get(notice_key)
         if isinstance(notice, Mapping):
             payload[notice_key] = _json_ready(notice)
@@ -4012,7 +4020,7 @@ def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
             for point in payload.get("path", ())
         ),
     }
-    for notice_key in GATE_CURVE_NOTICE_KEYS:
+    for notice_key in GATE_CURVE_IDENTITY_NOTICE_KEYS:
         notice = payload.get(notice_key)
         if isinstance(notice, Mapping):
             curve[notice_key] = dict(notice)
