@@ -23,6 +23,9 @@ def test_deterministic_refusal_allowlist_is_explicit():
         ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH,
         ALPHAMELTS_REASON_FE_FREE_SILICATE_IMPOSED_FO2_CRASH,
     )
+    from simulator.melt_backend.openimcc_bridge import (
+        ISOLATED_OPENIMCC_CACHEABLE_ERRORS,
+    )
     from simulator.melt_backend.vaporock import EMPTY_SPECIATION_STATUS_REASON
 
     assert CACHEABLE_REFUSAL_CODES == frozenset({
@@ -51,7 +54,21 @@ def test_deterministic_refusal_allowlist_is_explicit():
         "internal_analytical_missing_oxygen_condition",
         "internal_analytical_invalid_oxygen_condition",
         "openimcc_composition_canonicalization",
+        "imcc_composition_incomplete",
+        "imcc_ferric_input_unsupported",
+        "imcc_component_outside_domain",
+        "imcc_species_not_found",
+        "imcc_sp_extension_required",
+        "imcc_composition_outside_validated_envelope",
+        "imcc_T_outside_datapack_domain",
+        "imcc_gas_species_not_found",
+        "imcc_gas_T_outside_domain",
+        "imcc_gas_invalid_fO2",
     })
+    assert set(ISOLATED_OPENIMCC_CACHEABLE_ERRORS.values()) <= (
+        CACHEABLE_REFUSAL_CODES
+    )
+    assert "ImccNonconvergenceError" not in ISOLATED_OPENIMCC_CACHEABLE_ERRORS
     assert "internal_analytical_oxygen_balance_unavailable" not in (
         CACHEABLE_REFUSAL_CODES
     )
@@ -93,6 +110,19 @@ def test_deterministic_refusal_allowlist_is_explicit():
         "timeout",
         "subprocess_died",
         "nonzero_exit",
+        "engine_crash",
+        "unavailable",
+        "fo2_nonmonotonic_buffered",
+        "imcc_nonconvergence",
+        "imcc_dataframe_unavailable",
+        "imcc_unproven_datapack",
+        "imcc_malformed_datapack",
+        "imcc_gas_oxygen_balance_failed",
+        "imcc_gas_data_unavailable",
+        "imcc_gas_duplicate_interval",
+        "imcc_gas_invalid_interval",
+        "openimcc_not_importable",
+        "openimcc_oxygen_balance_unavailable",
     ):
         assert transient not in CACHEABLE_REFUSAL_CODES
 
@@ -1115,3 +1145,294 @@ def test_worker_timeout_exception_is_counted_and_not_stored(tmp_path, monkeypatc
         assert connection.execute(
             "SELECT count(*) FROM engine_outputs"
         ).fetchone()[0] == 0
+
+
+@pytest.mark.parametrize(
+    ("composition_mol", "code", "exception_name"),
+    [
+        (
+            {"SiO2": 1.0, "Fe2O3": 1.0},
+            "imcc_ferric_input_unsupported",
+            "ImccFerricInputUnsupportedError",
+        ),
+        (
+            {"SiO2": 1.0, "P2O5": 0.1},
+            "imcc_sp_extension_required",
+            "ImccSPComponentRequiresExtensionError",
+        ),
+    ],
+)
+def test_openimcc_presolver_refusal_hits_after_disk_round_trip(
+    composition_mol, code, exception_name, tmp_path, monkeypatch,
+):
+    pytest.importorskip("openimcc")
+    from openimcc.kernel import ImccFerricInputUnsupportedError
+    from openimcc.model import ImccSPComponentRequiresExtensionError
+    from simulator.melt_backend import openimcc_bridge
+
+    expected = {
+        "ImccFerricInputUnsupportedError": ImccFerricInputUnsupportedError,
+        "ImccSPComponentRequiresExtensionError": (
+            ImccSPComponentRequiresExtensionError
+        ),
+    }[exception_name]
+    _enable_disk_cache(tmp_path, monkeypatch)
+    calls = []
+    original = openimcc_bridge._evaluate_uncached
+
+    def wrapped(**adapter_kwargs):
+        calls.append(1)
+        return original(**adapter_kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "_evaluate_uncached", wrapped)
+
+    def run():
+        return openimcc_bridge.evaluate(
+            composition_mol=composition_mol,
+            temperature_K=1600.0,
+        )
+
+    with pytest.raises(expected) as first:
+        run()
+    engine_cache._MEMORY_CACHE.clear()
+    with pytest.raises(expected) as second:
+        run()
+
+    assert first.value.code == second.value.code == code
+    assert str(first.value) == str(second.value)
+    assert len(calls) == 1
+    counts = _assert_returned_miss_accounting("openimcc")
+    assert counts["hits"] == counts["misses"] == counts["stores"] == 1
+    assert counts.get(f"not_stored:refusal:{code}", 0) == 0
+
+
+def test_openimcc_invalid_fo2_refusal_hits_after_disk_round_trip(
+    tmp_path, monkeypatch,
+):
+    openimcc = pytest.importorskip("openimcc")
+    from openimcc.gas import ImccGasInvalidFugacityError
+    from simulator.melt_backend.openimcc_bridge import evaluate_gas
+
+    _enable_disk_cache(tmp_path, monkeypatch)
+    calls = []
+    original = openimcc.evaluate_gas
+
+    def wrapped(*args, **kwargs):
+        calls.append(1)
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(openimcc, "evaluate_gas", wrapped)
+
+    def run():
+        return evaluate_gas(
+            {"SiO2": 1.0},
+            1600.0,
+            0.0,
+            object(),
+        )
+
+    with pytest.raises(ImccGasInvalidFugacityError) as first:
+        run()
+    engine_cache._MEMORY_CACHE.clear()
+    with pytest.raises(ImccGasInvalidFugacityError) as second:
+        run()
+
+    assert first.value.code == second.value.code == "imcc_gas_invalid_fO2"
+    assert str(first.value) == str(second.value)
+    assert len(calls) == 1
+    counts = _assert_returned_miss_accounting("openimcc")
+    assert counts["hits"] == counts["misses"] == counts["stores"] == 1
+
+
+def test_openimcc_nonconvergence_is_not_stored(tmp_path, monkeypatch):
+    pytest.importorskip("openimcc")
+    from openimcc.kernel import ImccNonconvergenceError
+    from simulator.melt_backend import openimcc_bridge
+
+    _enable_disk_cache(tmp_path, monkeypatch)
+
+    def refuse(**_kwargs):
+        raise ImccNonconvergenceError("did not converge", {"residual": 1.0})
+
+    monkeypatch.setattr(openimcc_bridge, "_evaluate_uncached", refuse)
+
+    def run():
+        return openimcc_bridge.evaluate(
+            composition_mol={"SiO2": 1.0},
+            temperature_K=1600.0,
+        )
+
+    with pytest.raises(ImccNonconvergenceError):
+        run()
+    with pytest.raises(ImccNonconvergenceError):
+        run()
+
+    counts = _assert_returned_miss_accounting("openimcc")
+    assert counts["misses"] == 2
+    assert counts["stores"] == 0
+    assert counts["not_stored:exception:imcc_nonconvergence"] == 2
+
+
+def test_isolated_openimcc_names_match_package_codes():
+    pytest.importorskip("openimcc")
+    from openimcc.gas import (
+        ImccGasDataUnavailableError,
+        ImccGasInvalidFugacityError,
+        ImccGasOxygenBalanceError,
+        ImccGasSpeciesNotFoundError,
+        ImccGasTemperatureOutsideDomainError,
+    )
+    from openimcc.kernel import (
+        ImccComponentOutsideDomainError,
+        ImccCompositionIncompleteError,
+        ImccDataframeUnavailableError,
+        ImccFerricInputUnsupportedError,
+        ImccNonconvergenceError,
+        ImccSpeciesNotFoundError,
+        ImccTOutsideDatapackDomainError,
+    )
+    from openimcc.model import (
+        ImccCompositionOutsideValidatedEnvelopeError,
+        ImccMalformedDatapackError,
+        ImccSPComponentRequiresExtensionError,
+        ImccUnprovenDatapackError,
+    )
+    from simulator.engine_cache import CACHEABLE_REFUSAL_CODES
+    from simulator.melt_backend.openimcc_bridge import (
+        ISOLATED_OPENIMCC_CACHEABLE_ERRORS,
+    )
+
+    package_classes = {
+        "ImccCompositionIncompleteError": ImccCompositionIncompleteError,
+        "ImccFerricInputUnsupportedError": ImccFerricInputUnsupportedError,
+        "ImccComponentOutsideDomainError": ImccComponentOutsideDomainError,
+        "ImccSpeciesNotFoundError": ImccSpeciesNotFoundError,
+        "ImccSPComponentRequiresExtensionError": (
+            ImccSPComponentRequiresExtensionError
+        ),
+        "ImccCompositionOutsideValidatedEnvelopeError": (
+            ImccCompositionOutsideValidatedEnvelopeError
+        ),
+        "ImccTOutsideDatapackDomainError": ImccTOutsideDatapackDomainError,
+    }
+    assert set(package_classes) == set(ISOLATED_OPENIMCC_CACHEABLE_ERRORS)
+    for name, refusal_class in package_classes.items():
+        assert refusal_class.code == ISOLATED_OPENIMCC_CACHEABLE_ERRORS[name]
+        assert refusal_class.code in CACHEABLE_REFUSAL_CODES
+    for refusal_class in (
+        ImccGasSpeciesNotFoundError,
+        ImccGasTemperatureOutsideDomainError,
+        ImccGasInvalidFugacityError,
+    ):
+        assert refusal_class.code in CACHEABLE_REFUSAL_CODES
+    for refusal_class in (
+        ImccNonconvergenceError,
+        ImccDataframeUnavailableError,
+        ImccMalformedDatapackError,
+        ImccUnprovenDatapackError,
+        ImccGasOxygenBalanceError,
+        ImccGasDataUnavailableError,
+    ):
+        assert refusal_class.code not in CACHEABLE_REFUSAL_CODES
+
+
+def test_isolated_openimcc_input_refusal_hits_after_disk_round_trip(
+    tmp_path, monkeypatch,
+):
+    from simulator.battery import residue
+
+    _enable_disk_cache(tmp_path, monkeypatch)
+    calls = []
+
+    def isolated(_evaluate, *, timeout_s, **kwargs):
+        del timeout_s
+        calls.append(kwargs)
+        raise residue.IsolatedOpenImccWorkerError(
+            "ImccFerricInputUnsupportedError",
+            "Fe2O3 input is unsupported",
+        )
+
+    monkeypatch.setattr(residue, "_evaluate_openimcc_isolated", isolated)
+
+    def run():
+        return residue._cached_isolated_openimcc_state(
+            {"SiO2": 1.0, "Fe2O3": 1.0},
+            1600.0,
+            timeout_s=15.0,
+            allow_extrapolation=True,
+            allow_out_of_envelope=True,
+        )
+
+    with pytest.raises(residue.IsolatedOpenImccWorkerError) as first:
+        run()
+    engine_cache._MEMORY_CACHE.clear()
+    with pytest.raises(residue.IsolatedOpenImccWorkerError) as second:
+        run()
+
+    assert first.value.error_name == second.value.error_name
+    assert str(first.value) == str(second.value) == (
+        "isolated OpenIMCC ImccFerricInputUnsupportedError: "
+        "Fe2O3 input is unsupported"
+    )
+    assert len(calls) == 1
+    counts = _assert_returned_miss_accounting("openimcc")
+    assert counts["hits"] == counts["misses"] == counts["stores"] == 1
+
+
+def test_isolated_openimcc_solver_failure_is_not_stored(tmp_path, monkeypatch):
+    from simulator.battery import residue
+
+    _enable_disk_cache(tmp_path, monkeypatch)
+
+    def isolated(_evaluate, *, timeout_s, **_kwargs):
+        del timeout_s
+        raise residue.ResidueEngineNonconvergence("openimcc", "did not converge")
+
+    monkeypatch.setattr(residue, "_evaluate_openimcc_isolated", isolated)
+
+    def run():
+        return residue._cached_isolated_openimcc_state(
+            {"SiO2": 1.0},
+            1600.0,
+            timeout_s=15.0,
+            allow_extrapolation=True,
+            allow_out_of_envelope=True,
+        )
+
+    with pytest.raises(residue.ResidueEngineNonconvergence):
+        run()
+    with pytest.raises(residue.ResidueEngineNonconvergence):
+        run()
+    counts = _assert_returned_miss_accounting("openimcc")
+    assert counts["misses"] == 2
+    assert counts["stores"] == 0
+    assert counts["not_stored:exception:ResidueEngineNonconvergence"] == 2
+
+    engine_cache.engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+
+    def unmapped(_evaluate, *, timeout_s, **_kwargs):
+        del timeout_s
+        raise residue.IsolatedOpenImccWorkerError(
+            "ImccNonconvergenceError", "did not converge",
+        )
+
+    monkeypatch.setattr(residue, "_evaluate_openimcc_isolated", unmapped)
+
+    def run_unmapped():
+        return residue._cached_isolated_openimcc_state(
+            {"SiO2": 1.0},
+            1700.0,
+            timeout_s=15.0,
+            allow_extrapolation=True,
+            allow_out_of_envelope=True,
+        )
+
+    with pytest.raises(residue.IsolatedOpenImccWorkerError):
+        run_unmapped()
+    with pytest.raises(residue.IsolatedOpenImccWorkerError):
+        run_unmapped()
+    counts = _assert_returned_miss_accounting("openimcc")
+    assert counts["misses"] == 2
+    assert counts["stores"] == 0
+    assert counts["not_stored:exception:ImccNonconvergenceError"] == 2
