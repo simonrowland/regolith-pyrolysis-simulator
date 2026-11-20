@@ -9,7 +9,7 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 857
+  sources: 861
   extracts: 854
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 88
@@ -965,10 +965,31 @@ gaps:
   - yu-2003-k-na-evaporation-chondrule-melts
   - zhang-2024-alkali-evaporation-ti-thesis
   sidecars_missing_fields:
+  - source_id: barin-1989
+    sidecar_path: docs/references/pdfs/02-thermochemistry/barin-1989.md
+    missing_fields:
+    - doi
+    - license_or_oa_basis
+    - sha256
+    - retrieved_date
   - source_id: ivtan-cro2-g
     sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-cro2-g.md
     missing_fields: &id001
     - doi
+  - source_id: ivtan-nio-thermo
+    sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-nio-thermo.md
+    missing_fields:
+    - doi
+    - license_or_oa_basis
+    - sha256
+    - retrieved_date
+  - source_id: ivtan-zno-thermo
+    sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-zno-thermo.md
+    missing_fields:
+    - doi
+    - license_or_oa_basis
+    - sha256
+    - retrieved_date
   - source_id: kems-003-pound-1972
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.md
     missing_fields: &id002
@@ -1048,6 +1069,12 @@ gaps:
     missing_fields: &id019
     - doi
     - retrieval_url
+  - source_id: robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics
+    sidecar_path: docs/references/pdfs/02-thermochemistry/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics.md
+    missing_fields:
+    - license_or_oa_basis
+    - sha256
+    - retrieved_date
   - source_id: smales-1971-lpsc-12022
     sidecar_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md
     missing_fields: &id020
@@ -4024,6 +4051,55 @@ sources:
       last_stage: null
       date: null
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: barin-1989
+  aliases: []
+  citation: Barin, I. (1989). *Thermochemical Data of Pure Substances*, 1st ed., Parts I and II. VCH,
+    Weinheim and New York. ISBN 3-527-27812-5 and 0-89573-866-X.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: docs/references/pdfs/02-thermochemistry/barin-1989.md
+  sidecar_missing_fields: [doi, license_or_oa_basis, sha256, retrieved_date]
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/barin-1989/barin-1989.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/barin-1989/sidecar.yaml
+      present: false
+    text:
+      path: text/barin-1989
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/barin-1989
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/barin-1989.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/barin-1989.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: e1dbb239851508a1a3635ff8a7eec9400953b826
 - source_id: barin-1995
   aliases: []
   citation: Barin, I. (1995). Thermochemical Data of Pure Substances (3rd ed.). VCH.
@@ -14954,6 +15030,104 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: ivtan-nio-thermo
+  aliases: []
+  citation: Bergman, G. A., Gusarov, A. V. & Leonidov, V. Ya. (n.d.). IVTANTHERMO electronic table 2026,
+    nickel oxide NiO(s, l), Moscow State University, Faculty of Chemistry. https://www.chem.msu.ru/rus/tsiv/Ni/print-NiO_c.html
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-nio-thermo.md
+  sidecar_missing_fields: [doi, license_or_oa_basis, sha256, retrieved_date]
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ivtan-nio-thermo/ivtan-nio-thermo.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/ivtan-nio-thermo/sidecar.yaml
+      present: false
+    text:
+      path: text/ivtan-nio-thermo
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/ivtan-nio-thermo
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ivtan-nio-thermo.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ivtan-nio-thermo.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: e1dbb239851508a1a3635ff8a7eec9400953b826
+- source_id: ivtan-zno-thermo
+  aliases: []
+  citation: Bergman, G. A. & Gusarov, A. V. (n.d.). IVTANTHERMO electronic table 1603, zinc oxide ZnO(s,
+    l), Moscow State University, Faculty of Chemistry. https://www.chem.msu.ru/rus/tsiv/Zn/print-ZnO_c.html
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-zno-thermo.md
+  sidecar_missing_fields: [doi, license_or_oa_basis, sha256, retrieved_date]
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ivtan-zno-thermo/ivtan-zno-thermo.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/ivtan-zno-thermo/sidecar.yaml
+      present: false
+    text:
+      path: text/ivtan-zno-thermo
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/ivtan-zno-thermo
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ivtan-zno-thermo.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ivtan-zno-thermo.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: e1dbb239851508a1a3635ff8a7eec9400953b826
 - source_id: iwahashi-2021-cr-oxide-solid-activities
   aliases: []
   citation: Iwahashi, K., Hashimoto, S., Yamauchi, R., Saito, K. & Hasegawa, M. (2021). Phase Relationship
@@ -34797,6 +34971,56 @@ sources:
       last_stage: extracted
       date: '2026-10-03'
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics
+  aliases: []
+  citation: 'Robie, R. A., Huebner, J. S. & Hemingway, B. S. (1995). “Heat capacities and thermodynamic
+    properties of braunite (Mn7SiO12) and rhodonite (MnSiO3).” *American Mineralogist*, 80(5–6), 560–575.
+    DOI: 10.2138/am-1995-5-615.'
+  doi: 10.2138/am-1995-5-615
+  report_number: null
+  identifier: 10.2138/am-1995-5-615
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: docs/references/pdfs/02-thermochemistry/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics.md
+  sidecar_missing_fields: [license_or_oa_basis, sha256, retrieved_date]
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics.pdf
+      present: true
+      sha256: 8e8798268f9ffa06fa345ee9bd8f2a23e3b82b7896744e24b809ff81756b4c2b
+      matches_simulator: null
+    sidecar:
+      path: raw/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics
+      exists: true
+      file_count: 55
+    tables:
+      path: tables/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: e1dbb239851508a1a3635ff8a7eec9400953b826
 - source_id: robinot-2025-promes-review
   aliases: []
   citation: Robinot, J., Rodat, S., Abanades, S., Paillet, A. & Cowley, A. (2025), "Review of in-situ
