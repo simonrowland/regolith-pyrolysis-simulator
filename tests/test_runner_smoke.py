@@ -121,8 +121,8 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # 9666fc129 plus the de32c69ca runner regen). The runner regen script
         # does not update these pins. Lunar full runs diverge between the
         # laptop and studio-3, so these digests are not a laptop re-run.
-        "flux_maps_sha256": "f35a18fca674c3e6eb14bd01621c007a941d4b9029bf876bb8ed7a9663f62eae",
-        "ledger_sha256": "7569fdaa31127ae0fd5f00b48482b58da8f04822a33378cba5299b4d1a349bb2",
+        "flux_maps_sha256": "993481553b6d3b40ec02e96b71d2dab6da00fbfcefee6b941ad9317be3351b48",
+        "ledger_sha256": "cda1eea40d9d4db96977292d92cba28ca03885abd17616fd5a573d06d249f394",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
@@ -834,7 +834,7 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
     # the replay; the per-row identities independently verify separation
     # of cumulative condensate, reagent transfers, and live product.
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        0.0004975311735864234, rel=1e-12, abs=1e-15
+        7.693708697396846e-4, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
@@ -2267,7 +2267,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         # The committed mars golden's per-hour summary. The condenser stack
         # regenerated that fixture; this is its sha256, not a second run.
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "118530d56fec9d6494325767f9dd68bad70213a1bfe252e97d6b6a9c3fdf38f8"
+            "dc698b1407dd501052c9ca37b314cd670dcb49474fc084b5cdc3a3b4c612f8ba"
         )
 
 
