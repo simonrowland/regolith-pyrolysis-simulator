@@ -524,8 +524,16 @@ def test_profile_furnace_temperature_threshold_drives_gate() -> None:
         source="profiles/test.yaml",
     )
 
-    hot = constraints.evaluate(_trace(condensed=({(3, "SiO"): 20.0},), temperature_C=1300.1))
-    cool = constraints.evaluate(_trace(condensed=({(3, "SiO"): 20.0},), temperature_C=1299.9))
+    hot = constraints.evaluate(_trace(
+        condensed=({(3, "SiO"): 20.0},),
+        stage4_sio_impurity_to_designated_ratio=0.0,
+        temperature_C=1300.1,
+    ))
+    cool = constraints.evaluate(_trace(
+        condensed=({(3, "SiO"): 20.0},),
+        stage4_sio_impurity_to_designated_ratio=0.0,
+        temperature_C=1299.9,
+    ))
 
     assert hot.failing_gates == ("furnace_temperature",)
     assert cool.feasible
