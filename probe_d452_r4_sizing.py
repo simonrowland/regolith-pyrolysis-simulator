@@ -45,6 +45,7 @@ CEILING_REFERENCE_AREA_M2 = 1.0e300
 AREA_RELATIVE_TOLERANCE = 0.01
 MAX_FIXED_POINT_PASSES = 8
 DIAGNOSTIC_SPECIES = ("Mn", "SiO", "Si")
+TIME_OVERLAP_SPECIES = ("Mn", "SiO", "Si", "Fe")
 MODEL_STATE_FIELDS = (
     "wall_species_partial_pressures_pa",
     "vapor_pressure_data",
@@ -204,6 +205,7 @@ def _run_c6(
     hourly: dict[tuple[str, str, int], dict] = {}
     peaks: dict[tuple[str, str], dict] = {}
     diagnostic_peaks: dict[str, dict] = {}
+    time_overlap_kg_hr: dict[tuple[int, str], float] = {}
     stage_profiles: dict[tuple[int, str], dict] = {}
     segment_profiles: dict[tuple[int, str], dict] = {}
     current_stage_partials: dict[str, float] = {}
@@ -255,6 +257,13 @@ def _run_c6(
         )
         stage_profile["partial_pressures_pa"].update(local_partials)
         stage_profile["pO2_mbar"] = pO2_mbar
+
+        if species in TIME_OVERLAP_SPECIES:
+            incoming = float(kwargs["available_kg"])
+            overlap_key = (hour, species)
+            old_incoming = time_overlap_kg_hr.get(overlap_key)
+            if old_incoming is None or incoming > old_incoming:
+                time_overlap_kg_hr[overlap_key] = incoming
 
         if species in DIAGNOSTIC_SPECIES:
             incoming = float(kwargs["available_kg"])
@@ -333,6 +342,14 @@ def _run_c6(
             f"hour={hour} incident_kg_hr={row['incoming_kg_hr']:.12g} "
             f"eta={row['eta']:.12g}"
         )
+    overlap_hours = sorted({hour for hour, _species in time_overlap_kg_hr})
+    for hour in overlap_hours:
+        rates = []
+        for species in TIME_OVERLAP_SPECIES:
+            incoming = time_overlap_kg_hr.get((hour, species))
+            value = "not_observed" if incoming is None else f"{incoming:.12g}"
+            rates.append(f"{species}_max_stage_inlet_kg_hr={value}")
+        print(f"D452_TEMPORAL_OVERLAP label={label} hour={hour} " + " ".join(rates))
     return {
         "sim": sim,
         "model": model,
