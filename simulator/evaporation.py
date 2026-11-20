@@ -4309,12 +4309,13 @@ class EvaporationMixin:
 
             # Premise: the ledger delta spans this tick's full vapor credit and
             # every committed removal (baffle, wall, or retained holdup).
-            # Algebra: free-vapor delta = (before + evolved - removals) - before
-            # = evolved - removals. Unit check: kg - kg = kg per one-hour tick,
-            # numerically kg/hr. Sanity: zero removal leaves the evolved rate;
-            # complete committed removal leaves zero, independent of diagnostics.
+            # Algebra: free vapor = evolved - removals. That delta is step
+            # mass. species_kg_hr is kg/h, so divide by the step. At one
+            # hour the divisor is 1.0. Zero removal leaves the evolved rate;
+            # complete removal leaves zero.
             residual_species_kg_hr[species] = max(
-                0.0, overhead_after_kg - overhead_before_kg,
+                0.0,
+                (overhead_after_kg - overhead_before_kg) / self.process_dt_hr(),
             )
 
         self._apply_organic_tar_wall_deposit()
@@ -4582,7 +4583,11 @@ class EvaporationMixin:
                 species='Fe',
             )
             routed_fe_mol = overhead_fe_mol
+        # remaining_kg is the route's kg/h remainder. The debit leaves
+        # remaining_kg * dt in overhead, so the moles are that step mass
+        # over M_Fe. At one hour dt is 1.0 and the moles stay remaining / M.
         remaining_kg = float(route_diag.get('remaining_kg', 0.0) or 0.0)
+        uncondensed_mol = remaining_kg * self.process_dt_hr() / fe_molar_mass
         return {
             'native_fe_vapor_route_status': route_status,
             'native_fe_vapor_mol': float(routed_fe_mol),
@@ -4594,7 +4599,7 @@ class EvaporationMixin:
                 route_diag.get('credited_condensed_kg', 0.0) or 0.0
             ),
             'native_fe_uncondensed_kg': remaining_kg,
-            'native_fe_uncondensed_mol': float(remaining_kg / fe_molar_mass),
+            'native_fe_uncondensed_mol': float(uncondensed_mol),
         }
 
     def _dispatch_condensation_route(

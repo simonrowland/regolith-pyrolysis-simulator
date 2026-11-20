@@ -8172,6 +8172,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
         }
 
+    def _native_fe_residual_capacity_mol_hr(
+        self,
+        capacity_mol_hr: float,
+        step_mol: float,
+    ) -> float:
+        """Hourly Fe capacity left after this step's vapor moles.
+
+        ``step_mol`` is moles this step. The kg/h cap reads the residual
+        as mol/h. On the hour the step is one hour, so the subtraction
+        stays ``capacity - step_mol``.
+        """
+
+        if self.process_timestep.is_one_hour:
+            spent_mol_hr = step_mol
+        else:
+            spent_mol_hr = step_mol / self.process_dt_hr()
+        return max(0.0, capacity_mol_hr - spent_mol_hr)
+
     def _native_fe_partition_diagnostic(
         self,
         native_fe_available_mol: float,
@@ -8392,11 +8410,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'native_fe_vapor_capacity_mol_hr': capacity_mol_hr,
             'native_fe_vapor_capacity_kg_hr': capacity_kg_hr,
             'ordinary_melt_fe_residual_capacity_mol_hr': (
-                max(0.0, capacity_mol_hr - vapor_mol)
-                if self.process_timestep.is_one_hour
-                else max(
-                    0.0,
-                    capacity_mol_hr - vapor_mol / self.process_dt_hr(),
+                self._native_fe_residual_capacity_mol_hr(
+                    capacity_mol_hr, vapor_mol,
                 )
             ),
             'capacity_allocation_rule': 'pool_first_residual',
@@ -8620,18 +8635,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         capacity_mol_hr = float(partition.get(
             'native_fe_vapor_capacity_mol_hr', 0.0,
         ) or 0.0)
-        if self.process_timestep.is_one_hour:
-            residual_capacity_mol = max(
-                0.0,
-                capacity_mol_hr - committed_vapor_mol,
-            )
-        else:
-            # committed_vapor_mol is this step. The cap reader treats the
-            # stored residual as mol/h and multiplies by M_Fe.
-            residual_capacity_mol = max(
-                0.0,
-                capacity_mol_hr - committed_vapor_mol / self.process_dt_hr(),
-            )
+        # committed_vapor_mol is this step. The cap reader treats the
+        # stored residual as mol/h and multiplies by M_Fe.
+        residual_capacity_mol = self._native_fe_residual_capacity_mol_hr(
+            capacity_mol_hr, committed_vapor_mol,
+        )
         self._native_fe_vapor_residual_capacity_mol_this_hr = residual_capacity_mol
         partition.update({
             'native_fe_split_commit_status': split_commit_status,

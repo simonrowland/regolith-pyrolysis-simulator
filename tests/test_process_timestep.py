@@ -1071,6 +1071,189 @@ def test_metal_phase_native_fe_condensation_debits_the_step_mass():
     assert train != pytest.approx(step_kg * sim.process_dt_hr(), rel=1e-6)
 
 
+def _partial_species_route(species: str, fraction: float):
+    from types import SimpleNamespace
+
+    def _route(flux, _melt):
+        rate_kg_hr = float(flux.species_kg_hr[species])
+        return SimpleNamespace(
+            remaining_by_species={species: fraction * rate_kg_hr},
+            retained_in_source_by_species={},
+            wall_deposit_fraction_by_species={species: 0.0},
+            wall_deposit_account_fractions_by_species={species: {}},
+            condensation_authority_by_species={},
+            condensed_for_species=lambda _species: 0.0,
+            condensed_by_stage_species={},
+            impurity_by_stage_species={},
+            wall_route_species_order=(species,),
+        )
+
+    return _route
+
+
+def test_cleaned_melt_uncondensed_moles_match_the_overhead_left():
+    """Uncondensed native Fe is the step moles the debit leaves behind.
+
+    The route remainder is a kg/h rate. The overhead credit is that
+    rate times dt, and the debit is ``(rate - remaining) * dt``, so
+    the kilograms left are ``remaining_kg_hr * dt``. The moles are
+    that mass over ``M_Fe``. Storing ``remaining_kg_hr / M_Fe`` makes
+    the uncondensed fraction of the committed vapor ``f / dt``. At
+    ``dt_h = 0.25`` and ``f = 0.5`` that fraction is 2. At one hour
+    the two formulas are the same number. The metal-phase return is
+    the ledger kilogram delta and is not multiplied by dt.
+
+    Mutation: drop ``* process_dt_hr()`` on the cleaned-melt
+    ``native_fe_uncondensed_mol``. The short moles become
+    ``remaining_kg_hr / M_Fe``.
+    """
+
+    from simulator.accounting.formulas import resolve_species_formula
+
+    fraction = 0.5
+    vapor_mol = 1.0
+    dt_h = 0.25
+    sim = _loaded_sim()
+    sim.process_timestep = resolve_process_timestep(900.0)
+    formula = resolve_species_formula("Fe", sim.species_formula_registry)
+    molar_mass = formula.molar_mass_kg_per_mol()
+    rate_kg_hr = vapor_mol * molar_mass / dt_h
+    remaining_kg_hr = fraction * rate_kg_hr
+    sim.condensation_model.route = _partial_species_route("Fe", fraction)
+    result = sim._route_native_fe_vapor_to_condensation(
+        vapor_mol,
+        source_account="process.cleaned_melt",
+    )
+    committed_mol = float(result["native_fe_vapor_mol"])
+    uncondensed_mol = float(result["native_fe_uncondensed_mol"])
+    overhead_kg = sim.atom_ledger.kg_by_account(
+        "process.overhead_gas"
+    ).get("Fe", 0.0)
+    assert committed_mol == pytest.approx(vapor_mol, rel=1e-9)
+    assert overhead_kg == pytest.approx(remaining_kg_hr * dt_h, rel=1e-9)
+    assert uncondensed_mol == pytest.approx(
+        remaining_kg_hr * dt_h / molar_mass, rel=1e-9,
+    )
+    assert uncondensed_mol / committed_mol == pytest.approx(fraction)
+    assert uncondensed_mol != pytest.approx(
+        remaining_kg_hr / molar_mass, rel=1e-6,
+    )
+    assert result["native_fe_uncondensed_kg"] == pytest.approx(
+        remaining_kg_hr, rel=1e-9,
+    )
+
+    partitioned = _loaded_sim()
+    partitioned.process_timestep = resolve_process_timestep(900.0)
+    partitioned.melt.temperature_C = 1600.0
+    partitioned.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    partitioned._sync_oxygen_reservoir_mirror()
+    partitioned.melt.melt_surface_area_m2 = 1.0e6
+    partitioned.condensation_model.route = _partial_species_route("Fe", fraction)
+    partitioned._apply_native_fe_saturation_split()
+    partition = partitioned._last_native_fe_partition_diagnostic
+    partition_vapor = float(partition["native_fe_vapor_mol"])
+    partition_uncondensed = float(partition["native_fe_uncondensed_mol"])
+    assert partition_vapor > 0.0
+    assert partition_uncondensed / partition_vapor == pytest.approx(fraction)
+    assert partition["native_fe_uncondensed_fraction_of_pool"] == pytest.approx(
+        partition_uncondensed
+        / float(partition["native_fe_pool_mol"]),
+    )
+    assert partition["native_fe_uncondensed_fraction_of_pool"] != pytest.approx(
+        fraction / dt_h, rel=1e-6,
+    )
+
+    hourly = _loaded_sim()
+    hourly.process_timestep = resolve_process_timestep(3600.0)
+    hourly.condensation_model.route = _partial_species_route("Fe", fraction)
+    hourly_result = hourly._route_native_fe_vapor_to_condensation(
+        vapor_mol,
+        source_account="process.cleaned_melt",
+    )
+    assert float(hourly_result["native_fe_uncondensed_mol"]) == pytest.approx(
+        fraction * vapor_mol, rel=1e-9,
+    )
+
+    metal = _loaded_sim()
+    metal.process_timestep = resolve_process_timestep(900.0)
+    step_kg = vapor_mol * molar_mass
+    metal.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"Fe": step_kg},
+        material_origin="feedstock",
+    )
+    metal.condensation_model.route = _partial_species_route("Fe", fraction)
+    metal_result = metal._route_native_fe_vapor_to_condensation(
+        vapor_mol,
+        source_account="process.metal_phase",
+    )
+    assert float(metal_result["native_fe_uncondensed_mol"]) == pytest.approx(
+        fraction * vapor_mol, rel=1e-9,
+    )
+    assert float(metal_result["native_fe_uncondensed_mol"]) != pytest.approx(
+        fraction * vapor_mol * metal.process_dt_hr(), rel=1e-6,
+    )
+
+
+def test_short_step_residual_flux_is_kilograms_per_hour():
+    """The free-vapor flux is a kg/h rate, not this step's leftover mass.
+
+    ``OverheadModel.estimate_transport_state`` reads ``total_kg_hr`` as
+    kg/h on the non-controlled path. The overhead ledger delta is
+    ``remaining_kg_hr * dt``. Dividing that delta by the step recovers
+    the kg/h remainder. Leaving the delta in ``species_kg_hr`` reports
+    a short step as ``f * rate * dt``. At one hour the divisor is 1.0
+    and the residual equals the ledger delta.
+
+    Mutation: drop ``/ process_dt_hr()`` on the residual assignment.
+    The short residual then equals the ledger kilograms.
+    """
+
+    rate_kg_hr = 0.4
+    fraction = 0.5
+    dt_h = 0.25
+    remaining_kg_hr = rate_kg_hr * fraction
+
+    short = _loaded_sim()
+    short.process_timestep = resolve_process_timestep(900.0)
+    short.condensation_model._knudsen_policy_configured = True
+    short.condensation_model.route = _partial_species_route("K", fraction)
+    before_kg = short.atom_ledger.kg_by_account(
+        "process.overhead_gas"
+    ).get("K", 0.0)
+    residual = short._route_to_condensation(_flux({"K": rate_kg_hr}))
+    after_kg = short.atom_ledger.kg_by_account(
+        "process.overhead_gas"
+    ).get("K", 0.0)
+    ledger_kg = after_kg - before_kg
+    assert ledger_kg == pytest.approx(remaining_kg_hr * dt_h, rel=1e-9)
+    assert residual.species_kg_hr["K"] == pytest.approx(
+        ledger_kg / dt_h, rel=1e-9,
+    )
+    assert residual.total_kg_hr == pytest.approx(ledger_kg / dt_h, rel=1e-9)
+    assert residual.species_kg_hr["K"] == pytest.approx(
+        remaining_kg_hr, rel=1e-9,
+    )
+    assert residual.species_kg_hr["K"] != pytest.approx(ledger_kg, rel=1e-6)
+
+    hourly = _loaded_sim()
+    hourly.process_timestep = resolve_process_timestep(3600.0)
+    hourly.condensation_model._knudsen_policy_configured = True
+    hourly.condensation_model.route = _partial_species_route("K", fraction)
+    hourly_before = hourly.atom_ledger.kg_by_account(
+        "process.overhead_gas"
+    ).get("K", 0.0)
+    hourly_residual = hourly._route_to_condensation(_flux({"K": rate_kg_hr}))
+    hourly_after = hourly.atom_ledger.kg_by_account(
+        "process.overhead_gas"
+    ).get("K", 0.0)
+    hourly_ledger_kg = hourly_after - hourly_before
+    assert hourly_ledger_kg == pytest.approx(remaining_kg_hr, rel=1e-9)
+    assert hourly_residual.species_kg_hr["K"] == pytest.approx(
+        hourly_ledger_kg, rel=1e-9,
+    )
+
+
 def test_subhour_c4_acquisition_count_is_refused():
     """Below-window C4 must not treat snapshots as hours.
 
