@@ -318,6 +318,8 @@ def test_retry_recovery_preserves_step_down_notice(
         'magemin-shadow', 'alphamelts-diagnostic',
     ]
     assert 'engine_worker_timeout' in notice['failed_providers'][0]['reason']
+    assert notice['failed_providers'][0]['disposition'] == 'environment'
+    assert 'disposition' not in notice['failed_providers'][1]
     assert 'incomplete_cooling_path' in notice['failed_providers'][1]['reason']
     assert curve['alphamelts_reference_pressure'] == {
         'physical_overhead_pressure_bar': .009,

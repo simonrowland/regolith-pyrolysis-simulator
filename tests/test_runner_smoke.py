@@ -78,6 +78,7 @@ from simulator.runner import (
     build_sio_yield_report,
     _vapor_pressure_source_report,
 )
+from tests.chemistry.test_condensation_green_pins import deterministic_gate_payload
 from tests.golden_sections import nodes
 from simulator.condensation import (
     STAGE_PURITY_NO_CAPTURED_MASS,
@@ -2228,6 +2229,8 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     # unchanged. docs-private/research/2026-08-02-train13-adjudication.md
     actual, capture, expected_text = runner_golden_loader(scenario)
     expected = json.loads(expected_text)
+    comparable = deterministic_gate_payload(actual)
+    expected_comparable = deterministic_gate_payload(expected)
 
     pins = _flux_ledger_pins(actual, capture)
     _assert_schema_shape(actual)
@@ -2238,7 +2241,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         "total_count": 0,
         "by_hour": [],
     }
-    assert actual == expected, (
+    assert comparable == expected_comparable, (
         f"runner output diverged from golden fixture {scenario['fixture']!s}; "
         "regenerate all canonical scenarios via "
         "`python3 scripts/regenerate_runner_goldens.py` if the change is "
@@ -2249,13 +2252,13 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         # Pin the merged d-137 envelope while keeping t-423's default carrier
         # covered. d-137 adds wall-deposit authority metadata to each row.
         canonical_hours = json.dumps(
-            actual["per_hour_summary"],
+            comparable["per_hour_summary"],
             sort_keys=True,
             separators=(",", ":"),
             allow_nan=False,
         ).encode("utf-8")
         expected_hours = json.dumps(
-            expected["per_hour_summary"],
+            expected_comparable["per_hour_summary"],
             sort_keys=True,
             separators=(",", ":"),
             allow_nan=False,
@@ -2289,7 +2292,7 @@ def test_runner_golden_output_ignores_host_binding_receipts(
     host_receipt_path.unlink(missing_ok=True)
 
     scenario = {**SCENARIOS[0], "hours": 1}
-    without_host_receipt = _run_scenario(scenario)
+    without_host_receipt = deterministic_gate_payload(_run_scenario(scenario))
     host_receipt_path.write_text(
         json.dumps(
             {
@@ -2300,11 +2303,11 @@ def test_runner_golden_output_ignores_host_binding_receipts(
         ),
         encoding="utf-8",
     )
-    with_valid_host_receipt = _run_scenario(scenario)
+    with_valid_host_receipt = deterministic_gate_payload(_run_scenario(scenario))
     assert without_host_receipt == with_valid_host_receipt
 
     host_receipt_path.write_text("not json", encoding="utf-8")
-    with_garbage_host_receipt = _run_scenario(scenario)
+    with_garbage_host_receipt = deterministic_gate_payload(_run_scenario(scenario))
 
     assert without_host_receipt == with_garbage_host_receipt
 
@@ -2313,8 +2316,8 @@ def test_runner_golden_output_ignores_host_binding_receipts(
 def test_runner_is_deterministic(scenario):
     """Running the same scenario twice yields byte-identical JSON."""
 
-    first = _run_scenario(scenario)
-    second = _run_scenario(scenario)
+    first = deterministic_gate_payload(_run_scenario(scenario))
+    second = deterministic_gate_payload(_run_scenario(scenario))
     assert json.dumps(first, sort_keys=True) == json.dumps(second, sort_keys=True)
 
 

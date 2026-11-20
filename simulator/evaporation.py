@@ -4205,6 +4205,7 @@ class EvaporationMixin:
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_determinism import (
             GateCurveProviderOutcome,
+            failed_provider_attempt_is_environment,
             gate_curve_provider_outcome_for_status,
             gate_curve_provider_outcome_token,
             gate_curve_provider_timeout_reason,
@@ -4237,6 +4238,15 @@ class EvaporationMixin:
         timeout_reason = None
         step_down = None
         failed_providers = []
+        # A recovered retry repeats the provider order. Publishing both copies
+        # would duplicate the step-down and move golden bytes. Environment
+        # attempts from the abandoned dispatch stay; the final dispatch is
+        # published in full. No timeout leaves the abandoned list empty, so
+        # the only dispatch is unchanged. A retry that records no failures
+        # keeps the abandoned list (the alphamelts pressure notice). A second
+        # timeout still publishes that dispatch intact, so hold-last-good
+        # still sees alphamelts. d-298/d-299's hold decision is unchanged.
+        abandoned_attempts = []
         for attempt in range(2):
             try:
                 result = self._dispatch_only(
@@ -4264,12 +4274,25 @@ class EvaporationMixin:
                     or 'unavailable'
                 )
                 warnings = list(getattr(result, 'warnings', ()) or ())
-            if diagnostic.get('gate_provider_step_down'):
-                step_down = diagnostic['gate_provider_step_down']
-                failed_providers.extend(step_down['failed_providers'])
+            dispatch_step_down = diagnostic.get('gate_provider_step_down')
+            dispatch_failed = (
+                list(dispatch_step_down['failed_providers'])
+                if dispatch_step_down else []
+            )
+            if dispatch_step_down:
+                step_down = dispatch_step_down
             timeout_reason = gate_curve_provider_timeout_reason(diagnostic)
-            if timeout_reason is None or attempt == 1:
-                break
+            if timeout_reason is not None and attempt == 0:
+                abandoned_attempts = dispatch_failed
+                continue
+            if dispatch_failed:
+                failed_providers = [
+                    item for item in abandoned_attempts
+                    if failed_provider_attempt_is_environment(item)
+                ] + dispatch_failed
+            else:
+                failed_providers = list(abandoned_attempts)
+            break
 
         path = tuple(diagnostic.get('liquid_fraction_path') or ())
         source = 'gate_liquid_fraction'
@@ -4323,8 +4346,10 @@ class EvaporationMixin:
                 'provider_diagnostic': diagnostic,
                 'status': status,
                 'warnings': warnings,
-                **({'backend_failure_disposition': 'environment'}
-                   if timeout_reason is not None else {}),
+                **({
+                    'backend_failure_disposition': 'environment',
+                    'disposition': 'environment',
+                } if timeout_reason is not None else {}),
                 **({'detail': diagnostic['exception_message']}
                    if diagnostic.get('exception_message') else {}),
             }

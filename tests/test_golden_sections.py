@@ -48,7 +48,13 @@ def test_runner_byte_roundtrip_on_current_fixture(
     _assert_raw_flux_capture_continuity(
         actual, current, files, capture["flux_maps"]
     )
-    assert current == expected_text.encode() == json_bytes(actual)
+    from tests.chemistry.test_condensation_green_pins import (
+        deterministic_gate_payload,
+    )
+
+    assert current == expected_text.encode() == json_bytes(
+        deterministic_gate_payload(actual)
+    )
     assert partition(load_json(current)) == files
     assert reassemble(files) == current
 

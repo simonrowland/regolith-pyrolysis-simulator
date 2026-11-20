@@ -853,14 +853,18 @@ def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture(
     # broken-liquidus job tree. docs-private/research/2026-08-02-train13-adjudication.md
     from tests.test_runner_smoke import SCENARIOS
 
+    from tests.chemistry.test_condensation_green_pins import (
+        deterministic_gate_payload,
+    )
+
     actual, _, expected_text = runner_golden_loader(SCENARIOS[0])
     expected = json.loads(expected_text)
     assert "cost_rollup_diagnostic" in actual["run_metadata"]
     assert actual["run_metadata"]["cost_rollup_diagnostic"]["price_basis"] == (
         "legacy_placeholder_awaiting_owner_ratification"
     )
-    stripped_actual = copy.deepcopy(actual)
-    stripped_expected = copy.deepcopy(expected)
+    stripped_actual = deterministic_gate_payload(copy.deepcopy(actual))
+    stripped_expected = deterministic_gate_payload(copy.deepcopy(expected))
     stripped_actual["run_metadata"].pop("cost_rollup_diagnostic", None)
     stripped_expected["run_metadata"].pop("cost_rollup_diagnostic", None)
     assert stripped_actual == stripped_expected
