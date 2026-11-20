@@ -728,7 +728,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # cache_key(spec) with that default-off policy.
     # 2026-11-12 b260: recomputed for t-1720 (d-389 carrier cost in the
     # objective).
-    assert cache_key(spec) == "8d41af13498d7c9be4c2b39053f64c9c439e2d2ef109fac255f8d027cb4d8861"
+    # 2026-11-19 C2A staged-pressure runtime results changed; recomputed from
+    # cache_key(spec) for the new analytical corpus epoch.
+    assert cache_key(spec) == "bfa65ea9105b78b35ca7e46ec47dbdfa50c9f5c5488c468696e0900ac2813d29"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
