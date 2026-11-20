@@ -336,6 +336,7 @@ def _call_cached_backend_equilibrate(
 
     from simulator.engine_cache import (
         _is_refusal,
+        cacheable_refusal,
         cached_engine_call,
         engine_cache_settings,
     )
@@ -351,7 +352,8 @@ def _call_cached_backend_equilibrate(
         with _without_engine_cache():
             result = solve()
         if _is_refusal(result):
-            return result
+            if not cacheable_refusal(result):
+                return result
         if isinstance(result, EquilibriumResult):
             return result.to_hot(engine_id=handle.name)
         if isinstance(result, SimpleNamespace):

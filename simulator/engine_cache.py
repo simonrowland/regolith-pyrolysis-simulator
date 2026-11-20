@@ -287,23 +287,84 @@ REFUSAL_TIMEOUT = "engine_timeout"
 REFUSAL_ENGINE_CRASH = "engine_crash"
 REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
 REFUSAL_UNAVAILABLE = "unavailable"
+REFUSAL_NOT_CONVERGED = "not_converged"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
 
 CACHEABLE_REFUSAL_CODES = frozenset({
     REFUSAL_OUT_OF_BASIS, REFUSAL_COMPOSITION_PROJECTED, REFUSAL_MAJOR_SUM,
-    REFUSAL_NO_LIQUID,
+    REFUSAL_NO_LIQUID, REFUSAL_NOT_CONVERGED,
 })
+
+# VapoRock classifies an empty finite speciation after conversion. This marker
+# can confirm the typed not_converged code, but cannot admit another code.
+# ThermoEngine's non-finite field may come from a child that is already dead,
+# so it stays uncached until the adapter distinguishes that from a live result.
+_DETERMINISTIC_ENGINE_REFUSAL_MARKER_GROUPS = (
+    ("speciation_no_finite_values", "no_finite_values"),
+)
+
+
+def _has_deterministic_engine_refusal(detail: str) -> bool:
+    reason_codes = set(re.findall(r"[a-z0-9_]+", detail))
+    return any(
+        all(marker in reason_codes for marker in group)
+        for group in _DETERMINISTIC_ENGINE_REFUSAL_MARKER_GROUPS
+    )
 
 
 def cacheable_refusal(result) -> bool:
-    return (
+    # EquilibriumResult and its light-weight adapter projections carry the
+    # refusal code in backend diagnostics rather than a mapping envelope.
+    diagnostics = getattr(result, "diagnostics", None)
+    if isinstance(diagnostics, Mapping):
+        if diagnostics.get("backend_failure_disposition"):
+            return False
+        status = getattr(result, "status", None)
+        # Missing engines and transient failures are explicit exclusions;
+        # marker text cannot reclassify them as deterministic solver results.
+        if status in {REFUSAL_UNAVAILABLE, REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH}:
+            return False
+        if status not in CACHEABLE_REFUSAL_CODES:
+            return False
+        reason = " ".join(
+            str(diagnostics.get(name) or "").lower()
+            for name in (
+                "backend_status_reason", "backend_failure_reason_code",
+                "empty_speciation_cause", "engine_reason",
+            )
+        )
+        return (
+            status == REFUSAL_NOT_CONVERGED
+            and _has_deterministic_engine_refusal(reason)
+        )
+    if (
         isinstance(result, Mapping)
         and result.get("status") == "refusal"
-        and result.get("refusal_reason") in CACHEABLE_REFUSAL_CODES
-        and result.get("engine_status") in {None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok"}
         and not result.get("exit_signal")
         and not result.get("exit_code")
-    )
+        and not result.get("backend_failure_disposition")
+    ):
+        refusal_code = result.get("refusal_reason")
+        engine_status = result.get("engine_status")
+        if refusal_code in {
+            REFUSAL_UNAVAILABLE, REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH,
+        } or engine_status in {
+            "unavailable", "not_attempted", REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH,
+        }:
+            return False
+        if refusal_code not in CACHEABLE_REFUSAL_CODES:
+            return False
+        if refusal_code == REFUSAL_NOT_CONVERGED:
+            if engine_status != REFUSAL_NOT_CONVERGED:
+                return False
+            detail = " ".join(str(result.get(name) or "") for name in (
+                "refusal_reason", "engine_status", "reason", "engine_reason",
+            )).lower()
+            return _has_deterministic_engine_refusal(detail)
+        return engine_status in {
+            None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok",
+        }
+    return False
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
