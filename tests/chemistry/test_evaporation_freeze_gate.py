@@ -1947,9 +1947,17 @@ def test_ferric_fold_silica_boundary_splits_the_real_freeze_gate_memo_key(
         None,
         (True, (), None),
     )
-    assert any(
-        'authority=extrapolated' in str(warning)
-        for warning in above.magemin_domain_verdict[1]
+    from engines.magemin.domain import MAGEMinDomainGate
+
+    canonical_diagnostic = MAGEMinDomainGate.silica_extrapolation_diagnostic(
+        {'SiO2': 81.0}
+    )
+    assert canonical_diagnostic is not None
+    assert above.magemin_domain_verdict[3] == (
+        canonical_diagnostic['authority'],
+        tuple(
+            canonical_diagnostic['certified_band']['sio2_wt_pct']
+        ),
     )
 
 
@@ -2650,6 +2658,24 @@ def test_over_limit_projection_steps_down_to_hold_or_floor(
         vapor_pressure_data, feedstocks_data, setpoints_data, enabled=True,
     )
     if held:
+        held_key, _reason = sim._freeze_gate_cache_key_and_domain(
+            pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
+            fO2_log=sim._freeze_gate_redox_key_fO2_log(
+                fO2_log=float(sim._current_melt_redox_fO2_log()),
+            ),
+        )
+        sim._freeze_gate_current_magemin_domain_verdict = getattr(
+            held_key, 'magemin_domain_verdict', None,
+        )
+        if (
+            isinstance(sim._freeze_gate_current_magemin_domain_verdict, tuple)
+            and len(sim._freeze_gate_current_magemin_domain_verdict) > 3
+        ):
+            sim._freeze_gate_current_magemin_domain_verdict = (
+                sim._freeze_gate_current_magemin_domain_verdict[3]
+            )
+        else:
+            sim._freeze_gate_current_magemin_domain_verdict = (None, ())
         sim._remember_freeze_gate_provider_curve({
             'source': 'gate_liquid_fraction',
             'solidus_T_C': 1200.0, 'liquidus_T_C': 1500.0,
@@ -4415,7 +4441,9 @@ def test_same_hour_held_magemin_curve_is_bound_to_its_domain_verdict(
     assert failed_record['curve']['gate_provider_refusal'][
         'qualification'
     ] == 'held_last_good_curve'
-    assert sim._freeze_gate_held_curve_record['domain_verdict'] is None
+    assert sim._freeze_gate_held_curve_record['domain_verdict'] == (
+        None, (),
+    )
 
     set_bulk(29.999)
     recomputed = sim._freeze_gate_curve_record()
@@ -4424,6 +4452,141 @@ def test_same_hour_held_magemin_curve_is_bound_to_its_domain_verdict(
     assert recomputed['curve'].get('gate_provider_refusal', {}).get(
         'qualification'
     ) != 'held_last_good_curve'
+
+
+def test_worker_timeout_last_good_matches_current_evaluated_silica_verdict(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    _install_magemin_subprocess_gate(sim, monkeypatch)
+
+    def set_bulk(silica_wt_pct):
+        composition_wt_pct = {
+            'SiO2': silica_wt_pct,
+            'MgO': 50.0,
+            'FeO': 100.0 - silica_wt_pct - 50.0,
+        }
+        composition_mol = {
+            species: amount / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            _CLEANED_MELT_ACCOUNT,
+            composition_mol,
+            source='MAGEMin timeout last-good domain test',
+            material_origin='feedstock',
+        )
+        sim.atom_ledger = ledger
+
+    set_bulk(30.001)
+    successful_record = sim._freeze_gate_curve_record()
+    assert successful_record['curve'].get('authority') is None
+    last_good_verdict = sim._freeze_gate_last_good_curve[
+        'magemin_domain_verdict'
+    ]
+    assert last_good_verdict == (None, ())
+
+    set_bulk(29.999)
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    backend = provider._backend
+    timeout_calls = []
+
+    def timeout_worker(**kwargs):
+        timeout_calls.append(kwargs['bulk_projection'].composition_wt_pct)
+        raise EngineWorkerTimeout(
+            'MAGEMin worker', 0.01, phase='job',
+        )
+
+    monkeypatch.setattr(backend, '_call_magemin', timeout_worker)
+    failed_record = sim._freeze_gate_curve_record()
+
+    assert len(timeout_calls) == 2
+    assert failed_record['curve']['gate_provider_refusal'][
+        'qualification'
+    ] == 'first_call_kress91_floor_prediction'
+    assert failed_record['curve'] != successful_record['curve']
+    assert sim._freeze_gate_held_curve_record['domain_verdict'] is not None
+    assert (
+        sim._freeze_gate_held_curve_record['domain_verdict']
+        != last_good_verdict
+    )
+
+
+@pytest.mark.parametrize(
+    ('composition_wt_pct', 'expected_reason'),
+    [
+        pytest.param({'MnO': 100.0}, 'silicate_window', id='no-positive-ig'),
+        pytest.param({}, 'major_sum', id='empty-cleaned-melt'),
+    ],
+)
+def test_freeze_gate_magemin_precheck_skips_silica_verdict(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    composition_wt_pct,
+    expected_reason,
+):
+    import simulator.melt_backend.magemin as magemin_module
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    if composition_wt_pct:
+        composition_mol = {
+            species: amount / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger.load_external_mol(
+            _CLEANED_MELT_ACCOUNT,
+            composition_mol,
+            source='MAGEMin precheck silica verdict regression',
+            material_origin='feedstock',
+        )
+    sim.atom_ledger = ledger
+
+    def unexpected_verdict(*_args, **_kwargs):
+        pytest.fail('precheck refusal must precede the silica verdict helper')
+
+    monkeypatch.setattr(
+        magemin_module,
+        'evaluated_silica_verdict',
+        unexpected_verdict,
+    )
+    key, reason = sim._freeze_gate_cache_key_and_domain(
+        pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
+        fO2_log=sim._freeze_gate_redox_key_fO2_log(
+            fO2_log=float(sim._current_melt_redox_fO2_log()),
+        ),
+    )
+
+    assert key is not None
+    assert reason == expected_reason
 
 
 @pytest.mark.parametrize(

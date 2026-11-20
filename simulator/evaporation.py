@@ -1138,7 +1138,7 @@ class _FlaggedFreezeGateCurveCacheKey(NamedTuple):
     water_mol_fraction: float
     formula_registry_digest: str
     inert_species: tuple[str, ...]
-    magemin_domain_verdict: tuple[bool, tuple[str, ...], str | None]
+    magemin_domain_verdict: tuple[Any, ...]
     redox_state_identity: tuple[tuple[str, Any], ...] | None
 
 
@@ -3526,14 +3526,19 @@ class EvaporationMixin:
         return self._freeze_gate_curve_record(redox_state=redox_state)['curve']
 
     def _remember_freeze_gate_provider_curve(
-        self, curve: dict[str, Any],
+        self,
+        curve: dict[str, Any],
     ) -> dict[str, Any]:
+        magemin_domain_verdict = getattr(
+            self, '_freeze_gate_current_magemin_domain_verdict', None,
+        )
         self._freeze_gate_last_good_curve = {
             'provider': self._liquid_fraction_provider,
             'realized_provider': curve.get('gate_provider_step_down', {}).get('realized_provider'),
             'curve': copy.deepcopy(curve),
             'computed_hour': int(self.melt.hour),
             'composition_wt_pct': self.melt.composition_wt_pct(),
+            'magemin_domain_verdict': copy.deepcopy(magemin_domain_verdict),
             'domain_identity': (
                 curve.get('authority'),
                 copy.deepcopy(curve.get('certified_band')),
@@ -3543,25 +3548,43 @@ class EvaporationMixin:
         return curve
 
     def _hold_freeze_gate_provider_curve(
-        self, failure: Mapping[str, Any], *, timeout_reason: str | None = None,
+        self,
+        failure: Mapping[str, Any],
+        *,
+        timeout_reason: str | None = None,
     ) -> dict[str, Any] | None:
         previous = self._freeze_gate_last_good_curve
         if previous is None or previous['provider'] != self._liquid_fraction_provider:
             return None
         diagnostic = failure['provider_diagnostic']
-        backend_diagnostic = diagnostic.get('backend_diagnostics') or {}
-        authority = diagnostic.get('authority')
-        certified_band = diagnostic.get('certified_band')
-        if authority is None:
-            authority = backend_diagnostic.get('authority')
-        if certified_band is None:
-            certified_band = backend_diagnostic.get('certified_band')
-        current_domain_identity = (
-            authority,
-            copy.deepcopy(certified_band),
-        )
-        if previous.get('domain_identity') != current_domain_identity:
-            return None
+        if self._liquid_fraction_provider == 'magemin':
+            # A failed attempt has no domain verdict. Match the last-good
+            # curve against the current request's pre-dispatch classification,
+            # which is computed by evaluated_silica_verdict without the engine.
+            magemin_domain_verdict = getattr(
+                self, '_freeze_gate_current_magemin_domain_verdict', None,
+            )
+            if (
+                magemin_domain_verdict is None
+                or previous.get('magemin_domain_verdict') is None
+                or previous.get('magemin_domain_verdict')
+                != magemin_domain_verdict
+            ):
+                return None
+        else:
+            backend_diagnostic = diagnostic.get('backend_diagnostics') or {}
+            authority = diagnostic.get('authority')
+            certified_band = diagnostic.get('certified_band')
+            if authority is None:
+                authority = backend_diagnostic.get('authority')
+            if certified_band is None:
+                certified_band = backend_diagnostic.get('certified_band')
+            current_domain_identity = (
+                authority,
+                copy.deepcopy(certified_band),
+            )
+            if previous.get('domain_identity') != current_domain_identity:
+                return None
         realized_provider = previous.get('realized_provider')
         if realized_provider and realized_provider not in {
             attempt['provider'] for attempt in failure['provider_diagnostic'].get(
@@ -3641,6 +3664,28 @@ class EvaporationMixin:
             fO2_log=redox_key_fO2_log,
             **redox_state_kwargs,
         )
+        magemin_domain_verdict = None
+        if (
+            self._liquid_fraction_provider == 'magemin'
+            and magemin_domain_reason is None
+        ):
+            key_domain_verdict = getattr(
+                key,
+                'magemin_domain_verdict',
+                None,
+            )
+            if (
+                isinstance(key_domain_verdict, tuple)
+                and len(key_domain_verdict) > 3
+            ):
+                magemin_domain_verdict = key_domain_verdict[3]
+            else:
+                # The ordinary in-band key deliberately keeps its v7 bytes.
+                # This marker is only the held-curve identity for that verdict.
+                magemin_domain_verdict = (None, ())
+        self._freeze_gate_current_magemin_domain_verdict = copy.deepcopy(
+            magemin_domain_verdict
+        )
         # Classify MAGEMin before reading the held curve. A known held
         # disclosure is replayed into this run; an unknown one is recomputed.
         if magemin_domain_reason is None:
@@ -3649,8 +3694,15 @@ class EvaporationMixin:
                 isinstance(held, Mapping)
                 and held.get('hour') == int(self.melt.hour)
                 and held.get('provider') == self._liquid_fraction_provider
-                and held.get('domain_verdict') == getattr(
-                    key, 'magemin_domain_verdict', None
+                and (
+                    (
+                        magemin_domain_verdict is not None
+                        and held.get('domain_verdict') == magemin_domain_verdict
+                    )
+                    if self._liquid_fraction_provider == 'magemin'
+                    else held.get('domain_verdict') == getattr(
+                        key, 'magemin_domain_verdict', None
+                    )
                 )
             ):
                 held_record = held.get('record')
@@ -3889,9 +3941,7 @@ class EvaporationMixin:
                     self._freeze_gate_held_curve_record = {
                         'hour': int(self.melt.hour),
                         'provider': self._liquid_fraction_provider,
-                        'domain_verdict': getattr(
-                            key, 'magemin_domain_verdict', None
-                        ),
+                        'domain_verdict': magemin_domain_verdict,
                         'record': copy.deepcopy(record),
                     }
                     return record
@@ -4229,6 +4279,7 @@ class EvaporationMixin:
             )
             from simulator.melt_backend import magemin as magemin_module
             from simulator.melt_backend.magemin import (
+                DEFAULT_MAGEMIN_DATABASE,
                 MAGEMinBackend,
                 evaluated_silica_verdict,
             )
@@ -4309,12 +4360,19 @@ class EvaporationMixin:
             projected_valid, projected_warnings, projected_reason = (
                 projected_verdict
             )
-            evaluated_silica = evaluated_silica_verdict(
-                {'process.cleaned_melt': provider_mol},
-                MAGEMinBackend._DEFAULT_DATABASE,
-                species_formula_registry=formula_registry,
-                composition_mol_by_account=True,
+            magemin_domain_reason = exact_reason or projected_reason
+            magemin_domain_valid = (
+                exact_valid
+                and projected_valid
             )
+            evaluated_silica = None
+            if magemin_domain_valid and magemin_domain_reason is None:
+                evaluated_silica = evaluated_silica_verdict(
+                    {'process.cleaned_melt': provider_mol},
+                    DEFAULT_MAGEMIN_DATABASE,
+                    species_formula_registry=formula_registry,
+                    composition_mol_by_account=True,
+                )
             verdict_warnings = [
                 warning
                 for warning in exact_warnings
@@ -4324,30 +4382,40 @@ class EvaporationMixin:
                 )
             ]
             for warning in projected_warnings:
+                is_silica_extrapolation = (
+                    'authority=extrapolated' in warning
+                    and 'SiO2' in warning
+                )
                 if (
-                    not (
-                        'authority=extrapolated' in warning
-                        and 'SiO2' in warning
-                    )
+                    (not is_silica_extrapolation or evaluated_silica is not None)
                     and warning not in verdict_warnings
                 ):
                     verdict_warnings.append(warning)
-            if evaluated_silica is not None:
-                verdict_warnings.append(
-                    'MAGEMin evaluated bulk: authority=extrapolated; '
-                    'certified_band=SiO2 [30, 80] wt%.'
-                )
             if projection_reason is not None:
                 verdict_warnings.append(projection_reason)
-            magemin_domain_reason = exact_reason or projected_reason
-            magemin_domain_valid = (
-                exact_valid
-                and projected_valid
+            silica_band = (
+                (evaluated_silica.get('certified_band') or {}).get(
+                    'sio2_wt_pct'
+                )
+                if evaluated_silica is not None
+                else None
             )
             magemin_domain_verdict = (
-                magemin_domain_valid,
-                tuple(verdict_warnings),
-                magemin_domain_reason or projection_reason,
+                (
+                    magemin_domain_valid,
+                    tuple(verdict_warnings),
+                    magemin_domain_reason or projection_reason,
+                    (
+                        evaluated_silica.get('authority'),
+                        tuple(silica_band or ()),
+                    ),
+                )
+                if evaluated_silica is not None
+                else (
+                    magemin_domain_valid,
+                    tuple(verdict_warnings),
+                    magemin_domain_reason or projection_reason,
+                )
             )
             if magemin_domain_valid:
                 magemin_domain_reason = None
@@ -4714,7 +4782,9 @@ class EvaporationMixin:
             )
             if projected is not None:
                 projected.update(notices)
-                return self._remember_freeze_gate_provider_curve(projected)
+                return self._remember_freeze_gate_provider_curve(
+                    projected,
+                )
             invalid_notice = getattr(
                 self, '_invalid_projected_liquidus_notice', None,
             )
@@ -4791,7 +4861,9 @@ class EvaporationMixin:
                     self,
                     GateCurveProviderOutcome.PRODUCED,
                 )
-                return self._remember_freeze_gate_provider_curve(curve)
+                return self._remember_freeze_gate_provider_curve(
+                    curve,
+                )
             if _liquidus_fraction_inconsistent_since(reasons, reason_mark):
                 return None
             reasons.append('gate liquid fraction table invalid')
@@ -4807,7 +4879,9 @@ class EvaporationMixin:
                 self,
                 GateCurveProviderOutcome.PRODUCED,
             )
-            return self._remember_freeze_gate_provider_curve(curve)
+            return self._remember_freeze_gate_provider_curve(
+                curve,
+            )
         record_gate_curve_provider_outcome(
             self,
             GateCurveProviderOutcome.FAILED,
