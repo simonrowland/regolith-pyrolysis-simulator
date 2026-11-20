@@ -60,6 +60,20 @@ def test_runtime_pressure_floor_is_reported_when_area_is_available() -> None:
     with pytest.raises(Hashimoto1983Refusal) as exc_info:
         require_runtime_inputs(mutated)
     assert exc_info.value.reason == "runtime_pressure_below_implemented_floor"
+    assert str(exc_info.value) == (
+        "runtime_pressure_below_implemented_floor: "
+        "0.000133322 mbar < 0.001 mbar"
+    )
+
+
+def test_runtime_pressure_override_cannot_bypass_printed_pressure_floor() -> None:
+    preset = load_hashimoto_preset(DEFAULT_PRESET_PATH)
+    preset["free_evaporation_geometry"]["exposed_melt_area_m2"] = 1.0e-6
+    preset["vacuum"]["runtime_pressure_mbar"] = 0.1
+
+    with pytest.raises(Hashimoto1983Refusal) as exc_info:
+        require_runtime_inputs(preset)
+    assert exc_info.value.reason == "runtime_pressure_below_implemented_floor"
 
 
 def test_admitted_rows_have_pinned_record_count_and_skip_superseded_rows() -> None:

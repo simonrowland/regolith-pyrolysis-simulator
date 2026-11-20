@@ -4005,11 +4005,12 @@ def test_lab_schedule_pressure_floor_endpoint_is_explicit() -> None:
     below_floor["chamber_pressure_mbar"][0]["value"] = (
         LAB_SCHEDULE_PRESSURE_FLOOR_MBAR / 2.0
     )
-    with pytest.raises(
-        LabScheduleValidationError,
-        match="lab_schedule_pressure_below_implemented_floor",
-    ):
+    with pytest.raises(LabScheduleValidationError) as exc_info:
         normalize_lab_schedule(below_floor)
+    assert str(exc_info.value) == (
+        "lab_schedule_pressure_below_implemented_floor: "
+        "0.0005 mbar < 0.001 mbar"
+    )
 
 
 def test_lab_schedule_pO2_setpoint_above_total_pressure_clips_per_hour() -> None:
