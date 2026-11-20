@@ -38,7 +38,7 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
         "61b0c0bb1105c233265d2e0175899f2c28bb0db324798c8e850025c8864acac0"
     ),
     Engine.OPENIMCC: (
-        "87e4d99db4de9feed4a80902d51b1ef2f8c137b548b07ab44fc768dd6bcee33e"
+        "23d00bd8a218fca557c7b060458ceaaef1494017a76ee700dcee7ee9b7d6ea74"
     ),
 }
 # Green's OpenIMCC zero-offset row used default d066-v1 (version 1.0.3-d066-v1,
