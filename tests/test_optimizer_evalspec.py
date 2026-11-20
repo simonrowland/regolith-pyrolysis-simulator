@@ -4036,6 +4036,7 @@ def test_lab_schedule_pressure_mutation_below_floor_runs_with_notice(
     session = _force_builtin_run_from_config(run_config)._start_session()
     row = session.advance().per_hour_summary
     assert row["pO2_enforcement"]["p_total_mbar"] == pytest.approx(pressure_mbar)
+    assert session.simulator.melt.p_total_mbar == pytest.approx(pressure_mbar)
     notices = runtime_schedule["pressure_domain_notices"]
     assert len(notices) == 2
     for notice in notices:
@@ -4046,6 +4047,34 @@ def test_lab_schedule_pressure_mutation_below_floor_runs_with_notice(
             LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
         )
     assert spec.lab_schedule["pressure_domain_notices"] == notices
+    assert row["pO2_enforcement"]["pressure_domain_notices"] == [
+        dict(notice) for notice in notices
+    ]
+
+
+def test_unscheduled_c2a_still_applies_knudsen_pressure_adjustment() -> None:
+    _, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        _campaign_window_profile(
+            "C2A_continuous",
+            None,
+            None,
+            1,
+            profile_id="unscheduled-c2a",
+        ),
+        RecipeSchema(),
+    )
+    sim = _force_builtin_run_from_config(run_config)._start_session().simulator
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.p_total_mbar = 1.0e-6
+    sim.melt.pO2_mbar = 0.0
+
+    sim._apply_c2a_knudsen_pressure_adjustment()
+
+    assert sim.campaign_mgr.last_pO2_enforcement is None
+    assert sim.melt.p_total_mbar == pytest.approx(5.0)
 
 
 @pytest.mark.parametrize(
@@ -4302,6 +4331,21 @@ def test_interpolate_schedule_points_refuses_extrapolation() -> None:
             match="lab_schedule_sample_time_outside_declared_window",
         ):
             interpolate_schedule_points(points, sample_time_h)
+
+
+def test_interpolate_schedule_points_preserves_positive_descending_endpoint() -> None:
+    schedule = normalize_lab_schedule(
+        _lab_schedule(
+            duration_h=1.0,
+            temperature_points=((0.0, 25.0), (1.0, 1200.0)),
+            pressure_points=((0.0, 0.01), (1.0, 1.0e-19)),
+            furnace_ceiling_C=1300.0,
+        )
+    )
+
+    assert interpolate_schedule_points(
+        schedule["chamber_pressure_mbar"], 1.0
+    ) == 1.0e-19
 
 
 def test_non_string_mapping_keys_raise() -> None:

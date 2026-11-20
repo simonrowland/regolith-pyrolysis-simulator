@@ -4077,6 +4077,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ):
             return
 
+        # Scheduled lab pressure is an explicit experimental control. This
+        # automatic sweep adjustment supplies the default for unscheduled C2A.
+        if getattr(self.campaign_mgr, 'last_pO2_enforcement', None) is not None:
+            return
         from simulator.campaigns import (
             C2A_STAGED_PN2_KNUDSEN_FLOOR_ACTION,
             C2A_STAGED_PN2_SWEEP_MAX_MBAR,
@@ -6276,7 +6280,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pO2_mbar = self._finite_float_or_none(getattr(self.melt, 'pO2_mbar', None))
         if pO2_mbar is None or pO2_mbar <= 0.0:
             return None, 'no_positive_controlled_pO2'
-        return math.log10(pO2_mbar / 1000.0), 'controlled_o2_pO2_mbar'
+        pO2_bar = pO2_mbar / 1000.0
+        if pO2_bar > 0.0:
+            return math.log10(pO2_bar), 'controlled_o2_pO2_mbar'
+        return math.log10(pO2_mbar) - 3.0, 'controlled_o2_pO2_mbar'
 
     def _reset_o2_bubbler_telemetry_for_hour(self) -> None:
         retained_external_o2_mol = self._o2_bubbler_external_o2_overhead_mol()
