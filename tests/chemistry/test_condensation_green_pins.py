@@ -150,8 +150,11 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
     # and the terminal rises by that mass. t-1604 remains D_AB at
     # T_film = (T_gas,in + T_wall) / 2, with T_gas,in now this stage's
     # bulk inlet. b1113 remains the removal of the designated-species
-    # skip. Inlets are unchanged. full_lunar is still the t-1604
-    # measurement and was not re-run.
+    # skip. full_lunar was re-run on studio-2 at a2299343eb (b271 regen
+    # tip) and matches the d-441 owner card for b265: under d-402 each
+    # stage captures what its wall saturation pressure condenses, so
+    # Stage 4 now holds Fe 74.20, SiO 255.54 and Mg 30.11 kg, and the
+    # terminal falls (Fe 85.64 -> 18.04, SiO 311.51 -> 59.99 kg).
     expected = json.loads(PINS.read_text())[name]
     # Collect every species before failing: stopping at the first mismatch
     # hid stale Cr/SiO pins behind an Fe miss through two repins.
@@ -217,6 +220,8 @@ def _without_engine_versions(value):
 @pytest.mark.xdist_group("magemin_fullrun_c")
 @pytest.mark.timeout(5400)
 def test_green_full_lunar_capture_pin(route_totals, tmp_path):
+    # Current full_lunar pins: studio-2 actuals at a2299343eb, equal to the
+    # d-441 owner card (b265 values). History of the earlier pins follows.
     # full_lunar Fe capture totals are the studio-3 actuals (pins2 log, tree
     # 9666fc129 plus the de32c69ca runner regen); Cr and SiO are the studio-3
     # actuals at 16fcc5985, identical across two isolated runs. Lunar full runs
