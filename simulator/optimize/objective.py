@@ -6103,19 +6103,30 @@ def _marginal_extraction_cost_summary(
         sim,
         cost_parameters=cost_parameters,
     )
-    # Marginal extraction cost = variable energy + reagent replacement loss +
-    # per-run furnace depreciation. Capital purchase and launch costs are not
-    # included in this run-local objective.
+    collector_stage_hardware = _collector_stage_hardware_cost_summary(
+        sim,
+        cost_parameters=cost_parameters,
+    )
+    # Candidate collector hardware is priced beside variable costs so area
+    # affects the existing optimizer cost objective.
     depreciation_usd = depreciation["depreciation_expense_per_run_usd"]
+    collector_stage_hardware_usd = collector_stage_hardware[
+        "hardware_capital_cost_usd"
+    ]
     total = (
         None
-        if depreciation_usd is None or not carrier_cost_available
+        if (
+            depreciation_usd is None
+            or not carrier_cost_available
+            or is_unavailable_quantity(collector_stage_hardware_usd)
+        )
         else (
             electrical_cost_usd
             + solar_heat_cost_usd
             + float(carrier_cost_usd)
             + float(reagent["reagent_cost_usd"])
             + float(depreciation_usd)
+            + float(collector_stage_hardware_usd)
         )
     )
     return MappingProxyType({
@@ -6136,6 +6147,82 @@ def _marginal_extraction_cost_summary(
         "carrier_cost_usd": carrier_cost_usd,
         "reagent": reagent,
         "depreciation": depreciation,
+        "collector_stage_hardware": collector_stage_hardware,
+    })
+
+
+def _collector_stage_hardware_cost_summary(
+    sim: Any,
+    *,
+    cost_parameters: CostParameters,
+) -> Mapping[str, Any]:
+    """Price absolute collector stage area using configured liner mass."""
+
+    condensation_model = getattr(sim, "condensation_model", None)
+    stage_areas = getattr(condensation_model, "stage_area_m2_by_stage", None)
+    if not isinstance(stage_areas, MappingABC):
+        unavailable = unavailable_quantity(
+            reason="collector_stage_area_inputs_unavailable",
+            units="USD",
+        )
+        return MappingProxyType({
+            "status": "unavailable",
+            "hardware_capital_cost_usd": unavailable,
+            "reason": unavailable["reason"],
+        })
+    collector_rows: dict[str, Mapping[str, float]] = {}
+    collector_stage_cost_usd = 0.0
+    for stage_key, density_kg_m3 in sorted(
+        cost_parameters.condenser_stage_bulk_density_kg_m3.items()
+    ):
+        if stage_key not in stage_areas:
+            unavailable = unavailable_quantity(
+                reason=f"collector_stage_area_missing:{stage_key}",
+                units="USD",
+            )
+            return MappingProxyType({
+                "status": "unavailable",
+                "hardware_capital_cost_usd": unavailable,
+                "reason": unavailable["reason"],
+            })
+        area_m2 = _finite_float(
+            stage_areas[stage_key], f"stage_areas_m2.{stage_key}"
+        )
+        if area_m2 < 0.0:
+            unavailable = unavailable_quantity(
+                reason=f"collector_stage_area_invalid:{stage_key}",
+                units="USD",
+            )
+            return MappingProxyType({
+                "status": "unavailable",
+                "hardware_capital_cost_usd": unavailable,
+                "reason": unavailable["reason"],
+            })
+        # Collector wall mass = area [m²] × thickness [m] × bulk density
+        # [kg/m³], giving kg; multiply by the owner-ratified delivery price
+        # [USD/kg] for installed collector area cost.
+        mass_kg = (
+            area_m2
+            * cost_parameters.condenser_stage_wall_thickness_m
+            * density_kg_m3
+        )
+        stage_cost_usd = mass_kg * cost_parameters.import_delivery_cost_per_kg
+        collector_stage_cost_usd += stage_cost_usd
+        collector_rows[stage_key] = MappingProxyType({
+            "area_m2": area_m2,
+            "bulk_density_kg_m3": density_kg_m3,
+            "wall_thickness_m": cost_parameters.condenser_stage_wall_thickness_m,
+            "mass_kg": mass_kg,
+            "cost_usd": stage_cost_usd,
+        })
+    return MappingProxyType({
+        "status": "ok",
+        "collector_stage_costs": MappingProxyType(collector_rows),
+        "collector_stage_cost_usd": collector_stage_cost_usd,
+        "collector_stage_cost_source_status": (
+            "FLAGGED provisional d-283 material mass; d-389 delivery cost ratified"
+        ),
+        "hardware_capital_cost_usd": collector_stage_cost_usd,
     })
 
 

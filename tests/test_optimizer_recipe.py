@@ -601,11 +601,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
     assert unpinned is schema
-    assert len(paths) == 65
-    assert (
-        hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "2ec62a88bfd19a7ada68b2cef06882b85d218b2e57dfc753d5d3feb1cc91dec7"
-    )
+    assert len(paths) == 70
+    assert hashlib.sha256(
+        canonical_json_dumps(paths).encode("utf-8")
+    ).hexdigest() == "dcd8a3381775c4587da583c882f8e0ba08cb3c266aad481985c7e292ce8cf5d0"
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
         FEEDSTOCK,
@@ -823,7 +822,7 @@ def test_furnace_max_t_c_bounds_are_allowlist_epoch_pinned() -> None:
     # bound values meant a failure named none of them -- the diff said only "at
     # index 2", and an epoch drift and a bounds drift were indistinguishable.
     # One assertion per fact, so the failure names the fact.
-    assert schema.allowlist_version == "allowlist-v12"
+    assert schema.allowlist_version == "allowlist-v13"
     assert O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION == "allowlist-v12"
     # The knob's bounds ARE the furnace envelope -- that identity is the claim
     # worth pinning here. The envelope's own VALUE is owned by the catalog and
@@ -2233,6 +2232,16 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
         "campaigns.C6.pO2_mbar_default": (0.08, 0.35),
         "campaigns.C6.p_total_mbar_default": (0.08, 0.35),
     }
+    optimizer_bounds = yaml.safe_load(SETPOINTS_PATH.read_text())[
+        "condenser_geometry"
+    ]["optimizer_bounds"]
+    stage_area_bounds = tuple(optimizer_bounds["stage_area_m2"])
+    expected.update(
+        {
+            f"condenser_geometry.stage_areas_m2.{stage}": stage_area_bounds
+            for stage in recipe_module.CONDENSER_STAGE_AREA_KEYS
+        }
+    )
     schema = RecipeSchema()
     actual = {
         ".".join(spec.path): (
@@ -2248,11 +2257,33 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
         )
     }
 
-    assert len(actual) == 43
+    assert len(actual) == 48
     assert actual == {
         path: (type(low), low, type(high), high)
         for path, (low, high) in expected.items()
     }
+
+
+def test_d283_stage_area_knobs_are_log_bounded_doe_paths() -> None:
+    schema = RecipeSchema()
+    bounds = yaml.safe_load(SETPOINTS_PATH.read_text())[
+        "condenser_geometry"
+    ]["optimizer_bounds"]["stage_area_m2"]
+    area_path = ("condenser_geometry", "stage_areas_m2", "fe_stage1")
+    spec = schema.spec_for(area_path)
+
+    assert spec.scale == "log"
+    assert (spec.low, spec.high) == pytest.approx(tuple(bounds))
+    assert spec.bounds_source == (
+        "setpoints:condenser_geometry.optimizer_bounds.stage_area_m2"
+    )
+    assert set(recipe_module.CONDENSER_STAGE_AREA_KNOB_PATHS) <= set(
+        doe_module.PHASE_ORDER_CONTINUOUS_KNOBS
+    )
+    patch = RecipePatch({area_path: spec.low}).validated(schema)
+    assert schema.to_setpoints_patch(patch)["condenser_geometry"][
+        "stage_areas_m2"
+    ]["fe_stage1"] == pytest.approx(spec.low)
 
 
 def test_recipe_schema_uses_supplied_setpoints_for_derived_bounds() -> None:

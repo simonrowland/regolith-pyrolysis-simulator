@@ -80,6 +80,13 @@ seed_recipes:
     rationale: Canonical continuous Path A seed with the 2200 C zirconia ceiling; inherited C2A ramp settings preserve the full 225 hour runner horizon.
     patch:
       furnace_max_T_C: 2200
+      condenser_geometry:
+        stage_areas_m2:
+          fe_stage1: 0.236
+          cr_stage2: 0.050893800988154644
+          sio_stage3: 0.06785840131753954
+          alkali_stage4: 0.05099999999999999
+          k_stage4b: 0.064
       campaigns:
         C2A_continuous:
           dT_dt_C_per_hr:

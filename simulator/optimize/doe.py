@@ -21,6 +21,7 @@ from simulator.optimize.recipe import (
     C2A_STAGED_P_TOTAL_MBAR_DEFAULT_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     C5_GUARD,
+    CONDENSER_STAGE_AREA_KNOB_PATHS,
     ConditionalExecutionContext,
     KeyPath,
     RecipePatch,
@@ -83,6 +84,7 @@ PHASE_ORDER_CONTINUOUS_KNOBS: tuple[KeyPath, ...] = (
     ("campaigns", "C0", "stage0_phase_temperature_C"),
     ("campaigns", "C0", "stage0_phase_pressure_mbar"),
     ("campaigns", "C0", "stage0_phase_pO2_mbar"),
+    *CONDENSER_STAGE_AREA_KNOB_PATHS,
 )
 
 

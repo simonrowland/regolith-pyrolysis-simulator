@@ -22,8 +22,20 @@ from simulator.canonical import canonical_json_dumps
 
 KeyPath = tuple[str, ...]
 
+CONDENSER_STAGE_AREA_KEYS = (
+    "fe_stage1",
+    "cr_stage2",
+    "sio_stage3",
+    "alkali_stage4",
+    "k_stage4b",
+)
+CONDENSER_STAGE_AREA_KNOB_PATHS: tuple[KeyPath, ...] = tuple(
+    ("condenser_geometry", "stage_areas_m2", stage)
+    for stage in CONDENSER_STAGE_AREA_KEYS
+)
+
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v12"
+allowlist_version = "allowlist-v13"
 O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v12"
 O2_BUBBLER_DEFAULT_ETA_ABSORB = 0.75
 _RECIPE_ENVELOPE_KEYS = frozenset({"metadata", "cost_parameters"})
@@ -1348,6 +1360,18 @@ class RecipeSchema:
                 "condensation_train stage 6/7 interface envelope: "
                 "setpoints.yaml condensation_train.metals_train bands"
             ),
+        ),
+        *(
+            _knob(
+                f"condenser_geometry.stage_areas_m2.{stage}",
+                units="m2",
+                bounds_source=(
+                    "setpoints:condenser_geometry.optimizer_bounds."
+                    "stage_area_m2"
+                ),
+                scale="log",
+            )
+            for stage in CONDENSER_STAGE_AREA_KEYS
         ),
     )
 

@@ -988,6 +988,41 @@ def _profile_copy(feedstock: str) -> dict:
     return copy.deepcopy(yaml.safe_load(path.read_text()))
 
 
+def test_d283_hero_stage_areas_are_profile_knobs_with_absolute_seeds() -> None:
+    path = (
+        DEFAULT_DATA_DIR
+        / "optimize_profiles"
+        / "hero"
+        / "lunar_mare_low_ti.yaml"
+    )
+    profile = validate_profile(
+        yaml.safe_load(path.read_text(encoding="utf-8")),
+        expected_feedstock="lunar_mare_low_ti",
+    )
+    from simulator.optimize.reoptimize import _profile_knob_paths
+
+    area_knobs = {
+        f"condenser_geometry.stage_areas_m2.{stage}"
+        for stage in (
+            "fe_stage1",
+            "cr_stage2",
+            "sio_stage3",
+            "alkali_stage4",
+            "k_stage4b",
+        )
+    }
+    assert area_knobs <= set(_profile_knob_paths(profile))
+    setpoints = yaml.safe_load((DEFAULT_DATA_DIR / "setpoints.yaml").read_text())
+    profile_areas = profile["seed_recipes"][0]["patch"]["condenser_geometry"][
+        "stage_areas_m2"
+    ]
+    configured_areas = setpoints["condenser_geometry"]["stage_areas_m2"]
+    assert all(
+        profile_areas[stage] == configured_areas[stage]
+        for stage in (path.rsplit(".", 1)[-1] for path in area_knobs)
+    )
+
+
 def _composition_profile() -> dict:
     profile = _profile_copy("lunar_mare_low_ti")
     profile["constraints"]["gates"] = [

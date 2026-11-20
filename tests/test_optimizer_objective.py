@@ -80,6 +80,16 @@ def _furnace_test_cost_parameters() -> CostParameters:
     )
 
 
+def _zero_collector_area_map() -> dict[str, float]:
+    return {
+        "fe_stage1": 0.0,
+        "cr_stage2": 0.0,
+        "sio_stage3": 0.0,
+        "alkali_stage4": 0.0,
+        "k_stage4b": 0.0,
+    }
+
+
 def test_dominates_requires_strict_improvement() -> None:
     assert dominates(
         {"oxygen_kg": 2.0, "energy_kWh": 4.0},
@@ -674,6 +684,9 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
             "electrical": 10.0,
             "evaporation_thermal": 0.0,
         },
+        condensation_model=SimpleNamespace(
+            stage_area_m2_by_stage=_zero_collector_area_map()
+        ),
         record=SimpleNamespace(
             cost_rollup={
                 "run_input_cost": {
@@ -953,9 +966,22 @@ def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() 
             "electrical": 1.0,
             "evaporation_thermal": 0.0,
         },
+        condensation_model=SimpleNamespace(
+            stage_area_m2_by_stage={
+                "fe_stage1": 0.2,
+                "cr_stage2": 0.0,
+                "sio_stage3": 0.0,
+                "alkali_stage4": 0.0,
+                "k_stage4b": 0.0,
+            }
+        ),
         record=SimpleNamespace(cost_rollup={}),
     )
 
+    collector_hardware = objective_module._collector_stage_hardware_cost_summary(
+        sim,
+        cost_parameters=cost_parameters,
+    )
     assert _metric_value(
         "throughput_cost_owner_ratify_usd",
         sim,
@@ -966,7 +992,9 @@ def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() 
         {},
         run_execution=SimpleNamespace(simulator=sim),
         cost_parameters=cost_parameters,
-    ) == pytest.approx(67.0)
+    ) == pytest.approx(
+        67.0 + collector_hardware["hardware_capital_cost_usd"]
+    )
 
 
 def test_marginal_cost_prices_electrical_and_evaporation_thermal_separately() -> None:
@@ -988,6 +1016,9 @@ def test_marginal_cost_prices_electrical_and_evaporation_thermal_separately() ->
             "electrical": 2.0,
             "evaporation_thermal": 3.0,
         },
+        condensation_model=SimpleNamespace(
+            stage_area_m2_by_stage=_zero_collector_area_map()
+        ),
         record=SimpleNamespace(cost_rollup={}),
     )
 
@@ -999,6 +1030,49 @@ def test_marginal_cost_prices_electrical_and_evaporation_thermal_separately() ->
         run_execution=SimpleNamespace(simulator=sim),
         cost_parameters=cost_parameters,
     ) == pytest.approx(32.0)
+
+
+def test_collector_hardware_cost_scales_with_configured_area() -> None:
+    areas = {
+        "fe_stage1": 0.2,
+        "cr_stage2": 0.1,
+        "sio_stage3": 0.3,
+        "alkali_stage4": 0.05,
+        "k_stage4b": 0.04,
+    }
+    sim = SimpleNamespace(
+        condensation_model=SimpleNamespace(stage_area_m2_by_stage=areas),
+    )
+    before = objective_module._collector_stage_hardware_cost_summary(
+        sim,
+        cost_parameters=_furnace_test_cost_parameters(),
+    )
+    fe_cost = before["collector_stage_costs"]["fe_stage1"]["cost_usd"]
+    areas["fe_stage1"] *= 2.0
+    after = objective_module._collector_stage_hardware_cost_summary(
+        sim,
+        cost_parameters=_furnace_test_cost_parameters(),
+    )
+
+    assert after["collector_stage_cost_usd"] == pytest.approx(
+        before["collector_stage_cost_usd"] + fe_cost
+    )
+
+
+def test_collector_hardware_cost_refuses_missing_stage_area() -> None:
+    summary = objective_module._collector_stage_hardware_cost_summary(
+        SimpleNamespace(
+            condensation_model=SimpleNamespace(
+                stage_area_m2_by_stage={"cr_stage2": 0.1}
+            )
+        ),
+        cost_parameters=_furnace_test_cost_parameters(),
+    )
+
+    assert summary["status"] == "unavailable"
+    assert summary["hardware_capital_cost_usd"]["reason"] == (
+        "collector_stage_area_missing:alkali_stage4"
+    )
 
 
 def test_cost_objective_ranking_prices_pumping_sidecar() -> None:
@@ -1045,6 +1119,9 @@ def test_cost_objective_ranking_prices_pumping_sidecar() -> None:
                 "electrical": base_energy_kWh,
                 "evaporation_thermal": 0.0,
             },
+            condensation_model=SimpleNamespace(
+                stage_area_m2_by_stage=_zero_collector_area_map()
+            ),
             record=SimpleNamespace(cost_rollup=cost_rollup),
         )
 
