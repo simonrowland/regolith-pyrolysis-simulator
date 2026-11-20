@@ -301,7 +301,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'class:simulator/reduced_real_determinism.py:PT1PersistentEquilibriumStore': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 1754,
+        "line": 1748,
         "kind": 'class',
         "name": 'PT1PersistentEquilibriumStore',
         "carries_disclosure": True,
@@ -749,7 +749,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/reduced_real_determinism.py:_source_module_digest': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 5034,
+        "line": 5028,
         "kind": 'lru',
         "name": '_source_module_digest',
         "carries_disclosure": False,
@@ -965,7 +965,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:published_cache': {
         "path": 'simulator/core.py',
-        "line": 5590,
+        "line": 5595,
         "kind": 'store',
         "name": 'published_cache',
         "carries_disclosure": False,
@@ -973,7 +973,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:rates_cache': {
         "path": 'simulator/core.py',
-        "line": 7811,
+        "line": 7837,
         "kind": 'store',
         "name": 'rates_cache',
         "carries_disclosure": False,
@@ -1133,7 +1133,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/reduced_real_determinism.py:_entries': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 444,
+        "line": 443,
         "kind": 'store',
         "name": '_entries',
         "carries_disclosure": True,
@@ -1141,7 +1141,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/reduced_real_determinism.py:physics_bucket_entries': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 445,
+        "line": 444,
         "kind": 'store',
         "name": 'physics_bucket_entries',
         "carries_disclosure": False,
