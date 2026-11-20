@@ -357,6 +357,15 @@ def test_c2a_staged_knudsen_floor_updates_stage_and_sso_evidence():
     sim._condensation_model = CondensationModel(
         CondensationTrain.create_default()
     )
+    # The property applies the collection route, then copies retained vapor,
+    # before it returns the model this test already built. The route is a
+    # no-op so that default train stays the floor input. Empty retained
+    # vapor is not an input to the floor formula.
+    sim.train = sim._condensation_model.train
+    sim.atom_ledger = SimpleNamespace(
+        physical_mol_by_account=lambda _account: {},
+        last_physical_mol_projection={},
+    )
     sim.overhead = SimpleNamespace(
         composition={"N2": 1.0e-6},
         pressure_mbar=1.0e-6,
@@ -364,6 +373,7 @@ def test_c2a_staged_knudsen_floor_updates_stage_and_sso_evidence():
     )
     sim._overhead_model = sim.overhead
     sim.campaign_mgr = SimpleNamespace(
+        apply_collection_route=lambda _melt, _train: None,
         last_c2a_staged_gas_control={
             "stage_name": "sio_window",
             "gas_cover_mode": "pn2_sweep",
