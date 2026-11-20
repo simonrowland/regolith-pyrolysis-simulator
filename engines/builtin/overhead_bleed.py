@@ -53,6 +53,13 @@ class EffectiveTransportCapacity:
     upstream_pressure_bar: float
     downstream_pressure_bar: float
     binding_cause: str
+    required_throat_diameter_m: float | None = None
+    required_throat_diameter_status: str = "unavailable_geometry_not_supplied"
+    required_slider_vane_open_fraction: float | None = None
+    required_slider_vane_open_fraction_status: str = (
+        "unavailable_geometry_not_supplied"
+    )
+    retained_holdup_after_tick_kg: float = 0.0
 
 
 def controlled_flow_capacity(
@@ -108,6 +115,12 @@ def controlled_flow_capacity(
     )
     demand_flux = evolved_flux + holdup_drain_flux
     swallowed_flux = min(demand_flux, effective_capacity)
+    retained_after_tick = max(
+        0.0,
+        retained_holdup
+        + evolved_flux * tick_duration_hr
+        - swallowed_flux * tick_duration_hr,
+    )
     saturation = (
         demand_flux / effective_capacity
         if effective_capacity > 0.0
@@ -151,6 +164,7 @@ def controlled_flow_capacity(
         upstream_pressure_bar=upstream_pressure,
         downstream_pressure_bar=downstream_pressure,
         binding_cause=binding_cause,
+        retained_holdup_after_tick_kg=retained_after_tick,
     )
 
 

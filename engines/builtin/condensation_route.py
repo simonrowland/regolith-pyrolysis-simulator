@@ -15,7 +15,8 @@ The provider:
 - reads ``process.overhead_gas``,
   ``process.condensation_retained_holdup``,
   ``process.condensation_train``, ``process.wall_deposit``, and
-  declared product bins from the account view -- the accounts the
+  declared product bins from the account view, including the Stage-3
+  Mn-cartridge account -- the accounts the
   deposition leg touches (debit vapor from overhead, credit deposits).
   ``process.cleaned_melt`` is NOT in the declared set: the
   EVAPORATION_TRANSITION provider already owns the melt -> overhead
@@ -58,7 +59,7 @@ time.
 
 Account declaration: ``process.overhead_gas``,
 ``process.condensation_retained_holdup``, ``process.condensation_train``,
-and ``process.wall_deposit``. The
+``terminal.mn_cartridge_stored``, and ``process.wall_deposit``. The
 deposition leg is strictly an overhead -> destination transfer; declaring
 ``process.cleaned_melt`` here would be an account-scope leak (the melt is
 the EVAPORATION_TRANSITION provider's responsibility, not ours). The
@@ -91,7 +92,10 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.account_ids import CONDENSATION_RETAINED_HOLDUP_ACCOUNT
+from simulator.account_ids import (
+    CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
+)
 from simulator.condensation import (
     C4B_WALL_ROUTE_ORDER,
     WALL_DEPOSIT_ACCOUNT,
@@ -100,6 +104,10 @@ from simulator.condensation import (
 )
 from simulator.state import (
     declared_wall_deposit_accounts,
+)
+
+_INVALID_CONDENSATION_PRODUCT_ACCOUNT_FRACTIONS = (
+    "invalid_condensation_product_account_fractions"
 )
 
 
@@ -122,6 +130,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         RETAINED_HOLDUP_ACCOUNT,
         WALL_DEPOSIT_ACCOUNT,
         CHROMIUM_CONDENSED_ACCOUNT,
+        MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
     })
 
     def __init__(self, wall_deposit_accounts: Iterable[str] = ()):
@@ -288,7 +297,9 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             )
         )
 
-        credits = self._credits_by_product_account(condensed_product_mol, sp_data)
+        credits = self._credits_by_product_account(
+            condensed_product_mol, sp_data, vapor_species=species
+        )
         # Prior retained vapor retries only through stable baffle chemistry;
         # newly arriving vapor keeps this tick's physical wall split. Merging
         # identical product/account components lets prior+current cross the
@@ -301,7 +312,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             resolve_species_formula,
         )
         prior_credits = self._credits_by_product_account(
-            prior_product_mol, sp_data
+            prior_product_mol, sp_data, vapor_species=species
         )
         prior_credits_materializable = bool(prior_credits) and all(
             float(mol)
@@ -606,27 +617,87 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             for product, raw_account in raw_product_accounts.items():
                 product_name = str(product)
                 account = str(raw_account or "")
-                if account not in self._declared_accounts():
+                account_refusal = self._product_account_refusal_reason(
+                    product_name, account, species
+                )
+                if account_refusal is not None:
                     return self._route_refusal(
-                        "undeclared_condensation_product_account",
+                        account_refusal,
                         control_audit,
                         field="condensation_product_accounts",
                         product=product_name,
                         account=account,
                     )
+
+        raw_account_fractions = sp_data.get(
+            "condensation_product_account_fractions"
+        )
+        if raw_account_fractions is not None:
+            raw_ratios = sp_data.get(
+                "condensation_products_mol_per_mol_vapor"
+            )
+            produced_products = (
+                {str(product) for product in raw_ratios}
+                if isinstance(raw_ratios, Mapping)
+                else {species}
+            )
+            if not isinstance(raw_account_fractions, Mapping):
+                return self._route_refusal(
+                    _INVALID_CONDENSATION_PRODUCT_ACCOUNT_FRACTIONS,
+                    control_audit,
+                    field="condensation_product_account_fractions",
+                )
+            for product, raw_fractions in raw_account_fractions.items():
+                product_name = str(product)
                 if (
-                    account == "process.overhead_gas"
-                    and (
-                        product_name == species
-                        or product_name not in self.GASEOUS_CONDENSATION_COPRODUCTS
-                    )
+                    not product_name
+                    or product_name not in produced_products
+                    or not isinstance(raw_fractions, Mapping)
+                    or not raw_fractions
                 ):
                     return self._route_refusal(
-                        "invalid_gaseous_condensation_coproduct",
+                        _INVALID_CONDENSATION_PRODUCT_ACCOUNT_FRACTIONS,
                         control_audit,
-                        field="condensation_product_accounts",
+                        field="condensation_product_account_fractions",
                         product=product_name,
-                        account=account,
+                    )
+                total_fraction = 0.0
+                for raw_account, raw_fraction in raw_fractions.items():
+                    account = str(raw_account)
+                    try:
+                        if not is_declared_real_scalar(
+                            raw_fraction, allow_numeric_str=True
+                        ):
+                            raise TypeError
+                        fraction = float(raw_fraction)
+                    except (TypeError, ValueError):
+                        fraction = math.nan
+                    account_refusal = self._product_account_refusal_reason(
+                        product_name, account, species
+                    )
+                    if (
+                        account_refusal is not None
+                        or not math.isfinite(fraction)
+                        or not 0.0 < fraction <= 1.0
+                    ):
+                        reason = account_refusal or (
+                            _INVALID_CONDENSATION_PRODUCT_ACCOUNT_FRACTIONS
+                        )
+                        return self._route_refusal(
+                            reason,
+                            control_audit,
+                            field="condensation_product_account_fractions",
+                            product=product_name,
+                            account=account,
+                        )
+                    total_fraction += fraction
+                if total_fraction > 1.0:
+                    return self._route_refusal(
+                        _INVALID_CONDENSATION_PRODUCT_ACCOUNT_FRACTIONS,
+                        control_audit,
+                        field="condensation_product_account_fractions",
+                        product=product_name,
+                        total_fraction=total_fraction,
                     )
 
         raw_wall_fraction = controls.get("wall_deposit_fraction", 0.0)
@@ -1316,25 +1387,71 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         self,
         condensed_product_mol: Mapping[str, float],
         sp_data: Mapping[str, Any],
+        *,
+        vapor_species: str,
     ) -> dict[str, dict[str, float]]:
         product_accounts = dict(
             sp_data.get("condensation_product_accounts") or {}
         )
+        account_fractions = dict(
+            sp_data.get("condensation_product_account_fractions") or {}
+        )
         credits: dict[str, dict[str, float]] = {}
         for product, mol in condensed_product_mol.items():
-            account = str(
+            default_account = str(
                 product_accounts.get(product) or "process.condensation_train"
             )
-            if account not in self._declared_accounts():
-                raise ValueError(
-                    f"undeclared condensation product account {account!r}"
+            refusal_reason = self._product_account_refusal_reason(
+                str(product), default_account, vapor_species
+            )
+            if refusal_reason is not None:
+                if refusal_reason == "undeclared_condensation_product_account":
+                    raise ValueError(
+                        f"undeclared condensation product account "
+                        f"{default_account!r}"
+                    )
+                raise ValueError(refusal_reason)
+            fractions = account_fractions.get(product, {})
+            allocated_fraction = 0.0
+            for raw_account, raw_fraction in dict(fractions).items():
+                account = str(raw_account)
+                refusal_reason = self._product_account_refusal_reason(
+                    str(product), account, vapor_species
                 )
-            species_mol = credits.setdefault(account, {})
-            species_mol[str(product)] = species_mol.get(str(product), 0.0) + mol
+                if refusal_reason is not None:
+                    raise ValueError(refusal_reason)
+                fraction = float(raw_fraction)
+                species_mol = credits.setdefault(account, {})
+                species_mol[str(product)] = (
+                    species_mol.get(str(product), 0.0) + mol * fraction
+                )
+                allocated_fraction += fraction
+            remainder = max(0.0, 1.0 - allocated_fraction)
+            if remainder > 0.0:
+                species_mol = credits.setdefault(default_account, {})
+                species_mol[str(product)] = (
+                    species_mol.get(str(product), 0.0) + mol * remainder
+                )
         return credits
 
     def _declared_accounts(self) -> frozenset[str]:
         return self.BASE_DECLARED_ACCOUNTS | self._declared_wall_deposit_accounts
+
+    def _product_account_refusal_reason(
+        self,
+        product_name: str,
+        account: str,
+        vapor_species: str,
+    ) -> str | None:
+        """Own the shared destination-account and gaseous-product rules."""
+        if account not in self._declared_accounts():
+            return "undeclared_condensation_product_account"
+        if account == "process.overhead_gas" and (
+            product_name == vapor_species
+            or product_name not in self.GASEOUS_CONDENSATION_COPRODUCTS
+        ):
+            return "invalid_gaseous_condensation_coproduct"
+        return None
 
     @staticmethod
     def _undeclared_wall_deposit_account(

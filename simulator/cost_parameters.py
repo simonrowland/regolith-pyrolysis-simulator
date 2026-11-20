@@ -27,6 +27,9 @@ DEFAULT_MIN_FOULING_PENALTY = 1.0
 DEFAULT_IMPORT_DELIVERY_COST_PER_KG = 10000.0
 DEFAULT_CARRIER_GAS_EARTH_PRICE_PER_KG = {"Ar": 0.0, "Kr": 290.0, "N2": 0.0}
 DEFAULT_CARRIER_MAKEUP_LOSS_FRACTION_PER_RUN = 0.01
+DEFAULT_HOT_DUCT_COST_PER_M2_USD = 25000.0
+DEFAULT_SHARED_CONDENSER_TRAIN_COST_PER_KG_HR_USD = 2000.0
+DEFAULT_FURNACES_PER_SHARED_TRAIN = 10
 ENERGY_COST_DEFAULT_SOURCE = "owner-t7-two-price-energy-v1"
 PAYLOAD_ABSENT_COST_PROVENANCE = (
     "canonical defaults; payload carried no cost parameters"
@@ -42,10 +45,34 @@ _REQUIRED_SCALAR_PARAMETERS = (
     "min_fouling_penalty",
     "import_delivery_cost_per_kg",
     "carrier_makeup_loss_fraction_per_run",
+    "condenser_stage_wall_thickness_m",
+    "hot_duct_cost_per_m2_usd",
+    "shared_condenser_train_cost_per_kg_hr_usd",
+    "furnaces_per_shared_train",
 )
 _SHUTTLE_PARAMETER = "shuttle_reagent_replacement_cost_per_kg"
 _CARRIER_PRICE_PARAMETER = "carrier_gas_earth_price_per_kg"
 _CARRIER_PRICE_SPECIES = frozenset({"Ar", "Kr", "N2"})
+_STAGE_BULK_DENSITY_PARAMETER = "condenser_stage_bulk_density_kg_m3"
+
+
+def _default_stage_wall_thickness_m() -> float:
+    return _parameter_value(
+        load_cost_parameters()["parameters"],
+        "condenser_stage_wall_thickness_m",
+    )
+
+
+def _default_stage_bulk_densities() -> Mapping[str, float]:
+    rows = load_cost_parameters()["parameters"][_STAGE_BULK_DENSITY_PARAMETER][
+        "values"
+    ]
+    return {
+        str(stage): _finite_positive(
+            entry["value"], f"{_STAGE_BULK_DENSITY_PARAMETER}.{stage}"
+        )
+        for stage, entry in rows.items()
+    }
 
 
 @dataclass(frozen=True)
@@ -65,6 +92,17 @@ class CostParameters:
     carrier_makeup_loss_fraction_per_run: float = (
         DEFAULT_CARRIER_MAKEUP_LOSS_FRACTION_PER_RUN
     )
+    condenser_stage_wall_thickness_m: float = field(
+        default_factory=_default_stage_wall_thickness_m
+    )
+    condenser_stage_bulk_density_kg_m3: Mapping[str, float] = field(
+        default_factory=_default_stage_bulk_densities
+    )
+    hot_duct_cost_per_m2_usd: float = DEFAULT_HOT_DUCT_COST_PER_M2_USD
+    shared_condenser_train_cost_per_kg_hr_usd: float = (
+        DEFAULT_SHARED_CONDENSER_TRAIN_COST_PER_KG_HR_USD
+    )
+    furnaces_per_shared_train: float = DEFAULT_FURNACES_PER_SHARED_TRAIN
 
     def __post_init__(self) -> None:
         for field_name in _REQUIRED_SCALAR_PARAMETERS:
@@ -108,6 +146,24 @@ class CostParameters:
             self,
             "carrier_gas_earth_price_per_kg",
             MappingProxyType(carrier_prices),
+        )
+        densities = {
+            str(stage): _finite_positive(
+                value,
+                f"{_STAGE_BULK_DENSITY_PARAMETER}.{stage}",
+            )
+            for stage, value in dict(
+                self.condenser_stage_bulk_density_kg_m3
+            ).items()
+        }
+        if not densities:
+            raise ValueError(
+                f"{_STAGE_BULK_DENSITY_PARAMETER} must define at least one stage"
+            )
+        object.__setattr__(
+            self,
+            "condenser_stage_bulk_density_kg_m3",
+            MappingProxyType(densities),
         )
 
     def reagent_cost_per_kg(self, species: str) -> float:
@@ -181,8 +237,12 @@ def normalize_cost_parameters(
     raw_parameters = payload.get("parameters")
     if not isinstance(raw_parameters, Mapping):
         raise ValueError("cost parameter payload missing parameters mapping")
-    raw_parameters = _with_missing_carrier_cost_defaults(
-        _with_missing_solar_heat_default(raw_parameters)
+    raw_parameters = _with_missing_stage_cost_defaults(
+        _with_missing_hardware_cost_defaults(
+            _with_missing_carrier_cost_defaults(
+                _with_missing_solar_heat_default(raw_parameters)
+            )
+        )
     )
 
     parameters: dict[str, Any] = {}
@@ -247,6 +307,35 @@ def normalize_cost_parameters(
         "values": carrier_price_values,
     }
 
+    stage_density_entry = _parameter_entry(
+        raw_parameters, _STAGE_BULK_DENSITY_PARAMETER
+    )
+    raw_stage_densities = stage_density_entry.get("values")
+    if not isinstance(raw_stage_densities, Mapping) or not raw_stage_densities:
+        raise ValueError(f"{_STAGE_BULK_DENSITY_PARAMETER} must define values")
+    stage_densities: dict[str, Any] = {}
+    for stage, raw_density in sorted(raw_stage_densities.items()):
+        stage_entry = dict(raw_density) if isinstance(raw_density, Mapping) else {}
+        value = stage_entry.get("value") if stage_entry else raw_density
+        stage_densities[str(stage)] = {
+            **{
+                str(key): copy.deepcopy(item)
+                for key, item in stage_entry.items()
+                if key != "value"
+            },
+            "value": _finite_positive(
+                value, f"{_STAGE_BULK_DENSITY_PARAMETER}.{stage}"
+            ),
+        }
+    parameters[_STAGE_BULK_DENSITY_PARAMETER] = {
+        **{
+            str(key): copy.deepcopy(value)
+            for key, value in stage_density_entry.items()
+            if key != "values"
+        },
+        "values": stage_densities,
+    }
+
     return {
         "schema_version": OPTIMIZE_COSTS_SCHEMA_VERSION,
         "parameters": parameters,
@@ -284,6 +373,13 @@ def cost_parameter_values(payload: Mapping[str, Any] | None = None) -> dict[str,
         species: _finite_nonnegative(entry["value"], f"{_CARRIER_PRICE_PARAMETER}.{species}")
         for species, entry in sorted(carrier_prices.items())
     }
+    stage_densities = raw_parameters[_STAGE_BULK_DENSITY_PARAMETER]["values"]
+    values[_STAGE_BULK_DENSITY_PARAMETER] = {
+        stage: _finite_positive(
+            entry["value"], f"{_STAGE_BULK_DENSITY_PARAMETER}.{stage}"
+        )
+        for stage, entry in sorted(stage_densities.items())
+    }
     return {
         "schema_version": OPTIMIZE_COSTS_SCHEMA_VERSION,
         "parameters": values,
@@ -316,6 +412,17 @@ def cost_parameters_from_mapping(payload: Mapping[str, Any] | None = None) -> Co
             "carrier_makeup_loss_fraction_per_run"
         ],
         shuttle_reagent_replacement_cost_per_kg=values[_SHUTTLE_PARAMETER],
+        condenser_stage_wall_thickness_m=values[
+            "condenser_stage_wall_thickness_m"
+        ],
+        condenser_stage_bulk_density_kg_m3=values[
+            _STAGE_BULK_DENSITY_PARAMETER
+        ],
+        hot_duct_cost_per_m2_usd=values["hot_duct_cost_per_m2_usd"],
+        shared_condenser_train_cost_per_kg_hr_usd=values[
+            "shared_condenser_train_cost_per_kg_hr_usd"
+        ],
+        furnaces_per_shared_train=values["furnaces_per_shared_train"],
     )
 
 
@@ -451,6 +558,63 @@ def _with_missing_carrier_cost_defaults(
     return result
 
 
+def _with_missing_stage_cost_defaults(
+    parameters: Mapping[str, Any],
+) -> dict[str, Any]:
+    result = dict(parameters)
+    missing = (
+        "condenser_stage_wall_thickness_m",
+        _STAGE_BULK_DENSITY_PARAMETER,
+    )
+    if any(name not in result for name in missing):
+        defaults = load_cost_parameters()["parameters"]
+        for name in missing:
+            result.setdefault(name, copy.deepcopy(defaults[name]))
+    return result
+
+
+def _with_missing_hardware_cost_defaults(
+    parameters: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Keep saved v1 recipe cost blocks usable as hardware pricing lands."""
+
+    result = dict(parameters)
+    result.setdefault(
+        "hot_duct_cost_per_m2_usd",
+        {
+            "value": DEFAULT_HOT_DUCT_COST_PER_M2_USD,
+            "units": "USD/m2",
+            "source_tag": (
+                "FLAGGED provisional (d-452): controller placeholder "
+                "pending owner/vendor ratification"
+            ),
+        },
+    )
+    result.setdefault(
+        "shared_condenser_train_cost_per_kg_hr_usd",
+        {
+            "value": DEFAULT_SHARED_CONDENSER_TRAIN_COST_PER_KG_HR_USD,
+            "units": "USD/(kg/hr)",
+            "source_tag": (
+                "FLAGGED provisional (d-452): controller placeholder "
+                "pending owner/vendor ratification"
+            ),
+        },
+    )
+    result.setdefault(
+        "furnaces_per_shared_train",
+        {
+            "value": DEFAULT_FURNACES_PER_SHARED_TRAIN,
+            "units": "furnaces/train",
+            "source_tag": (
+                "FLAGGED provisional (d-452): ten furnaces share a train "
+                "pending owner ratification"
+            ),
+        },
+    )
+    return result
+
+
 def _parameter_entry(parameters: Mapping[str, Any], name: str) -> Mapping[str, Any]:
     raw = parameters.get(name)
     if isinstance(raw, Mapping):
@@ -470,6 +634,12 @@ def _validated_scalar_parameter(value: Any, name: str) -> float:
         number = _finite_nonnegative(value, name)
         if name == "carrier_makeup_loss_fraction_per_run" and number > 1.0:
             raise ValueError(f"{name} must be at most 1.0")
+        if name == "condenser_stage_wall_thickness_m" and number <= 0.0:
+            raise ValueError(f"{name} must be positive")
+        if name == "furnaces_per_shared_train" and (
+            number <= 0.0 or not number.is_integer()
+        ):
+            raise ValueError(f"{name} must be a positive whole number")
         return number
     if isinstance(value, bool):
         raise TypeError(f"{name} must be numeric")
@@ -491,6 +661,13 @@ def _finite_nonnegative(value: Any, name: str) -> float:
         raise TypeError(f"{name} must be numeric") from exc
     if not math.isfinite(number) or number < 0.0:
         raise ValueError(f"{name} must be finite and non-negative")
+    return number
+
+
+def _finite_positive(value: Any, name: str) -> float:
+    number = _finite_nonnegative(value, name)
+    if number <= 0.0:
+        raise ValueError(f"{name} must be positive")
     return number
 
 

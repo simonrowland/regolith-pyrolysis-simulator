@@ -11,7 +11,11 @@ from typing import Any, NamedTuple
 
 from simulator.alpha_kinetics import parse_alpha_contract
 from simulator.accounting import AccountingError, resolve_species_formula
-from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.account_ids import (
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+)
+from simulator.condensation_routing import STAGE_KEY_BY_NUMBER
 from simulator.chemistry.melt_activity import single_cation_mole_fractions
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -3860,8 +3864,8 @@ class EvaporationMixin:
                 'axial': clamp_stir_factor(self.melt.stir_state.axial),
                 'radial': clamp_stir_factor(self.melt.stir_state.radial),
             },
-            'pipe_diameter_m': float(
-                getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
+            'pipe_diameter_m': self.overhead_model.effective_throat_diameter_m(
+                self.melt
             ),
             'overhead_pressure_pa': (
                 sum(overhead_partials_Pa.values())
@@ -4147,9 +4151,11 @@ class EvaporationMixin:
         ``CondensationModel.route()`` still computes the per-stage
         deposition projection (η model, residence times), but the
         ledger transition that moves vapor from
-        ``process.overhead_gas`` to ``process.condensation_train`` is
-        now owned by the :class:`BuiltinCondensationRouteProvider` and
-        committed through the kernel. The flow per species is:
+        ``process.overhead_gas`` to the configured condensation product
+        accounts is now owned by the :class:`BuiltinCondensationRouteProvider`
+        and committed through the kernel. Stage-3 deposits in the configured
+        Mn run-hour window are credited to the separate cartridge account.
+        The flow per species is:
 
         1. EVAPORATION_TRANSITION dispatched with ``remaining=rate`` --
            ALL vapor routed to ``process.overhead_gas``; elemental-metal
@@ -4158,8 +4164,8 @@ class EvaporationMixin:
         2. CONDENSATION_ROUTE dispatched with the analytically smoothed
            per-species condensed_kg derived from
            ``route_result.remaining_by_species`` -- debits
-           ``process.overhead_gas[species]`` and credits
-           ``process.condensation_train[products]`` (with SiO
+           ``process.overhead_gas[species]`` and credits the product accounts
+           (normally ``process.condensation_train``, with SiO
            disproportionation when sp_data declares the product map).
         3. ``_project_condensed_stage_collection`` projects the actual
            credited_condensed_kg onto stage UI bookkeeping.
@@ -4194,7 +4200,9 @@ class EvaporationMixin:
                         self.species_formula_registry,
                     )
                 ),
-                pipe_diameter_m=self.overhead_model.pipe_diameter_m,
+                pipe_diameter_m=(
+                    self.overhead_model.condenser_hydraulic_diameter_m
+                ),
                 # Chapman-Enskog diffusion uses bulk-gas temperature; the
                 # separate pipe temperature is a wall/liner condition.
                 gas_temperature_C=transport['conductance_temperature_C'],
@@ -4601,8 +4609,8 @@ class EvaporationMixin:
         tool can distinguish "kernel skipped" from "called and no-op".
 
         Returns ``credited_condensed_kg`` -- the amount of vapor
-        actually deposited onto ``process.condensation_train``, used by
-        the caller to drive ``_project_condensed_stage_collection``.
+        actually credited to baffle product accounts, used by the caller to
+        drive ``_project_condensed_stage_collection``.
         """
         wall_deposit_fraction = float(
             route_result.wall_deposit_fraction_by_species.get(species, 0.0)
@@ -4615,6 +4623,14 @@ class EvaporationMixin:
         if wall_deposit_fraction <= 1.0e-12 or not wall_deposit_account_fractions:
             wall_deposit_fraction = 0.0
             wall_deposit_account_fractions = {}
+
+        account_fractions = self._stage3_mn_cartridge_account_fractions(
+            route_result, species, sp_data
+        )
+        defer_fraction_refusal = account_fractions is None
+        if account_fractions:
+            sp_data = dict(sp_data or {})
+            sp_data["condensation_product_account_fractions"] = account_fractions
 
         kernel_result = self._dispatch_and_commit(
             ChemistryIntent.CONDENSATION_ROUTE,
@@ -4652,12 +4668,164 @@ class EvaporationMixin:
             },
         )
         if kernel_result.transition is None:
+            if defer_fraction_refusal:
+                reason = dict(kernel_result.diagnostic or {}).get(
+                    "reason_refused"
+                )
+                if not isinstance(reason, str) or not reason:
+                    raise AccountingError(
+                        "provider refused malformed condensation product "
+                        "account fractions without a refusal reason"
+                    )
+                raise AccountingError(reason)
             return 0.0
 
         diagnostic = dict(kernel_result.diagnostic or {})
         self._record_wall_deposit_delta(species, diagnostic)
         self._record_wall_alkali_binding_diagnostic_state(diagnostic)
         return float(diagnostic.get('credited_condensed_kg', 0.0))
+
+    def _stage3_mn_cartridge_fraction(self, route_result, species: str) -> float:
+        """Return Stage-3's share of baffle product in the scheduled Mn window."""
+        stage_deposits = getattr(route_result, 'condensed_by_stage_species', None)
+        condensed_for_species = getattr(route_result, 'condensed_for_species', None)
+        if not isinstance(stage_deposits, Mapping) or not callable(
+            condensed_for_species
+        ):
+            # Non-baffle routes (for example, the organic-tar wall-only route)
+            # have no Stage-3 product to assign to the removable cartridge.
+            return 0.0
+        setpoints = getattr(self, "setpoints", {})
+        if setpoints is None:
+            setpoints = {}
+        if not isinstance(setpoints, Mapping):
+            raise AccountingError("simulator setpoints must be a mapping")
+        train = setpoints.get("condensation_train", {})
+        if not isinstance(train, Mapping):
+            raise AccountingError("condensation_train setpoints must be a mapping")
+        stages = train.get("metals_train", {})
+        if not isinstance(stages, Mapping):
+            raise AccountingError("condensation_train.metals_train must be a mapping")
+        stage = stages.get(STAGE_KEY_BY_NUMBER[3], {})
+        if not isinstance(stage, Mapping):
+            raise AccountingError("stage_3_sio_zone setpoints must be a mapping")
+        schedule = stage.get("stage3_cartridge_schedule")
+        if schedule is None:
+            return 0.0
+        if not isinstance(schedule, Mapping):
+            raise AccountingError("stage3_cartridge_schedule must be a mapping")
+        if not schedule:
+            return 0.0
+        window = schedule.get("mn_cartridge_run_hour_window")
+        if not isinstance(window, (list, tuple)) or len(window) != 2:
+            raise AccountingError(
+                "stage3_cartridge_schedule.mn_cartridge_run_hour_window "
+                "must contain inclusive start and end hours"
+            )
+        if any(isinstance(value, bool) or not isinstance(value, Real) for value in window):
+            raise AccountingError(
+                "stage3_cartridge_schedule hour bounds must be real numbers"
+            )
+        start_hour, end_hour = (float(value) for value in window)
+        if (
+            not math.isfinite(start_hour)
+            or not math.isfinite(end_hour)
+            or not start_hour.is_integer()
+            or not end_hour.is_integer()
+            or start_hour < 1.0
+            or end_hour < start_hour
+        ):
+            raise AccountingError(
+                "stage3_cartridge_schedule hour bounds are invalid"
+            )
+        # D452_HOUR is one-based at the end-of-tick snapshot; routing runs
+        # before the simulator increments MeltState.hour.
+        raw_hour = getattr(self.melt, "hour", 0)
+        if isinstance(raw_hour, bool) or not isinstance(raw_hour, Real):
+            raise AccountingError("simulator run hour must be a real number")
+        elapsed_hour = float(raw_hour)
+        if not math.isfinite(elapsed_hour) or not elapsed_hour.is_integer():
+            raise AccountingError("simulator run hour must be a finite integer")
+        run_hour = elapsed_hour + 1.0
+        if not start_hour <= run_hour <= end_hour:
+            return 0.0
+        total_kg = float(route_result.condensed_for_species(species))
+        stage3_kg = float(
+            (stage_deposits.get(
+                STAGE_KEY_BY_NUMBER[3], {}
+            ) or {}).get(species, 0.0)
+        )
+        if total_kg <= 1.0e-12 or stage3_kg <= 1.0e-12:
+            return 0.0
+        fraction = stage3_kg / total_kg
+        if not math.isfinite(fraction) or not 0.0 < fraction <= 1.0 + 1.0e-12:
+            raise AccountingError(
+                "Stage-3 cartridge account fraction is outside [0, 1]"
+            )
+        return min(1.0, fraction)
+
+    @staticmethod
+    def _products_excluding_overhead_gas(
+        products: Mapping[Any, Any],
+        product_accounts: Mapping[str, Any],
+    ) -> dict[Any, Any]:
+        return {
+            product: value
+            for product, value in products.items()
+            if str(product_accounts.get(str(product)) or "")
+            != "process.overhead_gas"
+        }
+
+    def _stage3_mn_cartridge_account_fractions(
+        self,
+        route_result,
+        species: str,
+        sp_data: Mapping[str, Any],
+    ) -> dict[str, dict[str, float]] | None:
+        """Split deposited product accounts while preserving gaseous coproducts."""
+        raw_account_fractions = sp_data.get(
+            "condensation_product_account_fractions", {}
+        ) or {}
+        if not isinstance(raw_account_fractions, Mapping):
+            raise AccountingError(
+                "condensation_product_account_fractions must be a mapping"
+            )
+        account_fractions: dict[str, dict[str, float]] = {}
+        for product, raw_fractions in raw_account_fractions.items():
+            if raw_fractions is None:
+                account_fractions[str(product)] = {}
+            elif isinstance(raw_fractions, Mapping):
+                account_fractions[str(product)] = dict(raw_fractions)
+            else:
+                # The condensation provider owns this refusal code. Preserve
+                # the malformed map for provider validation and let its
+                # diagnostic supply the code to the simulator caller.
+                return None
+        stage3_fraction = self._stage3_mn_cartridge_fraction(
+            route_result, species
+        )
+        if stage3_fraction <= 0.0:
+            return account_fractions
+
+        products = dict(
+            sp_data.get("condensation_products_mol_per_mol_vapor") or {}
+        )
+        if not products:
+            products = {species: 1.0}
+        raw_product_accounts = sp_data.get("condensation_product_accounts", {}) or {}
+        if not isinstance(raw_product_accounts, Mapping):
+            raise AccountingError(
+                "condensation_product_accounts must be a mapping"
+            )
+        products = self._products_excluding_overhead_gas(
+            products, raw_product_accounts
+        )
+        for raw_product in products:
+            product = str(raw_product)
+            fractions = dict(account_fractions.get(product, {}) or {})
+            fractions[MANGANESE_STAGE3_CARTRIDGE_ACCOUNT] = stage3_fraction
+            account_fractions[product] = fractions
+        return account_fractions
 
     def _apply_organic_tar_wall_deposit(self) -> None:
         """Move cold-wall tar from overhead_gas onto process.wall_deposit.
@@ -4823,9 +4991,9 @@ class EvaporationMixin:
            only writable path.
 
         Returns:
-            ``credited_condensed_kg`` -- the amount of vapor that
-            condensed onto ``process.condensation_train``, used by the
-            caller to drive stage-collection bookkeeping.
+            ``credited_condensed_kg`` -- the amount of vapor credited to
+            baffle product accounts, used by the caller to drive
+            stage-collection bookkeeping.
         """
 
         stoich = self._evaporation_stoich(species, sp_data)
@@ -4938,11 +5106,9 @@ class EvaporationMixin:
             (sp_data or {}).get('condensation_product_accounts') or {}
         )
         if product_accounts:
-            product_kg = {
-                product: kg
-                for product, kg in product_kg.items()
-                if product_accounts.get(product) != 'process.overhead_gas'
-            }
+            product_kg = self._products_excluding_overhead_gas(
+                product_kg, product_accounts
+            )
         return product_kg
 
     def _condensation_product_mol_ratios(
@@ -5192,8 +5358,16 @@ class EvaporationMixin:
                         stage.collected_kg.get(product, 0.0)
                         + stage_product_kg)
                 })
+                source_account = (
+                    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
+                    if str(stage_key) == STAGE_KEY_BY_NUMBER[3]
+                    and self._stage3_mn_cartridge_fraction(
+                        route_result, species
+                    ) > 0.0
+                    else 'process.condensation_train'
+                )
                 self._record_stage_collection_source(
-                    'process.condensation_train',
+                    source_account,
                     stage_idx,
                     product,
                     stage_product_kg,

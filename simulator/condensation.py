@@ -12,7 +12,7 @@ Train topology (metals train, active C2A onward):
     Stage 0  Hot duct (>1400°C)      — IR spectroscopy. ``route()`` still
              walks this stage through ``_condensation_efficiency``. The
              default area map (``STAGE_AREA_KEY_BY_STAGE_NUMBER`` /
-             setpoints ``stage_area_ratios``) names stages 1-4 and
+             setpoints ``stage_areas_m2``) names stages 1-4 and
              terminal, so Stage 0 has no configured capture area and
              eta takes the no-area zero. A configured Stage-0 area
              admits species whose routing temperature sits in the
@@ -50,10 +50,10 @@ Key physics:
 
 The Fe → SiO separation (Stage 1 → Stage 3):
     Default Stage 1 wall is 1150°C; Stage 3 is 900-1200°C
-    (``CondensationTrain.create_default``). Stage 2 is the Cr/CrO2/Mn
-    harvester and isolates non-Cr species
-    (``_cr_stage_isolation_blocks``); SiO's designated destination is
-    Stage 3, not Stage 2.
+    (``CondensationTrain.create_default``). The Cr cartridge keeps
+    non-designated species off its tap; other stages and downstream
+    duct walls use saturation and record off-design capture as impurity.
+    SiO's designated destination is Stage 3, not Stage 2.
     This module does not model Fe melting, a sump, a chevron droplet
     separator, or a radiation-gap thermal break.
     A Stage-1 wall at or above 1100°C keeps SiO off the Fe tap. The
@@ -118,6 +118,7 @@ from simulator.accounting.queries import (
     wall_deposit_candidate_kg as query_wall_deposit_candidate_kg,
     wall_deposit_candidates_by_segment_kg as query_wall_deposit_candidates_by_segment_kg,
 )
+from simulator.accounting.exceptions import AccountingError
 from simulator.config import load_config_bundle
 from simulator.coating_rate import continuous_wall_deposition_flux
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -125,6 +126,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.core import (
     CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
 )
+from simulator.account_ids import MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
 from simulator.lab_geometry import (
     LabGeometry,
     LabGeometryError,
@@ -135,6 +137,7 @@ from simulator.condensation_routing import (
     DESIGNATED_STAGE,
     K_TRAP_STAGE_KEY,
     NA_COLLECTOR_STAGE_KEY,
+    STAGE_KEY_BY_NUMBER,
     accepted_species_for_stage_key,
     accepted_species_for_stage_number,
     coproduct_species_for_stage_number,
@@ -196,8 +199,9 @@ LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 # (Bird/Stewart/Lightfoot 2007 "Transport Phenomena" 2nd ed., Eq 14.4-9):
 #     Sh = 3.66 (asymptotic, fully developed laminar)
 #
-# For the simulator's overhead piping at C2A_continuous typical
-# operating point (pN2 ~10 mbar, T_gas ~1700 C, D_pipe = 0.12 m), the
+# For the simulator's downstream condenser at C2A_continuous typical
+# operating point (pN2 ~10 mbar, T_gas ~1700 C, with its configured hydraulic
+# diameter), the
 # Reynolds number Re = rho * v * D / mu is well below 2100 (laminar),
 # so Sh = 3.66 is the right anchor. Mass-transfer coefficient:
 #     k_c = Sh * D_AB / D_pipe   (m/s)
@@ -2252,6 +2256,10 @@ class CondensationModel:
             str, dict[str, float]
         ] = {}
         self.pipe_diameter_m = DEFAULT_PIPE_DIAMETER_M
+        # Collection-duct Kn is reported separately from this model's
+        # condenser/wall Kn: the latter continues to control deposition.
+        self.duct_pipe_diameter_m: float | None = None
+        self.last_duct_knudsen_regime_diagnostic: dict[str, Any] = {}
         self.stage_area_m2_by_stage: dict[str, float] = {}
         self.stage_hydraulic_diameter_m_by_stage: dict[str, float] = {}
         self.stage_area_geometry_provenance_notice: dict[str, Any] = {}
@@ -2364,6 +2372,7 @@ class CondensationModel:
         overhead_pressure_mbar: float | None = None,
         species_partial_pressures_mbar: Mapping[str, float] | None = None,
         pipe_diameter_m: float | None = None,
+        duct_pipe_diameter_m: float | None = None,
         gas_temperature_C: float | None = None,
         stage_area_m2_by_stage: Mapping[str, float] | None = None,
         stage_hydraulic_diameter_m_by_stage: Mapping[str, float] | None = None,
@@ -2398,7 +2407,13 @@ class CondensationModel:
         ``stage_hydraulic_diameter_m_by_stage`` is the capture-law
         gas-side length. It is stored beside the stage areas and is
         not written onto duct ``inner_diameter_m``. Stages absent from
-        the map keep ``pipe_diameter_m`` (the throat).
+        the map use ``pipe_diameter_m`` (the configured condenser/wall
+        hydraulic diameter), independent of the collection throat.
+
+        ``duct_pipe_diameter_m`` reports the collection throat Kn for
+        optimizer diagnostics. It is deliberately independent of
+        ``pipe_diameter_m``, which remains the condenser/wall diameter
+        used by deposition physics.
         """
 
         # Validate the complete candidate first. A late invalid pressure,
@@ -2421,6 +2436,9 @@ class CondensationModel:
                 )
         if pipe_diameter_m is not None:
             require_lab_pipe_diameter(pipe_diameter_m, 'pipe_diameter_m')
+        if duct_pipe_diameter_m is not None:
+            require_lab_pipe_diameter(
+                duct_pipe_diameter_m, 'duct_pipe_diameter_m')
         if stage_area_m2_by_stage is not None:
             for stage, raw_area in stage_area_m2_by_stage.items():
                 if isinstance(raw_area, bool):
@@ -2514,6 +2532,9 @@ class CondensationModel:
                 replace(segment, inner_diameter_m=self.pipe_diameter_m)
                 for segment in self.pipe_segments
             ]
+        if duct_pipe_diameter_m is not None:
+            self.duct_pipe_diameter_m = require_lab_pipe_diameter(
+                duct_pipe_diameter_m, 'duct_pipe_diameter_m')
         if gas_temperature_C is not None:
             gas_temperature = float(gas_temperature_C)
             if not math.isfinite(gas_temperature) or gas_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
@@ -2646,6 +2667,10 @@ class CondensationModel:
         self.last_knudsen_regime_diagnostic = copy.deepcopy(
             self._current_knudsen_diagnostic()
         )
+        if self.duct_pipe_diameter_m is not None:
+            self.last_duct_knudsen_regime_diagnostic = (
+                self._current_duct_knudsen_diagnostic()
+            )
         # gstack reviewer Phase B P2: previously this snapshot was gated
         # ONLY on ``overhead_pressure_mbar is not None``, so a caller that
         # tweaked wall temperatures or stir_factor without supplying a
@@ -2662,6 +2687,7 @@ class CondensationModel:
                 radial_stir_factor,
                 wall_temperature_C,
                 pipe_diameter_m,
+                duct_pipe_diameter_m,
                 gas_temperature_C,
                 stage_area_m2_by_stage,
                 stage_hydraulic_diameter_m_by_stage,
@@ -2678,6 +2704,7 @@ class CondensationModel:
                     else float(campaign_hour)
                 ),
                 "wall_temperature_C": float(self.wall_temperature_C),
+                "duct_pipe_diameter_m": self.duct_pipe_diameter_m,
                 "pipe_segment_temperatures_C": {
                     segment.name: float(segment.wall_temperature_C)
                     for segment in self.pipe_segments
@@ -2721,6 +2748,8 @@ class CondensationModel:
                         "warnings", ())),
                 "knudsen_regime_diagnostic": copy.deepcopy(
                     self.last_knudsen_regime_diagnostic),
+                "duct_knudsen_regime_diagnostic": copy.deepcopy(
+                    self.last_duct_knudsen_regime_diagnostic),
             }
             # Record the as-requested stir_factor only when it was passed
             # this call; otherwise the field is intentionally omitted so
@@ -2905,7 +2934,7 @@ class CondensationModel:
         return None
 
     def _hydraulic_diameter_m_for_stage_number(self, stage_number: int) -> float:
-        """Capture-law gas-side length. Absent stages keep the throat."""
+        """Capture-law gas-side length. Absent stages use the condenser pipe."""
 
         for key in (STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage_number)),
                     f'stage_{stage_number}', str(stage_number)):
@@ -4109,6 +4138,20 @@ class CondensationModel:
         )
         return unconfigured
 
+    def _current_duct_knudsen_diagnostic(self) -> dict[str, Any]:
+        if self.duct_pipe_diameter_m is None:
+            return {}
+        diagnostic = knudsen_regime_diagnostic(
+            overhead_pressure_mbar=self.overhead_pressure_mbar,
+            gas_temperature_C=self.gas_temperature_C,
+            pipe_diameter_m=self.duct_pipe_diameter_m,
+            carrier_gas=self.carrier_gas,
+        )
+        for segment in diagnostic.get('segments', ()):
+            if isinstance(segment, dict):
+                segment['name'] = 'collection_duct'
+        return diagnostic
+
     def _enforce_knudsen_regime(self) -> dict[str, Any]:
         diagnostic = self._current_knudsen_diagnostic()
         self.last_knudsen_regime_diagnostic = copy.deepcopy(diagnostic)
@@ -4212,17 +4255,13 @@ class CondensationModel:
     ) -> list[PipeSegment]:
         if self.lab_geometry is not None:
             return list(self.pipe_segments)
-        target_stage_number = designated_stage_number(species)
-        if target_stage_number is None:
+        if designated_stage_number(species) is None:
             return []
-        segments: list[PipeSegment] = []
-        for segment in self.pipe_segments:
-            downstream_number = _segment_stage_number(segment.downstream_stage)
-            if downstream_number is None:
-                continue
-            if downstream_number <= target_stage_number:
-                segments.append(segment)
-        return segments
+        # A designated stage is a product destination, not a cutoff for
+        # subsequent wall deposition. Any vapor that remains in the train
+        # can freeze out on a later duct; that deposit remains a separate
+        # wall account rather than being relabelled as tap product.
+        return list(self.pipe_segments)
 
     def _wall_deposit_candidate_for_surface_kg(
         self,
@@ -4361,7 +4400,7 @@ class CondensationModel:
         # k_g [m/s] = Sh * D_AB [m2/s] / Dh [m]. The molar coefficient per
         # pascal is k_g / (R * T_gas) [mol/(m2*s*Pa)]. Sherwood is 3.66 at
         # radial stir 1. This length is not written onto duct inner_diameter_m,
-        # so throat Poiseuille flow stays on the ~0.12 m throat.
+        # so throat Poiseuille flow stays on the configured throat diameter.
         gas_side_length_m = self._hydraulic_diameter_m_for_stage_number(
             stage.stage_number)
         T_gas_K = float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET
@@ -7555,36 +7594,17 @@ def _stage_alpha_surface_key(stage: CondensationStage) -> str:
     return f'stage_{int(stage.stage_number)}'
 
 
-def _cold_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
-    """Own taps on the cold alkali stages only. Not applied to stage 1.
-
-    The Na collector rejects K. The K trap accepts only species designated
-    to that key. Mg and every other species stage 4 captures stay on stage 4.
-    """
-
-    key = getattr(stage, 'stage_key', '') or ''
-    designated = DESIGNATED_STAGE.get(species)
-    if key == NA_COLLECTOR_STAGE_KEY:
-        return designated == K_TRAP_STAGE_KEY
-    if key == K_TRAP_STAGE_KEY:
-        return designated != K_TRAP_STAGE_KEY
-    return False
-
-
 def _stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
-    return (
-        _cr_stage_isolation_blocks(stage, species)
-        or _cold_stage_isolation_blocks(stage, species)
-    )
+    return _cr_stage_isolation_blocks(stage, species)
 
 
 def _cr_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
     chromium_stage = 'CrO2' in stage.target_species
-    designated_stage = designated_stage_number(species)
     if chromium_stage:
         return not is_designated_for_stage(species, stage.stage_number)
-    if designated_stage == 2:
-        return True
+    # Keep non-Cr products off the dedicated Cr cartridge. Outside that
+    # cartridge, saturation governs capture and the existing stage-purity
+    # ledger records non-designated condensate as impurity.
     return False
 
 
@@ -8077,10 +8097,34 @@ STAGE_PURITY_VERDICTS = frozenset((
 STAGE_PURITY_NO_CAPTURED_MASS = 'no_captured_mass'
 
 
-def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
-    """Classify each stage's accumulated product as designated or impurity."""
+def stage_purity_report(
+    train: CondensationTrain,
+    ledger: Any | None = None,
+) -> dict[str, dict[str, Any]]:
+    """Classify stage inventory, plus current ledger-backed cartridge products."""
 
     report: dict[str, dict[str, Any]] = {}
+    ledger_accounts = ledger.kg_by_account() if ledger is not None else {}
+    mn_cartridge_kg = dict(
+        ledger_accounts.get(MANGANESE_STAGE3_CARTRIDGE_ACCOUNT, {})
+    )
+    reagent_inventory_kg = dict(
+        ledger_accounts.get('process.reagent_inventory', {})
+    )
+    reagent_origins = (
+        ledger.origin_atom_moles_by_account().get(
+            'process.reagent_inventory', {}
+        )
+        if ledger is not None
+        else {}
+    )
+    reagent_unresolved = (
+        ledger.unresolved_origin_atom_moles_by_account().get(
+            'process.reagent_inventory', {}
+        )
+        if ledger is not None
+        else {}
+    )
     for stage in train.stages:
         stage_number = int(stage.stage_number)
         explicit_key = getattr(stage, 'stage_key', '') or ''
@@ -8096,6 +8140,24 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
             )
             for species, raw_kg in stage.collected_kg.items()
         }
+        if stage_key == STAGE_KEY_BY_NUMBER[3] and ledger is not None:
+            # Stage 3's projection includes both cartridges. The dedicated
+            # ledger account holds the Mn-window cartridge; subtract its live
+            # species balances to report the silica-window cartridge alone.
+            for species, raw_kg in mn_cartridge_kg.items():
+                cartridge_kg = _finite_nonnegative_value(
+                    raw_kg,
+                    label=f"Mn cartridge ledger balance for {species}",
+                )
+                stage_projection_kg = collected_kg.get(species, 0.0)
+                remaining_kg = stage_projection_kg - cartridge_kg
+                if remaining_kg < -1e-12:
+                    raise AccountingError(
+                        f"Mn cartridge ledger balance for {species} "
+                        f"({cartridge_kg:g} kg) exceeds Stage-3 projection "
+                        f"({stage_projection_kg:g} kg)"
+                    )
+                collected_kg[species] = max(0.0, remaining_kg)
         if explicit_key:
             accepted_species = accepted_species_for_stage_key(explicit_key)
             coproduct_species = frozenset(
@@ -8162,5 +8224,108 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
             stage_report['reason'] = STAGE_PURITY_NO_CAPTURED_MASS
         if activity:
             stage_report['activity'] = activity
+        if stage_key == STAGE_KEY_BY_NUMBER[3] and ledger is not None:
+            mn_cartridge_kg = {
+                species: _finite_nonnegative_value(
+                    value,
+                    label=f"Mn cartridge ledger balance for {species}",
+                )
+                for species, value in mn_cartridge_kg.items()
+            }
+            cartridge_total_kg = sum(mn_cartridge_kg.values())
+            manganese_kg = mn_cartridge_kg.get('Mn', 0.0)
+            stage_report.update({
+                'silica_cartridge_mass_kg': total_kg,
+                'silica_cartridge_species_kg': dict(collected_kg),
+                'silica_without_mn_purity_fraction': purity_fraction,
+                'mn_cartridge_mass_kg': cartridge_total_kg,
+                'mn_cartridge_species_kg': dict(mn_cartridge_kg),
+                'mn_cartridge_mn_mass_kg': manganese_kg,
+                'mn_cartridge_purity_fraction': (
+                    manganese_kg / cartridge_total_kg
+                    if cartridge_total_kg > 1e-12
+                    else None
+                ),
+                'mn_cartridge_capture_status': 'FLAGGED_UNCERTIFIED',
+            })
+            # Every Mn-cartridge capture remains uncertified: at h19 the Si
+            # dew point (1163.1 C) exceeds Mn (1133.9 C); the proposed
+            # 800-925 C Mn Psat band is below the certified 1228 K floor;
+            # alpha_s(Mn)=0.85 is UNCERTIFIED
+            # (no_direct_mn_sticking_coefficient); and the SiO wall-Psat
+            # refusal at 1400 K leaves 56 clean-window profiles indeterminate.
+        if stage_key == NA_COLLECTOR_STAGE_KEY and ledger is not None:
+            recovered_designated_kg: dict[str, float] = {}
+            recovered_origin_complete = True
+            for species in ('Na', 'Mg'):
+                current_reagent_kg = max(
+                    0.0, float(reagent_inventory_kg.get(species, 0.0))
+                )
+                origin_moles = dict(reagent_origins.get(species, {}) or {})
+                known_origin_moles = sum(
+                    max(0.0, float(value)) for value in origin_moles.values()
+                )
+                feedstock_share = (
+                    max(0.0, float(origin_moles.get('feedstock', 0.0)))
+                    / known_origin_moles
+                    if known_origin_moles > 1e-12
+                    else 0.0
+                )
+                if (
+                    current_reagent_kg > 1e-12
+                    and (
+                        known_origin_moles <= 1e-12
+                        or float(reagent_unresolved.get(species, 0.0)) > 1e-12
+                    )
+                ):
+                    recovered_origin_complete = False
+                recovered_designated_kg[species] = (
+                    current_reagent_kg * feedstock_share
+                )
+            net_designated_species_kg = {
+                species: max(0.0, float(collected_kg.get(species, 0.0)))
+                + recovered_designated_kg[species]
+                for species in ('Na', 'Mg')
+            }
+            net_designated_kg = sum(net_designated_species_kg.values())
+            sio_impurity_kg = sum(
+                max(0.0, float(collected_kg.get(species, 0.0)))
+                for species in ('SiO2', 'Si')
+            )
+            net_impurity_kg = sum(
+                max(0.0, float(value))
+                for species, value in collected_kg.items()
+                if species not in {'Na', 'Mg'}
+            )
+            net_unique_total_kg = net_designated_kg + net_impurity_kg
+            stage_report.update({
+                'net_unique_designated_species_kg': net_designated_species_kg,
+                'net_unique_designated_kg': net_designated_kg,
+                'net_unique_recovered_species_kg': recovered_designated_kg,
+                'net_unique_impurity_kg': net_impurity_kg,
+                'net_unique_total_kg': net_unique_total_kg,
+                'net_unique_purity_fraction': (
+                    net_designated_kg / net_unique_total_kg
+                    if recovered_origin_complete and net_unique_total_kg > 1e-12
+                    else None
+                ),
+                'sio_impurity_kg': sio_impurity_kg,
+                'sio_impurity_to_designated_ratio': (
+                    sio_impurity_kg / net_designated_kg
+                    if recovered_origin_complete and net_designated_kg > 1e-12
+                    else None
+                ),
+                'net_unique_basis_status': (
+                    'complete'
+                    if recovered_origin_complete
+                    else 'indeterminate_reagent_origin'
+                ),
+                'sio_impurity_basis': (
+                    'current Stage-4 SiO2+Si plus current feedstock-origin '
+                    'Na/Mg in reagent inventory; disjoint live ledger balances'
+                    if ledger is not None
+                    else 'current Stage-4 inventory only; ledger unavailable'
+                ),
+            })
         report[stage_key] = stage_report
     return report

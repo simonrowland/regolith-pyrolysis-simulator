@@ -19,6 +19,38 @@ parameters:
     rationale: "Owner-ratified import delivery cost, before Earth purchase price."
     source_tag: "owner ratified 2026-11-11 (d-389): imports at $10k/kg plus Earth cost"
 
+  condenser_stage_wall_thickness_m:
+    value: 0.01
+    units: m
+    rationale: "Shared provisional collector wall/baffle thickness for the d-283 area-mass estimate."
+    source_tag: "FLAGGED provisional d-283 (d-452): 10 mm pending hardware definition"
+
+  condenser_stage_bulk_density_kg_m3:
+    units: kg/m3
+    rationale: "Handbook-level bulk density assumptions for the named collector materials; all are provisional."
+    source_tag: "FLAGGED provisional d-283 (d-452): handbook values uncited pending material/vendor definition"
+    values:
+      fe_stage1:
+        value: 4500.0
+        material: "MZO coating used as proxy; structural material unspecified"
+        source_tag: "FLAGGED provisional d-283: handbook-level MgO-ZrO2 proxy"
+      cr_stage2:
+        value: 4500.0
+        material: "MZO liner for removable chromia cartridge"
+        source_tag: "FLAGGED provisional d-283: handbook-level MgO-ZrO2 proxy"
+      sio_stage3:
+        value: 2200.0
+        material: "fused silica baffles"
+        source_tag: "FLAGGED provisional d-283: handbook-level fused silica density"
+      alkali_stage4:
+        value: 3210.0
+        material: "SiC proxy; stage material unspecified in setpoints"
+        source_tag: "FLAGGED provisional d-283: handbook-level SiC density"
+      k_stage4b:
+        value: 3210.0
+        material: "SiC proxy shared with Stage 4; stage material unspecified"
+        source_tag: "FLAGGED provisional d-283: handbook-level SiC density"
+
   carrier_gas_earth_price_per_kg:
     units: USD/kg
     rationale: "Kr uses the approximate European small-quantity price from Ullmann's (1999); N2 and Ar use flagged zero Earth prices because no in-repo price is available and the $10,000/kg delivery term dominates."
@@ -56,6 +88,24 @@ parameters:
     units: batch-cost multiples
     rationale: "Advanced edge-case exploration control: furnace lifetime value as a multiple of one typical batch process cost; lower only to surface qualified fouling recipes when extraction is otherwise intractable."
     source_tag: "owner final ratification 2026-07-19: furnace capital value equals 500 typical batch process costs by default; advanced users may relax for edge-case exploration"
+
+  hot_duct_cost_per_m2_usd:
+    value: 25000.0
+    units: USD/m2
+    rationale: "FLAGGED design-study placeholder for hot-duct shell and refractory area; no vendor quote is available. Applied to lateral area pi*d*L."
+    source_tag: "FLAGGED provisional (d-452): controller placeholder pending owner/vendor ratification"
+
+  shared_condenser_train_cost_per_kg_hr_usd:
+    value: 2000.0
+    units: "USD/(kg/hr)"
+    rationale: "FLAGGED design-study placeholder for condenser-train installed capacity; no vendor quote is available."
+    source_tag: "FLAGGED provisional (d-452): controller placeholder pending owner/vendor ratification"
+
+  furnaces_per_shared_train:
+    value: 10
+    units: furnaces/train
+    rationale: "FLAGGED sharing assumption; total train capacity is max(n times average flow, one-furnace peak flow)."
+    source_tag: "FLAGGED provisional (d-452): ten furnaces share a train pending owner ratification"
 
   min_fouling_penalty:
     value: 1.0

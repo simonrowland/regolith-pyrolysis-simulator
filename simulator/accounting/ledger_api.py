@@ -223,7 +223,7 @@ class LedgerAPI:
             )
         elif view_name == "stage_purity":
             from simulator.condensation import stage_purity_report
-            payload = stage_purity_report(self.sim.train)
+            payload = stage_purity_report(self.sim.train, self.ledger)
         elif view_name == "thermal_train":
             # Diagnostic view over run history, not atom inventory.
             payload = self.queries.thermal_train_report()

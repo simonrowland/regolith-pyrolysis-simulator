@@ -1,4 +1,5 @@
 import math
+from dataclasses import replace
 from types import SimpleNamespace
 
 import pytest
@@ -22,7 +23,10 @@ from simulator.condensation_routing import (
     stage_list_index_for_destination,
     target_species_for_stage_number,
 )
+from simulator.account_ids import MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
+from simulator.evaporation import EvaporationMixin
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
+from simulator.accounting import AccountingError
 
 
 @pytest.mark.parametrize("stage_number", [1, 2, 3, 4])
@@ -202,6 +206,238 @@ def test_stage_purity_report_pins_empty_stage_four_collapse():
     }
 
 
+def test_stage4_net_unique_purity_uses_disjoint_current_ledger_balances():
+    train = _populated_stage_four_purity_train()
+    collector = train.stages[0]
+    collector.collected_kg.update({
+        "Na": 0.4,
+        "Mg": 2.0,
+        "SiO2": 0.25,
+        "Si": 0.25,
+        "Ca": 1.5,
+    })
+
+    class LedgerView:
+        def kg_by_account(self):
+            return {
+                "process.reagent_inventory": {"Na": 0.6, "Mg": 3.0},
+            }
+
+        def origin_atom_moles_by_account(self):
+            return {
+                "process.reagent_inventory": {
+                    "Na": {"feedstock": 0.6},
+                    "Mg": {"feedstock": 3.0},
+                },
+            }
+
+        def unresolved_origin_atom_moles_by_account(self):
+            return {}
+
+    stage = stage_purity_report(train, LedgerView())[
+        NA_COLLECTOR_STAGE_KEY
+    ]
+
+    # Na is 0.4 kg in the collector now and 0.6 kg recovered in inventory;
+    # earlier recovery/recollection events do not add another copy.
+    assert stage["net_unique_designated_species_kg"] == {
+        "Na": pytest.approx(1.0),
+        "Mg": pytest.approx(5.0),
+    }
+    assert stage["net_unique_designated_kg"] == pytest.approx(6.0)
+    assert stage["sio_impurity_kg"] == pytest.approx(0.5)
+    assert stage["sio_impurity_to_designated_ratio"] == pytest.approx(1 / 12)
+    assert stage["net_unique_impurity_kg"] == pytest.approx(2.0)
+    assert stage["net_unique_purity_fraction"] == pytest.approx(0.75)
+
+
+def test_stage3_report_splits_mn_cartridge_from_silica_window():
+    train = CondensationTrain.create_default()
+    train.stages[3].collected_kg.update({"SiO2": 3.0, "Si": 1.0, "Mn": 1.0})
+
+    class LedgerView:
+        def kg_by_account(self):
+            return {
+                MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: {
+                    "Mn": 0.5,
+                    "SiO2": 0.25,
+                },
+            }
+
+        def origin_atom_moles_by_account(self):
+            return {}
+
+        def unresolved_origin_atom_moles_by_account(self):
+            return {}
+
+    stage = stage_purity_report(train, LedgerView())[STAGE_KEY_BY_NUMBER[3]]
+
+    assert stage["mn_cartridge_mass_kg"] == pytest.approx(0.75)
+    assert stage["mn_cartridge_mn_mass_kg"] == pytest.approx(0.5)
+    assert stage["mn_cartridge_purity_fraction"] == pytest.approx(2 / 3)
+    assert stage["mn_cartridge_capture_status"] == "FLAGGED_UNCERTIFIED"
+    assert stage["silica_without_mn_purity_fraction"] == pytest.approx(3.75 / 4.25)
+
+
+def test_stage3_cartridge_balance_cannot_exceed_stage_projection():
+    train = CondensationTrain.create_default()
+    train.stages[3].collected_kg["Mn"] = 0.25
+
+    class LedgerView:
+        def kg_by_account(self):
+            return {MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: {"Mn": 0.5}}
+
+    with pytest.raises(AccountingError, match="exceeds Stage-3 projection"):
+        stage_purity_report(train, LedgerView())
+
+
+@pytest.mark.parametrize(
+    ("elapsed_hour", "expected_fraction"),
+    [(10, 0.0), (11, 0.6), (29, 0.6), (30, 0.0)],
+)
+def test_stage3_mn_cartridge_schedule_uses_inclusive_run_hours(
+    elapsed_hour, expected_fraction
+):
+    host = SimpleNamespace(
+        setpoints={
+            "condensation_train": {
+                "metals_train": {
+                    STAGE_KEY_BY_NUMBER[3]: {
+                        "stage3_cartridge_schedule": {
+                            "mn_cartridge_run_hour_window": [12, 30],
+                        },
+                    },
+                },
+            },
+        },
+        melt=SimpleNamespace(hour=elapsed_hour),
+    )
+    route = SimpleNamespace(
+        condensed_by_stage_species={STAGE_KEY_BY_NUMBER[3]: {"Mn": 6.0}},
+        condensed_for_species=lambda _species: 10.0,
+    )
+
+    assert EvaporationMixin._stage3_mn_cartridge_fraction(
+        host, route, "Mn"
+    ) == pytest.approx(expected_fraction)
+
+
+def test_stage3_cartridge_split_keeps_declared_gas_coproduct_out():
+    host = SimpleNamespace(
+        setpoints={
+            "condensation_train": {
+                "metals_train": {
+                    STAGE_KEY_BY_NUMBER[3]: {
+                        "stage3_cartridge_schedule": {
+                            "mn_cartridge_run_hour_window": [12, 30],
+                        },
+                    },
+                },
+            },
+        },
+        melt=SimpleNamespace(hour=11),
+    )
+    route = SimpleNamespace(
+        condensed_by_stage_species={STAGE_KEY_BY_NUMBER[3]: {"CrO2": 6.0}},
+        condensed_for_species=lambda _species: 10.0,
+    )
+    sp_data = {
+        "condensation_products_mol_per_mol_vapor": {
+            "Cr2O3": 0.5,
+            "O2": 0.25,
+        },
+        "condensation_product_accounts": {
+            "Cr2O3": "terminal.chromium_condensed_oxide_stored",
+            "O2": "process.overhead_gas",
+        },
+    }
+
+    fractions = EvaporationMixin._stage3_mn_cartridge_account_fractions(
+        host, route, "CrO2", sp_data
+    )
+
+    assert set(fractions) == {"Cr2O3"}
+    assert fractions["Cr2O3"][MANGANESE_STAGE3_CARTRIDGE_ACCOUNT] == pytest.approx(
+        0.6
+    )
+
+
+def test_stage3_cartridge_split_defers_invalid_fractions_to_provider():
+    host = SimpleNamespace(
+        setpoints={
+            "condensation_train": {
+                "metals_train": {
+                    STAGE_KEY_BY_NUMBER[3]: {
+                        "stage3_cartridge_schedule": {
+                            "mn_cartridge_run_hour_window": [12, 30],
+                        },
+                    },
+                },
+            },
+        },
+        melt=SimpleNamespace(hour=11),
+    )
+    route = SimpleNamespace(
+        condensed_by_stage_species={STAGE_KEY_BY_NUMBER[3]: {"CrO2": 6.0}},
+        condensed_for_species=lambda _species: 10.0,
+    )
+
+    assert EvaporationMixin._stage3_mn_cartridge_account_fractions(
+        host,
+        route,
+        "CrO2",
+        {"condensation_product_account_fractions": {"Cr2O3": "invalid"}},
+    ) is None
+
+
+def test_stage3_mn_cartridge_schedule_rejects_bool_hour_bounds():
+    host = SimpleNamespace(
+        setpoints={
+            "condensation_train": {
+                "metals_train": {
+                    STAGE_KEY_BY_NUMBER[3]: {
+                        "stage3_cartridge_schedule": {
+                            "mn_cartridge_run_hour_window": [True, 30],
+                        },
+                    },
+                },
+            },
+        },
+        melt=SimpleNamespace(hour=11),
+    )
+    route = SimpleNamespace(
+        condensed_by_stage_species={STAGE_KEY_BY_NUMBER[3]: {"Mn": 6.0}},
+        condensed_for_species=lambda _species: 10.0,
+    )
+
+    with pytest.raises(AccountingError, match="hour bounds must be real numbers"):
+        EvaporationMixin._stage3_mn_cartridge_fraction(host, route, "Mn")
+
+
+def test_stage3_mn_cartridge_schedule_ignores_wall_only_routes():
+    host = SimpleNamespace(
+        setpoints={
+            "condensation_train": {
+                "metals_train": {
+                    STAGE_KEY_BY_NUMBER[3]: {
+                        "stage3_cartridge_schedule": {
+                            "mn_cartridge_run_hour_window": [12, 30],
+                        },
+                    },
+                },
+            },
+        },
+        melt=SimpleNamespace(hour=11),
+    )
+    route = SimpleNamespace(
+        wall_deposit_fraction_by_species={"organic_tar": 1.0},
+    )
+
+    assert EvaporationMixin._stage3_mn_cartridge_fraction(
+        host, route, "organic_tar"
+    ) == 0.0
+
+
 def test_stage_purity_activity_uses_explicit_accepted_species_capture_state():
     train = CondensationTrain.create_default()
     train.stages[2].collected_kg.update({"Cr": 1.0, "Mn": 0.0})
@@ -239,13 +475,8 @@ def test_route_result_records_scaled_stage_impurity_without_changing_capture():
     assert route.remaining_by_species["K"] == pytest.approx(1.0 - total_deposited)
 
 
-def test_default_k_route_allocation_numeric_pin():
-    """Pin the production band-integrated route, not a calibration target.
-
-    The c679673f5/85fedcb8e capture changes integrate each collector's
-    temperature band and saturation thresholds; the old midpoint pin had
-    more K reaching stage 6 and less captured at stage 5.
-    """
+def test_supersaturated_k_route_records_na_tap_co_deposition():
+    """Supersaturated K can co-deposit on the Na tap and is counted as impurity."""
     model = CondensationModel(CondensationTrain.create_default())
     assert tuple(stage_purity_report(model.train)) == (
         'stage_0', 'stage_1_fe_condenser', 'stage_2_cr_oxide_harvest',
@@ -261,17 +492,18 @@ def test_default_k_route_allocation_numeric_pin():
         EvaporationFlux(species_kg_hr={'K': 1.0}, total_kg_hr=1.0),
         MeltState(temperature_C=1650.0),
     )
-    assert route.condensed_by_stage_species == {
-        K_TRAP_STAGE_KEY: {'K': 0.9999661577804508},
-        'stage_5_vortex_dust_filter': {'K': 3.344749012837271e-05},
-        'stage_6_turbine_compressor': {'K': 3.947289899573387e-07},
-    }
-    assert route.remaining_by_species == {'K': 4.3083272981466337e-13}
-    assert route.wall_deposit_by_species == {}
-    assert route.impurity_by_stage_species == {
-        'stage_5_vortex_dust_filter': {'K': 3.344749012837271e-05},
-        'stage_6_turbine_compressor': {'K': 3.947289899573387e-07},
-    }
+    na_tap_k = route.condensed_by_stage_species[NA_COLLECTOR_STAGE_KEY]['K']
+    assert na_tap_k > 0.0
+    assert route.impurity_by_stage_species[NA_COLLECTOR_STAGE_KEY]['K'] == (
+        pytest.approx(na_tap_k)
+    )
+    assert route.condensed_by_stage_species[K_TRAP_STAGE_KEY]['K'] > 0.0
+    assert sum(
+        values.get('K', 0.0)
+        for values in route.condensed_by_stage_species.values()
+    ) + route.wall_deposit_by_species.get('K', 0.0) + route.remaining_by_species['K'] == (
+        pytest.approx(1.0)
+    )
 
 
 def _visit_labels(train: CondensationTrain) -> list[int | str]:
@@ -348,9 +580,15 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
 
     assert route.condensed_by_stage_species[NA_COLLECTOR_STAGE_KEY]['Na'] > 0.0
     assert route.condensed_by_stage_species[K_TRAP_STAGE_KEY]['K'] > 0.0
-    assert 'Na' not in route.impurity_by_stage_species.get(
-        NA_COLLECTOR_STAGE_KEY, {})
-    assert 'K' not in route.impurity_by_stage_species.get(K_TRAP_STAGE_KEY, {})
+    na_tap_k = route.condensed_by_stage_species[NA_COLLECTOR_STAGE_KEY].get('K', 0.0)
+    assert route.impurity_by_stage_species[NA_COLLECTOR_STAGE_KEY]['K'] == (
+        pytest.approx(na_tap_k)
+    )
+    k_trap_na = route.condensed_by_stage_species[K_TRAP_STAGE_KEY].get('Na', 0.0)
+    if k_trap_na > 0.0:
+        assert route.impurity_by_stage_species[K_TRAP_STAGE_KEY]['Na'] == (
+            pytest.approx(k_trap_na)
+        )
     na_key, na_record = _extrapolated_record_at(route, 'Na', 523.15)
     k_key, k_record = _extrapolated_record_at(route, 'K', 313.15)
     assert na_key == 'Na#67'
@@ -366,6 +604,86 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
     warnings = ' '.join(route.antoine_extrapolation_warnings)
     assert 'valid_range_K [924, 1118] at 523.15 K' in warnings
     assert 'valid_range_K [679.4, 1033] at 313.15 K' in warnings
+
+
+@pytest.mark.parametrize('species', ['Cr', 'Mn'])
+def test_designated_stage_two_species_can_reach_downstream_duct_walls(species):
+    model = CondensationModel(CondensationTrain.create_default())
+
+    candidates = model._mixed_temperature_wall_candidate_segments(species)
+
+    assert candidates
+    assert any(
+        int(segment.downstream_stage.removeprefix('stage_')) > 2
+        for segment in candidates
+    )
+
+
+def test_stage_two_manganese_freezes_out_at_k_trap_as_tap_impurity():
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={'Mn': 0.04254},
+        stage_area_m2_by_stage={
+            'fe_stage1': 0.0,
+            'cr_stage2': 0.0,
+            'sio_stage3': 0.0,
+            'alkali_stage4': 0.0,
+            'k_stage4b': 10.0,
+            'terminal': 0.0,
+        },
+    )
+    # Isolate cold-stage capture from the default interstage duct surfaces.
+    model.pipe_segments = []
+
+    route = model.route(
+        EvaporationFlux(species_kg_hr={'Mn': 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1650.0),
+    )
+
+    trap_capture = route.capture_kg_by_stage_identity[(4, 1)]['Mn']
+    assert trap_capture > 0.0
+    assert route.impurity_by_stage_species[K_TRAP_STAGE_KEY]['Mn'] == (
+        pytest.approx(trap_capture)
+    )
+    assert route.remaining_by_species['Mn'] < 1.0
+
+
+def test_stage_two_manganese_can_deposit_on_downstream_duct_wall():
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={'Mn': 0.04254},
+        stage_area_m2_by_stage={
+            'fe_stage1': 0.0,
+            'cr_stage2': 0.0,
+            'sio_stage3': 0.0,
+            'alkali_stage4': 0.0,
+            'k_stage4b': 0.0,
+            'terminal': 0.0,
+        },
+    )
+    model.pipe_segments = [
+        replace(
+            segment,
+            wall_temperature_C=(
+                250.0 if segment.downstream_stage == 'stage_4' else 1500.0
+            ),
+        )
+        for segment in model.pipe_segments
+    ]
+    cold_duct = next(
+        segment
+        for segment in model.pipe_segments
+        if segment.downstream_stage == 'stage_4'
+    )
+
+    route = model.route(
+        EvaporationFlux(species_kg_hr={'Mn': 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1650.0),
+    )
+
+    assert route.wall_deposit_by_segment_species[cold_duct.name]['Mn'] > 0.0
 
 
 def test_k_moves_to_its_trap_and_other_stage_4_destinations_stay():

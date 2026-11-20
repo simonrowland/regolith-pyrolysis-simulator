@@ -152,6 +152,7 @@ _CONSTRAINT_KEYS = frozenset({
     "gates",
     "target_species",
     "enforce_delivered_stream_purity",
+    "cycle_time_max_h_source",
     *_THRESHOLD_CONSTRAINT_KEYS,
 })
 _SEED_KEYS = frozenset(
@@ -185,6 +186,7 @@ _RUN_KEYS = frozenset(
         "allow_fallback_vapor",
         "allow_unmeasured_alpha_fallback",
         "force_builtin_vapor_pressure",
+        "until_campaign_complete",
         "lab_alpha_digest",
         "geometry_digest",
         "effective_exposed_area_m2",
@@ -505,7 +507,12 @@ def physics_constraints_from_profile(
             value=float(raw_constraints[key]),
             units=threshold.units,
             source="profile",
-            source_ref=f"{profile_source}:constraints.{key}",
+            source_ref=(
+                str(raw_constraints["cycle_time_max_h_source"])
+                if key == "cycle_time_max_h"
+                and raw_constraints.get("cycle_time_max_h_source")
+                else f"{profile_source}:constraints.{key}"
+            ),
             tolerance=threshold.tolerance,
         )
     if "target_species" in raw_constraints:
@@ -637,6 +644,13 @@ def _validate_constraints(raw: Any, *, source: str | Path) -> None:
     ):
         raise ProfileValidationError(
             f"{source}: constraints.enforce_delivered_stream_purity must be a bool"
+        )
+    if "cycle_time_max_h_source" in raw and (
+        not isinstance(raw["cycle_time_max_h_source"], str)
+        or not raw["cycle_time_max_h_source"].strip()
+    ):
+        raise ProfileValidationError(
+            f"{source}: constraints.cycle_time_max_h_source must be a non-empty string"
         )
     for key in _THRESHOLD_CONSTRAINT_KEYS:
         if key not in raw:
@@ -822,6 +836,12 @@ def _validate_run(raw: Any, *, source: str | Path, where: str) -> None:
         raise ProfileValidationError(f"{source}: {where}.mass_kg must be positive")
     if "c5_enabled" in raw and not isinstance(raw["c5_enabled"], bool):
         raise ProfileValidationError(f"{source}: {where}.c5_enabled must be bool")
+    if "until_campaign_complete" in raw and not isinstance(
+        raw["until_campaign_complete"], bool
+    ):
+        raise ProfileValidationError(
+            f"{source}: {where}.until_campaign_complete must be bool"
+        )
     if "mre_max_voltage_V" in raw and _bad_non_negative_number(raw["mre_max_voltage_V"]):
         raise ProfileValidationError(
             f"{source}: {where}.mre_max_voltage_V must be non-negative finite"

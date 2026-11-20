@@ -3586,6 +3586,7 @@ class ExtractionMixin:
             C7_MIN_TOTAL_PRESSURE_MBAR,
         )
         from engines.builtin.evaporation_flux import (
+            DEFAULT_SOURCE_FILM_CHARACTERISTIC_LENGTH_M,
             EvaporationFluxConfigurationError,
             _series_resistance_evaporation_flux_kg_m2_s,
         )
@@ -3803,8 +3804,12 @@ class ExtractionMixin:
         gas_temperature_K = float(
             getattr(self.overhead, 'headspace_temperature_K', 0.0) or hold_temp_K
         )
-        pipe_diameter_m = float(
-            getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
+        pipe_diameter_m = self.overhead_model.effective_throat_diameter_m(
+            self.melt
+        )
+        source_film_characteristic_length_m = series_config.get(
+            'source_film_characteristic_length_m',
+            DEFAULT_SOURCE_FILM_CHARACTERISTIC_LENGTH_M,
         )
         if cf7_ca_shell_route_active and (
             C7_MIN_TOTAL_PRESSURE_MBAR <= p_total_mbar <= C7_MAX_TOTAL_PRESSURE_MBAR
@@ -3833,6 +3838,9 @@ class ExtractionMixin:
                     ),
                     gas_resistance_enabled=bool_feature_flag(
                         series_config, 'gas_resistance_enabled', True
+                    ),
+                    source_film_characteristic_length_m=(
+                        source_film_characteristic_length_m
                     ),
                     melt_surface_renewal_base_kg_s_m2_pa=self._c7_float(
                         series_config.get(

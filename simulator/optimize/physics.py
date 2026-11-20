@@ -4,12 +4,14 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
+from functools import lru_cache
 import hashlib
 import math
 from types import MappingProxyType
 from typing import Any, Literal, Mapping
 
 from simulator.accounting import AccountingError
+from simulator.config import DEFAULT_DATA_DIR, _load_setpoints_file
 from simulator.accounting.completeness import (
     DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
     TargetExtractionCompleteness,
@@ -63,7 +65,7 @@ SourceKind = Literal[
 # v8: purity is diagnostic-only by default; extraction completeness uses the
 # left-the-melt basis and retains the captured product-ledger ratio as a
 # provisional diagnostic.
-PHYSICS_GATE_VERSION = "physics-feasibility-v8-left-melt-purity-diagnostic"
+PHYSICS_GATE_VERSION = "physics-feasibility-v10-stage4-sio-diagnostic"
 DEFAULT_ACTIVE_GATES: tuple[str, ...] = (
     "delivered_stream_purity",
     "coating",
@@ -71,7 +73,11 @@ DEFAULT_ACTIVE_GATES: tuple[str, ...] = (
     "knudsen_viscous",
     "furnace_temperature",
 )
-GATE_ORDER: tuple[str, ...] = (*DEFAULT_ACTIVE_GATES, "cycle_time")
+GATE_ORDER: tuple[str, ...] = (
+    *DEFAULT_ACTIVE_GATES,
+    "stage4_sio_impurity",
+    "cycle_time",
+)
 E1B_TARGET_SPECIES: tuple[str, ...] = ("Na", "K", "Fe", "Mg", "SiO")
 E1B_TARGET_YIELD_GATE_FRACTION = 0.95
 TARGET_SPECIES_YIELD_CONSUMERS: tuple[str, ...] = (
@@ -108,6 +114,36 @@ class ThresholdSpec:
             raise ValueError(f"{self.id}.tolerance must be finite and non-negative")
         if not self.source_ref:
             raise ValueError(f"{self.id}.source_ref must be declared")
+
+
+@lru_cache(maxsize=1)
+def _stage4_sio_impurity_threshold() -> ThresholdSpec:
+    setpoints = _load_setpoints_file(DEFAULT_DATA_DIR / "setpoints.yaml")
+    raw = (
+        setpoints.get("condenser_geometry", {})
+        .get("stage4_sio_impurity_gate", {})
+        .get("max_impurity_to_designated_ratio")
+    )
+    if isinstance(raw, bool):
+        raise ValueError("stage4 SiO impurity limit must be numeric")
+    try:
+        value = float(raw)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("stage4 SiO impurity limit is unavailable") from exc
+    if not math.isfinite(value) or value < 0.0:
+        raise ValueError(
+            "stage4 SiO impurity limit must be finite and non-negative"
+        )
+    return ThresholdSpec(
+        id="stage4_sio_impurity_to_designated_max",
+        value=value,
+        units="kg SiO2+Si / kg Na+Mg",
+        source="engineering_envelope",
+        source_ref=(
+            "data/setpoints.yaml:condenser_geometry."
+            "stage4_sio_impurity_gate.max_impurity_to_designated_ratio"
+        ),
+    )
 
 
 def _d045_upstream_wall_deposit_threshold() -> ThresholdSpec:
@@ -212,6 +248,9 @@ class PhysicsConstraintSet:
         source="engineering_envelope",
         source_ref="stage_purity_report PURE cutoff / optimizer profile default",
     ))
+    stage4_sio_impurity_max_ratio: ThresholdSpec = field(
+        default_factory=_stage4_sio_impurity_threshold
+    )
     enforce_delivered_stream_purity: bool = False
     coating_min_campaigns_to_resinter: ThresholdSpec = field(
         default_factory=lambda: ThresholdSpec(
@@ -269,6 +308,7 @@ class PhysicsConstraintSet:
     def __getstate__(self) -> dict[str, Any]:
         return {
             "stream_purity_min": self.stream_purity_min,
+            "stage4_sio_impurity_max_ratio": self.stage4_sio_impurity_max_ratio,
             "enforce_delivered_stream_purity": (
                 self.enforce_delivered_stream_purity
             ),
@@ -291,6 +331,12 @@ class PhysicsConstraintSet:
             object.__setattr__(self, key, value)
         if "enforce_delivered_stream_purity" not in state:
             object.__setattr__(self, "enforce_delivered_stream_purity", False)
+        if "stage4_sio_impurity_max_ratio" not in state:
+            object.__setattr__(
+                self,
+                "stage4_sio_impurity_max_ratio",
+                _stage4_sio_impurity_threshold(),
+            )
         self.__post_init__()
 
     def __post_init__(self) -> None:
@@ -364,6 +410,8 @@ class PhysicsConstraintSet:
             self.furnace_T_max_C,
             *tuple(self.allowable_wall_deposit_kg.values()),
         ]
+        if "stage4_sio_impurity" in self.active_gates:
+            thresholds.append(self.stage4_sio_impurity_max_ratio)
         if "cycle_time" in self.active_gates:
             thresholds.append(self.cycle_time_max_h)
         return tuple(thresholds)
@@ -407,6 +455,15 @@ class PhysicsConstraintSet:
                 self.furnace_T_max_C.source,
             ),
         ]
+        if "stage4_sio_impurity" in self.active_gates:
+            rows.append((
+                "stage4_sio_impurity",
+                (
+                    f"{self.stage4_sio_impurity_max_ratio.id}="
+                    f"{self.stage4_sio_impurity_max_ratio.value:g}"
+                ),
+                self.stage4_sio_impurity_max_ratio.source,
+            ))
         if "cycle_time" in self.active_gates:
             rows.append((
                 "cycle_time",
@@ -433,6 +490,7 @@ class PhysicsConstraintSet:
     def evaluate(self, trace: Any) -> FeasibilityResult:
         evaluators = {
             "delivered_stream_purity": self.delivered_stream_purity,
+            "stage4_sio_impurity": self.stage4_sio_impurity,
             "coating": self.coating,
             "extraction_completeness": self.extraction_completeness,
             "knudsen_viscous": self.knudsen_viscous,
@@ -479,6 +537,73 @@ class PhysicsConstraintSet:
         return FeasibilityResult(
             feasible=all(margin.feasible for margin in margins.values()),
             margins=margins,
+        )
+
+    def stage4_sio_impurity(self, trace: Any) -> GateMargin:
+        threshold = self.stage4_sio_impurity_max_ratio
+        try:
+            ratio = getattr(
+                trace, "stage4_sio_impurity_to_designated_ratio", None
+            )
+            if ratio is None:
+                return self._stage4_sio_impurity_unavailable(
+                    threshold,
+                    "net unique Stage-4 SiO2+Si ratio is unavailable",
+                )
+            observed = _non_negative_number(
+                ratio, "stage4 SiO impurity/designated ratio"
+            )
+            result = _margin(
+                "stage4_sio_impurity",
+                threshold.value - observed,
+                threshold,
+                observed,
+                (
+                    f"Stage-4 SiO2+Si / net unique Na+Mg = {observed:.6g}; "
+                    f"limit={threshold.value:.6g}"
+                ),
+            )
+            return replace(
+                result,
+                feasible=True,
+                status="warning" if not result.feasible else "available",
+                authoritative=False,
+                output_status="provisional",
+                status_reason=(
+                    "provisional controller purity gate violation"
+                    if not result.feasible
+                    else "provisional controller purity gate"
+                ),
+                status_payload={
+                    "basis": "net unique Stage-4 designated Na+Mg",
+                    "diagnostic_only": True,
+                    "violation_flag": (
+                        "stage4_sio_impurity_limit_exceeded"
+                        if not result.feasible
+                        else ""
+                    ),
+                },
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            return self._stage4_sio_impurity_unavailable(
+                threshold, str(exc)
+            )
+
+    @staticmethod
+    def _stage4_sio_impurity_unavailable(
+        threshold: ThresholdSpec,
+        reason: str,
+    ) -> GateMargin:
+        return replace(
+            _unavailable_gate("stage4_sio_impurity", threshold, reason),
+            feasible=True,
+            detail=f"diagnostic unavailable: {reason}",
+            status_payload={
+                "diagnostic_only": True,
+                "refusal_code": "stage4_sio_impurity_ratio_unavailable",
+                "reason": reason,
+                "violation_flag": "stage4_sio_impurity_ratio_unavailable",
+            },
         )
 
     def delivered_stream_purity(self, trace: Any) -> GateMargin:

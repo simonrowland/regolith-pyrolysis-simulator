@@ -124,24 +124,27 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # target_status=unverified_design_target, decision=d-310 and a reason
     # string; no value changed. Removing exactly those nine leaves recovers
     # b8c8690e41376896aa578e93acb1db4c40a95b1fb46cbe8aa9a50b1c28ab55a0.
+    # d-283/d-452: recomputed from load_config_bundle() after absolute collector
+    # areas and the 0.5 m throat geometry were added to the resolved setpoints.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "4436185d4b632cf72cf30d44df0dbc9a5278866f671bc72c14f13f18cbb027f8"
+        "6b4380d2b57ddde6f1453afaa2c6fc07ece75d6e42a6e20047effda85a74c57d"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
     # b-282: upstream wall search floor leaves the SiO-quiescent 1400 C
     # figure and becomes the coldest downstream collector interface (20 C).
+    # d-283/d-452 add bounded stage areas, throat area, and per-stage vanes.
     assert schema.bounds_digest == (
-        "924bcffff0ce77444cfd851929faefa132f8441929df26d5196704b996941b04"
+        "a402cd0bce53fc9ef5ea64c43e86415596cb62ef7a83b48c0a9fa152f0864cf2"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
     )
     # Moves with bounds_digest above -- that is the POINT of this test's name
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
-    # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
+    # tracks the schema. Recomputed from the production recipe resolver.
     assert empty.recipe_id(schema) == (
-        "0df7598273ce6b4f9a8e436eb93bcb6371b0ab49a1b5f7112f297929f110521f"
+        "ac9dcf952e171a3a80465ff581f66120fcaff0ffbe010d4e08caac0a0e7faafe"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -154,7 +157,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "8744ed2c41d68c6cde9722d7d45cc9963c4861e6d0ea5b2dd4424658b108d069"
+        "07b3610fadb3f9434371cf6b9f842f267df11898e510dbccf199df9acaec937f"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -601,11 +604,12 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
     assert unpinned is schema
-    assert len(paths) == 65
-    assert (
-        hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "2ec62a88bfd19a7ada68b2cef06882b85d218b2e57dfc753d5d3feb1cc91dec7"
-    )
+    # Five stage areas plus one throat and five vane paths extend the prior
+    # searchable recipe vocabulary.
+    assert len(paths) == 76
+    assert hashlib.sha256(
+        canonical_json_dumps(paths).encode("utf-8")
+    ).hexdigest() == "0432df0fe7e53251f70bf29cee426a71fb55a37f6bdded6b25f49341611123a4"
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
         FEEDSTOCK,
@@ -728,7 +732,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # cache_key(spec) with that default-off policy.
     # 2026-11-12 b260: recomputed for t-1720 (d-389 carrier cost in the
     # objective).
-    assert cache_key(spec) == "8d41af13498d7c9be4c2b39053f64c9c439e2d2ef109fac255f8d027cb4d8861"
+    # d-283/d-452: recomputed through _build_eval_inputs with hardware costs in
+    # canonical EvalSpec identity.
+    assert cache_key(spec) == "e472fdfd1fff9d490dd37a7a031ebe6d6389445731c6a0562cd585668f2a1827"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -823,7 +829,7 @@ def test_furnace_max_t_c_bounds_are_allowlist_epoch_pinned() -> None:
     # bound values meant a failure named none of them -- the diff said only "at
     # index 2", and an epoch drift and a bounds drift were indistinguishable.
     # One assertion per fact, so the failure names the fact.
-    assert schema.allowlist_version == "allowlist-v12"
+    assert schema.allowlist_version == "allowlist-v13"
     assert O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION == "allowlist-v12"
     # The knob's bounds ARE the furnace envelope -- that identity is the claim
     # worth pinning here. The envelope's own VALUE is owned by the catalog and
@@ -1204,6 +1210,66 @@ def test_c2a_staged_stage_gas_knobs_validate_and_render() -> None:
     assert sio_stage["pO2_mbar"] == pytest.approx(2.5)
     assert sio_stage["p_total_mbar"] == pytest.approx(12.0)
     assert sio_stage["gas_cover_mode"] == "po2_hold"
+
+
+def test_d452_throat_and_stage_vane_knobs_use_log_bounded_paths() -> None:
+    schema = RecipeSchema()
+    optimizer_bounds = yaml.safe_load(SETPOINTS_PATH.read_text())[
+        "condenser_geometry"
+    ]["optimizer_bounds"]
+    area_path = ("condenser_geometry", "initial_throat_area_m2")
+    vane_path = (
+        "campaigns", "C2A_staged", "stages", "sio_window",
+        "slider_vane_open_fraction",
+    )
+    area_spec = schema.spec_for(area_path)
+    vane_spec = schema.spec_for(vane_path)
+
+    assert area_spec.scale == "log"
+    assert area_spec.bounds_source == (
+        "setpoints:condenser_geometry.optimizer_bounds.max_throat_area_m2"
+    )
+    assert (area_spec.low, area_spec.high) == pytest.approx(
+        tuple(optimizer_bounds["max_throat_area_m2"])
+    )
+    assert vane_spec.scale == "log"
+    assert vane_spec.bounds_source == (
+        "setpoints:condenser_geometry.optimizer_bounds.slider_vane_open_fraction"
+    )
+    assert (vane_spec.low, vane_spec.high) == pytest.approx(
+        tuple(optimizer_bounds["slider_vane_open_fraction"])
+    )
+    patch = RecipePatch({area_path: area_spec.high, vane_path: 0.25}).validated(
+        schema
+    )
+    staged = schema.to_setpoints_patch(patch)
+    stage = _stage_by_name(staged["campaigns"]["C2A_staged"]["stages"], "sio_window")
+    assert stage["slider_vane_open_fraction"] == pytest.approx(0.25)
+
+
+def test_d452_throat_and_vanes_are_doe_continuous_knobs() -> None:
+    expected = {
+        ("condenser_geometry", "initial_throat_area_m2"),
+        ("campaigns", "C2A_continuous", "slider_vane_open_fraction"),
+        (
+            "campaigns", "C2A_staged", "stages", "alkali_early_fe",
+            "slider_vane_open_fraction",
+        ),
+        (
+            "campaigns", "C2A_staged", "stages", "sio_window",
+            "slider_vane_open_fraction",
+        ),
+        (
+            "campaigns", "C2A_staged", "stages", "fe_hot_hold",
+            "slider_vane_open_fraction",
+        ),
+        (
+            "campaigns", "C2A_staged", "stages", "cool_for_na_shuttle",
+            "slider_vane_open_fraction",
+        ),
+    }
+
+    assert expected <= set(doe_module.PHASE_ORDER_CONTINUOUS_KNOBS)
 
 
 def test_c2a_staged_stage_gas_knobs_fail_loudly() -> None:
@@ -1756,7 +1822,7 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # and this versioned recipe id move with it.
     assert (
         first.recipe_id()
-                == "6b9e45a34fdc8bf972cc3488bdb170538c4f807d45ceec2012d0fd12fe921937"
+                == "30ad3f1cc8410a7de61d1f2a897fc9de836eb3f4406ce1bbdf4c5a6ac384826b"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
@@ -2181,7 +2247,7 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
         + grounded_sources
         == len(RecipeSchema().allowlist)
     )
-    assert range_sourced == 41
+    assert range_sourced == 54
     assert converted_setpoint_ranges == 2
     assert engineering_envelopes > 0
     assert grounded_sources > 0
@@ -2233,6 +2299,32 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
         "campaigns.C6.pO2_mbar_default": (0.08, 0.35),
         "campaigns.C6.p_total_mbar_default": (0.08, 0.35),
     }
+    optimizer_bounds = yaml.safe_load(SETPOINTS_PATH.read_text())[
+        "condenser_geometry"
+    ]["optimizer_bounds"]
+    stage_area_bounds = tuple(optimizer_bounds["stage_area_m2"])
+    expected.update(
+        {
+            f"condenser_geometry.stage_areas_m2.{stage}": stage_area_bounds
+            for stage in recipe_module.CONDENSER_STAGE_AREA_KEYS
+        }
+    )
+    expected["condenser_geometry.initial_throat_area_m2"] = tuple(
+        optimizer_bounds["max_throat_area_m2"]
+    )
+    vane_bounds = tuple(optimizer_bounds["slider_vane_open_fraction"])
+    expected.update(
+        {
+            path: vane_bounds
+            for path in (
+                "campaigns.C2A_continuous.slider_vane_open_fraction",
+                "campaigns.C2A_staged.stages.alkali_early_fe.slider_vane_open_fraction",
+                "campaigns.C2A_staged.stages.sio_window.slider_vane_open_fraction",
+                "campaigns.C2A_staged.stages.fe_hot_hold.slider_vane_open_fraction",
+                "campaigns.C2A_staged.stages.cool_for_na_shuttle.slider_vane_open_fraction",
+            )
+        }
+    )
     schema = RecipeSchema()
     actual = {
         ".".join(spec.path): (
@@ -2248,11 +2340,33 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
         )
     }
 
-    assert len(actual) == 43
+    assert len(actual) == 54
     assert actual == {
         path: (type(low), low, type(high), high)
         for path, (low, high) in expected.items()
     }
+
+
+def test_d283_stage_area_knobs_are_log_bounded_doe_paths() -> None:
+    schema = RecipeSchema()
+    bounds = yaml.safe_load(SETPOINTS_PATH.read_text())[
+        "condenser_geometry"
+    ]["optimizer_bounds"]["stage_area_m2"]
+    area_path = ("condenser_geometry", "stage_areas_m2", "fe_stage1")
+    spec = schema.spec_for(area_path)
+
+    assert spec.scale == "log"
+    assert (spec.low, spec.high) == pytest.approx(tuple(bounds))
+    assert spec.bounds_source == (
+        "setpoints:condenser_geometry.optimizer_bounds.stage_area_m2"
+    )
+    assert set(recipe_module.CONDENSER_STAGE_AREA_KNOB_PATHS) <= set(
+        doe_module.PHASE_ORDER_CONTINUOUS_KNOBS
+    )
+    patch = RecipePatch({area_path: spec.low}).validated(schema)
+    assert schema.to_setpoints_patch(patch)["condenser_geometry"][
+        "stage_areas_m2"
+    ]["fe_stage1"] == pytest.approx(spec.low)
 
 
 def test_recipe_schema_uses_supplied_setpoints_for_derived_bounds() -> None:

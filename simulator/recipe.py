@@ -22,8 +22,20 @@ from simulator.canonical import canonical_json_dumps
 
 KeyPath = tuple[str, ...]
 
+CONDENSER_STAGE_AREA_KEYS = (
+    "fe_stage1",
+    "cr_stage2",
+    "sio_stage3",
+    "alkali_stage4",
+    "k_stage4b",
+)
+CONDENSER_STAGE_AREA_KNOB_PATHS: tuple[KeyPath, ...] = tuple(
+    ("condenser_geometry", "stage_areas_m2", stage)
+    for stage in CONDENSER_STAGE_AREA_KEYS
+)
+
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v12"
+allowlist_version = "allowlist-v13"
 O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v12"
 O2_BUBBLER_DEFAULT_ETA_ABSORB = 0.75
 _RECIPE_ENVELOPE_KEYS = frozenset({"metadata", "cost_parameters"})
@@ -508,6 +520,15 @@ def _c2a_stage_gas_knobs(stage_name: str) -> tuple[KnobSpec, ...]:
                 "Atmosphere.CONTROLLED_O2"
             ),
         ),
+        _knob(
+            f"{prefix}.slider_vane_open_fraction",
+            units="fraction",
+            bounds_source=(
+                "setpoints:condenser_geometry.optimizer_bounds."
+                "slider_vane_open_fraction"
+            ),
+            scale="log",
+        ),
     )
 
 
@@ -604,6 +625,14 @@ class RecipeSchema:
     )
 
     ALLOWLIST: tuple[KnobSpec, ...] = (
+        _knob(
+            "condenser_geometry.initial_throat_area_m2",
+            units="m2",
+            bounds_source=(
+                "setpoints:condenser_geometry.optimizer_bounds.max_throat_area_m2"
+            ),
+            scale="log",
+        ),
         _knob(
             "furnace_max_T_C",
             low=FURNACE_MAX_T_BOUNDS_C[0],
@@ -735,6 +764,15 @@ class RecipeSchema:
             "campaigns.C2A_continuous.p_total_mbar_default",
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_continuous.p_total_mbar",
+            scale="log",
+        ),
+        _knob(
+            "campaigns.C2A_continuous.slider_vane_open_fraction",
+            units="fraction",
+            bounds_source=(
+                "setpoints:condenser_geometry.optimizer_bounds."
+                "slider_vane_open_fraction"
+            ),
             scale="log",
         ),
         _knob(
@@ -1348,6 +1386,18 @@ class RecipeSchema:
                 "condensation_train stage 6/7 interface envelope: "
                 "setpoints.yaml condensation_train.metals_train bands"
             ),
+        ),
+        *(
+            _knob(
+                f"condenser_geometry.stage_areas_m2.{stage}",
+                units="m2",
+                bounds_source=(
+                    "setpoints:condenser_geometry.optimizer_bounds."
+                    "stage_area_m2"
+                ),
+                scale="log",
+            )
+            for stage in CONDENSER_STAGE_AREA_KEYS
         ),
     )
 

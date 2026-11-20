@@ -80,12 +80,42 @@ def test_yaml_defaults_load_with_recipe_default_provenance() -> None:
         "N2": pytest.approx(0.0),
     }
     assert values["carrier_makeup_loss_fraction_per_run"] == pytest.approx(0.01)
+    assert values["condenser_stage_wall_thickness_m"] == pytest.approx(0.01)
+    assert values["condenser_stage_bulk_density_kg_m3"] == {
+        "fe_stage1": pytest.approx(4500.0),
+        "cr_stage2": pytest.approx(4500.0),
+        "sio_stage3": pytest.approx(2200.0),
+        "alkali_stage4": pytest.approx(3210.0),
+        "k_stage4b": pytest.approx(3210.0),
+    }
+    assert values["hot_duct_cost_per_m2_usd"] == pytest.approx(25000.0)
+    assert values["shared_condenser_train_cost_per_kg_hr_usd"] == pytest.approx(
+        2000.0
+    )
+    assert values["furnaces_per_shared_train"] == pytest.approx(10.0)
     assert set(values["shuttle_reagent_replacement_cost_per_kg"]) == SHUTTLE_REAGENT_SPECIES
 
     defaulted = recipe_cost_parameters_from_payload({}, source="legacy.recipe.yaml")
     assert defaulted["provenance"]["defaults_applied"] is True
     assert "legacy.recipe.yaml" in defaulted["provenance"]["recipe_source"]
     assert cost_parameter_values(defaulted) == cost_parameter_values(block)
+    assert "FLAGGED provisional d-283" in defaulted["parameters"][
+        "condenser_stage_wall_thickness_m"
+    ]["source_tag"]
+    assert "FLAGGED provisional d-283" in defaulted["parameters"][
+        "condenser_stage_bulk_density_kg_m3"
+    ]["source_tag"]
+    assert "FLAGGED provisional d-283" in defaulted["parameters"][
+        "condenser_stage_bulk_density_kg_m3"
+    ]["values"]["fe_stage1"]["source_tag"]
+    for name in (
+        "hot_duct_cost_per_m2_usd",
+        "shared_condenser_train_cost_per_kg_hr_usd",
+        "furnaces_per_shared_train",
+    ):
+        assert "FLAGGED provisional (d-452)" in defaulted["parameters"][name][
+            "source_tag"
+        ]
 
 
 def test_carrier_cost_inputs_share_yaml_and_owner_ratify_cost_metadata() -> None:
@@ -136,6 +166,8 @@ def test_older_v1_recipe_cost_block_gets_new_carrier_cost_defaults() -> None:
         "import_delivery_cost_per_kg",
         "carrier_gas_earth_price_per_kg",
         "carrier_makeup_loss_fraction_per_run",
+        "condenser_stage_wall_thickness_m",
+        "condenser_stage_bulk_density_kg_m3",
     ):
         older["parameters"].pop(name)
 
@@ -291,6 +323,18 @@ def test_evalspec_hash_tracks_cost_values_but_not_cost_provenance() -> None:
     assert cache_key(_spec(floor_moved)) != cache_key(_spec(base))
     assert cost_parameters_from_mapping(floor_moved).min_fouling_penalty == 3.0
 
+    for name in (
+        "hot_duct_cost_per_m2_usd",
+        "shared_condenser_train_cost_per_kg_hr_usd",
+        "furnaces_per_shared_train",
+    ):
+        changed = _with_value(
+            base,
+            name,
+            base["parameters"][name]["value"] + 1.0,
+        )
+        assert cache_key(_spec(changed)) != cache_key(_spec(base))
+
 
 def test_default_furnace_cost_controls_are_identity_transparent_but_nondefaults_split_key() -> None:
     base = default_cost_parameters_block()
@@ -318,6 +362,14 @@ def test_shuttle_static_replacement_exception_is_exact_species_set() -> None:
             params.shuttle_reagent_replacement_cost_per_kg[species]
         )
     assert params.reagent_cost_per_kg("Fe") == pytest.approx(params.generic_reagent_cost_per_kg)
+
+
+def test_shared_train_furnace_count_must_be_positive_whole_number() -> None:
+    base = default_cost_parameters_block()
+    for value in (0, 1.5):
+        invalid = _with_value(base, "furnaces_per_shared_train", value)
+        with pytest.raises(ValueError, match="positive whole number"):
+            cost_parameters_from_mapping(invalid)
 
 
 def test_cost_parameter_sources_are_reproducible() -> None:

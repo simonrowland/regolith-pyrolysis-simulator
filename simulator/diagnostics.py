@@ -1620,6 +1620,7 @@ def pressure_coating_pareto_diagnostic(
     target_species: Sequence[str] = PRESSURE_COATING_PARETO_SPECIES,
 ) -> dict[str, Any]:
     from engines.builtin.evaporation_flux import (
+        DEFAULT_SOURCE_FILM_CHARACTERISTIC_LENGTH_M,
         _series_resistance_evaporation_flux_kg_m2_s,
     )
     from simulator.condensation import _knudsen_number
@@ -1633,6 +1634,11 @@ def pressure_coating_pareto_diagnostic(
     latest_evap = dict(getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {})
     wall_notice = getattr(condensation_model, "last_sticking_alpha_provenance_notice", {}) or {}
     series_by_species = dict(latest_evap.get("evaporation_series_resistance") or {})
+    setpoints = dict(getattr(sim, "setpoints", {}) or {})
+    chemistry_kernel = dict(setpoints.get("chemistry_kernel", {}) or {})
+    series_config = dict(
+        chemistry_kernel.get("evaporation_series_resistance", {}) or {}
+    )
     raw_alpha_authority_status_by_species = dict(
         getattr(sim, "_alpha_authority_status_by_species_engaged", {}) or {}
     )
@@ -1795,6 +1801,10 @@ def pressure_coating_pareto_diagnostic(
             "pipe_diameter_m": _first_finite(
                 series.get("transport_length_m"),
                 controlling["characteristic_length_m"],
+            ),
+            "source_film_characteristic_length_m": series_config.get(
+                "source_film_characteristic_length_m",
+                DEFAULT_SOURCE_FILM_CHARACTERISTIC_LENGTH_M,
             ),
             "axial_stir_factor": _first_finite(series.get("axial_stir_applied"), 0.0),
             "radial_stir_factor": _first_finite(series.get("radial_stir_applied"), 1.0),

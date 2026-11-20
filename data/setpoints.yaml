@@ -144,6 +144,7 @@ campaigns:
     pO2_mbar: null                       # <1e-5 mbar; maintained by Fe-granule sorbent
     pO2_mbar_default: 0.0
     p_total_mbar_default: 10.0
+    slider_vane_open_fraction: 1.0
     pO2_bar: "<1e-8"
     flow_regime: "viscous"               # Kn << 0.01 at 1-10 mbar
     target_species: ["Na", "K", "Fe", "CrO2", "SiO"]
@@ -224,6 +225,7 @@ campaigns:
     pO2_mbar: null
     pO2_mbar_default: 0.0
     p_total_mbar_default: 10.0
+    slider_vane_open_fraction: 1.0
     pO2_bar: "<1e-8"
     flow_regime: "viscous"
     target_species: ["Na", "K", "SiO", "Fe"]
@@ -245,6 +247,7 @@ campaigns:
         target_C: 1250
         ramp_rate_C_per_hr: 600
         duration_h: 4
+        slider_vane_open_fraction: 1.0
         target_species: ["Na", "K"]
         endpoint:
           type: "flux_decay_or_duration"
@@ -261,6 +264,7 @@ campaigns:
         target_C: 1600
         ramp_rate_C_per_hr: 175
         duration_h: 3
+        slider_vane_open_fraction: 1.0
         target_species: ["SiO", "minor_Fe"]
         endpoint:
           type: "SiO_pulse_then_flux_decay_or_duration"
@@ -274,6 +278,7 @@ campaigns:
       - name: fe_hot_hold
         ramp_rate_C_per_hr: 150
         duration_h: 1
+        slider_vane_open_fraction: 1.0
         target_species: ["Fe"]
         endpoint:
           type: "FeO_residual_or_duration"
@@ -289,6 +294,7 @@ campaigns:
         target_C: 1150
         ramp_rate_C_per_hr: 600
         duration_h: 1
+        slider_vane_open_fraction: 1.0
         target_species: ["residual_FeO"]
         endpoint:
           type: "temperature_gate_for_Na_FeO_cleanup"
@@ -445,17 +451,19 @@ campaigns:
     p_total_mbar_default: 0.2
     # The N2 continuum floor derives from hard-sphere kinetic theory:
     # p_min = k_B*T/(sqrt(2)*pi*sigma_N2^2*Kn_max*D), with T=1670 C,
-    # sigma_N2=3.798e-10 m, Kn_max=0.01, and hot-wall D=0.12 m. The
-    # formula returns Pa; divide by 100 for mbar. The operational 5-15 mbar
+    # sigma_N2=3.798e-10 m, Kn_max=0.01, and the owner-set D=0.50 m maximum
+    # aperture. The prior 0.348846 mbar floor scales inversely with D:
+    # 0.348846 * 0.12/0.50 = 0.083723 mbar. The formula returns Pa; divide
+    # by 100 for mbar. The operational 5-15 mbar
     # pN2 band keeps Kn well below 0.01. Derive total pressure as pO2+pN2.
     # The optimizer pressure-cap chunk consumes this data; it is not a clamp.
     continuum_pressure_bounds:
       pN2_mbar: [5.0, 15.0]
-      derived_pN2_floor_mbar: 0.348846
+      derived_pN2_floor_mbar: 0.08372304
       knudsen_max: 0.01
       carrier_gas: "N2"
       gas_temperature_C: 1670
-      pipe_diameter_m: 0.12
+      pipe_diameter_m: 0.5
     target_species: ["Mg"]
     # Mg threshold derivation (diagnostic grounding, not a replacement C4 hold):
     # Premise: late-stage melt fO2 has reached the named CF-1 body floor and
@@ -589,16 +597,17 @@ campaigns:
     pO2_mbar_default: 0.2
     p_total_mbar_default: 0.2
     # Same N2 continuum derivation and operational band as C4, evaluated at
-    # the selected C6 static hold 1400 C: k_B*(1400+273.15) /
-    # (sqrt(2)*pi*(3.798e-10 m)^2*0.12 m*0.01) = 30.037 Pa = 0.300374 mbar.
-    # The 5.0 mbar operating floor remains conservative at 16.65x that minimum.
+    # the selected C6 static hold 1400 C and owner-set D=0.50 m maximum
+    # aperture. The prior 0.300374 mbar floor scales inversely with D:
+    # 0.300374 * 0.12/0.50 = 0.07208976 mbar.
+    # The 5.0 mbar operating floor remains conservative at about 69.4x that minimum.
     continuum_pressure_bounds:
       pN2_mbar: [5.0, 15.0]
-      derived_pN2_floor_mbar: 0.300374
+      derived_pN2_floor_mbar: 0.07208976
       knudsen_max: 0.01
       carrier_gas: "N2"
       gas_temperature_C: 1400
-      pipe_diameter_m: 0.12
+      pipe_diameter_m: 0.5
     target_species: ["Al"]
     reaction: "3Mg(l) + Al2O3(melt) -> 3MgO(slag) + 2Al(l)"
     # 2026-07-11 C6 static-recipe sweep:
@@ -731,6 +740,7 @@ completion_contracts:
       - "process.condensation_train"
       - "process.overhead_gas"
       - "terminal.chromium_condensed_oxide_stored"
+      - "terminal.mn_cartridge_stored"
     residual_accounts: &vapor_residual_accounts
       - "process.cleaned_melt"
       - "terminal.slag"
@@ -1133,6 +1143,9 @@ condensation_train:
       label: "SiO Condensation Zone"
       temp_range_C: [900, 1200]
       material: "fused silica baffles (removable cartridge)"
+      stage3_cartridge_schedule:
+        mn_cartridge_run_hour_window: [12, 30]
+        source: "FLAGGED D452_HOUR seed rows; inclusive run-hour bounds"
       max_service_T_C: 1300
       product: "fused silica glass (SiO2 capture on fused-silica substrate)"
       note: >
@@ -1184,17 +1197,33 @@ condensation_train:
 # ============================================================================
 condenser_geometry:
 
-  # BH-063 user-exposed knob candidate. Default is pi * (0.06 m)^2,
-  # which reproduces the historical 12 cm hot-wall throat diameter:
-  # sqrt(4 * initial_throat_area_m2 / pi) = 0.12 m.
-  initial_throat_area_m2: 0.011309733552923255
-  initial_throat_area_source: "BH-063 owner-approved back-compat anchor; 12 cm pipe throat, 2026-07-08"
+  optimizer_bounds:
+    # FLAGGED provisional ranges. Convert the 0.05-0.50 m diameter envelope
+    # to area with A=pi*(d/2)^2. The lower hardware bound is provisional;
+    # 0.01 is a positive log-sampling floor for the physical 0<f<=1 vane.
+    # The owner-set maximum aperture is 0.50 m.
+    max_throat_area_m2: [0.001963495408493621, 0.19634954084936207]
+    max_throat_area_source: "FLAGGED provisional (d-452): 0.05-0.50 m aperture bounds; owner ratification pending"
+    slider_vane_open_fraction: [0.01, 1.0]
+    slider_vane_open_fraction_source: "FLAGGED provisional (d-452): owner requires 0 < f <= 1; 0.01 search floor pending ratification"
+    # The d-283 10 m2 ceiling was a probe limit, not a hardware bound. No
+    # structural hardware limit is sourced, so this flagged envelope extends
+    # beyond the d-452 1,142.635 m2 screening estimate and remains priced by
+    # the shared d-283 material basis below.
+    stage_area_m2: [0.001, 2000.0]
+    stage_area_m2_source: "FLAGGED provisional d-283/d-452: 0.001-2,000 m2 search envelope; no owner hardware maximum"
+
+  # Owner-set fixed maximum aperture is pi * (0.25 m)^2. Since the
+  # compressible-Poiseuille capacity scales as d^4, (0.50/0.12)^4 = 301x the
+  # historical 12 cm throat (about 0.35 kg/hr * 301 = 105 kg/hr at C4's
+  # 0.2 mbar setpoint). Knudsen pressure floors scale as 1/d.
+  initial_throat_area_m2: 0.19634954084936207
+  initial_throat_area_source: "owner 2026-11-19 (d-452): 0.5 m fixed throat"
   initial_throat_area_knob_candidate: true
 
-  # Physical stage area = initial_throat_area_m2 * ratio. The throat is
-  # the constriction; downstream condenser and terminal capture areas stay
-  # at or above throat area and expose conservative baffle/cyclone surface
-  # multipliers for later per-stage Kn/coating work.
+  # Ratios record the historical 12 cm-anchor design basis only. Runtime
+  # collector surfaces come from the absolute stage_areas_m2 map below and
+  # do not scale when the collection throat changes.
   stage_area_ratios:
     fe_stage1: 20.866981427604056
     cr_stage2: 4.5
@@ -1203,16 +1232,45 @@ condenser_geometry:
     k_stage4b: 5.658842421045168
     terminal: 2.0
   stage_area_ratio_sources:
-    fe_stage1: "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window"
-    cr_stage2: "engineering-default: removable Cr oxide cartridge sits between Fe condenser and SiO baffles with intermediate capture surface"
-    sio_stage3: "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages"
-    alkali_stage4: "owner-ruling-d137: Na collector, area 0.051 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
-    k_stage4b: "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
-    terminal: "engineering-default: terminal vent/capture area is not the constriction; keep >= throat for follow-on Kn diagnostics"
+    fe_stage1: "engineering-default: FLAGGED d-283 r4 three-pass fixed point at 0.5 m throat; absolute area 38.829406624 m2 for 90% Fe peak-window capture; pending owner certification"
+    cr_stage2: "engineering-default: FLAGGED d-283 r4 three-pass fixed point at 0.5 m throat; absolute area 350.525053773 m2; Cr2O3 capture ceiling-limited (90% unreachable); pending owner certification"
+    sio_stage3: "engineering-default: FLAGGED d-283 r4 three-pass fixed point at 0.5 m throat; absolute area 466.975203985 m2 for 90% SiO peak capture; pending owner certification"
+    alkali_stage4: "engineering-default: FLAGGED d-283 r4 three-pass fixed point at 0.5 m throat; absolute area 106.439821811 m2 for 90% Na/Mg peak capture; t-1217 law at f_eq ~ 1 and alpha 1 remains provisional on b-588 and b-599; pending owner certification"
+    k_stage4b: "engineering-default: FLAGGED d-283 r4 three-pass fixed point at 0.5 m throat; absolute area 0.0661518735017 m2 for 90% K peak capture; t-1217 law at f_eq ~ 1 and alpha 1 remains provisional on b-588 and b-599; pending owner certification"
+    terminal: "engineering-default: terminal vent/capture area is not the constriction; fixed independently of throat for follow-on Kn diagnostics"
+  # d-283 engineering-default design rule: for each collector use the
+  # production resolver to find the minimum A [m2] satisfying
+  # eta_prod(species, peak hourly incident flux [kg/hr], A, peak state) >= 0.90.
+  # Run the area sizing to a fixed point because upstream areas change the
+  # downstream peak fluxes; the controller r4 run converged in three passes at
+  # the 0.5 m throat. Areas are absolute hardware and do not scale with throat.
+  # Price basis is the existing data/optimize_costs.yaml model:
+  # mass [kg] = A [m2] * 0.010 m * material density [kg/m3], then
+  # cost [USD] = mass * $10,000/kg. Thickness and densities remain FLAGGED.
+  stage_areas_m2:
+    fe_stage1: 38.829406624 # 90% Fe capture at peak design flux; fixed-point area.
+    cr_stage2: 350.525053773 # Cr2O3 capture ceiling; 90% is unreachable, FLAGGED.
+    sio_stage3: 466.975203985 # 90% SiO capture at peak design flux; fixed-point area.
+    alkali_stage4: 106.439821811 # 90% Na/Mg capture at peak design flux; fixed-point area.
+    k_stage4b: 0.0661518735017 # 90% K capture at peak design flux; fixed-point area.
+    terminal: 0.02261946710584651
+  stage_areas_m2_source: "FLAGGED engineering-default d-283/d-452: controller r4 three-pass fixed point at 0.5 m throat; Cr2O3 remains capture-ceiling-limited; hardware priced via data/optimize_costs.yaml"
+  # Stage-4 purity gate: allow at most 5 kg of SiO2+Si impurity per 100 kg of
+  # net unique designated Na+Mg product. Algebra: (m_SiO2 + m_Si) / m_Na+Mg
+  # <= 0.05; numerator and denominator are kg, so the ratio is dimensionless.
+  # Sanity: 100 kg designated product permits 5 kg SiO-derived carryover.
+  # FLAGGED provisional controller value, pending owner ratification.
+  stage4_sio_impurity_gate:
+    max_impurity_to_designated_ratio: 0.05
+    source: "FLAGGED engineering-default controller limit; provisional, not owner-certified"
+  # This configured 12 cm hydraulic diameter is shared by condenser transfer
+  # fallbacks and the physical wall segments; it is independent of the throat.
+  condenser_hydraulic_diameter_m: 0.12
+  condenser_hydraulic_diameter_source: "FLAGGED d-283 (d-452): 12 cm-anchor condenser/wall hydraulic diameter pinned independent of the collection throat"
   # Capture-law gas-side length only. Parallel plates of gap g have
   # Dh = 2*g. The Stage-1 collector is a 10 mm gap, so Dh = 0.020 m.
   # Sherwood 3.66 is the laminar value at radial stir 1. Stages without
-  # an entry keep the throat diameter. This map is not the duct or throat.
+  # an entry use the separately configured condenser hydraulic diameter.
   stage_hydraulic_diameter_m:
     fe_stage1: 0.020
 
@@ -2009,6 +2067,12 @@ chemistry_kernel:
   # the placeholder policy.
   allow_unmeasured_alpha_fallback: false
   evaporation_series_resistance:
+    # FLAGGED b-1001: retain the prior 0.12 m source-film length while
+    # decoupling it from the collection throat. k_g = Sh·D_AB/L; at fixed
+    # L, changing the throat leaves source flux unchanged. A melt-surface
+    # boundary-layer correlation is b-1001's follow-up.
+    source_film_characteristic_length_m: 0.12
+    source_film_characteristic_length_source: "FLAGGED b-1001 (d-452): provisional 0.12 m source-film length; boundary-layer correlation belongs to b-1001"
     # J=M_i*k_L,i*Delta-C and Delta-p=H_i*Delta-C imply
     # k_m,i=M_i*k_L,i/H_i [s/m], R_m,i=H_i/(M_i*k_L,i) [m/s]. Runtime has
     # neither species/composition-specific D_i -> k_L,i nor H_i=dp_eq/dC_i;

@@ -82,7 +82,7 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
 
     assert mandate_paths == MANDATE_LEVER_PATHS
     assert mandate_paths <= schema_paths
-    assert "allowlist-v12" == schema.allowlist_version
+    assert "allowlist-v13" == schema.allowlist_version
 
     # P1 #1: campaigns.C2A_staged.stages.fe_hot_hold.target_C is a silent no-op
     # (the runtime holds fe_hot_hold at default_hold_T_C / the C4-style override,

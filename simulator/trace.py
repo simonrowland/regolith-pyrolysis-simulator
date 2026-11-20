@@ -12,6 +12,8 @@ from simulator.accounting.yield_disposition import (
     build_yield_disposition,
     ledger_snapshots_from_sim,
 )
+from simulator.condensation import stage_purity_report
+from simulator.condensation_routing import NA_COLLECTOR_STAGE_KEY
 from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX, HourSnapshot
 
@@ -83,6 +85,7 @@ class PhysicsTrace:
     )
     yield_disposition_fraction_table_rows: tuple[Mapping[str, Any], ...] = ()
     yield_disposition_fraction_table_error: str = ""
+    stage4_sio_impurity_to_designated_ratio: float | None = None
 
     @classmethod
     def from_simulator(cls, sim: Any) -> "PhysicsTrace":
@@ -146,6 +149,11 @@ class PhysicsTrace:
         except Exception as exc:  # noqa: BLE001 -- scoring fails closed below
             fraction_rows = ()
             fraction_table_error = str(exc)
+        stage_report = stage_purity_report(sim.train, sim.atom_ledger)
+        stage4_report = stage_report.get(NA_COLLECTOR_STAGE_KEY, {})
+        stage4_impurity_ratio = stage4_report.get(
+            "sio_impurity_to_designated_ratio"
+        )
         return cls(
             snapshots=snapshots,
             product_ledger_kg=_freeze_mapping(queries.product_ledger()),
@@ -164,6 +172,11 @@ class PhysicsTrace:
             ),
             wall_zone_by_segment=_freeze_mapping(wall_zone_by_segment(sim)),
             stage_purity_pct=_freeze_nested_mapping(stage_purity(sim.train)),
+            stage4_sio_impurity_to_designated_ratio=(
+                float(stage4_impurity_ratio)
+                if stage4_impurity_ratio is not None
+                else None
+            ),
             condensed_by_stage_species_delta=tuple(
                 _freeze_mapping(snapshot.condensed_by_stage_species_delta)
                 for snapshot in snapshots
@@ -204,6 +217,7 @@ class PhysicsTrace:
                 _thaw_value(self.extraction_completeness_by_target),
                 _thaw_value(self.yield_disposition_fraction_table_rows),
                 self.yield_disposition_fraction_table_error,
+                self.stage4_sio_impurity_to_designated_ratio,
             ),
         )
 

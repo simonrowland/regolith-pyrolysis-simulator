@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.config import DEFAULT_DATA_DIR, _load_setpoints_file
 from simulator.accounting.yield_disposition import (
     YIELD_DISPOSITION_MELT_BOUNDARY_PARTITION,
 )
@@ -135,6 +136,7 @@ def _trace(
         dict[str, object], ...
     ] | None = _DEFAULT_YIELD_DISPOSITION_ROWS,
     yield_disposition_fraction_table_error: str = "",
+    stage4_sio_impurity_to_designated_ratio: float | None = None,
     temperature_C: float = 1600.0,
     knudsen_number: float = 0.001,
     ) -> PhysicsTrace:
@@ -165,6 +167,9 @@ def _trace(
         ),
         yield_disposition_fraction_table_error=(
             yield_disposition_fraction_table_error
+        ),
+        stage4_sio_impurity_to_designated_ratio=(
+            stage4_sio_impurity_to_designated_ratio
         ),
     )
 
@@ -280,6 +285,54 @@ def test_delivered_stream_purity_zero_delivery_is_infeasible_not_nan() -> None:
     assert margin.margin == pytest.approx(-margin.threshold.value)
     assert math.isfinite(margin.observed)
     assert math.isfinite(margin.margin)
+
+
+def test_stage4_sio_impurity_gate_uses_net_unique_ratio_and_flags_violation() -> None:
+    constraints = PhysicsConstraintSet(active_gates=("stage4_sio_impurity",))
+    result = constraints.evaluate(_trace(
+        condensed=({},),
+        stage4_sio_impurity_to_designated_ratio=0.06,
+    ))
+
+    margin = result.margins["stage4_sio_impurity"]
+    assert result.feasible
+    assert result.failing_gates == ()
+    assert margin.feasible
+    assert margin.observed == pytest.approx(0.06)
+    setpoints = _load_setpoints_file(DEFAULT_DATA_DIR / "setpoints.yaml")
+    configured_limit = setpoints["condenser_geometry"][
+        "stage4_sio_impurity_gate"
+    ]["max_impurity_to_designated_ratio"]
+    assert margin.threshold.value == pytest.approx(configured_limit)
+    assert margin.status_payload["violation_flag"] == (
+        "stage4_sio_impurity_limit_exceeded"
+    )
+    assert margin.status_payload["diagnostic_only"] is True
+    assert margin.status == "warning"
+    assert margin.output_status == "provisional"
+
+
+def test_stage4_missing_net_ratio_is_flagged_without_rejecting_candidate() -> None:
+    result = PhysicsConstraintSet(active_gates=("stage4_sio_impurity",)).evaluate(
+        _trace(
+            condensed=({},),
+            stage4_sio_impurity_to_designated_ratio=None,
+        )
+    )
+
+    margin = result.margins["stage4_sio_impurity"]
+    assert result.feasible
+    assert result.failing_gates == ()
+    assert margin.feasible
+    assert margin.status == "unavailable"
+    assert margin.observed is None
+    assert margin.status_payload["diagnostic_only"] is True
+    assert margin.status_payload["refusal_code"] == (
+        "stage4_sio_impurity_ratio_unavailable"
+    )
+    assert margin.status_payload["violation_flag"] == (
+        "stage4_sio_impurity_ratio_unavailable"
+    )
 
 
 def test_extraction_completeness_gate_reports_left_melt_and_captured_basis() -> None:
@@ -497,8 +550,16 @@ def test_profile_furnace_temperature_threshold_drives_gate() -> None:
         source="profiles/test.yaml",
     )
 
-    hot = constraints.evaluate(_trace(condensed=({(3, "SiO"): 20.0},), temperature_C=1300.1))
-    cool = constraints.evaluate(_trace(condensed=({(3, "SiO"): 20.0},), temperature_C=1299.9))
+    hot = constraints.evaluate(_trace(
+        condensed=({(3, "SiO"): 20.0},),
+        stage4_sio_impurity_to_designated_ratio=0.0,
+        temperature_C=1300.1,
+    ))
+    cool = constraints.evaluate(_trace(
+        condensed=({(3, "SiO"): 20.0},),
+        stage4_sio_impurity_to_designated_ratio=0.0,
+        temperature_C=1299.9,
+    ))
 
     assert hot.failing_gates == ("furnace_temperature",)
     assert cool.feasible

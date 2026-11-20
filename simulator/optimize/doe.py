@@ -21,6 +21,7 @@ from simulator.optimize.recipe import (
     C2A_STAGED_P_TOTAL_MBAR_DEFAULT_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     C5_GUARD,
+    CONDENSER_STAGE_AREA_KNOB_PATHS,
     ConditionalExecutionContext,
     KeyPath,
     RecipePatch,
@@ -83,6 +84,25 @@ PHASE_ORDER_CONTINUOUS_KNOBS: tuple[KeyPath, ...] = (
     ("campaigns", "C0", "stage0_phase_temperature_C"),
     ("campaigns", "C0", "stage0_phase_pressure_mbar"),
     ("campaigns", "C0", "stage0_phase_pO2_mbar"),
+    *CONDENSER_STAGE_AREA_KNOB_PATHS,
+    ("condenser_geometry", "initial_throat_area_m2"),
+    ("campaigns", "C2A_continuous", "slider_vane_open_fraction"),
+    (
+        "campaigns", "C2A_staged", "stages", "alkali_early_fe",
+        "slider_vane_open_fraction",
+    ),
+    (
+        "campaigns", "C2A_staged", "stages", "sio_window",
+        "slider_vane_open_fraction",
+    ),
+    (
+        "campaigns", "C2A_staged", "stages", "fe_hot_hold",
+        "slider_vane_open_fraction",
+    ),
+    (
+        "campaigns", "C2A_staged", "stages", "cool_for_na_shuttle",
+        "slider_vane_open_fraction",
+    ),
 )
 
 

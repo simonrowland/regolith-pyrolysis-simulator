@@ -9,6 +9,7 @@ from typing import Any
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
     OXYGEN_CAPTURED_ACCOUNTS,
@@ -68,6 +69,7 @@ PRODUCT_LEDGER_ACCOUNTS = (
     "terminal.stage0_sulfide_matte",
     "terminal.drain_tap_material",
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
     "process.metal_phase",
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,

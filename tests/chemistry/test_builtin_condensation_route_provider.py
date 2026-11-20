@@ -41,6 +41,8 @@ import simulator.chemistry.phase_context as phase_context_module
 from engines.builtin.condensation_route import (
     BuiltinCondensationRouteProvider,
 )
+from simulator.accounting import AccountingError
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.kernel import (
     AtomBalanceError,
     ChemistryIntent,
@@ -49,7 +51,7 @@ from simulator.chemistry.kernel import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.accounting.formulas import resolve_species_formula
+from simulator.account_ids import MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
 from simulator.condensation import (
     C4B_WALL_ROUTE_ORDER,
     CondensationRouteResult,
@@ -327,6 +329,7 @@ def test_provider_declares_condensation_accounts():
         "process.condensation_retained_holdup",
         "process.wall_deposit",
         "terminal.chromium_condensed_oxide_stored",
+        MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
         *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     })
     assert "process.cleaned_melt" not in profile.declared_accounts
@@ -372,6 +375,87 @@ def test_provider_refuses_undeclared_product_destination(
     )
 
 
+def test_provider_splits_condensate_between_product_accounts_by_fraction(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """A cartridge split remains a single mol-native ledger transition."""
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    result = BuiltinCondensationRouteProvider().dispatch(
+        _route_validation_request(
+            sim,
+            species="SiO",
+            sp_data={
+                "condensation_product_account_fractions": {
+                    "SiO": {MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: 0.25},
+                },
+            },
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    credits = result.transition.credits
+    assert credits[MANGANESE_STAGE3_CARTRIDGE_ACCOUNT]["SiO"] == pytest.approx(0.25)
+    assert credits["process.condensation_train"]["SiO"] == pytest.approx(0.75)
+
+
+@pytest.mark.parametrize(
+    ("account_fractions", "expected_reason"),
+    [
+        (
+            {"SiO": {"terminal.unknown": 0.25}},
+            "undeclared_condensation_product_account",
+        ),
+        (
+            {"unknown_product": {MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: 0.25}},
+            "invalid_condensation_product_account_fractions",
+        ),
+        (
+            {
+                "SiO": {
+                    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: 0.75,
+                    "process.condensation_train": 0.5,
+                },
+            },
+            "invalid_condensation_product_account_fractions",
+        ),
+        (
+            {"SiO": {MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: True}},
+            "invalid_condensation_product_account_fractions",
+        ),
+        (
+            {"SiO": {"process.overhead_gas": 0.25}},
+            "invalid_gaseous_condensation_coproduct",
+        ),
+    ],
+)
+def test_provider_refuses_invalid_condensation_product_account_fractions(
+    account_fractions,
+    expected_reason,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    result = BuiltinCondensationRouteProvider().dispatch(
+        _route_validation_request(
+            sim,
+            species="SiO",
+            sp_data={
+                "condensation_product_account_fractions": account_fractions,
+            },
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == expected_reason
+
+
 def test_provider_allows_declared_oxygen_gaseous_coproduct(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -391,6 +475,9 @@ def test_provider_allows_declared_oxygen_gaseous_coproduct(
                     "Cr2O3": "terminal.chromium_condensed_oxide_stored",
                     "O2": "process.overhead_gas",
                 },
+                "condensation_product_account_fractions": {
+                    "Cr2O3": {MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: 0.25},
+                },
             },
         )
     )
@@ -398,6 +485,69 @@ def test_provider_allows_declared_oxygen_gaseous_coproduct(
     assert result.status == "ok"
     assert result.transition is not None
     assert set(result.transition.credits["process.overhead_gas"]) == {"O2"}
+    assert result.transition.credits[
+        MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
+    ]["Cr2O3"] > 0.0
+    assert "O2" not in result.transition.credits[
+        MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
+    ]
+    assert result.transition.credits[
+        "terminal.chromium_condensed_oxide_stored"
+    ]["Cr2O3"] > 0.0
+
+
+def test_simulator_condensed_product_projection_omits_overhead_gas_coproduct(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    products = sim._condensed_products_kg(
+        "CrO2",
+        1.0,
+        {
+            "condensation_products_mol_per_mol_vapor": {
+                "Cr2O3": 0.5,
+                "O2": 0.25,
+            },
+            "condensation_product_accounts": {
+                "Cr2O3": "terminal.chromium_condensed_oxide_stored",
+                "O2": "process.overhead_gas",
+            },
+        },
+    )
+
+    assert set(products) == {"Cr2O3"}
+
+
+def test_simulator_surfaces_provider_fraction_refusal(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    with pytest.raises(
+        AccountingError,
+        match="invalid_condensation_product_account_fractions",
+    ):
+        sim._dispatch_condensation_route(
+            "CrO2",
+            1.0,
+            {
+                "condensation_products_mol_per_mol_vapor": {
+                    "Cr2O3": 0.5,
+                    "O2": 0.25,
+                },
+                "condensation_product_accounts": {
+                    "Cr2O3": "terminal.chromium_condensed_oxide_stored",
+                    "O2": "process.overhead_gas",
+                },
+                "condensation_product_account_fractions": {
+                    "Cr2O3": "invalid",
+                },
+            },
+            CondensationRouteResult(),
+        )
 
 
 @pytest.mark.parametrize("ratio", [0.0, -1.0, math.nan])
@@ -545,6 +695,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         "process.condensation_retained_holdup",
         "process.wall_deposit",
         "terminal.chromium_condensed_oxide_stored",
+        MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
         *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     })
     for accounts in seen_accounts:

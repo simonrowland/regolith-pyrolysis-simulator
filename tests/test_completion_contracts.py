@@ -8,7 +8,10 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
-from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
+from simulator.account_ids import (
+    C7_AL_CREDIT_ACCOUNT,
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
+)
 from simulator.accounting.formulas import parse_formula
 from simulator.accounting.completeness import (
     CompletionContractBlocked,
@@ -247,6 +250,7 @@ def test_vapor_contract_uses_narrow_product_accounts_and_includes_wall() -> None
     contract = _contracts_by_id()["C2A_continuous.Fe.vapor"]
     accounts = {
         "process.condensation_train": {"Fe": 0.168},
+        MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: {"Fe": 0.042},
         "process.cleaned_melt": {"FeO": 0.144},
         "process.wall_deposit_segment_stage_0_to_stage_1": {"Fe": 0.028},
         "process.metal_phase": {"Fe": 999.0},
@@ -258,7 +262,7 @@ def test_vapor_contract_uses_narrow_product_accounts_and_includes_wall() -> None
         _FakeQueries(accounts, reagents),
     )
 
-    product_mol = _mol("Fe", 0.168)
+    product_mol = _mol("Fe", 0.210)
     residual_mol = _mol("FeO", 0.144)
     wall_mol = _mol("Fe", 0.028)
     expected = product_mol / (product_mol + residual_mol + wall_mol)
@@ -648,6 +652,22 @@ def test_e1b_target_yield_excludes_additive_overcredit() -> None:
     )
     assert result.product_target_equiv_mol == pytest.approx(0.5)
     assert result.yield_fraction == pytest.approx(0.5)
+
+
+def test_mn_cartridge_account_counts_as_target_product() -> None:
+    initial = {"Na2O": 0.5 * MOLAR_MASS["Na2O"] / 1000.0}
+    cartridge_product_kg = MOLAR_MASS["Na"] / 1000.0
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Na",),
+        initial,
+        _FakeQueries({
+            MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: {"Na": cartridge_product_kg},
+        }),
+    )["Na"]
+
+    assert result.product_target_equiv_mol == pytest.approx(1.0)
+    assert result.yield_fraction == pytest.approx(1.0)
 
 
 @pytest.mark.parametrize(("target", "native_oxide"), (("Na", "Na2O"), ("K", "K2O")))

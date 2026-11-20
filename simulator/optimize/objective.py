@@ -6103,26 +6103,45 @@ def _marginal_extraction_cost_summary(
         sim,
         cost_parameters=cost_parameters,
     )
-    # Marginal extraction cost = variable energy + reagent replacement loss +
-    # per-run furnace depreciation. Capital purchase and launch costs are not
-    # included in this run-local objective.
+    collector_stage_hardware = _collector_stage_hardware_cost_summary(
+        sim,
+        cost_parameters=cost_parameters,
+    )
+    hardware = _duct_and_shared_train_hardware_cost_summary(
+        sim,
+        cost_parameters=cost_parameters,
+    )
+    # Candidate hardware and collector areas enter the existing optimizer
+    # cost objective alongside variable energy, reagents, and depreciation.
     depreciation_usd = depreciation["depreciation_expense_per_run_usd"]
+    collector_stage_hardware_usd = collector_stage_hardware[
+        "hardware_capital_cost_usd"
+    ]
+    hardware_usd = hardware["hardware_capital_cost_usd"]
     total = (
         None
-        if depreciation_usd is None or not carrier_cost_available
+        if (
+            depreciation_usd is None
+            or not carrier_cost_available
+            or is_unavailable_quantity(collector_stage_hardware_usd)
+            or is_unavailable_quantity(hardware_usd)
+        )
         else (
             electrical_cost_usd
             + solar_heat_cost_usd
             + float(carrier_cost_usd)
             + float(reagent["reagent_cost_usd"])
             + float(depreciation_usd)
+            + float(collector_stage_hardware_usd)
+            + float(hardware_usd)
         )
     )
     return MappingProxyType({
         "schema_version": "optimizer-marginal-cost-v1",
         "accounting_principle": (
-            "marginal extraction cost: variable energy + carrier makeup/recycle "
-            "+ reagent consumption + per-run depreciation"
+            "candidate installed collector, hot-duct, and shared-train hardware "
+            "+ variable energy + carrier makeup/recycle + reagent consumption "
+            "+ per-run depreciation"
         ),
         "marginal_cost_usd": total,
         "energy_electrical_kWh": electrical_kWh,
@@ -6136,9 +6155,184 @@ def _marginal_extraction_cost_summary(
         "carrier_cost_usd": carrier_cost_usd,
         "reagent": reagent,
         "depreciation": depreciation,
+        "collector_stage_hardware": collector_stage_hardware,
+        "hardware": hardware,
     })
 
 
+def _collector_stage_hardware_cost_summary(
+    sim: Any,
+    *,
+    cost_parameters: CostParameters,
+) -> Mapping[str, Any]:
+    """Price absolute collector stage area using configured liner mass."""
+
+    condensation_model = getattr(sim, "condensation_model", None)
+    stage_areas = getattr(condensation_model, "stage_area_m2_by_stage", None)
+    if not isinstance(stage_areas, MappingABC):
+        unavailable = unavailable_quantity(
+            reason="collector_stage_area_inputs_unavailable",
+            units="USD",
+        )
+        return MappingProxyType({
+            "status": "unavailable",
+            "hardware_capital_cost_usd": unavailable,
+            "reason": unavailable["reason"],
+        })
+    collector_rows: dict[str, Mapping[str, float]] = {}
+    collector_stage_cost_usd = 0.0
+    for stage_key, density_kg_m3 in sorted(
+        cost_parameters.condenser_stage_bulk_density_kg_m3.items()
+    ):
+        if stage_key not in stage_areas:
+            unavailable = unavailable_quantity(
+                reason=f"collector_stage_area_missing:{stage_key}",
+                units="USD",
+            )
+            return MappingProxyType({
+                "status": "unavailable",
+                "hardware_capital_cost_usd": unavailable,
+                "reason": unavailable["reason"],
+            })
+        area_m2 = _finite_float(
+            stage_areas[stage_key], f"stage_areas_m2.{stage_key}"
+        )
+        if area_m2 < 0.0:
+            unavailable = unavailable_quantity(
+                reason=f"collector_stage_area_invalid:{stage_key}",
+                units="USD",
+            )
+            return MappingProxyType({
+                "status": "unavailable",
+                "hardware_capital_cost_usd": unavailable,
+                "reason": unavailable["reason"],
+            })
+        # Collector wall mass = area [m²] × thickness [m] × bulk density
+        # [kg/m³], giving kg; multiply by the owner-ratified delivery price
+        # [USD/kg] for installed collector area cost.
+        mass_kg = (
+            area_m2
+            * cost_parameters.condenser_stage_wall_thickness_m
+            * density_kg_m3
+        )
+        stage_cost_usd = mass_kg * cost_parameters.import_delivery_cost_per_kg
+        collector_stage_cost_usd += stage_cost_usd
+        collector_rows[stage_key] = MappingProxyType({
+            "area_m2": area_m2,
+            "bulk_density_kg_m3": density_kg_m3,
+            "wall_thickness_m": cost_parameters.condenser_stage_wall_thickness_m,
+            "mass_kg": mass_kg,
+            "cost_usd": stage_cost_usd,
+        })
+    return MappingProxyType({
+        "status": "ok",
+        "collector_stage_costs": MappingProxyType(collector_rows),
+        "collector_stage_cost_usd": collector_stage_cost_usd,
+        "collector_stage_cost_source_status": (
+            "FLAGGED provisional d-283 material mass; d-389 delivery cost ratified"
+        ),
+        "hardware_capital_cost_usd": collector_stage_cost_usd,
+    })
+
+
+def _duct_and_shared_train_hardware_cost_summary(
+    sim: Any,
+    *,
+    cost_parameters: CostParameters,
+) -> Mapping[str, Any]:
+    """Price the sized hot duct and shared condenser capacity for this run."""
+
+    model = getattr(sim, "overhead_model", None)
+    overhead = getattr(sim, "overhead", None)
+    if model is None or overhead is None:
+        unavailable = unavailable_quantity(
+            reason="hardware_sizing_inputs_unavailable",
+            units="USD",
+        )
+        return MappingProxyType({
+            "status": "unavailable",
+            "hardware_capital_cost_usd": unavailable,
+            "reason": unavailable["reason"],
+        })
+    try:
+        diameter_m = _finite_float(
+            getattr(model, "pipe_diameter_m"),
+            "maximum_throat_diameter_m",
+        )
+        length_m = _finite_float(
+            getattr(model, "pipe_length_m"),
+            "hot_duct_length_m",
+        )
+        peak_flow_kg_hr = _finite_float(
+            getattr(overhead, "train_peak_mass_flow_kg_hr"),
+            "train_peak_mass_flow_kg_hr",
+        )
+        average_flow_kg_hr = _finite_float(
+            getattr(overhead, "train_time_averaged_mass_flow_kg_hr"),
+            "train_time_averaged_mass_flow_kg_hr",
+        )
+    except (AttributeError, ObjectiveComputationError):
+        unavailable = unavailable_quantity(
+            reason="hardware_sizing_inputs_unavailable",
+            units="USD",
+        )
+        return MappingProxyType({
+            "status": "unavailable",
+            "hardware_capital_cost_usd": unavailable,
+            "reason": unavailable["reason"],
+        })
+    if (
+        diameter_m <= 0.0
+        or length_m <= 0.0
+        or peak_flow_kg_hr < 0.0
+        or average_flow_kg_hr < 0.0
+    ):
+        unavailable = unavailable_quantity(
+            reason="invalid_hardware_sizing_inputs",
+            units="USD",
+        )
+        return MappingProxyType({
+            "status": "unavailable",
+            "hardware_capital_cost_usd": unavailable,
+            "reason": unavailable["reason"],
+        })
+
+    # The hot duct's shell area is circumference × length. Shared-train
+    # capacity is n times the larger of average per-furnace flow and one
+    # furnace's peak divided across n furnaces: max(n*average, peak).
+    hot_duct_area_m2 = math.pi * diameter_m * length_m
+    per_furnace_train_share_kg_hr = max(
+        average_flow_kg_hr,
+        peak_flow_kg_hr / cost_parameters.furnaces_per_shared_train,
+    )
+    train_sizing_flow_kg_hr = (
+        per_furnace_train_share_kg_hr
+        * cost_parameters.furnaces_per_shared_train
+    )
+    hot_duct_cost_usd = (
+        hot_duct_area_m2 * cost_parameters.hot_duct_cost_per_m2_usd
+    )
+    condenser_train_cost_usd = (
+        train_sizing_flow_kg_hr
+        * cost_parameters.shared_condenser_train_cost_per_kg_hr_usd
+    )
+    return MappingProxyType({
+        "status": "ok",
+        "maximum_throat_diameter_m": diameter_m,
+        "hot_duct_length_m": length_m,
+        "hot_duct_lateral_area_m2": hot_duct_area_m2,
+        "hot_duct_cost_usd": hot_duct_cost_usd,
+        "train_peak_mass_flow_kg_hr": peak_flow_kg_hr,
+        "train_time_averaged_mass_flow_kg_hr": average_flow_kg_hr,
+        "furnaces_per_shared_train": cost_parameters.furnaces_per_shared_train,
+        "per_furnace_train_share_kg_hr": per_furnace_train_share_kg_hr,
+        "train_sizing_flow_kg_hr": train_sizing_flow_kg_hr,
+        "condenser_train_cost_usd": condenser_train_cost_usd,
+        "hardware_capital_cost_usd": (
+            hot_duct_cost_usd + condenser_train_cost_usd
+        ),
+        "pricing_source_status": "FLAGGED provisional (d-452)",
+    })
 def _reagent_consumption_cost_summary(
     sim: Any,
     product_ledger: Mapping[str, float],

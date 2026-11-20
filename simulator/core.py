@@ -544,6 +544,7 @@ from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
     OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
@@ -764,6 +765,19 @@ def _deep_merge_condenser_geometry(
             merged[key] = _deep_merge_condenser_geometry(current, value)
         else:
             merged[key] = copy.deepcopy(value)
+    ratio_overrides = override.get('stage_area_ratios')
+    if isinstance(ratio_overrides, Mapping):
+        absolute_overrides = override.get('stage_areas_m2', {})
+        explicit_area_stages = (
+            set(absolute_overrides)
+            if isinstance(absolute_overrides, Mapping)
+            else set()
+        )
+        areas = dict(merged.get('stage_areas_m2', {}) or {})
+        for stage in ratio_overrides:
+            if stage not in explicit_area_stages:
+                areas.pop(stage, None)
+        merged['stage_areas_m2'] = areas
     return merged
 
 
@@ -778,6 +792,7 @@ def _canonicalize_condenser_geometry_stage_keys(
     for stage_map_key in (
         'stage_area_ratios',
         'stage_area_ratio_sources',
+        'stage_areas_m2',
         'stage_hydraulic_diameter_m',
     ):
         raw_stage_map = resolved.get(stage_map_key)
@@ -1004,6 +1019,7 @@ FLOW_MASS_ACCOUNTS = (
     'terminal.drain_tap_material',
     'terminal.slag',
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
     OXYGEN_STAGE0_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
@@ -3932,7 +3948,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             species_partial_pressures_mbar=(
                 self.overhead_model.species_partial_pressures(*partial_pressure_args)
             ),
-            pipe_diameter_m=self.overhead_model.pipe_diameter_m,
+            pipe_diameter_m=(
+                self.overhead_model.condenser_hydraulic_diameter_m
+            ),
+            duct_pipe_diameter_m=(
+                self.overhead_model.effective_throat_diameter_m(self.melt)
+            ),
             # The upstream vapor is evaluated at the melt-side temperature used
             # by the conductance model; the independently scheduled pipe and
             # segment temperatures are liner-wall states, not gas states.
@@ -4012,7 +4033,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # Knudsen conductance evaluates the vapor at the melt-side gas
             # temperature; the scheduled pipe temperature is a wall state.
             gas_temperature_C=float(self.melt.temperature_C),
-            pipe_diameter_m=self.overhead_model.pipe_diameter_m,
+            pipe_diameter_m=self.overhead_model.effective_throat_diameter_m(
+                self.melt
+            ),
             pN2_min_mbar=C2A_STAGED_PN2_SWEEP_MIN_MBAR,
             pN2_max_mbar=C2A_STAGED_PN2_SWEEP_MAX_MBAR,
             carrier_gas=carrier_gas,
@@ -8157,6 +8180,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from engines.builtin.evaporation_flux import (
             DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
             DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
+            DEFAULT_SOURCE_FILM_CHARACTERISTIC_LENGTH_M,
             EvaporationFluxConfigurationError,
             _evaluate_alpha_control,
             _series_resistance_evaporation_flux_kg_m2_s,
@@ -8262,8 +8286,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
             )
         )
-        pipe_diameter_m = float(
-            getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
+        pipe_diameter_m = self.overhead_model.effective_throat_diameter_m(
+            self.melt
+        )
+        source_film_characteristic_length_m = series_config.get(
+            'source_film_characteristic_length_m',
+            DEFAULT_SOURCE_FILM_CHARACTERISTIC_LENGTH_M,
         )
         try:
             series_flux = _series_resistance_evaporation_flux_kg_m2_s(
@@ -8281,6 +8309,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 T_gas_K=gas_temperature_K,
                 melt_resistance_enabled=melt_resistance_enabled,
                 gas_resistance_enabled=gas_resistance_enabled,
+                source_film_characteristic_length_m=(
+                    source_film_characteristic_length_m
+                ),
                 melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
                 melt_surface_renewal_source=melt_surface_renewal_source,
             )
@@ -16709,6 +16740,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         stage_ratios = getattr(pipe, 'stage_area_ratios', None)
         if isinstance(stage_ratios, Mapping) and stage_ratios:
             geometry_config['stage_area_ratios'] = dict(stage_ratios)
+        stage_areas = getattr(pipe, 'stage_areas_m2_by_stage', None)
+        if isinstance(stage_areas, Mapping) and stage_areas:
+            geometry_config['stage_areas_m2'] = dict(stage_areas)
         from simulator.overhead import validate_condenser_geometry_config
 
         geometry_config = validate_condenser_geometry_config(
@@ -16857,14 +16891,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         diag = dict(getattr(model, 'last_knudsen_regime_diagnostic', {}) or {})
         if not diag:
             return {}
+        duct_diag = dict(
+            getattr(model, 'last_duct_knudsen_regime_diagnostic', {}) or {}
+        )
         # Project the diagnostic into the documented summary shape.
         summary: Dict[str, Any] = {}
-        if 'status' in diag:
-            summary['status'] = str(diag['status'])
+        projected_diag = duct_diag or diag
+        if 'status' in projected_diag:
+            summary['status'] = str(projected_diag['status'])
         # Prefer the diagnostic's JSON-safe projection: the model may carry
         # ``math.inf`` for zero-pressure/free-molecular ticks, while runner
         # exports require finite values or omission.
-        kn = diag.get('knudsen_number', getattr(model, 'knudsen_number', None))
+        kn = projected_diag.get(
+            'knudsen_number', getattr(model, 'knudsen_number', None)
+        )
         if kn is not None:
             try:
                 finite_kn = float(kn)
@@ -16872,18 +16912,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 finite_kn = None
             if finite_kn is not None and math.isfinite(finite_kn):
                 summary['knudsen_number'] = finite_kn
-        regime = getattr(model, 'knudsen_regime', None)
+        regime = projected_diag.get('regime')
+        if regime is None:
+            regime = getattr(model, 'knudsen_regime', None)
         if regime is not None:
-            summary['knudsen_regime'] = getattr(
-                regime, 'value', str(regime)
-            )
-        regime_factor = getattr(model, 'regime_factor', None)
+            summary['knudsen_regime'] = str(getattr(regime, 'value', regime))
+        regime_factor = projected_diag.get(
+            'regime_factor', getattr(model, 'regime_factor', None)
+        )
         if regime_factor is not None:
             try:
                 summary['regime_factor'] = float(regime_factor)
             except (TypeError, ValueError):
                 pass
-        warnings = diag.get('warnings', ())
+        if duct_diag:
+            segment = next(
+                (
+                    item
+                    for item in duct_diag.get('segments', ())
+                    if isinstance(item, Mapping)
+                    and item.get('name') == 'collection_duct'
+                ),
+                None,
+            )
+            if segment is not None:
+                summary['segments'] = (dict(segment),)
+        warnings = projected_diag.get('warnings', ())
         summary['warnings'] = tuple(str(w) for w in warnings)
         return summary
 

@@ -15,6 +15,7 @@ from simulator.accounting.lots import allocate_pool_withdrawal
 from simulator.accounting.queries import (
     TERMINAL_RUMP_REFRACTORY_OXIDES,
 )
+from simulator.account_ids import MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
 
 
 YIELD_DISPOSITION_SCHEMA_VERSION = "5.0"
@@ -84,6 +85,7 @@ _ACCOUNT_TO_BIN: Mapping[str, str] = {
     "reservoir.reagent.Mg": "charge_unprocessed",
     "reservoir.reagent.Na": "charge_unprocessed",
     "terminal.chromium_condensed_oxide_stored": "product_condensed",
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: "product_condensed",
     "terminal.drain_tap_material": "product_tapped",
     "terminal.offgas": "offgas_vented",
     "terminal.oxygen_melt_offgas_captured": "product_oxygen",

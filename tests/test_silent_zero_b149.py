@@ -490,7 +490,10 @@ def _c7_sim(ca_entry: dict) -> SimpleNamespace:
         campaign_mgr=CampaignManager(setpoints),
         _resolve_condensation_carrier_gas=lambda: "N2",
         overhead=SimpleNamespace(headspace_temperature_K=1000.0),
-        overhead_model=SimpleNamespace(pipe_diameter_m=0.12),
+        overhead_model=SimpleNamespace(
+            pipe_diameter_m=0.12,
+            effective_throat_diameter_m=lambda _melt: 0.12,
+        ),
         _evaporation_bulk_partial_pressure_pa=lambda sp: 0.0,
         _silent_zero_notes=[],
     )

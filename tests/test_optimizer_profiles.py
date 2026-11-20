@@ -52,6 +52,37 @@ def test_reduced_real_cache_accepts_cache_tier_ceiling() -> None:
     )
 
 
+def test_d452_hero_optimizes_completed_cycle_under_owner_duration_gate() -> None:
+    path = (
+        DEFAULT_DATA_DIR
+        / "optimize_profiles"
+        / "hero"
+        / "lunar_mare_low_ti.yaml"
+    )
+    raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+    profile = validate_profile(raw, expected_feedstock="lunar_mare_low_ti")
+    constraints = physics_constraints_from_profile(profile)
+
+    assert profile["run"]["until_campaign_complete"] is True
+    assert profile["run"]["hours"] == 360
+    assert profile["constraints"]["cycle_time_max_h"] == pytest.approx(300.0)
+    assert profile["constraints"]["cycle_time_max_h_source"] == (
+        "owner 2026-11-19 (d-452)"
+    )
+    assert constraints.cycle_time_max_h.value == pytest.approx(300.0)
+    assert constraints.cycle_time_max_h.source_ref == (
+        "owner 2026-11-19 (d-452)"
+    )
+    assert "cycle_time" in profile["constraints"]["gates"]
+    assert "delivered_stream_purity" in profile["constraints"]["gates"]
+    assert profile["constraints"]["stream_purity_min"] == pytest.approx(0.95)
+    assert "extraction_completeness" in profile["constraints"]["gates"]
+    objective_metrics = {row["metric"] for row in profile["objectives"]}
+    assert "duration_h" in objective_metrics
+    assert "oxygen_kg" in objective_metrics
+    assert "metals_total_kg" in objective_metrics
+
+
 def test_reduced_real_cache_accepts_authorized_backend_version() -> None:
     """Grind-infra sweep Finding 3: every generated real grind profile carries
     ``authorized_backend_version`` (the cached-real version-authority key that
@@ -986,6 +1017,41 @@ def test_composition_target_digest_covers_full_target_spec(mutation) -> None:
 def _profile_copy(feedstock: str) -> dict:
     path = DEFAULT_DATA_DIR / "optimize_profiles" / f"{feedstock}.yaml"
     return copy.deepcopy(yaml.safe_load(path.read_text()))
+
+
+def test_d283_hero_stage_areas_are_profile_knobs_with_absolute_seeds() -> None:
+    path = (
+        DEFAULT_DATA_DIR
+        / "optimize_profiles"
+        / "hero"
+        / "lunar_mare_low_ti.yaml"
+    )
+    profile = validate_profile(
+        yaml.safe_load(path.read_text(encoding="utf-8")),
+        expected_feedstock="lunar_mare_low_ti",
+    )
+    from simulator.optimize.reoptimize import _profile_knob_paths
+
+    area_knobs = {
+        f"condenser_geometry.stage_areas_m2.{stage}"
+        for stage in (
+            "fe_stage1",
+            "cr_stage2",
+            "sio_stage3",
+            "alkali_stage4",
+            "k_stage4b",
+        )
+    }
+    assert area_knobs <= set(_profile_knob_paths(profile))
+    setpoints = yaml.safe_load((DEFAULT_DATA_DIR / "setpoints.yaml").read_text())
+    profile_areas = profile["seed_recipes"][0]["patch"]["condenser_geometry"][
+        "stage_areas_m2"
+    ]
+    configured_areas = setpoints["condenser_geometry"]["stage_areas_m2"]
+    assert all(
+        profile_areas[stage] == configured_areas[stage]
+        for stage in (path.rsplit(".", 1)[-1] for path in area_knobs)
+    )
 
 
 def _composition_profile() -> dict:

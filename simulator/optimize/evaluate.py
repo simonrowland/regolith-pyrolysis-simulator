@@ -3349,9 +3349,12 @@ def _build_eval_inputs_impl(
         allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
         allow_fallback_vapor=bool(run_options["allow_fallback_vapor"]),
         force_builtin_vapor_pressure=force_builtin_vapor_pressure,
-        until_campaign_complete=_c0_pyrolysis_continues_through_later_steps(
-            run_options,
-            stop_at_stage0_exit=stop_at_stage0_exit,
+        until_campaign_complete=(
+            bool(run_options["until_campaign_complete"])
+            or _c0_pyrolysis_continues_through_later_steps(
+                run_options,
+                stop_at_stage0_exit=stop_at_stage0_exit,
+            )
         ),
     )._session_config()
     if stop_at_stage0_exit:
@@ -3801,6 +3804,9 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
     return MappingProxyType({
         "campaign": str(identity["campaign"]),
         "hours": int(merged.get("hours", 24)),
+        "until_campaign_complete": bool(
+            merged.get("until_campaign_complete", False)
+        ),
         "mass_kg": mass_kg,
         "additives_kg": dict(merged.get("additives_kg", {}) or {}),
         "track": str(identity["track"]),

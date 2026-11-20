@@ -49,9 +49,12 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
     configured = {}
     overhead = SimpleNamespace(
         pipe_diameter_m=0.4,
+        condenser_hydraulic_diameter_m=0.12,
+        effective_throat_diameter_m=lambda _melt: 0.4,
         estimate_transport_state=lambda _flux, _melt: {
             "pipe_temperature_C": 900.0,
             "conductance_temperature_C": 1450.0,
+            "throat_diameter_m": 0.4,
             "pressure_mbar": 2.0,
             "vapor_pressure_mbar": 1.0,
             "stage_area_m2_by_stage": {},
@@ -87,6 +90,8 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
 
     assert configured["gas_temperature_C"] == pytest.approx(1450.0)
     assert configured["wall_temperature_C"] == pytest.approx(900.0)
+    assert configured["pipe_diameter_m"] == pytest.approx(0.12)
+    assert configured["duct_pipe_diameter_m"] == pytest.approx(0.4)
     assert configured["pipe_segment_temperatures_C"] == {
         "duct_a": 850.0,
         "duct_b": 875.0,
@@ -586,7 +591,7 @@ def test_estimate_transport_state_refuses_invalid_effective_capacity(
         )
 
 
-def test_default_throat_area_reproduces_12_cm_diameter():
+def test_default_throat_area_matches_owner_hardware_aperture():
     model = _make_model()
 
     assert model.initial_throat_area_m2 == pytest.approx(
@@ -594,9 +599,9 @@ def test_default_throat_area_reproduces_12_cm_diameter():
         rel=1e-15,
     )
     assert math.sqrt(4.0 * model.initial_throat_area_m2 / math.pi) == (
-        pytest.approx(0.12, rel=1e-15)
+        pytest.approx(0.5, rel=1e-15)
     )
-    assert model.pipe_diameter_m == pytest.approx(0.12, rel=1e-15)
+    assert model.pipe_diameter_m == pytest.approx(0.5, rel=1e-15)
 
 
 def test_stage_area_m2_uses_throat_area_ratios():
@@ -624,34 +629,56 @@ def test_setpoint_condenser_geometry_defaults_anchor_throat_and_stage_areas():
     setpoints = load_config_bundle(DEFAULT_DATA_DIR).setpoints
     geometry = setpoints["condenser_geometry"]
     throat_area_m2 = float(geometry["initial_throat_area_m2"])
-    ratios = geometry["stage_area_ratios"]
+    areas_m2 = geometry["stage_areas_m2"]
     model = OverheadGasModel({}, condenser_geometry_config=geometry)
 
-    assert math.sqrt(4.0 * throat_area_m2 / math.pi) == pytest.approx(0.12)
-    assert model.pipe_diameter_m == pytest.approx(0.12)
-    assert model.stage_area_m2("fe_stage1") == pytest.approx(0.236, abs=0.0)
-    assert model.stage_area_m2("alkali_stage4") == pytest.approx(0.051, abs=1e-15)
-    assert model.stage_area_m2("k_stage4b") == pytest.approx(0.064, abs=0.0)
+    assert math.sqrt(4.0 * throat_area_m2 / math.pi) == pytest.approx(0.5)
+    assert model.pipe_diameter_m == pytest.approx(0.5)
+    # d-283 r4's three-pass fixed point pins the live absolute areas.
+    assert model.stage_area_m2("fe_stage1") == pytest.approx(
+        38.829406624, abs=0.0
+    )
+    assert model.stage_area_m2("alkali_stage4") == pytest.approx(
+        106.439821811, abs=1e-15
+    )
+    assert model.stage_area_m2("k_stage4b") == pytest.approx(
+        0.0661518735017, abs=0.0
+    )
+    assert model.condenser_hydraulic_diameter_m == pytest.approx(0.12)
     assert "k_stage4b" not in model.stage_hydraulic_diameter_m
     assert model.stage_hydraulic_diameter_m["fe_stage1"] == pytest.approx(0.020)
     assert "cr_stage2" not in model.stage_hydraulic_diameter_m
-    for stage, ratio in ratios.items():
-        assert float(ratio) >= 1.0
-        assert model.stage_area_m2(stage) == pytest.approx(
-            throat_area_m2 * float(ratio)
-        )
+    assert model.stage_area_m2_by_stage() == pytest.approx(areas_m2)
 
 
-def test_default_condenser_throat_anchor_still_allows_batch_pipe_scaling():
+def test_condenser_areas_and_hydraulic_diameter_do_not_follow_throat():
+    geometry = load_config_bundle(DEFAULT_DATA_DIR).setpoints[
+        "condenser_geometry"
+    ]
+    original = OverheadGasModel({}, condenser_geometry_config=geometry)
+    wider_geometry = dict(geometry)
+    wider_geometry["initial_throat_area_m2"] = math.pi * 0.25**2
+    wider = OverheadGasModel({}, condenser_geometry_config=wider_geometry)
+
+    assert wider.pipe_diameter_m == pytest.approx(0.5)
+    assert wider.stage_area_m2_by_stage() == pytest.approx(
+        original.stage_area_m2_by_stage()
+    )
+    assert wider.condenser_hydraulic_diameter_m == pytest.approx(
+        original.condenser_hydraulic_diameter_m
+    )
+
+
+def test_configured_condenser_throat_is_not_rescaled_by_batch():
     config = load_config_bundle(DEFAULT_DATA_DIR)
     design = EquipmentDesigner(config.setpoints).design_for_batch(
         16000.0,
         config.feedstocks["lunar_mare_low_ti"],
     )
 
-    assert design.pipe.diameter_m == pytest.approx(0.24)
+    assert design.pipe.diameter_m == pytest.approx(0.5)
     assert design.pipe.initial_throat_area_m2 == pytest.approx(
-        math.pi * 0.12**2
+        math.pi * 0.25**2
     )
 
 
@@ -807,20 +834,24 @@ def test_default_stage_geometry_provenance_reaches_coating_authority():
     assert surface_geometry["provisional"] is True
     assert surface_geometry["source_class"] == "engineering-default"
     by_stage = surface_geometry["stage_area_ratio_provenance_by_stage"]
-    fe_source = by_stage["fe_stage1"]["source"]
-    assert fe_source.startswith("owner-ruling-d137:")
-    assert "0.236 m2" in fe_source
-    assert "provisional" not in fe_source
     for key, area_text in (
-        ("alkali_stage4", "0.051 m2"),
-        ("k_stage4b", "0.064 m2"),
+        ("fe_stage1", "38.829406624 m2"),
+        ("cr_stage2", "350.525053773 m2"),
+        ("sio_stage3", "466.975203985 m2"),
+        ("alkali_stage4", "106.439821811 m2"),
+        ("k_stage4b", "0.0661518735017 m2"),
     ):
         source = by_stage[key]["source"]
-        assert source.startswith("owner-ruling-d137:")
-        assert "provisional" in source
-        assert "b-588" in source and "b-599" in source
+        assert source.startswith("engineering-default:")
+        assert "FLAGGED" in source
+        assert "d-283 r4 three-pass fixed point" in source
         assert area_text in source
+        assert by_stage[key]["source_class"] == "engineering-default"
         assert by_stage[key]["status"] == "provisional"
+        if key in {"alkali_stage4", "k_stage4b"}:
+            assert "provisional" in source
+            assert "b-588" in source and "b-599" in source
+    assert "Cr2O3 capture ceiling-limited" in by_stage["cr_stage2"]["source"]
 
 
 def test_legacy_headspace_conductance_alias_survives_new_none_key():
