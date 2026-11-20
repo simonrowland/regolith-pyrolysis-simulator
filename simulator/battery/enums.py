@@ -412,8 +412,10 @@ class ReferenceStateConvention(StrEnum):
     HENRIAN_LIQUID = "henrian_liquid"
     HYPOTHETICAL_1WT_PCT = "hypothetical_1wt_pct"
     CONDENSED_ELEMENT_REFERENCE = "condensed_element_reference"
-    # Same spelling as GIBBS_CONVENTION_APPARENT_298. Elements at 298.15 K,
-    # not the JANAF element reference state at the measurement temperature.
+    # Named copy of GIBBS_CONVENTION_APPARENT_298. This enum is layer 0, so
+    # it cannot import simulator.melt_backend, and chemistry cannot import
+    # this module. The spelling stays here. Elements at 298.15 K, not the
+    # JANAF element reference state at the measurement temperature.
     APPARENT_ELEMENTS_298_15K = "apparent_gibbs_formation_Tref_298.15K"
     TEMKIN = "temkin"
 

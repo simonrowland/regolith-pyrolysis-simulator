@@ -956,7 +956,7 @@ def _predict_thermoengine_partial_molar_enthalpy(
         REASON_NONFINITE,
         REASON_PHASE_MISMATCH,
         REASON_REFERENCE_MISMATCH,
-        REFERENCE_APPARENT_ELEMENTS_298,
+        GIBBS_CONVENTION_APPARENT_298,
         partial_molar_enthalpy_kJ_per_mol,
         select_partial_molar_enthalpy_j_per_mol,
     )
@@ -1048,7 +1048,7 @@ def _predict_thermoengine_partial_molar_enthalpy(
         ReferenceStateConvention.APPARENT_ELEMENTS_298_15K,
     )
     reference = (
-        REFERENCE_APPARENT_ELEMENTS_298
+        GIBBS_CONVENTION_APPARENT_298
         if lookup_apparent
         else standard.convention.value
     )

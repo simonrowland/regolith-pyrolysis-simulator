@@ -900,7 +900,7 @@ def test_mutation_mismatched_reference_is_detected(monkeypatch) -> None:
     original = owner.select_partial_molar_enthalpy_j_per_mol
 
     def forced(records, **kwargs):
-        kwargs["reference"] = owner.REFERENCE_APPARENT_ELEMENTS_298
+        kwargs["reference"] = owner.GIBBS_CONVENTION_APPARENT_298
         return original(records, **kwargs)
 
     monkeypatch.setattr(owner, "select_partial_molar_enthalpy_j_per_mol", forced)
@@ -942,23 +942,20 @@ def _apparent_h_from_printed_cells(table_id: str, temperature_K: float) -> float
 
 
 def test_apparent_token_matches_the_engine_zero() -> None:
-    from simulator.chemistry.partial_molar_enthalpy import (
-        REFERENCE_APPARENT_ELEMENTS_298,
-        enthalpy_record,
-    )
+    import simulator.chemistry.partial_molar_enthalpy as chemistry
     from simulator.melt_backend.pure_phase import GIBBS_CONVENTION_APPARENT_298
 
-    assert REFERENCE_APPARENT_ELEMENTS_298 == GIBBS_CONVENTION_APPARENT_298
+    assert chemistry.GIBBS_CONVENTION_APPARENT_298 is GIBBS_CONVENTION_APPARENT_298
     assert (
         ReferenceStateConvention.APPARENT_ELEMENTS_298_15K.value
         == GIBBS_CONVENTION_APPARENT_298
     )
     assert (
-        REFERENCE_APPARENT_ELEMENTS_298
+        chemistry.GIBBS_CONVENTION_APPARENT_298
         != ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE.value
     )
-    row = enthalpy_record("MgO", Phase.CR.value, -1.0, None)
-    assert row[3] == GIBBS_CONVENTION_APPARENT_298
+    row = chemistry.enthalpy_record("MgO", Phase.CR.value, -1.0, None)
+    assert row[3] is GIBBS_CONVENTION_APPARENT_298
 
 
 def test_apparent_enthalpy_converts_to_printed_formation_enthalpy() -> None:
@@ -1072,7 +1069,7 @@ def test_mutation_condensed_stamp_is_detected(monkeypatch) -> None:
 
     monkeypatch.setattr(
         owner,
-        "REFERENCE_APPARENT_ELEMENTS_298",
+        "GIBBS_CONVENTION_APPARENT_298",
         ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE.value,
     )
     with pytest.raises(AssertionError):

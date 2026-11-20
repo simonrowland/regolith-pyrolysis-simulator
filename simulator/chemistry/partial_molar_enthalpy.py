@@ -33,6 +33,7 @@ from collections.abc import Callable, Sequence
 from decimal import Decimal
 from typing import Any
 
+from simulator.melt_backend.pure_phase import GIBBS_CONVENTION_APPARENT_298
 from simulator.physical_constants import J_PER_KJ
 from simulator.reference_data.janaf import formula_composition
 
@@ -40,15 +41,11 @@ from simulator.reference_data.janaf import formula_composition
 # phase-boundary argument. Not a cache dimension.
 PARTIAL_MOLAR_ENTHALPY_DT_K = 1.0
 
-# Spellings of PerBasis.MOL_SPECIES, Phase.L / CR / G, and
-# GIBBS_CONVENTION_APPARENT_298 / ReferenceStateConvention
-# .APPARENT_ELEMENTS_298_15K. The simulation import closure cannot import
-# simulator.battery or the melt_backend package, so this module holds the
-# strings. tests/test_partial_molar_enthalpy.py pins them to those owners.
-# The apparent token is the engine zero (elements at 298.15 K). It is not
-# the JANAF condensed-element frame at the measurement temperature.
+# Spellings of PerBasis.MOL_SPECIES and Phase.L / CR / G. The simulation
+# closure bans simulator.battery, not melt_backend, so these enum strings
+# stay here. The apparent-enthalpy token is imported above. The battery
+# enum member is the named copy that layer 0 forces.
 BASIS_MOL_SPECIES = "mol_species"
-REFERENCE_APPARENT_ELEMENTS_298 = "apparent_gibbs_formation_Tref_298.15K"
 PHASE_LIQUID = "l"
 PHASE_CRYSTAL = "cr"
 PHASE_GAS = "g"
@@ -145,7 +142,7 @@ def enthalpy_record(
         # zero. JANAF condensed-element-at-T is not this number; scoring
         # subtracts the elemental enthalpy increments through
         # formation_h_from_apparent_kJ_mol when that frame is requested.
-        REFERENCE_APPARENT_ELEMENTS_298,
+        GIBBS_CONVENTION_APPARENT_298,
         value,
         None if reason is None else str(reason),
     ]
