@@ -43,6 +43,35 @@ def test_transient_and_unknown_refusals_are_never_stored(code, tmp_path, monkeyp
         assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 0
 
 
+@pytest.mark.parametrize(
+    ("failure_field", "failure_value"),
+    [("exit_signal", 9), ("exit_code", 1)],
+)
+def test_allowlisted_refusal_with_process_failure_is_never_stored(
+    failure_field, failure_value, tmp_path, monkeypatch,
+):
+    path = tmp_path / "cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    calls = []
+
+    def solve():
+        calls.append(1)
+        return {
+            "status": "refusal",
+            "refusal_reason": "no_liquid",
+            "engine_status": "no_liquid",
+            failure_field: failure_value,
+        }
+
+    for _ in range(2):
+        engine_cache.cached_engine_call("alphamelts", {}, solve)
+
+    assert len(calls) == 2
+    with sqlite3.connect(path) as connection:
+        assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 0
+
+
 def test_not_stored_paths_are_counted_by_reason(tmp_path, monkeypatch):
     path = tmp_path / "cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
