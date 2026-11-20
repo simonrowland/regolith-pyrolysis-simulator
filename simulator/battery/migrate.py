@@ -15505,7 +15505,7 @@ def fill_identity(
     """Fill required/uncompared axes as unknown and permitted axes as N/A.
 
     Keep source values on explicitly uncompared axes even when they are not
-    required, including p_partial reaction/reference/reservoir metadata.
+    required, including p_partial and fugacity reaction/reference/reservoir metadata.
     Transition temperatures store T as the observable, never as
     ``identity.temperature_K``.
     """
@@ -22911,10 +22911,9 @@ def _printed_oxygen_may_set(
 ) -> bool:
     """True when this profile may carry a printed oxygen value.
 
-    Not-applicable axes stay not applicable. That covers fugacity,
-    equilibrium composition, and an unbuffered residue vacuum. A required
-    or uncompared axis, and an axis that already holds unknown or a value,
-    may be filled.
+    Not-applicable axes stay not applicable. That covers equilibrium
+    composition and an unbuffered residue vacuum. A required or uncompared
+    axis, and an axis that already holds unknown or a value, may be filled.
 
     An unrecognized quantity has no profile. ``fill_identity`` returns
     before it can strip the axis, and the historical copy kept a printed
@@ -30735,7 +30734,14 @@ class Migrator:
             )
             coord = t_sel.amount
             row_extra = series_row_extra(
-                raw_item, include_locator=content_stable_id
+                raw_item,
+                include_locator=content_stable_id,
+                source_quantity_as_printed=(
+                    str(parent_values.get("source_quantity_as_printed"))
+                    if isinstance(parent_values, Mapping)
+                    and parent_values.get("source_quantity_as_printed") is not None
+                    else None
+                ),
             )
             if coord is None and ordinal_point_id is not None:
                 point_id = ordinal_point_id

@@ -1430,11 +1430,12 @@ def _oxide_projection_notices(
 def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -> Rail | None:
     """Headline rail, or None when the quantity is not on one.
 
-    Vapour is only p_sat, p_partial, or p_reference (SiO/SiO2 partial
-    pressures stay on SiO_evolution). Isotope ratios, ion ratios, and an
-    unknown quantity do not fall through onto vapour. A non-alkali kinetic
-    quantity (Zn, Cu, Mg evaporation coefficients, and the same else-branch)
-    does not fall through onto SiO_evolution.
+    Vapour includes p_sat, p_partial, p_reference, and fugacity
+    (SiO/SiO2 partial pressures stay on SiO_evolution; fugacity stays on
+    vapour). Isotope ratios, ion ratios, and an unknown quantity do not fall
+    through onto vapour. A non-alkali kinetic quantity (Zn, Cu, Mg evaporation
+    coefficients, and the same else-branch) does not fall through onto
+    SiO_evolution.
     """
 
     if quantity in {
@@ -1451,7 +1452,7 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
             return Rail.REDOX
         return Rail.MELT_ACTIVITY
     if quantity in _VAPOUR_EQUILIBRIUM:
-        if species_formula in _SIO_FORMULAS:
+        if quantity is not Quantity.FUGACITY and species_formula in _SIO_FORMULAS:
             return Rail.SIO_EVOLUTION
         return Rail.VAPOUR
     if quantity in MELT_ACTIVITY_QUANTITIES:
@@ -1465,6 +1466,7 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
         or quantity in PURE_STANDARD_THERMO
         or quantity in FUSION_QUANTITIES
         or quantity in VAPORIZATION_ENTHALPIES
+        or quantity is Quantity.PARTIAL_MOLAR_ENTHALPY
     ):
         return Rail.THERMOCHEMISTRY
     if quantity in {Quantity.WALL_DEPOSIT_MASS, Quantity.WALL_DEPOSIT_AREAL_RATE}:
@@ -14093,6 +14095,66 @@ def _predict_with_engine(
         return _predict_catalog_evaluator(observation)
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+    if quantity is Quantity.FUGACITY:
+        if engine not in {Engine.VAPOROCK, Engine.OPENIMCC}:
+            return EnginePrediction(
+                engine=engine,
+                channel=ENGINE_CHANNELS[engine],
+                execution=Execution(state=ExecutionState.UNSUPPORTED),
+                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={
+                    "reason": "engine_has_no_ideal_gas_fugacity_source",
+                    "engine": engine.value,
+                },
+                identity=identity,
+            )
+        species_phase = (
+            phase_token(identity.species)
+            if isinstance(identity, Identity) and identity.species is not None
+            else None
+        )
+        if species_phase is not Phase.G:
+            return EnginePrediction(
+                engine=engine,
+                channel=ENGINE_CHANNELS[engine],
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_MISMATCH,
+                refusal_detail={
+                    "reason": "fugacity_requires_gas_phase_species",
+                    "species_phase": (
+                        None if species_phase is None else species_phase.value
+                    ),
+                    "required_phase": Phase.G.value,
+                },
+                identity=identity,
+            )
+    if quantity is Quantity.PARTIAL_MOLAR_ENTHALPY:
+        refusal_detail = None
+        if engine in {Engine.MAGEMIN, Engine.ALPHAMELTS}:
+            refusal_detail = {
+                "reason": "partial_enthalpy_requires_fixed_phase_model",
+                "engine": engine.value,
+            }
+        elif engine in {Engine.VAPOROCK, Engine.OPENIMCC}:
+            refusal_detail = {
+                "reason": "partial_enthalpy_no_liquid_route",
+                "engine": engine.value,
+            }
+        if refusal_detail is not None:
+            return EnginePrediction(
+                engine=engine,
+                channel=ENGINE_CHANNELS[engine],
+                execution=Execution(state=ExecutionState.UNSUPPORTED),
+                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail=refusal_detail,
+                identity=identity,
+            )
     if engine is Engine.NASA_CEA_9 and quantity is not None:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
@@ -15228,6 +15290,22 @@ def _predict_with_engine(
 
     qualification = False
     extra_notices: list[Notice] = list(input_notices)
+    if quantity is Quantity.FUGACITY:
+        # Premise: the prediction explicitly assumes an ideal gas, so phi_i=1.
+        # Algebra: f_i=phi_i*p_i reduces to f_i=p_i. Both are Pa because
+        # the existing gas-pressure adapters normalize their maps to pascals.
+        # Sanity: for the ideal-gas limit, fugacity and partial pressure match.
+        extra_notices.append(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.FUGACITY,),
+                reason=(
+                    "ideal-gas assumption: fugacity coefficient phi_i=1, "
+                    "therefore f_i=p_i"
+                ),
+                origin="simulator.battery.score.ideal_gas_fugacity",
+            )
+        )
     authority = Authority.BRIDGE
     certified_band = None
     if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:

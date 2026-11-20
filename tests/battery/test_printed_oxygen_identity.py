@@ -16,6 +16,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator.battery.enums import Authority, NoticeKind, Quantity, ValueKind
 from simulator.battery.identity import IdentityEqualKind, identity_equal
@@ -26,6 +27,7 @@ from simulator.battery.migrate import (
     _BOUNDED_FO2_REASON,
     _band_text,
     _log_fO2_to_pa,
+    _printed_oxygen_may_set,
 )
 from simulator.battery.records import Located, Value
 from simulator.chemistry.fo2_buffers import evaluate_buffer
@@ -108,6 +110,80 @@ def test_real_unknown_air_condition_keeps_its_existing_absence() -> None:
     condition = observation.point_conditions["fO2_log"]
     assert condition.state.is_unknown
     assert condition.locator is None
+
+
+def test_sato_hickling_atm_fugacity_identity_matches_the_reported_series() -> None:
+    result = _migrated("sato-hickling-mclane-1973-lunar-fo2.yaml")
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.FUGACITY
+    ]
+    assert len(rows) == 75
+    stored_path = (
+        ROOT
+        / "data"
+        / "literature"
+        / "extracts-v2"
+        / "sato-hickling-mclane-1973-lunar-fo2.yaml"
+    )
+    stored = yaml.safe_load(stored_path.read_text(encoding="utf-8"))
+    stored_ids = {
+        observation["observation_id"]
+        for observation in stored["observations"]
+        if observation["identity"]["quantity"].get("value") == "fugacity"
+    }
+    migrated_ids = {observation.observation_id for observation in rows}
+    assert len(stored_ids) == len(migrated_ids) == 75
+    assert migrated_ids == stored_ids
+    queue = yaml.safe_load(
+        (ROOT / "data" / "battery" / "migration-queue.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    queued_ids = {
+        observation["observation_id"]
+        for entry in queue["entries"]
+        if entry["source"]
+        == "data/literature/extracts/sato-hickling-mclane-1973-lunar-fo2.yaml"
+        for observation in entry["observations"]
+    }
+    assert len(queued_ids) == 15
+    assert queued_ids <= migrated_ids
+
+    for observation in rows:
+        oxygen = observation.identity.fO2_Pa
+        assert oxygen is not None and oxygen.is_value
+        temperature = observation.identity.temperature_K
+        assert temperature is not None and temperature.is_value
+        conditions = observation.point_conditions or {}
+        printed_log = conditions.get("fO2_log")
+        assert isinstance(printed_log, Located)
+        assert printed_log.state.is_value and printed_log.locator is not None
+        assert observation.value is not None
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point is not None
+        relative_error = (
+            abs(oxygen.value - observation.value.point) / observation.value.point
+        )
+        assert relative_error <= Decimal("1e-7"), observation.observation_id
+
+    # Source Table 1, physical page 3 / printed page 1063, sample 15058,88,
+    # 1050 °C: -log10(fO2 / atm) = 14.9. The independently checked Pa value
+    # is 1.275606173500439925962071498e-10.
+    observation = _one(result, "sato73_15058_88_bulk_rock", "T=1323.15")
+    assert _decimal_point(observation.identity.fO2_Pa) == Decimal(
+        "1.275606173500439925962071498E-10"
+    )
+
+
+def test_fugacity_is_not_listed_as_an_inapplicable_oxygen_axis() -> None:
+    doc = _printed_oxygen_may_set.__doc__ or ""
+    not_applicable_description = doc.split(
+        "Not-applicable axes stay not applicable.", 1
+    )[1].split("A required", 1)[0]
+    assert "fugacity" not in not_applicable_description.lower()
 
 
 def _one(result, *fragments: str):

@@ -875,8 +875,97 @@ def test_real_sample_volume_and_unadopted_fugacity_are_preserved():
             assert all(o.value.kind.value == "unavailable" for o in rows)
 
 
-def test_fugacity_storage_cannot_open_or_score_engine(monkeypatch):
-    from simulator.battery.enums import Engine, Phase, SourceRelation
+def test_fugacity_identity_matches_partial_pressure_except_quantity() -> None:
+    from simulator.battery.enums import (
+        AmountBasis,
+        Phase,
+        ReferenceStateConvention,
+    )
+    from simulator.battery.identity import (
+        IdentityEqualKind,
+        identity_equal,
+        profile_for,
+    )
+    from simulator.battery.records import (
+        Composition,
+        Reaction,
+        ReactionTerm,
+        Species,
+        StandardState,
+        State,
+    )
+
+    species = Species("H2O", Phase.G)
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("SiO2", Decimal("0.55")), ("Na2O", Decimal("0.45"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    axes = {
+        "temperature_K": State.of(Decimal("1643.15")),
+        "fO2_Pa": State.of(Decimal("1e-8")),
+        "total_pressure_Pa": State.of(Decimal("100000")),
+        "composition": State.of(composition),
+    }
+    partial_pressure = M.fill_identity(Quantity.P_PARTIAL, species, **axes)
+    fugacity = M.fill_identity(Quantity.FUGACITY, species, **axes)
+
+    partial_profile = profile_for(partial_pressure)
+    fugacity_profile = profile_for(fugacity)
+    assert fugacity_profile == partial_profile
+    assert fugacity.species == partial_pressure.species == species
+    for name in partial_profile.required:
+        assert getattr(fugacity, name) == getattr(partial_pressure, name)
+
+    missing_axes = M.fill_identity(
+        Quantity.FUGACITY,
+        species,
+        temperature_K=State.of(Decimal("1643.15")),
+    )
+    assert all(
+        getattr(missing_axes, name).is_unknown
+        for name in {"fO2_Pa", "total_pressure_Pa", "composition"}
+    )
+    assert (
+        identity_equal(missing_axes, missing_axes).kind
+        is IdentityEqualKind.IDENTITY_UNKNOWN
+    )
+
+    def optional_metadata(formula: str):
+        metadata_species = Species(formula, Phase.G)
+        return {
+            "reaction": State.of(
+                Reaction((ReactionTerm(metadata_species, 1),))
+            ),
+            "reference_state": State.of(
+                StandardState(
+                    ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+                    metadata_species,
+                    "pure_gas",
+                )
+            ),
+            "reservoir": State.of(metadata_species),
+        }
+
+    for quantity in (Quantity.P_PARTIAL, Quantity.FUGACITY):
+        expected_metadata = optional_metadata("H2O")
+        with_metadata = M.fill_identity(
+            quantity, species, **axes, **expected_metadata
+        )
+        with_different_metadata = M.fill_identity(
+            quantity, species, **axes, **optional_metadata("CO2")
+        )
+        assert with_metadata.reaction == expected_metadata["reaction"]
+        assert with_metadata.reference_state == expected_metadata["reference_state"]
+        assert with_metadata.reservoir == expected_metadata["reservoir"]
+        assert (
+            identity_equal(with_metadata, with_different_metadata).kind
+            is IdentityEqualKind.EQUAL
+        )
+
+
+def test_fugacity_only_uses_supported_gas_map_engines(monkeypatch):
+    from simulator.battery.enums import Engine, MetricOperation, Phase, SourceRelation
     from simulator.battery.records import Species, State
     from simulator.battery.score import SCORE_ENGINE_SET, ScoreContext, populate_numeric, predict_with_engine, score_store
 
@@ -892,16 +981,29 @@ def test_fugacity_storage_cannot_open_or_score_engine(monkeypatch):
     for engine in SCORE_ENGINE_SET:
         prediction = predict_with_engine(engine, reference)
         assert prediction.value is None
-        assert prediction.refusal_detail == {
-            "reason": "quantity_not_predicted",
-            "quantity": Quantity.FUGACITY.value,
-        }
+        if engine in {Engine.VAPOROCK, Engine.OPENIMCC}:
+            assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+            assert prediction.refusal_detail["reason"] == (
+                "composition_not_stated_pure_reservoir"
+            )
+        elif engine is Engine.CATALOG_EVALUATOR:
+            assert prediction.refusal_detail == {
+                "reason": "quantity_not_predicted",
+                "quantity": Quantity.FUGACITY.value,
+            }
+        else:
+            assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+            assert prediction.refusal_detail["reason"] == (
+                "engine_has_no_ideal_gas_fugacity_source"
+            )
     residuals, _ = score_store(context, engines=(Engine.MAGEMIN,), include_diagnostics=False)
     assert residuals and all(not r.score_eligible and r.numeric is None for r in residuals)
     numeric, reason, _ = populate_numeric(quantity=Quantity.FUGACITY, candidate=Decimal("33.7"),
                                            reference=Decimal("33.7"), source_relation=SourceRelation.INDEPENDENT)
-    assert numeric is None
-    assert reason.value == "metric_domain"
+    assert numeric is not None
+    assert numeric.operation is MetricOperation.DEX
+    assert numeric.value == Decimal("0.0")
+    assert reason is None
 
 
 def test_geometry_context_keeps_original_source_record():
