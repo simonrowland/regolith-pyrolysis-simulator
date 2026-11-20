@@ -401,21 +401,41 @@ def test_provider_splits_condensate_between_product_accounts_by_fraction(
 
 
 @pytest.mark.parametrize(
-    "account_fractions",
+    ("account_fractions", "expected_reason"),
     [
-        {"SiO": {"terminal.unknown": 0.25}},
-        {"unknown_product": {MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: 0.25}},
-        {
-            "SiO": {
-                MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: 0.75,
-                "process.condensation_train": 0.5,
+        (
+            {"SiO": {"terminal.unknown": 0.25}},
+            "undeclared_condensation_product_account",
+        ),
+        (
+            {"unknown_product": {MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: 0.25}},
+            "invalid_condensation_product_account_fractions",
+        ),
+        (
+            {
+                "SiO": {
+                    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: 0.75,
+                    "process.condensation_train": 0.5,
+                },
             },
-        },
-        {"SiO": {MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: True}},
+            "invalid_condensation_product_account_fractions",
+        ),
+        (
+            {"SiO": {MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: True}},
+            "invalid_condensation_product_account_fractions",
+        ),
+        (
+            {"SiO": {"process.overhead_gas": 0.25}},
+            "invalid_gaseous_condensation_coproduct",
+        ),
     ],
 )
 def test_provider_refuses_invalid_condensation_product_account_fractions(
-    account_fractions, vapor_pressure_data, feedstocks_data, setpoints_data
+    account_fractions,
+    expected_reason,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
 ):
     sim = _build_sim(
         "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
@@ -432,9 +452,7 @@ def test_provider_refuses_invalid_condensation_product_account_fractions(
 
     assert result.status == "refused"
     assert result.transition is None
-    assert result.diagnostic["reason_refused"] == (
-        "invalid_condensation_product_account_fractions"
-    )
+    assert result.diagnostic["reason_refused"] == expected_reason
 
 
 def test_provider_allows_declared_oxygen_gaseous_coproduct(

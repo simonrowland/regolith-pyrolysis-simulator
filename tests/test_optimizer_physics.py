@@ -295,8 +295,9 @@ def test_stage4_sio_impurity_gate_uses_net_unique_ratio_and_flags_violation() ->
     ))
 
     margin = result.margins["stage4_sio_impurity"]
-    assert not result.feasible
-    assert result.failing_gates == ("stage4_sio_impurity",)
+    assert result.feasible
+    assert result.failing_gates == ()
+    assert margin.feasible
     assert margin.observed == pytest.approx(0.06)
     setpoints = _load_setpoints_file(DEFAULT_DATA_DIR / "setpoints.yaml")
     configured_limit = setpoints["condenser_geometry"][
@@ -306,7 +307,32 @@ def test_stage4_sio_impurity_gate_uses_net_unique_ratio_and_flags_violation() ->
     assert margin.status_payload["violation_flag"] == (
         "stage4_sio_impurity_limit_exceeded"
     )
+    assert margin.status_payload["diagnostic_only"] is True
+    assert margin.status == "warning"
     assert margin.output_status == "provisional"
+
+
+def test_stage4_missing_net_ratio_is_flagged_without_rejecting_candidate() -> None:
+    result = PhysicsConstraintSet(active_gates=("stage4_sio_impurity",)).evaluate(
+        _trace(
+            condensed=({},),
+            stage4_sio_impurity_to_designated_ratio=None,
+        )
+    )
+
+    margin = result.margins["stage4_sio_impurity"]
+    assert result.feasible
+    assert result.failing_gates == ()
+    assert margin.feasible
+    assert margin.status == "unavailable"
+    assert margin.observed is None
+    assert margin.status_payload["diagnostic_only"] is True
+    assert margin.status_payload["refusal_code"] == (
+        "stage4_sio_impurity_ratio_unavailable"
+    )
+    assert margin.status_payload["violation_flag"] == (
+        "stage4_sio_impurity_ratio_unavailable"
+    )
 
 
 def test_extraction_completeness_gate_reports_left_melt_and_captured_basis() -> None:
@@ -1688,12 +1714,6 @@ def test_non_authoritative_coating_readout_uses_declared_wall_zone_buckets(
         (
             "delivered_stream_purity",
             _valid_trace_object(condensed_by_stage_species_delta=()),
-        ),
-        (
-            "stage4_sio_impurity",
-            _valid_trace_object(
-                stage4_sio_impurity_to_designated_ratio=None,
-            ),
         ),
         (
             "coating",

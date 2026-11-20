@@ -279,6 +279,18 @@ def test_stage3_report_splits_mn_cartridge_from_silica_window():
     assert stage["silica_without_mn_purity_fraction"] == pytest.approx(3.75 / 4.25)
 
 
+def test_stage3_cartridge_balance_cannot_exceed_stage_projection():
+    train = CondensationTrain.create_default()
+    train.stages[3].collected_kg["Mn"] = 0.25
+
+    class LedgerView:
+        def kg_by_account(self):
+            return {MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: {"Mn": 0.5}}
+
+    with pytest.raises(AccountingError, match="exceeds Stage-3 projection"):
+        stage_purity_report(train, LedgerView())
+
+
 @pytest.mark.parametrize(
     ("elapsed_hour", "expected_fraction"),
     [(10, 0.0), (11, 0.6), (29, 0.6), (30, 0.0)],
@@ -308,6 +320,46 @@ def test_stage3_mn_cartridge_schedule_uses_inclusive_run_hours(
     assert EvaporationMixin._stage3_mn_cartridge_fraction(
         host, route, "Mn"
     ) == pytest.approx(expected_fraction)
+
+
+def test_stage3_cartridge_split_keeps_declared_gas_coproduct_out():
+    host = SimpleNamespace(
+        setpoints={
+            "condensation_train": {
+                "metals_train": {
+                    STAGE_KEY_BY_NUMBER[3]: {
+                        "stage3_cartridge_schedule": {
+                            "mn_cartridge_run_hour_window": [12, 30],
+                        },
+                    },
+                },
+            },
+        },
+        melt=SimpleNamespace(hour=11),
+    )
+    route = SimpleNamespace(
+        condensed_by_stage_species={STAGE_KEY_BY_NUMBER[3]: {"CrO2": 6.0}},
+        condensed_for_species=lambda _species: 10.0,
+    )
+    sp_data = {
+        "condensation_products_mol_per_mol_vapor": {
+            "Cr2O3": 0.5,
+            "O2": 0.25,
+        },
+        "condensation_product_accounts": {
+            "Cr2O3": "terminal.chromium_condensed_oxide_stored",
+            "O2": "process.overhead_gas",
+        },
+    }
+
+    fractions = EvaporationMixin._stage3_mn_cartridge_account_fractions(
+        host, route, "CrO2", sp_data
+    )
+
+    assert set(fractions) == {"Cr2O3"}
+    assert fractions["Cr2O3"][MANGANESE_STAGE3_CARTRIDGE_ACCOUNT] == pytest.approx(
+        0.6
+    )
 
 
 def test_stage3_mn_cartridge_schedule_rejects_bool_hour_bounds():
