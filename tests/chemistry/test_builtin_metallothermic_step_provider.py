@@ -3238,9 +3238,9 @@ def test_full_run_mass_balance_holds_with_kernel_committed_metallothermic(
             transition.name == "c6_mg_thermite_primary"
             for transition in metallothermic_transitions
         ), "lunar C0-C6 run did not reach the C6 thermite step"
-        feed_fe_atom_mol = sim.atom_ledger.initial_unattributed_atom_moles().get(
-            "Fe", 0.0
-        )
+        feed_fe_atom_mol = sim.atom_ledger.external_origin_atom_moles().get(
+            "feedstock", {}
+        ).get("Fe", 0.0)
         assert feed_fe_atom_mol > 0.0, "lunar feed has no modeled Fe inventory"
         stage_fe_mol = {
             int(stage.stage_number): float(
@@ -3388,6 +3388,9 @@ def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
         source_composition_mol = dict(
             sim.atom_ledger.mol_by_account("process.cleaned_melt")
         )
+        source_temperature_K = (
+            sim.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
+        )
         sim.step()
         steps += 1
         saturation_floor = sim._melt_metal_saturation_fO2_floor_log(
@@ -3411,7 +3414,7 @@ def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
     assert sim.melt.campaign_hour == 3, "run did not reach C3_NA hour 3"
     diagnostic = sim._last_vapor_pressure_diagnostic
     source_fO2_log = diagnostic["source_reaction_fO2_log10"]
-    temperature_K = sim.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
+    temperature_K = source_temperature_K
     saturation_floor = diagnostic["source_metal_saturation_floor"]
     assert saturation_floor is not None
     assert saturation_floor["binding_oxide"] == "FeO"
@@ -3560,12 +3563,16 @@ def test_c2a_metal_saturation_buffer_commits_native_metal_and_oxygen(
         assert oxygen_after > oxygen_before
     committed = sim.atom_ledger.transitions[transition_start:]
     cleaned_melt_o_debit = sum(
-        transition.debit_atom_moles(sim.atom_ledger.registry).get("O", 0.0)
+        lot.atom_moles_for(sim.atom_ledger.registry).get("O", 0.0)
         for transition in committed
+        for lot in transition.debits
+        if lot.account == "process.cleaned_melt"
     )
     cleaned_melt_o_credit = sum(
-        transition.credit_atom_moles(sim.atom_ledger.registry).get("O", 0.0)
+        lot.atom_moles_for(sim.atom_ledger.registry).get("O", 0.0)
         for transition in committed
+        for lot in transition.credits
+        if lot.account == "process.cleaned_melt"
     )
     assert melt_o_before - cleaned_melt_o_debit + cleaned_melt_o_credit == pytest.approx(
         melt_o_after,

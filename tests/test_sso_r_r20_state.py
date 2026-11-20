@@ -1425,6 +1425,7 @@ def test_c3_na_source_term_comes_from_committed_transition() -> None:
     sim.melt.campaign = CampaignPhase.C3_NA
     sim.melt.temperature_C = 1150.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -11.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1150.0 + 273.15
     sim._sync_oxygen_reservoir_mirror()
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     before_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
@@ -1461,8 +1462,16 @@ def test_c3_na_source_term_comes_from_committed_transition() -> None:
     # was an env-dependent retune (floor fallback when MAGEMin was unavailable);
     # with a real liquidus curve the applied path is the correct invariant.
     assert reservoir.melt_redox_capacity_mol_per_ln_fO2 > OXYGEN_RESERVOIR_NOOP_MOL
+    # The Euler source candidate is below the live FeO floor. The committed
+    # saturation buffer returns oxygen to the reservoir, so the recorded
+    # delta is the net post-buffer state change rather than source/C_m alone.
+    floor_after_buffer = sim._melt_metal_saturation_fO2_floor_log(
+        sim.melt.temperature_C + 273.15
+    )
+    assert floor_after_buffer is not None
+    assert reservoir.melt_intrinsic_fO2_log >= floor_after_buffer[0] - 1e-12
     assert reservoir.redox_source_delta_ln_fO2 == pytest.approx(
-        expected_source / reservoir.melt_redox_capacity_mol_per_ln_fO2
+        (reservoir.melt_intrinsic_fO2_log - before_fO2) * math.log(10.0)
     )
     assert reservoir.redox_source_terms_applied is True
     assert reservoir.redox_source_skipped_terms_mol_o2_equiv == {}

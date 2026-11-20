@@ -597,6 +597,7 @@ def test_freeze_gate_phase_fraction_admits_projected_magemin_with_notice() -> No
         _register_freeze_gate_liquid_fraction_providers=lambda: None,
         _melt_redox_liquidus_gate_record=lambda: record,
         _melt_redox_gate_record_is_admitted=lambda _record: True,
+        _melt_redox_gate_authority_pin_for_current_hour=lambda: (False, None),
     )
 
     phase_fraction, source, continuation, phase_notice, phase_detail = (

@@ -9353,7 +9353,12 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
             'Na', 1873.15, vapor_pressure_data=vapor_pressure_data,
         ),
     )
-    assert pressures['K'].hex() == '0x1.e0a0e8f4fbaebp+23'
+    # NIST's Fiock/Rodebush pure-K equation is log10(P_Pa) =
+    # 9.45718 - 4691.58/(T_K + 24.195). At 1873.15 K it gives the
+    # capped pure-metal pressure pinned here. This is an extrapolation far
+    # above the sidecar's 1033 K certified range; the older hex value used a
+    # stale K rail value.
+    assert pressures['K'].hex() == '0x1.267509ca67c27p+23'
     assert pressures['K'] > 0.0
 
 

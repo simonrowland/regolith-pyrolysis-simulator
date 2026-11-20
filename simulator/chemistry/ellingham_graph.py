@@ -388,9 +388,14 @@ def effective_equilibrium_pressure_Pa(
     if str(row.get("consumer_status", "")).lower() == "inactive":
         return 0.0
     catalog_payload = getattr(payload, "catalog_payload", payload)
+    has_catalog_source = (
+        isinstance(catalog_payload, Mapping)
+        and catalog_payload.get("schema_version") == 2
+        and "families" in catalog_payload
+    )
     reaction_evaluator = None
     if (
-        catalog_payload.get("schema_version") == 2
+        has_catalog_source
         and (row.get("reference_pressure_model") or row.get("liquid_oxide_standard_reaction"))
     ):
         reaction_evaluator = compiled_catalog_for(catalog_payload).evaluator_for_hot_train(species)
@@ -417,7 +422,13 @@ def effective_equilibrium_pressure_Pa(
             evaluation.pressure_pa,
             vapor_pressure_data=data,
         )
-    if row.get("reference_pressure_model") or row.get("liquid_oxide_standard_reaction"):
+    if (
+        has_catalog_source
+        and (
+            row.get("reference_pressure_model")
+            or row.get("liquid_oxide_standard_reaction")
+        )
+    ):
         raise EllinghamPressureRefusal(
             f"{species!r} requires its catalog melt-source reaction; "
             "the legacy projection alone lacks source inputs"
