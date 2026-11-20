@@ -637,8 +637,10 @@ def test_setpoint_condenser_geometry_defaults_anchor_throat_and_stage_areas():
     assert model.stage_area_m2("fe_stage1") == pytest.approx(0.236, abs=0.0)
     assert model.stage_area_m2("alkali_stage4") == pytest.approx(0.051, abs=1e-15)
     assert model.stage_area_m2("k_stage4b") == pytest.approx(0.064, abs=0.0)
+    assert model.stage_area_m2("mn_stage3b") == pytest.approx(0.1, abs=0.0)
     assert model.condenser_hydraulic_diameter_m == pytest.approx(0.12)
     assert "k_stage4b" not in model.stage_hydraulic_diameter_m
+    assert "mn_stage3b" not in model.stage_hydraulic_diameter_m
     assert model.stage_hydraulic_diameter_m["fe_stage1"] == pytest.approx(0.020)
     assert "cr_stage2" not in model.stage_hydraulic_diameter_m
     assert model.stage_area_m2_by_stage() == pytest.approx(areas_m2)
@@ -740,6 +742,7 @@ def test_stage_area_map_propagates_to_kn_and_coating_segments():
     stage_areas = {
         "fe_stage1": 0.04,
         "sio_stage3": 0.06,
+        "mn_stage3b": 0.07,
         "alkali_stage4": 0.05,
         "terminal": 0.02,
     }
@@ -770,6 +773,9 @@ def test_stage_area_map_propagates_to_kn_and_coating_segments():
     )
     assert condensation._hydraulic_diameter_m_for_stage_number(1) == pytest.approx(0.020)
     assert condensation._hydraulic_diameter_m_for_stage_number(3) == pytest.approx(0.12)
+    assert condensation._stage_area_m2_for_stage(
+        condensation.train.stages[9]
+    ) == pytest.approx(0.07)
 
 
 def test_default_stage_geometry_provenance_reaches_coating_authority():

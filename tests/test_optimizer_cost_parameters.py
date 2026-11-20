@@ -85,6 +85,7 @@ def test_yaml_defaults_load_with_recipe_default_provenance() -> None:
         "fe_stage1": pytest.approx(4500.0),
         "cr_stage2": pytest.approx(4500.0),
         "sio_stage3": pytest.approx(2200.0),
+        "mn_stage3b": pytest.approx(4500.0),
         "alkali_stage4": pytest.approx(3210.0),
         "k_stage4b": pytest.approx(3210.0),
     }

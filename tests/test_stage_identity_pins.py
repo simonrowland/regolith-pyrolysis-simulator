@@ -8,6 +8,7 @@ import pytest
 from simulator.accounting.queries import CONDENSATION_TRAIN_ACCOUNT
 from simulator.condensation_routing import (
     K_TRAP_STAGE_KEY,
+    MN_CAPTURE_STAGE_KEY,
     NA_COLLECTOR_STAGE_KEY,
     stage_key_for_stage,
 )
@@ -31,6 +32,7 @@ def _stage_roster(*, empty_stage_four_keys=False):
         (4, 1, K_TRAP_STAGE_KEY),
         (8, 0, K_TRAP_STAGE_KEY),
         (9, 0, ""),
+        (3, 1, MN_CAPTURE_STAGE_KEY),
     )
     return [
         SimpleNamespace(
@@ -98,6 +100,7 @@ def _stage_capture_simulator(*, empty_stage_four_keys=False):
             id="na-mg-collector",
         ),
         pytest.param(4, 1, "stage_4b_k_trap", id="k-trap"),
+        pytest.param(3, 1, MN_CAPTURE_STAGE_KEY, id="mn-stage"),
     ],
 )
 def test_stage_identity_empty_key_uses_independent_identity_key(
@@ -132,7 +135,7 @@ def test_runner_stage_identity_output_pin_for_shipped_roster():
         "stage_4_alkali_mg_carryover": 5.0,
         "stage_4b_k_trap_carryover": 19.0,
         "stage_5_dust_filter_carryover": 6.0,
-        "unreported_stage_silica_capture": 30.0,
+        "unreported_stage_silica_capture": 42.0,
     }
 
 

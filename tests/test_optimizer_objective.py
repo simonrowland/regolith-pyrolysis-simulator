@@ -85,6 +85,7 @@ def _zero_collector_area_map() -> dict[str, float]:
         "fe_stage1": 0.0,
         "cr_stage2": 0.0,
         "sio_stage3": 0.0,
+        "mn_stage3b": 0.0,
         "alkali_stage4": 0.0,
         "k_stage4b": 0.0,
     }
@@ -982,6 +983,7 @@ def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() 
                 "fe_stage1": 0.2,
                 "cr_stage2": 0.0,
                 "sio_stage3": 0.0,
+                "mn_stage3b": 0.0,
                 "alkali_stage4": 0.0,
                 "k_stage4b": 0.0,
             }
@@ -1100,6 +1102,7 @@ def test_collector_hardware_cost_scales_with_configured_area() -> None:
         "fe_stage1": 0.2,
         "cr_stage2": 0.1,
         "sio_stage3": 0.3,
+        "mn_stage3b": 0.02,
         "alkali_stage4": 0.05,
         "k_stage4b": 0.04,
     }
@@ -1111,6 +1114,11 @@ def test_collector_hardware_cost_scales_with_configured_area() -> None:
         cost_parameters=_furnace_test_cost_parameters(),
     )
     fe_cost = before["collector_stage_costs"]["fe_stage1"]["cost_usd"]
+    mn_cost = before["collector_stage_costs"]["mn_stage3b"]["cost_usd"]
+    assert before["collector_stage_costs"]["mn_stage3b"]["mass_kg"] == pytest.approx(
+        0.9
+    )
+    assert mn_cost == pytest.approx(9000.0)
     areas["fe_stage1"] *= 2.0
     after = objective_module._collector_stage_hardware_cost_summary(
         sim,

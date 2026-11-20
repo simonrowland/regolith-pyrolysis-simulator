@@ -12,12 +12,11 @@ Train topology (metals train, active C2A onward):
     Stage 0  Hot duct (>1400°C)      — IR spectroscopy. ``route()`` still
              walks this stage through ``_condensation_efficiency``. The
              default area map (``STAGE_AREA_KEY_BY_STAGE_NUMBER`` /
-             setpoints ``stage_areas_m2``) names stages 1-4 and
-             terminal, so Stage 0 has no configured capture area and
-             eta takes the no-area zero. A configured Stage-0 area
-             admits species whose routing temperature sits in the
-             default 1400-1600°C band (Ti at 1500°C in
-             ``CONDENSATION_TEMPS_C``).
+             setpoints ``stage_areas_m2``) names stages 1-4, collector
+             substages, and terminal, so Stage 0 has no configured capture
+             area and eta takes the no-area zero. A configured Stage-0 area
+             admits species whose routing temperature sits in the default
+             1400-1600°C band (Ti at 1500°C in ``CONDENSATION_TEMPS_C``).
     Stage 1  Fe condenser (1150°C wall) — designated Fe stage. This
              module does not model Fe phase or a sump. Equal band
              endpoints are that wall. Elemental Fe melts at 1538°C
@@ -134,6 +133,7 @@ from simulator.lab_geometry import (
 from simulator.condensation_routing import (
     DESIGNATED_STAGE,
     K_TRAP_STAGE_KEY,
+    MN_CAPTURE_STAGE_KEY,
     NA_COLLECTOR_STAGE_KEY,
     accepted_species_for_stage_key,
     accepted_species_for_stage_number,
@@ -378,8 +378,9 @@ STAGE_AREA_KEY_BY_STAGE_NUMBER = {
     4: 'alkali_stage4',
     7: 'terminal',
 }
-# The K trap shares stage number 4, so it cannot use the integer area map.
+# Collector substages share a public stage number and use explicit area keys.
 STAGE_AREA_KEY_BY_STAGE_KEY = {
+    MN_CAPTURE_STAGE_KEY: 'mn_stage3b',
     K_TRAP_STAGE_KEY: 'k_stage4b',
 }
 
@@ -2858,8 +2859,8 @@ class CondensationModel:
         self,
         wall_temperature_C: float,
     ) -> list[PipeSegment]:
-        # Ducts follow public stage numbers. The K trap shares stage 4 and
-        # has no duct of its own. Visit order is stage_visit_key in route().
+        # Ducts follow public stage numbers. Collector substages have no duct
+        # of their own. Visit order is stage_visit_key in route().
         stages = sorted(
             (stage for stage in self.train.stages if int(stage.sub_order) == 0),
             key=lambda stage: stage.stage_number,
@@ -2902,7 +2903,7 @@ class CondensationModel:
         ))
 
     def _stage_area_m2_for_stage(self, stage: CondensationStage) -> float | None:
-        """Area for this stage object. The K trap does not inherit stage 4."""
+        """Resolve collector substages by key before their shared stage number."""
 
         stage_key = getattr(stage, 'stage_key', '') or ''
         mapped = STAGE_AREA_KEY_BY_STAGE_KEY.get(stage_key)
@@ -3290,8 +3291,8 @@ class CondensationModel:
                 _required_record_alpha_s(record, species=species, site='stage_deposition')
                 route['stage_alpha_records_by_stage'][alpha_surface] = record
             for segment in self.pipe_segments:
-                # The K trap shares stage number 4 and has no duct. The
-                # stage_3_to_stage_4 wall belongs to the Na collector only.
+                # Collector substages share their parent number and have no
+                # duct. The stage_3_to_stage_4 wall is traversed once.
                 if int(stage.sub_order) != 0:
                     break
                 if (
@@ -7574,12 +7575,10 @@ def _campaign_requires_viscous_flow(campaign_name: str | None) -> bool:
 
 
 def stage_visit_key(stage: CondensationStage) -> tuple[int, int]:
-    """Visit order for route(). sub_order is 0 except the K trap, which is 1.
+    """Visit order for route(); sub_order orders collector substages.
 
-    Sorting by stage_number alone would visit the K trap with stage 4, but
-    could not place it after stage 7: (4, any sub_order) stays before 5.
-    A mutation that sets the trap's stage_number above 7 moves it after
-    stage 7 and turns the visit-order pin red.
+    Sorting by stage_number alone would visit each substage with its parent.
+    The identity tuple places Mn after SiO and K after the Na/Mg collector.
     """
 
     return (int(stage.stage_number), int(stage.sub_order))

@@ -341,8 +341,8 @@ def resolve_collector_bands_C(
     in-code band fallback: even the no-argument train reads shipped setpoints.
     File loaders require complete inputs; only in-memory callers may inherit
     omitted stages. The inherited YAML is itself loaded and validated strictly.
-    Integer keys stay one band per public stage number. The K trap band is
-    resolve_substage_bands_C, because stage 4 already owns this map.
+    Integer keys stay one band per public stage number. Collector substages
+    use resolve_substage_bands_C so two bands can share a public stage number.
     """
     stages, default_stages = _collector_stage_tables(
         setpoints, require_complete=require_complete,
@@ -362,8 +362,8 @@ def resolve_substage_bands_C(
 ) -> dict[str, tuple[float, float]]:
     """Bands for sub-stages that share a public stage number.
 
-    Keyed by stage key, not by integer, so stage 4 and stage 4b do not
-    overwrite each other.
+    Keyed by stage key, not by integer, so Mn/SiO and K/Na-Mg bands can
+    share their public stage number without overwriting each other.
     """
     stages, default_stages = _collector_stage_tables(
         setpoints, require_complete=require_complete,

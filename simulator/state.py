@@ -19,6 +19,9 @@ from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.condensation_routing import (
     K_TRAP_STAGE_KEY,
     K_TRAP_SUB_ORDER,
+    MN_CAPTURE_STAGE_KEY,
+    MN_CAPTURE_STAGE_NUMBER,
+    MN_CAPTURE_SUB_ORDER,
     NA_COLLECTOR_STAGE_KEY,
     target_species_for_stage_key,
     target_species_for_stage_number,
@@ -748,8 +751,8 @@ class CondensationStage:
     target_species: List[str]           # Primary species collected here
     collected_kg: Dict[str, float] = field(default_factory=dict)
     # Running total of each species condensed in this stage (kg)
-    # sub_order 0 is every public stage. The K trap is sub_order 1 of
-    # stage 4 and keeps stage_number 4. route() is the visit-order owner.
+    # sub_order 0 is every public stage. Collector substages keep their
+    # parent stage_number; route() owns their visit order.
     sub_order: int = 0
     stage_key: str = ''
 
@@ -873,13 +876,14 @@ class PipeSegment:
 class CondensationTrain:
     """
     The metals condensation train. Public stages are indexed 0-7.
-    The K trap is a sub-stage of 4, appended so stages[0]..stages[7]
-    stay those public stages. route() visits it after stage 4.
+    Mn and K collectors are sub-stages, appended so stages[0]..stages[7]
+    stay the public stages. route() orders them by (stage_number, sub_order).
 
     Stage 0: Hot duct (>1400°C) — IR spectroscopy, no condensation
     Stage 1: Fe condenser (1150°C wall)
     Stage 2: Cr oxide harvester (1100-1300°C)
     Stage 3: SiO zone (900-1200°C) — removable fused silica baffles
+    Stage 3b: Mn cold condenser (850°C wall), sub_order 1
     Stage 4: Na collector / alkali cyclone (250°C wall). Mg stays here.
     Stage 4b: K cold trap (40°C wall), sub_order 1
     Stage 5: Vortex dust filter (200-350°C)
@@ -907,12 +911,13 @@ class CondensationTrain:
     def create_default(setpoints: Mapping[str, Any] | None = None) -> 'CondensationTrain':
         """Build the metals train from config-owned bands.
 
-        Stages 0-7 stay at list indexes 0-7. The K trap is appended so
-        existing ``stages[n]`` readers keep the public stage. Visit order
-        is not this list; ``route()`` sorts by (stage_number, sub_order).
+        Stages 0-7 stay at list indexes 0-7. Collector substages are
+        appended so existing ``stages[n]`` readers keep the public stage.
+        Visit order is not this list; ``route()`` sorts by
+        (stage_number, sub_order).
         """
         bands = resolve_collector_bands_C(setpoints)
-        k_band = resolve_substage_bands_C(setpoints)[K_TRAP_STAGE_KEY]
+        substage_bands = resolve_substage_bands_C(setpoints)
         stages = [
             CondensationStage(0, 'Hot Duct (IR)',
                               bands[0], []),
@@ -936,10 +941,15 @@ class CondensationTrain:
             CondensationStage(7, 'Turbine Outlet Monitor',
                               bands[7], []),
             CondensationStage(4, 'K Cold Trap',
-                              k_band,
+                              substage_bands[K_TRAP_STAGE_KEY],
                               target_species_for_stage_key(K_TRAP_STAGE_KEY),
                               sub_order=K_TRAP_SUB_ORDER,
                               stage_key=K_TRAP_STAGE_KEY),
+            CondensationStage(MN_CAPTURE_STAGE_NUMBER, 'Mn Cold Condenser',
+                              substage_bands[MN_CAPTURE_STAGE_KEY],
+                              target_species_for_stage_key(MN_CAPTURE_STAGE_KEY),
+                              sub_order=MN_CAPTURE_SUB_ORDER,
+                              stage_key=MN_CAPTURE_STAGE_KEY),
         ]
         return CondensationTrain(stages=stages)
 

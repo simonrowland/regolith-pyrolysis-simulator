@@ -1050,8 +1050,9 @@ condensation_train:
       Estimated/operator-routing override for possible carryover; no
       source-backed 1 mbar condensation-temperature row is declared.
     Mn: >-
-      Estimated/operator-routing override for the Cr/Mn oxide harvester branch;
-      no source-backed 1 mbar condensation-temperature row is declared.
+      Estimated/operator-routing override retained for Mn vapor; distinct from
+      the designated 850 C condenser wall and not a pure-component dew point.
+      No source-backed 1 mbar condensation-temperature row is declared.
     Cr: >-
       Estimated/operator-routing override for Cr-bearing vapor capture; no
       source-backed 1 mbar condensation-temperature row is declared.
@@ -1149,6 +1150,21 @@ condensation_train:
         100-160 kg under Path A pN2 sweep.
       compatibility: "Uncertain/reactive under low-pO2 SiO conditions"
 
+    stage_3b_mn_capture:
+      label: "Mn Cold Condenser"
+      # d-452/r4: r3 peak p_Mn=4.254 Pa at h42, so 90% equilibrium
+      # capture requires Psat <= 0.1*p = 0.4254 Pa. The production
+      # _antoine_psat_pa resolver gives 0.05899 Pa at this 850 C wall
+      # (1123.15 K), a 98.61% saturation ceiling. This temperature is
+      # below the Mn Antoine fit's certified 1228 K floor; capture is
+      # extrapolated and remains status-bearing. Mn alpha_s stays
+      # UNCERTIFIED in the existing sticking sidecar.
+      temp_range_C: [850, 850]
+      material: "MZO-lined removable Mn cartridge; structural material unspecified"
+      product: "manganese condensate tap"
+      target_species: ["Mn"]
+      note: "FLAGGED provisional d-452: cold Mn capture stage between the SiO zone and Na/Mg collector"
+
     stage_4_alkali_mg_cyclone:
       label: "Alkali / Mg Cyclone Separator"
       # Owner ruling d-137 (2026-10-29): Na collector wall 250 C. Equal
@@ -1202,11 +1218,11 @@ condenser_geometry:
     max_throat_area_source: "FLAGGED provisional (d-452): 0.05-0.50 m aperture bounds; owner ratification pending"
     slider_vane_open_fraction: [0.01, 1.0]
     slider_vane_open_fraction_source: "FLAGGED provisional (d-452): owner requires 0 < f <= 1; 0.01 search floor pending ratification"
-    # Positive lower bound enables log sampling; upper headroom includes the
-    # d-283 Fe 90% estimate of 3.5-4.6 m2. These are hardware bounds, not a
-    # capture target.
-    stage_area_m2: [0.001, 10.0]
-    stage_area_m2_source: "FLAGGED provisional d-283/d-452: 0.001-10 m2 collector envelope; bounds pending owner ratification"
+    # No handbook hardware envelope is available. Keep this provisional,
+    # flagged ceiling above the current d-283 peak-flux design areas so it
+    # does not bind the optimizer; it is not a physical 1000 m2 limit.
+    stage_area_m2: [0.001, 1000.0]
+    stage_area_m2_source: "FLAGGED provisional d-283/d-452: 0.001-1000 m2 search envelope; no hardware basis, upper headroom only"
 
   # Owner-set fixed maximum aperture is pi * (0.25 m)^2. Since the
   # compressible-Poiseuille capacity scales as d^4, (0.50/0.12)^4 = 301x the
@@ -1223,6 +1239,7 @@ condenser_geometry:
     fe_stage1: 20.866981427604056
     cr_stage2: 4.5
     sio_stage3: 6.0
+    mn_stage3b: 1.0
     alkali_stage4: 4.5093900542703675
     k_stage4b: 5.658842421045168
     terminal: 2.0
@@ -1230,26 +1247,35 @@ condenser_geometry:
     fe_stage1: "owner-ruling-d137: baseline 0.236 m2 at the historical 12 cm throat; absolute area is pinned pending d-283 sizing; sized for 95% of the C2A Fe window"
     cr_stage2: "engineering-default: removable Cr oxide cartridge sits between Fe condenser and SiO baffles with intermediate capture surface"
     sio_stage3: "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages"
+    mn_stage3b: "FLAGGED provisional d-452: Mn stage MZO-lined cartridge; 1.0 ratio fallback only, absolute area set by d-283 peak-flux sizing"
     alkali_stage4: "owner-ruling-d137: baseline Na collector area 0.051 m2 at the historical 12 cm throat; absolute area is pinned pending d-283 sizing; t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
     k_stage4b: "owner-ruling-d137: baseline K cold-trap area 0.064 m2 at the historical 12 cm throat; absolute area is pinned pending d-283 sizing; t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
     terminal: "engineering-default: terminal vent/capture area is not the constriction; fixed independently of throat for follow-on Kn diagnostics"
-  # d-283 design rule: per stage choose A_stage = max_s inf{A:
-  # eta_prod(s, F_peak,s, A, state_peak,s) >= 0.90}, over its designated
-  # species, using the C0-C6 lunar_mare_low_ti reference at the 0.5 m throat.
-  # F_peak is maximum hourly incident species flow [kg/hr], eta_prod is the
-  # production capture resolver's dimensionless efficiency, and A is [m2].
-  # Size once and run one fixed-point check because upstream area changes
-  # downstream flow. Sanity: at 12 cm the rule should need areas near existing
-  # anchors for species they capture well; the 0.5 m Fe estimate is 3.5-4.6 m2.
+  # d-283 design rule: for every designated species, use its maximum hourly
+  # incident flow in the C0-C6 lunar_mare_low_ti reference at the 0.5 m throat.
+  # With n_dot [mol/s], partial pressure p [Pa], Psat [Pa], and production
+  # effective transport speed k_i [mol/(m2 s Pa)], the single-wall law is
+  # eta = ((p-Psat)/p)*(1-exp(-p*k_i*A/n_dot)); choose the minimum A [m2]
+  # giving eta >= 0.90, then take the maximum for species sharing a stage.
+  # Run one fixed-point pass because upstream capture changes later peak flow.
+  # At 850 C, the Mn peak p=4.254 Pa and production Psat=0.05899 Pa give a
+  # 98.61% equilibrium ceiling; the area sizes transport to 90% of incident
+  # Mn, rather than fitting the feedstock yield. Compare measured areas below
+  # against r3: Fe 1.164 kg/h, SiO 14.37 kg/h, Na 1.046 kg/h, Mg 1.038 kg/h.
+  # Fixed-Dh assumption: Dh=0.020 m for Fe and 0.12 m otherwise; laminar
+  # fully-developed Sh=3.66 is a conservative lower-bound mass transfer
+  # coefficient, independent of velocity. A is total wall area realizable as
+  # multipass or packed channels. No velocity/Reynolds correction is added.
   # Areas are absolute collector hardware and never scale with throat.
   stage_areas_m2:
     fe_stage1: 0.236
     cr_stage2: 0.050893800988154644
     sio_stage3: 0.06785840131753954
+    mn_stage3b: 0.1
     alkali_stage4: 0.05099999999999999
     k_stage4b: 0.064
     terminal: 0.02261946710584651
-  stage_areas_m2_source: "FLAGGED d-283 (d-452): 12 cm-anchor areas pending peak-flux sizing probe"
+  stage_areas_m2_source: "FLAGGED d-283/d-452: r3 12 cm anchors; peak-flux 90% areas pending Studio sizing and fixed-point pass"
   # This configured 12 cm hydraulic diameter is shared by condenser transfer
   # fallbacks and the physical wall segments; it is independent of the throat.
   condenser_hydraulic_diameter_m: 0.12

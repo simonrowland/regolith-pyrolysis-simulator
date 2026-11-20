@@ -10,19 +10,28 @@ STAGE_KEY_BY_NUMBER: dict[int, str] = {
     4: 'stage_4_alkali_mg_cyclone',
 }
 
-# Stage 4 keeps its key. The K trap is a sub-stage of 4, not a new
-# public stage number. sub_order 0 is every existing stage.
+# Public stage keys stay fixed. The Mn collector is a sub-stage of 3, and
+# the K trap is a sub-stage of 4; neither adds a public stage number.
 NA_COLLECTOR_STAGE_KEY = 'stage_4_alkali_mg_cyclone'
 K_TRAP_STAGE_KEY = 'stage_4b_k_trap'
 K_TRAP_STAGE_NUMBER = 4
 K_TRAP_SUB_ORDER = 1
+MN_CAPTURE_STAGE_KEY = 'stage_3b_mn_capture'
+MN_CAPTURE_STAGE_NUMBER = 3
+MN_CAPTURE_SUB_ORDER = 1
 STAGE_KEY_BY_IDENTITY: dict[tuple[int, int], str] = {
     (number, 0): key for number, key in STAGE_KEY_BY_NUMBER.items()
 }
 STAGE_KEY_BY_IDENTITY[(K_TRAP_STAGE_NUMBER, K_TRAP_SUB_ORDER)] = K_TRAP_STAGE_KEY
+STAGE_KEY_BY_IDENTITY[(MN_CAPTURE_STAGE_NUMBER, MN_CAPTURE_SUB_ORDER)] = (
+    MN_CAPTURE_STAGE_KEY
+)
 # Collector bands the integer registry cannot name. Completeness checks
 # require these keys; they do not renumber stages 5-7.
-SUBSTAGE_COLLECTOR_KEYS: tuple[str, ...] = (K_TRAP_STAGE_KEY,)
+SUBSTAGE_COLLECTOR_KEYS: tuple[str, ...] = (
+    MN_CAPTURE_STAGE_KEY,
+    K_TRAP_STAGE_KEY,
+)
 
 # Config includes ducts and downstream monitors as well as product collectors.
 # Keep the product/report registry above stable; reuse its canonical keys here.
@@ -84,17 +93,19 @@ STAGE_NUMBER_BY_KEY.update({
     'stage_2_cr_harvester': 2,
     'stage_3_silica_baffle': 3,
     'stage_4_alkali_cyclone': 4,
+    MN_CAPTURE_STAGE_KEY: MN_CAPTURE_STAGE_NUMBER,
     K_TRAP_STAGE_KEY: K_TRAP_STAGE_NUMBER,
 })
 
 STAGE_TARGET_SPECIES: dict[int, tuple[str, ...]] = {
     1: ('Fe',),
-    2: ('Cr', 'CrO2', 'Mn'),
+    2: ('Cr', 'CrO2'),
     3: ('SiO',),
     4: ('Na', 'Mg'),
 }
-# The integer map cannot hold two target tuples for stage 4.
+# The integer map cannot hold targets for collector substages.
 STAGE_TARGET_SPECIES_BY_KEY: dict[str, tuple[str, ...]] = {
+    MN_CAPTURE_STAGE_KEY: ('Mn',),
     K_TRAP_STAGE_KEY: ('K',),
 }
 
@@ -105,7 +116,7 @@ DESIGNATED_STAGE: dict[str, str] = {
     'Cr': 'stage_2_cr_oxide_harvest',
     'CrO2': 'stage_2_cr_oxide_harvest',
     'Cr2O3': 'stage_2_cr_oxide_harvest',
-    'Mn': 'stage_2_cr_oxide_harvest',
+    'Mn': MN_CAPTURE_STAGE_KEY,
     'SiO': 'stage_3_sio_zone',
     'SiO2': 'stage_3_sio_zone',
     'Na': NA_COLLECTOR_STAGE_KEY,
@@ -138,7 +149,7 @@ PRODUCT_DESTINATIONS: dict[str, dict[str, str]] = {
     'C5': {
         'Fe': 'stage_1_fe_condenser',
         'Cr': 'stage_2_cr_oxide_harvest',
-        'Mn': 'stage_2_cr_oxide_harvest',
+        'Mn': MN_CAPTURE_STAGE_KEY,
         'Si': 'metal_phase_si',
         'Ti': 'metal_phase_ti',
     },
@@ -152,7 +163,7 @@ PRODUCT_DESTINATIONS: dict[str, dict[str, str]] = {
     'MRE': {
         'Fe': 'stage_1_fe_condenser',
         'Cr': 'stage_2_cr_oxide_harvest',
-        'Mn': 'stage_2_cr_oxide_harvest',
+        'Mn': MN_CAPTURE_STAGE_KEY,
         'Si': 'metal_phase_si',
         'Ti': 'metal_phase_ti',
         'Al': 'metal_phase_al',
@@ -181,8 +192,9 @@ def designated_stage_number(species: str) -> int | None:
 def accepted_species_for_stage_number(stage_number: int) -> frozenset[str]:
     """Species that may land in a stage without counting as impurity.
 
-    A sub-stage key that shares this number is not accepted here. K is
-    designated to the K trap, so stage 4's accepted set is Na and Mg.
+    A sub-stage key that shares this number is not accepted here. Mn and K
+    are designated to their own substages; stage 3 accepts SiO, and stage 4
+    accepts Na and Mg.
     """
 
     canonical = STAGE_KEY_BY_NUMBER.get(stage_number)
@@ -268,9 +280,9 @@ def target_species_for_stage_key(stage_key: str) -> list[str]:
 def stage_list_index_for_destination(train: object, destination: str | None) -> int | None:
     """List index of the stage object for a destination key.
 
-    Public stage numbers stay 0-7. The K trap shares number 4 and is
-    appended after stage 7, so its list index is not its stage number.
-    Metal-phase destinations are not condenser stages.
+    Public stage numbers stay 0-7. Collector substages share their parent
+    stage number and are appended after stage 7, so their list indices do
+    not equal their stage numbers. Metal-phase destinations are not stages.
     """
 
     if not destination or not str(destination).startswith('stage_'):
