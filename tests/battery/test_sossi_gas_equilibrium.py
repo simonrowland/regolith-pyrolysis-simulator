@@ -1,0 +1,124 @@
+from __future__ import annotations
+
+from collections import Counter
+from copy import deepcopy
+from decimal import Decimal
+from pathlib import Path
+import re
+
+import pytest
+import yaml
+
+from simulator.battery.oxygen_identity import (
+    SOSSI_GAS_EQUILIBRIUM_BAND_DEX,
+    check_sossi_table2_gas_equilibrium,
+)
+
+
+ROOT = Path(__file__).resolve().parents[2]
+SOURCE = ROOT / "data/literature/extracts/kems-012-sossi-2019.yaml"
+
+
+def _source_parts():
+    source = yaml.safe_load(SOURCE.read_text())
+    experiments = source["experiments"]
+    table2 = next(
+        observation
+        for observation in source["species"]["Mn"]["observations"]
+        if observation.get("observation_id")
+        == "sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906"
+    )
+    series = table2["values"]["series"]
+    return experiments, series
+
+
+def _checks_by_run(experiments, series):
+    checks = check_sossi_table2_gas_equilibrium(experiments, series)
+    return {check.run_id: check for check in checks.values()}
+
+
+def test_all_43_sossi_table2_gas_equilibria_match_the_printed_logs() -> None:
+    experiments, series = _source_parts()
+    checks = _checks_by_run(experiments, series)
+
+    assert len(checks) == 43
+    assert Counter(check.method for check in checks.values()) == {
+        "imposed_fo2": 24,
+        "co2_dissociation_partials_bar": 10,
+        "printed_air": 9,
+    }
+    assert all(check.refusal_reason is None for check in checks.values())
+    assert all(
+        check.checked_log10_fO2_bar == check.printed_log10_fO2_bar
+        for check in checks.values()
+    )
+    assert all(
+        check.delta_log10_fO2_dex is None
+        or abs(check.delta_log10_fO2_dex) <= SOSSI_GAS_EQUILIBRIUM_BAND_DEX
+        for check in checks.values()
+    )
+
+    for run_id in ("P09/06/18a", "P09/06/18b"):
+        check = checks[run_id]
+        assert check.printed_log10_fO2_bar == Decimal("-9.23")
+        assert float(check.computed_log10_fO2_bar) == pytest.approx(
+            -9.2055, abs=0.00005
+        )
+        assert float(check.delta_log10_fO2_dex) == pytest.approx(
+            0.0245, abs=0.00005
+        )
+
+    assert float(checks["2M-15-07-16d"].computed_log10_fO2_bar) == pytest.approx(
+        -3.4351, abs=0.00005
+    )
+    assert float(checks["C18/12/15"].computed_log10_fO2_bar) == pytest.approx(
+        -3.0652, abs=0.00005
+    )
+    assert all(
+        checks[run_id].printed_log10_fO2_bar == Decimal("-0.68")
+        and checks[run_id].checked_log10_fO2_bar == Decimal("-0.68")
+        for run_id, check in checks.items()
+        if check.method == "printed_air"
+    )
+
+
+def test_breaking_the_printed_co_co2_ratio_refuses_the_run() -> None:
+    experiments, series = _source_parts()
+    mutated = deepcopy(series)
+    row = next(
+        item for item in mutated if item["run_id"].rstrip("*") == "P09/06/18a"
+    )
+    quote = row["locator"]["quote"]
+    row["locator"]["quote"], count = re.subn(
+        r"(P09/06/18a\*?\s+1400\s+15\s+)130(\s+65\s+-9\.23)",
+        r"\g<1>100\g<2>",
+        quote,
+        count=1,
+    )
+    assert count == 1
+
+    check = _checks_by_run(experiments, mutated)["P09/06/18a"]
+
+    assert check.refusal_reason == "gas_equilibrium_fo2_disagrees_with_printed"
+    assert check.checked_log10_fO2_bar is None
+    assert abs(check.delta_log10_fO2_dex) > SOSSI_GAS_EQUILIBRIUM_BAND_DEX
+
+
+@pytest.mark.parametrize("cover", ["Argon", "air"])
+def test_swapping_a_printed_co_co2_cover_refuses_the_run(cover: str) -> None:
+    experiments, series = _source_parts()
+    mutated = deepcopy(experiments)
+    experiment = next(
+        item
+        for item in mutated
+        if "P09/06/18a" in item["locator"]["note"]
+    )
+    experiment["pressure_environment"]["sweep_gas"]["state"] = {
+        "tag": "value",
+        "value": cover,
+    }
+
+    check = _checks_by_run(mutated, series)["P09/06/18a"]
+
+    assert check.refusal_reason == "cover_not_printed_mixture"
+    assert check.checked_log10_fO2_bar is None
