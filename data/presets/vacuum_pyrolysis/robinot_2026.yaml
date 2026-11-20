@@ -308,6 +308,7 @@ trajectory_comparison:
     f4b_provenance:
       path: tables/kems-044-robinot-2026/f4b.provenance.yaml
       sha256: f71dc8fd252d91a62e839426d74c7b05137ca3cffd64ae192d95d1ed479bdcab
+  # Owner ruling d-453 (2026-11-19) permits public figure digitizations.
   # For both O2 traces, each point stores digitization u and the analyzer term
   # (2% of the absolute reading) separately; combined u = sqrt(u_digit^2 +
   # u_analyzer^2). This preserves the paper uncertainty instead of folding it
@@ -318,6 +319,9 @@ trajectory_comparison:
       species: O2
       units: ppm
       source_pin: f4a_csv
+      provenance_pin: f4a_provenance
+      provenance_section: prose_anchor_checks
+      series_semantics: rate
       source_series: O2 concentration
       point_fields: [time_min, time_uncertainty_min, expected_value, digitization_uncertainty, analyzer_uncertainty, combined_uncertainty]
       points:
@@ -446,6 +450,15 @@ trajectory_comparison:
       species: O2
       units: mg
       source_pin: f4b_csv
+      provenance_pin: f4b_provenance
+      provenance_section: prose_anchor_checks
+      series_semantics: cumulative
+      comparison_role: trajectory_not_yield_target
+      prose_anchor_check:
+        provenance_pin: f4b_provenance
+        check_index: 0
+        status: FAIL
+        yield_anchor_observable_id: robinot_o2_final_mass_kg
       source_series: Cumulative O2
       point_fields: [time_min, time_uncertainty_min, expected_value, digitization_uncertainty, analyzer_uncertainty, combined_uncertainty]
       points:

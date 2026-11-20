@@ -303,6 +303,7 @@ def compare_o2_release_time_series(
         species=species,
         observation_points=observation_points,
         runtime_samples=runtime_ppm_samples,
+        series_semantics="rate",
         units="ppm",
         evidence_scope=evidence_scope,
         source_locator=source_locator,
@@ -319,6 +320,7 @@ def compare_time_series(
     observable_id: str,
     observation_points: Sequence[Mapping[str, Any]],
     runtime_samples: Sequence[Mapping[str, Any]],
+    series_semantics: str,
     units: str,
     evidence_scope: str,
     source_locator: Mapping[str, Any] | str,
@@ -330,7 +332,7 @@ def compare_time_series(
     assumed_input: bool = False,
     out_of_domain: bool = False,
 ) -> tuple[ComparisonRecord, ...]:
-    """Compare a trajectory at observed times plus its trapezoid integral.
+    """Compare a trajectory pointwise and, for rates, by signed time integral.
 
     Runtime values are linearly interpolated onto observation times. The
     interpolation requires bracketing samples, never extrapolates, and refuses
@@ -341,6 +343,11 @@ def compare_time_series(
 
     observations = _normalise_observation_points(observation_points)
     samples = _normalise_runtime_samples(runtime_samples)
+    if series_semantics not in {"rate", "cumulative"}:
+        raise TimeSeriesComparisonRefusal(
+            "unsupported_series_semantics",
+            f"series semantics {series_semantics!r} must be rate or cumulative",
+        )
     if len(observations) < 2:
         raise ValueError("time-series integral requires at least two observations")
     sample_times = [time_min for time_min, _ in samples]
@@ -365,9 +372,7 @@ def compare_time_series(
                 actual_value=actual,
                 units=units,
                 evidence_scope=evidence_scope,
-                source_locator=(
-                    point_locator if point_locator is not None else source_locator
-                ),
+                source_locator=_series_point_locator(source_locator, point_locator),
                 recipe=recipe,
                 observation=observation,
                 runtime=runtime,
@@ -377,36 +382,60 @@ def compare_time_series(
             )
         )
 
-    times = [time_min for time_min, _, _, _ in observations]
-    expected_values = [expected for _, expected, _, _ in observations]
-    observed_curve = list(zip(times, expected_values))
-    runtime_curve = list(zip(times, actual_values))
-    integral_uncertainty = _integral_uncertainty_bound(observations)
-    records.append(
-        compare_values(
-            case_id=case_id,
-            source_id=source_id,
-            observable_id=f"{observable_id}:integral",
-            species=species,
-            coordinate={"window_start_min": times[0], "window_end_min": times[-1]},
-            expected_value=trapezoid_integral(observed_curve),
-            expected_uncertainty={
-                "kind": "absolute",
-                "value": integral_uncertainty,
-            },
-            actual_value=trapezoid_integral(runtime_curve),
-            units=f"{units} min",
-            evidence_scope=f"{evidence_scope}; trapezoidal time integral",
-            source_locator={"integral_of": observable_id, "method": "trapezoid"},
-            recipe=recipe,
-            observation=observation,
-            runtime=runtime,
-            unsupported_speciation=unsupported_speciation,
-            assumed_input=assumed_input,
-            out_of_domain=out_of_domain,
+    if series_semantics == "rate":
+        times = [time_min for time_min, _, _, _ in observations]
+        expected_values = [expected for _, expected, _, _ in observations]
+        observed_curve = list(zip(times, expected_values))
+        runtime_curve = list(zip(times, actual_values))
+        integral_uncertainty = _integral_uncertainty_bound(observations)
+        records.append(
+            compare_values(
+                case_id=case_id,
+                source_id=source_id,
+                observable_id=f"{observable_id}:integral",
+                species=species,
+                coordinate={
+                    "window_start_min": times[0],
+                    "window_end_min": times[-1],
+                },
+                expected_value=trapezoid_integral(
+                    observed_curve,
+                    allow_negative_values=True,
+                ),
+                expected_uncertainty={
+                    "kind": "absolute",
+                    "value": integral_uncertainty,
+                },
+                actual_value=trapezoid_integral(
+                    runtime_curve,
+                    allow_negative_values=True,
+                ),
+                units=f"{units} min",
+                evidence_scope=f"{evidence_scope}; signed trapezoidal rate integral",
+                source_locator=_series_point_locator(
+                    source_locator,
+                    {"integral_of": observable_id, "method": "trapezoid"},
+                ),
+                recipe=recipe,
+                observation=observation,
+                runtime=runtime,
+                unsupported_speciation=unsupported_speciation,
+                assumed_input=assumed_input,
+                out_of_domain=out_of_domain,
+            )
         )
-    )
     return tuple(records)
+
+
+def _series_point_locator(
+    series_locator: Mapping[str, Any] | str,
+    point_locator: Mapping[str, Any] | str | None,
+) -> Mapping[str, Any] | str:
+    if point_locator is None:
+        return series_locator
+    if isinstance(series_locator, Mapping) and isinstance(point_locator, Mapping):
+        return {**series_locator, **point_locator}
+    return point_locator
 
 
 def _normalise_observation_points(

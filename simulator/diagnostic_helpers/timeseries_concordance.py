@@ -167,8 +167,18 @@ def dual_concordance(
     )
 
 
-def trapezoid_integral(points: Curve) -> float:
-    normalised = _normalise_curve(points, field_name="integral")
+def trapezoid_integral(
+    points: Curve,
+    *,
+    allow_negative_values: bool = False,
+) -> float:
+    """Integrate a curve, optionally retaining signed axis-fit residuals."""
+
+    normalised = _normalise_curve(
+        points,
+        field_name="integral",
+        allow_negative_values=allow_negative_values,
+    )
     if len(normalised) == 1:
         return 0.0
     total = 0.0
@@ -300,13 +310,19 @@ def _trajectory_concordance(
     return score, error_factor, len(log_factors)
 
 
-def _normalise_curve(points: Curve, *, field_name: str) -> tuple[tuple[float, float], ...]:
+def _normalise_curve(
+    points: Curve,
+    *,
+    field_name: str,
+    allow_negative_values: bool = False,
+) -> tuple[tuple[float, float], ...]:
+    validate_value = _finite_number if allow_negative_values else _finite_nonnegative
     normalised = tuple(
         sorted(
             (
                 (
                     _finite_number(float(time_s), f"{field_name} time"),
-                    _finite_nonnegative(float(value), f"{field_name} value"),
+                    validate_value(float(value), f"{field_name} value"),
                 )
                 for time_s, value in points
             ),
