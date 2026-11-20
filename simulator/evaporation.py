@@ -4753,6 +4753,18 @@ class EvaporationMixin:
             )
         return min(1.0, fraction)
 
+    @staticmethod
+    def _products_excluding_overhead_gas(
+        products: Mapping[Any, Any],
+        product_accounts: Mapping[str, Any],
+    ) -> dict[Any, Any]:
+        return {
+            product: value
+            for product, value in products.items()
+            if str(product_accounts.get(str(product)) or "")
+            != "process.overhead_gas"
+        }
+
     def _stage3_mn_cartridge_account_fractions(
         self,
         route_result,
@@ -4793,12 +4805,11 @@ class EvaporationMixin:
             raise AccountingError(
                 "condensation_product_accounts must be a mapping"
             )
+        products = self._products_excluding_overhead_gas(
+            products, raw_product_accounts
+        )
         for raw_product in products:
             product = str(raw_product)
-            # A product explicitly routed to overhead gas is a gaseous
-            # coproduct, not material on the removable Stage-3 cartridge.
-            if str(raw_product_accounts.get(product) or "") == "process.overhead_gas":
-                continue
             fractions = dict(account_fractions.get(product, {}) or {})
             fractions[MANGANESE_STAGE3_CARTRIDGE_ACCOUNT] = stage3_fraction
             account_fractions[product] = fractions
@@ -5083,11 +5094,9 @@ class EvaporationMixin:
             (sp_data or {}).get('condensation_product_accounts') or {}
         )
         if product_accounts:
-            product_kg = {
-                product: kg
-                for product, kg in product_kg.items()
-                if product_accounts.get(product) != 'process.overhead_gas'
-            }
+            product_kg = self._products_excluding_overhead_gas(
+                product_kg, product_accounts
+            )
         return product_kg
 
     def _condensation_product_mol_ratios(

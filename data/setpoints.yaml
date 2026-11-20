@@ -1232,11 +1232,11 @@ condenser_geometry:
     k_stage4b: 5.658842421045168
     terminal: 2.0
   stage_area_ratio_sources:
-    fe_stage1: "owner-ruling-d137: baseline 0.236 m2 at the historical 12 cm throat; absolute area is pinned pending d-283 sizing; sized for 95% of the C2A Fe window"
-    cr_stage2: "engineering-default: removable Cr oxide cartridge sits between Fe condenser and SiO baffles with intermediate capture surface"
-    sio_stage3: "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages"
-    alkali_stage4: "owner-ruling-d137: baseline Na collector area 0.051 m2 at the historical 12 cm throat; absolute area is pinned pending d-283 sizing; t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
-    k_stage4b: "owner-ruling-d137: baseline K cold-trap area 0.064 m2 at the historical 12 cm throat; absolute area is pinned pending d-283 sizing; t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
+    fe_stage1: "engineering-default: FLAGGED d-283 r4 three-pass fixed point at 0.5 m throat; absolute area 38.829406624 m2 for 90% Fe peak-window capture; pending owner certification"
+    cr_stage2: "engineering-default: FLAGGED d-283 r4 three-pass fixed point at 0.5 m throat; absolute area 350.525053773 m2; Cr2O3 capture ceiling-limited (90% unreachable); pending owner certification"
+    sio_stage3: "engineering-default: FLAGGED d-283 r4 three-pass fixed point at 0.5 m throat; absolute area 466.975203985 m2 for 90% SiO peak capture; pending owner certification"
+    alkali_stage4: "engineering-default: FLAGGED d-283 r4 three-pass fixed point at 0.5 m throat; absolute area 106.439821811 m2 for 90% Na/Mg peak capture; t-1217 law at f_eq ~ 1 and alpha 1 remains provisional on b-588 and b-599; pending owner certification"
+    k_stage4b: "engineering-default: FLAGGED d-283 r4 three-pass fixed point at 0.5 m throat; absolute area 0.0661518735017 m2 for 90% K peak capture; t-1217 law at f_eq ~ 1 and alpha 1 remains provisional on b-588 and b-599; pending owner certification"
     terminal: "engineering-default: terminal vent/capture area is not the constriction; fixed independently of throat for follow-on Kn diagnostics"
   # d-283 engineering-default design rule: for each collector use the
   # production resolver to find the minimum A [m2] satisfying
