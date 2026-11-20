@@ -527,49 +527,203 @@ def test_magemin_liner_silica_verdict_splits_rounded_cache_keys(cache_layer):
         mg_equivalent = liner_corrosion.deposit_oxide_equivalent_mass_by_oxide(
             {"Mg": 1.0}
         )["MgO"]
-        deposit = {
-            "SiO": 30.0000001 / si_o_equivalent,
-            "Mg": 69.9999999 / mg_equivalent,
+        liner = {"SiO2": 50.0, "MgO": 50.0}
+
+        def deposit_at_silica(silica_wt_pct):
+            return {
+                "SiO": silica_wt_pct / si_o_equivalent,
+                "Mg": (100.0 - silica_wt_pct) / mg_equivalent,
+            }
+
+        deposits = {
+            "in_band": deposit_at_silica(30.0000001),
+            "out_of_band": deposit_at_silica(29.9999999),
         }
-        in_band_curve, in_band_metadata = sampler._curve_with_metadata(
-            in_band,
-            deposit,
-            temperature_C=temperature,
-            pressure_bar=pressure,
-        )
-        assert in_band_metadata == {}
-        calls_after_in_band_fill = len(backend.calls)
-        cached_in_band_curve, cached_in_band_metadata = sampler._curve_with_metadata(
-            in_band,
-            deposit,
-            temperature_C=temperature,
-            pressure_bar=pressure,
-        )
-        assert cached_in_band_curve is in_band_curve
-        assert cached_in_band_metadata == {}
-
-        out_of_band_curve = sampler.curve(
-            out_of_band,
-            deposit,
-            temperature_C=temperature,
-            pressure_bar=pressure,
-        )
-
-        assert out_of_band_curve is not in_band_curve
-        assert len(sampler._curve_cache) == 2
-        assert len(backend.calls) > calls_after_in_band_fill
-        cached_out_of_band_curve, out_of_band_metadata = (
-            sampler._curve_with_metadata(
-                out_of_band,
-                deposit,
+        for first, second in (
+            ("in_band", "out_of_band"),
+            ("out_of_band", "in_band"),
+        ):
+            sampler = MageminLinerSampler(backend)
+            first_curve, first_metadata = sampler._curve_with_metadata(
+                liner,
+                deposits[first],
                 temperature_C=temperature,
                 pressure_bar=pressure,
             )
-        )
-        assert cached_out_of_band_curve is out_of_band_curve
-        assert out_of_band_metadata["authority"] == "extrapolated"
+            calls_after_first_fill = len(backend.calls)
+            cached_first_curve, cached_first_metadata = (
+                sampler._curve_with_metadata(
+                    liner,
+                    deposits[first],
+                    temperature_C=temperature,
+                    pressure_bar=pressure,
+                )
+            )
+            assert cached_first_curve is first_curve
+            assert cached_first_metadata == first_metadata
 
+            second_curve, second_metadata = sampler._curve_with_metadata(
+                liner,
+                deposits[second],
+                temperature_C=temperature,
+                pressure_bar=pressure,
+            )
+            assert second_curve is not first_curve
+            assert len(sampler._curve_cache) == 2
+            assert len(backend.calls) > calls_after_first_fill
+            assert (second_metadata.get("authority") == "extrapolated") == (
+                second == "out_of_band"
+            )
+            sampler.close()
+
+
+@pytest.mark.parametrize(
+    "liner",
+    ({"MgO": 100.0}, {"MnO": 100.0}, {}),
+    ids=("zero-silica-mgo", "no-positive-ig-mno", "empty-liner"),
+)
+def test_magemin_tier_b_curve_prechecks_zero_silica_before_projection(liner):
+    sampler = MageminLinerSampler(_FakeMageminBackend())
+
+    with pytest.raises(LinerCorrosionRefusal) as refusal:
+        sampler._curve_with_metadata(
+            liner,
+            {"Na": 0.01},
+            temperature_C=1500.0,
+            pressure_bar=1.0e-6,
+        )
+
+    if liner == {"MnO": 100.0}:
+        assert refusal.value.reason == "silicate_window"
     sampler.close()
+
+
+@pytest.mark.parametrize(
+    "liner_silica",
+    (29.9999999, 30.0000001, 79.9999999, 80.0000001),
+)
+def test_published_liner_segment_silica_flag_matches_curve_endpoint_verdicts(
+    liner_silica,
+):
+    from engines.magemin.domain import MAGEMinDomainGate
+
+    backend = _FakeMageminBackend()
+
+    def temperature_curve(
+        temperature_C,
+        *,
+        pressure_bar,
+        fO2_log,
+        projected_oxide_wt_pct,
+    ):
+        backend.calls.append(
+            (temperature_C, pressure_bar, fO2_log, dict(projected_oxide_wt_pct))
+        )
+        liquid_fraction = max(0.0, min(1.0, (temperature_C - 1000.0) / 500.0))
+        return SimpleNamespace(
+            status="ok",
+            liquid_fraction=liquid_fraction,
+            phase_masses_kg={
+                "liq": liquid_fraction,
+                "solid": 1.0 - liquid_fraction,
+            },
+            phase_compositions={
+                "liq": dict(projected_oxide_wt_pct),
+                "solid": dict(projected_oxide_wt_pct),
+            },
+            warnings=[],
+        )
+
+    backend.equilibrate = temperature_curve
+    edge = 30.0 if liner_silica < 50.0 else 80.0
+    liner = {"SiO2": liner_silica, "MgO": 100.0 - liner_silica}
+    si_o_equivalent = liner_corrosion.deposit_oxide_equivalent_mass_by_oxide(
+        {"SiO": 1.0}
+    )["SiO2"]
+    mg_equivalent = liner_corrosion.deposit_oxide_equivalent_mass_by_oxide(
+        {"Mg": 1.0}
+    )["MgO"]
+
+    def deposit_at_silica(silica_wt_pct):
+        return {
+            "SiO": 1.0e-4 * silica_wt_pct / 100.0 / si_o_equivalent,
+            "Mg": 1.0e-4 * (100.0 - silica_wt_pct) / 100.0 / mg_equivalent,
+        }
+
+    deposit_variants = (edge - 1.0e-7, edge + 1.0e-7)
+    temperature = 1200.0
+    pressure = 1.0e-6
+    for target_silica in deposit_variants:
+        other_silica = next(
+            value for value in deposit_variants if value != target_silica
+        )
+        other_deposit = deposit_at_silica(other_silica)
+        target_deposit = deposit_at_silica(target_silica)
+        sampler = MageminLinerSampler(backend)
+        sampler._curve_with_metadata(
+            liner,
+            other_deposit,
+            temperature_C=temperature,
+            pressure_bar=pressure,
+        )
+        curve, metadata = sampler._curve_with_metadata(
+            liner,
+            target_deposit,
+            temperature_C=temperature,
+            pressure_bar=pressure,
+        )
+        endpoint_diagnostics = []
+        for fraction, _liquid_fraction in curve.points:
+            composition = liner_corrosion._composition_at_fraction(
+                liner,
+                curve.deposit_composition_wt_pct,
+                fraction,
+            )
+            valid, _, reason = MAGEMinDomainGate.validate_with_reason(composition)
+            assert valid, reason
+            endpoint_diagnostics.append(
+                MAGEMinDomainGate.silica_extrapolation_diagnostic(composition)
+            )
+        expected_diagnostic = next(
+            (diagnostic for diagnostic in endpoint_diagnostics if diagnostic),
+            None,
+        )
+
+        state = build_liner_state_segment(
+            {
+                "composition": liner,
+                "criterion_tier": "B",
+                "density_kg_m3": 1000.0,
+                "reacted_layer_depth_m": 0.001,
+                "margin_C": 0.0,
+                "horizon_campaigns": 0,
+                "porosity_fraction": 0.0,
+            },
+            target_deposit,
+            area_m2=1.0,
+            service_temperature_C=temperature,
+            pressure_bar=pressure,
+            sampler=sampler,
+            deposit_inert_kg_by_species={"SiO": 0.0, "Mg": 0.0},
+            deposit_reactive_kg_by_species={"SiO": 0.0, "Mg": 0.0},
+            x_star=0.5,
+        )
+        silica_flags = [
+            flag
+            for flag in state["flags"]
+            if flag.startswith(liner_corrosion.MAGEMIN_SILICA_EXTRAPOLATED_FLAG)
+        ]
+        assert bool(silica_flags) is (expected_diagnostic is not None)
+        if expected_diagnostic is not None:
+            expected_band = expected_diagnostic["certified_band"]
+            assert metadata["certified_band"] == expected_band
+            assert any(
+                "certified_band=SiO2 [30, 80] wt%" in flag
+                for flag in silica_flags
+            )
+        else:
+            assert metadata == {}
+        sampler.close()
 
 
 @pytest.mark.live_engine

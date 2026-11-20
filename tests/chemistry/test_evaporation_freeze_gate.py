@@ -1848,6 +1848,117 @@ def test_same_hour_magemin_pin_redispatches_after_char_crosses_silica_band(
     assert curve['certified_band'] == {'sio2_wt_pct': [30.0, 80.0]}
 
 
+@pytest.mark.parametrize(
+    ('composition_wt_pct', 'expected_reasons'),
+    (
+        ({'MgO': 100.0}, {'silicate_window'}),
+        ({'MnO': 100.0}, {'silicate_window'}),
+        ({}, {'silicate_window', 'major_sum'}),
+    ),
+    ids=('zero-silica-mgo', 'no-positive-ig-mno', 'empty-cleaned-account'),
+)
+def test_same_hour_magemin_pin_never_resurrects_a_refused_bulk(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    composition_wt_pct,
+    expected_reasons,
+):
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+        identity_override=admission_module.BindingIdentity(
+            'magemin', 'ig', 'magemin-ig-r1', 'subprocess'
+        ),
+        provenance_override={
+            'binding_provenance_verifiable': True,
+            'runtime_version': {
+                'tag': 'value',
+                'value': 'MAGEMin fixture runtime',
+                'reason': None,
+            },
+            'runtime_artifacts': {
+                'magemin_selected_binary': {'sha256': 'a' * 64},
+            },
+        },
+    )
+
+    def load_bulk(composition, source):
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        composition_mol = {
+            species: amount / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition.items()
+        }
+        if composition_mol:
+            ledger.load_external_mol(
+                _CLEANED_MELT_ACCOUNT,
+                composition_mol,
+                source=source,
+                material_origin='feedstock',
+            )
+        sim.atom_ledger = ledger
+        sim._chem_kernel = sim._build_chemistry_kernel()
+        sim._project_cleaned_melt_from_atom_ledger()
+
+    load_bulk(
+        {'SiO2': 60.0, 'MgO': 40.0},
+        'same-hour pin valid baseline',
+    )
+    trace = _install_magemin_subprocess_gate(sim, monkeypatch)
+    successful = sim._freeze_gate_curve_record()['curve']
+    assert sim._melt_redox_gate_current_silica_verdict() == (None, True)
+    sim._establish_melt_redox_gate_authority_for_current_hour()
+    assert sim._melt_redox_gate_silica_verdict_matches_current()
+    assert len(trace['provider_diagnostics']) == 1
+
+    load_bulk(composition_wt_pct, 'same-hour pin refused current bulk')
+    if composition_wt_pct:
+        outcome = sim._establish_melt_redox_gate_authority_for_current_hour()
+    else:
+        with pytest.raises(EvaporationFluxRefusal) as refusal_error:
+            sim._establish_melt_redox_gate_authority_for_current_hour()
+        assert not isinstance(refusal_error.value.__cause__, MeltCompositionError)
+        outcome = None
+
+    if outcome is not None:
+        assert len(trace['provider_diagnostics']) == 2
+        assert outcome is not successful
+        assert outcome != successful
+        refusal = outcome.get('gate_provider_refusal')
+        assert isinstance(refusal, dict)
+        assert refusal['reason'] in expected_reasons
+
+    sim._clear_melt_redox_gate_authority_for_completed_hour(
+        int(sim.melt.hour)
+    )
+    if outcome is None:
+        with pytest.raises(EvaporationFluxRefusal) as fresh_refusal:
+            sim._freeze_gate_curve_record()
+        assert not isinstance(fresh_refusal.value.__cause__, MeltCompositionError)
+    else:
+        fresh_record = sim._freeze_gate_curve_record()
+        assert len(trace['provider_diagnostics']) == 3
+        assert fresh_record['curve'] != successful
+        assert fresh_record['curve']['gate_provider_refusal']['reason'] in (
+            expected_reasons
+        )
+
+
 def test_magemin_ferric_fold_clears_request_silica_flag_when_evaluated_in_band(
     monkeypatch,
     vapor_pressure_data,

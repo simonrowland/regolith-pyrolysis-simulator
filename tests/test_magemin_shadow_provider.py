@@ -472,6 +472,49 @@ def test_provider_dispatch_preserves_domain_refusal_when_engine_unavailable(
     assert engine_calls == []
 
 
+@pytest.mark.parametrize(
+    "composition_wt_pct",
+    (
+        {"MgO": 100.0},
+        {"MnO": 100.0},
+        {},
+    ),
+    ids=("zero-silica-mgo", "no-positive-ig-mno", "empty-cleaned-account"),
+)
+def test_provider_dispatch_returns_typed_zero_silica_refusal(
+    composition_wt_pct,
+):
+    from simulator.accounting.formulas import resolve_species_formula
+
+    formula_registry = {}
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    request = IntentRequest(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": composition_mol},
+            species_formula_registry=formula_registry,
+        ),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    result = MAGEMinShadowProvider().dispatch(request)
+
+    assert result.status == "out_of_domain"
+    assert result.diagnostic["backend_status"] == "out_of_domain"
+    assert result.diagnostic["backend_status_reason"] in {
+        "silicate_window",
+        "major_sum",
+    }
+
+
 def test_liquidus_finder_keyerror_propagates():
     request = IntentRequest(
         intent=ChemistryIntent.SILICATE_LIQUIDUS,

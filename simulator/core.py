@@ -786,6 +786,8 @@ _VALID_DECISION_CHOICES = {
     DecisionType.C7_PROCEED: ('yes', 'no'),
 }
 _RESOLVE_MELT_REDOX_GATE_AUTHORITY = object()
+# A captured missing diagnostic is distinct from a missing pin baseline.
+_MELT_REDOX_GATE_UNKNOWN_SILICA_VERDICT = ('unknown',)
 # Distinct from a resolved curve of None (gate read in progress). The FeO
 # domain reads a curve the hour already resolved. It must not start a
 # liquidus solve, and it must not treat a missing read as below.
@@ -5191,15 +5193,42 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 pinned_hour == int(self.melt.hour)
                 and pinned_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
             ):
+                current_verdict, submitted_bulk_passes = (
+                    self._melt_redox_gate_current_silica_verdict()
+                )
+                pinned_verdict = getattr(
+                    self,
+                    '_melt_redox_gate_authority_tick_silica_out_of_band',
+                    None,
+                )
+                silica_verdict_matches = (
+                    self._liquid_fraction_provider != 'magemin'
+                    or (
+                        submitted_bulk_passes
+                        and (
+                            (
+                                current_verdict is None
+                                and pinned_verdict
+                                == _MELT_REDOX_GATE_UNKNOWN_SILICA_VERDICT
+                            )
+                            or (
+                                current_verdict is not None
+                                and current_verdict == pinned_verdict
+                            )
+                        )
+                    )
+                )
                 if self._melt_redox_gate_record_is_admitted(
                     pinned_authority,
                     **redox_state_kwargs,
-                ) and self._melt_redox_gate_record_silica_verdict_matches_current(
-                    pinned_authority
-                ):
+                ) and silica_verdict_matches:
                     return pinned_authority['curve']
                 if not isinstance(pinned_authority, Mapping):
-                    return pinned_authority
+                    if (
+                        self._liquid_fraction_provider != 'magemin'
+                        or submitted_bulk_passes
+                    ):
+                        return pinned_authority
                 self._melt_redox_gate_authority_this_tick = (
                     _RESOLVE_MELT_REDOX_GATE_AUTHORITY
                 )
@@ -5208,10 +5237,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return self._melt_redox_liquidus_gate_curve(
                 **redox_state_kwargs,
             )
-        if (
-            gate_authority is None
-            or isinstance(gate_authority, _MeltRedoxLiquidusFloorFallback)
-        ):
+        if gate_authority is None:
+            return gate_authority
+        if isinstance(gate_authority, _MeltRedoxLiquidusFloorFallback):
+            if self._liquid_fraction_provider == 'magemin':
+                _verdict, submitted_bulk_passes = (
+                    self._melt_redox_gate_current_silica_verdict()
+                )
+                if not submitted_bulk_passes:
+                    return self._melt_redox_liquidus_gate_curve(
+                        **redox_state_kwargs,
+                    )
             return gate_authority
         if isinstance(gate_authority, Mapping):
             if gate_authority.get('disposition') in {'live', 'memo-hit', 'replay'}:
@@ -5225,9 +5261,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                             '_melt_redox_gate_authority_this_tick',
                             None,
                         )
-                        and not self._melt_redox_gate_record_silica_verdict_matches_current(
-                            gate_authority
-                        )
+                        and not self._melt_redox_gate_silica_verdict_matches_current()
                     ):
                         self._melt_redox_gate_authority_this_tick = (
                             _RESOLVE_MELT_REDOX_GATE_AUTHORITY
@@ -5266,15 +5300,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             redox_state=redox_state,
         )
 
-    def _melt_redox_gate_record_current_silica_verdict(
+    def _melt_redox_gate_current_silica_verdict(
         self,
-        value: Any,
-    ) -> bool | None:
+    ) -> tuple[bool | None, bool]:
         if getattr(self, '_liquid_fraction_provider', None) != 'magemin':
-            return None
-        curve = value.get('curve') if isinstance(value, Mapping) else value
-        if not isinstance(curve, Mapping):
-            return None
+            return None, True
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.melt_backend.magemin import (
             MAGEMinBackend,
@@ -5285,25 +5315,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ChemistryIntent.GATE_LIQUID_FRACTION
         )
         if provider_inputs is None:
-            return None
+            return None, False
+        _key, domain_reason = self._freeze_gate_cache_key_and_domain(
+            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+            fO2_log=self._freeze_gate_redox_key_fO2_log(
+                fO2_log=float(self._current_melt_redox_fO2_log()),
+            ),
+            provider_melt_inputs=provider_inputs,
+        )
+        if domain_reason is not None:
+            return None, False
         evaluated_diagnostic = evaluated_silica_verdict(
             {'process.cleaned_melt': provider_inputs.composition_mol},
             MAGEMinBackend._DEFAULT_DATABASE,
             species_formula_registry=self.species_formula_registry,
             composition_mol_by_account=True,
         )
-        return bool(evaluated_diagnostic)
+        if evaluated_diagnostic is None:
+            return None, True
+        return evaluated_diagnostic.get('authority') == 'extrapolated', True
 
-    def _melt_redox_gate_record_silica_verdict_matches_current(
-        self,
-        value: Any,
-    ) -> bool:
+    def _melt_redox_gate_silica_verdict_matches_current(self) -> bool:
         if getattr(self, '_liquid_fraction_provider', None) != 'magemin':
             return True
-        current_verdict = self._melt_redox_gate_record_current_silica_verdict(
-            value
+        current_verdict, submitted_bulk_passes = (
+            self._melt_redox_gate_current_silica_verdict()
         )
-        if current_verdict is None:
+        if not submitted_bulk_passes:
             return False
         pinned_verdict = getattr(
             self,
@@ -5311,11 +5349,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             None,
         )
         if pinned_verdict is None:
-            # A missing baseline is not evidence of a band change. Keep this
-            # check side-effect-free; admitted live records set the pin when
-            # the hour's authority is established.
-            return True
-        return current_verdict == pinned_verdict
+            # A missing baseline is not the captured unknown verdict.
+            return False
+        if pinned_verdict == _MELT_REDOX_GATE_UNKNOWN_SILICA_VERDICT:
+            return current_verdict is None
+        return (
+            current_verdict is not None
+            and current_verdict == pinned_verdict
+        )
 
     def _establish_melt_redox_gate_authority_for_current_hour(
         self,
@@ -5335,15 +5376,38 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             pinned_hour == current_hour
             and pinned_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         ):
+            current_verdict, submitted_bulk_passes = (
+                self._melt_redox_gate_current_silica_verdict()
+            )
+            silica_verdict_matches = (
+                self._liquid_fraction_provider != 'magemin'
+                or (
+                    submitted_bulk_passes
+                    and (
+                        (
+                            current_verdict is None
+                            and self._melt_redox_gate_authority_tick_silica_out_of_band
+                            == _MELT_REDOX_GATE_UNKNOWN_SILICA_VERDICT
+                        )
+                        or (
+                            current_verdict is not None
+                            and current_verdict
+                            == self._melt_redox_gate_authority_tick_silica_out_of_band
+                        )
+                    )
+                )
+            )
             if (
                 self._melt_redox_gate_record_is_admitted(pinned_authority)
-                and self._melt_redox_gate_record_silica_verdict_matches_current(
-                    pinned_authority
-                )
+                and silica_verdict_matches
             ):
                 return pinned_authority['curve']
             if not isinstance(pinned_authority, Mapping):
-                return pinned_authority
+                if (
+                    self._liquid_fraction_provider != 'magemin'
+                    or submitted_bulk_passes
+                ):
+                    return pinned_authority
             self._melt_redox_gate_authority_this_tick = (
                 _RESOLVE_MELT_REDOX_GATE_AUTHORITY
             )
@@ -5355,10 +5419,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and authority.get('disposition') in {'live', 'memo-hit'}
             and self._melt_redox_gate_record_is_admitted(authority)
         ):
+            silica_verdict, _submitted_bulk_passes = (
+                self._melt_redox_gate_current_silica_verdict()
+            )
             self._melt_redox_gate_authority_this_tick = authority
             self._melt_redox_gate_authority_tick_hour = current_hour
             self._melt_redox_gate_authority_tick_silica_out_of_band = (
-                self._melt_redox_gate_record_current_silica_verdict(authority)
+                silica_verdict
+                if silica_verdict is not None
+                else _MELT_REDOX_GATE_UNKNOWN_SILICA_VERDICT
             )
             return authority['curve']
         if (
@@ -14847,9 +14916,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 and gate_authority_hour == current_hour
                 and isinstance(gate_authority, Mapping)
                 and self._melt_redox_gate_record_is_admitted(gate_authority)
-                and self._melt_redox_gate_record_silica_verdict_matches_current(
-                    gate_authority
-                )
+                and self._melt_redox_gate_silica_verdict_matches_current()
             )
             if not reuse_gate_authority:
                 gate_authority = _RESOLVE_MELT_REDOX_GATE_AUTHORITY

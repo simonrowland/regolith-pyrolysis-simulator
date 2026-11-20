@@ -472,13 +472,11 @@ def test_missing_pinned_silica_verdict_check_is_read_only(monkeypatch):
     sim._melt_redox_gate_authority_tick_silica_out_of_band = None
     monkeypatch.setattr(
         sim,
-        "_melt_redox_gate_record_current_silica_verdict",
-        lambda _value: False,
+        "_melt_redox_gate_current_silica_verdict",
+        lambda: (None, True),
     )
 
-    assert sim._melt_redox_gate_record_silica_verdict_matches_current(
-        {"curve": {}}
-    )
+    assert not sim._melt_redox_gate_silica_verdict_matches_current()
     assert sim._melt_redox_gate_authority_tick_silica_out_of_band is None
 
 
