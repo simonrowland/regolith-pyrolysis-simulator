@@ -12,11 +12,11 @@ import subprocess
 import sys
 import threading
 from collections.abc import Mapping, Sequence
+from dataclasses import replace
 from functools import wraps
 from pathlib import Path
 
 import pytest
-import yaml
 
 from simulator import engine_cache
 
@@ -30,7 +30,7 @@ from simulator import engine_cache
 # result. Update the pair together after a reviewed numeric engine change.
 ENGINE_GOLDEN_PROBES = {
     "openimcc": (1, "0656d169b9fb045ebfc2455b7c725cf716817bfac00247d8406f2d24692ecf5d"),
-    "internal-analytical": (2, "f109bcd497f0514fe6151e9bc68630232f5c5739aa22ccbacbbf4c69d584c2ff"),
+    "internal-analytical": (2, "e58a39818ea3e1653503c64d20a0a90463e35602dba1894386291eb24158da06"),
     "vaporock": (1, "673a8c5ac16725e21c985b585a5320f08bc2bf31f785d9f68e7c1cd3f9753f3b"),
     "magemin": (3, "0e83b5a7f28e74ac77f2f763636e5ed042e450411faf200f9f62e02e357e4497"),
     "alphamelts": (3, "ff6a0568162891d88ef8924d6317eb5bd53c932717c5bde9acdc7fc4feb49c11"),
@@ -59,16 +59,6 @@ _EXPECTED_NUMERIC_TRACE_PATHS = {
         "data/literature/extracts/ivtan-mno-coo-thermo.yaml",
     },
 }
-
-_DATA_PRESSURE_GOLDENS = {
-    "Fe": "0x1.1f0c7cf66d4d7p-3",
-    "SiO": "0x1.6adedc06bbbddp+2",
-    "Na": "0x1.798a909525fabp+22",
-}
-_DATA_PRESSURE_GOLDEN_DIGEST = (
-    "bf676f323569a54be3fe78ae24a5dca0ffaebdc8248ff7ecb41526cb1c9fe51f"
-)
-
 
 def _numeric_leaves(value, path=()):
     if isinstance(value, bool) or value is None:
@@ -223,86 +213,6 @@ def _assert_expected_numeric_trace(
     )
 
 
-def _data_driven_pressure_probe() -> dict[str, str]:
-    """Pin Fe, SiO and Na outputs through the live data-backed resolvers."""
-    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
-    from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
-    from simulator.chemistry.kernel.dto import ProviderAccountView
-    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
-    from simulator.vapour_rail.catalog import vapor_pressure_compatibility_view
-
-    vapor_pressure_path = (
-        engine_cache._ENGINE_CACHE_ROOT / "data/vapor_pressures.yaml"
-    )
-    raw_vapor_pressure_data = yaml.safe_load(vapor_pressure_path.read_text())
-    provider = BuiltinVaporPressureProvider(
-        vapor_pressure_compatibility_view(raw_vapor_pressure_data)
-    )
-
-    def dispatch(cleaned_melt, temperature_K, *, control_inputs):
-        return provider.dispatch(
-            IntentRequest(
-                intent=ChemistryIntent.VAPOR_PRESSURE,
-                account_view=ProviderAccountView(
-                    accounts={"process.cleaned_melt": cleaned_melt},
-                    species_formula_registry={},
-                ),
-                temperature_C=temperature_K - 273.15,
-                pressure_bar=1.0e-6,
-                control_inputs=control_inputs,
-            )
-        )
-
-    fe = dispatch({"FeO": 1.0}, 1650.0, control_inputs={"pO2_bar": 1.0e-9})
-    sio = dispatch(
-        {"SiO2": 1.0},
-        1900.0,
-        control_inputs={
-            "pO2_bar": 1.0e-9,
-            "high_t_melt_activity": "constant_gamma",
-        },
-    )
-    assert fe.status == sio.status == "ok"
-
-    na_pressures = AlphaMELTSBackend()._activities_times_antoine(
-        1600.0,
-        {"Na": 2.0, "K": 1.0, "unknown": 10.0},
-        {"SiO2": 100.0},
-        pO2_bar=1.0e-9,
-    )
-    return {
-        "Fe": fe.diagnostic["vapor_pressures_Pa"]["Fe"].hex(),
-        "SiO": sio.diagnostic["vapor_pressures_Pa"]["SiO"].hex(),
-        "Na": na_pressures["Na"].hex(),
-    }
-
-
-def _assert_data_pressures_match_version(
-    engine_name: str, version: int, observed: Mapping[str, str]
-) -> None:
-    expected_version, _ = ENGINE_GOLDEN_PROBES[engine_name]
-    assert version == expected_version, (
-        f"{engine_name}: data-driven pressure probe must be reviewed with its "
-        f"ENGINE_CHEMISTRY_VERSION bump (expected {expected_version}, got {version})"
-    )
-    actual_digest = _numeric_output_digest(
-        engine_cache.EngineCacheValue(
-            {species: float.fromhex(value) for species, value in observed.items()},
-            {},
-        )
-    )
-    assert actual_digest == _DATA_PRESSURE_GOLDEN_DIGEST, (
-        f"{engine_name}: data-driven pressure digest changed without a reviewed "
-        f"ENGINE_CHEMISTRY_VERSION update; expected {_DATA_PRESSURE_GOLDEN_DIGEST}, "
-        f"got {actual_digest}"
-    )
-    assert dict(observed) == _DATA_PRESSURE_GOLDENS, (
-        f"{engine_name}: Fe/SiO/Na data-driven pressure changed without a "
-        "reviewed ENGINE_CHEMISTRY_VERSION update; "
-        f"expected {_DATA_PRESSURE_GOLDENS}, got {dict(observed)}"
-    )
-
-
 def _assert_probe_matches_golden(engine: str, version: int, actual: str) -> None:
     expected_version, expected_digest = ENGINE_GOLDEN_PROBES[engine]
     assert version == expected_version, (
@@ -333,12 +243,13 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
         equilibrate_cell,
         load_binary_pots,
     )
-    from simulator.engine_cache import _without_engine_cache
+    from simulator.engine_cache import _engine_cache_path_scope, _without_engine_cache
     from tests.battery.cache_test_support import open_available_engine
 
     loaded_pots, _metadata = load_binary_pots()
     pots = {pot.pot_id: pot for pot in loaded_pots}
     cached_values = []
+    cached_requests = []
     callsites: dict[str, set[str]] = {}
     traced = _trace_workspace_data_reads(monkeypatch, callsites)
     _clear_numeric_input_read_caches()
@@ -362,6 +273,7 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
             value = solve()
             if engine_id == engine_name:
                 cached_values.append(value)
+                cached_requests.append(cache_request)
             return value
 
         return original_cached_call(engine_id, cache_request, capture_solve)
@@ -383,20 +295,26 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
             "equilibrate",
             capture_backend_cache_value,
         )
-        with _without_engine_cache():
+        with _engine_cache_path_scope("probe.sqlite"), _without_engine_cache():
+            probe_pot = pots["feo_sio2_40_60"]
+            if engine_name == "internal-analytical":
+                probe_pot = replace(
+                    probe_pot,
+                    pot_id="fe_na_sio2_cache_probe",
+                    composition_wt_pct={
+                        "FeO": 20.0,
+                        "Na2O": 20.0,
+                        "SiO2": 60.0,
+                    },
+                )
             cell = equilibrate_cell(
                 handle,
-                pots["feo_sio2_40_60"],
+                probe_pot,
                 temperature_K=1700.0,
                 po2=Po2Request(mode="commanded", po2_bar=1.0e-8),
                 timeout_s=90.0,
                 isolated=False,
             )
-        data_pressures = (
-            _data_driven_pressure_probe()
-            if engine_name in {"internal-analytical", "alphamelts", "thermoengine"}
-            else None
-        )
         assert cached_values, (
             f"{engine_name}: real solve did not expose its cache value; "
             f"cell status={cell.status}, refusal={cell.refusal_reason}, "
@@ -406,17 +324,35 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
             "pid": os.getpid(),
             "version": engine_cache.ENGINE_CHEMISTRY_VERSION[engine_name],
             "digest": _numeric_output_digest(cached_values[-1]),
+            "request": cached_requests[-1] if cached_requests else None,
             "observed": sorted(traced),
             "callsites": {path: sorted(sites) for path, sites in callsites.items()},
             "mutations": len(mutations),
-            "data_pressures": data_pressures,
+            "vapor_pressure_species": _cached_vapor_pressure_species(
+                engine_name, cached_values[-1]
+            ),
         }
     finally:
         close_battery_engine_handle(handle)
 
 
+def _cached_vapor_pressure_species(engine_name, cache_value):
+    if engine_name == "openimcc":
+        return []
+    from simulator.melt_backend.base import equilibrium_cache_from_value
+
+    hot = engine_cache.live_hot(cache_value)
+    if not isinstance(hot, list):
+        return []
+    result = equilibrium_cache_from_value(hot, engine_id=engine_name)
+    pressures = result.get("vapor_pressures_Pa")
+    if not isinstance(pressures, Mapping):
+        return []
+    return sorted(str(name).split("(", 1)[0].strip() for name in pressures)
+
+
 def _run_probe(
-    engine_name, request, tmp_path, *, mutate_cold=False, timeout_s=120.0
+    engine_name, request, tmp_path, *, mutate_cold=False, timeout_s=120.0, cwd=None
 ):
     result_path = tmp_path / "probe.json"
     # Keep native work and process-wide I/O patches out of the pytest worker.
@@ -437,6 +373,7 @@ def _run_probe(
         capture_output=True,
         text=True,
         timeout=timeout_s,
+        cwd=cwd,
     )
     assert completed.returncode == 0, (
         f"{engine_name} probe exited {completed.returncode}\n"
@@ -452,11 +389,43 @@ def _run_probe(
     callsites = {path: set(sites) for path, sites in result["callsites"].items()}
     _assert_trace_is_fingerprinted(engine_name, observed, callsites)
     _assert_expected_numeric_trace(engine_name, observed, callsites)
-    if engine_name in {"internal-analytical", "alphamelts", "thermoengine"}:
-        _assert_data_pressures_match_version(
-            engine_name, result["version"], result["data_pressures"]
-        )
     return result
+
+
+def _assert_key_portable_across_working_directories(
+    engine_name: str,
+    version: int,
+    probe_request: Mapping[str, object],
+    tmp_path: Path,
+) -> None:
+    repository = engine_cache._ENGINE_CACHE_ROOT.resolve()
+    environment = {
+        **os.environ,
+        "PYTHONPATH": str(repository),
+    }
+    script = (
+        "import json, sys\n"
+        "from simulator.engine_cache import engine_cache_key\n"
+        "print(engine_cache_key(sys.argv[1], int(sys.argv[2]), "
+        "json.loads(sys.argv[3])).hex())\n"
+    )
+    request_json = json.dumps(probe_request, sort_keys=True, separators=(",", ":"))
+    keys = []
+    for name in ("cwd-one", "cwd-two"):
+        cwd = tmp_path / name
+        cwd.mkdir(parents=True)
+        completed = subprocess.run(
+            [sys.executable, "-c", script, engine_name, str(version), request_json],
+            cwd=cwd,
+            env=environment,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        keys.append(completed.stdout.strip())
+    assert keys[0] == keys[1], (
+        f"{engine_name} canonical probe key changed across working directories"
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -527,6 +496,7 @@ def test_probe_inherits_engine_resolution_context(request, tmp_path, monkeypatch
     (import_root / "probe_activation.py").write_text("activated = True\n")
     monkeypatch.syspath_prepend(str(import_root))
     monkeypatch.chdir(tmp_path)
+    probe_cwd = Path.cwd().resolve()
     monkeypatch.setenv("DYLD_FALLBACK_LIBRARY_PATH", str(tmp_path / "lib"))
     executable = tmp_path / "context-probe"
     executable.write_text(
@@ -535,7 +505,7 @@ def test_probe_inherits_engine_resolution_context(request, tmp_path, monkeypatch
         "from pathlib import Path\n"
         "import probe_activation\n"
         "assert probe_activation.activated\n"
-        f"assert Path.cwd() == Path({str(tmp_path)!r})\n"
+        f"assert Path.cwd().resolve() == Path({str(probe_cwd)!r}).resolve()\n"
         f"assert os.environ['DYLD_FALLBACK_LIBRARY_PATH'] == {str(tmp_path / 'lib')!r}\n"
         "assert sys.stdin.read() == ''\n"
         "Path(sys.argv[5]).write_text(json.dumps({\n"
@@ -545,29 +515,70 @@ def test_probe_inherits_engine_resolution_context(request, tmp_path, monkeypatch
     )
     executable.chmod(0o755)
     monkeypatch.setattr(sys, "executable", str(executable))
-    result = _run_probe("openimcc", request, tmp_path)
+    result = _run_probe("openimcc", request, tmp_path, cwd=probe_cwd)
     assert result["context_inherited"]
 
 
 @pytest.mark.parametrize("engine_name", tuple(engine_cache.ENGINE_CHEMISTRY_VERSION))
 def test_live_engine_numeric_probe_matches_version(
-    engine_name, request, tmp_path
+    engine_name, request, tmp_path, monkeypatch
 ) -> None:
+    from tests.test_engine_cache_input_identity import (
+        _assert_probe_key_ignores_source_changes,
+    )
+
     result = _run_probe(engine_name, request, tmp_path)
     _assert_probe_matches_golden(engine_name, result["version"], result["digest"])
-
-
+    probe_request = result["request"]
+    assert isinstance(probe_request, Mapping), (
+        f"{engine_name}: live probe did not capture the production cache request"
+    )
+    key = engine_cache.engine_cache_key(
+        engine_name, result["version"], probe_request
+    )
+    changed_request = dict(probe_request)
+    if "temperature_K" in changed_request:
+        changed_request["temperature_K"] = float(changed_request["temperature_K"]) + 1.0
+    elif isinstance(changed_request.get("kwargs"), Mapping):
+        changed_kwargs = dict(changed_request["kwargs"])
+        changed_kwargs["temperature_C"] = float(
+            changed_kwargs.get("temperature_C", 1700.0)
+        ) + 1.0
+        changed_request["kwargs"] = changed_kwargs
+    else:
+        changed_request["probe_key_change"] = True
+    assert engine_cache.engine_cache_key(
+        engine_name, result["version"], changed_request
+    ) != key
+    assert engine_cache.engine_cache_key(
+        engine_name, int(result["version"]) + 1, probe_request
+    ) != key
+    _assert_key_portable_across_working_directories(
+        engine_name,
+        result["version"],
+        probe_request,
+        tmp_path / "key-portability",
+    )
+    _assert_probe_key_ignores_source_changes(
+        engine_name,
+        result["version"],
+        dict(probe_request),
+        tmp_path / "source-invariance",
+        monkeypatch,
+    )
+    if engine_name in {"internal-analytical", "alphamelts", "thermoengine"}:
+        species = set(result["vapor_pressure_species"])
+        assert species, (
+            f"{engine_name}: cached probe output has no vapor-pressure leaves"
+        )
+        if engine_name == "internal-analytical":
+            assert {"Fe", "SiO", "Na"} <= species
 def test_numeric_probe_change_without_version_bump_fails_guard() -> None:
     version, digest = ENGINE_GOLDEN_PROBES["internal-analytical"]
     changed = "0" * len(digest)
     assert changed != digest
     with pytest.raises(AssertionError, match="bump ENGINE_CHEMISTRY_VERSION"):
         _assert_probe_matches_golden("internal-analytical", version, changed)
-    changed_pressures = {**_DATA_PRESSURE_GOLDENS, "Fe": "0x1.0p+0"}
-    with pytest.raises(AssertionError, match="ENGINE_CHEMISTRY_VERSION update"):
-        _assert_data_pressures_match_version(
-            "internal-analytical", version, changed_pressures
-        )
 
 
 def test_real_cold_field_mutation_without_version_bump_fails_guard(

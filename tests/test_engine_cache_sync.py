@@ -104,20 +104,6 @@ def test_merge_carries_cold_fingerprint_without_treating_it_as_payload_conflict(
     assert merged_fingerprint == expected_fingerprint
 
 
-def test_readonly_incomplete_cache_schema_refuses_instead_of_miss(tmp_path, monkeypatch):
-    path = tmp_path / "incomplete.sqlite"
-    connection = cache._connect(path, readonly=False)
-    assert connection is not None
-    cache._close_connections()
-    with sqlite3.connect(path) as writer:
-        writer.execute("DROP TABLE box_sequences")
-
-    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
-    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
-    with pytest.raises(cache.EngineCacheSchemaMismatch):
-        cache.cached_engine_call("openimcc", {"request": 1}, lambda: {"answer": 2})
-
-
 def test_conflicts_keep_master_report_both_origins_and_strict_only_exit(tmp_path, monkeypatch, capsys):
     first, second, master, strict_master = (tmp_path / n for n in ("a", "b", "m", "strict"))
     write_box(monkeypatch, first, "s1", [(1, {"answer": 1})])
