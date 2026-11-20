@@ -31,11 +31,18 @@ boundary row may use `reported_status: not_reported` only with
 `source_class: not_reported`, a paper `citation_id`, an `extraction_note` or
 `reason`, and a digest; silent absence still fails validation.
 
-Published achieved pressure is the v1 runtime boundary. Pump capacity may be
-stored when published, but nominal pump speed never generates an inferred
-pressure. If achieved pressure is absent, a numeric runtime pressure must be
-marked `assumption_with_sensitivity_marker`; every dependent residual then
-emits `assumed-input` and cannot certify a claim.
+A preset declares one pressure driver. `pressure_driver: imposed` keeps the
+published or assumed chamber-pressure schedule as the runtime boundary. A
+pump speed may be stored when the paper prints it, and that speed does not
+generate pressure in imposed mode. `pressure_driver: apparatus` solves the
+chamber pressure from the declared pump, conductance path, and gas load.
+The same preset is never silently both. If the driver key is absent, the
+schedule remains the boundary unless a numeric pump speed or a conductance
+element is present, in which case the apparatus refuses as ambiguous. An
+unprinted speed stays null. It is never invented. If achieved pressure is
+absent, a numeric runtime pressure must be marked
+`assumption_with_sensitivity_marker`; every dependent residual then emits
+`assumed-input` and cannot certify a claim.
 
 `lab_schedule.interpolation` is the consumer-facing schedule-shape field. If
 the paper reports only duration/peak anchors rather than a T(t) profile, the

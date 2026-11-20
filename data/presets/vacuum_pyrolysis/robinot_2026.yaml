@@ -62,12 +62,13 @@ lab_schedule:
       digest: "Robinot imposed-flow anchor: 0.3 NL/min Ar."
     pressure_control:
       mode: flow_through_with_pump
+      pressure_driver: imposed
       source_class: assumption_with_sensitivity_marker
       pump_throughput_source: assumption_with_sensitivity_marker
       source_ref: robinot_2026_methods
       citation_id: robinot_2026
-      extraction_note: pressure_control_mode_not_reported_flow_through_runtime_assumption
-      digest: "The reported achieved chamber pressure drives runtime. Flow-through control topology is assumed only to express the boundary; no pump speed is inferred or used to generate pressure."
+      extraction_note: "pressure_control_mode_not_reported_flow_through_runtime_assumption. pressure_driver is imposed because the pump speed and the conductance path are not printed."
+      digest: "The reported achieved chamber pressure drives runtime because pressure_driver is imposed. Flow-through control topology is assumed only to express the boundary. No pump speed is inferred or used to generate pressure. The apparatus is not fully specified."
   surface_temperature_C:
     holder:
       - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: holder_temperature_not_reported}
@@ -95,15 +96,24 @@ lab_geometry:
     mass_citation_id: robinot_2026
     mass_digest: "Robinot anchor reports an EAC-1 pellet mass of 3.38 g."
     crucible_material: null
-    exposed_melt_area_m2: 0.000314
-    exposed_melt_area_basis: "diagnostic 20 mm holder/opening top area; not fit to Robinot O2"
-    exposed_melt_area_digest: "REC-W0-04 uses pi*(0.01 m)^2 as a gram-lab exposed-area bridge. The value is not chosen to close the Robinot O2 gap."
+    crucible_material_reason: not_printed
+    pellet_diameter_mm: 13
+    pellet_height_mm: 10
+    pressed_at_tons: 2.5
+    pellet_source_class: literature_sidecar
+    pellet_citation_id: robinot_2026
+    pellet_digest: "Section 3.2 prints a pellet 13 mm in diameter and 10 mm in height, pressed at 2.5 tons. Those dimensions are not an exposed-area measurement."
+    exposed_melt_area_m2: null
+    exposed_melt_area_reason: "not printed; the top face of the 13 mm pellet was not inferred"
     crucible_opening_area_m2: null
+    crucible_opening_area_reason: not_printed
     named_missing_fields:
       - crucible_material
       - crucible_opening_area_m2
+      - exposed_melt_area_m2
   chamber:
     volume_m3: null
+    volume_reason: not_printed
     wall_area_m2: null
     wall_temperature_profile: window
     named_missing_fields:
@@ -159,13 +169,29 @@ lab_geometry:
       citation_id: robinot_2026
       extraction_note: "Robinot Sec. 2.2 states a PORAL grade 03 316L porous filter sat between reactor and pump; filter area/view factor are not stated, so a 50 mm equivalent downstream filter is an assumption with sensitivity coverage."
   pump:
+    model: Edwards NDX15
+    model_source_class: literature_sidecar
+    model_citation_id: robinot_2026
+    model_digest: "Section 3.1 names a scroll pump (Edwards NDX15) with a vacuum limit of 7e-3 mbar. It does not print a pumping speed."
+    vacuum_limit_mbar: 7.0e-3
+    vacuum_limit_source_class: literature_sidecar
+    vacuum_limit_citation_id: robinot_2026
     pumping_speed_m3_s: null
+    pumping_speed_reason: not_printed
+    ultimate_pressure_pa: null
+    ultimate_pressure_reason: "The paper prints a vacuum limit, not a throughput ultimate. vacuum_limit_mbar records the printed limit and is not a speed model."
     port_area_m2: null
+    port_area_reason: not_printed
     conductance_path: null
+    conductance_path_reason: not_printed
+    balance_temperature_K: null
+    balance_temperature_reason: "Chamber gas temperature is not printed. pressure_driver is imposed, so the balance temperature is not a runtime input."
     named_missing_fields:
       - pumping_speed_m3_s
+      - ultimate_pressure_pa
       - port_area_m2
       - conductance_path
+      - balance_temperature_K
 
 pair:
   faithful:
@@ -232,7 +258,7 @@ measurement_selectors:
       status: assumed-input
       blocked_by:
         - unreported_temperature_time_profile
-        - assumed_exposed_melt_area
+        - exposed_melt_area_not_printed
         - analyzer_recovery_not_modeled
   - observable_id: robinot_o2_mass_yield_fraction
     kind: o2_mass_yield_fraction
@@ -243,7 +269,7 @@ measurement_selectors:
       status: assumed-input
       blocked_by:
         - unreported_temperature_time_profile
-        - assumed_exposed_melt_area
+        - exposed_melt_area_not_printed
         - analyzer_recovery_not_modeled
   - observable_id: robinot_feed_oxygen_extraction_fraction
     kind: feed_oxygen_extraction_fraction
@@ -254,7 +280,7 @@ measurement_selectors:
       status: assumed-input
       blocked_by:
         - unreported_temperature_time_profile
-        - assumed_exposed_melt_area
+        - exposed_melt_area_not_printed
         - analyzer_recovery_not_modeled
 
 comparison_contract:
@@ -278,8 +304,8 @@ comparison_contract:
 digests:
   feedstock_digest: lunar_eac_1a_engelschion2020_xrf_sha256_1b7cce46216cb29f_robinot_elementals_suspect
   schedule_digest: robinot_2026_schedule_comparison_v2
-  gas_boundary_digest: robinot_2026_argon_achieved_13mbar_0p3NLmin_v2
-  geometry_digest: robinot_2026_geometry_assumptions_named_v2
+  gas_boundary_digest: robinot_2026_argon_achieved_13mbar_0p3NLmin_v3
+  geometry_digest: robinot_2026_geometry_assumptions_named_v3
   transport_formula_digest: not_applicable_until_p0
   sticking_provenance_digest: robinot_2026_sticking_skeleton_v1
   measurement_sidecar_digest: robinot_2026_comparison_observations_v2
