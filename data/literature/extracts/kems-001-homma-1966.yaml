@@ -692,41 +692,6 @@ species:
       uncertainty:
         note: Per-run experimental scatter large (79–233); theoretical Olette value 1095 ≫ experimental
           — authors attribute to surface depletion (Ward Cs/Cm)
-    - observation_id: homma_1966_crucible_area_numeric_b1
-      type: rate_series
-      locator:
-        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-        paragraph: alumina crucible CP-2 ID 38 mm
-      T_range_K:
-      - 1873.15
-      - 1873.15
-      phase: liquid_Fe_alloy_steel_melt
-      regime: vacuum_induction_free_evaporation_steel_melt
-      units: as published
-      values:
-        quantity: crucible_cross_section_as_proxy_free_surface
-        method_class: measured_direct
-        system_class: molten_metal
-        semantics: competing_observation_do_not_average
-        note: Numeric A from stated crucible ID 38 mm. Free surface ≈ crucible cross-section assumption;
-          not independently measured melt free surface. Olette α rows remain non-HKL. Molten-metal system
-          — NOT silicate-melt α evidence.
-        crucible_inner_diameter_mm: 38.0
-        sample_surface_area_m2: 0.0011341149
-      equipment:
-        sample_surface_area:
-          value: 0.0011341149
-          units: m2
-          inferred: true
-          inference: A = pi*(d/2)^2 with d=38 mm ID => 0.0011341149 m2
-          locator:
-            source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-            paragraph: commercial alumina crucible CP-2 ID 38 mm
-        cell_material:
-          value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 120 mm)
-          locator:
-            source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-            paragraph: crucible CP-2
     - observation_id: homma_1966_mn_olette_class_fence_b1
       type: alpha
       locator:
@@ -1183,6 +1148,51 @@ species:
           page: '515'
           section: II
         quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+    context:
+    - observation_id: homma_1966_crucible_area_numeric_b1
+      type: apparatus
+      locator:
+        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        page: 1
+        published_page: 515
+        pdf_page_index: 0
+        paragraph: alumina crucible CP-2 ID 38 mm
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe_alloy_steel_melt
+      regime: vacuum_induction_free_evaporation_steel_melt
+      units: as published
+      values:
+        quantity: crucible_cross_section_as_proxy_free_surface
+        method_class: measured_direct
+        system_class: molten_metal
+        semantics: competing_observation_do_not_average
+        note: Numeric A from stated crucible ID 38 mm. Free surface ≈ crucible cross-section assumption;
+          not independently measured melt free surface. Olette α rows remain non-HKL. Molten-metal system
+          — NOT silicate-melt α evidence.
+        crucible_inner_diameter_mm: 38.0
+        sample_surface_area_m2: 0.0011341149
+      equipment:
+        sample_surface_area:
+          value: 0.0011341149
+          units: m2
+          inferred: true
+          inference: A = pi*(d/2)^2 with d=38 mm ID => 0.0011341149 m2
+          locator:
+            source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+            page: 1
+            published_page: 515
+            pdf_page_index: 0
+            paragraph: commercial alumina crucible CP-2 ID 38 mm
+        cell_material:
+          value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 120 mm)
+          locator:
+            source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+            page: 1
+            published_page: 515
+            pdf_page_index: 0
+            paragraph: crucible CP-2
   Cu:
     observations:
     - observation_id: homma_1966_cu_specific_evaporation_constant
@@ -2355,10 +2365,7 @@ fidelity_samples:
     source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
     paragraph: K_Sn^S = 1.2e-3 ~ 1.6e-3 cm·sec^{-1}
     line_range: '7'
-- species: Mn
-  observable: rate_series
-  observation_id: homma_1966_crucible_area_numeric_b1
-  field: sample_surface_area_m2
+- path: species.Mn.context[homma_1966_crucible_area_numeric_b1].values.sample_surface_area_m2
   value: 0.0011341149
   locator:
     source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md

@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import AdmissionStatus, MethodToken, NoticeKind
+from simulator.battery.enums import AdmissionStatus, MethodToken, NoticeKind, Quantity
 from simulator.battery.records import SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX
 from simulator.yaml_cache import load_cached_safe_yaml
 from tests.battery.test_migrate import _migrate_real_extract
@@ -159,6 +159,85 @@ def test_hastie_figure_observations_have_paper_supported_admissions(hastie) -> N
         observation.admission.reason == "source admission_status=admitted"
         for observation in k2o_rows
     )
+
+
+def test_existing_quantity_tokens_and_context_rows_migrate_by_role(hastie) -> None:
+    document = load_cached_safe_yaml((EXTRACTS / EXTRACT).read_text(encoding="utf-8"))
+    activity_ids = {
+        "hastie_1981_fig11_k1_slag_k2o_gamma_digitized",
+        "hastie_1981_fig11_k1_slag_k2o_gamma_tms_open_square",
+    }
+    activity_rows = {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for row in species.get("observations", [])
+        if row["observation_id"] in activity_ids
+    }
+    reference_id = "hastie_1981_fig15_kcl_std_pressure_printed"
+    migrated = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in hastie.observations.values()
+    }
+    activity_observations = [
+        observation
+        for observation in hastie.observations.values()
+        if any(
+            f"::{observation_id}::" in observation.observation_id
+            for observation_id in activity_ids
+        )
+    ]
+    assert set(activity_rows) == activity_ids
+    assert all(
+        row["values"]["quantity"] == "activity_coefficient"
+        for row in activity_rows.values()
+    )
+    assert all(
+        observation.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+        for observation in activity_observations
+    )
+    assert len(activity_observations) == 19
+
+    context_ids = {
+        row["observation_id"]
+        for rows in hastie.context_by_work.values()
+        for row in rows
+    }
+    reference_context = next(
+        row
+        for rows in hastie.context_by_work.values()
+        for row in rows
+        if row["observation_id"] == reference_id
+    )
+    assert reference_context["type"] == "reference_metadata"
+    assert reference_context["locator"]["page"] == 75
+    assert (
+        reference_context["values"]["quantity"]
+        == "P_std_KCl_as_printed_on_figure"
+    )
+    assert reference_context["values"]["P_KCl_std_atm_as_printed"] == 0.005
+    orifice_id = "hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906"
+    assert orifice_id not in migrated
+    orifice_metadata = document["source_metadata"]["effusion_orifice"]
+    assert orifice_metadata["diameter_mm"] == 0.34
+    assert "0.34 mm" in orifice_metadata["quote"]
+    orifice_experiment = _experiment(hastie, "hastie-1981-pt-kms")
+    assert orifice_experiment.locator is not None
+    assert "0.34 mm" in (orifice_experiment.locator.note or "")
+    non_observation_ids = {
+        "hastie_1981_table2_17k2o_A_as_printed_note",
+        "hastie_1981_k2_slag_orifice_0p34mm",
+        "hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked",
+        "hastie_1981_remaining_figures_ledger",
+        "hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked_quoted_20260906",
+        "hastie_1981_remaining_figures_ledger_quoted_20260906",
+        "hastie_1981_fig15_kcl_std_pressure_printed_quoted_20260906",
+        "hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906",
+        "hastie_1981_fig6_na2co3_gamma_figure_only",
+        "hastie_1981_fig6_na2co3_gamma_figure_only_quoted_20260906",
+        "hastie_1981_fig15_kcl_std_pressure_printed",
+    }
+    assert non_observation_ids <= context_ids
+    assert not non_observation_ids & migrated.keys()
 
 
 def test_live_table2_row_flags_technique_assignment_ambiguous() -> None:

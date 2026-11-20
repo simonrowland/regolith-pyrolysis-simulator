@@ -14597,7 +14597,7 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
             "hastie-1981-pt-kms",
             "hastie-1981-kms",
             "KMS data with Pt-cell orifice diameter of 0.34 mm.",
-            "hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906",
+            None,
         ),
         (
             "metsoc-2019-6005.yaml",
@@ -14622,8 +14622,32 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
         assert experiment.locator is not None
         assert quote in (experiment.locator.note or "")
         assert experiment.bench_id in result.benches
-        for observation in observations_named(result, obs_local):
-            assert observation.experiment_id == experiment.experiment_id
+        if obs_local is not None:
+            for observation in observations_named(result, obs_local):
+                assert observation.experiment_id == experiment.experiment_id
+
+    hastie_extract = yaml.safe_load(
+        (EXTRACTS / "kems-020-hastie-1981-nbsir.yaml").read_text(encoding="utf-8")
+    )
+    orifice_id = "hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906"
+    assert all(
+        row.get("observation_id") != orifice_id
+        for species in hastie_extract["species"].values()
+        for row in species.get("observations", ())
+    )
+    orifice = hastie_extract["source_metadata"]["effusion_orifice"]
+    assert orifice["diameter_mm"] == 0.34
+    assert "0.34 mm" in orifice["quote"]
+
+    gamma_id = "hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906"
+    assert gamma_id in {
+        row["observation_id"]
+        for row in hastie_extract["species"]["K2O"].get("context", ())
+    }
+    assert gamma_id not in {
+        row["observation_id"]
+        for row in hastie_extract["species"]["K"].get("context", ())
+    }
 
     hastie = _migrate_real_extract(tmp_path / "hastie-unlinked", "kems-020-hastie-1981-nbsir.yaml")
     table2 = observations_named(hastie, "hastie_1981_table2_k_logP_coefficients")
