@@ -8,6 +8,7 @@ from typing import Any
 from simulator.battery import score
 from simulator.battery.score import SCORE_ENGINE_SET
 from scripts import battery_cache_equivalence as gate
+from scripts import battery_score
 
 
 def _install_fake_slice(
@@ -119,6 +120,30 @@ def test_store_error_fails_whole_store_cache_gate(
     assert gate.main([str(spec_path)]) == 1
     failure = capsys.readouterr()
     assert "store_error>0" in failure.err
+
+
+def test_score_summary_preserves_dynamic_not_stored_counters() -> None:
+    summary = battery_score._engine_cache_summary(
+        None,
+        local_counters={
+            "vaporock": {
+                "not_stored:cacheable_false": 3,
+                "not_stored:refusal:engine_timeout": 4,
+                "not_stored:readonly": 2,
+                "uncacheable:list": 1,
+            }
+        },
+    )
+
+    # by_engine keeps the hits/misses/stores contract; the full per-reason
+    # breakdown is in counters_by_engine.
+    assert summary["by_engine"]["vaporock"] == {"hits": 0, "misses": 0, "stores": 0}
+    assert summary["counters_by_engine"]["vaporock"] == {
+        "not_stored:cacheable_false": 3,
+        "not_stored:refusal:engine_timeout": 4,
+        "not_stored:readonly": 2,
+        "uncacheable:list": 1,
+    }
 
 
 def test_parallel_warm_worker_counters_are_summed_per_engine(

@@ -529,6 +529,7 @@ def _engine_cache_summary(
         engine: {name: 0 for name in ("hits", "misses", "stores")}
         for engine in engines
     }
+    counters_by_engine: dict[str, dict[str, int]] = {}
     sources = [local_counters or {}]
     if studio_cache_summary is not None:
         studio_by_engine = studio_cache_summary.get("by_engine", {})
@@ -541,10 +542,15 @@ def _engine_cache_summary(
             if not isinstance(counts, Mapping):
                 continue
             target = by_engine.setdefault(str(engine), {"hits": 0, "misses": 0, "stores": 0})
+            detail = counters_by_engine.setdefault(str(engine), {})
             diagnostics = []
             for name, value in sorted(counts.items()):
                 if not isinstance(value, int):
                     continue
+                # Every integer counter (not_stored:<reason>, uncacheable:<type>,
+                # read/store errors) is kept per engine for the not-stored audit
+                # (b-1272); by_engine stays the hits/misses/stores contract.
+                detail[name] = detail.get(name, 0) + value
                 if name in target:
                     target[name] += value
                 elif value:
@@ -561,6 +567,7 @@ def _engine_cache_summary(
     summary: dict[str, object] = {
         "enabled": cache_path is not None or studio_cache_summary is not None,
         "by_engine": by_engine,
+        "counters_by_engine": counters_by_engine,
         "runtime_identities": runtime_identities,
     }
     if cache_path is not None:

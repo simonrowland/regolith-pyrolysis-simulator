@@ -350,10 +350,12 @@ def _call_cached_backend_equilibrate(
 
         with _without_engine_cache():
             result = solve()
+        if isinstance(result, EquilibriumResult):
+            if handle.name != "vaporock" and _is_refusal(result):
+                return result
+            return result.to_hot(engine_id=handle.name)
         if _is_refusal(result):
             return result
-        if isinstance(result, EquilibriumResult):
-            return result.to_hot(engine_id=handle.name)
         if isinstance(result, SimpleNamespace):
             return equilibrium_to_hot(vars(result), engine_id=handle.name, live_value=result)
         if isinstance(result, Mapping):
