@@ -1,5 +1,6 @@
 from collections import Counter
 from copy import deepcopy
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -8,6 +9,7 @@ import pytest
 from simulator.battery.enums import Phase, QuenchState, Quantity, ValueKind
 from simulator.battery.identity import profile_for
 from simulator.battery.migrate import Migrator, load_yaml, wt_pct_to_mole_fraction
+from tools.validate_literature_extracts import validate_extract_file
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -87,7 +89,20 @@ def _assert_printed_pressure_condition(conditions):
     assert pressure.locator.published_page == 5548
 
 
+def _assert_richter_mass_loss_pin(row, *, temperature, duration_min, mass_loss):
+    assert row.identity.temperature_K.is_value
+    assert row.identity.temperature_K.value == Decimal(temperature)
+    time = row.point_conditions["time_min"]
+    assert time.state.is_value and time.state.value == Decimal(duration_min)
+    assert time.locator is not None
+    assert time.locator.table == "1"
+    assert time.locator.paragraph == row.locator.paragraph
+    assert row.value.kind is ValueKind.POINT
+    assert row.value.point == Decimal(mass_loss)
+
+
 def test_richter_2007_conditions_row_counts_and_render_pins():
+    assert validate_extract_file(EXTRACT) == []
     result, rows = _migrate_extract()
     document = load_yaml(EXTRACT)
     source_rows = list(_source_observations(document))
@@ -327,6 +342,11 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
     assert all(row.identity.species.phase.value is Phase.GLASS for row in residue_rows)
     assert all(row.quench_state is QuenchState.NOT_STATED for row in residue_rows)
     assert all("quench_state" in row.point_conditions for row in residue_rows)
+    assert all(
+        row.point_conditions["time_min"].state.is_value
+        and row.point_conditions["time_min"].locator is not None
+        for row in residue_rows
+    )
 
     # Render-checked Table 1 values remain intact, while row temperature and
     # source composition reach the migrated identities through existing paths.
@@ -339,11 +359,12 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         }
     )
     pins = (
-        ("R3-10", Decimal("0.32"), Decimal("2173.15"), 900, 5549),
-        ("R-14", Decimal("0.317"), Decimal("2073.15"), 1800, 5549),
-        ("R2-13", Decimal("0.367"), Decimal("1873.15"), 54000, 5550),
+        ("R3-10", Decimal("0.32"), Decimal("2173.15"), 15, 900, 5549),
+        ("R-14", Decimal("0.317"), Decimal("2073.15"), 30, 1800, 5549),
+        ("R2-13", Decimal("0.367"), Decimal("1873.15"), 900, 54000, 5550),
     )
-    for row_label, mass_loss, temperature, duration_s, page in pins:
+    pinned_rows = {}
+    for row_label, mass_loss, temperature, duration_min, duration_s, page in pins:
         matches = [
             row
             for row in rows.values()
@@ -351,6 +372,13 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         ]
         assert len(matches) == 1
         row = matches[0]
+        pinned_rows[row_label] = row
+        _assert_richter_mass_loss_pin(
+            row,
+            temperature=temperature,
+            duration_min=duration_min,
+            mass_loss=mass_loss,
+        )
         assert row.value.kind is ValueKind.POINT and row.value.point == mass_loss
         assert row.locator.page == page - 5543
         assert row.locator.published_page == page
@@ -371,4 +399,54 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         duration = experiment.thermal_schedule.total_duration_s
         assert duration.state.is_value
         assert duration.state.value.point == Decimal(duration_s)
+
+    mass_loss_rows = [
+        row
+        for row in rows.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+    ]
+    assert len(mass_loss_rows) == 50
+    for row in mass_loss_rows:
+        time = row.point_conditions["time_min"]
+        assert time.state.is_value
+        assert time.locator is not None
+        assert time.locator.page == time.locator.published_page - 5543
+        assert time.locator.table == "1"
+        assert time.locator.paragraph == row.locator.paragraph
+
+    row = pinned_rows["R-14"]
+    expected = {
+        "temperature": Decimal("2073.15"),
+        "duration_min": Decimal("30"),
+        "mass_loss": Decimal("0.317"),
+    }
+    wrong_temperature = replace(
+        row,
+        identity=replace(
+            row.identity,
+            temperature_K=replace(
+                row.identity.temperature_K, value=Decimal("2074.15")
+            ),
+        ),
+    )
+    with pytest.raises(AssertionError):
+        _assert_richter_mass_loss_pin(wrong_temperature, **expected)
+
+    wrong_time = replace(
+        row.point_conditions["time_min"],
+        state=replace(row.point_conditions["time_min"].state, value=Decimal("31")),
+    )
+    wrong_conditions = dict(row.point_conditions)
+    wrong_conditions["time_min"] = wrong_time
+    with pytest.raises(AssertionError):
+        _assert_richter_mass_loss_pin(
+            replace(row, point_conditions=wrong_conditions), **expected
+        )
+
+    wrong_mass_loss = replace(
+        row, value=replace(row.value, point=Decimal("0.318"))
+    )
+    with pytest.raises(AssertionError):
+        _assert_richter_mass_loss_pin(wrong_mass_loss, **expected)
 
