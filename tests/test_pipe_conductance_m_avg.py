@@ -49,9 +49,11 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
     configured = {}
     overhead = SimpleNamespace(
         pipe_diameter_m=0.4,
+        condenser_hydraulic_diameter_m=0.12,
         estimate_transport_state=lambda _flux, _melt: {
             "pipe_temperature_C": 900.0,
             "conductance_temperature_C": 1450.0,
+            "throat_diameter_m": 0.4,
             "pressure_mbar": 2.0,
             "vapor_pressure_mbar": 1.0,
             "stage_area_m2_by_stage": {},
@@ -87,6 +89,7 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
 
     assert configured["gas_temperature_C"] == pytest.approx(1450.0)
     assert configured["wall_temperature_C"] == pytest.approx(900.0)
+    assert configured["pipe_diameter_m"] == pytest.approx(0.12)
     assert configured["pipe_segment_temperatures_C"] == {
         "duct_a": 850.0,
         "duct_b": 875.0,

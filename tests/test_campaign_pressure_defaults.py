@@ -658,11 +658,13 @@ def test_c2a_staged_gas_cover_switch_is_stage_atomic():
         "gas_cover_mode": "po2_hold",
         "pO2_mbar": 1.0,
         "p_total_mbar": 1.0,
+        "slider_vane_open_fraction": 0.25,
     })
     _stage(setpoints, "sio_window").update({
         "gas_cover_mode": "pn2_sweep",
         "pO2_mbar": 1.0e-6,
         "p_total_mbar": 10.000001,
+        "slider_vane_open_fraction": 0.5,
     })
     manager = CampaignManager(setpoints)
     melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
@@ -674,6 +676,8 @@ def test_c2a_staged_gas_cover_switch_is_stage_atomic():
     assert first["gas_cover_mode"] == "po2_hold"
     assert first["pO2_mbar"] == pytest.approx(1.0)
     assert first["p_total_mbar"] == pytest.approx(1.0)
+    assert first["slider_vane_open_fraction"] == pytest.approx(0.25)
+    assert melt.slider_vane_open_fraction == pytest.approx(0.25)
     assert melt.background_gas_species == ""
     assert melt.background_gas_mole_fraction == pytest.approx(0.0)
 
@@ -686,8 +690,25 @@ def test_c2a_staged_gas_cover_switch_is_stage_atomic():
     assert second["pO2_mbar"] == pytest.approx(1.0e-6)
     assert second["p_total_mbar"] == pytest.approx(10.000001)
     assert second["pN2_mbar"] == pytest.approx(10.0)
+    assert second["slider_vane_open_fraction"] == pytest.approx(0.5)
+    assert melt.slider_vane_open_fraction == pytest.approx(0.5)
     assert melt.background_gas_species == "N2"
     assert melt.background_gas_mole_fraction == pytest.approx(1.0)
+
+
+def test_campaign_slider_vane_defaults_fully_open_and_accepts_setpoint():
+    setpoints = deepcopy(_setpoints())
+    melt = MeltState()
+    manager = CampaignManager(setpoints)
+
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+    assert melt.slider_vane_open_fraction == pytest.approx(1.0)
+
+    setpoints["campaigns"]["C2A_continuous"][
+        "slider_vane_open_fraction"
+    ] = 0.25
+    CampaignManager(setpoints).configure_campaign(melt, CampaignPhase.C2A)
+    assert melt.slider_vane_open_fraction == pytest.approx(0.25)
 
 
 def test_c2a_staged_pn2_sweep_trace_po2_is_not_silent_or_phantom_o2():

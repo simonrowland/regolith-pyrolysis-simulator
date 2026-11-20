@@ -24,13 +24,12 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     assert generated.read_bytes() == MANIFEST.read_bytes()
     payload = json.loads(MANIFEST.read_text(encoding="utf-8"))
     digest = payload.pop("payload_digest")
-    # b-282: upstream wall knobs search down to the coldest downstream
-    # collector interface (20 C) instead of the SiO-quiescent 1400 C figure.
-    # Conditional subspace dimensions stay unchanged.
+    # d-452: throat area plus continuous/staged vane controls expand both
+    # conditional subspaces by six dimensions.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "c97b737996a4f35521a03926691649d0f72e4097fd220a7ddc7097ea539aaa4d"
+        "ed83d93e45d256f5eb87017c76be82f0fd8c01744388347623d01a0bc2c660e3"
     )
-    assert digest == "b01c7966a0c21eccbfb87c5b9cbc1ea776ff740b294c88d20953a0109f73fc8d"
+    assert digest == "fb787db335fbd7fcb8b99137363d8f9bef1514659ea9c310a2ec296975132246"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (
@@ -45,4 +44,4 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
         for path in paths
         for prefix in forbidden_future_prefixes
     )
-    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [59, 65]
+    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [65, 71]

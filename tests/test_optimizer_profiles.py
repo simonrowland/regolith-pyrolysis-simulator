@@ -52,6 +52,37 @@ def test_reduced_real_cache_accepts_cache_tier_ceiling() -> None:
     )
 
 
+def test_d452_hero_optimizes_completed_cycle_under_flagged_duration_gate() -> None:
+    path = (
+        DEFAULT_DATA_DIR
+        / "optimize_profiles"
+        / "hero"
+        / "lunar_mare_low_ti.yaml"
+    )
+    raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+    profile = validate_profile(raw, expected_feedstock="lunar_mare_low_ti")
+    constraints = physics_constraints_from_profile(profile)
+
+    assert profile["run"]["until_campaign_complete"] is True
+    assert profile["run"]["hours"] == 360
+    assert profile["constraints"]["cycle_time_max_h"] == pytest.approx(360.0)
+    assert profile["constraints"]["cycle_time_max_h_source"] == (
+        "owner to set (d-452); 'no 1000-hour runs'"
+    )
+    assert constraints.cycle_time_max_h.value == pytest.approx(360.0)
+    assert constraints.cycle_time_max_h.source_ref == (
+        "owner to set (d-452); 'no 1000-hour runs'"
+    )
+    assert "cycle_time" in profile["constraints"]["gates"]
+    assert "delivered_stream_purity" in profile["constraints"]["gates"]
+    assert profile["constraints"]["stream_purity_min"] == pytest.approx(0.95)
+    assert "extraction_completeness" in profile["constraints"]["gates"]
+    objective_metrics = {row["metric"] for row in profile["objectives"]}
+    assert "duration_h" in objective_metrics
+    assert "oxygen_kg" in objective_metrics
+    assert "metals_total_kg" in objective_metrics
+
+
 def test_reduced_real_cache_accepts_authorized_backend_version() -> None:
     """Grind-infra sweep Finding 3: every generated real grind profile carries
     ``authorized_backend_version`` (the cached-real version-authority key that
