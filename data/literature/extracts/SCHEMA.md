@@ -774,6 +774,7 @@ observation.
 A locator is a mapping with at least one non-empty location key among:
 
 - `page`, `published_page`, `pdf_page_index`
+- `row`, `column` (printed table labels, stored as strings)
 - `table`, `figure`, `paragraph`, `section`, `equation`
 - `line_range` (e.g. thermo.inp line range)
 - `note` (prose locator when the above do not apply — allowed, but prefer structured keys)
@@ -788,6 +789,20 @@ location key above.
 `page` is the one-based physical page in the PDF. `pdf_page_index` is the
 zero-based PDF page index (the first PDF page is 0). `published_page` is the
 folio printed on the page; it may be absent, Roman-numeral, or non-numeric.
+`row` and `column` retain printed table labels as strings, including
+numeric-looking labels. `row_label` aliases `row`; `column_header` and
+`column_label` alias `column`. `table_row_number` and `table_column_number`
+retain one-based table grid positions; `table_row` and `table_column` are their
+respective aliases. For compatibility, an integer supplied directly under
+`row` or `column` is a grid index; use a string (or the explicit label alias)
+for a printed numeric label. A printed label and a grid position are separate
+facts and may coexist even when their values differ. Conflicting spellings of
+the same field, and unknown locator keys, make the locator invalid.
+
+Other recognized locator facts that do not have a first-class field are kept
+verbatim in the typed `extras` mapping. For example, `additional_page`,
+`additional_published_page`, and `repaired_table_path` remain separate from
+`page`, `published_page`, and `source_path`.
 Example: a figure on the 12th PDF page with printed folio 7 has `page: 12`,
 `pdf_page_index: 11`, and `published_page: 7`.
 

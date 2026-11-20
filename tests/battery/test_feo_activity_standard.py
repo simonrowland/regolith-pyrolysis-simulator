@@ -67,8 +67,10 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
 # Fe_tO (t-1802 Eq. 23 / d-432) does not move this row: cf2a0c7fe and
 # f96f7cace serialize the same bytes.
 # sha before d-443: 6ca537f3aebbf954650edbfa6a1c2cac43c4daef05def1348711beccf0123a9a
+# The merged locator canonicalization changes serialized bytes; measured on the
+# merged tree after d-443: 9e10dc23a02c6fb258540d9a25bdb2871192780cb2bfa60d75b6d3ba157663d6.
 _DISTIN_1880_RESIDUAL_SHA256 = (
-    "1afb5a6feb9b8910c54d307bbc93cb7bece1d2a94b6d94f2ac2be98636a7c842"
+    "9e10dc23a02c6fb258540d9a25bdb2871192780cb2bfa60d75b6d3ba157663d6"
 )
 _DISTIN_1880_RESIDUAL_DEX = Decimal("-0.10057837869175247")
 

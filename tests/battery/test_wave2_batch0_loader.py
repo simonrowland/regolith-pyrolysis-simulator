@@ -623,15 +623,14 @@ def test_no_temperature_ids_follow_the_printed_row(tmp_path: Path) -> None:
             extract["species"]["Li"]["observations"][0]["values"]["rows"].reverse()
         result = migrate(_write_min_tree(tmp_path / ("rev" if reverse else "fwd"), extract), write=False)
         assert all("::point:" not in oid for oid in result.observations)
-        # `row` is not a Locator field; it is kept on the note.
-        return {key: obs.locator.note for key, obs in result.observations.items()}
+        return {key: obs.locator.row for key, obs in result.observations.items()}
 
     forward = located(False)
     backward = located(True)
     assert forward == backward
     assert len(forward) == 2
-    assert any("Apollo 11 MBAS Average" in (note or "") for note in forward.values())
-    assert any("Apollo 12 MBAS Average" in (note or "") for note in forward.values())
+    assert any("Apollo 11 MBAS Average" in (row or "") for row in forward.values())
+    assert any("Apollo 12 MBAS Average" in (row or "") for row in forward.values())
 
 
 def test_flemetakis_list_rows_are_not_collapsed() -> None:

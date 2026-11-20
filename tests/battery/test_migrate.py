@@ -1765,6 +1765,7 @@ def test_stolyarova_1992_untyped_bulk_thermodynamics_stays_in_context(
     assert table4[0]["mu_Na2O_exp_kcal_mol"] == 56.0
     assert result.validation is not None
     assert result.validation.hard_issues == ()
+    assert result.registry_issues == []
 
 
 @pytest.mark.parametrize(
