@@ -45,6 +45,42 @@ def _migrated(name: str):
     return migrator.result
 
 
+def test_sato_hickling_atm_fugacity_identity_matches_the_reported_series() -> None:
+    result = _migrated("sato-hickling-mclane-1973-lunar-fo2.yaml")
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.FUGACITY
+    ]
+    assert len(rows) == 75
+
+    for observation in rows:
+        oxygen = observation.identity.fO2_Pa
+        assert oxygen is not None and oxygen.is_value
+        temperature = observation.identity.temperature_K
+        assert temperature is not None and temperature.is_value
+        conditions = observation.point_conditions or {}
+        printed_log = conditions.get("fO2_log")
+        assert isinstance(printed_log, Located)
+        assert printed_log.state.is_value and printed_log.locator is not None
+        assert observation.value is not None
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point is not None
+        relative_error = (
+            abs(oxygen.value - observation.value.point) / observation.value.point
+        )
+        assert relative_error <= Decimal("1e-7"), observation.observation_id
+
+    # Source Table 1, physical page 3 / printed page 1063, sample 15058,88,
+    # 1050 °C: -log10(fO2 / atm) = 14.9. The independently checked Pa value
+    # is 1.275606173500439925962071498e-10.
+    observation = _one(result, "sato73_15058_88_bulk_rock", "T=1323.15")
+    assert _decimal_point(observation.identity.fO2_Pa) == Decimal(
+        "1.275606173500439925962071498E-10"
+    )
+
+
 def _one(result, *fragments: str):
     matches = [
         observation

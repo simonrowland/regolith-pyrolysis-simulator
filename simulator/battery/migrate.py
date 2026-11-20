@@ -22117,10 +22117,9 @@ def _printed_oxygen_may_set(
 ) -> bool:
     """True when this profile may carry a printed oxygen value.
 
-    Not-applicable axes stay not applicable. That covers fugacity,
-    equilibrium composition, and an unbuffered residue vacuum. A required
-    or uncompared axis, and an axis that already holds unknown or a value,
-    may be filled.
+    Not-applicable axes stay not applicable. That covers equilibrium
+    composition and an unbuffered residue vacuum. A required or uncompared
+    axis, and an axis that already holds unknown or a value, may be filled.
 
     An unrecognized quantity has no profile. ``fill_identity`` returns
     before it can strip the axis, and the historical copy kept a printed

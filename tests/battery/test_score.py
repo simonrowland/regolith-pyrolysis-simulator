@@ -4614,8 +4614,9 @@ def test_gas_pressure_and_fugacity_use_only_the_matching_gas_map_species(
         species: Species,
         quantity: Quantity = Quantity.P_PARTIAL,
         engine: Engine = Engine.VAPOROCK,
+        identity=None,
     ):
-        identity = replace(base, quantity=quantity, species=species)
+        identity = identity or replace(base, quantity=quantity, species=species)
         observation = F.observation(
             f"{quantity.value}-{species.formula}-{calls['n']}",
             "exp-1",
@@ -4665,10 +4666,26 @@ def test_gas_pressure_and_fugacity_use_only_the_matching_gas_map_species(
     assert calls["n"] == 2
 
     for engine in (Engine.VAPOROCK, Engine.OPENIMCC):
-        fugacity = predict(Species("H2O", Phase.G), Quantity.FUGACITY, engine)
+        from simulator.battery import migrate as M
+
+        fugacity_identity = M.fill_identity(
+            Quantity.FUGACITY,
+            Species("H2O", Phase.G),
+            temperature_K=State.of(Decimal("1643.15")),
+            fO2_Pa=State.of(Decimal("1e-8")),
+            total_pressure_Pa=State.of(Decimal("100000")),
+            composition=State.of(composition),
+        )
+        fugacity = predict(
+            Species("H2O", Phase.G),
+            Quantity.FUGACITY,
+            engine,
+            identity=fugacity_identity,
+        )
         assert fugacity.refusal_reason is None
         assert fugacity.value == _GAS_MAP_PARTIAL_PA
         assert fugacity.unit == "Pa"
+        assert fugacity.identity == fugacity_identity
         assert any(
             notice.reason == (
                 "ideal-gas assumption: fugacity coefficient phi_i=1, "
@@ -4682,16 +4699,6 @@ def test_gas_pressure_and_fugacity_use_only_the_matching_gas_map_species(
             T_K=Decimal("1643.15"),
             total_P=Decimal("100000"),
         )
-        from simulator.battery import migrate as M
-
-        fugacity_identity = M.fill_identity(
-            Quantity.FUGACITY,
-            Species("H2O", Phase.G),
-            temperature_K=State.of(Decimal("1643.15")),
-            fO2_Pa=State.of(Decimal("1e-8")),
-            total_pressure_Pa=State.of(Decimal("100000")),
-            composition=State.of(composition),
-        )
         reference = F.observation(
             "fugacity-score-reference",
             experiment.experiment_id,
@@ -4704,7 +4711,7 @@ def test_gas_pressure_and_fugacity_use_only_the_matching_gas_map_species(
             reference,
             engine,
             context=_context(F.work(), experiment, reference),
-            prediction=replace(fugacity, identity=fugacity_identity),
+            prediction=fugacity,
         )
         assert residual.numeric is not None
         assert residual.numeric.operation is MetricOperation.DEX
