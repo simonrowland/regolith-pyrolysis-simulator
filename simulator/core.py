@@ -10563,24 +10563,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
         intrinsic_fO2_log = float(intrinsic_fO2_log)
         source_metal_saturation_floor = None
-        saturation_floor = self._melt_metal_saturation_fO2_floor_log(
-            T_C + 273.15
-        )
-        if saturation_floor is not None:
-            floor_fO2_log, binding_oxide, binding_activity = saturation_floor
-            if intrinsic_fO2_log < floor_fO2_log:
-                intrinsic_fO2_log = floor_fO2_log
-                if reservoir is not None:
-                    reservoir.melt_intrinsic_fO2_log = intrinsic_fO2_log
-                    self._sync_oxygen_reservoir_mirror()
-                else:
-                    self.melt.fO2_log = intrinsic_fO2_log
-                    self.melt.melt_fO2_log = intrinsic_fO2_log
-            source_metal_saturation_floor = {
-                'log10_fO2_bar': floor_fO2_log,
-                'binding_oxide': binding_oxide,
-                'binding_oxide_activity': binding_activity,
-            }
+        campaign = getattr(self.melt, 'campaign', None)
+        if str(getattr(campaign, 'name', '') or '') == 'C3_NA':
+            saturation_floor = self._melt_metal_saturation_fO2_floor_log(
+                T_C + 273.15
+            )
+            if saturation_floor is not None:
+                floor_fO2_log, binding_oxide, binding_activity = saturation_floor
+                if intrinsic_fO2_log < floor_fO2_log:
+                    # This is a dispatch constraint for the active C3 source
+                    # reaction, not an oxygen transfer. Keep the reservoir's
+                    # ledger-backed redox state unchanged; elemental pressure
+                    # ceilings enforce saturation in every campaign.
+                    intrinsic_fO2_log = floor_fO2_log
+                source_metal_saturation_floor = {
+                    'log10_fO2_bar': floor_fO2_log,
+                    'binding_oxide': binding_oxide,
+                    'binding_oxide_activity': binding_activity,
+                }
         vacuum_floor = (
             float(self._oxygen_numerical_floor_bar())
             if callable(getattr(self, '_oxygen_numerical_floor_bar', None))
