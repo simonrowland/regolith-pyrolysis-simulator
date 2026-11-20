@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import math
+from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -482,6 +484,82 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
     assert metric_operation_for_identity(manganese.identity) is MetricOperation.DEX
     assert refusal.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
     assert refusal.refusal_detail["reason"] == "channel_missing"
+
+
+def test_sossi_scorer_passes_the_checked_fO2_to_the_residue_cohort(monkeypatch) -> None:
+    import simulator.battery.score as score_module
+    import simulator.battery.residue as residue
+    from simulator.battery.enums import Engine
+    from simulator.battery.oxygen_identity import check_sossi_table2_gas_equilibrium
+    from simulator.battery.score import (
+        _sossi_residue_prediction,
+        load_score_context,
+        point_magnitude,
+    )
+
+    context = load_score_context(sources=("kems-012-sossi-2019",))
+    manganese = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-012-sossi-2019"
+        and row.admission.status.value == "admitted"
+        and row.identity.species.formula == "Mn"
+        and point_magnitude(row.value) is not None
+        and row.experiment_id.rsplit("::", 1)[-1]
+        == "sossi-2019-run-p09-06-18a"
+    )
+    experiment_id = manganese.experiment_id.rsplit("::", 1)[-1]
+    checked_log = Decimal("-9.22")
+
+    def check_with_probe(experiments, series):
+        checks = dict(check_sossi_table2_gas_equilibrium(experiments, series))
+        key = next(key for key, check in checks.items() if check.run_id == "P09/06/18a")
+        checks[key] = replace(
+            checks[key], checked_log10_fO2_bar=checked_log
+        )
+        return checks
+
+    monkeypatch.setattr(
+        score_module,
+        "check_sossi_table2_gas_equilibrium",
+        check_with_probe,
+    )
+    monkeypatch.setattr(
+        score_module.subprocess,
+        "run",
+        lambda *_args, **_kwargs: pytest.fail("residue scoring must not require git"),
+    )
+    passed_fO2 = {}
+
+    def capture_cohort(
+        experiments,
+        *_args,
+        buffered_fO2_log_by_experiment,
+        **_kwargs,
+    ):
+        passed_fO2.update(buffered_fO2_log_by_experiment)
+        return tuple(
+            SimpleNamespace(
+                experiment_id=experiment["experiment_id"],
+                primary_element_ppm={"Mn": 900.0, "Ti": 450.0},
+                sensitivity_band_ppm={"Mn": (800.0, 1000.0), "Ti": (400.0, 500.0)},
+                channel_missing_elements=(),
+                provenance={"integration": {"primary": {"status": "converged"}}},
+            )
+            for experiment in experiments
+        )
+
+    monkeypatch.setattr(residue, "_predict_sossi_residue_cohort", capture_cohort)
+    prediction = _sossi_residue_prediction(
+        context,
+        manganese,
+        Engine.OPENIMCC,
+        {},
+        test_experiment_ids=frozenset({manganese.experiment_id}),
+    )
+
+    assert prediction.execution.state.value == "produced", prediction.refusal_detail
+    assert passed_fO2[experiment_id] == float(checked_log)
 
 
 def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(

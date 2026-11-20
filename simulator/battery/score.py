@@ -46,7 +46,10 @@ import yaml
 
 from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
-from simulator.battery.oxygen_identity import log10_fo2_to_pa
+from simulator.battery.oxygen_identity import (
+    check_sossi_table2_gas_equilibrium,
+    log10_fo2_to_pa,
+)
 from simulator.supervised_process_pool import (
     supervised_process_map,
 )
@@ -17085,9 +17088,6 @@ def _sossi_residue_prediction(
                 short_id = row.experiment_id.rsplit("::", 1)[-1]
                 experiments_by_run[short_id] = {}
                 point = row.point_conditions or {}
-                oxygen = point.get("fO2_log")
-                if oxygen is not None and oxygen.state.is_value:
-                    buffered_fO2_by_experiment[short_id] = float(oxygen.state.value)
                 element = row.identity.species.formula
                 if element in {"Mn", "Ti"}:
                     trace = point.get("starting_component_ppm")
@@ -17130,6 +17130,58 @@ def _sossi_residue_prediction(
             if missing_runs:
                 raise ResidueInventoryRefusal(
                     "sossi_experiment_missing_from_extract", ",".join(sorted(missing_runs))
+                )
+            species = source.get("species")
+            manganese = species.get("Mn") if isinstance(species, Mapping) else None
+            table2 = next(
+                (
+                    observation
+                    for observation in (
+                        manganese.get("observations", ())
+                        if isinstance(manganese, Mapping)
+                        else ()
+                    )
+                    if isinstance(observation, Mapping)
+                    and observation.get("observation_id")
+                    == "sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906"
+                ),
+                None,
+            )
+            values = table2.get("values") if isinstance(table2, Mapping) else None
+            table2_series = values.get("series") if isinstance(values, Mapping) else None
+            if not isinstance(table2_series, (list, tuple)):
+                raise ResidueInventoryRefusal(
+                    "gas_equilibrium_fo2_unavailable",
+                    "Sossi Table 2 gas-flow quotes are missing from the source extract.",
+                )
+            try:
+                gas_checks = check_sossi_table2_gas_equilibrium(
+                    tuple(source_experiments.values()), table2_series
+                )
+            except (TypeError, ValueError) as exc:
+                raise ResidueInventoryRefusal(
+                    "gas_equilibrium_fo2_unavailable", str(exc)
+                ) from exc
+            for experiment_id in experiments_by_run:
+                check = gas_checks.get(experiment_id)
+                if check is None:
+                    raise ResidueInventoryRefusal(
+                        "gas_equilibrium_fo2_unavailable",
+                        f"no checked Table 2 gas record for {experiment_id}",
+                    )
+                if check.refusal_reason is not None:
+                    raise ResidueInventoryRefusal(
+                        check.refusal_reason,
+                        check.refusal_detail
+                        or f"Sossi gas equilibrium check failed for {experiment_id}",
+                    )
+                if check.checked_log10_fO2_bar is None:
+                    raise ResidueInventoryRefusal(
+                        "gas_equilibrium_fo2_unavailable",
+                        f"no checked log fO2 for {experiment_id}",
+                    )
+                buffered_fO2_by_experiment[experiment_id] = float(
+                    check.checked_log10_fO2_bar
                 )
             experiments = [source_experiments[key] for key in sorted(experiments_by_run)]
             rows = _predict_sossi_residue_cohort(
