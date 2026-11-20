@@ -37,7 +37,19 @@ from simulator.runner import _load_vacuum_preset_run_spec
 from simulator.accounting.run_artifact import (
     CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT,
 )
-from simulator.state import CampaignPhase, EvaporationFlux, MeltState, OverheadGas
+from simulator.campaigns import (
+    CampaignManager,
+    CampaignSubhourHourClockRefusal,
+)
+from simulator.state import (
+    BatchRecord,
+    CampaignPhase,
+    CondensationTrain,
+    EvaporationFlux,
+    HourSnapshot,
+    MeltState,
+    OverheadGas,
+)
 from tests.chemistry.conftest import _build_sim, _load_yaml
 
 
@@ -518,3 +530,408 @@ def test_quarter_hour_preset_runs_and_samples_inside_the_window(tmp_path: Path):
     enforcement = session.simulator.campaign_mgr.last_pO2_enforcement
     assert enforcement is not None
     assert enforcement["schedule_time_h"] == 0.25
+
+
+def _cro2_parent(sim) -> tuple[str, float, float, float]:
+    stoich = sim._evaporation_stoich("CrO2", _species_data(sim, "CrO2"))
+    parent = str(stoich["parent_oxide"])
+    available_parent = float(
+        sim.atom_ledger.kg_by_account("process.cleaned_melt")[parent]
+    )
+    oxide_per = float(stoich["oxide_per_product_kg"])
+    o2_per = float(stoich["O2_per_product_kg"])
+    assert o2_per < 0.0
+    assert available_parent > 0.0
+    return parent, available_parent, oxide_per, abs(o2_per)
+
+
+def test_cro2_oxygen_integral_at_one_hour_matches_the_golden():
+    """dt_hr = 1 keeps the CrO2 oxygen integral the chemistry file pins.
+
+    The parent map at three parent-equivalents an hour removes
+    ``available * -expm1(-3)``. The oxygen tail then limits that draw
+    by the overhead O2 integral. At one hour the rate scale is
+    ``-expm1(-k) / k``, which is the expression this fix must not move.
+
+    Mutation: dividing the allowed oxygen mass by ``dt_hr`` a second
+    time, or dropping the division, changes this row. The division is
+    bit-identical to the old quotient at ``dt_hr == 1``.
+    """
+
+    sim = _loaded_sim()
+    parent, available_parent, oxide_per, o2_per = _cro2_parent(sim)
+    available_o2_kg = 0.001
+    raw_rate = 3.0 * available_parent / oxide_per
+    rates = sim._analytic_evaporation_depletion_rates(
+        {"CrO2": raw_rate},
+        dt_hr=1.0,
+        phase_scalar=1.0,
+        cleaned_melt_kg={parent: available_parent},
+        available_o2_kg=available_o2_kg,
+    )
+    required_o2_kg = rates["CrO2"] * o2_per
+    parent_only_product_kg = (
+        available_parent * (-math.expm1(-3.0)) / oxide_per
+    )
+    parent_only_o2_draw_kg = parent_only_product_kg * o2_per
+    expected_fraction = max(
+        0.0,
+        min(
+            math.nextafter(1.0, 0.0),
+            -math.expm1(-(parent_only_o2_draw_kg / available_o2_kg)),
+        ),
+    )
+    expected_o2_draw_kg = available_o2_kg * expected_fraction
+    assert required_o2_kg <= available_o2_kg
+    assert required_o2_kg < parent_only_o2_draw_kg
+    assert required_o2_kg == pytest.approx(expected_o2_draw_kg, rel=1e-12)
+
+
+def test_cro2_short_step_oxygen_rate_matches_closed_form():
+    """A 60 s oxygen-limited CrO2 rate is the step integral over dt.
+
+    Closed form. Parent inventory and overhead O2 each follow
+    ``dM/dt = -k M``. The average product rate over the step is the
+    parent rate times
+
+        -expm1(-k dt) / (k dt)
+
+    where ``k`` is the oxygen demand (kg/h) divided by the O2 on hand
+    (kg), and ``dt`` is in hours. The pre-fix scale omitted ``/ dt``
+    and stored ``dt`` times that rate. The ledger multiplies by ``dt``
+    again, so the committed mass was short by ``dt``.
+
+    Mutation: ``allowed_draw_kg / required_o2_kg_hr`` without ``* dt_hr``
+    returns the defect rate below, sixty times smaller at this step.
+    """
+
+    sim = _loaded_sim()
+    parent, available_parent, oxide_per, o2_per = _cro2_parent(sim)
+    dt_hr = 1.0 / 60.0
+    parent_k = 1.0
+    raw_rate = parent_k * available_parent / oxide_per
+    parent_fraction = -math.expm1(-parent_k * dt_hr)
+    current_rate = (available_parent * parent_fraction / oxide_per) / dt_hr
+    k_per_h = 60.0
+    available_o2_kg = (current_rate * o2_per) / k_per_h
+    true_rate = current_rate * (
+        -math.expm1(-k_per_h * dt_hr) / (k_per_h * dt_hr)
+    )
+    defect_rate = current_rate * (-math.expm1(-k_per_h * dt_hr) / k_per_h)
+    assert true_rate == pytest.approx(defect_rate / dt_hr, rel=1e-12)
+    assert true_rate != pytest.approx(defect_rate, rel=1e-6)
+
+    rates = sim._analytic_evaporation_depletion_rates(
+        {"CrO2": raw_rate},
+        dt_hr=dt_hr,
+        phase_scalar=1.0,
+        cleaned_melt_kg={parent: available_parent},
+        available_o2_kg=available_o2_kg,
+    )
+    assert rates["CrO2"] == pytest.approx(true_rate, rel=1e-12)
+    assert rates["CrO2"] != pytest.approx(defect_rate, rel=1e-6)
+
+
+def test_second_campaign_hour_is_campaign_local(tmp_path: Path):
+    """A campaign started after step 0 counts its own steps.
+
+    ``start_campaign`` stores ``_campaign_start_hour`` and zeros
+    ``campaign_hour``. One short step later the elapsed hours are
+    ``dt_h``, the product of one step and the step length. The defect
+    wrote ``melt.hour * dt_h`` and jumped to the run's global time.
+
+    Mutation: restoring ``float(melt.hour) * dt_h`` yields ``1.25``
+    here (step index 5 times 0.25 h) instead of ``0.25``.
+    """
+
+    path = _write_lab_preset(tmp_path, duration_h=0.25, process_dt_s=900)
+    spec = _load_vacuum_preset_run_spec(path, "faithful")
+    run = PyrolysisRun(
+        feedstock_id=spec.feedstock_id,
+        campaign="C0",
+        hours=spec.hours,
+        mass_kg=spec.mass_kg,
+        process_dt_s=spec.process_dt_s,
+        lab_schedule=spec.lab_schedule,
+        setpoints_patch={"lab_geometry": spec.lab_geometry},
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.melt.hour = 4
+    sim.start_campaign(CampaignPhase.C0)
+    assert sim.melt.campaign_hour == 0
+    assert sim._campaign_start_hour == 4
+    session.advance()
+    assert sim.melt.hour == 5
+    assert sim.melt.campaign_hour == pytest.approx(0.25)
+    assert sim.melt.campaign_hour != pytest.approx(5 * 0.25)
+
+
+def test_c7_one_shot_keeps_configured_hold_on_a_short_step():
+    """C7 integrates the configured hold once, not the process step.
+
+    The host carries a 60 s timestep and a 1 h configured hold. The
+    extent's ``c7_hold_time_s`` is 3600. A 2 h hold is 7200. The defect
+    replaced either hold with ``process_dt_hr()`` and stored 60 s.
+
+    Mutation: the ``is_one_hour`` branch that assigns
+    ``hold_time_h = process_dt_hr()`` makes both rows 60.
+    """
+
+    from types import MethodType, SimpleNamespace
+
+    from simulator.extraction import ExtractionMixin
+
+    setpoints = _load_yaml("setpoints.yaml")
+    sim = SimpleNamespace(
+        melt=SimpleNamespace(
+            campaign=CampaignPhase.C7_CA_ALUMINOTHERMIC,
+            campaign_hour=0,
+            melt_surface_area_m2=0.2,
+            p_total_mbar=0.05,
+            stir_state=SimpleNamespace(axial=1.0),
+            stir_factor=1.0,
+        ),
+        vapor_pressures={
+            "metals": {
+                "Ca": {
+                    "evaporation_alpha": {"value": 0.5},
+                    "pure_component_antoine": {
+                        "A": 10.0,
+                        "B": 15000.0,
+                        "C": 0.0,
+                    },
+                }
+            }
+        },
+        setpoints=setpoints,
+        campaign_mgr=CampaignManager(setpoints),
+        _resolve_condensation_carrier_gas=lambda: "N2",
+        overhead=SimpleNamespace(headspace_temperature_K=1000.0),
+        overhead_model=SimpleNamespace(pipe_diameter_m=0.12),
+        _evaporation_bulk_partial_pressure_pa=lambda _species: 0.0,
+        _silent_zero_notes=[],
+        process_timestep=resolve_process_timestep(60),
+    )
+    sim.process_dt_hr = lambda: sim.process_timestep.dt_h
+    sim._c7_float = ExtractionMixin._c7_float
+    sim._c7_clamp = ExtractionMixin._c7_clamp
+    sim._c7_bool = ExtractionMixin._c7_bool
+    sim._c7_hold_temperature_C = MethodType(
+        ExtractionMixin._c7_hold_temperature_C,
+        sim,
+    )
+    sim._c7_knob_diag = MethodType(ExtractionMixin._c7_knob_diag, sim)
+
+    def _hold_s(hold_time_h: float) -> float:
+        _extent, diagnostic = ExtractionMixin._c7_transport_extent_mol(
+            sim,
+            {"hold_time_h": hold_time_h, "p_total_mbar": 0.05},
+            ca_per_extent=1.0,
+        )
+        return float(diagnostic["c7_hold_time_s"])
+
+    assert sim.process_dt_hr() == pytest.approx(60.0 / 3600.0)
+    assert _hold_s(1.0) == 3600.0
+    assert _hold_s(2.0) == 7200.0
+    assert _hold_s(1.0) != 60.0
+
+
+def _native_fe_case(sim, *, dt_s: float):
+    sim.process_timestep = resolve_process_timestep(dt_s)
+    sim.melt.temperature_C = 1700.0
+    sim.melt.p_total_mbar = 0.0
+    sim.overhead.pressure_mbar = 0.0
+    sim.overhead.composition = {"Fe": 0.0}
+    return sim._native_fe_partition_diagnostic(100.0)
+
+
+def test_native_fe_residual_stays_mol_per_hour_on_a_short_step():
+    """Step-moles are not subtracted from the hourly Fe capacity.
+
+    The diagnostic's ``native_fe_vapor_capacity_mol_hr`` is an hourly
+    rate. On a short step ``native_fe_vapor_mol`` is moles this step.
+    The residual the kg/h cap reads is
+
+        capacity_mol_hr - vapor_mol / dt_h
+
+    The defect stored ``capacity_mol_hr - vapor_mol``. The saturation
+    split stores the same hourly residual from the committed vapor.
+    On the hour the stored value stays ``capacity - committed``.
+
+    A wide crucible keeps the committed vapor below one step of
+    capacity, so the short residual is not zero on both formulas.
+    The kg/h cap is that residual times ``M_Fe``. The defect cap is
+    the leftover step kilograms, and a rate at the hourly capacity
+    must not be cut down to that step mass.
+
+    Mutation: ``capacity_mol_hr - vapor_mol`` in the diagnostic, or
+    ``capacity_mol_hr * dt_h - committed`` in the split, returns the
+    defect residual.
+    """
+
+    short = _native_fe_case(_loaded_sim(), dt_s=900.0)
+    vapor_mol = float(short["native_fe_vapor_mol"])
+    capacity_mol_hr = float(short["native_fe_vapor_capacity_mol_hr"])
+    dt_h = 0.25
+    assert vapor_mol > 0.0
+    assert capacity_mol_hr > 0.0
+    true_residual = max(0.0, capacity_mol_hr - vapor_mol / dt_h)
+    defect_residual = max(0.0, capacity_mol_hr - vapor_mol)
+    assert true_residual != defect_residual
+    assert short["ordinary_melt_fe_residual_capacity_mol_hr"] == true_residual
+
+    hourly = _native_fe_case(_loaded_sim(), dt_s=3600.0)
+    assert hourly["ordinary_melt_fe_residual_capacity_mol_hr"] == max(
+        0.0,
+        float(hourly["native_fe_vapor_capacity_mol_hr"])
+        - float(hourly["native_fe_vapor_mol"]),
+    )
+
+    sim = _loaded_sim()
+    sim.process_timestep = resolve_process_timestep(900.0)
+    sim.campaign_mgr._process_dt_h = sim.process_dt_hr()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim._sync_oxygen_reservoir_mirror()
+    sim.melt.melt_surface_area_m2 = 1.0e6
+    sim._apply_native_fe_saturation_split()
+    partition = sim._last_native_fe_partition_diagnostic
+    capacity = float(partition["native_fe_vapor_capacity_mol_hr"])
+    committed = float(partition["native_fe_vapor_mol"])
+    stored = float(sim._native_fe_vapor_residual_capacity_mol_this_hr)
+    true_stored = max(0.0, capacity - committed / dt_h)
+    defect_stored = max(0.0, capacity * dt_h - committed)
+    assert capacity > 0.0
+    assert true_stored != defect_stored
+    assert stored == true_stored
+    assert partition["ordinary_melt_fe_residual_capacity_mol_hr"] == stored
+    molar_mass = (
+        float(partition["native_fe_vapor_capacity_kg_hr"]) / capacity
+    )
+    reader_cap_kg_hr = stored * molar_mass
+    defect_cap_kg_hr = defect_stored * molar_mass
+    hourly_rate_kg_hr = float(partition["native_fe_vapor_capacity_kg_hr"])
+    assert min(hourly_rate_kg_hr, reader_cap_kg_hr) != pytest.approx(
+        min(hourly_rate_kg_hr, defect_cap_kg_hr),
+        rel=1e-9,
+    )
+
+
+def _endpoint_melt(
+    campaign: CampaignPhase,
+    hour: int,
+    *,
+    temperature_C: float,
+) -> MeltState:
+    return MeltState(
+        campaign=campaign,
+        campaign_hour=hour,
+        temperature_C=temperature_C,
+        composition_kg={"SiO2": 50.0, "Al2O3": 20.0, "CaO": 30.0},
+    )
+
+
+def _endpoint_flux(**species_kg_hr: float) -> EvaporationFlux:
+    return EvaporationFlux(
+        total_kg_hr=sum(species_kg_hr.values()),
+        species_kg_hr=dict(species_kg_hr),
+    )
+
+
+def test_subhour_c2a_duration_clamp_and_c4_window_are_refused():
+    """A short step must not walk an hour-counted campaign clock.
+
+    C2A stage length is still ``max(1, int(duration_h))``. C4's
+    in-window time still counts snapshots. Both raise
+    ``subhour_hour_clock_refused`` when the process step is not one
+    hour. The hourly call keeps the clamp and the snapshot count.
+    C0 and C7 at the same short step do not raise.
+
+    Mutation: deleting ``_refuse_subhour_hour_clock`` from a live site
+    lets that site return a stage, a hold, or ``False`` instead of
+    the typed refusal. Deleting it from C0 would be a different bug;
+    this test requires the short C0 call to return.
+    """
+
+    manager = CampaignManager(_load_yaml("setpoints.yaml"))
+    stages = manager._c2a_staged_enabled_stages()
+    clamped_hours = sum(
+        max(1, int(float(stage["duration_h"]))) for stage in stages
+    )
+    assert manager._configured_staged_max_hold_hr(
+        CampaignPhase.C2A_STAGED
+    ) == pytest.approx(clamped_hours)
+    selected = manager._c2a_staged_stage_by_hour(0, stages)
+    assert selected is not None
+    assert selected["name"] == "alkali_early_fe"
+
+    manager._process_dt_h = 0.25
+    with pytest.raises(CampaignSubhourHourClockRefusal) as max_hold:
+        manager._configured_staged_max_hold_hr(CampaignPhase.C2A_STAGED)
+    assert max_hold.value.reason == "subhour_hour_clock_refused"
+    assert max_hold.value.terminal_refusal is True
+    assert max_hold.value.diagnostic["clock"] == "c2a_staged_duration_clamp"
+    assert max_hold.value.diagnostic["process_dt_h"] == 0.25
+
+    with pytest.raises(CampaignSubhourHourClockRefusal) as stage_pick:
+        manager._c2a_staged_stage_by_hour(0, stages)
+    assert stage_pick.value.diagnostic["clock"] == "c2a_staged_duration_clamp"
+
+    record = BatchRecord(snapshots=[
+        HourSnapshot(
+            campaign=CampaignPhase.C4,
+            temperature_C=1580.0,
+            evap_flux=_endpoint_flux(Mg=0.019),
+        )
+    ])
+    melt = _endpoint_melt(CampaignPhase.C4, 1, temperature_C=1580.0)
+    flux = _endpoint_flux(Mg=0.019)
+    with pytest.raises(CampaignSubhourHourClockRefusal) as window:
+        manager.check_endpoint(melt, flux, CondensationTrain(), record)
+    assert window.value.diagnostic["clock"] == "c4_snapshot_window"
+
+    manager._process_dt_h = 1.0
+    assert manager.check_endpoint(
+        melt, flux, CondensationTrain(), record
+    ) is False
+
+    manager._process_dt_h = 0.25
+    assert manager.check_endpoint(
+        _endpoint_melt(CampaignPhase.C0, 0, temperature_C=25.0),
+        _endpoint_flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is False
+    assert manager.check_endpoint(
+        _endpoint_melt(
+            CampaignPhase.C7_CA_ALUMINOTHERMIC, 0, temperature_C=25.0
+        ),
+        _endpoint_flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is False
+
+    # The depletion path clamps duration after the max-hold helper.
+    # Replace that helper so this call reaches the third site.
+    setpoints = _load_yaml("setpoints.yaml")
+    setpoints["campaigns"]["C2A_staged"]["stages"][0][
+        "depletion_log_slope_epsilon_per_hr"
+    ] = 0.01
+    depletion = CampaignManager(setpoints)
+    depletion._configured_staged_max_hold_hr = lambda _campaign: 100.0
+    staged = _endpoint_melt(
+        CampaignPhase.C2A_STAGED, 0, temperature_C=1250.0
+    )
+    empty = _endpoint_flux()
+    train = CondensationTrain()
+    depletion._process_dt_h = 1.0
+    assert depletion.check_endpoint(
+        staged, empty, train, BatchRecord()
+    ) is False
+    depletion._process_dt_h = 0.25
+    with pytest.raises(CampaignSubhourHourClockRefusal) as duration:
+        depletion.check_endpoint(staged, empty, train, BatchRecord())
+    assert duration.value.diagnostic["clock"] == "c2a_staged_duration_clamp"

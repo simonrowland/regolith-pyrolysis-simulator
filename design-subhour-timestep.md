@@ -11,7 +11,7 @@ This chunk adds a process timestep in seconds, default 3600 s, and threads it th
 `melt.campaign_hour` is elapsed hours at the start of the step.
 
 - One-hour path: `campaign_hour += 1` after the step, the same integer increment as today.
-- Shorter path: after the step-index increment, `campaign_hour = float(melt.hour) * dt_h`. The value is assigned from the integer step index. It is not a running sum, so the elapsed time does not drift.
+- Shorter path: after the step-index increment, `campaign_hour = (melt.hour - _campaign_start_hour) * dt_h`. `_campaign_start_hour` is the step index `start_campaign` recorded. The value is the campaign's integer step count times `dt_h`. It is not a running sum, and it is not the run's global step index.
 
 The sample for pressure, pO2, and temperature is the end of the step.
 
@@ -116,7 +116,7 @@ Rates are fluxes times `dt`. The one-hour branch keeps the current source expres
 - `* 3600.0` on the inert-sweep bleed
 - `* 1.0` on the turbine hour
 - `vapor_mol = min(available, capacity_mol_hr)`
-- C7 uses the configured `hold_time_h` on the one-hour path, and `process_dt_hr()` only on a shorter step. A configured hold other than 1 h is existing hourly behavior and is not reinterpreted.
+- C7's one-shot keeps the configured `hold_time_h` at every dt. The applied flag already refuses a second pass, so a short step must not shrink that integral to `process_dt_hr()`. A configured hold other than 1 h is existing hourly behavior and is not reinterpreted.
 - Energy is computed exactly as today, then scaled by `dt_h` only when `dt_h != 1.0`. `mre_kWh` is not scaled: Faraday already integrated the step.
 
 `HourSnapshot` does not grow a dataclass field. A field would change `asdict` and equality on every hourly snapshot. After construction, a shorter step sets the extra attribute `snapshot.t_s = step_index * dt_s`. `asdict` ignores it. `build_per_hour_summary` adds `"t_s"` only when the attribute is set. Hourly summaries do not gain the key. Callers that only have an hourly row use `t_s = hour * 3600`.
@@ -143,7 +143,7 @@ Faraday charge is `I * dt`. Linear. Stable.
 
 Oxygen exchange is the exponential approach `1 - exp(-dt / tau)`. Stable for every `dt > 0`. At small `dt` the one-hour expression `1 - exp(-3600/tau)` must not be reused, and the short step must use `expm1`, or the exchanged amount underflows to 0. `tau` and the driving pO2 are frozen over the step; that freeze is the truncation, not a stability limit. The hourly call still executes `1 - exp(-3600/tau)` so a large `tau` does not change bits via `expm1`.
 
-Native-Fe vapor and C7 transport are flux times `dt` (or times the configured hold, on the hour). Stable. They are wrong by `hold/dt` if a short step repeats a one-hour integral, which is why those two branches exist.
+Native-Fe vapor taken this step is `min(available, capacity_mol_hr * dt_h)`. The residual the kg/h cap reads stays mol/h: `capacity_mol_hr - step_moles / dt_h` off the hour, and `capacity_mol_hr - vapor_mol` on the hour. C7 transport integrates the configured hold once. A short step does not scale that hold.
 
 Energy is power times `dt`, applied by scaling the one-hour record. Linear.
 
@@ -155,8 +155,8 @@ Wired here: items 1–8, 10, 12–38, 41, and 42. Item 25 keeps the method defau
 
 Left, with the reason:
 
-- Item 9. `max(1, int(duration_h))` forces a stage to at least one hour. Changing it moves hourly staged campaigns.
-- Item 11. C4's in-window clock counts snapshots. At one snapshot per hour that is elapsed hours. A shorter step would end the window after N steps.
+- Item 9. `max(1, int(duration_h))` stays, so hourly staged campaigns do not move. A process step that is not one hour and reaches that clamp raises `CampaignSubhourHourClockRefusal` (reason `subhour_hour_clock_refused`, clock `c2a_staged_duration_clamp`).
+- Item 11. C4's in-window clock still counts snapshots on the hour. A process step that is not one hour and reaches that count raises the same refusal with clock `c4_snapshot_window`.
 - Item 39. `electrolysis.step_hour` is not on the live plant path.
 - Item 40. The temperature scan is a one-hour probe.
 - Item 43. Thermal-train cost still treats one snapshot as one hour. Hourly cost is unchanged because the snapshot count is still the hour count. A shorter run would over-cost.
@@ -170,4 +170,4 @@ Left, with the reason:
 
 The end-of-step sample, the hour-counter advance, the exponential approach, and the `t_s` product live in `simulator/process_timestep.py`. `schedule_sample_time_h` delegates to that sample. The one-hour pressure sample in `core.py` stays inline, because it is the uncapped rule and the capped sampler is a different rule on that path.
 
-Left in place, and why: the condensation-route `dt_hr` is still passed and still unused inside the provider; the C0 forecast `hold_hr`; the temperature-scan `dt_hr=1`; the `SUBSOLIDUS_STEP_DURATION_HR` constant (the live step passes the process dt, the constant remains for other readers); `electrolysis.step_hour`; the C2A `max(1, int(duration_h))` clamps; the condensation residence `/3600`; the overhead kg/h unit conversions; the thermal-train snapshot-as-hour basis. The integer `"hour"` key stays the step index.
+Left in place, and why: the condensation-route `dt_hr` is still passed and still unused inside the provider; the C0 forecast `hold_hr`; the temperature-scan `dt_hr=1`; the `SUBSOLIDUS_STEP_DURATION_HR` constant (the live step passes the process dt, the constant remains for other readers); `electrolysis.step_hour`; the C2A `max(1, int(duration_h))` clamps (a short step that reaches one is refused, the clamp is not retuned); the condensation residence `/3600`; the overhead kg/h unit conversions; the thermal-train snapshot-as-hour basis. The integer `"hour"` key stays the step index.

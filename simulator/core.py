@@ -8391,9 +8391,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'native_fe_tap_mol': tap_mol,
             'native_fe_vapor_capacity_mol_hr': capacity_mol_hr,
             'native_fe_vapor_capacity_kg_hr': capacity_kg_hr,
-            'ordinary_melt_fe_residual_capacity_mol_hr': max(
-                0.0,
-                capacity_mol_hr - vapor_mol,
+            'ordinary_melt_fe_residual_capacity_mol_hr': (
+                max(0.0, capacity_mol_hr - vapor_mol)
+                if self.process_timestep.is_one_hour
+                else max(
+                    0.0,
+                    capacity_mol_hr - vapor_mol / self.process_dt_hr(),
+                )
             ),
             'capacity_allocation_rule': 'pool_first_residual',
             'native_pool_activity_argument': (
@@ -8613,21 +8617,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             vapor_route.get('native_fe_vapor_mol', 0.0) or 0.0
         )
         committed_pool_mol = committed_vapor_mol + committed_tap_mol
+        capacity_mol_hr = float(partition.get(
+            'native_fe_vapor_capacity_mol_hr', 0.0,
+        ) or 0.0)
         if self.process_timestep.is_one_hour:
             residual_capacity_mol = max(
                 0.0,
-                float(partition.get(
-                    'native_fe_vapor_capacity_mol_hr', 0.0,
-                ) or 0.0)
-                - committed_vapor_mol,
+                capacity_mol_hr - committed_vapor_mol,
             )
         else:
+            # committed_vapor_mol is this step. The cap reader treats the
+            # stored residual as mol/h and multiplies by M_Fe.
             residual_capacity_mol = max(
                 0.0,
-                float(partition.get(
-                    'native_fe_vapor_capacity_mol_hr', 0.0,
-                ) or 0.0) * self.process_dt_hr()
-                - committed_vapor_mol,
+                capacity_mol_hr - committed_vapor_mol / self.process_dt_hr(),
             )
         self._native_fe_vapor_residual_capacity_mol_this_hr = residual_capacity_mol
         partition.update({
@@ -16504,7 +16507,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.melt.campaign_hour += 1
         else:
             self.melt.campaign_hour = (
-                float(self.melt.hour) * self.process_timestep.dt_h
+                (float(self.melt.hour) - float(self._campaign_start_hour))
+                * self.process_timestep.dt_h
             )
         self._stamp_redox_source_context_for_current_state(force=True)
         snapshot = self._make_snapshot()

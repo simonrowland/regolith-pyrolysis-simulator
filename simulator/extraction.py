@@ -3639,13 +3639,11 @@ class ExtractionMixin:
                 getattr(self.melt, 'melt_surface_area_m2', 0.2),
             ),
         )
-        configured_hold_h = max(
+        # One-shot. The applied flag refuses a later step, so the
+        # configured hold is the whole integral at every process dt.
+        hold_time_h = max(
             0.0, self._c7_float(cfg.get('hold_time_h'), 1.0),
         )
-        if self.process_timestep.is_one_hour:
-            hold_time_h = configured_hold_h
-        else:
-            hold_time_h = self.process_dt_hr()
         ca_entry = dict(
             (getattr(self, 'vapor_pressures', {}) or {})
             .get('metals', {})

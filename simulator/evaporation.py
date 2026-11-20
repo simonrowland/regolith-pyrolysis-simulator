@@ -4113,8 +4113,10 @@ class EvaporationMixin:
                 / total_o2_draw_kg_hr
             )
             current_rate = float(effective_rates.get(species, 0.0))
+            # allowed_draw_kg is this step. The draw beside it is kg/h.
+            # Dividing by dt_hr makes the scale -expm1(-k dt) / (k dt).
             allowed_rate = current_rate * (
-                allowed_draw_kg / by_species_draw[species])
+                allowed_draw_kg / (by_species_draw[species] * dt_hr))
             if allowed_rate <= 1e-12:
                 effective_rates.pop(species, None)
             else:

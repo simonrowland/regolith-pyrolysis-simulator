@@ -301,6 +301,27 @@ class CampaignC4EndpointRefusal(CampaignEndpointRefusal):
     """Typed refusal when C4 cannot acquire or retain its process window."""
 
 
+class CampaignSubhourHourClockRefusal(ValueError):
+    """A short process step reached a clock that still counts whole hours.
+
+    C2A staged duration stays ``max(1, int(duration_h))`` and C4's
+    in-window time still counts snapshots. Those expressions are the
+    hourly campaign. A step that is not one hour must not walk them.
+    """
+
+    reason = 'subhour_hour_clock_refused'
+    terminal_refusal = True
+
+    def __init__(self, diagnostic: Mapping[str, object]):
+        self.diagnostic = dict(diagnostic)
+        self.diagnostic.setdefault('status', 'refused')
+        self.diagnostic.setdefault('reason', self.reason)
+        detail = self.diagnostic.get('detail')
+        super().__init__(
+            f'{self.reason}: {detail}' if detail else self.reason
+        )
+
+
 @lru_cache(maxsize=None)
 def _species_molar_mass_kg_per_mol(species: str) -> float | None:
     try:
@@ -1549,10 +1570,26 @@ class CampaignManager:
         label = f"{self._campaign_config_key(campaign)}.{key}"
         return self._required_float(endpoint.get(key), label)
 
+    def _refuse_subhour_hour_clock(self, clock: str) -> None:
+        """Refuse a short step before an hour-counted clock runs.
+
+        ``_process_dt_h == 1.0`` is the hourly path and returns without
+        touching the clock. C0 and C7 do not call this.
+        """
+
+        if self._process_dt_h == 1.0:
+            return
+        raise CampaignSubhourHourClockRefusal({
+            'clock': clock,
+            'process_dt_h': float(self._process_dt_h),
+            'detail': f'{clock} still counts whole hours',
+        })
+
     def _configured_staged_max_hold_hr(self,
                                        campaign: CampaignPhase) -> float:
         max_hold_hr = self._configured_max_hold_hr(campaign)
         stages = self._c2a_staged_enabled_stages()
+        self._refuse_subhour_hour_clock('c2a_staged_duration_clamp')
         total_hours = 0
         for idx, stage in enumerate(stages):
             if not isinstance(stage, dict):
@@ -1710,6 +1747,7 @@ class CampaignManager:
     ) -> dict | None:
         if not isinstance(stages, list) or not stages:
             return None
+        self._refuse_subhour_hour_clock('c2a_staged_duration_clamp')
         hour = max(0, int(campaign_hour))
         elapsed = 0
         selected = stages[-1]
@@ -2997,6 +3035,7 @@ class CampaignManager:
                 melt.campaign_hour - self._c2a_staged_stage_start_hour,
                 self._process_dt_h,
             )
+            self._refuse_subhour_hour_clock('c2a_staged_duration_clamp')
             duration_h = max(1, int(self._float(stage.get('duration_h'), 1.0)))
             min_hold_h = self._float(
                 endpoint.get('min_hold_h', endpoint.get('min_hold_hr')),
@@ -3292,6 +3331,7 @@ class CampaignManager:
                 <= float(snapshot.temperature_C)
                 <= window_high_C
             ]
+            self._refuse_subhour_hour_clock('c4_snapshot_window')
             completed_window_hr = float(
                 len(prior_in_window) + int(current_in_window)
             )
