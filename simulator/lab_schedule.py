@@ -164,6 +164,8 @@ def interpolate_schedule_points(
         left_t = float(left["t_h"])
         right_t = float(right["t_h"])
         if t <= right_t:
+            if t == right_t:
+                return float(right["value"])
             span = right_t - left_t
             if span <= 0.0:
                 return float(right["value"])
@@ -217,22 +219,26 @@ def pO2_enforcement_row(
 ) -> Mapping[str, Any]:
     achieved = min(float(setpoint_mbar), float(total_pressure_mbar))
     limited = float(setpoint_mbar) > float(total_pressure_mbar)
-    return MappingProxyType(
-        {
-            "hour": int(hour),
-            "schedule_id": str(schedule.get("id", "")),
-            "schedule_time_h": float(schedule_time_h),
-            "setpoint_mbar": float(setpoint_mbar),
-            "achieved_mbar": float(achieved),
-            "p_total_mbar": float(total_pressure_mbar),
-            "limited_by_total_pressure": bool(limited),
-            "status": (
-                "clipped_to_total_pressure"
-                if limited
-                else "achieved_as_setpoint"
-            ),
-        }
-    )
+    row = {
+        "hour": int(hour),
+        "schedule_id": str(schedule.get("id", "")),
+        "schedule_time_h": float(schedule_time_h),
+        "setpoint_mbar": float(setpoint_mbar),
+        "achieved_mbar": float(achieved),
+        "p_total_mbar": float(total_pressure_mbar),
+        "limited_by_total_pressure": bool(limited),
+        "status": (
+            "clipped_to_total_pressure"
+            if limited
+            else "achieved_as_setpoint"
+        ),
+    }
+    notices = schedule.get("pressure_domain_notices", ())
+    if notices:
+        row["pressure_domain_notices"] = tuple(
+            dict(notice) for notice in notices
+        )
+    return MappingProxyType(row)
 
 
 def _validate_interpolation_marker(schedule: Mapping[str, Any]) -> None:

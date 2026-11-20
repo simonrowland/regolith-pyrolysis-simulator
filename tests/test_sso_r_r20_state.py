@@ -719,6 +719,17 @@ def _seed_o2_bubbler_redox_state(
     )
 
 
+def test_controlled_o2_bubbler_log_accepts_positive_subnormal_pressure() -> None:
+    sim = _make_sim()
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.0e-323
+
+    target, source = sim._o2_bubbler_target_fO2_log(None)
+
+    assert target == pytest.approx(math.log10(1.0e-323) - 3.0)
+    assert source == "controlled_o2_pO2_mbar"
+
+
 def test_o2_bubbler_cannot_exceed_total_pressure_or_double_book_passthrough() -> None:
     sim = _make_sim()
     _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
