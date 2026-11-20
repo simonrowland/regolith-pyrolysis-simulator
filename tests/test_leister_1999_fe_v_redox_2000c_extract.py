@@ -9,7 +9,10 @@ import yaml
 
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import Migrator
-from tests.literature_extract_test_helpers import iter_locators
+from tests.literature_extract_test_helpers import (
+    assert_all_physical_locators,
+    iter_locators,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -92,9 +95,8 @@ def test_render_transcribed_tables_bind_values_to_samples_and_conditions() -> No
     assert _table_grid(document, "2") == TABLE_2_RENDER
     assert _table_grid(document, "3") == TABLE_3_RENDER
 
-    for locator in iter_locators(document):
-        assert locator["page"] == locator["pdf_page_index"] + 1
-        assert "published_page" in locator
+    assert_all_physical_locators(document)
+    assert all("published_page" in locator for locator in iter_locators(document))
 
     for species, body in document["species"].items():
         for observation in body.get("observations", []):
@@ -127,6 +129,17 @@ def test_render_and_extract_cell_mutations_fail_table_binding() -> None:
     ] = "96"
     with pytest.raises(AssertionError):
         assert _table_grid(changed_extract, "2") == TABLE_2_RENDER
+
+
+def test_shared_physical_page_assertion_rejects_pdf_index_mutation() -> None:
+    document = _document()
+    assert_all_physical_locators(document)
+
+    mutated = deepcopy(document)
+    first_locator = next(iter_locators(mutated))
+    first_locator["pdf_page_index"] += 1
+    with pytest.raises(AssertionError):
+        assert_all_physical_locators(mutated)
 
 
 def test_isolated_migration_preserves_species_temperature_conditions_and_scored_values() -> None:
