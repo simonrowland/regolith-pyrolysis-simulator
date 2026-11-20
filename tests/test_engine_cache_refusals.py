@@ -3,13 +3,17 @@ import threading
 
 import pytest
 
-from engines.domain_reason import OutOfDomainReason
+from engines.domain_reason import OutOfDomainReason, STABLE_OUT_OF_DOMAIN_REASONS
 from simulator import engine_cache
 from simulator.melt_backend.base import _call_with_hard_timeout
 
 
 def test_deterministic_refusal_allowlist_is_explicit():
-    from simulator.engine_cache import CACHEABLE_REFUSAL_CODES
+    from simulator.engine_cache import (
+        CACHEABLE_REFUSAL_CODES,
+        EngineCacheValue,
+        cacheable_refusal,
+    )
     from simulator.melt_backend.vaporock import EMPTY_SPECIATION_STATUS_REASON
 
     assert CACHEABLE_REFUSAL_CODES == frozenset({
@@ -21,6 +25,23 @@ def test_deterministic_refusal_allowlist_is_explicit():
         OutOfDomainReason.SUM_PRESSURE_SANITY.value,
         EMPTY_SPECIATION_STATUS_REASON,
     })
+    assert OutOfDomainReason.SPECIATION_NO_FINITE_VALUES in (
+        STABLE_OUT_OF_DOMAIN_REASONS
+    )
+    reason = OutOfDomainReason.SPECIATION_NO_FINITE_VALUES.value
+    assert cacheable_refusal(EngineCacheValue(
+        {}, refusal_reason=reason, refusal_status="not_converged",
+    ))
+    assert cacheable_refusal({
+        "status": "refusal",
+        "refusal_reason": reason,
+        "engine_status": "not_converged",
+    })
+    assert not cacheable_refusal(EngineCacheValue(
+        {},
+        refusal_reason=OutOfDomainReason.NOT_CONVERGED.value,
+        refusal_status="not_converged",
+    ))
 
 
 def _vaporock_equilibrium_cache_call(kwargs, tmp_path, monkeypatch, *, available=True):
