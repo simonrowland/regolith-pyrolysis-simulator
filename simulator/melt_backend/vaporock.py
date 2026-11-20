@@ -239,7 +239,9 @@ EMPTY_SPECIATION_REASON_BY_CAUSE: Mapping[EmptySpeciationCause, str] = {
 EMPTY_SPECIATION_REASON = EMPTY_SPECIATION_REASON_BY_CAUSE[
     EmptySpeciationCause.NO_FINITE_VALUES
 ]
-EMPTY_SPECIATION_STATUS_REASON = 'speciation_no_finite_values'
+EMPTY_SPECIATION_STATUS_REASON = (
+    OutOfDomainReason.SPECIATION_NO_FINITE_VALUES.value
+)
 if set(EMPTY_SPECIATION_REASON_BY_CAUSE) != set(EmptySpeciationCause):
     raise RuntimeError(
         'EMPTY_SPECIATION_REASON_BY_CAUSE must cover every '
@@ -2258,7 +2260,9 @@ class VapoRockBackend(MeltBackend):
             projection_diagnostics['finite_prediction'] = False
             projection_diagnostics['empty_speciation_cause'] = cause.value
             projection_diagnostics['backend_status_reason'] = (
-                f'speciation_{cause.value}'
+                EMPTY_SPECIATION_STATUS_REASON
+                if cause is EmptySpeciationCause.NO_FINITE_VALUES
+                else f'speciation_{cause.value}'
             )
 
         # Hollow speciation did not produce a usable result. Status is

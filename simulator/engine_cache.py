@@ -305,7 +305,21 @@ CACHEABLE_REFUSAL_CODES = frozenset({
     OutOfDomainReason.INVALID_PRESSURE_BAR.value,
     OutOfDomainReason.INVALID_FO2_LOG.value,
     OutOfDomainReason.SUM_PRESSURE_SANITY.value,
+    OutOfDomainReason.SPECIATION_NO_FINITE_VALUES.value,
 })
+
+
+def _cacheable_refusal_status(
+    refusal_reason: str | None, status: str | None,
+) -> bool:
+    if status in {
+        None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok",
+    }:
+        return True
+    return (
+        refusal_reason == OutOfDomainReason.SPECIATION_NO_FINITE_VALUES.value
+        and status == "not_converged"
+    )
 
 
 def cacheable_refusal(result) -> bool:
@@ -313,15 +327,17 @@ def cacheable_refusal(result) -> bool:
         return (
             result.cacheable
             and result.refusal_reason in CACHEABLE_REFUSAL_CODES
-            and result.refusal_status in {
-                None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok",
-            }
+            and _cacheable_refusal_status(
+                result.refusal_reason, result.refusal_status,
+            )
         )
     return (
         isinstance(result, Mapping)
         and result.get("status") == "refusal"
         and result.get("refusal_reason") in CACHEABLE_REFUSAL_CODES
-        and result.get("engine_status") in {None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok"}
+        and _cacheable_refusal_status(
+            result.get("refusal_reason"), result.get("engine_status"),
+        )
         and not result.get("exit_signal")
         and not result.get("exit_code")
     )

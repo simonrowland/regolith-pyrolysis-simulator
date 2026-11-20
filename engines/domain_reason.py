@@ -31,6 +31,7 @@ class OutOfDomainReason(str, Enum):
     TEMPERATURE_RANGE = "temperature_range"
     LIQUID_STATE = "liquid_state"
     SUM_PRESSURE_SANITY = "sum_pressure_sanity"
+    SPECIATION_NO_FINITE_VALUES = "speciation_no_finite_values"
 
 
 TRANSIENT_OUT_OF_DOMAIN_REASONS = frozenset({
