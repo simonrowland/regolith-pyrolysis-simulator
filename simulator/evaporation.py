@@ -3569,6 +3569,7 @@ class EvaporationMixin:
             GateCurveProviderOutcome,
             gate_curve_memo_record,
             gate_curve_memo_is_cacheable,
+            gate_curve_provider_outcome_token,
             record_repair_notice,
         )
 
@@ -3862,7 +3863,9 @@ class EvaporationMixin:
                         'provider': self._liquid_fraction_provider,
                         'reason': 'liquid_fraction_provider_failed',
                         'detail': detail,
-                        'outcome': self._freeze_gate_provider_outcome,
+                        'outcome': gate_curve_provider_outcome_token(
+                            self._freeze_gate_provider_outcome,
+                        ),
                     },
                 )
 
@@ -4203,6 +4206,7 @@ class EvaporationMixin:
         from simulator.reduced_real_determinism import (
             GateCurveProviderOutcome,
             gate_curve_provider_outcome_for_status,
+            gate_curve_provider_outcome_token,
             gate_curve_provider_timeout_reason,
             mark_uncacheable_replay_disposition,
             record_gate_curve_provider_outcome,
@@ -4315,7 +4319,7 @@ class EvaporationMixin:
             failure = {
                 'provider': self._liquid_fraction_provider,
                 'reason': timeout_reason or 'liquid_fraction_provider_failed',
-                'outcome': status_outcome,
+                'outcome': gate_curve_provider_outcome_token(status_outcome),
                 'provider_diagnostic': diagnostic,
                 'status': status,
                 'warnings': warnings,
@@ -4401,7 +4405,7 @@ class EvaporationMixin:
                 held = self._hold_freeze_gate_provider_curve({
                     'provider': self._liquid_fraction_provider,
                     'status': status,
-                    'outcome': status_outcome,
+                    'outcome': gate_curve_provider_outcome_token(status_outcome),
                     'provider_diagnostic': {
                         **diagnostic,
                         'backend_status_reason': invalid_notice['reason'],
