@@ -477,6 +477,98 @@ def test_magemin_liner_curve_and_state_keep_evaluated_silica_notice():
         and "warnings=" in flag
         for flag in state["flags"]
     )
+
+    in_band_state = build_liner_state_segment(
+        {
+            "composition": {"SiO2": 40.0, "MgO": 60.0},
+            "criterion_tier": "B",
+            "density_kg_m3": 1000.0,
+            "reacted_layer_depth_m": 0.001,
+            "margin_C": 0.0,
+            "horizon_campaigns": 0,
+            "porosity_fraction": 0.0,
+        },
+        {"Na": 0.0},
+        area_m2=1.0,
+        service_temperature_C=1500.0,
+        pressure_bar=1.0e-6,
+        sampler=sampler,
+        deposit_inert_kg_by_species={"Na": 0.0},
+        deposit_reactive_kg_by_species={"Na": 0.0},
+    )
+    assert liner_corrosion.MAGEMIN_SILICA_EXTRAPOLATED_FLAG not in (
+        in_band_state["flags"]
+    )
+    sampler.close()
+
+
+@pytest.mark.parametrize("cache_layer", ["point", "curve"])
+def test_magemin_liner_silica_verdict_splits_rounded_cache_keys(cache_layer):
+    backend = _FakeMageminBackend()
+    sampler = MageminLinerSampler(backend)
+    in_band = {"SiO2": 30.0000001, "MgO": 69.9999999}
+    out_of_band = {"SiO2": 29.9999999, "MgO": 70.0000001}
+    temperature = 1500.0
+    pressure = 1.0e-6
+
+    if cache_layer == "point":
+        sampler(in_band, temperature, pressure)
+        calls_after_in_band_fill = len(backend.calls)
+        sampler(out_of_band, temperature, pressure)
+
+        assert len(backend.calls) == calls_after_in_band_fill + 1
+        assert sampler.sample_diagnostics(
+            out_of_band, temperature, pressure
+        )["authority"] == "extrapolated"
+    else:
+        si_o_equivalent = liner_corrosion.deposit_oxide_equivalent_mass_by_oxide(
+            {"SiO": 1.0}
+        )["SiO2"]
+        mg_equivalent = liner_corrosion.deposit_oxide_equivalent_mass_by_oxide(
+            {"Mg": 1.0}
+        )["MgO"]
+        deposit = {
+            "SiO": 30.0000001 / si_o_equivalent,
+            "Mg": 69.9999999 / mg_equivalent,
+        }
+        in_band_curve, in_band_metadata = sampler._curve_with_metadata(
+            in_band,
+            deposit,
+            temperature_C=temperature,
+            pressure_bar=pressure,
+        )
+        assert in_band_metadata == {}
+        calls_after_in_band_fill = len(backend.calls)
+        cached_in_band_curve, cached_in_band_metadata = sampler._curve_with_metadata(
+            in_band,
+            deposit,
+            temperature_C=temperature,
+            pressure_bar=pressure,
+        )
+        assert cached_in_band_curve is in_band_curve
+        assert cached_in_band_metadata == {}
+
+        out_of_band_curve = sampler.curve(
+            out_of_band,
+            deposit,
+            temperature_C=temperature,
+            pressure_bar=pressure,
+        )
+
+        assert out_of_band_curve is not in_band_curve
+        assert len(sampler._curve_cache) == 2
+        assert len(backend.calls) > calls_after_in_band_fill
+        cached_out_of_band_curve, out_of_band_metadata = (
+            sampler._curve_with_metadata(
+                out_of_band,
+                deposit,
+                temperature_C=temperature,
+                pressure_bar=pressure,
+            )
+        )
+        assert cached_out_of_band_curve is out_of_band_curve
+        assert out_of_band_metadata["authority"] == "extrapolated"
+
     sampler.close()
 
 
@@ -886,7 +978,11 @@ def test_tier_b_saturation_uses_continuity_corrected_curve_for_x_star():
     assert middle_reference["engine_composition_sensitive"][
         "neighbour_brackets_C"
     ] == [[1400.0, 1425.0], [1400.0, 1425.0]]
-    x_star, continuity_evidence = liner_corrosion._tier_b_saturated_deposit_fraction(
+    (
+        x_star,
+        continuity_evidence,
+        curve_metadata,
+    ) = liner_corrosion._tier_b_saturated_deposit_fraction(
         sampler,
         liner,
         {"Na": 1.0},
@@ -907,6 +1003,7 @@ def test_tier_b_saturation_uses_continuity_corrected_curve_for_x_star():
     assert continuity_evidence[0]["engine_composition_sensitive"][
         "neighbour_brackets_C"
     ] == [[1400.0, 1425.0], [1400.0, 1425.0]]
+    assert curve_metadata == {}
 
     segment = liner_corrosion.build_liner_state_segment(
         {
@@ -1014,7 +1111,7 @@ def test_tier_b_saturation_accepts_agreeing_all_liquid_profile():
     pure_reference = liner_corrosion._tier_b_reference_profile(
         sampler, liner, pressure_bar=1.0
     )
-    x_star, evidence = liner_corrosion._tier_b_saturated_deposit_fraction(
+    x_star, evidence, curve_metadata = liner_corrosion._tier_b_saturated_deposit_fraction(
         sampler,
         liner,
         {"Na": 1.0},
@@ -1027,6 +1124,7 @@ def test_tier_b_saturation_accepts_agreeing_all_liquid_profile():
     # the nominal cached phi(f) table remains usable without a bulk jump.
     assert x_star == pytest.approx(0.009991)
     assert evidence == []
+    assert curve_metadata == {}
 
 
 def test_tier_b_shared_continuity_selects_agreeing_flat_neighbours():
@@ -2540,6 +2638,11 @@ def test_production_liner_metadata_path_reports_bounded_campaign_interval(monkey
                 pressure_bar=pressure_bar,
                 points=points,
             )
+
+        def _curve_with_metadata(self, *args, **kwargs):
+            return self.curve(*args, **kwargs), {
+                "flags": ["engine_phase_closure_unverified"]
+            }
 
         def close(self):
             pass
