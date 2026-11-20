@@ -23,37 +23,17 @@ def test_deterministic_refusal_allowlist_is_explicit():
     })
 
 
-@pytest.mark.parametrize(
-    "code",
-    [
-        OutOfDomainReason.FORBIDDEN_SPECIES.value,
-        OutOfDomainReason.TEMPERATURE_RANGE.value,
-        OutOfDomainReason.LIQUID_STATE.value,
-        OutOfDomainReason.INVALID_PRESSURE_BAR.value,
-        OutOfDomainReason.INVALID_FO2_LOG.value,
-        OutOfDomainReason.NON_FINITE_COMPOSITION.value,
-        OutOfDomainReason.SUM_PRESSURE_SANITY.value,
-    ],
-)
-def test_vaporock_domain_refusal_hits_after_equilibrium_hot_round_trip(
-    code, tmp_path, monkeypatch,
-):
+def _vaporock_equilibrium_cache_call(result, tmp_path, monkeypatch):
     from simulator.diagnostic_helpers.binary_pot_battery import (
         EngineHandle,
         _call_cached_backend_equilibrate,
     )
-    from simulator.melt_backend.base import EquilibriumResult
 
     path = tmp_path / "cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
     engine_cache.engine_cache_counters(reset=True)
     engine_cache._MEMORY_CACHE.clear()
-    result = EquilibriumResult(
-        phase_assemblage_available=False,
-        status="out_of_domain",
-        diagnostics={"backend_status_reason": code},
-    )
     handle = EngineHandle(
         name="vaporock",
         backend=object(),
@@ -79,9 +59,38 @@ def test_vaporock_domain_refusal_hits_after_equilibrium_hot_round_trip(
         calls.append(1)
         return result
 
-    cold = _call_cached_backend_equilibrate(handle, kwargs, solve)
+    return _call_cached_backend_equilibrate, handle, kwargs, calls, solve
+
+
+@pytest.mark.parametrize(
+    "code",
+    [
+        OutOfDomainReason.FORBIDDEN_SPECIES.value,
+        OutOfDomainReason.TEMPERATURE_RANGE.value,
+        OutOfDomainReason.LIQUID_STATE.value,
+        OutOfDomainReason.INVALID_PRESSURE_BAR.value,
+        OutOfDomainReason.INVALID_FO2_LOG.value,
+        OutOfDomainReason.NON_FINITE_COMPOSITION.value,
+        OutOfDomainReason.SUM_PRESSURE_SANITY.value,
+    ],
+)
+def test_vaporock_domain_refusal_hits_after_equilibrium_hot_round_trip(
+    code, tmp_path, monkeypatch,
+):
+    from simulator.melt_backend.base import EquilibriumResult
+
+    result = EquilibriumResult(
+        phase_assemblage_available=False,
+        status="out_of_domain",
+        diagnostics={"backend_status_reason": code},
+    )
+    cached_call, handle, kwargs, calls, solve = _vaporock_equilibrium_cache_call(
+        result, tmp_path, monkeypatch
+    )
+
+    cold = cached_call(handle, kwargs, solve)
     engine_cache._MEMORY_CACHE.clear()
-    warm = _call_cached_backend_equilibrate(
+    warm = cached_call(
         handle, kwargs, lambda: pytest.fail("refusal was not stored")
     )
 
@@ -103,49 +112,19 @@ def test_vaporock_domain_refusal_hits_after_equilibrium_hot_round_trip(
 def test_vaporock_transient_refusal_is_not_stored(
     status, code, tmp_path, monkeypatch,
 ):
-    from simulator.diagnostic_helpers.binary_pot_battery import (
-        EngineHandle,
-        _call_cached_backend_equilibrate,
-    )
     from simulator.melt_backend.base import EquilibriumResult
 
-    path = tmp_path / "cache.sqlite"
-    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
-    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
-    engine_cache.engine_cache_counters(reset=True)
-    engine_cache._MEMORY_CACHE.clear()
     result = EquilibriumResult(
         phase_assemblage_available=False,
         status=status,
         diagnostics={"backend_status_reason": code},
     )
-    handle = EngineHandle(
-        name="vaporock",
-        backend=object(),
-        available=True,
-        unavailable_reason=None,
-        takes_fo2=True,
-        supports_intrinsic_fo2=True,
-        engine_settings={
-            "temperature_units": "C",
-            "pressure_units": "bar",
-            "vapor_pressure_units": "Pa",
-        },
+    cached_call, handle, kwargs, calls, solve = _vaporock_equilibrium_cache_call(
+        result, tmp_path, monkeypatch
     )
-    kwargs = {
-        "temperature_C": 1600.0,
-        "composition_kg": {"SiO2": 1.0},
-        "pressure_bar": 1.0,
-        "fO2_log": -8.0,
-    }
-    calls = []
-
-    def solve():
-        calls.append(1)
-        return result
 
     for _ in range(2):
-        _call_cached_backend_equilibrate(handle, kwargs, solve)
+        cached_call(handle, kwargs, solve)
         engine_cache._MEMORY_CACHE.clear()
 
     assert len(calls) == 2
@@ -285,6 +264,21 @@ def test_bulk_loader_rejects_transient_refusals(tmp_path):
         engine_cache.load_cache_rows(tmp_path / "cache.sqlite", [(
             key, {"status": "refusal", "refusal_reason": "engine_timeout"},
             "alphamelts", 2, "laptop", 1,
+        )])
+
+
+def test_bulk_loader_rejects_typed_transient_equilibrium_refusal(tmp_path):
+    from simulator.engine_cache import EngineCacheValue
+
+    key = engine_cache.engine_cache_key("vaporock", 1, {})
+    transient = EngineCacheValue(
+        ["not_converged"],
+        refusal_reason=OutOfDomainReason.NOT_CONVERGED.value,
+        refusal_status="not_converged",
+    )
+    with pytest.raises(ValueError, match="refusal code is not cacheable"):
+        engine_cache.load_cache_rows(tmp_path / "cache.sqlite", [(
+            key, transient, "vaporock", 1, "laptop", 1,
         )])
 
 
