@@ -59,7 +59,8 @@ class EnergyTracker:
                        overhead: OverheadGas,
                        evap_flux: EvaporationFlux,
                        mre_kWh: float = 0.0,
-                       vapor_pressures: dict | None = None) -> EnergyRecord:
+                       vapor_pressures: dict | None = None,
+                       dt_h: float = 1.0) -> EnergyRecord:
         """
         Calculate electrical energy consumed this hour.
 
@@ -118,6 +119,18 @@ class EnergyTracker:
         record.evaporation_sources = dict(thermal_budget["sources"])
 
         record.sum_scoped_energy()
+        # Power times one hour is the record above. A shorter step scales
+        # those terms. mre_kWh is already the Faraday integral over dt.
+        if dt_h != 1.0:
+            record.turbine_kWh *= dt_h
+            record.condenser_kWh *= dt_h
+            record.latent_kWh *= dt_h
+            record.dissociation_kWh *= dt_h
+            record.evaporation_breakdown_kWh = {
+                key: value * dt_h
+                for key, value in record.evaporation_breakdown_kWh.items()
+            }
+            record.sum_scoped_energy()
 
         # Track cumulative
         self.cumulative_kWh += record.electrical_plus_evaporation_kWh
