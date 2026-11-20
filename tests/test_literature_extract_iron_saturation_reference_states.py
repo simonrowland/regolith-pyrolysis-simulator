@@ -10,7 +10,7 @@ from simulator.battery.enums import Authority, Quantity
 from simulator.battery.records import Located, StandardState
 from simulator.battery.score import iron_saturation_composition, temperature_of
 from tests.battery.test_migrate import _migrate_real_extract
-from tests.locator_assertions import canonical_source_locations
+from tests.locator_assertions import historical_source_locations, strict_source_locations
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -64,8 +64,8 @@ def test_reference_sources_migrate_in_isolation_with_conditions(
     extract = yaml.safe_load(
         (ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text(encoding="utf-8")
     )
-    baseline_rows = canonical_source_locations(baseline_rows, extract)
-    isolated_rows = canonical_source_locations(isolated_rows, extract)
+    baseline_rows = historical_source_locations(baseline_rows, extract)
+    isolated_rows = strict_source_locations(isolated_rows)
     mismatches = sorted(
         observation_id
         for observation_id, before in baseline_rows.items()

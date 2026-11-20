@@ -220,8 +220,7 @@ def test_distinct_locator_extras_round_trip_without_becoming_note() -> None:
         "additional_page": 3,
         "additional_published_page": "iv",
         "continued_page": 103,
-        "repaired_table_path": "tables/repaired.csv",
-        "quote": {"text": "same value, different locator fact"},
+        "continuation_pdf_page_index": 104,
     }
     locator = _locator_from_plain(
         {"page": 2, "published_page": 10, **extras}, refuse_invalid=True
@@ -954,24 +953,93 @@ def test_compilation_generator_refusal_mutation_is_detected_for_every_route(
     import importlib
 
     migrate_module = importlib.import_module("simulator.battery.migrate")
-    find_unknown = migrate_module._locator_mapping_first_unsupported_key
+    decode = migrate_module._locator_from_plain
 
-    def ignore_unknown(payload: object) -> str | None:
-        if isinstance(payload, dict) and "unreviewed_locator_axis" in payload:
-            return None
-        return find_unknown(payload)
+    def accept_unknown(payload: object, *, refuse_invalid: bool = False):
+        if refuse_invalid and isinstance(payload, dict) and "unreviewed_locator_axis" in payload:
+            return Locator(page=2)
+        return decode(payload, refuse_invalid=refuse_invalid)
 
     with monkeypatch.context() as mutation:
         mutation.setattr(
             migrate_module,
-            "_locator_mapping_first_unsupported_key",
-            ignore_unknown,
+            "_locator_from_plain",
+            accept_unknown,
         )
         for relative_path, _expected_count in _COMPILATION_GENERATOR_RECORDS:
             with pytest.raises(AssertionError):
                 _assert_compilation_generator_refuses_unknown_locator(
                     tmp_path / Path(relative_path).stem, relative_path
                 )
+
+
+@pytest.mark.parametrize(
+    "relative_path",
+    (
+        _UPSTREAM_COMPILATION_RECORDS[0],
+        _COMPILATION_GENERATOR_RECORDS[0][0],
+    ),
+    ids=("generic", "generator"),
+)
+def test_compilation_conflicting_page_aliases_refuse_before_dispatch(
+    tmp_path: Path, relative_path: str,
+) -> None:
+    _assert_compilation_conflicting_alias_refusal(tmp_path, relative_path)
+
+
+def test_compilation_alias_refusal_mutation_is_detected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery import migrate as migrate_module
+
+    decode = migrate_module._locator_from_plain
+
+    def accept_conflicting_compilation_aliases(
+        payload: object, *, refuse_invalid: bool = False
+    ):
+        if (
+            refuse_invalid
+            and isinstance(payload, dict)
+            and payload.get("page") == 5
+            and payload.get("pdf_page") == 7
+        ):
+            return Locator(page=5)
+        return decode(payload, refuse_invalid=refuse_invalid)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            migrate_module, "_locator_from_plain",
+            accept_conflicting_compilation_aliases,
+        )
+        for relative_path in (
+            _UPSTREAM_COMPILATION_RECORDS[0],
+            _COMPILATION_GENERATOR_RECORDS[0][0],
+        ):
+            with pytest.raises(AssertionError):
+                _assert_compilation_conflicting_alias_refusal(
+                    tmp_path / Path(relative_path).stem, relative_path
+                )
+
+
+def _assert_compilation_conflicting_alias_refusal(
+    tmp_path: Path, relative_path: str,
+) -> None:
+    source_path = REPO_ROOT / relative_path
+    source_doc = _load_compilation_document(source_path)
+    source_doc["source_locator"] = {"page": 5, "pdf_page": 7}
+    path = tmp_path / relative_path
+    path.parent.mkdir(parents=True)
+    _write_compilation_document(path, source_doc)
+    migrator = Migrator(root=tmp_path, index={}, aliases={})
+
+    migrator._migrate_compilation_file(path)
+
+    assert migrator.result.observations == {}
+    assert len(migrator.result.registry_issues) == 1
+    issue = migrator.result.registry_issues[0]
+    assert issue.reason is RefusalReason.INVALID_SOURCE
+    assert issue.path.endswith(".source_locator")
+    assert "conflicting locator fields:" in issue.detail
 
 
 def _assert_compilation_generator_refuses_unknown_locator(

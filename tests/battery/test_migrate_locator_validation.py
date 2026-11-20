@@ -128,3 +128,31 @@ def test_real_source_regressions_detect_reverted_emission(failure, source_id, mo
             test_real_source_locator_refusals_preserve_independent_anchors(
                 source_id, dict(_SOURCE_REFUSALS)[source_id]
             )
+
+
+def test_nested_explicit_extra_unknown_key_fails_persisted_reader(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    locator = {"page": 5, "extras": {"unreviewed_locator_axis": "value"}}
+    payload = {"observation": {"locator": locator}}
+    with pytest.raises(ValueError, match="extras.unreviewed_locator_axis"):
+        m._validate_persisted_locator_mappings(payload)
+
+    first_unsupported = m._locator_mapping_first_unsupported_key
+
+    def outer_keys_only(raw: object) -> str | None:
+        if isinstance(raw, dict):
+            return next(
+                (
+                    str(key) for key in raw
+                    if not m._locator_key_is_supported(str(key))
+                ),
+                None,
+            )
+        return first_unsupported(raw)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(m, "_locator_mapping_first_unsupported_key", outer_keys_only)
+        with pytest.raises(pytest.fail.Exception):
+            with pytest.raises(ValueError, match="extras.unreviewed_locator_axis"):
+                m._validate_persisted_locator_mappings(payload)

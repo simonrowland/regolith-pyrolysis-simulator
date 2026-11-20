@@ -1435,17 +1435,22 @@ def _locator_key_is_supported(name: str) -> bool:
 
 
 def _locator_mapping_first_unsupported_key(payload: object) -> str | None:
-    """Return the first unrecognized key without resolving alias conflicts."""
+    """Return the first unsupported outer or explicitly nested locator fact."""
     if not isinstance(payload, Mapping):
         return None
-    return next(
-        (
-            str(name)
-            for name in payload
-            if not _locator_key_is_supported(str(name))
-        ),
-        None,
-    )
+    for raw_name, value in payload.items():
+        name = str(raw_name)
+        if not _locator_key_is_supported(name):
+            return name
+        if name == "extras" and isinstance(value, Mapping):
+            for extra_name in value:
+                if not isinstance(extra_name, str):
+                    return f"extras.{extra_name!r}"
+                if extra_name != "source_sha256" and not _locator_key_is_supported(
+                    extra_name
+                ):
+                    return f"extras.{extra_name}"
+    return None
 
 
 def _locator_mapping_keys_are_supported(payload: object) -> bool:
@@ -1709,6 +1714,10 @@ def _decode_locator_from_plain(
         return payload
     if not _is_mapping(payload):
         return Locator(note=str(payload))
+    if reject_unknown:
+        unsupported = _locator_mapping_first_unsupported_key(payload)
+        if unsupported is not None:
+            raise _InvalidLocator(f"unknown locator key {unsupported!r}")
     kwargs: dict[str, object] = {}
     target_sources: dict[str, tuple[str, object]] = {}
     extra_values: dict[str, object] = {}
@@ -33399,11 +33408,9 @@ class Migrator:
                     if isinstance(row, Mapping):
                         require_rail_if_stated(row)
         loc_raw = doc.get("source_locator")
-        unknown_locator_key = _locator_mapping_first_unsupported_key(loc_raw)
-        if unknown_locator_key is not None:
-            exc = _InvalidLocator(
-                f"unknown locator key {unknown_locator_key!r}"
-            )
+        try:
+            _locator_from_plain(loc_raw, refuse_invalid=True)
+        except _InvalidLocator as exc:
             self.result.registry_issues.append(
                 ValidationIssue(
                     path=f"compilation[{rel}].source_locator",

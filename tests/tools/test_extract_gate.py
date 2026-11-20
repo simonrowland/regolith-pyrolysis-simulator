@@ -416,6 +416,39 @@ def test_locator_requires_zero_based_pdf_page_index(tmp_path: Path):
     assert any("pdf_page_index" in finding.detail for finding in report.findings)
 
 
+def test_explicit_extras_unknown_key_fails_extract_validator(monkeypatch):
+    from simulator.battery import migrate as migrate_module
+
+    doc = _document()
+    locator = doc["species"]["Fe"]["observations"][0]["locator"]
+    locator["extras"] = {"unreviewed_locator_axis": "value"}
+
+    def assert_locator_is_rejected() -> None:
+        errors = validator.validate_extract_document(doc)
+        assert any("locator" in error for error in errors)
+
+    assert_locator_is_rejected()
+    first_unsupported = migrate_module._locator_mapping_first_unsupported_key
+
+    def outer_keys_only(payload: object) -> str | None:
+        if isinstance(payload, dict):
+            return next(
+                (
+                    str(key) for key in payload
+                    if not migrate_module._locator_key_is_supported(str(key))
+                ),
+                None,
+            )
+        return first_unsupported(payload)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            migrate_module, "_locator_mapping_first_unsupported_key", outer_keys_only
+        )
+        with pytest.raises(AssertionError):
+            assert_locator_is_rejected()
+
+
 def test_datetime_extraction_date_does_not_raise(tmp_path: Path):
     from datetime import datetime
 

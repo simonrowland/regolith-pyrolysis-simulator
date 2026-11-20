@@ -7,7 +7,7 @@ from simulator.battery.migrate import _locator_from_plain, to_plain
 from simulator.battery.records import Locator
 
 
-def canonical_source_locations(payload: object, extract: dict) -> object:
+def historical_source_locations(payload: object, extract: dict) -> object:
     # The committed siblings predate these five fields. Match their entire
     # historical locator to its source, including the old flattened note;
     # never discard locations or infer a row from an ungrounded note fragment.
@@ -84,3 +84,19 @@ def canonical_source_locations(payload: object, extract: dict) -> object:
         return value
 
     return normalize(payload, None, {})
+
+
+def strict_source_locations(payload: object) -> object:
+    """Decode serialized locators without inferring any omitted source facts."""
+    if isinstance(payload, dict):
+        return {
+            key: (
+                to_plain(_locator_from_plain(value, refuse_invalid=True))
+                if key in {"locator", "source_locator"}
+                else strict_source_locations(value)
+            )
+            for key, value in payload.items()
+        }
+    if isinstance(payload, list):
+        return [strict_source_locations(value) for value in payload]
+    return payload

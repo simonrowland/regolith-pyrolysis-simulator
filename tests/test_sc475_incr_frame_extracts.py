@@ -10,7 +10,8 @@ from simulator.battery import migrate as migrate_module
 from simulator.battery import schema_gap as schema_gap_module
 from simulator.battery.migrate import Migrator
 from simulator.battery.validate import validate_corpus
-from tests.locator_assertions import canonical_source_locations
+from tests import locator_assertions
+from tests.locator_assertions import historical_source_locations, strict_source_locations
 
 ROOT = Path(__file__).resolve().parents[1]
 pytestmark = pytest.mark.timeout(300)
@@ -3068,7 +3069,45 @@ def test_non_sc475_kelley_series_store_matches_green_without_decided_by(tmp_path
     green_store = ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml"
     before = yaml.safe_load(green_store.read_text(encoding="utf-8"))
     after = yaml.safe_load(migrated_store.read_text(encoding="utf-8"))
-    assert canonical_source_locations(after, extract) == canonical_source_locations(before, extract)
+    assert strict_source_locations(after) == historical_source_locations(before, extract)
+
+
+def test_fixed_point_detects_dropped_structured_coordinate(monkeypatch):
+    extract = {
+        "species": {
+            "Fe": {
+                "observations": [
+                    {"observation_id": "row1", "locator": {"page": 5, "row": "R"}}
+                ]
+            }
+        }
+    }
+    correct = {
+        "observations": [
+            {"observation_id": "paper::row1", "locator": {"page": 5, "row": "R"}}
+        ]
+    }
+    dropped = {
+        "observations": [
+            {"observation_id": "paper::row1", "locator": {"page": 5}}
+        ]
+    }
+
+    def assert_coordinate_loss_is_visible() -> None:
+        assert strict_source_locations(correct) != strict_source_locations(dropped)
+
+    assert_coordinate_loss_is_visible()
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            locator_assertions,
+            "strict_source_locations",
+            lambda payload: historical_source_locations(payload, extract),
+        )
+        # The old source-inferred comparison makes both payloads look complete.
+        with pytest.raises(AssertionError):
+            assert locator_assertions.strict_source_locations(correct) != (
+                locator_assertions.strict_source_locations(dropped)
+            )
 
 
 def test_kelley_fixed_point_detects_corrupt_serialized_location(tmp_path, monkeypatch):
