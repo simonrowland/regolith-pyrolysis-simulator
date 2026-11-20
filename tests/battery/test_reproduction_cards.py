@@ -121,7 +121,12 @@ def test_real_inventory_and_foreign_keys(store, source, count):
         assert len(ids) == len(set(ids))
         assert all(oid in store[2] for oid in ids)
         entries = frozen["entries"]
-        assert all(resolve_path(scope, entry["ref"]) == entry["resolved"] for entry in entries)
+        stale_entries = [
+            (entry["ref"], entry["resolved"], resolved)
+            for entry in entries
+            if (resolved := resolve_path(scope, entry["ref"])) != entry["resolved"]
+        ]
+        assert not stale_entries, (source, run["card_id"], stale_entries)
         for eid in run["experiment_ids"]:
             selected_paths = {tuple(entry["ref"][2:]) for entry in entries
                               if entry["ref"][:2] == ["experiments", eid]}

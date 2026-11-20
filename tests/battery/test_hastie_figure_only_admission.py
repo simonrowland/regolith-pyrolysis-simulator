@@ -181,7 +181,8 @@ def test_hastie_figure_rows_without_supported_inputs_keep_typed_refusals(
         if observation.source_id == SOURCE_ID
         and observation.identity.quantity.is_unknown
     )
-    assert len(unsupported_quantity_rows) == 81
+    # qu retargeted twelve Hastie unsupported-quantity rows to context.
+    assert len(unsupported_quantity_rows) == 69
     for row in unsupported_quantity_rows:
         for engine in SCORING_ENGINES:
             prediction = predict_with_engine(
@@ -297,7 +298,20 @@ def test_hastie_fig4_rows_reach_outer_compiler_and_keep_both_flags(tmp_path) -> 
             assert gates.primary_check == "in_cell_partial_pressure_sum"
             assert [
                 check.name for check in gates.checks if not check.passed
-            ] == ["in_cell_partial_pressure_sum"]
+            ] == ["in_cell_partial_pressure_sum", "method"]
+            method_check = next(
+                check for check in gates.checks if check.name == "method"
+            )
+            assert not method_check.passed
+            assert method_check.detail["reason"] == experiment.method.reason
+            assert (
+                _missing_apparatus_fact(
+                    method_check,
+                    allow_calibration=False,
+                    allow_unknown_method=True,
+                )
+                == "method_unknown"
+            )
             assert not pressure_sum_check.passed
             assert (
                 pressure_sum_check.detail["reason"]
@@ -307,11 +321,6 @@ def test_hastie_fig4_rows_reach_outer_compiler_and_keep_both_flags(tmp_path) -> 
                 pressure_sum_check.detail.get("printed_partial_pressure_sum_Pa")
                 is None
             )
-            calibration_check = next(
-                check for check in gates.checks if check.name == "kems_calibration"
-            )
-            assert calibration_check.passed
-            assert calibration_check.detail["flag"] == "calibration_not_grounded"
             assert (
                 _missing_apparatus_fact(
                     pressure_sum_check,
@@ -335,7 +344,7 @@ def test_hastie_fig4_rows_reach_outer_compiler_and_keep_both_flags(tmp_path) -> 
                 and _missing_apparatus_fact(
                     check,
                     allow_calibration=False,
-                    allow_unknown_method=False,
+                    allow_unknown_method=True,
                 )
                 is None
             )
@@ -346,6 +355,18 @@ def test_hastie_fig4_rows_reach_outer_compiler_and_keep_both_flags(tmp_path) -> 
             )
             assert any(
                 notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+                for notice in apparatus_notices
+            ), (row.observation_id, gates.checks, apparatus_notices)
+            assert any(
+                notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+                and notice.reason.startswith("method_unknown:")
+                for notice in apparatus_notices
+            ), (row.observation_id, gates.checks, apparatus_notices)
+            assert any(
+                notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+                and notice.reason.startswith(
+                    "apparatus_unverified:in_cell_partial_pressure_sum;"
+                )
                 for notice in apparatus_notices
             ), (row.observation_id, gates.checks, apparatus_notices)
             residual, _candidate = compile_residual(

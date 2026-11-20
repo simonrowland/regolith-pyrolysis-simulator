@@ -2177,7 +2177,7 @@ def _unverified_apparatus_notices(
     experiment: Experiment | None,
     gates: GateOutcome,
 ) -> tuple[Notice, ...]:
-    """Return the narrow predict-and-flag admission for printed KEMS rows."""
+    """Return apparatus notices for KEMS rows and unknown-method figure pressures."""
 
     if experiment is None:
         return ()
@@ -2216,6 +2216,11 @@ def _unverified_apparatus_notices(
         and isinstance(reference_state.value, StandardState)
         and phase_token(reference_state.value.endmember) in CONDENSED_PHASES
     )
+    figure_only_partial_pressure = (
+        quantity is Quantity.P_PARTIAL
+        and reference.evidence.class_.is_value
+        and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+    )
     unknown_method_activity = (
         experiment.method.is_unknown
         and gates.reason is RefusalReason.METHOD_UNKNOWN
@@ -2223,7 +2228,12 @@ def _unverified_apparatus_notices(
         and author_reported_activity
         and typed_condensed_reference
     )
-    if not unknown_method_activity and (
+    unknown_method_figure_only_pressure = (
+        experiment.method.is_unknown
+        and gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        and figure_only_partial_pressure
+    )
+    if not unknown_method_activity and not unknown_method_figure_only_pressure and (
         not experiment.method.is_value
         or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
     ):
@@ -2244,11 +2254,6 @@ def _unverified_apparatus_notices(
         and author_reported_pressure
         and reference.evidence.class_.is_value
         and reference.evidence.class_.value in MEASURED_EVIDENCE
-    )
-    figure_only_partial_pressure = (
-        quantity is Quantity.P_PARTIAL
-        and reference.evidence.class_.is_value
-        and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
     )
     calibration_flagged_partial_pressure = (
         quantity is Quantity.P_PARTIAL
@@ -2307,7 +2312,9 @@ def _unverified_apparatus_notices(
             allow_calibration=allow_calibration,
             allow_missing_calibration=kems_activity,
             allow_missing_geometry=kems_activity,
-            allow_unknown_method=unknown_method_activity,
+            allow_unknown_method=(
+                unknown_method_activity or unknown_method_figure_only_pressure
+            ),
         )
         if fact is None:
             return ()
@@ -2356,26 +2363,28 @@ def _unverified_apparatus_notices(
                 )
             )
             continue
+        if fact == "calibration_not_grounded":
+            reason = (
+                f"calibration_not_grounded: "
+                f"{calibration_notice or 'Calibration is not grounded.'}"
+                + (f" ({calibration_reason})" if calibration_reason else "")
+            )
+        elif fact == "method_unknown" and unknown_method_activity:
+            reason = (
+                "method_unknown: published activity has a typed condensed "
+                "reference but its experiment method is not stated"
+            )
+        elif fact == "method_unknown":
+            reason = "method_unknown: " + str(
+                detail.get("reason") or "pressure series method is not stated"
+            )
+        else:
+            reason = f"apparatus_unverified:{fact}"
         notices.append(
             Notice(
                 kind=NoticeKind.UNVERIFIED_APPARATUS,
                 affected_quantities=(quantity,),
-                reason=(
-                "calibration_not_grounded: "
-                f"{calibration_notice or 'Calibration is not grounded.'}"
-                + (
-                    f" ({calibration_reason})"
-                    if calibration_reason
-                    else ""
-                )
-                if fact == "calibration_not_grounded"
-                else (
-                    "method_unknown: published activity has a typed condensed "
-                    "reference but its experiment method is not stated"
-                    if fact == "method_unknown"
-                    else f"apparatus_unverified:{fact}"
-                )
-                ),
+                reason=reason,
                 origin=reference.observation_id,
             )
         )
