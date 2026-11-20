@@ -225,10 +225,13 @@ def test_native_fe_alias_matches_per_oxide_extent_map(formula_registry):
     assert mapped.transition.reason == "melt_metal_saturation_buffer"
     assert dict(legacy.transition.debits) == dict(mapped.transition.debits)
     assert dict(legacy.transition.credits) == dict(mapped.transition.credits)
+    assert legacy.transition.credits["terminal.drain_tap_material"]["Fe"] == pytest.approx(
+        1.25
+    )
     _atom_check(mapped.transition, formula_registry, tol=1e-12)
 
 
-def test_metal_extent_map_routes_ni_co_fe_and_oxygen_to_buffer(
+def test_metal_extent_map_routes_ni_fe_and_oxygen_to_buffer(
     formula_registry,
 ):
     result = BuiltinNativeFeSaturationProvider().dispatch(
@@ -237,14 +240,12 @@ def test_metal_extent_map_routes_ni_co_fe_and_oxygen_to_buffer(
             {
                 "process.cleaned_melt": {
                     "NiO": 2.0,
-                    "CoO": 2.0,
                     "FeO": 2.0,
                 },
             },
             control_inputs={
                 "metal_extent_mol_by_oxide": {
                     "NiO": 0.5,
-                    "CoO": 0.25,
                     "FeO": 0.75,
                 },
                 "oxygen_account": "reservoir.fo2_buffer",
@@ -257,7 +258,6 @@ def test_metal_extent_map_routes_ni_co_fe_and_oxygen_to_buffer(
     assert dict(result.transition.debits) == {
         "process.cleaned_melt": {
             "NiO": 0.5,
-            "CoO": 0.25,
             "FeO": 0.75,
         },
     }
@@ -265,7 +265,6 @@ def test_metal_extent_map_routes_ni_co_fe_and_oxygen_to_buffer(
         "reservoir.fo2_buffer": {"O2": 0.75},
         "terminal.drain_tap_material": {
             "Ni": 0.5,
-            "Co": 0.25,
             "Fe": 0.75,
         },
     }
@@ -279,6 +278,7 @@ def test_metal_extent_map_routes_ni_co_fe_and_oxygen_to_buffer(
     [
         ("NiO", -0.1, 1.0, "negative_metal_extent"),
         ("NiO", 1.1, 1.0, "oxide_inventory_exceeded"),
+        ("CoO", 0.1, 1.0, "unsupported_oxide"),
         ("Na2O", 0.1, 1.0, "unsupported_oxide"),
     ],
 )
