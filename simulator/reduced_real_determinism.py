@@ -109,8 +109,9 @@ APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
 )
 _CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
 # One production record for an abandoned freeze-gate dispatch. Digests drop
-# this key whole. It is not curve identity: cache and store payloads omit
-# the environment keys, and replay does not restore them.
+# this key whole. It is not curve identity: memo records, cache compares,
+# and store payloads omit the environment keys. The live curve of the hour
+# that retried keeps them, and replay does not restore them.
 ENVIRONMENT_RETRIES_KEY = 'environment_retries'
 GATE_CURVE_ENVIRONMENT_KEYS = (
     ENVIRONMENT_RETRIES_KEY,
@@ -800,7 +801,9 @@ class PT0DeterminismStore:
             isinstance(active_record, Mapping)
             and active_record.get("disposition") in {"live", "memo-hit"}
             and isinstance(active_record.get("curve"), Mapping)
-            and dict(active_record["curve"]) == dict(curve)
+            and _identity_gate_curve(active_record["curve"]) == (
+                _identity_gate_curve(curve)
+            )
             and gate_curve_memo_origin_matches(
                 sim,
                 curve,
@@ -2976,6 +2979,21 @@ def gate_curve_provider_outcome_is_reusable(
     }
 
 
+def _identity_gate_curve(curve: Mapping[str, Any]) -> dict[str, Any]:
+    """Shallow copy with environment keys removed.
+
+    Those keys stay on the live curve of the hour that retried. Memo
+    records and identity compares use this view, so a later hit cannot
+    publish that hour's timeout. The input curve is not mutated.
+    """
+
+    return {
+        key: value
+        for key, value in curve.items()
+        if key not in GATE_CURVE_ENVIRONMENT_KEYS
+    }
+
+
 def gate_curve_memo_record(
     curve: Mapping[str, Any],
     origin: Mapping[str, Any] | None,
@@ -2987,7 +3005,7 @@ def gate_curve_memo_record(
     """Build the runtime record shared by the producer and core reader."""
 
     record = {
-        "curve": dict(curve),
+        "curve": _identity_gate_curve(curve),
         "origin": dict(origin) if isinstance(origin, Mapping) else None,
         "repair_notices": [dict(notice) for notice in repair_notices or ()],
         "disposition": disposition,
@@ -2995,6 +3013,17 @@ def gate_curve_memo_record(
     if provider_outcome is not None:
         record["provider_outcome"] = GateCurveProviderOutcome(provider_outcome)
     return record
+
+
+def _gate_curve_live_publication(
+    record: Mapping[str, Any],
+    curve: Mapping[str, Any],
+) -> dict[str, Any]:
+    """The hour's curve. ``record`` remains the identity memo."""
+
+    published = dict(record)
+    published["curve"] = curve
+    return published
 
 
 def gate_curve_memo_record_is_reusable(record: Mapping[str, Any]) -> bool:

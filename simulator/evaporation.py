@@ -3567,6 +3567,7 @@ class EvaporationMixin:
     ) -> dict[str, Any]:
         from simulator.reduced_real_determinism import (
             GateCurveProviderOutcome,
+            _gate_curve_live_publication,
             gate_curve_memo_record,
             gate_curve_memo_is_cacheable,
             gate_curve_provider_outcome_token,
@@ -3789,12 +3790,13 @@ class EvaporationMixin:
                     provider_outcome=self._freeze_gate_provider_outcome,
                 )
                 # Holds and first-call floors are tick-local, never solved memos.
+                published = _gate_curve_live_publication(record, curve)
                 self._freeze_gate_held_curve_record = {
                     'hour': int(self.melt.hour),
                     'provider': self._liquid_fraction_provider,
-                    'record': copy.deepcopy(record),
+                    'record': copy.deepcopy(published),
                 }
-                return record
+                return published
 
             # Invalid projected bounds are not a liquidus. The Kress floor
             # remains the qualified out-of-domain prediction and
@@ -3936,7 +3938,8 @@ class EvaporationMixin:
                 repair_notices=repair_notices,
                 **redox_state_kwargs,
             )
-        return record
+        # Cache and shared memo keep ``record``. This hour sees ``curve``.
+        return _gate_curve_live_publication(record, curve)
 
     @staticmethod
     def _freeze_gate_liquidus_fO2_log(fO2_log: float) -> float:

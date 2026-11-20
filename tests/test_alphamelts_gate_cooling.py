@@ -370,10 +370,15 @@ def _stripped_gate_bytes(value):
 
 def _run_gate_shape(
     shape, monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+    *,
+    shared_cache=None,
+    core=False,
 ):
     from tests.chemistry.test_declared_liquid_fraction_provider import _sim
 
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    if shared_cache is not None:
+        sim._freeze_gate_shared_curve_cache = shared_cache
     calls = []
 
     def primary(request):
@@ -422,7 +427,10 @@ def _run_gate_shape(
     magemin, alpha = _bind_gate_providers(sim, primary, alternate)
     monkeypatch.setattr(magemin, 'dispatch', primary)
     monkeypatch.setattr(alpha, 'dispatch', alternate)
-    record = sim._freeze_gate_curve_record()
+    if core:
+        record = sim._melt_redox_liquidus_gate_record()
+    else:
+        record = sim._freeze_gate_curve_record()
     return sim, record, calls
 
 
@@ -547,6 +555,9 @@ def test_store_payload_omits_environment_retries(
     assert 'environment_retries' not in clean_payload['curve']
     assert 'environment_retries' not in recovered_payload['curve']
     assert 'environment_retries' in recovered_curve
+    assert 'environment_retries' not in (
+        recovered_sim._freeze_gate_liquid_fraction_cache['curve']
+    )
 
     store = PT0DeterminismStore('capture', db_path=tmp_path / 'pt1.sqlite')
     store._store('freeze_gate_curve', clean_key, clean_payload)
@@ -561,13 +572,85 @@ def test_store_payload_omits_environment_retries(
     }
     assert 'environment_retries' not in _curve_from_payload(poisoned)
 
-    recovered_sim._melt_redox_liquidus_gate_record()
-    diagnostic = recovered_sim._last_melt_redox_liquidus_gate_diagnostic
+
+def test_later_hour_memo_hit_omits_environment_retries(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """A memo hit does not publish the producing hour's timeout.
+
+    The hour that retried still has environment_retries on its live
+    snapshot. The same-sim cache, the shared memo, and the core memo
+    each return an identity curve to a later hour.
+    """
+
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    shared = {}
+    sim, record, calls = _run_gate_shape(
+        'recovered', monkeypatch, vapor_pressure_data, feedstocks_data,
+        setpoints_data, shared_cache=shared, core=True,
+    )
+    assert calls == ['magemin', 'alphamelts', 'magemin']
+    assert record['curve']['environment_retries']['disposition'] == 'environment'
+    assert 'environment_retries' not in (
+        sim._freeze_gate_liquid_fraction_cache['curve']
+    )
+    assert sim._freeze_gate_liquid_fraction_curve_memo
+    for stored in sim._freeze_gate_liquid_fraction_curve_memo.values():
+        assert 'environment_retries' not in stored['curve']
+    assert shared
+    for stored in shared.values():
+        assert 'environment_retries' not in stored['curve']
+
+    diagnostic = sim._last_melt_redox_liquidus_gate_diagnostic
     assert diagnostic['environment_retries']['disposition'] == 'environment'
-    snapshot = recovered_sim._make_snapshot()
+    sim._melt_redox_gate_authority_this_tick = record
+    sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
+    sim._freeze_gate_liquid_fraction_factor()
+    assert sim._last_freeze_gate_diagnostic['environment_retries'][
+        'disposition'
+    ] == 'environment'
+    snapshot = sim._make_snapshot()
     assert snapshot.liquid_fraction_gate['redox']['environment_retries'][
         'disposition'
     ] == 'environment'
+    assert snapshot.liquid_fraction_gate['evaporation']['environment_retries'][
+        'disposition'
+    ] == 'environment'
+
+    produced = len(calls)
+    sim.melt.hour = int(sim.melt.hour) + 1
+    same_sim_hit = sim._freeze_gate_curve_record()
+    assert same_sim_hit['disposition'] == 'memo-hit'
+    assert 'environment_retries' not in same_sim_hit['curve']
+    assert len(calls) == produced
+
+    sim._freeze_gate_liquid_fraction_cache = None
+    core_hit = sim._melt_redox_liquidus_gate_record()
+    assert core_hit['disposition'] == 'memo-hit'
+    assert 'environment_retries' not in core_hit['curve']
+    assert 'environment_retries' not in (
+        sim._last_melt_redox_liquidus_gate_diagnostic
+    )
+    assert len(calls) == produced
+    later = sim._make_snapshot()
+    assert 'environment_retries' not in later.liquid_fraction_gate['redox']
+
+    other = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    other._freeze_gate_shared_curve_cache = shared
+    other_calls = []
+
+    def refuse(request):
+        other_calls.append(request)
+        raise AssertionError('shared memo miss dispatched')
+
+    magemin, alpha = _bind_gate_providers(other, refuse, refuse)
+    monkeypatch.setattr(magemin, 'dispatch', refuse)
+    monkeypatch.setattr(alpha, 'dispatch', refuse)
+    shared_hit = other._freeze_gate_curve_record()
+    assert shared_hit['disposition'] == 'memo-hit'
+    assert 'environment_retries' not in shared_hit['curve']
+    assert other_calls == []
 
 
 def test_engine_worker_timeout_outside_planner_keeps_its_row(
