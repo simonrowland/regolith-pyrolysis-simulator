@@ -74,8 +74,7 @@ def test_figure_digitization_pins_all_csv_values_and_detects_each_mutation() -> 
                 _assert_digitization_pins(mutated, digitization)
 
 
-def test_source_identity_and_page_locators_match_the_held_conference_paper() -> None:
-    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+def _assert_source_identity_and_page_locators(document: dict) -> None:
     assert "doi" not in document["source"]
     assert "pp. 327–336" in document["source"]["citation"]
     assert "fidelity_samples" not in document
@@ -114,6 +113,72 @@ def test_source_identity_and_page_locators_match_the_held_conference_paper() -> 
             "pdf_page_index": 4,
             "section": "Results — Equilibrium Time",
         }
+
+
+def test_source_identity_and_page_locators_match_the_held_conference_paper() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_source_identity_and_page_locators(document)
+
+    mutations = (
+        ("source", "doi", "10.2374/SRI08SP124"),
+        ("source", "citation", "held paper, pp. 328–337"),
+    )
+    for section, key, value in mutations:
+        mutated = deepcopy(document)
+        mutated[section][key] = value
+        with pytest.raises(AssertionError):
+            _assert_source_identity_and_page_locators(mutated)
+
+    mutated = deepcopy(document)
+    mutated["source_files"]["corpus_repo"] = "regolith-pyrolysis-simulator"
+    with pytest.raises(AssertionError):
+        _assert_source_identity_and_page_locators(mutated)
+
+    mutated = deepcopy(document)
+    mutated["source_files"]["files"][0]["path"] = (
+        "_corpus-out/tables/dong-2009-cr-v-slag-activities/f7a.csv"
+    )
+    with pytest.raises(AssertionError):
+        _assert_source_identity_and_page_locators(mutated)
+
+    mutated = deepcopy(document)
+    mutated["source_files"]["files"][0]["sha256"]["value"] = "0" * 64
+    with pytest.raises(AssertionError):
+        _assert_source_identity_and_page_locators(mutated)
+
+    mutated = deepcopy(document)
+    mutated["species"]["CrO"]["observations"][0]["standard_state"]["state"][
+        "reason"
+    ] = "not printed"
+    with pytest.raises(AssertionError):
+        _assert_source_identity_and_page_locators(mutated)
+
+    for locator_path, field, value in (
+        (("experiments", 0, "locator"), "published_page", 331),
+        (("species", "CrO", "observations", 0, "standard_state", "locator"), "page", 7),
+        (
+            ("species", "CrO", "observations", 0, "values", "points", 0, "point_conditions", "Cr2O3_reagent", "locator"),
+            "published_page",
+            330,
+        ),
+        (
+            ("species", "CrO", "observations", 0, "values", "points", 0, "point_conditions", "gas_mix", "locator"),
+            "published_page",
+            328,
+        ),
+        (
+            ("species", "CrO", "observations", 0, "values", "points", 0, "point_conditions", "base_slag_system", "locator"),
+            "page",
+            4,
+        ),
+    ):
+        mutated = deepcopy(document)
+        target = mutated
+        for part in locator_path:
+            target = target[part]
+        target[field] = value
+        with pytest.raises(AssertionError):
+            _assert_source_identity_and_page_locators(mutated)
 
 
 def test_isolated_migration_preserves_all_nine_located_rows() -> None:
