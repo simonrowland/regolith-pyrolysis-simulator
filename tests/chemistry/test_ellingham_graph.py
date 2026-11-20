@@ -13,7 +13,10 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_stoichiometry,
 )
 from simulator.state import GAS_CONSTANT
-from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+from simulator.vapour_rail.catalog import (
+    compiled_catalog_for,
+    vapor_pressure_legacy_view,
+)
 
 
 @pytest.fixture(scope="module")
@@ -101,8 +104,8 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
             if route == "helper":
-                # The projected row omits Si's catalog pressure model; this
-                # route needs the canonical source inputs to resolve Si.
+                # The legacy projection carries Si's reference pressure model
+                # but not the complete source inputs needed by this evaluator.
                 pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
                     species,
                     1873.15,
@@ -207,23 +210,52 @@ def test_elemental_metal_pressure_is_capped_at_pure_saturation(
         assert pressure == pytest.approx(pure_metal_saturation)
 
 
-@pytest.mark.parametrize("species", ("Cr", "Al", "Ti", "Mn"))
-def test_liquid_oxide_source_rows_refuse_in_catalog_and_legacy_views(
+@pytest.mark.parametrize(
+    ("species", "expected_pressure_pa"),
+    (("Cr", 48.022), ("Al", 3.495e-4), ("Ti", 1.685e-6), ("Mn", None)),
+    ids=("Cr", "Al", "Ti", "Mn"),
+)
+def test_liquid_oxide_source_rows_use_catalog_evaluator_or_refuse(
     species,
+    expected_pressure_pa,
 ):
     catalog_payload = ellingham_graph._load_default_vapor_pressure_data()
+    evaluator = compiled_catalog_for(catalog_payload).evaluator_for_hot_train(species)
+    expected = evaluator.evaluate(
+        1873.15,
+        source_activity=1.0,
+        pO2_bar=1e-12,
+    ).pressure_pa
+    if expected_pressure_pa is not None:
+        assert expected == pytest.approx(expected_pressure_pa, rel=1e-3)
+    expected = min(
+        expected,
+        ellingham_graph.metal_saturation_pressure_Pa(
+            species,
+            1873.15,
+            vapor_pressure_data=catalog_payload,
+        ),
+    )
+    assert ellingham_graph.effective_equilibrium_pressure_Pa(
+        species,
+        1873.15,
+        1e-12,
+        vapor_pressure_data=catalog_payload,
+        a_oxide=1.0,
+    ) == pytest.approx(expected)
+
     legacy_view = vapor_pressure_legacy_view(catalog_payload)
-    refusal_messages = []
-    for payload in (catalog_payload, legacy_view):
-        with pytest.raises(ellingham_graph.EllinghamPressureRefusal) as caught:
-            ellingham_graph.effective_equilibrium_pressure_Pa(
-                species,
-                1873.15,
-                1e-12,
-                vapor_pressure_data=payload,
-            )
-        refusal_messages.append(str(caught.value))
-    assert refusal_messages[0] == refusal_messages[1]
+    with pytest.raises(
+        ellingham_graph.EllinghamPressureRefusal,
+        match="requires a catalog melt-source evaluator",
+    ):
+        ellingham_graph.effective_equilibrium_pressure_Pa(
+            species,
+            1873.15,
+            1e-12,
+            vapor_pressure_data=legacy_view,
+            a_oxide=1.0,
+        )
 
 
 def test_evolves_uses_builtin_pressure_floor(vapor_pressure_data) -> None:
@@ -242,12 +274,13 @@ def test_evolves_uses_builtin_pressure_floor(vapor_pressure_data) -> None:
         pO2_bar,
         vapor_pressure_data=vapor_pressure_data,
     )
-    assert not ellingham_graph.evolves(
-        "Ti",
-        T_K,
-        pO2_bar,
-        vapor_pressure_data=vapor_pressure_data,
-    )
+    with pytest.raises(ellingham_graph.EllinghamPressureRefusal):
+        ellingham_graph.evolves(
+            "Ti",
+            T_K,
+            pO2_bar,
+            vapor_pressure_data=vapor_pressure_data,
+        )
 
 
 def test_k_standard_reaction_graph_uses_activity_and_po2_scaling(
@@ -272,16 +305,17 @@ def test_k_standard_reaction_graph_uses_activity_and_po2_scaling(
     ) == pytest.approx(expected)
 
 
-def test_evolution_order_qualitative_pyrolysis_sequence(vapor_pressure_data) -> None:
+def test_evolution_order_qualitative_pyrolysis_sequence() -> None:
     # Representative mbar-sweep operating point in the Fe/SiO band.
     T_K = 1650.0
     pO2_bar = 1e-6
+    catalog_payload = ellingham_graph._load_default_vapor_pressure_data()
     species = ("Na", "K", "Fe", "SiO", "Mg", "Ca", "Al", "Ti")
     ranked = ellingham_graph.evolution_order(
         T_K,
         pO2_bar,
         species,
-        vapor_pressure_data=vapor_pressure_data,
+        vapor_pressure_data=catalog_payload,
     )
     order = [entry.species for entry in ranked]
 
@@ -298,7 +332,7 @@ def test_evolution_order_qualitative_pyrolysis_sequence(vapor_pressure_data) -> 
         "Ti",
         T_K,
         pO2_bar,
-        vapor_pressure_data=vapor_pressure_data,
+        vapor_pressure_data=catalog_payload,
     )
 
 
