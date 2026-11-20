@@ -108,9 +108,13 @@ APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
     {"cached_interpolated", "cached_physics_bucket"}
 )
 _CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
+# One production record for an abandoned freeze-gate dispatch. Digests drop
+# this key whole; the final dispatch is not rewritten to match.
+ENVIRONMENT_RETRIES_KEY = 'environment_retries'
 GATE_CURVE_NOTICE_KEYS = (
     'composition_projected_notice', 'gate_provider_refusal',
     'gate_provider_step_down', 'alphamelts_reference_pressure',
+    ENVIRONMENT_RETRIES_KEY,
 )
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001

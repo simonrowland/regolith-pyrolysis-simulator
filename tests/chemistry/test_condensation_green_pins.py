@@ -9,6 +9,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.reduced_real_determinism import (
+    ENVIRONMENT_RETRIES_KEY,
     failed_provider_attempt_is_environment,
     gate_curve_provider_diagnostic_reasons,
     gate_curve_provider_timeout_reason,
@@ -207,6 +208,11 @@ def _without_environment_attempts(value):
     if isinstance(value, dict):
         rebuilt = None
         for key, item in value.items():
+            if key == ENVIRONMENT_RETRIES_KEY:
+                if rebuilt is None:
+                    rebuilt = dict(value)
+                rebuilt.pop(key, None)
+                continue
             if key == "failed_providers" and isinstance(item, (list, tuple)):
                 kept = []
                 changed = False
@@ -512,6 +518,31 @@ def test_deterministic_gate_payload_drops_only_environment_attempts():
         ),
     )
     assert deterministic_gate_payload(clean_sim) is clean_sim
+
+
+def test_environment_retries_drop_as_one_key():
+    clean = {"source": "gate", "solidus_T_C": 1000}
+    recovered = {
+        **clean,
+        ENVIRONMENT_RETRIES_KEY: {
+            "disposition": "environment",
+            "gate_provider_step_down": {
+                "failed_providers": [
+                    {"provider": "magemin-shadow", "reason": "engine_worker_timeout"},
+                    {
+                        "provider": "alphamelts-diagnostic",
+                        "reason": "incomplete_cooling_path",
+                    },
+                ],
+            },
+            "alphamelts_reference_pressure": {
+                "condensed_phase_reference_pressure_bar": 1,
+            },
+        },
+    }
+    assert deterministic_gate_payload(clean) is clean
+    assert deterministic_gate_payload(recovered) == clean
+    assert ENVIRONMENT_RETRIES_KEY in recovered
 
 
 def _without_engine_versions(value):

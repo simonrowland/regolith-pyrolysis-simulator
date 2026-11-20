@@ -311,9 +311,14 @@ def test_retry_recovery_preserves_step_down_notice(
     assert calls == ['magemin', 'alphamelts', 'magemin']
     assert curve['source'] == 'gate_liquid_fraction:fallback:magemin-shadow'
     assert (curve['solidus_T_C'], curve['liquidus_T_C']) == (1000, 1300)
-    notice = curve['gate_provider_step_down']
+    # The realized curve is the final magemin success. The abandoned
+    # dispatch, including the non-timeout alphamelts notice, is one record.
+    assert 'gate_provider_step_down' not in curve
+    assert 'alphamelts_reference_pressure' not in curve
+    record = curve['environment_retries']
+    assert record['disposition'] == 'environment'
+    notice = record['gate_provider_step_down']
     assert notice['requested_provider_order'] == ['magemin-shadow', 'alphamelts-diagnostic']
-    assert notice['realized_provider'] == 'magemin-shadow'
     assert [p['provider'] for p in notice['failed_providers']] == [
         'magemin-shadow', 'alphamelts-diagnostic',
     ]
@@ -321,7 +326,7 @@ def test_retry_recovery_preserves_step_down_notice(
     assert notice['failed_providers'][0]['disposition'] == 'environment'
     assert 'disposition' not in notice['failed_providers'][1]
     assert 'incomplete_cooling_path' in notice['failed_providers'][1]['reason']
-    assert curve['alphamelts_reference_pressure'] == {
+    assert record['alphamelts_reference_pressure'] == {
         'physical_overhead_pressure_bar': .009,
         'condensed_phase_reference_pressure_bar': 1,
         'numerical_path_warning': 'incomplete native path',
@@ -346,3 +351,179 @@ def test_magemin_success_does_not_call_alpha(
     assert curve['liquidus_T_C'] == 1300
     assert 'gate_provider_step_down' not in curve
     assert alpha._backend is None
+
+
+def _bind_gate_providers(sim, magemin_dispatch, alpha_dispatch):
+    sim._register_freeze_gate_liquid_fraction_providers()
+    magemin, alpha = sim._chem_registry.gate_provider_order
+    magemin.dispatch = magemin_dispatch
+    alpha.dispatch = alpha_dispatch
+    return magemin, alpha
+
+
+def _stripped_gate_bytes(value):
+    from simulator.reduced_real_determinism import canonical_json_bytes
+    from tests.chemistry.test_condensation_green_pins import deterministic_gate_payload
+
+    return canonical_json_bytes(deterministic_gate_payload(value))
+
+
+def test_recovered_dispatch_strips_to_the_clean_dispatch(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """A recovered hour equals the final dispatch once the retry record is dropped."""
+
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    def run(shape):
+        sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+        calls = []
+
+        def primary(request):
+            calls.append('magemin')
+            if shape.startswith('recovered') and calls.count('magemin') == 1:
+                return IntentResult(
+                    intent=request.intent, status='not_converged', diagnostic={
+                        'backend_status_reason': 'engine_worker_timeout',
+                    },
+                )
+            if 'projected' in shape:
+                return IntentResult(
+                    intent=request.intent, status='out_of_domain', diagnostic={
+                        'backend_status_reason': 'composition_projected',
+                    },
+                )
+            return IntentResult(
+                intent=request.intent, status='ok', diagnostic={
+                    'solidus_T_C': 1000, 'liquidus_T_C': 1300,
+                },
+            )
+
+        def alternate(request):
+            calls.append('alphamelts')
+            if shape.startswith('recovered') and calls.count('alphamelts') == 1:
+                return IntentResult(
+                    intent=request.intent, status='not_converged', diagnostic={
+                        'backend_status_reason': 'incomplete_cooling_path',
+                        'backend_diagnostics': {
+                            'physical_overhead_pressure_bar': .009,
+                            'condensed_phase_reference_pressure_bar': 1,
+                            'numerical_path_warning': 'abandoned path',
+                        },
+                    },
+                )
+            return IntentResult(
+                intent=request.intent, status='ok', diagnostic={
+                    'solidus_T_C': 1100, 'liquidus_T_C': 1400,
+                    'backend_diagnostics': {
+                        'physical_overhead_pressure_bar': .02,
+                        'condensed_phase_reference_pressure_bar': 1,
+                    },
+                },
+            )
+
+        magemin, alpha = _bind_gate_providers(sim, primary, alternate)
+        monkeypatch.setattr(magemin, 'dispatch', primary)
+        monkeypatch.setattr(alpha, 'dispatch', alternate)
+        record = sim._freeze_gate_curve_record()
+        return sim, record, calls
+
+    clean_sim, clean_record, clean_calls = run('clean')
+    recovered_sim, recovered_record, recovered_calls = run('recovered')
+    assert clean_calls == ['magemin']
+    assert recovered_calls == ['magemin', 'alphamelts', 'magemin']
+    assert 'environment_retries' in recovered_record['curve']
+    assert 'environment_retries' not in clean_record['curve']
+    assert recovered_record['curve']['environment_retries']['disposition'] == 'environment'
+    assert 'incomplete_cooling_path' in recovered_record['curve']['environment_retries'][
+        'gate_provider_step_down'
+    ]['failed_providers'][1]['reason']
+    assert _stripped_gate_bytes(clean_record['curve']) == _stripped_gate_bytes(
+        recovered_record['curve'],
+    )
+    assert _stripped_gate_bytes(clean_record) == _stripped_gate_bytes(recovered_record)
+    assert clean_sim._freeze_gate_last_good_curve.get('realized_provider') == (
+        recovered_sim._freeze_gate_last_good_curve.get('realized_provider')
+    )
+
+    assert clean_sim._freeze_gate_last_good_curve.get('realized_provider') is None
+
+    projected_sim, projected_record, projected_calls = run('projected')
+    recovered_projected_sim, recovered_projected_record, recovered_projected_calls = run(
+        'recovered-projected',
+    )
+    assert projected_calls == ['magemin', 'alphamelts']
+    assert recovered_projected_calls == ['magemin', 'alphamelts', 'magemin', 'alphamelts']
+    projected_curve = projected_record['curve']
+    recovered_projected_curve = recovered_projected_record['curve']
+    assert projected_curve['source'] == (
+        'gate_liquid_fraction:fallback:alphamelts-diagnostic'
+    )
+    assert 'composition_projected' in projected_curve['gate_provider_step_down'][
+        'failed_providers'
+    ][0]['reason']
+    assert projected_curve['alphamelts_reference_pressure'][
+        'physical_overhead_pressure_bar'
+    ] == .02
+    assert 'environment_retries' not in projected_curve
+    abandoned = recovered_projected_curve['environment_retries']
+    assert abandoned['disposition'] == 'environment'
+    assert abandoned['alphamelts_reference_pressure'][
+        'physical_overhead_pressure_bar'
+    ] == .009
+    assert 'incomplete_cooling_path' in abandoned['gate_provider_step_down'][
+        'failed_providers'
+    ][1]['reason']
+    assert recovered_projected_curve['alphamelts_reference_pressure'][
+        'physical_overhead_pressure_bar'
+    ] == .02
+    assert 'incomplete_cooling_path' not in recovered_projected_curve[
+        'gate_provider_step_down'
+    ]['failed_providers'][0]['reason']
+    assert _stripped_gate_bytes(projected_curve) == _stripped_gate_bytes(
+        recovered_projected_curve,
+    )
+    assert _stripped_gate_bytes(projected_record) == _stripped_gate_bytes(
+        recovered_projected_record,
+    )
+    assert projected_sim._freeze_gate_last_good_curve.get('realized_provider') == (
+        'alphamelts-diagnostic'
+    )
+    assert recovered_projected_sim._freeze_gate_last_good_curve.get(
+        'realized_provider',
+    ) == 'alphamelts-diagnostic'
+
+
+def test_engine_worker_timeout_outside_planner_keeps_its_row(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """A timeout that never reaches the planner still has a visible row."""
+
+    from simulator.engine_pool import EngineWorkerTimeout
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    calls = []
+
+    def dispatch(intent, **kwargs):
+        calls.append(intent)
+        if len(calls) == 1:
+            raise EngineWorkerTimeout('magemin', 15.0, phase='liquidus')
+        return IntentResult(intent=intent, status='ok', diagnostic={
+            'solidus_T_C': 1000, 'liquidus_T_C': 1300,
+        })
+
+    monkeypatch.setattr(sim, '_dispatch_only', dispatch)
+    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
+    assert len(calls) == 2
+    assert curve['source'] == 'gate_liquid_fraction'
+    assert (curve['solidus_T_C'], curve['liquidus_T_C']) == (1000, 1300)
+    assert 'gate_provider_step_down' not in curve
+    record = curve['environment_retries']
+    assert record['disposition'] == 'environment'
+    attempt = record['gate_provider_step_down']['failed_providers'][0]
+    assert attempt['provider'] == 'magemin'
+    assert attempt['disposition'] == 'environment'
+    assert 'engine_worker_timeout' in attempt['reason']
+    assert 'gate_provider_step_down' not in attempt['diagnostic']
+    assert record['gate_provider_step_down']['realized_provider'] is None
