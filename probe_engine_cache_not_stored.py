@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -18,16 +19,26 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory(prefix="regolith-engine-cache-not-stored-") as temp:
         cache_path = Path(temp) / "engine-cache.sqlite"
+        env = dict(
+            os.environ,
+            OMP_NUM_THREADS="1",
+            OPENBLAS_NUM_THREADS="1",
+            MKL_NUM_THREADS="1",
+            VECLIB_MAXIMUM_THREADS="1",
+            REGOLITH_ENGINE_CACHE=str(cache_path),
+            REGOLITH_ENGINE_CACHE_BOX="s2",
+        )
+        env.pop("REGOLITH_ENGINE_CACHE_MODE", None)
         subprocess.run(
             [
                 sys.executable,
                 str(score_script),
-                "--engines", "vaporock",
-                "--workers", "2",
+                "--engines", "magemin,vaporock",
+                "--workers", "6",
                 "--engine-cache", str(cache_path),
-                "--root", str(root),
             ],
             cwd=root,
+            env=env,
             check=True,
         )
 
@@ -38,7 +49,7 @@ def main() -> int:
     from simulator.battery.score import engines_from_names
 
     filters = _scoring_filter_record(
-        engines=engines_from_names(["vaporock"]),
+        engines=engines_from_names(["magemin", "vaporock"]),
         rail=None,
         work_id=None,
         limit=None,
