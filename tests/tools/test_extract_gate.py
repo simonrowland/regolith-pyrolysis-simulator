@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 from contextlib import nullcontext
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -916,6 +917,59 @@ def test_inherited_transition_composition_applies_to_unmarked_points(
     assert not report.hard_failed
     assert report.migration_hard_issues == 0
     assert "isolated-migration" not in _checks(report)
+
+
+def test_transition_mixture_gate_joins_points_with_parent_log_frame(
+    tmp_path: Path,
+):
+    doc = _document()
+    row = doc["species"]["Fe"]["observations"][0]
+    row.update(observation_id="transition_with_atm_log", type="transition_point")
+    row.pop("T_range_K", None)
+    row["values"] = {
+        "quantity": "transition_temperature",
+        "property_kind": "melting_point",
+        "source_quantity_as_printed": "-log fO2 (atm)",
+        "composition_mol": {"CaO": "0.7", "SiO2": "0.3"},
+        "points": [
+            {
+                "T_K": 1800,
+                "point_conditions": {
+                    "fO2_log": {
+                        "units": "log10(atm)",
+                        "state": {"tag": "value", "value": "-11"},
+                        "locator": {"page": 2, "table": "1"},
+                    }
+                },
+            }
+        ],
+    }
+    doc["species"] = {"FeO": {"observations": [row]}}
+    source_id = doc["source_id"]
+    path = tmp_path / f"{source_id}.yaml"
+    path.write_text(yaml.safe_dump(doc), encoding="utf-8")
+    runner = gate.migrate.Migrator(
+        gate.migrate.REPO_ROOT, index=None, aliases={}
+    )
+    runner._migrate_extract(path)
+    runner.finalize()
+    [(point_id, observation)] = runner.result.observations.items()
+
+    assert (
+        observation.identity.quantity.value
+        is gate.migrate.Quantity.TRANSITION_TEMPERATURE
+    )
+    damaged = replace(
+        observation,
+        identity=replace(observation.identity, composition=None),
+    )
+    issues = gate._transition_mixture_identity_issues(
+        doc, source_id, {point_id: damaged}
+    )
+
+    assert len(issues) == 1
+    assert "printed mixture has no composition" in issues[0]
+    assert point_id in issues[0]
 
 
 def test_profile_bound_transition_extracts_pass_migration_gate():

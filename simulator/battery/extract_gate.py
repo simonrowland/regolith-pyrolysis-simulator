@@ -931,7 +931,11 @@ def _transition_mixture_identity_issues(
                     migrate.AXIS_TEMPERATURE_K, None, point
                 ).amount
                 point_extra = migrate.series_row_extra(
-                    point, include_locator=container != "series"
+                    point,
+                    include_locator=container != "series",
+                    source_quantity_as_printed=values.get(
+                        "source_quantity_as_printed"
+                    ),
                 )
                 point_item = {
                     "index": index,
