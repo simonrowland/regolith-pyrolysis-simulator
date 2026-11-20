@@ -7322,6 +7322,16 @@ def _alignment_axes(profile: object) -> tuple[str, ...]:
     )
 
 
+def _accepted_axis_value(name: str, value: object, profile: object) -> object | None:
+    """Plain token of a value axis, or None when this profile rejects that axis."""
+
+    required = name in profile.required
+    permitted_na = name in profile.permitted_not_applicable
+    if not required and not permitted_na:
+        return None
+    return to_plain(value)
+
+
 def _axis_alignment_value(identity: Identity, name: str, profile: object) -> object | None:
     state = getattr(identity, name)
     required = name in profile.required
@@ -7329,9 +7339,7 @@ def _axis_alignment_value(identity: Identity, name: str, profile: object) -> obj
     if state is None:
         return {"state": "not_applicable"} if not required else None
     if state.is_value:
-        if not required and not permitted_na:
-            return None
-        return to_plain(state.value)
+        return _accepted_axis_value(name, state.value, profile)
     if state.is_not_applicable and permitted_na and not required:
         return {"state": "not_applicable"}
     return None
@@ -7440,7 +7448,9 @@ def _source_band_catalog(
     ratchet_entries: Mapping[str, Mapping[str, object]],
 ) -> tuple[dict[str, DecisionBand], list[dict[str, object]], dict[str, str]]:
     from simulator.battery.compilation_tier import (
+        _compilation_series_slots,
         _iter_compilation_series_cells,
+        _series_point_cell,
         is_compilation_evidence,
     )
 
@@ -7473,37 +7483,64 @@ def _source_band_catalog(
             continue
         alignment_template: dict[str, object] | None = None
         alignment_profile: object | None = None
-        for cell in _iter_compilation_series_cells(parent, origin):
-            if not isinstance(cell.identity, Identity):
-                continue
-            quantity = quantity_token(cell.identity)
-            if quantity is None:
-                continue
-            magnitude = point_magnitude(cell.value)
-            if magnitude is None or not magnitude.is_finite():
+        template_identity: Identity | None = None
+        slots = _compilation_series_slots(parent, origin)
+        if slots is None:
+            for cell in _iter_compilation_series_cells(parent, origin):
+                if not isinstance(cell.identity, Identity):
+                    continue
+                quantity = quantity_token(cell.identity)
+                if quantity is None:
+                    continue
+                magnitude = point_magnitude(cell.value)
+                if magnitude is None or not magnitude.is_finite():
+                    continue
+                key_doc = _source_alignment_group_key(cell, tier=tier)
+                if key_doc is None:
+                    continue
+                key = _group_token(key_doc)
+                group_keys[key] = key_doc
+                identities[key] = cell.identity
+                source = sources[key].setdefault(
+                    parent.source_id,
+                    {"values": set()},
+                )
+                source["values"].add(magnitude)
+            continue
+        for temperature, magnitude, occurrence in slots:
+            if not magnitude.is_finite():
                 continue
             if alignment_template is None:
+                cell = _series_point_cell(parent, temperature, magnitude, occurrence)
+                if not isinstance(cell.identity, Identity):
+                    continue
+                if quantity_token(cell.identity) is None:
+                    continue
                 key_doc = _source_alignment_group_key(cell, tier=tier)
                 if key_doc is None:
                     continue
                 alignment_template = key_doc
                 alignment_profile = profile_for(cell.identity)
+                template_identity = cell.identity
+                recorded_identity = cell.identity
             else:
+                assert template_identity is not None
                 key_doc = dict(alignment_template)
                 axes = dict(alignment_template["axes"])
                 if "temperature_K" in axes:
                     assert alignment_profile is not None
-                    temperature_axis = _axis_alignment_value(
-                        cell.identity, "temperature_K", alignment_profile
+                    temperature_axis = _accepted_axis_value(
+                        "temperature_K", temperature, alignment_profile
                     )
                     if temperature_axis is None:
                         continue
                     axes["temperature_K"] = temperature_axis
                 key_doc["axes"] = axes
-                key_doc["aligned_T_K"] = _source_aligned_temperature(cell.identity)
+                key_doc["aligned_T_K"] = to_plain(temperature)
+                recorded_identity = template_identity
             key = _group_token(key_doc)
             group_keys[key] = key_doc
-            identities[key] = cell.identity
+            identities[key] = recorded_identity
             source = sources[key].setdefault(
                 parent.source_id,
                 {"values": set()},
@@ -24247,26 +24284,7 @@ class _ResidualJsonlStream:
         self._database: sqlite3.Connection | None = None
         self._order_path: Path | None = None
         self._order_file: TextIO | None = None
-        if sort_on_finalize:
-            self._temporary = tempfile.TemporaryDirectory(
-                prefix="battery-score-index-"
-            )
-            self._database = sqlite3.connect(
-                Path(self._temporary.name) / "residual-order.sqlite"
-            )
-            self._database.execute("PRAGMA cache_size=-16384")
-            self._database.execute("PRAGMA temp_store=FILE")
-            self._database.execute("PRAGMA journal_mode=OFF")
-            self._database.execute("PRAGMA synchronous=OFF")
-            self._database.execute(
-                "CREATE TABLE residual_order ("
-                "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
-                "key TEXT NOT NULL, offset INTEGER NOT NULL, "
-                "band_value TEXT, numeric_value TEXT, order_ref TEXT NOT NULL, "
-                "order_point INTEGER NOT NULL, order_engine INTEGER NOT NULL, "
-                "order_subrow INTEGER NOT NULL)"
-            )
-        else:
+        if not sort_on_finalize:
             self._order_path = self.partial_path.with_name(
                 f"{self.partial_path.name}.order"
             )
@@ -24391,6 +24409,7 @@ class _ResidualJsonlStream:
         offset = self.file.tell()
         self.file.write(line + b"\n")
         if self.sort_on_finalize:
+            self._ensure_order_index()
             self._pending.append(
                 (
                     rail,
@@ -24412,6 +24431,29 @@ class _ResidualJsonlStream:
         now = time.monotonic()
         if self.count % self._FLUSH_LINES == 0 or now - self._last_flush >= 5:
             self.flush()
+
+    def _ensure_order_index(self) -> None:
+        # After the score pool forks. An open sqlite connection would be inherited.
+        if self._database is not None or not self.sort_on_finalize:
+            return
+        self._temporary = tempfile.TemporaryDirectory(
+            prefix="battery-score-index-"
+        )
+        self._database = sqlite3.connect(
+            Path(self._temporary.name) / "residual-order.sqlite"
+        )
+        self._database.execute("PRAGMA cache_size=-16384")
+        self._database.execute("PRAGMA temp_store=FILE")
+        self._database.execute("PRAGMA journal_mode=OFF")
+        self._database.execute("PRAGMA synchronous=OFF")
+        self._database.execute(
+            "CREATE TABLE residual_order ("
+            "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
+            "key TEXT NOT NULL, offset INTEGER NOT NULL, "
+            "band_value TEXT, numeric_value TEXT, order_ref TEXT NOT NULL, "
+            "order_point INTEGER NOT NULL, order_engine INTEGER NOT NULL, "
+            "order_subrow INTEGER NOT NULL)"
+        )
 
     def _flush_index(self) -> None:
         if not self._pending:
@@ -24441,6 +24483,7 @@ class _ResidualJsonlStream:
         self.flush()
         if not self.sort_on_finalize:
             return
+        self._ensure_order_index()
         assert self._database is not None
         self._flush_index()
         self._database.execute(
