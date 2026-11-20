@@ -351,15 +351,13 @@ def _call_cached_backend_equilibrate(
         with _without_engine_cache():
             result = solve()
         if isinstance(result, EquilibriumResult):
-            if handle.name != "vaporock" and _is_refusal(result):
-                return result
             return result.to_hot(engine_id=handle.name)
-        if _is_refusal(result):
-            return result
         if isinstance(result, SimpleNamespace):
             return equilibrium_to_hot(vars(result), engine_id=handle.name, live_value=result)
         if isinstance(result, Mapping):
             return equilibrium_to_hot(result, engine_id=handle.name)
+        if _is_refusal(result):
+            return result
         return result
 
     adapter_settings = (
@@ -3814,6 +3812,8 @@ def _internal_analytical_vapor_pressure_adapter(
     }
     high_t_activity = core_diagnostic.get("high_t_melt_activity")
     if isinstance(high_t_activity, Mapping) and high_t_activity.get("backend_failure_disposition"):
+        # imcc_nonconvergence and backend absence are not request-deterministic.
+        # equilibrium_to_hot leaves cacheable=False while this field is set.
         diagnostics["backend_failure_disposition"] = high_t_activity["backend_failure_disposition"]
     activities = dict(core_diagnostic.get("activities") or {})
     from simulator.chemistry.melt_activity import (

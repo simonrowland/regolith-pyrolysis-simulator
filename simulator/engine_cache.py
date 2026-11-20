@@ -297,6 +297,16 @@ REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
 REFUSAL_UNAVAILABLE = "unavailable"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
 
+# Wire tokens owned by alphamelts.py. Repeated here so this module does not
+# import the adapter. The allowlist pin binds each token to that constant.
+# These three are composition predicates evaluated before the binary starts,
+# so not_converged here is the guard's status, not a solver outcome.
+_PRELAUNCH_CRASH_REFUSAL_CODES = frozenset({
+    "subprocess_fe_free_absolute_fo2_crash",
+    "subprocess_cao_sio2_binary_crash",
+    "subprocess_fe_free_silicate_imposed_fo2_crash",
+})
+
 CACHEABLE_REFUSAL_CODES = frozenset({
     REFUSAL_OUT_OF_BASIS, REFUSAL_COMPOSITION_PROJECTED, REFUSAL_MAJOR_SUM,
     REFUSAL_NO_LIQUID,
@@ -306,6 +316,17 @@ CACHEABLE_REFUSAL_CODES = frozenset({
     OutOfDomainReason.INVALID_FO2_LOG.value,
     OutOfDomainReason.SUM_PRESSURE_SANITY.value,
     OutOfDomainReason.SPECIATION_NO_FINITE_VALUES.value,
+    OutOfDomainReason.SILICATE_WINDOW.value,
+    OutOfDomainReason.MAJOR_SUM.value,
+    OutOfDomainReason.INVALID_INPUT.value,
+    OutOfDomainReason.UNSUPPORTED_INPUT.value,
+    OutOfDomainReason.CLAMPED_OPERATING_POINT.value,
+    *_PRELAUNCH_CRASH_REFUSAL_CODES,
+})
+
+_NOT_CONVERGED_CACHEABLE_REASONS = frozenset({
+    OutOfDomainReason.SPECIATION_NO_FINITE_VALUES.value,
+    *_PRELAUNCH_CRASH_REFUSAL_CODES,
 })
 
 
@@ -316,8 +337,10 @@ def _cacheable_refusal_status(
         None, "out_of_domain", "input_refusal", "refusal", "no_liquid", "ok",
     }:
         return True
+    # process_failure is intentionally absent: a returncode, signal, or
+    # timeout on the result stays unstored even when the reason is listed.
     return (
-        refusal_reason == OutOfDomainReason.SPECIATION_NO_FINITE_VALUES.value
+        refusal_reason in _NOT_CONVERGED_CACHEABLE_REASONS
         and status == "not_converged"
     )
 
