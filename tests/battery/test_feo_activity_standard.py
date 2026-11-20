@@ -41,6 +41,20 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
         "87e4d99db4de9feed4a80902d51b1ef2f8c137b548b07ab44fc768dd6bcee33e"
     ),
 }
+# Green's OpenIMCC zero-offset row used default d066-v1 (version 1.0.3-d066-v1,
+# digest 02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75).
+# The 979adb2 default d066-v4 has a nonzero DG46-MASSON65 FeO offset (the
+# pinned row is 10,240.4790568 J/mol at 1600 K), so this zero-offset witness
+# uses published-core 1.0.2 (digest
+# ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c), whose
+# FeO standard is Fe-019 with exactly zero shift. The residual value is
+# unchanged. Serialized changes are coefficient_sources[0] (pack version
+# 1.0.3-d066-v1 -> 1.0.2), coefficient_sources[1] and [3] (pack/melt digest
+# 02c88c04... -> ae979b68...), and the new
+# candidate_observation.provenance.feo_standard_normalisation record:
+# from_standard, to_standard, melt_pack_identity, delta_g_j_mol, log10_shift,
+# and temperature_K. The candidate and top-level notices remain empty; there
+# is no engine-model caveat notice for a zero shift.
 # b217 pinned the N_Fe2+^0 multiply:
 # sha 3b1518942a5ca7524b6e4be8e2c98fd375db44c5835bd830a4acff0a54e32ce0
 # dex -0.013180332034779389
@@ -200,6 +214,7 @@ def test_declared_zero_offset_feo_standards_preserve_residual_bytes(
     if engine is Engine.OPENIMCC:
         assert before_prediction.value is prediction.value
         assert before_prediction.value.as_tuple() == prediction.value.as_tuple()
+        assert not before_prediction.notices
     canonical_prediction, refusal = converter(before_prediction)
     assert refusal is None
     assert canonical_prediction.value == prediction.value
@@ -316,6 +331,7 @@ def test_openimcc_feo_row_refuses_when_gas_load_loses_condensate_identity(
         (Decimal("1600"), Decimal("10240.4790568"), Decimal("0.3343")),
         (Decimal("1650"), Decimal("9692.4013452"), Decimal("0.3068")),
     ),
+    ids=("1600K", "1650K"),
 )
 def test_openimcc_feo_shift_uses_the_pinned_melt_pack_at_temperature(
     temperature_K: Decimal,
@@ -425,6 +441,7 @@ def test_openimcc_published_v1_feo_standard_has_an_explicit_zero_record() -> Non
 
     assert normalized.value is prediction.value
     assert normalized.value.as_tuple() == prediction.value.as_tuple()
+    assert not normalized.notices
     assert normalized.provenance["feo_standard_normalisation"] == {
         "from_standard": "Fe-019",
         "to_standard": "Fe-019",

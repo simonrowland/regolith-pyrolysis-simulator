@@ -751,7 +751,7 @@ def _normalize_openimcc_feo_activity_prediction(
             refusal_reason=refusal.reason,
             refusal_detail=dict(refusal.detail),
         )
-    assert value is not None and record is not None and notice is not None
+    assert value is not None and record is not None
     authority = prediction.authority
     certified_band = prediction.certified_band
     if record.get("authority") == Authority.EXTRAPOLATED.value:
@@ -766,7 +766,10 @@ def _normalize_openimcc_feo_activity_prediction(
         value=value,
         authority=authority,
         certified_band=certified_band,
-        notices=union_notices(prediction.notices, (notice,)),
+        notices=union_notices(
+            prediction.notices,
+            (notice,) if notice is not None else (),
+        ),
         provenance={
             **prediction.provenance,
             "melt_pack_identity": record["melt_pack_identity"],

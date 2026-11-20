@@ -522,21 +522,23 @@ def normalize_openimcc_feo_activity_value(
     )
     if extrapolation_evidence is not None:
         record.update(extrapolation_evidence)
-    notice = Notice(
-        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-        affected_quantities=(Quantity.ACTIVITY,),
-        reason=(
-            f"OpenIMCC FeO(l) activity normalized from {standard.name} to "
-            f"{_FEO_ACTIVITY_CANONICAL_STANDARD}"
-        ),
-        origin="openimcc_feo_standard_normalisation",
-        band=f"delta_g={record['delta_g_j_mol']} J/mol at {record['temperature_K']} K",
-        authority=(
-            Authority.EXTRAPOLATED
-            if extrapolation_evidence is not None
-            else None
-        ),
-    )
+    notice = None
+    if shift != 0:
+        notice = Notice(
+            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                f"OpenIMCC FeO(l) activity normalized from {standard.name} to "
+                f"{_FEO_ACTIVITY_CANONICAL_STANDARD}"
+            ),
+            origin="openimcc_feo_standard_normalisation",
+            band=f"delta_g={record['delta_g_j_mol']} J/mol at {record['temperature_K']} K",
+            authority=(
+                Authority.EXTRAPOLATED
+                if extrapolation_evidence is not None
+                else None
+            ),
+        )
     return normalized_value, record, notice, None
 
 
