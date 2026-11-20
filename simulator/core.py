@@ -4495,10 +4495,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         head_o2_mol: Optional[float] = None,
     ) -> float:
-        if str(getattr(self.melt.atmosphere, 'name', '') or '') in {
-            'PN2_SWEEP',
-            'ARGON_FLOW',
-        }:
+        if self._inert_cover_default_species() is not None:
             if head_o2_mol is None:
                 head_o2_mol = self._headspace_o2_mol_for_pO2_bar(
                     ledger_pO2_bar
@@ -9916,6 +9913,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         A forecast can disable the post-equilibrium SulfSat hook because its
         candidate temperatures are not realized run steps.
         """
+        self._active_pressure_assumption_notice = None
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'replay_enabled', False):
             return store.replay_equilibrium(self)
@@ -10196,15 +10194,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_backend_diagnostics = dict(
             getattr(result, 'diagnostics', {}) or {}
         )
-        pressure_notice = getattr(self, '_last_pressure_assumption_notice', None)
-        if isinstance(pressure_notice, Mapping):
-            result_diagnostics = dict(self._last_backend_diagnostics)
-            result_diagnostics['pressure_assumption_notices'] = [
-                dict(pressure_notice)
-            ]
-            result.diagnostics = result_diagnostics
-            self._last_backend_diagnostics = result_diagnostics
-            self._last_pressure_assumption_notice = None
         if (
             str(self._last_backend_status) == 'out_of_domain'
             and self._last_backend_diagnostics
@@ -10235,6 +10224,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # ledger (the gate has no LedgerTransition authority).
         if run_post_equilibrium_sulfsat:
             self._attach_post_equilibrium_sulfsat(result)
+        result_diagnostics = dict(getattr(result, 'diagnostics', {}) or {})
+        backend_diagnostics = dict(
+            getattr(self, '_last_backend_diagnostics', {}) or {}
+        )
+        pressure_notice = getattr(
+            self,
+            '_active_pressure_assumption_notice',
+            None,
+        )
+        if isinstance(pressure_notice, Mapping):
+            result_diagnostics['pressure_assumption_notices'] = [
+                dict(pressure_notice)
+            ]
+            backend_diagnostics['pressure_assumption_notices'] = [
+                dict(pressure_notice)
+            ]
+        else:
+            result_diagnostics.pop('pressure_assumption_notices', None)
+            backend_diagnostics.pop('pressure_assumption_notices', None)
+        result.diagnostics = result_diagnostics
+        self._last_backend_diagnostics = backend_diagnostics
+        self._active_pressure_assumption_notice = None
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'capture_enabled', False):
             store.capture_equilibrium(self, result)

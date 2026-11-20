@@ -3216,7 +3216,6 @@ class CondensationModel:
         # inlet partial onto every wall (b-282).
 
         stage_route_by_species: dict[str, dict[str, Any]] = {}
-        condensation_pressure_assumption_notices: dict[str, dict[str, Any]] = {}
         for species in evap_flux.species_kg_hr:
             if (
                 carrier_authority_status_by_species.get(species)
@@ -3227,37 +3226,6 @@ class CondensationModel:
                 )
             ):
                 continue
-            if (
-                species not in self.condensation_temperatures_C
-                and not math.isclose(
-                    self.overhead_pressure_mbar,
-                    CONDENSATION_TEMPERATURE_FALLBACK_REFERENCE_MBAR,
-                    rel_tol=0.0,
-                    abs_tol=1.0e-12,
-                )
-            ):
-                condensation_pressure_assumption_notices[species] = {
-                    'kind': 'out_of_domain_physics',
-                    'code': 'condensation_routing_pressure_assumption',
-                    'reason': (
-                        'Condensation routing retains the 1 mbar partial-pressure '
-                        'fallback at a different running total pressure; the fallback '
-                        'temperature is not pressure-adjusted.'
-                    ),
-                    'authority_level': 'extrapolated',
-                    'certified_band': {
-                        'partial_pressure_mbar': [
-                            CONDENSATION_TEMPERATURE_FALLBACK_REFERENCE_MBAR,
-                            CONDENSATION_TEMPERATURE_FALLBACK_REFERENCE_MBAR,
-                        ],
-                    },
-                    'reference_pressure_mbar': (
-                        CONDENSATION_TEMPERATURE_FALLBACK_REFERENCE_MBAR
-                    ),
-                    'running_total_pressure_mbar': float(
-                        self.overhead_pressure_mbar
-                    ),
-                }
             stage_route_by_species[species] = {
                 'T_cond_C': _species_condensation_temperature_C(
                     species, temps=self.condensation_temperatures_C,
@@ -3278,6 +3246,48 @@ class CondensationModel:
                 'positive condensable vapor species; missing '
                 + ', '.join(missing_partial_species)
             )
+        condensation_pressure_assumption_notices: dict[str, dict[str, Any]] = {}
+        for species in stage_route_by_species:
+            if (
+                species in self.condensation_temperatures_C
+                or species not in self.wall_species_partial_pressures_pa
+            ):
+                continue
+            species_partial_pressure_mbar = (
+                self.wall_species_partial_pressures_pa[species] / 100.0
+            )
+            if math.isclose(
+                species_partial_pressure_mbar,
+                CONDENSATION_TEMPERATURE_FALLBACK_REFERENCE_MBAR,
+                rel_tol=0.0,
+                abs_tol=1.0e-12,
+            ):
+                continue
+            condensation_pressure_assumption_notices[species] = {
+                'kind': 'out_of_domain_physics',
+                'code': 'condensation_routing_pressure_assumption',
+                'reason': (
+                    'Condensation routing retains the 1 mbar partial-pressure '
+                    'fallback at a different species partial pressure; the fallback '
+                    'temperature is not pressure-adjusted.'
+                ),
+                'authority_level': 'extrapolated',
+                'certified_band': {
+                    'partial_pressure_mbar': [
+                        CONDENSATION_TEMPERATURE_FALLBACK_REFERENCE_MBAR,
+                        CONDENSATION_TEMPERATURE_FALLBACK_REFERENCE_MBAR,
+                    ],
+                },
+                'reference_pressure_mbar': (
+                    CONDENSATION_TEMPERATURE_FALLBACK_REFERENCE_MBAR
+                ),
+                'running_species_partial_pressure_mbar': (
+                    species_partial_pressure_mbar
+                ),
+                'running_total_pressure_mbar': float(
+                    self.overhead_pressure_mbar
+                ),
+            }
         inlet_rates = dict(evap_flux.species_kg_hr)
         flowing_rates = dict(inlet_rates)
         wall_hkl_by_species: dict[str, dict[str, float]] = {}
