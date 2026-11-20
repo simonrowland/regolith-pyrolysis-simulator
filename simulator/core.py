@@ -4106,6 +4106,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             staged_control['knudsen_pressure_adjustment'] = dict(adjustment)
         self.melt.validate_melt_pressures()
 
+    def _apply_teststand_chamber_pressure(self) -> None:
+        # Today's process step is one hour. dt_s is that existing hour in
+        # seconds, passed through so a later sub-hour step can supply its
+        # own length. This method does not add a timestep.
+        from simulator.teststand import apply_process_chamber_pressure
+
+        apply_process_chamber_pressure(self, dt_s=3600.0)
+
     def _active_lab_schedule(self) -> Mapping[str, Any] | None:
         getter = getattr(self.campaign_mgr, "_lab_schedule", None)
         if not callable(getter):
@@ -16108,6 +16116,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 2. Temperature ramp and carried-in passive exchange ---
         self._update_temperature()
         self._apply_c2a_knudsen_pressure_adjustment()
+        self._apply_teststand_chamber_pressure()
         self._establish_melt_redox_gate_authority_for_current_hour()
         self._apply_oxygen_reservoir_exchange()
         self._apply_o2_bubbler()
@@ -16860,7 +16869,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             current_area_m2 <= 0.0
             or math.isclose(current_area_m2, 0.2, rel_tol=0.0, abs_tol=1e-12)
         ):
-            self.melt.melt_surface_area_m2 = crucible_area_m2
+            # condensation imports core at module level.
+            from simulator.condensation import read_gram_lab_exposed_melt_area
+
+            declared_area_m2 = read_gram_lab_exposed_melt_area(
+                self.setpoints.get('lab_geometry'),
+            )
+            self.melt.melt_surface_area_m2 = (
+                crucible_area_m2
+                if declared_area_m2 is None
+                else declared_area_m2
+            )
 
         pipe = self._equipment.pipe
         geometry_config = copy.deepcopy(self._overhead_condenser_geometry_config)
