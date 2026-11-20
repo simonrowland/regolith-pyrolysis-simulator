@@ -64,8 +64,11 @@ A null area is a typed omission. It is not replaced by a 1 g default or by
 an inferred pellet face. The existing gram-lab area bridge returns no area
 when the field is null; this note does not retune that bridge. Applying
 equipment geometry refuses `exposed_melt_area_not_printed` instead of
-writing `size_crucible`'s face onto that melt. Preset load still accepts
-the empty bridge.
+writing `size_crucible`'s face onto that melt. A printed positive area
+is installed there, before the C0 exit forecast. A present value that
+is not finite and positive refuses `invalid_lab_geometry_positive_value`.
+Preset load still accepts the empty bridge. The scale token is
+`LAB_GEOMETRY_SCALE`.
 
 An unprinted numeric field stays null with a `*_reason` string. Null is
 not coerced to 0. A required balance input that is null refuses with a
@@ -369,7 +372,9 @@ refusals, the hour hook at `steady_state` with `dt_s=3600`, the Robinot
 preset filled only with what the paper prints, and the
 `exposed_melt_area_not_printed` refusal when equipment geometry would
 otherwise adopt `size_crucible`'s face for a gram-lab sample with no
-printed area.
+printed area. A printed positive area is that face, including for the
+C0 forecast inside campaign start. A non-positive present value refuses
+`invalid_lab_geometry_positive_value`.
 
 Left for a later chunk, each only when its input exists:
 

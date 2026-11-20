@@ -126,6 +126,7 @@ from simulator.core import (
     CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
 )
 from simulator.lab_geometry import (
+    LAB_GEOMETRY_SCALE,
     LabGeometry,
     LabGeometryError,
     parse_lab_geometry,
@@ -1704,19 +1705,30 @@ def _stirring_enhanced_sherwood(
     return float(sherwood_laminar) * math.sqrt(sh_input)
 
 
-def gram_lab_exposed_melt_area_bridge(
+def read_gram_lab_exposed_melt_area(
     lab_geometry: Mapping[str, Any] | None,
-) -> dict[str, Any]:
+) -> float | None:
+    """Printed gram-lab melt face, or None when this geometry has no sample face.
+
+    None means the mapping is not a gram-lab sample. The scale token is
+    ``LAB_GEOMETRY_SCALE``. A gram-lab sample whose area is null or blank
+    raises ``exposed_melt_area_not_printed``. A present value that is not
+    finite and positive raises ``invalid_lab_geometry_positive_value``.
+    """
     if not isinstance(lab_geometry, Mapping):
-        return {}
-    if str(lab_geometry.get('scale') or '').strip() != 'gram_lab':
-        return {}
+        return None
+    if str(lab_geometry.get('scale') or '').strip() != LAB_GEOMETRY_SCALE:
+        return None
     sample = lab_geometry.get('sample')
     if not isinstance(sample, Mapping):
-        return {}
-    raw_area = sample.get('exposed_melt_area_m2')
+        return None
+    raw_area = sample.get('exposed_melt_area_m2', None)
     if raw_area in (None, ''):
-        return {}
+        raise LabGeometryError(
+            'exposed_melt_area_not_printed',
+            'lab_geometry.sample.exposed_melt_area_m2 is null; '
+            'size_crucible must not supply the melt face',
+        )
     if isinstance(raw_area, bool):
         raise LabGeometryError(
             'invalid_lab_geometry_positive_value',
@@ -1734,36 +1746,24 @@ def gram_lab_exposed_melt_area_bridge(
             'invalid_lab_geometry_positive_value',
             'lab_geometry.sample.exposed_melt_area_m2 must be finite positive',
         )
+    return area
+
+
+def gram_lab_exposed_melt_area_bridge(
+    lab_geometry: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    try:
+        area = read_gram_lab_exposed_melt_area(lab_geometry)
+    except LabGeometryError as exc:
+        if exc.code != 'exposed_melt_area_not_printed':
+            raise
+        return {}
+    if area is None:
+        return {}
     return {
         'effective_exposed_area_m2': area,
         'area_basis': LAB_EXPOSED_MELT_AREA_BASIS,
     }
-
-
-def refuse_sized_crucible_without_exposed_melt_area(
-    lab_geometry: Mapping[str, Any] | None,
-) -> None:
-    """Refuse size_crucible as the face of a gram-lab sample with no area.
-
-    A null or blank ``exposed_melt_area_m2`` still makes
-    ``gram_lab_exposed_melt_area_bridge`` return ``{}``, so preset load
-    stays valid. The refusal is the equipment copy that would otherwise
-    replace the default melt area with the mass-sized crucible face.
-    A gram-lab mapping with no sample block is not that omission.
-    """
-    if not isinstance(lab_geometry, Mapping):
-        return
-    if str(lab_geometry.get('scale') or '').strip() != 'gram_lab':
-        return
-    sample = lab_geometry.get('sample')
-    if not isinstance(sample, Mapping):
-        return
-    if sample.get('exposed_melt_area_m2', None) in (None, ''):
-        raise LabGeometryError(
-            'exposed_melt_area_not_printed',
-            'lab_geometry.sample.exposed_melt_area_m2 is null; '
-            'size_crucible must not supply the melt face',
-        )
 
 
 def _neufeld_collision_integral_omega_d(T_star: float) -> float:

@@ -13,10 +13,11 @@ import pytest
 import yaml
 
 from simulator import runner as runner_module
+from simulator import condensation as condensation_module
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     COMPARISON_SCHEMA_VERSION,
 )
-from simulator.lab_geometry import LabGeometryError
+from simulator.lab_geometry import LAB_GEOMETRY_SCALE, LabGeometryError
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession
 from tests.test_runner_smoke import _assert_schema_shape
@@ -311,6 +312,85 @@ def test_null_exposed_melt_area_refuses_sized_crucible_face() -> None:
     assert pomeroy_melt_m2 != pytest.approx(
         pomeroy_session.simulator._equipment.crucible.melt_surface_area_m2
     )
+
+
+def test_c0_start_installs_printed_area_before_the_bridge() -> None:
+    robinot = _vacuum_preset("robinot_2026.yaml")
+    printed = copy.deepcopy(robinot)
+    printed["lab_geometry"]["sample"]["exposed_melt_area_m2"] = 0.000123
+    run = _gram_lab_run(printed, campaign="C0")
+    session = SimSession()
+    session.start(run._session_config())
+    melt_m2 = session.simulator.melt.melt_surface_area_m2
+    sized_m2 = session.simulator._equipment.crucible.melt_surface_area_m2
+    assert melt_m2 == pytest.approx(0.000123)
+    assert melt_m2 != pytest.approx(sized_m2)
+    omitted = copy.deepcopy(printed)
+    omitted["lab_geometry"]["sample"]["exposed_melt_area_m2"] = None
+    omitted_session = SimSession()
+    with pytest.raises(LabGeometryError) as caught:
+        omitted_session.start(
+            _gram_lab_run(omitted, campaign="C0")._session_config()
+        )
+    assert caught.value.code == "exposed_melt_area_not_printed"
+    assert omitted_session.simulator.melt.melt_surface_area_m2 == pytest.approx(
+        0.2
+    )
+
+
+@pytest.mark.parametrize("raw_area", [0, False, True, "nope"])
+def test_invalid_exposed_area_refuses_before_sized_face(raw_area) -> None:
+    robinot = copy.deepcopy(_vacuum_preset("robinot_2026.yaml"))
+    robinot["lab_geometry"]["sample"]["exposed_melt_area_m2"] = raw_area
+    session = SimSession()
+    with pytest.raises(LabGeometryError) as caught:
+        session.start(_gram_lab_run(robinot, campaign="C0")._session_config())
+    assert caught.value.code == "invalid_lab_geometry_positive_value"
+    assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(0.2)
+    sized_m2 = session.simulator._equipment.crucible.melt_surface_area_m2
+    assert sized_m2 > 0.0
+    assert session.simulator.melt.melt_surface_area_m2 != pytest.approx(sized_m2)
+
+
+def test_bridge_and_equipment_share_the_exposed_area_reader(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    robinot = _vacuum_preset("robinot_2026.yaml")
+    monkeypatch.setattr(
+        condensation_module,
+        "read_gram_lab_exposed_melt_area",
+        lambda _geometry: 0.000201,
+    )
+    bridge = condensation_module.gram_lab_exposed_melt_area_bridge(
+        robinot["lab_geometry"]
+    )
+    assert bridge["effective_exposed_area_m2"] == pytest.approx(0.000201)
+    run = _gram_lab_run(robinot, campaign="C2A")
+    session = run._start_session()
+    session.simulator._get_turbine_spec()
+    melt_m2 = session.simulator.melt.melt_surface_area_m2
+    assert melt_m2 == pytest.approx(0.000201)
+    assert melt_m2 != pytest.approx(
+        session.simulator._equipment.crucible.melt_surface_area_m2
+    )
+
+
+def test_exposed_area_scale_token_is_lab_geometry_scale(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    assert LAB_GEOMETRY_SCALE == "gram_lab"
+    robinot = _vacuum_preset("robinot_2026.yaml")
+    monkeypatch.setattr(
+        condensation_module,
+        "LAB_GEOMETRY_SCALE",
+        "not_the_gram_lab_token",
+    )
+    session = _gram_lab_run(robinot, campaign="C2A")._start_session()
+    session.simulator._get_turbine_spec()
+    melt_m2 = session.simulator.melt.melt_surface_area_m2
+    sized_m2 = session.simulator._equipment.crucible.melt_surface_area_m2
+    assert melt_m2 == pytest.approx(sized_m2)
+    assert melt_m2 != pytest.approx(0.2)
 
 
 def test_gram_lab_exposed_area_sets_runtime_melt_area() -> None:
