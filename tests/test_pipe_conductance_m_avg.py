@@ -586,7 +586,7 @@ def test_estimate_transport_state_refuses_invalid_effective_capacity(
         )
 
 
-def test_default_throat_area_reproduces_12_cm_diameter():
+def test_default_throat_area_matches_owner_hardware_aperture():
     model = _make_model()
 
     assert model.initial_throat_area_m2 == pytest.approx(
@@ -594,9 +594,9 @@ def test_default_throat_area_reproduces_12_cm_diameter():
         rel=1e-15,
     )
     assert math.sqrt(4.0 * model.initial_throat_area_m2 / math.pi) == (
-        pytest.approx(0.12, rel=1e-15)
+        pytest.approx(0.5, rel=1e-15)
     )
-    assert model.pipe_diameter_m == pytest.approx(0.12, rel=1e-15)
+    assert model.pipe_diameter_m == pytest.approx(0.5, rel=1e-15)
 
 
 def test_stage_area_m2_uses_throat_area_ratios():
@@ -627,12 +627,11 @@ def test_setpoint_condenser_geometry_defaults_anchor_throat_and_stage_areas():
     areas_m2 = geometry["stage_areas_m2"]
     model = OverheadGasModel({}, condenser_geometry_config=geometry)
 
+    assert math.sqrt(4.0 * throat_area_m2 / math.pi) == pytest.approx(0.5)
+    assert model.pipe_diameter_m == pytest.approx(0.5)
     assert model.stage_area_m2("fe_stage1") == pytest.approx(0.236, abs=0.0)
     assert model.stage_area_m2("alkali_stage4") == pytest.approx(0.051, abs=1e-15)
     assert model.stage_area_m2("k_stage4b") == pytest.approx(0.064, abs=0.0)
-    assert math.sqrt(4.0 * throat_area_m2 / math.pi) == pytest.approx(
-        model.pipe_diameter_m
-    )
     assert model.condenser_hydraulic_diameter_m == pytest.approx(0.12)
     assert "k_stage4b" not in model.stage_hydraulic_diameter_m
     assert model.stage_hydraulic_diameter_m["fe_stage1"] == pytest.approx(0.020)
@@ -658,16 +657,16 @@ def test_condenser_areas_and_hydraulic_diameter_do_not_follow_throat():
     )
 
 
-def test_default_condenser_throat_anchor_still_allows_batch_pipe_scaling():
+def test_configured_condenser_throat_is_not_rescaled_by_batch():
     config = load_config_bundle(DEFAULT_DATA_DIR)
     design = EquipmentDesigner(config.setpoints).design_for_batch(
         16000.0,
         config.feedstocks["lunar_mare_low_ti"],
     )
 
-    assert design.pipe.diameter_m == pytest.approx(0.24)
+    assert design.pipe.diameter_m == pytest.approx(0.5)
     assert design.pipe.initial_throat_area_m2 == pytest.approx(
-        math.pi * 0.12**2
+        math.pi * 0.25**2
     )
 
 

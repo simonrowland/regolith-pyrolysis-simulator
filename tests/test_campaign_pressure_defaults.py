@@ -148,7 +148,10 @@ def test_c6_continuum_derivation_uses_selected_static_hold_temperature():
 
     expected_mbar = (
         1.380649e-23 * (1400.0 + 273.15)
-        / (math.sqrt(2.0) * math.pi * (3.798e-10) ** 2 * 0.12 * 0.01)
+        / (
+            math.sqrt(2.0) * math.pi * (3.798e-10) ** 2
+            * float(continuum["pipe_diameter_m"]) * 0.01
+        )
         / 100.0
     )
     assert continuum["derived_pN2_floor_mbar"] == pytest.approx(
@@ -218,30 +221,16 @@ def test_declared_continuum_floor_matches_its_own_derivation(campaign_name):
     )
 
 
-def test_campaign_default_pressure_versus_its_own_continuum_floor():
-    """Pins WHICH campaigns run a default below their own declared floor.
+def test_campaign_default_pressure_is_above_its_continuum_floor():
+    """C4 and C6 defaults clear the continuum floor at the 0.50 m aperture.
 
-    ★ This pins a DEFECT, not an expectation. b-326: C4 and C6 both declare a
-    continuum floor and both set p_total_mbar_default BELOW it --
+        C4  floor 0.083723 mbar   default 0.2   -> 2.39x above, implied Kn 0.00419
+        C6  floor 0.072090 mbar   default 0.2   -> 2.77x above, implied Kn 0.00360
 
-        C4  floor 0.348846 mbar   default 0.2   -> 1.74x below, implied Kn 0.0174
-        C6  floor 0.300374 mbar   default 0.2   -> 1.50x below, implied Kn 0.0150
+    against a declared knudsen_max of 0.01. The 0.2 mbar total pressure
+    remains above each N2 continuum floor with the new fixed aperture.
 
-    against a declared knudsen_max of 0.01. The consequence is real: the
-    viscous-flow refusal that makes C4 unreachable is CORRECT -- the recipe is
-    asking for a pressure its own derivation forbids.
-
-    Resolving it is a physics call (either the 0.2 defaults are wrong, or these
-    campaigns knowingly operate transitional and need a conductance model
-    rather than a continuum P_bulk), so it is owner-gated and NOT fixed here.
-
-    Pinned as the exact violating SET rather than left red or xfailed, because
-    the set is what carries information: fixing one campaign, or a third
-    campaign regressing, both change it and both fail this test. An xfail would
-    stay silent through either.
     """
-    known_violations = {"C4", "C6"}
-
     violations = {}
     for name, campaign in _campaigns_with_continuum_bounds().items():
         default_mbar = campaign.get("p_total_mbar_default")
@@ -251,14 +240,10 @@ def test_campaign_default_pressure_versus_its_own_continuum_floor():
         if float(default_mbar) < floor:
             violations[name] = (float(default_mbar), floor)
 
-    assert set(violations) == known_violations, (
-        f"the set of campaigns running below their own continuum floor has "
-        f"CHANGED (b-326). Now {sorted(violations)}, previously "
-        f"{sorted(known_violations)}. If a campaign was fixed, drop it from "
-        f"known_violations; if a new one regressed, that is a live defect. "
-        f"Detail: "
+    assert not violations, (
+        "campaign defaults below their own continuum floor: "
         + "; ".join(
-            f"{n}: default {d} mbar vs floor {f:.6f} mbar ({f / d:.2f}x below)"
+            f"{n}: default {d} mbar vs floor {f:.6f} mbar"
             for n, (d, f) in sorted(violations.items())
         )
     )
