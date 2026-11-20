@@ -32,6 +32,7 @@ from urllib.parse import quote
 
 from engines.domain_reason import OutOfDomainReason
 
+
 @dataclass(frozen=True)
 class EngineCacheValue:
     hot: object
@@ -300,11 +301,9 @@ CACHEABLE_REFUSAL_CODES = frozenset({
     REFUSAL_OUT_OF_BASIS, REFUSAL_COMPOSITION_PROJECTED, REFUSAL_MAJOR_SUM,
     REFUSAL_NO_LIQUID,
     OutOfDomainReason.FORBIDDEN_SPECIES.value,
-    OutOfDomainReason.TEMPERATURE_RANGE.value,
     OutOfDomainReason.LIQUID_STATE.value,
     OutOfDomainReason.INVALID_PRESSURE_BAR.value,
     OutOfDomainReason.INVALID_FO2_LOG.value,
-    OutOfDomainReason.NON_FINITE_COMPOSITION.value,
     OutOfDomainReason.SUM_PRESSURE_SANITY.value,
 })
 
