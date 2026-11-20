@@ -10,6 +10,7 @@ from simulator.melt_backend.base import _call_with_hard_timeout
 
 def test_deterministic_refusal_allowlist_is_explicit():
     from simulator.engine_cache import CACHEABLE_REFUSAL_CODES
+    from simulator.melt_backend.vaporock import EMPTY_SPECIATION_STATUS_REASON
 
     assert CACHEABLE_REFUSAL_CODES == frozenset({
         "out_of_basis", "composition_projected", "sum_below_95_wt_pct", "no_liquid",
@@ -18,6 +19,7 @@ def test_deterministic_refusal_allowlist_is_explicit():
         OutOfDomainReason.INVALID_PRESSURE_BAR.value,
         OutOfDomainReason.INVALID_FO2_LOG.value,
         OutOfDomainReason.SUM_PRESSURE_SANITY.value,
+        EMPTY_SPECIATION_STATUS_REASON,
     })
 
 
@@ -107,6 +109,55 @@ def test_vaporock_domain_refusal_hits_after_equilibrium_hot_round_trip(
     assert cold.status == warm.status == "out_of_domain"
     assert cold.diagnostics["backend_status_reason"] == code
     assert warm.diagnostics["backend_status_reason"] == code
+    assert len(calls) == 1
+    counts = engine_cache.engine_cache_counters()["vaporock"]
+    assert counts["hits"] == counts["misses"] == counts["stores"] == 1
+
+
+def test_vaporock_no_finite_speciation_refusal_hits_after_disk_round_trip(
+    tmp_path, monkeypatch,
+):
+    from simulator.melt_backend.vaporock import (
+        EMPTY_SPECIATION_STATUS_REASON,
+        EmptySpeciationCause,
+    )
+
+    kwargs = {
+        "temperature_C": 1600.0,
+        "composition_mol": {"SiO2": 1.0},
+        "pressure_bar": 1e-6,
+        "fO2_log": -8.0,
+    }
+    cached_call, backend, handle, calls, solve = _vaporock_equilibrium_cache_call(
+        kwargs, tmp_path, monkeypatch
+    )
+
+    def empty_speciation(**_kwargs):
+        backend._latch_empty_speciation(
+            EmptySpeciationCause.NO_FINITE_VALUES,
+            {
+                "speciation_row_count": 2,
+                "speciation_finite_count": 0,
+                "speciation_nan_count": 1,
+                "speciation_neginf_count": 1,
+                "speciation_other_nonfinite_count": 0,
+            },
+        )
+        return {}
+
+    monkeypatch.setattr(backend, "_call_vaporock", empty_speciation)
+    cold = cached_call(handle, kwargs, solve)
+    engine_cache._MEMORY_CACHE.clear()
+    warm = cached_call(
+        handle, kwargs, lambda: pytest.fail("speciation refusal was not stored")
+    )
+
+    assert cold.status == warm.status == "not_converged"
+    assert (
+        cold.diagnostics["backend_status_reason"]
+        == EMPTY_SPECIATION_STATUS_REASON
+    )
+    assert warm.diagnostics == cold.diagnostics
     assert len(calls) == 1
     counts = engine_cache.engine_cache_counters()["vaporock"]
     assert counts["hits"] == counts["misses"] == counts["stores"] == 1
