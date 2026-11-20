@@ -428,6 +428,9 @@ _AXIS_NAMES = (
 _P_PARTIAL_UNCOMPARED_AXES = frozenset(
     {"reaction", "reference_state", "reservoir"}
 )
+_GAS_PRESSURE_IDENTITY_QUANTITIES = frozenset(
+    {Quantity.P_PARTIAL, Quantity.FUGACITY}
+)
 
 
 @dataclass(frozen=True)
@@ -1097,7 +1100,7 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "subtype",
             "total_pressure_Pa",
         )
-    elif q in {Quantity.P_PARTIAL, Quantity.FUGACITY}:
+    elif q in _GAS_PRESSURE_IDENTITY_QUANTITIES:
         # Gas partial pressure and fugacity share the same species and state:
         # temperature, oxygen, total pressure, and printed melt. Their
         # reaction, standard state, and pure-reservoir axes are not inputs.
@@ -1497,7 +1500,7 @@ def _melt_activity_uncompared_axes(
 def _uncompared_axes_for(identity: Identity) -> frozenset[str]:
     """Return axes that may retain values without becoming comparison keys."""
 
-    if quantity_token(identity) in {Quantity.P_PARTIAL, Quantity.FUGACITY}:
+    if quantity_token(identity) in _GAS_PRESSURE_IDENTITY_QUANTITIES:
         return _P_PARTIAL_UNCOMPARED_AXES
     return _melt_activity_uncompared_axes((identity,))
 
