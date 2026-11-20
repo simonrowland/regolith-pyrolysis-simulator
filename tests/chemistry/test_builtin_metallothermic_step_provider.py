@@ -3456,7 +3456,7 @@ def test_c3_source_redox_and_elemental_vapor_respect_metal_saturation(
 
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
-def test_c2a_metal_saturation_buffers_excess_oxygen_deficit_as_fe_metal(
+def test_c2a_metal_saturation_buffer_commits_native_metal_and_oxygen(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -3475,43 +3475,63 @@ def test_c2a_metal_saturation_buffers_excess_oxygen_deficit_as_fe_metal(
     temperature_K = sim.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
     floor = sim._melt_metal_saturation_fO2_floor_log(temperature_K)
     assert floor is not None
-    assert floor[1] == "FeO"
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = floor[0]
     sim.melt.oxygen_reservoir.reference_T_K = temperature_K
     sim.melt.fO2_log = floor[0]
     sim.melt.melt_fO2_log = floor[0]
     sim._sync_oxygen_reservoir_mirror()
 
-    # From FeO -> Fe + 1/2 O2: each mol of oxygen deficit (mol O2-equivalent)
-    # binds 2*n_Fe/n_O mol Fe. Compute this from the ledger oxide stoichiometry,
-    # independently of the transition that must commit the precipitated Fe.
     oxygen_deficit_o2_mol = 1.0e-3
-    _, fe_atoms_per_feo, oxygen_atoms_per_feo = OXIDE_TO_METAL["FeO"]
-    expected_fe_mol = (
-        oxygen_deficit_o2_mol
-        * 2.0
-        * float(fe_atoms_per_feo)
-        / float(oxygen_atoms_per_feo)
+    tap_before = sim.atom_ledger.atom_moles_by_account(
+        "terminal.drain_tap_material"
     )
-    fe_mol_before = float(
-        sim.atom_ledger.atom_moles_by_account("process.metal_phase").get(
-            "Fe", 0.0
+    buffer_o2_before = float(
+        sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0)
+        or 0.0
+    )
+    melt_o_before = float(
+        sim.atom_ledger.atom_moles_by_account("process.cleaned_melt").get(
+            "O", 0.0
         )
         or 0.0
     )
+    transition_start = len(sim.atom_ledger.transitions)
     sim._apply_oxygen_reservoir_redox_source_terms(
         {"test:c2a_oxygen_deficit": -oxygen_deficit_o2_mol},
         exchange_direction="test:c2a_oxygen_deficit",
     )
-    fe_mol_after = float(
-        sim.atom_ledger.atom_moles_by_account("process.metal_phase").get(
-            "Fe", 0.0
+    tap_after = sim.atom_ledger.atom_moles_by_account(
+        "terminal.drain_tap_material"
+    )
+    buffer_o2_after = float(
+        sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0)
+        or 0.0
+    )
+    melt_o_after = float(
+        sim.atom_ledger.atom_moles_by_account("process.cleaned_melt").get(
+            "O", 0.0
         )
         or 0.0
     )
-    assert fe_mol_after - fe_mol_before == pytest.approx(
-        expected_fe_mol,
-        rel=1e-9,
+    metal_deltas = {
+        metal: float(tap_after.get(metal, 0.0) or 0.0)
+        - float(tap_before.get(metal, 0.0) or 0.0)
+        for metal in ("Ni", "Co", "Fe")
+    }
+    assert any(delta > 0.0 for delta in metal_deltas.values()), metal_deltas
+    assert buffer_o2_after > buffer_o2_before
+    committed = sim.atom_ledger.transitions[transition_start:]
+    cleaned_melt_o_debit = sum(
+        transition.debit_atom_moles(sim.atom_ledger.registry).get("O", 0.0)
+        for transition in committed
+    )
+    cleaned_melt_o_credit = sum(
+        transition.credit_atom_moles(sim.atom_ledger.registry).get("O", 0.0)
+        for transition in committed
+    )
+    assert melt_o_before - cleaned_melt_o_debit + cleaned_melt_o_credit == pytest.approx(
+        melt_o_after,
+        rel=1e-12,
         abs=1e-12,
     )
     assert (
@@ -3519,6 +3539,46 @@ def test_c2a_metal_saturation_buffers_excess_oxygen_deficit_as_fe_metal(
         >= floor[0] - 1e-12
     )
     assert abs(sim._make_snapshot().mass_balance_error_pct) < 5e-12
+
+
+def test_c2a_buffer_plan_exhausts_lunar_nio_before_touching_feo(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        _hkl_only_setpoints(copy.deepcopy(setpoints_data)),
+        additives_kg={"K": 30.0, "Na": 25.0, "Mg": 60.0},
+    )
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.campaign_hour = 6.0
+    sim.melt.temperature_C = 1650.0
+    temperature_K = sim.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
+    composition_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    floor_rows = sim._melt_metal_saturation_fO2_floor_rows(
+        temperature_K,
+        composition_mol=composition_mol,
+    )
+    assert [row[1] for row in floor_rows[:3]] == ["NiO", "CoO", "FeO"]
+    nickel_oxide_mol = float(composition_mol["NiO"])
+
+    plan = sim._plan_melt_metal_saturation_buffer(
+        candidate_fO2_log=floor_rows[1][0],
+        temperature_K=temperature_K,
+        composition_mol=composition_mol,
+    )
+
+    assert plan["reduction_order"] == ["NiO"]
+    assert plan["oxide_extent_mol_by_oxide"]["NiO"] == pytest.approx(
+        nickel_oxide_mol,
+        rel=1e-9,
+        abs=1e-12,
+    )
+    assert "FeO" not in plan["oxide_extent_mol_by_oxide"]
 
 
 def test_mars_basalt_c3_shuttle_conserves_total_elemental_fe(
