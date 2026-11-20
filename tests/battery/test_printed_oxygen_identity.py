@@ -24,6 +24,7 @@ from simulator.battery.migrate import (
     _BOUNDED_FO2_REASON,
     _band_text,
     _log_fO2_to_pa,
+    _printed_oxygen_may_set,
 )
 from simulator.battery.records import Located, Value
 from simulator.chemistry.fo2_buffers import evaluate_buffer
@@ -79,6 +80,14 @@ def test_sato_hickling_atm_fugacity_identity_matches_the_reported_series() -> No
     assert _decimal_point(observation.identity.fO2_Pa) == Decimal(
         "1.275606173500439925962071498E-10"
     )
+
+
+def test_fugacity_is_not_listed_as_an_inapplicable_oxygen_axis() -> None:
+    doc = _printed_oxygen_may_set.__doc__ or ""
+    not_applicable_description = doc.split(
+        "Not-applicable axes stay not applicable.", 1
+    )[1].split("A required", 1)[0]
+    assert "fugacity" not in not_applicable_description.lower()
 
 
 def _one(result, *fragments: str):
