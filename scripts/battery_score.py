@@ -532,9 +532,16 @@ def _engine_cache_summary(
     counters_by_engine: dict[str, dict[str, int]] = {}
     sources = [local_counters or {}]
     if studio_cache_summary is not None:
-        studio_by_engine = studio_cache_summary.get("by_engine", {})
-        if isinstance(studio_by_engine, Mapping):
-            sources.append(studio_by_engine)
+        # A studio summary written by this scorer carries counters_by_engine,
+        # a superset of by_engine (hits/misses/stores plus not_stored:* and
+        # uncacheable:*). Prefer it so studio-dispatched MELTS engines keep
+        # their not-stored breakdown; fall back to by_engine for an older
+        # studio summary that predates the field.
+        studio_counts = studio_cache_summary.get("counters_by_engine")
+        if not isinstance(studio_counts, Mapping):
+            studio_counts = studio_cache_summary.get("by_engine", {})
+        if isinstance(studio_counts, Mapping):
+            sources.append(studio_counts)
     for source in sources:
         if not isinstance(source, Mapping):
             continue

@@ -146,6 +146,33 @@ def test_score_summary_preserves_dynamic_not_stored_counters() -> None:
     }
 
 
+def test_studio_summary_keeps_not_stored_breakdown() -> None:
+    studio = {
+        "by_engine": {"alphamelts": {"hits": 5, "misses": 7, "stores": 3}},
+        "counters_by_engine": {
+            "alphamelts": {
+                "hits": 5,
+                "misses": 7,
+                "stores": 3,
+                "not_stored:refusal:untyped": 4,
+            }
+        },
+    }
+    summary = battery_score._engine_cache_summary(None, studio_cache_summary=studio)
+
+    assert summary["by_engine"]["alphamelts"] == {"hits": 5, "misses": 7, "stores": 3}
+    assert summary["counters_by_engine"]["alphamelts"]["not_stored:refusal:untyped"] == 4
+    counts = summary["counters_by_engine"]["alphamelts"]
+    assert counts["misses"] == counts["stores"] + counts["not_stored:refusal:untyped"]
+
+
+def test_older_studio_summary_without_counters_still_merges() -> None:
+    studio = {"by_engine": {"alphamelts": {"hits": 2, "misses": 1, "stores": 1}}}
+    summary = battery_score._engine_cache_summary(None, studio_cache_summary=studio)
+
+    assert summary["by_engine"]["alphamelts"] == {"hits": 2, "misses": 1, "stores": 1}
+
+
 def test_parallel_warm_worker_counters_are_summed_per_engine(
     tmp_path: Path,
     monkeypatch: Any,
