@@ -317,7 +317,38 @@ def runner_golden_loader(tmp_path_factory):
     return load
 
 
+# Golden producers share one MAGEMin chain. The machine-wide flock default
+# is 2 slots, and the slot wait is inside the 15s warm-call timeout, so a
+# focused -n 6 run of these files used to time the gate out twice and hold
+# the last curve. Tests that already have a group (serial, an existing
+# magemin chain) are left on it. This is not a guarantee under arbitrary
+# CPU load from other jobs: a held curve still fails as an environment
+# error before the digest compare.
+_GOLDEN_MAGEMIN_GROUP_FILES = frozenset({
+    "test_coating_rate.py",
+    "test_condensation_green_pins.py",
+    "test_condensation_vapour_fog_ledger.py",
+    "test_golden_sections.py",
+    "test_recipe_io.py",
+    "test_run_executor.py",
+    "test_runner_smoke.py",
+    "test_sio_yield_regression.py",
+    "test_web_socket_trace.py",
+})
+
+
+def _group_golden_magemin_producers(items: list[pytest.Item]) -> None:
+    for item in items:
+        filename = _Path(item.nodeid.split("::", 1)[0]).name
+        if filename not in _GOLDEN_MAGEMIN_GROUP_FILES:
+            continue
+        if any(mark.name == "xdist_group" for mark in item.iter_markers()):
+            continue
+        item.add_marker(pytest.mark.xdist_group("magemin_fullrun_a"))
+
+
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    _group_golden_magemin_producers(items)
     for item in items:
         get_closest_marker = getattr(item, "get_closest_marker", None)
         if not callable(get_closest_marker):

@@ -845,6 +845,7 @@ def test_cost_rollup_empty_electrical_breakdown_mapping_means_zero():
     assert fe.thermal_flux_h == pytest.approx(1273.15)
 
 
+@pytest.mark.xdist_group("magemin_fullrun_a")
 def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture(
     runner_golden_loader,
 ):

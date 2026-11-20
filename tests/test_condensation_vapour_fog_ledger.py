@@ -177,6 +177,11 @@ def _assert_ledger(name: str, run: PyrolysisRun) -> None:
     result = run._run_session(session)
     _record(name, session, result)
     assert result["status"] == "ok"
+    from tests.chemistry.test_condensation_green_pins import (
+        deterministic_gate_payload,
+    )
+
+    deterministic_gate_payload(session.simulator)
     digest = ledger_digest(
         session.simulator.atom_ledger.kg_by_account(),
         session.simulator.product_ledger(),
