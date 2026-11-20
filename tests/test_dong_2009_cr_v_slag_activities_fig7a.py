@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
@@ -10,17 +11,16 @@ import yaml
 
 from simulator.battery.enums import ValueKind
 from simulator.battery.migrate import Migrator
-from tools.validate_literature_extracts import check_all_fidelity_samples_match
+from simulator.corpus_paths import regolith_corpus_root
 
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts-v2/dong-2009-cr-v-slag-activities.yaml"
-DIGITIZATION = ROOT / "_corpus-out/tables/dong-2009-cr-v-slag-activities/f7a.csv"
-PINS = {
-    "1803-3": ("0.00442", "0.0195"),
-    "1873-2": ("0.00065", "0.0023"),
-    "1923-3": ("0.00134", "0.0082"),
-}
+CORPUS_BRANCH = "w1119dong-fig7a"
+CORPUS_COMMIT = "af89e74f4052a01a0d034c72c7e0486362d83904"
+DIGITIZATION_PATH = "tables/dong-2009-cr-v-slag-activities/f7a.csv"
+DIGITIZATION_SHA256 = "f731888428e30c6acfbfc28239c32144181ab22a7cf90d0d29c9878c721dcbff"
+DIGITIZATION = regolith_corpus_root() / DIGITIZATION_PATH
 
 
 def _rows(document: dict) -> dict[str, dict]:
@@ -33,28 +33,87 @@ def _rows(document: dict) -> dict[str, dict]:
 
 def _assert_digitization_pins(document: dict, digitization: dict[str, dict]) -> None:
     points = _rows(document)
-    for row_id, (x_cr_o, activity) in PINS.items():
-        assert points[row_id]["x_CrO"] == digitization[row_id]["x_CrO"] == x_cr_o
-        assert points[row_id]["activity"] == digitization[row_id]["activity_CrO"] == activity
+    assert points.keys() == digitization.keys()
+    for row_id, csv_row in digitization.items():
+        assert points[row_id]["x_CrO"] == csv_row["x_CrO"]
+        assert points[row_id]["activity"] == csv_row["activity_CrO"]
+        assert points[row_id]["digitization_uncertainty"]["x_CrO"].removeprefix(
+            "±"
+        ) == csv_row["x_uncertainty"]
+        assert points[row_id]["digitization_uncertainty"]["activity"].removeprefix(
+            "±"
+        ) == csv_row["activity_uncertainty"]
 
 
-def test_figure_digitization_pins_match_csv_and_detect_mutation() -> None:
+def _load_digitization() -> dict[str, dict]:
+    if not DIGITIZATION.is_file():
+        pytest.skip(
+            f"corpus artifact {DIGITIZATION_PATH} is unavailable; expected branch "
+            f"{CORPUS_BRANCH} at {CORPUS_COMMIT}"
+        )
+    payload = DIGITIZATION.read_bytes()
+    assert hashlib.sha256(payload).hexdigest() == DIGITIZATION_SHA256
+    return {
+        row["row_id"]: row
+        for row in csv.DictReader(payload.decode("utf-8").splitlines())
+    }
+
+
+def test_figure_digitization_pins_all_csv_values_and_detects_each_mutation() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    with DIGITIZATION.open(encoding="utf-8", newline="") as source:
-        digitization = {row["row_id"]: row for row in csv.DictReader(source)}
+    digitization = _load_digitization()
+    assert len(digitization) == 9
     _assert_digitization_pins(document, digitization)
-    for row_id, point in _rows(document).items():
-        csv_row = digitization[row_id]
-        uncertainty = point["digitization_uncertainty"]
-        assert uncertainty["x_CrO"].removeprefix("±") == csv_row["x_uncertainty"]
-        assert uncertainty["activity"].removeprefix("±") == csv_row["activity_uncertainty"]
-    assert check_all_fidelity_samples_match(document, label=EXTRACT.stem) == []
 
-    mutated = deepcopy(document)
-    _rows(mutated)["1873-2"]["activity"] = "0.0024"
-    with pytest.raises(AssertionError):
-        _assert_digitization_pins(mutated, digitization)
-    assert check_all_fidelity_samples_match(mutated, label="mutated Fig. 7(a)")
+    for row_id in digitization:
+        for field in ("x_CrO", "activity"):
+            mutated = deepcopy(document)
+            point = _rows(mutated)[row_id]
+            point[field] = str(Decimal(point[field]) + Decimal("0.0001"))
+            with pytest.raises(AssertionError):
+                _assert_digitization_pins(mutated, digitization)
+
+
+def test_source_identity_and_page_locators_match_the_held_conference_paper() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    assert "doi" not in document["source"]
+    assert "pp. 327–336" in document["source"]["citation"]
+    assert "fidelity_samples" not in document
+    source_files = document["source_files"]
+    assert source_files["corpus_repo"] == "regolith-corpus"
+    assert source_files["corpus_commit"]["value"] == CORPUS_COMMIT
+    assert source_files["files"][0]["path"] == DIGITIZATION_PATH
+    assert source_files["files"][0]["sha256"]["value"] == DIGITIZATION_SHA256
+
+    observations = document["species"]["CrO"]["observations"]
+    reason = observations[0]["standard_state"]["state"]["reason"]
+    assert "Cr(Pt)(s) + 1/2 O2(g) = CrO(l)" in reason
+    assert "does not state whether CrO(l) is pure" in reason
+    for observation in observations:
+        assert observation["standard_state"]["locator"] == {
+            "page": 3,
+            "published_page": 329,
+            "pdf_page_index": 2,
+            "equation": "1",
+        }
+
+    experiment = document["experiments"][0]["locator"]
+    assert (
+        experiment["page"],
+        experiment["published_page"],
+        experiment["pdf_page_index"],
+    ) == (4, 330, 3)
+    points = _rows(document)
+    for point in points.values():
+        conditions = point["point_conditions"]
+        assert conditions["gas_mix"]["locator"]["published_page"] == 327
+        assert conditions["Cr2O3_reagent"]["locator"]["published_page"] == 329
+        assert conditions["base_slag_system"]["locator"] == {
+            "page": 5,
+            "published_page": 331,
+            "pdf_page_index": 4,
+            "section": "Results — Equilibrium Time",
+        }
 
 
 def test_isolated_migration_preserves_all_nine_located_rows() -> None:
@@ -66,9 +125,7 @@ def test_isolated_migration_preserves_all_nine_located_rows() -> None:
     assert len(result.observations) == 9
 
     observations = [
-        row
-        for row in result.observations.values()
-        if row.value.kind is ValueKind.POINT
+        row for row in result.observations.values() if row.value.kind is ValueKind.POINT
     ]
     assert len(observations) == 9
     source_points = _rows(yaml.safe_load(EXTRACT.read_text(encoding="utf-8")))
@@ -86,7 +143,10 @@ def test_isolated_migration_preserves_all_nine_located_rows() -> None:
         )
         assert migrated.identity.temperature_K.value == temp_k
         assert migrated.identity.reference_state.is_unknown
-        assert migrated.identity.reference_state.reason == "not printed"
+        assert (
+            "Cr(Pt)(s) + 1/2 O2(g) = CrO(l)"
+            in migrated.identity.reference_state.reason
+        )
         assert migrated.point_conditions is not None
         condition_keys = (
             "temperature_K",

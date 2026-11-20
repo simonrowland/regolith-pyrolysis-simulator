@@ -3,16 +3,16 @@ source_id: dong-2009-cr-v-slag-activities
 source:
   citation: >-
     Dong, P., Seetharaman, S. and Wang, X. (2009), “Thermodynamic Activity of Chromium,
-    Vanadium Oxide in CaO-SiO2-MgO-Al2O3 Slags,” MOLTEN 2009, Santiago, Chile, pp. 328–337.
-  doi: 10.2374/SRI08SP124
+    Vanadium Oxide in CaO-SiO2-MgO-Al2O3 Slags,” MOLTEN 2009, Santiago, Chile, pp. 327–336.
   year: 2009
   corpus_asset: raw/dong-2009-cr-v-slag-activities/dong-2009-cr-v-slag-activities.pdf
 source_files:
-  corpus_repo: regolith-pyrolysis-simulator
+  corpus_repo: regolith-corpus
+  corpus_commit: {tag: value, value: af89e74f4052a01a0d034c72c7e0486362d83904}
   files:
     - asset_id: tables:dong-2009-cr-v-slag-activities
       role: table_csv
-      path: _corpus-out/tables/dong-2009-cr-v-slag-activities/f7a.csv
+      path: tables/dong-2009-cr-v-slag-activities/f7a.csv
       sha256:
         tag: value
         value: f731888428e30c6acfbfc28239c32144181ab22a7cf90d0d29c9878c721dcbff
@@ -31,37 +31,9 @@ experiments:
   - experiment_id: dong_2009_gas_slag_equilibrium
     locator:
       page: 4
-      published_page: 331
+      published_page: 330
       pdf_page_index: 3
       section: Experimental Procedure
-fidelity_samples:
-  - path: species.CrO.observations[dong_2009_fig7a_1803K].values.points[2].activity
-    value: '0.0195'
-    locator:
-      page: 7
-      published_page: 333
-      pdf_page_index: 6
-      figure: '7'
-      panel: a
-      note: The figure-digitization CSV is the numeric source for this drawn marker.
-  - path: species.CrO.observations[dong_2009_fig7a_1873K].values.points[1].activity
-    value: '0.0023'
-    locator:
-      page: 7
-      published_page: 333
-      pdf_page_index: 6
-      figure: '7'
-      panel: a
-      note: The figure-digitization CSV is the numeric source for this drawn marker.
-  - path: species.CrO.observations[dong_2009_fig7a_1923K].values.points[2].activity
-    value: '0.0082'
-    locator:
-      page: 7
-      published_page: 333
-      pdf_page_index: 6
-      figure: '7'
-      panel: a
-      note: The figure-digitization CSV is the numeric source for this drawn marker.
 species:
   CrO:
     observations:
@@ -80,14 +52,16 @@ species:
         standard_state:
           state:
             tag: unknown
-            reason: not printed
+            reason: >-
+              Equation (1) prints “Cr(Pt)(s) + 1/2 O2(g) = CrO(l)”; the paper does not state
+              whether CrO(l) is pure, hypothetical, or otherwise normalized as the activity
+              standard state.
           inferred: false
           locator:
-            page: 7
-            published_page: 333
-            pdf_page_index: 6
-            figure: '7'
-            panel: a
+            page: 3
+            published_page: 329
+            pdf_page_index: 2
+            equation: '1'
         units: dimensionless activity
         experiment: dong_2009_gas_slag_equilibrium
         values:
@@ -115,25 +89,25 @@ species:
                   locator: {page: 7, published_page: 333, pdf_page_index: 6, figure: '7', panel: a}
                 base_slag_system:
                   state: {tag: value, value: CaO-SiO2-MgO-Al2O3-CrOX system}
-                  locator: {page: 4, published_page: 331, pdf_page_index: 3, section: Results — Equilibrium Time}
+                  locator: {page: 5, published_page: 331, pdf_page_index: 4, section: Results — Equilibrium Time}
                 Cr2O3_reagent:
                   state: {tag: value, value: Cr2O3 powder}
-                  locator: {page: 3, published_page: 330, pdf_page_index: 2, section: Raw Material}
+                  locator: {page: 3, published_page: 329, pdf_page_index: 2, section: Raw Material}
                 nominal_CrOx_loading:
                   state: {tag: unknown, reason: No numeric nominal CrOx loading is stated for this point.}
-                  locator: {page: 3, published_page: 330, pdf_page_index: 2, section: Raw Material}
+                  locator: {page: 3, published_page: 329, pdf_page_index: 2, section: Raw Material}
                 targeted_mixture_mass:
                   state: {tag: value, value: total mass of each mixture was about 1.5~2 g}
-                  locator: {page: 3, published_page: 330, pdf_page_index: 2, section: Raw Material}
+                  locator: {page: 3, published_page: 329, pdf_page_index: 2, section: Raw Material}
                 gas_mix:
                   state: {tag: value, value: 'mixtures of CO, CO2 and Ar gases'}
-                  locator: {page: 1, published_page: 328, pdf_page_index: 0, section: Abstract}
+                  locator: {page: 1, published_page: 327, pdf_page_index: 0, section: Abstract}
                 gas_mix_ratio:
                   state: {tag: unknown, reason: The gas ratios are not stated per plotted point.}
-                  locator: {page: 1, published_page: 328, pdf_page_index: 0, section: Abstract}
+                  locator: {page: 1, published_page: 327, pdf_page_index: 0, section: Abstract}
                 chromium_valence_assumption:
                   state: {tag: value, value: all the Cr in the slag was assumed to be present in the divalent state}
-                  locator: {page: 1, published_page: 328, pdf_page_index: 0, section: Abstract}
+                  locator: {page: 1, published_page: 327, pdf_page_index: 0, section: Abstract}
             - row_as_digitized: 1803-2
               T_C: '1529.85'
               x_CrO: '0.00134'
@@ -167,9 +141,14 @@ species:
           series: '1873 K circles'
           note: Digitized marker series; numeric row values are in values.points.
         standard_state:
-          state: {tag: unknown, reason: not printed}
+          state:
+            tag: unknown
+            reason: >-
+              Equation (1) prints “Cr(Pt)(s) + 1/2 O2(g) = CrO(l)”; the paper does not state
+              whether CrO(l) is pure, hypothetical, or otherwise normalized as the activity
+              standard state.
           inferred: false
-          locator: {page: 7, published_page: 333, pdf_page_index: 6, figure: '7', panel: a}
+          locator: {page: 3, published_page: 329, pdf_page_index: 2, equation: '1'}
         units: dimensionless activity
         experiment: dong_2009_gas_slag_equilibrium
         values:
@@ -223,9 +202,14 @@ species:
           series: '1923 K triangles'
           note: Digitized marker series; numeric row values are in values.points.
         standard_state:
-          state: {tag: unknown, reason: not printed}
+          state:
+            tag: unknown
+            reason: >-
+              Equation (1) prints “Cr(Pt)(s) + 1/2 O2(g) = CrO(l)”; the paper does not state
+              whether CrO(l) is pure, hypothetical, or otherwise normalized as the activity
+              standard state.
           inferred: false
-          locator: {page: 7, published_page: 333, pdf_page_index: 6, figure: '7', panel: a}
+          locator: {page: 3, published_page: 329, pdf_page_index: 2, equation: '1'}
         units: dimensionless activity
         experiment: dong_2009_gas_slag_equilibrium
         values:
