@@ -5137,26 +5137,6 @@ def test_gas_pressure_and_fugacity_use_only_the_matching_gas_map_species(
         assert missing_pressure.refusal_detail["fields"] == ["total_pressure_Pa"]
         assert calls["n"] == before
 
-        oxygen_identity = M.fill_identity(
-            Quantity.FUGACITY,
-            Species("O2", Phase.G),
-            temperature_K=State.of(Decimal("1643.15")),
-            fO2_Pa=State.of(Decimal("1e-8")),
-            total_pressure_Pa=State.of(Decimal("100000")),
-            composition=State.of(composition),
-        )
-        before = calls["n"]
-        circular = predict(
-            Species("O2", Phase.G),
-            Quantity.FUGACITY,
-            engine,
-            identity=oxygen_identity,
-        )
-        assert circular.value is None
-        assert circular.refusal_reason is RefusalReason.CYCLIC_DERIVATION
-        assert circular.refusal_detail["reason"] == "circular_oxygen_input"
-        assert calls["n"] == before
-
     for engine in (Engine.VAPOROCK, Engine.OPENIMCC):
         fugacity_identity = M.fill_identity(
             Quantity.FUGACITY,
@@ -5246,6 +5226,102 @@ def test_gas_pressure_and_fugacity_use_only_the_matching_gas_map_species(
     for engine in (Engine.VAPOROCK, Engine.OPENIMCC):
         mutated = predict(Species("H2O", Phase.G), Quantity.FUGACITY, engine)
         assert mutated.value == Decimal("2469.0")
+
+
+@pytest.mark.parametrize(
+    "quantity", (Quantity.FUGACITY, Quantity.P_PARTIAL, Quantity.P_REFERENCE)
+)
+@pytest.mark.parametrize("engine", (Engine.VAPOROCK, Engine.OPENIMCC))
+@pytest.mark.parametrize("formula", ("O2", "O2(g)"))
+def test_oxygen_pressure_quantities_refuse_echoed_fo2(
+    monkeypatch: pytest.MonkeyPatch,
+    quantity: Quantity,
+    engine: Engine,
+    formula: str,
+) -> None:
+    """An observed O2 pressure cannot be its own commanded fO2 prediction."""
+    from simulator.battery import migrate as M
+
+    identity = (
+        replace(
+            F.pref_identity(fO2_Pa=Decimal("1e-8")),
+            species=Species(formula, Phase.G),
+        )
+        if quantity is Quantity.P_REFERENCE
+        else M.fill_identity(
+            quantity,
+            Species(formula, Phase.G),
+            temperature_K=State.of(Decimal("1643.15")),
+            fO2_Pa=State.of(Decimal("1e-8")),
+            total_pressure_Pa=State.of(Decimal("100000")),
+            composition=State.of(
+                Composition(
+                    basis="ordered_complete_mole_inventory",
+                    components=(("SiO2", Decimal("0.55")), ("Na2O", Decimal("0.45"))),
+                    amount_basis=AmountBasis.MOLE_FRACTION,
+                )
+            ),
+        )
+    )
+    observation = F.observation(
+        f"oxygen-echo-{quantity.value}-{engine.value}",
+        "oxygen-echo-exp",
+        identity,
+        Decimal("1e-8"),
+        source_id="oxygen-echo",
+    )
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
+
+    handle = EngineHandle(
+        name=engine.value,
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+
+    solve_calls = 0
+
+    def echo_commanded_o2(_handle, pot, *, temperature_K, po2, **_kwargs):
+        nonlocal solve_calls
+        solve_calls += 1
+        return EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=engine.value,
+            temperature_K=temperature_K,
+            po2=po2,
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={},
+            gas_partial_pressures_Pa={
+                "O2": float(po2.po2_bar) * 100000.0,
+            },
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+        )
+
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(battery, "equilibrate_cell", echo_commanded_o2)
+    prediction = predict_with_engine(
+        engine,
+        observation,
+        handles={engine.value: handle},
+        isolated=False,
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.CYCLIC_DERIVATION
+    assert prediction.refusal_detail["reason"] == "circular_oxygen_input"
+    assert solve_calls == 0
 
 
 def test_static_equilibrium_pressure_refuses_missing_reservoir_or_engine_total(
@@ -10746,24 +10822,32 @@ def test_vapour_rail_includes_fugacity_and_only_vapour_quantities() -> None:
     assert no_headline_rail_reason(Quantity.VISCOSITY) == "no_headline_rail:viscosity"
 
 
-def test_partial_molar_enthalpy_keeps_existing_engine_refusal() -> None:
+@pytest.mark.parametrize(
+    "engine",
+    (Engine.OPENIMCC, Engine.VAPOROCK, Engine.ALPHAMELTS, Engine.MAGEMIN),
+)
+def test_partial_molar_enthalpy_keeps_existing_engine_refusal(engine: Engine) -> None:
     identity = replace(
         F.activity_identity(formula="SiO2", component_basis="SiO2"),
         quantity=Quantity.PARTIAL_MOLAR_ENTHALPY,
         species=Species("SiO2", Phase.L),
     )
     observation = F.observation(
-        "partial-enthalpy-openimcc",
+        f"partial-enthalpy-{engine.value}",
         "partial-enthalpy-exp",
         identity,
         Decimal("0"),
         source_id="partial-enthalpy-refusal",
     )
 
-    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+    prediction = predict_with_engine(engine, observation)
 
+    assert prediction.value is None
     assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
-    assert prediction.refusal_detail["reason"] != "partial_enthalpy_no_liquid_route"
+    assert prediction.refusal_detail == {
+        "reason": "quantity_not_predicted",
+        "quantity": Quantity.PARTIAL_MOLAR_ENTHALPY.value,
+    }
 
 
 _SAMPLE_PHASE_NOT_MELT_OBSERVABLE = "sample_phase_not_melt_activity_observable"

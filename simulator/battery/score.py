@@ -8786,6 +8786,36 @@ def _has_printed_fo2(observation: Observation, identity: Identity) -> bool:
     return has_printed_fo2(observation, identity)
 
 
+def _observation_supplies_commanded_engine_input(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    quantity: Quantity,
+) -> str | None:
+    """Return the observed field fed back as an engine input, when present."""
+
+    species = identity.species
+    if (
+        quantity in _VAPOUR_EQUILIBRIUM
+        and species is not None
+        and "fO2_Pa" in profile_for(identity).required
+        and _has_printed_fo2(observation, identity)
+    ):
+        from simulator.vapour_rail.channels import is_dioxygen_formula
+
+        if is_dioxygen_formula(species.formula):
+            return "fO2_Pa"
+    if (
+        engine is Engine.INTERNAL_ANALYTICAL
+        and quantity is Quantity.ACTIVITY
+        and species is not None
+        and species.formula.strip().casefold() == "feo"
+        and _source_rule_enabled(observation.source_id, "distin_fe_metal_saturation")
+    ):
+        return "activity"
+    return None
+
+
 def _source_oxygen_pressure_for_score(observation: Observation) -> Decimal | None:
     """Return point-associated oxygen pressure, not identity-only fO2.
 
@@ -10389,28 +10419,6 @@ def _oxygen_input_request(
     if not oxygen_required:
         input_notices.append(_omission_notice(quantity, oxygen_why))
         return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
-    if (
-        observation is not None
-        and quantity is Quantity.FUGACITY
-        and identity.species is not None
-        and identity.species.formula == "O2"
-        and _has_printed_fo2(observation, identity)
-    ):
-        return _input_refusal(
-            engine=engine,
-            channel=channel,
-            sources=sources,
-            identity=identity,
-            requested=requested,
-            reason=RefusalReason.CYCLIC_DERIVATION,
-            detail={
-                "reason": "circular_oxygen_input",
-                "quantity": quantity.value,
-                "species": identity.species.formula,
-                "input": "fO2_Pa",
-            },
-            notices=tuple(input_notices),
-        )
     if observation is None:
         fo2_state = identity.fO2_Pa
         if (
@@ -14325,6 +14333,28 @@ def _predict_with_engine(
             refusal_detail={"reason": "species_formula_unparsed", "formula": formula},
             identity=identity,
         )
+    commanded_input = _observation_supplies_commanded_engine_input(
+        engine, observation, identity, quantity
+    )
+    if commanded_input is not None:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=(
+                identity.composition
+                if identity.composition is not None and identity.composition.is_value
+                else None
+            ),
+            reason=RefusalReason.CYCLIC_DERIVATION,
+            detail={
+                "reason": "circular_oxygen_input",
+                "quantity": quantity.value,
+                "species": formula,
+                "input": commanded_input,
+            },
+        )
     vapour_phase_detail = vapour_crystalline_sample_liquid_engine_refusal(
         identity,
         engine=engine,
@@ -14661,23 +14691,6 @@ def _predict_with_engine(
         and quantity is Quantity.ACTIVITY
         and formula.strip().casefold() == "feo"
     )
-    if distin_feo_activity and engine is Engine.INTERNAL_ANALYTICAL:
-        # The internal ladder can derive fO2 from Distin's reported a_FeO,
-        # but using that same observation as the activity target is circular.
-        return EnginePrediction(
-            engine=engine,
-            channel=channel,
-            execution=Execution(state=ExecutionState.NOT_PROBED),
-            authority=Authority.REFUSED,
-            coefficient_sources=sources,
-            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
-            refusal_detail={
-                "reason": "distin_activity_requires_joint_fe_metal_solve",
-                "missing_evidence": "independent Fe-saturation fO2 and a_FeO solve",
-            },
-            identity=identity,
-            requested_composition=identity.composition,
-        )
     if distin_feo_activity and engine is Engine.OPENIMCC:
         if not _distin_has_fe_metal_saturation(observation, experiment):
             return EnginePrediction(
