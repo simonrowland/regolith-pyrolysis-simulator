@@ -337,6 +337,16 @@ CACHEABLE_REFUSAL_CODES = frozenset({
     REFUSAL_UNSUPPORTED_INPUT,
     REFUSAL_CLAMPED_OPERATING_POINT,
     *_PRELAUNCH_CRASH_REFUSAL_CODES,
+    # Raised before any kernel or package call. Repeated from the raise
+    # sites; the real-refusal tests bind them. Oxygen-balance failure is
+    # a solver outcome and stays off this set.
+    "internal_analytical_missing_composition",
+    "internal_analytical_invalid_temperature",
+    "internal_analytical_invalid_total_pressure",
+    "internal_analytical_invalid_composition",
+    "internal_analytical_missing_oxygen_condition",
+    "internal_analytical_invalid_oxygen_condition",
+    "openimcc_composition_canonicalization",
 })
 
 _NOT_CONVERGED_CACHEABLE_REASONS = frozenset({
