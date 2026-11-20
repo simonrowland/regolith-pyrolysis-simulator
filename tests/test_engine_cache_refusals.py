@@ -3,6 +3,7 @@ import threading
 
 import pytest
 
+from engines.domain_reason import OutOfDomainReason
 from simulator import engine_cache
 from simulator.melt_backend.base import _call_with_hard_timeout
 
@@ -12,7 +13,146 @@ def test_deterministic_refusal_allowlist_is_explicit():
 
     assert CACHEABLE_REFUSAL_CODES == frozenset({
         "out_of_basis", "composition_projected", "sum_below_95_wt_pct", "no_liquid",
+        OutOfDomainReason.FORBIDDEN_SPECIES.value,
+        OutOfDomainReason.TEMPERATURE_RANGE.value,
+        OutOfDomainReason.LIQUID_STATE.value,
+        OutOfDomainReason.INVALID_PRESSURE_BAR.value,
+        OutOfDomainReason.INVALID_FO2_LOG.value,
+        OutOfDomainReason.NON_FINITE_COMPOSITION.value,
+        OutOfDomainReason.SUM_PRESSURE_SANITY.value,
     })
+
+
+@pytest.mark.parametrize(
+    "code",
+    [
+        OutOfDomainReason.FORBIDDEN_SPECIES.value,
+        OutOfDomainReason.TEMPERATURE_RANGE.value,
+        OutOfDomainReason.LIQUID_STATE.value,
+        OutOfDomainReason.INVALID_PRESSURE_BAR.value,
+        OutOfDomainReason.INVALID_FO2_LOG.value,
+        OutOfDomainReason.NON_FINITE_COMPOSITION.value,
+        OutOfDomainReason.SUM_PRESSURE_SANITY.value,
+    ],
+)
+def test_vaporock_domain_refusal_hits_after_equilibrium_hot_round_trip(
+    code, tmp_path, monkeypatch,
+):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        _call_cached_backend_equilibrate,
+    )
+    from simulator.melt_backend.base import EquilibriumResult
+
+    path = tmp_path / "cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache.engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+    result = EquilibriumResult(
+        phase_assemblage_available=False,
+        status="out_of_domain",
+        diagnostics={"backend_status_reason": code},
+    )
+    handle = EngineHandle(
+        name="vaporock",
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+        engine_settings={
+            "temperature_units": "C",
+            "pressure_units": "bar",
+            "vapor_pressure_units": "Pa",
+        },
+    )
+    kwargs = {
+        "temperature_C": 1600.0,
+        "composition_kg": {"SiO2": 1.0},
+        "pressure_bar": 1.0,
+        "fO2_log": -8.0,
+    }
+    calls = []
+
+    def solve():
+        calls.append(1)
+        return result
+
+    cold = _call_cached_backend_equilibrate(handle, kwargs, solve)
+    engine_cache._MEMORY_CACHE.clear()
+    warm = _call_cached_backend_equilibrate(
+        handle, kwargs, lambda: pytest.fail("refusal was not stored")
+    )
+
+    assert cold.status == warm.status == "out_of_domain"
+    assert cold.diagnostics["backend_status_reason"] == code
+    assert warm.diagnostics["backend_status_reason"] == code
+    assert len(calls) == 1
+    counts = engine_cache.engine_cache_counters()["vaporock"]
+    assert counts["hits"] == counts["misses"] == counts["stores"] == 1
+
+
+@pytest.mark.parametrize(
+    ("status", "code"),
+    [
+        ("not_converged", OutOfDomainReason.NOT_CONVERGED.value),
+        ("unavailable", OutOfDomainReason.BACKEND_UNAVAILABLE.value),
+    ],
+)
+def test_vaporock_transient_refusal_is_not_stored(
+    status, code, tmp_path, monkeypatch,
+):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        _call_cached_backend_equilibrate,
+    )
+    from simulator.melt_backend.base import EquilibriumResult
+
+    path = tmp_path / "cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache.engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+    result = EquilibriumResult(
+        phase_assemblage_available=False,
+        status=status,
+        diagnostics={"backend_status_reason": code},
+    )
+    handle = EngineHandle(
+        name="vaporock",
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+        engine_settings={
+            "temperature_units": "C",
+            "pressure_units": "bar",
+            "vapor_pressure_units": "Pa",
+        },
+    )
+    kwargs = {
+        "temperature_C": 1600.0,
+        "composition_kg": {"SiO2": 1.0},
+        "pressure_bar": 1.0,
+        "fO2_log": -8.0,
+    }
+    calls = []
+
+    def solve():
+        calls.append(1)
+        return result
+
+    for _ in range(2):
+        _call_cached_backend_equilibrate(handle, kwargs, solve)
+        engine_cache._MEMORY_CACHE.clear()
+
+    assert len(calls) == 2
+    counts = engine_cache.engine_cache_counters()["vaporock"]
+    assert counts["misses"] == 2
+    assert counts["stores"] == 0
+    assert counts[f"not_stored:refusal:{code}"] == 2
 
 
 @pytest.mark.parametrize("engine", ["alphamelts", "vaporock"])
