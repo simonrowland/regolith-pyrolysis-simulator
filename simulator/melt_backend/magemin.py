@@ -2161,6 +2161,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             ))
         if not comp_wt:
             # No oxide species in MAGEMin's basis after the account split.
+            _valid, domain_warnings, domain_reason = domain_verdict
+            if composition_mol_by_account is None and domain_reason == 'major_sum':
+                domain_warnings = []
+                refusal_reason = 'missing_input'
+            else:
+                refusal_reason = domain_reason or 'missing_input'
             return typed_failure_result(EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
@@ -2168,11 +2174,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 status='out_of_domain',
                 warnings=[
                     *prior_warnings,
+                    *domain_warnings,
                     'MAGEMin received empty melt composition; returning empty '
                     'equilibrium result',
                 ],
                 diagnostics=projection_diagnostics,
-            ), reason='missing_input')
+            ), reason=refusal_reason)
 
         if bulk_projection is None:
             _valid, domain_warnings, domain_reason = domain_verdict

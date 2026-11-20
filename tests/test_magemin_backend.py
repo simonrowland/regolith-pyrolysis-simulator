@@ -5655,6 +5655,47 @@ def test_magemin_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
     assert any("refused projected/dropped non-basis" in w for w in result.warnings)
 
 
+@pytest.mark.parametrize(
+    ("composition_args", "expected_reason"),
+    [
+        pytest.param(
+            {"composition_kg": {"MnO": 100.0}},
+            "composition_projected",
+            id="no-positive-ig-components",
+        ),
+        pytest.param(
+            {"composition_mol_by_account": {"process.cleaned_melt": {}}},
+            "major_sum",
+            id="empty-cleaned-melt-account",
+        ),
+    ],
+)
+def test_magemin_precheck_typed_refusal_skips_evaluated_silica_verdict(
+    monkeypatch, composition_args, expected_reason
+):
+    def unexpected_verdict(*_args, **_kwargs):
+        pytest.fail("silica verdict must not run after the typed precheck refusal")
+
+    monkeypatch.setattr(
+        magemin_module,
+        "evaluated_silica_verdict",
+        unexpected_verdict,
+    )
+    backend, engine_calls = _magemin_backend_with_spied_engine_call(monkeypatch)
+
+    result = backend.equilibrate(
+        1400.0,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        **composition_args,
+    )
+
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status"] == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == expected_reason
+    assert engine_calls == []
+
+
 def test_magemin_subprocess_runs_in_fresh_temp_cwd(
     monkeypatch, tmp_path, magemin_subprocess_lock_dir,
     magemin_openmpi_tmpdir, tmp_path_factory,
