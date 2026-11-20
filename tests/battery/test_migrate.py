@@ -14380,8 +14380,8 @@ def _migrate_flat_run_columns(
         values["caption_depletion_columns"] = {
             "columns": list(depletion),
             "locator": {
-                "page": 51,
-                "pdf_page": 57,
+                "page": 57,
+                "published_page": 51,
                 "note": "caption depletion, not the run composition",
             },
             "quote": "start-to-end depletion",

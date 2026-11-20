@@ -99,6 +99,41 @@ def test_table2_comment_row_citations_match_pdf_pages() -> None:
         assert rows[index]["composition_role"]["quote"] == quote
 
 
+def test_hastie_caption_locators_use_physical_page_and_printed_folio(hastie) -> None:
+    doc = load_cached_safe_yaml((EXTRACTS / EXTRACT).read_text(encoding="utf-8"))
+    observations = {
+        row["observation_id"]: row
+        for species in doc["species"].values()
+        for row in species.get("observations", [])
+    }
+    expected_ids = (
+        "hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked",
+        "hastie_1981_remaining_figures_ledger",
+        "hastie_1981_fig5_glass_Na_figure_only_blocked",
+    )
+    locators = [
+        observations[observation_id]["locator"] for observation_id in expected_ids
+    ]
+    caption_locator = doc["species"]["Na"]["observations"][8]["values"][
+        "caption_depletion_columns"
+    ]["locator"]
+    locators.append(caption_locator)
+
+    assert all(
+        locator["page"] == 57 and locator["published_page"] == 51
+        for locator in locators
+    )
+
+    caption_locator_path = (
+        ".species.Na.observations[8].values."
+        "caption_depletion_columns.locator"
+    )
+    assert not any(
+        caption_locator_path in issue.path
+        for issue in [*hastie.registry_issues, *hastie.validation.hard_issues]
+    )
+
+
 def test_quoted_fits_experiment_carries_transpiration_from_printed_p22(hastie) -> None:
     experiment = _experiment(hastie, QUOTED_FITS)
     assert experiment.method.is_value
