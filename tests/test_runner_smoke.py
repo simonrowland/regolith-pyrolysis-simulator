@@ -378,7 +378,7 @@ def test_failure_payload_builds_per_hour_projection_once(monkeypatch):
     assert per_hour_projection_calls == [execution]
 
 
-@pytest.mark.xdist_group("lunar_c0_shared")
+@pytest.mark.xdist_group("magemin_fullrun_a")
 def test_default_lunar_c0_product_story_has_no_stage3_si_channel(
     lunar_c0_scenario_result, _lunar_c0_scenario_result_copy_factory
 ):
@@ -3611,7 +3611,7 @@ def test_runner_engines_yaml_optional_load(tmp_path):
     }
 
 
-@pytest.mark.xdist_group("lunar_c0_shared")
+@pytest.mark.xdist_group("magemin_fullrun_a")
 def test_per_hour_summary_includes_pressure_and_mass_balance(
     lunar_c0_scenario_result,
 ):
@@ -3748,7 +3748,7 @@ def test_session_per_hour_summary_event_uses_runner_builder():
     )
 
 
-@pytest.mark.xdist_group("lunar_c0_shared")
+@pytest.mark.xdist_group("magemin_fullrun_a")
 def test_runner_final_state_is_mol_keyed_not_kg(lunar_c0_scenario_result):
     """Regression: ``final_state`` reports moles, not kilograms.
 
