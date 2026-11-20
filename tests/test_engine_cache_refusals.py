@@ -508,12 +508,23 @@ def _enable_disk_cache(tmp_path, monkeypatch):
 
 
 def _assert_returned_miss_accounting(engine):
+    """Every miss is a store, a store error, a byte conflict, or a named bucket.
+
+    ``not_stored:*`` and ``uncacheable:*`` are the buckets. ``store_error``
+    and ``conflicts`` already name their paths, so they count here too.
+    """
+
     counts = engine_cache.engine_cache_counters()[engine]
     accounted = sum(
         value for key, value in counts.items()
         if key.startswith("not_stored:") or key.startswith("uncacheable:")
     )
-    assert counts["misses"] == counts["stores"] + accounted
+    assert counts["misses"] == (
+        counts.get("stores", 0)
+        + counts.get("store_error", 0)
+        + counts.get("conflicts", 0)
+        + accounted
+    )
     return counts
 
 
@@ -765,7 +776,8 @@ def test_thermoengine_uninitialized_valid_melt_raises_and_is_not_stored(
     # not_stored bucket. The invariant below is for returned values.
     assert counts["misses"] == 2
     assert counts["stores"] == 0
-    assert not any(key.startswith("not_stored:") for key in counts)
+    assert counts["not_stored:exception:ImportError"] == 2
+    _assert_returned_miss_accounting("thermoengine")
 
 
 def test_magemin_unavailable_refusal_is_not_stored(tmp_path, monkeypatch):
@@ -994,3 +1006,112 @@ def test_openimcc_canonicalization_refusal_hits_after_disk_round_trip(
     assert len(calls) == 1
     counts = _assert_returned_miss_accounting("openimcc")
     assert counts["hits"] == counts["misses"] == counts["stores"] == 1
+
+
+_SCORING_ENGINES = (
+    "openimcc",
+    "internal-analytical",
+    "vaporock",
+    "magemin",
+    "alphamelts",
+    "thermoengine",
+)
+
+
+def test_every_miss_path_is_counted_for_every_scoring_engine(tmp_path, monkeypatch):
+    """The measured gap was a miss with no store and no not_stored bucket."""
+
+    from simulator.engine_cache import EngineCacheValue
+
+    _enable_disk_cache(tmp_path, monkeypatch)
+    for engine in _SCORING_ENGINES:
+        assert engine_cache.cached_engine_call(
+            engine, {"path": "store"}, lambda: {"answer": 1},
+        ) == {"answer": 1}
+        assert engine_cache.cached_engine_call(
+            engine, {"path": "cacheable-false"},
+            lambda: EngineCacheValue({"answer": 1}, cacheable=False),
+        ) == {"answer": 1}
+        assert engine_cache.cached_engine_call(
+            engine, {"path": "refusal"},
+            lambda: {"status": "refusal", "refusal_reason": "engine_timeout"},
+        )["refusal_reason"] == "engine_timeout"
+        assert engine_cache.cached_engine_call(
+            engine, {"path": "uncacheable"},
+            lambda: {"nested": {"a": 1}},
+        ) == {"nested": {"a": 1}}
+        with pytest.raises(ValueError, match="engine failed"):
+            engine_cache.cached_engine_call(
+                engine,
+                {"path": "raise"},
+                lambda: (_ for _ in ()).throw(ValueError("engine failed")),
+            )
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    for engine in _SCORING_ENGINES:
+        assert engine_cache.cached_engine_call(
+            engine, {"path": "readonly"}, lambda: {"answer": 2},
+        ) == {"answer": 2}
+        counts = _assert_returned_miss_accounting(engine)
+        assert counts["stores"] == 1
+        assert counts["not_stored:cacheable_false"] == 1
+        assert counts["not_stored:refusal:engine_timeout"] == 1
+        assert counts["uncacheable:dict"] == 1
+        assert counts["not_stored:exception:ValueError"] == 1
+        assert counts["not_stored:readonly"] == 1
+        assert counts["misses"] == 6
+
+
+def test_store_error_and_already_present_misses_are_counted(tmp_path, monkeypatch):
+    _enable_disk_cache(tmp_path, monkeypatch)
+
+    def fail_insert(*_args, **_kwargs):
+        raise sqlite3.OperationalError("disk full")
+
+    monkeypatch.setattr(engine_cache, "_insert_cache_row_if_absent", fail_insert)
+    assert engine_cache.cached_engine_call(
+        "alphamelts", {"path": "store-error"}, lambda: {"answer": 1},
+    ) == {"answer": 1}
+    counts = _assert_returned_miss_accounting("alphamelts")
+    assert counts["misses"] == 1
+    assert counts["stores"] == 0
+    assert counts["store_error"] == 1
+
+    engine_cache.engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+
+    def already_present(*_args, **_kwargs):
+        return False, False
+
+    monkeypatch.setattr(engine_cache, "_insert_cache_row_if_absent", already_present)
+    assert engine_cache.cached_engine_call(
+        "thermoengine", {"path": "already-present"}, lambda: {"answer": 1},
+    ) == {"answer": 1}
+    counts = _assert_returned_miss_accounting("thermoengine")
+    assert counts["misses"] == 1
+    assert counts["stores"] == 0
+    assert counts["conflicts"] == 0
+    assert counts["not_stored:already_present"] == 1
+
+
+def test_worker_timeout_exception_is_counted_and_not_stored(tmp_path, monkeypatch):
+    class WorkerTimeout(RuntimeError):
+        def __init__(self) -> None:
+            super().__init__("worker timed out")
+            self.timed_out = True
+
+    path = tmp_path / "cache.sqlite"
+    _enable_disk_cache(tmp_path, monkeypatch)
+    with pytest.raises(WorkerTimeout):
+        engine_cache.cached_engine_call(
+            "magemin",
+            {"path": "worker-timeout"},
+            lambda: (_ for _ in ()).throw(WorkerTimeout()),
+        )
+    counts = _assert_returned_miss_accounting("magemin")
+    assert counts["misses"] == 1
+    assert counts["stores"] == 0
+    assert counts["not_stored:exception:timeout"] == 1
+    with sqlite3.connect(path) as connection:
+        assert connection.execute(
+            "SELECT count(*) FROM engine_outputs"
+        ).fetchone()[0] == 0

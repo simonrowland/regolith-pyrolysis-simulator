@@ -1415,6 +1415,34 @@ def _record_engine_cache_counters(
                 target[name] += int(value)
 
 
+def _counter_token(value: object) -> str | None:
+    if not isinstance(value, str) or not value:
+        return None
+    if all(character.isalnum() or character == "_" for character in value):
+        return value
+    return None
+
+
+def _not_stored_exception_label(exc: BaseException) -> str:
+    """Name a miss that left solve() by raising. The value is never stored.
+
+    Worker timeouts and process exits use those facts, not the wrapper
+    class. A package ``code`` or isolated ``error_name`` keeps the source
+    token so the next run shows which refusal escaped.
+    """
+
+    if getattr(exc, "timed_out", False) is True:
+        return "timeout"
+    returncode = getattr(exc, "returncode", None)
+    if isinstance(returncode, int) and returncode != 0:
+        return "worker_exit"
+    for attribute in ("error_name", "code"):
+        token = _counter_token(getattr(exc, attribute, None))
+        if token is not None:
+            return token
+    return type(exc).__name__
+
+
 def _is_refusal(result: Any) -> bool:
     value = result
     status = value.get("status") if isinstance(value, Mapping) else getattr(value, "status", None)
@@ -1599,8 +1627,19 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 return result
         counts["misses"] += 1
 
-    solved = solve()
-    hot = live_hot(solved)
+    try:
+        solved = solve()
+        hot = live_hot(solved)
+    except BaseException as exc:
+        # A raise used to count a miss and then leave no bucket. That is
+        # the openimcc / magemin / thermoengine gap: the call recomputes
+        # on every run and the summary cannot say why.
+        with _LOCK:
+            bucket = _counter_bucket(engine_id)
+            label = _not_stored_exception_label(exc)
+            name = f"not_stored:exception:{label}"
+            bucket[name] = bucket.get(name, 0) + 1
+        raise
     if readonly or connection is None:
         # Readonly state takes precedence: a refusal or uncacheable value
         # cannot be stored either way, so count this miss in one bucket.
@@ -1685,8 +1724,13 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             counts = _counter_bucket(engine_id)
             if inserted:
                 counts["stores"] += 1
-            if conflict:
+            elif conflict:
                 counts["conflicts"] += 1
+            else:
+                # The row appeared with the same bytes after the miss read.
+                # It is not a store and not a byte conflict.
+                name = "not_stored:already_present"
+                counts[name] = counts.get(name, 0) + 1
     except Exception:
         with _LOCK:
             try:

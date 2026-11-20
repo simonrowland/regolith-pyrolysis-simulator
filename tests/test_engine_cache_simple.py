@@ -1479,6 +1479,7 @@ def test_exceptions_and_typed_refusals_are_not_stored(
         "read_error": 0,
         "conflicts": 0,
         "not_stored:refusal:untyped": 2,
+        "not_stored:exception:ValueError": 1,
     }
 
 
