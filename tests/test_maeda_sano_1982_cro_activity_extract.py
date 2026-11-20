@@ -54,9 +54,28 @@ FIGURE11_ROWS = {
     "maeda_sano_1982_f11_row05": ("30.1", "0.0190275906", "3.04237512e-5"),
     "maeda_sano_1982_f11_row06": ("24.1", "0.0199555760", "2.32264502e-5"),
 }
-EXPECTED_CR_CONVENTION = (
-    "スラグ中クロムはほとんどが2価であると考えられる。したがって、"
-    "本論文では、スラグ中クロムをすべてCrOと表記した。"
+FORMULA_MASSES = {
+    "CaO": "56.0774",
+    "MgO": "40.3044",
+    "Al2O3": "101.9613",
+    "SiO2": "60.0843",
+}
+FIGURE11_DIGITIZATION_BANDS = {
+    "maeda_sano_1982_f11_row01": "0.35",
+    "maeda_sano_1982_f11_row02": "0.35",
+    "maeda_sano_1982_f11_row03": "0.35",
+    "maeda_sano_1982_f11_row04": "0.35",
+    "maeda_sano_1982_f11_row05": "0.35",
+    "maeda_sano_1982_f11_row06": "0.43",
+}
+ATOMIC_WEIGHT_SOURCE = (
+    "External constant: IUPAC 2007 Periodic Table of the Elements; "
+    "chromium standard atomic weight 51.9961 rounded to 51.996."
+)
+FORMULA_MASS_SOURCE = (
+    "Calculated from IUPAC 2007 standard atomic weights (Ca 40.078, "
+    "Mg 24.3050, Al 26.9815386, Si 28.0855, O 15.9994): "
+    "CaO 56.0774, MgO 40.3044, Al2O3 101.9613, SiO2 60.0843 g/mol."
 )
 
 
@@ -96,9 +115,7 @@ def _assert_experiment_cr_convention(document: dict) -> None:
         "pdf_page_index": 1,
         "section": "2.1",
     }
-    assert assumption["values"]["chromium_valence_assumption_as_printed"] == (
-        EXPECTED_CR_CONVENTION
-    )
+    assert "chromium_valence_assumption_as_printed" not in assumption["values"]
     assert "all slag chromium as CrO" in assumption["values"][
         "chromium_valence_assumption"
     ]
@@ -136,11 +153,28 @@ def _assert_render_pins(document: dict) -> None:
             == total_moles
         )
         assert _derivation_parameter(row, "chromium_molar_mass_g_per_mol") == "51.996"
+        parameters = dict(row["values"]["derivation"]["parameters"])
+        chromium_mass = parameters["chromium_molar_mass_g_per_mol"]
+        assert chromium_mass["locator"] == {"note": ATOMIC_WEIGHT_SOURCE}
+        for oxide, formula_mass in FORMULA_MASSES.items():
+            parameter = parameters[f"{oxide}_formula_mass_g_per_mol"]
+            assert parameter["state"]["value"] == formula_mass
+            assert parameter["locator"] == {"note": FORMULA_MASS_SOURCE}
         assert "footnote-3 shortcut is not used" in values["derivation"]["method"][
             "state"
         ]["value"]
         assert "activity_coefficient_uncertainty_absolute" not in values
-        assert "uncertainty" not in row
+        assert row["uncertainty"]["kind"] == "derived"
+        assert row["uncertainty"]["value"] == FIGURE11_DIGITIZATION_BANDS[
+            observation_id
+        ]
+        assert row["uncertainty"]["basis"] == "gamma_CrO_absolute_units"
+        assert row["uncertainty"]["derivation"]["relation"] == (
+            "propagated_fig11_composition_digitization"
+        )
+        assert "MgO–Al2O3 exchange" in row["uncertainty"]["derivation"][
+            "method"
+        ]["state"]["value"]
 
     first_f14 = rows["maeda_sano_1982_f14_al2o3_20_row01"]
     assert first_f14["values"]["composition_wt_pct"]["components"] == [
@@ -150,8 +184,16 @@ def _assert_render_pins(document: dict) -> None:
         ["SiO2", "33.4"],
     ]
     assert first_f14["values"]["a_CrO_as_published"] == "3.79e-3"
-    assert first_f14["uncertainty"].startswith("±3 gamma units")
-    assert "not a source-reported" in first_f14["uncertainty"]
+    for observation_id in PINNED_GAMMA:
+        if "_f14_" not in observation_id:
+            continue
+        uncertainty = rows[observation_id]["uncertainty"]
+        assert uncertainty["kind"] == "derived"
+        assert uncertainty["value"] == "3"
+        assert uncertainty["basis"] == "gamma_CrO_absolute_units"
+        assert uncertainty["derivation"]["relation"] == (
+            "figure_digitization_bound"
+        )
     assert "activity_coefficient_uncertainty_absolute" not in first_f14["values"]
     _assert_experiment_cr_convention(document)
 
@@ -180,6 +222,52 @@ def test_render_values_are_pinned_and_mutations_restore_reviewed_defects() -> No
     ][2][1]["state"]["value"] = "0.01732"
     with pytest.raises(AssertionError):
         _assert_render_pins(changed_basis)
+
+    false_mass_source = deepcopy(document)
+    mass_parameter = dict(
+        _rows(false_mass_source)["maeda_sano_1982_f11_row01"]["values"][
+            "derivation"
+        ]["parameters"]
+    )["chromium_molar_mass_g_per_mol"]
+    mass_parameter["locator"] = {
+        "page": 6,
+        "published_page": 764,
+        "pdf_page_index": 5,
+        "equation": "13",
+    }
+    with pytest.raises(AssertionError):
+        _assert_render_pins(false_mass_source)
+
+    wrong_formula_mass = deepcopy(document)
+    mass_parameter = dict(
+        _rows(wrong_formula_mass)["maeda_sano_1982_f11_row01"]["values"][
+            "derivation"
+        ]["parameters"]
+    )["CaO_formula_mass_g_per_mol"]
+    mass_parameter["state"]["value"] = "56.077"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(wrong_formula_mass)
+
+    false_printed_assumption = deepcopy(document)
+    false_printed_assumption["species"]["CrO"]["context"][0]["values"][
+        "chromium_valence_assumption_as_printed"
+    ] = "normalized source text"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(false_printed_assumption)
+
+    wrong_fig14_uncertainty = deepcopy(document)
+    _rows(wrong_fig14_uncertainty)["maeda_sano_1982_f14_al2o3_20_row01"][
+        "uncertainty"
+    ]["kind"] = "printed"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(wrong_fig14_uncertainty)
+
+    wrong_fig11_uncertainty = deepcopy(document)
+    _rows(wrong_fig11_uncertainty)["maeda_sano_1982_f11_row01"]["uncertainty"][
+        "value"
+    ] = "0.18"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(wrong_fig11_uncertainty)
 
     missing_convention = deepcopy(document)
     missing_convention["species"]["CrO"]["context"].clear()
@@ -255,9 +343,7 @@ def test_extract_and_generated_store_validate_and_load_all_observations(
     assumption = context[f"{SID}::context::maeda_sano_1982_experiment_cr_valence_convention"]
     assert assumption["experiment"] == EXPERIMENT_ID
     assert assumption["locator"]["published_page"] == 760
-    assert assumption["values"]["chromium_valence_assumption_as_printed"] == (
-        EXPECTED_CR_CONVENTION
-    )
+    assert "chromium_valence_assumption_as_printed" not in assumption["values"]
 
     source_rows = _rows(document)
     for observation in observations.values():
@@ -282,11 +368,24 @@ def test_extract_and_generated_store_validate_and_load_all_observations(
         assert conditions["chromium_valence"].locator is not None
         assert conditions["chromium_valence_as_printed"].locator is not None
         if source_values["T_C"] == "1500":
-            assert observation.uncertainty.kind is UncertaintyKind.PRINTED
-            assert "±3 gamma units" in str(observation.uncertainty.verbatim)
+            assert observation.uncertainty.kind is UncertaintyKind.DERIVED
+            assert observation.uncertainty.value == Decimal("3")
+            assert observation.uncertainty.basis == "gamma_CrO_absolute_units"
+            assert observation.uncertainty.derivation is not None
+            assert observation.uncertainty.derivation.relation == (
+                "figure_digitization_bound"
+            )
             assert conditions["oxygen_partial_pressure_atm"].state.is_value
         else:
-            assert observation.uncertainty.kind is UncertaintyKind.NONE
+            assert observation.uncertainty.kind is UncertaintyKind.DERIVED
+            assert observation.uncertainty.value == Decimal(
+                FIGURE11_DIGITIZATION_BANDS[local_id]
+            )
+            assert observation.uncertainty.basis == "gamma_CrO_absolute_units"
+            assert observation.uncertainty.derivation is not None
+            assert observation.uncertainty.derivation.relation == (
+                "propagated_fig11_composition_digitization"
+            )
             assert conditions["oxygen_partial_pressure_atm"].state.is_unknown
             assert observation.derivation is not None
             assert observation.derivation.references == (

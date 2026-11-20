@@ -17,10 +17,10 @@ extraction:
     page 764. The six 1650 °C gamma values were recalculated from Eq. (13), the
     printed Cr concentrations, and composition-specific total mole amounts on the AlO1.5
     basis. Footnote 3's simple ppm conversion is approximate and was not used
-    for these MgO-bearing slags. The Fig. 11 composition coordinates have a
-    ±1 wt% digitization uncertainty; no numeric uncertainty was propagated to
-    gamma or reported for those points. The Fig. 14 digitization uncertainty
-    is ±3 gamma units; the paper reports no point-specific measurement errors.
+    for these MgO-bearing slags. A ±1 wt% Fig. 11 composition-coordinate
+    digitization bound is propagated by exchanging MgO and Al2O3 at fixed CaO
+    and SiO2. Fig. 14 gamma digitization uncertainty is estimated as ±3 units;
+    the paper reports no point-specific measurement errors.
   date: '2026-11-20'
   worker: w1120maeda
 review_status: draft
@@ -78,7 +78,6 @@ species:
         units: as stated and translated
         values:
           chromium_valence_assumption: 'Because slag chromium and solid carbon coexist, almost all slag chromium is considered divalent; the authors therefore denote all slag chromium as CrO.'
-          chromium_valence_assumption_as_printed: 'スラグ中クロムはほとんどが2価であると考えられる。したがって、本論文では、スラグ中クロムをすべてCrOと表記した。'
     observations:
       - observation_id: maeda_sano_1982_f14_al2o3_20_row01
         type: activity_coefficient
@@ -86,7 +85,20 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '1'}
         phase: l
         units: dimensionless
-        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
+        uncertainty:
+          kind: derived
+          value: '3'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '1'}
+          derivation:
+            relation: figure_digitization_bound
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Estimated figure-reading bound; no measurement uncertainty is printed.'}
+              locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '1'}
+            references: ['Fig. 14']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -119,7 +131,20 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '2'}
         phase: l
         units: dimensionless
-        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
+        uncertainty:
+          kind: derived
+          value: '3'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '2'}
+          derivation:
+            relation: figure_digitization_bound
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Estimated figure-reading bound; no measurement uncertainty is printed.'}
+              locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '2'}
+            references: ['Fig. 14']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -152,7 +177,20 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '3'}
         phase: l
         units: dimensionless
-        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
+        uncertainty:
+          kind: derived
+          value: '3'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '3'}
+          derivation:
+            relation: figure_digitization_bound
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Estimated figure-reading bound; no measurement uncertainty is printed.'}
+              locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '3'}
+            references: ['Fig. 14']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -185,7 +223,20 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '4'}
         phase: l
         units: dimensionless
-        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
+        uncertainty:
+          kind: derived
+          value: '3'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '4'}
+          derivation:
+            relation: figure_digitization_bound
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Estimated figure-reading bound; no measurement uncertainty is printed.'}
+              locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '4'}
+            references: ['Fig. 14']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -218,7 +269,20 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '5'}
         phase: l
         units: dimensionless
-        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
+        uncertainty:
+          kind: derived
+          value: '3'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '5'}
+          derivation:
+            relation: figure_digitization_bound
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Estimated figure-reading bound; no measurement uncertainty is printed.'}
+              locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '5'}
+            references: ['Fig. 14']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -251,7 +315,20 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '6'}
         phase: l
         units: dimensionless
-        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
+        uncertainty:
+          kind: derived
+          value: '3'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '6'}
+          derivation:
+            relation: figure_digitization_bound
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Estimated figure-reading bound; no measurement uncertainty is printed.'}
+              locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '6'}
+            references: ['Fig. 14']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -284,7 +361,20 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '7'}
         phase: l
         units: dimensionless
-        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
+        uncertainty:
+          kind: derived
+          value: '3'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '7'}
+          derivation:
+            relation: figure_digitization_bound
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Estimated figure-reading bound; no measurement uncertainty is printed.'}
+              locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '7'}
+            references: ['Fig. 14']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -317,7 +407,20 @@ species:
         locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '8'}
         phase: l
         units: dimensionless
-        uncertainty: '±3 gamma units (figure digitization estimate; not a source-reported measurement uncertainty)'
+        uncertainty:
+          kind: derived
+          value: '3'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '8'}
+          derivation:
+            relation: figure_digitization_bound
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Estimated figure-reading bound; no measurement uncertainty is printed.'}
+              locator: {page: 7, published_page: 765, pdf_page_index: 6, figure: '14', row: '8'}
+            references: ['Fig. 14']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -351,6 +454,20 @@ species:
         derived_from: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
         phase: l
         units: dimensionless
+        uncertainty:
+          kind: derived
+          value: '0.35'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '1'}
+          derivation:
+            relation: propagated_fig11_composition_digitization
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Propagated a ±1 wt% coordinate shift through gamma proportional to total moles, as MgO–Al2O3 exchange at fixed CaO and SiO2.'}
+              locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '1'}
+            references: ['Fig. 11 composition digitization', 'Eq. (13)']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -382,7 +499,11 @@ species:
               - [a_CrO, {state: {tag: value, value: '1.34e-3'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
               - [equilibrium_Cr_ppm, {state: {tag: value, value: '30.1'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '1'}}]
               - [total_moles_per_g_AlO1.5_basis, {state: {tag: value, value: '0.0200667709'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '1', note: 'calculated from the row oxide composition and formula masses'}}]
-              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
+              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {note: &maeda_cr_mass_source 'External constant: IUPAC 2007 Periodic Table of the Elements; chromium standard atomic weight 51.9961 rounded to 51.996.'}}]
+              - [CaO_formula_mass_g_per_mol, {state: {tag: value, value: '56.0774'}, locator: {note: &maeda_formula_mass_source 'Calculated from IUPAC 2007 standard atomic weights (Ca 40.078, Mg 24.3050, Al 26.9815386, Si 28.0855, O 15.9994): CaO 56.0774, MgO 40.3044, Al2O3 101.9613, SiO2 60.0843 g/mol.'}}]
+              - [MgO_formula_mass_g_per_mol, {state: {tag: value, value: '40.3044'}, locator: {note: *maeda_formula_mass_source}}]
+              - [Al2O3_formula_mass_g_per_mol, {state: {tag: value, value: '101.9613'}, locator: {note: *maeda_formula_mass_source}}]
+              - [SiO2_formula_mass_g_per_mol, {state: {tag: value, value: '60.0843'}, locator: {note: *maeda_formula_mass_source}}]
             output_unit: dimensionless
         point_conditions:
           temperature_C: {state: {tag: value, value: '1650'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', note: 'caption: 1650°C'}}
@@ -398,6 +519,20 @@ species:
         derived_from: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
         phase: l
         units: dimensionless
+        uncertainty:
+          kind: derived
+          value: '0.35'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '2'}
+          derivation:
+            relation: propagated_fig11_composition_digitization
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Propagated a ±1 wt% coordinate shift through gamma proportional to total moles, as MgO–Al2O3 exchange at fixed CaO and SiO2.'}
+              locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '2'}
+            references: ['Fig. 11 composition digitization', 'Eq. (13)']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -429,7 +564,11 @@ species:
               - [a_CrO, {state: {tag: value, value: '1.34e-3'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
               - [equilibrium_Cr_ppm, {state: {tag: value, value: '30.0'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '2'}}]
               - [total_moles_per_g_AlO1.5_basis, {state: {tag: value, value: '0.0198069759'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '2', note: 'calculated from the row oxide composition and formula masses'}}]
-              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
+              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {note: *maeda_cr_mass_source}}]
+              - [CaO_formula_mass_g_per_mol, {state: {tag: value, value: '56.0774'}, locator: {note: *maeda_formula_mass_source}}]
+              - [MgO_formula_mass_g_per_mol, {state: {tag: value, value: '40.3044'}, locator: {note: *maeda_formula_mass_source}}]
+              - [Al2O3_formula_mass_g_per_mol, {state: {tag: value, value: '101.9613'}, locator: {note: *maeda_formula_mass_source}}]
+              - [SiO2_formula_mass_g_per_mol, {state: {tag: value, value: '60.0843'}, locator: {note: *maeda_formula_mass_source}}]
             output_unit: dimensionless
         point_conditions:
           temperature_C: {state: {tag: value, value: '1650'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', note: 'caption: 1650°C'}}
@@ -445,6 +584,20 @@ species:
         derived_from: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
         phase: l
         units: dimensionless
+        uncertainty:
+          kind: derived
+          value: '0.35'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '3'}
+          derivation:
+            relation: propagated_fig11_composition_digitization
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Propagated a ±1 wt% coordinate shift through gamma proportional to total moles, as MgO–Al2O3 exchange at fixed CaO and SiO2.'}
+              locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '3'}
+            references: ['Fig. 11 composition digitization', 'Eq. (13)']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -476,7 +629,11 @@ species:
               - [a_CrO, {state: {tag: value, value: '1.34e-3'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
               - [equilibrium_Cr_ppm, {state: {tag: value, value: '30.1'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '3'}}]
               - [total_moles_per_g_AlO1.5_basis, {state: {tag: value, value: '0.0195471808'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '3', note: 'calculated from the row oxide composition and formula masses'}}]
-              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
+              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {note: *maeda_cr_mass_source}}]
+              - [CaO_formula_mass_g_per_mol, {state: {tag: value, value: '56.0774'}, locator: {note: *maeda_formula_mass_source}}]
+              - [MgO_formula_mass_g_per_mol, {state: {tag: value, value: '40.3044'}, locator: {note: *maeda_formula_mass_source}}]
+              - [Al2O3_formula_mass_g_per_mol, {state: {tag: value, value: '101.9613'}, locator: {note: *maeda_formula_mass_source}}]
+              - [SiO2_formula_mass_g_per_mol, {state: {tag: value, value: '60.0843'}, locator: {note: *maeda_formula_mass_source}}]
             output_unit: dimensionless
         point_conditions:
           temperature_C: {state: {tag: value, value: '1650'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', note: 'caption: 1650°C'}}
@@ -492,6 +649,20 @@ species:
         derived_from: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
         phase: l
         units: dimensionless
+        uncertainty:
+          kind: derived
+          value: '0.35'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '4'}
+          derivation:
+            relation: propagated_fig11_composition_digitization
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Propagated a ±1 wt% coordinate shift through gamma proportional to total moles, as MgO–Al2O3 exchange at fixed CaO and SiO2.'}
+              locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '4'}
+            references: ['Fig. 11 composition digitization', 'Eq. (13)']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -523,7 +694,11 @@ species:
               - [a_CrO, {state: {tag: value, value: '1.34e-3'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
               - [equilibrium_Cr_ppm, {state: {tag: value, value: '30.0'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '4'}}]
               - [total_moles_per_g_AlO1.5_basis, {state: {tag: value, value: '0.0192873857'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '4', note: 'calculated from the row oxide composition and formula masses'}}]
-              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
+              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {note: *maeda_cr_mass_source}}]
+              - [CaO_formula_mass_g_per_mol, {state: {tag: value, value: '56.0774'}, locator: {note: *maeda_formula_mass_source}}]
+              - [MgO_formula_mass_g_per_mol, {state: {tag: value, value: '40.3044'}, locator: {note: *maeda_formula_mass_source}}]
+              - [Al2O3_formula_mass_g_per_mol, {state: {tag: value, value: '101.9613'}, locator: {note: *maeda_formula_mass_source}}]
+              - [SiO2_formula_mass_g_per_mol, {state: {tag: value, value: '60.0843'}, locator: {note: *maeda_formula_mass_source}}]
             output_unit: dimensionless
         point_conditions:
           temperature_C: {state: {tag: value, value: '1650'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', note: 'caption: 1650°C'}}
@@ -539,6 +714,20 @@ species:
         derived_from: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
         phase: l
         units: dimensionless
+        uncertainty:
+          kind: derived
+          value: '0.35'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '5'}
+          derivation:
+            relation: propagated_fig11_composition_digitization
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Propagated a ±1 wt% coordinate shift through gamma proportional to total moles, as MgO–Al2O3 exchange at fixed CaO and SiO2.'}
+              locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '5'}
+            references: ['Fig. 11 composition digitization', 'Eq. (13)']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -570,7 +759,11 @@ species:
               - [a_CrO, {state: {tag: value, value: '1.34e-3'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
               - [equilibrium_Cr_ppm, {state: {tag: value, value: '30.1'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '5'}}]
               - [total_moles_per_g_AlO1.5_basis, {state: {tag: value, value: '0.0190275906'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '5', note: 'calculated from the row oxide composition and formula masses'}}]
-              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
+              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {note: *maeda_cr_mass_source}}]
+              - [CaO_formula_mass_g_per_mol, {state: {tag: value, value: '56.0774'}, locator: {note: *maeda_formula_mass_source}}]
+              - [MgO_formula_mass_g_per_mol, {state: {tag: value, value: '40.3044'}, locator: {note: *maeda_formula_mass_source}}]
+              - [Al2O3_formula_mass_g_per_mol, {state: {tag: value, value: '101.9613'}, locator: {note: *maeda_formula_mass_source}}]
+              - [SiO2_formula_mass_g_per_mol, {state: {tag: value, value: '60.0843'}, locator: {note: *maeda_formula_mass_source}}]
             output_unit: dimensionless
         point_conditions:
           temperature_C: {state: {tag: value, value: '1650'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', note: 'caption: 1650°C'}}
@@ -586,6 +779,20 @@ species:
         derived_from: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
         phase: l
         units: dimensionless
+        uncertainty:
+          kind: derived
+          value: '0.43'
+          basis: gamma_CrO_absolute_units
+          locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '6'}
+          derivation:
+            relation: propagated_fig11_composition_digitization
+            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            parameters: []
+            method:
+              state: {tag: value, value: 'Propagated a ±1 wt% coordinate shift through gamma proportional to total moles, as MgO–Al2O3 exchange at fixed CaO and SiO2.'}
+              locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '6'}
+            references: ['Fig. 11 composition digitization', 'Eq. (13)']
+            output_unit: gamma_CrO_absolute_units
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
         values:
           quantity: activity_coefficient
@@ -617,7 +824,11 @@ species:
               - [a_CrO, {state: {tag: value, value: '1.34e-3'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
               - [equilibrium_Cr_ppm, {state: {tag: value, value: '24.1'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '6'}}]
               - [total_moles_per_g_AlO1.5_basis, {state: {tag: value, value: '0.0199555760'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '6', note: 'calculated from the row oxide composition and formula masses'}}]
-              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}}]
+              - [chromium_molar_mass_g_per_mol, {state: {tag: value, value: '51.996'}, locator: {note: *maeda_cr_mass_source}}]
+              - [CaO_formula_mass_g_per_mol, {state: {tag: value, value: '56.0774'}, locator: {note: *maeda_formula_mass_source}}]
+              - [MgO_formula_mass_g_per_mol, {state: {tag: value, value: '40.3044'}, locator: {note: *maeda_formula_mass_source}}]
+              - [Al2O3_formula_mass_g_per_mol, {state: {tag: value, value: '101.9613'}, locator: {note: *maeda_formula_mass_source}}]
+              - [SiO2_formula_mass_g_per_mol, {state: {tag: value, value: '60.0843'}, locator: {note: *maeda_formula_mass_source}}]
             output_unit: dimensionless
         point_conditions:
           temperature_C: {state: {tag: value, value: '1650'}, locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', note: 'caption: 1650°C'}}
