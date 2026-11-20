@@ -169,6 +169,10 @@ def ellingham_oxide_stoichiometry_for_formula(
     _metal, n_metal, n_oxygen = stoich
     if n_oxygen <= 0:
         return None
+    # OXIDE_TO_METAL stores M_n O_m -> n M + m/2 O2. Normalizing that
+    # reaction to one mol O2 gives n_M=2n/m and n_ox=2/m. These coefficients
+    # are dimensionless; the Ellingham resolver returns K*a_oxide**n_ox in bar.
+    # Sanity: FeO gives (2, 2), Na2O (4, 2), and Al2O3 (4/3, 2/3).
     return (
         2.0 * float(n_metal) / float(n_oxygen),
         2.0 / float(n_oxygen),

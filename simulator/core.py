@@ -2816,17 +2816,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         try:
             verified_scalar_source = None
-            pinned_hour = getattr(
-                self, '_melt_redox_gate_authority_tick_hour', None)
-            gate_authority = getattr(
-                self,
-                '_melt_redox_gate_authority_this_tick',
-                _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
+            has_current_hour_pin, gate_authority = (
+                self._melt_redox_gate_authority_pin_for_current_hour()
             )
             if (
                 scalar_liquid_fraction is None
-                and pinned_hour == int(self.melt.hour)
-                and gate_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+                and has_current_hour_pin
             ):
                 scalar_liquid_fraction = (
                     self._melt_redox_liquid_fraction_factor(
@@ -5865,10 +5860,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             parent_activity = activity.thermodynamic_parent_activity()
             if parent_activity <= 0.0:
                 continue
-            # For MOx(melt) <-> M(metal) + x/2 O2, K =
-            # a_M * (fO2/bar)^(x/2) / a_MOx. Since a_M <= 1,
-            # fO2/bar >= (K*a_MOx)^(2/x), the unit-metal-activity
-            # dissociation threshold at the actual parent-oxide activity.
+            # The general Ellingham reaction is normalized to one mol O2:
+            # a_M = (K*a_MOx**n_ox / (fO2/bar))**(1/n_M). Since a_M <= 1,
+            # fO2/bar >= K*a_MOx**n_ox, the unit-metal-activity threshold
+            # at the actual parent-oxide activity.
             # The resolver returns bar; fO2/bar is dimensionless before
             # taking log10. a_MOx=1 recovers the pure-oxide buffer, and a
             # smaller a_MOx lowers the floor monotonically.
