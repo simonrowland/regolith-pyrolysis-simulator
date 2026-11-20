@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+import simulator.diagnostic_helpers.hashimoto_1983 as hashimoto
 from simulator.diagnostic_helpers.hashimoto_1983 import (
     DEFAULT_OBSERVATIONS_PATH,
     DEFAULT_PRESET_PATH,
@@ -11,6 +12,14 @@ from simulator.diagnostic_helpers.hashimoto_1983 import (
     require_runtime_inputs,
     score_hashimoto_1983,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
+
+
+def test_hashimoto_input_is_outside_shipped_runtime_preset_catalog() -> None:
+    runtime_preset_directory = DEFAULT_PRESET_PATH.parents[2] / "presets/vacuum_pyrolysis"
+    catalog_paths = set(runtime_preset_directory.glob("*.yaml"))
+    assert DEFAULT_PRESET_PATH.parent != runtime_preset_directory
+    assert DEFAULT_PRESET_PATH not in catalog_paths
 
 
 def test_preset_loads_printed_inputs_and_missing_area_refuses() -> None:
@@ -41,6 +50,18 @@ def test_missing_starting_oxide_refuses_after_mutation() -> None:
     assert exc_info.value.reason == "missing_starting_oxide"
 
 
+def test_runtime_pressure_floor_is_reported_when_area_is_available() -> None:
+    preset = load_hashimoto_preset(DEFAULT_PRESET_PATH)
+    mutated = dict(preset)
+    mutated["free_evaporation_geometry"] = {
+        **preset["free_evaporation_geometry"],
+        "exposed_melt_area_m2": 1.0e-6,
+    }
+    with pytest.raises(Hashimoto1983Refusal) as exc_info:
+        require_runtime_inputs(mutated)
+    assert exc_info.value.reason == "runtime_pressure_below_implemented_floor"
+
+
 def test_admitted_rows_have_pinned_record_count_and_skip_superseded_rows() -> None:
     observations = load_admitted_observations(DEFAULT_OBSERVATIONS_PATH)
     assert len(observations) == 120
@@ -54,6 +75,47 @@ def test_admitted_rows_have_pinned_record_count_and_skip_superseded_rows() -> No
     with pytest.raises(Hashimoto1983Refusal) as exc_info:
         score_hashimoto_1983(observations=changed)
     assert exc_info.value.reason == "admitted_record_count_mismatch"
+
+
+def test_same_count_duplicate_override_refuses_after_mutation() -> None:
+    observations = load_admitted_observations(DEFAULT_OBSERVATIONS_PATH)
+    substituted = (*observations[:-1], observations[0])
+    with pytest.raises(Hashimoto1983Refusal) as exc_info:
+        score_hashimoto_1983(observations=substituted)
+    assert exc_info.value.reason == "duplicate_admitted_observation"
+
+
+def test_loader_refuses_non_wt_residue_basis_after_mutation(monkeypatch) -> None:
+    document = load_cached_safe_yaml(
+        DEFAULT_OBSERVATIONS_PATH.read_text(encoding="utf-8")
+    )
+    first_admitted = next(
+        row for row in document["observations"]
+        if row["identity"]["quantity"].get("value") == "residue_component_composition"
+        and row["admission"]["status"] == "admitted"
+    )
+    first_admitted["identity"]["subtype"]["value"] = "oxide_mole_fraction"
+    first_admitted["value"]["point"] = "0.0357"
+    monkeypatch.setattr(hashimoto, "load_cached_safe_yaml", lambda _raw: document)
+    with pytest.raises(Hashimoto1983Refusal) as exc_info:
+        load_admitted_observations(DEFAULT_OBSERVATIONS_PATH)
+    assert exc_info.value.reason == "unsupported_residue_subtype"
+
+
+def test_loader_refuses_non_table3_row_after_mutation(monkeypatch) -> None:
+    document = load_cached_safe_yaml(
+        DEFAULT_OBSERVATIONS_PATH.read_text(encoding="utf-8")
+    )
+    first_admitted = next(
+        row for row in document["observations"]
+        if row["identity"]["quantity"].get("value") == "residue_component_composition"
+        and row["admission"]["status"] == "admitted"
+    )
+    first_admitted["locator"]["table"] = "2"
+    monkeypatch.setattr(hashimoto, "load_cached_safe_yaml", lambda _raw: document)
+    with pytest.raises(Hashimoto1983Refusal) as exc_info:
+        load_admitted_observations(DEFAULT_OBSERVATIONS_PATH)
+    assert exc_info.value.reason == "unexpected_residue_table"
 
 
 def test_synthetic_runtime_equal_to_printed_values_has_zero_residual() -> None:
@@ -90,3 +152,19 @@ def test_missing_runtime_output_refuses_for_each_observation() -> None:
     assert all(record.sim_wt_pct is None for record in records)
     assert all(record.residual is None for record in records)
     assert all(record.refusal_reason == "missing_runtime_output" for record in records)
+
+
+@pytest.mark.parametrize("invalid_output", [-1.0, 101.0])
+def test_invalid_runtime_output_has_no_numeric_prediction_or_residual(
+    invalid_output: float,
+) -> None:
+    observations = load_admitted_observations(DEFAULT_OBSERVATIONS_PATH)
+    first = observations[0]
+    runtime = {first.experiment_id: {first.oxide: invalid_output}}
+    records = score_hashimoto_1983(
+        observations=observations,
+        runtime_outputs=runtime,
+    )
+    assert records[0].refusal_reason == "invalid_runtime_output"
+    assert records[0].sim_wt_pct is None
+    assert records[0].residual is None

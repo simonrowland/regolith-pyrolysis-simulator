@@ -21,6 +21,8 @@ starting_composition_source:
 vacuum:
   value: 1.0e-4
   units: Torr
+  # Unit conversion from the printed pressure; the extracted point is 0.013332236842 Pa.
+  runtime_pressure_mbar: 0.00013332236842105264
   qualifier: about
   published_page: 118
   pdf_page_index: 7

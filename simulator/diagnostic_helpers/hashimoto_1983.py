@@ -19,12 +19,13 @@ from typing import Any
 
 import yaml
 
+from simulator.lab_schedule import LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
 SOURCE_ID = "kems-015-hashimoto-1983"
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_PRESET_PATH = ROOT / "data/presets/vacuum_pyrolysis/hashimoto_1983.yaml"
+DEFAULT_PRESET_PATH = ROOT / "data/literature/reproduction-inputs/hashimoto_1983.yaml"
 DEFAULT_OBSERVATIONS_PATH = (
     ROOT / "data/literature/extracts-v2/kems-015-hashimoto-1983.yaml"
 )
@@ -131,6 +132,18 @@ def require_runtime_inputs(preset: Mapping[str, Any]) -> None:
         )
     if _finite_number(area, "free_evaporation_geometry.exposed_melt_area_m2") <= 0.0:
         raise Hashimoto1983Refusal("invalid_exposed_melt_area")
+    vacuum = preset.get("vacuum")
+    if not isinstance(vacuum, Mapping) or vacuum.get("units") != "Torr":
+        raise Hashimoto1983Refusal("unsupported_runtime_pressure_unit")
+    pressure_mbar = _finite_number(
+        vacuum.get("runtime_pressure_mbar"),
+        "vacuum.runtime_pressure_mbar",
+    )
+    if pressure_mbar < LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:
+        raise Hashimoto1983Refusal(
+            "runtime_pressure_below_implemented_floor",
+            f"{pressure_mbar:g} mbar < {LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:g} mbar",
+        )
 
 
 def load_admitted_observations(
@@ -148,7 +161,6 @@ def load_admitted_observations(
         raise Hashimoto1983Refusal("observations_missing")
 
     observations: list[HashimotoObservation] = []
-    seen_ids: set[str] = set()
     for row in rows:
         if not isinstance(row, Mapping):
             continue
@@ -163,9 +175,12 @@ def load_admitted_observations(
             continue
 
         observation_id = _required_text(row.get("observation_id"), "observation_id")
-        if observation_id in seen_ids:
-            raise Hashimoto1983Refusal("duplicate_admitted_observation", observation_id)
-        seen_ids.add(observation_id)
+        subtype = _nested(row, "identity", "subtype")
+        if not isinstance(subtype, Mapping) or subtype.get("value") != "oxide_wt_percent":
+            raise Hashimoto1983Refusal("unsupported_residue_subtype", observation_id)
+        locator = row.get("locator")
+        if not isinstance(locator, Mapping) or str(locator.get("table")) != "3":
+            raise Hashimoto1983Refusal("unexpected_residue_table", observation_id)
         source_id = _required_text(row.get("source_id"), "source_id")
         if source_id != SOURCE_ID:
             raise Hashimoto1983Refusal("unexpected_source_id", source_id)
@@ -199,11 +214,7 @@ def load_admitted_observations(
                 published_wt_pct=published_wt_pct,
             )
         )
-    if len(observations) != ADMITTED_RECORD_COUNT:
-        raise Hashimoto1983Refusal(
-            "admitted_record_count_mismatch",
-            f"expected {ADMITTED_RECORD_COUNT}, got {len(observations)}",
-        )
+    _validate_admitted_cohort(observations)
     return tuple(observations)
 
 
@@ -225,11 +236,7 @@ def score_hashimoto_1983(
     active_observations = (
         observations if observations is not None else load_admitted_observations()
     )
-    if len(active_observations) != ADMITTED_RECORD_COUNT:
-        raise Hashimoto1983Refusal(
-            "admitted_record_count_mismatch",
-            f"expected {ADMITTED_RECORD_COUNT}, got {len(active_observations)}",
-        )
+    _validate_admitted_cohort(active_observations)
     validate_starting_composition(active_preset)
     input_refusal: Hashimoto1983Refusal | None = None
     if runtime_outputs is None:
@@ -256,12 +263,13 @@ def score_hashimoto_1983(
                 notices.add(refusal_reason)
             else:
                 try:
-                    simulated = _finite_number(
+                    candidate = _finite_number(
                         run_output[observation.oxide],
                         f"runtime_outputs.{observation.experiment_id}.{observation.oxide}",
                     )
-                    if not 0.0 <= simulated <= 100.0:
+                    if not 0.0 <= candidate <= 100.0:
                         raise Hashimoto1983Refusal("invalid_runtime_output")
+                    simulated = candidate
                 except Hashimoto1983Refusal as exc:
                     refusal_reason = exc.reason
                     notices.add(exc.reason)
@@ -318,6 +326,22 @@ def _located_value(raw: Any, field: str) -> float:
     ):
         raise Hashimoto1983Refusal("unlocated_point_condition", field)
     return _finite_number(state.get("value"), f"point_conditions.{field}")
+
+
+def _validate_admitted_cohort(
+    observations: Sequence[HashimotoObservation],
+) -> None:
+    if len(observations) != ADMITTED_RECORD_COUNT:
+        raise Hashimoto1983Refusal(
+            "admitted_record_count_mismatch",
+            f"expected {ADMITTED_RECORD_COUNT}, got {len(observations)}",
+        )
+    observation_ids = [row.observation_id for row in observations]
+    if len(set(observation_ids)) != len(observation_ids):
+        raise Hashimoto1983Refusal("duplicate_admitted_observation")
+    experiment_oxides = [(row.experiment_id, row.oxide) for row in observations]
+    if len(set(experiment_oxides)) != len(experiment_oxides):
+        raise Hashimoto1983Refusal("duplicate_experiment_oxide")
 
 
 def _nested(value: Any, *keys: str) -> Any:
