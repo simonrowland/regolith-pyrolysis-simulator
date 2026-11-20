@@ -10,6 +10,30 @@ from simulator.battery.migrate import _locator_from_plain, to_plain
 from simulator.battery.records import Locator
 
 
+def _type_sensitive_value(value: object) -> object:
+    if isinstance(value, dict):
+        return {key: _type_sensitive_value(child) for key, child in value.items()}
+    if isinstance(value, list):
+        return [_type_sensitive_value(child) for child in value]
+    return (type(value).__name__, value)
+
+
+def _type_tag_observation_locators(payload: object) -> object:
+    if isinstance(payload, dict):
+        observation_row = "observation_id" in payload
+        return {
+            key: (
+                _type_sensitive_value(value)
+                if observation_row and key in {"locator", "source_locator"}
+                else _type_tag_observation_locators(value)
+            )
+            for key, value in payload.items()
+        }
+    if isinstance(payload, list):
+        return [_type_tag_observation_locators(value) for value in payload]
+    return payload
+
+
 def historical_source_locations(payload: object, extract: dict) -> object:
     # The committed siblings predate these five fields. Match their entire
     # historical locator to its source, including the old flattened note;
@@ -86,7 +110,7 @@ def historical_source_locations(payload: object, extract: dict) -> object:
             return [normalize(item, None, replacements) for item in value]
         return value
 
-    return normalize(payload, None, {})
+    return _type_tag_observation_locators(normalize(payload, None, {}))
 
 
 def regenerated_source_locations(payload: object) -> object:
@@ -103,7 +127,11 @@ def regenerated_source_locations(payload: object) -> object:
                 )
             else:
                 normalized[key] = regenerated_source_locations(value)
-        return normalized
+        return (
+            _type_tag_observation_locators(normalized)
+            if observation_row
+            else normalized
+        )
     if isinstance(payload, list):
         return [regenerated_source_locations(value) for value in payload]
     return payload
@@ -131,6 +159,17 @@ def mutate_first_serialized_locator(path: Path, *, mutation: str) -> None:
             if coordinate is not None:
                 del locator[coordinate]
                 break
+        if mutation == "integer_to_float":
+            coordinate = next(
+                (
+                    key for key in ("table_row_number", "table_column_number")
+                    if type(locator.get(key)) is int
+                ),
+                None,
+            )
+            if coordinate is not None:
+                locator[coordinate] = float(locator[coordinate])
+                break
     else:
-        raise AssertionError(f"no locator field available for {mutation} mutation")
+        raise LookupError(f"no locator field available for {mutation} mutation")
     path.write_text(yaml.safe_dump(document), encoding="utf-8")

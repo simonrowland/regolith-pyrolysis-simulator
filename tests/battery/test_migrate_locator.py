@@ -1217,6 +1217,93 @@ def test_unknown_locator_key_is_a_typed_validation_issue(tmp_path: Path) -> None
     assert migrated.value == expected.value
 
 
+@pytest.mark.parametrize("unknown_location", ["outer", "extras"])
+@pytest.mark.parametrize("unknown_first", [False, True])
+def test_extract_intake_preserves_coordinates_when_locator_has_invalid_row_and_unknown_key(
+    tmp_path: Path, unknown_location: str, unknown_first: bool,
+) -> None:
+    _assert_method_uncertainty_locator_survives_unknown_axis(
+        tmp_path, unknown_location=unknown_location, unknown_first=unknown_first,
+    )
+
+
+def test_extract_unknown_axis_scan_mutation_is_detected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery import migrate as migrate_module
+
+    first_unsupported = migrate_module._locator_mapping_first_unsupported_key
+
+    def skip_late_unknown_after_invalid_row(payload: object) -> str | None:
+        if isinstance(payload, dict) and payload.get("row") is True:
+            return None
+        return first_unsupported(payload)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            migrate_module,
+            "_locator_mapping_first_unsupported_key",
+            skip_late_unknown_after_invalid_row,
+        )
+        with pytest.raises(AssertionError, match="lost typed method uncertainty"):
+            _assert_method_uncertainty_locator_survives_unknown_axis(
+                tmp_path, unknown_location="outer", unknown_first=False,
+            )
+
+
+def test_locator_mutation_helper_reports_missing_target_outside_assertion(
+    tmp_path: Path,
+) -> None:
+    from tests.locator_assertions import mutate_first_serialized_locator
+
+    path = tmp_path / "no-observation-locators.yaml"
+    path.write_text(yaml.safe_dump({"observations": []}), encoding="utf-8")
+    with pytest.raises(LookupError, match="no locator field available"):
+        mutate_first_serialized_locator(path, mutation="page_alias")
+
+
+def _assert_method_uncertainty_locator_survives_unknown_axis(
+    tmp_path: Path, *, unknown_location: str, unknown_first: bool,
+) -> None:
+    extract = copy.deepcopy(FIXTURE_EXTRACT)
+    locator = {"page": 7, "row": True}
+    if unknown_location == "outer":
+        unknown = {"unreviewed_axis": "x"}
+        locator = {**unknown, **locator} if unknown_first else {**locator, **unknown}
+    else:
+        extras = {"unreviewed_axis": "x"}
+        locator["extras"] = extras
+        if unknown_first:
+            locator = {"extras": extras, "page": 7, "row": True}
+    extract["source"]["method_uncertainty"] = {
+        "value": "0.10",
+        "meaning": "one_sigma",
+        "quantity": "activity",
+        "basis": "log10_dex",
+        "quantity_basis": "log10 activity in dex",
+        "locator": locator,
+    }
+    try:
+        result = migrate(
+            _write_min_tree(tmp_path / f"{unknown_location}-{unknown_first}", extract),
+            write=False,
+        )
+    except Exception as exc:
+        raise AssertionError("lost typed method uncertainty during extract intake") from exc
+    assert result.observations
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith(".source.method_uncertainty.locator")
+        for issue in result.registry_issues
+    )
+    work = next(
+        work for work in result.works.values()
+        if "fixture-source" in work.source_ids
+    )
+    uncertainty = work.source_method_uncertainties["fixture-source"]
+    assert uncertainty.locator.page == 7
+
+
 def test_distinct_registry_locator_facts_do_not_drop_observation_values(
     tmp_path: Path,
 ) -> None:

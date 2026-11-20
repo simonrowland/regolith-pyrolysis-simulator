@@ -1717,6 +1717,10 @@ def _decode_locator_from_plain(
             return Locator(note=str(payload))
         except ValueError as exc:
             raise _InvalidLocator(f"invalid locator: {exc}") from exc
+    if reject_unknown:
+        unsupported = _locator_mapping_first_unsupported_key(payload)
+        if unsupported is not None:
+            raise _InvalidLocator(f"unknown locator key {unsupported!r}")
     kwargs: dict[str, object] = {}
     target_sources: dict[str, tuple[str, object]] = {}
     extra_values: dict[str, object] = {}
@@ -1724,17 +1728,10 @@ def _decode_locator_from_plain(
     for raw_name, value in payload.items():
         name = str(raw_name)
         if not _locator_key_is_supported(name):
-            if reject_unknown:
-                raise _InvalidLocator(f"unknown locator key {name!r}")
             continue
         if name == "extras":
             if not isinstance(value, Mapping):
                 raise _InvalidLocator("extras must be an object")
-            unsupported = _locator_mapping_first_unsupported_key(
-                {"extras": value}
-            )
-            if reject_unknown and unsupported is not None:
-                raise _InvalidLocator(f"unknown locator key {unsupported!r}")
             for extra_name, extra_value in value.items():
                 if not isinstance(extra_name, str):
                     raise _InvalidLocator("extras keys must be strings")

@@ -166,6 +166,27 @@ def test_reference_fixed_point_detects_locator_mutation(
             )
 
 
+def test_reference_fixed_point_detects_equal_valued_float_locator_coordinate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_id = "doyle-1988-feo-activity-multicomponent-magma"
+    expected_count = SOURCE_COUNTS[source_id]
+    original = _isolated_migration
+
+    def mutate_output(root, source):
+        result = original(root, source)
+        path = root / source / "tree/data/literature/extracts-v2" / f"{source}.yaml"
+        mutate_first_serialized_locator(path, mutation="integer_to_float")
+        return result
+
+    with monkeypatch.context() as changed_migration:
+        changed_migration.setitem(globals(), "_isolated_migration", mutate_output)
+        with pytest.raises(AssertionError):
+            test_reference_sources_migrate_in_isolation_with_conditions(
+                tmp_path, source_id, expected_count
+            )
+
+
 def test_rule_precedence_uses_roeder_dg_and_doyle_coughlin(tmp_path: Path) -> None:
     # Mutation: changing either payload from D&G/cited to prose breaks its route.
     roeder = _isolated_migration(
