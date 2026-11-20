@@ -72,6 +72,35 @@ def test_index_extract_row_counts_match_source_extracts() -> None:
             assert extract["rows"] == rows, extract["path"]
 
 
+def test_schreiber_index_count_is_derived_from_figure_rows() -> None:
+    """The indexed row count is the 8 Figure 4 rows plus the Figure 5 markers."""
+    source_id = "schreiber-haskin-1976-plsc7-chromium-in-basalts"
+    index = yaml.safe_load(COMMITTED_YAML.read_text())
+    source = next(row for row in index["sources"] if row["source_id"] == source_id)
+    extract = yaml.safe_load((REPO_ROOT / source["extracts"][0]["path"]).read_text())
+    observations = [
+        observation
+        for body in (extract.get("species") or {}).values()
+        for observation in (body.get("observations") or [])
+    ]
+    figure4_rows = [row for row in observations if row["observation_id"].startswith("schreiber_1976_")]
+    figure5_rows = [row for row in observations if row["observation_id"].startswith("fig5_panel_")]
+
+    assert len(figure4_rows) == 8
+    assert len(figure5_rows) == 34
+    assert source["extracts"][0]["rows"] == len(figure4_rows) + len(figure5_rows) == 42
+
+
+def test_schreiber_work_citation_matches_extract_citation() -> None:
+    source_id = "schreiber-haskin-1976-plsc7-chromium-in-basalts"
+    extract = yaml.safe_load((REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text())
+    work_path = REPO_ROOT / "data/literature/works/bd5c0c2ddbf02ce3306adc1f1022cb7382273480dcceed4a670678920fe60409.yaml"
+    work = yaml.safe_load(work_path.read_text())
+
+    assert work["work"]["citation"] == extract["source"]["citation"]
+    assert work["work"]["citation"].endswith("1221-1259.")
+
+
 def test_robie_hemingway_compilation_is_citable_with_published_doi() -> None:
     index = yaml.safe_load(COMMITTED_YAML.read_text())
     source = next(

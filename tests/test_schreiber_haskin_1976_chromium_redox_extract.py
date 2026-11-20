@@ -1,10 +1,26 @@
+from dataclasses import replace
 from decimal import Decimal
+import hashlib
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.enums import QUANTITY_UNITS, Phase, Quantity, ValueKind
-from simulator.battery.migrate import Migrator, PA_PER_ATM_DEC, _log_fO2_to_pa
+from simulator.battery.migrate import (
+    Migrator,
+    PA_PER_ATM_DEC,
+    _log_fO2_to_pa,
+    experiment_from_plain,
+    observation_from_plain,
+    to_plain,
+    work_from_plain,
+)
+from simulator.battery.records import Value
+from simulator.battery.validate import validate_corpus
+from simulator.state_types import State
+from tests.helpers.corpus_paths import regolith_corpus_root
+from tools.validate_literature_extracts import validate_extract_document
 
 
 EXTRACT = Path(
@@ -51,7 +67,7 @@ def _assert_caption_pins(document: dict) -> None:
         row["observation_id"]: row
         for row in document["species"]["Cr"]["observations"]
     }
-    assert set(observations) == set(FIG4)
+    assert set(observations) >= set(FIG4)
     for observation_id, (fraction, log_fO2, printed) in FIG4.items():
         row = observations[observation_id]
         point = row["values"]["points"][0]
@@ -123,7 +139,7 @@ def test_isolated_migration_preserves_fractions_units_conditions_and_quench_phas
         if row.source_id == EXTRACT.stem
     }
     assert not migrator.result.validation.hard_issues
-    assert set(migrated) == set(FIG4)
+    assert set(FIG4) <= set(migrated)
     for observation_id, (fraction, log_fO2, _printed) in FIG4.items():
         row = migrated[observation_id]
         assert row.identity.species.formula == "Cr"
@@ -140,3 +156,217 @@ def test_isolated_migration_preserves_fractions_units_conditions_and_quench_phas
         assert row.point_conditions["printed_composition"].state.value == FAS
         assert row.point_conditions["quench_state"].state.value.value == "not_stated"
         assert row.notices == ()
+
+
+REPO_ROOT = Path.cwd()
+FIG5_EXTRACT = REPO_ROOT / "data/literature/extracts-v2/schreiber-haskin-1976-plsc7-chromium-in-basalts.yaml"
+FIG5_SOURCE_ID = "schreiber-haskin-1976-plsc7-chromium-in-basalts"
+FIG5_LEGACY_EXTRACT = REPO_ROOT / "data/literature/extracts/schreiber-haskin-1976-plsc7-chromium-in-basalts.yaml"
+# 600 dpi page reading of folio 1232. Circle = 1500 C, triangle = 1550 C.
+# These literals are the digitization, not a copy of the extract.
+FIG5_MARKER_PINS = (
+    ("fig5_panel_c_fas_cr2_fraction_T1500C_x4p1", "0.27", "1500", "-4.1"),
+    ("fig5_panel_c_fas_cr2_fraction_T1500C_x6p4", "0.49", "1500", "-6.4"),
+    ("fig5_panel_c_fas_cr2_fraction_T1500C_x8p6", "0.82", "1500", "-8.6"),
+    ("fig5_panel_d_fad_cr2_fraction_T1550C_x8p6", "0.81", "1550", "-8.6"),
+    ("fig5_panel_d_fad_cr2_fraction_T1500C_x9p1", "0.99", "1500", "-9.1"),
+    ("fig5_panel_d_fad_cr2_fraction_T1550C_x4p2", "0.25", "1550", "-4.2"),
+)
+FIG5_PANEL_TEMPERATURE_PINS = {
+    ("c", "1500"): ("-2.7", "-3.5", "-4.1", "-5.5", "-6.4", "-7.0", "-7.8", "-8.6", "-9.1"),
+    ("c", "1550"): ("-2.9", "-3.4", "-4.2", "-5.0", "-6.4", "-6.9", "-8.0"),
+    ("d", "1500"): ("-2.6", "-3.6", "-4.1", "-4.7", "-5.2", "-5.7", "-6.0", "-6.4", "-6.9", "-7.9", "-9.1"),
+    ("d", "1550"): ("-2.9", "-3.5", "-4.2", "-6.4", "-6.9", "-7.4", "-8.6"),
+}
+FIG5_PANEL_MARKER_COUNTS = {
+    ("c", "1500"): 9,
+    ("c", "1550"): 7,
+    ("d", "1500"): 11,
+    ("d", "1550"): 7,
+}
+FIG5_ABSENT_MARKER_IDS = (
+    "fig5_panel_d_fad_cr2_fraction_T1500C_x8p4",
+    "fig5_panel_d_fad_cr2_fraction_T1550C_x5p4",
+    "fig5_panel_d_fad_cr2_fraction_T1550C_x6p8",
+    "fig5_panel_d_fad_cr2_fraction_T1550C_x7p5",
+    "fig5_panel_c_fas_cr2_fraction_T1550C_x5p7",
+    "fig5_panel_c_fas_cr2_fraction_T1550C_x8p3",
+)
+FIG5_TABLE = Path("tables/schreiber-haskin-1976-plsc7-chromium-in-basalts/fig5_cr2_digitization.csv")
+FIG5_TABLE_SHA256 = "5a2769fdb950e9ca5d12217e2c67de4de5695d9289b19405d1593fe54847912c"
+
+
+def _migrate_fig5_extract(extract_path: Path = FIG5_LEGACY_EXTRACT):
+    migrator = Migrator(REPO_ROOT)
+    migrator._migrate_extract(extract_path)
+    migrator.finalize()
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.hard_issues == ()
+    return migrator
+
+
+def _assert_migrated_fig5_pins(rows) -> None:
+    for raw_id, expected, temp_c, log_fO2 in FIG5_MARKER_PINS:
+        row = next(item for item in rows if item.observation_id.startswith(f"{FIG5_SOURCE_ID}::{raw_id}::"))
+        assert row.value.point == Decimal(expected)
+        assert row.identity.temperature_K.value == Decimal(temp_c) + Decimal("273.15")
+        assert row.identity.fO2_Pa.value == _log_fO2_to_pa(Decimal(log_fO2), PA_PER_ATM_DEC)
+        assert row.identity.total_pressure_Pa.value == Decimal("101325")
+
+
+def _assert_migrated_fig5_panel_temperatures(rows) -> None:
+    expected = {
+        (panel, temperature_c, _log_fO2_to_pa(Decimal(log_fO2), PA_PER_ATM_DEC))
+        for (panel, temperature_c), log_values in FIG5_PANEL_TEMPERATURE_PINS.items()
+        for log_fO2 in log_values
+    }
+    observed = {
+        (
+            row.observation_id.split("::", 1)[1].split("_")[2],
+            str(int(row.identity.temperature_K.value - Decimal("273.15"))),
+            row.identity.fO2_Pa.value,
+        )
+        for row in rows
+    }
+    assert observed == expected
+
+
+def _assert_fig5_legacy_fixes(document: dict) -> None:
+    rows = [r for r in document["species"]["Cr"]["observations"] if r["observation_id"].startswith("fig5_panel_")]
+    assert len(rows) == sum(FIG5_PANEL_MARKER_COUNTS.values())
+    assert document["source"]["citation"].endswith("1221-1259.")
+    ids = {row["observation_id"] for row in rows}
+    for marker_id in FIG5_ABSENT_MARKER_IDS:
+        assert marker_id not in ids
+    assert not any("fig5_panel_" in sample.get("path", "") for sample in document["fidelity_samples"])
+    for row in rows:
+        conditions = row["values"]["points"][0]["point_conditions"]
+        assert conditions["composition"]["state"]["tag"] == "unknown"
+        assert conditions["composition"]["state"]["reason"] == "not associated with plotted points"
+        assert conditions["printed_composition"]["state"]["value"]["Cr2O3"] == "0.5 wt%"
+        assert conditions["fO2_log"]["units"] == "log10(atm)"
+        assert conditions["fO2_log"]["state"]["value"] == row["values"]["points"][0]["log_fO2"]["value"]
+        assert conditions["total_pressure_Pa"]["state"]["tag"] == "value"
+        assert conditions["total_pressure_Pa"]["state"]["value"]["point"] == "101325"
+    _assert_fig5_panel_temperatures(rows)
+
+
+def _assert_fig5_panel_temperatures(rows: list[dict]) -> None:
+    observed = {}
+    for row in rows:
+        point = row["values"]["points"][0]
+        temperature_c = point["T_C"]
+        conditions = point["point_conditions"]
+        assert conditions["T_C"]["state"]["value"] == temperature_c
+        assert conditions["temperature_K"]["state"]["value"] == str(
+            Decimal(temperature_c) + Decimal("273.15")
+        )
+        observed.setdefault((row["locator"]["panel"], temperature_c), []).append(
+            point["log_fO2"]["value"]
+        )
+    assert {key: len(values) for key, values in observed.items()} == FIG5_PANEL_MARKER_COUNTS
+    assert {key: len(values) for key, values in FIG5_PANEL_TEMPERATURE_PINS.items()} == FIG5_PANEL_MARKER_COUNTS
+    assert {key: tuple(sorted(values, key=Decimal)) for key, values in observed.items()} == {
+        key: tuple(sorted(values, key=Decimal))
+        for key, values in FIG5_PANEL_TEMPERATURE_PINS.items()
+    }
+
+
+def test_fig5_extract_validates_and_migrates_with_page_pins_and_mutations() -> None:
+    legacy = yaml.safe_load(FIG5_LEGACY_EXTRACT.read_text(encoding="utf-8"))
+    assert validate_extract_document(legacy, expected_source_id=FIG5_SOURCE_ID) == []
+    _assert_fig5_legacy_fixes(legacy)
+
+    changed_panel_temperature = yaml.safe_load(FIG5_LEGACY_EXTRACT.read_text(encoding="utf-8"))
+    moved_marker = next(
+        row for row in changed_panel_temperature["species"]["Cr"]["observations"]
+        if row["observation_id"] == "fig5_panel_d_fad_cr2_fraction_T1500C_x9p1"
+    )
+    moved_point = moved_marker["values"]["points"][0]
+    moved_point["T_C"] = "1550"
+    moved_point["point_conditions"]["T_C"]["state"]["value"] = "1550"
+    moved_point["point_conditions"]["temperature_K"]["state"]["value"] = "1823.15"
+    with pytest.raises(AssertionError):
+        _assert_fig5_panel_temperatures(
+            [r for r in changed_panel_temperature["species"]["Cr"]["observations"]
+             if r["observation_id"].startswith("fig5_panel_")]
+        )
+
+    for mutation in ("range", "pressure", "tilde", "fidelity", "citation", "oxygen"):
+        changed = yaml.safe_load(FIG5_LEGACY_EXTRACT.read_text(encoding="utf-8"))
+        row = next(r for r in changed["species"]["Cr"]["observations"] if r["observation_id"].startswith("fig5_panel_"))
+        conditions = row["values"]["points"][0]["point_conditions"]
+        if mutation == "range":
+            conditions["composition"]["state"]["reason"] += " Range 0.1–0.8 wt% Cr2O3."
+        elif mutation == "pressure":
+            conditions["total_pressure_Pa"]["state"] = {"tag": "unknown", "reason": "not reported"}
+        elif mutation == "tilde":
+            conditions["printed_composition"]["state"]["value"]["Cr2O3"] = "~0.5 wt%"
+        elif mutation == "fidelity":
+            changed["fidelity_samples"].append({"path": "species.Cr.observations[fig5_panel_bad].values.points[0].value"})
+        elif mutation == "citation":
+            changed["source"]["citation"] = changed["source"]["citation"].replace("1221-1259", "1221-1242")
+        else:
+            conditions["fO2_log"]["state"]["value"] = "2.7"
+        with pytest.raises(AssertionError):
+            _assert_fig5_legacy_fixes(changed)
+
+    result = _migrate_fig5_extract()
+    rows = [r for r in result.result.observations.values() if r.source_id == FIG5_SOURCE_ID and r.locator and r.locator.figure == "5"]
+    assert len(rows) == sum(FIG5_PANEL_MARKER_COUNTS.values())
+    _assert_migrated_fig5_pins(rows)
+    _assert_migrated_fig5_panel_temperatures(rows)
+    victim = next(r for r in rows if r.observation_id.startswith(f"{FIG5_SOURCE_ID}::{FIG5_MARKER_PINS[0][0]}::"))
+    changed_value = [replace(r, value=Value.point_of(Decimal("0.25"))) if r.observation_id == victim.observation_id else r for r in rows]
+    with pytest.raises(AssertionError):
+        _assert_migrated_fig5_pins(changed_value)
+
+    moved = next(r for r in rows if "T1500C_x9p1" in r.observation_id)
+    changed_temperature = [
+        replace(
+            r,
+            identity=replace(
+                r.identity,
+                temperature_K=State.of(r.identity.temperature_K.value + Decimal("50")),
+            ),
+        )
+        if r.observation_id == moved.observation_id
+        else r
+        for r in rows
+    ]
+    with pytest.raises(AssertionError):
+        _assert_migrated_fig5_panel_temperatures(changed_temperature)
+
+    mutated = _migrate_fig5_extract()
+    victim = next(r for r in mutated.result.observations.values() if r.source_id == FIG5_SOURCE_ID and r.value.point == Decimal("0.27"))
+    bad = victim.identity.fO2_Pa.value * Decimal("100")
+    mutated.result.observations[victim.observation_id] = replace(victim, identity=replace(victim.identity, fO2_Pa=State.of(bad)))
+    with pytest.raises(AssertionError):
+        _assert_migrated_fig5_pins([r for r in mutated.result.observations.values() if r.source_id == FIG5_SOURCE_ID and r.locator and r.locator.figure == "5"])
+
+
+def test_fig5_v2_is_the_migrator_output() -> None:
+    result = _migrate_fig5_extract()
+    expected = [to_plain(r) for r in sorted(result.result.observations.values(), key=lambda item: item.observation_id) if r.source_id == FIG5_SOURCE_ID]
+    current = yaml.safe_load(FIG5_EXTRACT.read_text(encoding="utf-8"))
+    assert current["observations"] == expected
+    work_document = yaml.safe_load((REPO_ROOT / "data/literature/works/bd5c0c2ddbf02ce3306adc1f1022cb7382273480dcceed4a670678920fe60409.yaml").read_text())
+    work = work_from_plain(work_document["work"])
+    experiments = [experiment_from_plain(row) for row in work_document["experiments"]]
+    migrated = {row.observation_id: row for row in (observation_from_plain(raw) for raw in current["observations"])}
+    assert validate_corpus([work], experiments, migrated).hard_issues == ()
+
+
+def test_fig5_native_digitization_matches_corpus_blob_or_skips_with_provenance() -> None:
+    table = regolith_corpus_root() / FIG5_TABLE
+    if not table.is_file():
+        pytest.skip("native Figure 5 table is absent; corpus branch w1119schr-fig5 @ 0664fb4fc86c7f1b5cb71de8de5a0d4e2ee19f03")
+    payload = table.read_bytes()
+
+    def assert_corpus_blob(blob: bytes) -> None:
+        assert hashlib.sha256(blob).hexdigest() == FIG5_TABLE_SHA256
+
+    assert_corpus_blob(payload)
+    mutated = payload[:-1] + bytes((payload[-1] ^ 1,))
+    with pytest.raises(AssertionError):
+        assert_corpus_blob(mutated)
