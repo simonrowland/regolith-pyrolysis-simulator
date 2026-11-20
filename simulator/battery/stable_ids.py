@@ -67,14 +67,21 @@ def tabulated_cell_suffix(
     return suffix
 
 
-def series_row_extra(raw_item: Any, *, include_locator: bool = True) -> str | None:
+def series_row_extra(
+    raw_item: Any,
+    *,
+    include_locator: bool = True,
+    source_quantity_as_printed: str | None = None,
+) -> str | None:
     """Content suffix for a series row when T alone is not unique.
 
     Prefer a printed row label (run / sample / locator.paragraph) plus a
     short sha1 of the row payload with temperature fields removed. Distinct
     printed rows rematerialize to distinct ids without encounter ordinals.
     New row/point containers can retain the full printed locator in that
-    payload; legacy series children leave it out to preserve their ids.
+    payload; legacy series children leave it out to preserve their ids. When
+    the parent quantity label already names an atm log, the matching explicit
+    point log unit is interpretation metadata, not additional row content.
     """
 
     if not isinstance(raw_item, Mapping):
@@ -111,6 +118,34 @@ def series_row_extra(raw_item: Any, *, include_locator: bool = True) -> str | No
     if not include_locator:
         skip.add("locator")
     residual = {k: raw_item[k] for k in raw_item if k not in skip}
+    point_conditions = residual.get("point_conditions")
+    if isinstance(point_conditions, Mapping):
+        oxygen_log = point_conditions.get("fO2_log")
+        log_units = (
+            str(oxygen_log.get("units") or oxygen_log.get("unit") or "")
+            .strip()
+            .lower()
+            if isinstance(oxygen_log, Mapping)
+            else ""
+        )
+        parent_units = str(source_quantity_as_printed or "").strip().lower()
+        if (
+            isinstance(oxygen_log, Mapping)
+            and log_units == "log10(atm)"
+            and parent_units == "-log fo2 (atm)"
+        ):
+            # The log frame interprets the printed condition but does not
+            # rename its row when the parent already declares that frame.
+            # Keep the log state and locator in the hash so same-temperature
+            # rows remain distinct.
+            normalized_log = {
+                key: value
+                for key, value in oxygen_log.items()
+                if key not in {"units", "unit"}
+            }
+            normalized_conditions = dict(point_conditions)
+            normalized_conditions["fO2_log"] = normalized_log
+            residual["point_conditions"] = normalized_conditions
     if residual:
         blob = json.dumps(residual, sort_keys=True, default=str, separators=(",", ":"))
         digest = hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]

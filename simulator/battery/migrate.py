@@ -29878,7 +29878,14 @@ class Migrator:
             )
             coord = t_sel.amount
             row_extra = series_row_extra(
-                raw_item, include_locator=content_stable_id
+                raw_item,
+                include_locator=content_stable_id,
+                source_quantity_as_printed=(
+                    str(parent_values.get("source_quantity_as_printed"))
+                    if isinstance(parent_values, Mapping)
+                    and parent_values.get("source_quantity_as_printed") is not None
+                    else None
+                ),
             )
             if coord is None and ordinal_point_id is not None:
                 point_id = ordinal_point_id

@@ -948,15 +948,16 @@ def test_fugacity_identity_matches_partial_pressure_except_quantity() -> None:
         }
 
     for quantity in (Quantity.P_PARTIAL, Quantity.FUGACITY):
+        expected_metadata = optional_metadata("H2O")
         with_metadata = M.fill_identity(
-            quantity, species, **axes, **optional_metadata("H2O")
+            quantity, species, **axes, **expected_metadata
         )
         with_different_metadata = M.fill_identity(
             quantity, species, **axes, **optional_metadata("CO2")
         )
-        assert with_metadata.reaction is not None
-        assert with_metadata.reference_state is not None
-        assert with_metadata.reservoir is not None
+        assert with_metadata.reaction == expected_metadata["reaction"]
+        assert with_metadata.reference_state == expected_metadata["reference_state"]
+        assert with_metadata.reservoir == expected_metadata["reservoir"]
         assert (
             identity_equal(with_metadata, with_different_metadata).kind
             is IdentityEqualKind.EQUAL

@@ -15,6 +15,8 @@ from collections import Counter
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
+import yaml
+
 from simulator.battery.enums import Authority, NoticeKind, Quantity, ValueKind
 from simulator.battery.identity import IdentityEqualKind, identity_equal
 from simulator.battery.migrate import (
@@ -55,6 +57,22 @@ def test_sato_hickling_atm_fugacity_identity_matches_the_reported_series() -> No
         and observation.identity.quantity.value is Quantity.FUGACITY
     ]
     assert len(rows) == 75
+    stored_path = (
+        ROOT
+        / "data"
+        / "literature"
+        / "extracts-v2"
+        / "sato-hickling-mclane-1973-lunar-fo2.yaml"
+    )
+    stored = yaml.safe_load(stored_path.read_text(encoding="utf-8"))
+    stored_ids = {
+        observation["observation_id"]
+        for observation in stored["observations"]
+        if observation["identity"]["quantity"].get("value") == "fugacity"
+    }
+    migrated_ids = {observation.observation_id for observation in rows}
+    assert len(stored_ids) == len(migrated_ids) == 75
+    assert migrated_ids == stored_ids
 
     for observation in rows:
         oxygen = observation.identity.fO2_Pa

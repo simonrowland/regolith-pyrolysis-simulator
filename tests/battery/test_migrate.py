@@ -4276,6 +4276,52 @@ def test_merge_located_mapping_order_is_hash_seed_stable() -> None:
     assert orders == {"alpha,beta,gamma,delta,epsilon,zeta"}
 
 
+def test_series_row_id_ignores_fugacity_log_unit_annotation() -> None:
+    row = {
+        "temperature_K": "1323.15",
+        "log_fO2_as_signed": "-14.9",
+        "fugacity_Pa": "1.2756062E-10",
+        "point_conditions": {
+            "fO2_log": {
+                "units": "log10(atm)",
+                "state": {"tag": "value", "value": "-14.9"},
+                "locator": {"page": 3, "table": "1"},
+            }
+        },
+    }
+    without_unit = {
+        **row,
+        "point_conditions": {
+            "fO2_log": {
+                "state": {"tag": "value", "value": "-14.9"},
+                "locator": {"page": 3, "table": "1"},
+            }
+        },
+    }
+    other_log = {
+        **without_unit,
+        "point_conditions": {
+            "fO2_log": {
+                "state": {"tag": "value", "value": "-14.8"},
+                "locator": {"page": 3, "table": "1"},
+            }
+        },
+    }
+
+    source_quantity = "-log fO2 (atm)"
+    assert series_row_extra(
+        row, source_quantity_as_printed=source_quantity
+    ) == series_row_extra(
+        without_unit, source_quantity_as_printed=source_quantity
+    )
+    assert series_row_extra(row) != series_row_extra(without_unit)
+    assert series_row_extra(
+        row, source_quantity_as_printed=source_quantity
+    ) != series_row_extra(
+        other_log, source_quantity_as_printed=source_quantity
+    )
+
+
 def test_lineage_parents_from_source_never_invents_pointer() -> None:
     """b-549 / b-979: a printed string is prose, not a parent. Prefixing it
     would mint an id the source did not write, and storing it would dangle.
