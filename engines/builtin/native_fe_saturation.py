@@ -4,8 +4,8 @@ Routes the pre-0.6 storm FeO -> Fe + 0.5 O2 split through the chemistry
 kernel without changing the saturation physics that computes the extent.
 Native Fe vapor is only budgeted here; the Fe vapor ledger leg is routed
 through EVAPORATION_TRANSITION -> CONDENSATION_ROUTE with every other metal
-vapor. Its optional per-oxide extent map also commits the FeO/NiO/CoO metal
-buffer selected by the simulator's redox update.
+vapor. Its optional per-oxide extent map also commits the FeO/NiO metal buffer
+selected by the simulator's redox update.
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ class BuiltinNativeFeSaturationProvider(ChemistryProvider):
 
     CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
     OVERHEAD_GAS_ACCOUNT = "process.overhead_gas"
-    SUPPORTED_OXIDES = frozenset({"FeO", "NiO", "CoO"})
+    SUPPORTED_OXIDES = frozenset({"FeO", "NiO"})
 
     def capability_profile(self) -> CapabilityProfile:
         from simulator.account_ids import (
@@ -71,7 +71,6 @@ class BuiltinNativeFeSaturationProvider(ChemistryProvider):
             TERMINAL_DRAIN_TAP_ACCOUNT as DRAIN_TAP_ACCOUNT,
         )
         from simulator.scalar_boundary import is_declared_real_scalar
-        from simulator.state import OXIDE_TO_METAL
 
         wrong_intent = reject_wrong_intent(
             request, ChemistryIntent.NATIVE_FE_SATURATION
@@ -179,34 +178,32 @@ class BuiltinNativeFeSaturationProvider(ChemistryProvider):
             formula_entry = request.account_view.species_formula_registry.get(
                 oxide
             )
-            oxide_stoich = OXIDE_TO_METAL.get(oxide)
-            ell_stoich = ellingham_oxide_stoichiometry_for_formula(
-                oxide,
-                oxide_to_metal=OXIDE_TO_METAL,
-            )
-            if formula_entry is None or oxide_stoich is None or ell_stoich is None:
+            if formula_entry is None:
                 return refused("unsupported_oxide_formula", oxide=oxide)
-            metal, formula_metal_mol, formula_oxygen_mol = oxide_stoich
             elements = resolve_species_formula(
                 oxide,
                 request.account_view.species_formula_registry,
             ).elements
+            metal = oxide.removesuffix("O")
+            formula_metal_mol = float(elements.get(metal, 0.0) or 0.0)
+            formula_oxygen_mol = float(elements.get("O", 0.0) or 0.0)
             if (
-                not math.isclose(
-                    float(elements.get(metal, 0.0)),
-                    float(formula_metal_mol),
-                    rel_tol=0.0,
-                    abs_tol=1.0e-9,
+                set(elements) != {metal, "O"}
+                or not math.isclose(
+                    formula_metal_mol, 1.0, rel_tol=0.0, abs_tol=1.0e-9
                 )
                 or not math.isclose(
-                    float(elements.get("O", 0.0)),
-                    float(formula_oxygen_mol),
-                    rel_tol=0.0,
-                    abs_tol=1.0e-9,
+                    formula_oxygen_mol, 1.0, rel_tol=0.0, abs_tol=1.0e-9
                 )
-                or set(elements) != {metal, "O"}
             ):
                 return refused("oxide_formula_mismatch", oxide=oxide)
+            oxide_stoich = (metal, formula_metal_mol, formula_oxygen_mol)
+            ell_stoich = ellingham_oxide_stoichiometry_for_formula(
+                oxide,
+                oxide_to_metal={oxide: oxide_stoich},
+            )
+            if ell_stoich is None:
+                return refused("unsupported_oxide_formula", oxide=oxide)
 
             n_metal_per_o2, n_oxide_per_o2 = ell_stoich
             oxygen_for_metal_mol = metal_extent_mol / n_metal_per_o2
@@ -234,7 +231,7 @@ class BuiltinNativeFeSaturationProvider(ChemistryProvider):
         )
         credits: dict[str, dict[str, float]] = {}
         if tap_metals:
-            credits[self.DRAIN_TAP_ACCOUNT] = tap_metals
+            credits[DRAIN_TAP_ACCOUNT] = tap_metals
         if oxygen_mol > 1.0e-12:
             credits[oxygen_account] = {"O2": oxygen_mol}
         if not debits and not credits:

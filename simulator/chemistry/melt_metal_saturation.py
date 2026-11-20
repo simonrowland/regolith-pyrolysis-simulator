@@ -89,6 +89,45 @@ def melt_metal_saturation_fO2_floor_log(
     return rows[0] if rows else None
 
 
+def unsupported_melt_metal_saturation_notice(
+    composition_mol: Mapping[str, float],
+) -> dict[str, str] | None:
+    """Return a typed notice when CoO has no accepted Co Ellingham fit."""
+
+    if (
+        float(composition_mol.get("CoO", 0.0) or 0.0) <= 0.0
+        or "Co" in ELLINGHAM_THERMO
+    ):
+        return None
+    return {
+        "type": "typed_notice",
+        "kind": "melt_metal_saturation_oxide_not_on_ellingham_owner",
+        "oxide": "CoO",
+        "metal": "Co",
+        "reason_code": "no_accepted_ellingham_formation_segment",
+        "message": "CoO not on the Ellingham owner; Co not buffered",
+    }
+
+
+def melt_metal_saturation_buffer_not_reached_notice(
+    *,
+    reason_code: str,
+    binding_oxide: str,
+    floor_fO2_log: float,
+    best_reachable_fO2_log: float,
+) -> dict[str, float | str]:
+    """Describe a floor crossing the available buffer could not reach."""
+
+    return {
+        "type": "typed_notice",
+        "kind": "melt_metal_saturation_buffer_not_reached",
+        "reason_code": reason_code,
+        "binding_oxide": binding_oxide,
+        "floor_fO2_log": float(floor_fO2_log),
+        "best_reachable_fO2_log": float(best_reachable_fO2_log),
+    }
+
+
 def plan_melt_metal_saturation_buffer(
     *,
     candidate_fO2_log: float,
@@ -103,9 +142,9 @@ def plan_melt_metal_saturation_buffer(
 
     For an Ellingham reaction normalized to one mol O2, reducing ``n_ox``
     mol oxide produces ``n_M`` mol metal and releases that O2 once. The
-    resolver orders the lunar binders by their current thresholds, so
-    inventory exhaustion proceeds through NiO, CoO, then FeO without a fixed
-    order.
+    resolver orders accepted lunar binders by their current thresholds, so
+    inventory exhaustion proceeds from NiO to FeO as each live floor changes.
+    CoO stays out of the plan until its Ellingham owner has an accepted fit.
     """
 
     candidate = float(candidate_fO2_log)

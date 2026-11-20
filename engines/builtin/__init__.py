@@ -22,7 +22,7 @@ Public exports:
   ledger-mutating intent in the migration, owns SiO disproportionation
   on deposition).
 - :class:`BuiltinNativeFeSaturationProvider` -- authoritative provider
-  for ``ChemistryIntent.NATIVE_FE_SATURATION`` (mol-native FeO/NiO/CoO
+  for ``ChemistryIntent.NATIVE_FE_SATURATION`` (mol-native FeO/NiO
   oxide-to-metal buffering and the native-Fe split).
 - :class:`BuiltinNativeFeMetallicTapProvider` -- authoritative provider
   for ``ChemistryIntent.NATIVE_FE_METALLIC_TAP`` (mol-native existing-Fe

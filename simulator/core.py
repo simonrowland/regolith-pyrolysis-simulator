@@ -2143,7 +2143,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'BuiltinNativeFeSaturationProvider',
             (ChemistryIntent.NATIVE_FE_SATURATION,),
             False,
-            'NATIVE_FE_SATURATION -- AUTHORITATIVE: FeO/NiO/CoO oxide-to-metal '
+            'NATIVE_FE_SATURATION -- AUTHORITATIVE: FeO/NiO oxide-to-metal '
             'buffering plus pre-storm native-Fe exsolution.',
         ),
         (
@@ -5892,6 +5892,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> float:
         """Commit oxide-to-metal buffering when a redox candidate crosses its floor."""
 
+        from simulator.chemistry.melt_metal_saturation import (
+            melt_metal_saturation_buffer_not_reached_notice,
+            unsupported_melt_metal_saturation_notice,
+        )
+        from simulator.reduced_real_determinism import record_repair_notice
+
+        composition = self.atom_ledger.mol_by_account("process.cleaned_melt")
+        unsupported_notice = unsupported_melt_metal_saturation_notice(
+            composition
+        )
+        if unsupported_notice is not None:
+            record_repair_notice(self, unsupported_notice)
+
         saturation_floor = self._melt_metal_saturation_fO2_floor_log(
             temperature_K
         )
@@ -5900,43 +5913,49 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             or candidate_fO2_log >= saturation_floor[0]
         ):
             return candidate_fO2_log
-        floor_log, binding_oxide, binding_activity = saturation_floor
-        if redox_capacity_mol_per_ln <= OXYGEN_RESERVOIR_NOOP_MOL:
-            raise AccountingError(
-                'melt metal-saturation buffer cannot resolve a floor crossing '
-                f'without redox capacity: binding={binding_oxide}, '
-                f'activity={binding_activity:.12g}'
+        floor_log, binding_oxide, _ = saturation_floor
+
+        def flag_unreached(
+            reason_code: str,
+            best_reachable_fO2_log: float,
+        ) -> None:
+            record_repair_notice(
+                self,
+                melt_metal_saturation_buffer_not_reached_notice(
+                    reason_code=reason_code,
+                    binding_oxide=binding_oxide,
+                    floor_fO2_log=floor_log,
+                    best_reachable_fO2_log=best_reachable_fO2_log,
+                ),
             )
+
+        if redox_capacity_mol_per_ln <= OXYGEN_RESERVOIR_NOOP_MOL:
+            flag_unreached(
+                "redox_capacity_unavailable",
+                candidate_fO2_log,
+            )
+            return candidate_fO2_log
         plan = self._plan_melt_metal_saturation_buffer(
             candidate_fO2_log=candidate_fO2_log,
             redox_capacity_mol_per_ln=redox_capacity_mol_per_ln,
             temperature_K=temperature_K,
-            composition_mol=self.atom_ledger.mol_by_account(
-                'process.cleaned_melt'
-            ),
+            composition_mol=composition,
         )
-        if not plan['oxide_extent_mol_by_oxide']:
-            raise AccountingError(
-                'melt metal-saturation buffer could not reduce '
-                f'binding oxide {binding_oxide}: '
-                f'oxygen deficit={plan["oxygen_deficit_o2_mol"]:.12g} '
-                f'mol O2-equivalent, activity={binding_activity:.12g}'
-            )
         planned_fO2_log = float(plan['candidate_fO2_log_after_buffer'])
-        planned_floor_log = plan['floor_log_after_buffer']
-        if (
-            planned_floor_log is not None
-            and planned_fO2_log < float(planned_floor_log) - 1.0e-10
-        ):
-            raise AccountingError(
-                'melt metal-saturation buffer exhausted its oxide capacity '
-                'before reaching the live floor: '
-                f'binding={binding_oxide}, '
-                f'candidate={planned_fO2_log:.12g}, '
-                f'floor={float(planned_floor_log):.12g}, '
-                f'unbuffered={plan["oxygen_unbuffered_o2_mol"]:.12g} '
-                'mol O2-equivalent'
+        if not plan['oxide_extent_mol_by_oxide']:
+            flag_unreached(
+                "no_buffer_extent",
+                planned_fO2_log,
             )
+            return planned_fO2_log
+        planned_floor_log = plan['floor_log_after_buffer']
+        plan_reaches_floor = (
+            planned_floor_log is not None
+            and planned_fO2_log >= float(planned_floor_log) - 1.0e-10
+        )
+        plan_unreached_floor = (
+            planned_floor_log is not None and not plan_reaches_floor
+        )
 
         # Fe redox re-speciation sends oxygen released from the melt to the FO2
         # buffer for internally carried evaporative metal loss and bubbler
@@ -5962,12 +5981,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         buffer_proposal = buffer_result.transition
         if buffer_result.status != 'ok' or buffer_proposal is None:
-            diagnostic = dict(buffer_result.diagnostic or {})
-            raise AccountingError(
-                'melt metal-saturation buffer refused the binding oxide '
-                f'{binding_oxide}: '
-                f'{diagnostic.get("reason", buffer_result.status)}'
+            flag_unreached(
+                "buffer_provider_refused",
+                candidate_fO2_log,
             )
+            return candidate_fO2_log
         transition_source, transition_meta = (
             self._melt_redox_transition_provenance(gate_authority)
         )
@@ -5988,11 +6006,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             updated_floor is not None
             and planned_fO2_log < updated_floor[0] - 1.0e-8
         ):
-            raise AccountingError(
-                'committed melt metal-saturation buffer did not reach the '
-                f'live floor for {updated_floor[1]}: '
-                f'candidate={planned_fO2_log:.12g}, '
-                f'floor={updated_floor[0]:.12g}'
+            flag_unreached(
+                "committed_buffer_did_not_reach_floor",
+                planned_fO2_log,
+            )
+            return planned_fO2_log
+        if plan_unreached_floor:
+            flag_unreached(
+                "oxide_capacity_exhausted",
+                planned_fO2_log,
             )
         return planned_fO2_log
 
