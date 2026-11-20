@@ -1391,10 +1391,15 @@ def test_readonly_mode_serves_hits_and_solves_misses_without_writing(
     assert engine_cache.cached_engine_call(
         "vaporock", {"temperature_K": 901.0}, lambda: {"pressure": 3.0}
     ) == {"pressure": 3.0}
-    assert _engine_cache_counters(reset=True)["vaporock"] == {
+    counts = _engine_cache_counters(reset=True)["vaporock"]
+    assert counts == {
         "hits": 1, "misses": 1, "stores": 0,
         "store_error": 0, "read_error": 0, "conflicts": 0,
+        "not_stored:readonly": 1,
     }
+    assert counts["misses"] == counts["stores"] + sum(
+        value for key, value in counts.items() if key.startswith("not_stored:")
+    )
     with sqlite3.connect(database) as connection:
         assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 1
 
