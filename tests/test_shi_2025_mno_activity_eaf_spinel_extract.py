@@ -6,7 +6,12 @@ import pytest
 import yaml
 
 from simulator.battery.enums import EvidenceClass, Phase, ValueKind
-from simulator.battery.migrate import Migrator
+from simulator.battery.input_provenance import PRINTED_STARTING_BULK
+from simulator.battery.migrate import Migrator, _percent_to_fraction
+from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -271,8 +276,35 @@ def test_isolated_migration_maps_conditions_values_and_schema_refusal():
         assert total_pressure is None or total_pressure.state.is_unknown
         assert row.locator.page == page and row.locator.table == table
     activity = _record(migrator, "shi2025_table6_row_1_mno_activity")
-    assert activity.identity.composition.is_unknown
+    identity_composition = activity.identity.composition
+    assert identity_composition is not None and identity_composition.is_value
+    assert identity_composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert identity_composition.value.input_provenance == PRINTED_STARTING_BULK
+    printed_charge_percent = dict(
+        zip(
+            ("CaO", "SiO2", "Al2O3", "MgO", "FeO", "MnO"),
+            TABLE1_RENDER[0][1],
+            strict=True,
+        )
+    )
+    expected_proxy = {
+        oxide: _percent_to_fraction(Decimal(amount))
+        for oxide, amount in printed_charge_percent.items()
+    }
+    assert identity_composition.value.as_map() == expected_proxy
+    proxy_notices = [
+        notice
+        for notice in activity.notices
+        if INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+    ]
+    assert len(proxy_notices) == 1
+    point_composition = activity.point_conditions["composition"].state
+    assert point_composition.is_value
+    assert point_composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert point_composition.value.input_provenance == PRINTED_STARTING_BULK
+    assert point_composition.value.as_map() == expected_proxy
     assert _record(migrator, "shi2025_table3_row_5_al2o3_activity").identity.composition.is_unknown
     printed_start = activity.point_conditions["printed_composition"]
     assert printed_start.state.is_value
     assert printed_start.locator.table == "1"
+    assert printed_start.state.value.as_map() == expected_proxy

@@ -189,9 +189,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0001130368308746852372423477753'
@@ -233,7 +245,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1586.4:h=dbd08a55028a
   - kind: engine_model_caveat
     affected_quantities:
@@ -276,9 +289,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -388,9 +413,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0001375451311408213621420531865'
@@ -432,7 +469,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1598.0:h=01ba59f3a5e4
   - kind: engine_model_caveat
     affected_quantities:
@@ -475,9 +513,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -587,9 +637,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0001742831628696413076925694515'
@@ -631,7 +693,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1608.6:h=5797ae1ff25a
   - kind: engine_model_caveat
     affected_quantities:
@@ -674,9 +737,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -786,9 +861,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.000205376355686532385139869827'
@@ -830,7 +917,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1619.2:h=3c7368c5248b
   - kind: engine_model_caveat
     affected_quantities:
@@ -873,9 +961,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -985,9 +1085,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0002707969949719790289649549982'
@@ -1029,7 +1141,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1630.8:h=c4055b7f3378
   - kind: engine_model_caveat
     affected_quantities:
@@ -1072,9 +1185,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -1184,9 +1309,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0003564586708364758804140589978'
@@ -1228,7 +1365,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1642.5:h=812891db8f28
   - kind: engine_model_caveat
     affected_quantities:
@@ -1271,9 +1409,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -1383,9 +1533,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.000424282620608589749720920957'
@@ -1427,7 +1589,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1653.0:h=e54c71253285
   - kind: out_of_certified_band
     affected_quantities:
@@ -1470,9 +1633,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -1582,9 +1757,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0005543237477659571528317515592'
@@ -1626,7 +1813,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1664.7:h=adf9b4b24936
   - kind: out_of_certified_band
     affected_quantities:
@@ -1669,9 +1857,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -1781,9 +1981,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0006867736328898168970651094784'
@@ -1825,7 +2037,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1674.2:h=15f35d04c8e3
   - kind: out_of_certified_band
     affected_quantities:
@@ -1868,9 +2081,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -1980,9 +2205,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0008498962133782554895546805285'
@@ -2024,7 +2261,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1684.8:h=d035eabe084a
   - kind: out_of_certified_band
     affected_quantities:
@@ -2067,9 +2305,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -2179,9 +2429,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.001073003144774422585579250289'
@@ -2223,7 +2485,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1695.4:h=f01ab0b31bbc
   - kind: out_of_certified_band
     affected_quantities:
@@ -2266,9 +2529,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -19591,9 +19866,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0001130368308746852372423477753'
@@ -19635,7 +19922,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1586.4:h=ec5cf4936d90
   - kind: engine_model_caveat
     affected_quantities:
@@ -19678,9 +19966,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -19790,9 +20090,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0001375451311408213621420531865'
@@ -19834,7 +20146,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1598.0:h=76d5c484f9a1
   - kind: engine_model_caveat
     affected_quantities:
@@ -19877,9 +20190,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -19989,9 +20314,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0001742831628696413076925694515'
@@ -20033,7 +20370,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1608.6:h=61447593ee0a
   - kind: engine_model_caveat
     affected_quantities:
@@ -20076,9 +20414,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -20188,9 +20538,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.000205376355686532385139869827'
@@ -20232,7 +20594,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1619.2:h=eb9a03f602b5
   - kind: engine_model_caveat
     affected_quantities:
@@ -20275,9 +20638,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -20387,9 +20762,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0002707969949719790289649549982'
@@ -20431,7 +20818,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1630.8:h=d584b2aa944a
   - kind: engine_model_caveat
     affected_quantities:
@@ -20474,9 +20862,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -20586,9 +20986,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0003564586708364758804140589978'
@@ -20630,7 +21042,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1642.5:h=1eedf8aec100
   - kind: engine_model_caveat
     affected_quantities:
@@ -20673,9 +21086,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -20785,9 +21210,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.000424282620608589749720920957'
@@ -20829,7 +21266,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1653.0:h=802c56cd2394
   - kind: out_of_certified_band
     affected_quantities:
@@ -20872,9 +21310,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -20984,9 +21434,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0005543237477659571528317515592'
@@ -21028,7 +21490,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1664.7:h=834ec94443c8
   - kind: out_of_certified_band
     affected_quantities:
@@ -21071,9 +21534,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -21183,9 +21658,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0006867736328898168970651094784'
@@ -21227,7 +21714,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1674.2:h=3f6e6aa43b68
   - kind: out_of_certified_band
     affected_quantities:
@@ -21270,9 +21758,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -21382,9 +21882,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0008498962133782554895546805285'
@@ -21426,7 +21938,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1684.8:h=d035eabe084a
   - kind: out_of_certified_band
     affected_quantities:
@@ -21469,9 +21982,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1
@@ -21581,9 +22106,21 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.001073003144774422585579250289'
@@ -21625,7 +22162,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1695.4:h=305467477c7e
   - kind: out_of_certified_band
     affected_quantities:
@@ -21668,9 +22206,21 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         pdf_page_index: 1

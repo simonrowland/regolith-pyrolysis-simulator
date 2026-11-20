@@ -66,11 +66,11 @@ from simulator.battery.score import (  # noqa: E402
     _write_headline_summary_from_accumulator_json,
     measured_engine_rail_records,
 )
-from simulator.engine_cache import _engine_cache_path_scope  # noqa: E402
-from scripts.battery_cache_equivalence import (  # noqa: E402
-    _engine_cache_path,
-    _studio_host,
+from simulator.engine_cache import (  # noqa: E402
+    _configured_engine_cache_path,
+    _engine_cache_path_scope,
 )
+from scripts.battery_cache_equivalence import _studio_host  # noqa: E402
 from simulator.battery.score_report import (  # noqa: E402
     _score_shard_failure_report_lines,
     format_nasa9_fit_comparison_stratum,
@@ -541,10 +541,16 @@ def _engine_cache_summary(
             if not isinstance(counts, Mapping):
                 continue
             target = by_engine.setdefault(str(engine), {"hits": 0, "misses": 0, "stores": 0})
-            for name in target:
-                value = counts.get(name, 0)
-                if isinstance(value, int):
+            diagnostics = []
+            for name, value in sorted(counts.items()):
+                if not isinstance(value, int):
+                    continue
+                if name in target:
                     target[name] += value
+                elif value:
+                    diagnostics.append(f"{name}={value}")
+            if diagnostics:
+                print(f"engine cache {engine}: {' '.join(diagnostics)}", file=sys.stderr)
     runtime_identities = dict(local_runtime_identities or {})
     if studio_cache_summary is not None:
         studio_identities = studio_cache_summary.get("runtime_identities", {})
@@ -654,7 +660,7 @@ def main(argv: list[str] | None = None) -> int:
     cache_path_value = (
         str(args.engine_cache.expanduser())
         if args.engine_cache is not None
-        else _engine_cache_path()
+        else _configured_engine_cache_path()
     )
     engine_cache_path = (
         None if not cache_path_value else Path(cache_path_value).expanduser()
