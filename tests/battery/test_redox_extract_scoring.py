@@ -620,10 +620,14 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
     # primary 1-sigma verdicts without the assumption/alternative notices.
     # t-1646 round 5 refuses the Sossi (11)/(12) two-sigma spans that cross
     # r=0; the remaining source widths use the transformed log-ratio metric.
-    # The payload now hashes to
-    # 6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862.
+    # fam13 binds the six Aithala Table S-1 Fe rows to the physical SI PDF
+    # (page 13, SI-7; SHA-256 ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa).
+    # Their printed redox values and decisions are unchanged; the serialized
+    # locator changes from source_path=None to that PDF path. The combined
+    # payload hash therefore moves from 6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862
+    # to 0140d9de1cf1d76f49fcf1a1c1889efb3153a95adb25768a39d901cc175ddb50.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862"
+        "0140d9de1cf1d76f49fcf1a1c1889efb3153a95adb25768a39d901cc175ddb50"
     )
 
 
