@@ -16,6 +16,7 @@ from simulator.fe_redox import (
     kress91_split,
     melt_mol_fractions_for_kress91,
 )
+from simulator.melt_backend.magemin import MAGEMinDomainIdentity
 from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 from simulator.state import MOLAR_MASS
 
@@ -40,6 +41,9 @@ _IRON_RICH_BASALT_WT = {
     "Na2O": 1.0,
     "K2O": 0.5,
 }
+_IN_BAND_MAGEMIN_IDENTITY = MAGEMinDomainIdentity(
+    "in_band", "clear", None, None,
+)
 _T_K = 1673.15
 
 
@@ -220,6 +224,7 @@ def _below_liquidus_domain(temperature_K: float) -> LiquidFeODomain:
         liquidus_T_C=1700.0,
         solidus_T_C=1050.0,
         source="gate_liquid_fraction",
+        domain_identity=_IN_BAND_MAGEMIN_IDENTITY,
     )
 
 
@@ -233,6 +238,23 @@ def _expected_below_liquidus_notice(domain: LiquidFeODomain) -> dict[str, object
         "source": domain.source,
         "authority": "extrapolated",
     }
+
+
+def test_liquid_feo_domain_requires_a_typed_magemin_identity():
+    values = {
+        "below_liquidus": False,
+        "temperature_K": _T_K,
+        "liquidus_T_C": 1200.0,
+        "solidus_T_C": 1050.0,
+        "source": "gate_liquid_fraction",
+    }
+    with pytest.raises(TypeError, match="domain_identity"):
+        LiquidFeODomain(**values)
+    with pytest.raises(
+        TypeError,
+        match="domain_identity must be MAGEMinDomainIdentity",
+    ):
+        LiquidFeODomain(**values, domain_identity=None)
 
 
 def test_liquid_feo_below_liquidus_carries_notice_and_keeps_the_liquid_number():
@@ -284,6 +306,7 @@ def test_liquid_feo_at_or_above_liquidus_is_byte_identical():
         liquidus_T_C=1200.0,
         solidus_T_C=1050.0,
         source="gate_liquid_fraction",
+        domain_identity=_IN_BAND_MAGEMIN_IDENTITY,
     )
     guarded = calphad_ferrous_feo_activity_diagnostic(
         comp_wt=_BASALTIC_FE_MELT_WT,

@@ -76,6 +76,26 @@ from simulator.melt_backend.magemin import (
 _RENDEZVOUS_TIMEOUT_S = 30.0
 
 
+def _watch_projection_threshold_callers(monkeypatch):
+    from inspect import currentframe
+
+    import simulator.composition_projection as projection_module
+
+    callers = []
+    original = projection_module._projected_liquidus_refusal_reason
+
+    def record_caller(notice):
+        callers.append(currentframe().f_back.f_code.co_name)
+        return original(notice)
+
+    monkeypatch.setattr(
+        projection_module,
+        '_projected_liquidus_refusal_reason',
+        record_caller,
+    )
+    return callers
+
+
 def _bootstrap_sleeping_magemin_worker(
     _binary_path=None, _database='ig', _config=None,
 ):
@@ -3505,6 +3525,7 @@ def test_magemin_projected_retry_records_absolute_fo2_per_sample(
 def test_magemin_iron_projected_retry_refuses_over_threshold_drop_before_engine(
     monkeypatch, magemin_subprocess_lock_dir,
 ):
+    refusal_callers = _watch_projection_threshold_callers(monkeypatch)
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
     source = {
         'SiO2': 50.0,
@@ -3535,6 +3556,7 @@ def test_magemin_iron_projected_retry_refuses_over_threshold_drop_before_engine(
     )
 
     assert result.status == 'out_of_domain'
+    assert result.diagnostics['projection_threshold_verdict'] == 'refused'
     projected_notice = result.diagnostics['composition_projected_notice']
     assert projected_notice['reason'].startswith(
         'composition_projected_over_threshold:'
@@ -3544,6 +3566,8 @@ def test_magemin_iron_projected_retry_refuses_over_threshold_drop_before_engine(
     } == {'P2O5', 'MnO'}
     assert 'projected_liquidus_status' not in result.diagnostics
     assert calls == []
+    assert 'find_liquidus_solidus' not in refusal_callers
+    assert refusal_callers
 
 
 def test_magemin_preprojected_iron_bulk_uses_oxide_gate_basis(
@@ -4075,10 +4099,13 @@ def test_magemin_p2o5_bulk_is_composition_projected_refusal(monkeypatch):
     )
 
 
-def test_magemin_liquidus_of_projected_bulk_stays_composition_projected():
+def test_magemin_liquidus_of_projected_bulk_stays_composition_projected(
+    monkeypatch,
+):
     """The ig-order drop stays a refusal. The projected bulk's liquidus is
     attached for the freeze gate; it is not reported as status=ok.
     """
+    refusal_callers = _watch_projection_threshold_callers(monkeypatch)
     backend = MAGEMinBackend()
     backend._available = True
     backend._bridge = "subprocess"
@@ -4114,6 +4141,7 @@ def test_magemin_liquidus_of_projected_bulk_stays_composition_projected():
 
     assert calls
     assert result.status == "out_of_domain"
+    assert result.diagnostics['projection_threshold_verdict'] == 'clear'
     assert result.status != "ok"
     assert result.solidus_T_C == pytest.approx(1000.0, abs=2.0)
     assert result.liquidus_T_C == pytest.approx(1200.0, abs=2.0)
@@ -4127,6 +4155,8 @@ def test_magemin_liquidus_of_projected_bulk_stays_composition_projected():
     assert fractions["MnO"] == pytest.approx(0.005)
     assert notice["authority"] == "extrapolated"
     assert notice["reason"] == "composition_projected"
+    assert 'find_liquidus_solidus' not in refusal_callers
+    assert refusal_callers
 
     calls_before = len(calls)
     refused = backend.equilibrate(

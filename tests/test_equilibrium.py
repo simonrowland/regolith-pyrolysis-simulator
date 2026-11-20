@@ -25,6 +25,7 @@ from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     LiquidFeODomain,
 )
+from simulator.melt_backend.magemin import MAGEMinDomainIdentity
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.silent_zero import (
     CATEGORY_PROVEN_ZERO,
@@ -416,6 +417,9 @@ _FEO_MELT_WT = {
     "MgO": 10.0,
     "CaO": 13.0,
 }
+_IN_BAND_MAGEMIN_IDENTITY = MAGEMinDomainIdentity(
+    'in_band', 'clear', None, None,
+)
 
 
 def _feo_equilibrium_sim(*, temperature_C, domain=None, with_domain_method=True):
@@ -447,6 +451,7 @@ def test_subliquidus_equilibrium_carries_liquid_feo_notice_without_changing_acti
         liquidus_T_C=1700.0,
         solidus_T_C=1050.0,
         source="gate_liquid_fraction",
+        domain_identity=_IN_BAND_MAGEMIN_IDENTITY,
     )
     plain = EquilibriumMixin._internal_analytical_equilibrium(
         _feo_equilibrium_sim(temperature_C=225.0, with_domain_method=False)
@@ -484,6 +489,7 @@ def test_above_liquidus_equilibrium_diagnostic_is_byte_identical():
         liquidus_T_C=1200.0,
         solidus_T_C=1050.0,
         source="gate_liquid_fraction",
+        domain_identity=_IN_BAND_MAGEMIN_IDENTITY,
     )
     plain = EquilibriumMixin._internal_analytical_equilibrium(
         _feo_equilibrium_sim(temperature_C=1600.0, with_domain_method=False)
@@ -506,6 +512,9 @@ def _gate_host(curve, *, pinned=True):
     host = SimpleNamespace(
         melt=SimpleNamespace(hour=1),
         _resolved_melt_redox_gate_authority=_resolve,
+        _melt_redox_gate_authority_tick_verdict_identity=(
+            _IN_BAND_MAGEMIN_IDENTITY
+        ),
     )
     if pinned:
         host._melt_redox_gate_authority_tick_hour = 1
@@ -587,6 +596,7 @@ def test_liquid_feo_domain_floor_fallback_and_unresolved_gate():
     assert missing.liquidus_T_C is None
     assert missing.solidus_T_C is None
     assert missing.source == "none:liquidus_gate_in_progress"
+    assert missing.liquidus_unknown is True
 
     unresolved = PyrolysisSimulator.liquid_feo_domain_at(
         _gate_host({"source": "broken"}),
@@ -594,6 +604,7 @@ def test_liquid_feo_domain_floor_fallback_and_unresolved_gate():
     )
     assert unresolved.below_liquidus is True
     assert unresolved.source == "none:liquidus_unresolved"
+    assert unresolved.liquidus_unknown is True
 
     not_established = PyrolysisSimulator.liquid_feo_domain_at(
         _gate_host(
@@ -606,7 +617,8 @@ def test_liquid_feo_domain_floor_fallback_and_unresolved_gate():
         ),
         1750.0 + 273.15,
     )
-    assert not_established is None
+    assert not_established.liquidus_unknown is True
+    assert not_established.source == "none:liquidus_gate_not_established"
 
 
 def _established_record_host(record):
@@ -844,6 +856,7 @@ def test_native_fe_saturation_carries_the_liquidus_notice_on_both_returns():
         liquidus_T_C=1700.0,
         solidus_T_C=1050.0,
         source="gate_liquid_fraction",
+        domain_identity=_IN_BAND_MAGEMIN_IDENTITY,
     )
     above = LiquidFeODomain(
         below_liquidus=False,
@@ -851,6 +864,7 @@ def test_native_fe_saturation_carries_the_liquidus_notice_on_both_returns():
         liquidus_T_C=1200.0,
         solidus_T_C=1050.0,
         source="gate_liquid_fraction",
+        domain_identity=_IN_BAND_MAGEMIN_IDENTITY,
     )
 
     def _host(domain):
@@ -896,3 +910,196 @@ def test_native_fe_saturation_carries_the_liquidus_notice_on_both_returns():
     assert {
         key: value for key, value in zero.items() if key != "notices"
     } == zero_plain
+
+
+def _magemin_identity_for_liquid_feo_test(silica_wt_pct):
+    from simulator.melt_backend.magemin import (
+        magemin_domain_identity_from_evaluated_bulk,
+    )
+
+    identity, _diagnostic = magemin_domain_identity_from_evaluated_bulk(
+        {
+            "SiO2": float(silica_wt_pct),
+            "MgO": 100.0 - float(silica_wt_pct),
+        }
+    )
+    return identity
+
+
+def _liquid_feo_resolution_host(route, identity):
+    from collections.abc import Mapping
+
+    from simulator.core import _MeltRedoxLiquidusFloorFallback
+    from simulator.evaporation import EvaporationFluxRefusal
+
+    hour = 7
+    curve = {
+        "source": "gate_liquid_fraction",
+        "liquidus_T_C": 1200.0,
+        "solidus_T_C": 1000.0,
+    }
+    host = SimpleNamespace(
+        melt=SimpleNamespace(hour=hour),
+        _liquid_fraction_provider="magemin",
+        _freeze_gate_current_magemin_domain_identity=identity,
+        _liquid_feo_resolution_dispatch_count=0,
+        _melt_redox_gate_current_pin_verdict=lambda: (identity, True),
+        _resolved_melt_redox_gate_authority=lambda authority: (
+            authority["curve"]
+            if isinstance(authority, Mapping) and "curve" in authority
+            else authority
+        ),
+    )
+
+    def retain(value, retained_identity=identity):
+        host._liquid_feo_resolved_curve_hour = hour
+        host._liquid_feo_resolved_curve = value
+        host._liquid_feo_resolved_curve_domain_identity = retained_identity
+
+    if route in {"live resolve", "same-hour pin"}:
+        host._melt_redox_gate_authority_tick_hour = hour
+        host._melt_redox_gate_authority_tick_verdict_identity = identity
+        host._melt_redox_gate_authority_this_tick = {
+            "disposition": "live" if route == "live resolve" else "memo-hit",
+            "curve": curve,
+        }
+    elif route == "retained matching curve":
+        retain(curve)
+    elif route == "retained mismatching curve":
+        old_silica = (
+            50.0 if identity.silica_verdict == "extrapolated" else 85.0
+        )
+        retain(curve, _magemin_identity_for_liquid_feo_test(old_silica))
+    elif route == "replay success":
+        retain({"disposition": "replay", "curve": curve})
+    elif route == "replay miss":
+        host._melt_redox_gate_authority_tick_hour = None
+    elif route in {"timeout -> Kress floor", "provider FAILED", "held slot"}:
+        old_silica = (
+            50.0 if identity.silica_verdict == "extrapolated" else 85.0
+        )
+        retain(curve, _magemin_identity_for_liquid_feo_test(old_silica))
+
+        def establish():
+            host._liquid_feo_resolution_dispatch_count += 1
+            if route == "provider FAILED":
+                raise EvaporationFluxRefusal(
+                    "provider_failed",
+                    {"reason": "declared provider failure"},
+                )
+            if route == "timeout -> Kress floor":
+                return _MeltRedoxLiquidusFloorFallback(
+                    source="none:liquidus_unavailable",
+                    reason="timeout",
+                    liquidus_status="unavailable",
+                    verdict_identity=identity,
+                )
+            held_curve = {
+                **curve,
+                "gate_provider_refusal": {
+                    "qualification": "held_last_good_curve",
+                },
+            }
+            retain(held_curve)
+            return held_curve
+
+        host._establish_melt_redox_gate_authority_for_current_hour = establish
+    else:
+        raise AssertionError(f"unhandled liquidus route {route!r}")
+
+    # A mismatching retained curve must be replaced by the exact identity
+    # resolved for the current request. This models the live/replay/fallback
+    # result shape consumed by liquid_feo_domain_at.
+    if route == "retained mismatching curve":
+        def establish_matching_curve():
+            host._liquid_feo_resolution_dispatch_count += 1
+            retain(curve)
+            return curve
+
+        host._establish_melt_redox_gate_authority_for_current_hour = (
+            establish_matching_curve
+        )
+    return host
+
+
+def test_liquid_feo_domain_identity_is_preserved_across_resolution_paths():
+    from simulator.fe_redox import calphad_ferrous_feo_activity_diagnostic
+
+    routes = (
+        "live resolve",
+        "same-hour pin",
+        "retained matching curve",
+        "retained mismatching curve",
+        "replay success",
+        "replay miss",
+        "timeout -> Kress floor",
+        "provider FAILED",
+        "held slot",
+    )
+    unknown_routes = {
+        "replay miss",
+        "timeout -> Kress floor",
+        "provider FAILED",
+    }
+    for silica_wt_pct in (50.0, 79.999, 80.001, 85.0, 29.999):
+        identity = _magemin_identity_for_liquid_feo_test(silica_wt_pct)
+        composition = {
+            "SiO2": silica_wt_pct,
+            "MgO": 90.0 - silica_wt_pct,
+            "FeO": 10.0,
+        }
+        for route in routes:
+            host = _liquid_feo_resolution_host(route, identity)
+            for read_number in (1, 2):
+                domain = PyrolysisSimulator.liquid_feo_domain_at(
+                    host, 1800.0 + 273.15
+                )
+                assert domain is not None, (route, silica_wt_pct, read_number)
+                assert domain.domain_identity == identity, (
+                    route,
+                    silica_wt_pct,
+                    read_number,
+                )
+                activity = calphad_ferrous_feo_activity_diagnostic(
+                    comp_wt=composition,
+                    fO2_log=-10.0,
+                    T_K=1800.0 + 273.15,
+                    pressure_bar=1e-6,
+                    liquid_domain=domain,
+                )
+                notices = activity.get("notices", ())
+                identity_notice = next(
+                    (
+                        notice
+                        for notice in notices
+                        if notice.get("kind") == "magemin_domain_identity"
+                    ),
+                    None,
+                )
+                if identity.silica_verdict == "extrapolated":
+                    assert identity_notice is not None, (
+                        route,
+                        silica_wt_pct,
+                        read_number,
+                    )
+                    assert identity_notice["authority"] == "extrapolated"
+                    assert identity_notice["certified_band"] == {
+                        "sio2_wt_pct": [30.0, 80.0],
+                    }
+                if route in unknown_routes:
+                    assert identity_notice is not None, (
+                        route,
+                        silica_wt_pct,
+                        read_number,
+                    )
+                    assert identity_notice["liquidus_status"] == "unknown"
+            assert host._liquid_feo_resolution_dispatch_count == (
+                1
+                if route in {
+                    "retained mismatching curve",
+                    "timeout -> Kress floor",
+                    "provider FAILED",
+                    "held slot",
+                }
+                else 0
+            ), (route, silica_wt_pct)

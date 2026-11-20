@@ -14,6 +14,7 @@ from simulator.fe_redox import (
     kress91_ferrous_feo_activity,
     kress91_furnace_activity_pressure_bar,
 )
+from simulator.melt_backend.magemin import MAGEMinDomainIdentity
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
@@ -46,6 +47,10 @@ from simulator.vapour_rail.melt_activity_resolver import (
     crystalline_target_standard_state,
     ownerless_nonzero_reservoir_ids,
     validate_tier_b_candidate,
+)
+
+_IN_BAND_MAGEMIN_IDENTITY = MAGEMinDomainIdentity(
+    "in_band", "clear", None, None,
 )
 from simulator.vapour_rail.request import VapourResolveState, _state_fingerprint
 from simulator.vapour_rail.u0_manifest import load_u0_manifest
@@ -1184,6 +1189,7 @@ def test_fe_shadow_below_liquidus_keeps_the_liquid_number_and_the_notice() -> No
         liquidus_T_C=1700.0,
         solidus_T_C=1050.0,
         source="gate_liquid_fraction",
+        domain_identity=_IN_BAND_MAGEMIN_IDENTITY,
     )
     state = VapourResolveState(
         temperature_K=temperature_K,
@@ -1250,6 +1256,7 @@ def test_catalog_keeps_liquid_feo_domain_out_of_vapour_identity(monkeypatch) -> 
         liquidus_T_C=1700.0,
         solidus_T_C=1050.0,
         source="gate_liquid_fraction",
+        domain_identity=_IN_BAND_MAGEMIN_IDENTITY,
     )
     catalog = VapourRailCatalog(species={}, legacy_projection={})
     catalog.resolve_batch(

@@ -2057,11 +2057,146 @@ def test_same_hour_floor_fallback_pin_rechecks_projection_threshold_verdict(
     assert not current_identity.matches(held_identity)
 
 
+@pytest.mark.parametrize('pin_kind', ('mapping', 'floor'))
+def test_same_hour_resolver_rejects_stale_mapping_and_floor_pins(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    pin_kind,
+):
+    from simulator.core import _MeltRedoxLiquidusFloorFallback
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+        identity_override=admission_module.BindingIdentity(
+            'magemin', 'ig', 'magemin-ig-r1', 'subprocess'
+        ),
+        provenance_override={
+            'binding_provenance_verifiable': True,
+            'runtime_version': {
+                'tag': 'value',
+                'value': 'MAGEMin fixture runtime',
+                'reason': None,
+            },
+            'runtime_artifacts': {
+                'magemin_selected_binary': {'sha256': 'a' * 64},
+            },
+        },
+    )
+    _install_magemin_subprocess_gate(sim, monkeypatch)
+    monkeypatch.setattr(sim, '_pt0_store', lambda: None, raising=False)
+
+    def load_bulk(silica_wt_pct, source):
+        composition = {
+            'SiO2': silica_wt_pct,
+            'MgO': 100.0 - silica_wt_pct,
+        }
+        composition_mol = {
+            species: amount / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            _CLEANED_MELT_ACCOUNT,
+            composition_mol,
+            source=source,
+            material_origin='feedstock',
+        )
+        sim.atom_ledger = ledger
+        sim._chem_kernel = sim._build_chemistry_kernel()
+        sim._project_cleaned_melt_from_atom_ledger()
+
+    load_bulk(79.999, 'hourly pin in-band silica verdict')
+    if pin_kind == 'floor':
+        original_curve_record = sim._freeze_gate_curve_record
+
+        def unavailable_curve_record(**_kwargs):
+            raise ProviderUnavailableError('liquidus unavailable for pin fixture')
+
+        sim._melt_redox_gate_current_pin_verdict()
+        monkeypatch.setattr(
+            sim,
+            '_freeze_gate_curve_record',
+            unavailable_curve_record,
+        )
+        stale_pin = sim._melt_redox_liquidus_gate_curve()
+        monkeypatch.setattr(
+            sim,
+            '_freeze_gate_curve_record',
+            original_curve_record,
+        )
+        assert isinstance(stale_pin, _MeltRedoxLiquidusFloorFallback)
+    else:
+        sim._freeze_gate_curve_record()
+        sim._establish_melt_redox_gate_authority_for_current_hour()
+        stale_pin = sim._melt_redox_gate_authority_this_tick
+        assert isinstance(stale_pin, dict)
+        assert sim._melt_redox_gate_record_is_admitted(stale_pin)
+    stale_identity = sim._freeze_gate_current_magemin_domain_identity
+    if pin_kind == 'mapping':
+        stale_identity = sim._melt_redox_gate_authority_tick_verdict_identity
+    assert stale_identity.projection_threshold_verdict == 'clear'
+    assert sim._melt_redox_gate_pin_verdicts_match(
+        stale_identity,
+        stale_pin.verdict_identity if pin_kind == 'floor' else stale_identity,
+        submitted_bulk_passes=True,
+    )
+    sim._melt_redox_gate_authority_this_tick = stale_pin
+    sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
+    sim._melt_redox_gate_authority_tick_verdict_identity = stale_identity
+
+    load_bulk(80.001, 'hourly pin extrapolated silica verdict')
+    curve_resolutions = []
+    original_resolve_curve = sim._melt_redox_liquidus_gate_curve
+
+    def track_curve_resolution(**kwargs):
+        curve_resolutions.append(dict(kwargs))
+        return original_resolve_curve(**kwargs)
+
+    monkeypatch.setattr(
+        sim,
+        '_melt_redox_liquidus_gate_curve',
+        track_curve_resolution,
+    )
+    try:
+        resolved = sim._resolved_melt_redox_gate_authority()
+    except EvaporationFluxRefusal:
+        resolved = None
+
+    assert curve_resolutions
+    assert resolved is not stale_pin
+    assert not sim._melt_redox_gate_pin_verdicts_match(
+        sim._freeze_gate_current_magemin_domain_identity,
+        stale_identity,
+        submitted_bulk_passes=True,
+    )
+    assert sim._freeze_gate_current_magemin_domain_identity.silica_verdict == (
+        'extrapolated'
+    )
+
+
+@pytest.mark.parametrize("failure_mode", ("success", "timeout", "failed"))
 def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    failure_mode,
 ):
     from simulator.engine_pool import EngineWorkerTimeout
     from simulator.physical_constants import MBAR_PER_BAR
@@ -2073,7 +2208,7 @@ def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
         enabled=True,
         liquid_fraction_provider='magemin',
     )
-    _install_magemin_subprocess_gate(sim, monkeypatch)
+    trace = _install_magemin_subprocess_gate(sim, monkeypatch)
 
     def set_bulk(silica_wt_pct):
         composition_wt_pct = {
@@ -2098,7 +2233,7 @@ def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
         sim.atom_ledger = ledger
         return composition_wt_pct
 
-    set_bulk(50.0)
+    set_bulk(79.999)
     record = sim._freeze_gate_curve_record()
     sim._freeze_gate_cache_key_and_domain(
         pressure_bar=float(sim.melt.p_total_mbar) / MBAR_PER_BAR,
@@ -2111,7 +2246,7 @@ def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
     sim._liquid_feo_resolved_curve = record['curve']
     sim._liquid_feo_resolved_curve_domain_identity = retained_identity
 
-    current_bulk = set_bulk(81.0)
+    current_bulk = set_bulk(80.001)
     changed_key, _reason = sim._freeze_gate_cache_key_and_domain(
         pressure_bar=float(sim.melt.p_total_mbar) / MBAR_PER_BAR,
         fO2_log=sim._freeze_gate_redox_key_fO2_log(
@@ -2128,27 +2263,40 @@ def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
         timeout_calls.append(kwargs['bulk_projection'].composition_wt_pct)
         raise EngineWorkerTimeout('MAGEMin worker', 0.01, phase='job')
 
-    monkeypatch.setattr(provider._backend, '_call_magemin', timeout_worker)
+    if failure_mode == 'timeout':
+        monkeypatch.setattr(provider._backend, '_call_magemin', timeout_worker)
+    elif failure_mode == 'failed':
+        trace['fail'] = True
     sim._freeze_gate_liquid_fraction_cache = None
     sim._freeze_gate_liquid_fraction_curve_memo.clear()
-    activity = sim._native_fe_saturation_state(
-        current_bulk,
-        fe3_over_sigma_fe=0.1,
-        T_K=1800.0 + 273.15,
-        pressure_bar=float(sim.melt.p_total_mbar) / MBAR_PER_BAR,
-        fO2_log=float(sim._current_melt_redox_fO2_log()),
-    )
-    identity_notice = next(
-        notice
-        for notice in activity['notices']
-        if notice.get('kind') == 'magemin_domain_identity'
-    )
-    assert identity_notice['silica_verdict'] == 'extrapolated'
-    assert identity_notice['certified_band'] == {
-        'sio2_wt_pct': [30.0, 80.0],
-    }
-    assert identity_notice['liquidus_status'] == 'unknown'
-    assert len(timeout_calls) == 2
+
+    def activity_read():
+        return sim._native_fe_saturation_state(
+            current_bulk,
+            fe3_over_sigma_fe=0.1,
+            T_K=1800.0 + 273.15,
+            pressure_bar=float(sim.melt.p_total_mbar) / MBAR_PER_BAR,
+            fO2_log=float(sim._current_melt_redox_fO2_log()),
+        )
+
+    for _read_number in (1, 2):
+        activity = activity_read()
+        identity_notice = next(
+            notice
+            for notice in activity['notices']
+            if notice.get('kind') == 'magemin_domain_identity'
+        )
+        assert identity_notice['silica_verdict'] == 'extrapolated'
+        assert identity_notice['authority'] == 'extrapolated'
+        assert identity_notice['certified_band'] == {
+            'sio2_wt_pct': [30.0, 80.0],
+        }
+        if failure_mode == 'success':
+            assert 'liquidus_status' not in identity_notice
+        else:
+            assert identity_notice['liquidus_status'] == 'unknown'
+    if failure_mode == 'timeout':
+        assert len(timeout_calls) >= 2
 
 
 def test_magemin_ferric_fold_clears_request_silica_flag_when_evaluated_in_band(
