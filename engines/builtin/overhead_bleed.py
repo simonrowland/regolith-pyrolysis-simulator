@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 from engines.builtin._common import (
@@ -498,6 +499,23 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         if controls.get("force_drain_all", False):
             return dict(holdup_mol)
 
+        # Present only when the headspace balance already solved the
+        # bled moles. Cap each species at the holdup. Absence keeps the
+        # conductance split below. Unknown keys are not a second source.
+        committed = controls.get("committed_bled_species_mol")
+        if committed is not None:
+            bled: dict[str, float] = {}
+            for species, mol in holdup_mol.items():
+                raw = committed.get(species, 0.0) if isinstance(committed, Mapping) else 0.0
+                try:
+                    requested = float(raw)
+                except (TypeError, ValueError):
+                    requested = 0.0
+                amount = min(max(0.0, float(mol)), max(0.0, requested))
+                if amount > 0.0:
+                    bled[species] = amount
+            return bled
+
         conductance_raw = controls.get("bleed_conductance_kg_s")
         if conductance_raw is None:
             conductance_raw = controls.get("bleed_conductance_kg_s_per_bar")
@@ -611,6 +629,31 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 controls["vessel_rating_Pa"]
             ):
                 return "p_open_Pa must be below vessel_rating_Pa"
+        committed_bled = controls.get("committed_bled_species_mol")
+        if committed_bled is not None:
+            if not isinstance(committed_bled, Mapping):
+                return (
+                    "committed_bled_species_mol must be a map of "
+                    "finite non-negative moles"
+                )
+            for name, raw in committed_bled.items():
+                if isinstance(raw, bool):
+                    return (
+                        "committed_bled_species_mol must be a map of "
+                        f"finite non-negative moles:{name}"
+                    )
+                try:
+                    moles = float(raw)
+                except (TypeError, ValueError):
+                    return (
+                        "committed_bled_species_mol must be a map of "
+                        f"finite non-negative moles:{name}"
+                    )
+                if not math.isfinite(moles) or moles < 0.0:
+                    return (
+                        "committed_bled_species_mol must be a map of "
+                        f"finite non-negative moles:{name}"
+                    )
         if accumulator_enabled:
             try:
                 cavern_capacity_kg = float(controls["cavern_capacity_kg"])

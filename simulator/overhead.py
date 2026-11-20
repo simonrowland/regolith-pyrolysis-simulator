@@ -181,6 +181,7 @@ class PipeSpeciesOutflow:
     ``species_mol_s`` is already split. Continuum moles are one total
     divided by mole fraction. Free-molecular moles are per-species
     effusion. A caller must not split the mapping again.
+    ``mass_flow_kg_s`` is the same split summed with each molar mass.
     """
 
     species_mol_s: Mapping[str, float]
@@ -188,6 +189,7 @@ class PipeSpeciesOutflow:
     blend_weight: float
     binding_cause: str
     notices: tuple[str, ...]
+    mass_flow_kg_s: float = 0.0
 
 
 def _pipe_scalar(
@@ -457,13 +459,29 @@ def _pipe_outflow_result(
     blend_weight: float,
     binding_cause: str,
     notices: tuple[str, ...],
+    masses: Mapping[str, float] | None = None,
 ) -> PipeSpeciesOutflow:
+    # Premise: the split moles are the regime law. One mass flow is
+    # their sum with the molar masses already used to build that split.
+    # Algebra: m_dot = Σ n_dot_i * M_i.
+    # Unit check: (mol/s) * (kg/mol) = kg/s.
+    # Limit: a closed end (no positive moles) is 0 kg/s. The commanded
+    # millibar is not an input.
+    if masses is None:
+        mass_flow_kg_s = 0.0
+    else:
+        mass_flow_kg_s = math.fsum(
+            float(species_mol_s.get(species, 0.0)) * float(masses[species])
+            for species in species_mol_s
+            if species in masses
+        )
     return PipeSpeciesOutflow(
         species_mol_s=MappingProxyType(dict(sorted(species_mol_s.items()))),
         regime=regime,
         blend_weight=blend_weight,
         binding_cause=binding_cause,
         notices=notices,
+        mass_flow_kg_s=mass_flow_kg_s,
     )
 
 
@@ -556,6 +574,7 @@ def pipe_species_outflow_mol_s(
             blend_weight=blend_weight,
             binding_cause=binding,
             notices=notice_tuple,
+            masses=masses,
         )
 
     choked = False
@@ -609,6 +628,7 @@ def pipe_species_outflow_mol_s(
         blend_weight=blend_weight,
         binding_cause=binding,
         notices=notice_tuple,
+        masses=masses,
     )
 
 
@@ -954,10 +974,9 @@ class OverheadGasModel:
         # 0.5.3 Phase A1 (2026-05-28): default-on global flip. Hard-vacuum
         # P_ambient=0 is no longer the default — every campaign now sees the
         # finite-headspace backpressure floor (per docs-private/goal-finite-
-        # headspace-2026-05-21.md Q1 pinned decision). Synthetic O2 floor from
-        # melt.pO2_mbar is re-applied below in _update_finite_headspace so a
-        # controlled-O2 recipe setpoint is preserved across the holdup-derived
-        # partial-pressure overwrite.
+        # headspace-2026-05-21.md Q1 pinned decision). The reported partials
+        # are the holdup. A controlled-O2 setpoint is not written back over
+        # that inventory; the carry-shortfall notice is the comparison.
         'enabled': True,  # dimensionless bool — finite-headspace model switch
         'volume_m3': None,  # m³ — finite headspace gas volume override
         'temperature_model': 'melt',  # unitless — headspace temperature model selector
@@ -1373,8 +1392,18 @@ class OverheadGasModel:
         cold_train_capacity,
         retained_holdup_kg: float = 0.0,
         dt_hr: float = 1.0,
+        upstream_pressure_Pa: float | None = None,
+        holdup_mol: Mapping[str, float] | None = None,
+        downstream_pressure_Pa: float = 0.0,
+        temperature_K: float | None = None,
     ) -> Optional[EffectiveTransportCapacity]:
-        """Return the one-tick flow boundary for controlled-pO2 operation."""
+        """Return the one-tick flow boundary for controlled-pO2 operation.
+
+        The pipe's upstream pressure is the inventory the caller passes.
+        An explicit conductance override does not need that pressure.
+        Omitting it on the regime path is a typed refusal: the commanded
+        millibar is not a substitute.
+        """
 
         if self._downstream_pressure_override is not None:
             return None
@@ -1384,17 +1413,55 @@ class OverheadGasModel:
             'O2_BACKPRESSURE',
         }:
             return None
-        allowed_pressure_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)
-        pipe_capacity_kg_hr = (
-            max(0.0, float(self._conductance_override)) * 3600.0
-            if self._conductance_override is not None
-            else self._pipe_conductance(
-                allowed_pressure_Pa,
-                float(melt.temperature_C),
-                p_downstream_Pa=0.0,
-                species_kg_for_M_avg=evap_flux.species_kg_hr,
-            ) * 3600.0
-        )
+        if self._conductance_override is not None:
+            pipe_kg_s = max(0.0, float(self._conductance_override))
+            if upstream_pressure_Pa is None:
+                upstream_pressure_bar = 0.0
+            else:
+                upstream_pressure_bar = max(0.0, float(upstream_pressure_Pa)) / PA_PER_BAR
+        else:
+            if upstream_pressure_Pa is None:
+                raise OverheadConfigurationError(
+                    "missing_upstream_pressure: inventory pressure is required"
+                )
+            upstream_pa = float(upstream_pressure_Pa)
+            if not math.isfinite(upstream_pa) or upstream_pa < 0.0:
+                raise OverheadConfigurationError(
+                    "missing_upstream_pressure: inventory pressure is required"
+                )
+            gas_temperature_K = (
+                float(temperature_K)
+                if temperature_K is not None
+                else float(melt.temperature_C) + 273.15
+            )
+            holdup = dict(holdup_mol or {})
+            positive = {
+                species: moles
+                for species, moles in holdup.items()
+                if float(moles) > 0.0
+            }
+            # Empty holdup or a non-positive inventory pressure carries
+            # nothing. Do not floor the upstream pressure at 1 Pa.
+            if (
+                upstream_pa <= 0.0
+                or not positive
+                or not math.isfinite(gas_temperature_K)
+                or gas_temperature_K <= 0.0
+            ):
+                pipe_kg_s = 0.0
+            else:
+                downstream_pa = max(0.0, float(downstream_pressure_Pa))
+                outflow = pipe_species_outflow_mol_s(
+                    upstream_pa,
+                    downstream_pa,
+                    gas_temperature_K,
+                    positive,
+                    self.pipe_diameter_m,
+                    self.pipe_length_m,
+                )
+                pipe_kg_s = outflow.mass_flow_kg_s
+            upstream_pressure_bar = upstream_pa / PA_PER_BAR
+        pipe_capacity_kg_hr = pipe_kg_s * 3600.0
         from simulator.thermal_train import FiniteCapacity, NoColdTrain
 
         equipment_capacity = (
@@ -1413,7 +1480,7 @@ class OverheadGasModel:
             retained_holdup_kg=retained_holdup_kg,
             dt_hr=dt_hr,
             equipment_capacity_required=equipment_capacity_required,
-            upstream_pressure_bar=allowed_pressure_Pa / PA_PER_BAR,
+            upstream_pressure_bar=upstream_pressure_bar,
         )
 
     def _resolve_liner_temperature_value(
@@ -1836,44 +1903,10 @@ class OverheadGasModel:
                 gas.composition.get(_sweep_key, 0.0),
                 max(0.0, melt.p_total_mbar - melt.pO2_mbar))  # mbar — sweep balance partial pressure
 
-        # 0.5.3 Phase A1 (2026-05-28): commanded-pO2 floor mirror. The legacy
-        # no-headspace branch (above) writes `gas.composition['O2'] = max(...,
-        # melt.pO2_mbar)` so a recipe pO2 setpoint always survives. Without the
-        # mirror here, the holdup-derived O2 partial would override the setpoint
-        # for actively-controlled atmospheres. Only apply in O2-controlled modes:
-        # an uncontrolled HARD_VACUUM / PN2_SWEEP run must NOT get a synthetic
-        # O2 floor (matches the design intent at equilibrium.py:9-12).
-        #
-        # Phase A chunk-review P1 (codex 2026-05-28): also raise the reported
-        # total pressure to at least the commanded pO2 floor. Pre-fix the
-        # holdup-derived total could be 0.0 mbar while the O2 partial was
-        # forced to e.g. 1.5 mbar — an impossible gas state (P_total < pO2).
-        # The runner fixture ``ci_carbonaceous_chondrite_C2B_12h.json`` carried
-        # ``P_total_bar=0`` with ``pO2_bar=0.0015`` as visible evidence. Fix
-        # mirrors the CO2_BACKPRESSURE / PN2_SWEEP branches above: when the
-        # commanded atmosphere demands a non-zero pO2, the reported total
-        # must accommodate it.
-        if atmosphere_name in {
-            'CONTROLLED_O2',
-            'CONTROLLED_O2_FLOW',
-            'O2_BACKPRESSURE',
-        }:
-            if melt.pO2_mbar > 0.0:
-                gas.composition['O2'] = max(  # mbar — controlled O2 partial pressure floor
-                    gas.composition.get('O2', 0.0), melt.pO2_mbar)  # mbar — controlled O2 partial pressure floor
-            gas.pressure_mbar = max(  # mbar — controlled total pressure floor
-                gas.pressure_mbar, melt.pO2_mbar, melt.p_total_mbar)  # mbar — controlled total pressure floor
-            background_species = str(
-                getattr(melt, 'background_gas_species', '') or '').strip()
-            if background_species and background_species.upper() != 'O2':
-                background_fraction = float(  # dimensionless — background gas mole fraction
-                    getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
-                gas.composition[background_species] = max(  # mbar — background gas partial pressure
-                    gas.composition.get(background_species, 0.0),
-                    controlled_background_partial_pressure(
-                        melt.p_total_mbar, melt.pO2_mbar, background_fraction,
-                    ),  # mbar — background gas partial pressure share
-                )
+        # The controlled-O2 snapshot no longer raises the reported partial
+        # to the commanded setpoint. The holdup written above is the only
+        # pressure. CO2 and sweep stamps above stay; the no-headspace
+        # branch still carries its own commanded floor.
 
     @staticmethod
     def _reset_gas(gas: OverheadGas) -> None:

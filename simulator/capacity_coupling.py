@@ -201,6 +201,10 @@ def solve_capacity_shadow(
     pipe_length_m: float | None = None,
     outflow_cap_kg_s: float | None = None,
     redox_source_mol_s: Mapping[str, float] | None = None,
+    redox_mol_s_at_partials: (
+        Callable[[Mapping[str, float]], Mapping[str, float]] | None
+    ) = None,
+    authoritative: bool = False,
     rel_tol: float = DEFAULT_REL_TOL,
     max_iterations: int = DEFAULT_MAX_ITERATIONS,
 ) -> CapacityShadowResult | CapacityShadowRefusal:
@@ -247,8 +251,8 @@ def solve_capacity_shadow(
             0,
         )
     # Geometry, or an explicit outflow cap (0 is a closed line), is the
-    # §2 balance. The Picard loop below is the no-geometry conductance
-    # shadow. It stays until chunk 3 rewires the live hour.
+    # §2 balance. The Picard loop below stays the no-geometry shadow.
+    # The live hour passes geometry and does not commit this loop.
     if (
         pipe_diameter_m is not None
         or pipe_length_m is not None
@@ -268,6 +272,8 @@ def solve_capacity_shadow(
             pipe_length_m=pipe_length_m,
             outflow_cap_kg_s=outflow_cap_kg_s,
             redox_source_mol_s=redox_source_mol_s,
+            redox_mol_s_at_partials=redox_mol_s_at_partials,
+            authoritative=authoritative,
             rel_tol=rel_tol,
             max_iterations=max_iterations,
         )
@@ -288,6 +294,7 @@ def solve_capacity_shadow(
             iterations=0,
             max_delta_history_Pa=(),
             mass_closure_error_pct=0.0,
+            authoritative=authoritative,
         )
 
     species_order = tuple(sorted(set(pre_holdup_mol) | set(molar_mass_kg_mol)))
@@ -538,6 +545,7 @@ def solve_capacity_shadow(
         iterations=iteration,
         max_delta_history_Pa=tuple(delta_history),
         mass_closure_error_pct=closure_pct,
+        authoritative=authoritative,
     )
 
 
@@ -619,11 +627,12 @@ def _as_finite(value: object, reason: str) -> float:
 class _HeadspaceLaw:
     """Trial-pressure source and outflow for one headspace step.
 
-    S_redox is stored as a molar rate (mol/s). A partition of the hour
-    passes the hour's rate N/3600 s into every substep, including a
-    halved substep. N/dt_substep would put the substep length into G
-    and move the fast root. This chunk passes zeros. Chunk 3 inherits
-    the rate.
+    S_redox is a molar rate (mol/s). A partition of the hour passes the
+    hour's rate N/3600 s into every substep, including a halved
+    substep. N/dt_substep would put the substep length into G and move
+    the fast root. The callback, when present, is that hour rate and
+    is not rescaled by the substep. A missing callback leaves the
+    constant map, which chunk 2 passes as zeros.
     """
 
     def __init__(
@@ -639,6 +648,9 @@ class _HeadspaceLaw:
         length_m: float | None,
         cap_kg_s: float | None,
         redox_mol_s: Mapping[str, float],
+        redox_mol_s_at_partials: (
+            Callable[[Mapping[str, float]], Mapping[str, float]] | None
+        ) = None,
     ) -> None:
         self.species = species
         self.masses = dict(masses)
@@ -653,6 +665,32 @@ class _HeadspaceLaw:
             species_name: float(redox_mol_s.get(species_name, 0.0))
             for species_name in species
         }
+        self.redox_mol_s_at_partials = redox_mol_s_at_partials
+
+    def _redox_rates(self, partials: Mapping[str, float]) -> dict[str, float]:
+        # Membership stays on the constant map built with the species
+        # set. The callback is the hour rate N/3600 s. It is not divided
+        # by the substep. A missing callback returns that constant map,
+        # so a chunk-2 zero is unchanged.
+        if self.redox_mol_s_at_partials is None:
+            return self.redox_mol_s
+        try:
+            raw = self.redox_mol_s_at_partials(partials)
+        except _BalanceRefused:
+            raise
+        except Exception as exc:
+            raise _BalanceRefused(
+                f"redox_source_refused:{type(exc).__name__}:{exc}"
+            ) from exc
+        if not isinstance(raw, Mapping):
+            raise _BalanceRefused("redox_source_not_a_mapping")
+        out = dict(self.redox_mol_s)
+        for name, rate in raw.items():
+            label = str(name)
+            if label not in self.masses or label not in self.redox_mol_s:
+                raise _BalanceRefused(f"missing_molar_mass:{label}")
+            out[label] = _as_finite(rate, f"redox_source_not_finite:{label}")
+        return out
 
     def partials_of(self, moles: Mapping[str, float]) -> dict[str, float]:
         return _ideal_gas_partials_Pa(
@@ -803,11 +841,12 @@ class _HeadspaceLaw:
         # Unit check: each term is mol/s. Limit: Q = 0 and q + S > 0
         # leaves G positive, so a closed line has no fast root.
         moles = self.moles_at_pressure(pressure_pa)
-        source, outflow, _binding, _piece = self._flows(self.partials_of(moles))
+        partials = self.partials_of(moles)
+        source, outflow, _binding, _piece = self._flows(partials)
         species = self.species[0]
         return (
             source[species]
-            + self.redox_mol_s[species]
+            + self._redox_rates(partials)[species]
             - outflow[species]
         )
 
@@ -822,7 +861,8 @@ class _HeadspaceLaw:
         # Unit check: (mol/s) * s = mol.
         # Limit: Q = 0 and constant q gives n = n0 + (q + S) Δt.
         moles = self.moles_at_pressure(pressure_pa)
-        source, outflow, _binding, _piece = self._flows(self.partials_of(moles))
+        partials = self.partials_of(moles)
+        source, outflow, _binding, _piece = self._flows(partials)
         species = self.species[0]
         return (
             moles[species]
@@ -830,7 +870,7 @@ class _HeadspaceLaw:
             - dt_s
             * (
                 source[species]
-                + self.redox_mol_s[species]
+                + self._redox_rates(partials)[species]
                 - outflow[species]
             )
         )
@@ -947,15 +987,16 @@ class _HeadspaceLaw:
             # source that changes inside the step is not q(end)·Δt.
             # Unit check: mol/s * kg/mol * s = kg.
             # Limit: already at the root, m0 = m_end and bled = (q + S) Δt.
+            redox = self._redox_rates(partials)
             source_kg = math.fsum(
-                (source[species] + self.redox_mol_s[species])
+                (source[species] + redox[species])
                 * self.masses[species]
                 * dt_s
                 for species in self.species
             )
             bled_mol = {
                 species: n0[species]
-                + (source[species] + self.redox_mol_s[species]) * dt_s
+                + (source[species] + redox[species]) * dt_s
                 - moles[species]
                 for species in self.species
             }
@@ -1246,7 +1287,7 @@ def _euler_one(
     source0, _outflow0, _binding0, _piece0 = law._flows(zero)
     n_hi = n0[species] + max(
         0.0,
-        source0[species] + law.redox_mol_s[species],
+        source0[species] + law._redox_rates(zero)[species],
     ) * dt_s
     p_hi = n_hi * GAS_CONSTANT * law.temperature_K / law.volume_m3
     if p_hi <= p_lo:
@@ -1347,12 +1388,14 @@ def _slow_converge(
     def rates_of(
         moles: Mapping[str, float],
     ) -> tuple[list[float], list[float], list[float], tuple]:
-        source, outflow, _binding, piece = law._flows(law.partials_of(moles))
+        partials = law.partials_of(moles)
+        source, outflow, _binding, piece = law._flows(partials)
+        redox = law._redox_rates(partials)
         added: list[float] = []
         bled: list[float] = []
         net: list[float] = []
         for name in species:
-            inflow = source[name] + law.redox_mol_s[name]
+            inflow = source[name] + redox[name]
             removed = outflow[name]
             rate = inflow - removed
             if not (
@@ -1548,8 +1591,9 @@ def _slice_value(
 ) -> float:
     trial = dict(moles)
     trial[species] = n_i
-    source, outflow, _binding, _piece = law._flows(law.partials_of(trial))
-    redox = law.redox_mol_s[species]
+    partials = law.partials_of(trial)
+    source, outflow, _binding, _piece = law._flows(partials)
+    redox = law._redox_rates(partials)[species]
     if mode == "fast":
         return source[species] + redox - outflow[species]
     return (
@@ -1573,10 +1617,11 @@ def _solve_slice(
     if mode == "slow":
         frozen = dict(moles)
         frozen[species] = 0.0
-        source0, _outflow, _binding, _piece = law._flows(law.partials_of(frozen))
+        frozen_partials = law.partials_of(frozen)
+        source0, _outflow, _binding, _piece = law._flows(frozen_partials)
         n_hi = n0[species] + max(
             0.0,
-            source0[species] + law.redox_mol_s[species],
+            source0[species] + law._redox_rates(frozen_partials)[species],
         ) * dt_s
     else:
         n_hi = max(
@@ -1680,8 +1725,9 @@ def _ray_samples(
                 species: pressure * fractions[species] for species in law.species
             }
         source, outflow, _binding, _piece = law._flows(partials)
+        redox = law._redox_rates(partials)
         return math.fsum(
-            source[species] + law.redox_mol_s[species] - outflow[species]
+            source[species] + redox[species] - outflow[species]
             for species in law.species
         )
 
@@ -1793,9 +1839,11 @@ def _commit_many(
     fractions = _fractions_of(law, n0)
     if fractions is None:
         zero = {species: 0.0 for species in law.species}
-        source, _outflow, _binding, _piece = law._flows(law.partials_of(zero))
+        zero_partials = law.partials_of(zero)
+        source, _outflow, _binding, _piece = law._flows(zero_partials)
+        redox = law._redox_rates(zero_partials)
         weights = {
-            species: max(0.0, source[species] + law.redox_mol_s[species])
+            species: max(0.0, source[species] + redox[species])
             for species in law.species
         }
         total = math.fsum(weights.values())
@@ -1826,6 +1874,8 @@ def _publish(
     step: _HeadspaceStep,
     capacity: NoColdTrain | FiniteCapacity,
     vessel_rating_Pa: float | None,
+    *,
+    authoritative: bool = False,
 ) -> CapacityShadowResult | CapacityShadowRefusal:
     if (
         vessel_rating_Pa is not None
@@ -1885,6 +1935,7 @@ def _publish(
         iterations=step.iterations,
         max_delta_history_Pa=(step.residual_Pa,),
         mass_closure_error_pct=closure,
+        authoritative=authoritative,
     )
 
 
@@ -1902,6 +1953,9 @@ def _build_law(
     pipe_length_m: float | None,
     outflow_cap_kg_s: float | None,
     redox_source_mol_s: Mapping[str, float] | None,
+    redox_mol_s_at_partials: (
+        Callable[[Mapping[str, float]], Mapping[str, float]] | None
+    ) = None,
 ) -> tuple[_HeadspaceLaw, dict[str, float]] | CapacityShadowRefusal:
     try:
         if not all(
@@ -1959,7 +2013,40 @@ def _build_law(
                     rate,
                     f"redox_source_mol_s must be finite:{name}",
                 )
-        names = set(pre_holdup_mol) | set(redox)
+        # One flux evaluation at the opening inventory. Species that
+        # source introduces join the set at n0 = 0. A name with no
+        # molar mass is a typed refusal, not a dropped source. Later
+        # trials that invent a further name still refuse in _flux_kg_hr.
+        factor = GAS_CONSTANT * temperature_K / volume_m3
+        opening_partials: dict[str, float] = {}
+        for name, amount in pre_holdup_mol.items():
+            number = _as_finite(
+                amount,
+                "pre_holdup_mol must be finite and >= 0",
+            )
+            if number < 0.0:
+                raise _BalanceRefused("pre_holdup_mol must be finite and >= 0")
+            if number > 0.0:
+                opening_partials[str(name)] = number * factor
+        from simulator.evaporation import EvaporationFluxRefusal
+
+        try:
+            discovered = flux_kg_hr_at_partials(opening_partials)
+        except EvaporationFluxRefusal:
+            raise
+        except _BalanceRefused:
+            raise
+        except Exception as exc:
+            raise _BalanceRefused(
+                f"evaporation_flux_refused:{type(exc).__name__}:{exc}"
+            ) from exc
+        if not isinstance(discovered, Mapping):
+            raise _BalanceRefused("evaporation_flux_not_a_mapping")
+        discovered_names: set[str] = set()
+        for name, rate in discovered.items():
+            _as_finite(rate, f"evaporation_flux_not_finite:{name}")
+            discovered_names.add(str(name))
+        names = set(pre_holdup_mol) | set(redox) | discovered_names
         if not names:
             raise _BalanceRefused("headspace_balance_no_species")
         masses: dict[str, float] = {}
@@ -1992,6 +2079,7 @@ def _build_law(
             length_m=length,
             cap_kg_s=cap_kg_s,
             redox_mol_s=redox,
+            redox_mol_s_at_partials=redox_mol_s_at_partials,
         )
         return law, n0
     except _BalanceRefused as refused:
@@ -2013,8 +2101,12 @@ def _commit_headspace_balance(
     pipe_length_m: float | None,
     outflow_cap_kg_s: float | None,
     redox_source_mol_s: Mapping[str, float] | None,
-    rel_tol: float,
-    max_iterations: int,
+    redox_mol_s_at_partials: (
+        Callable[[Mapping[str, float]], Mapping[str, float]] | None
+    ) = None,
+    authoritative: bool = False,
+    rel_tol: float = DEFAULT_REL_TOL,
+    max_iterations: int = DEFAULT_MAX_ITERATIONS,
 ) -> CapacityShadowResult | CapacityShadowRefusal:
     built = _build_law(
         pre_holdup_mol=pre_holdup_mol,
@@ -2029,6 +2121,7 @@ def _commit_headspace_balance(
         pipe_length_m=pipe_length_m,
         outflow_cap_kg_s=outflow_cap_kg_s,
         redox_source_mol_s=redox_source_mol_s,
+        redox_mol_s_at_partials=redox_mol_s_at_partials,
     )
     if isinstance(built, CapacityShadowRefusal):
         return built
@@ -2051,7 +2144,13 @@ def _commit_headspace_balance(
         raise
     except _BalanceRefused as refused:
         return CapacityShadowRefusal(refused.reason, 0)
-    return _publish(law, step, capacity, vessel_rating_Pa)
+    return _publish(
+        law,
+        step,
+        capacity,
+        vessel_rating_Pa,
+        authoritative=authoritative,
+    )
 
 
 def diagnostic_backward_euler_headspace_step(
