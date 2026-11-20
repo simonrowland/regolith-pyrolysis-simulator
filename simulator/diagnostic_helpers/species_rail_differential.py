@@ -68,6 +68,7 @@ from simulator.diagnostic_helpers.gibbs_battery import (
 )
 from simulator.diagnostic_helpers.species_rail import (
     TIER_MAJOR,
+    TIER_TRACE,
     SpeciesRail,
     derive_species_rail,
     parse_formula_composition,

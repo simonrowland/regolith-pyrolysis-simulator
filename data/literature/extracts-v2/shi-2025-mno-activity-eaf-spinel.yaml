@@ -1287,9 +1287,25 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: published_initial_slag_mole_percent
+        components:
+        - - CaO
+          - '0.1897'
+        - - SiO2
+          - '0.2306'
+        - - Al2O3
+          - '0.1364'
+        - - MgO
+          - '0.0742'
+        - - FeO
+          - '0.2824'
+        - - MnO
+          - '0.0867'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000000101325'
@@ -1336,7 +1352,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_1_mno_activity::T=1673:row=1:h=51d26a442ecb
   source_id: shi-2025-mno-activity-eaf-spinel
   locator:
@@ -1414,16 +1431,31 @@ observations:
         note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.1897'
+          - - SiO2
+            - '0.2306'
+          - - Al2O3
+            - '0.1364'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 6
-        published_page: 2274
-        pdf_page_index: 5
-        table: '6'
-        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=1; column=aMnO; table_row_number=2; table_column_number=4;
-          phase=liquid
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
     printed_composition:
       state:
         tag: value
@@ -1725,9 +1757,25 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: published_initial_slag_mole_percent
+        components:
+        - - CaO
+          - '0.1446'
+        - - SiO2
+          - '0.1758'
+        - - Al2O3
+          - '0.2364'
+        - - MgO
+          - '0.0742'
+        - - FeO
+          - '0.2824'
+        - - MnO
+          - '0.0867'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000000101325'
@@ -1774,7 +1822,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_2_mno_activity::T=1673:row=2:h=a87a2a84b853
   source_id: shi-2025-mno-activity-eaf-spinel
   locator:
@@ -1852,16 +1901,31 @@ observations:
         note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.1446'
+          - - SiO2
+            - '0.1758'
+          - - Al2O3
+            - '0.2364'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 6
-        published_page: 2274
-        pdf_page_index: 5
-        table: '6'
-        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=2; column=aMnO; table_row_number=3; table_column_number=4;
-          phase=liquid
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
     printed_composition:
       state:
         tag: value
@@ -2163,9 +2227,25 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: published_initial_slag_mole_percent
+        components:
+        - - CaO
+          - '0.1221'
+        - - SiO2
+          - '0.1484'
+        - - Al2O3
+          - '0.2864'
+        - - MgO
+          - '0.0742'
+        - - FeO
+          - '0.2824'
+        - - MnO
+          - '0.0867'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000000101325'
@@ -2212,7 +2292,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_3_mno_activity::T=1673:row=3:h=71fba74d46cd
   source_id: shi-2025-mno-activity-eaf-spinel
   locator:
@@ -2290,16 +2371,31 @@ observations:
         note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.1221'
+          - - SiO2
+            - '0.1484'
+          - - Al2O3
+            - '0.2864'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 6
-        published_page: 2274
-        pdf_page_index: 5
-        table: '6'
-        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=3; column=aMnO; table_row_number=4; table_column_number=4;
-          phase=liquid
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
     printed_composition:
       state:
         tag: value
@@ -2601,9 +2697,25 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: published_initial_slag_mole_percent
+        components:
+        - - CaO
+          - '0.0994'
+        - - SiO2
+          - '0.1209'
+        - - Al2O3
+          - '0.3364'
+        - - MgO
+          - '0.0742'
+        - - FeO
+          - '0.2824'
+        - - MnO
+          - '0.0867'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000000101325'
@@ -2650,7 +2762,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_4_mno_activity::T=1673:row=4:h=a26e2a032c08
   source_id: shi-2025-mno-activity-eaf-spinel
   locator:
@@ -2728,16 +2841,31 @@ observations:
         note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.0994'
+          - - SiO2
+            - '0.1209'
+          - - Al2O3
+            - '0.3364'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 6
-        published_page: 2274
-        pdf_page_index: 5
-        table: '6'
-        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=4; column=aMnO; table_row_number=5; table_column_number=4;
-          phase=liquid
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
     printed_composition:
       state:
         tag: value

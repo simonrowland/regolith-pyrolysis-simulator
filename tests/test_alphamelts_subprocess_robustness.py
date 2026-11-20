@@ -11,7 +11,9 @@ import pytest
 
 from engines.alphamelts.subprocess_runner import equilibrate_via_subprocess
 from simulator.diagnostic_helpers.binary_pot_battery import (
+    _OxygenBalanceRefusal,
     _solve_vapor_engine_cell_oxygen_balance,
+    classify_equilibrate_outcome,
 )
 from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH,
@@ -435,6 +437,40 @@ def test_cao_sio2_binary_refuses_before_launch_with_imposed_fo2(tmp_path):
     assert guard['measured_signal'] == 'SIGABRT'
     assert guard['active_components'] == ['CaO', 'SiO2']
     assert 'CaO-SiO2' in result.warnings[0]
+
+
+def test_cao_sio2_binary_refuses_at_first_oxygen_balance_trial(tmp_path):
+    backend, marker = _marker_backend(tmp_path)
+    composition = _melt({'CaO': 0.51, 'SiO2': 0.49})
+    trials = []
+
+    def trial(po2_bar: float) -> SimpleNamespace:
+        trials.append(po2_bar)
+        result = equilibrate_via_subprocess(
+            backend,
+            temperature_C=1993.0 - 273.15,
+            pressure_bar=1.0,
+            fO2_log=math.log10(po2_bar),
+            composition_mol_by_account=composition,
+            species_formula_registry={},
+            run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+        )
+        status, refusal_reason, engine_reason = classify_equilibrate_outcome(result)
+        return SimpleNamespace(
+            status=status, refusal_reason=refusal_reason, engine_reason=engine_reason,
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc:
+        _solve_vapor_engine_cell_oxygen_balance(
+            trial, temperature_K=1993.0, cell_material=None, fixed_point_activities=True,
+        )
+
+    assert exc.value.reason_code == 'oxygen_balance_no_admitted_bracket:engine_domain_crash'
+    assert str(exc.value).endswith(
+        f'starting-cell guard refusals: engine_crash: {_CAO_SIO2_BINARY_CRASH}: 31'
+    )
+    assert trials == [1e-6]
+    assert not marker.exists()
 
 
 def test_cao_sio2_binary_refuses_before_launch_without_imposed_fo2(tmp_path):

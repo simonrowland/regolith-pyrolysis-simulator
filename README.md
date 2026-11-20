@@ -287,7 +287,8 @@ integration rather than exposing the development server.
 `install-dependencies.py` installs the Python stack from `requirements.txt`: Flask and
 Flask-SocketIO (web UI), PyYAML, Plotly, NumPy (pinned `<2`, because VapoRock needs `np.bool8`),
 SciPy, pandas, psutil, threadpoolctl, optuna (recipe optimizer), OpenIMCC (high-temperature melt
-activities), and the pytest plugins the test configuration requires. It also installs the locked alphaMELTS app.
+activities), the pytest plugins required by the test configuration, and Pyflakes for the
+undefined-name check. It also installs the locked alphaMELTS app.
 
 `install-engines.py` builds the pinned chemistry engines: MAGEMin, PySulfSat, ThermoEngine,
 VapoRock, PetThermoTools and Thermobar. Run it after the base install. A later exact `uv sync`
