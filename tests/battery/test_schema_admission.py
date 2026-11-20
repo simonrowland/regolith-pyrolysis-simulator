@@ -876,13 +876,24 @@ def test_real_sample_volume_and_unadopted_fugacity_are_preserved():
 
 
 def test_fugacity_identity_matches_partial_pressure_except_quantity() -> None:
-    from simulator.battery.enums import AmountBasis, Phase
+    from simulator.battery.enums import (
+        AmountBasis,
+        Phase,
+        ReferenceStateConvention,
+    )
     from simulator.battery.identity import (
         IdentityEqualKind,
         identity_equal,
         profile_for,
     )
-    from simulator.battery.records import Composition, Species, State
+    from simulator.battery.records import (
+        Composition,
+        Reaction,
+        ReactionTerm,
+        Species,
+        StandardState,
+        State,
+    )
 
     species = Species("H2O", Phase.G)
     composition = Composition(
@@ -919,6 +930,37 @@ def test_fugacity_identity_matches_partial_pressure_except_quantity() -> None:
         identity_equal(missing_axes, missing_axes).kind
         is IdentityEqualKind.IDENTITY_UNKNOWN
     )
+
+    def optional_metadata(formula: str):
+        metadata_species = Species(formula, Phase.G)
+        return {
+            "reaction": State.of(
+                Reaction((ReactionTerm(metadata_species, 1),))
+            ),
+            "reference_state": State.of(
+                StandardState(
+                    ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+                    metadata_species,
+                    "pure_gas",
+                )
+            ),
+            "reservoir": State.of(metadata_species),
+        }
+
+    for quantity in (Quantity.P_PARTIAL, Quantity.FUGACITY):
+        with_metadata = M.fill_identity(
+            quantity, species, **axes, **optional_metadata("H2O")
+        )
+        with_different_metadata = M.fill_identity(
+            quantity, species, **axes, **optional_metadata("CO2")
+        )
+        assert with_metadata.reaction is not None
+        assert with_metadata.reference_state is not None
+        assert with_metadata.reservoir is not None
+        assert (
+            identity_equal(with_metadata, with_different_metadata).kind
+            is IdentityEqualKind.EQUAL
+        )
 
 
 def test_fugacity_only_uses_supported_gas_map_engines(monkeypatch):
