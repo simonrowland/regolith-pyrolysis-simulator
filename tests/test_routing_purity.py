@@ -362,6 +362,38 @@ def test_stage3_cartridge_split_keeps_declared_gas_coproduct_out():
     )
 
 
+def test_stage3_cartridge_split_rejects_non_mapping_product_fractions():
+    host = SimpleNamespace(
+        setpoints={
+            "condensation_train": {
+                "metals_train": {
+                    STAGE_KEY_BY_NUMBER[3]: {
+                        "stage3_cartridge_schedule": {
+                            "mn_cartridge_run_hour_window": [12, 30],
+                        },
+                    },
+                },
+            },
+        },
+        melt=SimpleNamespace(hour=11),
+    )
+    route = SimpleNamespace(
+        condensed_by_stage_species={STAGE_KEY_BY_NUMBER[3]: {"CrO2": 6.0}},
+        condensed_for_species=lambda _species: 10.0,
+    )
+
+    with pytest.raises(
+        AccountingError,
+        match="invalid_condensation_product_account_fractions",
+    ):
+        EvaporationMixin._stage3_mn_cartridge_account_fractions(
+            host,
+            route,
+            "CrO2",
+            {"condensation_product_account_fractions": {"Cr2O3": "invalid"}},
+        )
+
+
 def test_stage3_mn_cartridge_schedule_rejects_bool_hour_bounds():
     host = SimpleNamespace(
         setpoints={
