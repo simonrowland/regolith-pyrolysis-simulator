@@ -474,6 +474,9 @@ def test_provider_allows_declared_oxygen_gaseous_coproduct(
                     "Cr2O3": "terminal.chromium_condensed_oxide_stored",
                     "O2": "process.overhead_gas",
                 },
+                "condensation_product_account_fractions": {
+                    "Cr2O3": {MANGANESE_STAGE3_CARTRIDGE_ACCOUNT: 0.25},
+                },
             },
         )
     )
@@ -481,6 +484,15 @@ def test_provider_allows_declared_oxygen_gaseous_coproduct(
     assert result.status == "ok"
     assert result.transition is not None
     assert set(result.transition.credits["process.overhead_gas"]) == {"O2"}
+    assert result.transition.credits[
+        MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
+    ]["Cr2O3"] > 0.0
+    assert "O2" not in result.transition.credits[
+        MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
+    ]
+    assert result.transition.credits[
+        "terminal.chromium_condensed_oxide_stored"
+    ]["Cr2O3"] > 0.0
 
 
 @pytest.mark.parametrize("ratio", [0.0, -1.0, math.nan])
