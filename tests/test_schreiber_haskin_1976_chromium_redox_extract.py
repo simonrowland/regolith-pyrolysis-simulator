@@ -4,7 +4,16 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.enums import QUANTITY_UNITS, Phase, Quantity, ValueKind
-from simulator.battery.migrate import Migrator, PA_PER_ATM_DEC, _log_fO2_to_pa
+from simulator.battery.migrate import (
+    Migrator,
+    PA_PER_ATM_DEC,
+    _log_fO2_to_pa,
+    experiment_from_plain,
+    observation_from_plain,
+    work_from_plain,
+)
+from simulator.battery.validate import validate_corpus
+from tools.validate_literature_extracts import validate_extract_document
 
 
 EXTRACT = Path(
@@ -51,7 +60,7 @@ def _assert_caption_pins(document: dict) -> None:
         row["observation_id"]: row
         for row in document["species"]["Cr"]["observations"]
     }
-    assert set(observations) == set(FIG4)
+    assert set(observations) >= set(FIG4)
     for observation_id, (fraction, log_fO2, printed) in FIG4.items():
         row = observations[observation_id]
         point = row["values"]["points"][0]
@@ -123,7 +132,7 @@ def test_isolated_migration_preserves_fractions_units_conditions_and_quench_phas
         if row.source_id == EXTRACT.stem
     }
     assert not migrator.result.validation.hard_issues
-    assert set(migrated) == set(FIG4)
+    assert set(FIG4) <= set(migrated)
     for observation_id, (fraction, log_fO2, _printed) in FIG4.items():
         row = migrated[observation_id]
         assert row.identity.species.formula == "Cr"
@@ -140,3 +149,92 @@ def test_isolated_migration_preserves_fractions_units_conditions_and_quench_phas
         assert row.point_conditions["printed_composition"].state.value == FAS
         assert row.point_conditions["quench_state"].state.value.value == "not_stated"
         assert row.notices == ()
+
+
+REPO_ROOT = Path.cwd()
+FIG5_EXTRACT = REPO_ROOT / "data/literature/extracts-v2/schreiber-haskin-1976-plsc7-chromium-in-basalts.yaml"
+FIG5_SOURCE_ID = "schreiber-haskin-1976-plsc7-chromium-in-basalts"
+FIG5_LEGACY_EXTRACT = REPO_ROOT / "data/literature/extracts/schreiber-haskin-1976-plsc7-chromium-in-basalts.yaml"
+FIG5_PINS = {
+    f"{FIG5_SOURCE_ID}::fig5_panel_c_fas_cr2_fraction::T=1500C:-logPO2=4.1": "0.26",
+    f"{FIG5_SOURCE_ID}::fig5_panel_c_fas_cr2_fraction::T=1550C:-logPO2=4.8": "0.49",
+    f"{FIG5_SOURCE_ID}::fig5_panel_d_fad_cr2_fraction::T=1550C:-logPO2=9.1": "1.0",
+}
+FIG5_MIGRATED_PINS = (("0.26", "1500", "-4.1"), ("0.49", "1550", "-4.8"), ("1.0", "1550", "-9.1"))
+
+
+def _assert_fig5_pins(document: dict) -> None:
+    observations = {row["observation_id"]: row for row in document["observations"]}
+    for observation_id, expected in FIG5_PINS.items():
+        assert observations[observation_id]["value"]["point"] == expected
+
+
+def test_fig5_three_digitized_cell_pins_and_mutation() -> None:
+    document = yaml.safe_load(FIG5_EXTRACT.read_text(encoding="utf-8"))
+    assert len(document["observations"]) == 43
+    _assert_fig5_pins(document)
+    changed = yaml.safe_load(FIG5_EXTRACT.read_text(encoding="utf-8"))
+    row = next(row for row in changed["observations"] if row["observation_id"] == next(iter(FIG5_PINS)))
+    row["value"]["point"] = "0.25"
+    try:
+        _assert_fig5_pins(changed)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("a changed Figure 5 cell must fail its independent page-image pin")
+
+
+def test_fig5_v2_validation_keeps_conditions_for_all_digitized_points() -> None:
+    document = yaml.safe_load(FIG5_EXTRACT.read_text(encoding="utf-8"))
+    work_document = yaml.safe_load(
+        (REPO_ROOT / "data/literature/works/bd5c0c2ddbf02ce3306adc1f1022cb7382273480dcceed4a670678920fe60409.yaml").read_text()
+    )
+    work = work_from_plain(work_document["work"])
+    experiments = [experiment_from_plain(row) for row in work_document["experiments"]]
+    migrated = {
+        row.observation_id: row
+        for row in (observation_from_plain(raw) for raw in document["observations"])
+    }
+    validation = validate_corpus([work], experiments, migrated)
+    assert validation.hard_issues == ()
+    digitized = [row for row in document["observations"] if "fig5_panel_" in row["observation_id"]]
+    assert len(digitized) == 35
+    for source in digitized:
+        row = migrated[source["observation_id"]]
+        conditions = row.point_conditions
+        assert conditions is not None
+        assert conditions["T_C"].state.value == Decimal(
+            source["point_conditions"]["T_C"]["state"]["value"]
+        )
+        assert conditions["fO2_log"].state.value == Decimal(
+            source["point_conditions"]["fO2_log"]["state"]["value"]
+        )
+        assert conditions["printed_composition"].state.is_value
+        assert conditions["composition"].state.is_unknown
+
+
+def test_fig5_legacy_extract_validates_and_migrates_without_hard_issues() -> None:
+    legacy = yaml.safe_load(FIG5_LEGACY_EXTRACT.read_text(encoding="utf-8"))
+    assert validate_extract_document(legacy, expected_source_id=FIG5_SOURCE_ID) == []
+    migrator = Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(FIG5_LEGACY_EXTRACT)
+    migrator.finalize()
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.hard_issues == ()
+    migrated = [
+        row
+        for row in migrator.result.observations.values()
+        if row.source_id == FIG5_SOURCE_ID
+    ]
+    for expected, temp_c, log_fO2 in FIG5_MIGRATED_PINS:
+        row = next(
+            item
+            for item in migrated
+            if item.value.point == Decimal(expected)
+            and item.point_conditions["T_C"].state.value == Decimal(temp_c)
+            and item.point_conditions["fO2_log"].state.value == Decimal(log_fO2)
+        )
+        assert row.value.point == Decimal(expected)
+        assert row.point_conditions["T_C"].state.is_value
+        assert row.point_conditions["fO2_log"].state.is_value
+        assert row.point_conditions["printed_composition"].state.is_value
