@@ -66,7 +66,9 @@ when the field is null; this note does not retune that bridge. Applying
 equipment geometry refuses `exposed_melt_area_not_printed` instead of
 writing `size_crucible`'s face onto that melt. A printed positive area
 is installed there, before the C0 exit forecast. A present value that
-is not finite and positive refuses `invalid_lab_geometry_positive_value`.
+is not a finite positive declared scalar refuses
+`invalid_lab_geometry_positive_value`. That includes a binary scalar
+and an integer `float()` cannot convert. Numeric strings stay admitted.
 Preset load still accepts the empty bridge. The scale token is
 `LAB_GEOMETRY_SCALE`.
 
@@ -373,8 +375,9 @@ preset filled only with what the paper prints, and the
 `exposed_melt_area_not_printed` refusal when equipment geometry would
 otherwise adopt `size_crucible`'s face for a gram-lab sample with no
 printed area. A printed positive area is that face, including for the
-C0 forecast inside campaign start. A non-positive present value refuses
-`invalid_lab_geometry_positive_value`.
+C0 forecast inside campaign start. A non-positive present value, a
+binary scalar, or an integer `float()` cannot convert refuses
+`invalid_lab_geometry_positive_value`. Numeric strings stay admitted.
 
 Left for a later chunk, each only when its input exists:
 
