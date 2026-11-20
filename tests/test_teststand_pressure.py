@@ -34,6 +34,9 @@ PRESET_DIR = REPO_ROOT / "data" / "presets" / "vacuum_pyrolysis"
 _MISSING = object()
 _T_K = 273.15
 _HOUR_S = 3600.0
+# Q = v_dot * P_std at the normal temperature. Independent of
+# normal_litres_per_minute_to_mol_per_s and of STANDARD_ATMOSPHERE_PA.
+_Q_NL_0_3 = (0.3e-3 / 60.0) * 101325.0
 
 
 def _schedule(
@@ -153,10 +156,22 @@ class _Sim:
         self.setpoints = {"lab_geometry": geometry}
 
 
+def test_teststand_refusal_is_not_a_pytest_class() -> None:
+    assert TeststandRefusal.__name__.startswith("Test")
+    assert TeststandRefusal.__test__ is False
+    try:
+        del TeststandRefusal.__test__
+        assert getattr(TeststandRefusal, "__test__", True) is True
+        assert TeststandRefusal.__name__.startswith("Test")
+    finally:
+        TeststandRefusal.__test__ = False
+
+
 def test_steady_state_carrier_only_is_q_over_s() -> None:
     speed_m3_s = 0.004
+    assert _Q_NL_0_3 == 0.506625
+    expected_pa = _Q_NL_0_3 / speed_m3_s
     n_dot = normal_litres_per_minute_to_mol_per_s(0.3)
-    expected_pa = n_dot * GAS_CONSTANT * _T_K / speed_m3_s
     geometry = _geometry(speed=speed_m3_s, ultimate=0.0, path=[])
     at_hour = _advance(
         geometry,
@@ -170,7 +185,9 @@ def test_steady_state_carrier_only_is_q_over_s() -> None:
         evolved_noncondensable_mol=0.0,
         form="steady_state",
     )
+    assert at_hour.q_pa_m3_s == pytest.approx(_Q_NL_0_3, abs=0.0)
     assert at_hour.pressure_pa == pytest.approx(expected_pa, rel=1e-12)
+    assert at_one_second.q_pa_m3_s == pytest.approx(_Q_NL_0_3, abs=0.0)
     assert at_one_second.pressure_pa == pytest.approx(expected_pa, rel=1e-12)
     assert at_hour.s_eff_m3_s == pytest.approx(speed_m3_s, rel=1e-12)
     assert at_hour.form == "steady_state"
@@ -234,8 +251,7 @@ def test_missing_pump_speed_refuses_and_a_declared_speed_solves() -> None:
         )
     assert caught.value.code == "missing_pump_speed"
     speed_m3_s = 0.004
-    n_dot = normal_litres_per_minute_to_mol_per_s(0.3)
-    expected_pa = n_dot * GAS_CONSTANT * _T_K / speed_m3_s
+    expected_pa = _Q_NL_0_3 / speed_m3_s
     solved = _advance(
         _geometry(speed=speed_m3_s, ultimate=0.0, path=[]),
         dt_s=1.0,
@@ -486,8 +502,7 @@ def test_cited_ndx15_speed_does_not_produce_the_printed_robinot_pressure() -> No
     # 15.1 m^3/h is the nXDS15i brochure peak (Edwards 3601-0086), passed
     # in as an argument. It is not read from the preset.
     speed_m3_s = 15.1 / _HOUR_S
-    n_dot = normal_litres_per_minute_to_mol_per_s(0.3)
-    expected_pa = n_dot * GAS_CONSTANT * _T_K / speed_m3_s
+    expected_pa = _Q_NL_0_3 / speed_m3_s
     solved = _advance(
         _geometry(speed=speed_m3_s, ultimate=0.0, path=[], temperature_K=_T_K),
         schedule=_schedule(flow=0.3),
@@ -530,8 +545,7 @@ def test_printed_vacuum_limit_is_not_an_ultimate_pressure() -> None:
     assert parsed.printed_vacuum_limit_mbar == pytest.approx(7.0e-3)
     assert parsed.pump.ultimate_pressure_pa is None
     speed_m3_s = 15.1 / _HOUR_S
-    n_dot = normal_litres_per_minute_to_mol_per_s(0.3)
-    expected_pa = n_dot * GAS_CONSTANT * _T_K / speed_m3_s
+    expected_pa = _Q_NL_0_3 / speed_m3_s
     solved = _advance(
         _geometry(
             speed=speed_m3_s,
@@ -697,7 +711,7 @@ def test_process_hook_imposed_robinot_does_not_write_pressure() -> None:
 def test_process_hook_apparatus_uses_steady_state_and_evolved_gas() -> None:
     speed_m3_s = 0.004
     n_dot = normal_litres_per_minute_to_mol_per_s(0.3)
-    expected_mbar = (n_dot * GAS_CONSTANT * _T_K / speed_m3_s) / 100.0
+    expected_mbar = (_Q_NL_0_3 / speed_m3_s) / 100.0
     sim = _Sim(
         _schedule(driver="apparatus", flow=0.3),
         _geometry(speed=speed_m3_s, ultimate=0.0, path=[]),
@@ -744,8 +758,7 @@ def test_c2a_staged_apparatus_refuses_before_writing_pressure() -> None:
 
 def test_solved_total_below_existing_oxygen_partial_refuses() -> None:
     speed_m3_s = 0.004
-    n_dot = normal_litres_per_minute_to_mol_per_s(0.3)
-    expected_mbar = (n_dot * GAS_CONSTANT * _T_K / speed_m3_s) / 100.0
+    expected_mbar = (_Q_NL_0_3 / speed_m3_s) / 100.0
     sim = _Sim(
         _schedule(driver="apparatus", flow=0.3),
         _geometry(speed=speed_m3_s, ultimate=0.0, path=[]),

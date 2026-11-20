@@ -1740,6 +1740,32 @@ def gram_lab_exposed_melt_area_bridge(
     }
 
 
+def refuse_sized_crucible_without_exposed_melt_area(
+    lab_geometry: Mapping[str, Any] | None,
+) -> None:
+    """Refuse size_crucible as the face of a gram-lab sample with no area.
+
+    A null or blank ``exposed_melt_area_m2`` still makes
+    ``gram_lab_exposed_melt_area_bridge`` return ``{}``, so preset load
+    stays valid. The refusal is the equipment copy that would otherwise
+    replace the default melt area with the mass-sized crucible face.
+    A gram-lab mapping with no sample block is not that omission.
+    """
+    if not isinstance(lab_geometry, Mapping):
+        return
+    if str(lab_geometry.get('scale') or '').strip() != 'gram_lab':
+        return
+    sample = lab_geometry.get('sample')
+    if not isinstance(sample, Mapping):
+        return
+    if sample.get('exposed_melt_area_m2', None) in (None, ''):
+        raise LabGeometryError(
+            'exposed_melt_area_not_printed',
+            'lab_geometry.sample.exposed_melt_area_m2 is null; '
+            'size_crucible must not supply the melt face',
+        )
+
+
 def _neufeld_collision_integral_omega_d(T_star: float) -> float:
     """Neufeld 1972 correlation for the dimensionless collision integral
     ``Ω_D`` as a function of the reduced temperature

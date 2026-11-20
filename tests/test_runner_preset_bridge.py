@@ -16,7 +16,9 @@ from simulator import runner as runner_module
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     COMPARISON_SCHEMA_VERSION,
 )
+from simulator.lab_geometry import LabGeometryError
 from simulator.runner import PyrolysisRun
+from simulator.session import SimSession
 from tests.test_runner_smoke import _assert_schema_shape
 from tests.mre_reproduction_fixtures import synthetic_voltage_documents
 
@@ -239,6 +241,78 @@ def _write_mre_bridge_preset(tmp_path: Path) -> tuple[Path, Path]:
     return preset_path, sidecar_path
 
 
+def _vacuum_preset(name: str) -> dict:
+    path = REPO_ROOT / "data" / "presets" / "vacuum_pyrolysis" / name
+    loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
+    assert isinstance(loaded, dict)
+    return loaded
+
+
+def _gram_lab_run(preset: dict, *, campaign: str) -> PyrolysisRun:
+    sample = preset["lab_geometry"]["sample"]
+    return PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign=campaign,
+        hours=0,
+        mass_kg=float(sample["mass_g"]) / 1000.0,
+        setpoints_patch={"lab_geometry": preset["lab_geometry"]},
+        lab_schedule=preset["lab_schedule"],
+    )
+
+
+def test_null_exposed_melt_area_refuses_sized_crucible_face() -> None:
+    for name in ("robinot_2026.yaml", "sesko_2024.yaml"):
+        preset = _vacuum_preset(name)
+        assert preset["lab_geometry"]["sample"].get("exposed_melt_area_m2") in (
+            None,
+            "",
+        )
+        run = _gram_lab_run(preset, campaign="C0")
+        session = SimSession()
+        with pytest.raises(LabGeometryError) as caught:
+            session.start(run._session_config())
+        assert caught.value.code == "exposed_melt_area_not_printed"
+        sim = session.simulator
+        crucible_area_m2 = sim._equipment.crucible.melt_surface_area_m2
+        assert crucible_area_m2 > 0.0
+        assert sim.melt.melt_surface_area_m2 == pytest.approx(0.2)
+        assert sim.melt.melt_surface_area_m2 != pytest.approx(crucible_area_m2)
+
+    robinot = _vacuum_preset("robinot_2026.yaml")
+    printed = copy.deepcopy(robinot)
+    printed["lab_geometry"]["sample"]["exposed_melt_area_m2"] = 0.000123
+    printed_run = _gram_lab_run(printed, campaign="C2A")
+    printed_session = printed_run._start_session()
+    printed_run._apply_lab_area_bridge(
+        printed_session.simulator,
+        printed_run._lab_area_bridge(),
+    )
+    printed_session.simulator._get_turbine_spec()
+    printed_melt_m2 = printed_session.simulator.melt.melt_surface_area_m2
+    sized_face_m2 = (
+        printed_session.simulator._equipment.crucible.melt_surface_area_m2
+    )
+    assert printed_melt_m2 == pytest.approx(0.000123)
+    assert printed_melt_m2 != pytest.approx(sized_face_m2)
+
+    pomeroy = _vacuum_preset("pomeroy_cardiff_2006.yaml")
+    assert pomeroy["lab_geometry"]["sample"]["exposed_melt_area_m2"] == (
+        pytest.approx(0.000314)
+    )
+    pomeroy_run = _gram_lab_run(pomeroy, campaign="C2A")
+    pomeroy_session = pomeroy_run._start_session()
+    pomeroy_run._apply_lab_area_bridge(
+        pomeroy_session.simulator,
+        pomeroy_run._lab_area_bridge(),
+    )
+    pomeroy_session.simulator._get_turbine_spec()
+    pomeroy_melt_m2 = pomeroy_session.simulator.melt.melt_surface_area_m2
+    assert pomeroy_melt_m2 == pytest.approx(0.000314)
+    assert pomeroy_melt_m2 != pytest.approx(
+        pomeroy_session.simulator._equipment.crucible.melt_surface_area_m2
+    )
+
+
 def test_gram_lab_exposed_area_sets_runtime_melt_area() -> None:
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
@@ -291,6 +365,7 @@ def test_preset_bridge_cli_maps_leg_and_records_provenance(tmp_path: Path):
     preset_path = _write_bridge_preset(
         tmp_path,
         feedstock_id="lunar_mare_low_ti",
+        exposed_melt_area_m2=0.000123,
     )
 
     returncode, payload = _run_preset_cli(
@@ -321,6 +396,8 @@ def test_preset_bridge_cli_maps_leg_and_records_provenance(tmp_path: Path):
         "mass_kg": 0.002,
         "schedule_id": "bridge_schedule",
         "geometry_id": "bridge_geometry",
+        "effective_exposed_area_m2": 0.000123,
+        "area_basis": "gram_lab_exposed_melt",
     }
     assert metadata["feedstock_id"] == "lunar_mare_low_ti"
     assert metadata["mass_kg"] == pytest.approx(0.002)
@@ -367,6 +444,7 @@ def test_preset_bridge_compare_mode_writes_json_and_markdown(tmp_path: Path):
     preset_path = _write_bridge_preset(
         tmp_path,
         feedstock_id="lunar_mare_low_ti",
+        exposed_melt_area_m2=0.000123,
         comparison_sidecar_path=sidecar_path,
     )
 
@@ -534,17 +612,14 @@ def test_preset_bridge_mass_balance_breach_marks_status_failed(
     preset_path = _write_bridge_preset(
         tmp_path,
         feedstock_id="lunar_mare_low_ti",
+        exposed_melt_area_m2=0.000123,
     )
     preset = runner_module._load_preset_run_spec(preset_path, "faithful")
     breached_pct = runner_module.RUNNER_MASS_BALANCE_LIMIT_PCT * 2.0
-    original_execute = runner_module.RunExecutor.execute
+    original_execute_session = runner_module.RunExecutor.execute_session
 
-    def execute_with_breach(self, config, *, worker_runtime=None):
-        execution = original_execute(
-            self,
-            config,
-            worker_runtime=worker_runtime,
-        )
+    def execute_session_with_breach(self, session, **kwargs):
+        execution = original_execute_session(self, session, **kwargs)
         assert execution.snapshots
         execution.snapshots[-1].mass_balance_error_pct = breached_pct
         per_hour = list(execution.per_hour)
@@ -554,8 +629,8 @@ def test_preset_bridge_mass_balance_breach_marks_status_failed(
 
     monkeypatch.setattr(
         runner_module.RunExecutor,
-        "execute",
-        execute_with_breach,
+        "execute_session",
+        execute_session_with_breach,
     )
 
     payload = PyrolysisRun(

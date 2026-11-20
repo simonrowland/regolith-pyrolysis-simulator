@@ -53,6 +53,8 @@ _FORMULAS_PRESSURE_DEPENDENT = frozenset({"poiseuille", "bk"})
 class TeststandRefusal(ValueError):
     """Typed refusal for an apparatus that cannot set chamber pressure."""
 
+    __test__ = False
+
     def __init__(
         self,
         code: str,

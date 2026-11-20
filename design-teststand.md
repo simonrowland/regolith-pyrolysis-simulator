@@ -62,7 +62,10 @@ declaration because a gram-scale reproduction has to say what was heated
 and what area faced the chamber. They do not appear in the gas balance.
 A null area is a typed omission. It is not replaced by a 1 g default or by
 an inferred pellet face. The existing gram-lab area bridge returns no area
-when the field is null; this note does not retune that bridge.
+when the field is null; this note does not retune that bridge. Applying
+equipment geometry refuses `exposed_melt_area_not_printed` instead of
+writing `size_crucible`'s face onto that melt. Preset load still accepts
+the empty bridge.
 
 An unprinted numeric field stays null with a `*_reason` string. Null is
 not coerced to 0. A required balance input that is null refuses with a
@@ -362,8 +365,11 @@ specified. The achieved-pressure schedule remains the runtime boundary.
 Implemented: the driver split, the schema fields, the steady solve
 (nominal pump or speed curve; series of certified elements), the analytic
 exponential for a pressure-independent `S_eff`, regime notices and typed
-refusals, the hour hook at `steady_state` with `dt_s=3600`, and the
-Robinot preset filled only with what the paper prints.
+refusals, the hour hook at `steady_state` with `dt_s=3600`, the Robinot
+preset filled only with what the paper prints, and the
+`exposed_melt_area_not_printed` refusal when equipment geometry would
+otherwise adopt `size_crucible`'s face for a gram-lab sample with no
+printed area.
 
 Left for a later chunk, each only when its input exists:
 

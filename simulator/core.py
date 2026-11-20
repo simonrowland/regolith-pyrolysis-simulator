@@ -16705,6 +16705,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             current_area_m2 <= 0.0
             or math.isclose(current_area_m2, 0.2, rel_tol=0.0, abs_tol=1e-12)
         ):
+            # condensation imports core at module level.
+            from simulator.condensation import (
+                refuse_sized_crucible_without_exposed_melt_area,
+            )
+
+            refuse_sized_crucible_without_exposed_melt_area(
+                self.setpoints.get('lab_geometry'),
+            )
             self.melt.melt_surface_area_m2 = crucible_area_m2
 
         pipe = self._equipment.pipe
