@@ -853,8 +853,9 @@ _SLOW_RTOL = 1.0e-12
 # sign-scan fallback walks 4096 points. Hour 21 of the canonical
 # lunar walk stayed inside one Radau call for 34 minutes. The caps
 # sit above a healthy hour plus one fallback scan, and they stop
-# that stall. A closed pipe below downstream does not spend them:
-# its accumulation is exact.
+# that stall. A closed pipe whose shut grids agree does not spend
+# them. A shut grid that stays apart uses the slow integral, and
+# these caps are the work cap on that path.
 _MAX_FLUX_EVALUATIONS = 250_000
 _MAX_INTEGRATOR_EVALUATIONS = 100_000
 
@@ -1438,6 +1439,19 @@ def _remember_sign_scan_fallback(law: _HeadspaceLaw, detail: str) -> None:
             "species": "headspace",
             "reason": "sign_scan_fallback",
             "detail": detail,
+        },
+    ))
+
+
+def _remember_shut_path(law: _HeadspaceLaw, path: str) -> None:
+    # One flag per hour. midpoint is the fast shut grid. radau_fallback
+    # is the slow integral after that grid stays apart. The snapshot
+    # already carries species notices, so the hour record is this notice.
+    law._remember_species_notices((
+        {
+            "species": "headspace",
+            "reason": "shut_path",
+            "detail": path,
         },
     ))
 
@@ -2057,8 +2071,8 @@ def _closed_pipe_accumulation(
     that extrapolation cross P_down, and an 8-step grid does too,
     while the hour integral stays shut. Those attempts use a finer
     RK4, then implicit midpoint, instead of the slow solver. A shut
-    grid that still disagrees at the last spacing is a work-cap
-    refusal. A grid that opens the pipe returns None.
+    grid that still disagrees at the last spacing falls through to
+    that integral. A grid that opens the pipe returns None.
     Unit check: mol/s * s = mol, and mol * R * T / V = Pa.
     Limit: q = 0 leaves the opening holdup. P_down = 0 is open at
     every positive pressure, so this returns None. A sealed cap with
@@ -2297,9 +2311,9 @@ def _closed_pipe_midpoint(
     Limit: a step that would open the pipe, or a fixed point that
     does not settle in 80 passes, rejects that spacing. Two shut
     grids within 1e-6 Pa publish the finer one. 64 steps is the
-    last spacing. A shut grid that is still apart there refuses
-    with the work cap. Falling through to Radau on a pipe that
-    never opened is the unbounded hour. A spacing sequence that
+    last spacing. A shut grid that is still apart there is not
+    the authority: the slow integral publishes, and only that
+    integral's evaluation caps refuse. A spacing sequence that
     never stays shut returns None, and the open-pipe solver runs.
     """
 
@@ -2399,6 +2413,7 @@ def _closed_pipe_midpoint(
             continue
         saw_shut = True
         if previous is not None and gap_pa(previous, current) <= DEFAULT_ABS_TOL_PA:
+            _remember_shut_path(law, "midpoint")
             return law.step_from_moles(
                 n0,
                 dt_s,
@@ -2413,12 +2428,14 @@ def _closed_pipe_midpoint(
             )
         previous = current
         steps *= 2
-    # The pipe stayed shut on a grid and the two finest still
-    # differ by more than 1e-6 Pa. Radau on that trajectory is the
-    # hour that ran for tens of minutes. The open-pipe solver is
-    # only for a sequence that never stayed shut.
+    # The pipe stayed shut on a grid and no pair agreed within
+    # 1e-6 Pa. The grid is the fast path. The slow integral is
+    # bounded by the flux cap and the integrator cap, and those
+    # are the only work-cap refusals. A sequence that never stayed
+    # shut returns None, and the open-pipe solver runs.
     if saw_shut:
-        raise _BalanceRefused("headspace_balance_work_cap")
+        _remember_shut_path(law, "radau_fallback")
+        return _slow_converge(law, n0, dt_s)
     return None
 
 

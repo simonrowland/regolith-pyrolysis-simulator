@@ -3692,10 +3692,12 @@ def test_negative_bleed_above_the_gate_refuses_and_inside_rewrites():
     assert extra["O2"] == pytest.approx(0.5e-6, rel=1.0e-12)
 
 
-def test_shut_grid_that_stays_apart_refuses_the_work_cap():
-    # A shut grid whose last pair still disagrees must not fall
-    # through to Radau. Deleting the raise returns None.
-    built = capacity_coupling._build_law(
+def _apart_shut_law():
+    # Downstream sits above the opening holdup, so the real pipe is
+    # shut. The gap callback reports every pair as 1 Pa apart, so the
+    # grid cannot publish. The flux is zero: the fall-through integral
+    # is the opening inventory.
+    return capacity_coupling._build_law(
         pre_holdup_mol={"O2": 1.0e-6},
         molar_mass_kg_mol={"O2": _o2_molar_mass_kg()},
         flux_kg_hr_at_partials=lambda _partials: {"O2": 0.0},
@@ -3703,20 +3705,135 @@ def test_shut_grid_that_stays_apart_refuses_the_work_cap():
         temperature_K=_HS_T_K,
         volume_m3=_HS_V_M3,
         dt_hr=1.0,
-        downstream_pressure_Pa=0.0,
+        downstream_pressure_Pa=100.0,
         pipe_diameter_m=_HS_D_M,
         pipe_length_m=_HS_L_M,
         outflow_cap_kg_s=None,
         redox_source_mol_s=None,
     )
+
+
+def _apart_grid(law, n0):
+    return capacity_coupling._closed_pipe_midpoint(
+        law,
+        n0,
+        3600.0,
+        lambda _amount: {name: 0.0 for name in law.species},
+        lambda _previous, _current: 1.0,
+    )
+
+
+def test_shut_grid_that_stays_apart_refuses_the_work_cap():
+    # The grid is not the authority. A pair the gap holds 1 Pa apart
+    # falls through and publishes the opening inventory. The integrator
+    # cap is what still refuses: the grid does not call it, and the
+    # first fall-through evaluation is already over a cap of 0.
+    built = _apart_shut_law()
     assert not isinstance(built, CapacityShadowRefusal)
     law, n0 = built
-    with pytest.raises(capacity_coupling._BalanceRefused) as caught:
-        capacity_coupling._closed_pipe_midpoint(
-            law,
-            n0,
-            3600.0,
-            lambda _amount: {name: 0.0 for name in law.species},
-            lambda _previous, _current: 1.0,
-        )
+    step = _apart_grid(law, n0)
+    pa_per_mol = GAS_CONSTANT * _HS_T_K / _HS_V_M3
+    inventory_pa = n0["O2"] * pa_per_mol
+    assert step.pressure_Pa == pytest.approx(inventory_pa, abs=1.0e-6)
+    assert step.partials["O2"] == pytest.approx(inventory_pa, abs=1.0e-6)
+    assert abs(step.bled_mol["O2"]) * pa_per_mol <= 1.0e-6
+    assert abs(step.moles["O2"] - n0["O2"]) * pa_per_mol <= 1.0e-6
+    paths = [
+        notice
+        for notice in law.species_notices.values()
+        if notice.get("reason") == "shut_path"
+    ]
+    assert [notice["detail"] for notice in paths] == ["radau_fallback"]
+
+    capped = _apart_shut_law()
+    assert not isinstance(capped, CapacityShadowRefusal)
+    cap_law, cap_n0 = capped
+    with patch.object(capacity_coupling, "_MAX_INTEGRATOR_EVALUATIONS", 0):
+        with pytest.raises(capacity_coupling._BalanceRefused) as caught:
+            _apart_grid(cap_law, cap_n0)
     assert caught.value.reason == "headspace_balance_work_cap"
+
+
+def test_shut_grid_fallthrough_flux_cap_refuses():
+    # The flux cap is the other hard stop. The apart grid uses the
+    # injected rate and does not call the flux. The fall-through's
+    # first flux evaluation is already over a cap of 0.
+    built = _apart_shut_law()
+    assert not isinstance(built, CapacityShadowRefusal)
+    law, n0 = built
+    with patch.object(capacity_coupling, "_MAX_FLUX_EVALUATIONS", 0):
+        with pytest.raises(capacity_coupling._BalanceRefused) as caught:
+            _apart_grid(law, n0)
+    assert caught.value.reason == "headspace_balance_work_cap"
+
+
+def test_shut_fill_steeper_than_inverse_pressure_falls_through():
+    # dP/dt = K / P^2 stays shut and is not the 1/P identity the
+    # midpoint integrates in one step. The separated integral is the
+    # oracle. A 64-step midpoint is still about 5e-5 Pa high here,
+    # so publishing that grid would miss this gate.
+    # Premise: P^2 dP = K dt, so (P_end^3 - P0^3) / 3 = K t.
+    # Algebra: K = (90^3 - 64^3) / (3 * 3600), P_end = 90 Pa.
+    # The opening hour-step is K*3600/P0^2. That line crosses the
+    # 100 Pa downstream; the integral does not.
+    # Unit check: Pa^3 / s * s / Pa^2 = Pa.
+    # Limit: K = 0 leaves 64 Pa. A trajectory that crosses 100 Pa
+    # is not this grid.
+    opening_pa = 64.0
+    downstream_pa = 100.0
+    end_pa = 90.0
+    mass = _o2_molar_mass_kg()
+    pa_per_mol = GAS_CONSTANT * _HS_T_K / _HS_V_M3
+    k_pa3_s = (end_pa ** 3 - opening_pa ** 3) / (3.0 * 3600.0)
+    scale_kg_h = k_pa3_s * mass * 3600.0 / pa_per_mol
+    oracle_pa = (opening_pa ** 3 + 3.0 * k_pa3_s * 3600.0) ** (1.0 / 3.0)
+    euler_pa = opening_pa + k_pa3_s * 3600.0 / (opening_pa ** 2)
+    assert euler_pa > downstream_pa
+    assert opening_pa < oracle_pa < downstream_pa
+
+    def flux(partials: dict[str, float]) -> dict[str, float]:
+        total = math.fsum(partials.values())
+        if total < 1.0e-6:
+            total = 1.0e-6
+        return {"O2": scale_kg_h / (total * total)}
+
+    n0 = opening_pa / pa_per_mol
+    result = _as_result(
+        _commit_o2(
+            n0 * mass,
+            0.0,
+            1.0,
+            flux=flux,
+            downstream_pa=downstream_pa,
+        )
+    )
+    assert result.partial_pressures_Pa["O2"] == pytest.approx(
+        oracle_pa,
+        abs=1.0e-6,
+    )
+    assert result.bled_species_mol["O2"] == pytest.approx(0.0, abs=0.0)
+    assert result.saturation.pipe == 0.0
+    assert result.mass_closure_error_pct <= 5.0e-12
+    paths = [
+        notice
+        for notice in result.species_notices
+        if notice.get("reason") == "shut_path"
+    ]
+    assert [notice["detail"] for notice in paths] == ["radau_fallback"]
+    # Q is 0 at the published partial. The net is the fill rate
+    # K/P^2, not a closed root.
+    end_pa_published = result.partial_pressures_Pa["O2"]
+    outflow = pipe_species_outflow_mol_s(
+        end_pa_published,
+        downstream_pa,
+        _HS_T_K,
+        {"O2": end_pa_published / pa_per_mol},
+        _HS_D_M,
+        _HS_L_M,
+        molar_mass_kg_mol={"O2": mass},
+    )
+    assert float(outflow.species_mol_s["O2"]) == 0.0
+    rate_mol_s = flux({"O2": end_pa_published})["O2"] / mass / 3600.0
+    net_pa_h = rate_mol_s * pa_per_mol * 3600.0
+    fill_pa_h = k_pa3_s / (oracle_pa ** 2) * 3600.0
+    assert net_pa_h == pytest.approx(fill_pa_h, rel=1.0e-8)
