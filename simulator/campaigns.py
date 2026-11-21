@@ -37,7 +37,7 @@ from simulator.lab_schedule import (
     pO2_setpoint_mbar_from_schedule,
     schedule_sample_time_h,
 )
-from simulator.process_timestep import advance_hour_counter
+from simulator.process_timestep import PROCESS_HOUR_S, advance_hour_counter
 from simulator.furnace_materials import (
     FURNACE_CEILING_FALLBACK_C,
     FURNACE_MAX_T_BOUNDS_C,
@@ -45,6 +45,10 @@ from simulator.furnace_materials import (
     setpoints_furnace_ceiling_C,
 )
 from simulator.recipe_errors import MalformedRecipeError
+from simulator.thermal_budget import (
+    FURNACE_POWER_DRIVER_KEY,
+    melt_temperature_from_furnace_power,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.recipe import (
     C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
@@ -2405,6 +2409,31 @@ class CampaignManager:
         """
         result = self._get_base_temp_target(campaign, campaign_hour, melt)
         target_T, ramp_rate = self._apply_ramp_override(campaign, result[0], result[1])
+        # A power-driven target is the energy balance, not a schedule
+        # setpoint. The furnace clamp and the C0 forecast cap would pin
+        # every power level to the same ceiling. Flags record the
+        # exceedance; the solved temperature is what the step applies.
+        power_step = self.__dict__.get("_power_temperature_for_step")
+        if power_step is not None:
+            if target_T is None or not math.isfinite(float(target_T)):
+                raise ValueError(
+                    'campaign temperature target must be finite; '
+                    f'got {target_T!r}'
+                )
+            requested = float(target_T)
+            lab_schedule = self._lab_schedule(campaign)
+            ceiling = None
+            if lab_schedule is not None and "furnace_ceiling_C" in lab_schedule:
+                ceiling = float(lab_schedule["furnace_ceiling_C"])
+            annotated = dict(power_step)
+            annotated["exceeds_furnace_ceiling"] = (
+                ceiling is not None and requested > ceiling
+            )
+            annotated["exceeds_furnace_max"] = (
+                requested > float(self.furnace_max_T_C)
+            )
+            self._power_temperature_for_step = annotated
+            return (requested, ramp_rate)
         if campaign == CampaignPhase.C0:
             prediction = self.c0_exit_prediction
             predicted_exit_C = (
@@ -2439,6 +2468,8 @@ class CampaignManager:
                                campaign_hour: int,
                                melt: MeltState) -> Tuple[Optional[float], float]:
         """Base temperature targets before runtime overrides."""
+        if "_power_temperature_for_step" in self.__dict__:
+            del self._power_temperature_for_step
         lab_schedule = self._lab_schedule(campaign)
         if lab_schedule is not None:
             sample_time_h = schedule_sample_time_h(
@@ -2446,6 +2477,19 @@ class CampaignManager:
                 campaign_hour,
                 dt_h=self._process_dt_h,
             )
+            if FURNACE_POWER_DRIVER_KEY in lab_schedule:
+                # Present means this driver is the furnace. Do not fall
+                # back to the melt_temperature_C series.
+                record = melt_temperature_from_furnace_power(
+                    lab_schedule[FURNACE_POWER_DRIVER_KEY],
+                    time_s=float(sample_time_h) * float(PROCESS_HOUR_S),
+                    previous_temperature_C=float(melt.temperature_C),
+                    dt_s=float(self._process_dt_h) * float(PROCESS_HOUR_S),
+                    live_mass_kg=melt.total_mass_kg,
+                )
+                self._power_temperature_for_step = record
+                target = float(record["temperature_C"])
+                return (target, abs(target - float(melt.temperature_C)))
             target = interpolate_schedule_points(
                 lab_schedule['melt_temperature_C'],
                 sample_time_h,
