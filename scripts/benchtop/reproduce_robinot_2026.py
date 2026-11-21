@@ -607,12 +607,15 @@ def _temperature_records(
         float(step["t"]): step["melt_temperature_C"]
         for step in run_data["per_step"]
     }
+    power_records_by_time: dict[float, Mapping[str, Any]] = {}
+    for record in run_data["power_temperature_records"]:
+        if record.get("temperature_C") is not None:
+            # Endpoint checks can request the same target again; the first
+            # value is the one applied by the process step.
+            power_records_by_time.setdefault(float(record["time_min"]), record)
     result = []
-    for power_record in run_data["power_temperature_records"]:
-        temperature = power_record.get("temperature_C")
-        if temperature is None:
-            continue
-        time_min = float(power_record["time_min"])
+    for time_min, power_record in sorted(power_records_by_time.items()):
+        temperature = power_record["temperature_C"]
         flags = ["prediction_not_observation"]
         if power_record.get("exceeds_furnace_ceiling"):
             flags.append("exceeds_furnace_ceiling")

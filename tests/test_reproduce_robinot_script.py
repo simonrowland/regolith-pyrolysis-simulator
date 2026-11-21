@@ -46,3 +46,11 @@ def test_truncated_three_step_run_emits_comparison_record_schema() -> None:
         "robinot_pyrometer_peak_temperature_C",
     }
     assert all(isinstance(record["flags"], list) for record in records)
+    temperature_records = [
+        record
+        for record in records
+        if record["observable"] == "predicted_melt_temperature_C"
+    ]
+    temperature_times = [record["t"] for record in temperature_records]
+    assert len(temperature_times) == 3
+    assert len(temperature_times) == len(set(temperature_times))
