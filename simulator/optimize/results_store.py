@@ -1289,6 +1289,8 @@ def _serialize_eval_spec(eval_spec: EvalSpec) -> dict[str, Any]:
         payload.pop("vapor_pressure_fallback_provider_id", None)
     if not eval_spec.stop_at_stage0_exit:
         payload.pop("stop_at_stage0_exit", None)
+    if not eval_spec.until_campaign_complete:
+        payload.pop("until_campaign_complete", None)
     return payload
 
 

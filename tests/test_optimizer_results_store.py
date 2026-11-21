@@ -37,8 +37,10 @@ from simulator.optimize.results_store import (
     ResultStoreWriteRejected,
     SCHEMA_VERSION,
     _deserialize_margins,
+    _deserialize_eval_spec,
     _serialize_objectives,
     _serialize_margins,
+    _serialize_eval_spec,
     grounded_result_feasible,
     reground_scored_result,
 )
@@ -82,6 +84,19 @@ def _base_spec(**overrides: object) -> EvalSpec:
     }
     data.update(overrides)
     return EvalSpec(**data)
+
+
+def test_eval_spec_store_serialization_omits_false_campaign_completion():
+    bounded = _base_spec(until_campaign_complete=False)
+    bounded_payload = _serialize_eval_spec(bounded)
+
+    assert "until_campaign_complete" not in bounded_payload
+    assert _deserialize_eval_spec(bounded_payload).until_campaign_complete is False
+
+    complete = _base_spec(until_campaign_complete=True)
+    complete_payload = _serialize_eval_spec(complete)
+    assert complete_payload["until_campaign_complete"] is True
+    assert _deserialize_eval_spec(complete_payload).until_campaign_complete is True
 
 
 def _margin(

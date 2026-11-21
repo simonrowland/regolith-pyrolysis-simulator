@@ -10,6 +10,7 @@ from engines.builtin.condensation_route import BuiltinCondensationRouteProvider
 from engines.builtin.evaporation_transition import (
     BuiltinEvaporationTransitionProvider,
 )
+from simulator.account_ids import MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
@@ -180,6 +181,9 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
     terminal_chromia = sim.atom_ledger.kg_by_account(
         "terminal.chromium_condensed_oxide_stored"
     )
+    mn_cartridge = sim.atom_ledger.kg_by_account(
+        MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
+    )
     train = sim.atom_ledger.kg_by_account("process.condensation_train")
     stages = [stage.collected_kg for stage in sim.train.stages]
     later_stages = [
@@ -197,8 +201,14 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
     # duplicating atoms.
     assert terminal_chromia.get("Cr2O3", 0.0) > 0.0
     assert "Cr2O3" not in train
+    # Stage 2 remains the designated Cr harvester. During the inclusive hour
+    # 12 Mn-cartridge window, later Stage-3 chromia is deliberately credited
+    # to the removable cartridge, so the aggregate need not sit on Stage 2.
+    assert stages[2].get("Cr2O3", 0.0) > 0.0
+    assert mn_cartridge.get("Cr2O3", 0.0) > 0.0
+    assert "O2" not in mn_cartridge
     assert sum(float(stage.get("Cr2O3", 0.0)) for stage in stages) == pytest.approx(
-        terminal_chromia["Cr2O3"]
+        terminal_chromia["Cr2O3"] + mn_cartridge["Cr2O3"]
     )
     # CrO2 reacts into chromia, but elemental Cr is below wall saturation.
     assert stages[2].get("Cr", 0.0) == 0.0

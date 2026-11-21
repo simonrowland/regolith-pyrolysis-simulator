@@ -377,12 +377,11 @@ def test_rekey_migration_round_trip_and_idempotency(
     _sample_config(tmp_path, monkeypatch)
     db_path = tmp_path / "cache.sqlite"
     legacy_version = "alphaMELTS subprocess (/opt/alphamelts2)"
-    # VR-3 (be07c4d5) retired the June redox-v3 corpus: optimizer identity
-    # dropped data/provider fingerprints and bumped corpus_version to
-    # analytical-corpus-2026-07-31-vapour-rail-key-v2, declared
-    # non-interoperable with prior epochs. Rekey only accepts an
-    # interoperable target; the old June string is a refused epoch, not a
-    # migration destination.
+    # VR-3 (be07c4d5) retired the June redox-v3 corpus after dropping
+    # data/provider fingerprints from optimizer identity. R13 retires that
+    # epoch too because campaign-completion mode now separates EvalSpec keys.
+    # Rekey only accepts an interoperable target; the old June string is a
+    # refused epoch, not a migration destination.
     target = current_corpus_version()
     key = {
         "schema_version": "test",

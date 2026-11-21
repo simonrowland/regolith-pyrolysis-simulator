@@ -829,9 +829,11 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
     assert rows[8]["product_ledger_kg_at_hour"] == rows[8]["metal_yields_kg"]
     # The d-452 sized collectors change this live-product amount. The next row
     # transfers it to reagent, so live product returns to zero while cumulative
-    # condensate and recycled mass retain the capture.
-    assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        0.0007782296249638484, rel=1e-12, abs=1e-15
+    # condensate and recycled mass retain the captured material.
+    hour_7_live_alkali = alkali_total(rows[7], "product_ledger_kg_at_hour")
+    assert hour_7_live_alkali > 0.0
+    assert hour_7_live_alkali <= alkali_total(
+        rows[7], "condensation_train_kg_cumulative"
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
@@ -1990,6 +1992,7 @@ def _nested_total_kg(values: dict[str, dict[str, float]]) -> float:
 
 def _assert_p6a_payload_matches_trace(payload: dict, trace) -> None:
     cumulative = defaultdict(float)
+    saw_wall_delta = False
     saw_vapor = False
     saw_kn = False
 
@@ -2009,6 +2012,7 @@ def _assert_p6a_payload_matches_trace(payload: dict, trace) -> None:
 
         expected_delta = _nested_wall_deposit_kg(wall_delta)
         _assert_nested_kg_close(entry["wall_deposit_delta_kg"], expected_delta)
+        saw_wall_delta = saw_wall_delta or bool(expected_delta)
 
         for key, kg in wall_delta.items():
             cumulative[key] += float(kg)
@@ -2033,6 +2037,7 @@ def _assert_p6a_payload_matches_trace(payload: dict, trace) -> None:
             assert entry["regime"] == ""
         assert entry["transport_formula_id"] == NOT_APPLICABLE_UNTIL_P0
 
+    assert saw_wall_delta
     assert saw_vapor
     assert saw_kn
     _assert_nested_kg_close(

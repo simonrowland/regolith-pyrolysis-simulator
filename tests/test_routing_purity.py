@@ -628,8 +628,10 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
         )
     na_key, na_record = _extrapolated_record_at(route, 'Na', 523.15)
     k_key, k_record = _extrapolated_record_at(route, 'K', 313.15)
-    assert na_key.startswith('Na#')
-    assert k_key.startswith('K#')
+    assert na_key == 'Na#67'
+    # The d-452 Stage-3 band scan records one additional distinct K
+    # extrapolation before the cold-wall record, shifting this list index.
+    assert k_key == 'K#68'
     assert 'Na#wall:523.15' not in route.antoine_extrapolations
     assert 'K#wall:313.15' not in route.antoine_extrapolations
     assert tuple(na_record['valid_range_K']) == (924.0, 1118.0)

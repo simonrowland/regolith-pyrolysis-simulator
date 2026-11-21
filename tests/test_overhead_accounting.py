@@ -957,10 +957,13 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account():
         cro2_kg = sim.atom_ledger.kg_by_account(account).get("CrO2", 0.0)
         if cro2_kg > 0.0:
             wall_cro2_by_account_kg[account] = cro2_kg
-    # Resized collectors can capture CrO2 before a downstream duct wall; keep
-    # the causal wall-attribution contract without pinning the old two-wall
-    # split from the smaller collector geometry.
-    assert wall_cro2_by_account_kg
+    # CrO2 reaches the two physical walls upstream of its designated Stage-2
+    # harvester. The resized train changes the per-wall amount, while the
+    # causal segment ownership remains the same.
+    assert set(wall_cro2_by_account_kg) == {
+        "process.wall_deposit_segment_stage_0_to_stage_1",
+        "process.wall_deposit_segment_stage_1_to_stage_2",
+    }
     assert all(value > 0.0 for value in wall_cro2_by_account_kg.values())
     remaining_cro2_kg = flux.species_kg_hr["CrO2"] - sum(
         wall_cro2_by_account_kg.values()
