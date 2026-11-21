@@ -85,6 +85,7 @@ from simulator.battery.enums import (
     QuenchState,
     QuotedTargetKind,
     Quantity,
+    RelativeSeriesUnavailableReason,
     ReferenceStateConvention,
     Rail,
     RefusalReason,
@@ -199,6 +200,11 @@ from simulator.battery.records import (
     Residual,
     ResidualNumeric,
     ResidualRefusal,
+    RelativeSeriesAnchor,
+    RelativeSeriesClock,
+    RelativeSeriesComparison,
+    RelativeSeriesEvidence,
+    RelativeSeriesPoint,
     State,
     Uncertainty,
     Value,
@@ -255,7 +261,6 @@ from simulator.battery.score_metrics import (
     metric_operation_for_identity,
     populate_numeric,
 )
-import simulator.battery.score_metrics as _score_metrics
 from simulator.transport_regime import KnudsenRegime, high_edge_knudsen_clause
 from simulator.melt_backend.base import (
     MULTIVALENT_MELT_ELEMENTS,
@@ -16900,52 +16905,90 @@ def _is_selected_condition_observation(
 
 
 def _score_relative_qms_series(
-    observed_series: Sequence[_score_metrics.RelativeSeriesPoint],
-    model_series: Sequence[_score_metrics.RelativeSeriesPoint],
-    anchor: _score_metrics.RelativeSeriesAnchor,
-    clock: _score_metrics.RelativeSeriesClock,
-    evidence: _score_metrics.RelativeSeriesEvidence,
+    observed_series: Sequence[RelativeSeriesPoint],
+    model_series: Sequence[RelativeSeriesPoint],
+    anchor: RelativeSeriesAnchor,
+    clock: RelativeSeriesClock,
+    evidence: RelativeSeriesEvidence,
     *,
     context: ScoreContext,
     reference: Observation,
-) -> _score_metrics.RelativeSeriesComparison:
-    """Apply the existing oxygen independence guard before pure QMS scoring."""
+    source_trace: Observation,
+) -> RelativeSeriesComparison:
+    """Bind trace and model oxygen inputs before the pure series comparator."""
+
+    from simulator.battery.score_metrics import relative_channel_point_residuals
+
+    def unavailable(reason: RelativeSeriesUnavailableReason) -> RelativeSeriesComparison:
+        return RelativeSeriesComparison(unavailable_reason=reason)
 
     if evidence.target_species in {"O", "O2"}:
         rows = tuple(context.observations.values())
+        if (
+            context.observations.get(reference.observation_id) != reference
+            or not isinstance(reference.identity, Identity)
+            or reference.source_id is None
+        ):
+            return unavailable(RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN)
+        if (
+            context.observations.get(source_trace.observation_id) != source_trace
+            or source_trace.source_id != reference.source_id
+            or source_trace.experiment_id != reference.experiment_id
+            or {point.run_id for point in observed_series} != {source_trace.experiment_id}
+            or any(
+                point.observation_id != source_trace.observation_id
+                for point in observed_series
+            )
+            or not isinstance(source_trace.identity, Identity)
+            or quantity_token(source_trace.identity) is not Quantity.ION_INTENSITY
+            or source_trace.identity.species is None
+            or source_trace.identity.species.formula != evidence.target_species
+        ):
+            return unavailable(RelativeSeriesUnavailableReason.SOURCE_TRACE_UNAVAILABLE)
+
         experiment = context.experiments.get(reference.experiment_id)
         if experiment is None:
-            return _score_metrics.RelativeSeriesComparison(
-                unavailable=_score_metrics.RelativeSeriesUnavailable(
-                    _score_metrics.RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
-                )
-            )
+            return unavailable(RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN)
         bench = _bench_for_score(experiment, context.benches)
-        oxygen = resolve_source_oxygen(reference, rows, bench)
-        for source_point in observed_series:
-            source_observation = (
-                None
-                if source_point.observation_id is None
-                else context.observations.get(source_point.observation_id)
-            )
-            if source_observation is None:
-                return _score_metrics.RelativeSeriesComparison(
-                    unavailable=_score_metrics.RelativeSeriesUnavailable(
-                        _score_metrics.RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
-                    )
+        model_inputs = evidence.model_oxygen_input_observation_ids
+        if (
+            evidence.model_run_id is None
+            or {point.run_id for point in model_series} != {evidence.model_run_id}
+            or model_inputs is None
+            or any(item not in context.observations for item in model_inputs)
+            or len(set(model_inputs)) != len(model_inputs)
+        ):
+            return unavailable(RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE)
+
+        if _has_printed_fo2(reference, reference.identity):
+            if source_trace.observation_id in model_inputs:
+                return unavailable(RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT)
+            if model_inputs:
+                return unavailable(
+                    RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
                 )
-            if _printed_fo2_names_observation(source_observation) or (
-                isinstance(oxygen, SourceOxygenCondition)
-                and _is_selected_condition_observation(source_observation, oxygen)
-            ):
-                evidence = replace(evidence, oxygen_independent=False)
-                break
+            independent = not _printed_fo2_names_observation(source_trace)
         else:
-            evidence = replace(
-                evidence,
-                oxygen_independent=evidence.oxygen_independent is not False,
+            oxygen = resolve_source_oxygen(reference, rows, bench)
+            if not isinstance(oxygen, SourceOxygenCondition):
+                return unavailable(RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN)
+            independent = not (
+                source_trace.observation_id in model_inputs
+                or _is_selected_condition_observation(source_trace, oxygen)
+                or _printed_fo2_names_observation(source_trace)
             )
-    return _score_metrics.relative_channel_point_residuals(
+            if not independent:
+                evidence = replace(evidence, oxygen_independent=False)
+                return relative_channel_point_residuals(
+                    observed_series, model_series, anchor, clock, evidence
+                )
+            if set(model_inputs) != set(oxygen.used_observations):
+                return unavailable(
+                    RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
+                )
+        evidence = replace(evidence, oxygen_independent=independent)
+
+    return relative_channel_point_residuals(
         observed_series, model_series, anchor, clock, evidence
     )
 

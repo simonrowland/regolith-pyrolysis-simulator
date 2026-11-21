@@ -243,7 +243,7 @@ def test_de_maria_binding_and_costa_migration_leave_published_pressures_unchange
 ) -> None:
     demaria, demaria_series = published_pressure_rows["kems-022-demaria-1971"]
     demaria_count = 0
-    for _prefix, (expected, actual, demaria_rows) in demaria_series.items():
+    for prefix, (expected, actual, demaria_rows) in demaria_series.items():
         assert len(demaria_rows) == len(expected)
         experiment = demaria.experiments[demaria_rows[0].experiment_id]
         assert experiment.apparatus is not None
@@ -256,8 +256,10 @@ def test_de_maria_binding_and_costa_migration_leave_published_pressures_unchange
             _has_ungrounded_kems_partial_pressure_calibration(row, before_binding)
             for row in demaria_rows
         )
+        grounded = prefix != "demaria_1971_o_atomic_psat_table5"
         assert all(
-            not _has_ungrounded_kems_partial_pressure_calibration(row, experiment)
+            _has_ungrounded_kems_partial_pressure_calibration(row, experiment)
+            == (not grounded)
             for row in demaria_rows
         )
         assert {
@@ -275,6 +277,19 @@ def test_de_maria_binding_and_costa_migration_leave_published_pressures_unchange
         "demaria_1971_al2o_psat_table4": 14,
         "demaria_1971_alo_psat_table4": 6,
         "demaria_1971_o_atomic_psat_table5": 13,
+    }
+    assert {
+        prefix: sum(
+            not _has_ungrounded_kems_partial_pressure_calibration(
+                row, demaria.experiments[row.experiment_id]
+            )
+            for row in rows
+        )
+        for prefix, (_expected, _actual, rows) in demaria_series.items()
+    } == {
+        "demaria_1971_al2o_psat_table4": 14,
+        "demaria_1971_alo_psat_table4": 6,
+        "demaria_1971_o_atomic_psat_table5": 0,
     }
 
     costa, costa_series = published_pressure_rows["kems-007-costa-2015"]

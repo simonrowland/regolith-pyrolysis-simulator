@@ -6,14 +6,21 @@ import math
 
 import pytest
 
-from simulator.battery.enums import Quantity, UncertaintyKind, ValueKind
-from simulator.battery.records import Uncertainty, Value
-from simulator.battery.score_metrics import (
+from simulator.battery.enums import (
+    Quantity,
+    RelativeSeriesUnavailableReason,
+    UncertaintyKind,
+    ValueKind,
+)
+from simulator.battery.records import (
     RelativeSeriesAnchor,
     RelativeSeriesClock,
     RelativeSeriesEvidence,
     RelativeSeriesPoint,
-    RelativeSeriesUnavailableReason,
+    Uncertainty,
+    Value,
+)
+from simulator.battery.score_metrics import (
     relative_channel_point_residuals,
 )
 from tests.battery import factories as F
@@ -84,6 +91,8 @@ def _inputs():
         response_proportional_over_interval=True,
         locator=F.loc(page=1),
         oxygen_independent=True,
+        model_run_id="model-run",
+        model_oxygen_input_observation_ids=(),
     )
     return observed, model, anchor, clock, evidence
 
@@ -114,8 +123,8 @@ def test_constant_current_multiplier_cancels_after_eligible_anchor_normalization
         clock,
         evidence,
     )
-    assert original.unavailable is None
-    assert scaled.unavailable is None
+    assert original.unavailable_reason is None
+    assert scaled.unavailable_reason is None
     assert tuple(row.residual_dex for row in original.points) == tuple(
         row.residual_dex for row in scaled.points
     )
@@ -130,7 +139,7 @@ def test_matching_normalized_traces_have_zero_residuals():
     result = relative_channel_point_residuals(
         observed, model, anchor, clock, evidence
     )
-    assert result.unavailable is None
+    assert result.unavailable_reason is None
     assert tuple(row.residual_dex for row in result.points) == (
         Decimal(0), Decimal(0), Decimal(0)
     )
@@ -225,8 +234,7 @@ def test_unproven_relative_series_is_typed_unavailable(change, reason):
     result = relative_channel_point_residuals(
         observed, model, anchor, clock, evidence
     )
-    assert result.unavailable is not None
-    assert result.unavailable.reason is reason
+    assert result.unavailable_reason is reason
     assert result.points == ()
 
 
@@ -236,7 +244,7 @@ def test_unmatched_observed_point_is_unavailable_without_interpolation():
     result = relative_channel_point_residuals(
         observed, model, anchor, clock, evidence
     )
-    assert result.unavailable is None
+    assert result.unavailable_reason is None
     assert result.points[-1].residual_dex is None
     assert result.points[-1].unavailable_reason is (
         RelativeSeriesUnavailableReason.MODEL_POINT_MISSING
@@ -262,7 +270,7 @@ def test_nonpositive_or_censored_datum_is_typed_unavailable_per_point():
     result = relative_channel_point_residuals(
         observed, model, anchor, clock, evidence
     )
-    assert result.unavailable is None
+    assert result.unavailable_reason is None
     assert result.points[1].unavailable_reason is (
         RelativeSeriesUnavailableReason.SOURCE_VALUE_NOT_POSITIVE_POINT
     )
@@ -280,8 +288,7 @@ def test_relative_channel_contract_rejects_flux_or_mixed_source_runs():
         clock,
         replace(evidence, model_quantity=Quantity.EVAPORATION_RATE),
     )
-    assert wrong_model_quantity.unavailable is not None
-    assert wrong_model_quantity.unavailable.reason is (
+    assert wrong_model_quantity.unavailable_reason is (
         RelativeSeriesUnavailableReason.QUANTITY_UNSUPPORTED
     )
 
@@ -292,7 +299,6 @@ def test_relative_channel_contract_rejects_flux_or_mixed_source_runs():
         clock,
         evidence,
     )
-    assert mixed_runs.unavailable is not None
-    assert mixed_runs.unavailable.reason is (
+    assert mixed_runs.unavailable_reason is (
         RelativeSeriesUnavailableReason.MIXED_SOURCE_RUNS
     )

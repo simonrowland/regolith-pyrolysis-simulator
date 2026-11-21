@@ -34,7 +34,7 @@ def test_demaria_qms_calibration_migrates_with_scoped_located_fields() -> None:
         "sensitivity_factor@all_species",
         "sensitivity_factor_units@all_species",
         "cross_section_source@all_species",
-        "fragment_correction_state@all_species",
+        "fragment_correction_state@species=O",
         "fragment_correction_state@species=O2",
         "pressure_uncertainty@all_species",
     }
@@ -55,16 +55,21 @@ def test_demaria_qms_calibration_migrates_with_scoped_located_fields() -> None:
     assert silver.locator.pdf_page_index == 1
 
     oxygen = calibration["standard@species=O2"]
-    assert oxygen.state.is_value
-    assert "Brix and Herzberg 1954" in str(oxygen.state.value)
+    assert oxygen.state.is_unknown
+    assert "whenever possible" in str(oxygen.state.reason)
+    assert "satisfactory at high temperatures" in str(oxygen.state.reason)
+    assert "less reliable at lower temperatures" in str(oxygen.state.reason)
     assert oxygen.locator is not None
     assert oxygen.locator.page == 2
+    assert oxygen.locator.published_page == 1368
     assert oxygen.locator.pdf_page_index == 1
     atomic_oxygen = calibration["standard@species=O"]
-    assert atomic_oxygen.state.is_value
-    assert "O+/O2+ intensity ratio" in str(atomic_oxygen.state.value)
+    assert atomic_oxygen.state.is_unknown
+    assert "whenever possible" in str(atomic_oxygen.state.reason)
     assert atomic_oxygen.locator is not None
+    assert "O+/O2+ intensity ratio" in str(atomic_oxygen.locator.paragraph)
     assert atomic_oxygen.locator.page == 2
+    assert atomic_oxygen.locator.published_page == 1368
     assert atomic_oxygen.locator.pdf_page_index == 1
 
     factor = calibration["sensitivity_factor@all_species"]
@@ -83,12 +88,16 @@ def test_demaria_qms_calibration_migrates_with_scoped_located_fields() -> None:
     method = calibration["method@all_species"]
     assert method.state.is_value
     assert "P = I_i^+ T / (S sigma gamma a_i)" in str(method.state.value)
-    fragment = calibration["fragment_correction_state@all_species"]
-    assert fragment.state.is_value
-    assert "applied" in str(fragment.state.value)
-    oxygen_fragment = calibration["fragment_correction_state@species=O2"]
-    assert oxygen_fragment.state.is_value
-    assert "low-temperature O+ fragment" in str(oxygen_fragment.state.value)
+    assert "fragment_correction_state@all_species" not in calibration
+    for species in ("O", "O2"):
+        fragment = calibration[f"fragment_correction_state@species={species}"]
+        assert fragment.state.is_unknown
+        assert "conditional O/O2 procedure" in str(fragment.state.reason)
+        assert "application to this grouped experiment is unknown" in str(
+            fragment.state.reason
+        )
+        assert fragment.locator is not None
+        assert "following equation 1" in str(fragment.locator.paragraph)
     uncertainty = calibration["pressure_uncertainty@all_species"]
     assert uncertainty.state.is_value
     assert "factor of 2" in str(uncertainty.state.value)

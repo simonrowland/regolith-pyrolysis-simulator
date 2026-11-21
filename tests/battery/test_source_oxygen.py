@@ -15,11 +15,13 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Quantity,
+    RelativeSeriesUnavailableReason,
     ValueKind,
 )
 from simulator.battery.records import (
     Bench, BenchIdentity, Derivation, FO2Control, Located, Notice, Reaction,
-    ReactionTerm, Species, State, Value,
+    ReactionTerm, RelativeSeriesAnchor, RelativeSeriesClock,
+    RelativeSeriesEvidence, RelativeSeriesPoint, Species, State, Value,
 )
 from simulator.battery.score import (
     ScoreContext,
@@ -28,13 +30,6 @@ from simulator.battery.score import (
     load_score_context,
     predict_with_engine,
     _score_relative_qms_series,
-)
-from simulator.battery.score_metrics import (
-    RelativeSeriesAnchor,
-    RelativeSeriesClock,
-    RelativeSeriesEvidence,
-    RelativeSeriesPoint,
-    RelativeSeriesUnavailableReason,
 )
 from simulator.battery.source_oxygen import (
     SourceOxygenCondition,
@@ -117,18 +112,18 @@ def _single_physics_rung(notices):
     return labels[0]
 
 
-def _relative_qms_inputs(observation_id=None):
+def _relative_qms_inputs(source_trace, model_input_ids):
     target_species = "O2"
     observed = tuple(
         RelativeSeriesPoint(
-            run_id="source-qms-run",
+            run_id=source_trace.experiment_id,
             coordinate=Decimal(str(time_s)),
             value=Value(ValueKind.POINT, point=Decimal(str(signal))),
             observable=f"{target_species}+",
             boundary="cell-exit",
             coordinate_unit="s",
             locator=F.loc(page=3),
-            observation_id=observation_id,
+            observation_id=source_trace.observation_id,
         )
         for time_s, signal in ((0, 2), (1, 4))
     )
@@ -167,6 +162,8 @@ def _relative_qms_inputs(observation_id=None):
         background_treatment_supported=True,
         response_proportional_over_interval=True,
         locator=F.loc(page=1),
+        model_run_id="model-run",
+        model_oxygen_input_observation_ids=model_input_ids,
     )
     return observed, model, anchor, clock, evidence
 
@@ -1627,24 +1624,126 @@ def test_relative_qms_oxygen_inputs_cannot_validate_themselves(source_context):
     component = source_context.observations[condition.observation.derived_from[0]]
     assert component.observation_id in condition.used_observations
 
-    for reference in (condition.observation, component):
-        observed, model, anchor, clock, evidence = _relative_qms_inputs(
-            reference.observation_id
-        )
-        result = _score_relative_qms_series(
-            observed,
-            model,
-            anchor,
-            clock,
+    trace = replace(
+        melt_row,
+        observation_id="relative-qms-o2-source-trace",
+        identity=replace(
+            melt_row.identity,
+            species=Species("O2", Phase.G),
+            quantity=Quantity.ION_INTENSITY,
+            reaction=State.unknown("ion channel"),
+            fO2_Pa=None,
+        ),
+        value=Value(ValueKind.POINT, point=Decimal("2")),
+        derived_from=None,
+        derivation=None,
+    )
+    scoring_context = replace(
+        source_context,
+        observations={
+            **source_context.observations,
+            trace.observation_id: trace,
+        },
+    )
+    resolved = _resolve(scoring_context, melt_row)
+    assert isinstance(resolved, SourceOxygenCondition)
+
+    observed, model, anchor, clock, evidence = _relative_qms_inputs(
+        trace, tuple(sorted((*resolved.used_observations, trace.observation_id)))
+    )
+    result = _score_relative_qms_series(
+        observed,
+        model,
+        anchor,
+        clock,
+        evidence,
+        context=scoring_context,
+        reference=melt_row,
+        source_trace=trace,
+    )
+    assert result.unavailable_reason is RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT
+    assert result.points == ()
+
+    unrelated_id = replace(observed[0], observation_id=melt_row.observation_id)
+    unrelated = (unrelated_id, *observed[1:])
+    mismatched = _score_relative_qms_series(
+        unrelated,
+        model,
+        anchor,
+        clock,
+        evidence,
+        context=scoring_context,
+        reference=melt_row,
+        source_trace=trace,
+    )
+    assert mismatched.unavailable_reason is (
+        RelativeSeriesUnavailableReason.SOURCE_TRACE_UNAVAILABLE
+    )
+    assert mismatched.points == ()
+
+    unresolved_inputs = _score_relative_qms_series(
+        observed,
+        model,
+        anchor,
+        clock,
+        replace(evidence, model_oxygen_input_observation_ids=()),
+        context=scoring_context,
+        reference=melt_row,
+        source_trace=trace,
+    )
+    assert unresolved_inputs.unavailable_reason is (
+        RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
+    )
+    assert unresolved_inputs.points == ()
+
+    ambiguous_inputs = _score_relative_qms_series(
+        observed,
+        model,
+        anchor,
+        clock,
+        replace(
             evidence,
-            context=source_context,
-            reference=melt_row,
-        )
-        assert result.unavailable is not None
-        assert result.unavailable.reason is (
-            RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT
-        )
-        assert result.points == ()
+            model_oxygen_input_observation_ids=(
+                trace.observation_id,
+                trace.observation_id,
+            ),
+        ),
+        context=scoring_context,
+        reference=melt_row,
+        source_trace=trace,
+    )
+    assert ambiguous_inputs.unavailable_reason is (
+        RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
+    )
+
+    fallback_trace = replace(trace, source_id="unresolved-oxygen-source")
+    fallback_reference = replace(melt_row, source_id="unresolved-oxygen-source")
+    fallback_context = replace(
+        scoring_context,
+        observations={
+            **scoring_context.observations,
+            fallback_trace.observation_id: fallback_trace,
+            fallback_reference.observation_id: fallback_reference,
+        },
+    )
+    fallback_observed = tuple(
+        replace(point, observation_id=fallback_trace.observation_id)
+        for point in observed
+    )
+    fallback = _score_relative_qms_series(
+        fallback_observed,
+        model,
+        anchor,
+        clock,
+        replace(evidence, model_oxygen_input_observation_ids=()),
+        context=fallback_context,
+        reference=fallback_reference,
+        source_trace=fallback_trace,
+    )
+    assert fallback.unavailable_reason is (
+        RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
+    )
+    assert fallback.points == ()
 
 
 def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
@@ -1665,9 +1764,7 @@ def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
         source_context,
         observations={**source_context.observations, reference.observation_id: reference},
     )
-    observed, model, anchor, clock, evidence = _relative_qms_inputs(
-        reference.observation_id
-    )
+    observed, model, anchor, clock, evidence = _relative_qms_inputs(reference, ())
 
     result = _score_relative_qms_series(
         observed,
@@ -1677,21 +1774,48 @@ def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
         evidence,
         context=scoring_context,
         reference=reference,
+        source_trace=reference,
     )
 
-    assert result.unavailable is None
+    assert result.unavailable_reason is None
     assert reference.identity.fO2_Pa == State.of(command)
 
-    self_dependent = _score_relative_qms_series(
+    named_input = _score_relative_qms_series(
         observed,
         model,
         anchor,
         clock,
-        replace(evidence, oxygen_independent=False),
+        replace(
+            evidence,
+            model_oxygen_input_observation_ids=(reference.observation_id,),
+        ),
         context=scoring_context,
         reference=reference,
+        source_trace=reference,
     )
-    assert self_dependent.unavailable is not None
-    assert self_dependent.unavailable.reason is (
+    assert named_input.unavailable_reason is (
         RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT
     )
+    assert named_input.points == ()
+
+    resolved = _resolve(source_context, melt_row)
+    assert isinstance(resolved, SourceOxygenCondition)
+    reduction_inputs = _score_relative_qms_series(
+        observed,
+        model,
+        anchor,
+        clock,
+        replace(
+            evidence,
+            model_oxygen_input_observation_ids=tuple(
+                sorted(resolved.used_observations)
+            ),
+        ),
+        context=scoring_context,
+        reference=reference,
+        source_trace=reference,
+    )
+    assert reduction_inputs.unavailable_reason is (
+        RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
+    )
+    assert reduction_inputs.points == ()

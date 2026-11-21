@@ -79,24 +79,24 @@ experiments:
           paragraph: silver calibration used to convert ion intensities into pressures
       "standard@species=O":
         state:
-          tag: value
-          value: 'O+/O2+ intensity ratio with O2 dissociation equilibrium (Brix and Herzberg 1954; JANAF 1965)'
+          tag: unknown
+          reason: O/O2 calibration was used whenever possible, but the source does not establish its use for this grouped experiment; agreement with silver was satisfactory at high temperatures and less reliable at lower temperatures because of the O+ fragment
         locator:
           record: demaria_1971_silver_and_o_o2_calibration
           page: 2
           published_page: 1368
           pdf_page_index: 1
-          paragraph: O/O2 calibration based on the direct ion-intensity ratio and O2 dissociation equilibrium
+          paragraph: following equation 1; conditional O/O2 procedure based on O+/O2+ intensity ratio and O2 dissociation equilibrium
       "standard@species=O2":
         state:
-          tag: value
-          value: 'O+ and O2+ intensity ratio with O2 dissociation equilibrium (Brix and Herzberg 1954; JANAF 1965)'
+          tag: unknown
+          reason: O/O2 calibration was used whenever possible, but the source does not establish its use for this grouped experiment; agreement with silver was satisfactory at high temperatures and less reliable at lower temperatures because of the O+ fragment
         locator:
           record: demaria_1971_silver_and_o_o2_calibration
           page: 2
           published_page: 1368
           pdf_page_index: 1
-          paragraph: O/O2 calibration based on the direct ion-intensity ratio and O2 dissociation equilibrium
+          paragraph: following equation 1; conditional O/O2 procedure based on O+/O2+ intensity ratio and O2 dissociation equilibrium
       "method@all_species":
         state:
           tag: value
@@ -137,24 +137,26 @@ experiments:
           published_page: 1368
           pdf_page_index: 1
           equation: '1'
-      "fragment_correction_state@all_species":
+      "fragment_correction_state@species=O":
         state:
-          tag: value
-          value: applied; fragmentation-pattern and secondary-electron corrections were included
+          tag: unknown
+          reason: fragmentation-pattern and secondary-electron corrections were included when the conditional O/O2 procedure was used; application to this grouped experiment is unknown
         locator:
           record: demaria_1971_silver_and_o_o2_calibration
           page: 2
           published_page: 1368
           pdf_page_index: 1
+          paragraph: following equation 1; corrections stated within the conditional O/O2 procedure
       "fragment_correction_state@species=O2":
         state:
-          tag: value
-          value: applied; low-temperature O+ fragment contribution made the O/O2 calibration less reliable
+          tag: unknown
+          reason: fragmentation-pattern and secondary-electron corrections were included when the conditional O/O2 procedure was used; application to this grouped experiment is unknown
         locator:
           record: demaria_1971_silver_and_o_o2_calibration
           page: 2
           published_page: 1368
           pdf_page_index: 1
+          paragraph: following equation 1; corrections stated within the conditional O/O2 procedure
       "pressure_uncertainty@all_species":
         state:
           tag: value

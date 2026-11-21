@@ -11,9 +11,7 @@ names from ``score`` receive the same objects through that facade.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
 from decimal import Decimal
-from enum import StrEnum
 from typing import Mapping, Sequence
 
 from simulator.battery.enums import (
@@ -23,6 +21,7 @@ from simulator.battery.enums import (
     PRINTED_CAPACITY_QUANTITIES,
     Quantity,
     Rail,
+    RelativeSeriesUnavailableReason,
     RefusalReason,
     ResidualStatus,
     SourceRelation,
@@ -34,11 +33,14 @@ from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import (
     DecisionBand,
     Experiment,
-    Locator,
     Observation,
+    RelativeSeriesAnchor,
+    RelativeSeriesClock,
+    RelativeSeriesComparison,
+    RelativeSeriesEvidence,
+    RelativeSeriesPoint,
+    RelativeSeriesPointResidual,
     ResidualNumeric,
-    Uncertainty,
-    Value,
 )
 
 
@@ -101,131 +103,6 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
 }
 
 
-class RelativeSeriesUnavailableReason(StrEnum):
-    INVALID_SERIES = "invalid_series"
-    MIXED_CHANNELS = "mixed_channels"
-    MIXED_SOURCE_RUNS = "mixed_source_runs"
-    MIXED_MODEL_RUNS = "mixed_model_runs"
-    CHANNEL_MISMATCH = "channel_mismatch"
-    MIXED_MODEL_SPECIES = "mixed_model_species"
-    MODEL_SPECIES_MISMATCH = "model_species_mismatch"
-    QUANTITY_UNSUPPORTED = "quantity_unsupported"
-    BOUNDARY_MISMATCH = "measurement_boundary_mismatch"
-    COORDINATE_UNIT_MISMATCH = "coordinate_unit_mismatch"
-    PROPORTIONAL_TRACKING_UNESTABLISHED = "proportional_tracking_unestablished"
-    BACKGROUND_UNRESOLVED = "background_unresolved"
-    INTERFERENCE_UNRESOLVED = "interference_unresolved"
-    SOURCE_EVIDENCE_UNLOCATED = "source_evidence_unlocated"
-    CLOCK_EVENT_MISMATCH = "clock_event_mismatch"
-    CLOCK_MAPPING_UNSUPPORTED = "clock_mapping_unsupported"
-    CLOCK_MAPPING_UNLOCATED = "clock_mapping_unlocated"
-    SOURCE_ANCHOR_MISSING = "source_anchor_missing"
-    MODEL_ANCHOR_MISSING = "model_anchor_missing"
-    SOURCE_ANCHOR_NOT_POSITIVE = "source_anchor_not_positive"
-    MODEL_ANCHOR_NOT_POSITIVE = "model_anchor_not_positive"
-    SOURCE_LOCATOR_MISSING = "source_locator_missing"
-    DUPLICATE_COORDINATE = "duplicate_coordinate"
-    MODEL_POINT_MISSING = "model_point_missing"
-    SOURCE_VALUE_NOT_POSITIVE_POINT = "source_value_not_positive_point"
-    MODEL_VALUE_NOT_POSITIVE_POINT = "model_value_not_positive_point"
-    OXYGEN_ELIGIBILITY_UNKNOWN = "oxygen_eligibility_unknown"
-    OXYGEN_SELF_AGREEMENT = "oxygen_self_agreement"
-
-
-@dataclass(frozen=True)
-class RelativeSeriesPoint:
-    run_id: str
-    coordinate: Decimal
-    value: Value
-    observable: str
-    boundary: str
-    coordinate_unit: str
-    locator: Locator | None = None
-    observation_id: str | None = None
-    uncertainty: Uncertainty | None = None
-
-    def __post_init__(self) -> None:
-        object.__setattr__(self, "coordinate", Decimal(str(self.coordinate)))
-        if not self.coordinate.is_finite():
-            raise ValueError("relative-series coordinate must be finite")
-        if (
-            not self.run_id
-            or not self.observable
-            or not self.boundary
-            or not self.coordinate_unit
-        ):
-            raise ValueError(
-                "relative-series point requires run, observable, boundary, and coordinate unit"
-            )
-
-
-@dataclass(frozen=True)
-class RelativeSeriesAnchor:
-    source_coordinate: Decimal
-    model_coordinate: Decimal
-    source_event: str
-    model_event: str
-    physical_event: str
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self, "source_coordinate", Decimal(str(self.source_coordinate))
-        )
-        object.__setattr__(
-            self, "model_coordinate", Decimal(str(self.model_coordinate))
-        )
-        if (
-            not self.source_coordinate.is_finite()
-            or not self.model_coordinate.is_finite()
-        ):
-            raise ValueError("relative-series anchor coordinates must be finite")
-        if not self.source_event or not self.model_event or not self.physical_event:
-            raise ValueError("relative-series anchor requires both events and their match")
-
-
-@dataclass(frozen=True)
-class RelativeSeriesClock:
-    source_event: str
-    model_event: str
-    physical_event: str
-    mapping_supported: bool | None
-    locator: Locator | None
-
-
-@dataclass(frozen=True)
-class RelativeSeriesEvidence:
-    quantity: Quantity
-    model_quantity: Quantity
-    channel: str
-    target_species: str
-    boundary: str
-    target_isolated_or_interferences_corrected: bool | None
-    background_treatment_supported: bool | None
-    response_proportional_over_interval: bool | None
-    locator: Locator | None
-    oxygen_independent: bool | None = None
-
-
-@dataclass(frozen=True)
-class RelativeSeriesUnavailable:
-    reason: RelativeSeriesUnavailableReason
-
-
-@dataclass(frozen=True)
-class RelativeSeriesPointResidual:
-    source_coordinate: Decimal
-    model_coordinate: Decimal
-    residual_dex: Decimal | None
-    unavailable_reason: RelativeSeriesUnavailableReason | None = None
-    uncertainty: Uncertainty | None = None
-
-
-@dataclass(frozen=True)
-class RelativeSeriesComparison:
-    points: tuple[RelativeSeriesPointResidual, ...] = ()
-    unavailable: RelativeSeriesUnavailable | None = None
-
-
 def relative_channel_point_residuals(
     observed_series: Sequence[RelativeSeriesPoint],
     model_series: Sequence[RelativeSeriesPoint],
@@ -245,7 +122,7 @@ def relative_channel_point_residuals(
     def unavailable(
         reason: RelativeSeriesUnavailableReason,
     ) -> RelativeSeriesComparison:
-        return RelativeSeriesComparison(unavailable=RelativeSeriesUnavailable(reason))
+        return RelativeSeriesComparison(unavailable_reason=reason)
 
     if not observed_series or not model_series:
         return unavailable(RelativeSeriesUnavailableReason.INVALID_SERIES)
@@ -265,6 +142,21 @@ def relative_channel_point_residuals(
         return unavailable(RelativeSeriesUnavailableReason.MODEL_SPECIES_MISMATCH)
     if len({point.run_id for point in model_series}) != 1:
         return unavailable(RelativeSeriesUnavailableReason.MIXED_MODEL_RUNS)
+    if evidence.target_species in {"O", "O2"}:
+        if (
+            evidence.model_run_id is None
+            or {point.run_id for point in model_series} != {evidence.model_run_id}
+            or evidence.model_oxygen_input_observation_ids is None
+        ):
+            return unavailable(
+                RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
+            )
+        if len(set(evidence.model_oxygen_input_observation_ids)) != len(
+            evidence.model_oxygen_input_observation_ids
+        ):
+            return unavailable(
+                RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
+            )
     if evidence.model_quantity is not Quantity.P_PARTIAL:
         return unavailable(RelativeSeriesUnavailableReason.QUANTITY_UNSUPPORTED)
     if any(
