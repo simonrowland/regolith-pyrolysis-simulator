@@ -1638,6 +1638,7 @@ def test_relative_qms_oxygen_inputs_cannot_validate_themselves(source_context):
             clock,
             evidence,
             context=source_context,
+            reference=melt_row,
         )
         assert result.unavailable is not None
         assert result.unavailable.reason is (
@@ -1675,6 +1676,7 @@ def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
         clock,
         evidence,
         context=scoring_context,
+        reference=reference,
     )
 
     assert result.unavailable is None
@@ -1687,6 +1689,7 @@ def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
         clock,
         replace(evidence, oxygen_independent=False),
         context=scoring_context,
+        reference=reference,
     )
     assert self_dependent.unavailable is not None
     assert self_dependent.unavailable.reason is (

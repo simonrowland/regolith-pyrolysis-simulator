@@ -681,6 +681,7 @@ _MOVED_NAMES = (
 
 _METRICS_IMPORT_MODULES = frozenset({
     "__future__",
+    "dataclasses",
     "math",
     "decimal",
     "typing",
