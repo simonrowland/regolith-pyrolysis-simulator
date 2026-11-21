@@ -452,7 +452,7 @@ species:
         type: activity_coefficient
         experiment: maeda_sano_1982_cao_mgo_alumina_silica_cr_equilibrium
         locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '1'}
-        derived_from: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+        derived_from: [maeda-sano-1982-cro-activity-coefficient-slag::context::maeda_sano_1982_experiment_cr_valence_convention]
         phase: l
         units: dimensionless
         uncertainty:
@@ -491,7 +491,7 @@ species:
             components: [[CaO, '10'], [MgO, '35'], [Al2O3, '15'], [SiO2, '40']]
           derivation:
             relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr × 10^-6 / 51.996) / total_moles_per_g on the AlO1.5 basis'
-            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            inputs: [maeda-sano-1982-cro-activity-coefficient-slag::context::maeda_sano_1982_experiment_cr_valence_convention]
             method:
               state: {tag: value, value: 'gamma_CrO recalculated from the printed Fig. 11 Cr concentration and row composition using Eq. (13); composition-specific total moles are on the AlO1.5 basis, and the footnote-3 shortcut is not used'}
               locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}
@@ -517,7 +517,7 @@ species:
         type: activity_coefficient
         experiment: maeda_sano_1982_cao_mgo_alumina_silica_cr_equilibrium
         locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '2'}
-        derived_from: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+        derived_from: [maeda-sano-1982-cro-activity-coefficient-slag::context::maeda_sano_1982_experiment_cr_valence_convention]
         phase: l
         units: dimensionless
         uncertainty:
@@ -556,7 +556,7 @@ species:
             components: [[CaO, '10'], [MgO, '30'], [Al2O3, '20'], [SiO2, '40']]
           derivation:
             relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr × 10^-6 / 51.996) / total_moles_per_g on the AlO1.5 basis'
-            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            inputs: [maeda-sano-1982-cro-activity-coefficient-slag::context::maeda_sano_1982_experiment_cr_valence_convention]
             method:
               state: {tag: value, value: 'gamma_CrO recalculated from the printed Fig. 11 Cr concentration and row composition using Eq. (13); composition-specific total moles are on the AlO1.5 basis, and the footnote-3 shortcut is not used'}
               locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}
@@ -582,7 +582,7 @@ species:
         type: activity_coefficient
         experiment: maeda_sano_1982_cao_mgo_alumina_silica_cr_equilibrium
         locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '3'}
-        derived_from: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+        derived_from: [maeda-sano-1982-cro-activity-coefficient-slag::context::maeda_sano_1982_experiment_cr_valence_convention]
         phase: l
         units: dimensionless
         uncertainty:
@@ -621,7 +621,7 @@ species:
             components: [[CaO, '10'], [MgO, '25'], [Al2O3, '25'], [SiO2, '40']]
           derivation:
             relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr × 10^-6 / 51.996) / total_moles_per_g on the AlO1.5 basis'
-            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            inputs: [maeda-sano-1982-cro-activity-coefficient-slag::context::maeda_sano_1982_experiment_cr_valence_convention]
             method:
               state: {tag: value, value: 'gamma_CrO recalculated from the printed Fig. 11 Cr concentration and row composition using Eq. (13); composition-specific total moles are on the AlO1.5 basis, and the footnote-3 shortcut is not used'}
               locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}
@@ -647,7 +647,7 @@ species:
         type: activity_coefficient
         experiment: maeda_sano_1982_cao_mgo_alumina_silica_cr_equilibrium
         locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '4'}
-        derived_from: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+        derived_from: [maeda-sano-1982-cro-activity-coefficient-slag::context::maeda_sano_1982_experiment_cr_valence_convention]
         phase: l
         units: dimensionless
         uncertainty:
@@ -686,7 +686,7 @@ species:
             components: [[CaO, '10'], [MgO, '20'], [Al2O3, '30'], [SiO2, '40']]
           derivation:
             relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr × 10^-6 / 51.996) / total_moles_per_g on the AlO1.5 basis'
-            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            inputs: [maeda-sano-1982-cro-activity-coefficient-slag::context::maeda_sano_1982_experiment_cr_valence_convention]
             method:
               state: {tag: value, value: 'gamma_CrO recalculated from the printed Fig. 11 Cr concentration and row composition using Eq. (13); composition-specific total moles are on the AlO1.5 basis, and the footnote-3 shortcut is not used'}
               locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}
@@ -712,7 +712,7 @@ species:
         type: activity_coefficient
         experiment: maeda_sano_1982_cao_mgo_alumina_silica_cr_equilibrium
         locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '5'}
-        derived_from: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+        derived_from: [maeda-sano-1982-cro-activity-coefficient-slag::context::maeda_sano_1982_experiment_cr_valence_convention]
         phase: l
         units: dimensionless
         uncertainty:
@@ -751,7 +751,7 @@ species:
             components: [[CaO, '10'], [MgO, '15'], [Al2O3, '35'], [SiO2, '40']]
           derivation:
             relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr × 10^-6 / 51.996) / total_moles_per_g on the AlO1.5 basis'
-            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            inputs: [maeda-sano-1982-cro-activity-coefficient-slag::context::maeda_sano_1982_experiment_cr_valence_convention]
             method:
               state: {tag: value, value: 'gamma_CrO recalculated from the printed Fig. 11 Cr concentration and row composition using Eq. (13); composition-specific total moles are on the AlO1.5 basis, and the footnote-3 shortcut is not used'}
               locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}
@@ -777,7 +777,7 @@ species:
         type: activity_coefficient
         experiment: maeda_sano_1982_cao_mgo_alumina_silica_cr_equilibrium
         locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '6'}
-        derived_from: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+        derived_from: [maeda-sano-1982-cro-activity-coefficient-slag::context::maeda_sano_1982_experiment_cr_valence_convention]
         phase: l
         units: dimensionless
         uncertainty:
@@ -816,7 +816,7 @@ species:
             components: [[CaO, '10'], [MgO, '30'], [Al2O3, '25'], [SiO2, '35']]
           derivation:
             relation: 'gamma_CrO = a_CrO / N_CrO; N_CrO = (ppm Cr × 10^-6 / 51.996) / total_moles_per_g on the AlO1.5 basis'
-            inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
+            inputs: [maeda-sano-1982-cro-activity-coefficient-slag::context::maeda_sano_1982_experiment_cr_valence_convention]
             method:
               state: {tag: value, value: 'gamma_CrO recalculated from the printed Fig. 11 Cr concentration and row composition using Eq. (13); composition-specific total moles are on the AlO1.5 basis, and the footnote-3 shortcut is not used'}
               locator: {page: 6, published_page: 764, pdf_page_index: 5, equation: '13'}

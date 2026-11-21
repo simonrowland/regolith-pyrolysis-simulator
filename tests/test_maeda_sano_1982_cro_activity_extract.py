@@ -25,6 +25,9 @@ from tools.validate_literature_extracts import (
 
 ROOT = Path(__file__).resolve().parents[1]
 SID = "maeda-sano-1982-cro-activity-coefficient-slag"
+FIGURE11_CONTEXT_ID = (
+    f"{SID}::context::maeda_sano_1982_experiment_cr_valence_convention"
+)
 EXPERIMENT_ID = (
     "10.2355/tetsutohagane1955.68.7_759::experiment::"
     "maeda_sano_1982_cao_mgo_alumina_silica_cr_equilibrium"
@@ -167,6 +170,8 @@ def _assert_render_pins(document: dict) -> None:
     ):
         row = rows[observation_id]
         values = row["values"]
+        assert row["derived_from"] == [FIGURE11_CONTEXT_ID]
+        assert values["derivation"]["inputs"] == [FIGURE11_CONTEXT_ID]
         assert values["equilibrium_Cr_ppm_as_published"] == expected_ppm[index]
         assert values["equilibrium_Cr_ppm_as_published"] == ppm
         assert tuple(map(tuple, values["composition_wt_pct"]["components"])) == (
@@ -201,12 +206,11 @@ def _assert_render_pins(document: dict) -> None:
         assert row["uncertainty"]["derivation"]["relation"] == (
             "propagated_fig11_composition_digitization"
         )
-        assert "MgO–Al2O3 exchange" in row["uncertainty"]["derivation"][
-            "method"
-        ]["state"]["value"]
-        assert "AlO1.5" in row["uncertainty"]["derivation"]["method"][
+        uncertainty_method = row["uncertainty"]["derivation"]["method"][
             "state"
         ]["value"]
+        assert "AlO1.5 basis" in uncertainty_method
+        assert "Al2O3 contributes two AlO1.5 formula units" in uncertainty_method
 
     first_f14 = rows["maeda_sano_1982_f14_al2o3_20_row01"]
     assert first_f14["values"]["composition_wt_pct"]["components"] == [
@@ -372,6 +376,7 @@ def test_extract_and_generated_store_validate_and_load_all_observations(
     assert EXPERIMENT_ID in experiments
     assert experiments[EXPERIMENT_ID].work_id in works
     context = load_migrated_context(tmp_path)
+    resolvable_record_ids = set(observations) | set(context)
     assumption = context[f"{SID}::context::maeda_sano_1982_experiment_cr_valence_convention"]
     assert assumption["experiment"] == EXPERIMENT_ID
     assert assumption["locator"]["published_page"] == 760
@@ -420,6 +425,15 @@ def test_extract_and_generated_store_validate_and_load_all_observations(
             )
             assert conditions["oxygen_partial_pressure_atm"].state.is_unknown
             assert observation.derivation is not None
+            assert observation.derived_from == (FIGURE11_CONTEXT_ID,)
+            assert observation.derivation.inputs == (FIGURE11_CONTEXT_ID,)
+            resolved_references = (
+                *(observation.derived_from or ()),
+                *observation.derivation.inputs,
+            )
+            assert all(
+                reference in resolvable_record_ids for reference in resolved_references
+            )
             assert observation.derivation.references == (
                 "Eq. (13)",
                 "Fig. 11",
