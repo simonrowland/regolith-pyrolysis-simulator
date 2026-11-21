@@ -5000,7 +5000,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     '_freeze_gate_current_magemin_domain_identity',
                     None,
                 )
-                if self._liquid_fraction_provider == 'magemin'
+                if getattr(self, '_liquid_fraction_provider', None) == 'magemin'
                 else None
             ),
         )
