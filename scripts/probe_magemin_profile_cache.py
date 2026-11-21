@@ -54,8 +54,16 @@ def main() -> int:
     original_key = getattr(EvaporationMixin, key_builder_name)
     original_dispatch = EvaporationMixin._freeze_gate_curve_from_gate_dispatch
     original_magemin_call = MAGEMinBackend._call_magemin
-    original_cacheable = determinism.gate_curve_memo_is_cacheable
-    original_reusable = binding_admission.gate_curve_memo_reuse_eligible
+    cacheable_name = "gate_curve_memo_is_cacheable"
+    original_cacheable = getattr(determinism, cacheable_name, None)
+    if not callable(original_cacheable):
+        cacheable_name = "_is_cacheable_gate_curve"
+        original_cacheable = getattr(determinism, cacheable_name, None)
+    reusable_name = "gate_curve_memo_reuse_eligible"
+    original_reusable = getattr(binding_admission, reusable_name, None)
+    if not callable(original_reusable):
+        reusable_name = "gate_curve_memo_eligibility"
+        original_reusable = getattr(binding_admission, reusable_name, None)
 
     def stack() -> list[dict[str, Any]]:
         active = getattr(local, "records", None)
@@ -79,16 +87,16 @@ def main() -> int:
             active[-1]["keys"].append((key, domain_reason, identity))
         return result
 
-    @wraps(original_cacheable)
     def cacheable_probe(*pos: Any, **kw: Any) -> Any:
+        assert callable(original_cacheable)
         result = original_cacheable(*pos, **kw)
         active = stack()
         if active:
             active[-1]["admission"].append(("cacheable", bool(result)))
         return result
 
-    @wraps(original_reusable)
     def reusable_probe(*pos: Any, **kw: Any) -> Any:
+        assert callable(original_reusable)
         result = original_reusable(*pos, **kw)
         active = stack()
         if active:
@@ -174,8 +182,10 @@ def main() -> int:
     EvaporationMixin._freeze_gate_curve_from_gate_dispatch = dispatch_probe
     EvaporationMixin._freeze_gate_curve_record = record_probe
     MAGEMinBackend._call_magemin = magemin_call_probe
-    determinism.gate_curve_memo_is_cacheable = cacheable_probe
-    binding_admission.gate_curve_memo_reuse_eligible = reusable_probe
+    if callable(original_cacheable):
+        setattr(determinism, cacheable_name, cacheable_probe)
+    if callable(original_reusable):
+        setattr(binding_admission, reusable_name, reusable_probe)
 
     error = None
     try:
@@ -212,14 +222,20 @@ def main() -> int:
         EvaporationMixin._freeze_gate_curve_from_gate_dispatch = original_dispatch
         EvaporationMixin._freeze_gate_curve_record = original_record
         MAGEMinBackend._call_magemin = original_magemin_call
-        determinism.gate_curve_memo_is_cacheable = original_cacheable
-        binding_admission.gate_curve_memo_reuse_eligible = original_reusable
+        if callable(original_cacheable):
+            setattr(determinism, cacheable_name, original_cacheable)
+        if callable(original_reusable):
+            setattr(binding_admission, reusable_name, original_reusable)
 
     print(json.dumps({
         "target_id": args.target_id,
         "repo_root": str(repo_root),
         "counts": dict(sorted(counts.items())),
         "identity_classifications": dict(sorted(identities.items())),
+        "admission_counters": {
+            "cacheable": cacheable_name if callable(original_cacheable) else None,
+            "reuse_eligible": reusable_name if callable(original_reusable) else None,
+        },
         "cache_miss_reasons": dict(sorted(miss_reasons.items())),
         "error": error,
     }, sort_keys=True))
