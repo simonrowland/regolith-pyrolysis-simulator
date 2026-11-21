@@ -490,7 +490,7 @@ def test_above_liquidus_equilibrium_diagnostic_is_byte_identical():
         solidus_T_C=1050.0,
         source="internal_analytical_liquidus",
         domain_identity=MAGEMinDomainIdentity(
-            "in_band", "not_applicable", None, "analytical_liquidus",
+            "in_band", "not_applicable", None, None,
         ),
     )
     plain = EquilibriumMixin._internal_analytical_equilibrium(
