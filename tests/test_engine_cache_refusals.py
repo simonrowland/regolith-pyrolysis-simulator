@@ -1,4 +1,5 @@
 import sqlite3
+import subprocess
 import threading
 
 import pytest
@@ -18,10 +19,14 @@ def test_deterministic_refusal_allowlist_is_explicit():
         EngineCacheValue,
         cacheable_refusal,
     )
+    from engines.alphamelts.thermoengine import ThermoEngineRefusalCause
     from simulator.melt_backend.alphamelts import (
         ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH,
+        ALPHAMELTS_REASON_EXIT_SIGNAL,
         ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH,
         ALPHAMELTS_REASON_FE_FREE_SILICATE_IMPOSED_FO2_CRASH,
+        ALPHAMELTS_REASON_NO_CONVERGENCE,
+        ALPHAMELTS_REASON_SUBPROCESS_DIED,
     )
     from simulator.melt_backend.openimcc_bridge import (
         ISOLATED_OPENIMCC_CACHEABLE_ERRORS,
@@ -44,6 +49,10 @@ def test_deterministic_refusal_allowlist_is_explicit():
         OutOfDomainReason.INVALID_INPUT.value,
         OutOfDomainReason.UNSUPPORTED_INPUT.value,
         OutOfDomainReason.CLAMPED_OPERATING_POINT.value,
+        OutOfDomainReason.MAGEMIN_MODE_VECTOR_MASS_DEFICIT.value,
+        ALPHAMELTS_REASON_NO_CONVERGENCE,
+        ThermoEngineRefusalCause.FO2_NONMONOTONIC_BUFFERED.value,
+        ALPHAMELTS_REASON_SUBPROCESS_DIED,
         ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH,
         ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH,
         ALPHAMELTS_REASON_FE_FREE_SILICATE_IMPOSED_FO2_CRASH,
@@ -101,16 +110,14 @@ def test_deterministic_refusal_allowlist_is_explicit():
         OutOfDomainReason.NOT_CONVERGED.value,
         OutOfDomainReason.BACKEND_UNAVAILABLE.value,
         OutOfDomainReason.OUT_OF_DOMAIN.value,
-        "no_convergence",
         "negative_convergence_evidence",
         "engine_not_converged",
-        "magemin_mode_vector_mass_deficit",
         "timeout",
-        "subprocess_died",
         "nonzero_exit",
         "engine_crash",
+        ALPHAMELTS_REASON_EXIT_SIGNAL,
         "unavailable",
-        "fo2_nonmonotonic_buffered",
+        "missing_binary",
         "imcc_nonconvergence",
         "imcc_dataframe_unavailable",
         "imcc_unproven_datapack",
@@ -807,8 +814,9 @@ def test_thermoengine_uninitialized_valid_melt_raises_and_is_not_stored(
         engine_cache._MEMORY_CACHE.clear()
     assert len(calls) == 2
     counts = engine_cache.engine_cache_counters()["thermoengine"]
-    # The raise leaves solve() before a return, so the miss is not a
-    # not_stored bucket. The invariant below is for returned values.
+    # Uninitialized ThermoEngineBackend.equilibrate raises ImportError.
+    # That is this family's real raising path: the counter label is the
+    # exception class, and the value is not stored.
     assert counts["misses"] == 2
     assert counts["stores"] == 0
     assert counts["not_stored:exception:ImportError"] == 2
@@ -1484,3 +1492,566 @@ def test_openimcc_gas_species_not_found_is_not_stored(tmp_path, monkeypatch):
     assert counts["misses"] == 2
     assert counts["stores"] == 0
     assert counts["not_stored:exception:imcc_gas_species_not_found"] == 2
+
+
+_FE_BEARING_KG = {
+    "SiO2": 49.0,
+    "Al2O3": 15.0,
+    "FeO": 10.0,
+    "Fe2O3": 1.0,
+    "MgO": 10.0,
+    "CaO": 10.0,
+    "Na2O": 5.0,
+}
+
+
+def _alphamelts_subprocess_cache(tmp_path, monkeypatch, *, run_mode=True, binary=True):
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
+
+    backend = AlphaMELTSBackend()
+    backend._mode = "subprocess"
+    backend._configure_subprocess_calc_mode(None)
+    backend._timeout_s = 5.0
+    if binary:
+        backend._binary_path = "/bin/echo"
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": dict(_FE_BEARING_KG),
+        "fO2_log": -8.0,
+        "pressure_bar": 1.0,
+    }
+    if run_mode:
+        kwargs.update(isothermal_run_kwargs(
+            "alphamelts", {"subprocess_run_mode": None},
+        ))
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "alphamelts", backend, kwargs, tmp_path, monkeypatch,
+    )
+    return backend, cached_call, handle, calls, solve, kwargs
+
+
+def test_magemin_mode_vector_mass_deficit_hits_after_disk_round_trip(
+    tmp_path, monkeypatch,
+):
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    monkeypatch.setattr(
+        backend,
+        "_call_magemin",
+        lambda *_args, **_kwargs: {
+            "operating_point_diagnostics": {
+                "authoritative_for_requested_conditions": True,
+                "solved_fO2_log": -8.0,
+                "backend_status": "ok",
+            },
+            "mode_vector_mass_deficit": {"mode_sum": 0.4, "deficit": 0.6},
+        },
+    )
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {"SiO2": 0.6, "MgO": 0.4},
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "magemin", backend, kwargs, tmp_path, monkeypatch,
+    )
+    cold, _warm = _assert_disk_round_trip(
+        cached_call, handle, kwargs,
+        {"solve": solve, "calls": calls},
+        OutOfDomainReason.MAGEMIN_MODE_VECTOR_MASS_DEFICIT.value,
+    )
+    assert cold.status == "out_of_domain"
+
+
+def test_alphamelts_no_convergence_hits_after_disk_round_trip(
+    tmp_path, monkeypatch,
+):
+    from simulator.melt_backend.alphamelts import ALPHAMELTS_REASON_NO_CONVERGENCE
+
+    backend, cached_call, handle, calls, solve, kwargs = (
+        _alphamelts_subprocess_cache(tmp_path, monkeypatch)
+    )
+    stdout = (
+        "Initial alphaMELTS calculation at: P 1 bars, T 1400 (C)\n"
+        "Quadratic convergence failure. Aborting.\n"
+    )
+
+    def fake_run(*_args, **_kwargs):
+        return subprocess.CompletedProcess(
+            ["alphamelts"], 0, stdout, "",
+        )
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.alphamelts._run_alphamelts_subprocess",
+        fake_run,
+    )
+    del backend
+    cold, _warm = _assert_disk_round_trip(
+        cached_call, handle, kwargs,
+        {"solve": solve, "calls": calls},
+        ALPHAMELTS_REASON_NO_CONVERGENCE,
+    )
+    assert cold.status == "out_of_domain"
+
+
+@pytest.mark.parametrize(
+    ("signame", "stored"),
+    [
+        ("SIGSEGV", True),
+        ("SIGABRT", True),
+        ("SIGBUS", True),
+        ("SIGKILL", False),
+        ("SIGPROF", False),
+    ],
+)
+def test_alphamelts_signal_death_is_stored_only_for_a_binary_fault(
+    signame, stored, tmp_path, monkeypatch,
+):
+    import signal
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        REFUSAL_ENGINE_CRASH,
+        classify_equilibrate_outcome,
+    )
+    from simulator.melt_backend.alphamelts import (
+        ALPHAMELTS_REASON_EXIT_SIGNAL,
+        ALPHAMELTS_REASON_SUBPROCESS_DIED,
+    )
+
+    signum = getattr(signal, signame)
+    expected_returncode = -int(signum)
+    _backend, cached_call, handle, calls, solve, kwargs = (
+        _alphamelts_subprocess_cache(tmp_path, monkeypatch)
+    )
+
+    def fake_run(*_args, **_kwargs):
+        return subprocess.CompletedProcess(
+            ["alphamelts"], expected_returncode, "", "",
+        )
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.alphamelts._run_alphamelts_subprocess",
+        fake_run,
+    )
+    # The store decision reads the live signal. The HOT projection of
+    # subprocess_failure keeps returncode only, so a round trip cannot
+    # assert the signal name.
+    if stored:
+        cold, warm = _assert_disk_round_trip(
+            cached_call, handle, kwargs,
+            {"solve": solve, "calls": calls},
+            ALPHAMELTS_REASON_SUBPROCESS_DIED,
+        )
+        for result in (cold, warm):
+            assert (
+                result.diagnostics["subprocess_failure"]["returncode"]
+                == expected_returncode
+            )
+            assert result.diagnostics["backend_failure_category"] == "engine_crash"
+            _status, reason, _engine_reason = classify_equilibrate_outcome(result)
+            assert reason == REFUSAL_ENGINE_CRASH
+        return
+
+    for _ in range(2):
+        result = cached_call(handle, kwargs, solve)
+        assert result.diagnostics["backend_status_reason"] == (
+            ALPHAMELTS_REASON_EXIT_SIGNAL
+        )
+        assert result.diagnostics["backend_failure_category"] == "engine_crash"
+        assert (
+            result.diagnostics["subprocess_failure"]["returncode"]
+            == expected_returncode
+        )
+        _status, reason, _engine_reason = classify_equilibrate_outcome(result)
+        assert reason == REFUSAL_ENGINE_CRASH
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("alphamelts")
+    assert counts["stores"] == 0
+    assert counts[f"not_stored:refusal:{ALPHAMELTS_REASON_EXIT_SIGNAL}"] == 2
+    with sqlite3.connect(tmp_path / "cache.sqlite") as connection:
+        assert connection.execute(
+            "SELECT count(*) FROM engine_outputs"
+        ).fetchone()[0] == 0
+
+
+def test_mislabeled_sigkill_is_not_stored_as_subprocess_died(
+    tmp_path, monkeypatch,
+):
+    """The status gate rejects an external kill even if the reason is wrong."""
+
+    from simulator.melt_backend.alphamelts import ALPHAMELTS_REASON_SUBPROCESS_DIED
+
+    backend, cached_call, handle, calls, _solve, kwargs = (
+        _alphamelts_subprocess_cache(tmp_path, monkeypatch)
+    )
+
+    def solve():
+        calls.append(1)
+        return backend._subprocess_operational_failure_result(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+            warnings=[],
+            diagnostics={},
+            reason_code=ALPHAMELTS_REASON_SUBPROCESS_DIED,
+            failure={"returncode": -9, "signal": "SIGKILL"},
+            detail="external kill labeled as the binary crash",
+        )
+
+    for _ in range(2):
+        result = cached_call(handle, kwargs, solve)
+        assert (
+            result.diagnostics["backend_status_reason"]
+            == ALPHAMELTS_REASON_SUBPROCESS_DIED
+        )
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("alphamelts")
+    assert counts["stores"] == 0
+    assert counts[
+        f"not_stored:refusal:{ALPHAMELTS_REASON_SUBPROCESS_DIED}"
+    ] == 2
+
+
+def test_alphamelts_timeout_is_not_stored_as_a_crash(tmp_path, monkeypatch):
+    from simulator.melt_backend.alphamelts import ALPHAMELTS_REASON_TIMEOUT
+
+    _backend, cached_call, handle, calls, solve, kwargs = (
+        _alphamelts_subprocess_cache(tmp_path, monkeypatch)
+    )
+
+    def fake_run(*_args, **_kwargs):
+        raise subprocess.TimeoutExpired(["alphamelts"], 5.0)
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.alphamelts._run_alphamelts_subprocess",
+        fake_run,
+    )
+    for _ in range(2):
+        result = cached_call(handle, kwargs, solve)
+        assert result.diagnostics["backend_status_reason"] == (
+            ALPHAMELTS_REASON_TIMEOUT
+        )
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("alphamelts")
+    assert counts["stores"] == 0
+    assert counts[f"not_stored:refusal:{ALPHAMELTS_REASON_TIMEOUT}"] == 2
+
+
+def test_alphamelts_missing_binary_raises_and_is_not_stored(
+    tmp_path, monkeypatch,
+):
+    from simulator.melt_backend.alphamelts import (
+        ALPHAMELTS_REASON_MISSING_BINARY,
+        AlphaMELTSSubprocessContractError,
+    )
+
+    _backend, cached_call, handle, calls, solve, kwargs = (
+        _alphamelts_subprocess_cache(tmp_path, monkeypatch, binary=False)
+    )
+    for _ in range(2):
+        with pytest.raises(AlphaMELTSSubprocessContractError) as caught:
+            cached_call(handle, kwargs, solve)
+        assert caught.value.backend_status_reason == (
+            ALPHAMELTS_REASON_MISSING_BINARY
+        )
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("alphamelts")
+    assert counts["stores"] == 0
+    assert counts[
+        "not_stored:exception:AlphaMELTSSubprocessContractError"
+    ] == 2
+
+
+def test_alphamelts_missing_run_mode_raises_through_equilibrate(
+    tmp_path, monkeypatch,
+):
+    """The family's real raising path is the contract error, not a lambda."""
+
+    from simulator.melt_backend.alphamelts import (
+        ALPHAMELTS_REASON_RUN_MODE_REQUIRED,
+        AlphaMELTSSubprocessContractError,
+    )
+
+    _backend, cached_call, handle, calls, solve, kwargs = (
+        _alphamelts_subprocess_cache(
+            tmp_path, monkeypatch, run_mode=False,
+        )
+    )
+    for _ in range(2):
+        with pytest.raises(AlphaMELTSSubprocessContractError) as caught:
+            cached_call(handle, kwargs, solve)
+        assert caught.value.backend_status_reason == (
+            ALPHAMELTS_REASON_RUN_MODE_REQUIRED
+        )
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("alphamelts")
+    assert counts["stores"] == 0
+    assert counts[
+        "not_stored:exception:AlphaMELTSSubprocessContractError"
+    ] == 2
+
+
+def test_alphamelts_worker_death_is_not_stored(tmp_path, monkeypatch):
+    from simulator.melt_backend.alphamelts import (
+        ALPHAMELTS_REASON_SUBPROCESS_DIED,
+        AlphaMELTSBackend,
+        AlphaMELTSSubprocessContractError,
+    )
+
+    _enable_disk_cache(tmp_path, monkeypatch)
+    backend = AlphaMELTSBackend()
+
+    class _DeadWorker:
+        def call(self, *_args, **_kwargs):
+            raise RuntimeError("worker exited")
+
+    backend._pet_worker = _DeadWorker()
+
+    def solve():
+        return backend._run_petthermotools_isolated("equilibrate_MELTS")
+
+    for _ in range(2):
+        with pytest.raises(AlphaMELTSSubprocessContractError) as caught:
+            engine_cache.cached_engine_call(
+                "alphamelts", {"path": "worker-death"}, solve,
+            )
+        assert caught.value.backend_status_reason == (
+            ALPHAMELTS_REASON_SUBPROCESS_DIED
+        )
+        engine_cache._MEMORY_CACHE.clear()
+    counts = _assert_returned_miss_accounting("alphamelts")
+    assert counts["misses"] == 2
+    assert counts["stores"] == 0
+    assert counts[
+        "not_stored:exception:AlphaMELTSSubprocessContractError"
+    ] == 2
+
+
+def test_thermoengine_fo2_nonmonotonic_buffered_is_stored_and_reraised(
+    tmp_path, monkeypatch,
+):
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+        ThermoEngineTransport,
+    )
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    backend = ThermoEngineBackend()
+    transport_calls = []
+
+    class _Transport:
+        engine_version = "test"
+
+        def equilibrate(self, **_kwargs):
+            transport_calls.append(1)
+            ThermoEngineTransport._validate_fO2_order((
+                (0.2, -5.0, None, None),
+                (0.8, -6.0, None, None),
+            ))
+
+    backend._thermoengine_transport = _Transport()
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {"SiO2": 0.6, "MgO": 0.4},
+        "fO2_log": -8.0,
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "thermoengine", backend, kwargs, tmp_path, monkeypatch,
+    )
+    raised = []
+    for _ in range(2):
+        with pytest.raises(ThermoEngineOutOfDomainError) as caught:
+            cached_call(handle, kwargs, solve)
+        raised.append(caught.value)
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(transport_calls) == 1
+    assert len(calls) == 1
+    for exc in raised:
+        assert exc.cause is ThermoEngineRefusalCause.FO2_NONMONOTONIC_BUFFERED
+        assert exc.requested == pytest.approx(-5.0)
+        assert exc.solved == pytest.approx(-6.0)
+    counts = _assert_returned_miss_accounting("thermoengine")
+    assert counts["hits"] == counts["misses"] == counts["stores"] == 1
+    assert counts.get(
+        "not_stored:exception:ThermoEngineOutOfDomainError", 0,
+    ) == 0
+
+
+def test_thermoengine_other_fo2_cause_is_not_stored(tmp_path, monkeypatch):
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineRefusalCause,
+    )
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    backend = ThermoEngineBackend()
+
+    class _Transport:
+        engine_version = "test"
+
+        def equilibrate(self, **_kwargs):
+            raise ThermoEngineOutOfDomainError(
+                ThermoEngineRefusalCause.FO2_REQUIRES_IRON,
+            )
+
+    backend._thermoengine_transport = _Transport()
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {"SiO2": 0.6, "MgO": 0.4},
+        "fO2_log": -8.0,
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "thermoengine", backend, kwargs, tmp_path, monkeypatch,
+    )
+    for _ in range(2):
+        with pytest.raises(ThermoEngineOutOfDomainError) as caught:
+            cached_call(handle, kwargs, solve)
+        assert caught.value.cause is ThermoEngineRefusalCause.FO2_REQUIRES_IRON
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("thermoengine")
+    assert counts["stores"] == 0
+    assert counts["not_stored:exception:ThermoEngineOutOfDomainError"] == 2
+
+
+def test_magemin_worker_timeout_raises_through_equilibrate(
+    tmp_path, monkeypatch,
+):
+    """Declared-input errors are returned. EngineWorkerTimeout is re-raised.
+
+    A hung binary is not a test input. The injection is at the call the
+    real except already re-raises, so the counter label is that class.
+    """
+
+    from simulator.engine_pool import EngineWorkerTimeout
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+
+    def hang(*_args, **_kwargs):
+        raise EngineWorkerTimeout("magemin", 1.0, phase="call")
+
+    monkeypatch.setattr(backend, "_call_magemin", hang)
+    kwargs = {
+        "temperature_C": 1400.0,
+        "composition_kg": {"SiO2": 0.6, "MgO": 0.4},
+        "pressure_bar": 1.0,
+    }
+    cached_call, handle, calls, solve = _equilibrate_through_cache(
+        "magemin", backend, kwargs, tmp_path, monkeypatch,
+    )
+    for _ in range(2):
+        with pytest.raises(EngineWorkerTimeout):
+            cached_call(handle, kwargs, solve)
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("magemin")
+    assert counts["stores"] == 0
+    assert counts["not_stored:exception:EngineWorkerTimeout"] == 2
+
+
+def test_vaporock_remote_worker_error_raises_through_equilibrate(
+    tmp_path, monkeypatch,
+):
+    """VapoRockCallError is returned. A remote worker error is not caught."""
+
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    kwargs = {
+        "temperature_C": 1600.0,
+        "composition_mol": {"SiO2": 1.0},
+        "pressure_bar": 1.0e-6,
+        "fO2_log": -8.0,
+    }
+    cached_call, backend, handle, calls, solve = _vaporock_equilibrium_cache_call(
+        kwargs, tmp_path, monkeypatch,
+    )
+
+    class _Future:
+        def result(self):
+            raise EngineWorkerRemoteError("RuntimeError", "worker boom", "tb")
+
+    class _Pool:
+        def submit(self, request, timeout_s=None):
+            del request, timeout_s
+            return _Future()
+
+    backend._warm_pool = _Pool()
+    for _ in range(2):
+        with pytest.raises(EngineWorkerRemoteError):
+            cached_call(handle, kwargs, solve)
+        engine_cache._MEMORY_CACHE.clear()
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("vaporock")
+    assert counts["stores"] == 0
+    assert counts["not_stored:exception:EngineWorkerRemoteError"] == 2
+
+
+def test_internal_analytical_oxygen_balance_failure_is_not_stored(
+    tmp_path, monkeypatch,
+):
+    """The adapter raises the non-allowlisted code into the cache except."""
+
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        Po2Request,
+        _InternalAnalyticalInputRefusal,
+        internal_analytical_residue_vapor_pressure,
+    )
+
+    _enable_disk_cache(tmp_path, monkeypatch)
+
+    class _NonOk:
+        def equilibrate(self, **_kwargs):
+            return SimpleNamespace(status="not_converged", diagnostics={})
+
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_OpenImccBatteryBackend",
+        lambda *_args, **_kwargs: _NonOk(),
+    )
+    core = SimpleNamespace(_high_t_melt_activity="openimcc")
+
+    def run():
+        return internal_analytical_residue_vapor_pressure(
+            core=core,
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            composition_kg={"SiO2": 1.0},
+            composition_mol=None,
+            fO2_log=None,
+            po2_request=Po2Request(
+                mode="oxygen_balance_effusion", po2_bar=None,
+            ),
+            include_diagnostic_shadows=False,
+        )
+
+    for _ in range(2):
+        with pytest.raises(_InternalAnalyticalInputRefusal) as caught:
+            run()
+        assert caught.value.code == (
+            "internal_analytical_oxygen_balance_unavailable"
+        )
+        engine_cache._MEMORY_CACHE.clear()
+    counts = _assert_returned_miss_accounting("internal-analytical")
+    assert counts["misses"] == 2
+    assert counts["stores"] == 0
+    assert counts[
+        "not_stored:exception:internal_analytical_oxygen_balance_unavailable"
+    ] == 2

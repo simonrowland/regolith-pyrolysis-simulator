@@ -311,6 +311,19 @@ REFUSAL_SILICATE_WINDOW = "silicate_window"
 REFUSAL_INVALID_INPUT = "invalid_input"
 REFUSAL_UNSUPPORTED_INPUT = "unsupported_input"
 REFUSAL_CLAMPED_OPERATING_POINT = "clamped_operating_point"
+# Probe 2026-11-20, three fresh processes. Sample sizes are the evidence.
+# s2: 12 requests, 12/12 identical, 12 stayed this reason.
+REFUSAL_MAGEMIN_MODE_VECTOR_MASS_DEFICIT = "magemin_mode_vector_mass_deficit"
+# s3: 2 requests, 2/2 identical, 2 stayed this reason.
+REFUSAL_NO_CONVERGENCE = "no_convergence"
+# s3: 11 requests, 11/11 identical, 11 stayed this reason.
+REFUSAL_FO2_NONMONOTONIC_BUFFERED = "fo2_nonmonotonic_buffered"
+# s3 cell label engine_crash: 11 requests, 11/11 identical, 11 stayed
+# engine_crash. The classifier collapses subprocess_died into that cell
+# token. Stored only when the signal is the binary's own fault
+# (SIGABRT, SIGSEGV, SIGBUS). A timeout, SIGKILL, SIGPROF, a worker
+# death, and a missing runtime carry other labels and are not this code.
+REFUSAL_SUBPROCESS_DIED = "subprocess_died"
 
 # Wire tokens owned by alphamelts.py. Repeated here so this module does not
 # import the adapter. The allowlist pin binds each token to that constant.
@@ -336,6 +349,10 @@ CACHEABLE_REFUSAL_CODES = frozenset({
     REFUSAL_INVALID_INPUT,
     REFUSAL_UNSUPPORTED_INPUT,
     REFUSAL_CLAMPED_OPERATING_POINT,
+    REFUSAL_MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
+    REFUSAL_NO_CONVERGENCE,
+    REFUSAL_FO2_NONMONOTONIC_BUFFERED,
+    REFUSAL_SUBPROCESS_DIED,
     *_PRELAUNCH_CRASH_REFUSAL_CODES,
     # Raised before any kernel or package call. Repeated from the raise
     # sites; the real-refusal tests bind them. Oxygen-balance failure is

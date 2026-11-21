@@ -28,6 +28,7 @@ from simulator import engine_cache
         "INVALID_INPUT",
         "UNSUPPORTED_INPUT",
         "CLAMPED_OPERATING_POINT",
+        "MAGEMIN_MODE_VECTOR_MASS_DEFICIT",
     ],
 )
 def test_cache_refusal_literal_matches_domain_reason(name: str) -> None:
@@ -46,3 +47,31 @@ def test_domain_major_sum_literal_is_not_the_wt_pct_token() -> None:
     assert engine_cache.REFUSAL_MAJOR_SUM == "sum_below_95_wt_pct"
     assert engine_cache.REFUSAL_DOMAIN_MAJOR_SUM in engine_cache.CACHEABLE_REFUSAL_CODES
     assert engine_cache.REFUSAL_MAJOR_SUM in engine_cache.CACHEABLE_REFUSAL_CODES
+
+
+def test_probe_refusal_literals_match_their_owners() -> None:
+    """Adapter tokens are repeated in the leaf. The owners are the pin."""
+
+    from engines.alphamelts.thermoengine import ThermoEngineRefusalCause
+    from simulator.melt_backend.alphamelts import (
+        ALPHAMELTS_REASON_NO_CONVERGENCE,
+        ALPHAMELTS_REASON_SUBPROCESS_DIED,
+    )
+
+    pairs = (
+        (
+            engine_cache.REFUSAL_NO_CONVERGENCE,
+            ALPHAMELTS_REASON_NO_CONVERGENCE,
+        ),
+        (
+            engine_cache.REFUSAL_SUBPROCESS_DIED,
+            ALPHAMELTS_REASON_SUBPROCESS_DIED,
+        ),
+        (
+            engine_cache.REFUSAL_FO2_NONMONOTONIC_BUFFERED,
+            ThermoEngineRefusalCause.FO2_NONMONOTONIC_BUFFERED.value,
+        ),
+    )
+    for literal, owner in pairs:
+        assert literal == owner
+        assert literal in engine_cache.CACHEABLE_REFUSAL_CODES

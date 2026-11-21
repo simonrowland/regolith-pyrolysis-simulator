@@ -531,6 +531,17 @@ def _intern_equilibrium_source_provenance(hot: list[Any]) -> list[Any]:
     return hot
 
 
+# The process faulted itself. SIGKILL is the timeout reaper. SIGPROF is
+# the CPU-budget timer. Any other signal is an external kill. One set:
+# alphamelts uses it to name the reason, and the status gate below uses
+# it so a mislabeled external kill cannot be stored as subprocess_died.
+_BINARY_FAULT_SIGNALS = frozenset({'SIGABRT', 'SIGSEGV', 'SIGBUS'})
+
+
+def signal_is_binary_fault(signal_name: object) -> bool:
+    return isinstance(signal_name, str) and signal_name in _BINARY_FAULT_SIGNALS
+
+
 def _equilibrium_refusal_status(
     status: Any, diagnostics: Any,
 ) -> str:
@@ -540,6 +551,10 @@ def _equilibrium_refusal_status(
     of the process, not of the request. ``process_failure`` is not a
     cacheable status, so the row is not stored even when the reason code
     is otherwise deterministic.
+
+    The exception is a returned ``subprocess_died`` whose signal is the
+    binary's own fault. The adapter does not use that reason for a
+    timeout, an external kill, a worker death, or a missing runtime.
     """
     refusal_status = str(status or '')
     failure = (
@@ -549,9 +564,26 @@ def _equilibrium_refusal_status(
     if not isinstance(failure, Mapping):
         return refusal_status
     returncode = failure.get('returncode')
+    signal_name = failure.get('signal')
+    from simulator.engine_cache import REFUSAL_SUBPROCESS_DIED
+
+    reason = (
+        diagnostics.get('backend_status_reason')
+        or diagnostics.get('backend_failure_reason_code')
+    )
+    binary_fault = (
+        reason == REFUSAL_SUBPROCESS_DIED
+        and signal_is_binary_fault(signal_name)
+        and isinstance(returncode, int)
+        and not isinstance(returncode, bool)
+        and returncode < 0
+        and failure.get('timeout_s') is None
+    )
+    if binary_fault:
+        return refusal_status
     if (
         returncode not in (None, 0)
-        or failure.get('signal')
+        or signal_name
         or failure.get('timeout_s') is not None
     ):
         return 'process_failure'
