@@ -303,7 +303,7 @@ def test_unreported_gram_lab_surface_uses_existing_temperature_default() -> None
     holder = raw["surfaces"][0]
     holder.pop("temperature_profile")
 
-    geometry = parse_lab_geometry(raw)
+    geometry = parse_lab_geometry(raw, allow_temperature_profiles=True)
 
     assert geometry is not None
     surface = next(item for item in geometry.surfaces if item.surface_id == "holder")
@@ -333,7 +333,7 @@ def test_explicit_gram_lab_surface_temperature_is_preserved() -> None:
     holder.pop("temperature_profile")
     holder["temperature_C"] = 37.0
 
-    geometry = parse_lab_geometry(raw)
+    geometry = parse_lab_geometry(raw, allow_temperature_profiles=True)
 
     assert geometry is not None
     surface = next(item for item in geometry.surfaces if item.surface_id == "holder")
