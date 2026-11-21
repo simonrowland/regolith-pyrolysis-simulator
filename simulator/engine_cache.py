@@ -354,7 +354,11 @@ CACHEABLE_REFUSAL_CODES = frozenset({
     # the package class. Nonconvergence, gas oxygen-balance failure, and
     # datapack-load errors stay off this set. imcc_species_not_found is
     # the parent-name lookup on the solved parent list, still fixed by
-    # that request.
+    # that request. imcc_gas_invalid_fO2 is checked on the fugacity
+    # argument before any gas table is read. imcc_gas_species_not_found
+    # and imcc_gas_T_outside_domain depend on the gas tables
+    # OPENIMCC_VAPOROCK_ROOT can swap, and that root is not in the key,
+    # so they stay off this set.
     "imcc_composition_incomplete",
     "imcc_ferric_input_unsupported",
     "imcc_component_outside_domain",
@@ -362,8 +366,6 @@ CACHEABLE_REFUSAL_CODES = frozenset({
     "imcc_sp_extension_required",
     "imcc_composition_outside_validated_envelope",
     "imcc_T_outside_datapack_domain",
-    "imcc_gas_species_not_found",
-    "imcc_gas_T_outside_domain",
     "imcc_gas_invalid_fO2",
 })
 
