@@ -2248,8 +2248,9 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
         == len(RecipeSchema().allowlist)
     )
     # 52 bounds are directly sourced from setpoint ranges; two additional
-    # campaign defaults are converted from setpoints and included in the
-    # 54-entry union pinned above.
+    # campaign defaults are converted from setpoints. Together with the 43
+    # campaign keys, five stage areas, throat, and five vanes, they make the
+    # 54-entry union pinned below.
     assert range_sourced == 52
     assert converted_setpoint_ranges == 2
     assert engineering_envelopes > 0

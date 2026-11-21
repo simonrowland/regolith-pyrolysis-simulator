@@ -791,13 +791,12 @@ class OverheadGasModel:
             'usage': [
                 'stage_area_m2_by_stage',
                 'stage_capture',
-                'wall_deposit_candidate_for_surface',
                 'coating_lifespan',
             ],
             'stage_area_ratio_provenance_by_stage': records,
             'message': (
                 'D-283 collector areas feed stage capture. Duct-wall deposition '
-                'uses each duct own cylindrical surface.'
+                "uses each duct's own cylindrical surface."
             ),
         }
 
