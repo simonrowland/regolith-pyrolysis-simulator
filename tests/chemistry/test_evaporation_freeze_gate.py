@@ -2310,7 +2310,10 @@ def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
             assert identity_notice is None
             assert float(resolved_curve['liquidus_T_C']) < 1800.0
             liquid_domain = sim.liquid_feo_domain_at(1800.0 + 273.15)
-            assert liquid_domain.domain_identity is None
+            assert (
+                liquid_domain.domain_identity.projection_threshold_verdict
+                == 'not_applicable'
+            )
             assert liquid_domain.below_liquidus is False
             assert liquid_domain.liquidus_unknown is False
             assert notices == []
