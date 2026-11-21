@@ -8,6 +8,7 @@ import pytest
 import yaml
 
 from simulator.battery import migrate as battery_migrate
+from simulator.battery import score as battery_score
 from tools import validate_literature_extracts as vle
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,6 +46,26 @@ def _series_rows(document: dict) -> dict[str, dict]:
 
 
 def _assert_table1_pins(document: dict) -> None:
+    assert len(document["experiments"]) == len(RUNS)
+    for experiment in document["experiments"]:
+        pressure_environment = experiment["apparatus"]["pressure_environment"]
+        total_pressure = pressure_environment["total_pressure_Pa"]
+        assert total_pressure["state"]["tag"] == "value"
+        assert total_pressure["state"]["value"] == {
+            "kind": "point",
+            "point": "0.0001",
+            "approximate": True,
+        }
+        assert total_pressure["locator"]["page"] == 8
+        assert total_pressure["locator"]["section"] == "2.2 Vacuum evaporation experiments"
+        assert "<10^-9" in total_pressure["locator"]["note"]
+        base_pressure = pressure_environment["pumping"]["base_pressure_Pa"]
+        assert base_pressure["state"]["value"] == {
+            "kind": "point",
+            "point": "0.0001",
+            "approximate": True,
+        }
+
     rows = _series_rows(document)
     assert set(rows) == {sample for sample, *_ in RUNS}
     for sample, temperature, time_min, nominal_hold, radius, cells in RUNS:
@@ -52,6 +73,7 @@ def _assert_table1_pins(document: dict) -> None:
         values = row["values"]
         assert values["quantity"] == "residue_component_composition"
         assert values["admission_status"] == "admitted"
+        assert values["composition_role"] == "initial_charge_only"
         assert row["locator"]["page"] == 71 and row["locator"]["table"] == "1"
         assert sample in row["locator"]["note"]
         assert 'relative to zero-time runs' in row["locator"]["note"]
@@ -59,22 +81,26 @@ def _assert_table1_pins(document: dict) -> None:
         assert point["sample"] == sample
         assert point["nominal_hold_as_named"] == nominal_hold
         assert point["T_C"] == temperature
+        assert point["t_min"] == time_min
+        assert point["locator"]["page"] == 71
+        assert point["locator"]["table"] == "1"
+        assert point["locator"]["row"] == sample
+        assert "Methods p. 9" in point["locator"]["note"]
         for oxide, cell in zip(OXIDES, cells, strict=True):
             field = f"{oxide}_wt_pct"
             if cell == "b.d.l.":
                 assert field not in point
             else:
                 assert point[field] == cell
-        time = point["point_conditions"]["time_min"]
-        assert time["state"]["tag"] == "value"
-        assert time["state"]["value"] == time_min
-        assert time["locator"]["page"] == 71
-        assert time["locator"]["table"] == "1"
         sample_radius = point["point_conditions"]["sample_radius_mm"]
         assert sample_radius["state"]["tag"] == "value"
         assert sample_radius["state"]["value"] == radius
         assert sample_radius["locator"]["page"] == 9
         assert sample_radius["locator"]["table"] == "S1"
+        assert sample_radius["locator"]["source_path"] == (
+            "raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf"
+        )
+        assert "zhang-2021-acsesc-si" in sample_radius["locator"]["note"]
 
     refusals = {
         row["values"]["composition_component"]: row
@@ -93,15 +119,25 @@ def _assert_table1_pins(document: dict) -> None:
         assert refusal["locator"]["page"] == 71
         assert refusal["locator"]["table"] == "1"
         assert refusal["locator"]["row"] == "Bas1400C90m"
+        pressure = refusal["point_conditions"]["total_pressure_Pa"]
+        assert pressure["state"]["value"] == {
+            "kind": "point",
+            "point": "0.0001",
+            "approximate": True,
+        }
         time = refusal["point_conditions"]["time_min"]
         assert time["state"]["tag"] == "value"
         assert time["state"]["value"] == "90"
         assert time["locator"]["page"] == 71
+        assert "Methods p. 9" in time["locator"]["note"]
         radius = refusal["point_conditions"]["sample_radius_mm"]
         assert radius["state"]["tag"] == "value"
         assert radius["state"]["value"] == "1.5"
         assert radius["locator"]["page"] == 9
         assert radius["locator"]["table"] == "S1"
+        assert radius["locator"]["source_path"] == (
+            "raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf"
+        )
 
 
 def test_table1_and_table_s1_cells_are_render_pinned_and_mutation_checked() -> None:
@@ -115,7 +151,7 @@ def test_table1_and_table_s1_cells_are_render_pinned_and_mutation_checked() -> N
         _assert_table1_pins(changed_cell)
 
     changed_time = deepcopy(document)
-    _series_rows(changed_time)["Bas1200C1h"]["values"]["series"][0]["point_conditions"]["time_min"]["state"]["value"] = "56"
+    _series_rows(changed_time)["Bas1200C1h"]["values"]["series"][0]["t_min"] = "56"
     with pytest.raises(AssertionError):
         _assert_table1_pins(changed_time)
 
@@ -123,6 +159,23 @@ def test_table1_and_table_s1_cells_are_render_pinned_and_mutation_checked() -> N
     _series_rows(changed_radius)["Bas1200C40h"]["values"]["series"][0]["point_conditions"]["sample_radius_mm"]["state"]["value"] = "1.5"
     with pytest.raises(AssertionError):
         _assert_table1_pins(changed_radius)
+
+    changed_radius_locator = deepcopy(document)
+    _series_rows(changed_radius_locator)["Bas1200C40h"]["values"]["series"][0]["point_conditions"]["sample_radius_mm"]["locator"]["source_path"] = (
+        "raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf"
+    )
+    with pytest.raises(AssertionError):
+        _assert_table1_pins(changed_radius_locator)
+
+    changed_pressure = deepcopy(document)
+    changed_pressure["experiments"][0]["apparatus"]["pressure_environment"]["total_pressure_Pa"]["state"]["value"]["point"] = "0.0002"
+    with pytest.raises(AssertionError):
+        _assert_table1_pins(changed_pressure)
+
+    changed_role = deepcopy(document)
+    del _series_rows(changed_role)["Bas1400C15m"]["values"]["composition_role"]
+    with pytest.raises(AssertionError):
+        _assert_table1_pins(changed_role)
 
 
 def test_isolated_migration_emits_every_oxide_with_located_time_and_radius(tmp_path: Path) -> None:
@@ -147,12 +200,33 @@ def test_isolated_migration_emits_every_oxide_with_located_time_and_radius(tmp_p
         conditions = observation.point_conditions or {}
         time = conditions["time_min"]
         radius = conditions["sample_radius_mm"]
+        pressure = conditions["total_pressure_Pa"]
         temperature = observation.identity.temperature_K
         assert temperature.is_value
         assert conditions["temperature_K"].state.value == temperature.value
         assert conditions["temperature_K"].locator.page == 71
         assert time.state.is_value and time.locator.page == 71
+        assert "Methods p. 9" in time.locator.note
         assert radius.state.is_value and radius.locator.page == 9
+        assert radius.locator.source_path == (
+            "raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf"
+        )
+        assert pressure.state.is_value
+        assert pressure.state.value.kind.value == "point"
+        assert pressure.state.value.approximate is True
+        assert pressure.state.value.point == Decimal("0.0001")
+        identity_pressure = observation.identity.total_pressure_Pa
+        assert identity_pressure.is_value
+        assert identity_pressure.value.kind == "approximate_pressure"
+        assert identity_pressure.value.point == Decimal("0.0001")
+        exposure = observation.identity.exposure
+        if observation.value.kind.value == "point":
+            assert exposure.is_value
+            assert exposure.value.duration_s.is_value
+            assert exposure.value.duration_s.value == time.state.value * Decimal("60")
+            assert observation.identity.composition.is_value
+            assert observation.identity.composition.value.proxy_flag == "initial_charge_only"
+            assert battery_score._initial_charge_composition_notice(observation) is not None
         key = (temperature.value, time.state.value, observation.identity.species.formula)
         assert key not in observed
         observed[key] = observation

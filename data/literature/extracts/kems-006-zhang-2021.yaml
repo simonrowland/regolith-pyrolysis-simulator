@@ -115,15 +115,18 @@ experiments:
       locator:
         section: 2.2 Vacuum evaporation experiments
   pressure_environment:
+    # 10^-6 mbar × 100 Pa/mbar = 10^-4 Pa; Table 4 <10^-9 bar × 10^5 Pa/bar = <10^-4 Pa.
     total_pressure_Pa:
       state:
         tag: value
         value:
           kind: point
-          point: '0.1'
+          point: '0.0001'
+          approximate: true
       locator:
+        page: 8
         section: 2.2 Vacuum evaporation experiments
-        note: Printed 10^-6 mbar; unit conversion only
+        note: 'About 10^-6 mbar; Table 4 p. 74 prints P(bar) <10^-9.'
     sweep_gas:
       state:
         tag: not_applicable
@@ -140,7 +143,7 @@ experiments:
           tag: value
           value:
             kind: point
-            point: '0.1'
+            point: '0.0001'
             approximate: true
         locator:
           section: 2.2 Vacuum evaporation experiments
@@ -229,10 +232,12 @@ experiments:
         tag: value
         value:
           kind: point
-          point: '0.1'
+          point: '0.0001'
+          approximate: true
       locator:
+        page: 8
         section: 2.2 Vacuum evaporation experiments
-        note: Printed 10^-6 mbar; unit conversion only
+        note: 'About 10^-6 mbar; Table 4 p. 74 prints P(bar) <10^-9.'
     sweep_gas:
       state:
         tag: not_applicable
@@ -249,7 +254,7 @@ experiments:
           tag: value
           value:
             kind: point
-            point: '0.1'
+            point: '0.0001'
             approximate: true
         locator:
           section: 2.2 Vacuum evaporation experiments
@@ -338,10 +343,12 @@ experiments:
         tag: value
         value:
           kind: point
-          point: '0.1'
+          point: '0.0001'
+          approximate: true
       locator:
+        page: 8
         section: 2.2 Vacuum evaporation experiments
-        note: Printed 10^-6 mbar; unit conversion only
+        note: 'About 10^-6 mbar; Table 4 p. 74 prints P(bar) <10^-9.'
     sweep_gas:
       state:
         tag: not_applicable
@@ -358,7 +365,7 @@ experiments:
           tag: value
           value:
             kind: point
-            point: '0.1'
+            point: '0.0001'
             approximate: true
         locator:
           section: 2.2 Vacuum evaporation experiments
@@ -447,10 +454,12 @@ experiments:
         tag: value
         value:
           kind: point
-          point: '0.1'
+          point: '0.0001'
+          approximate: true
       locator:
+        page: 8
         section: 2.2 Vacuum evaporation experiments
-        note: Printed 10^-6 mbar; unit conversion only
+        note: 'About 10^-6 mbar; Table 4 p. 74 prints P(bar) <10^-9.'
     sweep_gas:
       state:
         tag: not_applicable
@@ -467,7 +476,7 @@ experiments:
           tag: value
           value:
             kind: point
-            point: '0.1'
+            point: '0.0001'
             approximate: true
         locator:
           section: 2.2 Vacuum evaporation experiments
@@ -556,10 +565,12 @@ experiments:
         tag: value
         value:
           kind: point
-          point: '0.1'
+          point: '0.0001'
+          approximate: true
       locator:
+        page: 8
         section: 2.2 Vacuum evaporation experiments
-        note: Printed 10^-6 mbar; unit conversion only
+        note: 'About 10^-6 mbar; Table 4 p. 74 prints P(bar) <10^-9.'
     sweep_gas:
       state:
         tag: not_applicable
@@ -576,7 +587,7 @@ experiments:
           tag: value
           value:
             kind: point
-            point: '0.1'
+            point: '0.0001'
             approximate: true
         locator:
           section: 2.2 Vacuum evaporation experiments
@@ -665,10 +676,12 @@ experiments:
         tag: value
         value:
           kind: point
-          point: '0.1'
+          point: '0.0001'
+          approximate: true
       locator:
+        page: 8
         section: 2.2 Vacuum evaporation experiments
-        note: Printed 10^-6 mbar; unit conversion only
+        note: 'About 10^-6 mbar; Table 4 p. 74 prints P(bar) <10^-9.'
     sweep_gas:
       state:
         tag: not_applicable
@@ -685,7 +698,7 @@ experiments:
           tag: value
           value:
             kind: point
-            point: '0.1'
+            point: '0.0001'
             approximate: true
         locator:
           section: 2.2 Vacuum evaporation experiments
@@ -774,10 +787,12 @@ experiments:
         tag: value
         value:
           kind: point
-          point: '0.1'
+          point: '0.0001'
+          approximate: true
       locator:
+        page: 8
         section: 2.2 Vacuum evaporation experiments
-        note: Printed 10^-6 mbar; unit conversion only
+        note: 'About 10^-6 mbar; Table 4 p. 74 prints P(bar) <10^-9.'
     sweep_gas:
       state:
         tag: not_applicable
@@ -794,7 +809,7 @@ experiments:
           tag: value
           value:
             kind: point
-            point: '0.1'
+            point: '0.0001'
             approximate: true
         locator:
           section: 2.2 Vacuum evaporation experiments
@@ -883,10 +898,12 @@ experiments:
         tag: value
         value:
           kind: point
-          point: '0.1'
+          point: '0.0001'
+          approximate: true
       locator:
+        page: 8
         section: 2.2 Vacuum evaporation experiments
-        note: Printed 10^-6 mbar; unit conversion only
+        note: 'About 10^-6 mbar; Table 4 p. 74 prints P(bar) <10^-9.'
     sweep_gas:
       state:
         tag: not_applicable
@@ -903,7 +920,7 @@ experiments:
           tag: value
           value:
             kind: point
-            point: '0.1'
+            point: '0.0001'
             approximate: true
         locator:
           section: 2.2 Vacuum evaporation experiments
@@ -992,10 +1009,12 @@ experiments:
         tag: value
         value:
           kind: point
-          point: '0.1'
+          point: '0.0001'
+          approximate: true
       locator:
+        page: 8
         section: 2.2 Vacuum evaporation experiments
-        note: Printed 10^-6 mbar; unit conversion only
+        note: 'About 10^-6 mbar; Table 4 p. 74 prints P(bar) <10^-9.'
     sweep_gas:
       state:
         tag: not_applicable
@@ -1012,7 +1031,7 @@ experiments:
           tag: value
           value:
             kind: point
-            point: '0.1'
+            point: '0.0001'
             approximate: true
         locator:
           section: 2.2 Vacuum evaporation experiments
@@ -1101,10 +1120,12 @@ experiments:
         tag: value
         value:
           kind: point
-          point: '0.1'
+          point: '0.0001'
+          approximate: true
       locator:
+        page: 8
         section: 2.2 Vacuum evaporation experiments
-        note: Printed 10^-6 mbar; unit conversion only
+        note: 'About 10^-6 mbar; Table 4 p. 74 prints P(bar) <10^-9.'
     sweep_gas:
       state:
         tag: not_applicable
@@ -1121,7 +1142,7 @@ experiments:
           tag: value
           value:
             kind: point
-            point: '0.1'
+            point: '0.0001'
             approximate: true
         locator:
           section: 2.2 Vacuum evaporation experiments
@@ -1184,6 +1205,7 @@ species:
       values:
         quantity: residue_component_composition
         method_class: measured_direct
+        composition_role: initial_charge_only
         admission_status: admitted
         initial_glass_Na2O_wt_pct: 2.27
         starting_glass_wt_pct:
@@ -1210,16 +1232,13 @@ species:
           FeO_wt_pct: '10.00'
           K2O_wt_pct: '2.50'
           Rb2O_wt_pct: '1.89'
+          t_min: '0'
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1400C0m1
+            note: 'Methods p. 9 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
           point_conditions:
-            time_min:
-              state:
-                tag: value
-                value: '0'
-              locator:
-                page: 71
-                table: '1'
-                row: Bas1400C0m1
-                note: 'Methods p. 8 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
             sample_radius_mm:
               state:
                 tag: value
@@ -1227,8 +1246,9 @@ species:
               locator:
                 page: 9
                 table: S1
+                source_path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
                 row: Bas1400C0m1
-                note: 'Methods p. 8: "The value of a is the radius of the iridium loop."; Table S1 reports principal-axis lengths, including Axis A (mm).'
+                note: 'Source zhang-2021-acsesc-si, Table S1 p. 9 reports Axis A (mm); Methods p. 8 defines a as the iridium-loop radius.'
         note: Table 1 full printed oxide vector; below-detection cells are separately typed refusals.
       uncertainty:
         note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
@@ -1263,6 +1283,7 @@ species:
       values:
         quantity: residue_component_composition
         method_class: measured_direct
+        composition_role: initial_charge_only
         admission_status: admitted
         initial_glass_Na2O_wt_pct: 2.27
         starting_glass_wt_pct:
@@ -1289,16 +1310,13 @@ species:
           FeO_wt_pct: '10.15'
           K2O_wt_pct: '1.63'
           Rb2O_wt_pct: '1.12'
+          t_min: '15'
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1400C15m
+            note: 'Methods p. 9 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
           point_conditions:
-            time_min:
-              state:
-                tag: value
-                value: '15'
-              locator:
-                page: 71
-                table: '1'
-                row: Bas1400C15m
-                note: 'Methods p. 8 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
             sample_radius_mm:
               state:
                 tag: value
@@ -1306,8 +1324,9 @@ species:
               locator:
                 page: 9
                 table: S1
+                source_path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
                 row: Bas1400C15m
-                note: 'Methods p. 8: "The value of a is the radius of the iridium loop."; Table S1 reports principal-axis lengths, including Axis A (mm).'
+                note: 'Source zhang-2021-acsesc-si, Table S1 p. 9 reports Axis A (mm); Methods p. 8 defines a as the iridium-loop radius.'
         note: Table 1 full printed oxide vector; below-detection cells are separately typed refusals.
       uncertainty:
         note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
@@ -1342,6 +1361,7 @@ species:
       values:
         quantity: residue_component_composition
         method_class: measured_direct
+        composition_role: initial_charge_only
         admission_status: admitted
         initial_glass_Na2O_wt_pct: 2.27
         starting_glass_wt_pct:
@@ -1368,16 +1388,13 @@ species:
           FeO_wt_pct: '10.21'
           K2O_wt_pct: '1.19'
           Rb2O_wt_pct: '0.74'
+          t_min: '30'
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1400C30m
+            note: 'Methods p. 9 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
           point_conditions:
-            time_min:
-              state:
-                tag: value
-                value: '30'
-              locator:
-                page: 71
-                table: '1'
-                row: Bas1400C30m
-                note: 'Methods p. 8 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
             sample_radius_mm:
               state:
                 tag: value
@@ -1385,8 +1402,9 @@ species:
               locator:
                 page: 9
                 table: S1
+                source_path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
                 row: Bas1400C30m
-                note: 'Methods p. 8: "The value of a is the radius of the iridium loop."; Table S1 reports principal-axis lengths, including Axis A (mm).'
+                note: 'Source zhang-2021-acsesc-si, Table S1 p. 9 reports Axis A (mm); Methods p. 8 defines a as the iridium-loop radius.'
         note: Table 1 full printed oxide vector; below-detection cells are separately typed refusals.
       uncertainty:
         note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
@@ -1421,6 +1439,7 @@ species:
       values:
         quantity: residue_component_composition
         method_class: measured_direct
+        composition_role: initial_charge_only
         admission_status: admitted
         initial_glass_Na2O_wt_pct: 2.27
         starting_glass_wt_pct:
@@ -1447,16 +1466,13 @@ species:
           FeO_wt_pct: '10.28'
           K2O_wt_pct: '0.28'
           Rb2O_wt_pct: '0.10'
+          t_min: '60'
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1400C60m
+            note: 'Methods p. 9 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
           point_conditions:
-            time_min:
-              state:
-                tag: value
-                value: '60'
-              locator:
-                page: 71
-                table: '1'
-                row: Bas1400C60m
-                note: 'Methods p. 8 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
             sample_radius_mm:
               state:
                 tag: value
@@ -1464,8 +1480,9 @@ species:
               locator:
                 page: 9
                 table: S1
+                source_path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
                 row: Bas1400C60m
-                note: 'Methods p. 8: "The value of a is the radius of the iridium loop."; Table S1 reports principal-axis lengths, including Axis A (mm).'
+                note: 'Source zhang-2021-acsesc-si, Table S1 p. 9 reports Axis A (mm); Methods p. 8 defines a as the iridium-loop radius.'
         note: Table 1 full printed oxide vector; below-detection cells are separately typed refusals.
       uncertainty:
         note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
@@ -1500,6 +1517,7 @@ species:
       values:
         quantity: residue_component_composition
         method_class: measured_direct
+        composition_role: initial_charge_only
         admission_status: admitted
         initial_glass_Na2O_wt_pct: 2.27
         starting_glass_wt_pct:
@@ -1524,16 +1542,13 @@ species:
           Al2O3_wt_pct: '16.29'
           FeO_wt_pct: '10.30'
           K2O_wt_pct: '0.05'
+          t_min: '90'
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1400C90m
+            note: 'Methods p. 9 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
           point_conditions:
-            time_min:
-              state:
-                tag: value
-                value: '90'
-              locator:
-                page: 71
-                table: '1'
-                row: Bas1400C90m
-                note: 'Methods p. 8 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
             sample_radius_mm:
               state:
                 tag: value
@@ -1541,8 +1556,9 @@ species:
               locator:
                 page: 9
                 table: S1
+                source_path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
                 row: Bas1400C90m
-                note: 'Methods p. 8: "The value of a is the radius of the iridium loop."; Table S1 reports principal-axis lengths, including Axis A (mm).'
+                note: 'Source zhang-2021-acsesc-si, Table S1 p. 9 reports Axis A (mm); Methods p. 8 defines a as the iridium-loop radius.'
         note: Table 1 full printed oxide vector; below-detection cells are separately typed refusals.
       uncertainty:
         note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
@@ -1577,6 +1593,7 @@ species:
       values:
         quantity: residue_component_composition
         method_class: measured_direct
+        composition_role: initial_charge_only
         admission_status: admitted
         initial_glass_Na2O_wt_pct: 2.27
         starting_glass_wt_pct:
@@ -1603,16 +1620,13 @@ species:
           FeO_wt_pct: '9.69'
           K2O_wt_pct: '2.58'
           Rb2O_wt_pct: '1.87'
+          t_min: '0'
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1200C0h2
+            note: 'Methods p. 9 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
           point_conditions:
-            time_min:
-              state:
-                tag: value
-                value: '0'
-              locator:
-                page: 71
-                table: '1'
-                row: Bas1200C0h2
-                note: 'Methods p. 8 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
             sample_radius_mm:
               state:
                 tag: value
@@ -1620,8 +1634,9 @@ species:
               locator:
                 page: 9
                 table: S1
+                source_path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
                 row: Bas1200C0h2
-                note: 'Methods p. 8: "The value of a is the radius of the iridium loop."; Table S1 reports principal-axis lengths, including Axis A (mm).'
+                note: 'Source zhang-2021-acsesc-si, Table S1 p. 9 reports Axis A (mm); Methods p. 8 defines a as the iridium-loop radius.'
         note: Table 1 full printed oxide vector; below-detection cells are separately typed refusals.
       uncertainty:
         note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
@@ -1656,6 +1671,7 @@ species:
       values:
         quantity: residue_component_composition
         method_class: measured_direct
+        composition_role: initial_charge_only
         admission_status: admitted
         initial_glass_Na2O_wt_pct: 2.27
         starting_glass_wt_pct:
@@ -1682,16 +1698,13 @@ species:
           FeO_wt_pct: '10.05'
           K2O_wt_pct: '2.53'
           Rb2O_wt_pct: '1.93'
+          t_min: '55'
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1200C1h
+            note: 'Methods p. 9 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
           point_conditions:
-            time_min:
-              state:
-                tag: value
-                value: '55'
-              locator:
-                page: 71
-                table: '1'
-                row: Bas1200C1h
-                note: 'Methods p. 8 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
             sample_radius_mm:
               state:
                 tag: value
@@ -1699,8 +1712,9 @@ species:
               locator:
                 page: 9
                 table: S1
+                source_path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
                 row: Bas1200C1h
-                note: 'Methods p. 8: "The value of a is the radius of the iridium loop."; Table S1 reports principal-axis lengths, including Axis A (mm).'
+                note: 'Source zhang-2021-acsesc-si, Table S1 p. 9 reports Axis A (mm); Methods p. 8 defines a as the iridium-loop radius.'
         note: Table 1 full printed oxide vector; below-detection cells are separately typed refusals.
       uncertainty:
         note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
@@ -1735,6 +1749,7 @@ species:
       values:
         quantity: residue_component_composition
         method_class: measured_direct
+        composition_role: initial_charge_only
         admission_status: admitted
         initial_glass_Na2O_wt_pct: 2.27
         starting_glass_wt_pct:
@@ -1761,16 +1776,13 @@ species:
           FeO_wt_pct: '10.05'
           K2O_wt_pct: '2.15'
           Rb2O_wt_pct: '1.56'
+          t_min: '235'
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1200C4h
+            note: 'Methods p. 9 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
           point_conditions:
-            time_min:
-              state:
-                tag: value
-                value: '235'
-              locator:
-                page: 71
-                table: '1'
-                row: Bas1200C4h
-                note: 'Methods p. 8 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
             sample_radius_mm:
               state:
                 tag: value
@@ -1778,8 +1790,9 @@ species:
               locator:
                 page: 9
                 table: S1
+                source_path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
                 row: Bas1200C4h
-                note: 'Methods p. 8: "The value of a is the radius of the iridium loop."; Table S1 reports principal-axis lengths, including Axis A (mm).'
+                note: 'Source zhang-2021-acsesc-si, Table S1 p. 9 reports Axis A (mm); Methods p. 8 defines a as the iridium-loop radius.'
         note: Table 1 full printed oxide vector; below-detection cells are separately typed refusals.
       uncertainty:
         note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
@@ -1814,6 +1827,7 @@ species:
       values:
         quantity: residue_component_composition
         method_class: measured_direct
+        composition_role: initial_charge_only
         admission_status: admitted
         initial_glass_Na2O_wt_pct: 2.27
         starting_glass_wt_pct:
@@ -1840,16 +1854,13 @@ species:
           FeO_wt_pct: '10.17'
           K2O_wt_pct: '1.84'
           Rb2O_wt_pct: '1.27'
+          t_min: '595'
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1200C10h
+            note: 'Methods p. 9 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
           point_conditions:
-            time_min:
-              state:
-                tag: value
-                value: '595'
-              locator:
-                page: 71
-                table: '1'
-                row: Bas1200C10h
-                note: 'Methods p. 8 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
             sample_radius_mm:
               state:
                 tag: value
@@ -1857,8 +1868,9 @@ species:
               locator:
                 page: 9
                 table: S1
+                source_path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
                 row: Bas1200C10h
-                note: 'Methods p. 8: "The value of a is the radius of the iridium loop."; Table S1 reports principal-axis lengths, including Axis A (mm).'
+                note: 'Source zhang-2021-acsesc-si, Table S1 p. 9 reports Axis A (mm); Methods p. 8 defines a as the iridium-loop radius.'
         note: Table 1 full printed oxide vector; below-detection cells are separately typed refusals.
       uncertainty:
         note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
@@ -1893,6 +1905,7 @@ species:
       values:
         quantity: residue_component_composition
         method_class: measured_direct
+        composition_role: initial_charge_only
         admission_status: admitted
         initial_glass_Na2O_wt_pct: 2.27
         starting_glass_wt_pct:
@@ -1919,16 +1932,13 @@ species:
           FeO_wt_pct: '10.35'
           K2O_wt_pct: '1.09'
           Rb2O_wt_pct: '0.67'
+          t_min: '2395'
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1200C40h
+            note: 'Methods p. 9 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
           point_conditions:
-            time_min:
-              state:
-                tag: value
-                value: '2395'
-              locator:
-                page: 71
-                table: '1'
-                row: Bas1200C40h
-                note: 'Methods p. 8 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
             sample_radius_mm:
               state:
                 tag: value
@@ -1936,8 +1946,9 @@ species:
               locator:
                 page: 9
                 table: S1
+                source_path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
                 row: Bas1200C40h
-                note: 'Methods p. 8: "The value of a is the radius of the iridium loop."; Table S1 reports principal-axis lengths, including Axis A (mm).'
+                note: 'Source zhang-2021-acsesc-si, Table S1 p. 9 reports Axis A (mm); Methods p. 8 defines a as the iridium-loop radius.'
         note: Table 1 full printed oxide vector; below-detection cells are separately typed refusals.
       uncertainty:
         note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
@@ -2097,6 +2108,16 @@ species:
       T_C: 1400
       units: wt_percent
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0001'
+              approximate: true
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
         time_min:
           state:
             tag: value
@@ -2105,7 +2126,7 @@ species:
             page: 71
             table: '1'
             row: Bas1400C90m
-            note: 'Methods p. 8 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
+            note: 'Methods p. 9 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
         sample_radius_mm:
           state:
             tag: value
@@ -2113,8 +2134,9 @@ species:
           locator:
             page: 9
             table: S1
+            source_path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
             row: Bas1400C90m
-            note: 'Methods p. 8: "The value of a is the radius of the iridium loop."; Table S1 reports principal-axis lengths, including Axis A (mm).'
+            note: 'Source zhang-2021-acsesc-si, Table S1 p. 9 reports Axis A (mm); Methods p. 8 defines a as the iridium-loop radius.'
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -2138,6 +2160,16 @@ species:
       T_C: 1400
       units: wt_percent
       point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0001'
+              approximate: true
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
         time_min:
           state:
             tag: value
@@ -2146,7 +2178,7 @@ species:
             page: 71
             table: '1'
             row: Bas1400C90m
-            note: 'Methods p. 8 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
+            note: 'Methods p. 9 section 2.2: "The effective duration of the evaporation experiments was relative to zero-time runs."; Table 1 Time (min).'
         sample_radius_mm:
           state:
             tag: value
@@ -2154,8 +2186,9 @@ species:
           locator:
             page: 9
             table: S1
+            source_path: raw/zhang-2021-acsesc-si/zhang-2021-acsesc-si.pdf
             row: Bas1400C90m
-            note: 'Methods p. 8: "The value of a is the radius of the iridium loop."; Table S1 reports principal-axis lengths, including Axis A (mm).'
+            note: 'Source zhang-2021-acsesc-si, Table S1 p. 9 reports Axis A (mm); Methods p. 8 defines a as the iridium-loop radius.'
       values:
         quantity: residue_component_composition
         method_class: measured_direct

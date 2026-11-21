@@ -9505,7 +9505,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # Table 1 oxide cells. Its 325th printed oxide cell is <0.01 Na2O and remains
     # typed-refused. The count moved because these data became visible, not
     # because a check was relaxed; mismatches stay 0.
-    assert census.get("residue_component_composition") == 8112
+    # Zhang et al. (2021) Table 1 adds 88 numeric oxide cells; its two b.d.l.
+    # cells remain typed-refused and do not enter the numeric census.
+    assert census.get("residue_component_composition") == 8200
     assert per_source.get("su-zhang-2023-lunar-orange-glass-na-k-cu-degassing") == {
         "residue_component_composition": 3435
     }
@@ -9599,7 +9601,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 12505, (n_numeric, census, n_unavailable)
+    assert n_numeric == 12593, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
