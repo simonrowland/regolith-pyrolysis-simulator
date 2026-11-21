@@ -13336,7 +13336,10 @@ def uncertainty_for(raw: object) -> Uncertainty:
     if raw is None or raw == "":
         return Uncertainty(kind=UncertaintyKind.NONE)
     if isinstance(raw, Mapping):
-        if raw.get("kind") == UncertaintyKind.DERIVED.value:
+        if (
+            raw.get("kind") == UncertaintyKind.DERIVED.value
+            and isinstance(raw.get("derivation"), Mapping)
+        ):
             return _uncertainty_from_plain(raw)
         return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=raw)
     if isinstance(raw, str):

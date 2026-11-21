@@ -19,8 +19,9 @@ extraction:
     basis. Footnote 3's simple ppm conversion is approximate and was not used
     for these MgO-bearing slags. A ±1 wt% Fig. 11 composition-coordinate
     digitization bound is propagated by exchanging MgO and Al2O3 at fixed CaO
-    and SiO2. Fig. 14 gamma digitization uncertainty is estimated as ±3 units;
-    the paper reports no point-specific measurement errors.
+    and SiO2 on the AlO1.5 basis, counting each Al2O3 as two formula units.
+    Fig. 14 gamma digitization uncertainty is estimated as ±3 units; the paper
+    reports no point-specific measurement errors.
   date: '2026-11-20'
   worker: w1120maeda
 review_status: draft
@@ -456,7 +457,7 @@ species:
         units: dimensionless
         uncertainty:
           kind: derived
-          value: '0.35'
+          value: '0.12'
           basis: gamma_CrO_absolute_units
           locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '1'}
           derivation:
@@ -464,7 +465,7 @@ species:
             inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
             parameters: []
             method:
-              state: {tag: value, value: 'Propagated a ±1 wt% coordinate shift through gamma proportional to total moles, as MgO–Al2O3 exchange at fixed CaO and SiO2.'}
+              state: {tag: value, value: 'Propagated the ±1 wt% MgO–Al2O3 coordinate exchange through gamma proportional to total moles on the AlO1.5 basis; Al2O3 contributes two AlO1.5 formula units.'}
               locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '1'}
             references: ['Fig. 11 composition digitization', 'Eq. (13)']
             output_unit: gamma_CrO_absolute_units
@@ -521,7 +522,7 @@ species:
         units: dimensionless
         uncertainty:
           kind: derived
-          value: '0.35'
+          value: '0.12'
           basis: gamma_CrO_absolute_units
           locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '2'}
           derivation:
@@ -529,7 +530,7 @@ species:
             inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
             parameters: []
             method:
-              state: {tag: value, value: 'Propagated a ±1 wt% coordinate shift through gamma proportional to total moles, as MgO–Al2O3 exchange at fixed CaO and SiO2.'}
+              state: {tag: value, value: 'Propagated the ±1 wt% MgO–Al2O3 coordinate exchange through gamma proportional to total moles on the AlO1.5 basis; Al2O3 contributes two AlO1.5 formula units.'}
               locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '2'}
             references: ['Fig. 11 composition digitization', 'Eq. (13)']
             output_unit: gamma_CrO_absolute_units
@@ -586,7 +587,7 @@ species:
         units: dimensionless
         uncertainty:
           kind: derived
-          value: '0.35'
+          value: '0.12'
           basis: gamma_CrO_absolute_units
           locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '3'}
           derivation:
@@ -594,7 +595,7 @@ species:
             inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
             parameters: []
             method:
-              state: {tag: value, value: 'Propagated a ±1 wt% coordinate shift through gamma proportional to total moles, as MgO–Al2O3 exchange at fixed CaO and SiO2.'}
+              state: {tag: value, value: 'Propagated the ±1 wt% MgO–Al2O3 coordinate exchange through gamma proportional to total moles on the AlO1.5 basis; Al2O3 contributes two AlO1.5 formula units.'}
               locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '3'}
             references: ['Fig. 11 composition digitization', 'Eq. (13)']
             output_unit: gamma_CrO_absolute_units
@@ -651,7 +652,7 @@ species:
         units: dimensionless
         uncertainty:
           kind: derived
-          value: '0.35'
+          value: '0.12'
           basis: gamma_CrO_absolute_units
           locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '4'}
           derivation:
@@ -659,7 +660,7 @@ species:
             inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
             parameters: []
             method:
-              state: {tag: value, value: 'Propagated a ±1 wt% coordinate shift through gamma proportional to total moles, as MgO–Al2O3 exchange at fixed CaO and SiO2.'}
+              state: {tag: value, value: 'Propagated the ±1 wt% MgO–Al2O3 coordinate exchange through gamma proportional to total moles on the AlO1.5 basis; Al2O3 contributes two AlO1.5 formula units.'}
               locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '4'}
             references: ['Fig. 11 composition digitization', 'Eq. (13)']
             output_unit: gamma_CrO_absolute_units
@@ -716,7 +717,7 @@ species:
         units: dimensionless
         uncertainty:
           kind: derived
-          value: '0.35'
+          value: '0.12'
           basis: gamma_CrO_absolute_units
           locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '5'}
           derivation:
@@ -724,7 +725,7 @@ species:
             inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
             parameters: []
             method:
-              state: {tag: value, value: 'Propagated a ±1 wt% coordinate shift through gamma proportional to total moles, as MgO–Al2O3 exchange at fixed CaO and SiO2.'}
+              state: {tag: value, value: 'Propagated the ±1 wt% MgO–Al2O3 coordinate exchange through gamma proportional to total moles on the AlO1.5 basis; Al2O3 contributes two AlO1.5 formula units.'}
               locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '5'}
             references: ['Fig. 11 composition digitization', 'Eq. (13)']
             output_unit: gamma_CrO_absolute_units
@@ -781,7 +782,7 @@ species:
         units: dimensionless
         uncertainty:
           kind: derived
-          value: '0.43'
+          value: '0.15'
           basis: gamma_CrO_absolute_units
           locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '6'}
           derivation:
@@ -789,7 +790,7 @@ species:
             inputs: [pdf:maeda-sano-1982-cro-activity-coefficient-slag]
             parameters: []
             method:
-              state: {tag: value, value: 'Propagated a ±1 wt% coordinate shift through gamma proportional to total moles, as MgO–Al2O3 exchange at fixed CaO and SiO2.'}
+              state: {tag: value, value: 'Propagated the ±1 wt% MgO–Al2O3 coordinate exchange through gamma proportional to total moles on the AlO1.5 basis; Al2O3 contributes two AlO1.5 formula units.'}
               locator: {page: 5, published_page: 763, pdf_page_index: 4, figure: '11', row: '6'}
             references: ['Fig. 11 composition digitization', 'Eq. (13)']
             output_unit: gamma_CrO_absolute_units

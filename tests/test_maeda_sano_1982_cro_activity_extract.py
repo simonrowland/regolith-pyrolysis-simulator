@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 
 import pytest
@@ -61,12 +61,12 @@ FORMULA_MASSES = {
     "SiO2": "60.0843",
 }
 FIGURE11_DIGITIZATION_BANDS = {
-    "maeda_sano_1982_f11_row01": "0.35",
-    "maeda_sano_1982_f11_row02": "0.35",
-    "maeda_sano_1982_f11_row03": "0.35",
-    "maeda_sano_1982_f11_row04": "0.35",
-    "maeda_sano_1982_f11_row05": "0.35",
-    "maeda_sano_1982_f11_row06": "0.43",
+    "maeda_sano_1982_f11_row01": "0.12",
+    "maeda_sano_1982_f11_row02": "0.12",
+    "maeda_sano_1982_f11_row03": "0.12",
+    "maeda_sano_1982_f11_row04": "0.12",
+    "maeda_sano_1982_f11_row05": "0.12",
+    "maeda_sano_1982_f11_row06": "0.15",
 }
 ATOMIC_WEIGHT_SOURCE = (
     "External constant: IUPAC 2007 Periodic Table of the Elements; "
@@ -77,6 +77,32 @@ FORMULA_MASS_SOURCE = (
     "Mg 24.3050, Al 26.9815386, Si 28.0855, O 15.9994): "
     "CaO 56.0774, MgO 40.3044, Al2O3 101.9613, SiO2 60.0843 g/mol."
 )
+
+
+def _fig11_digitization_band(row: dict) -> Decimal:
+    # Premise: Fig. 11 gamma uses the AlO1.5 basis. A 1 wt-point MgO-to-Al2O3
+    # exchange changes total moles by 0.01/M_MgO - 2*0.01/M_Al2O3 mol/g,
+    # because each Al2O3 contributes two AlO1.5 formula units. With activity
+    # and Cr ppm fixed, gamma = a/N and N = (ppm*1e-6/M_Cr)/n_total imply
+    # gamma is proportional to n_total. Thus |delta gamma| = gamma *
+    # |delta n_total| / n_total. Both n terms have mol/g units, so their ratio
+    # is dimensionless and the result is in gamma units. Row 1 is about 0.12
+    # (~0.26% of gamma 46.45), a useful sanity check.
+    parameters = dict(row["values"]["derivation"]["parameters"])
+    total_moles = Decimal(
+        parameters["total_moles_per_g_AlO1.5_basis"]["state"]["value"]
+    )
+    mg_o_mass = Decimal(parameters["MgO_formula_mass_g_per_mol"]["state"]["value"])
+    al_o_mass = Decimal(parameters["Al2O3_formula_mass_g_per_mol"]["state"]["value"])
+    cr_mass = Decimal(parameters["chromium_molar_mass_g_per_mol"]["state"]["value"])
+    cr_ppm = Decimal(parameters["equilibrium_Cr_ppm"]["state"]["value"])
+    activity = Decimal(parameters["a_CrO"]["state"]["value"])
+    exchanged_moles = Decimal("0.01") / mg_o_mass - Decimal("0.02") / al_o_mass
+    cr_mole_fraction = (cr_ppm * Decimal("1e-6") / cr_mass) / total_moles
+    gamma = activity / cr_mole_fraction
+    return (gamma * abs(exchanged_moles) / total_moles).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
 
 
 def _document() -> dict:
@@ -168,6 +194,9 @@ def _assert_render_pins(document: dict) -> None:
         assert row["uncertainty"]["value"] == FIGURE11_DIGITIZATION_BANDS[
             observation_id
         ]
+        assert _fig11_digitization_band(row) == Decimal(
+            FIGURE11_DIGITIZATION_BANDS[observation_id]
+        )
         assert row["uncertainty"]["basis"] == "gamma_CrO_absolute_units"
         assert row["uncertainty"]["derivation"]["relation"] == (
             "propagated_fig11_composition_digitization"
@@ -175,6 +204,9 @@ def _assert_render_pins(document: dict) -> None:
         assert "MgO–Al2O3 exchange" in row["uncertainty"]["derivation"][
             "method"
         ]["state"]["value"]
+        assert "AlO1.5" in row["uncertainty"]["derivation"]["method"][
+            "state"
+        ]["value"]
 
     first_f14 = rows["maeda_sano_1982_f14_al2o3_20_row01"]
     assert first_f14["values"]["composition_wt_pct"]["components"] == [
