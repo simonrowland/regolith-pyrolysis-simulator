@@ -63,6 +63,7 @@ from scripts.seed_reduced_real_cache import payload_count, seed_cache
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evalspec import current_code_version
 from simulator.optimize.recipe import RecipeSchema
+from simulator.optimize.results_store import _decode_result_payload
 from simulator.grind_preflight import (
     GrindSourceGateError,
     assert_grind_feedstock_stage0_route_coverage,
@@ -1976,6 +1977,7 @@ def _run_prepared_job(
         try:
             assert_strict_vapor_result_store(
                 prepared.out_dir / "cache.sqlite",
+                _decode_result_payload,
                 context=f"{prepared.job.id}:cache.sqlite",
                 strict_vapor_gate=prepared.strict_vapor_gate,
             )
