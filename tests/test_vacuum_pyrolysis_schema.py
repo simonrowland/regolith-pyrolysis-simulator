@@ -582,6 +582,30 @@ def test_benchtop_presets_run_or_report_stage0_refusal(
         allow_unmeasured_alpha_fallback=True,
     )
 
+    bundle = runner_module.load_config_bundle()
+    design = EquipmentDesigner(bundle.setpoints).design_for_batch(
+        mass_kg=preset.mass_kg,
+        feedstock=bundle.feedstocks[preset.feedstock_id],
+        lab_geometry=preset.lab_geometry,
+    )
+    area_bridge = runner_module.gram_lab_exposed_melt_area_bridge(
+        preset.lab_geometry,
+        crucible_face_area_m2=design.crucible.melt_surface_area_m2,
+    )
+    area_notice = area_bridge["notices"][0]
+    assert area_notice["code"] == "knob_defaulted"
+    assert area_notice["path"] == (
+        "lab_geometry.sample.exposed_melt_area_m2"
+    )
+    assert area_notice["value"] == pytest.approx(
+        design.crucible.melt_surface_area_m2
+    )
+    assert area_notice["source_class"] == "assumption_with_sensitivity_marker"
+    if preset.provenance["sample_mass_g"] is None:
+        assert area_notice["out_of_domain"] is True
+    else:
+        assert "out_of_domain" not in area_notice
+
     if preset_path == SESKO_PRESET_PATH:
         assert preset.provenance["sample_mass_g"] == SESKO_SAMPLE_MASS_G
         assert preset.mass_kg == pytest.approx(0.01)
@@ -604,26 +628,6 @@ def test_benchtop_presets_run_or_report_stage0_refusal(
         assert preset.lab_schedule["chamber_pressure_mbar"][0][
             "runtime_delta_annotation_id"
         ] == SESKO_PRESSURE_RUNTIME_DELTA_ID
-
-        bundle = runner_module.load_config_bundle()
-        design = EquipmentDesigner(bundle.setpoints).design_for_batch(
-            mass_kg=preset.mass_kg,
-            feedstock=bundle.feedstocks[preset.feedstock_id],
-            lab_geometry=preset.lab_geometry,
-        )
-        area_bridge = runner_module.gram_lab_exposed_melt_area_bridge(
-            preset.lab_geometry,
-            crucible_face_area_m2=design.crucible.melt_surface_area_m2,
-        )
-        area_notice = area_bridge["notices"][0]
-        assert area_notice["code"] == "knob_defaulted"
-        assert area_notice["path"] == (
-            "lab_geometry.sample.exposed_melt_area_m2"
-        )
-        assert area_notice["value"] == pytest.approx(
-            design.crucible.melt_surface_area_m2
-        )
-        assert "out_of_domain" not in area_notice
 
         class ThermoEngineBackend:
             name = "thermoengine"
