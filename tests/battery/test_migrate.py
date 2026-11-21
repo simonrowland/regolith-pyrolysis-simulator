@@ -87,6 +87,7 @@ from simulator.battery.migrate import (
     iter_observation_store_paths,
     lineage_parents_from_source,
     source_derivation_from_source,
+    uncertainty_for,
     _derivation_inputs_requirement_error,
     load_migrated_context,
     QUANTITY_SOURCE_FIELDS,
@@ -134,6 +135,28 @@ from tests.helpers.named_manifests import assert_named_rows, load_named_manifest
 
 
 _FAST_SAFE_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+
+
+def test_wood_wade_derived_uncertainties_without_derivation_remain_printed() -> None:
+    extract_path = (
+        REPO_ROOT
+        / "data/literature/extracts/wood-wade-2013-trace-activities.yaml"
+    )
+    document = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    raw_uncertainties = [
+        row.get("uncertainty")
+        for species in document["species"].values()
+        for row in species.get("observations", [])
+        if isinstance(row.get("uncertainty"), Mapping)
+        and row["uncertainty"].get("kind") == "derived"
+        and "derivation" not in row["uncertainty"]
+    ]
+
+    assert len(raw_uncertainties) == 307
+    for raw in raw_uncertainties:
+        uncertainty = uncertainty_for(raw)
+        assert uncertainty.kind is UncertaintyKind.PRINTED
+        assert uncertainty.verbatim == raw
 
 
 def test_ion_current_comparison_provenance_assumes_unreported_pairing() -> None:
