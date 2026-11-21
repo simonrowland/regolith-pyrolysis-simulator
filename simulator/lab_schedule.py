@@ -546,30 +546,45 @@ def _normalize_gas_boundary(raw: Any) -> Mapping[str, Any]:
         normalized["flow_reference_state"] = _normalize_gas_boundary_field(
             flow_reference_state,
             field="flow_reference_state",
-            required=(),
+            required=("standard_temperature_K", "standard_pressure_Pa"),
         )
-        if normalized["flow_reference_state"].get("reported_status") == "not_reported":
-            if normalized["flow_reference_state"].get("reason") != (
-                "unresolved_sccm_standard_state"
+        reference_state = normalized["flow_reference_state"]
+        reported_status = reference_state.get("reported_status")
+        if reported_status == "not_reported":
+            if (
+                reference_state.get("standard_temperature_K") is not None
+                or reference_state.get("standard_pressure_Pa") is not None
             ):
+                raise LabScheduleValidationError(
+                    "lab_schedule_sccm_reference_state_not_reported_has_values"
+                )
+            if reference_state.get("reason") != "unresolved_sccm_standard_state":
                 raise LabScheduleValidationError(
                     "lab_schedule_sccm_reference_state_not_reported_reason_invalid"
                 )
-            if normalized["flow_reference_state"].get("conversion_role") != (
-                "diagnostic_only"
-            ):
+            if reference_state.get("conversion_role") != "diagnostic_only":
                 raise LabScheduleValidationError(
                     "lab_schedule_sccm_conversion_role_must_be_diagnostic_only"
                 )
             if not str(
-                normalized["flow_reference_state"].get(
-                    "conversion_note", ""
-                )
-                or ""
+                reference_state.get("conversion_note", "") or ""
             ).strip():
                 raise LabScheduleValidationError(
                     "lab_schedule_sccm_conversion_diagnostic_missing_note"
                 )
+        elif reported_status == "reported":
+            _required_finite_positive(
+                reference_state.get("standard_temperature_K"),
+                "gas_boundary_sccm_reference_temperature_K",
+            )
+            _required_finite_positive(
+                reference_state.get("standard_pressure_Pa"),
+                "gas_boundary_sccm_reference_pressure_Pa",
+            )
+        else:
+            raise LabScheduleValidationError(
+                "lab_schedule_sccm_reference_state_reported_status_invalid"
+            )
         pressure_driver = normalized["pressure_control"].get("pressure_driver")
         if pressure_driver != "imposed":
             raise LabScheduleValidationError(

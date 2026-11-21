@@ -138,6 +138,43 @@ def test_sccm_component_flows_cannot_drive_apparatus_pressure() -> None:
         normalize_lab_schedule(raw)
 
 
+def test_reported_sccm_reference_state_requires_temperature_and_pressure() -> None:
+    raw = _schedule(component_flows=True)
+    raw["gas_boundary"]["flow_reference_state"] = {
+        "reported_status": "reported",
+        "source_class": "literature_primary",
+        "citation_id": "sossi-2019",
+        "source_ref": "Table 2 methods citation",
+    }
+
+    with pytest.raises(
+        LabScheduleValidationError,
+        match="missing_gas_boundary_flow_reference_state_standard_temperature_K",
+    ):
+        normalize_lab_schedule(raw)
+
+
+def test_reported_sccm_reference_state_accepts_source_supported_temperature_and_pressure() -> None:
+    raw = _schedule(component_flows=True)
+    raw["gas_boundary"]["flow_reference_state"] = {
+        "reported_status": "reported",
+        "standard_temperature_K": 273.15,
+        "standard_pressure_Pa": 101325,
+        "source_class": "literature_primary",
+        "citation_id": "sossi-2019",
+        "source_ref": "Table 2 methods citation",
+    }
+
+    schedule = normalize_lab_schedule(raw)
+
+    assert schedule["gas_boundary"]["flow_reference_state"][
+        "standard_temperature_K"
+    ] == 273.15
+    assert schedule["gas_boundary"]["flow_reference_state"][
+        "standard_pressure_Pa"
+    ] == 101325
+
+
 @pytest.mark.parametrize(
     ("mutation", "expected"),
     [
