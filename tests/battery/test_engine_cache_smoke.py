@@ -41,8 +41,13 @@ def test_every_engine_smoke_rows_are_identical(tmp_path: Path, monkeypatch) -> N
     requests = {}
     original_call = engine_cache.cached_engine_call
 
-    def capture_request(engine, request, solve):
-        result = original_call(engine, request, solve)
+    def capture_request(engine, request, solve, *, disclosure_runtime=None):
+        result = original_call(
+            engine,
+            request,
+            solve,
+            disclosure_runtime=disclosure_runtime,
+        )
         key = engine_cache.engine_cache_key(engine, engine_cache.ENGINE_CHEMISTRY_VERSION[engine], request)
         if (str(cache), key, False) in engine_cache._MEMORY_CACHE:
             requests[engine] = deepcopy(request)

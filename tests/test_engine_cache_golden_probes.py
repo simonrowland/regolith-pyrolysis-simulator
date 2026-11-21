@@ -253,14 +253,25 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
         monkeypatch.setattr(EquilibriumResult, "to_hot", changed_enthalpy)
     original_cached_call = engine_cache.cached_engine_call
 
-    def capture_cache_value(engine_id, cache_request, solve):
+    def capture_cache_value(
+        engine_id,
+        cache_request,
+        solve,
+        *,
+        disclosure_runtime=None,
+    ):
         def capture_solve():
             value = solve()
             if engine_id == engine_name:
                 cached_values.append(value)
             return value
 
-        return original_cached_call(engine_id, cache_request, capture_solve)
+        return original_cached_call(
+            engine_id,
+            cache_request,
+            capture_solve,
+            disclosure_runtime=disclosure_runtime,
+        )
 
     monkeypatch.setattr(engine_cache, "cached_engine_call", capture_cache_value)
     handle = open_available_engine(Engine(engine_name), nodeid=nodeid)

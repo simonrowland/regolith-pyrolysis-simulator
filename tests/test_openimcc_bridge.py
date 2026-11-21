@@ -1378,7 +1378,7 @@ def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None
     monkeypatch.setattr(engine_cache, "record_engine_open", lambda *_args: None)
     requests = []
 
-    def cache_call(engine, request, solve):
+    def cache_call(engine, request, solve, *, disclosure_runtime=None):
         requests.append((engine, request))
         return solve()
 

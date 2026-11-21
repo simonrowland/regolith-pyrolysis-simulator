@@ -24,7 +24,7 @@ def test_every_normalized_prediction_setting_changes_the_key(engine):
 def test_isolated_request_keys_cover_all_consumed_physics_inputs(engine, monkeypatch):
     keys = []
 
-    def capture(name, request, solve):
+    def capture(name, request, solve, *, disclosure_runtime=None):
         keys.append(engine_cache.engine_cache_key(name, engine_cache.ENGINE_CHEMISTRY_VERSION[name], request))
         return {"status": "refusal", "refusal_reason": "unavailable"}
 
@@ -55,7 +55,7 @@ def test_analytical_oxygen_pack_changes_each_key(seam, tmp_path, monkeypatch):
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
     seen = []
 
-    def capture(engine, request, solve):
+    def capture(engine, request, solve, *, disclosure_runtime=None):
         seen.append(engine_cache.engine_cache_key(engine, 1, request))
         return {"status": "refusal", "refusal_reason": "unavailable"}
 
@@ -265,7 +265,7 @@ def test_inline_request_keys_cover_every_forwarded_solve_input(engine, tmp_path,
 
     keys = []
 
-    def capture(name, request, solve):
+    def capture(name, request, solve, *, disclosure_runtime=None):
         keys.append(engine_cache.engine_cache_key(name, engine_cache.ENGINE_CHEMISTRY_VERSION[name], request))
         return None
 
