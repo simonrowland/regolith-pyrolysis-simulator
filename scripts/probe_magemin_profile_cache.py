@@ -40,7 +40,18 @@ def main() -> int:
     miss_reasons: Counter[str] = Counter()
     local = threading.local()
     original_record = EvaporationMixin._freeze_gate_curve_record
-    original_key = EvaporationMixin._freeze_gate_cache_key_and_domain
+    domain_key_builder = getattr(
+        EvaporationMixin,
+        "_freeze_gate_cache_key_and_domain",
+        None,
+    )
+    domain_identity_supported = callable(domain_key_builder)
+    key_builder_name = (
+        "_freeze_gate_cache_key_and_domain"
+        if domain_identity_supported
+        else "_freeze_gate_cache_key"
+    )
+    original_key = getattr(EvaporationMixin, key_builder_name)
     original_dispatch = EvaporationMixin._freeze_gate_curve_from_gate_dispatch
     original_magemin_call = MAGEMinBackend._call_magemin
     original_cacheable = determinism.gate_curve_memo_is_cacheable
@@ -58,10 +69,14 @@ def main() -> int:
         result = original_key(self, *pos, **kw)
         active = stack()
         if active and active[-1]["sim"] is self:
+            if isinstance(result, tuple) and len(result) == 2:
+                key, domain_reason = result
+            else:
+                key, domain_reason = result, None
             identity = getattr(
                 self, "_freeze_gate_current_magemin_domain_identity", None
             )
-            active[-1]["keys"].append((result[0], result[1], identity))
+            active[-1]["keys"].append((key, domain_reason, identity))
         return result
 
     @wraps(original_cacheable)
@@ -125,14 +140,21 @@ def main() -> int:
 
         key, domain_reason, identity = entry["keys"][0]
         identity_label = (
-            "missing" if identity is None
-            else f"{identity.silica_verdict}/{identity.projection_threshold_verdict}"
+            "unsupported_by_base"
+            if not domain_identity_supported
+            else (
+                "missing" if identity is None
+                else f"{identity.silica_verdict}/"
+                f"{identity.projection_threshold_verdict}"
+            )
         )
         identities[identity_label] += 1
         reasons = []
         if domain_reason is not None:
             reasons.append("domain_refusal")
-        elif identity is None or not identity.reusable:
+        elif domain_identity_supported and (
+            identity is None or not identity.reusable
+        ):
             reasons.append("identity_not_reusable")
         if entry["local_key"] is None:
             reasons.append("no_local_memo")
@@ -148,7 +170,7 @@ def main() -> int:
         miss_reasons["+".join(dict.fromkeys(reasons)) or "candidate_not_accepted"] += 1
         return result
 
-    EvaporationMixin._freeze_gate_cache_key_and_domain = key_probe
+    setattr(EvaporationMixin, key_builder_name, key_probe)
     EvaporationMixin._freeze_gate_curve_from_gate_dispatch = dispatch_probe
     EvaporationMixin._freeze_gate_curve_record = record_probe
     MAGEMinBackend._call_magemin = magemin_call_probe
@@ -186,7 +208,7 @@ def main() -> int:
     except Exception as exc:  # Keep counters useful when the profile aborts.
         error = {"class": type(exc).__name__, "message": str(exc)}
     finally:
-        EvaporationMixin._freeze_gate_cache_key_and_domain = original_key
+        setattr(EvaporationMixin, key_builder_name, original_key)
         EvaporationMixin._freeze_gate_curve_from_gate_dispatch = original_dispatch
         EvaporationMixin._freeze_gate_curve_record = original_record
         MAGEMinBackend._call_magemin = original_magemin_call
