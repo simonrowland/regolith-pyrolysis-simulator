@@ -34,7 +34,7 @@ CEILINGS = {
     "bar": 0,
     "atm": 0,
     # The merged-tree test recount includes constackfix's removals and b262's separate core.py removal.
-    "celsius": 81,
+    "celsius": 79,
 }
 
 # path, bare numeric text, family, allowed count, reason

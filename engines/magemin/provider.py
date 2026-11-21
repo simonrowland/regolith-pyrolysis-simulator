@@ -287,7 +287,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             )
 
         from simulator.melt_backend.magemin import (
-            MAGEMinBackend,
+            DEFAULT_MAGEMIN_DATABASE,
             evaluated_silica_verdict,
         )
 
@@ -302,7 +302,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 else composition_wt_pct
             ),
             str(_SHADOW_BACKEND_CONFIG.get(
-                'database', MAGEMinBackend._DEFAULT_DATABASE,
+                'database', DEFAULT_MAGEMIN_DATABASE,
             )),
             species_formula_registry=(
                 request.account_view.species_formula_registry
@@ -594,6 +594,8 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         to ``status='unavailable'`` cleanly.
         """
         _ensure_close_reaper()
+        if self._backend_initialised and self._backend is None:
+            return None
         if self._backend is not None:
             if not self._backend_initialised:
                 self._backend_initialization_error = None
@@ -602,9 +604,10 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                         dict(_SHADOW_BACKEND_CONFIG)
                     )
                     if initialized is False:
-                        self._backend_initialization_error = RuntimeError(
-                            "MAGEMin backend initialization reported unavailable"
-                        )
+                        self._backend = None
+                        self._backend_finalizer = None
+                        self._backend_initialised = True
+                        return None
                 except Exception as exc:
                     self._backend_initialization_error = exc
                 self._backend_initialised = True
@@ -623,9 +626,12 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                     self, _enqueue_backend_close, close, os.getpid()
                 )
             if backend.initialize(dict(_SHADOW_BACKEND_CONFIG)) is False:
-                raise RuntimeError(
-                    "MAGEMin backend initialization reported unavailable"
-                )
+                if backend_finalizer is not None:
+                    backend_finalizer()
+                self._backend = None
+                self._backend_finalizer = None
+                self._backend_initialised = True
+                return None
         except Exception as exc:
             self._backend_initialization_error = exc
             if backend_finalizer is not None:

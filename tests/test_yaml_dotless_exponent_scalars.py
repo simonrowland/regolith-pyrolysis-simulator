@@ -210,11 +210,28 @@ def test_every_data_yaml_has_no_untyped_dotless_exponent_in_numeric_fields(yaml_
             continue
         relative = path.relative_to(REPO_ROOT).as_posix()
         if _source_extract(relative):
-            green_source = subprocess.check_output(
-                ["git", "show", f"{GREEN_SCALAR_BASE}:{relative}"],
-                cwd=REPO_ROOT,
-                text=True,
-            )
+            try:
+                green_source = subprocess.check_output(
+                    ["git", "show", f"{GREEN_SCALAR_BASE}:{relative}"],
+                    cwd=REPO_ROOT,
+                    text=True,
+                )
+            except subprocess.CalledProcessError as exc:
+                try:
+                    subprocess.run(
+                        ["git", "cat-file", "-e", f"{GREEN_SCALAR_BASE}:{relative}"],
+                        cwd=REPO_ROOT,
+                        check=True,
+                    )
+                except subprocess.CalledProcessError:
+                    subprocess.run(
+                        ["git", "cat-file", "-e", f"{GREEN_SCALAR_BASE}^{{commit}}"],
+                        cwd=REPO_ROOT,
+                        check=True,
+                    )
+                    green_source = ""
+                else:
+                    raise exc
             _green_exponents, green_losses = _load_with_source_nodes(green_source)
             green_signatures = {
                 (key_path, value) for key_path, _line, value in green_losses

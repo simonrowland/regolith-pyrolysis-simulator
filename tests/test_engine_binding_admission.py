@@ -1080,7 +1080,13 @@ def test_gate_replay_skips_unadmitted_optional_fallback_candidate(
                 "receipt missing",
             )
 
-    def lookup(_artifact, keys, *, sim):
+    def lookup(
+        _artifact,
+        keys,
+        *,
+        sim,
+        require_gate_curve_domain_diagnostic=False,
+    ):
         lookup_keys.extend(keys)
         return {
             "curve": {
