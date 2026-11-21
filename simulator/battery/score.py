@@ -17058,6 +17058,7 @@ def _sossi_residue_prediction(
     try:
         from simulator.battery.residue import (
             ResidueInventoryRefusal,
+            _SossiResiduePrediction,
             _element_retention_ratio_from_inventories,
             _printed_fm_definition,
             _predict_sossi_residue_cohort,
@@ -17162,6 +17163,7 @@ def _sossi_residue_prediction(
                 raise ResidueInventoryRefusal(
                     "gas_equilibrium_fo2_unavailable", str(exc)
                 ) from exc
+            run_refusals = {}
             for experiment_id in experiments_by_run:
                 check = gas_checks.get(experiment_id)
                 if check is None:
@@ -17170,11 +17172,21 @@ def _sossi_residue_prediction(
                         f"no checked Table 2 gas record for {experiment_id}",
                     )
                 if check.refusal_reason is not None:
-                    raise ResidueInventoryRefusal(
-                        check.refusal_reason,
-                        check.refusal_detail
-                        or f"Sossi gas equilibrium check failed for {experiment_id}",
+                    run_refusals[experiment_id] = _SossiResiduePrediction(
+                        experiment_id,
+                        {},
+                        {},
+                        {},
+                        (),
+                        {
+                            "run_refusal": {
+                                "reason": check.refusal_reason,
+                                "detail": check.refusal_detail
+                                or "Sossi gas equilibrium check failed.",
+                            }
+                        },
                     )
+                    continue
                 if check.checked_log10_fO2_bar is None:
                     raise ResidueInventoryRefusal(
                         "gas_equilibrium_fo2_unavailable",
@@ -17183,18 +17195,37 @@ def _sossi_residue_prediction(
                 buffered_fO2_by_experiment[experiment_id] = float(
                     check.checked_log10_fO2_bar
                 )
-            experiments = [source_experiments[key] for key in sorted(experiments_by_run)]
-            rows = _predict_sossi_residue_cohort(
-                experiments,
-                load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
-                starting_trace_ppm_by_experiment=trace_ppm_by_experiment,
-                buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
-                engine=engine.value,
-                selected_experiment_ids=cohort_selection,
+            valid_ids = set(buffered_fO2_by_experiment)
+            selected_valid_ids = (
+                None
+                if cohort_selection is None
+                else frozenset(cohort_selection & valid_ids)
             )
-            cohort = {
-                row.experiment_id: row for row in rows
-            }
+            if selected_valid_ids is None or selected_valid_ids:
+                experiments = [source_experiments[key] for key in sorted(valid_ids)]
+                rows = _predict_sossi_residue_cohort(
+                    experiments,
+                    load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
+                    starting_trace_ppm_by_experiment={
+                        key: value
+                        for key, value in trace_ppm_by_experiment.items()
+                        if key in valid_ids
+                    },
+                    buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
+                    engine=engine.value,
+                    selected_experiment_ids=selected_valid_ids,
+                )
+                cohort = {row.experiment_id: row for row in rows}
+            else:
+                cohort = {}
+            refusal_ids = (
+                set(run_refusals)
+                if cohort_selection is None
+                else set(cohort_selection) & set(run_refusals)
+            )
+            cohort.update(
+                {experiment_id: run_refusals[experiment_id] for experiment_id in refusal_ids}
+            )
             _residue_prediction_cache_entry(
                 cache,
                 _SOSSI_SOURCE_ID,

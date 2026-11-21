@@ -562,6 +562,143 @@ def test_sossi_scorer_passes_the_checked_fO2_to_the_residue_cohort(monkeypatch) 
     assert passed_fO2[experiment_id] == float(checked_log)
 
 
+def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
+    monkeypatch,
+) -> None:
+    import simulator.battery.score as score_module
+    import simulator.battery.residue as residue
+    from simulator.battery.enums import Engine
+    from simulator.battery.oxygen_identity import check_sossi_table2_gas_equilibrium
+    from simulator.battery.score import (
+        _residue_prediction_cache_entry,
+        _sossi_residue_prediction,
+        load_score_context,
+        point_magnitude,
+    )
+
+    source_id = "kems-012-sossi-2019"
+    context = load_score_context(sources=(source_id,))
+    rows = {
+        (row.experiment_id.rsplit("::", 1)[-1], row.identity.species.formula): row
+        for row in context.observations.values()
+        if row.source_id == source_id
+        and row.admission.status.value == "admitted"
+        and row.identity.species.formula in {"Mn", "Ti"}
+        and point_magnitude(row.value) is not None
+    }
+    bad_short = "sossi-2019-run-p09-06-18a"
+    valid_short = "sossi-2019-run-p09-06-18b"
+    bad_ids = frozenset(
+        rows[(bad_short, element)].experiment_id for element in ("Mn", "Ti")
+    )
+    valid_ids = frozenset(
+        rows[(valid_short, element)].experiment_id for element in ("Mn", "Ti")
+    )
+    test_ids = bad_ids | valid_ids
+
+    def reject_one_run(experiments, series):
+        checks = dict(check_sossi_table2_gas_equilibrium(experiments, series))
+        key = next(key for key, check in checks.items() if check.run_id == "P09/06/18a")
+        checks[key] = replace(
+            checks[key],
+            checked_log10_fO2_bar=None,
+            refusal_reason="gas_equilibrium_fo2_disagrees_with_printed",
+            refusal_detail="mutation of the P09/06/18a CO/CO2 pair",
+        )
+        return checks
+
+    monkeypatch.setattr(
+        score_module, "check_sossi_table2_gas_equilibrium", reject_one_run
+    )
+    monkeypatch.setattr(
+        score_module.subprocess,
+        "run",
+        lambda *_args, **_kwargs: pytest.fail("residue scoring must not require git"),
+    )
+    calls = []
+
+    def valid_cohort(experiments, *_args, selected_experiment_ids=None, **_kwargs):
+        calls.append((
+            frozenset(item["experiment_id"] for item in experiments),
+            selected_experiment_ids,
+        ))
+        return tuple(
+            SimpleNamespace(
+                experiment_id=item["experiment_id"],
+                primary_element_ppm={"Mn": 900.0, "Ti": 450.0},
+                geometry_element_ppm={
+                    "Mn": {"sphere_constant": 900.0},
+                    "Ti": {"sphere_constant": 450.0},
+                },
+                sensitivity_band_ppm={
+                    "Mn": (800.0, 1000.0),
+                    "Ti": (400.0, 500.0),
+                },
+                channel_missing_elements=(),
+                provenance={"integration": {"primary": {"status": "converged"}}},
+            )
+            for item in experiments
+            if selected_experiment_ids is None
+            or item["experiment_id"] in selected_experiment_ids
+        )
+
+    monkeypatch.setattr(residue, "_predict_sossi_residue_cohort", valid_cohort)
+    selection = frozenset({bad_short, valid_short})
+    cache = {}
+    for element in ("Mn", "Ti"):
+        prediction = _sossi_residue_prediction(
+            context,
+            rows[(valid_short, element)],
+            Engine.OPENIMCC,
+            cache,
+            selected_experiment_ids=selection,
+            test_experiment_ids=test_ids,
+        )
+        assert prediction.execution.state.value == "produced", prediction.refusal_detail
+        refused = _sossi_residue_prediction(
+            context,
+            rows[(bad_short, element)],
+            Engine.OPENIMCC,
+            cache,
+            selected_experiment_ids=selection,
+            test_experiment_ids=test_ids,
+        )
+        assert refused.execution.state.value != "produced"
+        assert refused.refusal_detail["reason"] == (
+            "gas_equilibrium_fo2_disagrees_with_printed"
+        )
+
+    cached = _residue_prediction_cache_entry(
+        cache, source_id, Engine.OPENIMCC, selection
+    )
+    assert cached is not None
+    assert set(cached) == {bad_short, valid_short}
+    assert "__cohort_error__" not in cached
+    assert cached[bad_short].provenance["run_refusal"]["detail"] == (
+        "mutation of the P09/06/18a CO/CO2 pair"
+    )
+    assert calls == [
+        (frozenset({valid_short}), frozenset({valid_short})),
+    ]
+
+    unaffected_cache = {}
+    unaffected = _sossi_residue_prediction(
+        context,
+        rows[(valid_short, "Mn")],
+        Engine.OPENIMCC,
+        unaffected_cache,
+        selected_experiment_ids=frozenset({valid_short}),
+        test_experiment_ids=test_ids,
+    )
+    assert unaffected.execution.state.value == "produced"
+    unaffected_cohort = _residue_prediction_cache_entry(
+        unaffected_cache, source_id, Engine.OPENIMCC, frozenset({valid_short})
+    )
+    assert unaffected_cohort is not None
+    assert set(unaffected_cohort) == {valid_short}
+    assert "__cohort_error__" not in unaffected_cohort
+
+
 def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
