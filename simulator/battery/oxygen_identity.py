@@ -360,8 +360,29 @@ def _sossi_table2_gas_row(
         or not isinstance(quote, str)
     ):
         raise ValueError(f"sossi_table2_gas_row_locator_invalid:{run_id}")
-    if not quote.strip():
-        raise ValueError(f"sossi_table2_gas_row_quote_invalid:{run_id}")
+    quoted_run_id, temperature_C, co_sccm, co2_sccm, printed_log = (
+        _sossi_table2_gas_row_from_quote(quote, expected_run_id=run_id)
+    )
+
+    structured_temperature = _sossi_decimal(row.get("T_C"), f"{run_id}.T_C")
+    structured_log = row.get("log10_fO2")
+    if isinstance(structured_log, Mapping):
+        structured_log = structured_log.get("value")
+    if (
+        quoted_run_id != run_id
+        or structured_temperature != temperature_C
+        or _sossi_decimal(structured_log, f"{run_id}.log10_fO2") != printed_log
+    ):
+        raise ValueError(f"sossi_table2_gas_row_quote_disagrees:{run_id}")
+    return run_id, temperature_C, co_sccm, co2_sccm, printed_log
+
+
+def _sossi_table2_gas_row_from_quote(
+    quote: str, *, expected_run_id: str | None = None
+) -> tuple[str, Decimal, Decimal | None, Decimal | None, Decimal]:
+    if not isinstance(quote, str) or not quote.strip():
+        label = expected_run_id or "unknown"
+        raise ValueError(f"sossi_table2_gas_row_quote_invalid:{label}")
     header = quote.splitlines()[0].split("|")
     if tuple(item.strip() for item in header[:6]) != (
         "Run#",
@@ -371,32 +392,51 @@ def _sossi_table2_gas_row(
         "CO2_sccm",
         "logfO2",
     ):
-        raise ValueError(f"sossi_table2_gas_row_header_invalid:{run_id}")
+        label = expected_run_id or "unknown"
+        raise ValueError(f"sossi_table2_gas_row_header_invalid:{label}")
+    row_pattern = re.compile(
+        r"(?<![A-Z0-9])(?P<run_id>[A-Z0-9][A-Z0-9./-]*\*?)\s+"
+        r"(?P<temperature>\d+(?:\.\d+)?)\s+"
+        r"(?P<duration>\d+(?:\.\d+)?)\s+"
+        r"(?P<co>-|–|—|\d+(?:\.\d+)?)\s+"
+        r"(?P<co2>-|–|—|\d+(?:\.\d+)?)\s+"
+        r"(?P<fo2>-?\d+(?:\.\d+)?)\s+(?:PT|RE|IR)\b",
+        re.IGNORECASE,
+    )
     matches = [
-        line.split()
-        for line in quote.splitlines()
-        if line.split() and line.split()[0].rstrip("*") == run_id
+        match
+        for match in row_pattern.finditer(quote)
+        if expected_run_id is None
+        or match.group("run_id").rstrip("*") == expected_run_id
     ]
-    if len(matches) != 1 or len(matches[0]) < 6:
-        raise ValueError(f"sossi_table2_gas_row_quote_invalid:{run_id}")
-    tokens = matches[0]
-    temperature_C = _sossi_decimal(tokens[1], f"{run_id}.T_C")
-    co_sccm = _sossi_optional_flow(tokens[3], f"{run_id}.CO_sccm")
-    co2_sccm = _sossi_optional_flow(tokens[4], f"{run_id}.CO2_sccm")
-    printed_log = _sossi_decimal(tokens[5], f"{run_id}.logfO2")
+    if len(matches) != 1:
+        label = expected_run_id or "unknown"
+        raise ValueError(f"sossi_table2_gas_row_quote_invalid:{label}")
+    match = matches[0]
+    run_id = match.group("run_id").rstrip("*")
+    temperature_C = _sossi_decimal(match.group("temperature"), f"{run_id}.T_C")
+    co_sccm = _sossi_optional_flow(match.group("co"), f"{run_id}.CO_sccm")
+    co2_sccm = _sossi_optional_flow(match.group("co2"), f"{run_id}.CO2_sccm")
+    printed_log = _sossi_decimal(match.group("fo2"), f"{run_id}.logfO2")
     if co_sccm == 0:
         co_sccm = Decimal(0)
-
-    structured_temperature = _sossi_decimal(row.get("T_C"), f"{run_id}.T_C")
-    structured_log = row.get("log10_fO2")
-    if isinstance(structured_log, Mapping):
-        structured_log = structured_log.get("value")
-    if (
-        structured_temperature != temperature_C
-        or _sossi_decimal(structured_log, f"{run_id}.log10_fO2") != printed_log
-    ):
-        raise ValueError(f"sossi_table2_gas_row_quote_disagrees:{run_id}")
     return run_id, temperature_C, co_sccm, co2_sccm, printed_log
+
+
+def _sossi_table2_approximate_total_flow_sccm(
+    run_id: str,
+    co_sccm: Decimal | None,
+    co2_sccm: Decimal | None,
+) -> Decimal | None:
+    """Methods p. 6 reports ≈200 sccm except for air and ANU runs.
+
+    The Table 2 ANU runs have C-prefixed IDs. Blank CO/CO2 columns are the
+    air runs, so neither exception receives a synthesized total.
+    """
+
+    if (co_sccm is None and co2_sccm is None) or run_id.startswith("C"):
+        return None
+    return Decimal("200")
 
 
 def _sossi_decimal(raw: Any, label: str) -> Decimal:
