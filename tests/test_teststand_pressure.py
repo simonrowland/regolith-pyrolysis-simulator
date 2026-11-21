@@ -573,6 +573,27 @@ def test_every_vacuum_preset_declares_imposed_pressure() -> None:
         parsed = parse_teststand(preset["lab_schedule"], preset["lab_geometry"])
         assert parsed.pressure_driver == "imposed"
         assert parsed.pump is None or parsed.pump.nominal_speed_m3_s is None
+    pomeroy_apparatus = parse_teststand(
+        pomeroy["lab_schedule"], pomeroy["lab_geometry"]
+    )
+    assert pomeroy_apparatus.charge_mass_g is None
+    assert pomeroy_apparatus.exposed_melt_area_m2 is None
+    assert pomeroy_apparatus.chamber_volume_m3 is None
+    assert pomeroy_apparatus.pump is not None
+    assert pomeroy_apparatus.pump.nominal_speed_m3_s is None
+    assert pomeroy_apparatus.carrier_species is None
+    assert pomeroy_apparatus.carrier_mol_per_s is None
+    assert any(
+        "apparatus is not fully specified" in notice
+        for notice in pomeroy_apparatus.notices
+    )
+    sesko_apparatus = parse_teststand(
+        sesko["lab_schedule"], sesko["lab_geometry"]
+    )
+    assert sesko_apparatus.charge_mass_g == pytest.approx(10.0)
+    assert sesko_apparatus.exposed_melt_area_m2 is None
+    assert sesko_apparatus.chamber_volume_m3 is None
+    assert sesko_apparatus.pressure_driver == "imposed"
     sample = robinot["lab_geometry"]["sample"]
     assert sample["exposed_melt_area_m2"] is None
     assert sample["pellet_diameter_mm"] == 13

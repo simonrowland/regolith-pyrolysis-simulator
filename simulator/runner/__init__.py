@@ -553,12 +553,7 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         ) from exc
 
     mass_g = lab_geometry.sample_mass_g
-    if mass_g is None:
-        raise PresetRunnerError(
-            "malformed_preset: lab_geometry.sample.mass_g is required "
-            "unless the runner grows an explicit preset mass contract",
-            provenance=provenance,
-        )
+    mass_defaulted = mass_g is None
     duration_h = _preset_duration_h(
         leg_block.get("duration_h", schedule.get("duration_h")),
         f"pair.{requested_leg}.duration_h",
@@ -592,17 +587,31 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
     ):
         if key in preset:
             provenance[key] = copy.deepcopy(preset[key])
-    mass_kg = float(mass_g) / 1000.0
+    mass_kg = (
+        PyrolysisRun(feedstock_id=feedstock_id).mass_kg
+        if mass_defaulted
+        else float(mass_g) / 1000.0
+    )
     provenance.update(
         {
             "feedstock_id": feedstock_id,
             "duration_h": duration_h,
-            "sample_mass_g": float(mass_g),
+            "sample_mass_g": None if mass_defaulted else float(mass_g),
             "mass_kg": mass_kg,
             "schedule_id": schedule_id,
             "geometry_id": geometry_id,
         }
     )
+    if mass_defaulted:
+        provenance["notices"] = [
+            {
+                "code": "knob_defaulted",
+                "path": "mass_kg",
+                "value": mass_kg,
+                "unit": "kg",
+                "default_source": "PyrolysisRun.mass_kg",
+            }
+        ]
     provenance.update(gram_lab_exposed_melt_area_bridge(geometry))
     return PresetRunSpec(
         feedstock_id=feedstock_id,

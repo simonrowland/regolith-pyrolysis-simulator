@@ -8,10 +8,8 @@ extraction_status: published_thermal_recipe_runtime_pressure_assumed
 source_notes:
   - citation_id: pomeroy_cardiff_2006
     digest: "LPI paper reports MLS-1A outgas for 2 h at 200 C, ramp no faster than 12 C/min to 1400 C, hold for 20 min, MKS PPT RGA monitoring, and 1.17% non-condensed mass loss."
-  - citation_id: pomeroy_cardiff_2007
-    digest: "The approximately 10 g sample mass is a cross-paper follow-up scale, not a reported value for the 2006 run; it is an assumption and cannot support certification."
   - citation_id: pomeroy_cardiff_2006
-    digest: "The 2006 paper does not report achieved chamber pressure or pump speed. Runtime uses the explicit schedule floor as an assumption; no nominal pump speed is converted into pressure."
+    digest: "The paper reports vacuum operation but no numeric total chamber pressure or pump speed; Figure 2 shows RGA species partial pressures. The runtime schedule floor remains an assumption."
 
 lab_schedule:
   id: pomeroy_cardiff_2006_schedule
@@ -48,20 +46,22 @@ lab_schedule:
     - {t_h: 3.6666666666666665, value: 1400, unit: C, source_class: literature_sidecar, source_ref: pomeroy_cardiff_2006_experimental, citation_id: pomeroy_cardiff_2006}
     - {t_h: 4.0, value: 1400, unit: C, source_class: literature_sidecar, source_ref: pomeroy_cardiff_2006_experimental, citation_id: pomeroy_cardiff_2006}
   chamber_pressure_mbar:
-    - {t_h: 0.0, value: 0.001, unit: mbar, source_class: assumption_with_sensitivity_marker, citation_id: pomeroy_cardiff_2006, extraction_note: achieved_pressure_not_reported_runtime_schedule_floor}
-    - {t_h: 4.0, value: 0.001, unit: mbar, source_class: assumption_with_sensitivity_marker, citation_id: pomeroy_cardiff_2006, extraction_note: achieved_pressure_not_reported_runtime_schedule_floor}
+    - {t_h: 0.0, value: 0.001, unit: mbar, source_class: assumption_with_sensitivity_marker, source_ref: pomeroy_cardiff_2006_experimental, citation_id: pomeroy_cardiff_2006, extraction_note: "Runtime parser floor, not a printed chamber total pressure; the paper reports vacuum operation and Fig. 2 shows RGA species partial pressures (p. 47)."}
+    - {t_h: 4.0, value: 0.001, unit: mbar, source_class: assumption_with_sensitivity_marker, source_ref: pomeroy_cardiff_2006_experimental, citation_id: pomeroy_cardiff_2006, extraction_note: "Runtime parser floor, not a printed chamber total pressure; the paper reports vacuum operation and Fig. 2 shows RGA species partial pressures (p. 47)."}
   gas_boundary:
     background_gas:
       reported_status: not_reported
       source_class: not_reported
       citation_id: pomeroy_cardiff_2006
       extraction_note: "Paper describes vacuum operation but does not report a carrier gas."
+      reason: "No carrier species is identified in the p. 47 Experiment section."
       digest: pomeroy_cardiff_2006_background_gas_not_reported
     imposed_flow:
       reported_status: not_reported
       source_class: not_reported
       citation_id: pomeroy_cardiff_2006
       extraction_note: "Paper does not report imposed gas flow."
+      reason: "No carrier flow is stated in the p. 47 Experiment section."
       digest: pomeroy_cardiff_2006_imposed_flow_not_reported
     pressure_control:
       mode: achieved_pressure_not_reported_runtime_floor_assumption
@@ -69,7 +69,7 @@ lab_schedule:
       source_class: assumption_with_sensitivity_marker
       source_ref: pomeroy_cardiff_2006_experimental
       citation_id: pomeroy_cardiff_2006
-      extraction_note: "Runtime pressure is an explicit schedule assumption. Pump speed is not reported and is never used to infer pressure."
+      extraction_note: "The paper reports vacuum operation but no numeric chamber total pressure. Figure 2 plots RGA species partial pressures, not chamber total pressure. Pump speed is not reported and is never used to infer pressure."
       digest: pomeroy_cardiff_2006_pressure_unreported_runtime_floor_assumption
   surface_temperature_C:
     crucible_wall:
@@ -88,21 +88,28 @@ lab_geometry:
   equipment_sizing: lab_fixed_geometry
   geometry_status: assumed_dimensions_reported_apparatus_roles
   sample:
-    mass_g: 10.0
-    mass_qualifier: cross_paper_followup_scale_assumption
-    mass_source_class: assumption_with_sensitivity_marker
-    mass_source_ref: pomeroy_cardiff_2007_followup
-    mass_citation_id: pomeroy_cardiff_2007
-    mass_digest: "Follow-up NTRS record reports approximately 10 g experiments; 2006 run mass is not reported."
-    crucible_material: alumina
-    exposed_melt_area_m2: 0.000314
-    exposed_melt_area_basis: assumed_20_mm_opening
-    exposed_melt_area_digest: "No 2006 exposed area is reported; 20 mm opening is a sensitivity-marked runtime bridge, not a fitted value."
-    crucible_opening_area_m2: 0.000314
-    named_missing_fields: []
+    mass_g: null
+    mass_qualifier: not_reported
+    mass_source_class: not_reported
+    mass_source_ref: pomeroy_cardiff_2006_p47_experiment
+    mass_citation_id: pomeroy_cardiff_2006
+    mass_digest: "The p. 47 Experiment section says samples were weighed before loading but gives no numeric run mass."
+    crucible_material: null
+    crucible_material_reason: "Not reported on p. 47 Experiment."
+    exposed_melt_area_m2: null
+    exposed_melt_area_reason: "Not reported on p. 47 Experiment; no crucible opening size is given."
+    crucible_opening_area_m2: null
+    crucible_opening_area_reason: "Not reported on p. 47 Experiment."
+    named_missing_fields:
+      - sample_mass_g
+      - crucible_material
+      - exposed_melt_area_m2
+      - crucible_opening_area_m2
   chamber:
     volume_m3: null
+    volume_reason: "Chamber volume is not reported on p. 47 or in Fig. 2."
     wall_area_m2: null
+    wall_area_reason: "Chamber dimensions are not reported on p. 47 or in Fig. 2."
     wall_temperature_profile: rga_line
     named_missing_fields:
       - chamber_volume_m3
@@ -118,7 +125,7 @@ lab_geometry:
       source_class: assumption_with_sensitivity_marker
       sensitivity_marker: pomeroy_crucible_area_view_factor_sweep
       citation_id: pomeroy_cardiff_2006
-      extraction_note: "Alumina crucible is reported; dimensions and view factor are not."
+      extraction_note: "Holder material and dimensions are not reported; this deposition surface remains a sensitivity placeholder."
     - id: cold_trap
       role: collector
       area_m2: 0.005
@@ -143,12 +150,18 @@ lab_geometry:
       extraction_note: "RGA is reported, but line geometry and view factor are not."
   pump:
     pumping_speed_m3_s: null
+    pumping_speed_reason: "Not reported on p. 47 Experiment or Fig. 2."
     port_area_m2: null
+    port_area_reason: "Not reported on p. 47 Experiment or Fig. 2."
     conductance_path: null
+    conductance_path_reason: "Not reported on p. 47 Experiment or Fig. 2."
+    balance_temperature_K: null
+    balance_temperature_reason: "Not reported on p. 47 Experiment or Fig. 2."
     named_missing_fields:
       - pumping_speed_m3_s
       - port_area_m2
       - conductance_path
+      - balance_temperature_K
 
 pair:
   faithful:
@@ -175,7 +188,7 @@ measurement_selectors:
       status: assumed-input
       blocked_by:
         - achieved_pressure_not_reported
-        - sample_mass_cross_paper_assumption
+        - sample_mass_not_reported
         - runtime_pump_outlet_not_implemented
   - observable_id: pomeroy_sio_source_flux_series
     kind: species_time_series_kg_hr
@@ -217,13 +230,13 @@ comparison_contract:
   pressure_policy: achieved_pressure_not_reported_no_pump_speed_inference
   degraded_fallback_state:
     status: comparison_complete_but_noncertifiable
-    reason: achieved_pressure_sample_mass_geometry_and_pump_outlet_are_unavailable_or_assumed
+    reason: achieved_pressure_sample_mass_and_geometry_unavailable_and_pump_outlet_not_implemented
 
 digests:
   feedstock_digest: lunar_mls_1a_weiblen1990_hill2007_sha256_03a8a3ea22a08e85
   schedule_digest: pomeroy_cardiff_2006_reported_outgas_ramp_hold_v1
   gas_boundary_digest: pomeroy_cardiff_2006_pressure_not_reported_runtime_floor_v1
-  geometry_digest: pomeroy_cardiff_2006_assumed_geometry_v1
+  geometry_digest: pomeroy_cardiff_2006_unreported_teststand_fields_v2
   transport_formula_digest: runtime_builtin_open_surface_only
   sticking_provenance_digest: pomeroy_cardiff_2006_sticking_not_reported_v1
   measurement_sidecar_digest: pomeroy_cardiff_2006_measurements_v1

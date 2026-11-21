@@ -77,7 +77,7 @@ lab_schedule:
       reported_unit: mbar
       qualifier: oscillating_range
       source_class: literature_sidecar
-      source_ref: sesko_2024_experimental_procedure
+      source_ref: sesko_2024_p218_s3_2_2
       citation_id: sesko_2024
       extraction_note: "Paper states exposure pressure measurements oscillated from 1e-7 mbar to 1e-2 mbar."
     surface_temperature_K:
@@ -85,7 +85,7 @@ lab_schedule:
       reported_max_value: 1900
       reported_unit: K
       source_class: literature_sidecar
-      source_ref: sesko_2024_experimental_procedure
+      source_ref: sesko_2024_p218_s3_2_2
       citation_id: sesko_2024
       extraction_note: "Paper states regolith sample surface temperature reached 1750 K to 1900 K during exposure."
   window_semantics:
@@ -101,7 +101,7 @@ lab_schedule:
     - {t_h: 1.0, value: 1626.85, unit: C, qualifier: converted_from_reported_1900_K_upper_range, source_class: literature_sidecar, source_ref: sesko_2024_experimental_procedure, citation_id: sesko_2024}
   chamber_pressure_mbar:
     - {t_h: 0.0, value: 0.001, unit: mbar, qualifier: parser_floor_for_reported_1e-7_mbar, runtime_delta_annotation_id: pressure_floor_delta_reported_uhv_min_to_runtime_floor, source_class: assumption_with_sensitivity_marker, citation_id: sesko_2024, extraction_note: "Current normalize_lab_schedule floor is 1e-3 mbar; reported_exposure_profile.pressure_mbar preserves the stated 1e-7 mbar lower bound."}
-    - {t_h: 1.0, value: 0.01, unit: mbar, qualifier: reported_upper_range, source_class: literature_sidecar, source_ref: sesko_2024_experimental_procedure, citation_id: sesko_2024}
+    - {t_h: 1.0, value: 0.01, unit: mbar, qualifier: reported_upper_range, source_class: literature_sidecar, source_ref: sesko_2024_p218_s3_2_2, citation_id: sesko_2024}
   runtime_schedule_annotations:
     - id: pressure_floor_delta_reported_uhv_min_to_runtime_floor
       field: chamber_pressure_mbar[0].value
@@ -121,18 +121,20 @@ lab_schedule:
       source_class: not_reported
       citation_id: sesko_2024
       extraction_note: "Paper describes high-vacuum operation, not a carrier gas species."
+      reason: "No carrier species is identified in pp. 217-218 §§3.2.1-3.2.2."
       digest: "Sesko gas boundary: no imposed carrier gas reported."
     imposed_flow:
       reported_status: not_reported
       source_class: not_reported
       citation_id: sesko_2024
       extraction_note: "No imposed flow rate is reported; pumps were operating during solar exposure."
+      reason: "No carrier flow is stated in pp. 217-218 §§3.2.1-3.2.2."
       digest: "Sesko gas boundary: no imposed flow reported."
     pressure_control:
       mode: pumped_dynamic_uhv_exposure
       pressure_driver: imposed
       source_class: literature_sidecar
-      source_ref: sesko_2024_experimental_procedure
+      source_ref: sesko_2024_p218_s3_2_2
       citation_id: sesko_2024
       digest: "Vacuum pumps were operating during exposure; measured pressure oscillated from 1e-7 to 1e-2 mbar."
   temperature_measurement_basis:
@@ -172,15 +174,26 @@ lab_geometry:
   sample:
     mass_g: 10.0
     mass_source_class: literature_sidecar
-    mass_source_ref: sesko_2024_experimental_procedure
+    mass_source_ref: sesko_2024_p218_s3_2_2
     mass_citation_id: sesko_2024
-    mass_digest: "10 g EAC-1A simulant sample placed in an alumina ceramic crucible."
+    mass_digest: "10 g EAC-1A charge and alumina crucible reported in pp. 217-218 §§3.2.1-3.2.2."
+    crucible_material: alumina
+    crucible_material_source_ref: sesko_2024_p218_s3_2_2
+    crucible_material_citation_id: sesko_2024
+    exposed_melt_area_m2: null
+    exposed_melt_area_reason: "Not reported in pp. 217-218 §§3.2.1-3.2.2; no crucible opening dimensions are given."
+    crucible_opening_area_m2: null
+    crucible_opening_area_reason: "Not reported in pp. 217-218 §§3.2.1-3.2.2."
     named_missing_fields:
       - particle_size_distribution
       - packed_bed_depth_m
+      - exposed_melt_area_m2
+      - crucible_opening_area_m2
   chamber:
     volume_m3: null
+    volume_reason: "Chamber volume is not reported in pp. 217-218 §§3.2.1-3.2.2 or Figs. 1-2."
     wall_area_m2: null
+    wall_area_reason: "Chamber dimensions are not reported in pp. 217-218 §§3.2.1-3.2.2 or Figs. 1-2."
     wall_temperature_profile: chamber_wall
     named_missing_fields:
       - chamber_volume_m3
@@ -196,9 +209,9 @@ lab_geometry:
       line_of_sight_to_melt: true
       temperature_profile: quartz_window
       source_class: literature_sidecar
-      source_ref: sesko_2024_apparatus
+      source_ref: sesko_2024_p217_s3_2_1_fig2
       citation_id: sesko_2024
-      extraction_note: "CF DN 100 quartz glass window aperture diameter reported as 98.6 mm; area derived from aperture diameter. View factor is assumed."
+      extraction_note: "CF DN 100 viewport with 98.6 mm aperture reported in p. 217 §3.2.1 and Fig. 2; window area is derived from the aperture diameter and view factor is assumed."
     - id: crucible_wall
       role: sample_holder
       area_m2: 0.0025
@@ -224,7 +237,12 @@ lab_geometry:
       citation_id: sesko_2024
       extraction_note: "Vacuum chamber is reported, but chamber dimensions and deposition-relevant area are not."
   pump:
-    pressure_sensor_location: chamber_exit
+    pumping_speed_m3_s: null
+    pumping_speed_reason: "Not reported in pp. 217-218 §§3.2.1-3.2.2."
+    balance_temperature_K: null
+    balance_temperature_reason: "Not reported in pp. 217-218 §§3.2.1-3.2.2."
+    pressure_sensor_location: null
+    pressure_sensor_location_reason: "The location of the pressure measurement is not stated in pp. 217-218 §§3.2.1-3.2.2 or Figs. 1-2."
     pump_state_during_exposure: operating
     pump_throughput_source: not_reported
     conductance_path:
@@ -234,6 +252,7 @@ lab_geometry:
         - pump_speed
         - line_diameter_m
         - line_length_m
+      reason: "The paper reports pump operation but no speed or connecting-line dimensions (pp. 217-218 §§3.2.1-3.2.2 and Fig. 1)."
 
 pair:
   faithful:

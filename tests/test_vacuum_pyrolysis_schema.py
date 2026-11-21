@@ -8,6 +8,7 @@ import yaml
 
 from simulator.lab_geometry import parse_lab_geometry
 from simulator.lab_schedule import normalize_lab_schedule
+from simulator import runner as runner_module
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -423,8 +424,18 @@ def test_pomeroy_preset_captures_recipe_and_keeps_pressure_assumed() -> None:
     assert schedule["experiment_windows"]["ramp"]["end_h"] == POMEROY_RAMP_END_H
     assert schedule["experiment_windows"]["peak_hold"]["end_h"] == POMEROY_DURATION_H
     assert schedule["melt_temperature_C"][-1]["value"] == POMEROY_HOLD_TEMPERATURE_C
+    assert preset["lab_geometry"]["sample"]["mass_g"] is None
+    assert (
+        "sample_mass_g"
+        in preset["lab_geometry"]["sample"]["named_missing_fields"]
+    )
+    assert preset["lab_geometry"]["sample"]["exposed_melt_area_m2"] is None
     assert schedule["chamber_pressure_mbar"][0]["source_class"] == (
         "assumption_with_sensitivity_marker"
+    )
+    assert (
+        "RGA species partial pressures"
+        in schedule["chamber_pressure_mbar"][0]["extraction_note"]
     )
     assert "pump speed is not reported" in schedule["gas_boundary"][
         "pressure_control"
@@ -453,6 +464,40 @@ def test_pomeroy_preset_captures_recipe_and_keeps_pressure_assumed() -> None:
         )
         for row in measurement["qualitative_comparison_observations"]
     )
+
+
+def test_unreported_pomeroy_charge_uses_runner_default_and_reports_it(
+    tmp_path: Path,
+) -> None:
+    preset = runner_module._load_vacuum_preset_run_spec(
+        POMEROY_PRESET_PATH,
+        "faithful",
+    )
+    expected_default_kg = runner_module.PyrolysisRun(
+        feedstock_id=preset.feedstock_id
+    ).mass_kg
+    assert preset.mass_kg == expected_default_kg
+    assert preset.provenance["sample_mass_g"] is None
+    assert preset.provenance["notices"] == [
+        {
+            "code": "knob_defaulted",
+            "path": "mass_kg",
+            "value": expected_default_kg,
+            "unit": "kg",
+            "default_source": "PyrolysisRun.mass_kg",
+        }
+    ]
+
+    mutated_document = load_yaml(POMEROY_PRESET_PATH)
+    mutated_document["lab_geometry"]["sample"]["mass_g"] = 12.5
+    mutated_path = tmp_path / "pomeroy_mutated_mass.yaml"
+    mutated_path.write_text(yaml.safe_dump(mutated_document), encoding="utf-8")
+    mutated = runner_module._load_vacuum_preset_run_spec(
+        mutated_path,
+        "faithful",
+    )
+    assert mutated.mass_kg == pytest.approx(0.0125)
+    assert "notices" not in mutated.provenance
 
 
 def test_robinot_preset_references_registered_loadable_eac1_feedstock() -> None:
@@ -592,6 +637,11 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
     assert feedstock_ids == {"lunar_eac_1a"}
     assert measurement["material_context"]["feedstock_id"] == "lunar_eac_1a"
     assert measurement["conditions_reported"]["feedstock"]["species"] == "EAC-1A"
+    sample = preset["lab_geometry"]["sample"]
+    assert sample["mass_g"] == SESKO_SAMPLE_MASS_G
+    assert sample["crucible_material"] == "alumina"
+    assert sample["exposed_melt_area_m2"] is None
+    assert sample["crucible_opening_area_m2"] is None
 
     schedule = preset["lab_schedule"]
     assert schedule["melt_temperature_C"][0]["value"] == SESKO_TEMP_MIN_C
