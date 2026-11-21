@@ -17035,6 +17035,13 @@ def _sossi_residue_prediction(
     cohort_selection = _residue_cohort_selection(
         selected_experiment_ids, test_experiment_ids
     )
+    if cohort_selection is not None:
+        # Observation IDs are namespaced; the Sossi extract and residue engine
+        # address the same runs by their final experiment-id segment.
+        cohort_selection = frozenset(
+            experiment_id.rsplit("::", 1)[-1]
+            for experiment_id in cohort_selection
+        )
     if formula not in {"Mn", "Ti"}:
         return EnginePrediction(
             engine=engine,
