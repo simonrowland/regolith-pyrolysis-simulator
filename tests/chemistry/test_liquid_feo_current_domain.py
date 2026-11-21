@@ -147,7 +147,10 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         sim._establish_melt_redox_gate_authority_for_current_hour()
         temperature_C = 1300.0
         domain = sim.liquid_feo_domain_at(temperature_C + 273.15)
-        assert domain.domain_identity is None
+        assert (
+            domain.domain_identity.projection_threshold_verdict
+            == 'not_applicable'
+        )
         assert domain.below_liquidus is None
         assert domain.liquidus_unknown is True
     elif scenario == 'hot_read_above_known_liquidus_without_pin':
@@ -206,10 +209,14 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         assert liquidus_unknown_notices[0]['authority'] == 'unknown'
         return
 
-    if scenario in {
-        'hot_read_above_known_liquidus_without_pin',
-        'internal_analytical_liquidus_above',
-    }:
+    if scenario == 'hot_read_above_known_liquidus_without_pin':
+        assert identity_notices == []
+        assert below_notices == []
+        assert len(liquidus_unknown_notices) == 1
+        assert liquidus_unknown_notices[0]['authority'] == 'unknown'
+        return
+
+    if scenario == 'internal_analytical_liquidus_above':
         assert notices == []
         assert state['native_fe_activity'] == plain_activity
         return

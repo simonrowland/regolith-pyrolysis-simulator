@@ -489,7 +489,9 @@ def test_above_liquidus_equilibrium_diagnostic_is_byte_identical():
         liquidus_T_C=1200.0,
         solidus_T_C=1050.0,
         source="internal_analytical_liquidus",
-        domain_identity=None,
+        domain_identity=MAGEMinDomainIdentity(
+            "in_band", "not_applicable", None, "analytical_liquidus",
+        ),
     )
     plain = EquilibriumMixin._internal_analytical_equilibrium(
         _feo_equilibrium_sim(temperature_C=1600.0, with_domain_method=False)
