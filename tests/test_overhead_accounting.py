@@ -952,19 +952,41 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account():
     train = sim.atom_ledger.kg_by_account("process.condensation_train")
     stage_totals = sim.train.total_by_species()
 
-    wall_cro2_by_account_kg = {}
-    for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS:
-        cro2_kg = sim.atom_ledger.kg_by_account(account).get("CrO2", 0.0)
-        if cro2_kg > 0.0:
-            wall_cro2_by_account_kg[account] = cro2_kg
     # Each stage's incoming duct deposits before the collector. The inlet
     # duct stage_0_to_stage_1 sees undepleted CrO2 and takes the whole wall
-    # budget. The Stage-1 collector then captures the rest (~0.9967 of the
-    # 1 kg/hr parcel at the 15696ca7b3 probe), so stage_1_to_stage_2 still
-    # exists and is depleted to ~0. The segment was not removed.
+    # budget. The Stage-1 collector then captures the rest, so the next
+    # duct still exists on the live pipe and is depleted to ~0. Existence
+    # is that pipe segment, not the static account tuple: a removed
+    # segment drops out of pipe_segments and fails here.
+    segments_by_name = {
+        segment.name: segment
+        for segment in sim.condensation_model.pipe_segments
+    }
+    assert "stage_0_to_stage_1" in segments_by_name
+    assert "stage_1_to_stage_2" in segments_by_name
+    assert "stage_1_to_stage_2" in (
+        sim.condensation_model.wall_species_partial_pressures_pa_by_segment
+    )
+    inlet_segment = segments_by_name["stage_0_to_stage_1"].wall_deposit_account
+    downstream_segment = segments_by_name[
+        "stage_1_to_stage_2"
+    ].wall_deposit_account
+    wall_cro2_by_account_kg = {
+        segment.wall_deposit_account: sim.atom_ledger.kg_by_account(
+            segment.wall_deposit_account
+        ).get("CrO2", 0.0)
+        for segment in sim.condensation_model.pipe_segments
+    }
     authority = sim.condensation_model.last_condensation_authority_by_species["CrO2"]
-    inlet_segment = "process.wall_deposit_segment_stage_0_to_stage_1"
-    assert set(wall_cro2_by_account_kg) == {inlet_segment}
+    assert downstream_segment in wall_cro2_by_account_kg
+    assert wall_cro2_by_account_kg[downstream_segment] == pytest.approx(
+        0.0, abs=1e-12
+    )
+    assert {
+        account
+        for account, mass_kg in wall_cro2_by_account_kg.items()
+        if mass_kg > 0.0
+    } == {inlet_segment}
     assert wall_cro2_by_account_kg[inlet_segment] == pytest.approx(
         authority["wall_deposit_mass_kg_hr"]
     )

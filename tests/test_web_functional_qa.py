@@ -612,9 +612,22 @@ def test_headless_full_run_ledgers_and_product_story_web(
     assert cr_ingot_kg == round(train_cr_kg + cartridge_cr_kg, 2)
     assert cr_ingot_kg > 0.0
     assert cro_offgas_kg == pytest.approx(0.0, abs=1e-12)
-    # story payload values are display-rounded (2 dp), so compare loosely.
-    assert story["metal_ingots"]["species_kg"].get("Cr", 0.0) == pytest.approx(
-        cr_ingot_kg, abs=0.005
+    # The story counts a condenser metal as an ingot only when the stage
+    # accepts that species. Cr's designated stage is the Stage-2 harvester.
+    # This metal is on the Stage-3 silica collector, which does not accept
+    # Cr, so the train mass is off-spec condensate. The cartridge is a
+    # process account, not that line. Display rounding is the story
+    # bucket's own round-to-2-dp.
+    from simulator.condensation_routing import (
+        DESIGNATED_STAGE,
+        accepted_species_for_stage_key,
+    )
+
+    assert DESIGNATED_STAGE["Cr"] == "stage_2_cr_oxide_harvest"
+    assert "Cr" not in accepted_species_for_stage_key("stage_3_sio_zone")
+    assert story["metal_ingots"]["species_kg"].get("Cr", 0.0) == 0.0
+    assert story["off_spec_condensate"]["species_kg"].get("Cr", 0.0) == (
+        round(train_cr_kg, 2)
     )
     assert story["escaped_to_vacuum"]["species_kg"].get("CrO", 0.0) == pytest.approx(
         0.0, abs=0.005

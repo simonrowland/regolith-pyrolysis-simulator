@@ -2589,7 +2589,18 @@ def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
         assert len(sim.atom_ledger.transitions) == before_transition_count
     else:
         assert len(sim.atom_ledger.transitions) == before_transition_count + 1
-        assert reservoir.melt_intrinsic_fO2_log < before_fO2
+        # The ledger debit is the buffer mole, not the unbacked headspace
+        # transfer. fO2 moves only with that debit:
+        # log10(fO2) = log10(fO2_before) - dn_ledger / (C_m * ln(10)).
+        # C_m is the melt redox capacity. Headspace volume does not enter.
+        melt_capacity = reservoir.melt_redox_capacity_mol_per_ln_fO2
+        expected_fO2_log = before_fO2 - (
+            reservoir.exchange_o2_mol / (melt_capacity * math.log(10.0))
+        )
+        assert reservoir.melt_intrinsic_fO2_log == pytest.approx(expected_fO2_log)
+        assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
+            -1.0000000153832351
+        )
     assert after_o_atoms == pytest.approx(
         before_o_atoms,
         rel=0.0,

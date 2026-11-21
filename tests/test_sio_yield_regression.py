@@ -19,7 +19,11 @@ from simulator.condensation_routing import (
     K_TRAP_STAGE_KEY,
     NA_COLLECTOR_STAGE_KEY,
 )
-from simulator.condensation import CondensationModel, KnudsenRegimeRefusal
+from simulator.condensation import (
+    DEFAULT_PIPE_DIAMETER_M,
+    CondensationModel,
+    KnudsenRegimeRefusal,
+)
 from simulator.overhead import OverheadGasModel
 from simulator.runner import (
     SIO_ALPHA_PROVENANCE,
@@ -779,14 +783,47 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
 
     _assert_synthetic_sio_route_authority(route)
     # The 1 kg/hr parcel is sequential capture. Stage 3 takes eta3 of the
-    # inlet. Stage 4, the alkali/Mg cyclone at 523.15 K, takes eta4 of what
-    # Stage 3 leaves. At ae5998456 the cyclone already had its 5x-throat
-    # area, but _cold_stage_isolation_blocks refused SiO admission (SiO's
-    # designated stage is 3). Commit 37f7351c87 removed that isolation, so
-    # supersaturated SiO now freezes on the cold cyclone. The old 0.6848 kg
-    # remainder is what Stage 3 left when Stage 4 could not take SiO. It is
-    # not today's Stage-3-only eta. The fixture area is the synthetic
-    # throat ratio, not the 466.98 m2 design collector.
+    # inlet. Stage 4, the alkali/Mg cyclone, takes eta4 of what Stage 3
+    # leaves. SiO was never refused by stage isolation: _stage_isolation_blocks
+    # only keeps non-designated species off the Cr cartridge, and SiO's
+    # designated stage is stage_3_sio_zone. At ae5998456 the old remainder
+    # 0.6848392024862018 kg already included some Stage-4 SiO. Commit
+    # 37f7351c87 lets K freeze on the Na tap and non-K vapor freeze on the
+    # K trap. It does not change SiO admission on this cyclone.
+    # Collector area in this fixture is the default ratio times the throat
+    # (sio 6x, alkali 5x). Residence stays the model constants, 4 s and 3 s,
+    # the same dict as at ae5998456. Those areas are not the design
+    # collectors in setpoints.yaml. The capture gas-side length is the
+    # condenser hydraulic diameter, not the throat: this fixture writes
+    # DEFAULT_PIPE_DIAMETER_M onto pipe_diameter_m. At ae5998456 the fixture
+    # wrote the throat diameter, and that throat was also 0.12 m, so the
+    # numeric length matches. Flowing pressure is the Poiseuille report on
+    # the throat and is a different input. probe_d452_r14.py prints both
+    # sides; these destination values stay the tip probe until that pair
+    # exists.
+    from simulator.overhead import (
+        DEFAULT_CONDENSER_STAGE_AREA_RATIOS,
+        DEFAULT_INITIAL_THROAT_AREA_M2,
+    )
+
+    areas = model.stage_area_m2_by_stage
+    assert areas["sio_stage3"] == pytest.approx(
+        DEFAULT_INITIAL_THROAT_AREA_M2
+        * DEFAULT_CONDENSER_STAGE_AREA_RATIOS["sio_stage3"]
+    )
+    assert areas["alkali_stage4"] == pytest.approx(
+        DEFAULT_INITIAL_THROAT_AREA_M2
+        * DEFAULT_CONDENSER_STAGE_AREA_RATIOS["alkali_stage4"]
+    )
+    assert model.residence_time_s[3] == 4.0
+    assert model.residence_time_s[4] == 3.0
+    assert model.pipe_diameter_m == pytest.approx(DEFAULT_PIPE_DIAMETER_M)
+    assert model._hydraulic_diameter_m_for_stage_number(3) == pytest.approx(
+        DEFAULT_PIPE_DIAMETER_M
+    )
+    assert model._hydraulic_diameter_m_for_stage_number(4) == pytest.approx(
+        DEFAULT_PIPE_DIAMETER_M
+    )
     authority = route.condensation_authority_by_species["SiO"]
     outcomes = authority["stage_outcomes"]
     stage3_outcome = next(
@@ -1074,18 +1111,58 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
         melt,
     )
 
-    # Stage areas are zero, so collectors pass the parcel. The wall law is
-    # series-resistance flux on the default pipe (pi * 0.12 m * 1 m, split
-    # across the ducts), capped by the 1 kg/hr supply. t-1217's full-parcel
-    # expectation was that supply cap. At the r12 gate the default pipe was
-    # transport-limited (0.263 kg on the wall after stages were zeroed;
-    # 0.129 kg before). That fraction is not pinned. The notice below is the
-    # sticking-alpha record for the deposit the wall did take.
+    # Stage areas are zero, so collectors take none of the 1 kg/hr parcel.
+    # t-1217's wall == 1 was the supply cap. The default pipe's
+    # series-resistance budget is below that cap, so the complement stays
+    # vapor. The budget is the production per-duct candidate, not the
+    # route's own authority total and not a pasted gate actual.
     assert route.condensed_for_species("SiO") == pytest.approx(0.0)
+    from simulator.condensation import (
+        _segment_stage_number,
+        _species_condensation_temperature_C,
+        stage_visit_key,
+    )
+    from simulator.wall_deposition import wall_deposit_candidates_by_segment_kg
+
+    condensation_temperature_C = _species_condensation_temperature_C(
+        "SiO",
+        temps=model.condensation_temperatures_C,
+        vapor_pressure_data=model.vapor_pressure_data,
+    )
+    supply_kg_hr = 1.0
+    expected_wall_kg = 0.0
+    for stage in sorted(model.train.stages, key=stage_visit_key):
+        if int(stage.sub_order) != 0:
+            continue
+        for segment in model.pipe_segments:
+            if (
+                _segment_stage_number(segment.downstream_stage)
+                != stage.stage_number
+            ):
+                continue
+            candidates = wall_deposit_candidates_by_segment_kg(
+                model,
+                species="SiO",
+                rate_kg_hr=supply_kg_hr,
+                T_cond_C=condensation_temperature_C,
+                melt_temperature_C=melt.temperature_C,
+                supply_by_segment_kg={
+                    item.name: (
+                        supply_kg_hr if item.name == segment.name else 0.0
+                    )
+                    for item in model.pipe_segments
+                },
+            )
+            deposit_kg_hr = candidates.get(segment.name, 0.0)
+            expected_wall_kg += deposit_kg_hr
+            supply_kg_hr = max(0.0, supply_kg_hr - deposit_kg_hr)
     wall_kg = route.wall_deposit_by_species["SiO"]
-    authority = route.condensation_authority_by_species["SiO"]
-    assert wall_kg == pytest.approx(authority["wall_deposit_mass_kg_hr"])
-    assert 0.0 < wall_kg < 1.0
+    # A zero sticking coefficient contributes nothing (stage_2_to_stage_3
+    # below). The other ducts return the series-resistance candidate.
+    # Their sum is below the 1 kg/hr supply, so the supply cap does not bind.
+    assert expected_wall_kg < 1.0
+    assert wall_kg == pytest.approx(expected_wall_kg)
+    assert route.remaining_by_species["SiO"] == pytest.approx(1.0 - wall_kg)
     assert (
         route.condensed_for_species("SiO")
         + wall_kg

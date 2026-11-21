@@ -2897,16 +2897,23 @@ class CondensationModel:
     def _stage_area_m2_for_stage(self, stage: CondensationStage) -> float | None:
         """Area for this stage object.
 
-        A stage listed in ``STAGE_AREA_KEY_BY_STAGE_KEY`` (the K trap) has
-        its own area. It must not fall through to ``stage_N`` / ``str(N)``:
-        the trap shares public stage number 4 with the Na/Mg cyclone, and
-        that fall-through made a second stage-4 deposition with no area.
+        A stage listed in ``STAGE_AREA_KEY_BY_STAGE_KEY`` (the K trap) does
+        not inherit the sibling named area ``alkali_stage4``. It does use
+        ``stage_N`` / ``str(N)`` when that is the area the caller configured:
+        the trap shares public stage number 4, and a map of ``{"4": area}``
+        is that stage's area. A map that only names the cyclone leaves the
+        trap unset, and the caller passes the parcel through.
         """
 
         stage_key = getattr(stage, 'stage_key', '') or ''
         mapped = STAGE_AREA_KEY_BY_STAGE_KEY.get(stage_key)
         if mapped is not None:
-            keys = (mapped, stage_key)
+            keys = (
+                mapped,
+                stage_key,
+                f'stage_{stage.stage_number}',
+                str(stage.stage_number),
+            )
         else:
             keys = (
                 STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage.stage_number)),

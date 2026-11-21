@@ -10,7 +10,14 @@ from engines.builtin.condensation_route import BuiltinCondensationRouteProvider
 from engines.builtin.evaporation_transition import (
     BuiltinEvaporationTransitionProvider,
 )
-from simulator.account_ids import MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
+from simulator.account_ids import (
+    CONDENSATION_TRAIN_ACCOUNT,
+    MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
+)
+from simulator.condensation_routing import (
+    K_TRAP_STAGE_KEY,
+    NA_COLLECTOR_STAGE_KEY,
+)
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
@@ -184,11 +191,8 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
     mn_cartridge = sim.atom_ledger.kg_by_account(
         MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
     )
-    train = sim.atom_ledger.kg_by_account("process.condensation_train")
+    train = sim.atom_ledger.kg_by_account(CONDENSATION_TRAIN_ACCOUNT)
     stages = [stage.collected_kg for stage in sim.train.stages]
-    later_stages = [
-        stage.collected_kg for stage in sim.train.stages if stage.stage_number != 2
-    ]
 
     assert "CrO2" not in sim._last_vapour_batch_report["refusals_by_species"]
     assert "CrO2" in sim._last_vapour_batch_report["flux_active_species_ids"]
@@ -231,12 +235,36 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
     assert sum(float(stage.get("Cr2O3", 0.0)) for stage in stages) == pytest.approx(
         terminal_chromia["Cr2O3"]
     )
-    # CrO2 reacts into chromia. Elemental Cr is not a stage deposit here.
+    # CrO2 reacts into chromia. Elemental Cr is not supersaturated on the
+    # hot Stage-2 harvester, so it does not deposit there. The colder Na/Mg
+    # cyclone is the stage that freezes it. The r13 probe keyed collected
+    # mass by stage number and the K trap overwrote the cyclone; the train
+    # still held this Cr and no surviving stage did. The mass is the train
+    # account, not a pasted kilogram. The trap and every other non-stage-2
+    # collector stay empty of elemental Cr.
     assert cr_harvester.get("Cr", 0.0) == 0.0
     cr_outcomes = sim.condensation_model.last_condensation_refusals_by_species["Cr"]["stage_outcomes"]
     assert any(item["stage_number"] == 2 and item["reason"] == "no_supersaturation"
                and item["eta"] == 0.0 for item in cr_outcomes)
-    assert all("Cr" not in stage for stage in later_stages)
+    na_cyclone = next(
+        stage for stage in sim.train.stages
+        if stage.stage_key == NA_COLLECTOR_STAGE_KEY
+    )
+    k_trap = next(
+        stage for stage in sim.train.stages
+        if stage.stage_key == K_TRAP_STAGE_KEY
+    )
+    train_cr_kg = float(
+        sim.atom_ledger.kg_by_account(CONDENSATION_TRAIN_ACCOUNT).get("Cr", 0.0)
+        or 0.0
+    )
+    assert train_cr_kg > 0.0
+    assert na_cyclone.collected_kg.get("Cr", 0.0) == pytest.approx(train_cr_kg)
+    assert "Cr" not in k_trap.collected_kg
+    for stage in sim.train.stages:
+        if stage.stage_number == 2 or stage.stage_key == NA_COLLECTOR_STAGE_KEY:
+            continue
+        assert "Cr" not in stage.collected_kg
     # The multi-carrier chromium rail may redistribute Cr among melt, vapour,
     # and its designated stage, but cannot create or destroy chromium atoms.
     assert _total_chromium_mol(sim) == pytest.approx(initial_cr_mol, abs=1e-9)
