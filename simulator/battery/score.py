@@ -2177,7 +2177,7 @@ def _unverified_apparatus_notices(
     experiment: Experiment | None,
     gates: GateOutcome,
 ) -> tuple[Notice, ...]:
-    """Return the narrow predict-and-flag admission for printed KEMS rows."""
+    """Return apparatus notices for KEMS rows."""
 
     if experiment is None:
         return ()
@@ -2216,6 +2216,11 @@ def _unverified_apparatus_notices(
         and isinstance(reference_state.value, StandardState)
         and phase_token(reference_state.value.endmember) in CONDENSED_PHASES
     )
+    figure_only_partial_pressure = (
+        quantity is Quantity.P_PARTIAL
+        and reference.evidence.class_.is_value
+        and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+    )
     unknown_method_activity = (
         experiment.method.is_unknown
         and gates.reason is RefusalReason.METHOD_UNKNOWN
@@ -2244,11 +2249,6 @@ def _unverified_apparatus_notices(
         and author_reported_pressure
         and reference.evidence.class_.is_value
         and reference.evidence.class_.value in MEASURED_EVIDENCE
-    )
-    figure_only_partial_pressure = (
-        quantity is Quantity.P_PARTIAL
-        and reference.evidence.class_.is_value
-        and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
     )
     calibration_flagged_partial_pressure = (
         quantity is Quantity.P_PARTIAL
@@ -2356,26 +2356,28 @@ def _unverified_apparatus_notices(
                 )
             )
             continue
+        if fact == "calibration_not_grounded":
+            reason = (
+                f"calibration_not_grounded: "
+                f"{calibration_notice or 'Calibration is not grounded.'}"
+                + (f" ({calibration_reason})" if calibration_reason else "")
+            )
+        elif fact == "method_unknown" and unknown_method_activity:
+            reason = (
+                "method_unknown: published activity has a typed condensed "
+                "reference but its experiment method is not stated"
+            )
+        elif fact == "method_unknown":
+            reason = "method_unknown: " + str(
+                detail.get("reason") or "pressure series method is not stated"
+            )
+        else:
+            reason = f"apparatus_unverified:{fact}"
         notices.append(
             Notice(
                 kind=NoticeKind.UNVERIFIED_APPARATUS,
                 affected_quantities=(quantity,),
-                reason=(
-                "calibration_not_grounded: "
-                f"{calibration_notice or 'Calibration is not grounded.'}"
-                + (
-                    f" ({calibration_reason})"
-                    if calibration_reason
-                    else ""
-                )
-                if fact == "calibration_not_grounded"
-                else (
-                    "method_unknown: published activity has a typed condensed "
-                    "reference but its experiment method is not stated"
-                    if fact == "method_unknown"
-                    else f"apparatus_unverified:{fact}"
-                )
-                ),
+                reason=reason,
                 origin=reference.observation_id,
             )
         )
@@ -18058,6 +18060,20 @@ def _compile_residual_with_lineage(
         )
         if pressure_check is not None:
             pressure_detail = pressure_check.detail
+            if gates.reason is RefusalReason.METHOD_UNKNOWN:
+                method_check = next(
+                    (
+                        check
+                        for check in gates.checks
+                        if check.name == "method" and not check.passed
+                    ),
+                    None,
+                )
+                if method_check is not None:
+                    refusal_detail["missing_facts"] = {
+                        "method": method_check.detail.get("reason"),
+                        "in_cell_partial_pressure_sum": pressure_detail.get("reason"),
+                    }
             lower_bound = pressure_detail.get(
                 "printed_partial_pressure_lower_bound_Pa"
             )
