@@ -555,7 +555,7 @@ def test_unreported_pomeroy_knobs_use_runner_defaults_and_report_them(
     ],
     ids=["pomeroy-cardiff-2006", "sesko-2024"],
 )
-def test_benchtop_presets_run_or_report_stage0_refusal(
+def test_benchtop_presets_report_stage0_refusal_and_defaults(
     preset_path: Path,
     backend_name: str,
 ) -> None:
@@ -628,50 +628,57 @@ def test_benchtop_presets_run_or_report_stage0_refusal(
         assert preset.lab_schedule["chamber_pressure_mbar"][0][
             "runtime_delta_annotation_id"
         ] == SESKO_PRESSURE_RUNTIME_DELTA_ID
-
-        class ThermoEngineBackend:
-            name = "thermoengine"
-            _mode = "thermoengine"
-
-        config = run._session_config()
-        assert config.unavailable_error_cls is runner_module.RunnerError
-        with pytest.raises(
-            runner_module.RunnerError,
-            match="Stage-0 route.*requires subprocess.*ThermoEngineBackend",
-        ):
-            runner_module.SimSession().start(
-                config,
-                backend=ThermoEngineBackend(),
-            )
-        return
-
-    result = run.run()
-
-    assert result["status"] in {"ok", "partial"}
-    runtime_notices = result["run_metadata"]["preset"].get("notices", [])
-    area_notice = next(
-        notice
-        for notice in runtime_notices
-        if notice["path"] == "lab_geometry.sample.exposed_melt_area_m2"
-    )
-    assert area_notice["code"] == "knob_defaulted"
-    assert area_notice["value"] == pytest.approx(
-        result["run_metadata"]["effective_exposed_area_m2"]
-    )
-    assert area_notice["source_class"] == "assumption_with_sensitivity_marker"
-    if preset_path == POMEROY_PRESET_PATH:
-        assert area_notice["out_of_domain"] is True
-        assert {
-            notice["path"] for notice in runtime_notices
-        } == {
+    else:
+        expected_mass_kg = runner_module.PyrolysisRun(
+            feedstock_id=preset.feedstock_id
+        ).mass_kg
+        expected_pressure_mbar = runner_module.CampaignManager(
+            bundle.setpoints
+        )._pressure_config_float(
+            runner_module.CampaignPhase.C0,
+            "p_total_mbar",
+            "p_total_mbar_default",
+        )
+        assert preset.provenance["sample_mass_g"] is None
+        assert preset.mass_kg == pytest.approx(expected_mass_kg)
+        assert expected_pressure_mbar == pytest.approx(1.0)
+        assert all(
+            point["value"] == pytest.approx(expected_pressure_mbar)
+            for point in preset.lab_schedule["chamber_pressure_mbar"]
+        )
+        notices = {
+            notice["path"]: notice
+            for notice in preset.provenance.get("notices", [])
+        }
+        assert set(notices) == {
             "mass_kg",
             "lab_schedule.chamber_pressure_mbar",
-            "lab_geometry.sample.exposed_melt_area_m2",
         }
-        mass_notice = next(
-            notice for notice in runtime_notices if notice["path"] == "mass_kg"
-        )
+        mass_notice = notices["mass_kg"]
+        pressure_notice = notices["lab_schedule.chamber_pressure_mbar"]
+        assert mass_notice["code"] == "knob_defaulted"
+        assert mass_notice["value"] == pytest.approx(expected_mass_kg)
         assert mass_notice["out_of_domain"] is True
+        assert pressure_notice["code"] == "knob_defaulted"
+        assert pressure_notice["value"] == pytest.approx(
+            expected_pressure_mbar
+        )
+        assert area_notice["out_of_domain"] is True
+
+    class ThermoEngineBackend:
+        name = "thermoengine"
+        _mode = "thermoengine"
+
+    config = run._session_config()
+    assert config.unavailable_error_cls is runner_module.RunnerError
+    with pytest.raises(
+        runner_module.RunnerError,
+        match="Stage-0 route.*requires subprocess.*ThermoEngineBackend",
+    ):
+        runner_module.SimSession().start(
+            config,
+            backend=ThermoEngineBackend(),
+        )
 
 
 def test_robinot_preset_references_registered_loadable_eac1_feedstock() -> None:
