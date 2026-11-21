@@ -123,10 +123,21 @@ def test_openimcc_isolated_cell_cache_hits_in_parent_without_worker_round_trip(
             worker_calls.append(request)
         return original_worker_call(self, request, timeout_s=timeout_s)
 
-    def tracked_cached_call(engine_id: str, request: Any, solve: Any) -> Any:
+    def tracked_cached_call(
+        engine_id: str,
+        request: Any,
+        solve: Any,
+        *,
+        disclosure_runtime: Any | None = None,
+    ) -> Any:
         if os.getpid() == parent_pid and engine_id == "openimcc":
             parent_requests.append(dict(request))
-        return original_cached_call(engine_id, request, solve)
+        return original_cached_call(
+            engine_id,
+            request,
+            solve,
+            disclosure_runtime=disclosure_runtime,
+        )
 
     monkeypatch.setattr(WarmEngineWorker, "call", counted_worker_call)
     monkeypatch.setattr(engine_cache, "cached_engine_call", tracked_cached_call)
