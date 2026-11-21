@@ -120,9 +120,9 @@ experiments:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -231,9 +231,9 @@ experiments:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -342,9 +342,9 @@ experiments:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -453,9 +453,9 @@ experiments:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -564,9 +564,9 @@ experiments:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -675,9 +675,9 @@ experiments:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -786,9 +786,9 @@ experiments:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -897,9 +897,9 @@ experiments:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -1008,9 +1008,9 @@ experiments:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -1119,9 +1119,9 @@ experiments:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -1190,7 +1190,7 @@ species:
         table: '1'
         page: 71
         row: Bas1400C0m1
-        note: "Table 1 effective time 0 min; Methods p. 8 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1400C0m1 names zero-time (0 min)."
+        note: "Table 1 effective time 0 min; Methods p. 9 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1400C0m1 names zero-time (0 min)."
       T_range_K:
       - 1673.15
       - 1673.15
@@ -1268,7 +1268,7 @@ species:
         table: '1'
         page: 71
         row: Bas1400C15m
-        note: "Table 1 effective time 15 min; Methods p. 8 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1400C15m names 15 min."
+        note: "Table 1 effective time 15 min; Methods p. 9 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1400C15m names 15 min."
       T_range_K:
       - 1673.15
       - 1673.15
@@ -1346,7 +1346,7 @@ species:
         table: '1'
         page: 71
         row: Bas1400C30m
-        note: "Table 1 effective time 30 min; Methods p. 8 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1400C30m names 30 min."
+        note: "Table 1 effective time 30 min; Methods p. 9 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1400C30m names 30 min."
       T_range_K:
       - 1673.15
       - 1673.15
@@ -1424,7 +1424,7 @@ species:
         table: '1'
         page: 71
         row: Bas1400C60m
-        note: "Table 1 effective time 60 min; Methods p. 8 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1400C60m names 60 min."
+        note: "Table 1 effective time 60 min; Methods p. 9 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1400C60m names 60 min."
       T_range_K:
       - 1673.15
       - 1673.15
@@ -1502,7 +1502,7 @@ species:
         table: '1'
         page: 71
         row: Bas1400C90m
-        note: "Table 1 effective time 90 min; Methods p. 8 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1400C90m names 90 min."
+        note: "Table 1 effective time 90 min; Methods p. 9 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1400C90m names 90 min."
       T_range_K:
       - 1673.15
       - 1673.15
@@ -1578,7 +1578,7 @@ species:
         table: '1'
         page: 71
         row: Bas1200C0h2
-        note: "Table 1 effective time 0 min; Methods p. 8 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1200C0h2 names zero-time (5 min setpoint hold)."
+        note: "Table 1 effective time 0 min; Methods p. 9 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1200C0h2 names zero-time (5 min setpoint hold)."
       T_range_K:
       - 1473.15
       - 1473.15
@@ -1656,7 +1656,7 @@ species:
         table: '1'
         page: 71
         row: Bas1200C1h
-        note: "Table 1 effective time 55 min; Methods p. 8 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1200C1h names 1 h (60 min nominal)."
+        note: "Table 1 effective time 55 min; Methods p. 9 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1200C1h names 1 h (60 min nominal)."
       T_range_K:
       - 1473.15
       - 1473.15
@@ -1734,7 +1734,7 @@ species:
         table: '1'
         page: 71
         row: Bas1200C4h
-        note: "Table 1 effective time 235 min; Methods p. 8 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1200C4h names 4 h (240 min nominal)."
+        note: "Table 1 effective time 235 min; Methods p. 9 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1200C4h names 4 h (240 min nominal)."
       T_range_K:
       - 1473.15
       - 1473.15
@@ -1812,7 +1812,7 @@ species:
         table: '1'
         page: 71
         row: Bas1200C10h
-        note: "Table 1 effective time 595 min; Methods p. 8 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1200C10h names 10 h (600 min nominal)."
+        note: "Table 1 effective time 595 min; Methods p. 9 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1200C10h names 10 h (600 min nominal)."
       T_range_K:
       - 1473.15
       - 1473.15
@@ -1890,7 +1890,7 @@ species:
         table: '1'
         page: 71
         row: Bas1200C40h
-        note: "Table 1 effective time 2395 min; Methods p. 8 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1200C40h names 40 h (2400 min nominal)."
+        note: "Table 1 effective time 2395 min; Methods p. 9 section 2.2 state: 'The effective duration of the evaporation experiments was relative to zero-time runs.'; id Bas1200C40h names 40 h (2400 min nominal)."
       T_range_K:
       - 1473.15
       - 1473.15
@@ -2112,12 +2112,21 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: <
+              bound_value: '0.0001'
           locator:
             page: 8
             section: 2.2 Vacuum evaporation experiments
+        duration_h:
+          state:
+            tag: value
+            value: '1.5'
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1400C90m
+            note: 'Table 1 Time 90 min converted to 1.5 h; Methods p. 9 section 2.2 gives the effective duration relative to zero-time runs.'
         time_min:
           state:
             tag: value
@@ -2164,12 +2173,21 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: <
+              bound_value: '0.0001'
           locator:
             page: 8
             section: 2.2 Vacuum evaporation experiments
+        duration_h:
+          state:
+            tag: value
+            value: '1.5'
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1400C90m
+            note: 'Table 1 Time 90 min converted to 1.5 h; Methods p. 9 section 2.2 gives the effective duration relative to zero-time runs.'
         time_min:
           state:
             tag: value

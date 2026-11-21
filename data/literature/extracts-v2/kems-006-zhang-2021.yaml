@@ -32,16 +32,17 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    exposure:
       tag: value
       value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
-    exposure:
-      tag: unknown
-      reason: no exposure mapped from source
+        area_m2:
+          tag: unknown
+          reason: source does not state exposed area
+        duration_s:
+          tag: value
+          value: '5400'
     sample_mass_kg:
       tag: unknown
       reason: no sample_mass_kg mapped from source
@@ -79,12 +80,22 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
+    duration_h:
+      state:
+        tag: value
+        value: '1.5'
+      locator:
+        page: 71
+        table: '1'
+        note: Table 1 Time 90 min converted to 1.5 h; Methods p. 9 section 2.2 gives the effective duration relative to zero-time
+          runs.
     time_min:
       state:
         tag: value
@@ -167,16 +178,17 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    exposure:
       tag: value
       value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
-    exposure:
-      tag: unknown
-      reason: no exposure mapped from source
+        area_m2:
+          tag: unknown
+          reason: source does not state exposed area
+        duration_s:
+          tag: value
+          value: '5400'
     sample_mass_kg:
       tag: unknown
       reason: no sample_mass_kg mapped from source
@@ -214,12 +226,22 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
+    duration_h:
+      state:
+        tag: value
+        value: '1.5'
+      locator:
+        page: 71
+        table: '1'
+        note: Table 1 Time 90 min converted to 1.5 h; Methods p. 9 section 2.2 gives the effective duration relative to zero-time
+          runs.
     time_min:
       state:
         tag: value
@@ -324,13 +346,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -365,7 +382,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1200C0h2 names zero-time (5 min setpoint hold).; row=Bas1200C0h2'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -649,9 +666,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -741,13 +759,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -782,7 +795,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1200C0h2 names zero-time (5 min setpoint hold).; row=Bas1200C0h2'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -1066,9 +1079,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -1158,13 +1172,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -1199,7 +1208,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1200C0h2 names zero-time (5 min setpoint hold).; row=Bas1200C0h2'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -1483,9 +1492,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -1575,13 +1585,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -1616,7 +1621,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1200C0h2 names zero-time (5 min setpoint hold).; row=Bas1200C0h2'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -1900,9 +1905,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -1992,13 +1998,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -2033,7 +2034,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1200C0h2 names zero-time (5 min setpoint hold).; row=Bas1200C0h2'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -2317,9 +2318,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -2409,13 +2411,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -2450,7 +2447,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1200C0h2 names zero-time (5 min setpoint hold).; row=Bas1200C0h2'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -2734,9 +2731,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -2826,13 +2824,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -2867,7 +2860,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1200C0h2 names zero-time (5 min setpoint hold).; row=Bas1200C0h2'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -3151,9 +3144,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -3243,13 +3237,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -3284,7 +3273,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1200C0h2 names zero-time (5 min setpoint hold).; row=Bas1200C0h2'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -3568,9 +3557,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -3660,13 +3650,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -3701,7 +3686,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1200C0h2 names zero-time (5 min setpoint hold).; row=Bas1200C0h2'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -3985,9 +3970,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -4077,13 +4063,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -4118,7 +4099,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 595 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 595 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C10h names 10 h (600 min nominal).; row=Bas1200C10h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -4402,9 +4383,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -4494,13 +4476,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -4535,7 +4512,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 595 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 595 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C10h names 10 h (600 min nominal).; row=Bas1200C10h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -4819,9 +4796,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -4911,13 +4889,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -4952,7 +4925,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 595 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 595 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C10h names 10 h (600 min nominal).; row=Bas1200C10h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -5236,9 +5209,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -5328,13 +5302,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -5369,7 +5338,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 595 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 595 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C10h names 10 h (600 min nominal).; row=Bas1200C10h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -5653,9 +5622,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -5745,13 +5715,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -5786,7 +5751,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 595 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 595 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C10h names 10 h (600 min nominal).; row=Bas1200C10h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -6070,9 +6035,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -6162,13 +6128,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -6203,7 +6164,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 595 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 595 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C10h names 10 h (600 min nominal).; row=Bas1200C10h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -6487,9 +6448,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -6579,13 +6541,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -6620,7 +6577,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 595 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 595 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C10h names 10 h (600 min nominal).; row=Bas1200C10h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -6904,9 +6861,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -6996,13 +6954,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -7037,7 +6990,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 595 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 595 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C10h names 10 h (600 min nominal).; row=Bas1200C10h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -7321,9 +7274,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -7413,13 +7367,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -7454,7 +7403,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 595 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 595 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C10h names 10 h (600 min nominal).; row=Bas1200C10h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -7738,9 +7687,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -7830,13 +7780,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -7871,7 +7816,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 55 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 55 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C1h names 1 h (60 min nominal).; row=Bas1200C1h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -8155,9 +8100,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -8247,13 +8193,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -8288,7 +8229,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 55 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 55 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C1h names 1 h (60 min nominal).; row=Bas1200C1h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -8572,9 +8513,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -8664,13 +8606,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -8705,7 +8642,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 55 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 55 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C1h names 1 h (60 min nominal).; row=Bas1200C1h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -8989,9 +8926,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -9081,13 +9019,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -9122,7 +9055,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 55 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 55 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C1h names 1 h (60 min nominal).; row=Bas1200C1h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -9406,9 +9339,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -9498,13 +9432,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -9539,7 +9468,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 55 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 55 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C1h names 1 h (60 min nominal).; row=Bas1200C1h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -9823,9 +9752,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -9915,13 +9845,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -9956,7 +9881,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 55 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 55 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C1h names 1 h (60 min nominal).; row=Bas1200C1h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -10240,9 +10165,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -10332,13 +10258,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -10373,7 +10294,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 55 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 55 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C1h names 1 h (60 min nominal).; row=Bas1200C1h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -10657,9 +10578,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -10749,13 +10671,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -10790,7 +10707,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 55 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 55 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C1h names 1 h (60 min nominal).; row=Bas1200C1h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -11074,9 +10991,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -11166,13 +11084,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -11207,7 +11120,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 55 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 55 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C1h names 1 h (60 min nominal).; row=Bas1200C1h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -11491,9 +11404,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -11583,13 +11497,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -11624,7 +11533,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 2395 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 2395 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C40h names 40 h (2400 min nominal).; row=Bas1200C40h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -11908,9 +11817,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -12000,13 +11910,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -12041,7 +11946,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 2395 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 2395 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C40h names 40 h (2400 min nominal).; row=Bas1200C40h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -12325,9 +12230,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -12417,13 +12323,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -12458,7 +12359,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 2395 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 2395 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C40h names 40 h (2400 min nominal).; row=Bas1200C40h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -12742,9 +12643,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -12834,13 +12736,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -12875,7 +12772,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 2395 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 2395 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C40h names 40 h (2400 min nominal).; row=Bas1200C40h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -13159,9 +13056,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -13251,13 +13149,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -13292,7 +13185,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 2395 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 2395 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C40h names 40 h (2400 min nominal).; row=Bas1200C40h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -13576,9 +13469,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -13668,13 +13562,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -13709,7 +13598,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 2395 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 2395 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C40h names 40 h (2400 min nominal).; row=Bas1200C40h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -13993,9 +13882,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -14085,13 +13975,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -14126,7 +14011,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 2395 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 2395 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C40h names 40 h (2400 min nominal).; row=Bas1200C40h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -14410,9 +14295,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -14502,13 +14388,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -14543,7 +14424,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 2395 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 2395 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C40h names 40 h (2400 min nominal).; row=Bas1200C40h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -14827,9 +14708,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -14919,13 +14801,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -14960,7 +14837,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 2395 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 2395 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C40h names 40 h (2400 min nominal).; row=Bas1200C40h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -15244,9 +15121,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -15336,13 +15214,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -15377,7 +15250,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 235 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 235 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C4h names 4 h (240 min nominal).; row=Bas1200C4h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -15661,9 +15534,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -15753,13 +15627,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -15794,7 +15663,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 235 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 235 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C4h names 4 h (240 min nominal).; row=Bas1200C4h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -16078,9 +15947,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -16170,13 +16040,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -16211,7 +16076,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 235 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 235 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C4h names 4 h (240 min nominal).; row=Bas1200C4h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -16495,9 +16360,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -16587,13 +16453,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -16628,7 +16489,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 235 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 235 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C4h names 4 h (240 min nominal).; row=Bas1200C4h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -16912,9 +16773,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -17004,13 +16866,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -17045,7 +16902,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 235 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 235 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C4h names 4 h (240 min nominal).; row=Bas1200C4h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -17329,9 +17186,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -17421,13 +17279,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -17462,7 +17315,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 235 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 235 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C4h names 4 h (240 min nominal).; row=Bas1200C4h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -17746,9 +17599,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -17838,13 +17692,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -17879,7 +17728,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 235 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 235 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C4h names 4 h (240 min nominal).; row=Bas1200C4h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -18163,9 +18012,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -18255,13 +18105,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -18296,7 +18141,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 235 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 235 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C4h names 4 h (240 min nominal).; row=Bas1200C4h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -18580,9 +18425,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -18672,13 +18518,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -18713,7 +18554,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 235 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 235 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1200C4h names 4 h (240 min nominal).; row=Bas1200C4h'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -18997,9 +18838,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -19089,13 +18931,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -19130,7 +18967,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1400C0m1 names zero-time (0 min).; row=Bas1400C0m1'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -19414,9 +19251,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -19506,13 +19344,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -19547,7 +19380,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1400C0m1 names zero-time (0 min).; row=Bas1400C0m1'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -19831,9 +19664,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -19923,13 +19757,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -19964,7 +19793,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1400C0m1 names zero-time (0 min).; row=Bas1400C0m1'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -20248,9 +20077,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -20340,13 +20170,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -20381,7 +20206,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1400C0m1 names zero-time (0 min).; row=Bas1400C0m1'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -20665,9 +20490,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -20757,13 +20583,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -20798,7 +20619,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1400C0m1 names zero-time (0 min).; row=Bas1400C0m1'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -21082,9 +20903,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -21174,13 +20996,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -21215,7 +21032,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1400C0m1 names zero-time (0 min).; row=Bas1400C0m1'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -21499,9 +21316,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -21591,13 +21409,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -21632,7 +21445,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1400C0m1 names zero-time (0 min).; row=Bas1400C0m1'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -21916,9 +21729,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -22008,13 +21822,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -22049,7 +21858,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1400C0m1 names zero-time (0 min).; row=Bas1400C0m1'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -22333,9 +22142,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -22425,13 +22235,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -22466,7 +22271,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 0 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation experiments
+        note: 'Table 1 effective time 0 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation experiments
           was relative to zero-time runs.''; id Bas1400C0m1 names zero-time (0 min).; row=Bas1400C0m1'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -22750,9 +22555,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -22842,13 +22648,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -22883,7 +22684,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 15 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 15 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C15m names 15 min.; row=Bas1400C15m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -23167,9 +22968,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -23259,13 +23061,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -23300,7 +23097,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 15 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 15 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C15m names 15 min.; row=Bas1400C15m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -23584,9 +23381,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -23676,13 +23474,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -23717,7 +23510,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 15 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 15 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C15m names 15 min.; row=Bas1400C15m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -24001,9 +23794,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -24093,13 +23887,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -24134,7 +23923,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 15 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 15 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C15m names 15 min.; row=Bas1400C15m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -24418,9 +24207,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -24510,13 +24300,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -24551,7 +24336,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 15 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 15 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C15m names 15 min.; row=Bas1400C15m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -24835,9 +24620,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -24927,13 +24713,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -24968,7 +24749,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 15 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 15 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C15m names 15 min.; row=Bas1400C15m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -25252,9 +25033,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -25344,13 +25126,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -25385,7 +25162,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 15 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 15 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C15m names 15 min.; row=Bas1400C15m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -25669,9 +25446,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -25761,13 +25539,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -25802,7 +25575,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 15 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 15 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C15m names 15 min.; row=Bas1400C15m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -26086,9 +25859,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -26178,13 +25952,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -26219,7 +25988,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 15 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 15 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C15m names 15 min.; row=Bas1400C15m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -26503,9 +26272,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -26595,13 +26365,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -26636,7 +26401,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 30 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 30 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C30m names 30 min.; row=Bas1400C30m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -26920,9 +26685,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -27012,13 +26778,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -27053,7 +26814,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 30 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 30 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C30m names 30 min.; row=Bas1400C30m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -27337,9 +27098,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -27429,13 +27191,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -27470,7 +27227,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 30 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 30 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C30m names 30 min.; row=Bas1400C30m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -27754,9 +27511,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -27846,13 +27604,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -27887,7 +27640,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 30 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 30 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C30m names 30 min.; row=Bas1400C30m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -28171,9 +27924,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -28263,13 +28017,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -28304,7 +28053,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 30 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 30 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C30m names 30 min.; row=Bas1400C30m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -28588,9 +28337,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -28680,13 +28430,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -28721,7 +28466,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 30 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 30 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C30m names 30 min.; row=Bas1400C30m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -29005,9 +28750,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -29097,13 +28843,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -29138,7 +28879,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 30 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 30 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C30m names 30 min.; row=Bas1400C30m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -29422,9 +29163,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -29514,13 +29256,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -29555,7 +29292,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 30 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 30 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C30m names 30 min.; row=Bas1400C30m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -29839,9 +29576,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -29931,13 +29669,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -29972,7 +29705,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 30 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 30 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C30m names 30 min.; row=Bas1400C30m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -30256,9 +29989,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -30348,13 +30082,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -30389,7 +30118,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 60 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 60 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C60m names 60 min.; row=Bas1400C60m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -30673,9 +30402,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -30765,13 +30495,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -30806,7 +30531,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 60 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 60 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C60m names 60 min.; row=Bas1400C60m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -31090,9 +30815,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -31182,13 +30908,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -31223,7 +30944,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 60 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 60 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C60m names 60 min.; row=Bas1400C60m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -31507,9 +31228,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -31599,13 +31321,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -31640,7 +31357,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 60 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 60 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C60m names 60 min.; row=Bas1400C60m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -31924,9 +31641,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -32016,13 +31734,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -32057,7 +31770,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 60 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 60 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C60m names 60 min.; row=Bas1400C60m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -32341,9 +32054,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -32433,13 +32147,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -32474,7 +32183,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 60 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 60 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C60m names 60 min.; row=Bas1400C60m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -32758,9 +32467,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -32850,13 +32560,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -32891,7 +32596,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 60 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 60 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C60m names 60 min.; row=Bas1400C60m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -33175,9 +32880,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -33267,13 +32973,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -33308,7 +33009,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 60 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 60 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C60m names 60 min.; row=Bas1400C60m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -33592,9 +33293,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -33684,13 +33386,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -33725,7 +33422,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 60 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 60 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C60m names 60 min.; row=Bas1400C60m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -34009,9 +33706,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -34101,13 +33799,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -34142,7 +33835,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 90 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 90 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C90m names 90 min.; row=Bas1400C90m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -34384,9 +34077,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -34476,13 +34170,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -34517,7 +34206,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 90 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 90 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C90m names 90 min.; row=Bas1400C90m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -34759,9 +34448,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -34851,13 +34541,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -34892,7 +34577,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 90 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 90 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C90m names 90 min.; row=Bas1400C90m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -35134,9 +34819,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -35226,13 +34912,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -35267,7 +34948,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 90 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 90 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C90m names 90 min.; row=Bas1400C90m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -35509,9 +35190,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -35601,13 +35283,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -35642,7 +35319,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 90 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 90 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C90m names 90 min.; row=Bas1400C90m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -35884,9 +35561,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -35976,13 +35654,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -36017,7 +35690,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 90 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 90 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C90m names 90 min.; row=Bas1400C90m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -36259,9 +35932,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
@@ -36351,13 +36025,8 @@ observations:
       tag: unknown
       reason: source has no located oxygen condition for this run
     total_pressure_Pa:
-      tag: value
-      value:
-        point: '0.0001'
-        low: '0.000031622776601683793319988935444327185337195551393252'
-        high: '0.00031622776601683793319988935444327185337195551393252'
-        band_basis: half_decade_order_of_magnitude
-        kind: approximate_pressure
+      tag: unknown
+      reason: source has no located total pressure for this run
     exposure:
       tag: value
       value:
@@ -36392,7 +36061,7 @@ observations:
       evidence:
         page: 71
         table: '1'
-        note: 'Table 1 effective time 90 min; Methods p. 8 section 2.2 state: ''The effective duration of the evaporation
+        note: 'Table 1 effective time 90 min; Methods p. 9 section 2.2 state: ''The effective duration of the evaporation
           experiments was relative to zero-time runs.''; id Bas1400C90m names 90 min.; row=Bas1400C90m'
         source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
   notices: []
@@ -36634,9 +36303,10 @@ observations:
       state:
         tag: value
         value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+          approximate: false
       locator:
         page: 8
         section: 2.2 Vacuum evaporation experiments
