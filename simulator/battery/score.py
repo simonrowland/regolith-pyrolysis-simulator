@@ -16879,6 +16879,24 @@ def _none_uncertainty() -> Uncertainty:
     return Uncertainty(kind=UncertaintyKind.NONE)
 
 
+def _sample_catalog_run_identity(observation: Observation) -> str | None:
+    """Read a catalog sample marker only from an applicable identity axis."""
+
+    identity = observation.identity
+    if (
+        not isinstance(identity, Identity)
+        or "composition" not in profile_for(identity).required
+        or identity.composition is None
+        or not identity.composition.is_value
+        or not isinstance(identity.composition.value, Composition)
+    ):
+        return None
+    composition = identity.composition.value
+    if composition.proxy_flag != "composition_from_sample_catalog":
+        return None
+    return composition.proxy_source
+
+
 def _model_oxygen_control_lineage(
     reference: Observation,
     context: ScoreContext,
@@ -16975,6 +16993,25 @@ def _score_relative_qms_series(
             or source_trace.identity.species.formula != evidence.target_species
         ):
             return unavailable(RelativeSeriesUnavailableReason.SOURCE_TRACE_UNAVAILABLE)
+
+        sample_run_identities = {
+            _sample_catalog_run_identity(observation)
+            for observation in rows
+            if observation.source_id == reference.source_id
+            and observation.experiment_id == reference.experiment_id
+        }
+        sample_run_identities.discard(None)
+        if len(sample_run_identities) > 1:
+            reference_run = _sample_catalog_run_identity(reference)
+            trace_run = _sample_catalog_run_identity(source_trace)
+            if (
+                reference_run is None
+                or trace_run is None
+                or reference_run != trace_run
+            ):
+                return unavailable(
+                    RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
+                )
 
         experiment = context.experiments.get(reference.experiment_id)
         if experiment is None:

@@ -149,6 +149,7 @@ class RelativeSeriesUnavailableReason(StrEnum):
     INTERFERENCE_UNRESOLVED = "interference_unresolved"
     SOURCE_EVIDENCE_UNLOCATED = "source_evidence_unlocated"
     SOURCE_TRACE_UNAVAILABLE = "source_trace_unavailable"
+    AMBIGUOUS_RUN_IDENTITY = "ambiguous_run_identity"
     MODEL_OXYGEN_INPUTS_UNAVAILABLE = "model_oxygen_inputs_unavailable"
     CLOCK_EVENT_MISMATCH = "clock_event_mismatch"
     CLOCK_MAPPING_UNSUPPORTED = "clock_mapping_unsupported"

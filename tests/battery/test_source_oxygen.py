@@ -19,7 +19,14 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.records import (
-    Bench, BenchIdentity, Derivation, FO2Control, Located, Notice, Reaction,
+    Bench,
+    BenchIdentity,
+    Composition,
+    Derivation,
+    FO2Control,
+    Located,
+    Notice,
+    Reaction,
     ReactionTerm, RelativeSeriesAnchor, RelativeSeriesClock,
     RelativeSeriesEvidence, RelativeSeriesPoint, Species, State, Value,
 )
@@ -50,6 +57,14 @@ def source_context():
     )
 
 
+@pytest.fixture(scope="module")
+def demaria_context():
+    return load_score_context(
+        Path(__file__).resolve().parents[2],
+        sources=("kems-022-demaria-1971",),
+    )
+
+
 def _row(context, source, formula="SiO"):
     return next(
         row for row in context.observations.values()
@@ -59,6 +74,24 @@ def _row(context, source, formula="SiO"):
             source != "kems-053-stolyarova-1991"
             or dict(row.identity.composition.value.components).get("CaO") == Decimal("0.6")
         )
+    )
+
+
+def _demaria_o_sample(context, sample):
+    suffix = f"sample {sample}"
+    return next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-022-demaria-1971"
+        and row.experiment_id.endswith("::demaria-1971-main-kems")
+        and row.identity.species.formula == "O"
+        and row.identity.composition is not None
+        and row.identity.composition.is_value
+        and isinstance(row.identity.composition.value, Composition)
+        and row.identity.composition.value.proxy_flag
+        == "composition_from_sample_catalog"
+        and row.identity.composition.value.proxy_source is not None
+        and row.identity.composition.value.proxy_source.endswith(suffix)
     )
 
 
@@ -112,8 +145,7 @@ def _single_physics_rung(notices):
     return labels[0]
 
 
-def _relative_qms_inputs(source_trace, model_input_ids):
-    target_species = "O2"
+def _relative_qms_inputs(source_trace, model_input_ids, *, target_species="O2"):
     observed = tuple(
         RelativeSeriesPoint(
             run_id=source_trace.experiment_id,
@@ -1758,6 +1790,64 @@ def test_relative_qms_oxygen_inputs_cannot_validate_themselves(source_context):
         RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
     )
     assert fallback.points == ()
+
+
+def test_relative_qms_refuses_cross_sample_demaria_pairing(demaria_context):
+    sample_12022 = _demaria_o_sample(demaria_context, "12022")
+    sample_12065 = _demaria_o_sample(demaria_context, "12065")
+    reference = replace(
+        sample_12022,
+        observation_id="relative-qms-demaria-12022-reference",
+        identity=replace(
+            sample_12022.identity,
+            fO2_Pa=State.of(Decimal("1e-6")),
+        ),
+    )
+    # The trace comes from the other catalog sample, but ion intensity has no
+    # composition identity axis, so its Observation cannot identify that run.
+    trace = replace(
+        sample_12065,
+        observation_id="relative-qms-demaria-12065-trace",
+        identity=replace(
+            sample_12065.identity,
+            quantity=Quantity.ION_INTENSITY,
+            composition=State.not_applicable(
+                "ion-intensity trace has no composition axis"
+            ),
+            fO2_Pa=None,
+        ),
+        point_conditions=None,
+        derived_from=None,
+        derivation=None,
+        value=Value(ValueKind.POINT, point=Decimal("2")),
+    )
+    context = replace(
+        demaria_context,
+        observations={
+            **demaria_context.observations,
+            reference.observation_id: reference,
+            trace.observation_id: trace,
+        },
+    )
+    observed, model, anchor, clock, evidence = _relative_qms_inputs(
+        trace, (), target_species="O"
+    )
+
+    result = _score_relative_qms_series(
+        observed,
+        model,
+        anchor,
+        clock,
+        evidence,
+        context=context,
+        reference=reference,
+        source_trace=trace,
+    )
+
+    assert result.unavailable_reason is (
+        RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
+    )
+    assert result.points == ()
 
 
 def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
