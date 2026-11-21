@@ -13,8 +13,11 @@ Model scope:
   metal-conduction load after passive radiation to space.
 
 Assumptions and uncertified refinements:
-- process gas flow is never a cooling term; pO2 and neutral sweep remain
-  chemistry controls, not furnace-wall heat sinks;
+- process gas flow is never a cooling term on this furnace-sizing floor;
+  pO2 and neutral sweep remain chemistry controls, not furnace-wall heat
+  sinks. The benchtop power-driven pellet residual is a separate balance:
+  continuum argon at Nu = 2 is a sink there, because that pellet sits in
+  the printed low-pressure argon. That term is not part of this floor;
 - wall conductivity, wall thickness, wall area, solidus, outer-wall
   temperature, sky temperature, and view factor are caller-supplied unless a
   caller provides source tags;
@@ -26,7 +29,7 @@ from __future__ import annotations
 
 import copy
 import math
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -1229,6 +1232,28 @@ TONNE_SIZER_DOMAIN_MIN_KG = 1.0
 FACE_HOT_UPPER = "hot_upper"
 FACE_FULL_SIDE = "full_side"
 _FACE_SETS = frozenset({FACE_HOT_UPPER, FACE_FULL_SIDE})
+# Water-cooled holder. The steel temperature is unprinted. 300 K is the
+# typed-unknown boundary shared by the enclosure, the slab cold end, and
+# the argon. It is not the preset holder series, which ends at 1500 C.
+COLD_BOUNDARY_K = 300.0
+# Molten and glassy basalt, used as a band. Büttner et al. report about
+# 1.0 W m-1 K-1 at 1200 C and about 0.6 at 1350 C. Hofmeister and
+# coworkers put basaltic melts near 1.4. Lesher and Spera, Encyclopedia
+# of Volcanoes ch. 5, quote about 0.6 in the summary and about 1.2 to
+# 1.5 in the compiled table. The default is 1.0, the midpoint of 0.6
+# and 1.4 and Büttner's 1200 C value. It is not tuned to a pyrometer
+# reading, and it is not THERMAL_BUDGET_WALL_CONDUCTIVITY_W_M_K.
+PELLET_CONDUCTIVITY_LOW_W_M_K = 0.6
+PELLET_CONDUCTIVITY_HIGH_W_M_K = 1.4
+PELLET_CONDUCTIVITY_DEFAULT_W_M_K = 1.0
+# Still-gas sphere. Continuum conduction at the printed diameter, not a
+# fitted Nusselt number and not a free-molecular flux.
+NU_STILL_SPHERE = 2.0
+# NIST argon thermal conductivity, lambda column, at 1000 K. Monatomic
+# conductivity tracks viscosity, so the exponent 0.75 is that scaling.
+ARGON_CONDUCTIVITY_ANCHOR_K = 1000.0
+ARGON_CONDUCTIVITY_1000K_W_M_K = 0.0438
+ARGON_CONDUCTIVITY_EXPONENT = 0.75
 _MM_TO_M = 1.0e-3
 _DECLARED_FOCAL_LENGTH_MM = (
     ("pellet_diameter_mm", "pellet_diameter_m"),
@@ -1243,6 +1268,9 @@ class PowerTemperatureRefusal(ValueError):
     A missing emissivity takes the sizer default and emits
     ``knob_defaulted``. A missing area does that only at or above 1 kg.
     Below 1 kg the tonne sizer is ``radiative_area_out_of_domain``.
+    On a printed pellet, a missing conductivity takes the basalt-band
+    midpoint and is noticed. The cold boundary is not read from a
+    holder series.
     """
 
     def __init__(self, reason: str, detail: str = "") -> None:
@@ -1310,14 +1338,16 @@ def furnace_power_driver_payload(
     radiating_face_set: str | None = None,
     solar_absorptance: float | None = None,
     window_transmittance: float | None = None,
+    conductivity_W_m_K: float | None = None,
 ) -> dict[str, Any]:
     """Schedule payload the stepper reads. Emissivity stays unset here.
 
     The loader does not invent an emissivity. ``None`` tells the solver
     to take ``EquipmentDesigner.MELT_EMISSIVITY`` and notice it. A focal
-    spot is booked only when the deck declares both diameters. Absorptance
-    and window transmittance stay unset so the solver notices its own
-    defaults. This function does not multiply the trace.
+    spot is booked only when the deck declares both diameters. Absorptance,
+    window transmittance, and pellet conductivity stay unset so the solver
+    notices its own defaults. This function does not multiply the trace
+    and does not carry a holder temperature.
     """
 
     if not isinstance(trace, Mapping):
@@ -1336,6 +1366,7 @@ def furnace_power_driver_payload(
         "radiating_face_set": radiating_face_set,
         "solar_absorptance": solar_absorptance,
         "window_transmittance": window_transmittance,
+        "conductivity_W_m_K": conductivity_W_m_K,
     }
 
 
@@ -1628,6 +1659,169 @@ def _resolve_window_transmittance(
     return tau, None
 
 
+def argon_conductivity_W_m_K(temperature_K: float) -> float:
+    """Monatomic extrapolation of the NIST argon conductivity.
+
+    Premise: the NIST semiconductor-gas table gives argon
+    lambda(1000 K) = 43.8 mW m-1 K-1. Monatomic conductivity tracks
+    viscosity, so k scales as T to the 0.75. The exponent is that
+    scaling. It is not fitted to a melt temperature.
+
+    Algebra::
+
+        k(T) = 0.0438 * (T / 1000) ** 0.75
+
+    Units: T in kelvin, k in W m-1 K-1.
+
+    Sanity: k(300 K) = 0.01775, which rounds to the accepted room
+    temperature value 0.0178. At the 1800 C film,
+    (2073.15 + 300) / 2 = 1186.6 K, k is 0.0498.
+    """
+
+    if temperature_K <= 0.0 or not math.isfinite(temperature_K):
+        raise PowerTemperatureRefusal(
+            "argon_conductivity_temperature_not_positive",
+            f"temperature is {temperature_K} K",
+        )
+    ratio = temperature_K / ARGON_CONDUCTIVITY_ANCHOR_K
+    return ARGON_CONDUCTIVITY_1000K_W_M_K * ratio ** ARGON_CONDUCTIVITY_EXPONENT
+
+
+def pellet_energy_loss_W(
+    temperature_K: float,
+    *,
+    radiating_area_m2: float,
+    emissivity: float,
+    conductivity_W_m_K: float,
+    top_area_m2: float,
+    height_m: float,
+    diameter_m: float,
+) -> float:
+    """Watts leaving a printed pellet: radiation, holder, continuum argon.
+
+    Premise: Robinot section 3.1 seats the pellet on a water-cooled
+    steel holder, and section 4.1 flows argon at about 13 mbar. The
+    mean free path at 13 mm and 13 mbar is tens of micrometres
+    (Knudsen number about 3e-3 at 2073 K), so the gas is continuum.
+    Free-molecular heat transfer does not apply. The enthalpy the
+    same argon stream could carry is the same physical loss and is
+    not added on top. Latent heat is not in this residual.
+
+    The cold boundary is the cooling water. T_sur, T_cold, and T_gas
+    are that one temperature, 300 K. The preset holder series that
+    ends at 1500 C is not read. Nu = 2 is the still-gas sphere on
+    the printed diameter. The pellet is a cylinder for the slab and
+    a sphere of that diameter for the gas term, which is the
+    continuum limit named for this chamber. The radiating area is
+    the booked face. Conduction uses the top face, the contact, and
+    the printed height. The bottom face is not a radiator.
+
+    Algebra::
+
+        Q = eps * sigma * A_face * (T**4 - T_b**4)
+            + k * A_top * (T - T_b) / H
+            + Nu * k_Ar((T + T_b) / 2) * pi * d * (T - T_b)
+
+        T_b = 300 K
+        Nu = 2
+        k_Ar from argon_conductivity_W_m_K
+
+    Units: T kelvin, areas m2, k W m-1 K-1, H and d metres, Q watts.
+
+    Sanity at 1800 C (2073.15 K), d = 13 mm, H = 10 mm, k = 1,
+    A_top = 1.327e-4 m2, T_b = 300 K. Conduction is 23.5 W. The
+    investigation's 24 W is the same term at a 1773 K rise. Argon
+    conductivity at the film is 0.0498, and Q_gas at Nu = 2 is
+    7.2 W. Coupled to the peak focal power, alpha 0.85, and the hot
+    upper face, the root is 2072 C. The full side at the same power
+    is 1816 C.
+    """
+
+    boundary_K = COLD_BOUNDARY_K
+    radiation = (
+        STEFAN_BOLTZMANN
+        * emissivity
+        * radiating_area_m2
+        * (temperature_K ** 4 - boundary_K ** 4)
+    )
+    conduction = (
+        conductivity_W_m_K
+        * top_area_m2
+        * (temperature_K - boundary_K)
+        / height_m
+    )
+    film_K = 0.5 * (temperature_K + boundary_K)
+    gas = (
+        NU_STILL_SPHERE
+        * argon_conductivity_W_m_K(film_K)
+        * math.pi
+        * diameter_m
+        * (temperature_K - boundary_K)
+    )
+    return radiation + conduction + gas
+
+
+def _resolve_pellet_conductivity(
+    value: float | None,
+) -> tuple[float, dict[str, Any] | None]:
+    """Basalt-band midpoint when the deck does not print a conductivity.
+
+    The notice records the 0.6 to 1.4 band. A declared positive value
+    is used as given, including outside that band: poor contact is a
+    smaller conductivity, and the band is the citation of the default.
+    """
+
+    if value is None:
+        conductivity = float(PELLET_CONDUCTIVITY_DEFAULT_W_M_K)
+        return conductivity, {
+            "kind": KNOB_DEFAULTED,
+            "knob": "pellet_conductivity_W_m_K",
+            "value": conductivity,
+            "unit": "W/m/K",
+            "band_low": PELLET_CONDUCTIVITY_LOW_W_M_K,
+            "band_high": PELLET_CONDUCTIVITY_HIGH_W_M_K,
+            "source": (
+                "midpoint of the 0.6 to 1.4 W m-1 K-1 basalt band. "
+                "Büttner et al. report about 1.0 at 1200 C. "
+                "Not tuned to a pyrometer reading."
+            ),
+        }
+    conductivity = _declared_finite(
+        value,
+        missing="pellet_conductivity_not_numeric",
+        invalid="pellet_conductivity_not_numeric",
+    )
+    if conductivity <= 0.0:
+        raise PowerTemperatureRefusal(
+            "pellet_conductivity_not_positive",
+            f"conductivity is {conductivity} W m-1 K-1",
+        )
+    return conductivity, None
+
+
+def _tonne_sky_loss_W(
+    temperature_K: float,
+    *,
+    area_m2: float,
+    emissivity: float,
+) -> float:
+    """Tonne-path radiation to a 0 K sky.
+
+    Premise: the pre-pellet balance, and EQ-2's concentrator sizing,
+    book sigma * eps * A * T**4. A 300 K enclosure changes that flux
+    by (300 / T)**4, under 1 K at 1800 C. This path keeps the 0 K sky
+    so a call with no printed cylinder is the same balance as before.
+    Process gas is not a sink here.
+
+    Algebra: Q = sigma * eps * A * T**4.
+
+    Units: watts. Sanity: 1 kg, sizer area 0.001954474441911621 m2,
+    emissivity 0.85, 2073.15 K, is 1740.1373551492054 W.
+    """
+
+    return STEFAN_BOLTZMANN * emissivity * area_m2 * temperature_K ** 4
+
+
 def _optional_positive_length(
     value: float | None,
     *,
@@ -1705,6 +1899,7 @@ def solve_power_driven_melt_temperature_C(
     radiating_face_set: str | None = None,
     solar_absorptance: float | None = None,
     window_transmittance: float | None = None,
+    conductivity_W_m_K: float | None = None,
 ) -> dict[str, Any]:
     """Solve one end-of-step melt temperature from furnace power.
 
@@ -1718,38 +1913,49 @@ def solve_power_driven_melt_temperature_C(
     tonne-scale call, not a silent intercept.
 
     The charge stores sensible heat at
-    ``EquipmentDesigner.MELT_CP_J_KG_K`` and loses heat by radiation.
-    A printed pellet diameter and height use ``pellet_face_areas_m2``.
-    The booked face is the declared set. An unset face set below 1 kg
-    takes the hot upper surface and is noticed. The other of
-    ``hot_upper`` and ``full_side`` is solved beside it and does not
-    replace the booked temperature. Process gas is not a sink on this
-    path. Sky temperature is 0 K, matching EQ-2, so the loss is
-    ``sigma * emissivity * area * T**4`` with no sky term. A missing
-    emissivity takes the silicate default and is noticed. A missing
-    area takes the tonne sizer only at or above 1 kg. Below 1 kg that
-    sizer is out of domain and the step refuses.
+    ``EquipmentDesigner.MELT_CP_J_KG_K``. A printed pellet diameter
+    and height use ``pellet_face_areas_m2`` and ``pellet_energy_loss_W``:
+    radiation to the 300 K water-cooled boundary, slab conduction
+    through the top face, and continuum argon at Nu = 2. The booked
+    face is the declared set. An unset face set below 1 kg takes the
+    hot upper surface and is noticed. The other of ``hot_upper`` and
+    ``full_side`` is solved beside it, with the same conductivity,
+    boundary, and gas term, and does not replace the booked
+    temperature. A missing conductivity takes the basalt-band midpoint
+    and is noticed. The 300 K boundary is a typed unknown. The preset
+    holder series is not a temperature this solver reads.
+    With no printed cylinder the loss stays ``_tonne_sky_loss_W``:
+    sigma * emissivity * area * T**4, sky at 0 K, and no gas term.
+    A missing emissivity takes the silicate default and is noticed.
+    A missing area takes the tonne sizer only at or above 1 kg. Below
+    1 kg that sizer is out of domain and the step refuses.
     A missing solar absorptance takes the Gaier large-particle midpoint
     and is noticed. A missing window transmittance is the typed unknown
     1, an upper bound, and is noticed. None of these is tuned to a
     printed peak.
 
-    Algebra, both sides watts, absorbed power and radiation at the
-    unknown end temperature::
+    Algebra, both sides watts, losses at the unknown end temperature.
+    Printed pellet::
 
-        m * cp * (T - T_prev) / dt = P_abs - sigma * eps * A * T**4
+        m * cp * (T - T_prev) / dt = P_abs
+            - eps * sigma * A_face * (T**4 - T_b**4)
+            - k * A_top * (T - T_b) / H
+            - Nu * k_Ar((T + T_b) / 2) * pi * d * (T - T_b)
 
-        f(T) = sigma * eps * A * T**4 + (m * cp / dt) * T
-               - (m * cp * T_prev / dt + P_abs) = 0
+    No cylinder::
+
+        m * cp * (T - T_prev) / dt = P - sigma * eps * A * T**4
 
     Units: m kg, cp J/(kg·K), T kelvin, dt seconds, P watts, A m²,
-    sigma W/(m²·K⁴). ``f`` is strictly increasing for T > 0, so the
-    root is the bisection of the adiabatic bracket.
+    k W m-1 K-1, sigma W/(m²·K⁴). The loss rises with T, so the root
+    is the bisection of the adiabatic bracket.
 
     Sanity: 1 kg, no focal spot, has radiative area
     0.001954474441911621 m². Steady state at 1800 °C (2073.15 K) needs
     1740.1373551492054 W at sigma 5.670374e-8 and emissivity 0.85.
     A 13 mm pellet in a 20 mm spot intercepts 0.4225 of the focal watts.
+    At the digitized peak, alpha 0.85, k = 1, Nu = 2, and T_b = 300 K,
+    the hot upper root is 2072 °C and the full side is 1816 °C.
     """
 
     power = _declared_finite(
@@ -1873,21 +2079,75 @@ def solve_power_driven_melt_temperature_C(
             "power_temperature_balance_did_not_close",
             "charge heat capacity is not positive",
         )
+    pellet_balance = pellet_d is not None and height_m is not None
+    cold_boundary_K: float | None = None
+    surroundings_K = 0.0
+    conductivity: float | None = None
+    if pellet_balance:
+        conductivity, conductivity_notice = _resolve_pellet_conductivity(
+            conductivity_W_m_K
+        )
+        if conductivity_notice is not None:
+            notices.append(conductivity_notice)
+        cold_boundary_K = float(COLD_BOUNDARY_K)
+        surroundings_K = cold_boundary_K
+        notices.append({
+            "kind": TYPED_UNKNOWN,
+            "knob": "cold_boundary_K",
+            "value": cold_boundary_K,
+            "unit": "K",
+            "source": (
+                "unprinted. The holder is water-cooled, so the boundary "
+                "is near ambient. The preset holder series that ends at "
+                "1500 C is not T_sur."
+            ),
+        })
+        top_area_m2 = pellet_face_areas_m2(pellet_d, height_m)["top"]
+
+        def loss_for(radiating_area_m2: float) -> Callable[[float], float]:
+            def loss(temperature_K: float) -> float:
+                return pellet_energy_loss_W(
+                    temperature_K,
+                    radiating_area_m2=radiating_area_m2,
+                    emissivity=eps,
+                    conductivity_W_m_K=conductivity,
+                    top_area_m2=top_area_m2,
+                    height_m=height_m,
+                    diameter_m=pellet_d,
+                )
+            return loss
+
+        root_loss = loss_for(area)
+        other_loss = loss_for(other_area) if other_area is not None else None
+    else:
+        if conductivity_W_m_K is not None:
+            raise PowerTemperatureRefusal(
+                "pellet_geometry_incomplete",
+                "conductivity applies only to a printed pellet diameter and height",
+            )
+
+        def sky_loss(temperature_K: float) -> float:
+            return _tonne_sky_loss_W(
+                temperature_K,
+                area_m2=area,
+                emissivity=eps,
+            )
+
+        root_loss = sky_loss
+        other_loss = None
     root_K = _bisect_power_temperature_K(
         power_W=absorbed,
         previous_K=previous_K,
         capacity_W_per_K=capacity,
-        area_m2=area,
-        emissivity=eps,
+        loss_W=root_loss,
     )
     sensitivity = None
-    if other_area is not None:
+    if other_loss is not None:
         other_K = _bisect_power_temperature_K(
             power_W=absorbed,
             previous_K=previous_K,
             capacity_W_per_K=capacity,
-            area_m2=other_area,
-            emissivity=eps,
+            loss_W=other_loss,
         )
         sensitivity = {
             "face_set": other_face,
@@ -1906,6 +2166,9 @@ def solve_power_driven_melt_temperature_C(
         "window_transmittance": tau,
         "face_set": face_set,
         "sensitivity": sensitivity,
+        "cold_boundary_K": cold_boundary_K,
+        "surroundings_K": surroundings_K,
+        "conductivity_W_m_K": conductivity,
         "dt_s": step_s,
         "mass_kg": charge_kg,
         "area_m2": area,
@@ -1930,7 +2193,9 @@ def melt_temperature_from_furnace_power(
     ``MeltState.total_mass_kg`` starts at 0, which means the inventory
     has not been written yet. A positive finite live mass is the charge.
     Otherwise the printed sample mass on the driver is the charge.
-    Neither is invented when both are missing.
+    Neither is invented when both are missing. A holder temperature on
+    the driver is not read. The pellet boundary stays the water-cooled
+    typed unknown inside the solver.
     """
 
     if not isinstance(driver, Mapping):
@@ -1958,6 +2223,7 @@ def melt_temperature_from_furnace_power(
         radiating_face_set=driver.get("radiating_face_set"),
         solar_absorptance=driver.get("solar_absorptance"),
         window_transmittance=driver.get("window_transmittance"),
+        conductivity_W_m_K=driver.get("conductivity_W_m_K"),
     )
     record["time_s"] = _declared_finite(
         time_s,
@@ -2143,17 +2409,24 @@ def _bisect_power_temperature_K(
     power_W: float,
     previous_K: float,
     capacity_W_per_K: float,
-    area_m2: float,
-    emissivity: float,
+    loss_W: Callable[[float], float],
 ) -> float:
+    """Root of capacity * (T - T_prev) + loss(T) - power = 0.
+
+    ``loss_W`` is ``pellet_energy_loss_W`` or ``_tonne_sky_loss_W``.
+    Both rise with T above 0 K: the sky term is T**4, and the pellet
+    terms are T**4, a linear slab, and k_Ar(T) * (T - T_b) with
+    k_Ar proportional to T**0.75. The bracket is the adiabatic upper
+    bound, which ignores a non-negative high-T loss and so still
+    lies above the root.
+    """
+
     def residual(temperature_K: float) -> float:
-        radiation = (
-            STEFAN_BOLTZMANN * emissivity * area_m2 * temperature_K ** 4
-        )
-        if not math.isfinite(radiation):
+        loss = loss_W(temperature_K)
+        if not math.isfinite(loss):
             return math.inf
         return (
-            radiation
+            loss
             + capacity_W_per_K * (temperature_K - previous_K)
             - power_W
         )
