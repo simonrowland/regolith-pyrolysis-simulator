@@ -3,9 +3,16 @@
 from dataclasses import dataclass, fields, is_dataclass
 from collections.abc import Mapping
 from decimal import Decimal
+from hashlib import sha256
 
-from simulator.battery.records import Located, StandardState, Value
+from simulator.battery.records import (
+    Located,
+    StandardState,
+    Value,
+    nominal_pressure_pa,
+)
 from simulator.battery.enums import ValueKind
+from simulator.source_ids import SOSSI_SOURCE_ID
 from simulator.battery.waypoints import (
     Waypoint, WaypointResult, WaypointAuthority, SpeciesWaypoints,
     ConsumerReadiness, _AUTHORITY_RANK, _result, charge_moles_by_species, thermal_path,
@@ -13,6 +20,7 @@ from simulator.battery.waypoints import (
     identity_composition_waypoint, is_melt_activity_observation, is_pure_substance_engine_reference,
     reference_state_is_known, reference_state_value,
 )
+from simulator.physical_constants import STANDARD_ATMOSPHERE_PA
 
 
 REQUIREMENTS = {
@@ -29,6 +37,173 @@ REQUIREMENTS = {
              "measurement_selectors"),
     "rps": ("run_charge_moles_by_species", "run_mass_kg", "thermal_path", "run_pressure_boundary", "surfaces", "gas_boundary"),
 }
+
+
+def _sossi_table2_run_id(experiment):
+    from simulator.battery.oxygen_identity import _sossi_experiment_run_id
+
+    locator = experiment.locator
+    return _sossi_experiment_run_id(
+        {
+            "locator": (
+                {
+                    "note": locator.note,
+                    "table": locator.table,
+                    "page": locator.page,
+                }
+                if locator is not None
+                else None
+            )
+        }
+    )
+
+
+def _sossi_table2_gas_boundary(experiment, observation, *, expected_run_id=None):
+    if (
+        observation is None
+        or observation.source_id != SOSSI_SOURCE_ID
+    ):
+        return None
+    temperature = (observation.point_conditions or {}).get("temperature_K")
+    row_locator = temperature.locator if isinstance(temperature, Located) else None
+    if (
+        row_locator is None
+        or str(row_locator.page) not in {"54", "55"}
+        or row_locator.table != "2"
+        or "quote=" not in (row_locator.note or "")
+    ):
+        row_locator = observation.locator
+    if (
+        row_locator is None
+        or str(row_locator.page) not in {"54", "55"}
+        or row_locator.table != "2"
+    ):
+        return None
+    note = row_locator.note or ""
+    marker = "quote="
+    if marker not in note:
+        raise ValueError("sossi_table2_gas_quote_missing")
+    quote = note.split(marker, 1)[1]
+    from simulator.battery.oxygen_identity import (
+        _sossi_table2_approximate_total_flow_sccm,
+        _sossi_table2_gas_row_from_quote,
+    )
+
+    run_id, _temperature_C, co_sccm, co2_sccm, _printed_log = (
+        _sossi_table2_gas_row_from_quote(quote)
+    )
+    if expected_run_id is None:
+        expected_run_id = _sossi_table2_run_id(experiment)
+    if (
+        run_id != expected_run_id
+        or observation.experiment_id != experiment.experiment_id
+    ):
+        raise ValueError("sossi_table2_gas_row_experiment_mismatch")
+
+    citation_id = observation.source_id
+    quote_digest = sha256(quote.encode("utf-8")).hexdigest()
+    row_source = {
+        "source_class": "literature_primary",
+        "citation_id": citation_id,
+        "source_ref": f"PDF page {observation.locator.page}, Table 2, run {run_id}",
+    }
+    pressure_pa = nominal_pressure_pa(
+        experiment.pressure_environment.total_pressure_Pa
+    )
+    if pressure_pa != Decimal(str(STANDARD_ATMOSPHERE_PA)):
+        raise ValueError("sossi_table2_imposed_pressure_unavailable")
+    not_reported = {
+        **row_source,
+        "reported_status": "not_reported",
+        "digest": quote_digest,
+    }
+    if co_sccm is None and co2_sccm is None:
+        background_gas = {
+            **row_source,
+            "species": "air",
+        }
+        imposed_flow_reason = (
+            "The source leaves both CO and CO2 flow columns blank for this run."
+        )
+    else:
+        background_gas = {
+            **not_reported,
+            "reason": "The source reports separate CO and CO2 component flows.",
+        }
+        imposed_flow_reason = "The source reports component flows separately."
+    boundary = {
+        "background_gas": background_gas,
+        "imposed_flow": {
+            **not_reported,
+            "reason": imposed_flow_reason,
+        },
+        "pressure_control": {
+            "mode": "controlled",
+            "pressure_driver": "imposed",
+            "source_class": "literature_primary",
+            "citation_id": citation_id,
+            "source_ref": "PDF page 2: one-atmosphere gas-mixing furnace",
+        },
+    }
+    component_flows = {
+        species: {
+            **row_source,
+            "value": value,
+            "unit": "sccm",
+        }
+        for species, value in (("CO", co_sccm), ("CO2", co2_sccm))
+        if value is not None
+    }
+    if component_flows:
+        boundary["component_flows"] = component_flows
+        boundary["flow_reference_state"] = {
+            **not_reported,
+            "reason": "unresolved_sccm_standard_state",
+            "conversion_role": "diagnostic_only",
+            "conversion_note": (
+                "Total pressure is imposed and fO2 uses the CO/CO2 ratio, "
+                "so standard-state conversion is not load-bearing."
+            ),
+        }
+        approximate_total_flow = _sossi_table2_approximate_total_flow_sccm(
+            run_id, co_sccm, co2_sccm
+        )
+        if approximate_total_flow is not None:
+            boundary["reported_total_flow"] = {
+                **row_source,
+                "value": approximate_total_flow,
+                "unit": "sccm",
+                "qualifier": "approximate",
+                "source_ref": (
+                    "PDF page 6, section 2.1: approximately 200 sccm; "
+                    "air and ANU runs excepted"
+                ),
+            }
+    return boundary
+
+
+def _sossi_table2_flow_observation(experiment, observations):
+    try:
+        run_id = _sossi_table2_run_id(experiment)
+    except ValueError:
+        return None
+    for observation in observations:
+        species = getattr(observation.identity, "species", None)
+        if (
+            observation.source_id != SOSSI_SOURCE_ID
+            or observation.experiment_id != experiment.experiment_id
+            or getattr(species, "formula", None) != "Mn"
+            or observation.admission.status.value != "admitted"
+        ):
+            continue
+        if (
+            _sossi_table2_gas_boundary(
+                experiment, observation, expected_run_id=run_id
+            )
+            is not None
+        ):
+            return observation
+    return None
 
 
 @dataclass(frozen=True)
@@ -136,6 +311,29 @@ def collect_consumer_inputs(experiment, bench, observation=None) -> ConsumerInpu
     for name in ("mass_kg", "post_mass_kg", "purity_fraction", "temperature_program",
                  "temperature_uncertainty_K", "repeat_count", "hold_duration_s",
                  "measurement_selectors", "pressure_calibration", "temperature_calibration", "surfaces", "surface_temperature_C", "gas_boundary"):
+        if name == "gas_boundary":
+            source_boundary = _sossi_table2_gas_boundary(experiment, observation)
+            if source_boundary is not None:
+                route_path = (
+                    f"observation[{observation.observation_id}]"
+                    ".point_conditions.temperature_K"
+                )
+                route = Waypoint(
+                    name,
+                    source_boundary,
+                    route_path,
+                    (
+                        WaypointAuthority.EXTRAPOLATED
+                        if "reported_total_flow" in source_boundary
+                        else WaypointAuthority.PRINTED
+                    ),
+                    (
+                        route_path,
+                        "experiment.pressure_environment.total_pressure_Pa",
+                    ),
+                )
+                waypoints[name] = WaypointResult(name, route, (route,))
+                continue
         candidates = []
         if name == "mass_kg":
             candidates.append(("experiment.sample.mass_kg", experiment.sample.mass_kg))

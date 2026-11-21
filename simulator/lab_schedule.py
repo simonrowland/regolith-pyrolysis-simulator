@@ -534,6 +534,111 @@ def _normalize_gas_boundary(raw: Any) -> Mapping[str, Any]:
         field="pressure_control",
         required=("mode",),
     )
+    if "component_flows" in raw:
+        normalized["component_flows"] = _normalize_component_flows(
+            raw.get("component_flows")
+        )
+        flow_reference_state = raw.get("flow_reference_state")
+        if flow_reference_state is None:
+            raise LabScheduleValidationError(
+                "lab_schedule_missing_gas_boundary_flow_reference_state"
+            )
+        normalized["flow_reference_state"] = _normalize_gas_boundary_field(
+            flow_reference_state,
+            field="flow_reference_state",
+            required=("standard_temperature_K", "standard_pressure_Pa"),
+        )
+        reference_state = normalized["flow_reference_state"]
+        reported_status = reference_state.get("reported_status")
+        if reported_status == "not_reported":
+            if (
+                reference_state.get("standard_temperature_K") is not None
+                or reference_state.get("standard_pressure_Pa") is not None
+            ):
+                raise LabScheduleValidationError(
+                    "lab_schedule_sccm_reference_state_not_reported_has_values"
+                )
+            if reference_state.get("reason") != "unresolved_sccm_standard_state":
+                raise LabScheduleValidationError(
+                    "lab_schedule_sccm_reference_state_not_reported_reason_invalid"
+                )
+            if reference_state.get("conversion_role") != "diagnostic_only":
+                raise LabScheduleValidationError(
+                    "lab_schedule_sccm_conversion_role_must_be_diagnostic_only"
+                )
+            if not str(
+                reference_state.get("conversion_note", "") or ""
+            ).strip():
+                raise LabScheduleValidationError(
+                    "lab_schedule_sccm_conversion_diagnostic_missing_note"
+                )
+        elif reported_status == "reported":
+            _required_finite_positive(
+                reference_state.get("standard_temperature_K"),
+                "gas_boundary_sccm_reference_temperature_K",
+            )
+            _required_finite_positive(
+                reference_state.get("standard_pressure_Pa"),
+                "gas_boundary_sccm_reference_pressure_Pa",
+            )
+        else:
+            raise LabScheduleValidationError(
+                "lab_schedule_sccm_reference_state_reported_status_invalid"
+            )
+        pressure_driver = normalized["pressure_control"].get("pressure_driver")
+        if pressure_driver != "imposed":
+            raise LabScheduleValidationError(
+                "lab_schedule_component_flows_require_imposed_pressure"
+            )
+    if "reported_total_flow" in raw:
+        reported_total_flow = _normalize_gas_boundary_field(
+            raw.get("reported_total_flow"),
+            field="reported_total_flow",
+            required=("value", "unit"),
+        )
+        if reported_total_flow.get("unit") != "sccm":
+            raise LabScheduleValidationError(
+                "lab_schedule_reported_total_flow_unit_must_be_sccm"
+            )
+        total_flow_value = _finite_non_negative(
+            reported_total_flow.get("value"),
+            "gas_boundary_reported_total_flow",
+        )
+        normalized["reported_total_flow"] = _freeze(
+            {**reported_total_flow, "value": total_flow_value}
+        )
+    return MappingProxyType(normalized)
+
+
+def _normalize_component_flows(raw: Any) -> Mapping[str, Any]:
+    if not isinstance(raw, Mapping) or not raw:
+        raise LabScheduleValidationError(
+            "lab_schedule_gas_boundary_component_flows_must_be_mapping"
+        )
+    normalized: dict[str, Any] = {}
+    for raw_species, raw_flow in raw.items():
+        species = str(raw_species).strip().upper()
+        if species not in {"CO", "CO2"}:
+            raise LabScheduleValidationError(
+                f"lab_schedule_gas_boundary_component_flow_species_unsupported:{species}"
+            )
+        if species in normalized:
+            raise LabScheduleValidationError(
+                f"lab_schedule_gas_boundary_component_flow_species_repeated:{species}"
+            )
+        flow = _normalize_gas_boundary_field(
+            raw_flow,
+            field=f"component_flow_{species}",
+            required=("value", "unit"),
+        )
+        if flow.get("unit") != "sccm":
+            raise LabScheduleValidationError(
+                f"lab_schedule_gas_boundary_component_flow_unit_must_be_sccm:{species}"
+            )
+        value = _finite_non_negative(
+            flow.get("value"), f"gas_boundary_component_flow_{species}"
+        )
+        normalized[species] = _freeze({**flow, "value": value})
     return MappingProxyType(normalized)
 
 
