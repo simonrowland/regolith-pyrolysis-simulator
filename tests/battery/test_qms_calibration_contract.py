@@ -63,6 +63,8 @@ def test_demaria_qms_calibration_migrates_with_scoped_located_fields() -> None:
     assert oxygen.locator.page == 2
     assert oxygen.locator.published_page == 1368
     assert oxygen.locator.pdf_page_index == 1
+    assert "Brix and Herzberg (1954)" in str(oxygen.locator.paragraph)
+    assert "JANAF (1965)" in str(oxygen.locator.paragraph)
     atomic_oxygen = calibration["standard@species=O"]
     assert atomic_oxygen.state.is_unknown
     assert "whenever possible" in str(atomic_oxygen.state.reason)
@@ -71,6 +73,8 @@ def test_demaria_qms_calibration_migrates_with_scoped_located_fields() -> None:
     assert atomic_oxygen.locator.page == 2
     assert atomic_oxygen.locator.published_page == 1368
     assert atomic_oxygen.locator.pdf_page_index == 1
+    assert "Brix and Herzberg (1954)" in str(atomic_oxygen.locator.paragraph)
+    assert "JANAF (1965)" in str(atomic_oxygen.locator.paragraph)
 
     factor = calibration["sensitivity_factor@all_species"]
     units = calibration["sensitivity_factor_units@all_species"]

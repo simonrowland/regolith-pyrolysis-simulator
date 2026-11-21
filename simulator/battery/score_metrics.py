@@ -140,23 +140,11 @@ def relative_channel_point_residuals(
         return unavailable(RelativeSeriesUnavailableReason.MIXED_MODEL_SPECIES)
     if model_species != {evidence.target_species}:
         return unavailable(RelativeSeriesUnavailableReason.MODEL_SPECIES_MISMATCH)
-    if len({point.run_id for point in model_series}) != 1:
-        return unavailable(RelativeSeriesUnavailableReason.MIXED_MODEL_RUNS)
-    if evidence.target_species in {"O", "O2"}:
-        if (
-            evidence.model_run_id is None
-            or {point.run_id for point in model_series} != {evidence.model_run_id}
-            or evidence.model_oxygen_input_observation_ids is None
-        ):
-            return unavailable(
-                RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
-            )
-        if len(set(evidence.model_oxygen_input_observation_ids)) != len(
-            evidence.model_oxygen_input_observation_ids
-        ):
-            return unavailable(
-                RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
-            )
+    oxygen_reason = _relative_series_model_oxygen_unavailable_reason(
+        observed_series, model_series, evidence
+    )
+    if oxygen_reason is not None:
+        return unavailable(oxygen_reason)
     if evidence.model_quantity is not Quantity.P_PARTIAL:
         return unavailable(RelativeSeriesUnavailableReason.QUANTITY_UNSUPPORTED)
     if any(
@@ -183,13 +171,6 @@ def relative_channel_point_residuals(
         return unavailable(
             RelativeSeriesUnavailableReason.SOURCE_EVIDENCE_UNLOCATED
         )
-    if evidence.target_species in {"O", "O2"}:
-        if evidence.oxygen_independent is None:
-            return unavailable(
-                RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
-            )
-        if not evidence.oxygen_independent:
-            return unavailable(RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT)
     if (
         clock.source_event != anchor.source_event
         or clock.model_event != anchor.model_event
@@ -313,6 +294,46 @@ def relative_channel_point_residuals(
             )
         )
     return RelativeSeriesComparison(points=tuple(point_residuals))
+
+
+def _relative_series_model_oxygen_unavailable_reason(
+    observed_series: Sequence[RelativeSeriesPoint],
+    model_series: Sequence[RelativeSeriesPoint],
+    evidence: RelativeSeriesEvidence,
+    *,
+    expected_input_ids: frozenset[str] | None = None,
+) -> RelativeSeriesUnavailableReason | None:
+    """Own O/O₂ model-run, input, and self-agreement eligibility."""
+
+    if evidence.target_species not in {"O", "O2"}:
+        return None
+    if not observed_series or not model_series:
+        return None
+    if len({point.run_id for point in model_series}) > 1:
+        return RelativeSeriesUnavailableReason.MIXED_MODEL_RUNS
+    input_ids = evidence.model_oxygen_input_observation_ids
+    observed_ids = {
+        point.observation_id
+        for point in observed_series
+        if point.observation_id is not None
+    }
+    if evidence.oxygen_independent is False or (
+        input_ids is not None and observed_ids.intersection(input_ids)
+    ):
+        return RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT
+    if evidence.oxygen_independent is None:
+        return RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
+    if (
+        evidence.model_run_id is None
+        or {point.run_id for point in model_series} != {evidence.model_run_id}
+        or input_ids is None
+        or len(set(input_ids)) != len(input_ids)
+    ):
+        return RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
+    if expected_input_ids is not None and set(input_ids) != expected_input_ids:
+        return RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
+    return None
+
 
 # Physical dimension of a stored unit. Unknown units match nothing.
 _UNIT_DIMENSION: dict[str, str] = {

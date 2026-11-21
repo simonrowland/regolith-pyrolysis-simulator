@@ -145,6 +145,40 @@ def test_matching_normalized_traces_have_zero_residuals():
     )
 
 
+def test_model_input_naming_the_source_trace_is_self_agreement():
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = tuple(
+        replace(point, observation_id="source-o2-trace") for point in observed
+    )
+    evidence = replace(
+        evidence,
+        model_oxygen_input_observation_ids=("source-o2-trace",),
+    )
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is (
+        RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT
+    )
+    assert result.points == ()
+
+
+def test_model_series_from_mixed_runs_has_typed_unavailability():
+    observed, model, anchor, clock, evidence = _inputs()
+    model = (*model[:-1], replace(model[-1], run_id="other-model-run"))
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is (
+        RelativeSeriesUnavailableReason.MIXED_MODEL_RUNS
+    )
+    assert result.points == ()
+
+
 @pytest.mark.parametrize(
     ("change", "reason"),
     [
