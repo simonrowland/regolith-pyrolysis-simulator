@@ -25,6 +25,18 @@ _BASE_A_FEO = {
     'hot_read_above_known_liquidus_without_pin': 0.19767374970074492,
 }
 
+_EXPECTED_DOMAIN = {
+    'no_pin_extrapolated': ('extrapolated', [30.0, 80.0], 'extrapolated'),
+    'failed_same_hour_pin_refresh': (
+        'extrapolated', [30.0, 80.0], 'extrapolated',
+    ),
+    'stale_lookup_then_extrapolated': (
+        'extrapolated', [30.0, 80.0], 'extrapolated',
+    ),
+    'fresh_extrapolated': ('extrapolated', [30.0, 80.0], 'extrapolated'),
+    'stable_refusal_floor': ('refused', None, 'unknown'),
+}
+
 
 def _liquid_feo_bulk(sim, silica_wt_pct):
     composition_wt_pct = {
@@ -53,7 +65,7 @@ def _liquid_feo_bulk(sim, silica_wt_pct):
 
 @pytest.mark.parametrize(
     'scenario',
-    tuple(_BASE_A_FEO),
+    (*_BASE_A_FEO, 'internal_analytical_liquidus_above'),
 )
 def test_liquid_feo_activity_uses_current_domain_on_production_paths(
     scenario,
@@ -63,13 +75,12 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
     feedstocks_data,
     setpoints_data,
 ):
-    from simulator.melt_backend.magemin import (
-        magemin_domain_identity_from_evaluated_bulk,
-    )
-
     provider = (
         'analytical'
-        if scenario == 'internal_analytical_floor'
+        if scenario in {
+            'internal_analytical_floor',
+            'internal_analytical_liquidus_above',
+        }
         else 'magemin'
     )
     sim = _build_freeze_gate_sim(
@@ -145,6 +156,11 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         assert resolved['curve']['liquidus_T_C'] < 1750.0
         assert getattr(sim, '_melt_redox_gate_authority_tick_hour', None) is None
         temperature_C = 1750.0
+    elif scenario == 'internal_analytical_liquidus_above':
+        composition = _liquid_feo_bulk(sim, 50.0)
+        resolved = sim._freeze_gate_curve_record()
+        assert resolved['curve']['liquidus_T_C'] < 1750.0
+        temperature_C = 1750.0
     else:
         composition = _liquid_feo_bulk(sim, 85.0)
         temperature_C = 1800.0
@@ -158,9 +174,10 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         T_K=temperature_K,
         pressure_bar=pressure_bar,
     )['a_FeO_authoritative']
-    assert plain_activity == pytest.approx(
-        _BASE_A_FEO[scenario], rel=0, abs=1e-15,
-    )
+    if scenario in _BASE_A_FEO:
+        assert plain_activity == pytest.approx(
+            _BASE_A_FEO[scenario], rel=0, abs=1e-15,
+        )
 
     state = sim._native_fe_saturation_state(
         composition,
@@ -179,38 +196,58 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         notice for notice in notices
         if notice.get('kind') == 'liquid_model_below_liquidus'
     ]
+    liquidus_unknown_notices = [
+        notice for notice in notices
+        if notice.get('kind') == 'liquidus_unknown'
+    ]
     if scenario == 'internal_analytical_floor':
-        assert notices == []
+        assert identity_notices == []
+        assert len(liquidus_unknown_notices) == 1
+        assert liquidus_unknown_notices[0]['authority'] == 'unknown'
         return
 
-    expected_identity, _diagnostic = magemin_domain_identity_from_evaluated_bulk(
-        composition
-    )
+    if scenario in {
+        'hot_read_above_known_liquidus_without_pin',
+        'internal_analytical_liquidus_above',
+    }:
+        assert notices == []
+        assert state['native_fe_activity'] == plain_activity
+        return
+
+    expected_silica, expected_band, expected_authority = _EXPECTED_DOMAIN[
+        scenario
+    ]
     assert len(identity_notices) == 1
     notice = identity_notices[0]
-    assert notice['silica_verdict'] == expected_identity.silica_verdict
+    assert notice['silica_verdict'] == expected_silica
     assert notice['projection_threshold_verdict'] == (
-        expected_identity.projection_threshold_verdict
+        'clear'
     )
-    expected_band = (
-        None
-        if expected_identity.certified_band is None
-        else {'sio2_wt_pct': list(expected_identity.certified_band)}
+    assert notice['certified_band'] == (
+        None if expected_band is None else {'sio2_wt_pct': expected_band}
     )
-    assert notice['certified_band'] == expected_band
-    assert notice['authority'] == (
-        'extrapolated'
-        if expected_identity.silica_verdict == 'extrapolated'
-        else 'unknown'
-    )
+    assert notice['authority'] == expected_authority
     if scenario in {
         'no_pin_extrapolated',
         'failed_same_hour_pin_refresh',
         'stale_lookup_then_extrapolated',
         'fresh_extrapolated',
         'stable_refusal_floor',
-        'hot_read_above_known_liquidus_without_pin',
     }:
         assert notice['liquidus_status'] == 'unknown'
-        assert notices == identity_notices
+        assert len(liquidus_unknown_notices) == 1
+        assert len(notices) == 2
         assert below_notices == []
+    if scenario in {
+        'failed_same_hour_pin_refresh',
+        'stale_lookup_then_extrapolated',
+    }:
+        repeated_state = sim._native_fe_saturation_state(
+            composition,
+            fe3_over_sigma_fe=0.1,
+            T_K=temperature_K,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+        )
+        assert repeated_state['native_fe_activity'] == plain_activity
+        assert repeated_state.get('notices', []) == notices
