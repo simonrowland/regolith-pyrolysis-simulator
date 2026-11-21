@@ -270,6 +270,48 @@ def _feasible_result(
     )
 
 
+@pytest.mark.parametrize("strategy_class", (OptunaTPEStrategy, OptunaNSGA2Strategy))
+@pytest.mark.parametrize("arrival", ("batch", "priced-first", "unpriced-first"))
+@pytest.mark.parametrize("unpriced_yield", (10.0, 9.0))
+def test_online_mixed_furnace_population_reprices_history_and_pending_trials(strategy_class, arrival, unpriced_yield):
+    pytest.importorskip("optuna")
+    strategy_options = {"budget": 8} if strategy_class is OptunaTPEStrategy else {}
+    strategy = strategy_class(
+        _simple_schema(), seed=4, objective_profile=PROFILE, **strategy_options
+    )
+    a, b, pending = strategy.ask(3)
+    priced = _feasible_result(a, 10.0, 1.0, furnace_penalty=1.0)
+    unpriced = _feasible_result(b, unpriced_yield, 1.0)
+    unpriced = replace(unpriced, run_reference=replace(unpriced.run_reference, product_summary={
+        "furnace_amortization_status": "batch_cost_unavailable",
+        "lifespan_cost_status": "wall_deposit_unavailable",
+        "furnace_amortization_batch_cost_equivalents": None,
+    }))
+    if arrival == "batch":
+        strategy.tell([(a, priced), (b, unpriced)])
+    elif arrival == "priced-first":
+        strategy.tell([(a, priced)])
+        assert _trials_by_candidate(strategy)[a.id].values == [5.0, 2.0]
+        strategy.tell([(b, unpriced)])
+    else:
+        strategy.tell([(b, unpriced)])
+        strategy.tell([(a, priced)])
+    trials = _trials_by_candidate(strategy)
+    assert trials[a.id].values == [10.0, 1.0]
+    assert trials[b.id].values == [unpriced_yield, 1.0]
+    comparison = strategy.study.user_attrs["furnace_cost_comparison"]
+    assert comparison["flag"] == "furnace cost excluded: 1 of 2 unpriced"
+    assert comparison["candidates"][b.id]["unpriced_reason"] == "wall_deposit_unavailable"
+    assert comparison["candidates"][a.id] == {"unpriced_reason": None, "penalty": 1.0, "applied": False}
+    winners = {trial.user_attrs[_CANDIDATE_ID_ATTR] for trial in strategy.best_trials}
+    assert a.id in winners
+    assert (b.id in winners) == (unpriced_yield == 10.0)
+    # A trial asked before the switch still belongs to the rebuilt study.
+    strategy.tell([(pending, _feasible_result(pending, 8.0, 1.0, furnace_penalty=3.0))])
+    assert _trials_by_candidate(strategy)[pending.id].values == [8.0, 1.0]
+    strategy.ask(1)
+
+
 def _single_objective_result(candidate: Candidate, metric: str, value: float) -> ScoredResult:
     return ScoredResult(
         candidate_id=candidate.id,

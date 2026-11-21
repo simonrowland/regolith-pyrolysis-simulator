@@ -13,6 +13,7 @@ from unittest.mock import patch
 import pytest
 
 from engines.magemin import MAGEMinShadowProvider
+from engines.alphamelts import AlphaMELTSProvider
 from simulator.chemistry.kernel import normalize_chemistry_kernel_config
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.fe_redox import KRESS91_LIQUID_CALIBRATION_MIN_T_C
@@ -45,6 +46,13 @@ from simulator.recipe import RecipePatch, RecipeSchema
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
 from tests.test_optimizer_evalspec import _mre_cap_profile
+
+
+@pytest.fixture(autouse=True)
+def _isolate_primary_failure_contract(monkeypatch):
+    # These tests inject MAGEMin faults and check d-298/d-299 after all
+    # declared engines fail. Alternate success has its own gate tests.
+    monkeypatch.setattr(AlphaMELTSProvider, '_ensure_backend', lambda _: None)
 
 
 def _sim(provider, vapor_pressure_data, feedstocks_data, setpoints_data):
@@ -209,7 +217,7 @@ def test_magemin_warm_worker_respawn_programming_error_propagates(
             pass
 
 
-@pytest.mark.parametrize('value', ['auto', 'alphamelts', '', None, True, 1])
+@pytest.mark.parametrize('value', ['auto', '', None, True, 1])
 def test_gate_provider_rejects_undeclared_values(value):
     with pytest.raises((TypeError, ValueError), match='liquid_fraction_provider'):
         normalize_chemistry_kernel_config({'liquid_fraction_provider': value})
@@ -510,7 +518,18 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
                 notice = curve['gate_provider_refusal']
                 assert curve['source'] == 'kress91_liquid_calibration_floor'
                 assert notice['authority'] == 'extrapolated (lower-rung)'
-                assert notice['provider_diagnostic'] == diagnostics[-1]
+                attempts = diagnostics[-1]['gate_provider_step_down'][
+                    'failed_providers'
+                ]
+                assert attempts[0]['provider'] == 'magemin-shadow'
+                projected_failure = attempts[0]['diagnostic'][
+                    'backend_diagnostics'
+                ]['projected_liquidus_diagnostics']
+                held_failure = notice['provider_diagnostic'][
+                    'backend_diagnostics'
+                ]['projected_liquidus_diagnostics']
+                assert projected_failure['backend_status_reason'] == reason
+                assert held_failure['backend_status_reason'] == reason
                 if reason == 'engine_worker_timeout':
                     assert notice['backend_failure_disposition'] == 'environment'
                     assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.FAILED

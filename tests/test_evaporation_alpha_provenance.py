@@ -516,6 +516,9 @@ def test_ca_ti_alpha_ceiling_survives_flux_serialization_replay_and_honesty():
         "Ti": "analytical_upper_bound",
     }
 
+    # The same diagnostic replay must retain an engaged broad proxy too.
+    serialized_flux["alpha_authority_status_by_species"]["CrO2"] = "proxy/bridge"
+
     knudsen = {
         "gas_temperature_C": 1000.0,
         "carrier_gas": "N2",
@@ -553,6 +556,7 @@ def test_ca_ti_alpha_ceiling_survives_flux_serialization_replay_and_honesty():
 
     assert replay["alpha_authority_status_by_species"] == {
         "Ca": "analytical_upper_bound",
+        "CrO2": "proxy/bridge",
         "Ti": "analytical_upper_bound",
     }
     for name in species:
@@ -576,6 +580,15 @@ def test_ca_ti_alpha_ceiling_survives_flux_serialization_replay_and_honesty():
     assert label["canonical"]["certification_allowed"] is False
     assert label["alpha_ceiling_species"] == ["Ca", "Ti"]
 
+    sim.condensation_model.last_sticking_alpha_provenance_notice = {
+        "wall_saturation_pressure_refused_species": ["CrO2"],
+    }
+    unlocated = pressure_coating_pareto_diagnostic(sim, target_species=("CrO2",))
+    refused = unlocated["by_species"]["CrO2"]
+    assert refused["status"] == "unavailable"
+    assert refused["reason"] == "wall_deposit_saturation_pressure_refused"
+    assert refused["wall_saturation_pressure_refusals"] == {}
+
 
 @pytest.mark.parametrize("species", ("Ca", "Ti"))
 def test_ca_ti_alpha_ceiling_survives_grounded_report_consumer(species):
@@ -597,10 +610,7 @@ def test_ca_ti_alpha_ceiling_survives_grounded_report_consumer(species):
     )
 
 
-def test_default_setpoints_refuse_unmeasured_alpha_fallback():
+def test_default_setpoints_have_no_unmeasured_alpha_gate():
     setpoints = yaml.safe_load(SETPOINTS_PATH.read_text()) or {}
 
-    assert (
-        setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"]
-        is False
-    )
+    assert "allow_unmeasured_alpha_fallback" not in setpoints["chemistry_kernel"]

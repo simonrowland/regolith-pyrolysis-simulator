@@ -134,6 +134,7 @@ def test_production_series_resistance_exports_rate_decomposition() -> None:
         regime_factor=0.0,
         T_gas_K=1700.0,
         overhead_pressure_pa=1000.0,
+        wall_pO2_Pa=1.0e-4,
         diagnostic_out=diagnostic,
     )
 
@@ -268,7 +269,7 @@ def test_hot_wall_above_certified_antoine_range_is_status_bearing() -> None:
 def test_source_reaction_without_wall_sidecar_marks_but_invalid_fit_refuses(
     monkeypatch, invalid_data,
 ) -> None:
-    from simulator.condensation import DepositionInputRefusal, _species_vapor_data
+    from simulator.condensation import _species_vapor_data
 
     species = "SiO"
     source_data = copy.deepcopy(_species_vapor_data(species))
@@ -295,21 +296,36 @@ def test_source_reaction_without_wall_sidecar_marks_but_invalid_fit_refuses(
         melt_temperature_C=1800.0, wall_temperature_C=1800.0,
         surface_area_m2=1.0,
     )
-    if invalid_data:
-        with pytest.raises(DepositionInputRefusal) as refused:
-            wall_deposit_candidate_for_surface_kg(model, **kwargs)
-        assert refused.value.terminal_refusal is True
-    else:
-        record = wall_deposit_candidate_for_surface_kg(model, **kwargs)
-        assert record["status"] == "unavailable"
-        assert "no extrapolation available" in record["reason"]
-        assert record["terminal_refusal"] is False
-        assert record["wall_temperature_K"] == pytest.approx(2073.15)
-    assert model.last_wall_deposition_rate_shadow_candidate == {}
+    from simulator.vapour_rail.wall_saturation import resolve_wall_saturation
+
+    expected = resolve_wall_saturation(
+        source_data, species_id=species, T_K=2073.15, pO2_Pa=None,
+    )
+    candidate = wall_deposit_candidate_for_surface_kg(model, **kwargs)
+    # d-402 uses the wall-reaction equilibrium; malformed legacy source-fit
+    # coefficients do not change its pressure or erase the unknown-pO2 flag.
+    # At 2073.15 K the pO2-free Psat exceeds the 100 Pa parcel pressure, so
+    # the physical result is a clean zero candidate, not a full-pressure sink.
+    assert isinstance(candidate, float) and candidate == 0.0
+    diagnostic = model.last_wall_deposition_rate_shadow_candidate[
+        "default_pipe"
+    ][species]
+    assert diagnostic["wall_saturation_pressure_pa"] == pytest.approx(
+        expected.pressure_Pa
+    )
+    assert expected.pressure_Pa > diagnostic["species_partial_pressure_pa"]
+    assert diagnostic["supersaturated"] is False
+    notice = diagnostic["wall_saturation_pressure_notice"]
+    assert notice["reason"] == "wall_pO2_unknown_pO2_free_route_used"
+    assert notice["authority_level"] == "status_bearing"
+    assert species not in model.last_sticking_alpha_provenance_notice.get(
+        "wall_saturation_pressure_extrapolations_by_species", {}
+    )
+    assert diagnostic["surface"]["wall_temperature_K"] == pytest.approx(2073.15)
 
 
-def test_source_only_antoine_pole_is_terminal_input_refusal(monkeypatch) -> None:
-    from simulator.condensation import DepositionInputRefusal, _species_vapor_data
+def test_sio_legacy_antoine_pole_is_not_the_wall_refusal(monkeypatch) -> None:
+    from simulator.condensation import _species_vapor_data
 
     source_data = copy.deepcopy(_species_vapor_data("SiO"))
     source_data["antoine"]["C"] = -2073.15
@@ -324,15 +340,28 @@ def test_source_only_antoine_pole_is_terminal_input_refusal(monkeypatch) -> None
         gas_temperature_C=1800.0, campaign_name="C0",
     )
 
-    with pytest.raises(DepositionInputRefusal, match="T_wall_K \\+ C") as refused:
-        wall_deposit_candidate_for_surface_kg(
-            model, species="SiO", rate_kg_hr=1.0,
-            T_cond_C=model.condensation_temperatures_C["SiO"],
-            melt_temperature_C=1800.0, wall_temperature_C=1800.0,
-            surface_area_m2=1.0,
-        )
-    assert refused.value.terminal_refusal is True
-    assert model.last_wall_deposition_rate_shadow_candidate == {}
+    from simulator.vapour_rail.wall_saturation import resolve_wall_saturation
+
+    expected = resolve_wall_saturation(
+        source_data, species_id="SiO", T_K=2073.15, pO2_Pa=None,
+    )
+    candidate = wall_deposit_candidate_for_surface_kg(
+        model, species="SiO", rate_kg_hr=1.0,
+        T_cond_C=model.condensation_temperatures_C["SiO"],
+        melt_temperature_C=1800.0, wall_temperature_C=1800.0,
+        surface_area_m2=1.0,
+    )
+    assert isinstance(candidate, float) and candidate == 0.0
+    diagnostic = model.last_wall_deposition_rate_shadow_candidate[
+        "default_pipe"
+    ]["SiO"]
+    assert diagnostic["wall_saturation_pressure_pa"] == pytest.approx(
+        expected.pressure_Pa
+    )
+    assert diagnostic["supersaturated"] is False
+    assert diagnostic["wall_saturation_pressure_notice"]["reason"] == (
+        "wall_pO2_unknown_pO2_free_route_used"
+    )
 
 
 @pytest.mark.parametrize(("field", "value"), [
@@ -621,6 +650,18 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     assert engagement["total_count"] >= 0
     assert engagement["engaged"] == (engagement["total_count"] > 0)
 
+    # Rebaselined 2026-11-03 for t-1604. Stage D_AB is evaluated at
+    # T_film = (T_gas,in + T_wall) / 2. The 24 h campaign and temperature
+    # schedule is unchanged. Shuttle inventory, the capture consequence:
+    # Na 0.007737103985195461 -> 0.003984164029366855 kg,
+    # K 0.00037914086313704933 -> 0.0001666916220602682 kg.
+    # Against a same-seat producer run of HEAD condensation.py
+    # (sha256 a2fefbda3e1af48dc12b298ca020263d0bdce8d898d5b05cdc76e33874af7830)
+    # the film-temperature payload changes 880 leaves and adds or drops
+    # 103 leaves, all downstream of that capture. The committed pin
+    # 5beb9b8a... is the studio-3 golden at 5a1129ddc, 106 commits before
+    # HEAD, so this seat does not reproduce it before the film-temperature
+    # change either.
     # Rebaselined 2026-10-28 for t-1452: the run-level engine-binding admission notice gains `governs` and states its scope
     # (cross-process cache replay and capture only); leaf diff vs 407e2f7b... is exactly those 2 notice leaves, no other value.
     # Rebaselined 2026-10-26 for b-813 and b-1028; sha256 c4756d389c417613353a48b60da4d33d5a163390c6592300eb3e4a4b0d546532.
@@ -637,7 +678,28 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         # b-1174: wall-report species = positive vapour supply; +20 zero-valued species keys, 0 changed/numeric leaves (train leaf diff).
         # IA stateless: the 7 hour-16 certified-gamma certificates carry hour/window_K/composition_window_L1 = null (21 leaves);
         # the history-dependent cap-step seam notice is gone (1 notice); 2 keys reordered; 0 numeric leaves changed. Payload = runner C0 fixture bytes.
-        "14387e1e0fe81b14d7557d4da279a8d62b9f6e5cab2d8a449931e958860db7de"
+        # Recomputed with produce_coating_golden on the merged production tree.
+        "dcbbb6da8930b50a7a34f50a4a2fb6b83278bbf822ac045fde3aff37321dc355"
+    )
+
+
+@pytest.mark.parametrize("positive", [False, True])
+@pytest.mark.parametrize("booked", [False, True])
+def test_source_carrier_refusal_requires_species_supply_booking(positive, booked):
+    from simulator.wall_deposit_availability import wall_deposit_figure_availability
+
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=positive,
+        authority={
+            "refused_carrier_species": ["CrO2"],
+            "wall_supply_bound_bookings": [{
+                "species": "CrO2", "supply_upper_bound_kg": 1.0,
+                "deposit_kg": 0.1 if positive else 0.0,
+            }] if booked else [],
+        },
+    )
+    assert availability.status == (
+        ("available" if positive else "measured_empty") if booked else "refused"
     )
 
 

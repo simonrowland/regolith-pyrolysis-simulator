@@ -19345,7 +19345,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=-7; calibration=oneill_1988_ammin_73_eq11; T=2073.15
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=-7.0; calibration=oneill_1988_ammin_73_eq11; T=2073.15
       K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0178329 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=50000 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting,phase_boundary_extrapolation_above_1811_K_Fe_melting'
     origin: lu-2026-mercury-sulfur-liquidus::lu26_mer20_5gpa_b11_1800c_47_s_in_glass
@@ -19353,7 +19353,7 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=IW offset=-7 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=50000
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-7.0 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=50000
       authority=extrapolated band_dex=1.3173 log10_fO2_bar=-12.2489081729176705 provenance=primary_emf buffer_as_printed=fO2_delta_IW'
     origin: lu-2026-mercury-sulfur-liquidus::lu26_mer20_5gpa_b11_1800c_47_s_in_glass
     band: '1.3173'
@@ -19361,7 +19361,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=IW offset=-7 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=50000
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-7.0 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=50000
       authority=extrapolated band_dex=1.3173 log10_fO2_bar=-12.2489081729176705 provenance=primary_emf buffer_as_printed=fO2_delta_IW'
     origin: lu-2026-mercury-sulfur-liquidus::lu26_mer20_5gpa_b11_1800c_47_s_in_glass
     band: '1.3173'

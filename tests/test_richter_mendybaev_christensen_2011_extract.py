@@ -10,7 +10,7 @@ import pytest
 import yaml
 
 from simulator.battery.migrate import Migrator, REPO_ROOT
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import MethodToken, ValueKind
 from simulator.battery.records import ApproxPressure, BandBasis
 
 
@@ -74,6 +74,43 @@ def _assert_render_pins(document: dict) -> None:
     assert len(gamma_rows) == 34
     assert len(FIT_IDS & observations.keys()) == 8
     assert len({obs["locator"]["draft_row"] for obs in gamma_rows.values()}) == 17
+
+    vacuum_method_locator = {
+        "page": 16,
+        "pdf_page_index": 15,
+        "published_page": 15,
+        "section": "4.2 Vacuum Evaporation Experiments",
+    }
+    flowing_method_locator = {
+        "page": 17,
+        "pdf_page_index": 16,
+        "published_page": 16,
+        "section": "4.3 One-bar Hydrogen Evaporation Experiments",
+    }
+    vacuum_experiments = [
+        row for row in document["experiments"]
+        if row.get("method_locator") == vacuum_method_locator
+    ]
+    flowing_experiments = [
+        row for row in document["experiments"]
+        if row.get("method_locator") == flowing_method_locator
+    ]
+    assert len(vacuum_experiments) == 24
+    assert all(
+        row["method"] == MethodToken.LANGMUIR_FREE_EVAPORATION.value
+        for row in vacuum_experiments
+    )
+    assert len(flowing_experiments) == 25
+    assert all(
+        row["method"] == {
+            "tag": "unknown",
+            "reason": (
+                "The paper describes one-bar flowing-gas evaporation but does not infer "
+                "vapour pressure from carrier-gas saturation; no closed method token applies."
+            ),
+        }
+        for row in flowing_experiments
+    )
 
     sio2 = observations["richter_2011_table1_iiab1-1_residue_sio2"][1]
     assert sio2["locator"]["page"] == 39
@@ -173,6 +210,34 @@ def test_table_values_are_render_pinned_and_mutations_fail(tmp_path: Path) -> No
     with pytest.raises(AssertionError):
         _assert_render_pins(_document(mutation_path))
 
+    changed_method = deepcopy(document)
+    vacuum_experiment = next(
+        row
+        for row in changed_method["experiments"]
+        if row.get("method_locator", {}).get("section")
+        == "4.2 Vacuum Evaporation Experiments"
+    )
+    vacuum_experiment["method"] = "transpiration"
+    mutation_path.write_text(
+        yaml.safe_dump(changed_method, sort_keys=False), encoding="utf-8"
+    )
+    with pytest.raises(AssertionError):
+        _assert_render_pins(_document(mutation_path))
+
+    changed_flowing_method = deepcopy(document)
+    flowing_experiment = next(
+        row
+        for row in changed_flowing_method["experiments"]
+        if row.get("method_locator", {}).get("section")
+        == "4.3 One-bar Hydrogen Evaporation Experiments"
+    )
+    flowing_experiment["method"] = "transpiration"
+    mutation_path.write_text(
+        yaml.safe_dump(changed_flowing_method, sort_keys=False), encoding="utf-8"
+    )
+    with pytest.raises(AssertionError):
+        _assert_render_pins(_document(mutation_path))
+
 
 def test_later_iiab2_starting_composition_is_unknown_and_zero_time_assays_remain() -> None:
     document = _document()
@@ -264,6 +329,35 @@ def test_isolated_migration_binds_conditions_and_exact_schema_gaps() -> None:
 
     assert result.validation is not None
     assert result.validation.hard_issues == ()
+    vacuum_experiments = [
+        row for row in document["experiments"]
+        if row.get("method_locator", {}).get("section") == "4.2 Vacuum Evaporation Experiments"
+    ]
+    flowing_experiments = [
+        row for row in document["experiments"]
+        if row.get("method_locator", {}).get("section") == "4.3 One-bar Hydrogen Evaporation Experiments"
+    ]
+    assert len(vacuum_experiments) == 24
+    assert len(flowing_experiments) == 25
+    migrated_method_experiments = {}
+    for row in (*vacuum_experiments, *flowing_experiments):
+        matching = [
+            experiment
+            for experiment in result.experiments.values()
+            if experiment.experiment_id.endswith(
+                f"::experiment::{row['experiment_id']}"
+            )
+        ]
+        assert len(matching) == 1
+        migrated_method_experiments[row["experiment_id"]] = matching[0]
+    for row in vacuum_experiments:
+        method = migrated_method_experiments[row["experiment_id"]].method
+        assert method.is_value
+        assert method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+    for row in flowing_experiments:
+        method = migrated_method_experiments[row["experiment_id"]].method
+        assert method.is_unknown
+        assert "does not infer vapour pressure from carrier-gas saturation" in method.reason
     assert len(source_observations) == 388
     assert len(result.observations) == 387
     assert sum(
@@ -285,6 +379,20 @@ def test_isolated_migration_binds_conditions_and_exact_schema_gaps() -> None:
         for source_id, rows in migrated_by_source_id.items()
         if not rows
     } == TYPED_REFUSAL_IDS
+    method_experiment_ids = {
+        row["experiment_id"] for row in (*vacuum_experiments, *flowing_experiments)
+    }
+    for source_id, (_species, source) in source_observations.items():
+        experiment_id = source.get("experiment_id")
+        if (
+            experiment_id not in method_experiment_ids
+            or not migrated_by_source_id[source_id]
+        ):
+            continue
+        migrated = migrated_by_source_id[source_id][0]
+        assert migrated.experiment_id == migrated_method_experiments[
+            experiment_id
+        ].experiment_id
     assert all(
         len(rows) == 1
         for source_id, rows in migrated_by_source_id.items()
@@ -316,6 +424,16 @@ def test_isolated_migration_binds_conditions_and_exact_schema_gaps() -> None:
             if key in identity_axis:
                 mapped = mapped or identity_axis[key].is_value
             assert mapped, (source_id, key, condition)
+
+    for migrated in result.observations.values():
+        oxygen_log = (migrated.point_conditions or {}).get("fO2_log")
+        if (
+            oxygen_log is not None
+            and oxygen_log.state.is_value
+            and getattr(oxygen_log.state.value, "kind", None)
+            in {ValueKind.BOUND, ValueKind.INTERVAL}
+        ):
+            assert oxygen_log.locator is not None
 
     quantity_unknown = {
         source_id

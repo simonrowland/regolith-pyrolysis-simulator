@@ -2,6 +2,18 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
+
+STAGE3_ROUTES = ('divert', 'through')
+STAGE3_BYPASS_SEGMENT_NAME = 'stage_2_to_stage_4_bypass'
+
+
+def pipe_segment_name(upstream_stage_number: int, downstream_stage_number: int) -> str:
+    return (
+        f'stage_{upstream_stage_number}_to_stage_{downstream_stage_number}'
+    )
+
 
 STAGE_KEY_BY_NUMBER: dict[int, str] = {
     1: 'stage_1_fe_condenser',
@@ -89,7 +101,7 @@ STAGE_NUMBER_BY_KEY.update({
 
 STAGE_TARGET_SPECIES: dict[int, tuple[str, ...]] = {
     1: ('Fe',),
-    2: ('Cr', 'CrO2', 'Mn'),
+    2: ('Cr', 'CrO', 'CrO2', 'CrO3', 'Mn'),
     3: ('SiO',),
     4: ('Na', 'Mg'),
 }
@@ -103,7 +115,9 @@ STAGE_TARGET_SPECIES_BY_KEY: dict[str, tuple[str, ...]] = {
 DESIGNATED_STAGE: dict[str, str] = {
     'Fe': 'stage_1_fe_condenser',
     'Cr': 'stage_2_cr_oxide_harvest',
+    'CrO': 'stage_2_cr_oxide_harvest',
     'CrO2': 'stage_2_cr_oxide_harvest',
+    'CrO3': 'stage_2_cr_oxide_harvest',
     'Cr2O3': 'stage_2_cr_oxide_harvest',
     'Mn': 'stage_2_cr_oxide_harvest',
     'SiO': 'stage_3_sio_zone',
@@ -176,6 +190,18 @@ def designated_stage_number(species: str) -> int | None:
     """Return canonical condenser stage for vapor species, if any."""
 
     return stage_number_for_destination(DESIGNATED_STAGE.get(species))
+
+
+def active_collector_stage_number(species: str, stage_numbers: Iterable[int]) -> int | None:
+    """First eligible physical collector at/after the designated stage.
+
+    Bypassing silica sends SiO toward Stage 4 under the existing allocation
+    law; its bypass wall therefore remains upstream of the active collector.
+    """
+    designated = designated_stage_number(species)
+    if designated is None:
+        return None
+    return min((number for number in stage_numbers if number >= designated), default=None)
 
 
 def accepted_species_for_stage_number(stage_number: int) -> frozenset[str]:
@@ -295,6 +321,21 @@ def stage_list_index_for_destination(train: object, destination: str | None) -> 
     return None
 
 
+def stage_index_for_visit_identity(
+    train: object, stage_number: int, sub_order: int,
+) -> int | None:
+    """List index of the stage with this (stage_number, sub_order) identity."""
+
+    stages = getattr(train, 'stages', ())
+    for index, stage in enumerate(stages):
+        if (
+            int(stage.stage_number) == int(stage_number)
+            and int(getattr(stage, 'sub_order', 0) or 0) == int(sub_order)
+        ):
+            return index
+    return None
+
+
 def product_destination(recipe: str, species: str) -> str | None:
     """Return the honest destination for a recipe-extracted product."""
 
@@ -311,3 +352,15 @@ def is_designated_for_stage(species: str, stage_number: int) -> bool:
     """True when species belongs to the stage's accepted-species set."""
 
     return species in accepted_species_for_stage_number(stage_number)
+
+
+STAGE3_PURITY_FIELDS = ("stage3_product_purity", "stage3_instantaneous_purity")
+
+
+def validate_stage3_purity(value, field):
+    """Mass fraction of SiO2 in SiO2 plus alkali-oxide contamination."""
+    from simulator.scalar_boundary import require_finite_float
+    purity = require_finite_float(value, field)
+    if not 0.0 < purity <= 1.0:
+        raise ValueError(f'{field} must be in (0, 1]')
+    return purity

@@ -48,7 +48,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -93,7 +93,12 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table2_fe2_valence_fraction::T=1773.15:row=7:h=2562e0a4b706
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 3
@@ -188,6 +193,22 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 155
+        pdf_page_index: 2
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Fe2+ was quantified from its optical absorption band; Fe3+ was calculated by difference from wet-chemically
       determined total iron. The paper does not tabulate the spectral inputs.
@@ -302,7 +323,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -347,7 +368,12 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table2_fe2_valence_fraction::T=1823.15:row=8:h=69da3a7e67cb
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 3
@@ -442,6 +468,22 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 155
+        pdf_page_index: 2
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Fe2+ was quantified from its optical absorption band; Fe3+ was calculated by difference from wet-chemically
       determined total iron. The paper does not tabulate the spectral inputs.
@@ -810,7 +852,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -855,7 +897,12 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table2_fe2_valence_fraction::T=1873.15:row=2:h=949c9edd78d0
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 3
@@ -950,6 +997,22 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 155
+        pdf_page_index: 2
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Fe2+ was quantified from its optical absorption band; Fe3+ was calculated by difference from wet-chemically
       determined total iron. The paper does not tabulate the spectral inputs.
@@ -1318,7 +1381,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -1363,7 +1426,12 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table2_fe2_valence_fraction::T=1873.15:row=9:h=cf06fcd12aec
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 3
@@ -1458,6 +1526,22 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 155
+        pdf_page_index: 2
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Fe2+ was quantified from its optical absorption band; Fe3+ was calculated by difference from wet-chemically
       determined total iron. The paper does not tabulate the spectral inputs.
@@ -1572,7 +1656,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -1617,7 +1701,12 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table2_fe2_valence_fraction::T=1973.15:row=10:h=e762f64191be
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 3
@@ -1712,6 +1801,22 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 155
+        pdf_page_index: 2
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Fe2+ was quantified from its optical absorption band; Fe3+ was calculated by difference from wet-chemically
       determined total iron. The paper does not tabulate the spectral inputs.
@@ -3096,7 +3201,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -3141,7 +3246,12 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table2_fe3_valence_fraction::T=1773.15:row=7:h=0418a4b73091
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 3
@@ -3236,6 +3346,22 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 155
+        pdf_page_index: 2
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Fe2+ was quantified from its optical absorption band; Fe3+ was calculated by difference from wet-chemically
       determined total iron. The paper does not tabulate the spectral inputs.
@@ -3350,7 +3476,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -3395,7 +3521,12 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table2_fe3_valence_fraction::T=1823.15:row=8:h=6ab5218add07
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 3
@@ -3490,6 +3621,22 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 155
+        pdf_page_index: 2
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Fe2+ was quantified from its optical absorption band; Fe3+ was calculated by difference from wet-chemically
       determined total iron. The paper does not tabulate the spectral inputs.
@@ -3858,7 +4005,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -3903,7 +4050,12 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table2_fe3_valence_fraction::T=1873.15:row=2:h=64a99c37b654
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 3
@@ -3998,6 +4150,22 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 155
+        pdf_page_index: 2
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Fe2+ was quantified from its optical absorption band; Fe3+ was calculated by difference from wet-chemically
       determined total iron. The paper does not tabulate the spectral inputs.
@@ -4366,7 +4534,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -4411,7 +4579,12 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table2_fe3_valence_fraction::T=1873.15:row=9:h=b0e5708c36e2
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 3
@@ -4506,6 +4679,22 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 155
+        pdf_page_index: 2
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Fe2+ was quantified from its optical absorption band; Fe3+ was calculated by difference from wet-chemically
       determined total iron. The paper does not tabulate the spectral inputs.
@@ -4620,7 +4809,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -4665,7 +4854,12 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table2_fe3_valence_fraction::T=1973.15:row=10:h=e30410e08ec2
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 3
@@ -4760,6 +4954,22 @@ observations:
         published_page: 155
         pdf_page_index: 2
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 155
+        pdf_page_index: 2
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Fe2+ was quantified from its optical absorption band; Fe3+ was calculated by difference from wet-chemically
       determined total iron. The paper does not tabulate the spectral inputs.
@@ -6399,7 +6609,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -6444,7 +6654,12 @@ observations:
         published_page: 157
         pdf_page_index: 4
         table: '3'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table3_v4_valence_fraction::T=1873.15:row=2:h=20c4ca063a98
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 5
@@ -6539,6 +6754,22 @@ observations:
         published_page: 157
         pdf_page_index: 4
         table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 5
+        published_page: 157
+        pdf_page_index: 4
+        table: '3'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Valence fractions were determined from optical absorption spectra using Lambert-Beer analysis. ESR-constrained
       V4+ coefficients were used and V5+/V3+ coefficients were estimated by difference; the numerical spectral inputs are
@@ -7164,7 +7395,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -7209,7 +7440,12 @@ observations:
         published_page: 157
         pdf_page_index: 4
         table: '3'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table3_v4_valence_fraction::T=1873.15:row=7:h=3ba38e763d13
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 5
@@ -7304,6 +7540,22 @@ observations:
         published_page: 157
         pdf_page_index: 4
         table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 5
+        published_page: 157
+        pdf_page_index: 4
+        table: '3'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Valence fractions were determined from optical absorption spectra using Lambert-Beer analysis. ESR-constrained
       V4+ coefficients were used and V5+/V3+ coefficients were estimated by difference; the numerical spectral inputs are
@@ -8949,7 +9201,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -8994,7 +9246,12 @@ observations:
         published_page: 157
         pdf_page_index: 4
         table: '3'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table3_v5_valence_fraction::T=1873.15:row=2:h=2a043a088fde
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 5
@@ -9089,6 +9346,22 @@ observations:
         published_page: 157
         pdf_page_index: 4
         table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 5
+        published_page: 157
+        pdf_page_index: 4
+        table: '3'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Valence fractions were determined from optical absorption spectra using Lambert-Beer analysis. ESR-constrained
       V4+ coefficients were used and V5+/V3+ coefficients were estimated by difference; the numerical spectral inputs are
@@ -9699,7 +9972,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The paper does not report total pressure for this sample.
@@ -9744,7 +10017,12 @@ observations:
         published_page: 157
         pdf_page_index: 4
         table: '3'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: leister-1999-fe-v-redox-2000c::leister_1999_table3_v5_valence_fraction::T=1873.15:row=7:h=f09af4b2d8f3
   source_id: leister-1999-fe-v-redox-2000c
   locator:
     page: 5
@@ -9839,6 +10117,22 @@ observations:
         published_page: 157
         pdf_page_index: 4
         table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 5
+        published_page: 157
+        pdf_page_index: 4
+        table: '3'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Valence fractions were determined from optical absorption spectra using Lambert-Beer analysis. ESR-constrained
       V4+ coefficients were used and V5+/V3+ coefficients were estimated by difference; the numerical spectral inputs are

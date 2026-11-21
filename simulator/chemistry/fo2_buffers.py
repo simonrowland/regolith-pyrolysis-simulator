@@ -51,8 +51,7 @@ equation, including O'Neill's printed R = 8.31441.
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
-from pathlib import Path
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Callable, Mapping
 
 from simulator.oxygen_buffers import (
@@ -66,6 +65,7 @@ from simulator.oxygen_buffers import (
     oneill_iw_log10_fO2_bar,
 )
 from simulator.physical_constants import GAS_CONSTANT_DECIMAL
+from simulator.reference_data import janaf
 
 # 1 atm = 1.01325 bar. log10(fO2/bar) = log10(fO2/atm) + log10(1.01325).
 _ATM_BAR = Decimal("1.01325")
@@ -445,9 +445,6 @@ _WUSTITE_Y = Decimal("0.053")
 _WUSTITE_DENOM = 1 - 4 * _WUSTITE_Y
 _NU_WUSTITE = Decimal(6) / _WUSTITE_DENOM
 _NU_MAGNETITE = (Decimal(2) - 2 * _WUSTITE_Y) / _WUSTITE_DENOM
-_JANAF_TABLES = Path(__file__).resolve().parents[2] / (
-    "data/literature/compilations/janaf/tables"
-)
 _JANAF_ROWS: dict[str, tuple[tuple[Decimal, Decimal], ...]] = {}
 _JANAF_TABLES_BY_CALIBRATION = {
     "janaf_mo_moo2": ("Mo-002", "Mo-009"),
@@ -573,7 +570,7 @@ def _liquid_onset_K(table: Mapping[str, object]) -> Decimal | None:
 
 
 def _janaf_dg_rows(table_id: str) -> tuple[tuple[Decimal, Decimal], ...]:
-    """Solid ΔfG rows, kJ mol^-1, from the as-published JANAF cell.
+    """Solid ΔfG rows, kJ mol^-1, from the shared repaired-value reader.
 
     Loaded on the first extended-buffer evaluation. A missing table is
     an error: the route is not invented.
@@ -582,45 +579,20 @@ def _janaf_dg_rows(table_id: str) -> tuple[tuple[Decimal, Decimal], ...]:
     cached = _JANAF_ROWS.get(table_id)
     if cached is not None:
         return cached
-    from simulator.reference_data.janaf import load_table_document
-
-    path = _JANAF_TABLES / f"{table_id}.yaml"
-    if not path.is_file():
-        raise FileNotFoundError(f"JANAF table {table_id} is not at {path}")
-    document = load_table_document(path)
-    table = document.get("table")
-    if not isinstance(table, Mapping):
-        raise ValueError(f"{path} has no table mapping")
+    table, _source_digest = janaf._checked_compiled_table_document(table_id)
     onset = _liquid_onset_K(table)
-    values = table.get("values")
-    if not isinstance(values, list):
-        raise ValueError(f"{path} has no values")
-    rows: list[tuple[Decimal, Decimal]] = []
-    for item in values:
-        if not isinstance(item, Mapping):
-            continue
-        temperature = item.get("temperature")
-        gibbs = item.get("formation_gibbs_energy")
-        if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
-            continue
-        try:
-            t_value = Decimal(str(temperature.get("as_published")))
-            dg_value = Decimal(str(gibbs.get("as_published")))
-        except (InvalidOperation, ValueError):
-            continue
-        if onset is not None and t_value >= onset:
-            continue
-        if rows and rows[-1][0] == t_value:
-            if rows[-1][1] != dg_value:
-                raise ValueError(f"{table_id} repeats {t_value} K with two ΔfG values")
-            continue
-        rows.append((t_value, dg_value))
-    if len(rows) < 2:
+    rows, _missing_temperatures = janaf._formation_gibbs_rows_from_table(
+        table_id, table
+    )
+    solid_rows = tuple(
+        (temperature, gibbs)
+        for temperature, gibbs in rows
+        if onset is None or temperature < onset
+    )
+    if len(solid_rows) < 2:
         raise ValueError(f"{table_id} has fewer than two solid ΔfG rows")
-    rows.sort(key=lambda item: item[0])
-    stored = tuple(rows)
-    _JANAF_ROWS[table_id] = stored
-    return stored
+    _JANAF_ROWS[table_id] = solid_rows
+    return solid_rows
 
 
 def _interp_segment(

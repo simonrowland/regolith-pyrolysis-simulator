@@ -54,7 +54,11 @@ observations:
           - '1'
         - - SiO2
           - '2'
-        amount_basis: mole_fraction
+        amount_basis: mol_inventory
+        proxy_flag: initial_charge_only
+        proxy_source: Shornikov et al. (1997), Table 1 caption and Experimental section
+        analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.00000000020265'
@@ -92,6 +96,12 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1566.00:h=76f9f3d4b5a5
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -156,6 +166,7 @@ observations:
           proxy_flag: initial_charge_only
           proxy_source: Shornikov et al. (1997), Table 1 caption and Experimental section
           analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         published_page: 175
@@ -295,7 +306,11 @@ observations:
           - '1'
         - - SiO2
           - '2'
-        amount_basis: mole_fraction
+        amount_basis: mol_inventory
+        proxy_flag: initial_charge_only
+        proxy_source: Shornikov et al. (1997), Table 1 caption and Experimental section
+        analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000000028371'
@@ -333,6 +348,12 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1640.00:h=a9d8648c25ba
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -397,6 +418,7 @@ observations:
           proxy_flag: initial_charge_only
           proxy_source: Shornikov et al. (1997), Table 1 caption and Experimental section
           analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         published_page: 175
@@ -535,7 +557,11 @@ observations:
           - '1'
         - - SiO2
           - '2'
-        amount_basis: mole_fraction
+        amount_basis: mol_inventory
+        proxy_flag: initial_charge_only
+        proxy_source: Shornikov et al. (1997), Table 1 caption and Experimental section
+        analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.00000001519875'
@@ -573,6 +599,12 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1688.00:h=88a2d38a7cc9
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -637,6 +669,7 @@ observations:
           proxy_flag: initial_charge_only
           proxy_source: Shornikov et al. (1997), Table 1 caption and Experimental section
           analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         published_page: 175
@@ -775,7 +808,11 @@ observations:
           - '1'
         - - SiO2
           - '2'
-        amount_basis: mole_fraction
+        amount_basis: mol_inventory
+        proxy_flag: initial_charge_only
+        proxy_source: Shornikov et al. (1997), Table 1 caption and Experimental section
+        analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000000830865'
@@ -813,6 +850,12 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1743.00:h=2dbf0bb943d5
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -877,6 +920,7 @@ observations:
           proxy_flag: initial_charge_only
           proxy_source: Shornikov et al. (1997), Table 1 caption and Experimental section
           analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         published_page: 175
@@ -1015,7 +1059,11 @@ observations:
           - '1'
         - - SiO2
           - '2'
-        amount_basis: mole_fraction
+        amount_basis: mol_inventory
+        proxy_flag: initial_charge_only
+        proxy_source: Shornikov et al. (1997), Table 1 caption and Experimental section
+        analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.00000017123925'
@@ -1053,6 +1101,12 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1778.00:h=a774506d7968
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1117,6 +1171,7 @@ observations:
           proxy_flag: initial_charge_only
           proxy_source: Shornikov et al. (1997), Table 1 caption and Experimental section
           analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         published_page: 175
@@ -1255,7 +1310,11 @@ observations:
           - '1'
         - - SiO2
           - '2'
-        amount_basis: mole_fraction
+        amount_basis: mol_inventory
+        proxy_flag: initial_charge_only
+        proxy_source: Shornikov et al. (1997), Table 1 caption and Experimental section
+        analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.000001884645'
@@ -1293,6 +1352,12 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1862.00:h=6a9b028ddadb
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1357,6 +1422,7 @@ observations:
           proxy_flag: initial_charge_only
           proxy_source: Shornikov et al. (1997), Table 1 caption and Experimental section
           analysis_selection_rule: Nominal initial diopside charge; post-vaporization measurement-state composition not printed.
+          input_provenance: printed_starting_bulk
       locator:
         page: 2
         published_page: 175

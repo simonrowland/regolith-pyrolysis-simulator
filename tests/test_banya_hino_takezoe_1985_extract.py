@@ -319,7 +319,9 @@ def test_isolated_migration_preserves_phase_conditions_and_identity() -> None:
     activity_points = [o for o in activity if o.value.kind is ValueKind.POINT]
     assert len(activity_points) == 19
     for observation in activity_points:
-        assert observation.identity.species.formula == "Fe_tO"
+        assert observation.identity.species.formula == "FeO"
+        assert observation.identity.reference_state.value.endmember.formula == "Fe(1-x)O"
+        assert observation.uncertainty.derivation.relation == "total_iron_basis"
         assert observation.identity.species.phase.value is Phase.L
         assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
 

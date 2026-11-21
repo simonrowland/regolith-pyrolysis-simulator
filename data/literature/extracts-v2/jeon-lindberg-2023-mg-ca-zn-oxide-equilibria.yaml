@@ -92,7 +92,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=10, Monoxide#2; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s10_r21_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -230,6 +235,22 @@ observations:
               note: row=10, Monoxide#2; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s10_r21_mgo
@@ -322,7 +343,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=10, Monoxide#2; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s10_r21_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -460,6 +486,22 @@ observations:
               note: row=10, Monoxide#2; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s10_r21_zno
@@ -552,7 +594,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=10, Monoxide#2; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s10_r21_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -690,6 +737,22 @@ observations:
               note: row=10, Monoxide#2; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s10_r22_cao
@@ -782,7 +845,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=10, Zincite; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s10_r22_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -920,6 +988,22 @@ observations:
               note: row=10, Zincite; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s10_r22_mgo
@@ -1012,7 +1096,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=10, Zincite; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s10_r22_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -1150,6 +1239,22 @@ observations:
               note: row=10, Zincite; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s10_r22_zno
@@ -1242,7 +1347,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=10, Zincite; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s10_r22_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -1380,6 +1490,22 @@ observations:
               note: row=10, Zincite; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r23_cao
@@ -1472,7 +1598,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=11, Monoxide#1; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r23_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -1610,6 +1741,22 @@ observations:
               note: row=11, Monoxide#1; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r23_mgo
@@ -1702,7 +1849,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=11, Monoxide#1; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r23_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -1840,6 +1992,22 @@ observations:
               note: row=11, Monoxide#1; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r23_zno
@@ -1932,7 +2100,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=11, Monoxide#1; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r23_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -2070,6 +2243,22 @@ observations:
               note: row=11, Monoxide#1; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r24_cao
@@ -2162,7 +2351,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=11, Monoxide#2; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r24_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -2300,6 +2494,22 @@ observations:
               note: row=11, Monoxide#2; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r24_mgo
@@ -2392,7 +2602,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=11, Monoxide#2; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r24_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -2530,6 +2745,22 @@ observations:
               note: row=11, Monoxide#2; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r24_zno
@@ -2622,7 +2853,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=11, Monoxide#2; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r24_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -2760,6 +2996,22 @@ observations:
               note: row=11, Monoxide#2; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r25_cao
@@ -2852,7 +3104,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=11, Zincite; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r25_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -2990,6 +3247,22 @@ observations:
               note: row=11, Zincite; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r25_mgo
@@ -3082,7 +3355,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=11, Zincite; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r25_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -3220,6 +3498,22 @@ observations:
               note: row=11, Zincite; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r25_zno
@@ -3312,7 +3606,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=11, Zincite; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s11_r25_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -3450,6 +3749,22 @@ observations:
               note: row=11, Zincite; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r26_cao
@@ -3542,7 +3857,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=12, Monoxide#1; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r26_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -3680,6 +4000,22 @@ observations:
               note: row=12, Monoxide#1; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r26_mgo
@@ -3772,7 +4108,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=12, Monoxide#1; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r26_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -3910,6 +4251,22 @@ observations:
               note: row=12, Monoxide#1; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r26_zno
@@ -4002,7 +4359,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=12, Monoxide#1; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r26_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -4140,6 +4502,22 @@ observations:
               note: row=12, Monoxide#1; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r27_cao
@@ -4232,7 +4610,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=12, Monoxide#2; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r27_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -4370,6 +4753,22 @@ observations:
               note: row=12, Monoxide#2; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r27_mgo
@@ -4462,7 +4861,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=12, Monoxide#2; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r27_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -4600,6 +5004,22 @@ observations:
               note: row=12, Monoxide#2; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r27_zno
@@ -4692,7 +5112,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=12, Monoxide#2; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r27_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -4830,6 +5255,22 @@ observations:
               note: row=12, Monoxide#2; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r28_cao
@@ -4922,7 +5363,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=12, Zincite; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r28_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -5060,6 +5506,22 @@ observations:
               note: row=12, Zincite; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r28_mgo
@@ -5152,7 +5614,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=12, Zincite; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r28_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -5290,6 +5757,22 @@ observations:
               note: row=12, Zincite; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r28_zno
@@ -5382,7 +5865,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=12, Zincite; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s12_r28_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -5520,6 +6008,22 @@ observations:
               note: row=12, Zincite; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r29_cao
@@ -5612,7 +6116,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=13, Monoxide#1; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r29_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -5782,6 +6291,22 @@ observations:
               note: row=13, Monoxide#1; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r29_mgo
@@ -5874,7 +6399,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=13, Monoxide#1; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r29_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -6044,6 +6574,22 @@ observations:
               note: row=13, Monoxide#1; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r29_zno
@@ -6136,7 +6682,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=13, Monoxide#1; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r29_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -6306,6 +6857,22 @@ observations:
               note: row=13, Monoxide#1; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r30_cao
@@ -6398,7 +6965,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=13, Monoxide#2; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r30_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -6568,6 +7140,22 @@ observations:
               note: row=13, Monoxide#2; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r30_mgo
@@ -6660,7 +7248,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=13, Monoxide#2; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r30_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -6830,6 +7423,22 @@ observations:
               note: row=13, Monoxide#2; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r30_zno
@@ -6922,7 +7531,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=13, Monoxide#2; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r30_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -7092,6 +7706,22 @@ observations:
               note: row=13, Monoxide#2; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r31_cao
@@ -7184,7 +7814,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=13, Zincite; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r31_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -7354,6 +7989,22 @@ observations:
               note: row=13, Zincite; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r31_mgo
@@ -7446,7 +8097,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=13, Zincite; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r31_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -7616,6 +8272,22 @@ observations:
               note: row=13, Zincite; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r31_zno
@@ -7708,7 +8380,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=13, Zincite; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s13_r31_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -7878,6 +8555,22 @@ observations:
               note: row=13, Zincite; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r32_cao
@@ -7970,7 +8663,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=14, Monoxide#1; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r32_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -8168,6 +8866,22 @@ observations:
               note: row=14, Monoxide#1; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r32_mgo
@@ -8260,7 +8974,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=14, Monoxide#1; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r32_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -8458,6 +9177,22 @@ observations:
               note: row=14, Monoxide#1; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r32_zno
@@ -8550,7 +9285,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=14, Monoxide#1; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r32_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -8748,6 +9488,22 @@ observations:
               note: row=14, Monoxide#1; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r33_cao
@@ -8840,7 +9596,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=14, Monoxide#2; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r33_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -9038,6 +9799,22 @@ observations:
               note: row=14, Monoxide#2; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r33_mgo
@@ -9130,7 +9907,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=14, Monoxide#2; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r33_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -9328,6 +10110,22 @@ observations:
               note: row=14, Monoxide#2; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r33_zno
@@ -9420,7 +10218,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=14, Monoxide#2; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r33_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -9618,6 +10421,22 @@ observations:
               note: row=14, Monoxide#2; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r34_cao
@@ -9710,7 +10529,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=14, Zincite; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r34_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -9908,6 +10732,22 @@ observations:
               note: row=14, Zincite; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r34_mgo
@@ -10000,7 +10840,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=14, Zincite; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r34_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -10198,6 +11043,22 @@ observations:
               note: row=14, Zincite; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r34_zno
@@ -10290,7 +11151,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=14, Zincite; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s14_r34_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -10488,6 +11354,22 @@ observations:
               note: row=14, Zincite; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r35_cao
@@ -10580,7 +11462,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=15, Monoxide#1; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r35_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -10742,6 +11629,22 @@ observations:
               note: row=15, Monoxide#1; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r35_mgo
@@ -10834,7 +11737,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=15, Monoxide#1; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r35_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -10996,6 +11904,22 @@ observations:
               note: row=15, Monoxide#1; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r35_zno
@@ -11088,7 +12012,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=15, Monoxide#1; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r35_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -11250,6 +12179,22 @@ observations:
               note: row=15, Monoxide#1; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r36_cao
@@ -11342,7 +12287,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=15, Monoxide#2; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r36_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -11504,6 +12454,22 @@ observations:
               note: row=15, Monoxide#2; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r36_mgo
@@ -11596,7 +12562,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=15, Monoxide#2; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r36_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -11758,6 +12729,22 @@ observations:
               note: row=15, Monoxide#2; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r36_zno
@@ -11850,7 +12837,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=15, Monoxide#2; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r36_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -12012,6 +13004,22 @@ observations:
               note: row=15, Monoxide#2; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r37_cao
@@ -12103,7 +13111,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=15, Slag; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r37_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -12265,6 +13278,22 @@ observations:
               note: row=15, Slag; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: l
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r37_mgo
@@ -12356,7 +13385,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=15, Slag; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r37_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -12518,6 +13552,22 @@ observations:
               note: row=15, Slag; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: l
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r37_zno
@@ -12609,7 +13659,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=15, Slag; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s15_r37_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -12771,6 +13826,22 @@ observations:
               note: row=15, Slag; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: l
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r38_cao
@@ -12863,7 +13934,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=16, Monoxide#1; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r38_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -13061,6 +14137,22 @@ observations:
               note: row=16, Monoxide#1; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r38_mgo
@@ -13153,7 +14245,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=16, Monoxide#1; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r38_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -13351,6 +14448,22 @@ observations:
               note: row=16, Monoxide#1; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r38_zno
@@ -13443,7 +14556,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=16, Monoxide#1; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r38_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -13641,6 +14759,22 @@ observations:
               note: row=16, Monoxide#1; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r39_cao
@@ -13733,7 +14867,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=16, Monoxide#2; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r39_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -13931,6 +15070,22 @@ observations:
               note: row=16, Monoxide#2; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r39_mgo
@@ -14023,7 +15178,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=16, Monoxide#2; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r39_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -14221,6 +15381,22 @@ observations:
               note: row=16, Monoxide#2; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r39_zno
@@ -14313,7 +15489,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=16, Monoxide#2; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r39_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -14511,6 +15692,22 @@ observations:
               note: row=16, Monoxide#2; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r40_cao
@@ -14602,7 +15799,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=16, Slag; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r40_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -14800,6 +16002,22 @@ observations:
               note: row=16, Slag; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: l
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r40_mgo
@@ -14891,7 +16109,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=16, Slag; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r40_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -15089,6 +16312,22 @@ observations:
               note: row=16, Slag; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: l
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r40_zno
@@ -15180,7 +16419,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=16, Slag; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s16_r40_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -15377,6 +16621,22 @@ observations:
               table: '2'
               note: row=16, Slag; column=ZnO
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: l
@@ -19012,7 +20272,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=5, Monoxide; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s5_r11_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -19150,6 +20415,22 @@ observations:
               note: row=5, Monoxide; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s5_r11_zno
@@ -19242,7 +20523,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=5, Monoxide; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s5_r11_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -19380,6 +20666,22 @@ observations:
               note: row=5, Monoxide; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s5_r12_mgo
@@ -19472,7 +20774,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=5, Zincite; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s5_r12_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -19610,6 +20917,22 @@ observations:
               note: row=5, Zincite; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s5_r12_zno
@@ -19702,7 +21025,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=5, Zincite; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s5_r12_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -19840,6 +21168,22 @@ observations:
               note: row=5, Zincite; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s6_r13_mgo
@@ -19932,7 +21276,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=6, Monoxide; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s6_r13_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -20070,6 +21419,22 @@ observations:
               note: row=6, Monoxide; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s6_r13_zno
@@ -20162,7 +21527,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=6, Monoxide; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s6_r13_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -20300,6 +21670,22 @@ observations:
               note: row=6, Monoxide; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s6_r14_mgo
@@ -20392,7 +21778,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=6, Zincite; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s6_r14_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -20530,6 +21921,22 @@ observations:
               note: row=6, Zincite; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s6_r14_zno
@@ -20622,7 +22029,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=6, Zincite; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s6_r14_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -20760,6 +22172,22 @@ observations:
               note: row=6, Zincite; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s7_r15_cao
@@ -20852,7 +22280,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=7, Monoxide#1; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s7_r15_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -20990,6 +22423,22 @@ observations:
               note: row=7, Monoxide#1; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s7_r15_mgo
@@ -21082,7 +22531,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=7, Monoxide#1; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s7_r15_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -21220,6 +22674,22 @@ observations:
               note: row=7, Monoxide#1; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s7_r15_zno
@@ -21312,7 +22782,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=7, Monoxide#1; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s7_r15_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -21450,6 +22925,22 @@ observations:
               note: row=7, Monoxide#1; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s7_r16_cao
@@ -21542,7 +23033,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=7, Monoxide#2; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s7_r16_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -21680,6 +23176,22 @@ observations:
               note: row=7, Monoxide#2; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s7_r16_mgo
@@ -21772,7 +23284,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=7, Monoxide#2; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s7_r16_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -21910,6 +23427,22 @@ observations:
               note: row=7, Monoxide#2; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s7_r16_zno
@@ -22002,7 +23535,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=7, Monoxide#2; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s7_r16_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -22140,6 +23678,22 @@ observations:
               note: row=7, Monoxide#2; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s8_r17_cao
@@ -22232,7 +23786,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=8, Monoxide#1; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s8_r17_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -22370,6 +23929,22 @@ observations:
               note: row=8, Monoxide#1; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s8_r17_mgo
@@ -22462,7 +24037,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=8, Monoxide#1; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s8_r17_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -22600,6 +24180,22 @@ observations:
               note: row=8, Monoxide#1; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s8_r17_zno
@@ -22692,7 +24288,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=8, Monoxide#1; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s8_r17_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -22830,6 +24431,22 @@ observations:
               note: row=8, Monoxide#1; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s8_r18_cao
@@ -22922,7 +24539,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=8, Monoxide#2; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s8_r18_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -23060,6 +24682,22 @@ observations:
               note: row=8, Monoxide#2; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s8_r18_mgo
@@ -23152,7 +24790,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=8, Monoxide#2; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s8_r18_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -23290,6 +24933,22 @@ observations:
               note: row=8, Monoxide#2; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s8_r18_zno
@@ -23382,7 +25041,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=8, Monoxide#2; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s8_r18_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -23520,6 +25184,22 @@ observations:
               note: row=8, Monoxide#2; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s9_r19_cao
@@ -23612,7 +25292,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=9, Monoxide#1; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s9_r19_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -23750,6 +25435,22 @@ observations:
               note: row=9, Monoxide#1; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s9_r19_mgo
@@ -23842,7 +25543,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=9, Monoxide#1; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s9_r19_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -23980,6 +25686,22 @@ observations:
               note: row=9, Monoxide#1; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s9_r19_zno
@@ -24072,7 +25794,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=9, Monoxide#1; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s9_r19_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -24210,6 +25937,22 @@ observations:
               note: row=9, Monoxide#1; column=ZnO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s9_r20_cao
@@ -24302,7 +26045,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=9, Zincite; column=CaO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s9_r20_cao
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -24440,6 +26188,22 @@ observations:
               note: row=9, Zincite; column=CaO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s9_r20_mgo
@@ -24532,7 +26296,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=9, Zincite; column=MgO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s9_r20_mgo
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -24670,6 +26439,22 @@ observations:
               note: row=9, Zincite; column=MgO
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: cr
 - observation_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s9_r20_zno
@@ -24762,7 +26547,12 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: row=9, Zincite; column=ZnO
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria::jeon23_s9_r20_zno
   source_id: jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
   locator:
     page: 5
@@ -24899,6 +26689,22 @@ observations:
               table: '2'
               note: row=9, Zincite; column=ZnO
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 12738
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: cr

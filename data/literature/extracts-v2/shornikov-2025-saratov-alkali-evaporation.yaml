@@ -44,9 +44,29 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5007013870195268383956181486'
+        - - TiO2
+          - '0.0008994958075878343276266462051'
+        - - Al2O3
+          - '0.01734331494605916599199045912'
+        - - FeO
+          - '0.1012995597623313608485726174'
+        - - MgO
+          - '0.3424968417281735095249248857'
+        - - CaO
+          - '0.02207372022638176573997875929'
+        - - Na2O
+          - '0.0128390664863871466484340079'
+        - - K2O
+          - '0.002346614023552378522854475945'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -95,7 +115,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shornikov-2025-saratov-alkali-evaporation::shornikov_2025_k_pressure_range_1450_1500k
   source_id: shornikov-2025-saratov-alkali-evaporation
   locator:
@@ -108,9 +129,29 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5007013870195268383956181486'
+          - - TiO2
+            - '0.0008994958075878343276266462051'
+          - - Al2O3
+            - '0.01734331494605916599199045912'
+          - - FeO
+            - '0.1012995597623313608485726174'
+          - - MgO
+            - '0.3424968417281735095249248857'
+          - - CaO
+            - '0.02207372022638176573997875929'
+          - - Na2O
+            - '0.0128390664863871466484340079'
+          - - K2O
+            - '0.002346614023552378522854475945'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 4
         published_page: 116
@@ -168,9 +209,29 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5007013870195268383956181486'
+        - - TiO2
+          - '0.0008994958075878343276266462051'
+        - - Al2O3
+          - '0.01734331494605916599199045912'
+        - - FeO
+          - '0.1012995597623313608485726174'
+        - - MgO
+          - '0.3424968417281735095249248857'
+        - - CaO
+          - '0.02207372022638176573997875929'
+        - - Na2O
+          - '0.0128390664863871466484340079'
+        - - K2O
+          - '0.002346614023552378522854475945'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -219,7 +280,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shornikov-2025-saratov-alkali-evaporation::shornikov_2025_na_pressure_range_1450_1500k
   source_id: shornikov-2025-saratov-alkali-evaporation
   locator:
@@ -232,9 +294,29 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5007013870195268383956181486'
+          - - TiO2
+            - '0.0008994958075878343276266462051'
+          - - Al2O3
+            - '0.01734331494605916599199045912'
+          - - FeO
+            - '0.1012995597623313608485726174'
+          - - MgO
+            - '0.3424968417281735095249248857'
+          - - CaO
+            - '0.02207372022638176573997875929'
+          - - Na2O
+            - '0.0128390664863871466484340079'
+          - - K2O
+            - '0.002346614023552378522854475945'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 4
         published_page: 116

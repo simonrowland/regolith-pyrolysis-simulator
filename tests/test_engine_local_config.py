@@ -9,9 +9,11 @@ import subprocess
 import sys
 import warnings
 from pathlib import Path
+from types import ModuleType, SimpleNamespace
 
 import pytest
 
+from simulator import engine_local_config
 from simulator.engine_local_config import (
     EngineIdentity,
     EngineLocalConfig,
@@ -99,14 +101,164 @@ def test_identity_derived_from_config_for_alphamelts_subprocess(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    _sample_config(tmp_path, monkeypatch)
+    config = _sample_config(tmp_path, monkeypatch)
+    binary_path = config.paths.alphamelts_binary_path
+    assert binary_path is not None
+    configured_identity = config.identities["alphamelts"]
+    config.identities["alphamelts"] = EngineIdentity(
+        name=configured_identity.name,
+        version=configured_identity.version,
+        digest=engine_local_config.sha256_file(binary_path),
+    )
+    write_config(config)
     backend = AlphaMELTSBackend()
     backend._mode = "subprocess"
-    backend._binary_path = tmp_path / "alphamelts2"
-    assert backend.get_engine_version() == "alphaMELTS 9.9.9 (digest=sha256:abc111)"
+    backend._binary_path = binary_path
+    assert backend.get_engine_version() == config.identities[
+        "alphamelts"
+    ].cache_version()
 
 
-def test_config_absent_legacy_fallback_emits_warning(
+def test_legacy_alphamelts_label_uses_probe_release_and_keeps_digest(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = _sample_config(tmp_path, monkeypatch)
+    alpha_binary = config.paths.alphamelts_binary_path
+    assert alpha_binary is not None
+    legacy_identity = EngineIdentity(
+        name="alphamelts",
+        version="alphaMELTS",
+        digest=engine_local_config.sha256_file(alpha_binary),
+    )
+    config.identities["alphamelts"] = legacy_identity
+    write_config(config)
+
+    reported_version = "alphamelts2 2.3.1"
+    monkeypatch.setattr(
+        "simulator.melt_backend.alphamelts._run_alphamelts_subprocess",
+        lambda command, **_kwargs: subprocess.CompletedProcess(
+            command, 0, stdout=reported_version, stderr=""
+        ),
+    )
+    backend = AlphaMELTSBackend()
+    backend._mode = "subprocess"
+    backend._binary_path = alpha_binary
+
+    version = backend.get_engine_version()
+
+    expected = EngineIdentity(
+        name=legacy_identity.name,
+        version=reported_version,
+        digest=legacy_identity.digest,
+    ).cache_version()
+    assert version == expected
+    assert "2.3.1" in version
+    assert legacy_identity.digest in version
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.alphamelts._run_alphamelts_subprocess",
+        lambda command, **_kwargs: subprocess.CompletedProcess(
+            command, 1, stdout="", stderr="probe unavailable"
+        ),
+    )
+    backend._engine_version = None
+    fallback = backend.get_engine_version()
+    assert fallback == legacy_identity.cache_version()
+    assert legacy_identity.digest in fallback
+
+
+def test_configured_alphamelts_digest_mismatch_uses_actual_binary_digest(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    config = _sample_config(tmp_path, monkeypatch)
+    alpha_binary = config.paths.alphamelts_binary_path
+    assert alpha_binary is not None
+    configured_identity = config.identities["alphamelts"]
+    backend = AlphaMELTSBackend()
+    backend._mode = "subprocess"
+    backend._binary_path = alpha_binary
+    caplog.set_level(logging.WARNING, logger="simulator.engine_local_config")
+
+    version = backend.get_engine_version()
+
+    actual_identity = EngineIdentity(
+        name=configured_identity.name,
+        version=configured_identity.version,
+        digest=engine_local_config.sha256_file(alpha_binary),
+    )
+    assert version == actual_identity.cache_version()
+    assert "Configured alphamelts binary digest mismatch" in caplog.text
+
+
+def test_binary_sha256_cache_uses_path_mtime_and_size(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(engine_local_config, "_BINARY_SHA256_CACHE", {})
+    binary_path = tmp_path / "first-binary"
+    binary_path.write_bytes(b"same-size")
+    original_stat = binary_path.stat()
+    other_path = tmp_path / "second-binary"
+    other_path.write_bytes(b"same-size")
+    os.utime(
+        other_path,
+        ns=(original_stat.st_atime_ns, original_stat.st_mtime_ns),
+    )
+
+    original_sha256_file = engine_local_config.sha256_file
+    calls = 0
+
+    def count_hashes(path: Path) -> str:
+        nonlocal calls
+        calls += 1
+        return original_sha256_file(path)
+
+    monkeypatch.setattr(engine_local_config, "sha256_file", count_hashes)
+    first_digest = engine_local_config._cached_binary_sha256(binary_path)
+    assert engine_local_config._cached_binary_sha256(binary_path) == first_digest
+    assert calls == 1
+
+    engine_local_config._cached_binary_sha256(other_path)
+    assert calls == 2
+
+    binary_path.write_bytes(b"different-size")
+    os.utime(
+        binary_path,
+        ns=(original_stat.st_atime_ns, original_stat.st_mtime_ns),
+    )
+    engine_local_config._cached_binary_sha256(binary_path)
+    assert calls == 3
+
+    binary_path.write_bytes(b"x" * len(b"different-size"))
+    os.utime(
+        binary_path,
+        ns=(
+            original_stat.st_atime_ns,
+            original_stat.st_mtime_ns + 1_000_000_000,
+        ),
+    )
+    engine_local_config._cached_binary_sha256(binary_path)
+    assert calls == 4
+
+
+def test_alphamelts_cache_version_drops_host_metadata() -> None:
+    identity = EngineIdentity(
+        name="alphamelts",
+        version=(
+            "alphamelts2 2.3.1 "
+            "(path=/Users/operator/engines/alphamelts2 "
+            "server=Mac-Studio-256-1)"
+        ),
+        digest="sha256:abc111",
+    )
+
+    assert identity.cache_version() == "alphaMELTS 2.3.1 (digest=sha256:abc111)"
+
+
+def test_config_absent_fallback_uses_binary_digest(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -120,15 +272,98 @@ def test_config_absent_legacy_fallback_emits_warning(
     )
     backend = AlphaMELTSBackend()
     backend._mode = "subprocess"
-    backend._binary_path = tmp_path / "alphamelts2"
+    binary_path = tmp_path / "alphamelts2"
+    binary_path.write_bytes(b"fake-alphaMELTS-build")
+    backend._binary_path = binary_path
     backend._engine_path = backend._binary_path
+    reported_version = (
+        "alphamelts2 2.3.1 "
+        "(path=/Users/operator/engines/alphamelts2 "
+        "server=Mac-Studio-256-1)"
+    )
+    monkeypatch.setattr(
+        "simulator.melt_backend.alphamelts._run_alphamelts_subprocess",
+        lambda command, **_kwargs: subprocess.CompletedProcess(
+            command, 0, stdout=reported_version, stderr=""
+        ),
+    )
 
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         version = backend.get_engine_version()
 
-    assert version == f"alphaMELTS subprocess ({backend._binary_path})"
-    assert any("legacy alphaMELTS path-based identity" in str(item.message) for item in caught)
+    expected = engine_local_config._cache_version_for_binary(
+        "alphamelts", binary_path, reported_version
+    )
+    assert expected is not None
+    assert version == expected
+    assert not any(
+        marker.casefold() in version.casefold()
+        for marker in ("/Users/", "/home/", "server=")
+    )
+    assert any(
+        "binary SHA-256 identity" in str(item.message)
+        for item in caught
+    )
+
+
+def test_thermoengine_fallback_version_omits_module_path(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from engines.alphamelts import thermoengine as transport_module
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    monkeypatch.setattr(
+        engine_local_config,
+        "config_path",
+        lambda: tmp_path / "missing-engines.local.toml",
+    )
+    monkeypatch.setattr(
+        transport_module, "_load_thermoengine_phaseobjc_library", lambda: None
+    )
+    fake_thermoengine = ModuleType("thermoengine")
+    fake_thermoengine.__file__ = str(tmp_path / "private" / "thermoengine.py")
+    fake_thermoengine.chem = object()
+    fake_thermoengine.equilibrate = SimpleNamespace(
+        MELTSmodel=lambda **_kwargs: None
+    )
+    fake_thermoengine.model = SimpleNamespace(
+        Database=lambda **_kwargs: SimpleNamespace(
+            get_phase=lambda _name: object()
+        )
+    )
+    monkeypatch.setitem(sys.modules, "thermoengine", fake_thermoengine)
+
+    transport = object.__new__(transport_module.ThermoEngineTransport)
+    transport._model_name = "MELTSv1.0.2"
+    transport._initialize_in_process()
+    backend = object.__new__(ThermoEngineBackend)
+    backend._thermoengine_transport = transport
+    backend._engine_version = transport.engine_version
+
+    version = backend.get_engine_version()
+
+    assert version == (
+        "thermoengine MELTS 1.0.2 (liq_mod v1.0) "
+        "(adapter=regolith-thermoengine-v2)"
+    )
+    assert str(tmp_path) not in version
+
+
+def test_vaporock_engine_version_emitter_is_directly_exercised() -> None:
+    from simulator.melt_backend.vaporock import VapoRockBackend
+
+    backend = object.__new__(VapoRockBackend)
+    assert backend.get_engine_version() == "unavailable"
+
+
+def test_openimcc_engine_version_emitter_is_directly_exercised() -> None:
+    from simulator.melt_backend.openimcc_bridge import OpenImccMeltBackend
+
+    backend = object.__new__(OpenImccMeltBackend)
+    backend._pack = SimpleNamespace(model_id="OpenIMCC", version="1.2.3")
+    assert backend.get_engine_version() == "OpenIMCC 1.2.3"
 
 
 def test_warn_legacy_once_respects_always_filter() -> None:
@@ -365,8 +600,13 @@ else:
 
 def test_is_legacy_cache_version_detects_path_identity() -> None:
     legacy = "alphaMELTS subprocess (/opt/alphamelts2)"
+    legacy_with_digest = (
+        "alphamelts2 2.3.1 (path=/Users/operator/alphamelts2 "
+        "server=Mac-Studio-256-1) (digest=sha256:deadbeef)"
+    )
     modern = "alphaMELTS 2.3.1 (digest=sha256:deadbeef)"
     assert is_legacy_cache_version(legacy) is True
+    assert is_legacy_cache_version(legacy_with_digest) is True
     assert is_legacy_cache_version(modern) is False
 
 

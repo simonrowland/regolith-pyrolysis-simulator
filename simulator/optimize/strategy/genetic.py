@@ -206,6 +206,7 @@ class OptunaNSGA2Strategy:
             self.objective_profile,
             self._objective_definitions,
             scored,
+            comparison=getattr(self, "_furnace_cost_comparison", None),
         )
 
 

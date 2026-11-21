@@ -161,6 +161,72 @@ def test_charge_moles_sanity_and_typed_absence() -> None:
     assert missing.absence.reason is GapReason.MISSING_EVIDENCE
 
 
+def test_point_composition_specializes_charge_for_each_observation() -> None:
+    sample = Sample(
+        mass_kg=factories.located(Value.point_of("0.0001")),
+        initial_composition=factories.located(
+            Composition(
+                "mix",
+                (("MgO", Decimal("0.5")), ("SiO2", Decimal("0.5"))),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+    )
+    experiment = replace(factories.kems_experiment(), sample=sample)
+    bench = _bench()
+    point_charges = {}
+    for observation_id, formula in (("mg-point", "MgO"), ("silica-point", "SiO2")):
+        observation = replace(
+            factories.observation(
+                observation_id,
+                experiment.experiment_id,
+                factories.o2_identity(),
+                1,
+            ),
+            point_conditions={
+                "mass_kg": factories.located(Value.point_of("0.0001")),
+                "composition": factories.located(
+                    Composition(
+                        "formula",
+                        ((formula, Decimal("1")),),
+                        AmountBasis.MOLE_FRACTION,
+                    )
+                ),
+            },
+        )
+        point_charges[formula] = charge_moles_by_species(
+            experiment, bench, observation
+        )
+
+    assert set(point_charges["MgO"]) == {"MgO"}
+    assert set(point_charges["SiO2"]) == {"SiO2"}
+    mg_charge = point_charges["MgO"]["MgO"].selected
+    silica_charge = point_charges["SiO2"]["SiO2"].selected
+    assert mg_charge is not None and silica_charge is not None
+    assert mg_charge.value.point != silica_charge.value.point
+
+
+def test_value_noncomposition_point_charge_is_unsupported() -> None:
+    experiment = replace(factories.kems_experiment(), sample=_charge())
+    observation = replace(
+        factories.observation(
+            "non-composition-point", experiment.experiment_id, factories.o2_identity(), 1
+        ),
+        point_conditions={
+            "composition": factories.located({"MgO": Decimal("100")})
+        },
+    )
+
+    result = charge_moles_by_species(experiment, _bench(), observation)
+
+    assert not result
+    assert result.absence is not None
+    assert result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert result.absence.missing == (
+        "observation[non-composition-point].point_conditions.composition",
+    )
+
+
 def test_knudsen_uses_cell_volume_and_preserves_interval() -> None:
     geometry = ApparatusGeometry(
         cell_internal_dimensions={
@@ -1905,8 +1971,12 @@ def test_oxygen_condition_graphite_c_co_is_derived_never_printed() -> None:
     assert result.selected is not None
     assert result.selected.route == "graphite_c_co_buffer"
     assert result.selected.authority is WaypointAuthority.DERIVED
-    # Sanity vs published CCO at 1473.15 K, 1.01325 bar (Jakobsson & Oskarsson).
-    assert float(result.selected.value.point) == pytest.approx(-10.475256412619215, abs=1e-9)
+    # NIST-JANAF C-093 CO ΔfG° rows 1400/1500 K and C-095 CO2 rows
+    # 1400/1500 K give this stated-CO equilibrium and implied CO2 diagnostic.
+    assert float(result.selected.value.point) == pytest.approx(
+        -17.109615057437, abs=1e-12
+    )
+    assert result.selected.notice == "implied_pCO2_bar=0.000873271731674; JANAF C-095"
 
 
 def test_ts1985_table2_co_atmosphere_survives_migration(tmp_path) -> None:
@@ -2018,7 +2088,9 @@ def test_oxygen_condition_c_co_uses_total_p_when_co_is_the_stated_gas() -> None:
     assert result.selected is not None
     assert result.selected.route == "graphite_c_co_buffer"
     assert result.selected.authority is WaypointAuthority.DERIVED
-    assert float(result.selected.value.point) == pytest.approx(-11.553088871754722, abs=1e-9)
+    assert float(result.selected.value.point) == pytest.approx(
+        -17.701868157294, abs=1e-12
+    )
 
 
 def test_oxygen_condition_c_co_refuses_total_p_for_non_co_sweep() -> None:

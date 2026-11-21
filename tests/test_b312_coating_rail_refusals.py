@@ -401,4 +401,6 @@ def test_b304_healthy_sio_flux_at_ten_pa_1200k_alpha_004():
     flux = _series_resistance_deposition_flux_mol_m2_s(
         "SiO", 10.0, 1200.0, 0.04,
     )
-    assert flux == pytest.approx(2.9388e-4, rel=1e-4)
+    # d-402's solid-standard-state SiO saturation at 1200 K lowers this
+    # 10 Pa deposition flux from 2.9388e-4 to 2.9253002e-4 mol/m²/s.
+    assert flux == pytest.approx(2.925300202309033e-4, rel=1e-4)

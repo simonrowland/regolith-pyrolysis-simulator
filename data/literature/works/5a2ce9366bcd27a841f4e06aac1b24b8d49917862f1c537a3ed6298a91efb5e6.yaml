@@ -1,0 +1,614 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  citation: van Westrenen, W., Blundy, J. & Wood, B. (1999). Crystal-chemical controls on trace element partitioning between
+    garnet and anhydrous silicate melt. American Mineralogist, 84, 838–847.
+  source_ids:
+  - van-westrenen-1999-garnet-melt-trace-partitioning
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e1dbb239851508a1a3635ff8a7eec9400953b826
+    files:
+    - asset_id: pdf:van-westrenen-1999-garnet-melt-trace-partitioning
+      role: pdf
+      path: raw/van-westrenen-1999-garnet-melt-trace-partitioning/van-westrenen-1999-garnet-melt-trace-partitioning.pdf
+      sha256:
+        tag: value
+        value: b0da2be0e5275b755c2ab90067052363add97087613f370d8612f3c84d3ec8ff
+    - asset_id: pdftotext:van-westrenen-1999-garnet-melt-trace-partitioning
+      role: pdftotext
+      path: text/van-westrenen-1999-garnet-melt-trace-partitioning
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:van-westrenen-1999-garnet-melt-trace-partitioning
+      role: table_csv
+      path: tables/van-westrenen-1999-garnet-melt-trace-partitioning
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:van-westrenen-1999-garnet-melt-trace-partitioning
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6::experiment::vw99_exp11
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: The printed G1/G2 mixture is not expanded into a complete run composition; no oxide reconstruction was made.
+      locator:
+        page: 2
+        published_page: 839
+        pdf_page_index: 1
+        table: '2'
+        source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '15.2'
+          MgO: '19.9'
+          Al2O3: '15.9'
+          SiO2: '48.9'
+      locator:
+        page: 5
+        published_page: 842
+        pdf_page_index: 4
+        table: '4'
+        note: source_sha256=e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927; row=experiment 11, Gl
+        source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1838.15'
+      locator:
+        page: 2
+        published_page: 839
+        pdf_page_index: 1
+        table: '2'
+        source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '3000000000'
+      locator:
+        page: 2
+        published_page: 839
+        pdf_page_index: 1
+        table: '2'
+        source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3000000000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 839
+        pdf_page_index: 1
+        table: '2'
+        source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: No sweep-gas or carrier-gas flow is reported.
+      locator:
+        page: 2
+        published_page: 839
+        pdf_page_index: 1
+        table: '2'
+        source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+    regime:
+      regime_class:
+        tag: unknown
+        reason: No pressure regime token is printed.
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  locator:
+    page: 2
+    published_page: 839
+    pdf_page_index: 1
+    table: '2'
+    note: source_sha256=e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927
+    source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+context:
+- observation_id: vw99_figure1_apparatus
+  type: figure_record
+  locator:
+    figure: '1'
+    page: 3
+    published_page: 840
+    pdf_page_index: 2
+  units: schematic
+  values:
+    quantity: experimental apparatus configuration
+    identity: garnet-melt high-pressure experiment
+    caption: Experimental setup; t/c is a W-3%Re/W-25%Re thermocouple.
+    panel: single
+    axes: none
+    series: []
+    attribution: authors’ apparatus schematic
+    digitisation: no plotted numeric series
+  context_id: van-westrenen-1999-garnet-melt-trace-partitioning::context::vw99_figure1_apparatus
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  species: SiO2
+- observation_id: vw99_figure2_standard_ratios
+  type: figure_record
+  locator:
+    figure: '2'
+    page: 3
+    published_page: 840
+    pdf_page_index: 2
+  units: observed/published ratio
+  values:
+    quantity: SIMS standard observed/published ratios
+    identity: trace elements in glass and garnet standards
+    caption: Comparison of observed and published values for secondary garnet/glass standards.
+    panel: single
+    axes:
+      x: element
+      y: observed/published ratio
+    series:
+    - name: BCR-1 glass
+      marker: open circle
+      marker_count: 16
+      attribution: observed in this study; reference values from Govindaraju (1994)
+    - name: BIR-1 glass
+      marker: open square
+      marker_count: 16
+      attribution: observed in this study; reference values from Jochum et al. (1990)
+    - name: DD1 garnet
+      marker: filled circle
+      marker_count: 7
+      attribution: observed in this study; reference values from Irving and Frey (1978)
+    - name: MU53388 garnet
+      marker: filled square
+      marker_count: 15
+      attribution: observed in this study; reference values from Norman et al. (1996)
+    attribution: observed in this study; published standards compared using Table 3
+    digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
+  context_id: van-westrenen-1999-garnet-melt-trace-partitioning::context::vw99_figure2_standard_ratios
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  species: SiO2
+- observation_id: vw99_figure3_backscatter
+  type: figure_record
+  locator:
+    figure: '3'
+    page: 3
+    published_page: 840
+    pdf_page_index: 2
+  units: micrograph
+  values:
+    quantity: experimental product texture
+    identity: experiment 11 garnet, glass, and quench crystals
+    caption: Backscattered electron image of experiment 11 showing garnet (Gt), quench (Q), glass (G), gold coating (Au),
+      and ion microprobe pits (IP).
+    panel: single
+    axes: none; width of view 350 μm
+    series: []
+    attribution: authors’ backscattered electron image
+    digitisation: no plotted numeric series
+  context_id: van-westrenen-1999-garnet-melt-trace-partitioning::context::vw99_figure3_backscatter
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  species: SiO2
+- observation_id: vw99_figure4_partition_coefficients
+  type: figure_record
+  locator:
+    figure: '4'
+    page: 4
+    published_page: 841
+    pdf_page_index: 3
+  units: dimensionless D and ratio values
+  values:
+    quantity: garnet/melt partition coefficients and D_U/D_Th, CPP
+    identity: experiments 8, 11–14 and garnet compositions along the pyrope-grossular join
+    caption: Spidergram of garnet/melt partition coefficients and variation of D_U/D_Th and CPP along the pyrope-grossular
+      join.
+    panel:
+    - a
+    - b
+    axes:
+      a:
+        x: element
+        y: D (Grt/Melt)
+        y_scale: logarithmic
+      b:
+        x: '% pyrope'
+        y: ratio
+    series:
+    - panel: a
+      name: Py82 (experiment 8)
+      marker: open circle
+      marker_count: 18
+      attribution: partition coefficients measured in this study
+    - panel: a
+      name: Py84 (experiment 11)
+      marker: filled circle
+      marker_count: 21
+      attribution: partition coefficients measured in this study
+    - panel: a
+      name: Py65 (experiment 12)
+      marker: filled triangle
+      marker_count: 21
+      attribution: partition coefficients measured in this study
+    - panel: a
+      name: Py9 (experiment 13)
+      marker: filled square
+      marker_count: 21
+      attribution: partition coefficients measured in this study
+    - panel: a
+      name: Py60 (experiment 14)
+      marker: open triangle
+      marker_count: 21
+      attribution: partition coefficients measured in this study
+    - panel: b
+      name: D_U/D_Th
+      marker: filled circle
+      marker_count: 5
+      attribution: calculated by the authors from this study’s partition coefficients
+    - panel: b
+      name: CPP
+      marker: filled diamond
+      marker_count: 5
+      attribution: Hart and Dunn (1993)
+    attribution: this study; element order follows Sun and McDonough (1989) where possible and In/Li follows Withers (1997)
+    digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
+  context_id: van-westrenen-1999-garnet-melt-trace-partitioning::context::vw99_figure4_partition_coefficients
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  species: SiO2
+- observation_id: vw99_figure5_onuma_diagrams
+  type: figure_record
+  locator:
+    figure: '5'
+    page: 7
+    published_page: 844
+    pdf_page_index: 6
+  units: D (Grt/Melt)
+  values:
+    quantity: garnet-melt partition coefficients for trivalent cations and fitted lattice-strain curves
+    identity: experiments 8 and 11–14; garnet X-site
+    caption: Onuma diagrams showing partition coefficients for trivalent cations entering the garnet X-site with non-linear
+      weighted least-squares fits to Equation 1; error bars are ±1σ.
+    panel:
+    - a
+    - b
+    - c
+    - d
+    - e
+    axes:
+      x: ionic radius (Å)
+      y: D (Grt/Melt)
+      y_scale: logarithmic
+    series:
+    - panel: a
+      name: experiment 8 measured cations
+      marker: filled circles
+      marker_count: 10
+      elements:
+      - Sc
+      - Y
+      - La
+      - Pr
+      - Sm
+      - Tb
+      - Er
+      - Tm
+      - Yb
+      - Lu
+      attribution: Table 5 data from this study
+    - panel: a
+      name: experiment 8 weighted least-squares fit
+      marker: solid curve
+      marker_count: 0
+      attribution: authors’ fit to Equation 1
+    - panel: b
+      name: experiment 11 measured cations
+      marker: filled circles
+      marker_count: 10
+      elements:
+      - Sc
+      - In
+      - Y
+      - La
+      - Pr
+      - Sm
+      - Tb
+      - Er
+      - Yb
+      - Lu
+      attribution: Table 5 data from this study
+    - panel: b
+      name: experiment 11 weighted least-squares fit
+      marker: solid curve
+      marker_count: 0
+      attribution: authors’ fit to Equation 1
+    - panel: c
+      name: experiment 12 measured cations
+      marker: filled circles
+      marker_count: 10
+      elements:
+      - Sc
+      - In
+      - Y
+      - La
+      - Pr
+      - Sm
+      - Tb
+      - Er
+      - Yb
+      - Lu
+      attribution: Table 5 data from this study
+    - panel: c
+      name: experiment 12 weighted least-squares fit
+      marker: solid curve
+      marker_count: 0
+      attribution: authors’ fit to Equation 1
+    - panel: d
+      name: experiment 13 measured cations
+      marker: filled circles
+      marker_count: 10
+      elements:
+      - Sc
+      - In
+      - Y
+      - La
+      - Pr
+      - Sm
+      - Tb
+      - Er
+      - Yb
+      - Lu
+      attribution: Table 5 data from this study
+    - panel: d
+      name: experiment 13 weighted least-squares fit
+      marker: solid curve
+      marker_count: 0
+      attribution: authors’ fit to Equation 1
+    - panel: e
+      name: experiment 14 measured cations
+      marker: filled circles
+      marker_count: 10
+      elements:
+      - Sc
+      - In
+      - Y
+      - La
+      - Pr
+      - Sm
+      - Tb
+      - Er
+      - Yb
+      - Lu
+      attribution: Table 5 data from this study
+    - panel: e
+      name: experiment 14 weighted least-squares fit
+      marker: solid curve
+      marker_count: 0
+      attribution: authors’ fit to Equation 1
+    attribution: measured partition coefficients and non-linear weighted least-squares fits from this study
+    digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
+  context_id: van-westrenen-1999-garnet-melt-trace-partitioning::context::vw99_figure5_onuma_diagrams
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  species: SiO2
+- observation_id: vw99_figure6_fit_trends
+  type: figure_record
+  locator:
+    figure: '6'
+    page: 8
+    published_page: 845
+    pdf_page_index: 7
+  units: Å for r0; dimensionless D0
+  values:
+    quantity: fitted r0 and D0 versus pyrope fraction
+    identity: garnet composition; panel b temperatures are printed beside the D0 points
+    caption: Variation of r0 along the pyrope-grossular join and D0 along the pyrope-grossular join.
+    panel:
+    - a
+    - b
+    axes:
+      a:
+        x: '% pyrope'
+        y: fitted r0 (Å)
+      b:
+        x: '% pyrope'
+        y: fitted D0
+    series:
+    - panel: a
+      name: fitted r0 data
+      marker: filled circle
+      marker_count: 5
+      attribution: Table 6 fits from this study
+    - panel: a
+      name: linear fit to r0
+      marker: solid line
+      marker_count: 0
+      attribution: authors’ linear regression
+    - panel: a
+      name: expected X-site radius range
+      marker: shaded band
+      marker_count: 0
+      attribution: Smyth and Bish (1988), with oxygen radius 1.38 Å
+    - panel: b
+      name: fitted D0 data
+      marker: filled circle
+      marker_count: 5
+      point_labels: 'temperatures in °C: experiment 8 = 1560; experiment 11 = 1565; experiment 12 = 1545; experiment 13 =
+        1530; experiment 14 = 1530'
+      attribution: Table 6 fits from this study
+    attribution: fitted values from this study; expected X-site range is based on Smyth and Bish (1988)
+    digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
+  context_id: van-westrenen-1999-garnet-melt-trace-partitioning::context::vw99_figure6_fit_trends
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  species: SiO2
+- observation_id: vw99_figure7_bulk_modulus
+  type: figure_record
+  locator:
+    figure: '7'
+    page: 9
+    published_page: 846
+    pdf_page_index: 8
+  units: K in GPa; Zc/d^3 in Å^-3
+  values:
+    quantity: site bulk modulus K versus cation charge divided by metal-oxygen distance cubed
+    identity: garnet X-site, clinopyroxene M2 site, plagioclase, and mineral endmembers
+    caption: Site bulk modulus versus cation charge over metal-oxygen distance cubed; crosses show end-member minerals and
+      the line shows the Hazen-Finger oxide relation.
+    panel: single
+    axes:
+      x: Zc/d^3
+      y: bulk modulus K (GPa)
+    series:
+    - name: garnet, this study
+      marker: filled circle
+      marker_count: 5
+      attribution: this study; values derived from partitioning experiments
+    - name: clinopyroxene M2 site
+      marker: open circle
+      marker_count: 20
+      attribution: Blundy and Wood (1994); Wood and Blundy (1997)
+    - name: plagioclase
+      marker: open square
+      marker_count: 19
+      attribution: Blundy and Wood (1994); Wood and Blundy (1997)
+    - name: mineral endmembers Ab, An, D, G, P
+      marker: cross
+      marker_count: 5
+      attribution: adapted from Wood and Blundy (1997)
+    - name: oxide trend
+      marker: solid line
+      marker_count: 0
+      attribution: Hazen and Finger (1979)
+    attribution: author-derived garnet values compared with published clinopyroxene and plagioclase data
+    digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
+  context_id: van-westrenen-1999-garnet-melt-trace-partitioning::context::vw99_figure7_bulk_modulus
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  species: SiO2
+- observation_id: vw99_table1_starting_materials
+  type: context
+  locator:
+    source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+    source_sha256: e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927
+    table: '1'
+    page: 2
+    published_page: 839
+    pdf_page_index: 1
+  units: major oxides wt%; trace elements ppm
+  values:
+    caption: Table 1. Major and trace element compositions of starting materials.
+    reason: Starting mixtures include quoted G1 major elements and author-prepared G2–G4 with a 26-element trace suite; these
+      are supporting charge compositions, not final product compositions.
+  context_id: van-westrenen-1999-garnet-melt-trace-partitioning::context::vw99_table1_starting_materials
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  species: SiO2
+- observation_id: vw99_table2_experimental_conditions
+  type: context
+  locator:
+    source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+    source_sha256: e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927
+    table: '2'
+    page: 2
+    published_page: 839
+    pdf_page_index: 1
+  units: P kbar, T °C, t h, products wt%
+  values:
+    caption: Table 2. Experimental conditions and products.
+    reason: Five run rows; T and P for experiment 11 are also carried on each typed Gl composition observation. No fO2 is
+      printed.
+  context_id: van-westrenen-1999-garnet-melt-trace-partitioning::context::vw99_table2_experimental_conditions
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  species: SiO2
+- observation_id: vw99_table3_standard_checks
+  type: context
+  locator:
+    source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+    source_sha256: e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927
+    table: '3'
+    page: 4
+    published_page: 841
+    pdf_page_index: 3
+  units: observed/published ratio
+  values:
+    caption: Table 3. Comparison of observed and published trace element compositions of SIMS secondary standards.
+    reason: Standard calibration comparisons are not run-composition observations.
+  context_id: van-westrenen-1999-garnet-melt-trace-partitioning::context::vw99_table3_standard_checks
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  species: SiO2
+- observation_id: vw99_table4_grt_q_rows
+  type: context
+  locator:
+    source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+    source_sha256: e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927
+    table: '4'
+    page: 5
+    published_page: 842
+    pdf_page_index: 4
+    row: experiment 11, Gl
+  units: major elements wt%; trace elements ppm
+  values:
+    caption: Table 4. Major and trace element composition of experimental products.
+    printed_phase_labels:
+    - Grt
+    - Q
+    reason: Grt and Q product rows retained verbatim in context because the schema has no garnet or quench phase token. The
+      Gl trace-element suite is typed under equilibrium_phase_composition using its printed ppm basis.
+  context_id: van-westrenen-1999-garnet-melt-trace-partitioning::context::vw99_table4_grt_q_rows
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  species: SiO2
+- observation_id: vw99_table5_partition_coefficients
+  type: context
+  locator:
+    source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+    source_sha256: e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927
+    table: '5'
+    page: 6
+    published_page: 843
+    pdf_page_index: 5
+  units: dimensionless D and σ as printed
+  values:
+    caption: Table 5. Garnet-melt partition coefficients.
+    schema_gap: No partition-coefficient quantity token is available; do not score these values.
+  context_id: van-westrenen-1999-garnet-melt-trace-partitioning::context::vw99_table5_partition_coefficients
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  species: SiO2
+- observation_id: vw99_table6_lattice_strain_fits
+  type: model_derived
+  locator:
+    source_path: tables/van-westrenen-1999-garnet-melt-trace-partitioning/cited-pages.txt
+    source_sha256: e277ab6e73afb0c36d054d1c412c126ea5a391f85180238a951f39b298917927
+    table: '6'
+    page: 8
+    published_page: 845
+    pdf_page_index: 7
+  units: r0 Å, D0 dimensionless, E GPa
+  values:
+    caption: Table 6. Results of fitting of partitioning data for Y, REE, In, and Sc to Equation 1.
+    reason: Fitted model parameters, not direct experimental run compositions.
+  context_id: van-westrenen-1999-garnet-melt-trace-partitioning::context::vw99_table6_lattice_strain_fits
+  work_id: 5a2ce9366bcd27a841f4e06aac1b24b8d49917862f1c537a3ed6298a91efb5e6
+  source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+  species: SiO2

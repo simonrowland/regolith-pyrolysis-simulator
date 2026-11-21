@@ -57,7 +57,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -117,7 +117,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF1-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf1_1_glass_al2o3_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -208,6 +213,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf1_1_glass_al2o3_wt_percent
@@ -265,7 +286,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -325,7 +346,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF1-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf1_1_glass_al2o3_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -416,6 +442,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf1_1_glass_fe2o3_mole_fraction
@@ -473,7 +515,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -533,7 +575,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF1-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf1_1_glass_fe2o3_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -624,6 +671,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf1_1_glass_fe2o3_wt_percent
@@ -681,7 +744,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -741,7 +804,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF1-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf1_1_glass_fe2o3_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -832,6 +900,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf1_1_glass_na2o_mole_fraction
@@ -889,7 +973,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -949,7 +1033,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF1-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf1_1_glass_na2o_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -1040,6 +1129,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf1_1_glass_na2o_wt_percent
@@ -1097,7 +1202,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -1157,7 +1262,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF1-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf1_1_glass_na2o_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -1248,6 +1358,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf2_1_glass_al2o3_mole_fraction
@@ -1305,7 +1431,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -1365,7 +1491,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF2-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf2_1_glass_al2o3_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -1456,6 +1587,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf2_1_glass_al2o3_wt_percent
@@ -1513,7 +1660,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -1573,7 +1720,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF2-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf2_1_glass_al2o3_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -1664,6 +1816,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf2_1_glass_fe2o3_mole_fraction
@@ -1721,7 +1889,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -1781,7 +1949,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF2-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf2_1_glass_fe2o3_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -1872,6 +2045,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf2_1_glass_fe2o3_wt_percent
@@ -1929,7 +2118,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -1989,7 +2178,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF2-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf2_1_glass_fe2o3_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -2080,6 +2274,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf2_1_glass_na2o_mole_fraction
@@ -2137,7 +2347,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -2197,7 +2407,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF2-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf2_1_glass_na2o_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -2288,6 +2503,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf2_1_glass_na2o_wt_percent
@@ -2345,7 +2576,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -2405,7 +2636,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF2-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf2_1_glass_na2o_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -2496,6 +2732,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf3_1_glass_al2o3_mole_fraction
@@ -2553,7 +2805,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -2613,7 +2865,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF3-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf3_1_glass_al2o3_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -2704,6 +2961,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf3_1_glass_al2o3_wt_percent
@@ -2761,7 +3034,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -2821,7 +3094,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF3-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf3_1_glass_al2o3_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -2912,6 +3190,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf3_1_glass_fe2o3_mole_fraction
@@ -2969,7 +3263,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -3029,7 +3323,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF3-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf3_1_glass_fe2o3_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -3120,6 +3419,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf3_1_glass_fe2o3_wt_percent
@@ -3177,7 +3492,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -3237,7 +3552,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF3-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf3_1_glass_fe2o3_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -3328,6 +3648,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf3_1_glass_na2o_mole_fraction
@@ -3385,7 +3721,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -3445,7 +3781,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF3-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf3_1_glass_na2o_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -3536,6 +3877,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf3_1_glass_na2o_wt_percent
@@ -3593,7 +3950,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -3653,7 +4010,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF3-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf3_1_glass_na2o_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -3744,6 +4106,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_1_glass_al2o3_mole_fraction
@@ -3801,7 +4179,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -3861,7 +4239,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF6-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_1_glass_al2o3_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -3952,6 +4335,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_1_glass_al2o3_wt_percent
@@ -4009,7 +4408,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -4069,7 +4468,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF6-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_1_glass_al2o3_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -4160,6 +4564,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_1_glass_fe2o3_mole_fraction
@@ -4217,7 +4637,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -4277,7 +4697,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF6-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_1_glass_fe2o3_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -4368,6 +4793,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_1_glass_fe2o3_wt_percent
@@ -4425,7 +4866,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -4485,7 +4926,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF6-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_1_glass_fe2o3_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -4576,6 +5022,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_1_glass_na2o_mole_fraction
@@ -4633,7 +5095,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -4693,7 +5155,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF6-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_1_glass_na2o_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -4784,6 +5251,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_1_glass_na2o_wt_percent
@@ -4841,7 +5324,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -4901,7 +5384,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF6-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_1_glass_na2o_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -4992,6 +5480,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_2_glass_al2o3_mole_fraction
@@ -5049,7 +5553,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -5109,7 +5613,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF6-2; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_2_glass_al2o3_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -5200,6 +5709,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_2_glass_al2o3_wt_percent
@@ -5257,7 +5782,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -5317,7 +5842,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF6-2; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_2_glass_al2o3_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -5408,6 +5938,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_2_glass_fe2o3_mole_fraction
@@ -5465,7 +6011,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -5525,7 +6071,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF6-2; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_2_glass_fe2o3_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -5616,6 +6167,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_2_glass_fe2o3_wt_percent
@@ -5673,7 +6240,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -5733,7 +6300,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF6-2; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_2_glass_fe2o3_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -5824,6 +6396,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_2_glass_na2o_mole_fraction
@@ -5881,7 +6469,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -5941,7 +6529,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF6-2; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_2_glass_na2o_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -6032,6 +6625,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_2_glass_na2o_wt_percent
@@ -6089,7 +6698,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -6149,7 +6758,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF6-2; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf6_2_glass_na2o_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -6240,6 +6854,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf9_1_glass_al2o3_mole_fraction
@@ -6297,7 +6927,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -6357,7 +6987,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF9-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf9_1_glass_al2o3_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -6448,6 +7083,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf9_1_glass_al2o3_wt_percent
@@ -6505,7 +7156,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -6565,7 +7216,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF9-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf9_1_glass_al2o3_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -6656,6 +7312,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf9_1_glass_fe2o3_mole_fraction
@@ -6713,7 +7385,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -6773,7 +7445,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF9-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf9_1_glass_fe2o3_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -6864,6 +7541,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf9_1_glass_fe2o3_wt_percent
@@ -6921,7 +7614,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -6981,7 +7674,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF9-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf9_1_glass_fe2o3_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -7072,6 +7770,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf9_1_glass_na2o_mole_fraction
@@ -7129,7 +7843,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -7189,7 +7903,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF9-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf9_1_glass_na2o_mole_fraction
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -7280,6 +7999,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf9_1_glass_na2o_wt_percent
@@ -7337,7 +8072,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: unknown
       reason: The source reports no sample total pressure for this run.
@@ -7397,7 +8132,12 @@ observations:
         pdf_page_index: 185
         table: '7.1'
         note: sample=NAF9-1; row=Glass
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t71_naf9_1_glass_na2o_wt_percent
   source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
   locator:
     page: 186
@@ -7488,6 +8228,22 @@ observations:
         published_page: '147'
         pdf_page_index: 175
         section: 7.3.2 Experimental results and discussion
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 186
+        published_page: '157'
+        pdf_page_index: 185
+        table: '7.1'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: moosavi-khoonsari-2015-na-fe-cmas-thesis::mk15_t72_naf1_1_glass_al2o3_mole_fraction

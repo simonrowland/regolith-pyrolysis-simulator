@@ -1,0 +1,442 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.gca.2006.03.022
+  citation: Cohen B.A., Levasseur S., Zanda B., Hewins R.H., and Halliday A.N. (2006). Kinetic isotope effect during reduction
+    of iron from a silicate melt. Geochimica et Cosmochimica Acta 70:3139–3148.
+  source_ids:
+  - cohen-2006-iron-silicate-reduction-isotopes
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e1dbb239851508a1a3635ff8a7eec9400953b826
+    files:
+    - asset_id: pdf:cohen-2006-iron-silicate-reduction-isotopes
+      role: pdf
+      path: raw/cohen-2006-iron-silicate-reduction-isotopes/cohen-2006-iron-silicate-reduction-isotopes.pdf
+      sha256:
+        tag: value
+        value: 621283742e78dd5ea4f9d51b2f036d7298fc3329ee80d7f709720c275fc3c14b
+    - asset_id: pdftotext:cohen-2006-iron-silicate-reduction-isotopes
+      role: pdftotext
+      path: text/cohen-2006-iron-silicate-reduction-isotopes
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:cohen-2006-iron-silicate-reduction-isotopes
+      role: table_csv
+      path: tables/cohen-2006-iron-silicate-reduction-isotopes
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:cohen-2006-iron-silicate-reduction-isotopes
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.gca.2006.03.022
+experiments:
+- experiment_id: 10.1016/j.gca.2006.03.022::cohen-2006-iron-silicate-reduction-isotopes
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'CO/CO2 reduction in a 1-atm vertical Deltech furnace' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2006.03.022
+  locator:
+    page: 3
+    published_page: 3141
+    pdf_page_index: 2
+    table: '2'
+    note: source_sha256=cd3e624c001fc2af169ff4e9b522d78fa322434a67fb661166a542e84ca454f2; column=SiO2 (wt%)
+    source_path: tables/cohen-2006-iron-silicate-reduction-isotopes/cited-pages.txt
+context:
+- observation_id: cohen_2006_figure_1_deferred
+  type: figure_context
+  units: as printed in figure caption
+  locator:
+    figure: '1'
+    page: 4
+    pdf_page_index: 3
+    published_page: 3142
+  values:
+    quantity_as_printed: iron isotope ratios δ57/54Fe versus δ57/56Fe
+    typed_quantity: iron isotope ratios δ57/54Fe versus δ57/56Fe
+    species: Fe isotope ratios
+    phase: measured Fe-bearing metal and silicate samples
+    temperature_as_printed: not stated; reduction runs span 1450–1540 °C
+    axes_as_printed: 'x: δ57/54Fe (‰); y: δ57/56Fe (‰)'
+    caption_as_printed: Iron isotopic data plotted on a δ57/54Fe against δ57/56Fe diagram; data lie on a mass-dependent fractionation
+      line with slope one-third.
+    panel: single
+    series:
+    - name: Cohen et al. experimental measurements
+      marker: measured points with error bars
+      marker_count: 15
+      attribution: Cohen et al. (2006)
+    - name: mass-dependent fractionation reference line
+      marker: dashed line
+      marker_count: 0
+      attribution: Cohen et al. (2006)
+    attribution: Cohen et al. (2006), present-work isotope data.
+    digitisation: deferred to a figure pass
+  context_id: cohen-2006-iron-silicate-reduction-isotopes::context::cohen_2006_figure_1_deferred
+  work_id: 10.1016/j.gca.2006.03.022
+  source_id: cohen-2006-iron-silicate-reduction-isotopes
+  species: Fe
+- observation_id: cohen_2006_figure_2_deferred
+  type: figure_context
+  units: as printed in figure caption
+  locator:
+    figure: '2'
+    page: 5
+    pdf_page_index: 4
+    published_page: 3143
+  values:
+    quantity_as_printed: back-scattered electron images of experimental charges
+    typed_quantity: back-scattered electron images of experimental charges
+    species: Fe-bearing experimental charges
+    phase: silicate glass charge with metallic Fe beads
+    temperature_as_printed: 1500 and 1540 °C; 10, 30 and 60 min
+    axes_as_printed: not applicable; micrographs with 400 μm scale bar
+    caption_as_printed: BSE images of experimental charges heated at 1500 and 1540 °C for 10, 30 and 60 min.
+    panel: 'six panels: 1540 °C at 10, 30, 60 min; 1500 °C at 10, 30, 60 min'
+    series:
+    - name: 1540 °C, 10 min BSE image
+      marker: micrograph
+      marker_count: 0
+      attribution: Cohen et al. (2006)
+    - name: 1540 °C, 30 min BSE image
+      marker: micrograph
+      marker_count: 0
+      attribution: Cohen et al. (2006)
+    - name: 1540 °C, 60 min BSE image
+      marker: micrograph
+      marker_count: 0
+      attribution: Cohen et al. (2006)
+    - name: 1500 °C, 10 min BSE image
+      marker: micrograph
+      marker_count: 0
+      attribution: Cohen et al. (2006)
+    - name: 1500 °C, 30 min BSE image
+      marker: micrograph
+      marker_count: 0
+      attribution: Cohen et al. (2006)
+    - name: 1500 °C, 60 min BSE image
+      marker: micrograph
+      marker_count: 0
+      attribution: Cohen et al. (2006)
+    attribution: Cohen et al. (2006), present-work BSE images.
+    digitisation: deferred to a figure pass
+  context_id: cohen-2006-iron-silicate-reduction-isotopes::context::cohen_2006_figure_2_deferred
+  work_id: 10.1016/j.gca.2006.03.022
+  source_id: cohen-2006-iron-silicate-reduction-isotopes
+  species: Fe
+- observation_id: cohen_2006_figure_3_deferred
+  type: figure_context
+  units: as printed in figure caption
+  locator:
+    figure: '3'
+    page: 5
+    pdf_page_index: 4
+    published_page: 3143
+  values:
+    quantity_as_printed: FeO/Al2O3 ratio versus heating time
+    typed_quantity: FeO/Al2O3 ratio versus heating time
+    species: FeO and Al2O3
+    phase: silicate glass residue
+    temperature_as_printed: 1450, 1500, 1540 °C reduction runs; comparison 1480 °C non-reduction and 1450 °C Yu et al. runs
+    axes_as_printed: 'x: time (min); y: FeO/Al2O3'
+    caption_as_printed: FeO/Al2O3 ratios versus time in reduction runs, non-reduction runs and Yu et al. comparison data;
+      open triangles show calculated minimum evaporative loss.
+    panel: single
+    series:
+    - name: 1450 °C reduction
+      marker: solid square
+      marker_count: 10
+      attribution: Cohen et al. (2006)
+    - name: 1500 °C reduction
+      marker: solid triangle
+      marker_count: 9
+      attribution: Cohen et al. (2006)
+    - name: 1540 °C reduction
+      marker: solid diamond
+      marker_count: 9
+      attribution: Cohen et al. (2006)
+    - name: 1480 °C non-reduction, IW+0.5
+      marker: open square
+      marker_count: 4
+      attribution: Cohen et al. (2006)
+    - name: Yu et al. (2003), 1450 °C, 1.0 × 10^-5 bar
+      marker: open circle
+      marker_count: 7
+      attribution: Yu et al. (2003)
+    - name: minimum Rayleigh evaporation loss
+      marker: open triangles connected by a hand-drawn solid line
+      marker_count: 2
+      attribution: calculated by Cohen et al. (2006)
+    attribution: Cohen et al. (2006); Yu et al. (2003) comparison points are identified in the caption.
+    digitisation: deferred to a figure pass
+  context_id: cohen-2006-iron-silicate-reduction-isotopes::context::cohen_2006_figure_3_deferred
+  work_id: 10.1016/j.gca.2006.03.022
+  source_id: cohen-2006-iron-silicate-reduction-isotopes
+  species: Fe
+- observation_id: cohen_2006_figure_4_deferred
+  type: figure_context
+  units: as printed in figure caption
+  locator:
+    figure: '4'
+    page: 5
+    pdf_page_index: 4
+    published_page: 3143
+  values:
+    quantity_as_printed: 100 × Na2O/Al2O3 versus heating time
+    typed_quantity: 100 × Na2O/Al2O3 versus heating time
+    species: Na2O and Al2O3
+    phase: silicate glass charge
+    temperature_as_printed: 1450, 1500, 1540 °C experimental runs; comparison at 1450 °C and 1.0 × 10^-5 bar
+    axes_as_printed: 'x: time (min); y: 100 × Na2O/Al2O3'
+    caption_as_printed: 100 × Na2O/Al2O3 versus time in charges produced at 1450, 1500 and 1540 °C, together with Yu et al.
+      (2003) data.
+    panel: single
+    series:
+    - name: 1450 °C experimental runs
+      marker: solid square
+      marker_count: 10
+      attribution: Cohen et al. (2006)
+    - name: 1500 °C experimental runs
+      marker: solid triangle
+      marker_count: 9
+      attribution: Cohen et al. (2006)
+    - name: 1540 °C experimental runs
+      marker: solid diamond
+      marker_count: 7
+      attribution: Cohen et al. (2006)
+    - name: Yu et al. (2003), 1450 °C, 1.0 × 10^-5 bar
+      marker: open circle
+      marker_count: 8
+      attribution: Yu et al. (2003)
+    attribution: Cohen et al. (2006); Yu et al. (2003) comparison points are identified in the caption.
+    digitisation: deferred to a figure pass
+  context_id: cohen-2006-iron-silicate-reduction-isotopes::context::cohen_2006_figure_4_deferred
+  work_id: 10.1016/j.gca.2006.03.022
+  source_id: cohen-2006-iron-silicate-reduction-isotopes
+  species: Fe
+- observation_id: cohen_2006_figure_5_deferred
+  type: figure_context
+  units: as printed in figure caption
+  locator:
+    figure: '5'
+    page: 6
+    pdf_page_index: 5
+    published_page: 3144
+  values:
+    quantity_as_printed: BSE image of a metal grain and alabandite inclusions
+    typed_quantity: BSE image of a metal grain and alabandite inclusions
+    species: Fe-Mn-S-Cu metal/sulfide grains
+    phase: metal grain on silicate bead rim
+    temperature_as_printed: 1540 °C, 10 min
+    axes_as_printed: not applicable; micrograph with 100 μm scale bar
+    caption_as_printed: BSE image of a metal grain on the rim of a silicate bead; arrows point to two alabandite grains.
+    panel: single image panel
+    series:
+    - name: BSE micrograph with two arrows identifying alabandite grains
+      marker: micrograph annotation
+      marker_count: 0
+      attribution: Cohen et al. (2006)
+    attribution: Cohen et al. (2006), present-work BSE image.
+    digitisation: deferred to a figure pass
+  context_id: cohen-2006-iron-silicate-reduction-isotopes::context::cohen_2006_figure_5_deferred
+  work_id: 10.1016/j.gca.2006.03.022
+  source_id: cohen-2006-iron-silicate-reduction-isotopes
+  species: Fe
+- observation_id: cohen_2006_figure_6_deferred
+  type: figure_context
+  units: as printed in figure caption
+  locator:
+    figure: '6'
+    page: 6
+    pdf_page_index: 5
+    published_page: 3144
+  values:
+    quantity_as_printed: δ57Fe versus time by phase and temperature
+    typed_quantity: δ57Fe versus time by phase and temperature
+    species: 57Fe/54Fe isotope delta
+    phase: silicate glass and metal
+    temperature_as_printed: 1450, 1500 and 1540 °C
+    axes_as_printed: 'x: time (min); y: δ57Fe (‰)'
+    caption_as_printed: δ57Fe for silicate (solid symbols) and metal (open symbols) formed in experimental runs; error bars
+      are based on long-term reproducibility of the standard.
+    panel: single
+    series:
+    - name: 1450 °C metal
+      marker: open circle
+      marker_count: 9
+      attribution: Cohen et al. (2006)
+    - name: 1500 °C metal
+      marker: open diamond
+      marker_count: 9
+      attribution: Cohen et al. (2006)
+    - name: 1540 °C metal
+      marker: open triangle
+      marker_count: 8
+      attribution: Cohen et al. (2006)
+    - name: 1450 °C silicate
+      marker: solid circle
+      marker_count: 8
+      attribution: Cohen et al. (2006)
+    - name: 1500 °C silicate
+      marker: solid diamond
+      marker_count: 7
+      attribution: Cohen et al. (2006)
+    - name: 1540 °C silicate
+      marker: solid triangle
+      marker_count: 8
+      attribution: Cohen et al. (2006)
+    attribution: Cohen et al. (2006), present-work measurements; isotope delta relative to IRMM-014.
+    digitisation: deferred to a figure pass
+  context_id: cohen-2006-iron-silicate-reduction-isotopes::context::cohen_2006_figure_6_deferred
+  work_id: 10.1016/j.gca.2006.03.022
+  source_id: cohen-2006-iron-silicate-reduction-isotopes
+  species: Fe
+- observation_id: cohen_2006_figure_7_deferred
+  type: figure_context
+  units: as printed in figure caption
+  locator:
+    figure: '7'
+    page: 7
+    pdf_page_index: 6
+    published_page: 3145
+  values:
+    quantity_as_printed: calculated bulk δ57Fe versus time
+    typed_quantity: calculated bulk δ57Fe versus time
+    species: 57Fe/54Fe bulk isotope delta
+    phase: bulk experimental charge from metal and silicate phases
+    temperature_as_printed: 1450, 1500 and 1540 °C
+    axes_as_printed: 'x: time (min); y: δ57Fe (‰)'
+    caption_as_printed: Calculated bulk δ57Fe composition of charges based on silicate and metal phase values and weights
+      in Table 4; heavy dashed line is the initial starting-material δ57Fe.
+    panel: single
+    series:
+    - name: 1450 °C
+      marker: open circle
+      marker_count: 5
+      attribution: calculated by Cohen et al. (2006) from measured Table 4 weights and Table 2 isotope values
+    - name: 1500 °C
+      marker: grey circle
+      marker_count: 8
+      attribution: calculated by Cohen et al. (2006) from measured Table 4 weights and Table 2 isotope values
+    - name: 1540 °C
+      marker: filled circle
+      marker_count: 6
+      attribution: calculated by Cohen et al. (2006) from measured Table 4 weights and Table 2 isotope values
+    - name: initial starting-material δ57Fe
+      marker: heavy dashed horizontal line
+      marker_count: 0
+      attribution: Cohen et al. (2006)
+    attribution: Cohen et al. (2006), author-calculated bulk values.
+    digitisation: deferred to a figure pass
+  context_id: cohen-2006-iron-silicate-reduction-isotopes::context::cohen_2006_figure_7_deferred
+  work_id: 10.1016/j.gca.2006.03.022
+  source_id: cohen-2006-iron-silicate-reduction-isotopes
+  species: Fe
+- observation_id: cohen_2006_table_1_context
+  type: table_context
+  units: as printed in source table
+  locator:
+    source_path: tables/cohen-2006-iron-silicate-reduction-isotopes/cited-pages.txt
+    source_sha256: cd3e624c001fc2af169ff4e9b522d78fa322434a67fb661166a542e84ca454f2
+    page: 3
+    pdf_page_index: 2
+    published_page: 3141
+    table: '1'
+  values:
+    caption: Chemical compositions and standard deviations of powdered starting material and starting Fe isotope composition.
+    reason: Starting-material/run compositions are preserved as printed context; no row-level composition observations transcribed.
+  context_id: cohen-2006-iron-silicate-reduction-isotopes::context::cohen_2006_table_1_context
+  work_id: 10.1016/j.gca.2006.03.022
+  source_id: cohen-2006-iron-silicate-reduction-isotopes
+  species: Fe
+- observation_id: cohen_2006_table_2_context
+  type: table_context
+  units: as printed in source table
+  locator:
+    source_path: tables/cohen-2006-iron-silicate-reduction-isotopes/cited-pages.txt
+    source_sha256: cd3e624c001fc2af169ff4e9b522d78fa322434a67fb661166a542e84ca454f2
+    page: 3
+    pdf_page_index: 2
+    published_page: 3141
+    table: '2'
+  values:
+    caption: Chemical analyses of the experimental charges and Fe isotope compositions of silicate and metal phases; 2s is
+      printed in per mil.
+    reason: The Total column remains context; row-level oxide and phase-specific isotope values are typed above.
+    measured_phase_as_printed: silicate glass composition; metal and silicate glass Fe isotope values
+  context_id: cohen-2006-iron-silicate-reduction-isotopes::context::cohen_2006_table_2_context
+  work_id: 10.1016/j.gca.2006.03.022
+  source_id: cohen-2006-iron-silicate-reduction-isotopes
+  species: Fe
+- observation_id: cohen_2006_table_3_context
+  type: table_context
+  units: as printed in source table
+  locator:
+    source_path: tables/cohen-2006-iron-silicate-reduction-isotopes/cited-pages.txt
+    source_sha256: cd3e624c001fc2af169ff4e9b522d78fa322434a67fb661166a542e84ca454f2
+    page: 6
+    pdf_page_index: 5
+    published_page: 3144
+    table: '3'
+  values:
+    caption: Chemical composition of metal grains in experimental charges.
+    reason: Metal grain analyses are preserved as printed context; no row-level composition observations transcribed.
+  context_id: cohen-2006-iron-silicate-reduction-isotopes::context::cohen_2006_table_3_context
+  work_id: 10.1016/j.gca.2006.03.022
+  source_id: cohen-2006-iron-silicate-reduction-isotopes
+  species: Fe
+- observation_id: cohen_2006_table_4_context
+  type: table_context
+  units: as printed in source table
+  locator:
+    source_path: tables/cohen-2006-iron-silicate-reduction-isotopes/cited-pages.txt
+    source_sha256: cd3e624c001fc2af169ff4e9b522d78fa322434a67fb661166a542e84ca454f2
+    page: 7
+    pdf_page_index: 6
+    published_page: 3145
+    table: '4'
+  values:
+    caption: Final silicate and metal weights, total Fe, and bulk Fe isotope composition.
+    reason: Bulk isotope mass-balance values are preserved as context pending row-level extraction.
+    measured_columns_as_printed:
+    - Metal weight (mg)
+    - Silicate weight (mg)
+    calculated_columns_as_printed:
+    - Total Fe (mg)
+    - Bulk δ57Fe (‰)
+    note: Final phase weights are measured; total Fe and bulk δ57Fe are separately printed calculated balance results.
+  context_id: cohen-2006-iron-silicate-reduction-isotopes::context::cohen_2006_table_4_context
+  work_id: 10.1016/j.gca.2006.03.022
+  source_id: cohen-2006-iron-silicate-reduction-isotopes
+  species: Fe

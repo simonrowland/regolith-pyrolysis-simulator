@@ -38,6 +38,8 @@ from simulator.condensation import (
     apply_setpoints_condensation_temperature_overrides,
     restore_condensation_temperature_overrides,
 )
+from simulator.condensation_routing import K_TRAP_SUB_ORDER
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_MBAR
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 
 
@@ -457,22 +459,21 @@ def test_pyrolysis_simulator_uses_instance_isolation_not_module_mutation():
     Tcond values keep their values independently."""
     from simulator.core import PyrolysisSimulator
     from simulator.melt_backend.base import InternalAnalyticalBackend
+    from simulator.config import load_config_bundle
 
     pre_module_dict = dict(CONDENSATION_TEMPS_C)
 
     def _build(sio_override: float) -> PyrolysisSimulator:
         b = InternalAnalyticalBackend()
         b.initialize({})
+        setpoints = load_config_bundle().setpoints
+        setpoints["campaigns"] = {}
+        setpoints["condensation_train"]["condensation_temperatures_C"] = {
+            "SiO": sio_override,
+        }
         return PyrolysisSimulator(
             b,
-            {
-                'campaigns': {},
-                'condensation_train': {
-                    'condensation_temperatures_C': {
-                        'SiO': sio_override,
-                    },
-                },
-            },
+            setpoints,
             {'x': {'label': 'X', 'composition_wt_pct': {'SiO2': 100}}},
             {'metals': {}, 'oxide_vapors': {}},
         )
@@ -500,14 +501,12 @@ def test_simulator_construction_applies_setpoints_overrides():
     ``CONDENSATION_TEMPS_C['SiO']``."""
     from simulator.core import PyrolysisSimulator
     from simulator.melt_backend.base import InternalAnalyticalBackend
+    from simulator.config import load_config_bundle
 
-    custom_setpoints = {
-        'campaigns': {},
-        'condensation_train': {
-            'condensation_temperatures_C': {
-                'SiO': 980.0,  # cold-baffle override
-            },
-        },
+    custom_setpoints = load_config_bundle().setpoints
+    custom_setpoints["campaigns"] = {}
+    custom_setpoints["condensation_train"]["condensation_temperatures_C"] = {
+        "SiO": 980.0,  # cold-baffle override
     }
     backend = InternalAnalyticalBackend()
     backend.initialize({})
@@ -537,6 +536,9 @@ def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
         CondensationTrain.create_default(),
         wall_temperature_C=900.0,
     )
+    # Keep the material-reload pin on its original silica path. This parcel
+    # contains only SiO, so the explicit through command satisfies admission.
+    default_model.train.collection_route['stage3_route'] = 'through'
     _configure_knudsen_policy(default_model)
     default_route = default_model.route(
         EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
@@ -583,6 +585,7 @@ def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
             materials=bundle.materials,
         )
     )
+    sim.campaign_mgr.overrides['C0'] = {'stage3_route': 'through'}
     sim.condensation_model.configure_operating_conditions(
         wall_temperature_C=900.0,
         overhead_pressure_mbar=1.0,
@@ -618,6 +621,11 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
     )
     _configure_knudsen_policy(default_model)
     if subpath == "stage_efficiency":
+        # Stage capture reads parcel pO2 only when stage 3 is through.
+        # SiO evaporates as SiO2 -> SiO + 1/2 O2, so that route carries
+        # the oxygen the wall law needs. Divert leaves pO2 unset and the
+        # law refuses. The 1300 C versus 900 C cutoff is unchanged.
+        default_model.train.collection_route["stage3_route"] = "through"
         default_model.pipe_segments = []
     default_result = default_model.route(
         EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
@@ -631,6 +639,7 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
     overridden_model.condensation_temperatures_C['SiO'] = 900.0
     _configure_knudsen_policy(overridden_model)
     if subpath == "stage_efficiency":
+        overridden_model.train.collection_route["stage3_route"] = "through"
         overridden_model.pipe_segments = []
     overridden_result = overridden_model.route(
         EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
@@ -674,7 +683,7 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
         return model.route(
             EvaporationFlux(species_kg_hr={"Ca": 1.0}, total_kg_hr=1.0),
             MeltState(temperature_C=1700.0),
-        )
+        ), train
 
     custom_vapor_pressures = {
         "metals": {
@@ -686,24 +695,134 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
     }
     custom_vapor_pressures["metals"]["Ca"]["pure_component_antoine"]["A"] += 8.0
 
-    default_route = route_calcium()
-    custom_route = route_calcium(custom_vapor_pressures)
+    default_route, default_train = route_calcium()
+    custom_route, custom_train = route_calcium(custom_vapor_pressures)
 
-    default_stage4 = default_route.condensed_by_stage_species[
-        "stage_4_alkali_mg_cyclone"]["Ca"]
-    custom_stage4 = custom_route.condensed_by_stage_species.get(
-        "stage_4_alkali_mg_cyclone", {}).get("Ca", 0.0)
-    # Raising the owning wall saturation curve reduces supersaturation.
-    assert custom_stage4 < default_stage4
-
-    with pytest.raises(condensation_module.WallSaturationPressureRefusal) as default:
-        condensation_module._antoine_psat_pa("SiO", 1700.0)
-    with pytest.raises(condensation_module.WallSaturationPressureRefusal) as fallback:
-        condensation_module._antoine_psat_pa(
-            "SiO", 1700.0, vapor_pressure_data=custom_vapor_pressures,
+    def _stage4_ca(route):
+        return (
+            route.condensed_by_stage_species.get(
+                "stage_4_alkali_mg_cyclone", {},
+            ).get("Ca", 0.0)
+            + route.condensed_by_stage_species.get(
+                "stage_4b_k_trap", {},
+            ).get("Ca", 0.0)
         )
-    assert fallback.value.reason == default.value.reason
-    assert fallback.value.valid_range_K == default.value.valid_range_K
+
+    default_stage4 = _stage4_ca(default_route)
+    custom_stage4 = _stage4_ca(custom_route)
+    # Public stage 4 sums two visits. pure_component_antoine.A is the
+    # collector curve (sub_order 0, band set above). The K trap is a
+    # second visit at the same stage number, and it selects the low-T
+    # compatibility Antoine, which this A += 8 edit does not touch.
+    # Premise: one reversible wall captures at most
+    # f_eq = 1 - P_sat(T_wall)/p_in of the stream that reaches it.
+    # The trap band is isothermal, so that is its whole ceiling. The
+    # compatibility form is log10(P/Pa) = 11.238 - 9520/T (C = 0).
+    # Algebra at the shipped 40 C wall: T = 40 + 273.15 = 313.15 K,
+    # 9520/313.15 = 30.400766, log10(P/Pa) = 11.238 - 30.400766
+    # = -19.162766, P_sat = 6.874e-20 Pa. The configured inlet is
+    # 1 mbar = 100 Pa, so P_sat/p_in = 6.874e-22. The collector leaves
+    # only a few percent of the feed, and the trap's local partial is
+    # that fraction of 100 Pa. Even at 0.3 Pa, P_sat/p_local is
+    # ~2e-19. Unit check: B*R*ln(10) = 182.26 kJ/mol, the Ca note
+    # dH_vap ~ 182.3 kJ/mol, and P_sat/p_in is dimensionless.
+    # float64 ulp(1) is 2.22e-16; both ratios sit below ulp(1)/2, so
+    # f_eq rounds to 1. Limiting case: a wall far below Ca's 1484 C
+    # boil has P_sat/p_in -> 0 and f_eq -> 1, the whole stream. The
+    # trap therefore takes whatever the collector left, and both
+    # stage-number totals equal the inlet. The collector visit is
+    # warmer, so its ceiling is below 1 and still falls when that A
+    # rises; that visit is the wiring check.
+    inlet_kg_hr = 1.0
+    p_in_pa = 1.0 * PA_PER_MBAR
+    collector = default_train.stages[4]
+    assert collector.sub_order == 0
+    trap = next(
+        stage
+        for stage in default_train.stages
+        if stage.stage_number == collector.stage_number
+        and stage.sub_order == K_TRAP_SUB_ORDER
+    )
+    assert trap.temp_range_C == next(
+        stage.temp_range_C
+        for stage in custom_train.stages
+        if stage.stage_number == collector.stage_number
+        and stage.sub_order == K_TRAP_SUB_ORDER
+    )
+    lo_c, hi_c = trap.temp_range_C
+    assert lo_c == hi_c
+    t_wall_k = lo_c + CELSIUS_TO_KELVIN_OFFSET
+
+    def trap_ceiling(vapor_pressure_data):
+        p_sat_pa = condensation_module._antoine_psat_pa(
+            "Ca",
+            t_wall_k,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        return 1.0 - p_sat_pa / p_in_pa
+
+    default_ceiling = trap_ceiling(None)
+    custom_ceiling = trap_ceiling(custom_vapor_pressures)
+    # The 40 C wall still has f_eq = 1 for Ca: P_sat is far below the
+    # inlet partial. This test's area is 1 m^2 on the stage-number key,
+    # so the cartridge heat NTU is about 10^3. The production e-NTU then
+    # sits on its NTU -> infinity limit and takes the supply that reaches
+    # the visit. The booked kilograms are that eta, not a second ceiling.
+    assert default_ceiling == 1.0
+    assert custom_ceiling == 1.0
+    trap_identity = (trap.stage_number, trap.sub_order)
+    collector_identity = (collector.stage_number, collector.sub_order)
+    for route in (default_route, custom_route):
+        detail = route.cartridge_capture_by_species['Ca']
+        assert detail['f_eq'] == pytest.approx(
+            condensation_module.equilibrium_capture_fraction(
+                detail['p_sat_pa'], detail['p_local_pa'],
+            )
+        )
+        assert detail['f_eq'] == pytest.approx(1.0)
+        assert detail['eta_vapour'] == pytest.approx(
+            condensation_module.vapour_entu_capture_fraction(
+                detail['f_eq'], detail['ntu_mass'],
+            )
+        )
+        assert detail['eta'] == pytest.approx(detail['eta_vapour'])
+        assert detail['ntu_mass'] > 40.0
+        trap_kg = route.capture_kg_by_stage_identity[trap_identity]['Ca']
+        assert trap_kg == pytest.approx(detail['supply_kg_hr'] * detail['eta'])
+        assert trap_kg == pytest.approx(detail['supply_kg_hr'])
+    assert default_stage4 == pytest.approx(
+        default_route.capture_kg_by_stage_identity[collector_identity]['Ca']
+        + default_route.capture_kg_by_stage_identity[trap_identity]['Ca']
+    )
+    assert custom_stage4 == pytest.approx(
+        custom_route.capture_kg_by_stage_identity[collector_identity]['Ca']
+        + custom_route.capture_kg_by_stage_identity[trap_identity]['Ca']
+    )
+    assert default_stage4 == pytest.approx(inlet_kg_hr)
+    assert custom_stage4 == pytest.approx(inlet_kg_hr)
+    default_collector = default_route.capture_kg_by_stage_identity[
+        collector_identity
+    ]["Ca"]
+    custom_collector = custom_route.capture_kg_by_stage_identity[
+        collector_identity
+    ]["Ca"]
+    assert custom_collector < default_collector
+
+    default_psat = condensation_module._antoine_psat_pa("SiO", 1700.0)
+    fallback_psat = condensation_module._antoine_psat_pa(
+        "SiO", 1700.0, vapor_pressure_data=custom_vapor_pressures,
+    )
+    # SiO is absent from the custom row, so both calls use the same global
+    # pO2-free wall equilibrium (d-402), independent of the Ca source fit.
+    assert fallback_psat == pytest.approx(default_psat)
+    assert default_psat is not None and default_psat > 0.0
+    diagnostic = {}
+    condensation_module._wall_deposition_driving_pressure_pa(
+        "SiO", 100.0, 1700.0, diagnostic_out=diagnostic,
+    )
+    assert diagnostic["wall_saturation_pressure_notice"]["reason"] == (
+        "wall_pO2_unknown_pO2_free_route_used"
+    )
 
 
 def test_partial_custom_antoine_block_falls_back_to_global_coefficients():
@@ -940,7 +1059,7 @@ def test_default_collector_band_contract_at_startup_reset_and_lazy_init():
 
     setpoints = load_config_bundle().setpoints
     expected = (
-        (1400, 1600), (1150, 1150), (1100, 1300), (900, 1200),
+        (1400, 1600), (1100, 1100), (1100, 1300), (900, 1200),
         (250, 250), (200, 350), (50, 200), (20, 50),
         (40, 40),
     )
@@ -1037,8 +1156,8 @@ def test_yaml_only_collector_band_reaches_all_consumers(
         assert model.train.stages[4].temp_range_C == band
         for calls in seen.values():
             calls.clear()
-        # K is isolated off the Na collector, and the band spy only records
-        # sub_order 0. Na is what still walks stage 4's capture law.
+        # The band spy records sub_order 0 only. Na and K both walk that
+        # collector. The trap is a later visit and is not this band.
         model.configure_operating_conditions(
             overhead_pressure_mbar=2.0,
             species_partial_pressures_mbar={'K': 1.0, 'Na': 1.0},

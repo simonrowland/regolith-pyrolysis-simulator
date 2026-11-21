@@ -11,6 +11,7 @@ from simulator.condensation import CondensationModel
 from simulator.condensation_routing import stage_key_for_stage
 from simulator.recipe_io import load_recipe_patch
 from simulator.runner import PyrolysisRun
+from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from tests.chemistry.conftest import full_builtin_provider_run
 
 
@@ -25,7 +26,7 @@ def route_totals(monkeypatch):
                   **{str(stage): 0.0 for stage in range(8)}}
         for species in SPECIES
     }
-    original = CondensationModel._route
+    original = CondensationModel.route
 
     def measure(model, flux, melt):
         result = original(model, flux, melt)
@@ -47,8 +48,40 @@ def route_totals(monkeypatch):
                 row[str(stage_number)] += captures.get(species, 0.0)
         return result
 
-    monkeypatch.setattr(CondensationModel, "_route", measure)
+    monkeypatch.setattr(CondensationModel, "route", measure)
     return totals
+
+
+def test_route_totals_measure_only_returned_allocation(route_totals):
+    model = CondensationModel(CondensationTrain(stages=[]))
+    model.train.collection_route["stage3_route"] = "through"
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={"Na": 0.5, "SiO": 0.5},
+        stage_area_m2_by_stage={str(stage): 1.0 for stage in range(8)},
+    )
+
+    refused_flux = EvaporationFlux({"Na": 0.02, "SiO": 0.05})
+    bypass_result = model.route(refused_flux, MeltState())
+
+    assert model.last_stage3_route_diagnostic["event"] == "stage3_opening_refused"
+    assert bypass_result.remaining_by_species["Na"] == pytest.approx(0.02)
+    assert bypass_result.remaining_by_species["SiO"] == pytest.approx(0.05)
+    assert route_totals["Na"]["inlet"] == pytest.approx(0.02)
+    assert route_totals["Na"]["terminal"] == pytest.approx(0.02)
+    assert route_totals["SiO"]["inlet"] == pytest.approx(0.05)
+    assert route_totals["SiO"]["terminal"] == pytest.approx(0.05)
+
+    model.train.collection_route["stage3_route"] = "through"
+    passed_result = model.route(EvaporationFlux({"SiO": 0.03}), MeltState())
+
+    assert passed_result.remaining_by_species["SiO"] == pytest.approx(0.03)
+    # With no stages, all input remains terminal: Na 0.02 + 0 = 0.02 kg/h;
+    # SiO 0.05 from the refused parcel + 0.03 from the admitted parcel = 0.08 kg/h.
+    assert route_totals["Na"]["inlet"] == pytest.approx(0.02)
+    assert route_totals["Na"]["terminal"] == pytest.approx(0.02)
+    assert route_totals["SiO"]["inlet"] == pytest.approx(0.08)
+    assert route_totals["SiO"]["terminal"] == pytest.approx(0.08)
 
 
 def assert_pin(name, actual, tmp_path, runner_output=None):
@@ -99,14 +132,26 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
                 authoritative[intent] = slots["authoritative"]
         assert active == authoritative
         assert active
-        # Assert the emitted provider maps above, but keep their host-specific
-        # registrations out of this digest; every other result field remains.
-        digest_payload = _runner_digest_payload(runner_output)
+        # Engine registration maps and engine_version strings are excluded
+        # because host-specific registrations and builds are not run results.
+        digest_payload, engine_version_count = _runner_digest_payload(runner_output)
+        assert engine_version_count >= 1
         digest_serialized = json.dumps(digest_payload, sort_keys=True)
         actual["runner_sha256"] = hashlib.sha256(
             digest_serialized.encode()
         ).hexdigest()
         print(f"T1217_RUNNER_SHA256 {name} {actual['runner_sha256']}")
+    # lunar_24h and c2a_staged are the executable route on this tree.
+    # The previous numbers predate the Stage-1 plate already in
+    # 0a361d54c (0.2828 m2, wall 1100 C). On lunar C0, Mars C2A, and CI,
+    # Stage-1 Fe is identical to that parent: stage 0 has no capture
+    # area, so the Stage-1 film is still the train gas temperature.
+    # t-1626 cools the gas for the later stages, their capture falls,
+    # and the terminal rises by that mass. t-1604 remains D_AB at
+    # T_film = (T_gas,in + T_wall) / 2, with T_gas,in now this stage's
+    # bulk inlet. b1113 remains the removal of the designated-species
+    # skip. Inlets are unchanged. full_lunar is still the t-1604
+    # measurement and was not re-run.
     expected = json.loads(PINS.read_text())[name]
     # Collect every species before failing: stopping at the first mismatch
     # hid stale Cr/SiO pins behind an Fe miss through two repins.
@@ -131,9 +176,9 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
 
 
 def _runner_digest_payload(runner_output):
-    # active and registry are projections of capability registrations, which
-    # vary with each host's engine configuration; requested and all other
-    # metadata remain in the hash so unrelated result changes still fail it.
+    # The active/registry maps and engine_version strings describe host-local
+    # registrations/builds, not run results, so exclude both from this digest.
+    # Requested registrations and the rest of the runner output remain hashed.
     payload = dict(runner_output)
     metadata = dict(payload["run_metadata"])
     engines_used = dict(metadata["engines_used"])
@@ -141,25 +186,31 @@ def _runner_digest_payload(runner_output):
     del engines_used["registry"]
     metadata["engines_used"] = engines_used
     payload["run_metadata"] = metadata
-    # engine_version strings carry the local engine binary's build digest
-    # (e.g. MAGEMin 1.9.6 built separately on the laptop and on studio-3), so
-    # they are host provenance, not results. A laptop-vs-studio-3 field diff of
-    # the full runner result found them to be the only remaining difference.
     return _without_engine_versions(payload)
 
 
 def _without_engine_versions(value):
     if isinstance(value, dict):
         stripped = {}
+        count = 0
         for key, item in value.items():
             if key == "engine_version":
                 assert isinstance(item, str) and item.strip()
+                count += 1
                 continue
-            stripped[key] = _without_engine_versions(item)
-        return stripped
+            stripped_item, nested_count = _without_engine_versions(item)
+            stripped[key] = stripped_item
+            count += nested_count
+        return stripped, count
     if isinstance(value, list):
-        return [_without_engine_versions(item) for item in value]
-    return value
+        stripped = []
+        count = 0
+        for item in value:
+            stripped_item, nested_count = _without_engine_versions(item)
+            stripped.append(stripped_item)
+            count += nested_count
+        return stripped, count
+    return value, 0
 
 
 @pytest.mark.nightly

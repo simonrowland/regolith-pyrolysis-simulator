@@ -2,6 +2,7 @@ campaigns:
   C2A_staged:
     stages:
     - name: alkali_early_fe
+      stage3_route: divert
       target_C: 1250
       ramp_rate_C_per_hr: 600
       duration_h: 4
@@ -24,6 +25,7 @@ campaigns:
           Fe: 0.0
           SiO: 0.0
     - name: sio_window
+      stage3_route: through
       target_C: 1600
       ramp_rate_C_per_hr: 175
       duration_h: 3
@@ -45,6 +47,7 @@ campaigns:
 
           '
     - name: fe_hot_hold
+      stage3_route: divert
       ramp_rate_C_per_hr: 150
       duration_h: 1
       target_species:
@@ -65,6 +68,7 @@ campaigns:
           FeO_residual: 20.3
           thermal_Fe_pct: 88.0
     - name: cool_for_na_shuttle
+      stage3_route: divert
       target_C: 1150
       ramp_rate_C_per_hr: 600
       duration_h: 1

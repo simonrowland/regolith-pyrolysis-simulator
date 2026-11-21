@@ -1,5 +1,6 @@
 import math
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -343,6 +344,67 @@ def test_c2a_knudsen_pressure_floor_recovers_stranded_setpoint():
         adjustment["controlling_characteristic_length_m"],
     )
     assert applied_kn < condensation_module.FREE_MOLECULAR_KNUDSEN_MIN
+
+
+def test_c2a_staged_knudsen_floor_updates_stage_and_sso_evidence():
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
+    sim.melt.p_total_mbar = 1.0e-6
+    sim.melt.pO2_mbar = 0.0
+    sim.melt.temperature_C = 1600.0
+    sim.melt.background_gas_species = "N2"
+    sim.melt.background_gas_mole_fraction = 1.0
+    sim._condensation_model = CondensationModel(
+        CondensationTrain.create_default()
+    )
+    sim.overhead = SimpleNamespace(
+        composition={"N2": 1.0e-6},
+        pressure_mbar=1.0e-6,
+        pipe_diameter_m=0.12,
+    )
+    sim._overhead_model = sim.overhead
+    sim.campaign_mgr = SimpleNamespace(
+        last_c2a_staged_gas_control={
+            "stage_name": "sio_window",
+            "gas_cover_mode": "pn2_sweep",
+            "atmosphere": "PN2_SWEEP",
+            "pO2_mbar": 0.0,
+            "pN2_mbar": 1.0e-6,
+            "p_total_mbar": 1.0e-6,
+            "requested_p_total_mbar": 1.0e-6,
+            "pn2_band_action": "honored_outside_band",
+            "pn2_band_notice": {
+                "type": "c2a_staged_pn2_outside_engineering_band",
+                "reason": "requested_pN2_outside_engineering_band",
+                "authority_level": "extrapolated",
+                "requested_p_total_mbar": 1.0e-6,
+                "requested_pN2_mbar": 1.0e-6,
+                "certified_band": {"pN2_mbar": [5.0, 15.0]},
+            },
+        }
+    )
+
+    PyrolysisSimulator._apply_c2a_knudsen_pressure_adjustment(sim)
+
+    raw = sim.campaign_mgr.last_c2a_staged_gas_control
+    assert raw["pn2_band_action"] == "adjusted_by_knudsen_pressure_floor"
+    assert sim.melt.p_total_mbar == pytest.approx(5.0)
+    assert raw["pN2_mbar"] == pytest.approx(5.0)
+    assert raw["p_total_mbar"] == pytest.approx(5.0)
+    assert raw["knudsen_pressure_adjustment"]["reason"] == (
+        "c2a_knudsen_pressure_floor"
+    )
+
+    from simulator.optimize.sso2_evidence import _stage_gas_payload_from_raw
+
+    evidence = _stage_gas_payload_from_raw(raw, snapshot=SimpleNamespace(hour=1))
+    assert evidence["pn2_band_action"] == (
+        "adjusted_by_knudsen_pressure_floor"
+    )
+    assert evidence["pN2_mbar"] == pytest.approx(5.0)
+    assert evidence["p_total_mbar"] == pytest.approx(5.0)
+    assert evidence["requested_p_total_mbar"] == pytest.approx(1.0e-6)
+    assert evidence["pn2_band_notice"] == raw["pn2_band_notice"]
 
 
 def test_c2a_knudsen_pressure_floor_uses_continuous_transport_for_empty_band():

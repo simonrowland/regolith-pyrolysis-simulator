@@ -81,8 +81,10 @@ def test_nio_mre_rung_is_phase_correct_graph_authority() -> None:
     assert liquid_reference is not None
     assert solid_reference.authority == "ellingham_graph"
     assert liquid_reference.authority == "ellingham_graph"
-    assert solid_reference.authoritative is True
-    assert liquid_reference.authoritative is True
+    assert solid_reference.authoritative is False
+    assert "unresolved_standard_state" in solid_reference.status
+    assert liquid_reference.authoritative is False
+    assert "unresolved_standard_state" in liquid_reference.status
     assert "Ni(s)" in (solid_reference.ellingham_phase_basis or "")
     assert "Ni(l)" in (liquid_reference.ellingham_phase_basis or "")
     assert liquid_reference.voltage == pytest.approx(0.386419, abs=1e-6)
@@ -544,8 +546,6 @@ def test_mn_liquid_anchor_is_not_the_one_bar_shomate() -> None:
 @pytest.mark.parametrize(
     ("species", "temperature_K", "expected_pa", "rel_tol"),
     [
-        # NIST Chemistry WebBook SRD 69, sodium Antoine row, Rodebush and Walters 1930.
-        ("Na", 1118.0, 61_691.685390, 1e-6),
         # NIST Chemistry WebBook SRD 69, potassium Antoine row, Fiock and Rodebush 1926.
         ("K", 1033.0, 104_572.576518, 1e-6),
         # NIST Chemistry WebBook SRD 69, calcium Antoine row, Hartmann and Schneider 1929.
@@ -925,9 +925,8 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
             assert "pure_component_first_principles" not in label
             assert "extrapolated_beyond_source" in label
 
-    # t-383: Na joins K on standard_reaction_term for the runtime selector.
-    # NIST Rodebush pure-component sidecar stays wall-only (wall_condensation
-    # / pure_component_antoine point tests); runtime coefficient block is antoine.
+    # t-383: Na joins K on standard_reaction_term for the melt selector.
+    # Pure-Na saturation is the Browning-Potter owner, not that reaction term.
     na_metal = data["metals"]["Na"]
     _, na_block = vapor_pressure_antoine_coefficients(na_metal, 1429.0)
     assert na_block == "antoine"
@@ -940,18 +939,14 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
         )
         == "builtin_fallback:standard_reaction_term"
     )
-    # Pure-component provenance tier still honest when the sidecar is selected.
-    from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients
+    from engines.builtin.sodium_saturation import sodium_saturation_pressure
 
-    _, na_pure_block = wall_condensation_antoine_coefficients(na_metal, 1118.0)
-    assert na_pure_block == "pure_component_antoine"
-    na_pure_label = vapor_pressure_source_label(
-        "builtin_fallback",
-        na_metal,
-        coefficient_block=na_pure_block,
-        temperature_K=1118.0,
+    na_saturation = sodium_saturation_pressure(
+        na_metal["pure_component_saturation"], 1118.0
     )
-    assert "pure_component_source_equation_fit" in na_pure_label
+    assert na_saturation.authority == "certified"
+    assert na_saturation.phase == "liquid"
+    assert "pure_component_antoine" not in na_metal
 
     k_metal = data["metals"]["K"]
     _, k_block = vapor_pressure_antoine_coefficients(k_metal, 1429.0)
@@ -983,9 +978,11 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
         assert "pure_component_unspecified" not in label
         assert "pure_component_first_principles" not in label
 
-    # t-383: runtime selector returns standard_reaction antoine for Na; force the
-    # pure-component sidecar block to exercise the unspecified-tier path.
-    unannotated = copy.deepcopy(data["metals"]["Na"])
+    # The unspecified tier is the label function when a grounded pure-component
+    # sidecar has no provenance class. Sodium's sidecar is retired, so this
+    # uses potassium's NIST row and strips its tier annotation. 900 K is inside
+    # that row's 679.4-1033 K band.
+    unannotated = copy.deepcopy(data["metals"]["K"])
     unannotated["pure_component_antoine"].pop("provenance_class", None)
     unannotated["pure_component_antoine"].pop("source_certification", None)
     unannotated_block = "pure_component_antoine"
@@ -993,7 +990,7 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
         "builtin_fallback",
         unannotated,
         coefficient_block=unannotated_block,
-        temperature_K=1118.0,
+        temperature_K=900.0,
     )
     assert unannotated_label == "builtin_fallback:pure_component_unspecified"
     assert "pure_component_first_principles" not in unannotated_label
@@ -1053,8 +1050,8 @@ def test_molar_mass_ledger_derives_from_canonical_atomic_weight_table() -> None:
 @pytest.mark.parametrize(
     ("reductant", "target", "expected_c", "abs_tol_c"),
     [
-        # NIST-JANAF high-T oxide refit: Na2O/FeO crossover cited by Mandate.
-        ("Na", "Fe", 1181.5, 1.0),
+        # JANAF Na-013 liquid rows, regrounded in b-959, cross Fe-020 near 1184 C.
+        ("Na", "Fe", 1184.0, 1.0),
         # NIST-JANAF high-T oxide refit: K2O/FeO crossover cited by Mandate.
         ("K", "Fe", 836.25, 1.0),
     ],
@@ -1069,6 +1066,20 @@ def test_janaf_alkali_fe_ellingham_crossovers_match_literature_window(
         reductant,
         target,
     ) == pytest.approx(expected_c, abs=abs_tol_c)
+
+
+def test_na_feo_crossover_annotation_matches_computed_root() -> None:
+    # The recipe note is not a control. It must stay on the root the shuttle
+    # gate actually computes, inside the 1184 +/- 1 C JANAF window above.
+    computed = BuiltinMetallothermicStepProvider._crossover_temperature_C(
+        "Na", "Fe",
+    )
+    assert computed == pytest.approx(1184.0, abs=1.0)
+    setpoints = yaml.safe_load((DATA_DIR / "setpoints.yaml").read_text())
+    annotated = setpoints["campaigns"]["C2A_staged"]["na_shuttle_stage"][
+        "JANAF_4th_multiphase_margin_kJ_per_mol_O2"
+    ]["Na_FeO_crossover_C"]
+    assert annotated == computed
 
 
 def test_janaf_alkali_fe_reduction_margin_changes_sign_at_crossover() -> None:

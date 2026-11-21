@@ -145,6 +145,85 @@ def _assert_hourly_payload_slope_is_bounded(
     )
 
 
+def _positive_evaporating_species(tick: dict) -> frozenset[str]:
+    raw = tick.get("evap_species")
+    if not isinstance(raw, dict):
+        return frozenset()
+    return frozenset(
+        str(species)
+        for species, rate in raw.items()
+        if not isinstance(rate, bool)
+        and isinstance(rate, (int, float))
+        and float(rate) > 0.0
+    )
+
+
+def _evaporation_onset_hour(ticks: list[dict]) -> int | None:
+    """First hour any new species starts evaporating in this campaign.
+
+    A published rate that is not positive is not evaporating. The hour is
+    that physical trigger, compared with every earlier hour.
+    """
+
+    seen: set[str] = set()
+    for tick in sorted(ticks, key=lambda item: int(item["hour"])):
+        positive = _positive_evaporating_species(tick)
+        if positive - seen:
+            return int(tick["hour"])
+        seen.update(positive)
+    return None
+
+
+def _campaign_post_onset_steady_window(
+    tick_payloads: list[dict],
+) -> tuple[str, list[tuple[int, int]], list[tuple[int, int]]] | None:
+    """Longest steady window strictly after evaporation onset.
+
+    The campaign's first and last ticks carry entry and exit content, so
+    they stay out of the steady window. The slope uses only steady hours
+    after the onset hour. The full steady window is what the span check
+    still sees, onset step included.
+    """
+
+    by_campaign: dict[str, list[dict]] = {}
+    for tick in tick_payloads:
+        campaign = tick.get("campaign")
+        if isinstance(campaign, str) and campaign:
+            by_campaign.setdefault(campaign, []).append(tick)
+    best: tuple[str, list[tuple[int, int]], list[tuple[int, int]]] | None = None
+    for campaign, ticks in by_campaign.items():
+        ordered = sorted(ticks, key=lambda item: int(item["hour"]))
+        if len(ordered) < 5:
+            continue
+        steady_samples = [
+            (int(tick["hour"]), _nbytes(tick)) for tick in ordered[1:-1]
+        ]
+        onset = _evaporation_onset_hour(ordered)
+        if onset is None:
+            post_onset = list(steady_samples)
+        else:
+            post_onset = [
+                sample for sample in steady_samples if sample[0] > onset
+            ]
+        if best is None or len(post_onset) > len(best[1]):
+            best = (campaign, post_onset, steady_samples)
+    return best
+
+
+def _tick_slope_window_ready(tick_payloads: list[dict]) -> bool:
+    # Twelve ticks keep the per_hour_summary slope's first-twelve slice.
+    # Three post-onset steady hours are the tick slope's own sample floor.
+    window = _campaign_post_onset_steady_window(tick_payloads)
+    return (
+        window is not None
+        and len(window[1]) >= 3
+        and len(tick_payloads) >= 12
+    )
+
+
+_TICK_SLOPE_COLLECTION_CAP = 30
+
+
 def test_hourly_payload_gate_rejects_linear_1000_bytes_per_hour() -> None:
     with pytest.raises(AssertionError, match="grew 1000.0 bytes/hour"):
         _assert_hourly_payload_slope_is_bounded(
@@ -406,11 +485,10 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         if event == "per_hour_summary" and isinstance(payload, dict):
             sid = kwargs.get("room")
             state = _simulations.get(sid)
-            summary_count = sum(
-                1 for name, _hour, _size, _serialized in wire_samples
-                if name == "per_hour_summary"
-            )
-            if summary_count >= 12 and state is not None:
+            if state is not None and (
+                _tick_slope_window_ready(tick_payloads)
+                or len(tick_payloads) >= _TICK_SLOPE_COLLECTION_CAP
+            ):
                 state["running"] = False
         return original_emit(event, payload, *args, **kwargs)
 
@@ -436,7 +514,11 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             },
         )
         rounds = 0
-        while len(tick_payloads) < 12 and rounds < 40:
+        while (
+            not _tick_slope_window_ready(tick_payloads)
+            and len(tick_payloads) < _TICK_SLOPE_COLLECTION_CAP
+            and rounds < 40
+        ):
             rounds += 1
             if not captured_tasks:
                 break
@@ -460,36 +542,32 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         _assert_hourly_payload_slope_is_bounded(
             "per_hour_summary", summary_hourly[4:12]
         )
-        tick_samples_by_campaign: dict[str, list[tuple[int, int]]] = {}
+        # A d-252 campaign transition changes per-hour content by design.
+        # Each campaign's first and last ticks carry entry/exit content.
+        # Evaporation onset is also one real step: the first hour any new
+        # species starts evaporating. The slope is the steady hours after
+        # that hour. The span check still sees the full steady window.
         for tick in tick_payloads:
             campaign = tick.get("campaign")
             assert isinstance(campaign, str) and campaign
-            tick_samples_by_campaign.setdefault(campaign, []).append(
-                (int(tick["hour"]), _nbytes(tick))
-            )
-        # A d-252 campaign transition changes per-hour content by design.
-        # Each campaign's first and last ticks carry entry/exit content, so
-        # omit those one-off transition hours and compare steady hours for
-        # accumulation. Campaign labels come from each tick payload.
-        steady_samples_by_campaign = {
-            campaign: sorted(samples)[1:-1]
-            for campaign, samples in tick_samples_by_campaign.items()
-            if len(samples) >= 5
-        }
-        stable_campaign, stable_campaign_samples = max(
-            steady_samples_by_campaign.items(), key=lambda item: len(item[1])
+        window = _campaign_post_onset_steady_window(tick_payloads)
+        assert window is not None, [
+            (tick.get("campaign"), tick.get("hour")) for tick in tick_payloads
+        ]
+        stable_campaign, post_onset_samples, steady_samples = window
+        assert len(post_onset_samples) >= 3, (
+            stable_campaign,
+            post_onset_samples,
+            steady_samples,
         )
-        assert len(stable_campaign_samples) >= 3, tick_samples_by_campaign
         _assert_hourly_payload_slope_is_bounded(
             f"simulation_tick[{stable_campaign}]",
-            stable_campaign_samples[:4],
+            post_onset_samples,
         )
-        stable_campaign_sizes = [
-            size for _hour, size in stable_campaign_samples
-        ]
-        assert max(stable_campaign_sizes) - min(stable_campaign_sizes) <= 1024, (
+        steady_sizes = [size for _hour, size in steady_samples]
+        assert max(steady_sizes) - min(steady_sizes) <= 1024, (
             stable_campaign,
-            stable_campaign_samples,
+            steady_samples,
         )
         assert all(
             '"padding"' not in serialized
@@ -695,3 +773,69 @@ def test_hourly_payload_gate_still_allows_flat_jitter() -> None:
         "flat-jitter",
         [(1, 46_000), (2, 46_002), (3, 45_998), (4, 46_001), (5, 45_999), (6, 46_000)],
     )
+
+
+def test_payload_slope_past_evaporation_onset_still_rejects_appended_growth() -> None:
+    """Onset is one step. A list that grows on every later tick still fails.
+
+    The species-start hour is a fixture. The slope window is the hour the
+    helper reads off the payloads, and the mutation is an appended blob.
+    """
+
+    species_starts = {"SiO": 4}
+    ticks = []
+    for hour in range(1, 10):
+        tick = {
+            "hour": hour,
+            "campaign": "probe",
+            "evap_species": {
+                name: 1.0
+                for name, start in species_starts.items()
+                if hour >= start
+            },
+            "body": "flat",
+        }
+        if hour == min(species_starts.values()):
+            tick["onset_step"] = "S" * 5000
+        ticks.append(tick)
+    onset = _evaporation_onset_hour(ticks)
+    assert onset == min(
+        int(tick["hour"])
+        for tick in ticks
+        if _positive_evaporating_species(tick)
+    )
+    past_onset = [
+        (int(tick["hour"]), _nbytes(tick))
+        for tick in ticks
+        if int(tick["hour"]) > onset
+    ]
+    _assert_hourly_payload_slope_is_bounded("evaporation-onset", past_onset)
+    including_onset = [
+        (int(tick["hour"]), _nbytes(tick))
+        for tick in ticks
+        if int(tick["hour"]) >= onset
+    ]
+    with pytest.raises(AssertionError, match="grew"):
+        _assert_hourly_payload_slope_is_bounded(
+            "onset-included",
+            including_onset,
+        )
+
+    mutated = []
+    appended: list[str] = []
+    for tick in ticks:
+        appended.append("m" * 200)
+        cloned = dict(tick)
+        cloned["mutation"] = list(appended)
+        mutated.append(cloned)
+    mutated_onset = _evaporation_onset_hour(mutated)
+    mutated_past = [
+        (int(tick["hour"]), _nbytes(tick))
+        for tick in mutated
+        if int(tick["hour"]) > mutated_onset
+    ]
+    with pytest.raises(AssertionError, match="grew"):
+        _assert_hourly_payload_slope_is_bounded(
+            "appended-mutation",
+            mutated_past,
+        )

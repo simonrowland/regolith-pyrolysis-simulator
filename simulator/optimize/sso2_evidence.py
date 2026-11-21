@@ -490,12 +490,9 @@ def _unmeasured_alpha_fallback_notice(sim: Any) -> dict[str, Any]:
         if is_sso_scoped
         else set()
     )
-    unexpected = engaged_species - permitted
-    if unexpected:
-        raise RuntimeError(
-            "SSO-2 unmeasured-alpha fallback escaped its trace-species scope: "
-            + ", ".join(sorted(unexpected))
-        )
+    # Prediction is now unconditional for every unmeasured species. This
+    # SSO-2 notice reports its trace subset; the run records all alpha flags.
+    engaged_species.intersection_update(permitted)
     degraded = dict(
         getattr(sim, "_degraded_path_engagement_summary", lambda: {})() or {}
     )
@@ -510,7 +507,7 @@ def _unmeasured_alpha_fallback_notice(sim: Any) -> dict[str, Any]:
     return {
         "severity": "warning",
         "status": "engaged" if total_count > 0 else "not_engaged",
-        "policy": "alpha=1.0 prototype fallback",
+        "policy": "proxy/bridge or alpha=1 upper bound",
         "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
         "permitted_species": sorted(permitted),
         "engaged_species": sorted(engaged_species),
@@ -869,6 +866,9 @@ def _stage_gas_payload_from_raw(
     for key in ("stage_name", "gas_cover_mode", "atmosphere", "pn2_band_action"):
         if raw.get(key) is not None:
             payload[key] = str(raw.get(key))
+    band_notice = raw.get("pn2_band_notice")
+    if isinstance(band_notice, Mapping):
+        payload["pn2_band_notice"] = dict(band_notice)
     for key in (
         "pO2_mbar",
         "pN2_mbar",
