@@ -20,12 +20,15 @@ from simulator.runner import _load_preset_run_spec
 from simulator.state import CampaignPhase, MeltState
 from simulator.thermal_budget import (
     FURNACE_POWER_DRIVER_KEY,
+    SOLAR_ABSORPTANCE_DEFAULT,
+    WINDOW_TRANSMITTANCE_UPPER_BOUND,
     PowerTemperatureRefusal,
     furnace_power_driver_payload,
     measured_furnace_power_trace,
     melt_temperature_from_furnace_power,
     reported_temperature_observations,
     sample_furnace_power_W,
+    solve_power_driven_melt_temperature_C,
 )
 
 
@@ -102,6 +105,10 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert driver["mass_kg"] == pytest.approx(0.00338)
     assert driver["exposed_area_m2"] is None
     assert driver["emissivity"] is None
+    assert driver["pellet_diameter_m"] == pytest.approx(0.013)
+    assert driver["focal_spot_diameter_m"] == pytest.approx(0.020)
+    assert driver["solar_absorptance"] is None
+    assert driver["window_transmittance"] is None
     watts = _trace_watts_by_minute(driver["trace"])
 
     rows = _series(schedule)
@@ -116,7 +123,17 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert temperatures[29] > 2500.0
 
     target, ramp, record, previous = rows[0]
-    assert record["power_W"] == pytest.approx(watts[1.0])
+    # Eq. (6) watts are the focal spot. The pellet takes the uniform-disk
+    # intercept 0.4225, the Gaier midpoint, and the unprinted window at 1.
+    assert record["focal_power_W"] == pytest.approx(watts[1.0])
+    assert record["intercept"] == pytest.approx(0.4225)
+    assert record["solar_absorptance"] == pytest.approx(SOLAR_ABSORPTANCE_DEFAULT)
+    assert record["window_transmittance"] == pytest.approx(
+        WINDOW_TRANSMITTANCE_UPPER_BOUND
+    )
+    assert record["power_W"] == pytest.approx(
+        watts[1.0] * 0.4225 * SOLAR_ABSORPTANCE_DEFAULT
+    )
     assert record["time_s"] == pytest.approx(60.0)
     assert record["role"] == "prediction"
     assert record["source_class"] == "engine_prediction"
@@ -128,21 +145,33 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert record["emissivity"] == pytest.approx(EquipmentDesigner.MELT_EMISSIVITY)
     assert ramp == pytest.approx(abs(target - previous))
     knobs = {notice["knob"]: notice for notice in record["notices"]}
-    assert set(knobs) == {"melt_radiative_area_m2", "melt_emissivity"}
+    assert set(knobs) == {
+        "melt_radiative_area_m2",
+        "melt_emissivity",
+        "solar_absorptance",
+        "window_transmittance",
+    }
     assert knobs["melt_radiative_area_m2"]["kind"] == "knob_defaulted"
     assert knobs["melt_emissivity"]["kind"] == "knob_defaulted"
+    assert knobs["solar_absorptance"]["kind"] == "knob_defaulted"
+    assert knobs["window_transmittance"]["kind"] == "typed_unknown"
+    assert knobs["window_transmittance"]["bound"] == "upper"
     assert knobs["melt_radiative_area_m2"]["unit"] == "m2"
     assert knobs["melt_emissivity"]["unit"] == "1"
     assert knobs["melt_emissivity"]["value"] == pytest.approx(
         EquipmentDesigner.MELT_EMISSIVITY
     )
+    assert knobs["solar_absorptance"]["value"] == pytest.approx(
+        SOLAR_ABSORPTANCE_DEFAULT
+    )
+    assert knobs["solar_absorptance"]["band_low"] == pytest.approx(0.669)
+    assert knobs["solar_absorptance"]["band_high"] == pytest.approx(0.906)
     for _target, _ramp, step_record, _previous in rows:
-        assert {notice["kind"] for notice in step_record["notices"]} == {
-            "knob_defaulted"
-        }
-        assert {notice["knob"] for notice in step_record["notices"]} == {
-            "melt_radiative_area_m2",
-            "melt_emissivity",
+        assert {(notice["kind"], notice["knob"]) for notice in step_record["notices"]} == {
+            ("knob_defaulted", "melt_radiative_area_m2"),
+            ("knob_defaulted", "melt_emissivity"),
+            ("knob_defaulted", "solar_absorptance"),
+            ("typed_unknown", "window_transmittance"),
         }
         assert step_record["scored_as_observed_temperature"] is False
 
@@ -247,6 +276,9 @@ def test_a_printed_area_and_emissivity_emit_no_knob_defaulted_notice():
     assert record["notices"] == ()
     assert record["area_m2"] == pytest.approx(1.0e-3)
     assert record["emissivity"] == pytest.approx(0.9)
+    assert record["intercept"] is None
+    assert record["focal_power_W"] is None
+    assert record["power_W"] == pytest.approx(100.0)
 
 
 def test_ambiguous_or_negative_power_and_a_missing_charge_refuse():
@@ -292,3 +324,78 @@ def test_ambiguous_or_negative_power_and_a_missing_charge_refuse():
             live_mass_kg=0.0,
         )
     assert missing.value.reason == "charge_mass_missing"
+
+
+def test_uniform_disk_intercept_books_the_printed_13_mm_pellet():
+    # Investigation anchor: (13 mm / 20 mm)^2 = 0.4225, and 1468.82 W of
+    # focal power puts 620.6 W on the pellet when alpha and tau are 1.
+    record = solve_power_driven_melt_temperature_C(
+        power_W=1468.819694,
+        previous_temperature_C=1800.0,
+        dt_s=60.0,
+        mass_kg=1.0,
+        area_m2=1.0e-3,
+        emissivity=0.85,
+        pellet_diameter_m=0.013,
+        focal_spot_diameter_m=0.020,
+        solar_absorptance=1.0,
+        window_transmittance=1.0,
+    )
+
+    assert record["intercept"] == pytest.approx(0.4225)
+    assert record["focal_power_W"] == pytest.approx(1468.819694)
+    # Investigation: 0.4225 of 1468.82 W is 620.6 W on the pellet.
+    assert record["power_W"] == pytest.approx(620.6, abs=0.05)
+    assert record["notices"] == ()
+
+
+def test_one_focal_diameter_without_the_other_refuses():
+    with pytest.raises(PowerTemperatureRefusal) as missing_spot:
+        solve_power_driven_melt_temperature_C(
+            power_W=100.0,
+            previous_temperature_C=25.0,
+            dt_s=60.0,
+            mass_kg=1.0,
+            area_m2=1.0e-3,
+            emissivity=0.85,
+            pellet_diameter_m=0.013,
+        )
+    assert missing_spot.value.reason == "focal_diameter_missing"
+
+    with pytest.raises(PowerTemperatureRefusal) as missing_pellet:
+        solve_power_driven_melt_temperature_C(
+            power_W=100.0,
+            previous_temperature_C=25.0,
+            dt_s=60.0,
+            mass_kg=1.0,
+            area_m2=1.0e-3,
+            emissivity=0.85,
+            focal_spot_diameter_m=0.020,
+            solar_absorptance=0.8,
+        )
+    assert missing_pellet.value.reason == "focal_diameter_missing"
+
+
+def test_one_kilogram_without_a_focal_spot_keeps_the_sizer_balance():
+    # Docstring sanity from before the focal booking: 1 kg, emissivity
+    # 0.85, sizer area, 1740.1373551492054 W holds 1800 °C. No pellet
+    # diameters, so the watts are not scaled.
+    record = solve_power_driven_melt_temperature_C(
+        power_W=1740.1373551492054,
+        previous_temperature_C=1800.0,
+        dt_s=60.0,
+        mass_kg=1.0,
+        area_m2=None,
+        emissivity=None,
+    )
+
+    assert record["temperature_C"] == pytest.approx(1800.0, abs=1.0e-4)
+    assert record["area_m2"] == pytest.approx(
+        EquipmentDesigner.radiative_loss_area_m2(1.0)
+    )
+    assert record["intercept"] is None
+    assert record["power_W"] == pytest.approx(1740.1373551492054)
+    assert {notice["knob"] for notice in record["notices"]} == {
+        "melt_radiative_area_m2",
+        "melt_emissivity",
+    }
