@@ -762,7 +762,11 @@ from simulator.chemistry.kernel import (
     normalize_chemistry_kernel_config,
     normalize_oxygen_sink_channel_mode,
 )
-from simulator.physical_constants import MBAR_PER_BAR, PA_PER_BAR
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    MBAR_PER_BAR,
+    PA_PER_BAR,
+)
 
 if TYPE_CHECKING:
     from simulator.melt_backend.magemin import MAGEMinDomainIdentity
@@ -5989,7 +5993,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             raise TypeError("temperature_K must be a finite float") from exc
         if not math.isfinite(T_K) or T_K <= 0.0:
             raise ValueError("temperature_K must be finite and positive")
-        T_C = T_K - 273.15
+        T_C = T_K - CELSIUS_TO_KELVIN_OFFSET
         from simulator.melt_backend.magemin import MAGEMinDomainIdentity
 
         magemin_provider = (
