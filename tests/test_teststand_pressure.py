@@ -560,13 +560,16 @@ def test_printed_vacuum_limit_is_not_an_ultimate_pressure() -> None:
     assert solved.pressure_pa == pytest.approx(expected_pa, rel=1e-12)
 
 
-def test_every_vacuum_preset_declares_imposed_pressure() -> None:
+def test_every_vacuum_preset_resolves_to_imposed_pressure() -> None:
     robinot = _load("robinot_2026.yaml")
     pomeroy = _load("pomeroy_cardiff_2006.yaml")
     sesko = _load("sesko_2024.yaml")
     for preset in (robinot, pomeroy, sesko):
         control = preset["lab_schedule"]["gas_boundary"]["pressure_control"]
-        assert control["pressure_driver"] == "imposed"
+        if preset is pomeroy:
+            assert "pressure_driver" not in control
+        else:
+            assert control["pressure_driver"] == "imposed"
         speed = preset["lab_geometry"]["pump"].get("pumping_speed_m3_s", None)
         assert speed is None
         assert speed != 0
@@ -594,6 +597,10 @@ def test_every_vacuum_preset_declares_imposed_pressure() -> None:
     assert sesko_apparatus.exposed_melt_area_m2 is None
     assert sesko_apparatus.chamber_volume_m3 is None
     assert sesko_apparatus.pressure_driver == "imposed"
+    assert any(
+        "apparatus is not fully specified" in notice
+        for notice in sesko_apparatus.notices
+    )
     sample = robinot["lab_geometry"]["sample"]
     assert sample["exposed_melt_area_m2"] is None
     assert sample["pellet_diameter_mm"] == 13

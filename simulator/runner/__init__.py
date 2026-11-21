@@ -527,6 +527,33 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         leg=requested_leg,
         provenance=provenance,
     )
+    duration_h = _preset_duration_h(
+        leg_block.get("duration_h", schedule.get("duration_h")),
+        f"pair.{requested_leg}.duration_h",
+        provenance,
+    )
+    pressure_defaulted = "chamber_pressure_mbar" not in schedule
+    pressure_default_mbar: float | None = None
+    if pressure_defaulted:
+        pressure_default_mbar = CampaignManager(
+            load_config_bundle().setpoints
+        )._pressure_config_float(
+            CampaignPhase.C0,
+            "p_total_mbar",
+            "p_total_mbar_default",
+        )
+        schedule["chamber_pressure_mbar"] = [
+            {
+                "t_h": 0.0,
+                "value": pressure_default_mbar,
+                "unit": "mbar",
+            },
+            {
+                "t_h": duration_h,
+                "value": pressure_default_mbar,
+                "unit": "mbar",
+            },
+        ]
     try:
         lab_geometry = parse_lab_geometry(
             geometry,
@@ -554,11 +581,6 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
 
     mass_g = lab_geometry.sample_mass_g
     mass_defaulted = mass_g is None
-    duration_h = _preset_duration_h(
-        leg_block.get("duration_h", schedule.get("duration_h")),
-        f"pair.{requested_leg}.duration_h",
-        provenance,
-    )
     hours = int(duration_h)
     if not math.isclose(duration_h, float(hours), rel_tol=0.0, abs_tol=1e-9):
         raise PresetRunnerError(
@@ -602,8 +624,19 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             "geometry_id": geometry_id,
         }
     )
+    notices = []
+    if pressure_defaulted:
+        notices.append(
+            {
+                "code": "knob_defaulted",
+                "path": "lab_schedule.chamber_pressure_mbar",
+                "value": pressure_default_mbar,
+                "unit": "mbar",
+                "default_source": "campaigns.C0.p_total_mbar_default",
+            }
+        )
     if mass_defaulted:
-        provenance["notices"] = [
+        notices.append(
             {
                 "code": "knob_defaulted",
                 "path": "mass_kg",
@@ -611,7 +644,9 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
                 "unit": "kg",
                 "default_source": "PyrolysisRun.mass_kg",
             }
-        ]
+        )
+    if notices:
+        provenance["notices"] = notices
     provenance.update(gram_lab_exposed_melt_area_bridge(geometry))
     return PresetRunSpec(
         feedstock_id=feedstock_id,

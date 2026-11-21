@@ -3,13 +3,13 @@ paper_id: pomeroy_cardiff_2006_vacuum_pyrolysis
 paper_citation_id: pomeroy_cardiff_2006
 measurement_id: pomeroy_cardiff_2006_measurements
 preset_kind: faithful_with_remediation_twin
-extraction_status: published_thermal_recipe_runtime_pressure_assumed
+extraction_status: published_thermal_recipe_pressure_defaulted_at_runtime
 
 source_notes:
   - citation_id: pomeroy_cardiff_2006
     digest: "LPI paper reports MLS-1A outgas for 2 h at 200 C, ramp no faster than 12 C/min to 1400 C, hold for 20 min, MKS PPT RGA monitoring, and 1.17% non-condensed mass loss."
   - citation_id: pomeroy_cardiff_2006
-    digest: "The paper reports vacuum operation but no numeric total chamber pressure or pump speed; Figure 2 shows RGA species partial pressures. The runtime schedule floor remains an assumption."
+    digest: "The paper reports vacuum operation but no numeric total chamber pressure or pump speed; Figure 2 shows RGA species partial pressures. The run deck leaves pressure unset for the campaign default."
 
 lab_schedule:
   id: pomeroy_cardiff_2006_schedule
@@ -45,9 +45,6 @@ lab_schedule:
     - {t_h: 2.0, value: 200, unit: C, source_class: literature_sidecar, source_ref: pomeroy_cardiff_2006_experimental, citation_id: pomeroy_cardiff_2006}
     - {t_h: 3.6666666666666665, value: 1400, unit: C, source_class: literature_sidecar, source_ref: pomeroy_cardiff_2006_experimental, citation_id: pomeroy_cardiff_2006}
     - {t_h: 4.0, value: 1400, unit: C, source_class: literature_sidecar, source_ref: pomeroy_cardiff_2006_experimental, citation_id: pomeroy_cardiff_2006}
-  chamber_pressure_mbar:
-    - {t_h: 0.0, value: 0.001, unit: mbar, source_class: assumption_with_sensitivity_marker, source_ref: pomeroy_cardiff_2006_experimental, citation_id: pomeroy_cardiff_2006, extraction_note: "Runtime parser floor, not a printed chamber total pressure; the paper reports vacuum operation and Fig. 2 shows RGA species partial pressures (p. 47)."}
-    - {t_h: 4.0, value: 0.001, unit: mbar, source_class: assumption_with_sensitivity_marker, source_ref: pomeroy_cardiff_2006_experimental, citation_id: pomeroy_cardiff_2006, extraction_note: "Runtime parser floor, not a printed chamber total pressure; the paper reports vacuum operation and Fig. 2 shows RGA species partial pressures (p. 47)."}
   gas_boundary:
     background_gas:
       reported_status: not_reported
@@ -64,13 +61,12 @@ lab_schedule:
       reason: "No carrier flow is stated in the p. 47 Experiment section."
       digest: pomeroy_cardiff_2006_imposed_flow_not_reported
     pressure_control:
-      mode: achieved_pressure_not_reported_runtime_floor_assumption
-      pressure_driver: imposed
-      source_class: assumption_with_sensitivity_marker
-      source_ref: pomeroy_cardiff_2006_experimental
+      mode: not_reported
+      reported_status: not_reported
+      source_class: not_reported
       citation_id: pomeroy_cardiff_2006
-      extraction_note: "The paper reports vacuum operation but no numeric chamber total pressure. Figure 2 plots RGA species partial pressures, not chamber total pressure. Pump speed is not reported and is never used to infer pressure."
-      digest: pomeroy_cardiff_2006_pressure_unreported_runtime_floor_assumption
+      extraction_note: "The paper reports vacuum operation but no numeric chamber total pressure. Figure 2 plots RGA species partial pressures, not chamber total pressure."
+      digest: pomeroy_cardiff_2006_pressure_not_reported
   surface_temperature_C:
     crucible_wall:
       - {t_h: 0.0, value: 200, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: pomeroy_cardiff_2006, extraction_note: crucible_wall_temperature_not_reported}
@@ -227,15 +223,15 @@ comparison_contract:
   internal_analytical_used: false
   internal_analytical_blocker: internal_analytical_cannot_certify_experiment_grade
   fast_tier_policy: cached_real_only_no_internal_analytical
-  pressure_policy: achieved_pressure_not_reported_no_pump_speed_inference
+  pressure_policy: achieved_pressure_not_reported_use_c0_campaign_default
   degraded_fallback_state:
     status: comparison_complete_but_noncertifiable
     reason: achieved_pressure_sample_mass_and_geometry_unavailable_and_pump_outlet_not_implemented
 
 digests:
   feedstock_digest: lunar_mls_1a_weiblen1990_hill2007_sha256_03a8a3ea22a08e85
-  schedule_digest: pomeroy_cardiff_2006_reported_outgas_ramp_hold_v1
-  gas_boundary_digest: pomeroy_cardiff_2006_pressure_not_reported_runtime_floor_v1
+  schedule_digest: pomeroy_cardiff_2006_reported_outgas_ramp_hold_pressure_unset_v2
+  gas_boundary_digest: pomeroy_cardiff_2006_pressure_not_reported_campaign_default_v2
   geometry_digest: pomeroy_cardiff_2006_unreported_teststand_fields_v2
   transport_formula_digest: runtime_builtin_open_surface_only
   sticking_provenance_digest: pomeroy_cardiff_2006_sticking_not_reported_v1

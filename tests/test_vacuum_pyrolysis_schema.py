@@ -8,6 +8,7 @@ import yaml
 
 from simulator.lab_geometry import parse_lab_geometry
 from simulator.lab_schedule import normalize_lab_schedule
+from simulator.teststand import parse_teststand
 from simulator import runner as runner_module
 
 
@@ -315,11 +316,22 @@ def require_not_reported_gas_boundary(row: dict, detail: str) -> None:
 
 def require_schedule_point_units(schedule: dict) -> None:
     require_points_have_unit(schedule.get("melt_temperature_C"), "C", "melt_temperature_C")
-    require_points_have_unit(
-        schedule.get("chamber_pressure_mbar"),
-        "mbar",
-        "chamber_pressure_mbar",
-    )
+    if schedule.get("chamber_pressure_mbar") is None:
+        pressure_control = (schedule.get("gas_boundary") or {}).get(
+            "pressure_control"
+        )
+        require(
+            is_not_reported(pressure_control)
+            and pressure_control.get("source_class") == NOT_REPORTED,
+            "missing_schedule_pressure_must_be_not_reported",
+            "chamber_pressure_mbar may be omitted only when pressure is not reported",
+        )
+    else:
+        require_points_have_unit(
+            schedule.get("chamber_pressure_mbar"),
+            "mbar",
+            "chamber_pressure_mbar",
+        )
     for surface_id, points in (schedule.get("surface_temperature_C") or {}).items():
         require_points_have_unit(points, "C", f"surface_temperature_C.{surface_id}")
 
@@ -413,7 +425,7 @@ def test_robinot_preset_carries_required_external_anchors() -> None:
     assert preset["comparison_contract"]["internal_analytical_used"] is False
 
 
-def test_pomeroy_preset_captures_recipe_and_keeps_pressure_assumed() -> None:
+def test_pomeroy_preset_captures_recipe_and_leaves_pressure_unset() -> None:
     preset = load_yaml(POMEROY_PRESET_PATH)
     measurements = load_yaml(MEASUREMENTS_PATH)
     feedstocks = load_yaml(FEEDSTOCKS_PATH)
@@ -430,16 +442,12 @@ def test_pomeroy_preset_captures_recipe_and_keeps_pressure_assumed() -> None:
         in preset["lab_geometry"]["sample"]["named_missing_fields"]
     )
     assert preset["lab_geometry"]["sample"]["exposed_melt_area_m2"] is None
-    assert schedule["chamber_pressure_mbar"][0]["source_class"] == (
-        "assumption_with_sensitivity_marker"
-    )
-    assert (
-        "RGA species partial pressures"
-        in schedule["chamber_pressure_mbar"][0]["extraction_note"]
-    )
-    assert "pump speed is not reported" in schedule["gas_boundary"][
-        "pressure_control"
-    ]["extraction_note"].lower()
+    assert "chamber_pressure_mbar" not in schedule
+    pressure_control = schedule["gas_boundary"]["pressure_control"]
+    assert pressure_control["reported_status"] == NOT_REPORTED
+    assert pressure_control["source_class"] == NOT_REPORTED
+    assert "RGA species partial pressures" in pressure_control["extraction_note"]
+    assert preset["lab_geometry"]["pump"]["pumping_speed_m3_s"] is None
 
     faithful = preset["pair"]["faithful"]
     assert faithful["feedstock_id"] == "lunar_mls_1a"
@@ -466,9 +474,11 @@ def test_pomeroy_preset_captures_recipe_and_keeps_pressure_assumed() -> None:
     )
 
 
-def test_unreported_pomeroy_charge_uses_runner_default_and_reports_it(
+def test_unreported_pomeroy_knobs_use_runner_defaults_and_report_them(
     tmp_path: Path,
 ) -> None:
+    source_document = load_yaml(POMEROY_PRESET_PATH)
+    assert "chamber_pressure_mbar" not in source_document["lab_schedule"]
     preset = runner_module._load_vacuum_preset_run_spec(
         POMEROY_PRESET_PATH,
         "faithful",
@@ -476,20 +486,50 @@ def test_unreported_pomeroy_charge_uses_runner_default_and_reports_it(
     expected_default_kg = runner_module.PyrolysisRun(
         feedstock_id=preset.feedstock_id
     ).mass_kg
+    expected_default_pressure_mbar = runner_module.CampaignManager(
+        runner_module.load_config_bundle().setpoints
+    )._pressure_config_float(
+        runner_module.CampaignPhase.C0,
+        "p_total_mbar",
+        "p_total_mbar_default",
+    )
     assert preset.mass_kg == expected_default_kg
     assert preset.provenance["sample_mass_g"] is None
-    assert preset.provenance["notices"] == [
-        {
+    assert "chamber_pressure_mbar" not in preset.document["lab_schedule"]
+    assert [
+        (point["t_h"], point["value"], point["unit"])
+        for point in preset.lab_schedule["chamber_pressure_mbar"]
+    ] == [
+        (0.0, expected_default_pressure_mbar, "mbar"),
+        (preset.hours, expected_default_pressure_mbar, "mbar"),
+    ]
+    notices = {
+        notice["path"]: notice for notice in preset.provenance["notices"]
+    }
+    assert notices == {
+        "lab_schedule.chamber_pressure_mbar": {
+            "code": "knob_defaulted",
+            "path": "lab_schedule.chamber_pressure_mbar",
+            "value": expected_default_pressure_mbar,
+            "unit": "mbar",
+            "default_source": "campaigns.C0.p_total_mbar_default",
+        },
+        "mass_kg": {
             "code": "knob_defaulted",
             "path": "mass_kg",
             "value": expected_default_kg,
             "unit": "kg",
             "default_source": "PyrolysisRun.mass_kg",
-        }
-    ]
+        },
+    }
 
     mutated_document = load_yaml(POMEROY_PRESET_PATH)
     mutated_document["lab_geometry"]["sample"]["mass_g"] = 12.5
+    explicit_pressure = [
+        {"t_h": 0.0, "value": 2.0, "unit": "mbar"},
+        {"t_h": 4.0, "value": 3.0, "unit": "mbar"},
+    ]
+    mutated_document["lab_schedule"]["chamber_pressure_mbar"] = explicit_pressure
     mutated_path = tmp_path / "pomeroy_mutated_mass.yaml"
     mutated_path.write_text(yaml.safe_dump(mutated_document), encoding="utf-8")
     mutated = runner_module._load_vacuum_preset_run_spec(
@@ -497,7 +537,58 @@ def test_unreported_pomeroy_charge_uses_runner_default_and_reports_it(
         "faithful",
     )
     assert mutated.mass_kg == pytest.approx(0.0125)
-    assert "notices" not in mutated.provenance
+    assert mutated.lab_schedule["chamber_pressure_mbar"] == explicit_pressure
+    mutated_notices = {
+        notice["path"] for notice in mutated.provenance.get("notices", [])
+    }
+    assert "mass_kg" not in mutated_notices
+    assert "lab_schedule.chamber_pressure_mbar" not in mutated_notices
+
+
+@pytest.mark.parametrize(
+    ("preset_path", "backend_name"),
+    [
+        (POMEROY_PRESET_PATH, "thermoengine"),
+        (SESKO_PRESET_PATH, "internal-analytical"),
+    ],
+    ids=["pomeroy-cardiff-2006", "sesko-2024"],
+)
+def test_benchtop_presets_run_with_reported_pressure_or_runtime_default(
+    preset_path: Path,
+    backend_name: str,
+) -> None:
+    preset = runner_module._load_vacuum_preset_run_spec(preset_path, "faithful")
+    apparatus = parse_teststand(preset.lab_schedule, preset.lab_geometry)
+    assert apparatus.pressure_driver == "imposed"
+    assert any(
+        "apparatus is not fully specified" in notice
+        for notice in apparatus.notices
+    )
+
+    result = runner_module.PyrolysisRun(
+        feedstock_id=preset.feedstock_id,
+        campaign="C0",
+        hours=preset.hours,
+        mass_kg=preset.mass_kg,
+        backend_name=backend_name,
+        setpoints_patch={"lab_geometry": copy.deepcopy(preset.lab_geometry)},
+        lab_schedule=copy.deepcopy(preset.lab_schedule),
+        run_metadata_overrides={
+            runner_module.PRESET_PROVENANCE_METADATA_KEY: dict(preset.provenance),
+        },
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    ).run()
+
+    assert result["status"] in {"ok", "partial"}
+    runtime_notices = result["run_metadata"]["preset"].get("notices", [])
+    if preset_path == POMEROY_PRESET_PATH:
+        assert {
+            notice["path"] for notice in runtime_notices
+        } == {
+            "mass_kg",
+            "lab_schedule.chamber_pressure_mbar",
+        }
 
 
 def test_robinot_preset_references_registered_loadable_eac1_feedstock() -> None:
@@ -763,8 +854,14 @@ def test_all_vpr_presets_validate_and_round_trip_runtime_parsers() -> None:
             preset["lab_geometry"],
             allow_temperature_profiles=True,
         )
+        runtime_schedule = preset["lab_schedule"]
+        if "chamber_pressure_mbar" not in runtime_schedule:
+            runtime_schedule = runner_module._load_vacuum_preset_run_spec(
+                preset_path,
+                "faithful",
+            ).lab_schedule
         normalized_schedule = normalize_lab_schedule(
-            preset["lab_schedule"],
+            runtime_schedule,
             required_surface_profiles=[
                 surface.surface_id
                 for surface in geometry.surfaces
