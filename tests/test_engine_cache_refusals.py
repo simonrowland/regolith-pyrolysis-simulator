@@ -638,6 +638,7 @@ def test_alphamelts_prelaunch_crash_family_hits_after_disk_round_trip(
         ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH,
         AlphaMELTSBackend,
     )
+    from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
 
     backend = AlphaMELTSBackend()
     backend._mode = "subprocess"
@@ -648,6 +649,10 @@ def test_alphamelts_prelaunch_crash_family_hits_after_disk_round_trip(
         "fO2_log": -8.0,
         "pressure_bar": 1.0,
     }
+    # Production equilibrate_cell passes this. The crash family is after
+    # the run-mode check, so an omitted mode raises the contract error
+    # and never returns the prelaunch refusal.
+    kwargs.update(isothermal_run_kwargs("alphamelts", {"subprocess_run_mode": None}))
     cached_call, handle, calls, solve = _equilibrate_through_cache(
         "alphamelts", backend, kwargs, tmp_path, monkeypatch,
     )
