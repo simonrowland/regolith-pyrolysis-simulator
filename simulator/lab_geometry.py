@@ -13,6 +13,7 @@ from simulator.scalar_boundary import is_declared_real_scalar
 LAB_GEOMETRY_SCALE = "gram_lab"
 LAB_FIXED_EQUIPMENT_SIZING = "lab_fixed_geometry"
 LAB_EXPOSED_MELT_AREA_BASIS = "gram_lab_exposed_melt"
+_LAB_SURFACE_TEMPERATURE_DEFAULT_C = 0.0
 LAB_SURFACE_ROLES = frozenset({
     "holder",
     "window",
@@ -97,7 +98,9 @@ class LabSurface:
             upstream_stage=upstream_stage,
             downstream_stage=downstream_stage,
             wall_temperature_C=(
-                0.0 if self.temperature_C is None else self.temperature_C
+                _LAB_SURFACE_TEMPERATURE_DEFAULT_C
+                if self.temperature_C is None
+                else self.temperature_C
             ),
             length_m=length_m,
             inner_diameter_m=diameter_m,
