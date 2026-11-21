@@ -231,6 +231,15 @@ def test_gate_order_steps_down_before_hold_or_floor(
                                 'condensed_phase_reference_pressure_bar': 1},
     }))
     if prior_good:
+        if prior_good is True:
+            from simulator.melt_backend.magemin import (
+                magemin_domain_identity_from_evaluated_bulk,
+            )
+
+            identity, _ = magemin_domain_identity_from_evaluated_bulk(
+                sim.melt.composition_wt_pct(),
+            )
+            sim._freeze_gate_current_magemin_domain_identity = identity
         sim._remember_freeze_gate_provider_curve({
             'source': 'gate_liquid_fraction:fallback:' + (
                 'alphamelts-diagnostic' if prior_good == 'alphamelts' else 'magemin-shadow'
@@ -272,6 +281,42 @@ def test_gate_order_steps_down_before_hold_or_floor(
             assert solved['physical_overhead_pressure_bar'] == .05
             assert solved['solidus_bracket_C'] == [1000, 1010]
             assert solved['numerical_path_warning'] == 'original solved path warning'
+
+
+def test_identityless_magemin_held_curve_uses_kress_floor(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim._register_freeze_gate_liquid_fraction_providers()
+    magemin, alpha = sim._chem_registry.gate_provider_order
+
+    def failed(status, diagnostic):
+        return lambda request: IntentResult(
+            intent=request.intent,
+            status=status,
+            diagnostic=diagnostic,
+        )
+
+    monkeypatch.setattr(magemin, 'dispatch', failed('not_converged', {
+        'backend_status_reason': 'no_convergence',
+    }))
+    monkeypatch.setattr(alpha, 'dispatch', failed('not_converged', {
+        'backend_status_reason': 'incomplete_cooling_path',
+    }))
+    sim._remember_freeze_gate_provider_curve({
+        'source': 'gate_liquid_fraction:fallback:magemin-shadow',
+        'solidus_T_C': 1000,
+        'liquidus_T_C': 1300,
+    })
+
+    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
+
+    assert curve['gate_provider_refusal']['qualification'] == (
+        'first_call_kress91_floor_prediction'
+    )
+    assert curve['solidus_T_C'] == 1200
 
 
 def test_retry_recovery_preserves_step_down_notice(

@@ -3533,12 +3533,17 @@ class EvaporationMixin:
         self,
         curve: dict[str, Any],
     ) -> dict[str, Any]:
-        magemin_domain_identity = getattr(
-            self, '_freeze_gate_current_magemin_domain_identity', None,
+        realized_provider = curve.get('gate_provider_step_down', {}).get(
+            'realized_provider'
+        )
+        magemin_domain_identity = (
+            getattr(self, '_freeze_gate_current_magemin_domain_identity', None)
+            if self._freeze_gate_curve_uses_magemin_domain_identity(curve)
+            else None
         )
         self._freeze_gate_last_good_curve = {
             'provider': self._liquid_fraction_provider,
-            'realized_provider': curve.get('gate_provider_step_down', {}).get('realized_provider'),
+            'realized_provider': realized_provider,
             'curve': copy.deepcopy(curve),
             'computed_hour': int(self.melt.hour),
             'composition_wt_pct': self.melt.composition_wt_pct(),
@@ -3551,6 +3556,20 @@ class EvaporationMixin:
         self._freeze_gate_held_curve_record = None
         return curve
 
+    def _freeze_gate_curve_uses_magemin_domain_identity(
+        self,
+        curve: Mapping[str, Any],
+    ) -> bool:
+        if self._liquid_fraction_provider != 'magemin':
+            return False
+        step_down = curve.get('gate_provider_step_down')
+        realized_provider = (
+            step_down.get('realized_provider')
+            if isinstance(step_down, Mapping)
+            else None
+        )
+        return realized_provider != 'alphamelts-diagnostic'
+
     def _hold_freeze_gate_provider_curve(
         self,
         failure: Mapping[str, Any],
@@ -3561,7 +3580,11 @@ class EvaporationMixin:
         if previous is None or previous['provider'] != self._liquid_fraction_provider:
             return None
         diagnostic = failure['provider_diagnostic']
-        if self._liquid_fraction_provider == 'magemin':
+        realized_provider = previous.get('realized_provider')
+        magemin_sourced = self._freeze_gate_curve_uses_magemin_domain_identity(
+            previous.get('curve') or {}
+        )
+        if magemin_sourced:
             # A failed attempt has no domain verdict. Match the last-good
             # curve against the current request's pre-dispatch identity,
             # which is computed from the evaluated bulk without the engine.
@@ -3589,7 +3612,6 @@ class EvaporationMixin:
             )
             if previous.get('domain_identity') != current_domain_identity:
                 return None
-        realized_provider = previous.get('realized_provider')
         if realized_provider and realized_provider not in {
             attempt['provider'] for attempt in failure['provider_diagnostic'].get(
                 'gate_provider_step_down', {},
@@ -3631,7 +3653,7 @@ class EvaporationMixin:
                     },
                 }
                 if (
-                    self._liquid_fraction_provider == 'magemin'
+                    magemin_sourced
                     and magemin_domain_identity is not None
                     and magemin_domain_identity.silica_verdict
                     == 'extrapolated'
