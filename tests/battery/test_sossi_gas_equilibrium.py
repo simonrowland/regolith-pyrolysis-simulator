@@ -188,6 +188,12 @@ def test_real_sossi_extract_flows_reach_the_lab_schedule_boundary() -> None:
         bench = benches[experiment.bench_id]
         inputs = collect_consumer_inputs(experiment, bench, observation)
         pressure = inputs.waypoints["run_pressure_boundary"].selected.value.point
+        gas_boundary = inputs.waypoints["gas_boundary"].selected
+        assert gas_boundary is not None
+        assert gas_boundary.route == (
+            f"observation[{observation.observation_id}]"
+            ".point_conditions.temperature_K"
+        )
         boundary = _normalize_gas_boundary(_document(inputs, "gas_boundary"))
         return pressure, boundary, experiment, observation, bench
 

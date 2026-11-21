@@ -45,12 +45,24 @@ def _sossi_table2_gas_boundary(experiment, observation):
     if (
         observation is None
         or observation.source_id != _SOSSI_SOURCE_ID
-        or observation.locator is None
-        or str(observation.locator.page) not in {"54", "55"}
-        or observation.locator.table != "2"
     ):
         return None
-    note = observation.locator.note or ""
+    temperature = (observation.point_conditions or {}).get("temperature_K")
+    row_locator = temperature.locator if isinstance(temperature, Located) else None
+    if (
+        row_locator is None
+        or str(row_locator.page) not in {"54", "55"}
+        or row_locator.table != "2"
+        or "quote=" not in (row_locator.note or "")
+    ):
+        row_locator = observation.locator
+    if (
+        row_locator is None
+        or str(row_locator.page) not in {"54", "55"}
+        or row_locator.table != "2"
+    ):
+        return None
+    note = row_locator.note or ""
     marker = "quote="
     if marker not in note:
         raise ValueError("sossi_table2_gas_quote_missing")
@@ -266,7 +278,10 @@ def collect_consumer_inputs(experiment, bench, observation=None) -> ConsumerInpu
         if name == "gas_boundary":
             source_boundary = _sossi_table2_gas_boundary(experiment, observation)
             if source_boundary is not None:
-                route_path = f"observation[{observation.observation_id}].locator.note"
+                route_path = (
+                    f"observation[{observation.observation_id}]"
+                    ".point_conditions.temperature_K"
+                )
                 route = Waypoint(
                     name,
                     source_boundary,
