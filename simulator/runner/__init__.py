@@ -1464,8 +1464,8 @@ class PyrolysisRun:
                 if overhead_gas is not None else None
             ),
             "fixed_pressure_holdup_nonphysical_observed": (
-                bool(overhead_gas.fixed_pressure_holdup_observed)
-                if overhead_gas is not None else False
+                getattr(overhead_gas, "fixed_pressure_holdup_observed", None)
+                if overhead_gas is not None else None
             ),
             "fixed_pressure_holdup_peak_kg": (
                 float(overhead_gas.fixed_pressure_holdup_peak_kg)
@@ -2944,7 +2944,7 @@ def build_per_hour_summary(
             snapshot.overhead, "train_time_averaged_mass_flow_kg_hr", None
         ),
         "fixed_pressure_holdup_nonphysical": getattr(
-            snapshot.overhead, "fixed_pressure_holdup_nonphysical", False
+            snapshot.overhead, "fixed_pressure_holdup_nonphysical", None
         ),
         "fixed_pressure_holdup_kg": getattr(
             snapshot.overhead, "fixed_pressure_holdup_kg", None

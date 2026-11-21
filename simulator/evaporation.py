@@ -4687,8 +4687,6 @@ class EvaporationMixin:
 
     def _stage3_mn_cartridge_fraction(self, route_result, species: str) -> float:
         """Return Stage-3's share of baffle product in the scheduled Mn window."""
-        if str(species) != "Mn":
-            return 0.0
         stage_deposits = getattr(route_result, 'condensed_by_stage_species', None)
         condensed_for_species = getattr(route_result, 'condensed_for_species', None)
         if not isinstance(stage_deposits, Mapping) or not callable(

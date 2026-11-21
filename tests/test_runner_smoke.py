@@ -322,6 +322,9 @@ def test_success_payload_builds_per_hour_projection_once(monkeypatch):
 
     assert payload["per_hour_summary"] == [row]
     assert payload["pO2_enforcement_by_hour"] == [{"status": "ok"}]
+    assert payload["run_metadata"]["overhead_drain_diagnostics"][
+        "fixed_pressure_holdup_nonphysical_observed"
+    ] is None
     # A reverted success builder converts the original rows again for summary.
     assert len(per_hour_conversion_calls) == 1
 
@@ -760,6 +763,7 @@ def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
     assert summary["pO2_bar"] is None
     assert summary["mass_balance_pct"] is None
     assert summary["O2_yield_kg_cumulative"] is None
+    assert summary["fixed_pressure_holdup_nonphysical"] is None
     json.dumps(summary, allow_nan=False)
 
 

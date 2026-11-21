@@ -756,7 +756,7 @@ class OverheadGasModel:
         }
 
     def stage_area_geometry_provenance_notice(self) -> dict[str, Any]:
-        """Provenance payload for stage-area geometry used by wall deposits."""
+        """Provenance payload for stage-area geometry used by stage capture."""
 
         records = {
             stage: dict(record)
@@ -790,16 +790,14 @@ class OverheadGasModel:
             'provisional': bool(status_bearing),
             'usage': [
                 'stage_area_m2_by_stage',
-                'PipeSegment.declared_area_m2',
-                'PipeSegment.surface_area_m2',
+                'stage_capture',
                 'wall_deposit_candidate_for_surface',
                 'coating_lifespan',
             ],
             'stage_area_ratio_provenance_by_stage': records,
             'message': (
-                'Condenser stage-area ratios include provisional/default '
-                'geometry; wall-deposit and coating readouts are status-bearing '
-                'until stage surface areas are certified.'
+                'D-283 collector areas feed stage capture. Duct-wall deposition '
+                'uses each duct own cylindrical surface.'
             ),
         }
 

@@ -322,7 +322,7 @@ def test_stage3_mn_cartridge_schedule_uses_inclusive_run_hours(
     ) == pytest.approx(expected_fraction)
 
 
-def test_stage3_mn_cartridge_split_leaves_other_species_unchanged():
+def test_stage3_cartridge_split_assigns_chromium_product_and_leaves_oxygen_overhead():
     host = SimpleNamespace(
         setpoints={
             "condensation_train": {
@@ -356,7 +356,10 @@ def test_stage3_mn_cartridge_split_leaves_other_species_unchanged():
         host, route, "CrO2", sp_data
     )
 
-    assert fractions == {}
+    assert set(fractions) == {"Cr2O3"}
+    assert fractions["Cr2O3"][MANGANESE_STAGE3_CARTRIDGE_ACCOUNT] == pytest.approx(
+        0.6
+    )
 
 
 def test_stage3_mn_cartridge_split_uses_scheduled_mn_fraction():

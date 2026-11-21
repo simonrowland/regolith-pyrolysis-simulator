@@ -2247,7 +2247,10 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
         + grounded_sources
         == len(RecipeSchema().allowlist)
     )
-    assert range_sourced == 54
+    # 52 bounds are directly sourced from setpoint ranges; two additional
+    # campaign defaults are converted from setpoints and included in the
+    # 54-entry union pinned above.
+    assert range_sourced == 52
     assert converted_setpoint_ranges == 2
     assert engineering_envelopes > 0
     assert grounded_sources > 0
