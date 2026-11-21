@@ -21,7 +21,6 @@ from simulator.battery.enums import (
 from simulator.battery.records import (
     Bench,
     BenchIdentity,
-    Composition,
     Derivation,
     FO2Control,
     Located,
@@ -78,20 +77,15 @@ def _row(context, source, formula="SiO"):
 
 
 def _demaria_o_sample(context, sample):
-    suffix = f"sample {sample}"
+    row_marker = f":row={sample}:"
     return next(
         row
         for row in context.observations.values()
         if row.source_id == "kems-022-demaria-1971"
         and row.experiment_id.endswith("::demaria-1971-main-kems")
         and row.identity.species.formula == "O"
-        and row.identity.composition is not None
-        and row.identity.composition.is_value
-        and isinstance(row.identity.composition.value, Composition)
-        and row.identity.composition.value.proxy_flag
-        == "composition_from_sample_catalog"
-        and row.identity.composition.value.proxy_source is not None
-        and row.identity.composition.value.proxy_source.endswith(suffix)
+        and "::demaria_1971_o_atomic_psat_table5::" in row.observation_id
+        and row_marker in row.observation_id
     )
 
 
@@ -1803,8 +1797,8 @@ def test_relative_qms_refuses_cross_sample_demaria_pairing(demaria_context):
             fO2_Pa=State.of(Decimal("1e-6")),
         ),
     )
-    # The trace comes from the other catalog sample, but ion intensity has no
-    # composition identity axis, so its Observation cannot identify that run.
+    # The store's row id selects sample 12065, but ion intensity has no
+    # composition identity axis to carry that sample into a QMS trace.
     trace = replace(
         sample_12065,
         observation_id="relative-qms-demaria-12065-trace",
