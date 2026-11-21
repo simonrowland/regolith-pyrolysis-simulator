@@ -340,7 +340,9 @@ class EquipmentDesigner:
 
         One owner of the rough-cylinder estimate. A 1-tonne charge is
         0.2 m². This is not a printed melt face and not the opening
-        from ``size_crucible``.
+        from ``size_crucible``. It is not the radiating area of a
+        sample under 1 kg. The power-driven pellet path refuses this
+        value there instead of taking it as a default.
         """
 
         return 0.2 * (mass_kg / 1000.0) ** 0.67

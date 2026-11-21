@@ -674,7 +674,9 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             mass_kg=mass_kg,
             exposed_area_m2=exposed_area_m2,
             pellet_diameter_m=lengths.get("pellet_diameter_m"),
+            pellet_height_m=lengths.get("pellet_height_m"),
             focal_spot_diameter_m=lengths.get("focal_spot_diameter_m"),
+            radiating_face_set=lengths.get("radiating_face_set"),
         )
     return PresetRunSpec(
         feedstock_id=feedstock_id,
