@@ -61,8 +61,6 @@ def test_deterministic_refusal_allowlist_is_explicit():
         "imcc_sp_extension_required",
         "imcc_composition_outside_validated_envelope",
         "imcc_T_outside_datapack_domain",
-        "imcc_gas_species_not_found",
-        "imcc_gas_T_outside_domain",
         "imcc_gas_invalid_fO2",
     })
     assert set(ISOLATED_OPENIMCC_CACHEABLE_ERRORS.values()) <= (
@@ -117,6 +115,8 @@ def test_deterministic_refusal_allowlist_is_explicit():
         "imcc_dataframe_unavailable",
         "imcc_unproven_datapack",
         "imcc_malformed_datapack",
+        "imcc_gas_species_not_found",
+        "imcc_gas_T_outside_domain",
         "imcc_gas_oxygen_balance_failed",
         "imcc_gas_data_unavailable",
         "imcc_gas_duplicate_interval",
@@ -1324,12 +1324,7 @@ def test_isolated_openimcc_names_match_package_codes():
     for name, refusal_class in package_classes.items():
         assert refusal_class.code == ISOLATED_OPENIMCC_CACHEABLE_ERRORS[name]
         assert refusal_class.code in CACHEABLE_REFUSAL_CODES
-    for refusal_class in (
-        ImccGasSpeciesNotFoundError,
-        ImccGasTemperatureOutsideDomainError,
-        ImccGasInvalidFugacityError,
-    ):
-        assert refusal_class.code in CACHEABLE_REFUSAL_CODES
+    assert ImccGasInvalidFugacityError.code in CACHEABLE_REFUSAL_CODES
     for refusal_class in (
         ImccNonconvergenceError,
         ImccDataframeUnavailableError,
@@ -1337,6 +1332,8 @@ def test_isolated_openimcc_names_match_package_codes():
         ImccUnprovenDatapackError,
         ImccGasOxygenBalanceError,
         ImccGasDataUnavailableError,
+        ImccGasSpeciesNotFoundError,
+        ImccGasTemperatureOutsideDomainError,
     ):
         assert refusal_class.code not in CACHEABLE_REFUSAL_CODES
 
@@ -1441,3 +1438,49 @@ def test_isolated_openimcc_solver_failure_is_not_stored(tmp_path, monkeypatch):
     assert counts["misses"] == 2
     assert counts["stores"] == 0
     assert counts["not_stored:exception:ImccNonconvergenceError"] == 2
+
+
+def test_openimcc_gas_species_not_found_is_not_stored(tmp_path, monkeypatch):
+    """A gas-table miss is the package's exception, and it is not stored.
+
+    evaluate_gas is the real call. The name is not a species in any JANAF
+    table, so the refusal is ImccGasSpeciesNotFoundError. That code depends
+    on the tables OPENIMCC_VAPOROCK_ROOT can swap, which is not in the key.
+    """
+
+    openimcc = pytest.importorskip("openimcc")
+    from openimcc.gas import ImccGasSpeciesNotFoundError
+    from simulator.melt_backend.openimcc_bridge import evaluate_gas
+
+    _enable_disk_cache(tmp_path, monkeypatch)
+    gas_pack = openimcc.load_gas_datapack()
+    calls = []
+    original = openimcc.evaluate_gas
+
+    def wrapped(*args, **kwargs):
+        calls.append(1)
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(openimcc, "evaluate_gas", wrapped)
+
+    def run():
+        return evaluate_gas(
+            {"NotAGasSpeciesXYZ": 1.0},
+            1600.0,
+            1.0e-6,
+            gas_pack,
+            parent_oxides=("NotAGasSpeciesXYZ",),
+        )
+
+    with pytest.raises(ImccGasSpeciesNotFoundError) as first:
+        run()
+    engine_cache._MEMORY_CACHE.clear()
+    with pytest.raises(ImccGasSpeciesNotFoundError) as second:
+        run()
+
+    assert first.value.code == second.value.code == "imcc_gas_species_not_found"
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("openimcc")
+    assert counts["misses"] == 2
+    assert counts["stores"] == 0
+    assert counts["not_stored:exception:imcc_gas_species_not_found"] == 2
