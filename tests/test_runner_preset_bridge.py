@@ -13,7 +13,7 @@ import pytest
 import yaml
 
 from simulator import runner as runner_module
-from simulator import condensation as condensation_module
+from simulator import lab_geometry as lab_geometry_module
 from simulator.core import PyrolysisSimulator
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     COMPARISON_SCHEMA_VERSION,
@@ -307,7 +307,7 @@ def _gram_lab_run(preset: dict, *, campaign: str) -> PyrolysisRun:
     )
 
 
-def test_null_exposed_melt_area_refuses_sized_crucible_face() -> None:
+def test_null_exposed_melt_area_defaults_to_sized_crucible_face() -> None:
     for name in ("robinot_2026.yaml", "sesko_2024.yaml"):
         preset = _vacuum_preset(name)
         assert preset["lab_geometry"]["sample"].get("exposed_melt_area_m2") in (
@@ -316,14 +316,11 @@ def test_null_exposed_melt_area_refuses_sized_crucible_face() -> None:
         )
         run = _gram_lab_run(preset, campaign="C0")
         session = SimSession()
-        with pytest.raises(LabGeometryError) as caught:
-            session.start(run._session_config())
-        assert caught.value.code == "exposed_melt_area_not_printed"
+        session.start(run._session_config())
         sim = session.simulator
         crucible_area_m2 = sim._equipment.crucible.melt_surface_area_m2
         assert crucible_area_m2 > 0.0
-        assert sim.melt.melt_surface_area_m2 == pytest.approx(0.2)
-        assert sim.melt.melt_surface_area_m2 != pytest.approx(crucible_area_m2)
+        assert sim.melt.melt_surface_area_m2 == pytest.approx(crucible_area_m2)
 
     robinot = _vacuum_preset("robinot_2026.yaml")
     printed = copy.deepcopy(robinot)
@@ -385,15 +382,19 @@ def test_c0_start_installs_printed_area_before_the_bridge(
     omitted = copy.deepcopy(printed)
     omitted["lab_geometry"]["sample"]["exposed_melt_area_m2"] = None
     omitted_session = SimSession()
-    with pytest.raises(LabGeometryError) as caught:
-        omitted_session.start(
-            _gram_lab_run(omitted, campaign="C0")._session_config()
-        )
-    assert caught.value.code == "exposed_melt_area_not_printed"
-    assert omitted_session.simulator.melt.melt_surface_area_m2 == pytest.approx(
-        0.2
+    omitted_session.start(
+        _gram_lab_run(omitted, campaign="C0")._session_config()
     )
-    assert forecast_areas == [pytest.approx(0.000123)]
+    omitted_sized_area_m2 = (
+        omitted_session.simulator._equipment.crucible.melt_surface_area_m2
+    )
+    assert omitted_session.simulator.melt.melt_surface_area_m2 == pytest.approx(
+        omitted_sized_area_m2
+    )
+    assert forecast_areas == [
+        pytest.approx(0.000123),
+        pytest.approx(omitted_sized_area_m2),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -437,11 +438,13 @@ def test_bridge_and_equipment_share_the_exposed_area_reader(
 ) -> None:
     robinot = _vacuum_preset("robinot_2026.yaml")
     monkeypatch.setattr(
-        condensation_module,
-        "read_gram_lab_exposed_melt_area",
-        lambda _geometry: 0.000201,
+        lab_geometry_module,
+        "resolve_gram_lab_exposed_melt_area",
+        lambda _geometry, **_kwargs: lab_geometry_module.GramLabMeltAreaResolution(
+            0.000201
+        ),
     )
-    bridge = condensation_module.gram_lab_exposed_melt_area_bridge(
+    bridge = lab_geometry_module.gram_lab_exposed_melt_area_bridge(
         robinot["lab_geometry"]
     )
     assert bridge["effective_exposed_area_m2"] == pytest.approx(0.000201)
@@ -461,7 +464,7 @@ def test_exposed_area_scale_token_is_lab_geometry_scale(
     assert LAB_GEOMETRY_SCALE == "gram_lab"
     robinot = _vacuum_preset("robinot_2026.yaml")
     monkeypatch.setattr(
-        condensation_module,
+        lab_geometry_module,
         "LAB_GEOMETRY_SCALE",
         "not_the_gram_lab_token",
     )

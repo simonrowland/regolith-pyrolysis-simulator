@@ -12,6 +12,7 @@ from simulator.scalar_boundary import is_declared_real_scalar
 
 LAB_GEOMETRY_SCALE = "gram_lab"
 LAB_FIXED_EQUIPMENT_SIZING = "lab_fixed_geometry"
+LAB_EXPOSED_MELT_AREA_BASIS = "gram_lab_exposed_melt"
 LAB_SURFACE_ROLES = frozenset({
     "holder",
     "window",
@@ -40,6 +41,15 @@ class LabGeometryError(ValueError):
     def __init__(self, code: str, detail: str) -> None:
         super().__init__(f"{code}: {detail}")
         self.code = code
+
+
+@dataclass(frozen=True)
+class GramLabMeltAreaResolution:
+    """Effective melt-face area and whether runtime sizing supplied it."""
+
+    area_m2: float | None
+    defaulted: bool = False
+    out_of_domain: bool = False
 
 
 @dataclass(frozen=True)
@@ -186,6 +196,84 @@ def parse_lab_geometry(
             field="lab_geometry.sample.mass_g",
         ),
     )
+
+
+def resolve_gram_lab_exposed_melt_area(
+    lab_geometry: Mapping[str, Any] | None,
+    *,
+    crucible_face_area_m2: float | None = None,
+) -> GramLabMeltAreaResolution:
+    """Resolve a printed gram-lab melt face or its sized crucible default."""
+
+    if not isinstance(lab_geometry, Mapping):
+        return GramLabMeltAreaResolution(None)
+    if str(lab_geometry.get("scale") or "").strip() != LAB_GEOMETRY_SCALE:
+        return GramLabMeltAreaResolution(None)
+    sample = lab_geometry.get("sample")
+    if not isinstance(sample, Mapping):
+        return GramLabMeltAreaResolution(None)
+
+    raw_area = sample.get("exposed_melt_area_m2")
+    defaulted = raw_area in (None, "")
+    if defaulted:
+        if crucible_face_area_m2 is None:
+            return GramLabMeltAreaResolution(None)
+        raw_area = crucible_face_area_m2
+
+    try:
+        area = (
+            float(raw_area)
+            if is_declared_real_scalar(raw_area, allow_numeric_str=True)
+            else None
+        )
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise LabGeometryError(
+            "invalid_lab_geometry_positive_value",
+            "lab_geometry.sample.exposed_melt_area_m2 must be finite positive",
+        ) from exc
+    if area is None or not math.isfinite(area) or area <= 0.0:
+        raise LabGeometryError(
+            "invalid_lab_geometry_positive_value",
+            "lab_geometry.sample.exposed_melt_area_m2 must be finite positive",
+        )
+    return GramLabMeltAreaResolution(
+        area_m2=area,
+        defaulted=defaulted,
+        out_of_domain=(
+            defaulted and sample.get("mass_g") in (None, "")
+        ),
+    )
+
+
+def gram_lab_exposed_melt_area_bridge(
+    lab_geometry: Mapping[str, Any] | None,
+    *,
+    crucible_face_area_m2: float | None = None,
+) -> dict[str, Any]:
+    resolution = resolve_gram_lab_exposed_melt_area(
+        lab_geometry,
+        crucible_face_area_m2=crucible_face_area_m2,
+    )
+    if resolution.area_m2 is None:
+        return {}
+    bridge: dict[str, Any] = {
+        "effective_exposed_area_m2": resolution.area_m2,
+        "area_basis": LAB_EXPOSED_MELT_AREA_BASIS,
+    }
+    if resolution.defaulted:
+        notice = {
+            "code": "knob_defaulted",
+            "path": "lab_geometry.sample.exposed_melt_area_m2",
+            "value": resolution.area_m2,
+            "unit": "m2",
+            "default_source": "EquipmentDesigner.size_crucible",
+            "source_class": "assumption_with_sensitivity_marker",
+            "sensitivity_marker": "defaulted_crucible_face",
+        }
+        if resolution.out_of_domain:
+            notice["out_of_domain"] = True
+        bridge["notices"] = [notice]
+    return bridge
 
 
 def _parse_lab_surface(

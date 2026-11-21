@@ -520,6 +520,7 @@ def test_unreported_pomeroy_knobs_use_runner_defaults_and_report_them(
             "value": expected_default_kg,
             "unit": "kg",
             "default_source": "PyrolysisRun.mass_kg",
+            "out_of_domain": True,
         },
     }
 
@@ -582,13 +583,31 @@ def test_benchtop_presets_run_with_reported_pressure_or_runtime_default(
 
     assert result["status"] in {"ok", "partial"}
     runtime_notices = result["run_metadata"]["preset"].get("notices", [])
+    area_notice = next(
+        notice
+        for notice in runtime_notices
+        if notice["path"] == "lab_geometry.sample.exposed_melt_area_m2"
+    )
+    assert area_notice["code"] == "knob_defaulted"
+    assert area_notice["value"] == pytest.approx(
+        result["run_metadata"]["effective_exposed_area_m2"]
+    )
+    assert area_notice["source_class"] == "assumption_with_sensitivity_marker"
     if preset_path == POMEROY_PRESET_PATH:
+        assert area_notice["out_of_domain"] is True
         assert {
             notice["path"] for notice in runtime_notices
         } == {
             "mass_kg",
             "lab_schedule.chamber_pressure_mbar",
+            "lab_geometry.sample.exposed_melt_area_m2",
         }
+        mass_notice = next(
+            notice for notice in runtime_notices if notice["path"] == "mass_kg"
+        )
+        assert mass_notice["out_of_domain"] is True
+    else:
+        assert "out_of_domain" not in area_notice
 
 
 def test_robinot_preset_references_registered_loadable_eac1_feedstock() -> None:

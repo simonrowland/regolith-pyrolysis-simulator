@@ -100,7 +100,6 @@ from simulator.core import (
 )
 from simulator.condensation import (
     KNUDSEN_REFUSAL_REASON,
-    gram_lab_exposed_melt_area_bridge,
     stage_purity_report,
 )
 from simulator.cost_ledger import build_cost_rollup_diagnostic
@@ -135,7 +134,12 @@ from simulator.run_executor import (
     _json_safe,
     _safe_exception_text,
 )
-from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
+from simulator.lab_geometry import (
+    LAB_GEOMETRY_SCALE,
+    LabGeometryError,
+    gram_lab_exposed_melt_area_bridge,
+    parse_lab_geometry,
+)
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LabScheduleValidationError,
@@ -636,15 +640,19 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             }
         )
     if mass_defaulted:
-        notices.append(
-            {
-                "code": "knob_defaulted",
-                "path": "mass_kg",
-                "value": mass_kg,
-                "unit": "kg",
-                "default_source": "PyrolysisRun.mass_kg",
-            }
-        )
+        mass_notice = {
+            "code": "knob_defaulted",
+            "path": "mass_kg",
+            "value": mass_kg,
+            "unit": "kg",
+            "default_source": "PyrolysisRun.mass_kg",
+        }
+        if (
+            lab_geometry.scale == LAB_GEOMETRY_SCALE
+            and lab_geometry.sample_mass_g is None
+        ):
+            mass_notice["out_of_domain"] = True
+        notices.append(mass_notice)
     if notices:
         provenance["notices"] = notices
     provenance.update(gram_lab_exposed_melt_area_bridge(geometry))
@@ -1197,14 +1205,21 @@ class PyrolysisRun:
         execution.session._set_result_document(document)
         return document
 
-    def _lab_area_bridge(self) -> dict[str, Any]:
+    def _lab_area_bridge(
+        self,
+        *,
+        crucible_face_area_m2: float | None = None,
+    ) -> dict[str, Any]:
         lab_geometry = (
             self.setpoints_patch.get("lab_geometry")
             if isinstance(self.setpoints_patch, Mapping)
             else None
         )
         try:
-            return gram_lab_exposed_melt_area_bridge(lab_geometry)
+            return gram_lab_exposed_melt_area_bridge(
+                lab_geometry,
+                crucible_face_area_m2=crucible_face_area_m2,
+            )
         except LabGeometryError as exc:
             raise RunnerError(str(exc)) from exc
 
@@ -1527,11 +1542,27 @@ class PyrolysisRun:
                 lambda: _json_safe(execution.reduced_real_cache),
                 section="run_metadata.reduced_real_cache",
             )
+        crucible = getattr(getattr(sim, "_equipment", None), "crucible", None)
+        crucible_face_area_m2 = getattr(
+            crucible,
+            "melt_surface_area_m2",
+            None,
+        )
         lab_area_bridge = _safe_failure_value(
-            lambda: _json_safe(self._lab_area_bridge()),
+            lambda: _json_safe(
+                self._lab_area_bridge(
+                    crucible_face_area_m2=crucible_face_area_m2,
+                )
+            ),
             section="run_metadata.lab_area_bridge",
         )
+        lab_area_notices = []
         if lab_area_bridge:
+            if isinstance(lab_area_bridge, Mapping):
+                lab_area_bridge = dict(lab_area_bridge)
+                lab_area_notices = list(
+                    lab_area_bridge.pop("notices", []) or []
+                )
             if (
                 isinstance(lab_area_bridge, Mapping)
                 and lab_area_bridge.get("status") == "unavailable"
@@ -1546,6 +1577,18 @@ class PyrolysisRun:
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
+        if lab_area_notices:
+            preset = run_metadata.get(PRESET_PROVENANCE_METADATA_KEY)
+            if isinstance(preset, Mapping):
+                preset = copy.deepcopy(dict(preset))
+                preset["notices"] = list(preset.get("notices", []) or [])
+                preset["notices"].extend(lab_area_notices)
+                for key in ("effective_exposed_area_m2", "area_basis"):
+                    if key in run_metadata:
+                        preset[key] = run_metadata[key]
+                run_metadata[PRESET_PROVENANCE_METADATA_KEY] = preset
+            else:
+                run_metadata["notices"] = lab_area_notices
         run_metadata["campaigns_elapsed"] = _safe_failure_value(
             lambda: float(execution.campaigns_elapsed),
             section="run_metadata.campaigns_elapsed",

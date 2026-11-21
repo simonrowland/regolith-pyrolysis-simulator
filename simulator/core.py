@@ -660,7 +660,11 @@ from simulator.melt_regime import (
 )
 from simulator.config_flags import bool_feature_flag
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
+from simulator.lab_geometry import (
+    LabGeometryError,
+    parse_lab_geometry,
+    resolve_gram_lab_exposed_melt_area,
+)
 from simulator.lab_schedule import LabScheduleValidationError, interpolate_schedule_points
 from simulator.accounting.completeness import (
     CompletionContractBlocked,
@@ -16869,16 +16873,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             current_area_m2 <= 0.0
             or math.isclose(current_area_m2, 0.2, rel_tol=0.0, abs_tol=1e-12)
         ):
-            # condensation imports core at module level.
-            from simulator.condensation import read_gram_lab_exposed_melt_area
-
-            declared_area_m2 = read_gram_lab_exposed_melt_area(
+            area_resolution = resolve_gram_lab_exposed_melt_area(
                 self.setpoints.get('lab_geometry'),
+                crucible_face_area_m2=crucible_area_m2,
             )
             self.melt.melt_surface_area_m2 = (
                 crucible_area_m2
-                if declared_area_m2 is None
-                else declared_area_m2
+                if area_resolution.area_m2 is None
+                else area_resolution.area_m2
             )
 
         pipe = self._equipment.pipe

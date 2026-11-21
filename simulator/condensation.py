@@ -150,7 +150,6 @@ from simulator.core import (
     CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
 )
 from simulator.lab_geometry import (
-    LAB_GEOMETRY_SCALE,
     LabGeometry,
     LabGeometryError,
     parse_lab_geometry,
@@ -200,7 +199,6 @@ KNUDSEN_REFUSAL_REASON = 'knudsen_outside_viscous_flow'
 KNUDSEN_TRANSITION_REASON = 'knudsen_transitional_flow'
 INVALID_PIPE_DIAMETER_REASON = 'invalid_pipe_diameter'
 COLD_SPOT_MARGIN_C = 25.0
-LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 
 # Viscous-regime wall mass-transfer model (post-F3 follow-on, 2026-05-27).
 # F3 added wall-side regime_factor = Kn/(Kn + 0.01): f -> 0 in viscous flow
@@ -1726,69 +1724,6 @@ def _stirring_enhanced_sherwood(
     # to Sh = sherwood_laminar, not Sh = 0.
     sh_input = max(1.0, operator_value)
     return float(sherwood_laminar) * math.sqrt(sh_input)
-
-
-def read_gram_lab_exposed_melt_area(
-    lab_geometry: Mapping[str, Any] | None,
-) -> float | None:
-    """Printed gram-lab melt face, or None when this geometry has no sample face.
-
-    None means the mapping is not a gram-lab sample. The scale token is
-    ``LAB_GEOMETRY_SCALE``. A gram-lab sample whose area is null or blank
-    raises ``exposed_melt_area_not_printed``. A present value that is not
-    a finite positive declared scalar raises
-    ``invalid_lab_geometry_positive_value``. Numeric strings stay admitted.
-    A binary scalar, and an integer that ``float()`` cannot convert, are
-    that refusal. ``LabGeometryError`` is a ``ValueError``, so this
-    function raises it outside the conversion ``except``.
-    """
-    if not isinstance(lab_geometry, Mapping):
-        return None
-    if str(lab_geometry.get('scale') or '').strip() != LAB_GEOMETRY_SCALE:
-        return None
-    sample = lab_geometry.get('sample')
-    if not isinstance(sample, Mapping):
-        return None
-    raw_area = sample.get('exposed_melt_area_m2', None)
-    if raw_area in (None, ''):
-        raise LabGeometryError(
-            'exposed_melt_area_not_printed',
-            'lab_geometry.sample.exposed_melt_area_m2 is null; '
-            'size_crucible must not supply the melt face',
-        )
-    try:
-        if is_declared_real_scalar(raw_area, allow_numeric_str=True):
-            area: float | None = float(raw_area)
-        else:
-            area = None
-    except (TypeError, ValueError, OverflowError) as exc:
-        raise LabGeometryError(
-            'invalid_lab_geometry_positive_value',
-            'lab_geometry.sample.exposed_melt_area_m2 must be finite positive',
-        ) from exc
-    if area is None or not math.isfinite(area) or area <= 0.0:
-        raise LabGeometryError(
-            'invalid_lab_geometry_positive_value',
-            'lab_geometry.sample.exposed_melt_area_m2 must be finite positive',
-        )
-    return area
-
-
-def gram_lab_exposed_melt_area_bridge(
-    lab_geometry: Mapping[str, Any] | None,
-) -> dict[str, Any]:
-    try:
-        area = read_gram_lab_exposed_melt_area(lab_geometry)
-    except LabGeometryError as exc:
-        if exc.code != 'exposed_melt_area_not_printed':
-            raise
-        return {}
-    if area is None:
-        return {}
-    return {
-        'effective_exposed_area_m2': area,
-        'area_basis': LAB_EXPOSED_MELT_AREA_BASIS,
-    }
 
 
 def _neufeld_collision_integral_omega_d(T_star: float) -> float:
