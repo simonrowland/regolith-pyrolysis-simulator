@@ -20993,6 +20993,13 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         expected_fO2, expected_starting = expected_sossi_conditions[run_key]
         assert conditions["fO2_log"].state.value == expected_fO2
         assert conditions["starting_component_ppm"].state.value == expected_starting
+        starting_locator = conditions["starting_component_ppm"].locator
+        assert starting_locator is not None
+        assert starting_locator.page == 53
+        assert starting_locator.table == "1"
+        assert starting_locator.source_path == (
+            "raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf"
+        )
         expected_pressure = sossi.experiments[obs.experiment_id].pressure_environment.total_pressure_Pa
         assert conditions["total_pressure_Pa"].state == expected_pressure.state
         identity = obs.identity
