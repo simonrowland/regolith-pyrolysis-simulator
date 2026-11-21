@@ -626,7 +626,7 @@ observations:
         amount_basis: mol_inventory
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '10000'
@@ -663,7 +663,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1773.15:row=abs:h=34bb0eaab6c2
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 5
@@ -749,6 +754,27 @@ observations:
         published_page: 69
         pdf_page_index: 1
         table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-1.678898900802177548242073382'
+          interval_high: '-1.678898900802177548242073382'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        figure: '8'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Sn2+ fraction evaluated from photoluminescence and optical absorption calibration.
     inputs: []
@@ -827,7 +853,7 @@ observations:
         amount_basis: mol_inventory
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '100000'
@@ -864,7 +890,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1923.15:row=abs:h=4f157ebe7479
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 5
@@ -950,6 +981,27 @@ observations:
         published_page: 69
         pdf_page_index: 1
         table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6788989008021775482420733816'
+          interval_high: '-0.6788989008021775482420733816'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 72
+        pdf_page_index: 4
+        figure: '8'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Sn2+ fraction evaluated from photoluminescence and optical absorption calibration.
     inputs: []
@@ -1024,7 +1076,7 @@ observations:
         amount_basis: mol_inventory
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '100000'
@@ -1061,7 +1113,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1873.15:row=as:h=e9395ccaa322
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 4
@@ -1143,6 +1200,27 @@ observations:
         published_page: 69
         pdf_page_index: 1
         table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6788989008021775482420733816'
+          interval_high: '-0.6788989008021775482420733816'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        figure: '6'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements and optical absorption calibration.
     inputs: []
@@ -1217,7 +1295,7 @@ observations:
         amount_basis: mol_inventory
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '100000'
@@ -1254,7 +1332,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1973.15:row=as:h=c3177fb0b9ed
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 4
@@ -1336,6 +1419,27 @@ observations:
         published_page: 69
         pdf_page_index: 1
         table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6788989008021775482420733816'
+          interval_high: '-0.6788989008021775482420733816'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        figure: '6'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements and optical absorption calibration.
     inputs: []
@@ -2382,7 +2486,7 @@ observations:
         amount_basis: mol_inventory
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '100000'
@@ -2419,7 +2523,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_5000_ppmw_1600C_air::T=1873.15:row=as:h=1babe8ec3659
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 4
@@ -2501,6 +2610,27 @@ observations:
         published_page: 69
         pdf_page_index: 1
         table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6788989008021775482420733816'
+          interval_high: '-0.6788989008021775482420733816'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 71
+        pdf_page_index: 3
+        figure: '4'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements.
     inputs: []

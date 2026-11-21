@@ -31,6 +31,7 @@ from typing import Any
 
 from simulator.cost_energy import json_safe_number, unavailable_quantity
 from simulator.physical_constants import GAS_CONSTANT_10SIG, PA_PER_BAR, PA_PER_MBAR
+from simulator.transport_regime import series_effective_speed_m3_s
 from simulator.environment import (
     ASTEROID_VACUUM_FLOOR_BAR,
     MARS_DATUM_PRESSURE_BAR,
@@ -480,11 +481,11 @@ def estimate_subambient_pump_cost(
         line_conductance_m3_s = _float_or_nan(validated_line_conductance_m3_s)
         if not math.isfinite(line_conductance_m3_s) or line_conductance_m3_s <= 0.0:
             return _infeasible_degenerate("invalid-line-conductance")
-        # Pump and line conductance are in series at the chamber:
-        # 1/S_eff = 1/S_pump + 1/C_line. The supplied C_line is required to
-        # have already passed the applicable Knudsen-regime correlation.
-        effective_speed_ceiling_m3_s = 1.0 / (
-            1.0 / speed_ceiling + 1.0 / line_conductance_m3_s
+        # The supplied C_line has already passed the Knudsen-regime
+        # correlation. The series law lives in transport_regime.
+        effective_speed_ceiling_m3_s = series_effective_speed_m3_s(
+            speed_ceiling,
+            line_conductance_m3_s,
         )
         feasible = (
             math.isfinite(required_speed_m3_s)

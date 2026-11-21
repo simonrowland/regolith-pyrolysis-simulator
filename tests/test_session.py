@@ -159,6 +159,50 @@ def test_session_runtime_carrier_override_reaches_hourly_state(
     assert hourly["p_carrier_bar"] > 0.0
 
 
+def test_staged_pressure_does_not_reuse_prior_knudsen_floor():
+    from simulator.optimize.sso2_evidence import _stage_gas_payload_from_raw
+
+    config = _config(campaign="C2A_STAGED")
+    stages = config.setpoints["campaigns"]["C2A_staged"]["stages"]
+    stages[0].update(
+        gas_cover_mode="pn2_sweep",
+        p_total_mbar=1.0e-6,
+        pO2_mbar=0.0,
+    )
+    stages[1].update(
+        gas_cover_mode="pn2_sweep",
+        p_total_mbar=5.0,
+        pO2_mbar=1.0,
+    )
+    sim = SimSession().start(config).simulator
+    sim.melt.temperature_C = 1600.0
+
+    def apply_stage_pressure():
+        sim.campaign_mgr.apply_c2a_staged_gas_controls(sim.melt)
+        sim._sync_c2a_staged_overhead_gas_control()
+        sim._apply_c2a_knudsen_pressure_adjustment()
+        raw = sim.campaign_mgr.last_c2a_staged_gas_control
+        return _stage_gas_payload_from_raw(raw, snapshot=None), raw
+
+    first, first_raw = apply_stage_pressure()
+    assert first["p_total_mbar"] == pytest.approx(5.0)
+    assert first_raw["knudsen_pressure_adjustment"][
+        "requested_p_total_mbar"
+    ] == pytest.approx(1.0e-6)
+    assert first["pn2_band_action"] == "adjusted_by_knudsen_pressure_floor"
+
+    sim.melt.campaign_hour = 4.0
+    second, second_raw = apply_stage_pressure()
+
+    assert second["stage_name"] == "sio_window"
+    assert second["requested_p_total_mbar"] == pytest.approx(5.0)
+    assert second["pO2_mbar"] == pytest.approx(1.0)
+    assert second["pN2_mbar"] == pytest.approx(4.0)
+    assert second["p_total_mbar"] == pytest.approx(5.0)
+    assert second["pn2_band_action"] == "honored_outside_band"
+    assert "knudsen_pressure_adjustment" not in second_raw
+
+
 def test_session_runtime_unknown_carrier_is_rejected_before_start():
     session = SimSession()
 
@@ -640,6 +684,25 @@ def test_campaign_override_po2_numeric_string_is_refused():
     assert exc_info.value.reason_code == "runtime_campaign_pO2_mbar_not_numeric"
     assert sim.melt.pO2_mbar == pytest.approx(before_po2)
     assert "pO2_mbar" not in sim.campaign_mgr.overrides.get("C2A", {})
+
+
+def test_session_start_campaign_pressure_override_validates_raw_value():
+    config = _config(
+        campaign="C2A",
+        runtime_campaign_overrides={
+            "C2A": {"pO2_mbar": 0.1, "p_total_mbar": 10.0},
+        },
+    )
+    # The frozen config contains a mutable nested mapping; startup must still
+    # admit raw pressure values before coercing them to floats.
+    config.runtime_campaign_overrides["C2A"]["pO2_mbar"] = "1.0"
+    session = SimSession()
+
+    with pytest.raises(ValueError) as exc_info:
+        session.start(config)
+
+    assert exc_info.value.reason_code == "runtime_campaign_pO2_mbar_not_numeric"
+    assert session._sim is None
 
 
 def test_session_adjust_campaign_override_po2_zero_leaves_atmosphere_alone():

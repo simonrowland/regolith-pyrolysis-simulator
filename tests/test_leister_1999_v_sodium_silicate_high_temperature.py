@@ -15,6 +15,10 @@ from simulator.battery.enums import (
 )
 from simulator.battery.migrate import Migrator
 from simulator.battery.score import _printed_uncertainty_band
+from tests.literature_extract_test_helpers import (
+    assert_all_physical_locators,
+    iter_locators,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,25 +55,10 @@ def test_table2_valence_cells_render_pins_and_migrate_with_conditions() -> None:
     assert points[0]["locator"]["published_page"] == 322
     assert points[0]["locator"]["pdf_page_index"] == 3
 
-    locators = []
-
-    def collect_locators(value: object) -> None:
-        if isinstance(value, dict):
-            if "page" in value and "pdf_page_index" in value:
-                locators.append(value)
-            for item in value.values():
-                collect_locators(item)
-        elif isinstance(value, list):
-            for item in value:
-                collect_locators(item)
-
-    collect_locators(document)
+    locators = list(iter_locators(document))
     assert len(locators) == 184
-    assert all(
-        locator["page"] == locator["pdf_page_index"] + 1
-        and "published_page" in locator
-        for locator in locators
-    )
+    assert_all_physical_locators(document)
+    assert all("published_page" in locator for locator in locators)
     assert all(
         (point["point_conditions"]["atmosphere"]["state"]["value"] == "N2")
         == (point["quench_status"]["state"]["value"] == "not_stated")

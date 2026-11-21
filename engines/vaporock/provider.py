@@ -33,6 +33,7 @@ from engines.builtin._common import (
     reject_wrong_intent,
     resolve_request_vacuum_floor_bar,
     resolve_transport_pO2_bar,
+    transport_pO2_extrapolation_notice,
 )
 from engines.vaporock.result import VapoRockDiagnostics
 from simulator.chemistry.kernel.capabilities import (
@@ -295,6 +296,7 @@ class VapoRockProvider(ChemistryProvider):
             'transport_pO2_bar': float(pO2_bar),
             'transport_fO2_log': float(fO2_log_resolved),
         }
+        oxygen_notice = transport_pO2_extrapolation_notice(request)
         return ControlAudit(
             requested=requested,
             applied=applied,
@@ -302,7 +304,7 @@ class VapoRockProvider(ChemistryProvider):
                 'VapoRock vapor pressure applies transport gas fO2 from '
                 'transport_pO2_bar; intrinsic_fO2_log is retained as melt '
                 'redox provenance.',
-            ),
+            ) + ((oxygen_notice,) if oxygen_notice else ()),
         )
 
     def _composition_from_view(self, request: IntentRequest) -> dict:

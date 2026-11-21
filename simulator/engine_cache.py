@@ -1,8 +1,7 @@
 """One process-local HOT SQLite cache for engine outputs.
 
-Code-side numeric changes require a chemistry-version bump. The key also
-contains the selected engine pin and bytes of its runtime data files, so those
-input edits miss old rows without expiring or deleting them.
+Chemistry changes expire cached outputs only when the engine's manually
+maintained chemistry version is bumped.
 """
 
 from __future__ import annotations
@@ -308,16 +307,15 @@ def cacheable_refusal(result) -> bool:
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
-    "internal-analytical": 2,
+    "internal-analytical": 3,
     "vaporock": 1,
-    "magemin": 3,
-    "alphamelts": 3,
-    "thermoengine": 3,
+    "magemin": 4,
+    "alphamelts": 4,
+    "thermoengine": 4,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
-# diagnostic; the declared engine pin and runtime data bytes are separate key
-# material because they can change outputs without a code-side version bump.
+# diagnostic and does not change cache keys or expire cached outputs.
 # alphamelts v1: 2026-11-08 alphaMELTS 2.3.1 Darwin arm64 binary - initial cache version
 # alphamelts v2: 2026-11-11 alphaMELTS 2.3.1, b257r landing 982a8d9fa - canonical activity labels, oxide-vapour projection and typed missing-pO2 refusal (18be4a5cd, b4e6e0dda, 959731207)
 # thermoengine v1: 2026-11-08 ThermoEngine df7a5f4609116a83bf40a5a352a19e3826a822d9 - initial cache version
@@ -331,6 +329,10 @@ ENGINE_CHEMISTRY_VERSION = {
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
+# internal-analytical v3: 2026-11-18 b265 e7fbd4c052 onto b-1244 71806e046 - vapour-rail continuation notice, wall-saturation thermo and evaporation drive
+# magemin v4: 2026-11-18 MAGEMin pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - positive SiO2 outside [30, 80] wt% is predicted and flagged; Fe-free cells leave fO2 indeterminate
+# alphamelts v4: 2026-11-18 alphaMELTS binary pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - subfloor oxygen extrapolation notice and freeze-gate cooling path
+# thermoengine v4: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - same subfloor oxygen extrapolation notice
 
 
 @dataclass(frozen=True)
@@ -431,7 +433,7 @@ ENGINE_CACHE_INPUTS = {
     ),
 }
 _ENGINE_CACHE_INPUT_IDENTITY_BYTES = 16
-_ENGINE_CACHE_KEY_PREFIX_BYTES = 4 + _ENGINE_CACHE_INPUT_IDENTITY_BYTES
+_ENGINE_CACHE_KEY_PREFIX_BYTES = 4
 
 
 class EngineCacheInputIdentityError(ValueError):
@@ -517,7 +519,7 @@ def _cache_input_component(engine_id: str, input_ref: EngineCacheInput) -> bytes
         ) from exc
 
 
-@lru_cache(maxsize=len(ENGINE_CHEMISTRY_VERSION))
+@lru_cache(maxsize=None)
 def _engine_cache_input_identity_digest(engine_id: str) -> bytes:
     try:
         inputs = ENGINE_CACHE_INPUTS[engine_id]
@@ -549,7 +551,7 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     },
     "internal-analytical": {
         "identity": "source-sha256:ac03c54243b61890960158318fb40a52972f301e9ac1dc9c381fa3a495818740",
-        "date": "2026-11-08",
+        "date": "2026-11-18",
     },
     "vaporock": {
         "identity": "version:1.0.0;record-sha256:89e860e3d6995f542337748019c4f6198f76c127ce3ca90fbbc2063bd401fc5a",
@@ -557,15 +559,15 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     },
     "magemin": {
         "identity": "sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28",
-        "date": "2026-11-08",
+        "date": "2026-11-18",
     },
     "alphamelts": {
         "identity": "sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85",
-        "date": "2026-11-08",
+        "date": "2026-11-18",
     },
     "thermoengine": {
         "identity": "version:1.2.0;record-sha256:462a81b3fda92acf74a1e9e38f260dac65232d855340f72307e05a65219c1b27",
-        "date": "2026-11-08",
+        "date": "2026-11-18",
     },
 }
 
@@ -788,7 +790,6 @@ def engine_cache_key(engine_id: str, chem_version: str | int, request: Any) -> b
     header = (
         bytes((_ENGINE_NUMBERS[engine_id],))
         + version.to_bytes(2, "big")
-        + _engine_cache_input_identity_digest(engine_id)
     )
     if len(payload) + _ENGINE_CACHE_KEY_PREFIX_BYTES > _NATURAL_KEY_LIMIT:
         return header + b"\xff" + hashlib.blake2b(payload, digest_size=16).digest()
@@ -1438,11 +1439,19 @@ def _read_provenance(connection: sqlite3.Connection, provenance_id: int) -> byte
 
 
 def _initialize_cold(connection: sqlite3.Connection, schema: str = "main") -> None:
+    # Trace metadata only; cache lookup reads HOT and never consults this field.
     connection.execute(f"CREATE TABLE IF NOT EXISTS {schema}.engine_values "
-                       "(key BLOB PRIMARY KEY, value BLOB NOT NULL) WITHOUT ROWID")
+                       "(key BLOB PRIMARY KEY, value BLOB NOT NULL, "
+                       "input_fingerprint BLOB) WITHOUT ROWID")
 
 
-def _store_cold(connection: sqlite3.Connection, path: Path, key: bytes, values: Mapping[str, Any]) -> None:
+def _store_cold(
+    connection: sqlite3.Connection,
+    path: Path,
+    key: bytes,
+    values: Mapping[str, Any],
+    input_fingerprint: bytes | None = None,
+) -> None:
     if not any(row[1] == "cold" for row in connection.execute("PRAGMA database_list")):
         cold_path = _cache_pair(path)[1]
         if not values and not cold_path.exists():
@@ -1457,7 +1466,11 @@ def _store_cold(connection: sqlite3.Connection, path: Path, key: bytes, values: 
         _check_cold_schema(connection)
     if values:
         value = zlib.compress(pack(values), level=6)
-        connection.execute("INSERT OR REPLACE INTO cold.engine_values VALUES (?,?)", (key, value))
+        connection.execute(
+            "INSERT OR REPLACE INTO cold.engine_values "
+            "(key, value, input_fingerprint) VALUES (?, ?, ?)",
+            (key, value, input_fingerprint),
+        )
     else:
         connection.execute("DELETE FROM cold.engine_values WHERE key=?", (key,))
 
@@ -1550,7 +1563,22 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 provenance=provenance,
             )
             if inserted:
-                _store_cold(connection, path, cache_key, solved.cold if isinstance(solved, EngineCacheValue) else {})
+                cold_values = solved.cold if isinstance(solved, EngineCacheValue) else {}
+                input_fingerprint = None
+                # Fingerprint source inputs only for a newly created COLD output row.
+                if cold_values:
+                    try:
+                        input_fingerprint = _engine_cache_input_identity_digest(engine_id)
+                    except EngineCacheInputIdentityError:
+                        # Trace metadata must never prevent an otherwise valid cache write.
+                        pass
+                _store_cold(
+                    connection,
+                    path,
+                    cache_key,
+                    cold_values,
+                    input_fingerprint,
+                )
             connection.commit()
             if inserted:
                 _record_bloom_key(connection, cache_key)
@@ -1662,7 +1690,7 @@ def _cache_uri(path: Path, mode: str = "ro") -> str:
 
 
 def _check_cold_schema(connection: sqlite3.Connection) -> None:
-    expected = ["key", "value"]
+    expected = ["key", "value", "input_fingerprint"]
     found = [row[1] for row in connection.execute("PRAGMA cold.table_info(engine_values)")]
     if found != expected:
         raise EngineCacheSchemaMismatch("cold.engine_values", expected, found)
@@ -1785,13 +1813,17 @@ def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -
                     for key, value, engine, version, seq, provenance in cursor:
                         counts["read"] += 1
                         incoming_cold = source.execute(
-                            "SELECT value FROM cold.engine_values WHERE key=?", (key,),
+                            "SELECT value,input_fingerprint FROM cold.engine_values WHERE key=?", (key,),
                         ).fetchone() if has_cold else None
-                        kept_cold = destination.execute("SELECT value FROM cold.engine_values WHERE key=?", (key,)).fetchone()
+                        kept_cold = destination.execute(
+                            "SELECT value,input_fingerprint FROM cold.engine_values WHERE key=?", (key,),
+                        ).fetchone()
                         inserted, conflict = _insert_cache_row_if_absent(
                             destination, key, value, engine, version, box, seq, provenance=provenance,
                         )
-                        conflict = conflict or bool(incoming_cold and kept_cold and incoming_cold != kept_cold)
+                        conflict = conflict or bool(
+                            incoming_cold and kept_cold and incoming_cold[0] != kept_cold[0]
+                        )
                         counts["inserted"] += int(inserted)
                         counts["conflicts"] += int(conflict)
                         counts["already_present"] += int(not inserted and not conflict)
@@ -1804,7 +1836,11 @@ def merge_cache_files(into: Path, inputs: list[Path], *, vacuum: bool = False) -
                                 "input": {"source_box": box, "row_seq": seq},
                             }, sort_keys=True) + "\n")
                         elif incoming_cold:
-                            destination.execute("INSERT OR IGNORE INTO cold.engine_values VALUES (?,?)", (key, incoming_cold[0]))
+                            destination.execute(
+                                "INSERT OR IGNORE INTO cold.engine_values "
+                                "(key, value, input_fingerprint) VALUES (?, ?, ?)",
+                                (key, incoming_cold[0], incoming_cold[1]),
+                            )
                         last = seq
                     if last > (watermark[0] if watermark else 0):
                         destination.execute(

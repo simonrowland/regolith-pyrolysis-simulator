@@ -50,6 +50,17 @@ from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.supervised_process_pool import (
     supervised_process_map,
 )
+from simulator.battery.source_declarations import (
+    HASHIMOTO_RESIDUE_PREDICTOR,
+    SOSSI_RESIDUE_PREDICTOR,
+    declared_residue_predictor as _declared_residue_predictor,
+    source_rule_enabled as _source_rule_enabled,
+)
+from simulator.source_ids import (
+    HASHIMOTO_SOURCE_ID as _HASHIMOTO_SOURCE_ID,
+    SF04_WORKBOOK_SOURCE_ID,
+    SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
+)
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
@@ -144,7 +155,12 @@ from simulator.battery.input_provenance import (
     printed_single_melt_evidence,
     single_phase_printed_bulk_policy,
 )
-from simulator.physical_constants import ATM_PA_DECIMAL, GAS_CONSTANT, PA_PER_BAR
+from simulator.physical_constants import (
+    ATM_PA_DECIMAL,
+    GAS_CONSTANT,
+    GAS_CONSTANT_DECIMAL,
+    PA_PER_BAR,
+)
 
 if TYPE_CHECKING:
     from simulator.diagnostic_helpers.binary_pot_battery import Po2Request
@@ -416,9 +432,6 @@ def _score_identity_equal(
 
 TWO_PHASE_BULK_COMPOSITION_STATUS = "two_phase_bulk_composition_not_liquid_composition"
 TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER = "bulk_composition_in_two_phase_region"
-# Engines that consume the SF04 magma companion workbook. Never score them
-# against those rows (chunk-3 carried ruling).
-SF04_WORKBOOK_SOURCE_ID = "sf04-magma-companion-workbook"
 SF04_WORKBOOK_REGIME = "magma_model_companion_workbook"
 
 INTERNAL_CONSISTENCY_STEMS: frozenset[str] = frozenset(
@@ -559,13 +572,13 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     # B677 and B689 are different bulletins from the B672 Mn rows and
     # are not coefficient sources.
     "ellingham": ("janaf-4th", "nasa-cea-thermo", "nasa-glenn"),
-    "imcc-sf04-v1.0.2": ("sf04-magma-companion-workbook",),
-    "imcc-sf04-ext-v4": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.2": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.2-ext-sp-2": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.3-d066-v1": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.3-d066-ext-v1": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.3-d066-v1-kcaalsi2o7": ("sf04-magma-companion-workbook",),
+    "imcc-sf04-v1.0.2": (SF04_WORKBOOK_SOURCE_ID,),
+    "imcc-sf04-ext-v4": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.2": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.2-ext-sp-2": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.3-d066-v1": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.3-d066-ext-v1": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.3-d066-v1-kcaalsi2o7": (SF04_WORKBOOK_SOURCE_ID,),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
@@ -1707,7 +1720,9 @@ def vapour_crystalline_sample_liquid_engine_refusal(
         return detail
     compound = reservoir[0]
 
-    from simulator.battery.generators.janaf import janaf_fusion_energy
+    from simulator.reference_data.janaf import (
+        janaf_fusion_energy,
+    )
 
     try:
         janaf_fusion_energy(compound, temperature_K)
@@ -1974,7 +1989,7 @@ def is_internal_consistency(origin: str | None) -> bool:
 
 
 def is_sf04_workbook(observation: Observation) -> bool:
-    if observation.source_id == SF04_WORKBOOK_SOURCE_ID:
+    if _source_rule_enabled(observation.source_id, "sf04_workbook"):
         return True
     evidence = observation.evidence
     if evidence.original_method_class == SF04_WORKBOOK_REGIME:
@@ -3499,14 +3514,16 @@ def _fusion_energy_when_polymorph_absent(
     notice means the value must stay on the solid number.
     """
 
+    from simulator.reference_data.janaf import (
+        _janaf_fusion_energy_for_pair,
+        janaf_fusion_energy,
+    )
     from simulator.battery.generators.janaf import (
         _JANAF_POLYMORPH_BY_TABLE,
         JANAF_R_J_PER_MOL_K,
         JANAFFusionPolymorphUnavailable,
         _janaf_eligible_pure_crystal_tables,
-        _janaf_fusion_energy_for_pair,
         _janaf_stable_crystal_set,
-        janaf_fusion_energy,
     )
 
     fusion = janaf_fusion_energy(formula, temperature_K)
@@ -3673,9 +3690,11 @@ def _janaf_fusion_energy_for_reference(
 ):
     """Resolve the JANAF pair for the phase named by the source reference."""
 
+    from simulator.reference_data.janaf import (
+        _janaf_fusion_energy_for_pair,
+    )
     from simulator.battery.generators.janaf import (
         _fusion_table_pair,
-        _janaf_fusion_energy_for_pair,
         JANAFFusionPolymorphUnavailable,
     )
 
@@ -3931,7 +3950,30 @@ _HOLZHEID_PRINTED_FACTOR_1400_C = "1.94"
 _HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
 _FEO_WUSTITE_FORMULA = "Fe(1-x)O"
 _FEO_STOICHIOMETRIC_FORMULA = "FeO"
-_DISTIN_SOURCE_ID = "distin-1971-ferrous-silicate-melts"
+# There is no shared observation field linking the printed equation to its
+# activity rows: Takezoe keeps it as context, while the Yuge extract omits its
+# Eqs. 25–27. The repo-wide scan found these three cohorts with the
+# nonstoichiometric Fe_tO(l), Fe-saturated reference. Watanabe 1977 explicitly
+# uses Raoultian pure-liquid FeO; Ohta 1996 reports a different γ(Fe_tO), and
+# the 1993 slag extract carries a separate conversion relation.
+_BANYA_FETO_ACTIVITY_RELATIONS = {
+    # Ban-ya 1980 uses the same Fe_tO(l), Fe-saturated reference as the
+    # conversion printed in Ban-ya, Hino & Takezoe 1985 Eq. 23.
+    "banya-chiba-hikosaka-1980-feto-binary-solid-iron": (
+        "Ban-ya, Hino & Takezoe 1985 Eq. 23, p. 1770 "
+        "(same Fe_tO(l), Fe-saturated reference as the 1980 data)"
+    ),
+    "banya-hino-takezoe-1985-na-fe-silicate-redox": (
+        "Ban-ya, Hino & Takezoe 1985 Eq. 23, p. 1770"
+    ),
+    "banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity": (
+        "Ban-ya, Hino & Yuge 1985 Eqs. 25–27, p. 4 / folio 856"
+    ),
+}
+_TOTAL_IRON_BASIS_RELATION = "total_iron_basis"
+_SOLID_WUSTITE_REFERENCE_UNGROUNDED = (
+    "solid_wustite_reference_conversion_not_grounded"
+)
 # Ruled Darken & Gurry iron–liquid-oxide saturation, Tables III A/B, at the
 # three Table III B temperatures. These are the owner's anchors. A linear fit
 # of the stored line-CN r column does not reproduce them, so they are not
@@ -3990,7 +4032,7 @@ def _least_squares_line(
 def _janaf_formation_gibbs_J(table_id: str, temperature_K: Decimal) -> Decimal:
     """Formation Gibbs energy in J/mol from the production JANAF interpolator."""
 
-    from simulator.battery.generators.janaf import (
+    from simulator.reference_data.janaf import (
         _fusion_table_points,
         _interpolate_formation_gibbs,
     )
@@ -4160,6 +4202,89 @@ def _feo_reference_factor(
     return (
         (delta_g - delta_f_g) / (JANAF_R_J_PER_MOL_K * temperature_K)
     ).exp()
+
+
+def _banya_feto_to_feo_rs_factor(temperature_K: Decimal) -> Decimal:
+    """Convert Ban-ya's iron-saturated liquid Fe_tO activity to FeO(R.S.).
+
+    Premise: the source reaction is Fe_tO(l) + (1-t) Fe(s,l) = FeO(R.S.),
+    and at iron saturation a_Fe = 1. Thus K = a_FeO /
+    (a_FetO * a_Fe**(1-t)) = exp(-ΔG19 / RT), giving
+    log10(a_FeO) = log10(a_FetO) - ΔG19[J/mol] / (R T ln 10).
+    Ban-ya, Hino & Takezoe 1985 prints this relation as Eq. 23 (p. 1770;
+    controller physics ruling d-432 calls it Eq. 19); Ban-ya, Hino & Yuge
+    1985 independently prints the same relation in Eqs. 25–27 (p. 4 / folio
+    856). The 1980 set uses the same Fe-saturated Fe_tO reference. The
+    printed ΔG is -2040 + 1.707 T cal/mol. Convert with the owned
+    THERMOCHEMICAL_CALORIE_J; T is K and the owned CODATA
+    GAS_CONSTANT_DECIMAL is J/(mol K), so the exponent is dimensionless.
+    At 1673.15 K, ΔG19 is
+    816.1 cal/mol and the log10 shift is -0.1066 dex (a_FeO = 0.7824
+    a_FetO); ΔG19 = 0 gives equal activities. This relation already performs
+    the reference change and must not receive the D&G/JANAF or N0 factors.
+    """
+
+    delta_g_cal = Decimal("-2040") + Decimal("1.707") * temperature_K
+    delta_g_J = THERMOCHEMICAL_CALORIE_J * delta_g_cal
+    return (-delta_g_J / (GAS_CONSTANT_DECIMAL * temperature_K)).exp()
+
+
+def _banya_feto_activity_comparison(
+    reference: Observation,
+    *,
+    identity: Identity,
+    standard_state: StandardState,
+    quantity: Quantity,
+    temperature_K: Decimal,
+    relation_citation: str,
+) -> Observation:
+    factor = _banya_feto_to_feo_rs_factor(temperature_K)
+    converted = reference.value.point * factor
+    conversion_notice = Notice(
+        kind=NoticeKind.DERIVATION_USES_COMPILATION,
+        affected_quantities=(quantity,),
+        reason=(
+            f"source_relation={relation_citation}; "
+            "Fe_tO(l) + (1-t) Fe(s,l) = FeO(R.S.); "
+            "source_standard=Fe_tO(l), Fe-saturated; "
+            "destination_standard=FeO(R.S.); "
+            f"source_value={reference.value.point}; "
+            f"converted_value={converted}; "
+            f"factor={_display_decimal(factor, '0.001')}; "
+            f"T={temperature_K} K"
+        ),
+        origin=reference.observation_id,
+    )
+    assumption_notice = Notice(
+        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+        affected_quantities=(quantity,),
+        reason=(
+            "model_basis_assumption: FeO(l) D&G/Masson is treated as "
+            "identical to source FeO(R.S.) for prediction"
+        ),
+        origin=reference.observation_id,
+    )
+    notices: tuple[Notice, ...] = (conversion_notice, assumption_notice)
+    row_band = _printed_uncertainty_band(
+        quantity,
+        reference.uncertainty,
+        reference.value.point,
+        source_observation=reference,
+    )
+    if row_band.notice is not None:
+        notices += (row_band.notice,)
+    stoichiometric = _stoichiometric_standard(standard_state)
+    if identity.species.formula == "Fe_tO":
+        identity = replace(
+            identity,
+            species=replace(identity.species, formula=_FEO_STOICHIOMETRIC_FORMULA),
+        )
+    return replace(
+        reference,
+        identity=replace(identity, reference_state=State.of(stoichiometric)),
+        value=replace(reference.value, point=converted),
+        notices=union_notices(reference.notices, notices),
+    )
 
 
 def _feo_jackknife_factors(
@@ -4497,9 +4622,10 @@ def _iron_saturated_feo_calibration() -> tuple[
 def _iron_saturated_feo_comparison(
     reference: Observation, *, engine: Engine | None
 ) -> Observation | None:
-    """Retag iron-saturated Fe(1-x)O(l) onto the comparison FeO frame.
+    """Retag iron-saturated wüstite activity onto the comparison FeO frame.
 
-    An iron-saturated Fe(1-x)O standard has chemical potential
+    Ban-ya's Fe_tO sources use their printed Fe_tO(l) -> FeO(R.S.) relation.
+    Other iron-saturated Fe(1-x)O sources have chemical potential
     mu_FeO = mu_Fe + mu_O; a_Fe = 1 fixes mu_Fe. The gas-ratio factor f
     carries that partial onto JANAF Fe-019. iron_saturation_composition owns
     the typed saturation composition and its comparison band; N0 is not a
@@ -4536,6 +4662,20 @@ def _iron_saturated_feo_comparison(
     if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
         return None
     standard_state = identity.reference_state.value
+    banya_relation_citation = _BANYA_FETO_ACTIVITY_RELATIONS.get(
+        reference.source_id
+    )
+    banya_source_relation = banya_relation_citation is not None
+    species_formulas = (
+        {_FEO_STOICHIOMETRIC_FORMULA, "Fe_tO"}
+        if banya_source_relation
+        else {_FEO_STOICHIOMETRIC_FORMULA}
+    )
+    standard_formulas = (
+        {_FEO_WUSTITE_FORMULA, "Fe_tO"}
+        if banya_source_relation
+        else {_FEO_WUSTITE_FORMULA}
+    )
     if standard_state.convention is ReferenceStateConvention.TEMKIN:
         # Route Temkin through this function's recorded iron-saturation owner.
         pass
@@ -4545,9 +4685,9 @@ def _iron_saturated_feo_comparison(
     ):
         return None
     if (
-        identity.species.formula != _FEO_STOICHIOMETRIC_FORMULA
-        or standard_state.endmember.formula != _FEO_WUSTITE_FORMULA
-        or standard_state.component_basis != _FEO_WUSTITE_FORMULA
+        identity.species.formula not in species_formulas
+        or standard_state.endmember.formula not in standard_formulas
+        or standard_state.component_basis != standard_state.endmember.formula
         or phase_token(standard_state.endmember) is not Phase.L
         or reference.value.kind is not ValueKind.POINT
         or reference.value.point is None
@@ -4571,9 +4711,23 @@ def _iron_saturated_feo_comparison(
                 "has no temperature_K"
             ),
             origin=reference.observation_id,
-            band="Darken & Gurry iron-boundary conversion requires temperature_K",
+            band=(
+                "Ban-ya Fe_tO to FeO(R.S.) conversion requires temperature_K"
+                if banya_source_relation
+                else "Darken & Gurry iron-boundary conversion requires temperature_K"
+            ),
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
+    if banya_relation_citation is not None:
+        return _banya_feto_activity_comparison(
+            reference,
+            identity=identity,
+            standard_state=standard_state,
+            quantity=quantity,
+            temperature_K=temperature_K,
+            relation_citation=banya_relation_citation,
+        )
+
     composition_decision = iron_saturation_composition(reference)
     composition_notice = _composition_notice(
         reference, composition_decision, quantity
@@ -4685,11 +4839,12 @@ def fusion_comparison_reference(
     """Single owner of reference-state selection for the scorer and the melt benchmark.
 
     Crystal activities move onto the liquid endmember by the JANAF fusion
-    energy. Iron-saturated Fe(1-x)O(l) activities, including Distin's
-    tabulated oxygen ratio, move onto stoichiometric FeO(l) by the Darken
-    & Gurry factor f alone (a_FeO = a_measured * f, f = exp((mu_w - mu_FeO)/RT)
-    from the measured Fe/oxide equilibrium and JANAF). N0 parameterises the
-    iron-saturation composition and its d-333 band; it is not a second divisor.
+    energy. Ban-ya Fe_tO activities use the source's Fe_tO(l) -> FeO(R.S.)
+    relation. Other iron-saturated Fe(1-x)O(l) activities, including Distin's
+    oxygen ratio, use the Darken & Gurry factor f to reach stoichiometric
+    FeO(l) (a_FeO = a_measured * f, f = exp((mu_w - mu_FeO)/RT)). N0
+    parameterises the other sources' iron-saturation composition and band; it
+    is not an additional activity factor.
     """
 
     iron_saturated = _iron_saturated_feo_comparison(reference, engine=engine)
@@ -4697,6 +4852,35 @@ def fusion_comparison_reference(
         return iron_saturated
 
     identity = reference.identity
+    if (
+        reference.admission.status is AdmissionStatus.ADMITTED
+        and isinstance(identity, Identity)
+        and quantity_token(identity)
+        in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        and identity.reference_state is not None
+        and identity.reference_state.is_value
+        and isinstance(identity.reference_state.value, StandardState)
+    ):
+        standard = identity.reference_state.value
+        if (
+            standard.endmember.formula
+            in {_FEO_WUSTITE_FORMULA, "Fe0.947O"}
+            and phase_token(standard.endmember) is Phase.CR
+        ):
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(quantity_token(identity),),
+                reason=_SOLID_WUSTITE_REFERENCE_UNGROUNDED,
+                origin=reference.observation_id,
+                band=(
+                    "solid wüstite to stoichiometric FeO requires a sourced "
+                    "stoichiometry correction and solid/liquid standard-state term"
+                ),
+            )
+            return replace(
+                reference,
+                notices=union_notices(reference.notices, (notice,)),
+            )
     if (
         reference.admission.status is not AdmissionStatus.ADMITTED
         or not isinstance(identity, Identity)
@@ -4795,13 +4979,15 @@ def fusion_comparison_reference(
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
+    from simulator.reference_data.janaf import (
+        _janaf_fusion_energy_for_pair,
+        janaf_fusion_energy,
+    )
     from simulator.battery.generators.janaf import (
         JANAF_R_J_PER_MOL_K,
         JANAFFusionPolymorphUnavailable,
         _janaf_eligible_pure_crystal_tables,
-        _janaf_fusion_energy_for_pair,
         _janaf_stable_crystal_set,
-        janaf_fusion_energy,
     )
 
     # d-338: a printed pure solid that names no polymorph takes the JANAF
@@ -6653,6 +6839,84 @@ def _is_standard_pressure_ambiguity_uncertainty(
     )
 
 
+def _total_iron_basis_band(
+    quantity: Quantity,
+    uncertainty: Uncertainty,
+    source_observation: Observation | None,
+) -> _PrintedBandResolution:
+    derivation = uncertainty.derivation
+    if (
+        uncertainty.kind is not UncertaintyKind.DERIVED
+        or derivation is None
+        or derivation.relation != _TOTAL_IRON_BASIS_RELATION
+    ):
+        return _PrintedBandResolution()
+    if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_quantity_unmapped"}
+        )
+    if source_observation is None:
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_source_observation_missing"}
+        )
+    located = (source_observation.point_conditions or {}).get("composition")
+    composition = (
+        located.state.value
+        if isinstance(located, Located) and located.state.is_value
+        else None
+    )
+    if (
+        not isinstance(composition, Composition)
+        or composition.amount_basis is not AmountBasis.MOLE_FRACTION
+    ):
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_mole_composition_missing"}
+        )
+    components = dict(composition.components)
+    feo = components.get("FeO", Decimal(0))
+    if "Fe2O3" not in components:
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_ferric_analysis_missing"}
+        )
+    fe2o3 = components["Fe2O3"]
+    total_iron = feo + 2 * fe2o3
+    if (
+        not feo.is_finite()
+        or not fe2o3.is_finite()
+        or feo <= 0
+        or total_iron <= 0
+    ):
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_ferric_split_invalid"}
+        )
+
+    # FetO counts all Fe as FeO. On the source mole-fraction oxide basis,
+    # FeO contributes one ferrous Fe per formula unit and Fe2O3 contributes
+    # two ferric Fe. Thus f_Fe2+ = x_FeO/(x_FeO + 2*x_Fe2O3). The largest
+    # log10 activity shift hidden by total-iron reporting is |log10(f_Fe2+)|;
+    # applying it symmetrically gives the conservative per-row half-width.
+    fe2plus_fraction = feo / total_iron
+    width_dex = abs(fe2plus_fraction.log10())
+    band = DecisionBand(
+        width_dex,
+        "dimensionless",
+        "total_iron_basis: source FeO/Fe2O3 ferric split bounds hidden Fe3+",
+        band_basis="derived_bound",
+    )
+    notice = Notice(
+        kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+        affected_quantities=(quantity,),
+        reason=(
+            "total_iron_basis: FetO counts total Fe as FeO; the score band "
+            f"uses source f_Fe2+={fe2plus_fraction}"
+        ),
+        origin=source_observation.observation_id,
+        band=f"{width_dex} dex",
+        authority=Authority.DERIVED,
+    )
+    return _PrintedBandResolution(band=band, notice=notice)
+
+
 def _printed_uncertainty_band(
     quantity: Quantity,
     uncertainty: Uncertainty | None,
@@ -6665,6 +6929,15 @@ def _printed_uncertainty_band(
 ) -> _PrintedBandResolution:
     if uncertainty is None:
         return _PrintedBandResolution()
+    total_iron = _total_iron_basis_band(
+        quantity, uncertainty, source_observation
+    )
+    if (
+        uncertainty.kind is UncertaintyKind.DERIVED
+        and uncertainty.derivation is not None
+        and uncertainty.derivation.relation == _TOTAL_IRON_BASIS_RELATION
+    ):
+        return total_iron
     if _is_standard_pressure_ambiguity_uncertainty(uncertainty):
         width = uncertainty.value
         if (
@@ -7049,6 +7322,16 @@ def _alignment_axes(profile: object) -> tuple[str, ...]:
     )
 
 
+def _accepted_axis_value(name: str, value: object, profile: object) -> object | None:
+    """Plain token of a value axis, or None when this profile rejects that axis."""
+
+    required = name in profile.required
+    permitted_na = name in profile.permitted_not_applicable
+    if not required and not permitted_na:
+        return None
+    return to_plain(value)
+
+
 def _axis_alignment_value(identity: Identity, name: str, profile: object) -> object | None:
     state = getattr(identity, name)
     required = name in profile.required
@@ -7056,9 +7339,7 @@ def _axis_alignment_value(identity: Identity, name: str, profile: object) -> obj
     if state is None:
         return {"state": "not_applicable"} if not required else None
     if state.is_value:
-        if not required and not permitted_na:
-            return None
-        return to_plain(state.value)
+        return _accepted_axis_value(name, state.value, profile)
     if state.is_not_applicable and permitted_na and not required:
         return {"state": "not_applicable"}
     return None
@@ -7167,7 +7448,9 @@ def _source_band_catalog(
     ratchet_entries: Mapping[str, Mapping[str, object]],
 ) -> tuple[dict[str, DecisionBand], list[dict[str, object]], dict[str, str]]:
     from simulator.battery.compilation_tier import (
+        _compilation_series_slots,
         _iter_compilation_series_cells,
+        _series_point_cell,
         is_compilation_evidence,
     )
 
@@ -7200,37 +7483,64 @@ def _source_band_catalog(
             continue
         alignment_template: dict[str, object] | None = None
         alignment_profile: object | None = None
-        for cell in _iter_compilation_series_cells(parent, origin):
-            if not isinstance(cell.identity, Identity):
-                continue
-            quantity = quantity_token(cell.identity)
-            if quantity is None:
-                continue
-            magnitude = point_magnitude(cell.value)
-            if magnitude is None or not magnitude.is_finite():
+        template_identity: Identity | None = None
+        slots = _compilation_series_slots(parent, origin)
+        if slots is None:
+            for cell in _iter_compilation_series_cells(parent, origin):
+                if not isinstance(cell.identity, Identity):
+                    continue
+                quantity = quantity_token(cell.identity)
+                if quantity is None:
+                    continue
+                magnitude = point_magnitude(cell.value)
+                if magnitude is None or not magnitude.is_finite():
+                    continue
+                key_doc = _source_alignment_group_key(cell, tier=tier)
+                if key_doc is None:
+                    continue
+                key = _group_token(key_doc)
+                group_keys[key] = key_doc
+                identities[key] = cell.identity
+                source = sources[key].setdefault(
+                    parent.source_id,
+                    {"values": set()},
+                )
+                source["values"].add(magnitude)
+            continue
+        for temperature, magnitude, occurrence in slots:
+            if not magnitude.is_finite():
                 continue
             if alignment_template is None:
+                cell = _series_point_cell(parent, temperature, magnitude, occurrence)
+                if not isinstance(cell.identity, Identity):
+                    continue
+                if quantity_token(cell.identity) is None:
+                    continue
                 key_doc = _source_alignment_group_key(cell, tier=tier)
                 if key_doc is None:
                     continue
                 alignment_template = key_doc
                 alignment_profile = profile_for(cell.identity)
+                template_identity = cell.identity
+                recorded_identity = cell.identity
             else:
+                assert template_identity is not None
                 key_doc = dict(alignment_template)
                 axes = dict(alignment_template["axes"])
                 if "temperature_K" in axes:
                     assert alignment_profile is not None
-                    temperature_axis = _axis_alignment_value(
-                        cell.identity, "temperature_K", alignment_profile
+                    temperature_axis = _accepted_axis_value(
+                        "temperature_K", temperature, alignment_profile
                     )
                     if temperature_axis is None:
                         continue
                     axes["temperature_K"] = temperature_axis
                 key_doc["axes"] = axes
-                key_doc["aligned_T_K"] = _source_aligned_temperature(cell.identity)
+                key_doc["aligned_T_K"] = to_plain(temperature)
+                recorded_identity = template_identity
             key = _group_token(key_doc)
             group_keys[key] = key_doc
-            identities[key] = cell.identity
+            identities[key] = recorded_identity
             source = sources[key].setdefault(
                 parent.source_id,
                 {"values": set()},
@@ -9091,7 +9401,12 @@ def _openimcc_redox_result_evidence(
 def _distin_has_fe_metal_saturation(
     observation: Observation, experiment: Experiment | None
 ) -> bool:
-    if observation.source_id != _DISTIN_SOURCE_ID or experiment is None:
+    if (
+        not _source_rule_enabled(
+            observation.source_id, "distin_fe_metal_saturation"
+        )
+        or experiment is None
+    ):
         return False
     condition = experiment.fe_metal_saturated
     return (
@@ -12351,6 +12666,96 @@ def _predict_mass_loss_with_residue(
     )
 
 
+def _predict_static_sodium_saturation(
+    *,
+    engine: Engine,
+    channel: str,
+    identity: Identity,
+    observation: Observation,
+    formula: str,
+    temperature: object,
+    reservoir_phase: str,
+    block: Mapping[str, object],
+) -> EnginePrediction:
+    """Static-equilibrium pure-Na P_sat from the one saturation owner."""
+
+    from engines.builtin.sodium_saturation import (
+        SodiumSaturationError,
+        sodium_saturation_pressure,
+    )
+
+    try:
+        saturation = sodium_saturation_pressure(block, temperature)
+    except SodiumSaturationError as exc:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=(),
+            lineage_complete=False,
+            refusal_reason=RefusalReason.INVALID_IDENTITY,
+            refusal_detail={
+                "reason": "static_equilibrium_pressure_invalid",
+                "detail": str(exc),
+                "formula": formula,
+            },
+            identity=identity,
+        )
+    if saturation.reservoir_phase != reservoir_phase:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=(),
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_MISMATCH,
+            refusal_detail={
+                "reason": "saturation-reservoir-phase-mismatch",
+                "observation_reservoir_basis": f"{formula}({reservoir_phase})",
+                "segment_basis": f"pure_component_saturation({saturation.reservoir_phase})",
+                "formula": formula,
+                "phase": saturation.phase,
+            },
+            identity=identity,
+        )
+    low, high = saturation.certified_range_K
+    authority = Authority.CERTIFIED
+    notices: tuple[Notice, ...] = ()
+    if saturation.authority != "certified":
+        authority = Authority.EXTRAPOLATED
+        notices = (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.P_SAT,),
+                reason=saturation.notice or "pure_component_saturation_extrapolated",
+                origin=observation.observation_id,
+                band=f"[{low:g}, {high:g}] K",
+                authority=Authority.EXTRAPOLATED,
+            ),
+        )
+    sources = expand_coefficient_sources(("ANL/RE-95/2",))
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence=f"{engine.value}:static-pure-pressure:{formula}",
+        ),
+        value=as_decimal(str(saturation.pressure_pa)),
+        unit="Pa",
+        coefficient_basis="pure_component_saturation",
+        authority=authority,
+        notices=notices,
+        coefficient_sources=sources,
+        lineage_complete=lineage_complete_for(sources),
+        certified_band={
+            "temperature_K": (Decimal(str(low)), Decimal(str(high)))
+        },
+        identity=identity,
+        version="builtin-vapor-pressure",
+    )
+
+
 def _predict_named_fe_valence(
     engine: Engine,
     observation: Observation,
@@ -13941,6 +14346,22 @@ def _predict_with_engine(
                 load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
             )
             row = vapor_pressure_data.get("metals", {}).get(formula)
+            from engines.builtin.sodium_saturation import sodium_saturation_block
+
+            saturation_block = (
+                sodium_saturation_block(row) if isinstance(row, Mapping) else None
+            )
+            if saturation_block is not None:
+                return _predict_static_sodium_saturation(
+                    engine=engine,
+                    channel=channel,
+                    identity=identity,
+                    observation=observation,
+                    formula=formula,
+                    temperature=T,
+                    reservoir_phase=reservoir[1],
+                    block=saturation_block,
+                )
             try:
                 coefficients, coefficient_block = wall_condensation_antoine_coefficients(
                     row, float(T)
@@ -14174,7 +14595,9 @@ def _predict_with_engine(
         )
 
     distin_feo_activity = (
-        observation.source_id == _DISTIN_SOURCE_ID
+        _source_rule_enabled(
+            observation.source_id, "distin_fe_metal_saturation"
+        )
         and quantity is Quantity.ACTIVITY
         and formula.strip().casefold() == "feo"
     )
@@ -15967,9 +16390,6 @@ def candidate_observation(
     )
 
 
-_HASHIMOTO_SOURCE_ID = "kems-015-hashimoto-1983"
-
-
 def _openimcc_liquid_row_extrapolated_notice(
     *,
     reason: str,
@@ -16127,7 +16547,8 @@ def _hashimoto_residue_prediction(
             observations = [
                 row
                 for row in context.observations.values()
-                if row.source_id == _HASHIMOTO_SOURCE_ID
+                if _declared_residue_predictor(row.source_id)
+                == HASHIMOTO_RESIDUE_PREDICTOR
                 and row.observation_id.startswith(_HASHIMOTO_SOURCE_ID + "::")
                 and (
                     test_experiment_ids is None
@@ -16160,7 +16581,7 @@ def _hashimoto_residue_prediction(
                 )
             source_path = (
                 REPO_ROOT
-                / "data/literature/extracts/kems-015-hashimoto-1983.yaml"
+                / f"data/literature/extracts/{_HASHIMOTO_SOURCE_ID}.yaml"
             )
             source = load_yaml(source_path)
             geometry = next(
@@ -16454,9 +16875,6 @@ def _hashimoto_residue_prediction(
         )
 
 
-_SOSSI_SOURCE_ID = "kems-012-sossi-2019"
-
-
 def _knudsen_residue_prediction(
     context,
     reference,
@@ -16649,7 +17067,8 @@ def _sossi_residue_prediction(
             live_rows = [
                 row
                 for row in context.observations.values()
-                if row.source_id == _SOSSI_SOURCE_ID
+                if _declared_residue_predictor(row.source_id)
+                == SOSSI_RESIDUE_PREDICTOR
                 and (
                     test_experiment_ids is None
                     or row.experiment_id in test_experiment_ids
@@ -16700,7 +17119,7 @@ def _sossi_residue_prediction(
                     f"{expected_count}",
                 )
             source = load_yaml(
-                REPO_ROOT / "data/literature/extracts/kems-012-sossi-2019.yaml"
+                REPO_ROOT / f"data/literature/extracts/{_SOSSI_SOURCE_ID}.yaml"
             )
             source_experiments = {
                 str(item.get("experiment_id")): item
@@ -18906,7 +19325,7 @@ def load_score_context(
                 **observations,
                 **{
                     observation_id: all_observations[observation_id]
-                    for observation_id in unresolved_reference_ids
+                    for observation_id in sorted(unresolved_reference_ids, key=str)
                     if observation_id in all_observations
                 },
             }
@@ -23865,26 +24284,7 @@ class _ResidualJsonlStream:
         self._database: sqlite3.Connection | None = None
         self._order_path: Path | None = None
         self._order_file: TextIO | None = None
-        if sort_on_finalize:
-            self._temporary = tempfile.TemporaryDirectory(
-                prefix="battery-score-index-"
-            )
-            self._database = sqlite3.connect(
-                Path(self._temporary.name) / "residual-order.sqlite"
-            )
-            self._database.execute("PRAGMA cache_size=-16384")
-            self._database.execute("PRAGMA temp_store=FILE")
-            self._database.execute("PRAGMA journal_mode=OFF")
-            self._database.execute("PRAGMA synchronous=OFF")
-            self._database.execute(
-                "CREATE TABLE residual_order ("
-                "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
-                "key TEXT NOT NULL, offset INTEGER NOT NULL, "
-                "band_value TEXT, numeric_value TEXT, order_ref TEXT NOT NULL, "
-                "order_point INTEGER NOT NULL, order_engine INTEGER NOT NULL, "
-                "order_subrow INTEGER NOT NULL)"
-            )
-        else:
+        if not sort_on_finalize:
             self._order_path = self.partial_path.with_name(
                 f"{self.partial_path.name}.order"
             )
@@ -24009,6 +24409,7 @@ class _ResidualJsonlStream:
         offset = self.file.tell()
         self.file.write(line + b"\n")
         if self.sort_on_finalize:
+            self._ensure_order_index()
             self._pending.append(
                 (
                     rail,
@@ -24030,6 +24431,29 @@ class _ResidualJsonlStream:
         now = time.monotonic()
         if self.count % self._FLUSH_LINES == 0 or now - self._last_flush >= 5:
             self.flush()
+
+    def _ensure_order_index(self) -> None:
+        # After the score pool forks. An open sqlite connection would be inherited.
+        if self._database is not None or not self.sort_on_finalize:
+            return
+        self._temporary = tempfile.TemporaryDirectory(
+            prefix="battery-score-index-"
+        )
+        self._database = sqlite3.connect(
+            Path(self._temporary.name) / "residual-order.sqlite"
+        )
+        self._database.execute("PRAGMA cache_size=-16384")
+        self._database.execute("PRAGMA temp_store=FILE")
+        self._database.execute("PRAGMA journal_mode=OFF")
+        self._database.execute("PRAGMA synchronous=OFF")
+        self._database.execute(
+            "CREATE TABLE residual_order ("
+            "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
+            "key TEXT NOT NULL, offset INTEGER NOT NULL, "
+            "band_value TEXT, numeric_value TEXT, order_ref TEXT NOT NULL, "
+            "order_point INTEGER NOT NULL, order_engine INTEGER NOT NULL, "
+            "order_subrow INTEGER NOT NULL)"
+        )
 
     def _flush_index(self) -> None:
         if not self._pending:
@@ -24059,6 +24483,7 @@ class _ResidualJsonlStream:
         self.flush()
         if not self.sort_on_finalize:
             return
+        self._ensure_order_index()
         assert self._database is not None
         self._flush_index()
         self._database.execute(

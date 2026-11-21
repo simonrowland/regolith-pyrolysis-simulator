@@ -4,7 +4,15 @@ CONFIRM (VERIFY-codex / VERIFY-grok): millibar Fe/SiO at a 1400 C wall
 false-cleared both diagnostic components because the check used
 CONDENSATION_TEMPS_C landing setpoints (Fe 1250 C, SiO 1050 C) plus a
 uniform 1400 C floor — the SiO quiescent 0.1 µbar figure, not bake-off
-dew temperature.
+dew temperature. The current gate uses each segment's arriving partial
+pressure against its wall saturation pressure; the uniform floor is not
+a hot-wall violation threshold.
+
+Successful-value controls named by the verifiers: adequately hot or
+diluted Fe stays clear; a wall below the SiO engineering landing T
+still sets has_cold_spot; a 1300 C wall is judged by its local mixture.
+SiO uses the wall-saturation law: missing pO2 refuses, and a real Psat
+above the local pressure drives nothing.
 
 d-384: the hot-wall invariant is per species. A wall violates iff the
 arriving partial exceeds P_sat,species(T_wall). Fe P_sat is the value
@@ -14,7 +22,9 @@ both sides of that owner value and do not pin an Fe dew point or an
 Fe saturation number.
 
 A wall below the SiO engineering landing T still sets has_cold_spot.
-SiO reactive P_sat ~= 0 deposition policy is untouched (M30 / D04).
+A declared reactive wall reaction uses the same saturation law for
+deposition and hot-wall diagnostics; a refused law is never replaced by
+P_sat = 0 (d-402).
 The uniform 1400 C floor is not a violation (b-282). A refused wall
 P_sat, or a missing local pressure, is a typed refusal of the hot-wall
 quantity, not a clear (d-367).
@@ -27,22 +37,44 @@ from types import SimpleNamespace
 
 import pytest
 
+from engines.builtin.sodium_saturation import (
+    sodium_saturation_block,
+    sodium_saturation_pressure,
+)
+
 from simulator.condensation import (
     CELSIUS_TO_KELVIN_OFFSET,
     CONDENSATION_TEMPS_C,
     CondensationModel,
+    WallSaturationPressureRefusal,
+    _antoine_psat_pa,
+    VAPOR_PRESSURE_DATA,
     _try_antoine_psat_pa,
     _wall_deposition_driving_pressure_pa,
     cold_spot_diagnostic,
 )
 from simulator.condensation_routing import DESIGNATED_STAGE, designated_stage_number
 from simulator.optimize.physics import PhysicsConstraintSet
-from simulator.state import CondensationTrain, EvaporationFlux, MeltState, PipeSegment
+from simulator.state import (
+    MOLAR_MASS,
+    CondensationTrain,
+    EvaporationFlux,
+    MeltState,
+    PipeSegment,
+)
 
 
 MBAR_TO_PA = 100.0
 MILLIBAR_BAKEOFF_PA = 1.0 * MBAR_TO_PA
+DILUTE_QUIESCENT_PA = 0.01
 WALL_1400_K = 1400.0 + CELSIUS_TO_KELVIN_OFFSET
+
+
+@pytest.fixture(scope="module")
+def sodium_saturation_500_c():
+    block = sodium_saturation_block(VAPOR_PRESSURE_DATA["metals"]["Na"])
+    assert block is not None
+    return sodium_saturation_pressure(block, 500.0 + CELSIUS_TO_KELVIN_OFFSET)
 
 
 def _upstream_segment(downstream_stage: str, wall_temperature_C: float) -> PipeSegment:
@@ -61,6 +93,59 @@ def _fe_sio_segments(wall_temperature_C: float) -> list[PipeSegment]:
         _upstream_segment("stage_3", wall_temperature_C),
         _upstream_segment("stage_1", wall_temperature_C),
     ]
+
+
+def test_millibar_fe_sio_at_1400_c_is_hot_wall_violation():
+    """Keep the parent value pin and verify the local Fe partial is judged."""
+
+    assert CONDENSATION_TEMPS_C["Fe"] == 1250
+    assert CONDENSATION_TEMPS_C["SiO"] == 1050
+    fe_psat, refused = _try_antoine_psat_pa("Fe", WALL_1400_K)
+    assert refused is False
+    assert fe_psat == pytest.approx(1.1375418658, rel=1e-9, abs=0.0)
+    assert MILLIBAR_BAKEOFF_PA > fe_psat
+
+    segments = _fe_sio_segments(1400.0)
+    diagnostic = cold_spot_diagnostic(
+        segments,
+        {"SiO": 1.0, "Fe": 1.0},
+        species_partial_pressures_pa_by_segment=_pressures_by_segment(
+            segments,
+            {"SiO": MILLIBAR_BAKEOFF_PA, "Fe": MILLIBAR_BAKEOFF_PA},
+        ),
+    )
+
+    assert diagnostic["has_upstream_hot_wall_violation"] is True
+    assert any(
+        finding["species"] == "Fe"
+        for finding in diagnostic["upstream_hot_wall_findings"]
+    )
+
+
+def test_dilute_or_hot_fe_at_valid_wall_stays_clear():
+    """Retain the parent's diluted and hot Fe successful-value controls."""
+
+    dilute_segments = _fe_sio_segments(1400.0)
+    dilute = cold_spot_diagnostic(
+        dilute_segments,
+        {"Fe": 1.0},
+        species_partial_pressures_pa_by_segment=_pressures_by_segment(
+            dilute_segments, {"Fe": DILUTE_QUIESCENT_PA}
+        ),
+    )
+    hot_segments = _fe_sio_segments(1800.0)
+    hot = cold_spot_diagnostic(
+        hot_segments,
+        {"Fe": 1.0},
+        species_partial_pressures_pa_by_segment=_pressures_by_segment(
+            hot_segments, {"Fe": MILLIBAR_BAKEOFF_PA}
+        ),
+    )
+
+    assert dilute["has_upstream_hot_wall_violation"] is False
+    assert dilute["has_cold_spot"] is False
+    assert hot["has_upstream_hot_wall_violation"] is False
+    assert hot["has_cold_spot"] is False
 
 
 def _pressures_by_segment(segments, partials):
@@ -165,12 +250,12 @@ def test_fe_hot_wall_violation_iff_partial_exceeds_owner_psat(
     assert diagnostic["has_cold_spot"] is False
 
 
-def test_na_500_c_alkali_duty_is_not_a_hot_wall_violation():
+def test_na_500_c_alkali_duty_is_not_a_hot_wall_violation(sodium_saturation_500_c):
     """b-282: Na at 500 C on 1 mbar alkali duty is undersaturated.
 
-    CLAUDE.md §4 / docs/concepts.md: Na bake-off T_wall,min is 486 C.
-    P_sat(Na, 773.15 K) is about 162 Pa, so 100 Pa does not foul. The
-    uniform 1400 C floor is what flags this wall.
+    The Browning-Potter owner puts P_sat at this wall above 100 Pa.
+    Its own declared band qualifies that comparison as extrapolated;
+    the historical uniform 1400 C floor must not decide the verdict.
     """
 
     na_psat, refused = _try_antoine_psat_pa("Na", 500.0 + CELSIUS_TO_KELVIN_OFFSET)
@@ -191,9 +276,8 @@ def test_na_500_c_alkali_duty_is_not_a_hot_wall_violation():
     assert diagnostic["upstream_hot_wall_refused"] is False
     assert diagnostic["upstream_hot_wall_findings"] == []
     assert diagnostic["upstream_hot_wall_refusals"] == []
-    # 773.15 K is below the Na pure-component fit certified for 924–1118 K.
-    # The undersaturated comparison is the best estimate; the fit is not
-    # an unqualified clear (d-367).
+    # The owner's certified band, rather than an obsolete Antoine band,
+    # qualifies this best-estimate undersaturated comparison (d-367).
     qualifications = diagnostic["upstream_hot_wall_extrapolations"]
     assert len(qualifications) == 1
     assert qualifications[0]["species"] == "Na"
@@ -205,7 +289,9 @@ def test_na_500_c_alkali_duty_is_not_a_hot_wall_violation():
     records = qualifications[0]["records"]
     assert records
     assert all(record["authority_level"] == "extrapolated" for record in records)
-    assert records[0]["valid_range_K"] == pytest.approx((924.0, 1118.0))
+    assert records[0]["valid_range_K"] == pytest.approx(
+        sodium_saturation_500_c.certified_range_K
+    )
 
 
 def test_species_change_and_low_wall_uniform_minimum():
@@ -272,68 +358,114 @@ def test_wall_below_sio_landing_temperature_still_has_cold_spot():
     )
 
 
-def test_sio_reactive_wall_saturation_backstop_unchanged():
-    """D04 / M30: diagnostic must not retune SiO reactive deposition P_sat."""
+def test_sio_wall_saturation_uses_the_law_not_the_zero_backstop():
+    """A pO2-free route or a supplied pO2 uses the wall-saturation law.
 
-    sio_psat, refused = _try_antoine_psat_pa("SiO", WALL_1400_K)
-    assert refused is True
-    assert sio_psat is None
+    A free-route saturation is available when the reaction ladder includes
+    a pO2-independent path. Neither path may replace its Psat with zero.
+    """
 
+    free_psat, refused = _try_antoine_psat_pa("SiO", WALL_1400_K)
+    assert refused is False
+    assert free_psat is not None and free_psat > 0.0
+    free_notice: dict[str, object] = {}
+    free_driving = _wall_deposition_driving_pressure_pa(
+        "SiO",
+        free_psat * 0.5,
+        WALL_1400_K,
+        diagnostic_out=free_notice,
+    )
+    assert free_driving == 0.0
+    assert free_notice["wall_saturation_pressure_pa"] == pytest.approx(
+        free_psat
+    )
+
+    po2_pa = 1.0e-4
+    psat = _antoine_psat_pa("SiO", WALL_1400_K, wall_pO2_Pa=po2_pa)
+    assert psat is not None and psat > 0.0
     notice: dict[str, object] = {}
     driving = _wall_deposition_driving_pressure_pa(
         "SiO",
-        MILLIBAR_BAKEOFF_PA,
+        psat * 0.5,
         WALL_1400_K,
+        wall_pO2_Pa=po2_pa,
         diagnostic_out=notice,
     )
-    assert driving == pytest.approx(MILLIBAR_BAKEOFF_PA)
-    assert notice["wall_saturation_pressure_pa"] == 0.0
-    assert notice["wall_saturation_pressure_status"] == "reactive_product_backstop"
+    assert driving == 0.0
+    assert notice["wall_saturation_pressure_pa"] == pytest.approx(psat)
+    assert notice.get("wall_saturation_pressure_status") != "reactive_product_backstop"
 
     sio_segments = [_upstream_segment("stage_3", 1400.0)]
     sio_only = cold_spot_diagnostic(
         sio_segments,
         {"SiO": 1.0},
         species_partial_pressures_pa_by_segment=_pressures_by_segment(
-            sio_segments, {"SiO": MILLIBAR_BAKEOFF_PA}
+            sio_segments, {"SiO": free_psat * 0.5}
         ),
     )
     assert sio_only["has_upstream_hot_wall_violation"] is False
-    assert sio_only["upstream_hot_wall_refused"] is True
-    assert sio_only["upstream_hot_wall_refusals"][0]["refusal_type"] == (
-        "WallSaturationPressureRefusal"
+    assert sio_only["upstream_hot_wall_refused"] is False
+    assert _judgement_for(sio_only, "SiO")["saturation_pressure_pa"] == pytest.approx(
+        free_psat
+    )
+    supersaturated = cold_spot_diagnostic(
+        sio_segments,
+        {"SiO": 1.0},
+        species_partial_pressures_pa_by_segment=_pressures_by_segment(
+            sio_segments,
+            {"SiO": 2.0 * psat, "O2": po2_pa},
+        ),
+    )
+    assert supersaturated["has_upstream_hot_wall_violation"] is True
+    judgement = _judgement_for(supersaturated, "SiO")
+    assert judgement["saturation_pressure_pa"] == pytest.approx(psat)
+    assert judgement["status"] == "violation"
+
+
+def test_sio_reactive_wall_saturation_backstop_unchanged():
+    """Retain the parent test id while checking d-402's replacement law."""
+
+    po2_pa = 1.0e-4
+    psat = _antoine_psat_pa("SiO", WALL_1400_K, wall_pO2_Pa=po2_pa)
+    assert psat is not None and psat > 0.0
+    notice: dict[str, object] = {}
+    driving = _wall_deposition_driving_pressure_pa(
+        "SiO",
+        2.0 * psat,
+        WALL_1400_K,
+        wall_pO2_Pa=po2_pa,
+        diagnostic_out=notice,
+    )
+
+    assert driving == pytest.approx(psat)
+    assert notice["wall_saturation_pressure_pa"] == pytest.approx(psat)
+    assert notice.get("wall_saturation_pressure_status") != (
+        "reactive_product_backstop"
     )
 
 
 def test_sio_at_1300_c_refuses_unchecked_bakeoff_instead_of_clearing():
-    """SiO at 1300 C and 100 Pa is neither a cold spot nor a silent clear.
+    """Keep the parent test id while checking d-402's predictive law."""
 
-    1300 C is above the 1050 C landing setpoint. Wall P_sat refuses, so
-    the millibar bake-off requirement is a typed refusal of that quantity.
-    It is not a supersaturation finding: refused P_sat is not P_sat = 0.
-    """
-
+    psat, refused = _try_antoine_psat_pa(
+        "SiO", 1300.0 + CELSIUS_TO_KELVIN_OFFSET
+    )
+    assert refused is False
+    assert psat is not None and psat > 0.0
     segments = [_upstream_segment("stage_3", 1300.0)]
     diagnostic = cold_spot_diagnostic(
         segments,
         {"SiO": 1.0},
         species_partial_pressures_pa_by_segment=_pressures_by_segment(
-            segments, {"SiO": MILLIBAR_BAKEOFF_PA}
+            segments, {"SiO": 2.0 * psat}
         ),
     )
 
     assert diagnostic["has_cold_spot"] is False
-    assert diagnostic["has_upstream_hot_wall_violation"] is False
-    assert diagnostic["upstream_hot_wall_findings"] == []
-    assert diagnostic["upstream_hot_wall_refused"] is True
-    refusal = diagnostic["upstream_hot_wall_refusals"][0]
-    assert refusal["status"] == "refused"
-    assert refusal["output_status"] == "refused"
-    assert refusal["quantity"] == "upstream_hot_wall"
-    assert refusal["species"] == "SiO"
-    assert refusal["refusal_type"] == "WallSaturationPressureRefusal"
-    assert refusal["wall_temperature_C"] == 1300.0
-    assert "wall_saturation_pressure_refused" in refusal["reason"]
+    judgement = _judgement_for(diagnostic, "SiO")
+    assert judgement["saturation_pressure_pa"] == pytest.approx(psat)
+    assert judgement["status"] == "violation"
+    assert diagnostic["has_upstream_hot_wall_violation"] is True
 
 
 def test_omitted_partial_pressure_refuses_fe_hot_wall_quantity():
@@ -452,6 +584,42 @@ def test_route_fe_judgement_uses_arriving_partial_against_owner_psat():
                 ), (wall_C, factor, partial_pa, owner)
                 saw_violation = saw_violation or violated
             assert diagnostic["has_upstream_hot_wall_violation"] is saw_violation
+
+
+def test_route_millibar_fe_at_1400_c_uses_wall_partial_pressure():
+    """Keep the parent route pin for bake-off, dilution, and hot walls."""
+
+    def _route(wall_C: float, fe_mbar: float):
+        model = CondensationModel(
+            CondensationTrain.create_default(),
+            wall_temperature_C=wall_C,
+        )
+        model.configure_operating_conditions(
+            wall_temperature_C=wall_C,
+            overhead_pressure_mbar=10.0,
+            species_partial_pressures_mbar={"Fe": fe_mbar},
+            pipe_diameter_m=0.12,
+            gas_temperature_C=1700.0,
+            stage_area_m2_by_stage={
+                str(stage.stage_number): 1.0 for stage in model.train.stages
+            },
+            pipe_segment_temperatures_C={
+                segment.name: wall_C for segment in model.pipe_segments
+            },
+        )
+        model.route(
+            EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0),
+            MeltState(temperature_C=1700.0),
+        )
+        return model.last_cold_spot_diagnostic
+
+    millibar = _route(1400.0, 1.0)
+    dilute = _route(1400.0, DILUTE_QUIESCENT_PA / MBAR_TO_PA)
+    hot = _route(1800.0, 1.0)
+
+    assert millibar["has_upstream_hot_wall_violation"] is True
+    assert dilute["has_upstream_hot_wall_violation"] is False
+    assert hot["has_upstream_hot_wall_violation"] is False
 
 
 # Invariant (b-282 / d-367): every upstream hot-wall species judgement is a
@@ -787,13 +955,6 @@ def test_hot_wall_judgement_is_qualified_on_every_consumer(
     _assert_gate_invariant(margin, species, wall_C, pressure_case)
 
 
-# Hand evaluation of the Na pure-component sidecar, not _try_antoine_psat_pa.
-# log10(P/Pa) = 7.46077 - 1873.728 / (T_K - 416.372), T_K = 773.15.
-# 1873.728 / 356.778 = 5.2520923775; 7.46077 - that = 2.2086776225;
-# 10**2.2086776225 = 161.7954698005069 Pa.
-NA_PSAT_500_C_PA = 161.7954698005069
-
-
 def _dalton_partials_after_capture_pa(
     inlet_partial_pa: dict[str, float],
     total_pa: float,
@@ -822,19 +983,37 @@ def _dalton_partials_after_capture_pa(
     }
 
 
-def test_route_judges_na_on_pressure_after_upstream_fe_capture():
-    """Inlet 100 Pa Na at 500 C is a false clear once Fe capture enriches it.
+def test_route_judges_na_on_pressure_after_upstream_fe_capture(sodium_saturation_500_c):
+    """Upstream Fe capture must enrich Na across the owner's saturation.
 
-    Total pressure 1000 Pa, inlet Na/Fe/carrier = 100/800/100 Pa. Stage 0
-    captures most of the Fe before stage_0_to_stage_1. Na's arriving
-    partial then exceeds P_sat(Na, 500 C) = 161.7954698005069 Pa.
+    Start Na at half the 500 C owner pressure. On a five-P_sat total
+    basis, Fe occupies four P_sat and carrier half a P_sat. Removing
+    more than five eighths of the Fe leaves Na above P_sat at the next wall.
+    The independent Dalton projection below uses actual captured mass.
     """
+
+    na_psat = sodium_saturation_500_c.pressure_pa
+    inlet_na_pa = na_psat * 0.5
+    inlet_fe_pa = na_psat * 4.0
+    total_pa = na_psat * 5.0
+    assert inlet_na_pa < na_psat
+    # Premise: inlet p_Na/p_Fe = n_Na/n_Fe, while each source rate is mass.
+    # Algebra: m_Na/m_Fe = (p_Na/p_Fe)*(M_Na/M_Fe). The molar masses share
+    # units, so the ratio is kg/kg; with zero capture this reconstructs the
+    # inlet basis, and complete Fe capture leaves Na enriched against carrier.
+    fe_inlet_kg_hr = 1.0
+    na_inlet_kg_hr = fe_inlet_kg_hr * (inlet_na_pa / inlet_fe_pa) * (
+        MOLAR_MASS["Na"] / MOLAR_MASS["Fe"]
+    )
 
     model = CondensationModel(CondensationTrain.create_default())
     model.configure_operating_conditions(
         wall_temperature_C=500.0,
-        overhead_pressure_mbar=10.0,
-        species_partial_pressures_mbar={"Na": 1.0, "Fe": 8.0},
+        overhead_pressure_mbar=total_pa / MBAR_TO_PA,
+        species_partial_pressures_mbar={
+            "Na": inlet_na_pa / MBAR_TO_PA,
+            "Fe": inlet_fe_pa / MBAR_TO_PA,
+        },
         pipe_diameter_m=0.12,
         gas_temperature_C=1700.0,
         stage_area_m2_by_stage={
@@ -845,7 +1024,10 @@ def test_route_judges_na_on_pressure_after_upstream_fe_capture():
         },
     )
     result = model.route(
-        EvaporationFlux(species_kg_hr={"Na": 1.0, "Fe": 1.0}, total_kg_hr=2.0),
+        EvaporationFlux(
+            species_kg_hr={"Na": na_inlet_kg_hr, "Fe": fe_inlet_kg_hr},
+            total_kg_hr=na_inlet_kg_hr + fe_inlet_kg_hr,
+        ),
         MeltState(temperature_C=1700.0),
     )
 
@@ -856,11 +1038,11 @@ def test_route_judges_na_on_pressure_after_upstream_fe_capture():
     fe_remaining = 1.0 - fe_captured_upstream_kg_hr
     assert 0.0 < fe_remaining < 0.5
     expected = _dalton_partials_after_capture_pa(
-        {"Na": 100.0, "Fe": 800.0},
-        1000.0,
+        {"Na": inlet_na_pa, "Fe": inlet_fe_pa},
+        total_pa,
         {"Na": 1.0, "Fe": fe_remaining},
     )
-    assert expected["Na"] > NA_PSAT_500_C_PA > 100.0
+    assert expected["Na"] > na_psat > inlet_na_pa
 
     judgements = [
         judgement
@@ -870,7 +1052,7 @@ def test_route_judges_na_on_pressure_after_upstream_fe_capture():
     assert len(judgements) == 1
     judgement = judgements[0]
     assert judgement["partial_pressure_pa"] == pytest.approx(expected["Na"])
-    assert judgement["saturation_pressure_pa"] == pytest.approx(NA_PSAT_500_C_PA)
+    assert judgement["saturation_pressure_pa"] == pytest.approx(na_psat)
     assert judgement["status"] == "violation"
     stored = model.wall_species_partial_pressures_pa_by_segment[
         "stage_0_to_stage_1"
@@ -882,7 +1064,7 @@ def test_route_judges_na_on_pressure_after_upstream_fe_capture():
         if item["species"] == "Fe" and item["segment"] == "stage_0_to_stage_1"
     )
     assert fe_judgement["partial_pressure_pa"] == pytest.approx(expected["Fe"])
-    assert expected["Fe"] < 800.0
+    assert expected["Fe"] < inlet_fe_pa
 
     for name, partials in model.wall_species_partial_pressures_pa_by_segment.items():
         if partials.get("Na", 0.0) > 0.0:
@@ -895,16 +1077,10 @@ def test_route_judges_na_on_pressure_after_upstream_fe_capture():
 
 # Invariant: the partial on a hot-wall judgement is the partial of the
 # mixture that arrives at that segment. Inlet pressure is not reused after
-# capture. Na keeps a hand Antoine pin; its P_sat owner is not the pure-Fe
-# line d-383 replaces. Fe P_sat comes from _saturation_oracle, which calls
-# the production owner _try_antoine_psat_pa (d-384).
-#   Na 500 C: A=7.46077, B=1873.728, C=-416.372, T=773.15 -> 161.7954698005069 Pa
-# 90% capture of an 800 Pa partner at 1000 Pa total, species held at 100 Pa:
-#   p = 1000 * 0.1 / (0.1 + 0.08 + 0.1) = 357.1428571428571 Pa
-_LITERAL_WALL_PSAT_PA = {
-    ("Na", 500.0): NA_PSAT_500_C_PA,
-}
-_NO_WALL_SATURATION_SPECIES = frozenset({"SiO", "CrO2"})
+# capture. _saturation_oracle pins every species/wall pair with the production
+# resolver; Na at 500 C also checks the sodium-owner fixture. The independent
+# Dalton projection preserves the arriving-mixture invariant.
+_NO_WALL_SATURATION_SPECIES = frozenset({"CrO2"})
 _ARRIVING_CAPTURES = ("none", "partner_90", "self_gone")
 _ENRICHED_PARTIAL_PA = 1000.0 * 0.1 / 0.28
 
@@ -943,6 +1119,7 @@ def test_every_hot_wall_judgement_uses_the_arriving_partial(
     wall_C: float,
     capture: str,
     channel: str,
+    sodium_saturation_500_c,
 ):
     """Enumerates species, wall, capture class, and coating channel.
 
@@ -1008,15 +1185,12 @@ def test_every_hot_wall_judgement_uses_the_arriving_partial(
         assert "wall_after" in by_segment
         judged_names = ("wall_inlet", "wall_after")
 
-    if species == "Fe":
-        # d-384: same owner the diagnostic calls. A hand Antoine number
-        # would keep the pure-Fe line d-383 replaces.
-        pinned_psat, pinned_known, _extrapolated = _saturation_oracle(
-            species, wall_C
-        )
-    else:
-        pinned_psat = _LITERAL_WALL_PSAT_PA.get((species, wall_C))
-        pinned_known = pinned_psat is not None
+    pinned_psat, pinned_known, _extrapolated = _saturation_oracle(
+        species, wall_C
+    )
+    if species == "Na" and wall_C == 500.0:
+        assert pinned_known
+        assert pinned_psat == pytest.approx(sodium_saturation_500_c.pressure_pa)
     for name in judged_names:
         judgement = by_segment[name]
         where = f"{species} {wall_C} {capture} {name}"

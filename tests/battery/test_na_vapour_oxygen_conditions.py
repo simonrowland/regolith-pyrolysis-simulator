@@ -94,7 +94,16 @@ def test_rego_table_i_row_selects_flagged_two_species_c_co_condition() -> None:
     assert selected is not None
     assert selected.route == "rego_c_co_two_species_approximation"
     assert selected.tier == 3
-    assert selected.log10_fO2_bar == pytest.approx(-16.6550589855, abs=1e-10)
+    assert selected.log10_fO2_bar == pytest.approx(-16.576568296481874, abs=1e-12)
+
+    changed_target = resolve_row_fo2(
+        experiment,
+        None,
+        replace(row, value=Value.point_of(Decimal("326.968"))),
+        quantity=Quantity.P_PARTIAL,
+    )
+    assert changed_target is not None
+    assert changed_target.log10_fO2_bar == selected.log10_fO2_bar
 
     # Mutation proof: the C/CO condition follows the row's printed Table I
     # total pressure. Increasing it raises pCO and therefore raises fO2.
@@ -384,10 +393,6 @@ def test_rys_source_oxygen_requires_row_level_independence_evidence() -> None:
     assert refused.reason is SourceOxygenFallbackReason.UNTYPED_LINEAGE
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Rego pCO=P_total-pNa_obs; physics b-1195/d-405 owns the fix",
-)
 def test_rego_na_oxygen_condition_is_independent_of_observed_target() -> None:
     experiment = F.tabulation_experiment(
         "rego-target-mutation",

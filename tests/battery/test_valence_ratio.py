@@ -1906,7 +1906,7 @@ def test_extract_malformed_quench_condition_is_a_row_refusal(
             "aithala_2026_vf271_xanes",
             "0.816",
             16,
-            12,
+            73,
         ),
         (
             "matzen-2022-martian-basalt-redox.yaml",

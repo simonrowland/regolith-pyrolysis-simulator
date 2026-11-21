@@ -1,3 +1,4 @@
+import json
 import shlex
 from dataclasses import replace
 from types import SimpleNamespace
@@ -5,12 +6,12 @@ from unittest.mock import patch
 
 import pytest
 
-from engines.builtin.metallothermic_step import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
     METAL_PHASE_ACCOUNT,
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 from simulator.accounting import AccountingQueries, MaterialLot
 from simulator.chemistry.kernel.capabilities import (
@@ -793,10 +794,7 @@ def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
     assert produced_kg == pytest.approx(o2_kg_from_mol)
 
 
-@pytest.mark.parametrize("campaign", [CampaignPhase.C5, CampaignPhase.MRE_BASELINE])
-def test_mre_refused_partition_is_flagged_per_step_without_energy_or_products(
-    campaign,
-):
+def test_mre_multi_oxide_partition_predicts_with_visible_uncertainty_flag():
     sim = _sim(
         {
             "mixed": {
@@ -812,7 +810,7 @@ def test_mre_refused_partition_is_flagged_per_step_without_energy_or_products(
     )
     sim.load_batch("mixed", mass_kg=1000.0)
     _enable_c5_mre(sim, target_species="", max_voltage_V=2.0)
-    sim.melt.campaign = campaign
+    sim.melt.campaign = CampaignPhase.C5
     sim.melt.temperature_C = 1600.0
     sim.melt.hour = 42
     sim.melt.campaign_hour = 7
@@ -826,22 +824,32 @@ def test_mre_refused_partition_is_flagged_per_step_without_energy_or_products(
     sim._mre_effective_current_A = 1000.0
 
     no_op_before = sim._chem_no_op_dispatch_count
+    dispatch = sim._dispatch_only
+    electrolysis_results = []
+
+    def capture_electrolysis(*args, **kwargs):
+        result = dispatch(*args, **kwargs)
+        if args and args[0] is ChemistryIntent.ELECTROLYSIS_STEP:
+            electrolysis_results.append(result)
+        return result
+
+    sim._dispatch_only = capture_electrolysis
     melt_before = dict(sim.atom_ledger.kg_by_account("process.cleaned_melt"))
-    metal_before = dict(sim.atom_ledger.kg_by_account("process.metal_phase"))
     o2_before = dict(
         sim.atom_ledger.kg_by_account("terminal.oxygen_mre_anode_stored")
     )
 
-    sim._step_mre()
+    produced_o2_kg = sim._step_mre()
 
     from simulator.runner import build_per_hour_summary
 
     diagnostic = sim._mre_ellingham_ladder_diagnostic
+    serialized_diagnostic = json.loads(json.dumps(diagnostic))
     runner_summary = build_per_hour_summary(sim, sim._make_snapshot())
-    assert runner_summary["mre_ellingham_ladder_diagnostic"] == diagnostic
+    assert runner_summary["mre_ellingham_ladder_diagnostic"] == serialized_diagnostic
     web_summary = _browser_socket_payload("per_hour_summary", runner_summary)
     assert web_summary == _per_hour_summary_entry(runner_summary)
-    assert web_summary["mre_ellingham_ladder_diagnostic"] == diagnostic
+    assert web_summary["mre_ellingham_ladder_diagnostic"] == serialized_diagnostic
     tick_projection = _browser_socket_payload(
         "simulation_tick",
         {"per_hour_summary_delta": runner_summary},
@@ -850,37 +858,30 @@ def test_mre_refused_partition_is_flagged_per_step_without_energy_or_products(
         tick_projection["per_hour_summary_delta"][
             "mre_ellingham_ladder_diagnostic"
         ]
-        == diagnostic
+        == serialized_diagnostic
     )
 
-    assert sim._chem_no_op_dispatch_count == no_op_before + 1
-    assert sim.atom_ledger.kg_by_account("process.cleaned_melt") == pytest.approx(
-        melt_before
+    assert sim._chem_no_op_dispatch_count == no_op_before
+    assert sim._mre_energy_this_hr == pytest.approx(2.0)
+    assert produced_o2_kg > 0.0
+    assert sim._mre_metals_this_hr
+    melt_after = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    assert any(melt_after.get(oxide, 0.0) < mass for oxide, mass in melt_before.items())
+    o2_after = sim.atom_ledger.kg_by_account("terminal.oxygen_mre_anode_stored")
+    assert o2_after.get("O2", 0.0) > o2_before.get("O2", 0.0)
+    assert electrolysis_results
+    diagnostic = electrolysis_results[-1].diagnostic
+    assert diagnostic["O2_produced_mol"] > 0.0
+    assert diagnostic["energy_kWh"] == pytest.approx(2.0)
+    assert diagnostic["certification_allowed"] is False
+    notice = next(
+        notice for notice in diagnostic["notices"]
+        if notice["reason"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
     )
-    assert sim.atom_ledger.kg_by_account("process.metal_phase") == pytest.approx(
-        metal_before
-    )
-    assert sim.atom_ledger.kg_by_account(
-        "terminal.oxygen_mre_anode_stored"
-    ) == pytest.approx(o2_before)
-    assert sim.product_ledger() == {}
-    assert sim._mre_metals_this_hr == {}
-    assert sim._mre_energy_this_hr == pytest.approx(0.0)
-    assert sim._mre_voltage_V == pytest.approx(2.0)
-    assert sim._mre_effective_current_A == pytest.approx(0.0)
-    assert sim.melt.mre_voltage_V == pytest.approx(2.0)
-    assert sim.melt.mre_current_A == pytest.approx(0.0)
-
-    step_outcome = diagnostic["step_outcome"]
-    assert step_outcome == {
-        "status": "refused",
-        "reason": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["certified_band"] == {
+        "oxide_to_metal_target_count": (0, 1)
     }
-    assert diagnostic["notices"][0] == {
-        "kind": "mre_step_refusal",
-        "reason": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
-    }
-
 
 def test_vetoed_c5_mre_preserves_spent_residue_account():
     from simulator.electrolysis import MRE_RAW_MARGIN_REFUSAL
@@ -1118,7 +1119,7 @@ def test_na_shuttle_metals_are_reported_from_process_metal_phase():
     sim._shuttle_inject_Na()
 
     sim.atom_ledger.assert_balanced()
-    assert sim.atom_ledger.kg_by_account(SPENT_REDUCTANT_RESIDUE_ACCOUNT).get(
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
         "Na2O", 0.0
     ) > 0.0
     assert "Na2O" not in sim.atom_ledger.kg_by_account(

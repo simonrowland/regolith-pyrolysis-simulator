@@ -36,6 +36,10 @@ from simulator.state import (
     MOLAR_MASS,
     MeltState,
 )
+from tests.condensation_test_support import (
+    assert_pfree_wall_prediction,
+    assert_synthetic_sio_route_authority,
+)
 
 
 pytestmark = pytest.mark.usefixtures("production_configured_condensation_route")
@@ -47,24 +51,6 @@ GOLDENS = (
     ("lunar_mare_low_ti", "lunar_mare_low_ti_c2a.json"),
     ("mars_basalt", "mars_basalt_c2a.json"),
 )
-
-
-def _assert_synthetic_sio_route_authority(route) -> None:
-    authority = route.condensation_authority_by_species["SiO"]
-    stage_outcomes = route.condensation_refusals_by_species.get("SiO", {}).get(
-        "stage_outcomes", []
-    )
-    # t-1217: carrier authority cannot certify extrapolated stage-surface saturation.
-    assert authority["status"] == "status_bearing"
-    assert authority["carrier_authority"]["pressure"] == {
-        "kind": "value",
-        "pa": 100.0,
-        "valid_range_K": [1323.0, 1324.0],
-    }
-    # t-1217: extrapolated stage-surface saturation is visible but not authoritative.
-    assert "antoine_psat_unavailable_at_T" in {
-        outcome["reason"] for outcome in stage_outcomes
-    }
 
 
 def test_sio_alpha_provenance_receipt_and_fixtures_refuse_evaporation_label():
@@ -447,80 +433,19 @@ def test_sio_evolved_pins_agree_across_every_place_they_are_stored():
         + "\n  ".join(mismatches)
     )
 
-# 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
-# default `StirState(radial=1.0)` (laminar gas-side Sherwood) produced
-# Stage 4 SiO carryover ABOVE Stage 3 SiO zone product — documented
-# "Known limitation" in CHANGELOG 0.5.3 as a routing trade-off.
-# 2026-07-12 wave-10 wall-flux closeout: the restored area-integrated
-# wall budget moved default C2A routing; stage 3 was then a pinned zero.
-# 2026-07-21 B1: that pinned zero was the SIGNATURE OF THE FAIL-OPEN DEFECT
-# (silent reactive_product_backstop=False on authorized SiO baffle stages,
-# fixed in 07fa3fe). Stage 3 is the DESIGNATED SiO capture (North Star);
-# it is now pinned NONZERO from double-run byte-stable CLI executions.
-# Predecessor history (for legacy reviewers): pre-Phase-A1 values were
-# 1.65257779038 / 1.69466902181 kg, sat above the legacy stage_3 ~1 kg
-# magnitude; the post-flip regime is ~1.94 mg total SiO evolved
-# (1000x less absolute mass, with relative routing inverted).
-# Re-pinned from the executable sio_yield CLI after stage-key reporting.
+# Stage-3 purity admission bypasses rejected parcels; downstream Stage-4
+# collector values below are pinned from the production CLI and Studio fixture.
 BASELINE_STAGE4_SIO2_KG = {
-    "lunar_mare_low_ti": 1.05988273133e-09,
-    "mars_basalt": 1.26683344649e-06,
+    "lunar_mare_low_ti": 8.76551515134e-07,
+    "mars_basalt": 8.90876677849e-07,
 }
 
-# 2026-07-21 B1: measured stage-3 SiO-zone product on compose-0.6.3 after the
-# 07fa3fe baffle fix (double-run byte-stable CLI). Nonzero is load-bearing:
-# a zero here means the designated-condenser capture failed open again.
-# 2026-07-21 B1 wall-gate fix (same gate as the stage site, queries.py): hot
-# walls above T_cond no longer engage the SiO disproportionation backstop, so
-# the mass that phantom-deposited on the >1050 C hot train now reaches the
-# designated stage-3 baffle — stage-3 capture DOUBLES and wall deposit goes
-# to zero for this recipe. North-Star-coherent: designated-condenser capture,
-# no hot-wall coating.
-# 2026-07-24 re-pin (SC-92 churn-era correction, f1fb933; same class as
-# BASELINE_SIO_EVOLVED_KG above): honest-MAGEMin CLI values, fresh
-# double-run byte-stable on compose-0.6.3 @ cd88e34.
-# 2026-08-01 REPIN round 4 (SC-109): same C2A soft-endpoint arming mechanism
-# as BASELINE_SIO_EVOLVED_KG — longer full-extraction campaigns supply ~8x
-# more SiO to the designated Stage-3 condenser (lunar 8.598e-7 -> 6.731e-6,
-# ~7.83x). Authority: ~/Repos/rps-adjudicate/m2-bisect.md. Regenerated at
-# tip d13f597 from the executable sio_yield CLI.
-# regenerated 2026-08-02 under REPAIRED MAGEMin config per the train13
-# adjudication; prior values were generated against the broken-liquidus job
-# tree (lunar 6.73114533926e-06 / mars 6.78097843708e-06).
-# docs-private/research/2026-08-02-train13-adjudication.md
-# Rebaselined 2026-08-28 after f7bcbf79 removed fabricated stage pressure
-# and b42d14ed carried per-carrier authority into the wall-routing model.
-# 2026-09-26 b-573 freeze-gate regen (studio-3): lunar 2.73730312429e-06 ->
-# 2.73730270602e-06, mars 2.7578902906e-06 -> 2.75788843064e-06.
-# 2026-10-31 d-137 CLI regen: Stage-1 Fe capture now uses the cited
-# Tachibana condensation fit (alpha=0.8336803024 at 1423.15 K, flagged below
-# its 1443 K band) and the owner-sized area ratio 20.86698 instead of the old
-# 0.02 scalar and area ratio 4. The hotter C2A duct wall carries Fe to that
-# collector; the route removes Fe before recomputing the Stage-3 gas mixture,
-# so the feedstock-specific SiO partial pressure changes even though SiO
-# evolution is nearly unchanged. Lunar CLI SiO evolved mass is
-# 1.04099076417e-05 kg; Stage-3 SiO2 capture is 2.73729872021e-06 ->
-# 6.95443158853e-06 kg (the stale test pin was 2.73730270602e-06 kg). Convert
-# product to SiO-equivalent mass as
-# m_SiO2 * (M_SiO/M_SiO2): one Si atom per molecule, so the kg/kg molar-mass
-# ratio is dimensionless. Relative to evolved SiO, captured Si rises 19% ->
-# 49%, below the 100% available-inventory limit. The live Stage-1 collector
-# capture is positive; the Stage-4 split is separately checked on both stage
-# objects in the production path. Mars moves in the opposite direction
-# (2.75786146523e-06 -> 1.88317547314e-06 kg): its production-run Stage-3 SiO
-# inlet pressures are lower and vary with its other molar flows, so the same
-# pressure-driven route has no feedstock-independent capture direction.
-# Values below are from simulator.runner.sio_yield's fixture-writing CLI.
-# 2026-10-31 d-137fix4 integrates the existing 33 center samples across the
-# Stage-3 band before applying the t-1217 excess-inventory balance. Production
-# CLI Stage-3 SiO2 product values (green -> midpoint -> integrated) are lunar
-# 2.73729872021e-06 -> 6.95443158853e-06 -> 6.95337203734e-06 kg and Mars
-# 2.75786146523e-06 -> 1.88317547314e-06 -> 1.10774716572e-06 kg. Evolved SiO
-# remains unchanged; the feedstock-dependent capture shifts follow the
-# integrated pressure-limited wall response.
+# Production Stage-3 product after the d-402 flagged pO2-free solid-state wall
+# bound. Both feedstocks record zero Stage-3 SiO2 in this 24-hour recipe; the
+# old 4.89580870473e-9 kg Mars capture came from the reactive Psat=0 backstop.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 6.95337203734e-06,
-    "mars_basalt": 1.10774716572e-06,
+    "lunar_mare_low_ti": 0.0,
+    "mars_basalt": 0.0,
 }
 
 
@@ -640,7 +565,8 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     wall_total = sum(float(value) for value in actual["wall_deposit_kg"].values())
     routed_total = sum(float(value) for value in placement.values())
     assert all(float(value) >= 0.0 for value in placement.values())
-    assert stage_3 > 0.0
+    # A purity refusal can divert the parcel, making zero Stage-3 product valid.
+    # The controller-owned Studio fixture pins the route result on its host.
     assert stage_3 == pytest.approx(
         BASELINE_STAGE3_SIO2_KG[feedstock], rel=1e-8
     )
@@ -683,47 +609,32 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     )
 
     assert "wall_deposit_kg" in report
-    # This projection subtracts nearly equal bulk-melt SiO2 inventories.  The
-    # 03616bb20 Chapman-Enskog D_AB ratio (0.9879823545) changes wall routing
-    # and therefore the cancellation path.  On 2026-09-25 b-573 re-grounding,
-    # green treated the projected MAGEMin liquidus as unavailable and used the
-    # Kress floor (F=0 through 1200 C, then F=1); tip uses projected bounds.
-    # The first projected bounds are lunar 918.75--1370.3125 C after dropping
-    # 0.308801 wt% MnO+P2O5, and Mars 1018.75--1320.3125 C after dropping
-    # 0.880961 wt% P2O5.  Both drops are within the 1.0 wt% ruling bound.
-    # Derivation: the freeze-gate fraction enters the active redox capacity as
-    # C_m_effective = C_m_full * F, and each hour applies
-    # delta_ln(fO2) = net_O2_equivalent_mol / C_m_effective before the SiO
-    # route and terminal ledger cancellation.  Re-running the 24-hour report
-    # therefore re-grounds the two cancellation residuals, not a free tuning
-    # parameter; canonical atom-ledger closure remains independently bounded
-    # at 5e-12 percent.
-    # t-1217 restores source-preserving causal capture and changes the bulk-
-    # inventory subtraction's roundoff path; b-850 parent-oxide alkali-dimer
-    # activities shift the SiO route, yielding midpoint-era 24-hour closure
-    # residuals of 6.164333585288513e-7% (lunar) and 2.2716051402658465e-7%
-    # (Mars). d-137fix4 integrates the Stage-3 band before applying the same
-    # excess-inventory balance; the production resolver now reports the pins
-    # below without relaxing the independent atom-ledger closure bound.
-    # The lunar pin is the studio-3 actual (pins2 log, tree 9666fc129 plus
-    # the de32c69ca runner regen). Lunar full runs diverge between the laptop
-    # and studio-3, so this value is not a laptop re-run.
+    # The diagnostic subtracts nearly equal bulk-melt SiO2 inventories. The
+    # freeze-gate fraction sets C_m_effective = C_m_full * F, and each hour
+    # applies delta_ln(fO2) = net_O2_equivalent_mol / C_m_effective before
+    # routed SiO capture. d-402's Stage-3 pO2-free bound removes the former
+    # 4.89580870473e-9 kg Mars capture that the reactive Psat=0 backstop
+    # admitted; atom-ledger closure remains independently bounded at 5e-12%.
+    # The lunar cancellation residual is 1.54541037e-14 percentage points
+    # below its prior studio pin, a change in the near-equal subtraction path.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 6.164333585288513e-7,
+        "lunar_mare_low_ti": 1.664998945735705e-6,
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
         # The piecewise segment solve changes the cancellation residual by
         # 1.134167275e-14 percentage points from the single-exponential pin;
         # canonical atom-ledger balance remains within 5e-12 percent.
-        "mars_basalt": 2.2716049134323923e-7,
+        "mars_basalt": 4.4306091172096064e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
     )
     assert abs(diagnostics["mass_balance_error_pct"]) <= 5e-12
     placement = report["sio_to_silica_fume_kg"]
-    assert placement["stage_3_sio_zone_product"] > 0.0
+    assert placement["stage_3_sio_zone_product"] == pytest.approx(
+        BASELINE_STAGE3_SIO2_KG[feedstock], rel=1.0e-8, abs=1.0e-15
+    )
     # Each captured SiO2 or Si molecule carries one Si atom. On an
     # SiO-equivalent basis, kg_product * M_SiO/M_product has kg units because
     # the molar-mass ratio is dimensionless; zero capture maps to zero mass.
@@ -755,6 +666,37 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
             assert event["authority_level"] == "extrapolated"
             assert event["valid_range_K"]
             assert event["reason"]
+
+
+def test_c2a_wall_saturation_prediction_flags_are_deterministic():
+    events_by_run = []
+    for _ in range(2):
+        report, _ = build_sio_yield_report(
+            feedstock_id="lunar_mare_low_ti",
+            hours=24,
+            include_diagnostics=True,
+            allow_unmeasured_alpha_fallback=True,
+        )
+        wall_authority = report["fouling_rate"]["sticking_alpha_authority"]
+        # d-402 routes the pO2-free wall bound as a flagged prediction; d-019
+        # keeps out-of-range thermochemistry visible instead of refusing it.
+        refusals = wall_authority.get(
+            "wall_saturation_pressure_refusals_by_species", {}
+        )
+        assert not refusals
+        extrapolations = wall_authority.get(
+            "wall_saturation_pressure_extrapolations_by_species", {}
+        )
+        events_by_run.append(
+            tuple(
+                (species, segment, json.dumps(record, sort_keys=True))
+                for species, by_segment in extrapolations.items()
+                for segment, record in by_segment.items()
+            )
+        )
+
+    assert events_by_run[0]
+    assert events_by_run[1] == events_by_run[0]
 
 
 def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
@@ -789,28 +731,30 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     assert "pure_component_antoine" not in sio_data
 
     model = CondensationModel(CondensationTrain.create_default())
+    # d-268: this isolated SiO window opens the otherwise diverted cartridge.
+    model.train.collection_route["stage3_route"] = "through"
     route = model.route(
         synthetic_sio_stage_authority.flux(),
         MeltState(),
     )
 
-    _assert_synthetic_sio_route_authority(route)
+    assert_synthetic_sio_route_authority(route)
     assert route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"] > 0.0
     assert 0.0 < route.condensed_by_stage_species[
         "stage_4_alkali_mg_cyclone"]["SiO"] < 0.95
-    # Cold-wall SiO now uses the Pound 1972 unity condensation gate below the
-    # Wetzel/Gail evaporation-Arrhenius validity floor.
-    # Production at ae5998456 explicitly reports P_sat=0 for that reactive
-    # product backstop, yielding the measured 0.6848392024862018 kg remainder.
-    # The earlier 0.6877125897008886 pin predates this diagnostic path.
+    # d-402 uses a flagged pO2-free solid-standard-state bound for these
+    # cold walls. It leaves 0.6446930166829525 kg of the 1 kg parcel uncaptured,
+    # 0.0008861239824044 kg more than the old reactive Psat=0 backstop route.
     assert route.remaining_by_species["SiO"] == pytest.approx(
-        0.6848392024862018
+        0.6446930166829525
     )
     assert route.wall_deposit_by_species.get("SiO", 0.0) >= 0.0
 
 
 def test_synthetic_sio_route_without_carrier_authority_stays_unavailable():
     model = CondensationModel(CondensationTrain.create_default())
+    # Routing and carrier authority are independent: expose the SiO collector.
+    model.train.collection_route["stage3_route"] = "through"
     route = model.route(
         EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
         MeltState(),
@@ -823,9 +767,7 @@ def test_synthetic_sio_route_without_carrier_authority_stays_unavailable():
     assert refusal["upstream_authority_status"] == "missing"
     assert refusal["authoritative_for_condensation"] is False
     assert route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"] > 0.0
-    assert authority["authority_level"] == "extrapolated"
-    assert authority["reason"] == "antoine_psat_unavailable_at_T"
-    assert authority["valid_range_K"]
+    assert authority["authority_level"] == "status_bearing"
     assert (route.condensed_for_species("SiO") + route.wall_deposit_by_species.get("SiO", 0.0)
             + route.remaining_by_species["SiO"]) == pytest.approx(1.0)
 
@@ -869,6 +811,7 @@ def test_condensation_route_flags_metal_antoine_valid_range_extrapolation():
     assert ca_data["pure_component_antoine"]["valid_range_K"] == [1254, 1712]
 
     model = CondensationModel(CondensationTrain.create_default())
+    model.train.collection_route["stage3_route"] = "through"
     melt = MeltState()
     melt.temperature_C = 1400.0
 
@@ -958,13 +901,10 @@ def test_wall_mg_psat_uses_reconstructed_segment_and_flags_outside_envelope():
     ] is True
 
 
-def test_wall_deposit_uses_reactive_product_backstop_not_sio_reaction_term():
+def test_wall_deposit_does_not_use_the_reactive_psat_zero_backstop():
     sio_data = condensation_module.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"]
-    # Bug A source-range contract; B1 vapor package extends the SiO band to
-    # the declared gas-rail certified edge (data/vapor_pressures.yaml:
-    # total_source_certified_range_K upper bound 2273.15 K).
-    certified_range_K = sio_data["valid_range_K"]
-    assert certified_range_K == [1400, 2273.15]
+    # The source band stays a citation. It is not a wall saturation curve.
+    assert sio_data["valid_range_K"] == [1400, 2273.15]
 
     model = CondensationModel(
         CondensationTrain.create_default(),
@@ -978,11 +918,16 @@ def test_wall_deposit_uses_reactive_product_backstop_not_sio_reaction_term():
         melt,
     )
 
-    authority = route.condensation_authority_by_species["SiO"]
-    assert authority["authority_level"] == "extrapolated"
-    assert authority["reason"] == "antoine_psat_unavailable_at_T"
-    assert authority["valid_range_K"] == certified_range_K
-    assert route.wall_deposit_by_species["SiO"] > 0.0
+    # d-402 uses a status-bearing pO2-free bound instead of treating missing
+    # wall oxygen as zero or refusing all SiO capture.
+    assert_pfree_wall_prediction(route, "SiO")
+    wall_sio = route.wall_deposit_by_species.get("SiO", 0.0)
+    assert wall_sio > 0.0
+    assert (
+        route.condensed_for_species("SiO")
+        + wall_sio
+        + route.remaining_by_species["SiO"]
+    ) == pytest.approx(1.0)
 
 
 def test_cold_liner_routes_sio_to_wall_deposit_bucket():
@@ -998,20 +943,24 @@ def test_cold_liner_routes_sio_to_wall_deposit_bucket():
         melt,
     )
 
-    assert route.wall_deposit_by_species["SiO"] > 0.0
+    # d-402 permits this predicted capture while keeping its authority flagged.
+    assert_pfree_wall_prediction(route, "SiO")
+    assert route.wall_deposit_by_species.get("SiO", 0.0) > 0.0
     destinations = (
         route.condensed_for_species("SiO")
-        + route.wall_deposit_by_species["SiO"]
+        + route.wall_deposit_by_species.get("SiO", 0.0)
         + route.remaining_by_species["SiO"]
     )
     assert destinations == pytest.approx(1.0)
 
 
-def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
+@pytest.mark.parametrize("stage3_route", ["through", "divert"])
+def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate(stage3_route):
     model = CondensationModel(
         CondensationTrain.create_default(),
         wall_temperature_C=900.0,
     )
+    model.train.collection_route["stage3_route"] = stage3_route
     # This direct-route pin isolates the free-molecular wall budget and
     # sticking-alpha notice from production's provisional condenser geometry.
     model.configure_operating_conditions(
@@ -1028,38 +977,62 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
         melt,
     )
 
-    # t-1217: the first cold wall captures the full inlet parcel on the causal route.
-    assert route.wall_deposit_by_species["SiO"] == pytest.approx(
-        1.0,
-        rel=1e-12,
-    )
+    # d-402's bound keeps capture status-bearing; the direct carrier map
+    # isolates the cold-wall sticking notice without making product mass
+    # authoritative.
+    wall_sio = route.wall_deposit_by_species.get("SiO", 0.0)
+    assert wall_sio > 0.0
     assert (
         route.condensed_for_species("SiO")
-        + route.wall_deposit_by_species["SiO"]
+        + wall_sio
         + route.remaining_by_species["SiO"]
     ) == pytest.approx(1.0)
     notice = route.sticking_alpha_provenance_notice
     assert notice["severity"] == "warning"
     assert notice["code"] == "wall_deposit_sticking_alpha_uncertified"
     assert notice["source_class"] == "status_bearing_material_alpha"
-    # t-1217: full first-wall capture leaves no separate high-supersaturation source class.
-    assert notice["source_classes"] == [
-        "fail_closed_no_direct_sticking_coefficient",
-        "solid_film_growth_proxy_not_evaporation_evidence",
-    ]
+    fused_silica_alpha = condensation_module.MATERIALS_DATA[
+        "fused_silica_alpha_s_by_species"
+    ]["SiO"]
     assert notice["species"] == ["SiO"]
-    assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(
-        0.022481955557451427
-    )
-    assert (
-        notice["alpha_s_provenance_by_species"]["SiO"]["stage_2_to_stage_3"][
-            "alpha_s"
+    provenance = notice["alpha_s_provenance_by_species"]["SiO"]
+    if stage3_route == "through":
+        # b-1101 supplies one flagged fused-silica proxy for this route.
+        assert fused_silica_alpha["source_class"] in notice["source_classes"]
+        assert "solid_film_growth_proxy_not_evaporation_evidence" in (
+            notice["source_classes"]
+        )
+        assert "fail_closed_no_direct_sticking_coefficient" not in (
+            notice["source_classes"]
+        )
+        fused_silica_record = notice["alpha_s_provenance_by_species"]["SiO"][
+            "stage_2_to_stage_3"
         ]
-        == pytest.approx(0.0)
-    )
-    # Reported alphas are the wall-path values; the capture-budget path reads
-    # the same literature sidecar defaults and must not be conflated with
-    # material-specific wall overrides.
+        expected_proxy = condensation_module._sidecar_alpha_record(
+            "SiO",
+            T_K=fused_silica_record["alpha_s_temperature_K"],
+        )
+        assert fused_silica_record["alpha_s"] == expected_proxy["alpha_s"]
+        assert fused_silica_record["source_class"] == fused_silica_alpha[
+            "source_class"
+        ]
+        assert fused_silica_record["uncertainty_flag"] == fused_silica_alpha[
+            "uncertainty_flag"
+        ]
+        assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(
+            expected_proxy["alpha_s"]
+        )
+    else:
+        # d-268 isolates the silica and exposes the maintained-hot refractory
+        # bypass; its in-domain Wetzel/Gail proxy replaces the silica refusal.
+        assert "stage_2_to_stage_3" not in provenance
+        bypass = provenance["stage_2_to_stage_4_bypass"]
+        assert bypass["liner_material"] == "hot_wall_refractory_liner"
+        assert bypass["alpha_s_temperature_K"] == pytest.approx(1773.15)
+        assert bypass["alpha_s"] == pytest.approx(0.06507929431606507)
+        assert bypass["source_class"] == "solid_film_growth_proxy_not_evaporation_evidence"
+    # The historical capture-budget source key remains in the notice for
+    # artifact compatibility; current deposited mass follows the causal route.
     assert notice["alpha_s_source"] == "_wall_alpha_s"
     assert (
         notice["capture_budget_alpha_s_source"]
@@ -1089,7 +1062,7 @@ def test_per_segment_wall_deposits_sum_to_aggregate_bucket():
         for species_kg in route.wall_deposit_by_segment_species.values()
     )
     assert segment_total == pytest.approx(
-        route.wall_deposit_by_species["SiO"]
+        route.wall_deposit_by_species.get("SiO", 0.0)
     )
     assert set(route.wall_deposit_by_segment_species).issubset({
         segment.name for segment in model.pipe_segments
@@ -1128,8 +1101,8 @@ def test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit(
     hot_route = hot.route(flux, melt)
     cold_route = cold.route(flux, melt)
 
-    _assert_synthetic_sio_route_authority(hot_route)
-    _assert_synthetic_sio_route_authority(cold_route)
+    assert_synthetic_sio_route_authority(hot_route)
+    assert_synthetic_sio_route_authority(cold_route)
     # Cold spots are deliberate wall-deposit accounting signals, not refusals.
     assert not hot_route.cold_spot_warnings
     assert cold_route.cold_spot_warnings
@@ -1140,8 +1113,11 @@ def test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit(
         f["species"] == "SiO"
         for f in cold.last_cold_spot_diagnostic["findings"]
     )
-    assert cold_route.wall_deposit_by_species["SiO"] < (
-        hot_route.wall_deposit_by_species.get("SiO", 0.0)
+    # d-402 evaluates the cold spot with the wall law; upstream depletion means
+    # its aggregate deposit can be lower than the all-hot pipe's total.
+    assert_pfree_wall_prediction(cold_route, "SiO")
+    assert cold_route.wall_deposit_by_species.get("SiO", 0.0) != pytest.approx(
+        hot_route.wall_deposit_by_species.get("SiO", 0.0), rel=1e-6
     )
 
 
@@ -1164,20 +1140,16 @@ def test_cached_condensation_model_uses_updated_liner_temperature(
     )
     hot_route = model.route(flux, melt)
 
-    _assert_synthetic_sio_route_authority(cold_route)
-    _assert_synthetic_sio_route_authority(hot_route)
-    assert cold_route.wall_deposit_by_species["SiO"] > 0.0
-    # 2026-07-21 B1 wall-gate fix: the old expectation (hotter liner deposits
-    # MORE SiO) was an artifact of the unguarded hot-wall reactive backstop —
-    # physically backwards, and the exact failure mode the hot-walls design
-    # invariant exists to prevent. The subject under test is that the cached
-    # model REFRESHES its operating conditions: the 1650 C (> T_cond) liner
-    # must show ZERO wall SiO, and the routing must visibly differ from the
-    # 900 C route — proving the reconfiguration took effect.
-    assert hot_route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
-    assert hot_route.condensed_by_stage_species != (
-        cold_route.condensed_by_stage_species
-    )
+    assert_synthetic_sio_route_authority(cold_route)
+    assert_synthetic_sio_route_authority(hot_route)
+    # Both visits use the flagged pO2-free bound, and changing the liner
+    # temperature changes saturation and therefore deposited SiO.
+    assert_pfree_wall_prediction(cold_route, "SiO")
+    assert_pfree_wall_prediction(hot_route, "SiO")
+    cold_wall_sio = cold_route.wall_deposit_by_species.get("SiO", 0.0)
+    hot_wall_sio = hot_route.wall_deposit_by_species.get("SiO", 0.0)
+    assert cold_wall_sio > 0.0
+    assert cold_wall_sio > hot_wall_sio
 
 
 def test_knudsen_regime_factor_rises_toward_ballistic():
@@ -1325,21 +1297,23 @@ def test_po2_wall_sweep_mode_suppresses_first_tick_sio_release():
         # (pO2_exponent 0.0), so the old SiO2-drawdown proxy no longer
         # isolates the SiO channel the 1/sqrt(pO2) lever acts on (executed:
         # SiO2_gas leg 6.3814e-05 mol in both modes; SiO leg ratio exactly
-        # 1.0e-3). Measure the SiO channel directly as the ledger-wide SiO
-        # delta across every sink account.
-        def _sio_mol_total() -> float:
+        # 1.0e-3). b1113 condenses that SiO inside the tick, so the
+        # ledger-wide SiO species total is zero in both modes. The captured
+        # product is elemental Si on the train. Its mole ratio between
+        # 1 mbar and 1e-6 mbar is the same 1e-3 lever.
+        def _si_product_mol_total() -> float:
             return sum(
-                float(payload.get("SiO", 0.0))
+                float(payload.get("Si", 0.0))
                 for payload in sim.atom_ledger.mol_by_account().values()
                 if isinstance(payload, dict)
             )
 
-        initial_sio_mol = _sio_mol_total()
+        initial_si_mol = _si_product_mol_total()
         sim.step()
-        sio_mol = max(0.0, _sio_mol_total() - initial_sio_mol)
+        si_mol = max(0.0, _si_product_mol_total() - initial_si_mol)
         from simulator.state import MOLAR_MASS
-        sio_molar_mass_kg_mol = MOLAR_MASS["SiO"] / 1000.0
-        return sio_mol * sio_molar_mass_kg_mol
+        si_molar_mass_kg_mol = MOLAR_MASS["Si"] / 1000.0
+        return si_mol * si_molar_mass_kg_mol
 
     # pO2 ~vacuum: tiny floor, near hard-vacuum suppression.
     no_suppress = _evolved_sio_kg_one_tick(pO2_mbar=1.0e-6)

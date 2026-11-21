@@ -40,9 +40,9 @@ def test_natural_key_is_exact_canonical_and_local() -> None:
 def test_long_natural_key_uses_only_a_16_byte_request_digest() -> None:
     request = {"composition_mol": {f"component-{index}": index + 0.25 for index in range(100)}}
     key = engine_cache.engine_cache_key("openimcc", 1, request)
-    assert len(key) == 36
+    assert len(key) == 20
     assert key[:3] == bytes((1, 0, 1))
-    assert key[19] == 255
+    assert key[3] == 255
     assert key != engine_cache.engine_cache_key("openimcc", 1, {**request, "temperature_K": 1700.0})
 
 
@@ -50,7 +50,6 @@ def test_natural_key_wire_pin_and_signed_zero_survive_repeated_builds() -> None:
     # 1700 = 0x1.a9p+10: frexp exponent 11, significand 0x1a900000000000.
     expected = (
         bytes.fromhex("010001")
-        + engine_cache._engine_cache_input_identity_digest("openimcc")
         + bytes.fromhex("000801840901043d001a900000000000")
     )
     for _ in range(3):

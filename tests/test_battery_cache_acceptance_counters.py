@@ -140,6 +140,7 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
             self.report_aggregate = None
             self.static_refusal_counts: dict = {}
             self.selected_reference_ids: set[str] = set()
+            self._database = None
 
         def append_payload_line(self, *_args: Any, **_kwargs: Any) -> None:
             self.count += 1
@@ -150,9 +151,9 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
         def close(self) -> None:
             return None
 
-    context = object()
+    context = None
     refs = tuple(
-        SimpleNamespace(observation_id=f"observation-{index}") for index in range(2)
+        SimpleNamespace(observation_id=f"ref-{index}") for index in (1, 2)
     )
     prepared = SimpleNamespace(
         context=context,
@@ -161,7 +162,11 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
     )
     monkeypatch.setattr(score, "_ResidualJsonlStream", _Stream)
     monkeypatch.setattr(score, "_prepare_score_run", lambda *_args, **_kwargs: prepared)
-    monkeypatch.setattr(score, "_partition_score_refs", lambda *_args, **_kwargs: refs)
+    monkeypatch.setattr(
+        score,
+        "_partition_score_refs",
+        lambda *_args, **_kwargs: ((refs[0],), (refs[1],)),
+    )
 
     def _parallel_map(tasks, _worker, **kwargs):
         assert kwargs["max_workers"] == 2
@@ -204,7 +209,7 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
         workers=2,
     )
 
-    assert metadata.selected_reference_ids == {"observation-0", "observation-1"}
+    assert metadata.selected_reference_ids == {"ref-1", "ref-2"}
     assert metadata.engine_cache_counters is not None
     assert set(metadata.engine_cache_counters) == {
         engine.value

@@ -32,7 +32,10 @@ from simulator.fe_redox import (
     KRESS91_LN_FO2_COEFFICIENT,
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.runner import build_per_hour_summary
+from simulator.runner import (
+    RUNNER_MASS_BALANCE_LIMIT_PCT as MASS_BALANCE_MAX_PCT,
+    build_per_hour_summary,
+)
 from simulator.state import Atmosphere, CampaignPhase, EvaporationFlux, MeltState
 from scripts import evaporation_selectivity_map as selectivity_map
 from tests.ledger_test_support import _transition_account_species_mol
@@ -284,7 +287,11 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
     sim = session.simulator
     hot_hours = set()
     c6_releases = []
-    c6_moves_toward_gas_split = False
+    c6_solid_refusal_seen = False
+    initial_iron_atoms = math.fsum(
+        sim.atom_ledger.atom_moles_by_account(account).get("Fe", 0.0)
+        for account in sim.atom_ledger.mol_by_account()
+    )
     transition_count = len(sim.atom_ledger.transitions)
     for result in drive_session(session, 400, DecisionPolicy.AUTO_APPLY):
         snapshot = result.snapshot
@@ -315,27 +322,34 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
                         ferric_debit = _cleaned_melt_debit_mol(sim, transition, "Fe2O3")
                         # Fe2O3 -> 2 FeO + 1/2 O2; mol O2 = mol Fe2O3 / 2.
                         assert o2 == pytest.approx(ferric_debit / 2.0, abs=1e-12)
-            inventory = sim.atom_ledger.mol_by_account("process.cleaned_melt")
-            assert inventory.get("FeO", 0.0) > 0.0
-            gas_ferric = sim._fe3_over_sigma_fe_at_fO2(
-                sim._melt_oxide_wt_pct(),
-                fO2_log=math.log10(sim.melt.p_total_mbar / 1000.0),
-                T_K=sim.melt.temperature_C + 273.15,
-                pressure_bar=sim.melt.p_total_mbar / 1000.0,
-            )
-            # Fe2O3 has two Fe atoms: n_target = f_ferric * n_Fe/2 mol.
-            gas_target = gas_ferric * sim._cleaned_melt_fe_atom_mol() / 2.0
             for diagnostic in sim._fe_redox_respeciation_diagnostics_this_hr:
-                if diagnostic.get("direction") == "reducing":
-                    c6_moves_toward_gas_split |= (
-                        abs(inventory.get("Fe2O3", 0.0) - gas_target)
-                        < abs(diagnostic["current_fe2o3_mol"] - gas_target)
-                    )
+                if diagnostic.get("reason") == "fe_redox_respeciation_not_liquid":
+                    c6_solid_refusal_seen = True
         transition_count = len(sim.atom_ledger.transitions)
     assert sim.is_complete()
     assert hot_hours == {167, 168}
-    assert c6_releases
-    assert c6_moves_toward_gas_split
+    # The d-019/t-1567 diagnosis found that the old Kress floor treated a
+    # 0.14 wt% SiO2 solid residue as liquid. The MAGEMin silica-domain gate
+    # correctly refuses that extrapolation, so C6 leaves Fe2O3 unreduced and
+    # releases no respeciation O2.
+    assert c6_solid_refusal_seen
+    assert not c6_releases
+    final_iron_atoms = math.fsum(
+        sim.atom_ledger.atom_moles_by_account(account).get("Fe", 0.0)
+        for account in sim.atom_ledger.mol_by_account()
+    )
+    # Premise: the closure contract bounds relative error. The owner is
+    # RUNNER_MASS_BALANCE_LIMIT_PCT, imported as MASS_BALANCE_MAX_PCT.
+    # Algebra: |final - initial| <= initial * pct/100.
+    # Unit check: mol vs mol.
+    # Limiting value: 2359 mol x 5e-14 = 1.2e-10 mol, about 260 ulp,
+    # against a measured -8 ulp. The bound still catches any real leak
+    # bigger than one ten-billionth.
+    assert final_iron_atoms == pytest.approx(
+        initial_iron_atoms,
+        rel=0.0,
+        abs=initial_iron_atoms * MASS_BALANCE_MAX_PCT / 100,
+    )
 
 
 def _transition_account_o2_equiv_mol(
@@ -1746,7 +1760,7 @@ def test_c6_primary_source_term_from_transition_and_back_reduction_nets_zero(
     )
 
 
-def test_c3_na_spent_residue_credit_does_not_cancel_reduction_source() -> None:
+def test_c3_na_melt_credit_does_not_cancel_reduction_source() -> None:
     sim = _make_sim(additives_kg={"Na": 12.0})
     sim._init_shuttle_inventory(CampaignPhase.C3_NA)
     sim.melt.campaign = CampaignPhase.C3_NA
@@ -1779,8 +1793,8 @@ def test_c3_na_spent_residue_credit_does_not_cancel_reduction_source() -> None:
     )
 
     assert feo_mol > 0.0
-    assert residue_na2o_mol == pytest.approx(feo_mol)
-    assert cleaned_na2o_mol == pytest.approx(0.0)
+    assert residue_na2o_mol == pytest.approx(0.0)
+    assert cleaned_na2o_mol == pytest.approx(feo_mol)
     assert sim._redox_source_breakdown_diagnostic()[
         "terms_mol_o2_equiv_by_label"
     ][label] == pytest.approx(-0.5 * feo_mol)
@@ -3207,7 +3221,9 @@ def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> No
 
 def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> None:
     sim = _make_sim()
-    sim.campaign_mgr.overrides["C2A_staged"] = {"hold_temp_C": 1700.0}
+    # This contamination probe explicitly exposes the otherwise isolated cartridge.
+    sim.campaign_mgr.overrides["C2A_staged"] = {
+        "hold_temp_C": 1700.0, "stage3_route": "through"}
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     sim.melt.temperature_C = 1650.0
     sim.melt.campaign_hour = 7

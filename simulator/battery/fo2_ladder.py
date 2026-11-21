@@ -58,15 +58,15 @@ from simulator.battery.records import (
     Value,
     nominal_pressure_pa,
 )
-from simulator.battery.source_oxygen import RYS_SOURCE_ID
+from simulator.source_ids import RYS_SOURCE_ID
 from simulator.battery.waypoints import (
     Waypoint,
     WaypointAuthority,
     WaypointResult,
     oxygen_condition,
 )
-from simulator.chemistry.graphite_c_co import carbon_delta_g_co_kj_per_mol_o2
-from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
+from simulator.oxygen_buffers import log10_fo2_c_co_bar
+from simulator.physical_constants import PA_PER_BAR
 
 _TIER1_DIRECT_ROUTES = frozenset({
     "oxygen_partial_pressure_to_log_fO2",
@@ -324,38 +324,21 @@ def resolve_row_fo2(
         and temperature > 0.0
     ):
         total_pressure = identity.total_pressure_Pa
-        p_na_bar = _pascal_point_to_bar(observation.value)
         if (
             total_pressure is not None
             and total_pressure.is_value
             and total_pressure.value is not None
-            and p_na_bar is not None
         ):
             pressure_pa = nominal_pressure_pa(total_pressure)
-            total_pressure_bar = (
+            p_co_bar = (
                 math.nan if pressure_pa is None else float(pressure_pa) / PA_PER_BAR
             )
-            p_co_bar = total_pressure_bar - p_na_bar
             if math.isfinite(p_co_bar) and p_co_bar > 0.0:
-                # d-375 accepts the source condition as a flagged two-species
-                # approximation, not a condition fitted to residuals.
-                # Premise: Rego Table I reports graphite with flowing CO;
-                # treat pCO as total pressure less the measured Na pressure.
-                # Algebra: for 2 C + O2 -> 2 CO, K_CO = pCO/sqrt(fO2), so
-                # log10(fO2/bar) = 2*(log10(pCO/bar) - log10(K_CO));
-                # log10(K_CO) = -ΔG/(2 R T ln(10)).
-                # Units: pCO is converted Pa -> bar; ΔG is kJ/mol O2 -> J/mol;
-                # R is J/(mol K), T is K, and all log arguments are ratios.
-                # Sanity: Table I run 1 gives log10(fO2/bar) ≈ -16.6551;
-                # raising its total pressure raises pCO and fO2.
-                delta_g_j_per_mol = (
-                    carbon_delta_g_co_kj_per_mol_o2(temperature) * 1000.0
-                )
-                log10_k_co = -delta_g_j_per_mol / (
-                    2.0 * GAS_CONSTANT * temperature * math.log(10.0)
-                )
+                # Rego reports graphite under a CO-only cover, so the stated
+                # CO pressure is the row's total pressure. Its observed pNa is
+                # the target and does not enter this source condition.
                 return ResolvedFo2(
-                    2.0 * (math.log10(p_co_bar) - log10_k_co),
+                    log10_fo2_c_co_bar(temperature, p_co_bar),
                     3,
                     "rego_c_co_two_species_approximation",
                     False,

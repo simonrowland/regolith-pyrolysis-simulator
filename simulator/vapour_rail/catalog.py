@@ -53,7 +53,11 @@ from simulator.vapour_rail.channels import (
     is_dioxygen_formula,
     o2_potential_from_pO2_bar,
 )
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _AntoineCoefficientRefusal,
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
 from simulator.vapour_rail.nasa_cea import (
     Nasa7Segment,
     Nasa9Segment,
@@ -756,7 +760,7 @@ _LEGACY_FIELD_ORDER: Mapping[str, tuple[str, ...]] = {
         "fit_target", "authority_class", "residual_dex", "confidence_tier",
         "gamma_domain_K", "gamma_authority", "coherent_pair", "shadow_bracket",
         "pseudo_antoine_status", "backsolve", "reaction",
-        "pure_component_antoine", "oxide_activity_exponent", "pO2_exponent",
+        "pure_component_saturation", "oxide_activity_exponent", "pO2_exponent",
         "pO2_reference_bar", "evaporation_alpha", "antoine",
         "valid_range_K", "boiling_point_C", "condensation_T_C_at_1mbar", "notes",
     ),
@@ -929,7 +933,7 @@ class _ReferencePressureModel:
                 A = float(self.coefficients["A"])
                 B = float(self.coefficients["B"])
                 C = float(self.coefficients["C"])
-            except (KeyError, TypeError, ValueError) as exc:
+            except (KeyError, TypeError, ValueError, OverflowError) as exc:
                 raise CatalogCompileError(
                     "Antoine reference model requires numeric A, B, and C"
                 ) from exc
@@ -953,6 +957,46 @@ class _ReferencePressureModel:
         raise CatalogCompileError(
             f"unsupported reference pressure evaluator {self.evaluator_family!r}"
         )
+
+
+def realize_log10_pressure_pa(log10_pressure: float) -> tuple[float, str | None]:
+    """Map ``log10(P/Pa)`` onto a finite positive pressure.
+
+    Representable powers are bit-for-bit ``10**log10_pressure``. A log
+    below ``log10`` of the minimum positive float returns that minimum
+    and ``numerical_underflow_floor``: activity depletion can drive a
+    trace carrier under the IEEE range, and substituting 0 would be a
+    silent zero (d-367). A log above ``log10`` of the largest finite
+    float, and the endpoint equal to that logarithm, return that
+    ceiling and ``numerical_overflow_ceiling``. ``10**`` of the endpoint
+    raises ``OverflowError``: ``log10`` rounds the ceiling above every
+    finite power of ten, and the strict ``>`` comparison is false for
+    the logarithm of itself. That overflow is the ceiling, not an abort
+    (d-367). The adjacent float toward zero is the power
+    1.7976931348620926e+308 Pa with no flag. A non-finite power that is
+    neither clamp is returned unchanged; the caller refuses it. Units
+    remain Pa. The Langmuir surface laws call this same function. Their
+    overflow disposition is a typed refusal rather than the ceiling.
+    """
+
+    minimum_positive_pa = math.nextafter(0.0, math.inf)
+    maximum_finite_pa = math.nextafter(sys.float_info.max, 0.0)
+    # Premise: P = 10**log10(P) Pa. Compare the log to the endpoint logs
+    # so a representable power is never replaced. Sanity: log10 = -302.5
+    # is 3.162277660168379e-303 Pa, above the ~5e-324 Pa minimum, and is
+    # returned unchanged. log10 = -330 is the minimum, flagged.
+    # log10(maximum_finite_pa) is not strictly above itself, but 10** of
+    # that rounded log overflows. The adjacent log toward zero does not:
+    # 10**nextafter(endpoint, 0) = 1.7976931348620926e+308 Pa.
+    if log10_pressure < math.log10(minimum_positive_pa):
+        return minimum_positive_pa, "numerical_underflow_floor"
+    if log10_pressure > math.log10(maximum_finite_pa):
+        return maximum_finite_pa, "numerical_overflow_ceiling"
+    try:
+        pressure = 10.0**log10_pressure
+    except OverflowError:
+        return maximum_finite_pa, "numerical_overflow_ceiling"
+    return pressure, None
 
 
 @dataclass(frozen=True)
@@ -1007,6 +1051,7 @@ class CompiledPressureEvaluator:
         low, high = self.valid_temperature_K
         out_of_range = temperature_K < low or temperature_K > high
 
+        temperature_notice: dict[str, Any] = {}
         if out_of_range:
             if self.extrapolation_policy != DEFAULT_EXTRAPOLATION_POLICY:
                 raise CatalogCompileError(
@@ -1020,7 +1065,7 @@ class CompiledPressureEvaluator:
             # composite thermo) — never attenuated linear-T slope invention
             # (b-145 composites; t-538 all non-composite families).
             log10_reference = self._out_of_domain_log10_continuation(
-                temperature_K
+                temperature_K, temperature_notice=temperature_notice,
             )
         else:
             log10_reference = self.reference_model.log10_pressure(temperature_K)
@@ -1138,25 +1183,11 @@ class CompiledPressureEvaluator:
                         f"evaluation failed: {exc}"
                     ) from exc
 
-        # A finite continued log-pressure can lie outside IEEE-754's representable
-        # pressure interval: activity depletion drives trace carriers below the
-        # minimum, while far-above-window Stage-0 correlations can exceed the
-        # maximum. Premise: P=10^logP Pa. Clamp only at the numerical endpoints so
-        # the first case never invents zero and the second retains the limiting
-        # escape direction without returning inf. Units remain Pa. Sanity: every
-        # representable pressure is bit-for-bit unchanged; both cases remain typed
-        # non-certifying continuations.
-        minimum_positive_pa = math.nextafter(0.0, math.inf)
-        maximum_finite_pa = math.nextafter(sys.float_info.max, 0.0)
-        numerical_underflow = log10_pressure < math.log10(minimum_positive_pa)
-        numerical_overflow = log10_pressure > math.log10(maximum_finite_pa)
-        pressure_pa = (
-            minimum_positive_pa
-            if numerical_underflow
-            else maximum_finite_pa
-            if numerical_overflow
-            else 10.0**log10_pressure
-        )
+        # Endpoint policy lives in realize_log10_pressure_pa. Out-of-range
+        # thermo status still wins over the numerical continuation flag.
+        pressure_pa, numerical_status = realize_log10_pressure_pa(log10_pressure)
+        numerical_underflow = numerical_status == "numerical_underflow_floor"
+        numerical_overflow = numerical_status == "numerical_overflow_ceiling"
         if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
             raise CatalogCompileError(
                 f"{self.species_id}: evaluator produced invalid pressure"
@@ -1195,7 +1226,7 @@ class CompiledPressureEvaluator:
         object.__setattr__(
             evaluation,
             "extrapolation_notice",
-            o2_notice or _pO2_floor_inversion_notice(
+            o2_notice or temperature_notice or _pO2_floor_inversion_notice(
                 species_id=self.species_id,
                 pressure_pa=pressure_pa,
                 pO2_exponent=self.pO2_exponent,
@@ -1296,8 +1327,11 @@ class CompiledPressureEvaluator:
         temperature = _finite_positive(temperature_K, "temperature_K")
         low, high = self.valid_temperature_K
         out_of_range = temperature < low or temperature > high
+        temperature_notice: dict[str, Any] = {}
         reference_log10 = (
-            self._out_of_domain_log10_continuation(temperature)
+            self._out_of_domain_log10_continuation(
+                temperature, temperature_notice=temperature_notice,
+            )
             if out_of_range
             else self.reference_model.log10_pressure(temperature)
         )
@@ -1355,22 +1389,30 @@ class CompiledPressureEvaluator:
             "activity_verdict": activity.verdict.value,
             "flux_disposition": "instrumented_not_selected",
         }
+        # The scalar attribute stays one dict. This typed payload is a list
+        # of notice records: a dict would be iterated as its keys.
+        if temperature_notice:
+            payload["extrapolation_notice"] = [dict(temperature_notice)]
         if self.pO2_exponent and math.isfinite(ln_pressure):
             pressure_pa = math.exp(float(ln_pressure))
             notice = (o2_potential.observation_or_setpoint_receipt or {}).get(
                 "extrapolation_notice"
-            ) or _pO2_floor_inversion_notice(
+            ) or temperature_notice or _pO2_floor_inversion_notice(
                 species_id=self.species_id,
                 pressure_pa=pressure_pa,
                 pO2_exponent=self.pO2_exponent,
                 pO2_bar_used=oxygen,
                 was_clamped=False,
             )
-            if notice is not None:
-                payload["extrapolation_notice"] = dict(notice)
+            if isinstance(notice, Mapping):
+                payload["extrapolation_notice"] = [dict(notice)]
+            elif notice:
+                payload["extrapolation_notice"] = [dict(item) for item in notice]
         return MappingProxyType(payload)
 
-    def _out_of_domain_log10_continuation(self, temperature_K: float) -> float:
+    def _out_of_domain_log10_continuation(
+        self, temperature_K: float, *, temperature_notice: dict[str, Any] | None = None,
+    ) -> float:
         """Continuous out-of-domain estimate (anti-cliff; not claim authority).
 
         Owner-ratified anti-cliff policy: never drop to silent zero at the
@@ -1398,27 +1440,20 @@ class CompiledPressureEvaluator:
            attenuated linear-T slope that invented multi-dex low-T pressure.
         """
         if self.reference_model.physical_composite_ood:
-            # Premise: for composite carrier V, log10 P_V°(T) =
-            #   (1/ν) log10 K_ex(T) + (m/ν) log10 P_base°(T) + O2 term
-            # (see _log10_from_composite). Algebra: K_ex(T)=exp(-ΔG_ex°/RT)
-            # from whatever gas polynomials this row compiled — NASA CEA
-            # segments for some carriers (TiO2_gas), IVTAN-derived Shomate
-            # for others (MnO_gas / CoO_gas target gas). This branch does
-            # not first intersect those constituent domains, so "CEA
-            # 300–6000 K at any campaign T" is not a property of the
-            # branch. P_base° is the liquid-reservoir Antoine
-            #   log10 P_base = A − B/(T+C)
-            # which is van't Hoff / Clausius–Clapeyron in 1/(T+C) with the
-            # fitted reaction dH (B ∝ ΔH/R ln10). Composing at the requested
-            # T therefore evaluates each compiled factor at that T.
-            # Unit check: K_ex and every p/P° ratio are dimensionless;
-            # log10 P is log10(Pa). Sanity: at T=T_low the composite
-            # reproduces the in-domain edge value when every constituent
-            # polynomial accepts T_low (no cliff). MnO_gas / CoO_gas target
-            # Shomate cover [1000, 3000] K; T below that floor raises
-            # ShomateDomainError from the polynomial module rather than a
-            # typed catalog continuation.
-            return float(self.reference_model.log10_pressure(temperature_K))
+            # Compose the landed exchange and base-pressure models while their
+            # constituents accept T. Both scalar and typed consumers share the
+            # fallback and its original constituent-domain reason here.
+            try:
+                return float(self.reference_model.log10_pressure(temperature_K))
+            except (NasaCeaDomainError, ShomateDomainError) as exc:
+                if temperature_notice is not None:
+                    temperature_notice.update({
+                        "reason": str(exc),
+                        "authority_level": "extrapolated",
+                        "certified_band": {"temperature_K": self.valid_temperature_K},
+                        "continuation": "reciprocal_T_tangent",
+                    })
+                return self._reciprocal_T_tangent_log10(temperature_K)
 
         mode = self._physical_oor_continuation_mode()
         if mode == "direct":
@@ -1478,7 +1513,7 @@ class CompiledPressureEvaluator:
         return "reciprocal_T_tangent"
 
     def _reciprocal_T_tangent_log10(self, temperature_K: float) -> float:
-        """Continue log10 P as linear in 1/T from the fit-domain edge.
+        """Continue log10 P as linear in 1/T from the supported domain edge.
 
         Premise (Clausius–Clapeyron / van 't Hoff): near a local temperature
         where reaction ΔH is slowly varying,
@@ -1519,6 +1554,24 @@ class CompiledPressureEvaluator:
             )
 
         ref = self.reference_model
+
+        if ref.physical_composite_ood:
+            # The fit edge is inside every constituent's contiguous cover
+            # (checked at compile time). Bracket the actual support edge
+            # between that accepted T and the rejected request. Stop at
+            # adjacent floats so the join is the last supported temperature,
+            # not an arbitrary tolerance or the unrelated catalog fit edge.
+            rejected = temperature_K
+            while True:
+                probe = boundary + (rejected - boundary) * 0.5
+                if probe == boundary or probe == rejected:
+                    break
+                try:
+                    ref.log10_pressure(probe)
+                except (NasaCeaDomainError, ShomateDomainError):
+                    rejected = probe
+                else:
+                    boundary = probe
 
         if ref.evaluator_family == "antoine":
             try:
@@ -1577,7 +1630,7 @@ class CompiledPressureEvaluator:
         # reference surface is smooth.
         span = max(high - low, 1.0)
         step = min(max(span * 1.0e-4, 1.0e-3), 1.0)
-        inside = boundary + step if boundary == low else boundary - step
+        inside = boundary + step if temperature_K < low else boundary - step
         if inside <= 0.0:
             inside = boundary + step  # force positive probe
         boundary_log = float(ref.log10_pressure(boundary))
@@ -2903,13 +2956,12 @@ def _compile_reference_model(
         coefficients = _mapping(
             model.get("coefficients"), f"{species_id}.reference.coefficients"
         )
-        for key in ("A", "B", "C"):
-            try:
-                float(coefficients[key])
-            except (KeyError, TypeError, ValueError) as exc:
-                raise CatalogCompileError(
-                    f"{species_id}: Antoine reference requires numeric {key}"
-                ) from exc
+        try:
+            _read_antoine_coefficients(coefficients)
+        except _AntoineCoefficientRefusal as exc:
+            raise CatalogCompileError(
+                f"{species_id}.reference.coefficients: {exc}"
+            ) from exc
     elif family == "tabulated_equilibrium":
         raw_points = model.get("points")
         if not isinstance(raw_points, list) or len(raw_points) < 2:
