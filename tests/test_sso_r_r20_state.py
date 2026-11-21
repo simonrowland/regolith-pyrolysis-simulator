@@ -719,14 +719,28 @@ def _seed_o2_bubbler_redox_state(
     )
 
 
-def test_controlled_o2_bubbler_log_accepts_positive_subnormal_pressure() -> None:
+@pytest.mark.parametrize(
+    ("pressure_mbar", "expected_fO2_log"),
+    [
+        (1.0e-323, -326.0051853474518),
+        (2.5e-321, -323.602064826276),
+    ],
+    ids=("quotient-underflows", "quotient-is-positive-subnormal"),
+)
+def test_controlled_o2_bubbler_log_accepts_positive_subnormal_pressure(
+    pressure_mbar: float,
+    expected_fO2_log: float,
+) -> None:
     sim = _make_sim()
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
-    sim.melt.pO2_mbar = 1.0e-323
+    sim.melt.pO2_mbar = pressure_mbar
+
+    if pressure_mbar == 2.5e-321:
+        assert pressure_mbar / 1000.0 > 0.0
 
     target, source = sim._o2_bubbler_target_fO2_log(None)
 
-    assert target == pytest.approx(math.log10(1.0e-323) - 3.0)
+    assert target == pytest.approx(expected_fO2_log, rel=0.0, abs=1e-10)
     assert source == "controlled_o2_pO2_mbar"
 
 

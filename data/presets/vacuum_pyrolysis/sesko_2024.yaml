@@ -11,7 +11,7 @@ source_notes:
   - citation_id: sesko_2024
     digest: "Feedstock mapped to registered lunar_eac_1a alias; paper text uses EAC-1A while the composition table header abbreviates EAC-1."
   - citation_id: sesko_2024
-    digest: "Reported exposure pressure spans 1e-7..1e-2 mbar; reported_exposure_profile records that source range first-class, while chamber_pressure_mbar carries the runtime floor with a named delta annotation."
+    digest: "Reported exposure pressure spans 1e-7..1e-2 mbar; reported_exposure_profile records those bounds first-class, while chamber_pressure_mbar uses 1e-3 mbar as an assumed initial schedule point because the reported range is not a time-resolved trace."
 
 lab_schedule:
   id: sesko_2024_schedule_solar_exposure
