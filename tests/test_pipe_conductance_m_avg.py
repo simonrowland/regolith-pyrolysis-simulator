@@ -741,7 +741,7 @@ def test_stage_seven_area_alias_override_reaches_terminal_stage_area():
     assert model.stage_area_m2("stage7") == pytest.approx(0.08)
 
 
-def test_stage_area_map_propagates_to_kn_and_coating_segments():
+def test_stage_area_map_stays_separate_from_pipe_wall_areas():
     train = CondensationTrain.create_default()
     condensation = CondensationModel(train)
     stage_areas = {
@@ -761,11 +761,12 @@ def test_stage_area_map_propagates_to_kn_and_coating_segments():
     )
 
     by_name = {segment.name: segment for segment in condensation.pipe_segments}
-    assert by_name["stage_0_to_stage_1"].declared_area_m2 == pytest.approx(0.04)
-    assert by_name["stage_2_to_stage_3"].declared_area_m2 == pytest.approx(0.06)
-    assert by_name["stage_3_to_stage_4"].declared_area_m2 == pytest.approx(0.05)
-    assert by_name["stage_6_to_stage_7"].declared_area_m2 == pytest.approx(0.02)
-    assert by_name["stage_2_to_stage_3"].surface_area_m2 == pytest.approx(0.06)
+    assert all(segment.declared_area_m2 is None for segment in by_name.values())
+    for segment in by_name.values():
+        assert segment.surface_area_m2 == pytest.approx(
+            math.pi * segment.inner_diameter_m * segment.length_m
+        )
+    assert by_name["stage_2_to_stage_3"].surface_area_m2 != pytest.approx(0.06)
     assert (
         condensation.last_knudsen_regime_diagnostic["stage_area_m2_by_stage"]
         == stage_areas

@@ -3064,6 +3064,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
             "process.overhead_gas",
             "process.wall_deposit",
             "terminal.chromium_condensed_oxide_stored",
+            MANGANESE_STAGE3_CARTRIDGE_ACCOUNT,
             # Typed condensation-holdup lifecycle: sub-floor parcels retain
             # here and drain on later ticks (declared account, account_ids).
             "process.condensation_retained_holdup",

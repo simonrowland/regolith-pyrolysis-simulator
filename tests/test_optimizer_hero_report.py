@@ -75,7 +75,8 @@ def test_hero_profile_uses_only_existing_schema_fields() -> None:
     assert profile["feedstock"] == "lunar_mare_low_ti"
     assert profile["run"] == {
         "campaign": "C2A",
-        "hours": 225,
+        "hours": 360,
+        "until_campaign_complete": True,
         "mass_kg": 1.0,
         "backend_name": "internal-analytical",
     }

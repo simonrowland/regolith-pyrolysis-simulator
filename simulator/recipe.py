@@ -291,6 +291,7 @@ C2A_STAGED_STAGE_GAS_FIELDS: tuple[str, ...] = (
     "pO2_mbar",
     "p_total_mbar",
     "gas_cover_mode",
+    "slider_vane_open_fraction",
 )
 C2A_STAGED_STAGE_METADATA_FIELDS: frozenset[str] = frozenset(
     ("target_species", "endpoint", "verification")

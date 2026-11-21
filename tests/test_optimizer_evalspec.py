@@ -3602,7 +3602,7 @@ def test_in_window_c2a_run_captures_na_to_reagent_and_terminal_offgas() -> None:
         if lot.account == "process.overhead_gas"
     )
 
-    assert session.simulator.product_ledger()["Na"] == 0.0
+    assert session.simulator.product_ledger().get("Na", 0.0) == 0.0
     assert reagent_na > 0.0
     assert terminal_na > 0.0
     assert reagent_na + terminal_na == pytest.approx(

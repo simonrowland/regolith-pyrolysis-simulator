@@ -973,7 +973,15 @@ def _c4_point_two_mbar_transitional_run() -> PyrolysisRun:
         hours=1,
         mass_kg=1000,
         backend_name="internal-analytical",
-        setpoints_patch={"furnace_max_T_C": 1200},
+        setpoints_patch={
+            "furnace_max_T_C": 1200,
+            # Keep this refusal fixture at the former 12 cm throat so the
+            # tested transitional Knudsen point is independent of the new
+            # 0.5 m engineering default.
+            "condenser_geometry": {
+                "initial_throat_area_m2": 0.011309733552923255,
+            },
+        },
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,
         run_metadata_overrides={
@@ -1161,6 +1169,9 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
         setpoints_patch={
             "furnace_max_T_C": 1700,
             "campaigns": {"C4": {"p_total_mbar_default": 10.2}},
+            "condenser_geometry": {
+                "initial_throat_area_m2": 0.011309733552923255,
+            },
         },
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,

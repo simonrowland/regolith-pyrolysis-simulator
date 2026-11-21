@@ -1433,40 +1433,53 @@ class PyrolysisRun:
             "liquid_fraction_provider": sim.record.liquid_fraction_provider,
             "kernel_commit_sha": kernel_commit_sha,
         }
-        overhead_gas = sim.overhead
+        overhead_gas = getattr(sim, "overhead", None)
         drain_diagnostics = {
-            "maximum_throat_diameter_m": float(
-                overhead_gas.maximum_throat_diameter_m
+            "maximum_throat_diameter_m": (
+                float(overhead_gas.maximum_throat_diameter_m)
+                if overhead_gas is not None else None
             ),
-            "slider_vane_open_fraction": float(
-                overhead_gas.slider_vane_open_fraction
+            "slider_vane_open_fraction": (
+                float(overhead_gas.slider_vane_open_fraction)
+                if overhead_gas is not None else None
             ),
-            "required_throat_diameter_peak_m": float(
-                overhead_gas.required_throat_diameter_peak_m
+            "required_throat_diameter_peak_m": (
+                float(overhead_gas.required_throat_diameter_peak_m)
+                if overhead_gas is not None else None
             ),
             "required_slider_vane_open_fraction_peak": (
                 overhead_gas.required_slider_vane_open_fraction_peak
+                if overhead_gas is not None else None
             ),
             "required_slider_vane_open_fraction_status": (
                 overhead_gas.required_slider_vane_open_fraction_status
+                if overhead_gas is not None else None
             ),
-            "train_peak_mass_flow_kg_hr": float(
-                overhead_gas.train_peak_mass_flow_kg_hr
+            "train_peak_mass_flow_kg_hr": (
+                float(overhead_gas.train_peak_mass_flow_kg_hr)
+                if overhead_gas is not None else None
             ),
-            "train_time_averaged_mass_flow_kg_hr": float(
-                overhead_gas.train_time_averaged_mass_flow_kg_hr
+            "train_time_averaged_mass_flow_kg_hr": (
+                float(overhead_gas.train_time_averaged_mass_flow_kg_hr)
+                if overhead_gas is not None else None
             ),
-            "fixed_pressure_holdup_nonphysical_observed": bool(
-                overhead_gas.fixed_pressure_holdup_observed
+            "fixed_pressure_holdup_nonphysical_observed": (
+                bool(overhead_gas.fixed_pressure_holdup_observed)
+                if overhead_gas is not None else False
             ),
-            "fixed_pressure_holdup_peak_kg": float(
-                overhead_gas.fixed_pressure_holdup_peak_kg
+            "fixed_pressure_holdup_peak_kg": (
+                float(overhead_gas.fixed_pressure_holdup_peak_kg)
+                if overhead_gas is not None else None
             ),
-            "fixed_pressure_holdup_pinned_pressure_mbar": float(
-                overhead_gas.fixed_pressure_holdup_pinned_pressure_mbar
+            "fixed_pressure_holdup_pinned_pressure_mbar": (
+                float(overhead_gas.fixed_pressure_holdup_pinned_pressure_mbar)
+                if overhead_gas is not None else None
             ),
         }
-        if overhead_gas.fixed_pressure_holdup_observed:
+        if (
+            overhead_gas is not None
+            and overhead_gas.fixed_pressure_holdup_observed
+        ):
             drain_diagnostics["notice"] = (
                 "non-physical fixed-pressure holdup was present at a pinned "
                 f"pressure of {overhead_gas.fixed_pressure_holdup_pinned_pressure_mbar:.6g} mbar; "
@@ -2901,38 +2914,40 @@ def build_per_hour_summary(
         "condensation_train_kg_cumulative": condensation_train_kg_cumulative,
         "recycled_to_reagent_kg_cumulative": recycled_to_reagent_kg_cumulative,
         "vapor_species_kg_hr": _vapor_species_kg_hr(snapshot),
-        "required_throat_diameter_m": (
-            snapshot.overhead.required_throat_diameter_m
+        "required_throat_diameter_m": getattr(
+            snapshot.overhead, "required_throat_diameter_m", None
         ),
-        "required_throat_diameter_status": (
-            snapshot.overhead.required_throat_diameter_status
+        "required_throat_diameter_status": getattr(
+            snapshot.overhead, "required_throat_diameter_status", None
         ),
-        "maximum_throat_diameter_m": (
-            snapshot.overhead.maximum_throat_diameter_m
+        "maximum_throat_diameter_m": getattr(
+            snapshot.overhead, "maximum_throat_diameter_m", None
         ),
-        "slider_vane_open_fraction": (
-            snapshot.overhead.slider_vane_open_fraction
+        "slider_vane_open_fraction": getattr(
+            snapshot.overhead, "slider_vane_open_fraction", None
         ),
-        "required_slider_vane_open_fraction": (
-            snapshot.overhead.required_slider_vane_open_fraction
+        "required_slider_vane_open_fraction": getattr(
+            snapshot.overhead, "required_slider_vane_open_fraction", None
         ),
-        "required_slider_vane_open_fraction_status": (
-            snapshot.overhead.required_slider_vane_open_fraction_status
+        "required_slider_vane_open_fraction_status": getattr(
+            snapshot.overhead,
+            "required_slider_vane_open_fraction_status",
+            None,
         ),
-        "train_mass_flow_kg_hr": float(
-            snapshot.overhead.train_mass_flow_kg_hr
+        "train_mass_flow_kg_hr": getattr(
+            snapshot.overhead, "train_mass_flow_kg_hr", None
         ),
-        "train_peak_mass_flow_kg_hr": float(
-            snapshot.overhead.train_peak_mass_flow_kg_hr
+        "train_peak_mass_flow_kg_hr": getattr(
+            snapshot.overhead, "train_peak_mass_flow_kg_hr", None
         ),
-        "train_time_averaged_mass_flow_kg_hr": float(
-            snapshot.overhead.train_time_averaged_mass_flow_kg_hr
+        "train_time_averaged_mass_flow_kg_hr": getattr(
+            snapshot.overhead, "train_time_averaged_mass_flow_kg_hr", None
         ),
-        "fixed_pressure_holdup_nonphysical": bool(
-            snapshot.overhead.fixed_pressure_holdup_nonphysical
+        "fixed_pressure_holdup_nonphysical": getattr(
+            snapshot.overhead, "fixed_pressure_holdup_nonphysical", False
         ),
-        "fixed_pressure_holdup_kg": float(
-            snapshot.overhead.fixed_pressure_holdup_kg
+        "fixed_pressure_holdup_kg": getattr(
+            snapshot.overhead, "fixed_pressure_holdup_kg", None
         ),
         "wall_deposit_delta_kg": _nested_species_kg_from_segment_species(
             snapshot.wall_deposit_by_segment_species_delta,
@@ -2948,11 +2963,12 @@ def build_per_hour_summary(
         **_mre_ellingham_ladder_diagnostic_observables(snapshot),
         **fe_redox_split_observables,
     }
-    if snapshot.overhead.fixed_pressure_holdup_nonphysical:
+    if getattr(snapshot.overhead, "fixed_pressure_holdup_nonphysical", False):
         summary["fixed_pressure_holdup_notice"] = (
             "non-physical fixed-pressure holdup: "
-            f"{snapshot.overhead.fixed_pressure_holdup_kg:.6g} kg at "
-            f"p_total={snapshot.overhead.fixed_pressure_holdup_pinned_pressure_mbar:.6g} mbar; "
+            f"{getattr(snapshot.overhead, 'fixed_pressure_holdup_kg', 0.0):.6g} kg at "
+            "p_total="
+            f"{getattr(snapshot.overhead, 'fixed_pressure_holdup_pinned_pressure_mbar', 0.0):.6g} mbar; "
             "no physical buffer volume or pressure is modeled"
         )
     if fe_redox_split_observables and hasattr(sim, "_stage3_fe_wt_pct_diagnostic"):

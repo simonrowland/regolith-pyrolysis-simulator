@@ -2547,7 +2547,6 @@ class CondensationModel:
                 str(stage): float(area_m2)
                 for stage, area_m2 in stage_area_m2_by_stage.items()
             }
-            self._apply_stage_area_m2_to_pipe_segments()
         if stage_hydraulic_diameter_m_by_stage is not None:
             self.stage_hydraulic_diameter_m_by_stage = {
                 str(stage): float(diameter_m)
@@ -2889,20 +2888,11 @@ class CondensationModel:
                 wall_temperature_C=float(wall_temperature_C),
                 length_m=length_m,
                 inner_diameter_m=diameter_m,
-                declared_area_m2=self._stage_area_m2_for_stage_number(
-                    downstream.stage_number),
                 liner_material=str(
                     downstream_material.get('liner_material') or ''
                 ),
             ))
         return segments
-
-    def _stage_area_m2_for_stage_number(self, stage_number: int) -> float | None:
-        return self._stage_area_m2_for_keys((
-            STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage_number)),
-            f'stage_{stage_number}',
-            str(stage_number),
-        ))
 
     def _stage_area_m2_for_stage(self, stage: CondensationStage) -> float | None:
         """Area for this stage object. The K trap does not inherit stage 4."""
@@ -2910,7 +2900,12 @@ class CondensationModel:
         stage_key = getattr(stage, 'stage_key', '') or ''
         mapped = STAGE_AREA_KEY_BY_STAGE_KEY.get(stage_key)
         if mapped is not None:
-            keys = (mapped, stage_key, str(stage.stage_number))
+            keys = (
+                mapped,
+                stage_key,
+                f'stage_{stage.stage_number}',
+                str(stage.stage_number),
+            )
         else:
             keys = (
                 STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage.stage_number)),
@@ -2952,45 +2947,6 @@ class CondensationModel:
                 )
             return diameter_m
         return self.pipe_diameter_m
-
-    def _apply_stage_area_m2_to_pipe_segments(self) -> None:
-        if not self.pipe_segments:
-            return
-        updated: list[PipeSegment] = []
-        for segment in self.pipe_segments:
-            downstream_stage = str(segment.downstream_stage or '')
-            stage_number = None
-            if downstream_stage.startswith('stage_'):
-                try:
-                    stage_number = int(downstream_stage.removeprefix('stage_'))
-                except ValueError:
-                    stage_number = None
-            declared_area_m2 = (
-                self._stage_area_m2_for_stage_number(stage_number)
-                if stage_number is not None
-                else None
-            )
-            updated.append(PipeSegment(
-                name=segment.name,
-                upstream_stage=segment.upstream_stage,
-                downstream_stage=segment.downstream_stage,
-                wall_temperature_C=segment.wall_temperature_C,
-                length_m=segment.length_m,
-                inner_diameter_m=segment.inner_diameter_m,
-                role=segment.role,
-                declared_area_m2=(
-                    declared_area_m2
-                    if declared_area_m2 is not None
-                    else segment.declared_area_m2
-                ),
-                view_factor_from_melt=segment.view_factor_from_melt,
-                line_of_sight_to_melt=segment.line_of_sight_to_melt,
-                source_class=segment.source_class,
-                sensitivity_marker=segment.sensitivity_marker,
-                extraction_note=segment.extraction_note,
-                liner_material=segment.liner_material,
-            ))
-        self.pipe_segments = updated
 
     def _apply_pipe_segment_temperatures(
         self,
@@ -3831,16 +3787,19 @@ class CondensationModel:
                 (item for item in outcomes if item.get('status') == 'extrapolated'),
                 None,
             )
-            if domain_outcome is not None and refused_outcome is None:
+            if domain_outcome is not None:
                 authority = condensation_authority_by_species.get(species)
                 if authority is not None:
+                    if refused_outcome is None:
+                        authority.update({
+                            'status': (
+                                VAPOUR_CARRIER_AUTHORITY_MISSING
+                                if authority['status'] == VAPOUR_CARRIER_AUTHORITY_MISSING
+                                else VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
+                            ),
+                            'authoritative_for_condensation': False,
+                        })
                     authority.update({
-                        'status': (
-                            VAPOUR_CARRIER_AUTHORITY_MISSING
-                            if authority['status'] == VAPOUR_CARRIER_AUTHORITY_MISSING
-                            else VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
-                        ),
-                        'authoritative_for_condensation': False,
                         'authority_level': 'extrapolated',
                         'reason': domain_outcome['reason'],
                         'valid_range_K': domain_outcome['valid_range_K'],
@@ -8104,25 +8063,36 @@ def stage_purity_report(
     """Classify stage inventory, plus current ledger-backed cartridge products."""
 
     report: dict[str, dict[str, Any]] = {}
-    ledger_accounts = ledger.kg_by_account() if ledger is not None else {}
+    account_reader = getattr(ledger, 'kg_by_account', None)
+    ledger_account_projection_available = callable(account_reader)
+    ledger_accounts = account_reader() if ledger_account_projection_available else {}
     mn_cartridge_kg = dict(
         ledger_accounts.get(MANGANESE_STAGE3_CARTRIDGE_ACCOUNT, {})
     )
     reagent_inventory_kg = dict(
         ledger_accounts.get('process.reagent_inventory', {})
     )
+    has_reagent_inventory = any(
+        _finite_nonnegative_value(
+            value, label=f'reagent inventory for {species}'
+        ) > 1e-12
+        for species, value in reagent_inventory_kg.items()
+    )
+    origin_reader = getattr(ledger, 'origin_atom_moles_by_account', None)
+    unresolved_reader = getattr(
+        ledger, 'unresolved_origin_atom_moles_by_account', None
+    )
+    origin_tracking_available = callable(origin_reader) and callable(
+        unresolved_reader
+    )
     reagent_origins = (
-        ledger.origin_atom_moles_by_account().get(
-            'process.reagent_inventory', {}
-        )
-        if ledger is not None
+        origin_reader().get('process.reagent_inventory', {})
+        if has_reagent_inventory and callable(origin_reader)
         else {}
     )
     reagent_unresolved = (
-        ledger.unresolved_origin_atom_moles_by_account().get(
-            'process.reagent_inventory', {}
-        )
-        if ledger is not None
+        unresolved_reader().get('process.reagent_inventory', {})
+        if has_reagent_inventory and callable(unresolved_reader)
         else {}
     )
     for stage in train.stages:
@@ -8140,7 +8110,10 @@ def stage_purity_report(
             )
             for species, raw_kg in stage.collected_kg.items()
         }
-        if stage_key == STAGE_KEY_BY_NUMBER[3] and ledger is not None:
+        if (
+            stage_key == STAGE_KEY_BY_NUMBER[3]
+            and ledger_account_projection_available
+        ):
             # Stage 3's projection includes both cartridges. The dedicated
             # ledger account holds the Mn-window cartridge; subtract its live
             # species balances to report the silica-window cartridge alone.
@@ -8224,7 +8197,10 @@ def stage_purity_report(
             stage_report['reason'] = STAGE_PURITY_NO_CAPTURED_MASS
         if activity:
             stage_report['activity'] = activity
-        if stage_key == STAGE_KEY_BY_NUMBER[3] and ledger is not None:
+        if (
+            stage_key == STAGE_KEY_BY_NUMBER[3]
+            and ledger_account_projection_available
+        ):
             mn_cartridge_kg = {
                 species: _finite_nonnegative_value(
                     value,
@@ -8254,7 +8230,10 @@ def stage_purity_report(
             # alpha_s(Mn)=0.85 is UNCERTIFIED
             # (no_direct_mn_sticking_coefficient); and the SiO wall-Psat
             # refusal at 1400 K leaves 56 clean-window profiles indeterminate.
-        if stage_key == NA_COLLECTOR_STAGE_KEY and ledger is not None:
+        if (
+            stage_key == NA_COLLECTOR_STAGE_KEY
+            and ledger_account_projection_available
+        ):
             recovered_designated_kg: dict[str, float] = {}
             recovered_origin_complete = True
             for species in ('Na', 'Mg'):
@@ -8271,6 +8250,8 @@ def stage_purity_report(
                     if known_origin_moles > 1e-12
                     else 0.0
                 )
+                if current_reagent_kg > 1e-12 and not origin_tracking_available:
+                    recovered_origin_complete = False
                 if (
                     current_reagent_kg > 1e-12
                     and (
@@ -8323,7 +8304,7 @@ def stage_purity_report(
                 'sio_impurity_basis': (
                     'current Stage-4 SiO2+Si plus current feedstock-origin '
                     'Na/Mg in reagent inventory; disjoint live ledger balances'
-                    if ledger is not None
+                    if ledger_account_projection_available
                     else 'current Stage-4 inventory only; ledger unavailable'
                 ),
             })

@@ -3199,7 +3199,17 @@ def test_study_applies_profile_and_cli_pins_to_strategy_search(tmp_path) -> None
 def test_study_search_space_identity_tracks_schema_bounds_digest(tmp_path) -> None:
     base_schema = RecipeSchema()
     same_bounds_schema = RecipeSchema(allowlist=base_schema.allowlist)
-    target = next(spec for spec in base_schema.allowlist if spec.high is not None)
+    target = next(
+        spec
+        for spec in base_schema.allowlist
+        if spec.high is not None
+        and not spec.bounds_source.startswith(
+            (
+                "setpoints:",
+                "engineering_envelope converted from setpoints:",
+            )
+        )
+    )
     shifted_bounds_schema = RecipeSchema(
         allowlist=tuple(
             replace(spec, high=float(spec.high) + 1.0)

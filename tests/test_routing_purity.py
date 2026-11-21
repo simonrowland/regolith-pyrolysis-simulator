@@ -322,7 +322,7 @@ def test_stage3_mn_cartridge_schedule_uses_inclusive_run_hours(
     ) == pytest.approx(expected_fraction)
 
 
-def test_stage3_cartridge_split_keeps_declared_gas_coproduct_out():
+def test_stage3_mn_cartridge_split_leaves_other_species_unchanged():
     host = SimpleNamespace(
         setpoints={
             "condensation_train": {
@@ -356,8 +356,41 @@ def test_stage3_cartridge_split_keeps_declared_gas_coproduct_out():
         host, route, "CrO2", sp_data
     )
 
-    assert set(fractions) == {"Cr2O3"}
-    assert fractions["Cr2O3"][MANGANESE_STAGE3_CARTRIDGE_ACCOUNT] == pytest.approx(
+    assert fractions == {}
+
+
+def test_stage3_mn_cartridge_split_uses_scheduled_mn_fraction():
+    host = SimpleNamespace(
+        setpoints={
+            "condensation_train": {
+                "metals_train": {
+                    STAGE_KEY_BY_NUMBER[3]: {
+                        "stage3_cartridge_schedule": {
+                            "mn_cartridge_run_hour_window": [12, 30],
+                        },
+                    },
+                },
+            },
+        },
+        melt=SimpleNamespace(hour=11),
+    )
+    route = SimpleNamespace(
+        condensed_by_stage_species={STAGE_KEY_BY_NUMBER[3]: {"Mn": 6.0}},
+        condensed_for_species=lambda _species: 10.0,
+    )
+    sp_data = {
+        "condensation_products_mol_per_mol_vapor": {"Mn": 1.0},
+        "condensation_product_accounts": {
+            "Mn": "process.condensation_train",
+        },
+    }
+
+    fractions = EvaporationMixin._stage3_mn_cartridge_account_fractions(
+        host, route, "Mn", sp_data
+    )
+
+    assert set(fractions) == {"Mn"}
+    assert fractions["Mn"][MANGANESE_STAGE3_CARTRIDGE_ACCOUNT] == pytest.approx(
         0.6
     )
 
@@ -641,7 +674,7 @@ def test_stage_two_manganese_freezes_out_at_k_trap_as_tap_impurity():
         MeltState(temperature_C=1650.0),
     )
 
-    trap_capture = route.capture_kg_by_stage_identity[(4, 1)]['Mn']
+    trap_capture = route.condensed_by_stage_species[K_TRAP_STAGE_KEY]['Mn']
     assert trap_capture > 0.0
     assert route.impurity_by_stage_species[K_TRAP_STAGE_KEY]['Mn'] == (
         pytest.approx(trap_capture)
