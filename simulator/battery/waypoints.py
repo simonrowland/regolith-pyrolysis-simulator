@@ -27,6 +27,7 @@ from simulator.battery.migrate import (
     _printed_mass_percent_map_refusal,
     _printed_composition_map as _migration_printed_composition_map,
     _unrecognized_printed_chemical_components,
+    invalid_run_composition,
 )
 from simulator.battery.records import (
     Bench,
@@ -437,7 +438,15 @@ def charge_moles_by_species(
             if key in conditions
         }
         row_composition = conditions.get("composition")
-        if isinstance(row_composition, Located):
+        # An invalid run map's raw wt% echo is not a charge print. Printed
+        # blanks and VALUE point compositions retain their existing behavior.
+        if (
+            isinstance(row_composition, Located)
+            and row_composition.state.is_unknown
+            and invalid_run_composition(row_composition.state)
+        ):
+            fields.pop("printed_composition", None)
+        elif isinstance(row_composition, Located):
             if row_composition.state.is_value:
                 if not isinstance(row_composition.state.value, Composition):
                     return SpeciesWaypoints({}, WaypointAbsence(

@@ -19,3 +19,5 @@ openimcc @ git+https://github.com/simonrowland/openimcc@66ec4a3d8fd4c0741ca2fdf9
 pytest>=8.0
 pytest-xdist>=3.8
 pytest-timeout>=2.4
+# Required by the whole-tree undefined-name test.
+pyflakes>=4.1.0

@@ -45,6 +45,7 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
     Composition,
     Located,
     Locator,
@@ -601,13 +602,15 @@ def _assert_plante_observations_use_analyzed_composition(
                 for name in expected
             ), f"{source_id} composition differs from Table 1 analytical values"
         else:
-            assert composition is not None and composition.is_unknown, source_id
-            assert "per-run composition is not published" in composition.reason
+            assert composition is not None and composition.is_value, source_id
+            assert (
+                composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+            ), source_id
             if observation.identity.quantity.is_value:
                 notices = [
                     notice
                     for notice in observation.notices
-                    if "composition_role=initial_charge_only" in notice.reason
+                    if INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
                 ]
                 assert len(notices) == 1, source_id
                 assert notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
@@ -1623,12 +1626,13 @@ def test_markova_point_unsupported_map_refuses_without_parent_fallback(
     )
     composition = row.identity.composition
     assert composition is not None and composition.is_unknown
-    assert "per-run composition is not published" in composition.reason
+    assert composition.reason is not None
+    assert "unsupported component" in composition.reason
     printed = row.point_conditions["printed_composition"]
     assert printed.state.is_value and printed.state.value == expected_printed_map
     condition = row.point_conditions["composition"]
     assert condition.state.is_unknown
-    assert "per-run composition is not published" in condition.state.reason
+    assert "unsupported component" in condition.state.reason
     waypoint = normalized_composition(
         migrator.result.experiments[row.experiment_id], _bench(), row
     )
@@ -1636,7 +1640,7 @@ def test_markova_point_unsupported_map_refuses_without_parent_fallback(
     assert waypoint.absence is not None
 
 
-def test_markova_initial_charge_stays_context_under_refusal_mutation(
+def test_markova_invalid_point_composition_stays_refused_under_mutation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Dropping a component refusal cannot promote the initial charge to a datum."""
@@ -1698,7 +1702,7 @@ def test_markova_initial_charge_stays_context_under_refusal_mutation(
         and observation.identity.temperature_K.value == target_t
     )
     assert row.identity.composition.is_unknown
-    assert "per-run composition is not published" in row.identity.composition.reason
+    assert "XxO" in row.identity.composition.reason
     assert normalized_composition(
         migrator.result.experiments[row.experiment_id], _bench(), row
     ).selected is None
@@ -7605,14 +7609,17 @@ def test_markova_1983_initial_charge_maps_reach_their_own_rows(
             if sample_map == printed_wt
         )
         point = row["point_conditions"]["composition"]
-        assert point["state"]["tag"] == "unknown"
-        assert "per-run composition is not published" in point["state"]["reason"]
+        assert point["state"]["tag"] == "value"
+        assert (
+            point["state"]["value"]["proxy_flag"]
+            == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        )
         assert point["locator"]["published_page"] == 461
         assert point["locator"]["figure"] == str(expected_sample)
 
         identity = row["identity"]["composition"]
-        assert identity["tag"] == "unknown"
-        assert "per-run composition is not published" in identity["reason"]
+        assert identity["tag"] == "value"
+        assert identity["value"]["proxy_flag"] == INITIAL_CHARGE_ONLY_PROXY_FLAG
         assert printed_wt == samples[expected_sample]
         temperature_k = as_decimal(row["identity"]["temperature_K"]["value"])
         row_by_temperature_k[temperature_k] = row
@@ -9250,8 +9257,10 @@ def test_plante_hastie_analytical_rows_keep_printed_order(tmp_path: Path) -> Non
         assert dict(identity.value.components) == dict(expected.components)
 
 
-def test_shornikov_pressure_rows_keep_initial_charge_as_context(tmp_path: Path) -> None:
-    """The p.115 charge is not the unpublished per-run composition at p.116."""
+def test_shornikov_pressure_rows_use_initial_charge_as_flagged_proxy(
+    tmp_path: Path,
+) -> None:
+    """The p.115 start charge is a flagged proxy for p.116 pressure rows."""
 
     values = _extract_values(
         "shornikov-2025-saratov-alkali-evaporation.yaml",
@@ -9274,21 +9283,20 @@ def test_shornikov_pressure_rows_keep_initial_charge_as_context(tmp_path: Path) 
     )
     for local_id in _SHORNIKOV_PRESSURE_ROWS:
         observation = _observation(result, local_id)
-        reason = "missing input: per-run composition is not published"
         identity = observation.identity.composition
         point = (observation.point_conditions or {})["composition"]
-        assert identity is not None and identity.is_unknown
-        assert reason in identity.reason
-        assert point.state.is_unknown and reason in point.state.reason
+        assert identity is not None and identity.is_value
+        assert identity.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        assert point.state.is_value
+        assert point.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
         assert point.locator == observation.locator
         role_notices = [
             notice
             for notice in observation.notices
-            if "composition_role=initial_charge_only" in notice.reason
+            if INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
         ]
         assert len(role_notices) == 1
         assert role_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
-        assert "initial charge is sample context" in role_notices[0].reason
     experiment = next(
         item
         for item in result.experiments.values()

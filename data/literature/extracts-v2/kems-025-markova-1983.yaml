@@ -400,9 +400,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4449295201227287570386388026'
+        - - TiO2
+          - '0.0009853729182713357516436901598'
+        - - Al2O3
+          - '0.1204663239612100077731648342'
+        - - FeO
+          - '0.07448614988038438320168121756'
+        - - MnO
+          - '0.001194727098329355053811817446'
+        - - MgO
+          - '0.23400927384080846725697454'
+        - - CaO
+          - '0.1164797523721389962269410498'
+        - - Na2O
+          - '0.006934749581409788861585024299'
+        - - K2O
+          - '0.0005141302247189088355590237571'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -455,7 +477,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_fe_psat_figs_figure_only::T=1777.11:h=59da7fca6eb1
   source_id: kems-025-markova-1983
   locator:
@@ -525,9 +548,31 @@ observations:
           C, 2231=2000 C, 2515=2500 C; y log10 anchors 2802=-1, 2919=-2, 3036=-3, 3155=-4, 3273=-5, 3389=-6.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4449295201227287570386388026'
+          - - TiO2
+            - '0.0009853729182713357516436901598'
+          - - Al2O3
+            - '0.1204663239612100077731648342'
+          - - FeO
+            - '0.07448614988038438320168121756'
+          - - MnO
+            - '0.001194727098329355053811817446'
+          - - MgO
+            - '0.23400927384080846725697454'
+          - - CaO
+            - '0.1164797523721389962269410498'
+          - - Na2O
+            - '0.006934749581409788861585024299'
+          - - K2O
+            - '0.0005141302247189088355590237571'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -625,9 +670,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4449295201227287570386388026'
+        - - TiO2
+          - '0.0009853729182713357516436901598'
+        - - Al2O3
+          - '0.1204663239612100077731648342'
+        - - FeO
+          - '0.07448614988038438320168121756'
+        - - MnO
+          - '0.001194727098329355053811817446'
+        - - MgO
+          - '0.23400927384080846725697454'
+        - - CaO
+          - '0.1164797523721389962269410498'
+        - - Na2O
+          - '0.006934749581409788861585024299'
+        - - K2O
+          - '0.0005141302247189088355590237571'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -680,7 +747,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_fe_psat_figs_figure_only::T=1836.91:h=a8cd72495e58
   source_id: kems-025-markova-1983
   locator:
@@ -750,9 +818,31 @@ observations:
           C, 2231=2000 C, 2515=2500 C; y log10 anchors 2802=-1, 2919=-2, 3036=-3, 3155=-4, 3273=-5, 3389=-6.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4449295201227287570386388026'
+          - - TiO2
+            - '0.0009853729182713357516436901598'
+          - - Al2O3
+            - '0.1204663239612100077731648342'
+          - - FeO
+            - '0.07448614988038438320168121756'
+          - - MnO
+            - '0.001194727098329355053811817446'
+          - - MgO
+            - '0.23400927384080846725697454'
+          - - CaO
+            - '0.1164797523721389962269410498'
+          - - Na2O
+            - '0.006934749581409788861585024299'
+          - - K2O
+            - '0.0005141302247189088355590237571'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -850,9 +940,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5008662657721497946107413732'
+        - - TiO2
+          - '0.00265589573121718460338801233'
+        - - Al2O3
+          - '0.1861267233112690101075228508'
+        - - FeO
+          - '0.0392117264680269449034422812'
+        - - MnO
+          - '0.0005606550028721429957744916167'
+        - - MgO
+          - '0.07203498978642262273682328283'
+        - - CaO
+          - '0.1937366208005451454290017521'
+        - - Na2O
+          - '0.004384903739250131036137310247'
+        - - K2O
+          - '0.0004222193882470235771686461564'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -905,7 +1017,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_fe_psat_figs_figure_only::T=1889.56:h=ce36618c9822
   source_id: kems-025-markova-1983
   locator:
@@ -975,9 +1088,31 @@ observations:
           955=2000 C, 1235=2500 C; y log10 anchors 2906=-2, 3026=-3, 3146=-4, 3266=-5, 3384=-6.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5008662657721497946107413732'
+          - - TiO2
+            - '0.00265589573121718460338801233'
+          - - Al2O3
+            - '0.1861267233112690101075228508'
+          - - FeO
+            - '0.0392117264680269449034422812'
+          - - MnO
+            - '0.0005606550028721429957744916167'
+          - - MgO
+            - '0.07203498978642262273682328283'
+          - - CaO
+            - '0.1937366208005451454290017521'
+          - - Na2O
+            - '0.004384903739250131036137310247'
+          - - K2O
+            - '0.0004222193882470235771686461564'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -1075,9 +1210,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4635754701060889359668218679'
+        - - TiO2
+          - '0.0004080869173608556754596890075'
+        - - Al2O3
+          - '0.1708226531492833245447849225'
+        - - FeO
+          - '0.05026415944792524119037299335'
+        - - MnO
+          - '0.0008270058585898297275688357224'
+        - - MgO
+          - '0.1337508415477642852149976566'
+        - - CaO
+          - '0.1663389768651689522067410737'
+        - - Na2O
+          - '0.01325160180909279184062793656'
+        - - K2O
+          - '0.0007612042987257836326250242864'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1130,7 +1287,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_fe_psat_figs_figure_only::T=1906.20:h=75538baf93a1
   source_id: kems-025-markova-1983
   locator:
@@ -1200,9 +1358,31 @@ observations:
           C, 2297=2000 C, 2541=2500 C; y log10 anchors 1937=-2, 2051=-3, 2165=-4, 2278=-5, 2392=-6.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4635754701060889359668218679'
+          - - TiO2
+            - '0.0004080869173608556754596890075'
+          - - Al2O3
+            - '0.1708226531492833245447849225'
+          - - FeO
+            - '0.05026415944792524119037299335'
+          - - MnO
+            - '0.0008270058585898297275688357224'
+          - - MgO
+            - '0.1337508415477642852149976566'
+          - - CaO
+            - '0.1663389768651689522067410737'
+          - - Na2O
+            - '0.01325160180909279184062793656'
+          - - K2O
+            - '0.0007612042987257836326250242864'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -1300,9 +1480,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4449295201227287570386388026'
+        - - TiO2
+          - '0.0009853729182713357516436901598'
+        - - Al2O3
+          - '0.1204663239612100077731648342'
+        - - FeO
+          - '0.07448614988038438320168121756'
+        - - MnO
+          - '0.001194727098329355053811817446'
+        - - MgO
+          - '0.23400927384080846725697454'
+        - - CaO
+          - '0.1164797523721389962269410498'
+        - - Na2O
+          - '0.006934749581409788861585024299'
+        - - K2O
+          - '0.0005141302247189088355590237571'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1355,7 +1557,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_fe_psat_figs_figure_only::T=1918.92:h=c1bffc718903
   source_id: kems-025-markova-1983
   locator:
@@ -1425,9 +1628,31 @@ observations:
           C, 2231=2000 C, 2515=2500 C; y log10 anchors 2802=-1, 2919=-2, 3036=-3, 3155=-4, 3273=-5, 3389=-6.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4449295201227287570386388026'
+          - - TiO2
+            - '0.0009853729182713357516436901598'
+          - - Al2O3
+            - '0.1204663239612100077731648342'
+          - - FeO
+            - '0.07448614988038438320168121756'
+          - - MnO
+            - '0.001194727098329355053811817446'
+          - - MgO
+            - '0.23400927384080846725697454'
+          - - CaO
+            - '0.1164797523721389962269410498'
+          - - Na2O
+            - '0.006934749581409788861585024299'
+          - - K2O
+            - '0.0005141302247189088355590237571'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -1525,9 +1750,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5008662657721497946107413732'
+        - - TiO2
+          - '0.00265589573121718460338801233'
+        - - Al2O3
+          - '0.1861267233112690101075228508'
+        - - FeO
+          - '0.0392117264680269449034422812'
+        - - MnO
+          - '0.0005606550028721429957744916167'
+        - - MgO
+          - '0.07203498978642262273682328283'
+        - - CaO
+          - '0.1937366208005451454290017521'
+        - - Na2O
+          - '0.004384903739250131036137310247'
+        - - K2O
+          - '0.0004222193882470235771686461564'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1580,7 +1827,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_fe_psat_figs_figure_only::T=1946.58:h=b7ec3df26f8a
   source_id: kems-025-markova-1983
   locator:
@@ -1650,9 +1898,31 @@ observations:
           955=2000 C, 1235=2500 C; y log10 anchors 2906=-2, 3026=-3, 3146=-4, 3266=-5, 3384=-6.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5008662657721497946107413732'
+          - - TiO2
+            - '0.00265589573121718460338801233'
+          - - Al2O3
+            - '0.1861267233112690101075228508'
+          - - FeO
+            - '0.0392117264680269449034422812'
+          - - MnO
+            - '0.0005606550028721429957744916167'
+          - - MgO
+            - '0.07203498978642262273682328283'
+          - - CaO
+            - '0.1937366208005451454290017521'
+          - - Na2O
+            - '0.004384903739250131036137310247'
+          - - K2O
+            - '0.0004222193882470235771686461564'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -1750,9 +2020,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4635754701060889359668218679'
+        - - TiO2
+          - '0.0004080869173608556754596890075'
+        - - Al2O3
+          - '0.1708226531492833245447849225'
+        - - FeO
+          - '0.05026415944792524119037299335'
+        - - MnO
+          - '0.0008270058585898297275688357224'
+        - - MgO
+          - '0.1337508415477642852149976566'
+        - - CaO
+          - '0.1663389768651689522067410737'
+        - - Na2O
+          - '0.01325160180909279184062793656'
+        - - K2O
+          - '0.0007612042987257836326250242864'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1805,7 +2097,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_fe_psat_figs_figure_only::T=1984.47:h=1f6d3fae4864
   source_id: kems-025-markova-1983
   locator:
@@ -1875,9 +2168,31 @@ observations:
           C, 2297=2000 C, 2541=2500 C; y log10 anchors 1937=-2, 2051=-3, 2165=-4, 2278=-5, 2392=-6.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4635754701060889359668218679'
+          - - TiO2
+            - '0.0004080869173608556754596890075'
+          - - Al2O3
+            - '0.1708226531492833245447849225'
+          - - FeO
+            - '0.05026415944792524119037299335'
+          - - MnO
+            - '0.0008270058585898297275688357224'
+          - - MgO
+            - '0.1337508415477642852149976566'
+          - - CaO
+            - '0.1663389768651689522067410737'
+          - - Na2O
+            - '0.01325160180909279184062793656'
+          - - K2O
+            - '0.0007612042987257836326250242864'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -1975,9 +2290,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5008662657721497946107413732'
+        - - TiO2
+          - '0.00265589573121718460338801233'
+        - - Al2O3
+          - '0.1861267233112690101075228508'
+        - - FeO
+          - '0.0392117264680269449034422812'
+        - - MnO
+          - '0.0005606550028721429957744916167'
+        - - MgO
+          - '0.07203498978642262273682328283'
+        - - CaO
+          - '0.1937366208005451454290017521'
+        - - Na2O
+          - '0.004384903739250131036137310247'
+        - - K2O
+          - '0.0004222193882470235771686461564'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2030,7 +2367,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_fe_psat_figs_figure_only::T=2041.07:h=0de73c09fa96
   source_id: kems-025-markova-1983
   locator:
@@ -2100,9 +2438,31 @@ observations:
           955=2000 C, 1235=2500 C; y log10 anchors 2906=-2, 3026=-3, 3146=-4, 3266=-5, 3384=-6.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5008662657721497946107413732'
+          - - TiO2
+            - '0.00265589573121718460338801233'
+          - - Al2O3
+            - '0.1861267233112690101075228508'
+          - - FeO
+            - '0.0392117264680269449034422812'
+          - - MnO
+            - '0.0005606550028721429957744916167'
+          - - MgO
+            - '0.07203498978642262273682328283'
+          - - CaO
+            - '0.1937366208005451454290017521'
+          - - Na2O
+            - '0.004384903739250131036137310247'
+          - - K2O
+            - '0.0004222193882470235771686461564'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -2200,9 +2560,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4971750123408067761515609693'
+        - - TiO2
+          - '0.0004363372036916457384457924304'
+        - - Al2O3
+          - '0.2503891464124499041291718076'
+        - - FeO
+          - '0.005335571216819305104263478328'
+        - - MnO
+          - '0'
+        - - MgO
+          - '0.00190218726925945889197452033'
+        - - CaO
+          - '0.2381329372140042147366700954'
+        - - Na2O
+          - '0.006184863138230894923045000306'
+        - - K2O
+          - '0.0004439452047378003248683362593'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2255,7 +2637,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_fe_psat_figs_figure_only::T=2110.28:h=7f52bd0955d2
   source_id: kems-025-markova-1983
   locator:
@@ -2325,9 +2708,31 @@ observations:
           observation values.axis_calibration.figures.1.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4971750123408067761515609693'
+          - - TiO2
+            - '0.0004363372036916457384457924304'
+          - - Al2O3
+            - '0.2503891464124499041291718076'
+          - - FeO
+            - '0.005335571216819305104263478328'
+          - - MnO
+            - '0'
+          - - MgO
+            - '0.00190218726925945889197452033'
+          - - CaO
+            - '0.2381329372140042147366700954'
+          - - Na2O
+            - '0.006184863138230894923045000306'
+          - - K2O
+            - '0.0004439452047378003248683362593'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -2425,9 +2830,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4449295201227287570386388026'
+        - - TiO2
+          - '0.0009853729182713357516436901598'
+        - - Al2O3
+          - '0.1204663239612100077731648342'
+        - - FeO
+          - '0.07448614988038438320168121756'
+        - - MnO
+          - '0.001194727098329355053811817446'
+        - - MgO
+          - '0.23400927384080846725697454'
+        - - CaO
+          - '0.1164797523721389962269410498'
+        - - Na2O
+          - '0.006934749581409788861585024299'
+        - - K2O
+          - '0.0005141302247189088355590237571'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2480,7 +2907,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_feo_psat_figs_figure_only::T=1754.90:h=10fc75986bb9
   source_id: kems-025-markova-1983
   locator:
@@ -2550,9 +2978,31 @@ observations:
           extract axis_calibration.figures.4.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4449295201227287570386388026'
+          - - TiO2
+            - '0.0009853729182713357516436901598'
+          - - Al2O3
+            - '0.1204663239612100077731648342'
+          - - FeO
+            - '0.07448614988038438320168121756'
+          - - MnO
+            - '0.001194727098329355053811817446'
+          - - MgO
+            - '0.23400927384080846725697454'
+          - - CaO
+            - '0.1164797523721389962269410498'
+          - - Na2O
+            - '0.006934749581409788861585024299'
+          - - K2O
+            - '0.0005141302247189088355590237571'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -2650,9 +3100,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4449295201227287570386388026'
+        - - TiO2
+          - '0.0009853729182713357516436901598'
+        - - Al2O3
+          - '0.1204663239612100077731648342'
+        - - FeO
+          - '0.07448614988038438320168121756'
+        - - MnO
+          - '0.001194727098329355053811817446'
+        - - MgO
+          - '0.23400927384080846725697454'
+        - - CaO
+          - '0.1164797523721389962269410498'
+        - - Na2O
+          - '0.006934749581409788861585024299'
+        - - K2O
+          - '0.0005141302247189088355590237571'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2705,7 +3177,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_feo_psat_figs_figure_only::T=1847.16:h=42c202467c33
   source_id: kems-025-markova-1983
   locator:
@@ -2775,9 +3248,31 @@ observations:
           extract axis_calibration.figures.4.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4449295201227287570386388026'
+          - - TiO2
+            - '0.0009853729182713357516436901598'
+          - - Al2O3
+            - '0.1204663239612100077731648342'
+          - - FeO
+            - '0.07448614988038438320168121756'
+          - - MnO
+            - '0.001194727098329355053811817446'
+          - - MgO
+            - '0.23400927384080846725697454'
+          - - CaO
+            - '0.1164797523721389962269410498'
+          - - Na2O
+            - '0.006934749581409788861585024299'
+          - - K2O
+            - '0.0005141302247189088355590237571'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -2875,9 +3370,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5008662657721497946107413732'
+        - - TiO2
+          - '0.00265589573121718460338801233'
+        - - Al2O3
+          - '0.1861267233112690101075228508'
+        - - FeO
+          - '0.0392117264680269449034422812'
+        - - MnO
+          - '0.0005606550028721429957744916167'
+        - - MgO
+          - '0.07203498978642262273682328283'
+        - - CaO
+          - '0.1937366208005451454290017521'
+        - - Na2O
+          - '0.004384903739250131036137310247'
+        - - K2O
+          - '0.0004222193882470235771686461564'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2930,7 +3447,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_feo_psat_figs_figure_only::T=1910.74:h=237b6309869c
   source_id: kems-025-markova-1983
   locator:
@@ -3000,9 +3518,31 @@ observations:
           extract axis_calibration.figures.3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5008662657721497946107413732'
+          - - TiO2
+            - '0.00265589573121718460338801233'
+          - - Al2O3
+            - '0.1861267233112690101075228508'
+          - - FeO
+            - '0.0392117264680269449034422812'
+          - - MnO
+            - '0.0005606550028721429957744916167'
+          - - MgO
+            - '0.07203498978642262273682328283'
+          - - CaO
+            - '0.1937366208005451454290017521'
+          - - Na2O
+            - '0.004384903739250131036137310247'
+          - - K2O
+            - '0.0004222193882470235771686461564'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -3100,9 +3640,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4449295201227287570386388026'
+        - - TiO2
+          - '0.0009853729182713357516436901598'
+        - - Al2O3
+          - '0.1204663239612100077731648342'
+        - - FeO
+          - '0.07448614988038438320168121756'
+        - - MnO
+          - '0.001194727098329355053811817446'
+        - - MgO
+          - '0.23400927384080846725697454'
+        - - CaO
+          - '0.1164797523721389962269410498'
+        - - Na2O
+          - '0.006934749581409788861585024299'
+        - - K2O
+          - '0.0005141302247189088355590237571'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3155,7 +3717,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_feo_psat_figs_figure_only::T=1915.51:h=0dac936d9ef4
   source_id: kems-025-markova-1983
   locator:
@@ -3225,9 +3788,31 @@ observations:
           extract axis_calibration.figures.4.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4449295201227287570386388026'
+          - - TiO2
+            - '0.0009853729182713357516436901598'
+          - - Al2O3
+            - '0.1204663239612100077731648342'
+          - - FeO
+            - '0.07448614988038438320168121756'
+          - - MnO
+            - '0.001194727098329355053811817446'
+          - - MgO
+            - '0.23400927384080846725697454'
+          - - CaO
+            - '0.1164797523721389962269410498'
+          - - Na2O
+            - '0.006934749581409788861585024299'
+          - - K2O
+            - '0.0005141302247189088355590237571'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -3325,9 +3910,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4449295201227287570386388026'
+        - - TiO2
+          - '0.0009853729182713357516436901598'
+        - - Al2O3
+          - '0.1204663239612100077731648342'
+        - - FeO
+          - '0.07448614988038438320168121756'
+        - - MnO
+          - '0.001194727098329355053811817446'
+        - - MgO
+          - '0.23400927384080846725697454'
+        - - CaO
+          - '0.1164797523721389962269410498'
+        - - Na2O
+          - '0.006934749581409788861585024299'
+        - - K2O
+          - '0.0005141302247189088355590237571'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3380,7 +3987,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_feo_psat_figs_figure_only::T=1959.93:h=36ab6cf8f82f
   source_id: kems-025-markova-1983
   locator:
@@ -3450,9 +4058,31 @@ observations:
           extract axis_calibration.figures.4.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4449295201227287570386388026'
+          - - TiO2
+            - '0.0009853729182713357516436901598'
+          - - Al2O3
+            - '0.1204663239612100077731648342'
+          - - FeO
+            - '0.07448614988038438320168121756'
+          - - MnO
+            - '0.001194727098329355053811817446'
+          - - MgO
+            - '0.23400927384080846725697454'
+          - - CaO
+            - '0.1164797523721389962269410498'
+          - - Na2O
+            - '0.006934749581409788861585024299'
+          - - K2O
+            - '0.0005141302247189088355590237571'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -3550,9 +4180,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5008662657721497946107413732'
+        - - TiO2
+          - '0.00265589573121718460338801233'
+        - - Al2O3
+          - '0.1861267233112690101075228508'
+        - - FeO
+          - '0.0392117264680269449034422812'
+        - - MnO
+          - '0.0005606550028721429957744916167'
+        - - MgO
+          - '0.07203498978642262273682328283'
+        - - CaO
+          - '0.1937366208005451454290017521'
+        - - Na2O
+          - '0.004384903739250131036137310247'
+        - - K2O
+          - '0.0004222193882470235771686461564'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3605,7 +4257,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_feo_psat_figs_figure_only::T=2083.43:h=b5af9a29d2d0
   source_id: kems-025-markova-1983
   locator:
@@ -3675,9 +4328,31 @@ observations:
           extract axis_calibration.figures.3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5008662657721497946107413732'
+          - - TiO2
+            - '0.00265589573121718460338801233'
+          - - Al2O3
+            - '0.1861267233112690101075228508'
+          - - FeO
+            - '0.0392117264680269449034422812'
+          - - MnO
+            - '0.0005606550028721429957744916167'
+          - - MgO
+            - '0.07203498978642262273682328283'
+          - - CaO
+            - '0.1937366208005451454290017521'
+          - - Na2O
+            - '0.004384903739250131036137310247'
+          - - K2O
+            - '0.0004222193882470235771686461564'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -3775,9 +4450,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5008662657721497946107413732'
+        - - TiO2
+          - '0.00265589573121718460338801233'
+        - - Al2O3
+          - '0.1861267233112690101075228508'
+        - - FeO
+          - '0.0392117264680269449034422812'
+        - - MnO
+          - '0.0005606550028721429957744916167'
+        - - MgO
+          - '0.07203498978642262273682328283'
+        - - CaO
+          - '0.1937366208005451454290017521'
+        - - Na2O
+          - '0.004384903739250131036137310247'
+        - - K2O
+          - '0.0004222193882470235771686461564'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3830,7 +4527,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_feo_psat_figs_figure_only::T=2158.37:h=ab5091ca39a7
   source_id: kems-025-markova-1983
   locator:
@@ -3900,9 +4598,31 @@ observations:
           extract axis_calibration.figures.3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5008662657721497946107413732'
+          - - TiO2
+            - '0.00265589573121718460338801233'
+          - - Al2O3
+            - '0.1861267233112690101075228508'
+          - - FeO
+            - '0.0392117264680269449034422812'
+          - - MnO
+            - '0.0005606550028721429957744916167'
+          - - MgO
+            - '0.07203498978642262273682328283'
+          - - CaO
+            - '0.1937366208005451454290017521'
+          - - Na2O
+            - '0.004384903739250131036137310247'
+          - - K2O
+            - '0.0004222193882470235771686461564'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -4146,9 +4866,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4449295201227287570386388026'
+        - - TiO2
+          - '0.0009853729182713357516436901598'
+        - - Al2O3
+          - '0.1204663239612100077731648342'
+        - - FeO
+          - '0.07448614988038438320168121756'
+        - - MnO
+          - '0.001194727098329355053811817446'
+        - - MgO
+          - '0.23400927384080846725697454'
+        - - CaO
+          - '0.1164797523721389962269410498'
+        - - Na2O
+          - '0.006934749581409788861585024299'
+        - - K2O
+          - '0.0005141302247189088355590237571'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4201,7 +4943,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_mg_psat_figs_figure_only::T=2088.08:h=fda353a4baa9
   source_id: kems-025-markova-1983
   locator:
@@ -4271,9 +5014,31 @@ observations:
           extract axis_calibration.figures.4.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4449295201227287570386388026'
+          - - TiO2
+            - '0.0009853729182713357516436901598'
+          - - Al2O3
+            - '0.1204663239612100077731648342'
+          - - FeO
+            - '0.07448614988038438320168121756'
+          - - MnO
+            - '0.001194727098329355053811817446'
+          - - MgO
+            - '0.23400927384080846725697454'
+          - - CaO
+            - '0.1164797523721389962269410498'
+          - - Na2O
+            - '0.006934749581409788861585024299'
+          - - K2O
+            - '0.0005141302247189088355590237571'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -4371,9 +5136,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5008662657721497946107413732'
+        - - TiO2
+          - '0.00265589573121718460338801233'
+        - - Al2O3
+          - '0.1861267233112690101075228508'
+        - - FeO
+          - '0.0392117264680269449034422812'
+        - - MnO
+          - '0.0005606550028721429957744916167'
+        - - MgO
+          - '0.07203498978642262273682328283'
+        - - CaO
+          - '0.1937366208005451454290017521'
+        - - Na2O
+          - '0.004384903739250131036137310247'
+        - - K2O
+          - '0.0004222193882470235771686461564'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4426,7 +5213,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_mg_psat_figs_figure_only::T=2091.57:h=fb2088a2c0eb
   source_id: kems-025-markova-1983
   locator:
@@ -4496,9 +5284,31 @@ observations:
           extract axis_calibration.figures.3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5008662657721497946107413732'
+          - - TiO2
+            - '0.00265589573121718460338801233'
+          - - Al2O3
+            - '0.1861267233112690101075228508'
+          - - FeO
+            - '0.0392117264680269449034422812'
+          - - MnO
+            - '0.0005606550028721429957744916167'
+          - - MgO
+            - '0.07203498978642262273682328283'
+          - - CaO
+            - '0.1937366208005451454290017521'
+          - - Na2O
+            - '0.004384903739250131036137310247'
+          - - K2O
+            - '0.0004222193882470235771686461564'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -4596,9 +5406,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5008662657721497946107413732'
+        - - TiO2
+          - '0.00265589573121718460338801233'
+        - - Al2O3
+          - '0.1861267233112690101075228508'
+        - - FeO
+          - '0.0392117264680269449034422812'
+        - - MnO
+          - '0.0005606550028721429957744916167'
+        - - MgO
+          - '0.07203498978642262273682328283'
+        - - CaO
+          - '0.1937366208005451454290017521'
+        - - Na2O
+          - '0.004384903739250131036137310247'
+        - - K2O
+          - '0.0004222193882470235771686461564'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4651,7 +5483,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_mg_psat_figs_figure_only::T=2138.82:h=f64d3de1a16d
   source_id: kems-025-markova-1983
   locator:
@@ -4721,9 +5554,31 @@ observations:
           extract axis_calibration.figures.3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5008662657721497946107413732'
+          - - TiO2
+            - '0.00265589573121718460338801233'
+          - - Al2O3
+            - '0.1861267233112690101075228508'
+          - - FeO
+            - '0.0392117264680269449034422812'
+          - - MnO
+            - '0.0005606550028721429957744916167'
+          - - MgO
+            - '0.07203498978642262273682328283'
+          - - CaO
+            - '0.1937366208005451454290017521'
+          - - Na2O
+            - '0.004384903739250131036137310247'
+          - - K2O
+            - '0.0004222193882470235771686461564'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -4821,9 +5676,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4635754701060889359668218679'
+        - - TiO2
+          - '0.0004080869173608556754596890075'
+        - - Al2O3
+          - '0.1708226531492833245447849225'
+        - - FeO
+          - '0.05026415944792524119037299335'
+        - - MnO
+          - '0.0008270058585898297275688357224'
+        - - MgO
+          - '0.1337508415477642852149976566'
+        - - CaO
+          - '0.1663389768651689522067410737'
+        - - Na2O
+          - '0.01325160180909279184062793656'
+        - - K2O
+          - '0.0007612042987257836326250242864'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4876,7 +5753,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_mg_psat_figs_figure_only::T=2161.03:h=e55e3e37d2b7
   source_id: kems-025-markova-1983
   locator:
@@ -4946,9 +5824,31 @@ observations:
           extract axis_calibration.figures.2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4635754701060889359668218679'
+          - - TiO2
+            - '0.0004080869173608556754596890075'
+          - - Al2O3
+            - '0.1708226531492833245447849225'
+          - - FeO
+            - '0.05026415944792524119037299335'
+          - - MnO
+            - '0.0008270058585898297275688357224'
+          - - MgO
+            - '0.1337508415477642852149976566'
+          - - CaO
+            - '0.1663389768651689522067410737'
+          - - Na2O
+            - '0.01325160180909279184062793656'
+          - - K2O
+            - '0.0007612042987257836326250242864'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -5046,9 +5946,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4449295201227287570386388026'
+        - - TiO2
+          - '0.0009853729182713357516436901598'
+        - - Al2O3
+          - '0.1204663239612100077731648342'
+        - - FeO
+          - '0.07448614988038438320168121756'
+        - - MnO
+          - '0.001194727098329355053811817446'
+        - - MgO
+          - '0.23400927384080846725697454'
+        - - CaO
+          - '0.1164797523721389962269410498'
+        - - Na2O
+          - '0.006934749581409788861585024299'
+        - - K2O
+          - '0.0005141302247189088355590237571'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5101,7 +6023,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_mg_psat_figs_figure_only::T=2170.09:h=6f1496b68fef
   source_id: kems-025-markova-1983
   locator:
@@ -5171,9 +6094,31 @@ observations:
           extract axis_calibration.figures.4.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4449295201227287570386388026'
+          - - TiO2
+            - '0.0009853729182713357516436901598'
+          - - Al2O3
+            - '0.1204663239612100077731648342'
+          - - FeO
+            - '0.07448614988038438320168121756'
+          - - MnO
+            - '0.001194727098329355053811817446'
+          - - MgO
+            - '0.23400927384080846725697454'
+          - - CaO
+            - '0.1164797523721389962269410498'
+          - - Na2O
+            - '0.006934749581409788861585024299'
+          - - K2O
+            - '0.0005141302247189088355590237571'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -5271,9 +6216,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4635754701060889359668218679'
+        - - TiO2
+          - '0.0004080869173608556754596890075'
+        - - Al2O3
+          - '0.1708226531492833245447849225'
+        - - FeO
+          - '0.05026415944792524119037299335'
+        - - MnO
+          - '0.0008270058585898297275688357224'
+        - - MgO
+          - '0.1337508415477642852149976566'
+        - - CaO
+          - '0.1663389768651689522067410737'
+        - - Na2O
+          - '0.01325160180909279184062793656'
+        - - K2O
+          - '0.0007612042987257836326250242864'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5326,7 +6293,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_mg_psat_figs_figure_only::T=2181.05:h=5a59fd4da125
   source_id: kems-025-markova-1983
   locator:
@@ -5396,9 +6364,31 @@ observations:
           extract axis_calibration.figures.2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4635754701060889359668218679'
+          - - TiO2
+            - '0.0004080869173608556754596890075'
+          - - Al2O3
+            - '0.1708226531492833245447849225'
+          - - FeO
+            - '0.05026415944792524119037299335'
+          - - MnO
+            - '0.0008270058585898297275688357224'
+          - - MgO
+            - '0.1337508415477642852149976566'
+          - - CaO
+            - '0.1663389768651689522067410737'
+          - - Na2O
+            - '0.01325160180909279184062793656'
+          - - K2O
+            - '0.0007612042987257836326250242864'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -5496,9 +6486,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5008662657721497946107413732'
+        - - TiO2
+          - '0.00265589573121718460338801233'
+        - - Al2O3
+          - '0.1861267233112690101075228508'
+        - - FeO
+          - '0.0392117264680269449034422812'
+        - - MnO
+          - '0.0005606550028721429957744916167'
+        - - MgO
+          - '0.07203498978642262273682328283'
+        - - CaO
+          - '0.1937366208005451454290017521'
+        - - Na2O
+          - '0.004384903739250131036137310247'
+        - - K2O
+          - '0.0004222193882470235771686461564'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5551,7 +6563,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_mg_psat_figs_figure_only::T=2195.84:h=ec78dfab2cba
   source_id: kems-025-markova-1983
   locator:
@@ -5621,9 +6634,31 @@ observations:
           extract axis_calibration.figures.3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5008662657721497946107413732'
+          - - TiO2
+            - '0.00265589573121718460338801233'
+          - - Al2O3
+            - '0.1861267233112690101075228508'
+          - - FeO
+            - '0.0392117264680269449034422812'
+          - - MnO
+            - '0.0005606550028721429957744916167'
+          - - MgO
+            - '0.07203498978642262273682328283'
+          - - CaO
+            - '0.1937366208005451454290017521'
+          - - Na2O
+            - '0.004384903739250131036137310247'
+          - - K2O
+            - '0.0004222193882470235771686461564'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -5721,9 +6756,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4449295201227287570386388026'
+        - - TiO2
+          - '0.0009853729182713357516436901598'
+        - - Al2O3
+          - '0.1204663239612100077731648342'
+        - - FeO
+          - '0.07448614988038438320168121756'
+        - - MnO
+          - '0.001194727098329355053811817446'
+        - - MgO
+          - '0.23400927384080846725697454'
+        - - CaO
+          - '0.1164797523721389962269410498'
+        - - Na2O
+          - '0.006934749581409788861585024299'
+        - - K2O
+          - '0.0005141302247189088355590237571'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5776,7 +6833,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_mg_psat_figs_figure_only::T=2204.26:h=d375b6ba552b
   source_id: kems-025-markova-1983
   locator:
@@ -5846,9 +6904,31 @@ observations:
           extract axis_calibration.figures.4.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4449295201227287570386388026'
+          - - TiO2
+            - '0.0009853729182713357516436901598'
+          - - Al2O3
+            - '0.1204663239612100077731648342'
+          - - FeO
+            - '0.07448614988038438320168121756'
+          - - MnO
+            - '0.001194727098329355053811817446'
+          - - MgO
+            - '0.23400927384080846725697454'
+          - - CaO
+            - '0.1164797523721389962269410498'
+          - - Na2O
+            - '0.006934749581409788861585024299'
+          - - K2O
+            - '0.0005141302247189088355590237571'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
@@ -5946,9 +7026,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4635754701060889359668218679'
+        - - TiO2
+          - '0.0004080869173608556754596890075'
+        - - Al2O3
+          - '0.1708226531492833245447849225'
+        - - FeO
+          - '0.05026415944792524119037299335'
+        - - MnO
+          - '0.0008270058585898297275688357224'
+        - - MgO
+          - '0.1337508415477642852149976566'
+        - - CaO
+          - '0.1663389768651689522067410737'
+        - - Na2O
+          - '0.01325160180909279184062793656'
+        - - K2O
+          - '0.0007612042987257836326250242864'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6001,7 +7103,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: kems-025-markova-1983::markova_1983_mg_psat_figs_figure_only::T=2275.70:h=e291f58e062e
   source_id: kems-025-markova-1983
   locator:
@@ -6071,9 +7174,31 @@ observations:
           extract axis_calibration.figures.2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4635754701060889359668218679'
+          - - TiO2
+            - '0.0004080869173608556754596890075'
+          - - Al2O3
+            - '0.1708226531492833245447849225'
+          - - FeO
+            - '0.05026415944792524119037299335'
+          - - MnO
+            - '0.0008270058585898297275688357224'
+          - - MgO
+            - '0.1337508415477642852149976566'
+          - - CaO
+            - '0.1663389768651689522067410737'
+          - - Na2O
+            - '0.01325160180909279184062793656'
+          - - K2O
+            - '0.0007612042987257836326250242864'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         published_page: 461
         pdf_page_index: 2
