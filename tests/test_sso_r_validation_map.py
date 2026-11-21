@@ -519,13 +519,31 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
         from simulator.engine_binding_admission import write_gate_curve_memo_record
 
         nonlocal curve_calls
+
+        def add_current_domain_diagnostic(curve):
+            if getattr(self, '_liquid_fraction_provider', None) != 'magemin':
+                return curve
+            identity = getattr(
+                self,
+                '_freeze_gate_current_magemin_domain_identity',
+                None,
+            )
+            assert identity is not None
+            if identity.silica_verdict == 'extrapolated':
+                assert identity.certified_band is not None
+                curve['authority'] = 'extrapolated'
+                curve['certified_band'] = {
+                    'sio2_wt_pct': list(identity.certified_band),
+                }
+            return curve
+
         if not pin_window:
-            curve = {
+            curve = add_current_domain_diagnostic({
                 'source': 'test_setup_real_curve',
                 'solidus_T_C': 1000.0,
                 'liquidus_T_C': 1700.0,
                 'path': ((1000.0, 0.0), (1700.0, 1.0)),
-            }
+            })
             return write_gate_curve_memo_record(
                 self,
                 curve,
@@ -534,12 +552,12 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
         curve_calls += 1
         if curve_calls == 1:
             raise ProviderUnavailableError('validation row pin failure')
-        curve = {
+        curve = add_current_domain_diagnostic({
             'source': 'test_recovered_real_curve',
             'solidus_T_C': 1000.0,
             'liquidus_T_C': 1700.0,
             'path': ((1000.0, 0.0), (1700.0, 1.0)),
-        }
+        })
         return write_gate_curve_memo_record(
             self,
             curve,
