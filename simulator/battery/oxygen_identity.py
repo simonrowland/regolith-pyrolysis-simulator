@@ -22,7 +22,7 @@ from typing import Any, Mapping, Sequence
 
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
 from simulator.battery.enums import ValueKind
-from simulator.battery.records import Located, Value
+from simulator.battery.records import Located, Value, nominal_pressure_pa
 from simulator.physical_constants import (
     BAR_PA_DECIMAL,
     CELSIUS_TO_KELVIN_OFFSET,
@@ -360,6 +360,8 @@ def _sossi_table2_gas_row(
         or not isinstance(quote, str)
     ):
         raise ValueError(f"sossi_table2_gas_row_locator_invalid:{run_id}")
+    if not quote.strip():
+        raise ValueError(f"sossi_table2_gas_row_quote_invalid:{run_id}")
     header = quote.splitlines()[0].split("|")
     if tuple(item.strip() for item in header[:6]) != (
         "Run#",
@@ -416,18 +418,8 @@ def _sossi_optional_flow(raw: str, label: str) -> Decimal | None:
     return value
 
 
-def _sossi_point(experiment_field: Any, label: str) -> Decimal | None:
-    if not isinstance(experiment_field, Mapping):
-        return None
-    state = experiment_field.get("state")
-    value = state.get("value") if isinstance(state, Mapping) else None
-    if isinstance(value, Mapping):
-        if value.get("kind") != "point":
-            return None
-        value = value.get("point")
-    if value is None:
-        return None
-    return _sossi_decimal(value, label)
+def _sossi_point(experiment_field: Any) -> Decimal | None:
+    return nominal_pressure_pa(experiment_field)
 
 
 def _sossi_cover_matches(experiment: Mapping[str, Any], expected: str) -> bool:
@@ -439,13 +431,25 @@ def _sossi_cover_matches(experiment: Mapping[str, Any], expected: str) -> bool:
     if state.get("tag") != "value" or not isinstance(state.get("value"), str):
         return False
     text = state["value"].upper().replace("₂", "2")
-    species = set(re.findall(r"\b(?:CO2|CO|H2O|H2|O2|N2|ARGON|AR|AIR)\b", text))
+    terms = [
+        term.strip()
+        for term in re.split(r"\s*(?:\+|/|,|;|–|—)\s*", text)
+        if term.strip()
+    ]
+    aliases = {"ARGON": "AR"}
+    species = {aliases.get(term, term) for term in terms}
     expected_species = {
         "co_co2": {"CO", "CO2"},
         "co2": {"CO2"},
         "air": {"AIR"},
     }.get(expected)
-    return expected_species is not None and species == expected_species
+    recognized = {"CO", "CO2", "H2O", "H2", "O2", "N2", "AR", "AIR", "KR", "HE"}
+    return (
+        expected_species is not None
+        and bool(species)
+        and species <= recognized
+        and species == expected_species
+    )
 
 
 def _check_sossi_table2_row(
@@ -481,9 +485,7 @@ def _check_sossi_table2_row(
 
     pressure_environment = experiment.get("pressure_environment")
     pressure = pressure_environment if isinstance(pressure_environment, Mapping) else {}
-    total_pressure_pa = _sossi_point(
-        pressure.get("total_pressure_Pa"), f"{run_id}.total_pressure_Pa"
-    )
+    total_pressure_pa = _sossi_point(pressure.get("total_pressure_Pa"))
     thermal_schedule = experiment.get("thermal_schedule")
     setpoints = (
         thermal_schedule.get("setpoints_and_holds", ())
@@ -491,9 +493,7 @@ def _check_sossi_table2_row(
         else ()
     )
     first_setpoint = setpoints[0] if setpoints and isinstance(setpoints[0], Mapping) else {}
-    temperature_K = _sossi_point(
-        first_setpoint.get("temperature_K"), f"{run_id}.temperature_K"
-    )
+    temperature_K = _sossi_point(first_setpoint.get("temperature_K"))
     if (
         total_pressure_pa != Decimal(str(STANDARD_ATMOSPHERE_PA))
         or temperature_K is None

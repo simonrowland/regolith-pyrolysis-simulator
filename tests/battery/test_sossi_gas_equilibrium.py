@@ -104,7 +104,7 @@ def test_breaking_the_printed_co_co2_ratio_refuses_the_run() -> None:
     assert abs(check.delta_log10_fO2_dex) > SOSSI_GAS_EQUILIBRIUM_BAND_DEX
 
 
-@pytest.mark.parametrize("cover", ["Argon", "air"])
+@pytest.mark.parametrize("cover", ["Argon", "air", "CO + CO2 + Kr"])
 def test_swapping_a_printed_co_co2_cover_refuses_the_run(cover: str) -> None:
     experiments, series = _source_parts()
     mutated = deepcopy(experiments)
@@ -122,3 +122,36 @@ def test_swapping_a_printed_co_co2_cover_refuses_the_run(cover: str) -> None:
 
     assert check.refusal_reason == "cover_not_printed_mixture"
     assert check.checked_log10_fO2_bar is None
+
+
+def test_non_value_pressure_state_is_a_typed_gas_equilibrium_refusal() -> None:
+    experiments, series = _source_parts()
+    mutated = deepcopy(experiments)
+    experiment = next(
+        item
+        for item in mutated
+        if "P09/06/18a" in item["locator"]["note"]
+    )
+    experiment["pressure_environment"]["total_pressure_Pa"]["state"] = {
+        "tag": "unknown",
+        "reason": "mutated for refusal regression",
+    }
+
+    check = _checks_by_run(mutated, series)["P09/06/18a"]
+
+    assert check.refusal_reason == "gas_equilibrium_fo2_unavailable"
+    assert check.checked_log10_fO2_bar is None
+
+
+def test_empty_table2_quote_is_a_typed_parser_refusal() -> None:
+    experiments, series = _source_parts()
+    mutated = deepcopy(series)
+    row = next(
+        item for item in mutated if item["run_id"].rstrip("*") == "P09/06/18a"
+    )
+    row["locator"]["quote"] = ""
+
+    with pytest.raises(
+        ValueError, match="sossi_table2_gas_row_quote_invalid:P09/06/18a"
+    ):
+        check_sossi_table2_gas_equilibrium(experiments, mutated)
