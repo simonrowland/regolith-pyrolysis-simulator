@@ -125,6 +125,25 @@ def test_swapping_a_printed_co_co2_cover_refuses_the_run(cover: str) -> None:
     assert check.checked_log10_fO2_bar is None
 
 
+def test_ascii_hyphenated_co_co2_cover_matches_the_printed_mixture() -> None:
+    experiments, series = _source_parts()
+    mutated = deepcopy(experiments)
+    experiment = next(
+        item
+        for item in mutated
+        if "P09/06/18a" in item["locator"]["note"]
+    )
+    experiment["pressure_environment"]["sweep_gas"]["state"] = {
+        "tag": "value",
+        "value": "CO-CO2",
+    }
+
+    check = _checks_by_run(mutated, series)["P09/06/18a"]
+
+    assert check.refusal_reason is None
+    assert check.checked_log10_fO2_bar is not None
+
+
 def test_non_value_pressure_state_is_a_typed_gas_equilibrium_refusal() -> None:
     experiments, series = _source_parts()
     mutated = deepcopy(experiments)
@@ -168,6 +187,7 @@ def test_real_sossi_extract_flows_reach_the_lab_schedule_boundary() -> None:
         vacuum_pyrolysis_preset,
     )
     from simulator.battery.migrate import load_migrated_benches, load_migrated_store
+    from simulator.battery.waypoints import WaypointAuthority
     from simulator.lab_schedule import _normalize_gas_boundary
 
     source_id = "kems-012-sossi-2019"
@@ -200,12 +220,20 @@ def test_real_sossi_extract_flows_reach_the_lab_schedule_boundary() -> None:
             gap.waypoint == "gas_boundary" for gap in generated.readiness.gaps
         )
         boundary = _normalize_gas_boundary(_document(inputs, "gas_boundary"))
+        expected_authority = (
+            WaypointAuthority.EXTRAPOLATED
+            if "reported_total_flow" in boundary
+            else WaypointAuthority.PRINTED
+        )
+        assert gas_boundary.authority is expected_authority
         return pressure, boundary, experiment, observation, bench
 
     pressure, mixed, experiment, observation, bench = real_boundary("p09-06-18a")
     assert pressure == Decimal("101325")
     assert mixed["component_flows"]["CO"]["value"] == 130.0
     assert mixed["component_flows"]["CO2"]["value"] == 65.0
+    assert mixed["component_flows"]["CO"]["source_class"] == "literature_primary"
+    assert mixed["component_flows"]["CO2"]["source_class"] == "literature_primary"
     assert mixed["reported_total_flow"]["value"] == 200.0
     assert mixed["reported_total_flow"]["qualifier"] == "approximate"
     assert mixed["flow_reference_state"]["reason"] == (
@@ -249,6 +277,12 @@ def test_real_sossi_extract_flows_reach_the_lab_schedule_boundary() -> None:
     assert pure_co2["component_flows"]["CO2"]["value"] == 27.0
     assert "reported_total_flow" not in pure_co2
     assert pure_co2["pressure_control"]["pressure_driver"] == "imposed"
+
+    _, air, *_ = real_boundary("2m-15-07-16c")
+    assert air["background_gas"]["species"] == "air"
+    assert air["imposed_flow"]["reason"] == (
+        "The source leaves both CO and CO2 flow columns blank for this run."
+    )
 
 
 def test_rps_cli_passes_the_real_sossi_run_record(tmp_path, monkeypatch) -> None:

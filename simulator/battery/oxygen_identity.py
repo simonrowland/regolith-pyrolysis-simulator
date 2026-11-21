@@ -473,7 +473,7 @@ def _sossi_cover_matches(experiment: Mapping[str, Any], expected: str) -> bool:
     text = state["value"].upper().replace("₂", "2")
     terms = [
         term.strip()
-        for term in re.split(r"\s*(?:\+|/|,|;|–|—)\s*", text)
+        for term in re.split(r"\s*(?:\+|/|,|;|–|—|-)\s*", text)
         if term.strip()
     ]
     aliases = {"ARGON": "AR"}

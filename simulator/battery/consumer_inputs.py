@@ -12,6 +12,7 @@ from simulator.battery.records import (
     nominal_pressure_pa,
 )
 from simulator.battery.enums import ValueKind
+from simulator.source_ids import SOSSI_SOURCE_ID
 from simulator.battery.waypoints import (
     Waypoint, WaypointResult, WaypointAuthority, SpeciesWaypoints,
     ConsumerReadiness, _AUTHORITY_RANK, _result, charge_moles_by_species, thermal_path,
@@ -37,14 +38,30 @@ REQUIREMENTS = {
     "rps": ("run_charge_moles_by_species", "run_mass_kg", "thermal_path", "run_pressure_boundary", "surfaces", "gas_boundary"),
 }
 
-_SOSSI_SOURCE_ID = "kems-012-sossi-2019"
-_SOSSI_TABLE2_RUN_PREFIX = "Printed Table 2 physical run "
+
+def _sossi_table2_run_id(experiment):
+    from simulator.battery.oxygen_identity import _sossi_experiment_run_id
+
+    locator = experiment.locator
+    return _sossi_experiment_run_id(
+        {
+            "locator": (
+                {
+                    "note": locator.note,
+                    "table": locator.table,
+                    "page": locator.page,
+                }
+                if locator is not None
+                else None
+            )
+        }
+    )
 
 
-def _sossi_table2_gas_boundary(experiment, observation):
+def _sossi_table2_gas_boundary(experiment, observation, *, expected_run_id=None):
     if (
         observation is None
-        or observation.source_id != _SOSSI_SOURCE_ID
+        or observation.source_id != SOSSI_SOURCE_ID
     ):
         return None
     temperature = (observation.point_conditions or {}).get("temperature_K")
@@ -75,17 +92,8 @@ def _sossi_table2_gas_boundary(experiment, observation):
     run_id, _temperature_C, co_sccm, co2_sccm, _printed_log = (
         _sossi_table2_gas_row_from_quote(quote)
     )
-    experiment_note = experiment.locator.note if experiment.locator else None
-    if not isinstance(experiment_note, str) or not experiment_note.startswith(
-        _SOSSI_TABLE2_RUN_PREFIX
-    ):
-        raise ValueError("sossi_table2_experiment_locator_invalid")
-    expected_run_id = (
-        experiment_note[len(_SOSSI_TABLE2_RUN_PREFIX) :]
-        .split(";", 1)[0]
-        .strip()
-        .rstrip("*")
-    )
+    if expected_run_id is None:
+        expected_run_id = _sossi_table2_run_id(experiment)
     if (
         run_id != expected_run_id
         or observation.experiment_id != experiment.experiment_id
@@ -114,16 +122,20 @@ def _sossi_table2_gas_boundary(experiment, observation):
             **row_source,
             "species": "air",
         }
+        imposed_flow_reason = (
+            "The source leaves both CO and CO2 flow columns blank for this run."
+        )
     else:
         background_gas = {
             **not_reported,
             "reason": "The source reports separate CO and CO2 component flows.",
         }
+        imposed_flow_reason = "The source reports component flows separately."
     boundary = {
         "background_gas": background_gas,
         "imposed_flow": {
             **not_reported,
-            "reason": "The source reports component flows separately.",
+            "reason": imposed_flow_reason,
         },
         "pressure_control": {
             "mode": "controlled",
@@ -171,20 +183,25 @@ def _sossi_table2_gas_boundary(experiment, observation):
 
 
 def _sossi_table2_flow_observation(experiment, observations):
-    locator = experiment.locator
-    note = locator.note if locator is not None else None
-    if not isinstance(note, str) or not note.startswith(_SOSSI_TABLE2_RUN_PREFIX):
+    try:
+        run_id = _sossi_table2_run_id(experiment)
+    except ValueError:
         return None
     for observation in observations:
         species = getattr(observation.identity, "species", None)
         if (
-            observation.source_id != _SOSSI_SOURCE_ID
+            observation.source_id != SOSSI_SOURCE_ID
             or observation.experiment_id != experiment.experiment_id
             or getattr(species, "formula", None) != "Mn"
             or observation.admission.status.value != "admitted"
         ):
             continue
-        if _sossi_table2_gas_boundary(experiment, observation) is not None:
+        if (
+            _sossi_table2_gas_boundary(
+                experiment, observation, expected_run_id=run_id
+            )
+            is not None
+        ):
             return observation
     return None
 
@@ -305,7 +322,11 @@ def collect_consumer_inputs(experiment, bench, observation=None) -> ConsumerInpu
                     name,
                     source_boundary,
                     route_path,
-                    WaypointAuthority.PRINTED,
+                    (
+                        WaypointAuthority.EXTRAPOLATED
+                        if "reported_total_flow" in source_boundary
+                        else WaypointAuthority.PRINTED
+                    ),
                     (
                         route_path,
                         "experiment.pressure_environment.total_pressure_Pa",
