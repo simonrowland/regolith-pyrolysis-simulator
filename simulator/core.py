@@ -8274,8 +8274,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             bookings = state.get('wall_booking') or {}
             source = {}
             dropped = set()
-            returned_o2_mol_hr = 0.0
-            for species in names:
+            # `names` is the owned set. Sorted fsum, or the condensation
+            # oxygen follows hash order and moves a shut hour.
+            # Algebra: n = fsum of the credited mol/h.
+            # Unit check: mol/h. Limit: nothing captured sums to 0.
+            returned_o2_terms: list[float] = []
+            for species in sorted(names, key=str):
                 label = str(species)
                 if label == OXYGEN_SPECIES:
                     continue
@@ -8306,12 +8310,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if captured_kg <= rate_floor_kg_hr:
                     captured_kg = 0.0
                 source[label] = rate - captured_kg
-                returned_o2_mol_hr += self._condensation_overhead_o2_mol(
-                    label,
-                    captured_kg,
-                    wall_fraction=float(walls.get(label, 0.0) or 0.0),
-                    booking=bookings.get(label),
+                returned_o2_terms.append(
+                    self._condensation_overhead_o2_mol(
+                        label,
+                        captured_kg,
+                        wall_fraction=float(walls.get(label, 0.0) or 0.0),
+                        booking=bookings.get(label),
+                    )
                 )
+            returned_o2_mol_hr = (
+                math.fsum(returned_o2_terms) if returned_o2_terms else 0.0
+            )
             projector_gross = {
                 str(species): rate
                 for species, rate in gross.items()
@@ -8656,7 +8665,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if damp and old_scale:
                         blended = {}
                         new_scale = dict(state['capture_C'])
-                        for label in set(old_scale) | set(new_scale):
+                        for label in sorted(
+                            set(old_scale) | set(new_scale),
+                            key=str,
+                        ):
                             old = old_scale.get(label)
                             new = new_scale.get(label)
                             if old is None or new is None:

@@ -276,7 +276,14 @@ def _project_evaporation_overhead_source_mol_hr(
     o2_molar_mass = resolve_species_formula(
         'O2', registry
     ).molar_mass_kg_per_mol()
-    for species, raw_rate in rates_kg_hr.items():
+    # Species-name order, then one fsum. A dict walk adds the oxygen
+    # coproducts in hash order and moves a shut hour between seeds.
+    # Algebra: n_O2 = fsum(rate * O2_per_product_kg / M_O2).
+    # Unit check: (kg/h) / (kg/mol) = mol/h.
+    # Limit: no positive rate leaves the oxygen term absent.
+    o2_contributions: list[float] = []
+    for species in sorted(rates_kg_hr, key=str):
+        raw_rate = rates_kg_hr[species]
         rate_kg_hr = max(0.0, float(raw_rate))
         if rate_kg_hr <= 0.0:
             continue
@@ -303,10 +310,11 @@ def _project_evaporation_overhead_source_mol_hr(
                 and (vapor_oxygen_atoms > 0.0
                      or oxygen_destination == 'process.overhead_gas'))
         ):
-            source_mol_hr['O2'] = (
-                source_mol_hr.get('O2', 0.0)
-                + o2_kg_hr / o2_molar_mass
-            )
+            o2_contributions.append(o2_kg_hr / o2_molar_mass)
+    if o2_contributions:
+        source_mol_hr['O2'] = (
+            source_mol_hr.get('O2', 0.0) + math.fsum(o2_contributions)
+        )
     return source_mol_hr
 
 

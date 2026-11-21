@@ -185,10 +185,21 @@ def test_diverted_alkali_sio_numeric_pin():
 
 
 def test_evaporation_overhead_source_numeric_pin():
-    """Pin the existing shared source projection before consolidating it."""
-    source = _sim()._project_evaporation_overhead_source_mol_hr(
+    """The oxygen coproduct sum does not depend on dict insertion order."""
+    sim = _sim()
+    forward = sim._project_evaporation_overhead_source_mol_hr(
         {"SiO": 1.0, "Na": 0.0007, "K": 0.0001}, {})
-    assert {sp: mol.hex() for sp, mol in source.items()} == {'SiO': '0x1.6af1875a0e72ap+4', 'O2': '0x1.6af1875a0e72bp+3', 'Na': '0x1.f2dd8993f4497p-6', 'K': '0x1.4f3cb1669146ep-9'}
+    reverse = sim._project_evaporation_overhead_source_mol_hr(
+        {"K": 0.0001, "Na": 0.0007, "SiO": 1.0}, {})
+    forward_hex = {sp: mol.hex() for sp, mol in forward.items()}
+    reverse_hex = {sp: mol.hex() for sp, mol in reverse.items()}
+    assert forward_hex == reverse_hex
+    assert forward_hex == {
+        'SiO': '0x1.6af1875a0e72ap+4',
+        'O2': '0x1.6af1875a0e72bp+3',
+        'Na': '0x1.f2dd8993f4497p-6',
+        'K': '0x1.4f3cb1669146ep-9',
+    }
 
 
 @pytest.mark.parametrize("sio_kg,retained", [
