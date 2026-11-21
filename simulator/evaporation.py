@@ -4194,6 +4194,122 @@ class EvaporationMixin:
         )
         return key
 
+    def _freeze_gate_magemin_domain_identity_and_reason(
+        self,
+        provider_inputs: _SilicateProviderMeltInputs,
+    ) -> tuple[MAGEMinDomainIdentity, str | None]:
+        from simulator.melt_backend.base import project_melt_to_oxide_projection
+        from simulator.melt_backend import magemin as magemin_module
+        from simulator.melt_backend.magemin import (
+            MAGEMinBackend,
+            MAGEMinDomainIdentity,
+            magemin_domain_identity_from_evaluated_bulk,
+            _liquidus_inputs_on_feo_total_iron_basis,
+        )
+
+        formula_registry = getattr(self, 'species_formula_registry', {}) or {}
+        provider_mol = provider_inputs.composition_mol
+        _folded_kg, _folded_mol, folded_accounts = (
+            _liquidus_inputs_on_feo_total_iron_basis(
+                composition_kg=None,
+                composition_mol=None,
+                composition_mol_by_account={
+                    'process.cleaned_melt': provider_mol,
+                },
+            )
+        )
+        magemin_provider_mol = (
+            folded_accounts.get('process.cleaned_melt')
+            if isinstance(folded_accounts, Mapping)
+            else provider_mol
+        )
+        if not isinstance(magemin_provider_mol, Mapping):
+            magemin_provider_mol = provider_mol
+        # Domain and projection-threshold identity follow the same FeO_T
+        # composition the liquidus finder submits. The solver-input key keeps
+        # the original provider account.
+        magemin_projection = project_melt_to_oxide_projection(
+            composition_kg=None,
+            composition_mol=magemin_provider_mol,
+            oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
+            species_formula_registry=formula_registry,
+        )
+        backend = MAGEMinBackend()
+        # The exact source check retains non-DB oxides. Normalize the FeOt/O
+        # convention the same way as the live gate before validating it.
+        exact_iron_input = {
+            species: amount
+            for species, amount in magemin_projection.oxide_wt_pct.items()
+            if species in {'FeO', 'Fe2O3', 'FeOt', 'O'}
+        }
+        if any(
+            float(exact_iron_input.get(species, 0.0)) > 0.0
+            for species in ('FeO', 'Fe2O3', 'FeOt')
+        ):
+            exact_engine_bulk = backend._build_db_bulk_projection(
+                exact_iron_input
+            )
+            exact_gate_bulk = backend._domain_gate_oxide_composition(
+                exact_engine_bulk.composition_wt_pct,
+                submitted_oxide_wt_pct=magemin_projection.oxide_wt_pct,
+            )
+        else:
+            exact_gate_bulk = dict(magemin_projection.oxide_wt_pct)
+        exact_valid, _exact_warnings, exact_reason = (
+            magemin_module._validate_magemin_projection_with_reason(
+                exact_gate_bulk,
+                dropped_mass_kg_by_species=(
+                    magemin_projection.dropped_mass_kg_by_species
+                ),
+            )
+        )
+        (
+            _submitted_bulk,
+            projected_verdict,
+            evaluated_domain_projection,
+            projection_reason,
+        ) = backend._submitted_bulk_and_domain_verdict(
+            magemin_projection,
+            species_formula_registry=formula_registry,
+            projected_retry=True,
+        )
+        projected_valid, _projected_warnings, projected_reason = (
+            projected_verdict
+        )
+        domain_reason = exact_reason or projected_reason
+        domain_valid = exact_valid and projected_valid
+        projection_threshold_verdict = (
+            'refused' if projection_reason is not None else 'clear'
+        )
+        if (
+            domain_valid
+            and domain_reason is None
+            and evaluated_domain_projection is not None
+        ):
+            identity, _evaluated_silica = (
+                magemin_domain_identity_from_evaluated_bulk(
+                    evaluated_domain_projection.oxide_wt_pct,
+                    projection_threshold_verdict=projection_threshold_verdict,
+                    refusal_reason=projection_reason,
+                    domain_verdict=(projected_valid, projected_reason),
+                )
+            )
+        else:
+            identity, _evaluated_silica = (
+                magemin_domain_identity_from_evaluated_bulk(
+                    None,
+                    projection_threshold_verdict=projection_threshold_verdict,
+                    refusal_reason=projection_reason or domain_reason,
+                )
+            )
+        if domain_valid:
+            domain_reason = None
+        if not isinstance(identity, MAGEMinDomainIdentity):
+            identity, _evaluated_silica = (
+                magemin_domain_identity_from_evaluated_bulk(None)
+            )
+        return identity, domain_reason
+
     def _freeze_gate_cache_key_and_domain(
         self,
         *,
@@ -4308,127 +4424,13 @@ class EvaporationMixin:
         magemin_domain_reason = None
         magemin_domain_identity = None
         if self._liquid_fraction_provider == 'magemin':
-            from simulator.melt_backend.base import (
-                project_melt_to_oxide_projection,
-            )
-            from simulator.melt_backend import magemin as magemin_module
-            from simulator.melt_backend.magemin import (
-                MAGEMinDomainIdentity,
-                MAGEMinBackend,
-                _liquidus_inputs_on_feo_total_iron_basis,
-                magemin_domain_identity_from_evaluated_bulk,
-            )
+            from simulator.melt_backend.magemin import MAGEMinDomainIdentity
 
-            _folded_kg, _folded_mol, folded_accounts = (
-                _liquidus_inputs_on_feo_total_iron_basis(
-                    composition_kg=None,
-                    composition_mol=None,
-                    composition_mol_by_account={
-                        'process.cleaned_melt': provider_mol,
-                    },
+            magemin_domain_identity, magemin_domain_reason = (
+                self._freeze_gate_magemin_domain_identity_and_reason(
+                    provider_inputs,
                 )
             )
-            magemin_provider_mol = (
-                folded_accounts.get('process.cleaned_melt')
-                if isinstance(folded_accounts, Mapping)
-                else provider_mol
-            )
-            if not isinstance(magemin_provider_mol, Mapping):
-                magemin_provider_mol = provider_mol
-            # Domain and projection-threshold identity follow the same
-            # FeO_T composition the liquidus finder submits. Keep the cache's
-            # solver-input key above on the original provider account.
-            magemin_projection = project_melt_to_oxide_projection(
-                composition_kg=None,
-                composition_mol=magemin_provider_mol,
-                oxide_basis=MAGEMinBackend._MAGEMIN_INPUT_BASIS,
-                species_formula_registry=formula_registry,
-            )
-            backend = MAGEMinBackend()
-            # The exact source check retains non-DB oxides. Normalize the
-            # FeOt/O engine convention the same way as the live gate before
-            # applying the domain validator, while preserving other submitted
-            # components for this pre-cache check.
-            exact_iron_input = {
-                species: amount
-                for species, amount in magemin_projection.oxide_wt_pct.items()
-                if species in {'FeO', 'Fe2O3', 'FeOt', 'O'}
-            }
-            if any(
-                float(exact_iron_input.get(species, 0.0)) > 0.0
-                for species in ('FeO', 'Fe2O3', 'FeOt')
-            ):
-                exact_engine_bulk = backend._build_db_bulk_projection(
-                    exact_iron_input
-                )
-                exact_gate_bulk = backend._domain_gate_oxide_composition(
-                    exact_engine_bulk.composition_wt_pct,
-                    submitted_oxide_wt_pct=magemin_projection.oxide_wt_pct,
-                )
-            else:
-                exact_gate_bulk = dict(magemin_projection.oxide_wt_pct)
-            exact_valid, _exact_warnings, exact_reason = (
-                magemin_module._validate_magemin_projection_with_reason(
-                    exact_gate_bulk,
-                    dropped_mass_kg_by_species=(
-                        magemin_projection.dropped_mass_kg_by_species
-                    ),
-                )
-            )
-            (
-                _submitted_bulk,
-                projected_verdict,
-                evaluated_domain_projection,
-                projection_reason,
-            ) = backend._submitted_bulk_and_domain_verdict(
-                magemin_projection,
-                species_formula_registry=formula_registry,
-                projected_retry=True,
-            )
-            projected_valid, _projected_warnings, projected_reason = (
-                projected_verdict
-            )
-            magemin_domain_reason = exact_reason or projected_reason
-            magemin_domain_valid = (
-                exact_valid
-                and projected_valid
-            )
-            projection_threshold_verdict = (
-                'refused' if projection_reason is not None else 'clear'
-            )
-            if (
-                magemin_domain_valid
-                and magemin_domain_reason is None
-                and evaluated_domain_projection is not None
-            ):
-                magemin_domain_identity, _evaluated_silica = (
-                    magemin_domain_identity_from_evaluated_bulk(
-                        evaluated_domain_projection.oxide_wt_pct,
-                        projection_threshold_verdict=(
-                            projection_threshold_verdict
-                        ),
-                        refusal_reason=projection_reason,
-                        domain_verdict=(projected_valid, projected_reason),
-                    )
-                )
-            else:
-                magemin_domain_identity, _evaluated_silica = (
-                    magemin_domain_identity_from_evaluated_bulk(
-                        None,
-                        projection_threshold_verdict=(
-                            projection_threshold_verdict
-                        ),
-                        refusal_reason=(
-                            projection_reason or magemin_domain_reason
-                        ),
-                    )
-                )
-            if magemin_domain_valid:
-                magemin_domain_reason = None
-            if not isinstance(magemin_domain_identity, MAGEMinDomainIdentity):
-                magemin_domain_identity, _evaluated_silica = (
-                    magemin_domain_identity_from_evaluated_bulk(None)
-                )
         key_values = {
             'pressure_bar': round(pressure_bucket, 6),
             'fO2_log': round(fO2_bucket, 6),

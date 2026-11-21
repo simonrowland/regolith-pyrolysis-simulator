@@ -5336,17 +5336,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return None, True
         from simulator.melt_backend.magemin import MAGEMinDomainIdentity
 
-        _cache_key, domain_reason = self._freeze_gate_cache_key_and_domain(
-            pressure_bar=float(self.melt.p_total_mbar) / MBAR_PER_BAR,
-            fO2_log=self._freeze_gate_redox_key_fO2_log(
-                fO2_log=float(self._current_melt_redox_fO2_log()),
-            ),
-        )
-        identity = getattr(
-            self,
-            '_freeze_gate_current_magemin_domain_identity',
-            None,
-        )
+        try:
+            provider_inputs = self._silicate_provider_melt_inputs(
+                ChemistryIntent.GATE_LIQUID_FRACTION,
+            )
+            if provider_inputs is None:
+                return None, False
+            identity, domain_reason = (
+                self._freeze_gate_magemin_domain_identity_and_reason(
+                    provider_inputs,
+                )
+            )
+        except Exception:
+            return None, False
         if not isinstance(identity, MAGEMinDomainIdentity):
             return None, False
         return (
@@ -5995,10 +5997,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             raise ValueError("temperature_K must be finite and positive")
         T_C = T_K - CELSIUS_TO_KELVIN_OFFSET
         from simulator.melt_backend.magemin import (
-            CLEANED_MELT_ACCOUNT,
-            DEFAULT_MAGEMIN_DATABASE,
             MAGEMinDomainIdentity,
-            evaluated_magemin_domain_identity,
         )
 
         magemin_provider = (
@@ -6021,18 +6020,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     raise RuntimeError(
                         'current MAGEMin liquid bulk is unavailable'
                     )
-                domain_identity, _silica_diagnostic = (
-                    evaluated_magemin_domain_identity(
-                        {
-                            CLEANED_MELT_ACCOUNT: (
-                                provider_inputs.composition_mol
-                            ),
-                        },
-                        DEFAULT_MAGEMIN_DATABASE,
-                        species_formula_registry=getattr(
-                            self, 'species_formula_registry', None,
-                        ),
-                        composition_mol_by_account=True,
+                domain_identity, _domain_reason = (
+                    self._freeze_gate_magemin_domain_identity_and_reason(
+                        provider_inputs,
                     )
                 )
                 submitted_bulk_passes = (
