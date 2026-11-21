@@ -312,8 +312,18 @@ def test_pt0_supplied_finite_fo2_quantization_is_golden_neutral() -> None:
 
 def test_control_quantization_default_production_key_is_byte_identical() -> None:
     key = _freeze_gate_key()
-    key_hash = _key_hash(key)
+    codec_version = key['gate_curve_codec_version']
+    assert codec_version == 2
+    request_key = {
+        name: value for name, value in key.items()
+        if name != 'gate_curve_codec_version'
+    }
+    key_hash = _key_hash(request_key)
     fine_key = _freeze_gate_key(control_quantization=ControlQuantization.PRODUCTION)
+    fine_request_key = {
+        name: value for name, value in fine_key.items()
+        if name != 'gate_curve_codec_version'
+    }
 
     # 2026-07-04: rebaselined for #89 — the reduced-real production key now hashes
     # the FUNCTIONAL parsed content of setpoints/vapor_pressures (canonical JSON),
@@ -366,9 +376,11 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # 2026-10-31 b-929: Studio-2 canonical bytes after gate replay identity
     # began embedding the owner freeze-gate key. The key now binds the submitted
     # post-inert composition and inert membership, plus water/formula identity.
+    # The PT-0 gate-curve codec version is pinned separately so its authorized
+    # payload migration does not re-pin this production request identity.
     assert key_hash == "4cee08747e68f2c46df68ef2fbbe4b5141cd1395c9345d8315daa83305d5a2df"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
-    assert _key_hash(fine_key) == key_hash
+    assert _key_hash(fine_request_key) == key_hash
 
 
 def test_control_quantization_tiers_produce_distinct_key_hashes() -> None:
@@ -1587,7 +1599,12 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
         fO2_log=sim._compute_intrinsic_melt_fO2(),
         fe_redox_policy="intrinsic",
     )
-    magemin_bytes = canonical_json_bytes(magemin_key)
+    assert magemin_key['gate_curve_codec_version'] == 2
+    magemin_request_key = {
+        name: value for name, value in magemin_key.items()
+        if name != 'gate_curve_codec_version'
+    }
+    magemin_bytes = canonical_json_bytes(magemin_request_key)
     assert len(magemin_bytes) == 1319
     assert hashlib.sha256(magemin_bytes).hexdigest() == (
         "00f40658d0a344757029e661d4574a75c72b13521066689f205e6194a5dcea0a"
@@ -4237,6 +4254,7 @@ def test_pt1_domain_gate_prediction_replays_with_qualification(
         diagnostic={'backend_status_reason': 'silicate_window'},
     ))
     curve = sim._melt_redox_liquidus_gate_curve()
+    assert curve['is_liquidus_floor'] is True
     notice = curve['gate_provider_refusal']
     assert notice['reason'] == 'silicate_window'
     assert notice['authority'] == 'extrapolated'
@@ -4250,10 +4268,55 @@ def test_pt1_domain_gate_prediction_replays_with_qualification(
     )
 
     replay_sim = _build_pt0_sim(PT0DeterminismStore('replay', db_path=db_path))
-    assert replay_sim._melt_redox_liquidus_gate_curve() == curve
+    replayed_curve = replay_sim._establish_melt_redox_gate_authority_for_current_hour()
+    assert replayed_curve == curve
+    assert replayed_curve['is_liquidus_floor'] is True
     assert replay_sim._make_snapshot().liquid_fraction_gate['redox'][
         'gate_provider_refusal'
     ] == notice
+    activity = replay_sim._native_fe_saturation_state(
+        replay_sim.melt.composition_wt_pct(),
+        fe3_over_sigma_fe=0.1,
+        T_K=1800.0 + 273.15,
+        pressure_bar=float(replay_sim.melt.p_total_mbar) / 1000.0,
+        fO2_log=float(replay_sim._current_melt_redox_fO2_log()),
+    )
+    assert any(
+        item.get('kind') == 'liquidus_unknown'
+        for item in activity.get('notices', ())
+    )
+
+
+def test_pt0_gate_curve_codec_version_misses_markerless_rows(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / 'markerless-gate-curve.db'
+    store = PT0DeterminismStore('capture', db_path=db_path)
+    key = _freeze_gate_key()
+    assert key['gate_curve_codec_version'] == 2
+    assert rrd._curve_payload({
+        'source': 'gate_liquid_fraction',
+        'solidus_T_C': 950.0,
+        'liquidus_T_C': 1630.0,
+        'path': (),
+    })['is_liquidus_floor'] is False
+    store._store(
+        'freeze_gate_curve',
+        key,
+        {
+            'curve': {
+                'source': 'gate_liquid_fraction:fallback:magemin-shadow',
+                'solidus_T_C': 1200.0,
+                'liquidus_T_C': 1200.000001,
+                'path': [],
+            },
+        },
+        law_disclosures=[],
+    )
+
+    replay = PT0DeterminismStore('replay', db_path=db_path)
+    with pytest.raises(PT0CacheMiss, match='cached replay miss'):
+        replay._lookup_first_available('freeze_gate_curve', (key,))
 
 
 def test_pt1_capture_equilibrium_rejects_internal_analytical_provider(

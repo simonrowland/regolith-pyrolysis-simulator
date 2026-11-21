@@ -113,6 +113,7 @@ GATE_CURVE_NOTICE_KEYS = (
     'gate_provider_step_down', 'alphamelts_reference_pressure',
 )
 GATE_CURVE_DOMAIN_KEYS = ('authority', 'certified_band')
+PT0_GATE_CURVE_CODEC_VERSION = 2
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
@@ -1268,6 +1269,13 @@ class PT0DeterminismStore:
                 entry.get("key", {}),
             ):
                 continue
+            if artifact == "freeze_gate_curve":
+                curve_payload = (entry.get("payload") or {}).get("curve")
+                if (
+                    not isinstance(curve_payload, Mapping)
+                    or type(curve_payload.get("is_liquidus_floor")) is not bool
+                ):
+                    continue
             if require_gate_curve_domain_diagnostic:
                 identity = _magemin_identity_from_replay_key(key)
                 curve_payload = (entry.get("payload") or {}).get("curve")
@@ -3581,6 +3589,8 @@ def canonical_replay_key(
             total_amount_kg,
             quantization.composition_sig_figs,
         )
+    if artifact == "freeze_gate_curve":
+        key["gate_curve_codec_version"] = PT0_GATE_CURVE_CODEC_VERSION
     return key
 
 
@@ -4339,10 +4349,16 @@ def _emit_repair_notices(
 
 
 def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
+    is_liquidus_floor = curve.get("is_liquidus_floor", False)
+    if type(is_liquidus_floor) is not bool:
+        raise PT0CacheCollision(
+            "PT-0 gate-curve floor marker must be bool"
+        )
     payload = {
         "source": str(curve.get("source", "")),
         "solidus_T_C": _json_ready(curve.get("solidus_T_C")),
         "liquidus_T_C": _json_ready(curve.get("liquidus_T_C")),
+        "is_liquidus_floor": is_liquidus_floor,
         "path": [
             {
                 "temperature_C": _json_ready(point[0]),
@@ -4363,6 +4379,11 @@ def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
+    is_liquidus_floor = payload.get("is_liquidus_floor")
+    if type(is_liquidus_floor) is not bool:
+        raise PT0CacheMiss(
+            "PT-0 cached replay miss: gate-curve floor marker is missing or invalid"
+        )
     curve = {
         "source": str(payload["source"]),
         "solidus_T_C": float(payload["solidus_T_C"]),
@@ -4372,6 +4393,8 @@ def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
             for point in payload.get("path", ())
         ),
     }
+    if is_liquidus_floor:
+        curve["is_liquidus_floor"] = True
     for notice_key in GATE_CURVE_NOTICE_KEYS:
         notice = payload.get(notice_key)
         if isinstance(notice, Mapping):
