@@ -28565,10 +28565,22 @@ class Migrator:
                 if raw_starting_ppm is None or raw_starting_ppm == ""
                 else _parse_declared_decimal(raw_starting_ppm)
             )
-            raw_uncertainty = obs.get("uncertainty")
+            raw_fidelity_samples = context.get("fidelity_samples")
+            starting_samples = (
+                [
+                    sample
+                    for sample in raw_fidelity_samples
+                    if isinstance(sample, Mapping)
+                    and sample.get("species") == formula
+                    and sample.get("observation_id") == raw_obs_id
+                    and sample.get("field") == "starting_measured_ppm"
+                ]
+                if isinstance(raw_fidelity_samples, list)
+                else []
+            )
             starting_locator = (
-                _locator_from_plain(raw_uncertainty.get("locator"))
-                if isinstance(raw_uncertainty, Mapping)
+                _locator_from_plain(starting_samples[0].get("locator"))
+                if len(starting_samples) == 1
                 else None
             )
             if starting_ppm is not None and starting_locator is not None:

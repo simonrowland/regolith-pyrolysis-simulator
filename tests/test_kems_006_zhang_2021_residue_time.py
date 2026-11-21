@@ -73,7 +73,7 @@ def _assert_table1_pins(document: dict) -> None:
         values = row["values"]
         assert values["quantity"] == "residue_component_composition"
         assert values["admission_status"] == "admitted"
-        assert values["composition_role"] == "initial_charge_only"
+        assert values.get("composition_role") == "initial_charge_only"
         assert row["locator"]["page"] == 71 and row["locator"]["table"] == "1"
         assert sample in row["locator"]["note"]
         assert 'relative to zero-time runs' in row["locator"]["note"]
@@ -218,7 +218,7 @@ def test_isolated_migration_emits_every_oxide_with_located_time_and_radius(tmp_p
         )
         assert pressure.state.is_value
         assert pressure.state.value.kind.value == "bound"
-        assert pressure.state.value.bound_operator.value == "<"
+        assert pressure.state.value.bound_operator == "<"
         assert pressure.state.value.bound_value == Decimal("0.0001")
         identity_pressure = observation.identity.total_pressure_Pa
         assert identity_pressure.is_unknown

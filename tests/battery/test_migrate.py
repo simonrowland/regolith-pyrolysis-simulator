@@ -19910,7 +19910,8 @@ def test_residue_series_oxide_columns_are_migrated_or_documented() -> None:
         QUANTITY_SOURCE_FIELDS[Quantity.RESIDUE_COMPONENT_COMPOSITION]
     )
     non_component_reasons = {
-        "VF_wt_pct": "vaporized mass fraction, not a residue oxide component"
+        "VF_wt_pct": "vaporized mass fraction, not a residue oxide component",
+        "initial_glass_Na2O_wt_pct": "starting-glass Na2O, not a residue oxide component",
     }
     suffixes = ("_wt_pct", "_mol_pct", "_mole_pct", "_mol_percent")
 
@@ -21054,6 +21055,9 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         ):
             assert key in conditions
             assert conditions[key].locator is not None
+        starting_component = conditions["starting_component_ppm"]
+        assert starting_component.locator.page == 53
+        assert starting_component.locator.table == "1"
         atmosphere = conditions["atmosphere"]
         assert atmosphere.state.is_unknown
         assert "CO" in atmosphere.locator.note and "CO2" in atmosphere.locator.note
