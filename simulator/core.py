@@ -6280,9 +6280,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pO2_mbar = self._finite_float_or_none(getattr(self.melt, 'pO2_mbar', None))
         if pO2_mbar is None or pO2_mbar <= 0.0:
             return None, 'no_positive_controlled_pO2'
-        pO2_bar = pO2_mbar / 1000.0
-        if pO2_bar > 0.0:
-            return math.log10(pO2_bar), 'controlled_o2_pO2_mbar'
         return math.log10(pO2_mbar) - 3.0, 'controlled_o2_pO2_mbar'
 
     def _reset_o2_bubbler_telemetry_for_hour(self) -> None:
