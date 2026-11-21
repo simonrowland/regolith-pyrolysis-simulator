@@ -124,3 +124,16 @@ def test_configured_condenser_catalog_populates_plant_design():
             throat_area_m2 * 5.0,
         ]
     )
+
+
+def test_size_solar_concentrator_eq2_pin_at_one_tonne_1700C():
+    """EQ-2 thermal power at 1000 kg and 1700 C.
+
+    Independent watt sum at the public constants: sigma 5.670374e-8,
+    emissivity 0.85, cp 1200 J/kg/K, dT/dt 50 C/h, radiative area 0.2 m2.
+    Heating is 16666.666... W and radiation is 146117.0963211643 W.
+    """
+
+    spec = EquipmentDesigner().size_solar_concentrator(1000.0, 1700.0)
+
+    assert spec.thermal_power_kW == pytest.approx(162.78376298783095, rel=1e-12)
