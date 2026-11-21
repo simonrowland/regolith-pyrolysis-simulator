@@ -12,8 +12,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator import runner as runner_module
+from simulator import core as core_module
 from simulator import lab_geometry as lab_geometry_module
+from simulator import runner as runner_module
 from simulator.core import PyrolysisSimulator
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     COMPARISON_SCHEMA_VERSION,
@@ -297,13 +298,17 @@ def _vacuum_preset(name: str) -> dict:
 
 def _gram_lab_run(preset: dict, *, campaign: str) -> PyrolysisRun:
     sample = preset["lab_geometry"]["sample"]
+    sample_mass_g = sample.get("mass_g")
+    run_kwargs = {}
+    if sample_mass_g not in (None, ""):
+        run_kwargs["mass_kg"] = float(sample_mass_g) / 1000.0
     return PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign=campaign,
         hours=0,
-        mass_kg=float(sample["mass_g"]) / 1000.0,
         setpoints_patch={"lab_geometry": preset["lab_geometry"]},
         lab_schedule=preset["lab_schedule"],
+        **run_kwargs,
     )
 
 
@@ -340,21 +345,30 @@ def test_null_exposed_melt_area_defaults_to_sized_crucible_face() -> None:
     assert printed_melt_m2 != pytest.approx(sized_face_m2)
 
     pomeroy = _vacuum_preset("pomeroy_cardiff_2006.yaml")
-    assert pomeroy["lab_geometry"]["sample"]["exposed_melt_area_m2"] == (
-        pytest.approx(0.000314)
-    )
+    assert pomeroy["lab_geometry"]["sample"]["mass_g"] is None
+    assert pomeroy["lab_geometry"]["sample"]["exposed_melt_area_m2"] is None
     pomeroy_run = _gram_lab_run(pomeroy, campaign="C2A")
     pomeroy_session = pomeroy_run._start_session()
-    pomeroy_run._apply_lab_area_bridge(
-        pomeroy_session.simulator,
-        pomeroy_run._lab_area_bridge(),
-    )
     pomeroy_session.simulator._get_turbine_spec()
     pomeroy_melt_m2 = pomeroy_session.simulator.melt.melt_surface_area_m2
-    assert pomeroy_melt_m2 == pytest.approx(0.000314)
-    assert pomeroy_melt_m2 != pytest.approx(
+    pomeroy_sized_face_m2 = (
         pomeroy_session.simulator._equipment.crucible.melt_surface_area_m2
     )
+    assert pomeroy_melt_m2 == pytest.approx(pomeroy_sized_face_m2)
+    pomeroy_area_bridge = pomeroy_run._lab_area_bridge(
+        crucible_face_area_m2=pomeroy_sized_face_m2
+    )
+    pomeroy_area_notice = pomeroy_area_bridge["notices"][0]
+    assert pomeroy_area_bridge["effective_exposed_area_m2"] == pytest.approx(
+        pomeroy_sized_face_m2
+    )
+    assert pomeroy_area_notice["path"] == (
+        "lab_geometry.sample.exposed_melt_area_m2"
+    )
+    assert pomeroy_area_notice["value"] == pytest.approx(
+        pomeroy_sized_face_m2
+    )
+    assert pomeroy_area_notice["out_of_domain"] is True
 
 
 def test_c0_start_installs_printed_area_before_the_bridge(
@@ -437,12 +451,19 @@ def test_bridge_and_equipment_share_the_exposed_area_reader(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     robinot = _vacuum_preset("robinot_2026.yaml")
+
+    def resolver(_geometry, **_kwargs):
+        return lab_geometry_module.GramLabMeltAreaResolution(0.000201)
+
     monkeypatch.setattr(
         lab_geometry_module,
         "resolve_gram_lab_exposed_melt_area",
-        lambda _geometry, **_kwargs: lab_geometry_module.GramLabMeltAreaResolution(
-            0.000201
-        ),
+        resolver,
+    )
+    monkeypatch.setattr(
+        core_module,
+        "resolve_gram_lab_exposed_melt_area",
+        resolver,
     )
     bridge = lab_geometry_module.gram_lab_exposed_melt_area_bridge(
         robinot["lab_geometry"]
