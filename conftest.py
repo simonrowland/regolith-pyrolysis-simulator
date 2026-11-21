@@ -317,7 +317,37 @@ def runner_golden_loader(tmp_path_factory):
     return load
 
 
+# Golden producers share one dedicated group, serial among themselves and
+# parallel with magemin_fullrun_a..d. They used to join chain a. That chain
+# is already the long one, and the 15s warm-call timeout is not raised.
+# Tests that already have a group (serial, an existing magemin chain, the
+# lunar pin and lunar C0 consumers) stay on it. A held curve still fails
+# as an environment error before the digest compare.
+_GOLDEN_MAGEMIN_GROUP_FILES = frozenset({
+    "test_coating_rate.py",
+    "test_condensation_green_pins.py",
+    "test_condensation_vapour_fog_ledger.py",
+    "test_golden_sections.py",
+    "test_recipe_io.py",
+    "test_run_executor.py",
+    "test_runner_smoke.py",
+    "test_sio_yield_regression.py",
+    "test_web_socket_trace.py",
+})
+
+
+def _group_golden_magemin_producers(items: list[pytest.Item]) -> None:
+    for item in items:
+        filename = _Path(item.nodeid.split("::", 1)[0]).name
+        if filename not in _GOLDEN_MAGEMIN_GROUP_FILES:
+            continue
+        if any(mark.name == "xdist_group" for mark in item.iter_markers()):
+            continue
+        item.add_marker(pytest.mark.xdist_group("magemin_golden"))
+
+
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    _group_golden_magemin_producers(items)
     for item in items:
         get_closest_marker = getattr(item, "get_closest_marker", None)
         if not callable(get_closest_marker):

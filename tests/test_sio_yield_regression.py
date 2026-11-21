@@ -541,8 +541,14 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     )
 
     assert completed.returncode == 0, completed.stderr
-    actual = json.loads(output_path.read_text())
-    expected = json.loads((FIXTURE_DIR / golden_name).read_text())
+    from tests.chemistry.test_condensation_green_pins import (
+        deterministic_gate_payload,
+    )
+
+    actual = deterministic_gate_payload(json.loads(output_path.read_text()))
+    expected = deterministic_gate_payload(
+        json.loads((FIXTURE_DIR / golden_name).read_text())
+    )
 
     _assert_golden_close(actual, expected)
     assert actual["sio_to_silica_fume_kg"] == expected["sio_to_silica_fume_kg"]
