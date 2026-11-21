@@ -196,22 +196,43 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
         transition.reason == "evaporate_CrO2"
         for transition in sim.atom_ledger.transitions
     )
-    # The declared stable CrO2 -> Cr2O3 + O2 route materializes the oxide in
-    # the train, and the terminal cartridge mirrors all stage deposits without
-    # duplicating atoms.
+    # The declared stable CrO2 -> Cr2O3 + O2 route materializes the oxide.
+    # The terminal chromia account mirrors stage deposits and does not
+    # duplicate them onto the condensation train. At the d-283 Stage-1 area
+    # (38.83 m2, against the old ~0.24 m2 fixture) the Fe condenser is
+    # upstream of the designated Stage-2 harvester and takes the Cr2O3.
+    # Stage 2 keeps only the depleted trace. This trace does not book
+    # Cr2O3 onto the Mn cartridge. The Fe ingot therefore carries the Cr,
+    # and the Cr harvester sits idle.
+    def _stage_collected(stage_number: int) -> dict:
+        matches = [
+            stage.collected_kg
+            for stage in sim.train.stages
+            if int(stage.stage_number) == stage_number
+            and int(getattr(stage, "sub_order", 0) or 0) == 0
+        ]
+        assert len(matches) == 1
+        return matches[0]
+
+    fe_condenser = _stage_collected(1)
+    cr_harvester = _stage_collected(2)
+    stage1_cr2o3 = float(fe_condenser.get("Cr2O3", 0.0))
+    stage2_cr2o3 = float(cr_harvester.get("Cr2O3", 0.0))
     assert terminal_chromia.get("Cr2O3", 0.0) > 0.0
     assert "Cr2O3" not in train
-    # Stage 2 remains the designated Cr harvester. During the inclusive hour
-    # 12 Mn-cartridge window, later Stage-3 chromia is deliberately credited
-    # to the removable cartridge, so the aggregate need not sit on Stage 2.
-    assert stages[2].get("Cr2O3", 0.0) > 0.0
-    assert mn_cartridge.get("Cr2O3", 0.0) > 0.0
     assert "O2" not in mn_cartridge
-    assert sum(float(stage.get("Cr2O3", 0.0)) for stage in stages) == pytest.approx(
-        terminal_chromia["Cr2O3"] + mn_cartridge["Cr2O3"]
+    assert mn_cartridge.get("Cr2O3", 0.0) == 0.0
+    # Probe at 15696ca7b3. The two stage deposits are the terminal mirror.
+    assert stage1_cr2o3 == pytest.approx(4.838935502308641e-06)
+    assert stage2_cr2o3 == pytest.approx(3.4011963134814275e-10)
+    assert stage1_cr2o3 + stage2_cr2o3 == pytest.approx(
+        terminal_chromia["Cr2O3"]
     )
-    # CrO2 reacts into chromia, but elemental Cr is below wall saturation.
-    assert stages[2].get("Cr", 0.0) == 0.0
+    assert sum(float(stage.get("Cr2O3", 0.0)) for stage in stages) == pytest.approx(
+        terminal_chromia["Cr2O3"]
+    )
+    # CrO2 reacts into chromia. Elemental Cr is not a stage deposit here.
+    assert cr_harvester.get("Cr", 0.0) == 0.0
     cr_outcomes = sim.condensation_model.last_condensation_refusals_by_species["Cr"]["stage_outcomes"]
     assert any(item["stage_number"] == 2 and item["reason"] == "no_supersaturation"
                and item["eta"] == 0.0 for item in cr_outcomes)

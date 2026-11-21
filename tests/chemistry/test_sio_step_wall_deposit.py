@@ -237,10 +237,12 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
         # dimensionless and an absent parcel contributes zero to the sum.
         # Reverting only _route to its pre-21f065338 version recovers the old
         # 8.428322859789999e-06 kg pin; preserving flow gives the measured value below.
-        # The d-452 absolute Stage-3 area captures some SiO before it reaches
-        # this cold wall. Keep the physical deposition threshold contract and
-        # leave the floating output magnitude to the production probe.
-        assert _sio_wall_product_deposit_kg(1050.0) > 0.0
+        # Stage-3 capture upstream depletes the wall partial pressure, so the
+        # 1050 C cold-liner deposit is the probe value at 15696ca7b3. The
+        # 1400 C and 1500 C walls stay at the saturation floor.
+        assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
+            8.82760284106e-07
+        )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9
         )

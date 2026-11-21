@@ -957,20 +957,22 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account():
         cro2_kg = sim.atom_ledger.kg_by_account(account).get("CrO2", 0.0)
         if cro2_kg > 0.0:
             wall_cro2_by_account_kg[account] = cro2_kg
-    # CrO2 reaches the two physical walls upstream of its designated Stage-2
-    # harvester. The resized train changes the per-wall amount, while the
-    # causal segment ownership remains the same.
-    assert set(wall_cro2_by_account_kg) == {
-        "process.wall_deposit_segment_stage_0_to_stage_1",
-        "process.wall_deposit_segment_stage_1_to_stage_2",
-    }
-    assert all(value > 0.0 for value in wall_cro2_by_account_kg.values())
+    # Each stage's incoming duct deposits before the collector. The inlet
+    # duct stage_0_to_stage_1 sees undepleted CrO2 and takes the whole wall
+    # budget. The Stage-1 collector then captures the rest (~0.9967 of the
+    # 1 kg/hr parcel at the 15696ca7b3 probe), so stage_1_to_stage_2 still
+    # exists and is depleted to ~0. The segment was not removed.
+    authority = sim.condensation_model.last_condensation_authority_by_species["CrO2"]
+    inlet_segment = "process.wall_deposit_segment_stage_0_to_stage_1"
+    assert set(wall_cro2_by_account_kg) == {inlet_segment}
+    assert wall_cro2_by_account_kg[inlet_segment] == pytest.approx(
+        authority["wall_deposit_mass_kg_hr"]
+    )
     remaining_cro2_kg = flux.species_kg_hr["CrO2"] - sum(
         wall_cro2_by_account_kg.values()
     )
     # Only stage-captured CrO2 converts; the production authority supplies the
     # residual that remains in offgas after the live wall route.
-    authority = sim.condensation_model.last_condensation_authority_by_species["CrO2"]
     remaining_cro2_kg -= authority["remaining_mass_kg_hr"]
     expected_cr2o3_kg = (
         remaining_cro2_kg * 0.5 * MOLAR_MASS["Cr2O3"] / MOLAR_MASS["CrO2"]

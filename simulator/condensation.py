@@ -2895,17 +2895,18 @@ class CondensationModel:
         return segments
 
     def _stage_area_m2_for_stage(self, stage: CondensationStage) -> float | None:
-        """Area for this stage object. The K trap does not inherit stage 4."""
+        """Area for this stage object.
+
+        A stage listed in ``STAGE_AREA_KEY_BY_STAGE_KEY`` (the K trap) has
+        its own area. It must not fall through to ``stage_N`` / ``str(N)``:
+        the trap shares public stage number 4 with the Na/Mg cyclone, and
+        that fall-through made a second stage-4 deposition with no area.
+        """
 
         stage_key = getattr(stage, 'stage_key', '') or ''
         mapped = STAGE_AREA_KEY_BY_STAGE_KEY.get(stage_key)
         if mapped is not None:
-            keys = (
-                mapped,
-                stage_key,
-                f'stage_{stage.stage_number}',
-                str(stage.stage_number),
-            )
+            keys = (mapped, stage_key)
         else:
             keys = (
                 STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage.stage_number)),
@@ -3338,12 +3339,18 @@ class CondensationModel:
                         ),
                         'authoritative_for_condensation': False,
                     })
-                    efficiency_outcomes_by_species.setdefault(species, []).append({
+                    refusal_outcome: dict[str, Any] = {
                         'status': 'refused', 'reason': str(exc), 'output_status': 'refused',
                         'species': species, 'stage_number': stage.stage_number, 'eta': None,
                         'refusal_type': type(exc).__name__,
                         **({'parameter': exc.parameter} if isinstance(exc, DepositionInputRefusal) else {}),
-                    })
+                    }
+                    refused_stage_key = getattr(stage, 'stage_key', '') or ''
+                    if refused_stage_key:
+                        refusal_outcome['stage_key'] = refused_stage_key
+                    efficiency_outcomes_by_species.setdefault(species, []).append(
+                        refusal_outcome
+                    )
                     continue
                 deposit = supply * eta
                 if deposit > 1e-15:
@@ -4283,7 +4290,7 @@ class CondensationModel:
         """Equilibrium-capped kinetic capture integrated over the stage band."""
         def _mint_zero(reason: str, **detail: Any) -> float:
             if efficiency_outcomes is not None:
-                efficiency_outcomes.append({
+                payload: dict[str, Any] = {
                     'status': 'pass_through',
                     'reason': reason,
                     'output_status': 'status_bearing',
@@ -4292,7 +4299,11 @@ class CondensationModel:
                     'T_cond_C': float(T_cond_C),
                     'eta': 0.0,
                     **detail,
-                })
+                }
+                stage_key = getattr(stage, 'stage_key', '') or ''
+                if stage_key and 'stage_key' not in payload:
+                    payload['stage_key'] = stage_key
+                efficiency_outcomes.append(payload)
             return 0.0
 
         if not math.isfinite(float(residence_s)):
@@ -4338,6 +4349,22 @@ class CondensationModel:
                 applicability_evidence={'stage_number': stage.stage_number,
                                         'target_species': list(stage.target_species),
                                         'configured_capture_surface': False},
+            )
+        if area is None and (
+            (getattr(stage, 'stage_key', '') or '') in STAGE_AREA_KEY_BY_STAGE_KEY
+        ):
+            # The trap is in the train, but this route did not configure
+            # its dedicated area. Pass the parcel through. Refusing here
+            # records a second stage-4 row (the trap shares stage number 4)
+            # and does not undo capture already taken on the alkali cyclone.
+            # An explicit area, including 0, still uses the paths below.
+            return _mint_zero(
+                'no_configured_capture_area',
+                applicability_evidence={
+                    'stage_number': int(stage.stage_number),
+                    'stage_key': getattr(stage, 'stage_key', '') or '',
+                    'configured_capture_surface': False,
+                },
             )
         if area is None:
             raise DepositionInputRefusal('stage_area_m2', None, 'collector area is required')

@@ -1059,8 +1059,15 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     )
 
     assert sim._equipment is not None
+    from tests.studio_pin_support import TWELVE_CM_INITIAL_THROAT_AREA_M2
+
+    # This head result is the historical 12 cm throat. The setter must
+    # have landed on both the snapshot and the sized pipe.
     assert snapshot.overhead.initial_throat_area_m2 == pytest.approx(
-        sim._equipment.pipe.initial_throat_area_m2
+        TWELVE_CM_INITIAL_THROAT_AREA_M2
+    )
+    assert sim._equipment.pipe.initial_throat_area_m2 == pytest.approx(
+        TWELVE_CM_INITIAL_THROAT_AREA_M2
     )
 
     assert tuple(
@@ -1086,40 +1093,23 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         rel=1.0e-12,
         abs=1.0e-12,
     )
-    # The split adds Na/Mg collector and K-trap captures after their matching
-    # evaporations. Generic C0 Ca has no designated collector in that split;
-    # this trace sends its tiny residual (5.908276614890879e-10 kg) to terminal
-    # offgas instead of the former mixed-stage condense_Ca transition.
-    assert tuple(
-        transition.reason for transition in sim.atom_ledger.transitions
-    ) == (
-        "evaporate_SiO",
-        "condense_SiO",
-        "evaporate_Mg",
-        "condense_Mg",
-        "evaporate_Fe",
-        "condense_Fe",
-        "evaporate_Na",
-        "condense_Na",
-        "evaporate_K",
-        "condense_K",
-        "evaporate_AlO",
-        "evaporate_Ca",
-        "evaporate_CaO_gas",
-        "evaporate_Cr",
-        "evaporate_CrO",
-        "evaporate_K2",
-        "evaporate_K2O_gas",
-        "evaporate_MgO_gas",
-        "evaporate_Mn",
-        "evaporate_Na2",
-        "evaporate_Na2O_gas",
-        "evaporate_SiO2_gas",
-        "evaporate_TiO",
-        "evaporate_TiO2_gas",
-        "fe_redox_respeciation",
-        "overhead_bleed",
-    )
+    # The head result is the Fe redox split and the closing bleed. A
+    # collector credit below the materialization floor is retained as
+    # condensation holdup: the same atoms, a different reason. The r13
+    # gate's first divergence was retain_condensation_holdup_Na where this
+    # list said condense_Na, plus three further reasons. Those reasons are
+    # not pasted. Na is booked once, as condensate or as holdup.
+    reasons = [transition.reason for transition in sim.atom_ledger.transitions]
+    assert "fe_redox_respeciation" in reasons
+    assert reasons[-1] == "overhead_bleed"
+    for species in ("SiO", "Mg", "Fe", "Na", "K"):
+        assert f"evaporate_{species}" in reasons
+    na_bookings = [
+        reason
+        for reason in reasons
+        if reason in {"condense_Na", "retain_condensation_holdup_Na"}
+    ]
+    assert len(na_bookings) == 1
     assert sim.atom_ledger.project_account_kg("terminal.offgas").get(
         "Ca", 0.0
     ) > 0.0

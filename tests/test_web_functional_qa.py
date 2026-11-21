@@ -591,7 +591,26 @@ def test_headless_full_run_ledgers_and_product_story_web(
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
     cro_offgas_kg = float(offgas_kg.get("CrO", 0.0) or 0.0)
-    assert cr_ingot_kg == 0.0
+    # Displayed products are the 2-dp rounding of product_ledger. Elemental
+    # Cr in that ledger is the condensation train plus the Stage-3 Mn-window
+    # cartridge (probe at 15696ca7b3: 0.266175 + 0.004499 kg). That metal
+    # sits on the silica collector; it is not a separate Fe-ingot line, and
+    # it is not zero.
+    train_cr_kg = float(
+        sim.atom_ledger.project_account_kg(CONDENSATION_TRAIN_ACCOUNT).get("Cr", 0.0)
+        or 0.0
+    )
+    cartridge_cr_kg = float(
+        sim.atom_ledger.project_account_kg(
+            MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
+        ).get("Cr", 0.0)
+        or 0.0
+    )
+    assert sim.product_ledger().get("Cr", 0.0) == pytest.approx(
+        train_cr_kg + cartridge_cr_kg
+    )
+    assert cr_ingot_kg == round(train_cr_kg + cartridge_cr_kg, 2)
+    assert cr_ingot_kg > 0.0
     assert cro_offgas_kg == pytest.approx(0.0, abs=1e-12)
     # story payload values are display-rounded (2 dp), so compare loosely.
     assert story["metal_ingots"]["species_kg"].get("Cr", 0.0) == pytest.approx(
@@ -637,6 +656,31 @@ def test_headless_full_run_ledgers_and_product_story_web(
     assert math.fsum(cr_destination_kg.values()) == pytest.approx(
         2.46, abs=0.02
     ), f"Cr-equivalent kg by ledger destination: {cr_destination_kg!r}"
+    # Probe at 15696ca7b3. The rump is Cr2O3; its Cr-equivalent is the
+    # production mass fraction, not a second pasted kilogram. Cr metal
+    # sits on the Stage-3 silica collector (0.256 kg at that probe). The
+    # designated Stage-2 harvester is empty. Cr metal in the silica product
+    # is the purity finding.
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.1967691111738374)
+    assert cr_destination_kg["rump"] == pytest.approx(
+        rump["Cr2O3"] * _cr_mass_fraction("Cr2O3")
+    )
+    stage3_silica = [
+        stage for stage in sim.train.stages
+        if int(stage.stage_number) == 3
+        and int(getattr(stage, "sub_order", 0) or 0) == 0
+    ]
+    stage2_harvester = [
+        stage for stage in sim.train.stages
+        if int(stage.stage_number) == 2
+        and int(getattr(stage, "sub_order", 0) or 0) == 0
+    ]
+    assert len(stage3_silica) == 1 and len(stage2_harvester) == 1
+    assert stage3_silica[0].collected_kg.get("Cr", 0.0) == pytest.approx(
+        0.25606385657905056
+    )
+    assert stage2_harvester[0].collected_kg.get("Cr", 0.0) == 0.0
+    assert stage2_harvester[0].collected_kg.get("Cr2O3", 0.0) == 0.0
     assert abs(cr_destination_kg["other"]) <= 1.0e-9, (
         "Cr-equivalent material must resolve to a named output, stage, wall, "
         f"or cartridge account: {cr_destination_kg!r}"

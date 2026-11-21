@@ -778,13 +778,58 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     )
 
     _assert_synthetic_sio_route_authority(route)
-    assert route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"] > 0.0
-    assert 0.0 < route.condensed_by_stage_species[
-        "stage_4_alkali_mg_cyclone"]["SiO"] < 0.95
-    # Attribute every part of the synthetic parcel to the production
-    # resolver's distinct destinations. In particular, source-retained mass
-    # is not part of the route's stage/wall/remaining projections.
+    # The 1 kg/hr parcel is sequential capture. Stage 3 takes eta3 of the
+    # inlet. Stage 4, the alkali/Mg cyclone at 523.15 K, takes eta4 of what
+    # Stage 3 leaves. At ae5998456 the cyclone already had its 5x-throat
+    # area, but _cold_stage_isolation_blocks refused SiO admission (SiO's
+    # designated stage is 3). Commit 37f7351c87 removed that isolation, so
+    # supersaturated SiO now freezes on the cold cyclone. The old 0.6848 kg
+    # remainder is what Stage 3 left when Stage 4 could not take SiO. It is
+    # not today's Stage-3-only eta. The fixture area is the synthetic
+    # throat ratio, not the 466.98 m2 design collector.
     authority = route.condensation_authority_by_species["SiO"]
+    outcomes = authority["stage_outcomes"]
+    stage3_outcome = next(
+        item for item in outcomes
+        if item.get("stage_number") == 3 and item.get("status") == "extrapolated"
+    )
+    stage4_outcome = next(
+        item for item in outcomes
+        if item.get("stage_number") == 4
+        and item.get("status") == "extrapolated"
+        and item.get("stage_key") != K_TRAP_STAGE_KEY
+    )
+    trap_outcomes = [
+        item for item in outcomes if item.get("stage_key") == K_TRAP_STAGE_KEY
+    ]
+    assert trap_outcomes
+    assert all(
+        item["status"] == "pass_through"
+        and item["reason"] == "no_configured_capture_area"
+        and item["eta"] == 0.0
+        for item in trap_outcomes
+    )
+    assert not any(
+        item.get("status") == "refused" and item.get("parameter") == "stage_area_m2"
+        for item in outcomes
+    )
+    eta3 = float(stage3_outcome["eta"])
+    eta4 = float(stage4_outcome["eta"])
+    stage3_kg = route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"]
+    stage4_kg = route.condensed_by_stage_species["stage_4_alkali_mg_cyclone"]["SiO"]
+    remaining_kg = route.remaining_by_species["SiO"]
+    assert stage3_kg == pytest.approx(eta3)
+    assert stage4_kg == pytest.approx(eta4 * (1.0 - eta3))
+    assert remaining_kg == pytest.approx((1.0 - eta3) * (1.0 - eta4))
+    assert route.retained_in_source_by_species.get("SiO", 0.0) == pytest.approx(0.0)
+    assert route.wall_deposit_by_species.get("SiO", 0.0) == pytest.approx(0.0)
+    # Probe at 15696ca7b3 on this synthetic fixture. The algebra above is
+    # the expectation; these values identify the destinations.
+    assert eta3 == pytest.approx(0.058775901177849185)
+    assert eta4 == pytest.approx(0.9697037276473276)
+    assert stage3_kg == pytest.approx(0.058775901177849185)
+    assert stage4_kg == pytest.approx(0.9127085171793363)
+    assert remaining_kg == pytest.approx(0.028515581642814536)
     stage_by_key = {
         key: float(by_species.get("SiO", 0.0))
         for key, by_species in route.condensed_by_stage_species.items()
@@ -1029,14 +1074,21 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
         melt,
     )
 
-    # t-1217: the first cold wall captures the full inlet parcel on the causal route.
-    assert route.wall_deposit_by_species["SiO"] == pytest.approx(
-        1.0,
-        rel=1e-12,
-    )
+    # Stage areas are zero, so collectors pass the parcel. The wall law is
+    # series-resistance flux on the default pipe (pi * 0.12 m * 1 m, split
+    # across the ducts), capped by the 1 kg/hr supply. t-1217's full-parcel
+    # expectation was that supply cap. At the r12 gate the default pipe was
+    # transport-limited (0.263 kg on the wall after stages were zeroed;
+    # 0.129 kg before). That fraction is not pinned. The notice below is the
+    # sticking-alpha record for the deposit the wall did take.
+    assert route.condensed_for_species("SiO") == pytest.approx(0.0)
+    wall_kg = route.wall_deposit_by_species["SiO"]
+    authority = route.condensation_authority_by_species["SiO"]
+    assert wall_kg == pytest.approx(authority["wall_deposit_mass_kg_hr"])
+    assert 0.0 < wall_kg < 1.0
     assert (
         route.condensed_for_species("SiO")
-        + route.wall_deposit_by_species["SiO"]
+        + wall_kg
         + route.remaining_by_species["SiO"]
     ) == pytest.approx(1.0)
     notice = route.sticking_alpha_provenance_notice

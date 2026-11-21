@@ -32,6 +32,7 @@ from simulator.fe_redox import (
     KRESS91_LN_FO2_COEFFICIENT,
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 from simulator.runner import build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase, EvaporationFlux, MeltState
 from scripts import evaporation_selectivity_map as selectivity_map
@@ -2540,7 +2541,36 @@ def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
     assert reservoir.exchange_direction == "melt_to_headspace"
     assert reservoir.exchange_clamped is True
     assert reservoir.exchange_o2_mol == pytest.approx(buffer_o2_mol)
-    assert reservoir.exchange_unbacked_o2_mol > 0.0
+    # d-452 replaced the 12 cm collection pipe with the owner 0.50 m
+    # aperture. Headspace is crucible freeboard plus pipe volume
+    # (cross-section times length). Empty-buffer unbacked oxygen is the
+    # melt-to-headspace transfer
+    # dn = alpha * Δx * C_h * C_m / (C_m + C_h), and
+    # C_h = p_floor * V / (R * T) scales with V. The finite melt capacity
+    # leaves the unbacked ratio about 6e-5 under the volume ratio, which
+    # rel=1e-4 covers. A ledger buffer subtracts from that transfer
+    # mole-for-mole. The historical unbacked value is the same exchange
+    # at the 12 cm pipe.
+    from tests.studio_pin_support import TWELVE_CM_INITIAL_THROAT_AREA_M2
+
+    freeboard_m3 = EquipmentDesigner._crucible_freeboard_volume_m3(
+        equipment.crucible
+    )
+    old_headspace_m3 = freeboard_m3 + TWELVE_CM_INITIAL_THROAT_AREA_M2 * pipe.length_m
+    volume_ratio = headspace_volume_m3 / old_headspace_m3
+    historical_unbacked_12cm_mol = 0.0015952259282159419
+    assert sim._headspace_temperature_K() == pytest.approx(1600.0 + 273.15)
+    assert sim._headspace_control_floor_pO2_bar() == pytest.approx(1.5 / 1000.0)
+    assert reservoir.headspace_capacity_mol_per_ln_pO2 == pytest.approx(
+        sim._headspace_control_floor_pO2_bar()
+        * PA_PER_BAR
+        * headspace_volume_m3
+        / (GAS_CONSTANT * sim._headspace_temperature_K())
+    )
+    assert reservoir.exchange_unbacked_o2_mol == pytest.approx(
+        historical_unbacked_12cm_mol * volume_ratio - buffer_o2_mol,
+        rel=1.0e-4,
+    )
     assert reservoir.exchange_unbacked_o2_mol + reservoir.exchange_o2_mol > 0.0
     assert reservoir.headspace_capacity_mol_per_ln_pO2 == pytest.approx(
         max(before_overhead_o2, sim._effective_headspace_floor_o2_mol())

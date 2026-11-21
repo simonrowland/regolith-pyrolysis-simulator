@@ -827,11 +827,12 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
         return sum(float(values.get(species, 0.0)) for species in ("Na", "K"))
 
     assert rows[8]["product_ledger_kg_at_hour"] == rows[8]["metal_yields_kg"]
-    # The d-452 sized collectors change this live-product amount. The next row
+    # rows[7] is the probe's hour_7_live_alkali_kg at 15696ca7b3. The d-452
+    # sized Na/Mg and K collectors set that live-product amount. The next row
     # transfers it to reagent, so live product returns to zero while cumulative
     # condensate and recycled mass retain the captured material.
     hour_7_live_alkali = alkali_total(rows[7], "product_ledger_kg_at_hour")
-    assert hour_7_live_alkali > 0.0
+    assert hour_7_live_alkali == pytest.approx(0.0007782296249638484)
     assert hour_7_live_alkali <= alkali_total(
         rows[7], "condensation_train_kg_cumulative"
     )
@@ -1088,6 +1089,11 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "metal_phase_stratification",
     "condensation_refusals_by_species",
     "high_t_melt_activity",
+    # Emitted only when the overhead flags a non-physical fixed-pressure
+    # holdup, or when the hour's IMCC activity shadow payload is non-empty.
+    # Absent on rows that do not take those paths.
+    "fixed_pressure_holdup_notice",
+    "imcc_activity_shadow",
 })
 
 VAPOR_PRESSURE_SOURCE_REPORT_KEYS = frozenset({
@@ -3858,6 +3864,12 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
     # class, so it is asserted as a whitelist member rather than helper-driven.
     assert "reduced_real_cache_state" in PER_HOUR_OPTIONAL_KEYS
     assert "reduced_real_cache_state" not in PER_HOUR_KEYS
+
+    # Same conditional class, added inline by build_per_hour_summary.
+    assert "fixed_pressure_holdup_notice" in PER_HOUR_OPTIONAL_KEYS
+    assert "imcc_activity_shadow" in PER_HOUR_OPTIONAL_KEYS
+    assert "fixed_pressure_holdup_notice" not in PER_HOUR_KEYS
+    assert "imcc_activity_shadow" not in PER_HOUR_KEYS
 
 
 @pytest.mark.parametrize(

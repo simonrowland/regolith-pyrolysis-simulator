@@ -4864,13 +4864,32 @@ def build_sio_yield_report(
 
     final_sio2_mol = float(cleaned_melt.get("SiO2", 0.0))
     sio_evaporated_mol = max(0.0, initial_sio2_mol - final_sio2_mol)
-    si_terminal_mol = float(condensation_train.get("Si", 0.0))
-    # Condensed SiO2(g) removes one mole of SiO2-equivalent per mole from the
-    # evolved chain, so it belongs in the same terminal ledger projection as
-    # condensed SiO2 rather than disappearing from the exported diagnostics.
-    sio2_terminal_mol = float(condensation_train.get("SiO2", 0.0)) + float(
+    # Si-atom count of a species map. The train, the wall, and the Stage-3
+    # Mn cartridge all book the same disproportionation products (Si, SiO2,
+    # leftover SiO, FeSi). Omitting the cartridge left ~97% of evaporated Si
+    # out of this diagnostic during mn_cartridge_run_hour_window; that is a
+    # missing account, not a mass-ledger leak. mass_balance_error_pct is the
+    # separate ledger check.
+    from simulator.account_ids import MANGANESE_STAGE3_CARTRIDGE_ACCOUNT
+
+    cartridge_mol = final_state.get(MANGANESE_STAGE3_CARTRIDGE_ACCOUNT, {}) or {}
+    # One species list, owned by _sio_wall_terminal_mol (SiO, Si, SiO2, FeSi).
+    # Condensed SiO2_gas is the extra train carrier that helper does not
+    # count. The chain tests reconstruct closure as si_terminal_mol +
+    # sio2_terminal_mol and have no separate cartridge field, so the metal
+    # coproduct (Si + FeSi, train and cartridge) is split out and the oxide
+    # side is the remainder of the same helper totals.
+    sio_train_mol = _sio_wall_terminal_mol(condensation_train) + float(
         condensation_train.get("SiO2_gas", 0.0)
     )
+    sio_cartridge_mol = _sio_wall_terminal_mol(cartridge_mol)
+    si_terminal_mol = (
+        float(condensation_train.get("Si", 0.0))
+        + float(condensation_train.get("FeSi", 0.0))
+        + float(cartridge_mol.get("Si", 0.0))
+        + float(cartridge_mol.get("FeSi", 0.0))
+    )
+    sio2_terminal_mol = (sio_train_mol + sio_cartridge_mol) - si_terminal_mol
     sio_wall_mol = _sio_wall_terminal_mol(wall_deposit)
     sio_escape_mol = float(terminal_offgas.get("SiO", 0.0))
     sio_retained_holdup_mol = float(retained_holdup.get("SiO", 0.0))
@@ -4901,6 +4920,10 @@ def build_sio_yield_report(
     sio_to_silica_fume_kg = _safe_failure_value(
         lambda: {
             **_stage_silica_fume_kg(sim),
+            # Stage collected_kg still holds cartridge SiO2. si_terminal_mol
+            # is the Si + FeSi atoms on the train and the cartridge, each
+            # one Si atom, reported as Si mass. The placement test applies
+            # the same M_SiO/M_Si factor to this field.
             "condensation_train_silicon_coproduct": _clean_report_float(
                 si_terminal_mol * MOLAR_MASS["Si"] / 1000.0
             ),

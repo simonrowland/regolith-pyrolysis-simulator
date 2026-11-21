@@ -1038,6 +1038,12 @@ incident, stuck, re-evaporated, and net continuous flux and has
   * `mass_balance_error_category` -- added inline by `build_per_hour_summary`
     when `HourSnapshot.mass_balance_error_category` is a non-empty string; the
     categorical mass-balance-error label for that hour.
+  * `fixed_pressure_holdup_notice` -- added inline when
+    `overhead.fixed_pressure_holdup_nonphysical` is true; a string naming the
+    held mass and the pinned pressure.
+  * `imcc_activity_shadow` -- copied from `HourSnapshot.imcc_activity_shadow`
+    when that payload is non-empty. Default runs leave the shadow off, so
+    the key is absent.
   * `reduced_real_cache_state` -- added downstream of `build_per_hour_summary`
     by `simulator/run_executor.py` (when the simulator's
     `_last_reduced_real_cache_state` is not `None`) and serialized into
