@@ -106,7 +106,9 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert driver["exposed_area_m2"] is None
     assert driver["emissivity"] is None
     assert driver["pellet_diameter_m"] == pytest.approx(0.013)
+    assert driver["pellet_height_m"] == pytest.approx(0.010)
     assert driver["focal_spot_diameter_m"] == pytest.approx(0.020)
+    assert driver["radiating_face_set"] == "hot_upper"
     assert driver["solar_absorptance"] is None
     assert driver["window_transmittance"] is None
     watts = _trace_watts_by_minute(driver["trace"])
@@ -120,7 +122,9 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert 400.0 < temperatures[0] < 2000.0
     assert temperatures[29] > temperatures[4] > temperatures[0]
     assert temperatures[-1] > temperatures[0]
-    assert temperatures[29] > 2500.0
+    # The tonne-sizer root was 4864 °C here. The printed hot-upper face
+    # is in the pyrometer's neighbourhood, not above 2500 °C.
+    assert 1500.0 < temperatures[29] < 2500.0
 
     target, ramp, record, previous = rows[0]
     # Eq. (6) watts are the focal spot. The pellet takes the uniform-disk
@@ -139,24 +143,26 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert record["source_class"] == "engine_prediction"
     assert record["scored_as_observed_temperature"] is False
     assert record["mass_kg"] == pytest.approx(0.00338)
-    assert record["area_m2"] == pytest.approx(
-        EquipmentDesigner.radiative_loss_area_m2(0.00338)
-    )
+    # Investigation areas for the 13 mm by 10 mm cylinder: hot upper
+    # 3.369e-4 m², full side 5.411e-4 m². Not the tonne sizer.
+    assert record["face_set"] == "hot_upper"
+    assert record["area_m2"] == pytest.approx(3.369e-4, abs=5.0e-8)
+    assert record["sensitivity"]["face_set"] == "full_side"
+    assert record["sensitivity"]["area_m2"] == pytest.approx(5.411e-4, abs=5.0e-8)
+    assert record["sensitivity"]["role"] == "sensitivity"
+    assert record["sensitivity"]["temperature_C"] < record["temperature_C"]
     assert record["emissivity"] == pytest.approx(EquipmentDesigner.MELT_EMISSIVITY)
     assert ramp == pytest.approx(abs(target - previous))
     knobs = {notice["knob"]: notice for notice in record["notices"]}
     assert set(knobs) == {
-        "melt_radiative_area_m2",
         "melt_emissivity",
         "solar_absorptance",
         "window_transmittance",
     }
-    assert knobs["melt_radiative_area_m2"]["kind"] == "knob_defaulted"
     assert knobs["melt_emissivity"]["kind"] == "knob_defaulted"
     assert knobs["solar_absorptance"]["kind"] == "knob_defaulted"
     assert knobs["window_transmittance"]["kind"] == "typed_unknown"
     assert knobs["window_transmittance"]["bound"] == "upper"
-    assert knobs["melt_radiative_area_m2"]["unit"] == "m2"
     assert knobs["melt_emissivity"]["unit"] == "1"
     assert knobs["melt_emissivity"]["value"] == pytest.approx(
         EquipmentDesigner.MELT_EMISSIVITY
@@ -168,11 +174,11 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert knobs["solar_absorptance"]["band_high"] == pytest.approx(0.906)
     for _target, _ramp, step_record, _previous in rows:
         assert {(notice["kind"], notice["knob"]) for notice in step_record["notices"]} == {
-            ("knob_defaulted", "melt_radiative_area_m2"),
             ("knob_defaulted", "melt_emissivity"),
             ("knob_defaulted", "solar_absorptance"),
             ("typed_unknown", "window_transmittance"),
         }
+        assert step_record["face_set"] == "hot_upper"
         assert step_record["scored_as_observed_temperature"] is False
 
     late = rows[29][2]
@@ -278,6 +284,8 @@ def test_a_printed_area_and_emissivity_emit_no_knob_defaulted_notice():
     assert record["emissivity"] == pytest.approx(0.9)
     assert record["intercept"] is None
     assert record["focal_power_W"] is None
+    assert record["face_set"] is None
+    assert record["sensitivity"] is None
     assert record["power_W"] == pytest.approx(100.0)
 
 
@@ -394,8 +402,106 @@ def test_one_kilogram_without_a_focal_spot_keeps_the_sizer_balance():
         EquipmentDesigner.radiative_loss_area_m2(1.0)
     )
     assert record["intercept"] is None
+    assert record["face_set"] is None
+    assert record["sensitivity"] is None
     assert record["power_W"] == pytest.approx(1740.1373551492054)
     assert {notice["knob"] for notice in record["notices"]} == {
         "melt_radiative_area_m2",
         "melt_emissivity",
     }
+
+
+def test_sub_kilogram_charge_without_a_cylinder_refuses_the_tonne_sizer():
+    with pytest.raises(PowerTemperatureRefusal) as refused:
+        solve_power_driven_melt_temperature_C(
+            power_W=100.0,
+            previous_temperature_C=25.0,
+            dt_s=60.0,
+            mass_kg=0.00338,
+            area_m2=None,
+            emissivity=0.85,
+        )
+    assert refused.value.reason == "radiative_area_out_of_domain"
+
+
+def test_unset_face_set_on_a_gram_pellet_defaults_to_hot_upper():
+    record = solve_power_driven_melt_temperature_C(
+        power_W=100.0,
+        previous_temperature_C=25.0,
+        dt_s=60.0,
+        mass_kg=0.00338,
+        area_m2=None,
+        emissivity=0.85,
+        pellet_diameter_m=0.013,
+        pellet_height_m=0.010,
+        focal_spot_diameter_m=0.020,
+        solar_absorptance=0.85,
+        window_transmittance=1.0,
+    )
+    declared = solve_power_driven_melt_temperature_C(
+        power_W=100.0,
+        previous_temperature_C=25.0,
+        dt_s=60.0,
+        mass_kg=0.00338,
+        area_m2=None,
+        emissivity=0.85,
+        pellet_diameter_m=0.013,
+        pellet_height_m=0.010,
+        focal_spot_diameter_m=0.020,
+        radiating_face_set="hot_upper",
+        solar_absorptance=0.85,
+        window_transmittance=1.0,
+    )
+
+    assert record["face_set"] == "hot_upper"
+    assert record["area_m2"] == pytest.approx(declared["area_m2"])
+    assert record["temperature_C"] == pytest.approx(declared["temperature_C"])
+    knobs = {notice["knob"]: notice for notice in record["notices"]}
+    assert knobs["radiating_face_set"]["kind"] == "knob_defaulted"
+    assert knobs["radiating_face_set"]["value"] == "hot_upper"
+    assert "radiating_face_set" not in {
+        notice["knob"] for notice in declared["notices"]
+    }
+
+
+def test_an_unknown_face_set_refuses():
+    with pytest.raises(PowerTemperatureRefusal) as refused:
+        solve_power_driven_melt_temperature_C(
+            power_W=100.0,
+            previous_temperature_C=25.0,
+            dt_s=60.0,
+            mass_kg=0.00338,
+            area_m2=None,
+            emissivity=0.85,
+            pellet_diameter_m=0.013,
+            pellet_height_m=0.010,
+            focal_spot_diameter_m=0.020,
+            radiating_face_set="top_only",
+            solar_absorptance=0.85,
+            window_transmittance=1.0,
+        )
+    assert refused.value.reason == "radiating_face_set_unknown"
+
+
+def test_printed_face_areas_match_the_investigation_and_the_no_loss_peak():
+    # No conduction yet. Investigation table, alpha 0.85, peak focal
+    # power: hot upper 2114 °C, top plus full side 1848 °C.
+    record = solve_power_driven_melt_temperature_C(
+        power_W=1468.819694,
+        previous_temperature_C=25.0,
+        dt_s=1.0e12,
+        mass_kg=0.00338,
+        area_m2=None,
+        emissivity=0.85,
+        pellet_diameter_m=0.013,
+        pellet_height_m=0.010,
+        focal_spot_diameter_m=0.020,
+        radiating_face_set="hot_upper",
+        solar_absorptance=0.85,
+        window_transmittance=1.0,
+    )
+
+    assert record["area_m2"] == pytest.approx(3.369e-4, abs=5.0e-8)
+    assert record["temperature_C"] == pytest.approx(2114.0, abs=2.0)
+    assert record["sensitivity"]["area_m2"] == pytest.approx(5.411e-4, abs=5.0e-8)
+    assert record["sensitivity"]["temperature_C"] == pytest.approx(1848.0, abs=2.0)
