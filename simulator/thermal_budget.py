@@ -24,15 +24,21 @@ Assumptions and uncertified refinements:
 
 from __future__ import annotations
 
+import copy
 import math
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
 from engines.antoine import _read_antoine_coefficients
+from simulator.diagnostic_helpers.timeseries_concordance import (
+    _interpolate,
+    _normalise_curve,
+)
 from simulator.equipment import EquipmentDesigner, STEFAN_BOLTZMANN
 from simulator.furnace_materials import load_furnace_materials
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.process_timestep import PROCESS_HOUR_S
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import GAS_CONSTANT, MOLAR_MASS, OXIDE_TO_METAL, STOICH_RATIOS
 
@@ -1181,3 +1187,583 @@ def _finite(value: float, name: str) -> float:
     if not math.isfinite(number):
         raise ValueError(f"{name} must be finite")
     return number
+
+
+# A run deck opts into the power-driven melt temperature by carrying this
+# key on its lab schedule. Absent, the schedule's melt_temperature_C
+# series stays the target. The key is not part of the schedule digest.
+FURNACE_POWER_DRIVER_KEY = "furnace_power_driver"
+KNOB_DEFAULTED = "knob_defaulted"
+_POWER_TRACE_ROLE = "measured_driver"
+_POWER_TRACE_UNITS = "W"
+_POWER_TIME_FIELD = "time_min"
+_POWER_VALUE_FIELD = "expected_value"
+_MINUTE_S = float(PROCESS_HOUR_S) / 60.0
+_BISECTION_STEPS = 80
+_UNSCORED_TEMPERATURE_SOURCE_CLASSES = frozenset({
+    "assumption_with_sensitivity_marker",
+    "engine_prediction",
+    "not_reported",
+})
+
+
+class PowerTemperatureRefusal(ValueError):
+    """Typed refusal for a furnace-power temperature step.
+
+    A missing emissivity or radiative area is not a refusal. Those knobs
+    take the sizer default and emit ``knob_defaulted``.
+    """
+
+    def __init__(self, reason: str, detail: str = "") -> None:
+        self.reason = str(reason)
+        message = self.reason if not detail else f"{self.reason}: {detail}"
+        super().__init__(message)
+
+
+def measured_furnace_power_trace(
+    document: Mapping[str, Any] | None,
+) -> Mapping[str, Any] | None:
+    """The one units=W measured_driver, or None when the deck has none.
+
+    Any other recorded trace is not this driver. Two watt drivers refuse
+    ``ambiguous_furnace_power_trace`` rather than picking one.
+    """
+
+    if not isinstance(document, Mapping):
+        return None
+    comparison = document.get("trajectory_comparison")
+    if comparison is None:
+        return None
+    if not isinstance(comparison, Mapping):
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "trajectory_comparison must be a mapping",
+        )
+    traces = comparison.get("recorded_input_traces")
+    if traces is None:
+        return None
+    if isinstance(traces, (str, bytes)) or not isinstance(traces, Sequence):
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "recorded_input_traces must be a sequence",
+        )
+    selected: list[Mapping[str, Any]] = []
+    for index, item in enumerate(traces):
+        if not isinstance(item, Mapping):
+            raise PowerTemperatureRefusal(
+                "furnace_power_trace_malformed",
+                f"recorded_input_traces[{index}] must be a mapping",
+            )
+        role = str(item.get("role") or "").strip()
+        units = str(item.get("units") or "").strip()
+        if role == _POWER_TRACE_ROLE and units == _POWER_TRACE_UNITS:
+            selected.append(item)
+    if not selected:
+        return None
+    if len(selected) > 1:
+        raise PowerTemperatureRefusal(
+            "ambiguous_furnace_power_trace",
+            f"{len(selected)} units=W measured_driver traces",
+        )
+    return selected[0]
+
+
+def furnace_power_driver_payload(
+    trace: Mapping[str, Any],
+    *,
+    mass_kg: float,
+    exposed_area_m2: float | None,
+) -> dict[str, Any]:
+    """Schedule payload the stepper reads. Emissivity stays unset here.
+
+    The loader does not invent an emissivity. ``None`` tells the solver
+    to take ``EquipmentDesigner.MELT_EMISSIVITY`` and notice it.
+    """
+
+    if not isinstance(trace, Mapping):
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "trace must be a mapping",
+        )
+    return {
+        "trace": copy.deepcopy(trace),
+        "mass_kg": mass_kg,
+        "exposed_area_m2": exposed_area_m2,
+        "emissivity": None,
+    }
+
+
+def sample_furnace_power_W(trace: Mapping[str, Any], time_s: float) -> float:
+    """Watts at ``time_s`` from the existing bracketing interpolator.
+
+    Times on the trace are minutes. The curve handed to
+    ``timeseries_concordance._interpolate`` is seconds. Outside the
+    first and last sample the interpolator raises; this wraps that as
+    ``power_trace_does_not_bracket`` and does not hold the last point.
+    ``reproduction_compare._interpolate_runtime_sample`` is a different
+    owner and is not called.
+    """
+
+    if not isinstance(trace, Mapping):
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "trace must be a mapping",
+        )
+    role = str(trace.get("role") or "").strip()
+    units = str(trace.get("units") or "").strip()
+    if role != _POWER_TRACE_ROLE or units != _POWER_TRACE_UNITS:
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "trace is not a units=W measured_driver",
+        )
+    if not is_declared_real_scalar(time_s, allow_numeric_str=True):
+        raise PowerTemperatureRefusal(
+            "power_trace_does_not_bracket",
+            "sample time is not numeric",
+        )
+    sample_s = float(time_s)
+    if not math.isfinite(sample_s):
+        raise PowerTemperatureRefusal(
+            "power_trace_does_not_bracket",
+            "sample time is not finite",
+        )
+    curve = _power_trace_curve_s(trace)
+    try:
+        return _interpolate(curve, sample_s, field_name="furnace power")
+    except ValueError as exc:
+        message = str(exc)
+        if "does not bracket" in message:
+            raise PowerTemperatureRefusal(
+                "power_trace_does_not_bracket",
+                message,
+            ) from exc
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            message,
+        ) from exc
+
+
+def solve_power_driven_melt_temperature_C(
+    *,
+    power_W: float,
+    previous_temperature_C: float,
+    dt_s: float,
+    mass_kg: float,
+    area_m2: float | None,
+    emissivity: float | None,
+) -> dict[str, Any]:
+    """Solve one end-of-step melt temperature from furnace power.
+
+    Premise: the measured furnace power that reaches the charge is
+    ``power_W``, frozen across this step. The charge stores sensible
+    heat at ``EquipmentDesigner.MELT_CP_J_KG_K`` and loses heat by the
+    crucible-surface radiation EQ-2 already books. Process gas is not
+    a sink. Sky temperature is 0 K, matching EQ-2, so the loss is
+    ``sigma * emissivity * area * T**4`` with no sky term. A missing
+    emissivity or area takes the sizer default and is noticed. Those
+    defaults are not tuned to a printed peak.
+
+    Algebra, both sides watts, power and radiation at the unknown end
+    temperature::
+
+        m * cp * (T - T_prev) / dt = P - sigma * eps * A * T**4
+
+        f(T) = sigma * eps * A * T**4 + (m * cp / dt) * T
+               - (m * cp * T_prev / dt + P) = 0
+
+    Units: m kg, cp J/(kg·K), T kelvin, dt seconds, P watts, A m²,
+    sigma W/(m²·K⁴). ``f`` is strictly increasing for T > 0, so the
+    root is the bisection of the adiabatic bracket.
+
+    Sanity: 1 kg has radiative area 0.001954474441911621 m². Steady
+    state at 1800 °C (2073.15 K) needs 1740.1373551492054 W at
+    sigma 5.670374e-8 and emissivity 0.85.
+    """
+
+    power = _declared_finite(
+        power_W,
+        missing="furnace_power_not_finite",
+        invalid="furnace_power_not_finite",
+    )
+    if power < 0.0:
+        raise PowerTemperatureRefusal(
+            "furnace_power_not_nonnegative",
+            f"power is {power}",
+        )
+    previous_C = _declared_finite(
+        previous_temperature_C,
+        missing="previous_temperature_not_finite",
+        invalid="previous_temperature_not_finite",
+    )
+    previous_K = previous_C + CELSIUS_TO_KELVIN_OFFSET
+    if previous_K < 0.0:
+        raise PowerTemperatureRefusal(
+            "previous_temperature_below_absolute_zero",
+            f"previous temperature is {previous_C} C",
+        )
+    step_s = _declared_finite(
+        dt_s,
+        missing="process_dt_not_positive",
+        invalid="process_dt_not_positive",
+    )
+    if step_s <= 0.0:
+        raise PowerTemperatureRefusal(
+            "process_dt_not_positive",
+            f"dt_s is {step_s}",
+        )
+    charge_kg = _declared_finite(
+        mass_kg,
+        missing="charge_mass_missing",
+        invalid="charge_mass_not_positive",
+    )
+    if charge_kg <= 0.0:
+        raise PowerTemperatureRefusal(
+            "charge_mass_not_positive",
+            f"mass is {charge_kg} kg",
+        )
+    notices: list[dict[str, Any]] = []
+    if area_m2 is None:
+        area = EquipmentDesigner.radiative_loss_area_m2(charge_kg)
+        notices.append({
+            "kind": KNOB_DEFAULTED,
+            "knob": "melt_radiative_area_m2",
+            "value": area,
+            "unit": "m2",
+            "source": "EquipmentDesigner.radiative_loss_area_m2",
+        })
+    else:
+        area = _declared_finite(
+            area_m2,
+            missing="melt_radiative_area_not_positive",
+            invalid="melt_radiative_area_not_positive",
+        )
+        if area <= 0.0:
+            raise PowerTemperatureRefusal(
+                "melt_radiative_area_not_positive",
+                f"area is {area} m2",
+            )
+    if emissivity is None:
+        eps = float(EquipmentDesigner.MELT_EMISSIVITY)
+        notices.append({
+            "kind": KNOB_DEFAULTED,
+            "knob": "melt_emissivity",
+            "value": eps,
+            "unit": "1",
+            "source": "EquipmentDesigner.MELT_EMISSIVITY",
+        })
+    else:
+        eps = _declared_finite(
+            emissivity,
+            missing="melt_emissivity_not_numeric",
+            invalid="melt_emissivity_not_numeric",
+        )
+        if eps < 0.0 or eps > 1.0:
+            raise PowerTemperatureRefusal(
+                "melt_emissivity_out_of_range",
+                f"emissivity is {eps}",
+            )
+    capacity = charge_kg * float(EquipmentDesigner.MELT_CP_J_KG_K) / step_s
+    if not math.isfinite(capacity) or capacity <= 0.0:
+        raise PowerTemperatureRefusal(
+            "power_temperature_balance_did_not_close",
+            "charge heat capacity is not positive",
+        )
+    root_K = _bisect_power_temperature_K(
+        power_W=power,
+        previous_K=previous_K,
+        capacity_W_per_K=capacity,
+        area_m2=area,
+        emissivity=eps,
+    )
+    return {
+        "temperature_C": root_K - CELSIUS_TO_KELVIN_OFFSET,
+        "temperature_K": root_K,
+        "power_W": power,
+        "dt_s": step_s,
+        "mass_kg": charge_kg,
+        "area_m2": area,
+        "emissivity": eps,
+        "role": "prediction",
+        "source_class": "engine_prediction",
+        "scored_as_observed_temperature": False,
+        "notices": tuple(notices),
+    }
+
+
+def melt_temperature_from_furnace_power(
+    driver: Mapping[str, Any],
+    *,
+    time_s: float,
+    previous_temperature_C: float,
+    dt_s: float,
+    live_mass_kg: float | None = None,
+) -> dict[str, Any]:
+    """Prediction for one step. The live melt mass wins when it is set.
+
+    ``MeltState.total_mass_kg`` starts at 0, which means the inventory
+    has not been written yet. A positive finite live mass is the charge.
+    Otherwise the printed sample mass on the driver is the charge.
+    Neither is invented when both are missing.
+    """
+
+    if not isinstance(driver, Mapping):
+        raise PowerTemperatureRefusal(
+            "furnace_power_driver_malformed",
+            "furnace power driver must be a mapping",
+        )
+    trace = driver.get("trace")
+    if not isinstance(trace, Mapping):
+        raise PowerTemperatureRefusal(
+            "furnace_power_driver_malformed",
+            "furnace power driver is missing its trace",
+        )
+    power_W = sample_furnace_power_W(trace, time_s)
+    record = solve_power_driven_melt_temperature_C(
+        power_W=power_W,
+        previous_temperature_C=previous_temperature_C,
+        dt_s=dt_s,
+        mass_kg=_charge_mass_kg(driver.get("mass_kg"), live_mass_kg),
+        area_m2=driver.get("exposed_area_m2"),
+        emissivity=driver.get("emissivity"),
+    )
+    record["time_s"] = _declared_finite(
+        time_s,
+        missing="power_trace_does_not_bracket",
+        invalid="power_trace_does_not_bracket",
+    )
+    return record
+
+
+def reported_temperature_observations(
+    points: Sequence[Mapping[str, Any]] | None,
+) -> tuple[Mapping[str, Any], ...]:
+    """Printed temperature points that may be scored as observations.
+
+    An engine prediction, an assumption, an unreported point, and a
+    qualifier that names a range are not a T(t) observation. Sesko's
+    1750–1900 K endpoints stay a range. A flagged power-driven
+    prediction is not an observation even if it is handed in here.
+    """
+
+    if points is None:
+        return ()
+    if isinstance(points, (str, bytes)) or not isinstance(points, Sequence):
+        raise PowerTemperatureRefusal(
+            "temperature_observations_malformed",
+            "temperature points must be a sequence",
+        )
+    kept: list[Mapping[str, Any]] = []
+    for index, point in enumerate(points):
+        if not isinstance(point, Mapping):
+            raise PowerTemperatureRefusal(
+                "temperature_observations_malformed",
+                f"point {index} must be a mapping",
+            )
+        if point.get("scored_as_observed_temperature") is False:
+            continue
+        source = str(point.get("source_class") or "").strip()
+        if not source:
+            raise PowerTemperatureRefusal(
+                "temperature_observation_missing_source_class",
+                f"point {index}",
+            )
+        if source in _UNSCORED_TEMPERATURE_SOURCE_CLASSES:
+            continue
+        qualifier = str(point.get("qualifier") or "")
+        if "range" in qualifier.casefold():
+            continue
+        kept.append(point)
+    return tuple(kept)
+
+
+def _charge_mass_kg(payload_mass: Any, live_mass_kg: Any) -> float:
+    if _is_set_live_mass(live_mass_kg):
+        live = _declared_finite(
+            live_mass_kg,
+            missing="charge_mass_not_positive",
+            invalid="charge_mass_not_positive",
+        )
+        if live <= 0.0:
+            raise PowerTemperatureRefusal(
+                "charge_mass_not_positive",
+                f"live mass is {live} kg",
+            )
+        return live
+    if payload_mass is None:
+        raise PowerTemperatureRefusal(
+            "charge_mass_missing",
+            "no printed sample mass and no live melt mass",
+        )
+    printed = _declared_finite(
+        payload_mass,
+        missing="charge_mass_missing",
+        invalid="charge_mass_not_positive",
+    )
+    if printed <= 0.0:
+        raise PowerTemperatureRefusal(
+            "charge_mass_not_positive",
+            f"printed mass is {printed} kg",
+        )
+    return printed
+
+
+def _is_set_live_mass(value: Any) -> bool:
+    if value is None or isinstance(value, bool):
+        return False
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        return True
+    number = float(value)
+    if not math.isfinite(number):
+        return True
+    return number != 0.0
+
+
+def _declared_finite(value: Any, *, missing: str, invalid: str) -> float:
+    if value is None:
+        raise PowerTemperatureRefusal(missing, "value is missing")
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise PowerTemperatureRefusal(invalid, f"value {value!r} is not numeric")
+    number = float(value)
+    if not math.isfinite(number):
+        raise PowerTemperatureRefusal(invalid, f"value {value!r} is not finite")
+    return number
+
+
+def _power_trace_curve_s(
+    trace: Mapping[str, Any],
+) -> tuple[tuple[float, float], ...]:
+    fields = trace.get("point_fields")
+    if isinstance(fields, (str, bytes)) or not isinstance(fields, Sequence):
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "point_fields must name time_min and expected_value",
+        )
+    names = [str(item) for item in fields]
+    if _POWER_TIME_FIELD not in names or _POWER_VALUE_FIELD not in names:
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "point_fields must name time_min and expected_value",
+        )
+    time_index = names.index(_POWER_TIME_FIELD)
+    value_index = names.index(_POWER_VALUE_FIELD)
+    points = trace.get("points")
+    if isinstance(points, (str, bytes)) or not isinstance(points, Sequence):
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            "points must be a sequence",
+        )
+    if len(points) == 0:
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_empty",
+            "furnace power trace needs points",
+        )
+    width = max(time_index, value_index) + 1
+    curve: list[tuple[float, float]] = []
+    for index, point in enumerate(points):
+        if (
+            isinstance(point, (str, bytes))
+            or not isinstance(point, Sequence)
+            or len(point) < width
+        ):
+            raise PowerTemperatureRefusal(
+                "furnace_power_trace_malformed",
+                f"point {index} does not carry time_min and expected_value",
+            )
+        time_min = _declared_finite(
+            point[time_index],
+            missing="furnace_power_trace_malformed",
+            invalid="furnace_power_trace_malformed",
+        )
+        watts = _declared_finite(
+            point[value_index],
+            missing="furnace_power_trace_malformed",
+            invalid="furnace_power_trace_malformed",
+        )
+        if watts < 0.0:
+            raise PowerTemperatureRefusal(
+                "furnace_power_not_nonnegative",
+                f"point {index} power is {watts}",
+            )
+        curve.append((time_min * _MINUTE_S, watts))
+    try:
+        return _normalise_curve(curve, field_name="furnace power")
+    except ValueError as exc:
+        message = str(exc)
+        if "unique" in message:
+            raise PowerTemperatureRefusal(
+                "furnace_power_trace_times_not_unique",
+                message,
+            ) from exc
+        if "at least one" in message:
+            raise PowerTemperatureRefusal(
+                "furnace_power_trace_empty",
+                message,
+            ) from exc
+        raise PowerTemperatureRefusal(
+            "furnace_power_trace_malformed",
+            message,
+        ) from exc
+
+
+def _bisect_power_temperature_K(
+    *,
+    power_W: float,
+    previous_K: float,
+    capacity_W_per_K: float,
+    area_m2: float,
+    emissivity: float,
+) -> float:
+    def residual(temperature_K: float) -> float:
+        radiation = (
+            STEFAN_BOLTZMANN * emissivity * area_m2 * temperature_K ** 4
+        )
+        if not math.isfinite(radiation):
+            return math.inf
+        return (
+            radiation
+            + capacity_W_per_K * (temperature_K - previous_K)
+            - power_W
+        )
+
+    lower = 0.0
+    upper = previous_K + power_W / capacity_W_per_K
+    if not math.isfinite(upper) or upper > 1.0e7:
+        upper = max(previous_K, 1.0e7)
+    if upper < lower:
+        upper = lower
+    f_lower = residual(lower)
+    f_upper = residual(upper)
+    guard = 0
+    while f_upper < 0.0 and upper < 1.0e7 and guard < 40:
+        upper = min(1.0e7, upper * 2.0 if upper > 0.0 else 1.0)
+        f_upper = residual(upper)
+        guard += 1
+    if f_lower > 0.0:
+        raise PowerTemperatureRefusal(
+            "power_temperature_balance_did_not_close",
+            "residual has no root at or above 0 K",
+        )
+    if f_upper < 0.0:
+        raise PowerTemperatureRefusal(
+            "power_temperature_balance_did_not_close",
+            "residual stays negative across the bracket",
+        )
+    for _step in range(_BISECTION_STEPS):
+        mid = 0.5 * (lower + upper)
+        if residual(mid) < 0.0:
+            lower = mid
+        else:
+            upper = mid
+    root = 0.5 * (lower + upper)
+    closed = residual(root)
+    scale = max(1.0, abs(power_W), abs(capacity_W_per_K * previous_K))
+    if (
+        not math.isfinite(root)
+        or not math.isfinite(closed)
+        or abs(closed) > 1.0e-6 * scale
+    ):
+        raise PowerTemperatureRefusal(
+            "power_temperature_balance_did_not_close",
+            "bisection did not close the watt balance",
+        )
+    return root
