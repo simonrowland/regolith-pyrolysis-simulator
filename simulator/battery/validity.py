@@ -329,9 +329,91 @@ def _invalid_kems_geometry_fields(
     return tuple(invalid)
 
 
-def _calibration_grounded(calibration: object) -> bool:
-    if not calibration or not isinstance(calibration, dict):
+def _calibration_entries_for_observation(
+    calibration: object,
+    *,
+    observation: Observation | None,
+    experiment_id: str | None,
+) -> Mapping[str, object] | None:
+    """Resolve scoped apparatus fields to the linked run and gas channel.
+
+    ``field@all_species`` is the shared fallback; ``field@species=<formula>``
+    applies to one identity channel and takes precedence, including when that
+    channel explicitly records an unknown.
+    """
+
+    if not isinstance(calibration, Mapping):
+        return None
+    scoped = any(isinstance(key, str) and "@" in key for key in calibration)
+    if not scoped:
+        return None
+    if (
+        observation is None
+        or not experiment_id
+        or observation.experiment_id != experiment_id
+        or not isinstance(observation.identity, Identity)
+        or observation.identity.species is None
+    ):
+        return {}
+
+    channel_scope = f"species={observation.identity.species.formula}"
+    fields = {
+        key.rsplit("@", 1)[0] if "@" in key else key
+        for key in calibration
+        if isinstance(key, str)
+    }
+    resolved: dict[str, object] = {}
+    for field in fields:
+        channel_key = f"{field}@{channel_scope}"
+        shared_key = f"{field}@all_species"
+        if channel_key in calibration:
+            resolved[field] = calibration[channel_key]
+        elif shared_key in calibration:
+            resolved[field] = calibration[shared_key]
+        elif field in calibration:
+            resolved[field] = calibration[field]
+    return resolved
+
+
+def _calibration_grounded(
+    calibration: object,
+    *,
+    observation: Observation | None = None,
+    experiment_id: str | None = None,
+) -> bool:
+    if not calibration or not isinstance(calibration, Mapping):
         return False
+    scoped_entries = _calibration_entries_for_observation(
+        calibration, observation=observation, experiment_id=experiment_id
+    )
+    if scoped_entries is not None:
+        if not scoped_entries:
+            return False
+        standards = [
+            located
+            for field, located in scoped_entries.items()
+            if field in _CALIBRATION_STANDARD_FIELDS
+        ]
+        if not any(
+            isinstance(located, Located)
+            and isinstance(located.state, State)
+            and located.state.is_value
+            and located.state.value is not None
+            for located in standards
+        ):
+            return False
+        for located in scoped_entries.values():
+            if (
+                not isinstance(located, Located)
+                or not isinstance(located.state, State)
+                or located.locator is None
+                or not located.locator.has_location()
+                or located.inference is not None
+                or not (located.state.is_value or located.state.is_unknown)
+            ):
+                return False
+        return True
+
     for located in calibration.values():
         if not isinstance(located, Located):
             return False
@@ -346,14 +428,30 @@ def _calibration_grounded(calibration: object) -> bool:
     return True
 
 
-def _calibration_not_grounded_detail(calibration: object) -> dict[str, str] | None:
+def _calibration_not_grounded_detail(
+    calibration: object,
+    *,
+    observation: Observation | None = None,
+    experiment_id: str | None = None,
+) -> dict[str, str] | None:
     if calibration is None or (isinstance(calibration, dict) and not calibration):
         return {
             "flag": "calibration_not_grounded",
             "calibration_record_status": "not_recorded",
             "calibration_notice": "No calibration entry has been recorded yet.",
         }
-    if isinstance(calibration, dict):
+    scoped_entries = _calibration_entries_for_observation(
+        calibration, observation=observation, experiment_id=experiment_id
+    )
+    if scoped_entries is not None:
+        if not scoped_entries:
+            return {
+                "flag": "calibration_not_grounded",
+                "calibration_record_status": "not_recorded",
+                "calibration_notice": "No calibration entry has been recorded yet.",
+            }
+        calibration = scoped_entries
+    if isinstance(calibration, Mapping):
         printed_standard = any(
             field in _CALIBRATION_STANDARD_FIELDS
             and isinstance(located, Located)
@@ -578,9 +676,22 @@ def underdetermined_apparatus(
         # Hertz-Knudsen weight-loss route:
         # p = (dm/dt)/(A W) * sqrt(2 pi R T / M).
         calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
-        calibrated = _calibration_grounded(calibration)
+        calibration_observation = (
+            observation if quantity is Quantity.P_PARTIAL else None
+        )
+        calibrated = _calibration_grounded(
+            calibration,
+            observation=calibration_observation,
+            experiment_id=experiment.experiment_id,
+        )
         ungrounded_detail = (
-            None if calibrated else _calibration_not_grounded_detail(calibration)
+            None
+            if calibrated
+            else _calibration_not_grounded_detail(
+                calibration,
+                observation=calibration_observation,
+                experiment_id=experiment.experiment_id,
+            )
         )
         calibration_flagged = (
             quantity is Quantity.P_PARTIAL and ungrounded_detail is not None
@@ -887,7 +998,15 @@ def effusion_regime_unverified(
 
     calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
     total_bounds = _pressure_bounds(experiment.pressure_environment.total_pressure_Pa)
-    if _calibration_grounded(calibration) and total_bounds is not None:
+    calibration_observation = (
+        observation if quantity is Quantity.P_PARTIAL else None
+    )
+    calibration_grounded = _calibration_grounded(
+        calibration,
+        observation=calibration_observation,
+        experiment_id=experiment.experiment_id,
+    )
+    if calibration_grounded and total_bounds is not None:
         _lower, upper, pressure_kind = total_bounds
         if (
             pressure_kind in {"interval", "upper_bound"}
@@ -913,8 +1032,12 @@ def effusion_regime_unverified(
         # printed in-cell sum, which is the independent fallback evidence.
 
     ungrounded_detail = (
-        _calibration_not_grounded_detail(calibration)
-        if not _calibration_grounded(calibration)
+        _calibration_not_grounded_detail(
+            calibration,
+            observation=calibration_observation,
+            experiment_id=experiment.experiment_id,
+        )
+        if not calibration_grounded
         and quantity
         in {
             Quantity.P_PARTIAL,

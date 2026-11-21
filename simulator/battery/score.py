@@ -5957,10 +5957,16 @@ def _has_ungrounded_kems_partial_pressure_calibration(
         or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
     ):
         return False
+    if experiment.experiment_id != observation.experiment_id:
+        return True
     calibration = (
         None if experiment.apparatus is None else experiment.apparatus.calibration
     )
-    return not _calibration_grounded(calibration)
+    return not _calibration_grounded(
+        calibration,
+        observation=observation,
+        experiment_id=experiment.experiment_id,
+    )
 
 
 def _kems_replicate_groups(
