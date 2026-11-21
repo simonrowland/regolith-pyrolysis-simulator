@@ -161,8 +161,8 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         temperature_C = 1750.0
     elif scenario == 'internal_analytical_liquidus_above':
         composition = _liquid_feo_bulk(sim, 50.0)
-        resolved = sim._freeze_gate_curve_record()
-        assert resolved['curve']['liquidus_T_C'] < 1750.0
+        resolved = sim._establish_melt_redox_gate_authority_for_current_hour()
+        assert resolved['liquidus_T_C'] < 1750.0
         temperature_C = 1750.0
     else:
         composition = _liquid_feo_bulk(sim, 85.0)
