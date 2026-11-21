@@ -9617,9 +9617,13 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # because a check was relaxed; mismatches stay 0.
     # b271r adds Cohen (225) and Floss (623) cells to b268r2's 8,112:
     # 8,112 + 225 + 623 = 8,960. Zhang (2021) adds 88 numeric cells; two b.d.l.
-    # cells remain unavailable. Recounted by _series_census on the merged tree:
+    # cells remain unavailable. _series_census on the merged 86882f9 tree gives
     # 8,960 + 88 = 9,048, with mismatches staying 0.
     assert census.get("residue_component_composition") == 9048
+    assert per_source.get("kems-006-zhang-2021") == {
+        "residue_component_composition": 88,
+        "evaporation_coefficient_alpha": 4,
+    }
     assert per_source.get("su-zhang-2023-lunar-orange-glass-na-k-cu-degassing") == {
         "residue_component_composition": 3435
     }
@@ -9733,8 +9737,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # Floss 623 residue, Navrotsky–Koryttseva 95 enthalpy, and Smythe 46 ratios.
     # Pretorius–Muan's 704 and van Westrenen's 26 migrated rows are flat values,
     # so they do not enter this series-only census. b268r2's 12,505 + 1,038 is
-    # 13,543; Zhang (2021) adds 88 numeric cells. Recounted by _series_census on
-    # merged extracts: 13,543 + 88 = 13,631, with mismatches staying 0.
+    # 13,543; Zhang (2021) adds 88 numeric cells. _series_census on the merged
+    # 86882f9 extracts gives 13,543 + 88 = 13,631, with mismatches staying 0.
     assert n_numeric == 13631, (n_numeric, census, n_unavailable)
 
 
@@ -20996,6 +21000,13 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         expected_fO2, expected_starting = expected_sossi_conditions[run_key]
         assert conditions["fO2_log"].state.value == expected_fO2
         assert conditions["starting_component_ppm"].state.value == expected_starting
+        starting_locator = conditions["starting_component_ppm"].locator
+        assert starting_locator is not None
+        assert starting_locator.page == 53
+        assert starting_locator.table == "1"
+        assert starting_locator.source_path == (
+            "raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf"
+        )
         expected_pressure = sossi.experiments[obs.experiment_id].pressure_environment.total_pressure_Pa
         assert conditions["total_pressure_Pa"].state == expected_pressure.state
         identity = obs.identity
@@ -21055,9 +21066,6 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         ):
             assert key in conditions
             assert conditions[key].locator is not None
-        starting_component = conditions["starting_component_ppm"]
-        assert starting_component.locator.page == 53
-        assert starting_component.locator.table == "1"
         atmosphere = conditions["atmosphere"]
         assert atmosphere.state.is_unknown
         assert "CO" in atmosphere.locator.note and "CO2" in atmosphere.locator.note
