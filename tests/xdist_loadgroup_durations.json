@@ -10,7 +10,7 @@
     "magemin_fullrun_b": 16709.486,
     "magemin_fullrun_c": 5112.176,
     "magemin_fullrun_d": 1999.277,
-    "magemin_golden": 7200.0,
+    "magemin_golden": 7679.5,
     "serial": 4278.223
   },
   "schema": 1,
@@ -22,6 +22,6 @@
     "serial 2136.098 -> 4278.223 (+2142.125s, 2026-11-10): nightly b-549 committed-store regeneration joined the chain after ci-train-tip2.xml was measured; +2142.125s is its successful byte-comparison wall duration on Mac-Studio-256-3. Supersede with a measured group total at the next hint regeneration.",
     "hashimoto_real_cohort 854.0 -> 1800.0 (2026-11-12): provisional lower bound from three whole-file remote runs that reached the 1800 s per-test wall timeout; no completed duration was measured. Three cpu_budget(1) probes produced no receipt within 75 min. Replace after a completed remote run.",
     "migration-series-census 250.0 -> 499.049 (+249.049s, 2026-11-13): the current remote gate cannot emit JUnit XML (the profile refuses --junitxml); interim hand estimate is the sum of the latest measured member process-CPU durations, J01 230.693s and K04 268.356s. Supersede with a measured JUnit group total at the next hint regeneration.",
-    "magemin_golden ESTIMATE 7200.0 (2026-11-20): not a measurement. Chosen so --dist loadgroup starts this chain after magemin_fullrun_a (12321.211) and before magemin_fullrun_c (5112.176). The moved producers were previously inside chain a, so 12321.211 still includes them until both numbers are replaced. The governing wall cap is remote CI regolith-pr and regolith-nightly wall_timeout_seconds = 21600 for the whole run. scripts/nightly-gate.sh CI_WALL_CAP_S=16200 is the retired studio-ci path. Supersede with a measured total from the whole-suite gate junit."
+    "magemin_golden 7679.5 (2026-11-21): measured. Sum of junit test times of the 295 items this group owns (the hook-marked items in the nine golden producer files, plus the explicitly marked cost-ledger test) in remote focused run f3b7f1ab1ecd43abb805deea47af5090 (studio-2, -n 6, tree 2398a3dba0). That run predates the itemcollected fix, so the items ran ungrouped under 6-way co-scheduling; their serial total on one chain may differ. magemin_fullrun_a (12321.211) still includes the producers that left it."
   ]
 }

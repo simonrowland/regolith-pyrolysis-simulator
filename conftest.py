@@ -336,18 +336,23 @@ _GOLDEN_MAGEMIN_GROUP_FILES = frozenset({
 })
 
 
-def _group_golden_magemin_producers(items: list[pytest.Item]) -> None:
-    for item in items:
-        filename = _Path(item.nodeid.split("::", 1)[0]).name
-        if filename not in _GOLDEN_MAGEMIN_GROUP_FILES:
-            continue
-        if any(mark.name == "xdist_group" for mark in item.iter_markers()):
-            continue
-        item.add_marker(pytest.mark.xdist_group("magemin_golden"))
+def pytest_itemcollected(item: pytest.Item) -> None:
+    # Mark at collection time, not in pytest_collection_modifyitems. On an
+    # xdist worker, xdist's own modifyitems hook (xdist/remote.py) is
+    # registered after this conftest, so pluggy calls it first: it reads
+    # xdist_group, suffixes the node id with @group, and never sees a mark
+    # added later. tests/_plugins/loadgroup_order.py (tryfirst) also needs
+    # the mark. A remote -n 6 run of 2398a3dba0 showed the old hook's
+    # producers ungrouped (no @magemin_golden on any hook-marked item).
+    filename = _Path(item.nodeid.split("::", 1)[0]).name
+    if filename not in _GOLDEN_MAGEMIN_GROUP_FILES:
+        return
+    if any(mark.name == "xdist_group" for mark in item.iter_markers()):
+        return
+    item.add_marker(pytest.mark.xdist_group("magemin_golden"))
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
-    _group_golden_magemin_producers(items)
     for item in items:
         get_closest_marker = getattr(item, "get_closest_marker", None)
         if not callable(get_closest_marker):
