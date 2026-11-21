@@ -75,3 +75,25 @@ def test_probe_refusal_literals_match_their_owners() -> None:
     for literal, owner in pairs:
         assert literal == owner
         assert literal in engine_cache.CACHEABLE_REFUSAL_CODES
+
+
+def test_unknown_gas_activity_code_is_not_a_cache_literal() -> None:
+    """The activity-key miss stays a package token, not a leaf literal.
+
+    evaluate_gas raises ImccGasUnknownActivityError for a key that is neither
+    a recognised parent nor a species. Round 2 did not allowlist that code,
+    and engine_cache does not repeat it.
+    """
+
+    pytest.importorskip("openimcc")
+    from openimcc.gas import ImccGasUnknownActivityError
+
+    code = ImccGasUnknownActivityError.code
+    assert code == "imcc_gas_unknown_activity"
+    assert code not in engine_cache.CACHEABLE_REFUSAL_CODES
+    leaf_literals = {
+        value
+        for name, value in vars(engine_cache).items()
+        if name.startswith("REFUSAL_") and isinstance(value, str)
+    }
+    assert code not in leaf_literals
