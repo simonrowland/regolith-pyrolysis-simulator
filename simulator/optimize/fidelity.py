@@ -834,6 +834,12 @@ def _pair_evalspec_mismatch(
         mismatches.append(
             f"hours fast={fast_spec.hours} high={high_spec.hours}"
         )
+    if fast_spec.until_campaign_complete != high_spec.until_campaign_complete:
+        mismatches.append(
+            "until_campaign_complete "
+            f"fast={fast_spec.until_campaign_complete} "
+            f"high={high_spec.until_campaign_complete}"
+        )
     if str(fast_spec.bounds_digest) != str(high_spec.bounds_digest):
         mismatches.append(
             "bounds_digest "

@@ -1562,7 +1562,7 @@ def test_real_backend_preserves_presented_denied_evidence_and_cannot_certify() -
     assert arm["authoritative"] is False
 
 
-def test_fidelity_pair_drops_unequal_evalspec_hours_and_bounds(
+def test_fidelity_pair_drops_unequal_evalspec_execution_semantics(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def fake_run_eval_batch(tasks, timeout_s, *, max_workers):
@@ -1579,6 +1579,7 @@ def test_fidelity_pair_drops_unequal_evalspec_hours_and_bounds(
             spec = replace(
                 result.eval_spec,
                 hours=1 if task.tier == "fast" else 2,
+                until_campaign_complete=task.tier == "fast",
                 bounds_digest=(
                     "fast-bounds" if task.tier == "fast" else "high-bounds"
                 ),
@@ -1606,7 +1607,9 @@ def test_fidelity_pair_drops_unequal_evalspec_hours_and_bounds(
         for drop in result.dropped_evaluations
     )
     assert all(
-        "hours" in drop["message"] and "bounds_digest" in drop["message"]
+        "hours" in drop["message"]
+        and "until_campaign_complete" in drop["message"]
+        and "bounds_digest" in drop["message"]
         for drop in result.dropped_evaluations
     )
 

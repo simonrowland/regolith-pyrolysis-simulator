@@ -102,6 +102,7 @@ class EvalSpec:
         default_factory=default_cost_parameters_block,
         kw_only=True,
     )
+    until_campaign_complete: bool = field(default=False, kw_only=True)
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -147,6 +148,8 @@ class EvalSpec:
             raise TypeError("c5_enabled must be a bool")
         if not isinstance(self.stop_at_stage0_exit, bool):
             raise TypeError("stop_at_stage0_exit must be a bool")
+        if not isinstance(self.until_campaign_complete, bool):
+            raise TypeError("until_campaign_complete must be a bool")
         if not isinstance(self.allow_fallback_vapor, bool):
             raise TypeError("allow_fallback_vapor must be a bool")
         if not isinstance(self.force_builtin_vapor_pressure, bool):
@@ -278,6 +281,7 @@ class EvalSpec:
                 _thaw_value(self.cost_parameters),
                 self.conditional_subspace_digest,
                 self.resolved_engine_identity,
+                self.until_campaign_complete,
             ),
         )
 
@@ -351,6 +355,7 @@ class PrefixEvalSpec(EvalSpec):
                 _thaw_value(self.cost_parameters),
                 self.conditional_subspace_digest,
                 self.resolved_engine_identity,
+                self.until_campaign_complete,
             ),
         )
 
@@ -389,6 +394,17 @@ def _with_default_redox_and_bubbler_reduce_args(
 
 
 def _rebuild_eval_spec(*args: Any) -> EvalSpec:
+    if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 7:
+        return EvalSpec(
+            *args[:-7],
+            allowlist_version=args[-7],
+            bounds_digest=args[-6],
+            stop_at_stage0_exit=args[-5],
+            cost_parameters=args[-4],
+            conditional_subspace_digest=args[-3],
+            resolved_engine_identity=args[-2],
+            until_campaign_complete=args[-1],
+        )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 6:
         return EvalSpec(
             *args[:-6],
@@ -464,6 +480,17 @@ def _rebuild_eval_spec(*args: Any) -> EvalSpec:
 
 
 def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
+    if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 7:
+        return PrefixEvalSpec(
+            *args[:-7],
+            allowlist_version=args[-7],
+            bounds_digest=args[-6],
+            stop_at_stage0_exit=args[-5],
+            cost_parameters=args[-4],
+            conditional_subspace_digest=args[-3],
+            resolved_engine_identity=args[-2],
+            until_campaign_complete=args[-1],
+        )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 6:
         return PrefixEvalSpec(
             *args[:-6],
@@ -588,6 +615,8 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         payload["physics_constraints"] = physics_constraints
     if spec.stop_at_stage0_exit:
         payload["stop_at_stage0_exit"] = spec.stop_at_stage0_exit
+    if spec.until_campaign_complete:
+        payload["until_campaign_complete"] = spec.until_campaign_complete
     if spec.stage0_redox_oxidant_kg:
         payload["stage0_redox_oxidant_kg"] = spec.stage0_redox_oxidant_kg
     if spec.stage0_carbon_reductant_kg:

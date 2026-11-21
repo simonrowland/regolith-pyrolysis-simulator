@@ -236,6 +236,20 @@ def test_until_campaign_complete_reaches_runner_and_partitions_eval_cache() -> N
     assert cache_key(bounded_spec) != cache_key(complete_spec)
 
 
+def test_until_campaign_complete_is_an_evalspec_cache_determinant() -> None:
+    bounded = _base_spec(until_campaign_complete=False)
+    complete = _base_spec(until_campaign_complete=True)
+
+    assert cache_key(bounded) != cache_key(complete)
+    assert b"until_campaign_complete" not in canonical_evalspec_json(bounded)
+    assert b'"until_campaign_complete":true' in canonical_evalspec_json(complete)
+
+
+def test_until_campaign_complete_rejects_non_bool_evalspec_values() -> None:
+    with pytest.raises(TypeError, match="until_campaign_complete must be a bool"):
+        _base_spec(until_campaign_complete=1)
+
+
 def test_canonical_evalspec_json_and_cache_key_are_byte_stable_cross_run() -> None:
     spec = _base_spec()
     explicit_empty = _base_spec(
@@ -661,6 +675,7 @@ def test_evalspec_reduce_rebuild_preserves_sparse_digest_metadata() -> None:
         ("backend_name", "magmin"),
         ("c5_enabled", True),
         ("stop_at_stage0_exit", True),
+        ("until_campaign_complete", True),
         ("mre_max_voltage_V", 1.45),
         ("mre_target_species", "SiO2"),
         ("stage0_redox_oxidant_kg", 12.5),
@@ -742,6 +757,17 @@ def test_stage0_exit_stop_survives_evalspec_reduce_paths() -> None:
         assert restored.stop_at_stage0_exit is True
 
 
+def test_until_campaign_complete_survives_evalspec_reduce_paths() -> None:
+    for spec in (
+        _base_spec(until_campaign_complete=True),
+        _prefix_spec(until_campaign_complete=True),
+    ):
+        restored = pickle.loads(pickle.dumps(spec))
+
+        assert restored.until_campaign_complete is True
+        assert cache_key(restored) == cache_key(spec)
+
+
 def test_resolved_engine_identity_survives_evalspec_reduce_paths() -> None:
     identity = "thermoengine MELTS test (adapter=regolith-thermoengine-v2)"
     for spec in (
@@ -760,7 +786,7 @@ def test_pre_redox_evalspec_reduce_payloads_get_zero_dose_defaults() -> None:
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[19:-6]
+    old_args = args[:16] + args[19:-7]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -780,7 +806,7 @@ def test_pre_bubbler_evalspec_reduce_payloads_get_empty_settings_default() -> No
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:18] + args[19:-6]
+    old_args = args[:18] + args[19:-7]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -800,7 +826,7 @@ def test_pre_redox_prefix_evalspec_reduce_payloads_get_zero_dose_defaults() -> N
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[19:-6]
+    old_args = args[:16] + args[19:-7]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -823,7 +849,7 @@ def test_pre_bubbler_prefix_evalspec_reduce_payloads_get_empty_settings_default(
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:18] + args[19:-6]
+    old_args = args[:18] + args[19:-7]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -841,7 +867,7 @@ def test_old_evalspec_reduce_payloads_default_stage0_exit_stop_false() -> None:
         _prefix_spec(stop_at_stage0_exit=False),
     ):
         _, new_args = spec.__reduce__()
-        old_args = new_args[:-6]
+        old_args = new_args[:-7]
         restored = type(spec)(*old_args)
 
         assert restored.stop_at_stage0_exit is False
@@ -851,6 +877,7 @@ def test_old_evalspec_reduce_payloads_default_stage0_exit_stop_false() -> None:
                 "allowlist_version",
                 "bounds_digest",
                 "stop_at_stage0_exit",
+                "until_campaign_complete",
             }:
                 continue
             assert getattr(restored, field.name) == getattr(spec, field.name)

@@ -3420,6 +3420,7 @@ def _build_eval_inputs_impl(
         vapor_pressure_fallback_provider_id=DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
         allow_fallback_vapor=allow_fallback_vapor,
         force_builtin_vapor_pressure=force_builtin_vapor_pressure,
+        until_campaign_complete=bool(run_config.until_campaign_complete),
         vapor_pressure_provider_code_fingerprint=(
             _vapor_pressure_provider_code_fingerprint(vapor_pressure_provider_id)
         ),

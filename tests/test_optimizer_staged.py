@@ -897,6 +897,7 @@ def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None
         allow_fallback_vapor=True,
         force_builtin_vapor_pressure=True,
         vapor_pressure_provider_code_fingerprint="provider-source-sha256:test",
+        until_campaign_complete=True,
     )
     prefix = make_prefix_eval_spec(
         base,
@@ -937,6 +938,7 @@ def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None
     assert loaded_prefix.eval_spec.vapor_pressure_provider_code_fingerprint == (
         "provider-source-sha256:test"
     )
+    assert loaded_prefix.eval_spec.until_campaign_complete is True
 
 
 def test_prefix_evalspec_copies_schema_metadata_without_keying_bounds_digest() -> None:
