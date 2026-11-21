@@ -5990,20 +5990,50 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if not math.isfinite(T_K) or T_K <= 0.0:
             raise ValueError("temperature_K must be finite and positive")
         T_C = T_K - 273.15
-        from simulator.melt_backend.magemin import MAGEMinDomainIdentity
+        from simulator.melt_backend.magemin import (
+            CLEANED_MELT_ACCOUNT,
+            DEFAULT_MAGEMIN_DATABASE,
+            MAGEMinDomainIdentity,
+            evaluated_magemin_domain_identity,
+        )
 
         magemin_provider = (
             getattr(self, '_liquid_fraction_provider', None) == 'magemin'
         )
+        not_applicable_identity = MAGEMinDomainIdentity(
+            'in_band', 'not_applicable', None, None,
+        )
         unknown_identity = MAGEMinDomainIdentity(
             'unknown', 'unknown', None, 'liquidus_domain_identity_unavailable',
         )
-        domain_identity = None
+        domain_identity = not_applicable_identity
         submitted_bulk_passes = True
         if magemin_provider:
             try:
-                domain_identity, submitted_bulk_passes = (
-                    self._melt_redox_gate_current_pin_verdict()
+                provider_inputs = self._silicate_provider_melt_inputs(
+                    ChemistryIntent.GATE_LIQUID_FRACTION,
+                )
+                if provider_inputs is None:
+                    raise RuntimeError(
+                        'current MAGEMin liquid bulk is unavailable'
+                    )
+                domain_identity, _silica_diagnostic = (
+                    evaluated_magemin_domain_identity(
+                        {
+                            CLEANED_MELT_ACCOUNT: (
+                                provider_inputs.composition_mol
+                            ),
+                        },
+                        DEFAULT_MAGEMIN_DATABASE,
+                        species_formula_registry=getattr(
+                            self, 'species_formula_registry', None,
+                        ),
+                        composition_mol_by_account=True,
+                    )
+                )
+                submitted_bulk_passes = (
+                    domain_identity.reusable
+                    and domain_identity.projection_threshold_verdict == 'clear'
                 )
             except Exception as exc:
                 domain_identity = MAGEMinDomainIdentity(
@@ -6161,10 +6191,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
                 liquidus_unknown=True,
             )
+        step_down = (
+            curve.get('gate_provider_step_down')
+            if isinstance(curve, Mapping)
+            else None
+        )
         if isinstance(curve, Mapping) and "liquidus_T_C" not in curve:
             nested = curve.get("curve")
             if isinstance(nested, Mapping):
                 curve = nested
+                if step_down is None:
+                    step_down = curve.get('gate_provider_step_down')
         if not isinstance(curve, Mapping) or curve.get("liquidus_T_C") is None:
             return domain(
                 below_liquidus=None,
@@ -6191,13 +6228,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 liquidus_unknown=True,
             )
         source = str(curve.get("source") or "liquidus_solidus")
-        if (
-            source.startswith('gate_liquid_fraction:fallback:')
-            and not source.startswith(
-                'gate_liquid_fraction:fallback:magemin'
-            )
-        ):
-            domain_identity = None
+        resolved_provider = getattr(self, '_liquid_fraction_provider', None)
+        if isinstance(step_down, Mapping):
+            realized_provider = step_down.get('realized_provider')
+            if isinstance(realized_provider, str) and realized_provider:
+                resolved_provider = realized_provider
+        if resolved_provider != 'magemin':
+            domain_identity = not_applicable_identity
         liquidus_unknown = curve.get('is_liquidus_floor') is True
         # Valid at and above the silicate liquidus. The Kress91 floor
         # (max(liquidus, 1200 C)) is a redox-capacity gate, not this bound.

@@ -997,6 +997,7 @@ def _calphad_authority_weight(delta_iw_log10: float) -> float:
 
 LIQUID_MODEL_BELOW_LIQUIDUS_KIND = "liquid_model_below_liquidus"
 MAGEMIN_DOMAIN_IDENTITY_KIND = "magemin_domain_identity"
+LIQUIDUS_UNKNOWN_KIND = "liquidus_unknown"
 
 
 def _finite_domain_float(value: object, name: str) -> float:
@@ -1021,7 +1022,7 @@ class LiquidFeODomain:
     liquidus_T_C: float | None
     solidus_T_C: float | None
     source: str
-    domain_identity: "MAGEMinDomainIdentity | None"
+    domain_identity: "MAGEMinDomainIdentity"
     liquidus_unknown: bool = False
 
     def __post_init__(self) -> None:
@@ -1031,12 +1032,9 @@ class LiquidFeODomain:
             self.below_liquidus, bool
         ):
             raise TypeError("below_liquidus must be bool or None")
-        if (
-            self.domain_identity is not None
-            and not isinstance(self.domain_identity, MAGEMinDomainIdentity)
-        ):
+        if not isinstance(self.domain_identity, MAGEMinDomainIdentity):
             raise TypeError(
-                "domain_identity must be MAGEMinDomainIdentity or None"
+                "domain_identity must be MAGEMinDomainIdentity"
             )
         if not isinstance(self.liquidus_unknown, bool):
             raise TypeError("liquidus_unknown must be bool")
@@ -1090,6 +1088,16 @@ def _with_liquid_model_below_liquidus_notice(
     if liquid_domain is None:
         return components
     notices: list[dict[str, object]] = []
+    if liquid_domain.liquidus_unknown:
+        notices.append({
+            "type": "typed_notice",
+            "kind": LIQUIDUS_UNKNOWN_KIND,
+            "temperature_K": liquid_domain.temperature_K,
+            "liquidus_T_C": liquid_domain.liquidus_T_C,
+            "solidus_T_C": liquid_domain.solidus_T_C,
+            "source": liquid_domain.source,
+            "authority": "unknown",
+        })
     if liquid_domain.below_liquidus is True:
         notices.append({
             "type": "typed_notice",
@@ -1101,7 +1109,7 @@ def _with_liquid_model_below_liquidus_notice(
             "authority": "extrapolated",
         })
     identity = liquid_domain.domain_identity
-    if identity is None:
+    if identity.projection_threshold_verdict == "not_applicable":
         if notices:
             components["notices"] = notices
         return components
@@ -1132,7 +1140,7 @@ def _with_liquid_model_below_liquidus_notice(
     }
     if liquid_domain.liquidus_unknown:
         identity_notice["liquidus_status"] = "unknown"
-    if liquid_domain.liquidus_unknown or silica_verdict != "in_band":
+    if silica_verdict != "in_band":
         notices.append(identity_notice)
     if notices:
         components["notices"] = notices
