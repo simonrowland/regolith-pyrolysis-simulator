@@ -41,6 +41,7 @@ from simulator.battery.records import (
     RelativeSeriesPoint,
     RelativeSeriesPointResidual,
     ResidualNumeric,
+    Uncertainty,
 )
 
 
@@ -303,14 +304,18 @@ def _relative_series_model_oxygen_unavailable_reason(
     *,
     expected_input_ids: frozenset[str] | None = None,
 ) -> RelativeSeriesUnavailableReason | None:
-    """Own O/O₂ model-run, input, and self-agreement eligibility."""
+    """Own one model run for every channel, then O/O₂ input eligibility.
 
-    if evidence.target_species not in {"O", "O2"}:
-        return None
+    The run check is not oxygen-only. A non-oxygen return before it let a
+    mixed SiO series score by coordinate.
+    """
+
     if not observed_series or not model_series:
         return None
     if len({point.run_id for point in model_series}) > 1:
         return RelativeSeriesUnavailableReason.MIXED_MODEL_RUNS
+    if evidence.target_species not in {"O", "O2"}:
+        return None
     input_ids = evidence.model_oxygen_input_observation_ids
     observed_ids = {
         point.observation_id

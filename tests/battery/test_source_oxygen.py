@@ -2045,3 +2045,176 @@ def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
         RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
     )
     assert reduction_inputs.points == ()
+
+
+def _pressure_reduced_from_current(source_context, pressure_inputs):
+    """A measured O2 pressure whose reduction is not in the resolver's gas map.
+
+    The resolver only walks partial-pressure rows, so a current named in
+    derivation.inputs stays out of used_observations. The scorer has to
+    walk that pressure's full observation lineage itself.
+    """
+
+    melt = _row(source_context, "kems-053-stolyarova-1991")
+    reference = replace(
+        melt,
+        identity=replace(melt.identity, fO2_Pa=None),
+        point_conditions=None,
+    )
+    trace = replace(
+        reference,
+        observation_id="relative-qms-current",
+        identity=replace(
+            reference.identity,
+            quantity=Quantity.ION_INTENSITY,
+            species=Species("O2", Phase.G),
+            composition=State.not_applicable("current channel"),
+        ),
+        read_from=None,
+        derived_from=None,
+        derivation=None,
+        value=Value(ValueKind.POINT, point=Decimal("2")),
+        engine=None,
+    )
+    pressure = replace(
+        reference,
+        observation_id="relative-qms-pressure-from-current",
+        identity=replace(
+            reference.identity,
+            quantity=Quantity.P_PARTIAL,
+            species=Species("O2", Phase.G),
+            reaction=State.unknown("direct reduction"),
+        ),
+        evidence=replace(
+            reference.evidence,
+            class_=State.of(EvidenceClass.MEASURED_REDUCED),
+        ),
+        read_from=None,
+        derived_from=None,
+        derivation=Derivation(
+            relation="trace_current_to_pressure",
+            inputs=tuple(pressure_inputs),
+            parameters=(),
+            output_unit="Pa",
+        ),
+        value=Value(ValueKind.POINT, point=Decimal("1e-6")),
+        engine=None,
+    )
+    rows = (reference, trace, pressure)
+    context = replace(
+        source_context,
+        observations={row.observation_id: row for row in rows},
+    )
+    return context, reference, trace, pressure
+
+
+def _assert_selected_pressure(context, reference, pressure):
+    control = _resolve(context, reference)
+    assert isinstance(control, SourceOxygenCondition)
+    assert control.used_observations == {pressure.observation_id}
+    return control
+
+
+def test_selected_pressure_reduced_from_its_current_cannot_validate_that_current(
+    source_context,
+):
+    context, reference, trace, pressure = _pressure_reduced_from_current(
+        source_context, ("relative-qms-current",)
+    )
+    _assert_selected_pressure(context, reference, pressure)
+
+    result = _score_relative_qms_series(
+        *_relative_qms_inputs(trace, (pressure.observation_id,)),
+        context=context,
+        reference=reference,
+        source_trace=trace,
+    )
+
+    assert result.unavailable_reason is (
+        RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT
+    )
+    assert result.points == ()
+
+
+def test_selected_pressure_hides_its_current_behind_another_row(source_context):
+    context, reference, trace, pressure = _pressure_reduced_from_current(
+        source_context, ()
+    )
+    bridge = replace(
+        trace,
+        observation_id="relative-qms-current-bridge",
+        derivation=Derivation(
+            relation="current_bridge",
+            inputs=(trace.observation_id,),
+            parameters=(),
+            output_unit="arb",
+        ),
+    )
+    pressure = replace(
+        pressure,
+        derivation=replace(
+            pressure.derivation,
+            inputs=(bridge.observation_id,),
+        ),
+    )
+    context = replace(
+        context,
+        observations={
+            reference.observation_id: reference,
+            trace.observation_id: trace,
+            bridge.observation_id: bridge,
+            pressure.observation_id: pressure,
+        },
+    )
+    _assert_selected_pressure(context, reference, pressure)
+
+    result = _score_relative_qms_series(
+        *_relative_qms_inputs(trace, (pressure.observation_id,)),
+        context=context,
+        reference=reference,
+        source_trace=trace,
+    )
+
+    assert result.unavailable_reason is (
+        RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT
+    )
+    assert result.points == ()
+
+
+def test_unresolved_selected_pressure_lineage_stays_unknown(source_context):
+    context, reference, trace, pressure = _pressure_reduced_from_current(
+        source_context, ("missing-printed-oxygen-input",)
+    )
+    _assert_selected_pressure(context, reference, pressure)
+
+    result = _score_relative_qms_series(
+        *_relative_qms_inputs(trace, (pressure.observation_id,)),
+        context=context,
+        reference=reference,
+        source_trace=trace,
+    )
+
+    assert result.unavailable_reason is (
+        RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
+    )
+    assert result.points == ()
+
+
+def test_selected_pressure_not_reduced_from_the_trace_can_score(source_context):
+    context, reference, trace, pressure = _pressure_reduced_from_current(
+        source_context, ()
+    )
+    _assert_selected_pressure(context, reference, pressure)
+
+    result = _score_relative_qms_series(
+        *_relative_qms_inputs(trace, (pressure.observation_id,)),
+        context=context,
+        reference=reference,
+        source_trace=trace,
+    )
+
+    assert result.unavailable_reason is None
+    assert tuple(point.residual_dex for point in result.points) == (
+        Decimal(0),
+        Decimal(0),
+    )

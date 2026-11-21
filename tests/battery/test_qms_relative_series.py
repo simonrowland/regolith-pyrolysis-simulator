@@ -1,8 +1,10 @@
 """Contract tests for eligible relative-channel QMS point residuals."""
 
+import ast
 from dataclasses import replace
 from decimal import Decimal
 import math
+from pathlib import Path
 
 import pytest
 
@@ -177,6 +179,111 @@ def test_model_series_from_mixed_runs_has_typed_unavailability():
         RelativeSeriesUnavailableReason.MIXED_MODEL_RUNS
     )
     assert result.points == ()
+
+
+def test_single_sio_model_run_keeps_zero_anchor_residuals():
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = tuple(replace(point, observable="SiO+") for point in observed)
+    model = tuple(replace(point, observable="SiO") for point in model)
+    evidence = replace(evidence, target_species="SiO", channel="SiO+")
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is None
+    assert tuple(point.residual_dex for point in result.points) == (0, 0, 0)
+
+
+def test_mixed_sio_model_runs_are_typed_unavailable():
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = tuple(replace(point, observable="SiO+") for point in observed)
+    model = tuple(replace(point, observable="SiO") for point in model)
+    model = (*model[:-1], replace(model[-1], run_id="other-model-run"))
+    evidence = replace(evidence, target_species="SiO", channel="SiO+")
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is (
+        RelativeSeriesUnavailableReason.MIXED_MODEL_RUNS
+    )
+    assert result.points == ()
+
+
+def _function(tree: ast.AST, name: str) -> ast.FunctionDef:
+    found = [
+        node for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef) and node.name == name
+    ]
+    assert len(found) == 1
+    return found[0]
+
+
+def _called_names(function: ast.FunctionDef) -> list[str]:
+    names: list[str] = []
+    for node in ast.walk(function):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if isinstance(func, ast.Name):
+            names.append(func.id)
+        elif isinstance(func, ast.Attribute):
+            names.append(func.attr)
+    return names
+
+
+def test_qms_channel_rules_have_one_owner():
+    """One model-run refusal, and one read of the printed control inputs.
+
+    A second MIXED_MODEL_RUNS return, or a second oxygen_pressure_point read
+    in the printed-control path, splits the rule the reviews closed.
+    """
+
+    root = Path(relative_channel_point_residuals.__code__.co_filename).parent
+    metrics_tree = ast.parse((root / "score_metrics.py").read_text(encoding="utf-8"))
+    score_tree = ast.parse((root / "score.py").read_text(encoding="utf-8"))
+    mixed_owners = [
+        node.name
+        for node in ast.walk(metrics_tree)
+        if isinstance(node, ast.FunctionDef)
+        and any(
+            isinstance(child, ast.Attribute) and child.attr == "MIXED_MODEL_RUNS"
+            for child in ast.walk(node)
+        )
+    ]
+    score_mixed = [
+        node.name
+        for node in ast.walk(score_tree)
+        if isinstance(node, ast.FunctionDef)
+        and any(
+            isinstance(child, ast.Attribute) and child.attr == "MIXED_MODEL_RUNS"
+            for child in ast.walk(node)
+        )
+    ]
+    assert mixed_owners == ["_relative_series_model_oxygen_unavailable_reason"]
+    assert score_mixed == []
+
+    helper = _function(
+        metrics_tree, "_relative_series_model_oxygen_unavailable_reason"
+    )
+    mixed_line = next(
+        node.lineno
+        for node in ast.walk(helper)
+        if isinstance(node, ast.Attribute) and node.attr == "MIXED_MODEL_RUNS"
+    )
+    species_line = next(
+        node.lineno
+        for node in ast.walk(helper)
+        if isinstance(node, ast.Attribute) and node.attr == "target_species"
+    )
+    assert mixed_line < species_line
+
+    walker = _function(score_tree, "_model_oxygen_control_lineage")
+    scorer = _function(score_tree, "_score_relative_qms_series")
+    assert _called_names(walker).count("oxygen_pressure_point") == 0
+    assert _called_names(scorer).count("oxygen_pressure_point") == 1
 
 
 @pytest.mark.parametrize(

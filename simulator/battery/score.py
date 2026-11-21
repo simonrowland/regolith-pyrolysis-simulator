@@ -295,6 +295,7 @@ from simulator.battery.source_lineage import (
 )
 from simulator.battery.validate import (
     Ancestry,
+    AncestryFailure,
     _ValidationIndexes,
     ValidationIssue,
     _BOUND_WORK_INPUTS,
@@ -16898,28 +16899,34 @@ def _sample_catalog_run_identity(observation: Observation) -> str | None:
 
 
 def _model_oxygen_control_lineage(
-    reference: Observation,
     context: ScoreContext,
     indexes: _ValidationIndexes,
+    input_ids: Iterable[str],
+    *,
+    seed: Iterable[str] = (),
 ) -> Ancestry:
-    """Resolve the selected model control and its printed observation inputs."""
+    """Full observation lineage of control rows.
 
-    ids = {reference.observation_id}
-    point = oxygen_pressure_point(reference)
-    inference = None if point is None else point.inference
-    if inference is not None:
-        for input_id in inference.inputs:
-            lineage = _observation_lineage(
-                input_id,
-                context.observations,
-                indexes.table_ids,
-                experiments=context.experiments,
-                asset_ids=indexes.asset_ids,
-                _cache=indexes.observation_lineages,
-            )
-            if not lineage.complete or lineage.ids is None:
-                return lineage
-            ids.update(lineage.ids)
+    The caller reads a printed input list once and passes it here. A
+    derivation input that is not an observation, table, or registered asset
+    stays unresolved; it is not dropped as an external reference.
+    """
+
+    ids = set(seed)
+    for input_id in input_ids:
+        lineage = _observation_lineage(
+            input_id,
+            context.observations,
+            indexes.table_ids,
+            experiments=context.experiments,
+            asset_ids=indexes.asset_ids,
+            _cache=indexes.observation_lineages,
+        )
+        if not lineage.complete or lineage.ids is None:
+            return lineage
+        ids.update(lineage.ids)
+    if not ids:
+        return Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
     return Ancestry.of(ids)
 
 
@@ -17030,14 +17037,17 @@ def _score_relative_qms_series(
         )
         model_inputs = evidence.model_oxygen_input_observation_ids
         if _has_printed_fo2(reference, reference.identity):
-            control_lineage = _model_oxygen_control_lineage(
-                reference, context, validation_indexes
-            )
             control_point = oxygen_pressure_point(reference)
             control_inputs = (
                 ()
                 if control_point is None or control_point.inference is None
                 else control_point.inference.inputs
+            )
+            control_lineage = _model_oxygen_control_lineage(
+                context,
+                validation_indexes,
+                control_inputs,
+                seed=(reference.observation_id,),
             )
             direct_self_agreement = (
                 source_trace.observation_id in control_inputs
@@ -17075,6 +17085,12 @@ def _score_relative_qms_series(
             oxygen = resolve_source_oxygen(reference, rows, bench)
             if not isinstance(oxygen, SourceOxygenCondition):
                 return unavailable(RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN)
+            # used_observations stops at partial-pressure rows. Walk those
+            # selected rows outward so a current named only on the pressure
+            # cannot validate itself.
+            selected_lineage = _model_oxygen_control_lineage(
+                context, validation_indexes, oxygen.used_observations
+            )
             direct_self_agreement = (
                 (model_inputs is not None and source_trace.observation_id in model_inputs)
                 or _is_selected_condition_observation(source_trace, oxygen)
@@ -17082,6 +17098,10 @@ def _score_relative_qms_series(
             )
             if direct_self_agreement:
                 independent = False
+            elif not selected_lineage.complete or selected_lineage.ids is None:
+                return unavailable(
+                    RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
+                )
             elif not source_lineage.complete or source_lineage.ids is None:
                 return unavailable(
                     RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
@@ -17098,6 +17118,7 @@ def _score_relative_qms_series(
                     or _is_selected_condition_observation(
                         source_trace, oxygen, trace_observations
                     )
+                    or bool(selected_lineage.ids.intersection(trace_observations))
                 )
             expected_inputs = oxygen.used_observations
         evidence = replace(evidence, oxygen_independent=independent)
