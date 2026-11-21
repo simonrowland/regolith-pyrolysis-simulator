@@ -488,8 +488,8 @@ def test_above_liquidus_equilibrium_diagnostic_is_byte_identical():
         temperature_K=1600.0 + 273.15,
         liquidus_T_C=1200.0,
         solidus_T_C=1050.0,
-        source="gate_liquid_fraction",
-        domain_identity=_IN_BAND_MAGEMIN_IDENTITY,
+        source="internal_analytical_liquidus",
+        domain_identity=None,
     )
     plain = EquilibriumMixin._internal_analytical_equilibrium(
         _feo_equilibrium_sim(temperature_C=1600.0, with_domain_method=False)
@@ -807,7 +807,7 @@ def test_load_batch_drops_a_retained_liquid_feo_curve():
     )
     assert isinstance(second, _MeltRedoxLiquidusFloorFallback)
     at_1300 = PyrolysisSimulator.liquid_feo_domain_at(sim, 1300.0 + 273.15)
-    assert at_1300.below_liquidus is False
+    assert at_1300.below_liquidus is None
     assert at_1300.source == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
     assert at_1300.liquidus_T_C == float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
 

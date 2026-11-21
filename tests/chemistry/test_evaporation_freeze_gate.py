@@ -2281,11 +2281,41 @@ def test_retained_liquid_feo_curve_is_rejected_after_domain_identity_changes(
 
     for _read_number in (1, 2):
         activity = activity_read()
+        notices = activity.get('notices', ())
         identity_notice = next(
-            notice
-            for notice in activity['notices']
-            if notice.get('kind') == 'magemin_domain_identity'
+            (
+                notice
+                for notice in notices
+                if notice.get('kind') == 'magemin_domain_identity'
+            ),
+            None,
         )
+        assert sim._freeze_gate_current_magemin_domain_identity.silica_verdict == (
+            'extrapolated'
+        )
+        resolved_curve = sim._liquid_feo_resolved_curve
+        if (
+            isinstance(resolved_curve, dict)
+            and isinstance(resolved_curve.get('curve'), dict)
+        ):
+            resolved_curve = resolved_curve['curve']
+        resolved_source = (
+            resolved_curve.get('source')
+            if isinstance(resolved_curve, dict)
+            else None
+        )
+        if resolved_source == (
+            'gate_liquid_fraction:fallback:alphamelts-diagnostic'
+        ):
+            assert identity_notice is None
+            assert float(resolved_curve['liquidus_T_C']) < 1800.0
+            liquid_domain = sim.liquid_feo_domain_at(1800.0 + 273.15)
+            assert liquid_domain.domain_identity is None
+            assert liquid_domain.below_liquidus is False
+            assert liquid_domain.liquidus_unknown is False
+            assert notices == []
+            continue
+        assert identity_notice is not None, (resolved_source, resolved_curve)
         assert identity_notice['silica_verdict'] == 'extrapolated'
         assert identity_notice['authority'] == 'extrapolated'
         assert identity_notice['certified_band'] == {

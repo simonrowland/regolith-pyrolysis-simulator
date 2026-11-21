@@ -1016,21 +1016,28 @@ class LiquidFeODomain:
     owner's statement that this evaluation is below the silicate liquidus.
     """
 
-    below_liquidus: bool
+    below_liquidus: bool | None
     temperature_K: float
     liquidus_T_C: float | None
     solidus_T_C: float | None
     source: str
-    domain_identity: "MAGEMinDomainIdentity"
+    domain_identity: "MAGEMinDomainIdentity | None"
     liquidus_unknown: bool = False
 
     def __post_init__(self) -> None:
         from simulator.melt_backend.magemin import MAGEMinDomainIdentity
 
-        if not isinstance(self.below_liquidus, bool):
-            raise TypeError("below_liquidus must be bool")
-        if not isinstance(self.domain_identity, MAGEMinDomainIdentity):
-            raise TypeError("domain_identity must be MAGEMinDomainIdentity")
+        if self.below_liquidus is not None and not isinstance(
+            self.below_liquidus, bool
+        ):
+            raise TypeError("below_liquidus must be bool or None")
+        if (
+            self.domain_identity is not None
+            and not isinstance(self.domain_identity, MAGEMinDomainIdentity)
+        ):
+            raise TypeError(
+                "domain_identity must be MAGEMinDomainIdentity or None"
+            )
         if not isinstance(self.liquidus_unknown, bool):
             raise TypeError("liquidus_unknown must be bool")
         temperature_K = _finite_domain_float(self.temperature_K, "temperature_K")
@@ -1083,7 +1090,7 @@ def _with_liquid_model_below_liquidus_notice(
     if liquid_domain is None:
         return components
     notices: list[dict[str, object]] = []
-    if liquid_domain.below_liquidus:
+    if liquid_domain.below_liquidus is True:
         notices.append({
             "type": "typed_notice",
             "kind": LIQUID_MODEL_BELOW_LIQUIDUS_KIND,
@@ -1094,6 +1101,10 @@ def _with_liquid_model_below_liquidus_notice(
             "authority": "extrapolated",
         })
     identity = liquid_domain.domain_identity
+    if identity is None:
+        if notices:
+            components["notices"] = notices
+        return components
     silica_verdict = identity.silica_verdict
     certified_band = identity.certified_band
     identity_notice = {

@@ -3480,6 +3480,7 @@ class EvaporationMixin:
             'source': source,
             'solidus_T_C': solidus_T_C,
             'liquidus_T_C': liquidus_T_C,
+            'is_liquidus_floor': True,
             'path': (
                 (solidus_T_C, 0.0),
                 (liquidus_T_C, 1.0),

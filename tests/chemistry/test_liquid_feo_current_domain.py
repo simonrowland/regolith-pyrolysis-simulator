@@ -135,6 +135,10 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         composition = _liquid_feo_bulk(sim, 50.0)
         sim._establish_melt_redox_gate_authority_for_current_hour()
         temperature_C = 1300.0
+        domain = sim.liquid_feo_domain_at(temperature_C + 273.15)
+        assert domain.domain_identity is None
+        assert domain.below_liquidus is None
+        assert domain.liquidus_unknown is True
     elif scenario == 'hot_read_above_known_liquidus_without_pin':
         composition = _liquid_feo_bulk(sim, 50.0)
         resolved = sim._freeze_gate_curve_record()
@@ -176,8 +180,7 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         if notice.get('kind') == 'liquid_model_below_liquidus'
     ]
     if scenario == 'internal_analytical_floor':
-        assert identity_notices == []
-        assert below_notices == []
+        assert notices == []
         return
 
     expected_identity, _diagnostic = magemin_domain_identity_from_evaluated_bulk(
