@@ -281,6 +281,23 @@ def test_profile_only_geometry_stays_refused_without_surface_schedule() -> None:
     assert excinfo.value.code == "missing_lab_surface_temperature"
 
 
+def test_unresolved_surface_pipe_segment_keeps_existing_zero_temperature() -> None:
+    geometry = parse_lab_geometry(
+        dynamic_surface_geometry_fixture(),
+        allow_temperature_profiles=True,
+    )
+
+    assert geometry is not None
+    holder = next(surface for surface in geometry.surfaces if surface.surface_id == "holder")
+    segment = holder.to_pipe_segment(
+        upstream_stage="stage_0",
+        downstream_stage="lab_surface_0",
+        default_diameter_m=0.02,
+    )
+    assert holder.temperature_C is None
+    assert segment.wall_temperature_C == pytest.approx(0.0)
+
+
 def test_surface_temperature_schedule_requires_lab_geometry() -> None:
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
