@@ -637,7 +637,8 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
         # b-1174: wall-report species = positive vapour supply; +20 zero-valued species keys, 0 changed/numeric leaves (train leaf diff).
         # IA stateless: the 7 hour-16 certified-gamma certificates carry hour/window_K/composition_window_L1 = null (21 leaves);
         # the history-dependent cap-step seam notice is gone (1 notice); 2 keys reordered; 0 numeric leaves changed. Payload = runner C0 fixture bytes.
-        "805e9517db9506de47ae7e0a3d15675acfc219f04b4b1bb4d5ccb4014f349d09"
+        # Pin car 979adb2 metal-saturation floor (Studio s3, 2026-11-21): K offgas -55%, Stage-1 Fe -18%, hot Na peak +57%; K dew 6.82 -> 100 Pa is computed y_K * vapor_pressure, not a ceiling clamp.
+        "208741ea347217dad59d677de17fbfc8618f5f0de835d654b6785f2d8c0ee441"
     )
 
 
