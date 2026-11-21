@@ -123,6 +123,7 @@ def test_deterministic_refusal_allowlist_is_explicit():
         "imcc_unproven_datapack",
         "imcc_malformed_datapack",
         "imcc_gas_species_not_found",
+        "imcc_gas_unknown_activity",
         "imcc_gas_T_outside_domain",
         "imcc_gas_oxygen_balance_failed",
         "imcc_gas_data_unavailable",
@@ -1294,6 +1295,7 @@ def test_isolated_openimcc_names_match_package_codes():
         ImccGasOxygenBalanceError,
         ImccGasSpeciesNotFoundError,
         ImccGasTemperatureOutsideDomainError,
+        ImccGasUnknownActivityError,
     )
     from openimcc.kernel import (
         ImccComponentOutsideDomainError,
@@ -1342,6 +1344,7 @@ def test_isolated_openimcc_names_match_package_codes():
         ImccGasDataUnavailableError,
         ImccGasSpeciesNotFoundError,
         ImccGasTemperatureOutsideDomainError,
+        ImccGasUnknownActivityError,
     ):
         assert refusal_class.code not in CACHEABLE_REFUSAL_CODES
 
@@ -1448,16 +1451,24 @@ def test_isolated_openimcc_solver_failure_is_not_stored(tmp_path, monkeypatch):
     assert counts["not_stored:exception:ImccNonconvergenceError"] == 2
 
 
-def test_openimcc_gas_species_not_found_is_not_stored(tmp_path, monkeypatch):
-    """A gas-table miss is the package's exception, and it is not stored.
+def test_openimcc_gas_unknown_activity_is_not_stored(tmp_path, monkeypatch):
+    """An unrecognised activity key is re-raised and never stored.
 
-    evaluate_gas is the real call. The name is not a species in any JANAF
-    table, so the refusal is ImccGasSpeciesNotFoundError. That code depends
-    on the tables OPENIMCC_VAPOROCK_ROOT can swap, which is not in the key.
+    evaluate_gas is the real call. ``NotAGasSpeciesXYZ`` is neither a
+    recognised gas parent nor a species, so openimcc raises
+    ImccGasUnknownActivityError before any table lookup. The cache does not
+    allowlist that code: it counts ``not_stored:exception:<code>`` and the
+    exception leaves the call. Two calls run because nothing was stored.
+
+    ``imcc_gas_species_not_found`` is a different path (a requested species,
+    a parent missing from a selected reaction, or a missing G(T) row). This
+    bridge call does not pass ``gas_species``, and the default reaction list
+    skips parents that were not supplied, so this input never reaches it.
+    That code stays off the allowlist.
     """
 
     openimcc = pytest.importorskip("openimcc")
-    from openimcc.gas import ImccGasSpeciesNotFoundError
+    from openimcc.gas import ImccGasUnknownActivityError
     from simulator.melt_backend.openimcc_bridge import evaluate_gas
 
     _enable_disk_cache(tmp_path, monkeypatch)
@@ -1480,18 +1491,19 @@ def test_openimcc_gas_species_not_found_is_not_stored(tmp_path, monkeypatch):
             parent_oxides=("NotAGasSpeciesXYZ",),
         )
 
-    with pytest.raises(ImccGasSpeciesNotFoundError) as first:
+    with pytest.raises(ImccGasUnknownActivityError) as first:
         run()
     engine_cache._MEMORY_CACHE.clear()
-    with pytest.raises(ImccGasSpeciesNotFoundError) as second:
+    with pytest.raises(ImccGasUnknownActivityError) as second:
         run()
 
-    assert first.value.code == second.value.code == "imcc_gas_species_not_found"
+    code = ImccGasUnknownActivityError.code
+    assert first.value.code == second.value.code == code
     assert len(calls) == 2
     counts = _assert_returned_miss_accounting("openimcc")
     assert counts["misses"] == 2
     assert counts["stores"] == 0
-    assert counts["not_stored:exception:imcc_gas_species_not_found"] == 2
+    assert counts[f"not_stored:exception:{code}"] == 2
 
 
 _FE_BEARING_KG = {
