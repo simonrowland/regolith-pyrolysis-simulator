@@ -29,6 +29,7 @@ from simulator.battery.migrate import (  # noqa: E402
     to_plain,
 )
 from simulator.battery.enums import BenchIdentityBasis  # noqa: E402
+from simulator.battery.consumer_inputs import _sossi_table2_flow_observation  # noqa: E402
 from simulator.battery.records import (  # noqa: E402
     ApparatusGeometry,
     Bench,
@@ -425,7 +426,15 @@ def report(root: Path, *, modelling_inputs=None) -> dict[str, object]:
         readiness = (
             _missing_bench_readiness(implicit=implicit)
             if bench is None
-            else consumer_readiness(experiment, bench, modelling_inputs=modelling_inputs)
+            else consumer_readiness(
+                experiment,
+                bench,
+                _sossi_table2_flow_observation(
+                    experiment,
+                    by_experiment_all.get(experiment.experiment_id, ()),
+                ),
+                modelling_inputs=modelling_inputs,
+            )
         )
         if bench is not None and by_experiment[experiment.experiment_id]:
             contexts = {}

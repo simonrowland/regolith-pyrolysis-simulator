@@ -159,8 +159,14 @@ def test_empty_table2_quote_is_a_typed_parser_refusal() -> None:
 
 
 def test_real_sossi_extract_flows_reach_the_lab_schedule_boundary() -> None:
-    from simulator.battery.consumer_inputs import collect_consumer_inputs
-    from simulator.battery.generators.bench import _document
+    from simulator.battery.consumer_inputs import (
+        _sossi_table2_flow_observation,
+        collect_consumer_inputs,
+    )
+    from simulator.battery.generators.bench import (
+        _document,
+        vacuum_pyrolysis_preset,
+    )
     from simulator.battery.migrate import load_migrated_benches, load_migrated_store
     from simulator.lab_schedule import _normalize_gas_boundary
 
@@ -176,15 +182,10 @@ def test_real_sossi_extract_flows_reach_the_lab_schedule_boundary() -> None:
                 f"::experiment::sossi-2019-run-{run_slug}"
             )
         )
-        observation = next(
-            item
-            for item in observations.values()
-            if item.source_id == source_id
-            and item.experiment_id == experiment.experiment_id
-            and item.identity.species.formula == "Mn"
-            and item.locator is not None
-            and item.locator.table == "2"
+        observation = _sossi_table2_flow_observation(
+            experiment, observations.values()
         )
+        assert observation is not None
         bench = benches[experiment.bench_id]
         inputs = collect_consumer_inputs(experiment, bench, observation)
         pressure = inputs.waypoints["run_pressure_boundary"].selected.value.point
@@ -193,6 +194,10 @@ def test_real_sossi_extract_flows_reach_the_lab_schedule_boundary() -> None:
         assert gas_boundary.route == (
             f"observation[{observation.observation_id}]"
             ".point_conditions.temperature_K"
+        )
+        generated = vacuum_pyrolysis_preset(inputs)
+        assert not any(
+            gap.waypoint == "gas_boundary" for gap in generated.readiness.gaps
         )
         boundary = _normalize_gas_boundary(_document(inputs, "gas_boundary"))
         return pressure, boundary, experiment, observation, bench
@@ -211,16 +216,24 @@ def test_real_sossi_extract_flows_reach_the_lab_schedule_boundary() -> None:
     assert "not load-bearing" in mixed["flow_reference_state"]["conversion_note"]
     assert "knob_defaulted" not in mixed["flow_reference_state"]
 
+    temperature_condition = observation.point_conditions["temperature_K"]
     mutated_note, count = re.subn(
         r"(P09/06/18a\*\s+1400\s+15\s+)130(\s+65\s+-9\.23)",
         r"\g<1>100\g<2>",
-        observation.locator.note,
+        temperature_condition.locator.note,
         count=1,
     )
     assert count == 1
+    mutated_temperature_condition = replace(
+        temperature_condition,
+        locator=replace(temperature_condition.locator, note=mutated_note),
+    )
     mutated_observation = replace(
         observation,
-        locator=replace(observation.locator, note=mutated_note),
+        point_conditions={
+            **observation.point_conditions,
+            "temperature_K": mutated_temperature_condition,
+        },
     )
     mutated_inputs = collect_consumer_inputs(
         experiment, bench, mutated_observation
@@ -236,3 +249,77 @@ def test_real_sossi_extract_flows_reach_the_lab_schedule_boundary() -> None:
     assert pure_co2["component_flows"]["CO2"]["value"] == 27.0
     assert "reported_total_flow" not in pure_co2
     assert pure_co2["pressure_control"]["pressure_driver"] == "imposed"
+
+
+def test_rps_cli_passes_the_real_sossi_run_record(tmp_path, monkeypatch) -> None:
+    import json
+
+    import scripts.bench_generate as cli
+    from simulator.battery.consumer_inputs import _sossi_table2_flow_observation
+    from simulator.battery.migrate import load_migrated_benches, load_migrated_store
+
+    source_id = "kems-012-sossi-2019"
+    works, experiments, observations = load_migrated_store(sources=(source_id,))
+    experiment = next(
+        item
+        for item in experiments.values()
+        if item.experiment_id.endswith(
+            "::experiment::sossi-2019-run-p09-06-18a"
+        )
+    )
+    observation = _sossi_table2_flow_observation(experiment, observations.values())
+    assert observation is not None
+    bench = load_migrated_benches()[experiment.bench_id]
+    source_observations = {
+        item.observation_id: item
+        for item in observations.values()
+        if item.experiment_id == experiment.experiment_id
+    }
+    monkeypatch.setattr(
+        cli, "load_migrated_benches", lambda _root: {bench.id: bench}
+    )
+    monkeypatch.setattr(cli, "_apparatus_references", lambda _root, _works: {})
+
+    def generate(output, run_observations):
+        monkeypatch.setattr(
+            cli,
+            "load_migrated_store",
+            lambda _root: (
+                works,
+                {experiment.experiment_id: experiment},
+                run_observations,
+            ),
+        )
+        assert cli.main(
+            [
+                "--consumer",
+                "rps",
+                "--source",
+                source_id,
+                "--output",
+                str(output),
+            ]
+        ) == 0
+        return json.loads((output / "summary.json").read_text())["records"][0]
+
+    record = generate(tmp_path / "with-flow-record", source_observations)
+    assert record["observation_id"] == observation.observation_id
+    assert "gas_boundary" not in {
+        gap["waypoint"] for gap in record["readiness"]["gaps"]
+    }
+
+    without_flow_record = {
+        key: item
+        for key, item in source_observations.items()
+        if item.observation_id != observation.observation_id
+    }
+    assert _sossi_table2_flow_observation(
+        experiment, without_flow_record.values()
+    ) is None
+    missing_flow_record = generate(
+        tmp_path / "without-flow-record", without_flow_record
+    )
+    assert missing_flow_record["observation_id"] is None
+    assert "gas_boundary" in {
+        gap["waypoint"] for gap in missing_flow_record["readiness"]["gaps"]
+    }

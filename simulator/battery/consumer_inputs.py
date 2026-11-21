@@ -170,6 +170,25 @@ def _sossi_table2_gas_boundary(experiment, observation):
     return boundary
 
 
+def _sossi_table2_flow_observation(experiment, observations):
+    locator = experiment.locator
+    note = locator.note if locator is not None else None
+    if not isinstance(note, str) or not note.startswith(_SOSSI_TABLE2_RUN_PREFIX):
+        return None
+    for observation in observations:
+        species = getattr(observation.identity, "species", None)
+        if (
+            observation.source_id != _SOSSI_SOURCE_ID
+            or observation.experiment_id != experiment.experiment_id
+            or getattr(species, "formula", None) != "Mn"
+            or observation.admission.status.value != "admitted"
+        ):
+            continue
+        if _sossi_table2_gas_boundary(experiment, observation) is not None:
+            return observation
+    return None
+
+
 @dataclass(frozen=True)
 class ConsumerInputs:
     experiment_id: str
@@ -292,7 +311,6 @@ def collect_consumer_inputs(experiment, bench, observation=None) -> ConsumerInpu
                         "experiment.pressure_environment.total_pressure_Pa",
                     ),
                 )
-                evidence[route_path] = observation.locator
                 waypoints[name] = WaypointResult(name, route, (route,))
                 continue
         candidates = []
