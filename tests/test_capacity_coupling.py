@@ -69,12 +69,17 @@ def _load_yaml(name: str) -> dict:
     return yaml.safe_load((DATA_DIR / name).read_text())
 
 
-def _real_capacity_sim():
+def _real_capacity_sim(*, legacy_capacity_throat: bool = False):
+    setpoints = _load_yaml("setpoints.yaml")
+    if legacy_capacity_throat:
+        from tests.studio_pin_support import set_legacy_capacity_throat
+
+        setpoints = set_legacy_capacity_throat(setpoints)
     return _build_sim(
         "lunar_mare_low_ti",
         _load_yaml("vapor_pressures.yaml"),
         _load_yaml("feedstocks.yaml"),
-        _load_yaml("setpoints.yaml"),
+        setpoints,
     )
 
 
@@ -1016,7 +1021,7 @@ def test_catalog_intrinsic_fo2_refuses_without_exact_solve_diagnostic():
 
 
 def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
-    sim = _real_capacity_sim()
+    sim = _real_capacity_sim(legacy_capacity_throat=True)
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1600.0
     monkeypatch.setattr(
@@ -1128,7 +1133,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
 
 
 def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkeypatch):
-    sim = _real_capacity_sim()
+    sim = _real_capacity_sim(legacy_capacity_throat=True)
     sim.campaign_mgr.campaigns["C0"]["p_total_mbar_default"] = 0.0
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1600.0
@@ -1309,7 +1314,7 @@ def test_default_off_c0_cover_does_not_apply_pipe_cap():
 
 def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
     """Ca/Ti ceiling flux stays live on a hot campaign the C0 cap does not scale."""
-    sim = _real_capacity_sim()
+    sim = _real_capacity_sim(legacy_capacity_throat=True)
     sim.start_campaign(CampaignPhase.C4)
     sim.melt.temperature_C = 1600.0
 

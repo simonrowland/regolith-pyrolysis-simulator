@@ -31,6 +31,7 @@ from simulator.session import (
 )
 from simulator.state import CampaignPhase, DecisionType
 from simulator.trace import PhysicsTrace
+from tests.studio_pin_support import TWELVE_CM_INITIAL_THROAT_AREA_M2
 
 
 def _run(**overrides) -> PyrolysisRun:
@@ -979,7 +980,7 @@ def _c4_point_two_mbar_transitional_run() -> PyrolysisRun:
             # tested transitional Knudsen point is independent of the new
             # 0.5 m engineering default.
             "condenser_geometry": {
-                "initial_throat_area_m2": 0.011309733552923255,
+                "initial_throat_area_m2": TWELVE_CM_INITIAL_THROAT_AREA_M2,
             },
         },
         allow_fallback_vapor=True,
@@ -1170,7 +1171,7 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
             "furnace_max_T_C": 1700,
             "campaigns": {"C4": {"p_total_mbar_default": 10.2}},
             "condenser_geometry": {
-                "initial_throat_area_m2": 0.011309733552923255,
+                "initial_throat_area_m2": TWELVE_CM_INITIAL_THROAT_AREA_M2,
             },
         },
         allow_fallback_vapor=True,

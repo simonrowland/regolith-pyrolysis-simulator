@@ -10,6 +10,17 @@ from simulator.runner import build_sio_yield_report
 from simulator.state import CampaignPhase
 
 
+TWELVE_CM_INITIAL_THROAT_AREA_M2 = 0.011309733552923255
+
+
+def set_legacy_capacity_throat(setpoints: dict) -> dict:
+    """Pin capacity-only tests to the historical 12 cm throat input."""
+    geometry = dict(setpoints.get("condenser_geometry", {}) or {})
+    geometry["initial_throat_area_m2"] = TWELVE_CM_INITIAL_THROAT_AREA_M2
+    setpoints["condenser_geometry"] = geometry
+    return setpoints
+
+
 def sio_evolved_baseline(feedstock: str) -> float:
     path = Path(__file__).parent / "fixtures" / "sio_yield" / f"{feedstock}_c2a.json"
     return json.loads(path.read_text(encoding="utf-8"))["sio_evolved_kg"]

@@ -4817,7 +4817,7 @@ class EvaporationMixin:
             raise AccountingError(
                 "condensation_product_accounts must be a mapping"
             )
-        products = self._products_excluding_overhead_gas(
+        products = EvaporationMixin._products_excluding_overhead_gas(
             products, raw_product_accounts
         )
         for raw_product in products:

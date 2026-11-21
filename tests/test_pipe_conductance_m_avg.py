@@ -1021,15 +1021,24 @@ def test_sc333_equipment_overhead_pipe_transport_numeric_pins():
         actual = OverheadGasModel._gas_dynamic_viscosity_Pa_s(temperature_K)
         assert actual.hex() == expected_hex
 
-    equipment_conductance = EquipmentDesigner({}).size_collection_pipe(
+    condenser_geometry = {
+        "initial_throat_area_m2": DEFAULT_INITIAL_THROAT_AREA_M2,
+    }
+    equipment_conductance = EquipmentDesigner({
+        "condenser_geometry": condenser_geometry,
+    }).size_collection_pipe(
         0.010,
         10.0,
     ).conductance_kg_s
-    overhead_conductance = OverheadGasModel({})._pipe_conductance(
+    overhead_conductance = OverheadGasModel(
+        condenser_geometry_config=condenser_geometry,
+    )._pipe_conductance(
         1000.0,
         1500.0,
     )
-    expected_conductance_hex = "0x1.c4f75c42aeb21p-4"
+    # The configured d-452 throat is 0.50 m; the old 0.12 m pin was
+    # approximately 301x smaller under the d^4 Poiseuille relation.
+    expected_conductance_hex = "0x1.0aa7ddd3e219fp+5"
 
     assert equipment_conductance.hex() == expected_conductance_hex
     assert overhead_conductance.hex() == expected_conductance_hex

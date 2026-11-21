@@ -2479,8 +2479,8 @@ def test_exchange_target_cannot_exceed_controlled_total_pressure() -> None:
 @pytest.mark.parametrize(
     ("buffer_o2_mol", "expected_unbacked_o2_mol", "expected_fO2_log"),
     [
-        (0.0, 0.0015952259282159419, -1.0),
-        (1.0e-6, 0.001594225928215942, -1.0000000153832351),
+        (0.0, 0.005052006283150437, -1.0),
+        (1.0e-6, 0.0050510062831504365, -1.0000000153832351),
     ],
 )
 def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(

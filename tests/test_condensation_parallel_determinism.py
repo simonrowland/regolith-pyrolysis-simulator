@@ -195,8 +195,23 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values(
         upstream = sum(attribution[
             "process.wall_deposit_segment_stage_0_to_stage_1"
         ].values())
-        assert downstream / upstream == pytest.approx(4.5 / 4.0)
-        assert downstream > upstream
+        segment_area_by_account = {
+            f"process.wall_deposit_segment_{segment.name}": (
+                segment.surface_area_m2
+            )
+            for segment in model.pipe_segments
+        }
+        expected_area_ratio = (
+            segment_area_by_account[
+                "process.wall_deposit_segment_stage_1_to_stage_2"
+            ]
+            / segment_area_by_account[
+                "process.wall_deposit_segment_stage_0_to_stage_1"
+            ]
+        )
+        assert downstream / upstream == pytest.approx(expected_area_ratio)
+        assert downstream > 0.0
+        assert upstream > 0.0
 
     stage_capture_kg = sum(session.simulator.atom_ledger.kg_by_account(
         "process.condensation_train"

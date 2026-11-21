@@ -237,11 +237,11 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
         # dimensionless and an absent parcel contributes zero to the sum.
         # Reverting only _route to its pre-21f065338 version recovers the old
         # 8.428322859789999e-06 kg pin; preserving flow gives the measured value below.
-        # With t-1217 causal capture and b-850 parent-oxide alkali-dimer
-        # activity both active, the merged unavailable-MAGEMin run measures
-        # 8.42832285937e-06 kg at 1050 C.
+        # With the d-452 absolute Stage-3 area active, the Studio r9 production
+        # run measures 8.82760284106e-07 kg at 1050 C; the larger collector
+        # captures more SiO before it reaches this cold wall.
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            8.42832285937e-06, rel=1e-9
+            8.82760284106e-07, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9
@@ -637,8 +637,10 @@ def test_wall_route_depletes_partial_pressure_after_upstream_wall_capture(
         gas_temperature_C=500.0,
         campaign_name="C2A",
         carrier_gas="N2",
+        # Keep collector capture out of this wall-only route check; non-
+        # designated species may now condense on intermediate stages.
         stage_area_m2_by_stage={
-            str(stage.stage_number): 1.0 for stage in model.train.stages
+            str(stage.stage_number): 0.0 for stage in model.train.stages
         },
     )
     liner_material = model.pipe_segments[0].liner_material

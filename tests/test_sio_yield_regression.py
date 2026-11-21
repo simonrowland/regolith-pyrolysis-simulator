@@ -700,25 +700,12 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # therefore re-grounds the two cancellation residuals, not a free tuning
     # parameter; canonical atom-ledger closure remains independently bounded
     # at 5e-12 percent.
-    # t-1217 restores source-preserving causal capture and changes the bulk-
-    # inventory subtraction's roundoff path; b-850 parent-oxide alkali-dimer
-    # activities shift the SiO route, yielding midpoint-era 24-hour closure
-    # residuals of 6.164333585288513e-7% (lunar) and 2.2716051402658465e-7%
-    # (Mars). d-137fix4 integrates the Stage-3 band before applying the same
-    # excess-inventory balance; the production resolver now reports the pins
-    # below without relaxing the independent atom-ledger closure bound.
-    # The lunar pin is the studio-3 actual (pins2 log, tree 9666fc129 plus
-    # the de32c69ca runner regen). Lunar full runs diverge between the laptop
-    # and studio-3, so this value is not a laptop re-run.
+    # The diagnostic subtracts nearly equal bulk SiO2 inventories. These are
+    # the Studio r9 outputs with d-452 sized collectors; canonical atom-ledger
+    # closure is checked independently above.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 6.164333585288513e-7,
-        # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
-        # from reservoir.fo2_buffer; the unbacked remainder is held and the
-        # resulting subtraction residual is reported by the production resolver.
-        # The piecewise segment solve changes the cancellation residual by
-        # 1.134167275e-14 percentage points from the single-exponential pin;
-        # canonical atom-ledger balance remains within 5e-12 percent.
-        "mars_basalt": 2.2716049134323923e-7,
+        "lunar_mare_low_ti": 4.996531688685302e-7,
+        "mars_basalt": 3.124527719015969e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
@@ -800,14 +787,18 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     assert route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"] > 0.0
     assert 0.0 < route.condensed_by_stage_species[
         "stage_4_alkali_mg_cyclone"]["SiO"] < 0.95
-    # Cold-wall SiO now uses the Pound 1972 unity condensation gate below the
-    # Wetzel/Gail evaporation-Arrhenius validity floor.
-    # Production at ae5998456 explicitly reports P_sat=0 for that reactive
-    # product backstop, yielding the measured 0.6848392024862018 kg remainder.
-    # The earlier 0.6877125897008886 pin predates this diagnostic path.
-    assert route.remaining_by_species["SiO"] == pytest.approx(
-        0.6848392024862018
+    # The d-452 route now includes downstream duct walls after Stage 3, so the
+    # old remaining-mass pin no longer describes this path. Check the live
+    # destinations close the synthetic one-kilogram SiO parcel instead.
+    stage_capture_kg = sum(
+        float(stage.get("SiO", 0.0))
+        for stage in route.condensed_by_stage_species.values()
     )
+    assert (
+        stage_capture_kg
+        + float(route.wall_deposit_by_species.get("SiO", 0.0))
+        + float(route.remaining_by_species["SiO"])
+    ) == pytest.approx(1.0)
     assert route.wall_deposit_by_species.get("SiO", 0.0) >= 0.0
 
 
@@ -1015,12 +1006,14 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
         wall_temperature_C=900.0,
     )
     # This direct-route pin isolates the free-molecular wall budget and
-    # sticking-alpha notice from production's provisional condenser geometry.
+    # sticking-alpha notice from stage capture and provisional duct sizing.
     model.configure_operating_conditions(
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"SiO": 1.0},
         campaign_name="C0",
-        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 0.0 for stage in model.train.stages
+        },
     )
     melt = MeltState()
     melt.temperature_C = 1700.0
@@ -1322,26 +1315,13 @@ def test_po2_wall_sweep_mode_suppresses_first_tick_sio_release():
         sim.melt.pO2_mbar = float(pO2_mbar)
         sim.melt.p_total_mbar = max(sim.melt.p_total_mbar, float(pO2_mbar))
         sim.melt.temperature_C = 1500.0
-        # 2026-08-05 MC-4 wave 1B (a34318c): the SiO2(g) gas-exchange carrier
-        # draws from the same SiO2 pool but is pO2-insensitive
-        # (pO2_exponent 0.0), so the old SiO2-drawdown proxy no longer
-        # isolates the SiO channel the 1/sqrt(pO2) lever acts on (executed:
-        # SiO2_gas leg 6.3814e-05 mol in both modes; SiO leg ratio exactly
-        # 1.0e-3). Measure the SiO channel directly as the ledger-wide SiO
-        # delta across every sink account.
-        def _sio_mol_total() -> float:
-            return sum(
-                float(payload.get("SiO", 0.0))
-                for payload in sim.atom_ledger.mol_by_account().values()
-                if isinstance(payload, dict)
-            )
-
-        initial_sio_mol = _sio_mol_total()
-        sim.step()
-        sio_mol = max(0.0, _sio_mol_total() - initial_sio_mol)
-        from simulator.state import MOLAR_MASS
-        sio_molar_mass_kg_mol = MOLAR_MASS["SiO"] / 1000.0
-        return sio_mol * sio_molar_mass_kg_mol
+        # SiO2(g) is pO2-insensitive, so read the SiO source flux directly.
+        snapshot = sim.step()
+        # Condensation can immediately convert SiO into Si + SiO2, so a
+        # ledger-wide SiO-species delta no longer measures the source flux.
+        return float(snapshot.evap_flux.species_kg_hr.get("SiO", 0.0)) * float(
+            snapshot.duration_h
+        )
 
     # pO2 ~vacuum: tiny floor, near hard-vacuum suppression.
     no_suppress = _evolved_sio_kg_one_tick(pO2_mbar=1.0e-6)

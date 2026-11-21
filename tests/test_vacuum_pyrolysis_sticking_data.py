@@ -415,11 +415,12 @@ def test_sio_wall_alpha_changes_unsaturated_route_in_kinetic_direction(monkeypat
     model = CondensationModel(
         CondensationTrain.create_default(),
         wall_temperature_C=900.0,
+        wall_surface_area_m2=1.0e-6,
     )
     _configure_knudsen_policy(model)
     model.configure_operating_conditions(
         stage_area_m2_by_stage={
-            str(stage.stage_number): 1e-6 for stage in model.train.stages
+            str(stage.stage_number): 0.0 for stage in model.train.stages
         },
     )
     melt = MeltState()

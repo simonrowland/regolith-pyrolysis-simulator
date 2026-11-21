@@ -605,21 +605,11 @@ def test_headless_full_run_ledgers_and_product_story_web(
         float(offgas_kg.get(species, 0.0) or 0.0) * _cr_mass_fraction(species)
         for species in ("Cr", "CrO", "CrO2", "CrO3")
     )
-    # Stage 4 now captures Na/Mg at 250 C and K at 40 C. That changes per-hour
-    # alkali capture and the later pressure-limited reduction trajectory: the
-    # independent runner and web paths both move Cr2O3 from 3.3280300206015765
-    # to 3.3283236817361845 kg, while Cr-equivalent terminal offgas moves from
-    # 9.216286830238766e-06 to 0.1824367962875407 kg and extracted Cr falls
-    # from 0.18 to 0 kg. The Cr2O3 delta is 0.000293661134608 kg; dividing by
-    # the old residual gives 8.8239e-5 (dimensionless); kg cancel in that
-    # ratio. In the limiting case of
-    # unchanged alkali capture, the late reduction trajectory and delta return
-    # to the old value. The sum still closes the 2.46 kg feed Cr inventory.
-    # d-137 rounds 5-7 (per-strip piecewise capture solution) move this by
-    # 3.93e-9 kg (1.18e-9 relative): float-level, measured on studio-3 at
-    # 340d3c9c5 with the nightly tier; the band-integration bisect bounds the
-    # solver's per-call differences at <=1.1e-7 kg.
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.328323685668657, rel=1e-9)
+    # The d-452 sized condenser train changes alkali capture and downstream
+    # Cr reduction. Studio r9 reports 3.1967691111738374 kg in the terminal
+    # ceramic rump; the ledger and extraction assertions below check the
+    # surrounding product story.
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.1967691111738374, rel=1e-9)
     assert cr_ingot_kg == 0.0
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)

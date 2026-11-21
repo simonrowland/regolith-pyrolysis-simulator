@@ -181,7 +181,7 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
         "terminal.chromium_condensed_oxide_stored"
     )
     train = sim.atom_ledger.kg_by_account("process.condensation_train")
-    stage_2 = sim.train.stages[2].collected_kg
+    stages = [stage.collected_kg for stage in sim.train.stages]
     later_stages = [
         stage.collected_kg for stage in sim.train.stages if stage.stage_number != 2
     ]
@@ -192,13 +192,16 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
         transition.reason == "evaporate_CrO2"
         for transition in sim.atom_ledger.transitions
     )
-    # Stage 2 now materializes the declared stable CrO2 -> Cr2O3 + O2 route;
-    # the terminal cartridge mirrors that product without duplicating atoms.
+    # The declared stable CrO2 -> Cr2O3 + O2 route materializes the oxide in
+    # the train, and the terminal cartridge mirrors all stage deposits without
+    # duplicating atoms.
     assert terminal_chromia.get("Cr2O3", 0.0) > 0.0
     assert "Cr2O3" not in train
-    assert stage_2.get("Cr2O3", 0.0) == pytest.approx(terminal_chromia["Cr2O3"])
+    assert sum(float(stage.get("Cr2O3", 0.0)) for stage in stages) == pytest.approx(
+        terminal_chromia["Cr2O3"]
+    )
     # CrO2 reacts into chromia, but elemental Cr is below wall saturation.
-    assert stage_2.get("Cr", 0.0) == 0.0
+    assert stages[2].get("Cr", 0.0) == 0.0
     cr_outcomes = sim.condensation_model.last_condensation_refusals_by_species["Cr"]["stage_outcomes"]
     assert any(item["stage_number"] == 2 and item["reason"] == "no_supersaturation"
                and item["eta"] == 0.0 for item in cr_outcomes)

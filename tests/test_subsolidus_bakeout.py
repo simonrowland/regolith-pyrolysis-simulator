@@ -40,6 +40,7 @@ from simulator.subsolidus_bakeout import (
     seam_refusal,
     throttle_mass_rate_kg_hr,
 )
+from tests.studio_pin_support import set_legacy_capacity_throat
 from simulator.vapour_rail.channels import (
     CHANNEL_REGISTRY,
     CHANNEL_S2,
@@ -613,9 +614,12 @@ def test_joint_release_stays_within_pipe_capacity():
     scale = throughput / (solid_peak + admitted)
     backend = InternalAnalyticalBackend()
     backend.initialize({})
+    setpoints = set_legacy_capacity_throat(
+        yaml.safe_load((_DATA / "setpoints.yaml").read_text())
+    )
     sim = PyrolysisSimulator(
         backend,
-        yaml.safe_load((_DATA / "setpoints.yaml").read_text()),
+        setpoints,
         {"feed": {
             "label": "joint",
             # FeO is the melt parent, so the real condensation route can
@@ -783,9 +787,12 @@ def test_c0_same_step_pipe_cap_numeric_pin():
     """Pin the production C0 gas cap before sharing its capacity owner."""
     backend = InternalAnalyticalBackend()
     backend.initialize({})
+    setpoints = set_legacy_capacity_throat(
+        yaml.safe_load((_DATA / "setpoints.yaml").read_text())
+    )
     sim = PyrolysisSimulator(
         backend,
-        yaml.safe_load((_DATA / "setpoints.yaml").read_text()),
+        setpoints,
         yaml.safe_load((_DATA / "feedstocks.yaml").read_text()),
         yaml.safe_load((_DATA / "vapor_pressures.yaml").read_text()),
     )
