@@ -594,20 +594,13 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         to ``status='unavailable'`` cleanly.
         """
         _ensure_close_reaper()
-        if self._backend_initialised and self._backend is None:
-            return None
         if self._backend is not None:
             if not self._backend_initialised:
                 self._backend_initialization_error = None
                 try:
-                    initialized = self._backend.initialize(
+                    self._backend.initialize(
                         dict(_SHADOW_BACKEND_CONFIG)
                     )
-                    if initialized is False:
-                        self._backend = None
-                        self._backend_finalizer = None
-                        self._backend_initialised = True
-                        return None
                 except Exception as exc:
                     self._backend_initialization_error = exc
                 self._backend_initialised = True
@@ -625,13 +618,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 backend_finalizer = weakref.finalize(
                     self, _enqueue_backend_close, close, os.getpid()
                 )
-            if backend.initialize(dict(_SHADOW_BACKEND_CONFIG)) is False:
-                if backend_finalizer is not None:
-                    backend_finalizer()
-                self._backend = None
-                self._backend_finalizer = None
-                self._backend_initialised = True
-                return None
+            backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
         except Exception as exc:
             self._backend_initialization_error = exc
             if backend_finalizer is not None:
