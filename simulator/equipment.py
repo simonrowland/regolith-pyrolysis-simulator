@@ -204,7 +204,14 @@ class EquipmentDesigner:
         geometry = (
             lab_geometry
             if isinstance(lab_geometry, LabGeometry)
-            else parse_lab_geometry(lab_geometry)
+            else parse_lab_geometry(
+                lab_geometry,
+                allow_temperature_profiles=(
+                    isinstance(lab_geometry, Mapping)
+                    and str(lab_geometry.get("scale") or "").strip()
+                    == LAB_GEOMETRY_SCALE
+                ),
+            )
         )
         if geometry is not None and geometry.scale == LAB_GEOMETRY_SCALE:
             return self.design_for_lab_geometry(

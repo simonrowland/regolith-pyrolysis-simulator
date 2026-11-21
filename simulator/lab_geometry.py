@@ -184,6 +184,7 @@ def parse_lab_geometry(
             index,
             surface,
             allow_temperature_profiles=allow_temperature_profiles,
+            allow_temperature_default=scale == LAB_GEOMETRY_SCALE,
         )
         for index, surface in enumerate(surfaces_raw)
     )
@@ -279,11 +280,59 @@ def gram_lab_exposed_melt_area_bridge(
     return bridge
 
 
+def _lab_surface_temperature_default_notices(
+    raw: Mapping[str, Any],
+    *,
+    sample_mass_g: float | None,
+    allow_temperature_profiles: bool,
+) -> list[dict[str, Any]]:
+    """Describe gram-lab surface temperatures supplied by the pipe fallback."""
+
+    if str(raw.get("scale") or "").strip() != LAB_GEOMETRY_SCALE:
+        return []
+    surfaces = raw.get("surfaces")
+    if not isinstance(surfaces, list):
+        return []
+    notices: list[dict[str, Any]] = []
+    for surface in surfaces:
+        if not isinstance(surface, Mapping):
+            continue
+        surface_id = str(surface.get("id") or "").strip()
+        if not surface_id:
+            continue
+        temperature_profile = str(
+            surface.get("temperature_profile") or ""
+        ).strip()
+        _, defaulted = _surface_temperature_resolution(
+            surface,
+            surface_id,
+            temperature_profile=temperature_profile,
+            allow_temperature_profiles=allow_temperature_profiles,
+            allow_temperature_default=True,
+        )
+        if not defaulted:
+            continue
+        notice: dict[str, Any] = {
+            "code": "knob_defaulted",
+            "path": f"lab_geometry.surfaces.{surface_id}.temperature_C",
+            "value": _LAB_SURFACE_TEMPERATURE_DEFAULT_C,
+            "unit": "C",
+            "default_source": "LabSurface.to_pipe_segment.wall_temperature_C",
+            "source_class": "assumption_with_sensitivity_marker",
+            "sensitivity_marker": "defaulted_lab_surface_temperature",
+        }
+        if sample_mass_g is None:
+            notice["out_of_domain"] = True
+        notices.append(notice)
+    return notices
+
+
 def _parse_lab_surface(
     index: int,
     raw: Any,
     *,
     allow_temperature_profiles: bool,
+    allow_temperature_default: bool,
 ) -> LabSurface:
     if not isinstance(raw, Mapping):
         raise LabGeometryError(
@@ -297,11 +346,12 @@ def _parse_lab_surface(
     role = _canonical_role(raw.get("role"), surface_id=surface_id)
     area_m2 = _required_finite_positive(raw.get("area_m2"), f"{surface_id}.area_m2")
     temperature_profile = str(raw.get("temperature_profile") or "").strip()
-    temperature_C = _surface_temperature_C(
+    temperature_C, _ = _surface_temperature_resolution(
         raw,
         surface_id,
         temperature_profile=temperature_profile,
         allow_temperature_profiles=allow_temperature_profiles,
+        allow_temperature_default=allow_temperature_default,
     )
     view_factor = _required_unit_interval(
         raw.get("view_factor_from_melt"),
@@ -351,18 +401,26 @@ def _canonical_role(value: Any, *, surface_id: str) -> str:
     return role
 
 
-def _surface_temperature_C(
+def _surface_temperature_resolution(
     raw: Mapping[str, Any],
     surface_id: str,
     *,
     temperature_profile: str,
     allow_temperature_profiles: bool,
-) -> float | None:
+    allow_temperature_default: bool,
+) -> tuple[float | None, bool]:
     for key in ("temperature_C", "wall_temperature_C"):
         if key in raw:
-            return _required_finite(raw[key], f"{surface_id}.{key}")
-    if allow_temperature_profiles and temperature_profile:
-        return None
+            return _required_finite(raw[key], f"{surface_id}.{key}"), False
+    if temperature_profile:
+        if allow_temperature_profiles:
+            return None, allow_temperature_default
+        raise LabGeometryError(
+            "missing_lab_surface_temperature",
+            f"{surface_id}: temperature_C or resolvable temperature_profile is required",
+        )
+    if allow_temperature_default:
+        return _LAB_SURFACE_TEMPERATURE_DEFAULT_C, True
     raise LabGeometryError(
         "missing_lab_surface_temperature",
         f"{surface_id}: temperature_C or resolvable temperature_profile is required",

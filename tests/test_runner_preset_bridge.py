@@ -20,6 +20,7 @@ from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     COMPARISON_SCHEMA_VERSION,
 )
 from simulator.lab_geometry import LAB_GEOMETRY_SCALE, LabGeometryError
+from simulator.lab_schedule import LabScheduleValidationError
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession
 from tests.test_runner_smoke import _assert_schema_shape
@@ -326,6 +327,34 @@ def test_null_exposed_melt_area_defaults_to_sized_crucible_face() -> None:
         crucible_area_m2 = sim._equipment.crucible.melt_surface_area_m2
         assert crucible_area_m2 > 0.0
         assert sim.melt.melt_surface_area_m2 == pytest.approx(crucible_area_m2)
+        if name == "sesko_2024.yaml":
+            normalized = sim.campaign_mgr._lab_schedule(
+                runner_module.CampaignPhase.C0
+            )
+            assert [point["value"] for point in normalized[
+                "chamber_pressure_mbar"
+            ]] == [pytest.approx(1.0), pytest.approx(1.0)]
+            assert sim.campaign_mgr.lab_schedule_notices == [
+                {
+                    "code": "knob_defaulted",
+                    "path": "lab_schedule.chamber_pressure_mbar",
+                    "value": pytest.approx(1.0),
+                    "unit": "mbar",
+                    "default_source": "campaigns.C0.p_total_mbar_default",
+                    "out_of_domain": True,
+                }
+            ]
+            result = run._run_session(session)
+            runtime_notices = {
+                notice["path"]: notice
+                for notice in result["run_metadata"]["notices"]
+            }
+            assert runtime_notices[
+                "lab_schedule.chamber_pressure_mbar"
+            ]["out_of_domain"] is True
+            assert runtime_notices[
+                "lab_geometry.surfaces.quartz_window.temperature_C"
+            ]["value"] == pytest.approx(0.0)
 
     robinot = _vacuum_preset("robinot_2026.yaml")
     printed = copy.deepcopy(robinot)
@@ -369,6 +398,34 @@ def test_null_exposed_melt_area_defaults_to_sized_crucible_face() -> None:
         pomeroy_sized_face_m2
     )
     assert pomeroy_area_notice["out_of_domain"] is True
+
+
+def test_missing_pressure_default_is_limited_to_gram_lab() -> None:
+    setpoints = copy.deepcopy(runner_module.load_config_bundle().setpoints)
+    setpoints["lab_geometry"] = {"scale": "pilot_scale"}
+    manager = runner_module.CampaignManager(setpoints)
+    schedule = copy.deepcopy(
+        _vacuum_preset("pomeroy_cardiff_2006.yaml")["lab_schedule"]
+    )
+    manager.overrides["C0"] = {"lab_schedule": schedule}
+
+    with pytest.raises(
+        LabScheduleValidationError,
+        match="lab_schedule_chamber_pressure_mbar_must_be_points",
+    ):
+        manager._lab_schedule(runner_module.CampaignPhase.C0)
+    assert manager.lab_schedule_notices == []
+
+    schedule["chamber_pressure_mbar"] = [
+        {"t_h": 0.0, "value": 2.0, "unit": "mbar"},
+        {"t_h": 4.0, "value": 2.0, "unit": "mbar"},
+    ]
+    manager.overrides["C0"] = {"lab_schedule": schedule}
+    normalized = manager._lab_schedule(runner_module.CampaignPhase.C0)
+    assert [point["value"] for point in normalized[
+        "chamber_pressure_mbar"
+    ]] == [pytest.approx(2.0), pytest.approx(2.0)]
+    assert manager.lab_schedule_notices == []
 
 
 def test_c0_start_installs_printed_area_before_the_bridge(

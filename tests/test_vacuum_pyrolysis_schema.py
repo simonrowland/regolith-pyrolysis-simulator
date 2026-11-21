@@ -69,7 +69,6 @@ ROBINOT_EAC1_ELEMENTAL_WT_PCT = {
     "Ti": 2.0,
     "Fe": 3.0,
 }
-SESKO_PRESSURE_RUNTIME_FLOOR_MBAR = pytest.approx(1.0e-3)
 SESKO_PRESSURE_REPORTED_MIN_MBAR = pytest.approx(1.0e-7)
 SESKO_PRESSURE_REPORTED_MAX_MBAR = pytest.approx(1.0e-2)
 SESKO_TEMP_MIN_C = pytest.approx(1476.85)
@@ -81,7 +80,6 @@ SESKO_DEPOSIT_THICKNESS_UM = pytest.approx(31.3)
 SESKO_TEMP_EMISSIVITY = pytest.approx(0.98)
 SESKO_TRACKING_INTERVAL_MIN = pytest.approx(5)
 SESKO_FIXED_MIRROR_ANGLE_DEG = pytest.approx(45)
-SESKO_PRESSURE_RUNTIME_DELTA_ID = "pressure_floor_delta_reported_uhv_min_to_runtime_floor"
 POMEROY_DURATION_H = pytest.approx(4.0)
 POMEROY_OUTGAS_END_H = pytest.approx(2.0)
 POMEROY_RAMP_END_H = pytest.approx(3.6666666666666665)
@@ -318,15 +316,32 @@ def require_not_reported_gas_boundary(row: dict, detail: str) -> None:
 def require_schedule_point_units(schedule: dict) -> None:
     require_points_have_unit(schedule.get("melt_temperature_C"), "C", "melt_temperature_C")
     if schedule.get("chamber_pressure_mbar") is None:
-        pressure_control = (schedule.get("gas_boundary") or {}).get(
-            "pressure_control"
+        profile = schedule.get("reported_exposure_profile")
+        reported_pressure = (
+            profile.get("pressure_mbar") if isinstance(profile, dict) else None
         )
-        require(
-            is_not_reported(pressure_control)
-            and pressure_control.get("source_class") == NOT_REPORTED,
-            "missing_schedule_pressure_must_be_not_reported",
-            "chamber_pressure_mbar may be omitted only when pressure is not reported",
-        )
+        if isinstance(reported_pressure, dict) and {
+            "reported_min_value",
+            "reported_max_value",
+            "reported_unit",
+        } <= set(reported_pressure):
+            require(
+                reported_pressure["reported_unit"] == "mbar"
+                and reported_pressure["reported_min_value"]
+                <= reported_pressure["reported_max_value"],
+                "invalid_reported_pressure_range",
+                "reported_exposure_profile.pressure_mbar",
+            )
+        else:
+            pressure_control = (schedule.get("gas_boundary") or {}).get(
+                "pressure_control"
+            )
+            require(
+                is_not_reported(pressure_control)
+                and pressure_control.get("source_class") == NOT_REPORTED,
+                "missing_schedule_pressure_must_be_not_reported",
+                "chamber_pressure_mbar may be omitted only when pressure is not reported",
+            )
     else:
         require_points_have_unit(
             schedule.get("chamber_pressure_mbar"),
@@ -532,6 +547,7 @@ def test_unreported_pomeroy_knobs_use_runner_defaults_and_report_them(
         {"t_h": 4.0, "value": 3.0, "unit": "mbar"},
     ]
     mutated_document["lab_schedule"]["chamber_pressure_mbar"] = explicit_pressure
+    mutated_document["lab_geometry"]["surfaces"][0]["temperature_C"] = 37.0
     mutated_path = tmp_path / "pomeroy_mutated_mass.yaml"
     mutated_path.write_text(yaml.safe_dump(mutated_document), encoding="utf-8")
     mutated = runner_module._load_vacuum_preset_run_spec(
@@ -545,6 +561,7 @@ def test_unreported_pomeroy_knobs_use_runner_defaults_and_report_them(
     }
     assert "mass_kg" not in mutated_notices
     assert "lab_schedule.chamber_pressure_mbar" not in mutated_notices
+    assert "lab_geometry.surfaces.crucible_wall.temperature_C" not in mutated_notices
 
 
 @pytest.mark.parametrize(
@@ -622,12 +639,37 @@ def test_benchtop_presets_report_stage0_refusal_and_defaults(
         assert reported_pressure["reported_max_value"] == (
             SESKO_PRESSURE_REPORTED_MAX_MBAR
         )
-        assert preset.lab_schedule["chamber_pressure_mbar"][0]["value"] == (
-            SESKO_PRESSURE_RUNTIME_FLOOR_MBAR
+        expected_pressure_mbar = runner_module.CampaignManager(
+            bundle.setpoints
+        )._pressure_config_float(
+            runner_module.CampaignPhase.C0,
+            "p_total_mbar",
+            "p_total_mbar_default",
         )
-        assert preset.lab_schedule["chamber_pressure_mbar"][0][
-            "runtime_delta_annotation_id"
-        ] == SESKO_PRESSURE_RUNTIME_DELTA_ID
+        assert expected_pressure_mbar == pytest.approx(1.0)
+        assert [
+            point["value"]
+            for point in preset.lab_schedule["chamber_pressure_mbar"]
+        ] == [expected_pressure_mbar, expected_pressure_mbar]
+        pressure_notice = next(
+            notice
+            for notice in preset.provenance["notices"]
+            if notice["path"] == "lab_schedule.chamber_pressure_mbar"
+        )
+        assert pressure_notice["value"] == pytest.approx(expected_pressure_mbar)
+        assert pressure_notice["out_of_domain"] is True
+        surface_notices = [
+            notice
+            for notice in preset.provenance["notices"]
+            if notice["path"].startswith("lab_geometry.surfaces.")
+        ]
+        assert {notice["path"] for notice in surface_notices} == {
+            "lab_geometry.surfaces.quartz_window.temperature_C",
+            "lab_geometry.surfaces.crucible_wall.temperature_C",
+            "lab_geometry.surfaces.chamber_wall.temperature_C",
+        }
+        assert all(notice["value"] == pytest.approx(0.0) for notice in surface_notices)
+        assert all("out_of_domain" not in notice for notice in surface_notices)
     else:
         expected_mass_kg = runner_module.PyrolysisRun(
             feedstock_id=preset.feedstock_id
@@ -653,6 +695,9 @@ def test_benchtop_presets_report_stage0_refusal_and_defaults(
         assert set(notices) == {
             "mass_kg",
             "lab_schedule.chamber_pressure_mbar",
+            "lab_geometry.surfaces.crucible_wall.temperature_C",
+            "lab_geometry.surfaces.cold_trap.temperature_C",
+            "lab_geometry.surfaces.rga_line.temperature_C",
         }
         mass_notice = notices["mass_kg"]
         pressure_notice = notices["lab_schedule.chamber_pressure_mbar"]
@@ -662,6 +707,15 @@ def test_benchtop_presets_report_stage0_refusal_and_defaults(
         assert pressure_notice["code"] == "knob_defaulted"
         assert pressure_notice["value"] == pytest.approx(
             expected_pressure_mbar
+        )
+        assert all(
+            notices[path]["value"] == pytest.approx(0.0)
+            and notices[path]["out_of_domain"] is True
+            for path in (
+                "lab_geometry.surfaces.crucible_wall.temperature_C",
+                "lab_geometry.surfaces.cold_trap.temperature_C",
+                "lab_geometry.surfaces.rga_line.temperature_C",
+            )
         )
         assert area_notice["out_of_domain"] is True
 
@@ -828,19 +882,12 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
     assert schedule["melt_temperature_C"][0]["value"] == SESKO_TEMP_MIN_C
     assert schedule["melt_temperature_C"][-1]["value"] == SESKO_TEMP_MAX_C
     assert schedule["melt_temperature_C"][0]["unit"] == "C"
-    assert schedule["chamber_pressure_mbar"][0]["value"] == SESKO_PRESSURE_RUNTIME_FLOOR_MBAR
-    assert schedule["chamber_pressure_mbar"][0]["runtime_delta_annotation_id"] == SESKO_PRESSURE_RUNTIME_DELTA_ID
-    assert schedule["chamber_pressure_mbar"][-1]["value"] == SESKO_PRESSURE_REPORTED_MAX_MBAR
+    assert "chamber_pressure_mbar" not in schedule
+    assert "runtime_schedule_annotations" not in schedule
     reported_profile = schedule["reported_exposure_profile"]["pressure_mbar"]
     assert reported_profile["reported_min_value"] == SESKO_PRESSURE_REPORTED_MIN_MBAR
     assert reported_profile["reported_max_value"] == SESKO_PRESSURE_REPORTED_MAX_MBAR
     assert reported_profile["qualifier"] == "oscillating_range"
-    runtime_delta = {
-        row["id"]: row for row in schedule["runtime_schedule_annotations"]
-    }[SESKO_PRESSURE_RUNTIME_DELTA_ID]
-    assert runtime_delta["reported_value"] == SESKO_PRESSURE_REPORTED_MIN_MBAR
-    assert runtime_delta["runtime_value"] == SESKO_PRESSURE_RUNTIME_FLOOR_MBAR
-    assert runtime_delta["reason"] == "normalize_lab_schedule_floor"
     assert schedule["gas_boundary"]["background_gas"]["reported_status"] == NOT_REPORTED
     assert schedule["gas_boundary"]["imposed_flow"]["reported_status"] == NOT_REPORTED
     assert schedule["gas_boundary"]["pressure_control"]["mode"] == "pumped_dynamic_uhv_exposure"

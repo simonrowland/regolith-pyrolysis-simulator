@@ -298,6 +298,48 @@ def test_unresolved_surface_pipe_segment_keeps_existing_zero_temperature() -> No
     assert segment.wall_temperature_C == pytest.approx(0.0)
 
 
+def test_unreported_gram_lab_surface_uses_existing_temperature_default() -> None:
+    raw = dynamic_surface_geometry_fixture()
+    holder = raw["surfaces"][0]
+    holder.pop("temperature_profile")
+
+    geometry = parse_lab_geometry(raw)
+
+    assert geometry is not None
+    surface = next(item for item in geometry.surfaces if item.surface_id == "holder")
+    assert surface.temperature_C == pytest.approx(0.0)
+    segment = surface.to_pipe_segment(
+        upstream_stage="stage_0",
+        downstream_stage="lab_surface_0",
+        default_diameter_m=0.02,
+    )
+    assert segment.wall_temperature_C == pytest.approx(0.0)
+
+
+def test_unreported_non_benchtop_surface_temperature_still_refuses() -> None:
+    raw = dynamic_surface_geometry_fixture()
+    raw["scale"] = "pilot_scale"
+    raw["surfaces"][0].pop("temperature_profile")
+
+    with pytest.raises(LabGeometryError) as excinfo:
+        parse_lab_geometry(raw)
+
+    assert excinfo.value.code == "missing_lab_surface_temperature"
+
+
+def test_explicit_gram_lab_surface_temperature_is_preserved() -> None:
+    raw = dynamic_surface_geometry_fixture()
+    holder = raw["surfaces"][0]
+    holder.pop("temperature_profile")
+    holder["temperature_C"] = 37.0
+
+    geometry = parse_lab_geometry(raw)
+
+    assert geometry is not None
+    surface = next(item for item in geometry.surfaces if item.surface_id == "holder")
+    assert surface.temperature_C == pytest.approx(37.0)
+
+
 def test_surface_temperature_schedule_requires_lab_geometry() -> None:
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",

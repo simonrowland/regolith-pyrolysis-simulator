@@ -136,7 +136,9 @@ from simulator.run_executor import (
 )
 from simulator.lab_geometry import (
     LAB_GEOMETRY_SCALE,
+    LabGeometry,
     LabGeometryError,
+    _lab_surface_temperature_default_notices,
     gram_lab_exposed_melt_area_bridge,
     parse_lab_geometry,
 )
@@ -536,28 +538,14 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         f"pair.{requested_leg}.duration_h",
         provenance,
     )
-    pressure_defaulted = "chamber_pressure_mbar" not in schedule
-    pressure_default_mbar: float | None = None
-    if pressure_defaulted:
-        pressure_default_mbar = CampaignManager(
-            load_config_bundle().setpoints
-        )._pressure_config_float(
-            CampaignPhase.C0,
-            "p_total_mbar",
-            "p_total_mbar_default",
+    campaign_manager = CampaignManager(load_config_bundle().setpoints)
+    schedule, pressure_notices = (
+        campaign_manager._default_missing_lab_schedule_pressure(
+            schedule,
+            enabled="chamber_pressure_mbar" not in schedule,
+            duration_h=duration_h,
         )
-        schedule["chamber_pressure_mbar"] = [
-            {
-                "t_h": 0.0,
-                "value": pressure_default_mbar,
-                "unit": "mbar",
-            },
-            {
-                "t_h": duration_h,
-                "value": pressure_default_mbar,
-                "unit": "mbar",
-            },
-        ]
+    )
     try:
         lab_geometry = parse_lab_geometry(
             geometry,
@@ -628,17 +616,7 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             "geometry_id": geometry_id,
         }
     )
-    notices = []
-    if pressure_defaulted:
-        notices.append(
-            {
-                "code": "knob_defaulted",
-                "path": "lab_schedule.chamber_pressure_mbar",
-                "value": pressure_default_mbar,
-                "unit": "mbar",
-                "default_source": "campaigns.C0.p_total_mbar_default",
-            }
-        )
+    notices = list(pressure_notices)
     if mass_defaulted:
         mass_notice = {
             "code": "knob_defaulted",
@@ -653,6 +631,13 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         ):
             mass_notice["out_of_domain"] = True
         notices.append(mass_notice)
+    notices.extend(
+        _lab_surface_temperature_default_notices(
+            geometry,
+            sample_mass_g=lab_geometry.sample_mass_g,
+            allow_temperature_profiles=True,
+        )
+    )
     if notices:
         provenance["notices"] = notices
     provenance.update(gram_lab_exposed_melt_area_bridge(geometry))
@@ -1572,23 +1557,52 @@ class PyrolysisRun:
                 run_metadata["lab_area_bridge"] = lab_area_bridge
             else:
                 run_metadata.update(lab_area_bridge)
+        lab_schedule_notices = list(
+            getattr(
+                getattr(sim, "campaign_mgr", None),
+                "lab_schedule_notices",
+                (),
+            )
+            or ()
+        )
+        lab_geometry = getattr(sim, "lab_geometry", None)
+        lab_geometry_notices = []
+        if isinstance(lab_geometry, LabGeometry):
+            raw_geometry = session_config.setpoints.get("lab_geometry")
+            if isinstance(raw_geometry, Mapping):
+                lab_geometry_notices = (
+                    _lab_surface_temperature_default_notices(
+                        raw_geometry,
+                        sample_mass_g=lab_geometry.sample_mass_g,
+                        allow_temperature_profiles=True,
+                    )
+                )
         # Anything left in metadata_overrides is propagated verbatim --
         # callers can stuff extra provenance (CI run id, etc.) without
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
-        if lab_area_notices:
+        runtime_notices = (
+            lab_area_notices + lab_schedule_notices + lab_geometry_notices
+        )
+        if runtime_notices:
             preset = run_metadata.get(PRESET_PROVENANCE_METADATA_KEY)
             if isinstance(preset, Mapping):
                 preset = copy.deepcopy(dict(preset))
                 preset["notices"] = list(preset.get("notices", []) or [])
-                preset["notices"].extend(lab_area_notices)
+                for notice in runtime_notices:
+                    if notice not in preset["notices"]:
+                        preset["notices"].append(notice)
                 for key in ("effective_exposed_area_m2", "area_basis"):
                     if key in run_metadata:
                         preset[key] = run_metadata[key]
                 run_metadata[PRESET_PROVENANCE_METADATA_KEY] = preset
             else:
-                run_metadata["notices"] = lab_area_notices
+                notices = list(run_metadata.get("notices", []) or [])
+                for notice in runtime_notices:
+                    if notice not in notices:
+                        notices.append(notice)
+                run_metadata["notices"] = notices
         run_metadata["campaigns_elapsed"] = _safe_failure_value(
             lambda: float(execution.campaigns_elapsed),
             section="run_metadata.campaigns_elapsed",

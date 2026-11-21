@@ -37,6 +37,7 @@ from simulator.lab_schedule import (
     pO2_setpoint_mbar_from_schedule,
     schedule_sample_time_h,
 )
+from simulator.lab_geometry import LAB_GEOMETRY_SCALE
 from simulator.furnace_materials import (
     FURNACE_CEILING_FALLBACK_C,
     FURNACE_MAX_T_BOUNDS_C,
@@ -638,6 +639,7 @@ class CampaignManager:
         self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
         self.last_c4_termination: dict[str, object] | None = None
         self.last_campaign_stop: dict[str, object] | None = None
+        self.lab_schedule_notices: list[dict[str, object]] = []
 
     _CONFIG_KEY_BY_PHASE = {
         CampaignPhase.C0B: 'C0b_p_cleanup',
@@ -2594,8 +2596,79 @@ class CampaignManager:
         if raw is None:
             return None
         if isinstance(raw, Mapping):
-            return normalize_lab_schedule(raw)
+            use_gram_lab_default = (
+                isinstance(self.setpoints.get("lab_geometry"), Mapping)
+                and str(
+                    self.setpoints["lab_geometry"].get("scale") or ""
+                ).strip()
+                == LAB_GEOMETRY_SCALE
+            )
+            schedule, notices = self._default_missing_lab_schedule_pressure(
+                raw,
+                enabled=use_gram_lab_default,
+            )
+            for notice in notices:
+                if notice not in self.lab_schedule_notices:
+                    self.lab_schedule_notices.append(notice)
+            return normalize_lab_schedule(schedule)
         raise ValueError('lab_schedule_must_be_mapping')
+
+    def _default_missing_lab_schedule_pressure(
+        self,
+        raw: Mapping,
+        *,
+        enabled: bool = True,
+        duration_h: float | None = None,
+    ) -> tuple[dict[str, Any], list[dict[str, object]]]:
+        schedule = dict(raw)
+        if not enabled or "chamber_pressure_mbar" in schedule:
+            return schedule, []
+
+        pressure_mbar = self._pressure_config_float(
+            CampaignPhase.C0,
+            "p_total_mbar",
+            "p_total_mbar_default",
+        )
+        schedule["chamber_pressure_mbar"] = [
+            {"t_h": 0.0, "value": pressure_mbar, "unit": "mbar"},
+            {
+                "t_h": (
+                    schedule.get("duration_h")
+                    if duration_h is None
+                    else duration_h
+                ),
+                "value": pressure_mbar,
+                "unit": "mbar",
+            },
+        ]
+        notice: dict[str, object] = {
+            "code": "knob_defaulted",
+            "path": "lab_schedule.chamber_pressure_mbar",
+            "value": pressure_mbar,
+            "unit": "mbar",
+            "default_source": "campaigns.C0.p_total_mbar_default",
+        }
+        reported_profile = schedule.get("reported_exposure_profile")
+        reported_pressure = (
+            reported_profile.get("pressure_mbar")
+            if isinstance(reported_profile, Mapping)
+            else None
+        )
+        if isinstance(reported_pressure, Mapping):
+            try:
+                reported_min = float(reported_pressure["reported_min_value"])
+                reported_max = float(reported_pressure["reported_max_value"])
+            except (KeyError, TypeError, ValueError):
+                pass
+            else:
+                if (
+                    math.isfinite(reported_min)
+                    and math.isfinite(reported_max)
+                    and reported_min <= reported_max
+                    and not reported_min <= pressure_mbar <= reported_max
+                ):
+                    notice["out_of_domain"] = True
+        return schedule, [notice]
 
     def apply_lab_schedule_controls(
             self,
