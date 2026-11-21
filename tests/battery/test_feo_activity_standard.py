@@ -217,7 +217,7 @@ def test_declared_zero_offset_feo_standards_preserve_residual_bytes(
         assert not before_prediction.notices
     canonical_prediction, refusal = converter(before_prediction)
     assert refusal is None
-    assert canonical_prediction.value == prediction.value
+    assert canonical_prediction.value is prediction.value
     before, before_candidate = compile_residual(
         reference, engine, context=context, prediction=before_prediction
     )
