@@ -1205,6 +1205,28 @@ _UNSCORED_TEMPERATURE_SOURCE_CLASSES = frozenset({
     "engine_prediction",
     "not_reported",
 })
+# Gaier, Street and Gustafson 2010, NASA TM E-17366 / NTRS 20100025839.
+# Large-particle lunar-simulant total solar absorptance is 0.669 to 0.906.
+# The default is the midpoint of that measured band. It is not
+# EquipmentDesigner.MELT_EMISSIVITY: a solar absorptance and a thermal-IR
+# emissivity are not the same number, and 0.85 would only match by coincidence.
+# Robinot Fig. 3 calls the molten cap highly reflective. That cap was not
+# measured, so it is not folded into the midpoint.
+GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_LOW = 0.669
+GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_HIGH = 0.906
+SOLAR_ABSORPTANCE_DEFAULT = (
+    GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_LOW
+    + GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_HIGH
+) / 2.0
+# The glass-sphere transmittance is unprinted. 1 is the clean-window upper
+# bound. Opacification only lowers the power that reaches the pellet.
+WINDOW_TRANSMITTANCE_UPPER_BOUND = 1.0
+TYPED_UNKNOWN = "typed_unknown"
+_MM_TO_M = 1.0e-3
+_DECLARED_FOCAL_LENGTH_MM = (
+    ("pellet_diameter_mm", "pellet_diameter_m"),
+    ("focal_spot_diameter_mm", "focal_spot_diameter_m"),
+)
 
 
 class PowerTemperatureRefusal(ValueError):
@@ -1273,11 +1295,18 @@ def furnace_power_driver_payload(
     *,
     mass_kg: float,
     exposed_area_m2: float | None,
+    pellet_diameter_m: float | None = None,
+    focal_spot_diameter_m: float | None = None,
+    solar_absorptance: float | None = None,
+    window_transmittance: float | None = None,
 ) -> dict[str, Any]:
     """Schedule payload the stepper reads. Emissivity stays unset here.
 
     The loader does not invent an emissivity. ``None`` tells the solver
-    to take ``EquipmentDesigner.MELT_EMISSIVITY`` and notice it.
+    to take ``EquipmentDesigner.MELT_EMISSIVITY`` and notice it. A focal
+    spot is booked only when the deck declares both diameters. Absorptance
+    and window transmittance stay unset so the solver notices its own
+    defaults. This function does not multiply the trace.
     """
 
     if not isinstance(trace, Mapping):
@@ -1290,7 +1319,172 @@ def furnace_power_driver_payload(
         "mass_kg": mass_kg,
         "exposed_area_m2": exposed_area_m2,
         "emissivity": None,
+        "pellet_diameter_m": pellet_diameter_m,
+        "focal_spot_diameter_m": focal_spot_diameter_m,
+        "solar_absorptance": solar_absorptance,
+        "window_transmittance": window_transmittance,
     }
+
+
+def declared_benchtop_lengths_m(
+    sample: Mapping[str, Any] | None,
+) -> dict[str, float]:
+    """Pellet and focal diameters the deck actually prints, in metres.
+
+    A missing key is omitted. A present value that is not a positive
+    finite length refuses. This does not invent a spot diameter, and it
+    does not turn millimetres into an area.
+    """
+
+    if sample is None:
+        return {}
+    if not isinstance(sample, Mapping):
+        raise PowerTemperatureRefusal(
+            "benchtop_geometry_malformed",
+            "lab geometry sample must be a mapping",
+        )
+    lengths: dict[str, float] = {}
+    for source_key, dest_key in _DECLARED_FOCAL_LENGTH_MM:
+        if source_key not in sample or sample.get(source_key) in (None, ""):
+            continue
+        millimetres = _declared_finite(
+            sample.get(source_key),
+            missing="benchtop_length_not_positive",
+            invalid="benchtop_length_not_positive",
+        )
+        if millimetres <= 0.0:
+            raise PowerTemperatureRefusal(
+                "benchtop_length_not_positive",
+                f"{source_key} is {millimetres}",
+            )
+        lengths[dest_key] = millimetres * _MM_TO_M
+    return lengths
+
+
+def absorbed_focal_power_W(
+    focal_power_W: float,
+    *,
+    pellet_diameter_m: float,
+    focal_spot_diameter_m: float,
+    solar_absorptance: float,
+    window_transmittance: float,
+) -> tuple[float, float]:
+    """Watts absorbed by a pellet in a uniform focal disk.
+
+    Premise: Robinot Eq. (6) is the power concentrated at the focal
+    point, not a sample calorimeter. The pellet is the printed 13 mm
+    disk. The spot is the paper's roughly 2 cm disk, the disk whose
+    area is the stated 1.5 kW divided by 4.8 MW m-2. Sunlight that
+    misses the pellet lands on the water-cooled holder and does not
+    enter the melt balance. Solar absorptance is not the thermal
+    emissivity. Window transmittance is a separate factor.
+
+    Algebra::
+
+        intercept = (d_pellet / d_spot) ** 2
+        P_abs = P_focal * intercept * alpha * tau
+
+    Units: diameters in metres, both powers in watts, alpha and tau
+    dimensionless.
+
+    Sanity: 13 mm in a 20 mm spot intercepts (13/20)**2 = 0.4225.
+    At the digitized peak 1468.819694 W, alpha 1 and tau 1, the pellet
+    absorbs 620.576 W. The other 848 W hits the holder annulus.
+    """
+
+    intercept = (pellet_diameter_m / focal_spot_diameter_m) ** 2
+    absorbed = (
+        focal_power_W
+        * intercept
+        * solar_absorptance
+        * window_transmittance
+    )
+    return absorbed, intercept
+
+
+def _resolve_solar_absorptance(
+    value: float | None,
+) -> tuple[float, dict[str, Any] | None]:
+    """Gaier midpoint when the deck does not print an absorptance.
+
+    The notice records the band and that the molten cap was not measured.
+    A declared value is used as given and is not noticed.
+    """
+
+    if value is None:
+        alpha = float(SOLAR_ABSORPTANCE_DEFAULT)
+        return alpha, {
+            "kind": KNOB_DEFAULTED,
+            "knob": "solar_absorptance",
+            "value": alpha,
+            "unit": "1",
+            "band_low": GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_LOW,
+            "band_high": GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_HIGH,
+            "source": (
+                "Gaier, Street and Gustafson 2010 large-particle "
+                "simulant band 0.669 to 0.906, midpoint. Not "
+                "MELT_EMISSIVITY. The reflective molten cap was not measured."
+            ),
+        }
+    alpha = _declared_finite(
+        value,
+        missing="solar_absorptance_not_numeric",
+        invalid="solar_absorptance_not_numeric",
+    )
+    if alpha < 0.0 or alpha > 1.0:
+        raise PowerTemperatureRefusal(
+            "solar_absorptance_out_of_range",
+            f"solar absorptance is {alpha}",
+        )
+    return alpha, None
+
+
+def _resolve_window_transmittance(
+    value: float | None,
+) -> tuple[float, dict[str, Any] | None]:
+    """Unprinted transmittance stays 1, the clean-window upper bound.
+
+    This is a typed unknown, not a d-456 in-domain default. A declared
+    value is used as given and is not noticed.
+    """
+
+    if value is None:
+        tau = float(WINDOW_TRANSMITTANCE_UPPER_BOUND)
+        return tau, {
+            "kind": TYPED_UNKNOWN,
+            "knob": "window_transmittance",
+            "value": tau,
+            "unit": "1",
+            "bound": "upper",
+            "source": (
+                "unprinted. 1 is the clean-window upper bound. "
+                "Opacification only lowers the absorbed power."
+            ),
+        }
+    tau = _declared_finite(
+        value,
+        missing="window_transmittance_not_numeric",
+        invalid="window_transmittance_not_numeric",
+    )
+    if tau < 0.0 or tau > 1.0:
+        raise PowerTemperatureRefusal(
+            "window_transmittance_out_of_range",
+            f"window transmittance is {tau}",
+        )
+    return tau, None
+
+
+def _optional_positive_length(
+    value: float | None,
+    *,
+    invalid: str,
+) -> float | None:
+    if value is None:
+        return None
+    number = _declared_finite(value, missing=invalid, invalid=invalid)
+    if number <= 0.0:
+        raise PowerTemperatureRefusal(invalid, f"length is {number} m")
+    return number
 
 
 def sample_furnace_power_W(trace: Mapping[str, Any], time_s: float) -> float:
@@ -1351,33 +1545,49 @@ def solve_power_driven_melt_temperature_C(
     mass_kg: float,
     area_m2: float | None,
     emissivity: float | None,
+    pellet_diameter_m: float | None = None,
+    focal_spot_diameter_m: float | None = None,
+    solar_absorptance: float | None = None,
+    window_transmittance: float | None = None,
 ) -> dict[str, Any]:
     """Solve one end-of-step melt temperature from furnace power.
 
-    Premise: the measured furnace power that reaches the charge is
-    ``power_W``, frozen across this step. The charge stores sensible
-    heat at ``EquipmentDesigner.MELT_CP_J_KG_K`` and loses heat by the
+    Premise: ``power_W`` is frozen across the step. When both a pellet
+    diameter and a focal-spot diameter are set, ``power_W`` is the
+    focal-spot power (Robinot Eq. 6) and the residual uses
+    ``absorbed_focal_power_W``. One diameter without the other refuses.
+    Intercept is never defaulted to 1: that default is the bug that
+    booked the whole spot onto the pellet. When neither diameter is
+    set, ``power_W`` already enters the balance. That path is the
+    tonne-scale call, not a silent intercept.
+
+    The charge stores sensible heat at
+    ``EquipmentDesigner.MELT_CP_J_KG_K`` and loses heat by the
     crucible-surface radiation EQ-2 already books. Process gas is not
-    a sink. Sky temperature is 0 K, matching EQ-2, so the loss is
-    ``sigma * emissivity * area * T**4`` with no sky term. A missing
-    emissivity or area takes the sizer default and is noticed. Those
-    defaults are not tuned to a printed peak.
+    a sink on this path. Sky temperature is 0 K, matching EQ-2, so the
+    loss is ``sigma * emissivity * area * T**4`` with no sky term. A
+    missing emissivity or area takes the sizer default and is noticed.
+    A missing solar absorptance takes the Gaier large-particle midpoint
+    and is noticed. A missing window transmittance is the typed unknown
+    1, an upper bound, and is noticed. None of these is tuned to a
+    printed peak.
 
-    Algebra, both sides watts, power and radiation at the unknown end
-    temperature::
+    Algebra, both sides watts, absorbed power and radiation at the
+    unknown end temperature::
 
-        m * cp * (T - T_prev) / dt = P - sigma * eps * A * T**4
+        m * cp * (T - T_prev) / dt = P_abs - sigma * eps * A * T**4
 
         f(T) = sigma * eps * A * T**4 + (m * cp / dt) * T
-               - (m * cp * T_prev / dt + P) = 0
+               - (m * cp * T_prev / dt + P_abs) = 0
 
     Units: m kg, cp J/(kg·K), T kelvin, dt seconds, P watts, A m²,
     sigma W/(m²·K⁴). ``f`` is strictly increasing for T > 0, so the
     root is the bisection of the adiabatic bracket.
 
-    Sanity: 1 kg has radiative area 0.001954474441911621 m². Steady
-    state at 1800 °C (2073.15 K) needs 1740.1373551492054 W at
-    sigma 5.670374e-8 and emissivity 0.85.
+    Sanity: 1 kg, no focal spot, has radiative area
+    0.001954474441911621 m². Steady state at 1800 °C (2073.15 K) needs
+    1740.1373551492054 W at sigma 5.670374e-8 and emissivity 0.85.
+    A 13 mm pellet in a 20 mm spot intercepts 0.4225 of the focal watts.
     """
 
     power = _declared_finite(
@@ -1422,6 +1632,47 @@ def solve_power_driven_melt_temperature_C(
             f"mass is {charge_kg} kg",
         )
     notices: list[dict[str, Any]] = []
+    pellet_d = _optional_positive_length(
+        pellet_diameter_m,
+        invalid="pellet_diameter_not_positive",
+    )
+    focal_d = _optional_positive_length(
+        focal_spot_diameter_m,
+        invalid="focal_spot_diameter_not_positive",
+    )
+    optical_requested = (
+        solar_absorptance is not None or window_transmittance is not None
+    )
+    absorbed = power
+    intercept: float | None = None
+    alpha: float | None = None
+    tau: float | None = None
+    if pellet_d is None and focal_d is None:
+        if optical_requested:
+            raise PowerTemperatureRefusal(
+                "focal_diameter_missing",
+                "solar absorptance and window transmittance apply only "
+                "to a declared focal spot",
+            )
+    elif pellet_d is None or focal_d is None:
+        raise PowerTemperatureRefusal(
+            "focal_diameter_missing",
+            "focal-spot power needs both the pellet diameter and the spot diameter",
+        )
+    else:
+        alpha, alpha_notice = _resolve_solar_absorptance(solar_absorptance)
+        tau, tau_notice = _resolve_window_transmittance(window_transmittance)
+        if alpha_notice is not None:
+            notices.append(alpha_notice)
+        if tau_notice is not None:
+            notices.append(tau_notice)
+        absorbed, intercept = absorbed_focal_power_W(
+            power,
+            pellet_diameter_m=pellet_d,
+            focal_spot_diameter_m=focal_d,
+            solar_absorptance=alpha,
+            window_transmittance=tau,
+        )
     if area_m2 is None:
         area = EquipmentDesigner.radiative_loss_area_m2(charge_kg)
         notices.append({
@@ -1469,7 +1720,7 @@ def solve_power_driven_melt_temperature_C(
             "charge heat capacity is not positive",
         )
     root_K = _bisect_power_temperature_K(
-        power_W=power,
+        power_W=absorbed,
         previous_K=previous_K,
         capacity_W_per_K=capacity,
         area_m2=area,
@@ -1478,7 +1729,11 @@ def solve_power_driven_melt_temperature_C(
     return {
         "temperature_C": root_K - CELSIUS_TO_KELVIN_OFFSET,
         "temperature_K": root_K,
-        "power_W": power,
+        "power_W": absorbed,
+        "focal_power_W": power if intercept is not None else None,
+        "intercept": intercept,
+        "solar_absorptance": alpha,
+        "window_transmittance": tau,
         "dt_s": step_s,
         "mass_kg": charge_kg,
         "area_m2": area,
@@ -1525,6 +1780,10 @@ def melt_temperature_from_furnace_power(
         mass_kg=_charge_mass_kg(driver.get("mass_kg"), live_mass_kg),
         area_m2=driver.get("exposed_area_m2"),
         emissivity=driver.get("emissivity"),
+        pellet_diameter_m=driver.get("pellet_diameter_m"),
+        focal_spot_diameter_m=driver.get("focal_spot_diameter_m"),
+        solar_absorptance=driver.get("solar_absorptance"),
+        window_transmittance=driver.get("window_transmittance"),
     )
     record["time_s"] = _declared_finite(
         time_s,
