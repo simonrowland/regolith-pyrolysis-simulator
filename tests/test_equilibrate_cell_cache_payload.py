@@ -177,6 +177,8 @@ def test_hot_round_trip_keeps_consumer_field_contract(field, value) -> None:
 
 
 def test_hot_cell_version_record_is_interned_once(tmp_path, monkeypatch) -> None:
+    from simulator.vapour_rail import run_disclosure
+
     path = tmp_path / "versions.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
@@ -191,7 +193,10 @@ def test_hot_cell_version_record_is_interned_once(tmp_path, monkeypatch) -> None
     )
     for temperature in (1700.0, 1800.0):
         engine_cache.cached_engine_call(
-            cell.engine, {"temperature_K": temperature}, cell.to_hot
+            cell.engine,
+            {"temperature_K": temperature},
+            cell.to_hot,
+            disclosure_runtime=run_disclosure,
         )
     with sqlite3.connect(path) as connection:
         assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
