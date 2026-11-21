@@ -285,7 +285,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'attr:simulator/evaporation.py:_freeze_gate_shared_curve_cache': {
         "path": 'simulator/evaporation.py',
-        "line": 3828,
+        "line": 3829,
         "kind": 'attr',
         "name": '_freeze_gate_shared_curve_cache',
         "carries_disclosure": True,
@@ -973,7 +973,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:rates_cache': {
         "path": 'simulator/core.py',
-        "line": 7970,
+        "line": 7946,
         "kind": 'store',
         "name": 'rates_cache',
         "carries_disclosure": False,
@@ -1029,7 +1029,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/evaporation.py:_freeze_gate_held_curve_record': {
         "path": 'simulator/evaporation.py',
-        "line": 3550,
+        "line": 3551,
         "kind": 'store',
         "name": '_freeze_gate_held_curve_record',
         "carries_disclosure": True,
@@ -1037,7 +1037,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/evaporation.py:_freeze_gate_liquid_fraction_cache': {
         "path": 'simulator/evaporation.py',
-        "line": 4071,
+        "line": 4072,
         "kind": 'store',
         "name": '_freeze_gate_liquid_fraction_cache',
         "carries_disclosure": True,
@@ -1045,7 +1045,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/evaporation.py:computing_cache': {
         "path": 'simulator/evaporation.py',
-        "line": 3909,
+        "line": 3910,
         "kind": 'store',
         "name": 'computing_cache',
         "carries_disclosure": False,
