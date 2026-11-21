@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.equipment import EquipmentDesigner
 from simulator.lab_geometry import parse_lab_geometry
 from simulator.lab_schedule import normalize_lab_schedule
 from simulator.teststand import parse_teststand
@@ -550,11 +551,11 @@ def test_unreported_pomeroy_knobs_use_runner_defaults_and_report_them(
     ("preset_path", "backend_name"),
     [
         (POMEROY_PRESET_PATH, "thermoengine"),
-        (SESKO_PRESET_PATH, "internal-analytical"),
+        (SESKO_PRESET_PATH, "thermoengine"),
     ],
     ids=["pomeroy-cardiff-2006", "sesko-2024"],
 )
-def test_benchtop_presets_run_with_reported_pressure_or_runtime_default(
+def test_benchtop_presets_run_or_report_stage0_refusal(
     preset_path: Path,
     backend_name: str,
 ) -> None:
@@ -566,7 +567,7 @@ def test_benchtop_presets_run_with_reported_pressure_or_runtime_default(
         for notice in apparatus.notices
     )
 
-    result = runner_module.PyrolysisRun(
+    run = runner_module.PyrolysisRun(
         feedstock_id=preset.feedstock_id,
         campaign="C0",
         hours=preset.hours,
@@ -579,7 +580,68 @@ def test_benchtop_presets_run_with_reported_pressure_or_runtime_default(
         },
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,
-    ).run()
+    )
+
+    if preset_path == SESKO_PRESET_PATH:
+        assert preset.provenance["sample_mass_g"] == SESKO_SAMPLE_MASS_G
+        assert preset.mass_kg == pytest.approx(0.01)
+        assert not any(
+            notice["path"] == "mass_kg"
+            for notice in preset.provenance.get("notices", [])
+        )
+        reported_pressure = preset.lab_schedule["reported_exposure_profile"][
+            "pressure_mbar"
+        ]
+        assert reported_pressure["reported_min_value"] == (
+            SESKO_PRESSURE_REPORTED_MIN_MBAR
+        )
+        assert reported_pressure["reported_max_value"] == (
+            SESKO_PRESSURE_REPORTED_MAX_MBAR
+        )
+        assert preset.lab_schedule["chamber_pressure_mbar"][0]["value"] == (
+            SESKO_PRESSURE_RUNTIME_FLOOR_MBAR
+        )
+        assert preset.lab_schedule["chamber_pressure_mbar"][0][
+            "runtime_delta_annotation_id"
+        ] == SESKO_PRESSURE_RUNTIME_DELTA_ID
+
+        bundle = runner_module.load_config_bundle()
+        design = EquipmentDesigner(bundle.setpoints).design_for_batch(
+            mass_kg=preset.mass_kg,
+            feedstock=bundle.feedstocks[preset.feedstock_id],
+            lab_geometry=preset.lab_geometry,
+        )
+        area_bridge = runner_module.gram_lab_exposed_melt_area_bridge(
+            preset.lab_geometry,
+            crucible_face_area_m2=design.crucible.melt_surface_area_m2,
+        )
+        area_notice = area_bridge["notices"][0]
+        assert area_notice["code"] == "knob_defaulted"
+        assert area_notice["path"] == (
+            "lab_geometry.sample.exposed_melt_area_m2"
+        )
+        assert area_notice["value"] == pytest.approx(
+            design.crucible.melt_surface_area_m2
+        )
+        assert "out_of_domain" not in area_notice
+
+        class ThermoEngineBackend:
+            name = "thermoengine"
+            _mode = "thermoengine"
+
+        config = run._session_config()
+        assert config.unavailable_error_cls is runner_module.RunnerError
+        with pytest.raises(
+            runner_module.RunnerError,
+            match="Stage-0 route.*requires subprocess.*ThermoEngineBackend",
+        ):
+            runner_module.SimSession().start(
+                config,
+                backend=ThermoEngineBackend(),
+            )
+        return
+
+    result = run.run()
 
     assert result["status"] in {"ok", "partial"}
     runtime_notices = result["run_metadata"]["preset"].get("notices", [])
@@ -606,8 +668,6 @@ def test_benchtop_presets_run_with_reported_pressure_or_runtime_default(
             notice for notice in runtime_notices if notice["path"] == "mass_kg"
         )
         assert mass_notice["out_of_domain"] is True
-    else:
-        assert "out_of_domain" not in area_notice
 
 
 def test_robinot_preset_references_registered_loadable_eac1_feedstock() -> None:
