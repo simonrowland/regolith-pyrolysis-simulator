@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 import math
 from collections import defaultdict
-from collections.abc import Mapping
+from collections.abc import Collection, Mapping
 from numbers import Real
 from typing import Any, NamedTuple
 
@@ -5808,6 +5808,9 @@ class EvaporationMixin:
             booking_scaled_to_vapour_split,
             booking_wall_account_fractions,
         )
+        from engines.builtin.evaporation_transition import (
+            _NUMERICAL_FLOOR_KG,
+        )
 
         quoted_bookings = {
             str(species): booking
@@ -5871,7 +5874,7 @@ class EvaporationMixin:
                 route_result.remaining_by_species.get(label, 0.0) or 0.0
             )
             condensed_kg = max(0.0, rate_kg - remaining_kg)
-            if condensed_kg <= 1.0e-12:
+            if condensed_kg <= _NUMERICAL_FLOOR_KG:
                 continue
             vapor_mass = resolve_species_formula(
                 label,
@@ -5906,6 +5909,7 @@ class EvaporationMixin:
         headspace_booking_by_species: Mapping | None = None,
         headspace_wall_fraction_by_species: Mapping | None = None,
         headspace_wall_accounts_by_species: Mapping | None = None,
+        post_subfloor_species: Collection[str] = (),
     ) -> EvaporationFlux:
         """
         Route evaporated species through the condensation train.
@@ -6134,6 +6138,9 @@ class EvaporationMixin:
                 species,
                 rate_kg_hr,
                 apply_evaporative_redox_source_terms=False,
+                post_subfloor_coupled_legs=(
+                    str(species) in post_subfloor_species
+                ),
             )
             if route_outcome.get('evaporation_transition') is not None:
                 committed_species_kg_hr[species] = rate_kg_hr
@@ -6233,6 +6240,7 @@ class EvaporationMixin:
         rate_kg_hr: float,
         *,
         apply_evaporative_redox_source_terms: bool = True,
+        post_subfloor_coupled_legs: bool = False,
     ) -> dict[str, Any]:
         authority = dict(
             getattr(route_result, 'condensation_authority_by_species', {}).get(
@@ -6303,6 +6311,7 @@ class EvaporationMixin:
                     apply_evaporative_redox_source_terms
                 ),
                 return_transition=True,
+                post_subfloor_coupled_legs=post_subfloor_coupled_legs,
             )
         )
         if evaporation_transition is None:
@@ -6694,6 +6703,7 @@ class EvaporationMixin:
         *,
         apply_evaporative_redox_source_terms: bool = True,
         return_transition: bool = False,
+        post_subfloor_coupled_legs: bool = False,
     ):
         """Apply the per-species melt -> vapor transition via the kernel.
 
@@ -6760,24 +6770,6 @@ class EvaporationMixin:
 
         # F-B1: split dispatch / commit so post-commit redox scalar
         # bookkeeping can derive strictly from the applied LedgerTransition.
-        kernel_result = self._dispatch_only(
-            ChemistryIntent.EVAPORATION_TRANSITION,
-            control_inputs={
-                'species': species,
-                'stoich': dict(stoich),
-                'sp_data': dict(sp_data or {}),
-                'rate_kg_hr': float(rate_kg_hr),
-                'remaining_kg_hr': float(remaining_kg_hr),
-                'dt_hr': 1.0,
-                'available_kg': float(available_kg),
-            },
-        )
-        proposal = kernel_result.transition
-        if proposal is None:
-            self._chem_no_op_dispatch_count += 1
-            return (0.0, None) if return_transition else 0.0
-
-        diagnostic = dict(kernel_result.diagnostic or {})
         control_inputs = {
             'species': species,
             'stoich': dict(stoich),
@@ -6787,6 +6779,18 @@ class EvaporationMixin:
             'dt_hr': 1.0,
             'available_kg': float(available_kg),
         }
+        if post_subfloor_coupled_legs:
+            control_inputs['post_subfloor_coupled_legs'] = True
+        kernel_result = self._dispatch_only(
+            ChemistryIntent.EVAPORATION_TRANSITION,
+            control_inputs=control_inputs,
+        )
+        proposal = kernel_result.transition
+        if proposal is None:
+            self._chem_no_op_dispatch_count += 1
+            return (0.0, None) if return_transition else 0.0
+
+        diagnostic = dict(kernel_result.diagnostic or {})
         transition = self._commit_proposal(
             ChemistryIntent.EVAPORATION_TRANSITION,
             proposal,

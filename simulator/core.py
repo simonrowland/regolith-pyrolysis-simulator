@@ -7944,6 +7944,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from engines.builtin.evaporation_flux import (
             BuiltinEvaporationFluxProvider,
         )
+        from engines.builtin.evaporation_transition import (
+            _NUMERICAL_FLOOR_KG,
+            evaporation_parent_is_below_floor,
+        )
         from simulator.accounting.formulas import resolve_species_formula
         from simulator.capacity_coupling import (
             CapacityCouplingRefusalError,
@@ -7963,9 +7967,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.melt_regime import legacy_raw_liquid_fraction_is_zero
         from simulator.thermal_train import NoColdTrain
 
-        # The same floor the live-versus-solved comparison already uses.
-        # A rate at or below it is not a headspace source.
-        rate_floor_kg_hr = 1.0e-12
+        # The evaporation transition's kilogram floor. A rate at or
+        # below it is not a headspace source. The commit still posts
+        # an integral the solve added when a coupled leg is smaller.
+        rate_floor_kg_hr = _NUMERICAL_FLOOR_KG
         # Relative move that sends the frozen map or the capture
         # fraction back for one re-solve. A smaller gap stays.
         reclose_relative = 1.0e-6
@@ -8861,12 +8866,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Radau hour q(end) is not the integral, so the remaining
         # is n_end's added mass. A species the endpoint gross
         # dropped is posted when that mass clears the rate floor
-        # and the evaporation transition will post the parcel.
-        # A coupled leg in (0, 1e-12 kg] posts nothing: the mass
-        # stays off the flux. The condenser is configured on this
-        # flux, so a posted species is added first.
+        # and the parent debit clears the stock floor. A coupled
+        # leg below the floor is still posted: this hour's added
+        # mass is the authority, and the published partial is not
+        # reduced. The condenser is configured on this flux, so a
+        # posted species is added first. The subfloor post is only
+        # those integral species: an endpoint rate the solver already
+        # left out of q stays on the ordinary floor.
         source_kg = None
-        unposted_integral: set[str] = set()
+        post_subfloor_species: list[str] = []
         if solved is not None:
             from simulator.capacity_coupling import (
                 headspace_integral_added_kg,
@@ -8894,26 +8902,39 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if posted > current + rate_floor_kg_hr:
                     row = stoich.get(str(species))
                     parent = ""
+                    oxide_per = 0.0
                     if isinstance(row, Mapping):
                         parent = str(row.get("parent_oxide") or "")
+                        oxide_per = float(
+                            row.get("oxide_per_product_kg") or 0.0
+                        )
                     available_kg = (
                         float(frozen_melt_kg.get(parent, 0.0) or 0.0)
                         if parent
                         else 0.0
                     )
-                    if self._evaporation_transition_posts_parcel(
+                    # No parent stock, or a parent leg at the floor:
+                    # there is no debit to post. A coupled leg under
+                    # the floor is still the solve's parcel. The
+                    # partial is not reduced to match a skipped ledger.
+                    parent_blocks = (
+                        bool(parent)
+                        and oxide_per > 0.0
+                        and evaporation_parent_is_below_floor(
+                            posted * oxide_per,
+                            available_kg,
+                        )
+                    )
+                    if parent_blocks:
+                        continue
+                    source_kg[str(species)] = posted
+                    evap_flux.species_kg_hr[str(species)] = posted
+                    if not self._evaporation_transition_posts_parcel(
                         posted,
                         row,
                         available_kg,
                     ):
-                        source_kg[str(species)] = posted
-                        evap_flux.species_kg_hr[str(species)] = posted
-                    else:
-                        # The ledger will not receive this parcel.
-                        # Leave the endpoint rate in place. The
-                        # partial still names the integral; it is
-                        # removed after the redox re-solve.
-                        unposted_integral.add(str(species))
+                        post_subfloor_species.append(str(species))
                 else:
                     source_kg[str(species)] = posted
             evap_flux.update_totals()
@@ -8944,6 +8965,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 headspace_wall_accounts_by_species=(
                     None if solved is None else headspace_accounts
                 ),
+                post_subfloor_species=post_subfloor_species,
             )
             evap_flux = self._ledger_committed_evap_flux_this_tick
         self._headspace_overhead_flux_kg_hr = dict(overhead_flux.species_kg_hr)
@@ -9015,60 +9037,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     pre_holdup_mol=pre_holdup,
                     molar_mass_kg_mol=molar_masses,
                 )
-        if solved is not None and unposted_integral:
-            # Premise: the evaporation floor skipped the parcel, so
-            # the ledger kept n0 and the bleed still removes `bled`.
-            # The solved partial holds n_end = n0 + added − bled.
-            # The redox re-solve can move that partial, so the
-            # subtraction uses the partial about to be published.
-            # Algebra: ΔP = added_kg / M · R T / V,
-            # P' = P − ΔP = (n0 − bled) R T / V.
-            # Unit check: kg / (kg/mol) · Pa/mol = Pa.
-            # Limit: a non-positive added mass is not removed.
-            from dataclasses import replace
-
-            from simulator.capacity_coupling import (
-                headspace_integral_added_kg,
-            )
-            from simulator.physical_constants import GAS_CONSTANT as R_CODATA
-
-            temperature_K = self._headspace_temperature_K()
-            volume_m3 = self._headspace_volume_m3()
-            factor = (
-                R_CODATA * temperature_K / volume_m3
-                if volume_m3 > 0.0 and temperature_K > 0.0
-                else 0.0
-            )
-            added_kg = headspace_integral_added_kg(
-                solved.partial_pressures_Pa,
-                pre_holdup,
-                solved.bled_species_mol,
-                molar_masses,
-                temperature_K=temperature_K,
-                volume_m3=volume_m3,
-            )
-            retracted = dict(solved.partial_pressures_Pa)
-            for species in sorted(unposted_integral):
-                kilograms = float(added_kg.get(species, 0.0) or 0.0)
-                mass = float(molar_masses.get(species, 0.0) or 0.0)
-                if (
-                    kilograms <= 0.0
-                    or mass <= 0.0
-                    or factor <= 0.0
-                    or not math.isfinite(kilograms)
-                    or not math.isfinite(mass)
-                    or not math.isfinite(factor)
-                ):
-                    continue
-                retracted[species] = (
-                    float(retracted.get(species, 0.0) or 0.0)
-                    - kilograms / mass * factor
-                )
-            solved = replace(
-                solved,
-                partial_pressures_Pa=retracted,
-            )
-            self._headspace_capacity_result = solved
         self._settle_evaporative_redox_after_batch()
         self._headspace_sourced_excess_mol = None
         self._headspace_hour_settled = True

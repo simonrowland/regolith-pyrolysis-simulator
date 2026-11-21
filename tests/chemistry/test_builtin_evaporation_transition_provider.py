@@ -25,6 +25,7 @@ Covers:
 
 from __future__ import annotations
 
+import inspect
 import math
 from unittest.mock import patch
 
@@ -32,6 +33,7 @@ import pytest
 
 from engines.builtin.evaporation_transition import (
     BuiltinEvaporationTransitionProvider,
+    _NUMERICAL_FLOOR_KG,
 )
 from simulator.accounting import OriginUnresolvedError, resolve_species_formula
 from simulator.chemistry.kernel import (
@@ -450,6 +452,121 @@ def test_provider_emits_expected_proposal_for_known_inputs(
     assert tiny_result.diagnostic["subfloor_legs_kg"] == pytest.approx({
         "oxygen_coproduct": 2.0e-12 * canonical_stoich["O2_per_product_kg"],
     })
+
+
+def test_headspace_control_posts_a_subfloor_oxygen_leg(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    # The same 2e-12 kg/h sodium parcel the floor skips. The headspace
+    # control posts the vapour and the stoichiometric oxygen. A non-bool
+    # control is refused.
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinEvaporationTransitionProvider()
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {"Na2O": 100.0},
+            "process.overhead_gas": {},
+            "process.condensation_train": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    canonical_stoich = sim._evaporation_stoich(
+        "Na",
+        sim.vapor_pressures.get("metals", {}).get("Na", {}),
+    )
+    rate_kg_hr = 2.0e-12
+    posted = provider.dispatch(IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_TRANSITION,
+        account_view=view,
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "Na",
+            "stoich": canonical_stoich,
+            "sp_data": {},
+            "rate_kg_hr": rate_kg_hr,
+            "remaining_kg_hr": rate_kg_hr,
+            "dt_hr": 1.0,
+            "available_kg": 10.0,
+            "post_subfloor_coupled_legs": True,
+        },
+    ))
+    assert posted.status == "ok"
+    assert posted.transition is not None
+    mw_na2o = resolve_species_formula(
+        "Na2O", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    mw_na = resolve_species_formula(
+        "Na", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    mw_o2 = resolve_species_formula(
+        "O2", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    proposal = posted.transition
+    assert dict(proposal.debits["process.cleaned_melt"])["Na2O"] == pytest.approx(
+        rate_kg_hr * canonical_stoich["oxide_per_product_kg"] / mw_na2o,
+        rel=1e-12,
+    )
+    assert dict(proposal.credits["process.overhead_gas"])["Na"] == pytest.approx(
+        rate_kg_hr / mw_na,
+        rel=1e-12,
+    )
+    assert dict(proposal.credits["reservoir.fo2_buffer"])["O2"] == pytest.approx(
+        rate_kg_hr * canonical_stoich["O2_per_product_kg"] / mw_o2,
+        rel=1e-12,
+    )
+    for element, net in dict(proposal.atom_balance_proof).items():
+        assert abs(net) < 1e-9, (
+            f"atom_balance_proof[{element!r}] = {net} is not zero"
+        )
+    refused = provider.dispatch(IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_TRANSITION,
+        account_view=view,
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "Na",
+            "stoich": canonical_stoich,
+            "sp_data": {},
+            "rate_kg_hr": rate_kg_hr,
+            "remaining_kg_hr": rate_kg_hr,
+            "dt_hr": 1.0,
+            "available_kg": 10.0,
+            "post_subfloor_coupled_legs": "yes",
+        },
+    ))
+    assert refused.status == "unsupported"
+    assert refused.transition is None
+    assert refused.diagnostic["reason"] == (
+        "post_subfloor_coupled_legs must be a bool"
+    )
+
+
+def test_kilogram_floor_has_one_owner():
+    # The bump, the booking skip, and the coupled-leg skip are one
+    # kilogram floor. The hour names the owner. It does not subtract
+    # an unposted parcel from the solved partial.
+    from simulator.core import PyrolysisSimulator
+    from simulator.evaporation import EvaporationMixin
+
+    assert _NUMERICAL_FLOOR_KG == 1.0e-12
+    hour = inspect.getsource(
+        PyrolysisSimulator._solve_and_commit_headspace_hour
+    )
+    booking = inspect.getsource(
+        EvaporationMixin._commit_headspace_vapour_booking
+    )
+    assert "rate_floor_kg_hr = _NUMERICAL_FLOOR_KG" in hour
+    assert "rate_floor_kg_hr = 1.0e-12" not in hour
+    assert "unposted_integral" not in hour
+    assert "kilograms / mass * factor" not in hour
+    assert "_NUMERICAL_FLOOR_KG" in booking
+    assert "condensed_kg <= 1.0e-12" not in booking
 
 
 # ---------------------------------------------------------------------------

@@ -36,6 +36,11 @@ a re-derivation of the stoich math (which still routes through
   * ``available_kg`` -- the parent-oxide kg currently held in
     ``process.cleaned_melt``. Grouped analytic depletion already applied
     before dispatch; this only preserves the no-stock short-circuit.
+  * ``post_subfloor_coupled_legs`` -- optional bool. Absent or false
+    keeps the numerical floor: a coupled leg in ``(0, floor]`` returns
+    no transition. True is the headspace hour. That hour posts the
+    vapour and its stoichiometric oxygen even when a leg is below the
+    floor. The parent-stock check is unchanged.
 
 Returns an :class:`IntentResult` with ``transition`` populated by a
 :class:`LedgerTransitionProposal` (per-species debit/credit pair) and a
@@ -237,6 +242,23 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         dt_hr = float(controls.get("dt_hr", 1.0))
         sp_data = dict(controls.get("sp_data") or {})
         available_kg = float(controls.get("available_kg") or 0.0)
+        if "post_subfloor_coupled_legs" in controls:
+            post_subfloor_coupled_legs = controls["post_subfloor_coupled_legs"]
+            if post_subfloor_coupled_legs is not True and (
+                post_subfloor_coupled_legs is not False
+            ):
+                return IntentResult(
+                    intent=ChemistryIntent.EVAPORATION_TRANSITION,
+                    status="unsupported",
+                    control_audit=control_audit,
+                    diagnostic={
+                        "reason": (
+                            "post_subfloor_coupled_legs must be a bool"
+                        ),
+                    },
+                )
+        else:
+            post_subfloor_coupled_legs = False
         oxygen_destination = str(sp_data.get("oxygen_destination") or "")
         if oxygen_destination and oxygen_destination not in {
             "process.overhead_gas",
@@ -343,7 +365,11 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             condensed_product_kg=condensed_product_kg,
         )
         subfloor_legs = subfloor_legs_kg(coupled_leg_kg)
-        if subfloor_legs:
+        # Absent or false: a leg in (0, floor] posts nothing, so one
+        # side cannot land alone. The headspace hour sets the control
+        # and posts both legs. The parent-stock return above still
+        # applies to that hour.
+        if subfloor_legs and not post_subfloor_coupled_legs:
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="ok",
