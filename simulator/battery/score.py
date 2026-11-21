@@ -244,6 +244,14 @@ from simulator.battery.score_run import (
 )
 from simulator.battery.score_metrics import (
     QUANTITY_METRIC,
+    RelativeSeriesAnchor as _RelativeSeriesAnchor,
+    RelativeSeriesClock as _RelativeSeriesClock,
+    RelativeSeriesComparison as _RelativeSeriesComparison,
+    RelativeSeriesEvidence as _RelativeSeriesEvidence,
+    RelativeSeriesPoint as _RelativeSeriesPoint,
+    RelativeSeriesUnavailable as _RelativeSeriesUnavailable,
+    RelativeSeriesUnavailableReason as _RelativeSeriesUnavailableReason,
+    relative_channel_point_residuals as _relative_channel_point_residuals,
     _phase_component_reference_wt_percent,
     _reference_from_metric,
     _residual_metric_operation,
@@ -16896,6 +16904,56 @@ def _is_selected_condition_observation(
         return True
     derivation = oxygen.observation.derivation
     return derivation is not None and reference.observation_id in derivation.inputs
+
+
+def _score_relative_qms_series(
+    observed_series: Sequence[_RelativeSeriesPoint],
+    model_series: Sequence[_RelativeSeriesPoint],
+    anchor: _RelativeSeriesAnchor,
+    clock: _RelativeSeriesClock,
+    evidence: _RelativeSeriesEvidence,
+    *,
+    context: ScoreContext,
+) -> _RelativeSeriesComparison:
+    """Apply the existing oxygen independence guard before pure QMS scoring."""
+
+    if evidence.target_species in {"O", "O2"}:
+        rows = tuple(context.observations.values())
+        for source_point in observed_series:
+            source_observation = (
+                None
+                if source_point.observation_id is None
+                else context.observations.get(source_point.observation_id)
+            )
+            if source_observation is None:
+                return _RelativeSeriesComparison(
+                    unavailable=_RelativeSeriesUnavailable(
+                        _RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
+                    )
+                )
+            experiment = context.experiments.get(
+                source_observation.experiment_id
+            )
+            bench = (
+                None
+                if experiment is None
+                else _bench_for_score(experiment, context.benches)
+            )
+            oxygen = resolve_source_oxygen(source_observation, rows, bench)
+            if _printed_fo2_names_observation(source_observation) or (
+                isinstance(oxygen, SourceOxygenCondition)
+                and _is_selected_condition_observation(source_observation, oxygen)
+            ):
+                evidence = replace(evidence, oxygen_independent=False)
+                break
+        else:
+            evidence = replace(
+                evidence,
+                oxygen_independent=evidence.oxygen_independent is not False,
+            )
+    return _relative_channel_point_residuals(
+        observed_series, model_series, anchor, clock, evidence
+    )
 
 
 def hk_ratio_alpha_predictor_refusal(

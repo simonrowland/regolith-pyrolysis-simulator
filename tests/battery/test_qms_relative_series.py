@@ -1,0 +1,298 @@
+"""Contract tests for eligible relative-channel QMS point residuals."""
+
+from dataclasses import replace
+from decimal import Decimal
+import math
+
+import pytest
+
+from simulator.battery.enums import Quantity, UncertaintyKind, ValueKind
+from simulator.battery.records import Uncertainty, Value
+from simulator.battery.score_metrics import (
+    RelativeSeriesAnchor,
+    RelativeSeriesClock,
+    RelativeSeriesEvidence,
+    RelativeSeriesPoint,
+    RelativeSeriesUnavailableReason,
+    relative_channel_point_residuals,
+)
+from tests.battery import factories as F
+
+
+def _point(
+    coordinate: str,
+    value: str,
+    *,
+    observable: str,
+    source: bool,
+    boundary: str = "cell-exit",
+    coordinate_unit: str = "s",
+    uncertainty: Uncertainty | None = None,
+) -> RelativeSeriesPoint:
+    return RelativeSeriesPoint(
+        run_id="source-run" if source else "model-run",
+        coordinate=Decimal(coordinate),
+        value=Value(ValueKind.POINT, point=Decimal(value)),
+        observable=observable,
+        boundary=boundary,
+        coordinate_unit=coordinate_unit,
+        locator=F.loc(page=3) if source else None,
+        uncertainty=uncertainty if source else None,
+    )
+
+
+def _inputs():
+    observed = (
+        _point(
+            "0", "2", observable="O2+", source=True,
+            uncertainty=Uncertainty(
+                UncertaintyKind.PRINTED,
+                verbatim="± 1%",
+                locator=F.loc(page=3),
+            ),
+        ),
+        _point("1", "4", observable="O2+", source=True),
+        _point("2", "8", observable="O2+", source=True),
+    )
+    model = (
+        _point("10", "5", observable="O2", source=False),
+        _point("11", "10", observable="O2", source=False),
+        _point("12", "20", observable="O2", source=False),
+    )
+    anchor = RelativeSeriesAnchor(
+        source_coordinate=Decimal("0"),
+        model_coordinate=Decimal("10"),
+        source_event="acquisition-start",
+        model_event="trajectory-start",
+        physical_event="heater-enable",
+    )
+    clock = RelativeSeriesClock(
+        source_event="acquisition-start",
+        model_event="trajectory-start",
+        physical_event="heater-enable",
+        mapping_supported=True,
+        locator=F.loc(page=2),
+    )
+    evidence = RelativeSeriesEvidence(
+        quantity=Quantity.ION_INTENSITY,
+        model_quantity=Quantity.P_PARTIAL,
+        channel="O2+",
+        target_species="O2",
+        boundary="cell-exit",
+        target_isolated_or_interferences_corrected=True,
+        background_treatment_supported=True,
+        response_proportional_over_interval=True,
+        locator=F.loc(page=1),
+        oxygen_independent=True,
+    )
+    return observed, model, anchor, clock, evidence
+
+
+def test_constant_current_multiplier_cancels_after_eligible_anchor_normalization():
+    observed, model, anchor, clock, evidence = _inputs()
+    model = (
+        model[0],
+        replace(model[1], value=Value(ValueKind.POINT, point=Decimal("15"))),
+        replace(model[2], value=Value(ValueKind.POINT, point=Decimal("45"))),
+    )
+    original = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+    scaled = relative_channel_point_residuals(
+        tuple(
+            replace(
+                point,
+                value=Value(
+                    ValueKind.POINT,
+                    point=point.value.point * Decimal("7"),
+                ),
+            )
+            for point in observed
+        ),
+        model,
+        anchor,
+        clock,
+        evidence,
+    )
+    assert original.unavailable is None
+    assert scaled.unavailable is None
+    assert tuple(row.residual_dex for row in original.points) == tuple(
+        row.residual_dex for row in scaled.points
+    )
+    assert tuple(float(row.residual_dex) for row in original.points) == pytest.approx(
+        (0.0, math.log10(1.5), math.log10(2.25))
+    )
+    assert original.points[0].uncertainty == observed[0].uncertainty
+
+
+def test_matching_normalized_traces_have_zero_residuals():
+    observed, model, anchor, clock, evidence = _inputs()
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+    assert result.unavailable is None
+    assert tuple(row.residual_dex for row in result.points) == (
+        Decimal(0), Decimal(0), Decimal(0)
+    )
+
+
+@pytest.mark.parametrize(
+    ("change", "reason"),
+    [
+        (
+            lambda observed, model, anchor, clock, evidence: (
+                observed,
+                model,
+                replace(anchor, source_coordinate=Decimal("99")),
+                clock,
+                evidence,
+            ),
+            RelativeSeriesUnavailableReason.SOURCE_ANCHOR_MISSING,
+        ),
+        (
+            lambda observed, model, anchor, clock, evidence: (
+                observed,
+                model,
+                replace(anchor, model_coordinate=Decimal("99")),
+                clock,
+                evidence,
+            ),
+            RelativeSeriesUnavailableReason.MODEL_ANCHOR_MISSING,
+        ),
+        (
+            lambda observed, model, anchor, clock, evidence: (
+                (observed[0], replace(observed[1], observable="O+"), *observed[2:]),
+                model,
+                anchor,
+                clock,
+                evidence,
+            ),
+            RelativeSeriesUnavailableReason.MIXED_CHANNELS,
+        ),
+        (
+            lambda observed, model, anchor, clock, evidence: (
+                observed,
+                model,
+                anchor,
+                replace(clock, source_event="sample-insertion"),
+                evidence,
+            ),
+            RelativeSeriesUnavailableReason.CLOCK_EVENT_MISMATCH,
+        ),
+        (
+            lambda observed, model, anchor, clock, evidence: (
+                observed,
+                model,
+                anchor,
+                clock,
+                replace(evidence, background_treatment_supported=False),
+            ),
+            RelativeSeriesUnavailableReason.BACKGROUND_UNRESOLVED,
+        ),
+        (
+            lambda observed, model, anchor, clock, evidence: (
+                observed,
+                model,
+                anchor,
+                clock,
+                replace(evidence, target_isolated_or_interferences_corrected=None),
+            ),
+            RelativeSeriesUnavailableReason.INTERFERENCE_UNRESOLVED,
+        ),
+        (
+            lambda observed, model, anchor, clock, evidence: (
+                observed,
+                model,
+                anchor,
+                clock,
+                replace(evidence, response_proportional_over_interval=False),
+            ),
+            RelativeSeriesUnavailableReason.PROPORTIONAL_TRACKING_UNESTABLISHED,
+        ),
+    ],
+    ids=(
+        "missing-source-anchor",
+        "missing-model-anchor",
+        "mixed-channels",
+        "changed-clock-zero",
+        "background",
+        "interference",
+        "response-drift",
+    ),
+)
+def test_unproven_relative_series_is_typed_unavailable(change, reason):
+    observed, model, anchor, clock, evidence = change(*_inputs())
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+    assert result.unavailable is not None
+    assert result.unavailable.reason is reason
+    assert result.points == ()
+
+
+def test_unmatched_observed_point_is_unavailable_without_interpolation():
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = (*observed, _point("3", "16", observable="O2+", source=True))
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+    assert result.unavailable is None
+    assert result.points[-1].residual_dex is None
+    assert result.points[-1].unavailable_reason is (
+        RelativeSeriesUnavailableReason.MODEL_POINT_MISSING
+    )
+
+
+def test_nonpositive_or_censored_datum_is_typed_unavailable_per_point():
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = (
+        observed[0],
+        replace(
+            observed[1],
+            value=Value(
+                ValueKind.BOUND,
+                bound_operator="<",
+                bound_value=Decimal("5"),
+            ),
+        ),
+        replace(
+            observed[2], value=Value(ValueKind.POINT, point=Decimal("0"))
+        ),
+    )
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+    assert result.unavailable is None
+    assert result.points[1].unavailable_reason is (
+        RelativeSeriesUnavailableReason.SOURCE_VALUE_NOT_POSITIVE_POINT
+    )
+    assert result.points[2].unavailable_reason is (
+        RelativeSeriesUnavailableReason.SOURCE_VALUE_NOT_POSITIVE_POINT
+    )
+
+
+def test_relative_channel_contract_rejects_flux_or_mixed_source_runs():
+    observed, model, anchor, clock, evidence = _inputs()
+    wrong_model_quantity = relative_channel_point_residuals(
+        observed,
+        model,
+        anchor,
+        clock,
+        replace(evidence, model_quantity=Quantity.EVAPORATION_RATE),
+    )
+    assert wrong_model_quantity.unavailable is not None
+    assert wrong_model_quantity.unavailable.reason is (
+        RelativeSeriesUnavailableReason.QUANTITY_UNSUPPORTED
+    )
+
+    mixed_runs = relative_channel_point_residuals(
+        (observed[0], replace(observed[1], run_id="other-source-run"), observed[2]),
+        model,
+        anchor,
+        clock,
+        evidence,
+    )
+    assert mixed_runs.unavailable is not None
+    assert mixed_runs.unavailable.reason is (
+        RelativeSeriesUnavailableReason.MIXED_SOURCE_RUNS
+    )

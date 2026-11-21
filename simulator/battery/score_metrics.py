@@ -11,8 +11,10 @@ names from ``score`` receive the same objects through that facade.
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from decimal import Decimal
-from typing import Mapping
+from enum import StrEnum
+from typing import Mapping, Sequence
 
 from simulator.battery.enums import (
     QUANTITY_UNITS,
@@ -25,15 +27,18 @@ from simulator.battery.enums import (
     ResidualStatus,
     SourceRelation,
     ValenceValueForm,
+    ValueKind,
     effective_phase_basis,
 )
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import (
     DecisionBand,
     Experiment,
+    Locator,
     Observation,
     ResidualNumeric,
     Uncertainty,
+    Value,
 )
 
 
@@ -94,6 +99,328 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.SULFIDE_CAPACITY: MetricOperation.ABSOLUTE,
     Quantity.CHLORIDE_CAPACITY: MetricOperation.ABSOLUTE,
 }
+
+
+class RelativeSeriesUnavailableReason(StrEnum):
+    INVALID_SERIES = "invalid_series"
+    MIXED_CHANNELS = "mixed_channels"
+    MIXED_SOURCE_RUNS = "mixed_source_runs"
+    MIXED_MODEL_RUNS = "mixed_model_runs"
+    CHANNEL_MISMATCH = "channel_mismatch"
+    MIXED_MODEL_SPECIES = "mixed_model_species"
+    MODEL_SPECIES_MISMATCH = "model_species_mismatch"
+    QUANTITY_UNSUPPORTED = "quantity_unsupported"
+    BOUNDARY_MISMATCH = "measurement_boundary_mismatch"
+    COORDINATE_UNIT_MISMATCH = "coordinate_unit_mismatch"
+    PROPORTIONAL_TRACKING_UNESTABLISHED = "proportional_tracking_unestablished"
+    BACKGROUND_UNRESOLVED = "background_unresolved"
+    INTERFERENCE_UNRESOLVED = "interference_unresolved"
+    SOURCE_EVIDENCE_UNLOCATED = "source_evidence_unlocated"
+    CLOCK_EVENT_MISMATCH = "clock_event_mismatch"
+    CLOCK_MAPPING_UNSUPPORTED = "clock_mapping_unsupported"
+    CLOCK_MAPPING_UNLOCATED = "clock_mapping_unlocated"
+    SOURCE_ANCHOR_MISSING = "source_anchor_missing"
+    MODEL_ANCHOR_MISSING = "model_anchor_missing"
+    SOURCE_ANCHOR_NOT_POSITIVE = "source_anchor_not_positive"
+    MODEL_ANCHOR_NOT_POSITIVE = "model_anchor_not_positive"
+    SOURCE_LOCATOR_MISSING = "source_locator_missing"
+    DUPLICATE_COORDINATE = "duplicate_coordinate"
+    MODEL_POINT_MISSING = "model_point_missing"
+    SOURCE_VALUE_NOT_POSITIVE_POINT = "source_value_not_positive_point"
+    MODEL_VALUE_NOT_POSITIVE_POINT = "model_value_not_positive_point"
+    OXYGEN_ELIGIBILITY_UNKNOWN = "oxygen_eligibility_unknown"
+    OXYGEN_SELF_AGREEMENT = "oxygen_self_agreement"
+
+
+@dataclass(frozen=True)
+class RelativeSeriesPoint:
+    run_id: str
+    coordinate: Decimal
+    value: Value
+    observable: str
+    boundary: str
+    coordinate_unit: str
+    locator: Locator | None = None
+    observation_id: str | None = None
+    uncertainty: Uncertainty | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "coordinate", Decimal(str(self.coordinate)))
+        if not self.coordinate.is_finite():
+            raise ValueError("relative-series coordinate must be finite")
+        if (
+            not self.run_id
+            or not self.observable
+            or not self.boundary
+            or not self.coordinate_unit
+        ):
+            raise ValueError(
+                "relative-series point requires run, observable, boundary, and coordinate unit"
+            )
+
+
+@dataclass(frozen=True)
+class RelativeSeriesAnchor:
+    source_coordinate: Decimal
+    model_coordinate: Decimal
+    source_event: str
+    model_event: str
+    physical_event: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self, "source_coordinate", Decimal(str(self.source_coordinate))
+        )
+        object.__setattr__(
+            self, "model_coordinate", Decimal(str(self.model_coordinate))
+        )
+        if (
+            not self.source_coordinate.is_finite()
+            or not self.model_coordinate.is_finite()
+        ):
+            raise ValueError("relative-series anchor coordinates must be finite")
+        if not self.source_event or not self.model_event or not self.physical_event:
+            raise ValueError("relative-series anchor requires both events and their match")
+
+
+@dataclass(frozen=True)
+class RelativeSeriesClock:
+    source_event: str
+    model_event: str
+    physical_event: str
+    mapping_supported: bool | None
+    locator: Locator | None
+
+
+@dataclass(frozen=True)
+class RelativeSeriesEvidence:
+    quantity: Quantity
+    model_quantity: Quantity
+    channel: str
+    target_species: str
+    boundary: str
+    target_isolated_or_interferences_corrected: bool | None
+    background_treatment_supported: bool | None
+    response_proportional_over_interval: bool | None
+    locator: Locator | None
+    oxygen_independent: bool | None = None
+
+
+@dataclass(frozen=True)
+class RelativeSeriesUnavailable:
+    reason: RelativeSeriesUnavailableReason
+
+
+@dataclass(frozen=True)
+class RelativeSeriesPointResidual:
+    source_coordinate: Decimal
+    model_coordinate: Decimal
+    residual_dex: Decimal | None
+    unavailable_reason: RelativeSeriesUnavailableReason | None = None
+    uncertainty: Uncertainty | None = None
+
+
+@dataclass(frozen=True)
+class RelativeSeriesComparison:
+    points: tuple[RelativeSeriesPointResidual, ...] = ()
+    unavailable: RelativeSeriesUnavailable | None = None
+
+
+def relative_channel_point_residuals(
+    observed_series: Sequence[RelativeSeriesPoint],
+    model_series: Sequence[RelativeSeriesPoint],
+    anchor: RelativeSeriesAnchor,
+    clock: RelativeSeriesClock,
+    evidence: RelativeSeriesEvidence,
+) -> RelativeSeriesComparison:
+    """Compare a proven single QMS channel with its anchored model pressure.
+
+    The input coordinates are elapsed time in the declared shared unit. The
+    anchor maps the source and model clocks to one supported physical event;
+    samples are matched by elapsed offset from that event without
+    interpolation. Source current and model pressure are each normalized to
+    their value at the anchor, then passed through the existing dex metric.
+    """
+
+    def unavailable(
+        reason: RelativeSeriesUnavailableReason,
+    ) -> RelativeSeriesComparison:
+        return RelativeSeriesComparison(unavailable=RelativeSeriesUnavailable(reason))
+
+    if not observed_series or not model_series:
+        return unavailable(RelativeSeriesUnavailableReason.INVALID_SERIES)
+    if evidence.quantity is not Quantity.ION_INTENSITY:
+        return unavailable(RelativeSeriesUnavailableReason.QUANTITY_UNSUPPORTED)
+    observed_channels = {point.observable for point in observed_series}
+    if len(observed_channels) != 1:
+        return unavailable(RelativeSeriesUnavailableReason.MIXED_CHANNELS)
+    if observed_channels != {evidence.channel}:
+        return unavailable(RelativeSeriesUnavailableReason.CHANNEL_MISMATCH)
+    if len({point.run_id for point in observed_series}) != 1:
+        return unavailable(RelativeSeriesUnavailableReason.MIXED_SOURCE_RUNS)
+    model_species = {point.observable for point in model_series}
+    if len(model_species) != 1:
+        return unavailable(RelativeSeriesUnavailableReason.MIXED_MODEL_SPECIES)
+    if model_species != {evidence.target_species}:
+        return unavailable(RelativeSeriesUnavailableReason.MODEL_SPECIES_MISMATCH)
+    if len({point.run_id for point in model_series}) != 1:
+        return unavailable(RelativeSeriesUnavailableReason.MIXED_MODEL_RUNS)
+    if evidence.model_quantity is not Quantity.P_PARTIAL:
+        return unavailable(RelativeSeriesUnavailableReason.QUANTITY_UNSUPPORTED)
+    if any(
+        point.boundary != evidence.boundary
+        for point in (*observed_series, *model_series)
+    ):
+        return unavailable(RelativeSeriesUnavailableReason.BOUNDARY_MISMATCH)
+    coordinate_units = {
+        point.coordinate_unit for point in (*observed_series, *model_series)
+    }
+    if len(coordinate_units) != 1:
+        return unavailable(RelativeSeriesUnavailableReason.COORDINATE_UNIT_MISMATCH)
+    if evidence.target_isolated_or_interferences_corrected is not True:
+        return unavailable(
+            RelativeSeriesUnavailableReason.INTERFERENCE_UNRESOLVED
+        )
+    if evidence.background_treatment_supported is not True:
+        return unavailable(RelativeSeriesUnavailableReason.BACKGROUND_UNRESOLVED)
+    if evidence.response_proportional_over_interval is not True:
+        return unavailable(
+            RelativeSeriesUnavailableReason.PROPORTIONAL_TRACKING_UNESTABLISHED
+        )
+    if evidence.locator is None:
+        return unavailable(
+            RelativeSeriesUnavailableReason.SOURCE_EVIDENCE_UNLOCATED
+        )
+    if evidence.target_species in {"O", "O2"}:
+        if evidence.oxygen_independent is None:
+            return unavailable(
+                RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
+            )
+        if not evidence.oxygen_independent:
+            return unavailable(RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT)
+    if (
+        clock.source_event != anchor.source_event
+        or clock.model_event != anchor.model_event
+        or clock.physical_event != anchor.physical_event
+    ):
+        return unavailable(RelativeSeriesUnavailableReason.CLOCK_EVENT_MISMATCH)
+    if clock.mapping_supported is not True:
+        return unavailable(
+            RelativeSeriesUnavailableReason.CLOCK_MAPPING_UNSUPPORTED
+        )
+    if clock.locator is None:
+        return unavailable(
+            RelativeSeriesUnavailableReason.CLOCK_MAPPING_UNLOCATED
+        )
+    if any(point.locator is None for point in observed_series):
+        return unavailable(RelativeSeriesUnavailableReason.SOURCE_LOCATOR_MISSING)
+
+    observed_by_coordinate: dict[Decimal, RelativeSeriesPoint] = {}
+    for point in observed_series:
+        if point.coordinate in observed_by_coordinate:
+            return unavailable(RelativeSeriesUnavailableReason.DUPLICATE_COORDINATE)
+        observed_by_coordinate[point.coordinate] = point
+    model_by_coordinate: dict[Decimal, RelativeSeriesPoint] = {}
+    for point in model_series:
+        if point.coordinate in model_by_coordinate:
+            return unavailable(RelativeSeriesUnavailableReason.DUPLICATE_COORDINATE)
+        model_by_coordinate[point.coordinate] = point
+
+    source_anchor = observed_by_coordinate.get(anchor.source_coordinate)
+    if source_anchor is None:
+        return unavailable(RelativeSeriesUnavailableReason.SOURCE_ANCHOR_MISSING)
+    model_anchor = model_by_coordinate.get(anchor.model_coordinate)
+    if model_anchor is None:
+        return unavailable(RelativeSeriesUnavailableReason.MODEL_ANCHOR_MISSING)
+    if (
+        source_anchor.value.kind is not ValueKind.POINT
+        or source_anchor.value.point is None
+        or source_anchor.value.point <= 0
+    ):
+        return unavailable(
+            RelativeSeriesUnavailableReason.SOURCE_ANCHOR_NOT_POSITIVE
+        )
+    if (
+        model_anchor.value.kind is not ValueKind.POINT
+        or model_anchor.value.point is None
+        or model_anchor.value.point <= 0
+    ):
+        return unavailable(
+            RelativeSeriesUnavailableReason.MODEL_ANCHOR_NOT_POSITIVE
+        )
+
+    point_residuals: list[RelativeSeriesPointResidual] = []
+    for observed in observed_series:
+        model_coordinate = anchor.model_coordinate + (
+            observed.coordinate - anchor.source_coordinate
+        )
+        model = model_by_coordinate.get(model_coordinate)
+        if model is None:
+            point_residuals.append(
+                RelativeSeriesPointResidual(
+                    observed.coordinate,
+                    model_coordinate,
+                    None,
+                    RelativeSeriesUnavailableReason.MODEL_POINT_MISSING,
+                    observed.uncertainty,
+                )
+            )
+            continue
+        if (
+            observed.value.kind is not ValueKind.POINT
+            or observed.value.point is None
+            or observed.value.point <= 0
+        ):
+            point_residuals.append(
+                RelativeSeriesPointResidual(
+                    observed.coordinate,
+                    model_coordinate,
+                    None,
+                    RelativeSeriesUnavailableReason.SOURCE_VALUE_NOT_POSITIVE_POINT,
+                    observed.uncertainty,
+                )
+            )
+            continue
+        if (
+            model.value.kind is not ValueKind.POINT
+            or model.value.point is None
+            or model.value.point <= 0
+        ):
+            point_residuals.append(
+                RelativeSeriesPointResidual(
+                    observed.coordinate,
+                    model_coordinate,
+                    None,
+                    RelativeSeriesUnavailableReason.MODEL_VALUE_NOT_POSITIVE_POINT,
+                    observed.uncertainty,
+                )
+            )
+            continue
+        observed_normalized = observed.value.point / source_anchor.value.point
+        model_normalized = model.value.point / model_anchor.value.point
+        residual = compute_metric(
+            MetricOperation.DEX, model_normalized, observed_normalized
+        )
+        if residual is None:
+            point_residuals.append(
+                RelativeSeriesPointResidual(
+                    observed.coordinate,
+                    model_coordinate,
+                    None,
+                    RelativeSeriesUnavailableReason.SOURCE_VALUE_NOT_POSITIVE_POINT,
+                    observed.uncertainty,
+                )
+            )
+            continue
+        point_residuals.append(
+            RelativeSeriesPointResidual(
+                observed.coordinate,
+                model_coordinate,
+                residual,
+                uncertainty=observed.uncertainty,
+            )
+        )
+    return RelativeSeriesComparison(points=tuple(point_residuals))
 
 # Physical dimension of a stored unit. Unknown units match nothing.
 _UNIT_DIMENSION: dict[str, str] = {

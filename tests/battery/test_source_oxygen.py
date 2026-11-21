@@ -15,6 +15,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Quantity,
+    ValueKind,
 )
 from simulator.battery.records import (
     Bench, BenchIdentity, Derivation, FO2Control, Located, Notice, Reaction,
@@ -26,6 +27,14 @@ from simulator.battery.score import (
     compile_residual,
     load_score_context,
     predict_with_engine,
+    _score_relative_qms_series,
+)
+from simulator.battery.score_metrics import (
+    RelativeSeriesAnchor,
+    RelativeSeriesClock,
+    RelativeSeriesEvidence,
+    RelativeSeriesPoint,
+    RelativeSeriesUnavailableReason,
 )
 from simulator.battery.source_oxygen import (
     SourceOxygenCondition,
@@ -35,6 +44,7 @@ from simulator.battery.source_oxygen import (
     resolve_source_oxygen,
 )
 from simulator.diagnostic_helpers import binary_pot_battery as battery
+from tests.battery import factories as F
 
 
 @pytest.fixture(scope="module")
@@ -105,6 +115,60 @@ def _single_physics_rung(notices):
     labels = [notice.reason for notice in notices if "physics_rung=" in notice.reason]
     assert len(labels) == 1
     return labels[0]
+
+
+def _relative_qms_inputs(observation_id=None):
+    target_species = "O2"
+    observed = tuple(
+        RelativeSeriesPoint(
+            run_id="source-qms-run",
+            coordinate=Decimal(str(time_s)),
+            value=Value(ValueKind.POINT, point=Decimal(str(signal))),
+            observable=f"{target_species}+",
+            boundary="cell-exit",
+            coordinate_unit="s",
+            locator=F.loc(page=3),
+            observation_id=observation_id,
+        )
+        for time_s, signal in ((0, 2), (1, 4))
+    )
+    model = tuple(
+        RelativeSeriesPoint(
+            run_id="model-run",
+            coordinate=Decimal(str(time_s)),
+            value=Value(ValueKind.POINT, point=Decimal(str(pressure))),
+            observable=target_species,
+            boundary="cell-exit",
+            coordinate_unit="s",
+        )
+        for time_s, pressure in ((10, 5), (11, 10))
+    )
+    anchor = RelativeSeriesAnchor(
+        source_coordinate=Decimal(0),
+        model_coordinate=Decimal(10),
+        source_event="acquisition-start",
+        model_event="trajectory-start",
+        physical_event="heater-enable",
+    )
+    clock = RelativeSeriesClock(
+        source_event="acquisition-start",
+        model_event="trajectory-start",
+        physical_event="heater-enable",
+        mapping_supported=True,
+        locator=F.loc(page=2),
+    )
+    evidence = RelativeSeriesEvidence(
+        quantity=Quantity.ION_INTENSITY,
+        model_quantity=Quantity.P_PARTIAL,
+        channel=f"{target_species}+",
+        target_species=target_species,
+        boundary="cell-exit",
+        target_isolated_or_interferences_corrected=True,
+        background_treatment_supported=True,
+        response_proportional_over_interval=True,
+        locator=F.loc(page=1),
+    )
+    return observed, model, anchor, clock, evidence
 
 
 def _fallback_notice(context, monkeypatch, row, rows):
@@ -1551,4 +1615,80 @@ def test_comeasured_consistency_notice_reaches_printed_fo2_residual(source_conte
     assert not any(notice.origin == "unrelated-o2-source-notice" for notice in residual.notices)
     assert any(
         notice.reason.startswith("co_measured_o_o2_consistency:") for notice in residual.notices
+    )
+
+
+def test_relative_qms_oxygen_inputs_cannot_validate_themselves(source_context):
+    melt_row = _row(source_context, "kems-053-stolyarova-1991")
+    condition = _resolve(source_context, melt_row)
+    assert isinstance(condition, SourceOxygenCondition)
+    assert condition.observation.identity.species.formula == "O2"
+    assert condition.observation.derived_from
+    component = source_context.observations[condition.observation.derived_from[0]]
+    assert component.observation_id in condition.used_observations
+
+    for reference in (condition.observation, component):
+        observed, model, anchor, clock, evidence = _relative_qms_inputs(
+            reference.observation_id
+        )
+        result = _score_relative_qms_series(
+            observed,
+            model,
+            anchor,
+            clock,
+            evidence,
+            context=source_context,
+        )
+        assert result.unavailable is not None
+        assert result.unavailable.reason is (
+            RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT
+        )
+        assert result.points == ()
+
+
+def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
+    melt_row = _row(source_context, "kems-053-stolyarova-1991")
+    command = Decimal("4.2e-7")
+    reference = replace(
+        melt_row,
+        observation_id="relative-qms-explicit-fo2",
+        identity=replace(
+            melt_row.identity,
+            species=Species("O2", Phase.G),
+            quantity=Quantity.ION_INTENSITY,
+            fO2_Pa=State.of(command),
+        ),
+        value=Value(ValueKind.POINT, point=Decimal("2")),
+    )
+    scoring_context = replace(
+        source_context,
+        observations={**source_context.observations, reference.observation_id: reference},
+    )
+    observed, model, anchor, clock, evidence = _relative_qms_inputs(
+        reference.observation_id
+    )
+
+    result = _score_relative_qms_series(
+        observed,
+        model,
+        anchor,
+        clock,
+        evidence,
+        context=scoring_context,
+    )
+
+    assert result.unavailable is None
+    assert reference.identity.fO2_Pa == State.of(command)
+
+    self_dependent = _score_relative_qms_series(
+        observed,
+        model,
+        anchor,
+        clock,
+        replace(evidence, oxygen_independent=False),
+        context=scoring_context,
+    )
+    assert self_dependent.unavailable is not None
+    assert self_dependent.unavailable.reason is (
+        RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT
     )
