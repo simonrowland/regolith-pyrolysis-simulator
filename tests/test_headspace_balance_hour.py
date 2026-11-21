@@ -23,6 +23,7 @@ from simulator.accounting.run_artifact import (
     CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT,
 )
 from simulator.capacity_coupling import (
+    DEFAULT_ABS_TOL_PA,
     CapacityCouplingRefusalError,
     CapacityShadowRefusal,
     CapacityShadowResult,
@@ -620,6 +621,39 @@ def test_published_pressure_off_the_inventory_refuses():
     sim.overhead.pressure_mbar = inventory_pa / 100.0
     sim._refuse_if_headspace_pressure_is_not_inventory()
     sim.overhead.pressure_mbar = inventory_pa / 100.0 + 1.0
+    with pytest.raises(CapacityCouplingRefusalError) as caught:
+        sim._refuse_if_headspace_pressure_is_not_inventory()
+    assert (
+        caught.value.refusal.reason
+        == "headspace_published_pressure_not_inventory"
+    )
+
+
+def test_inventory_gate_boundary_is_one_micro_pascal():
+    # The production comparison is strict `> DEFAULT_ABS_TOL_PA`.
+    # Equality is inside. The millibar round trip can move a 1e-6 Pa
+    # gap, so the read-back decides which side the gate sees.
+    sim = _lunar()
+    inventory_pa = float(sim._headspace_inventory_pressure_Pa())
+
+    def read_back(gap_pa: float) -> float:
+        sim.overhead.pressure_mbar = (inventory_pa + gap_pa) / 100.0
+        return abs(float(sim.overhead.pressure_mbar) * 100.0 - inventory_pa)
+
+    inside = DEFAULT_ABS_TOL_PA
+    inside_gap = read_back(inside)
+    while inside_gap > DEFAULT_ABS_TOL_PA:
+        inside = math.nextafter(inside, 0.0)
+        inside_gap = read_back(inside)
+    assert 0.0 < inside_gap <= DEFAULT_ABS_TOL_PA
+    sim._refuse_if_headspace_pressure_is_not_inventory()
+
+    outside = math.nextafter(inside, math.inf)
+    outside_gap = read_back(outside)
+    while outside_gap <= DEFAULT_ABS_TOL_PA:
+        outside = math.nextafter(outside, math.inf)
+        outside_gap = read_back(outside)
+    assert outside_gap > DEFAULT_ABS_TOL_PA
     with pytest.raises(CapacityCouplingRefusalError) as caught:
         sim._refuse_if_headspace_pressure_is_not_inventory()
     assert (
