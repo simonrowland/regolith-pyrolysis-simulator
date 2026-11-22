@@ -34,13 +34,18 @@ Ambiguity resolutions:
   scopes by method (effusion pressure, Langmuir pressure/alpha,
   kinetic/yield); thermochemistry at a stated T/reference state is not
   that class and does not borrow the apparatus token. Archival
-  storage of incomplete apparatus is allowed. These tokens identify missing
-  inputs, not automatic refusals: when composition, temperature, quantity,
-  and numeric value make the row callable, the scorer uses its stated method
-  or apparatus default and attaches a typed flag naming the default and
-  original reason (``knob_defaulted`` for apparatus). The archive keeps the
-  absence; no default is written into the record. An ion-intensity row with
-  no calibration still has no numeric pressure for an engine call.
+  storage of incomplete apparatus is allowed. Current behavior: a missing
+  method on a method-scoped quantity returns ``method_unknown``; missing
+  geometry or calibration determinants return ``underdetermined_apparatus``.
+  The scorer turns failed gates into refusals, apart from its narrow
+  KEMS ``apparatus_flagged`` notice carve-out. Policy (d-460): an otherwise
+  callable row uses a stated method or apparatus default with a typed flag
+  naming the default and original reason. Until t-1922a lands, method and
+  effusion-gate failures remain refusals; until t-1922b lands, missing
+  apparatus determinants remain refusals and ``knob_defaulted`` is not a
+  notice kind. The archive keeps the absence; no default is written into the
+  record. An ion-intensity row with no calibration still has no numeric
+  pressure for an engine call.
 """
 
 from __future__ import annotations

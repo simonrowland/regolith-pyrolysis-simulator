@@ -40,11 +40,19 @@ score report, headline summary, hero charts and the battery leaderboard
 Each scoring run writes `data/battery/residuals.jsonl` afresh; it is generated, not committed.
 The migrator never invents a value: an unprinted pressure, phase or method stays unknown in
 the store. Absence is never stored as a measured zero, and no scorer default is written back
-into the extract. When an observation is otherwise callable, the scorer uses a stated default
-with a typed flag naming the default and original reason. Unstated pressure uses 1 atm with an
-assumed-pressure flag (d-451); an unprinted apparatus knob uses the simulator default with
-`knob_defaulted` (d-456). An unsourced evaporation coefficient uses α = 1, the Hertz–Knudsen
-upper bound, with a typed flag.
+into the extract. Policy (d-460): when a row is otherwise callable, use a stated default with
+a typed flag naming the default and original reason, and report its prediction in the flagged
+tier. Policy (d-451) calls for unstated pressure to use 1 atm with an assumed-pressure flag;
+current code only assumes 1 bar for crystal pure-standard H, Cp and S, with an
+`out_of_certified_band` notice whose reason is `standard-pressure-assumed`. The battery scorer
+still refuses missing total pressure as `identity_incomplete`, except for the Borisov 2018
+compilation, which is a 1 atm dataset. Policy (d-456) calls for an unprinted apparatus knob to
+use the simulator default with `knob_defaulted`; until t-1922b lands, missing apparatus
+determinants still refuse as `underdetermined_apparatus`, and no `knob_defaulted` notice exists.
+An unsourced evaporation coefficient should use α = 1, the Hertz–Knudsen upper bound, with a
+typed flag under d-460. Until t-1922b lands, the battery scorer still refuses
+`alpha_not_sourced` and `evaporation_coefficients_not_sourced`; these refusals are d-460 debt
+in the refusal census.
 
 ## Quoted records and inherited values
 
@@ -158,11 +166,16 @@ OpenIMCC, alphaMELTS and ThermoEngine, and VapoRock and MAGEMin decline it with
 - **Same oxygen.** `simulator/battery/fo2_ladder.py` resolves one fO₂ per row and gives it to
   every engine. In general it takes the first of: the printed fO₂; the printed Fe³⁺/ΣFe through
   the Kress and Carmichael (1991) inverse; the experiment's controlled atmosphere or buffer; and
-  the melt's intrinsic fO₂, flagged as borrowed. When earlier inputs do not resolve a value,
-  the ladder uses its stated last rung, intrinsic melt fO₂, if composition and temperature are
-  available, with a flag naming the unavailable earlier rungs. Without composition or temperature
-  no engine can be called. Rows where an engine computes its own redox state are labelled
-  `engine_intrinsic` and kept apart from `shared_ladder` rows.
+  the melt's intrinsic fO₂, flagged as borrowed. Current tier-4 behavior: `_tier4` uses intrinsic
+  melt fO₂ when composition weights and positive temperature are present, except for Knudsen
+  vapour rows blocked by `_knudsen_blocks_intrinsic` and metal-saturation activity refusals.
+  `fo2_tier_notice` marks a borrowed value with `out_of_certified_band` and reason
+  `fo2_tier=4; route=intrinsic_melt_fO2; borrowed`; it does not name the skipped rungs. A ladder
+  miss returns `None`, and callers that need shared fO₂ refuse. This is not a universal engine
+  call ban: printed fO₂ can resolve without composition, and pure-phase thermochemistry does not
+  require melt composition. Policy (d-460): when an otherwise callable row uses a fallback rung,
+  its typed flag should name the unavailable earlier rung. Rows where an engine computes its own
+  redox state are labelled `engine_intrinsic` and kept apart from `shared_ladder` rows.
 - **Same population.** A pairwise comparison uses only the shared rows: observations on which
   both engines returned exactly one numeric residual. A refusal on either side drops the row
   from that pair, so no engine is credited or penalised for rows the other did not answer.
@@ -210,11 +223,16 @@ The status is then `match` (|residual| ≤ band), `mismatch`, or `no_band` when 
 A `no_band` row keeps its number and counts in n and RMS; the match rate uses banded rows only.
 
 **Refusal.** A `refused` residual carries a typed `RefusalReason` and a detail payload, never a
-number. An observation is refused only when no engine can be called: it has no usable composition,
-no temperature, no identifiable quantity, or a non-numeric value. Other unknowns use a stated
-default with a typed flag naming the default and original reason, and the numeric prediction stays
-in the flagged tier. A refusal is a diagnostic: the report's refusal census counts every reason,
-marking where data or certification is still needed.
+number. Policy (d-460): refuse an observation only when no engine can be called because it has no
+usable composition, no temperature, no identifiable quantity, or a non-numeric value; predict and
+flag other unknowns using stated defaults. Current code still refuses method and effusion-gate
+failures (`method_unknown`, `effusion_regime_unverified`; t-1922a), missing apparatus and unsourced
+evaporation coefficients (`underdetermined_apparatus`, `alpha_not_sourced`,
+`evaporation_coefficients_not_sourced`; t-1922b), missing total pressure (`identity_incomplete`;
+t-1922), and liquidus quantities without a predictor (`quantity_not_predicted`; t-1923). Until
+those tasks land, these refusals are d-460 debt counted by reason in the refusal census. A refusal
+is a diagnostic: the report's refusal census counts every reason, marking where data or
+certification is still needed.
 
 **Notice flags.** Out-of-domain physics is predicted and flagged rather than refused. An engine
 answer outside its certified band, or outside its activity-coefficient domain, is priced with an

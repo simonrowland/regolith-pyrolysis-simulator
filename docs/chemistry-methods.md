@@ -426,10 +426,15 @@ the CITED / ASSUMED / UNCERTIFIED trust tiers of the citation policy, and a spec
 - **Proxy coefficient.** Calcium and titanium use a perovskite (CaTiO₃) proxy; aluminium uses a broad
   conflicting-proxy envelope. These are labelled as proxies, not regolith-melt measurements.
 - **No grounded coefficient.** Chromium, manganese, and the chromium-oxide vapor have no grounded
-  coefficient. For an unsourced coefficient, the scorer uses α = 1, the Hertz–Knudsen upper bound,
-  and flags the prediction with the default and the missing sourced coefficient. This is not a
-  measured coefficient or a silent default, and the prediction stays in the flagged tier. Species
-  with cited coefficients retain those coefficients.
+  coefficient (`evaporation_alpha_policy.policy = fail_loud_missing_alpha`; no stored alpha).
+  `evaporation._load_evaporation_alpha_by_species` omits them. The flux publisher's
+  `publisher_effective_alpha` then uses α = 1, the Hertz–Knudsen upper bound, with status
+  `analytical_upper_bound` and a warning naming the species. That is the flux publisher, not the
+  battery scorer, and it is not the battery flagged tier. Species with a cited
+  `evaporation_alpha` keep that coefficient. Policy (d-460): the battery scorer should predict an
+  unsourced coefficient as α = 1 with a typed flag in the flagged tier. Until t-1922b lands,
+  battery rows still refuse `alpha_not_sourced` and `evaporation_coefficients_not_sourced`; those
+  refusals are d-460 debt in the refusal census.
 <!-- impl: §4.2 -> engines/builtin/evaporation_flux.py BuiltinEvaporationFluxProvider.dispatch:800 — alpha fallback policy -->
 
 SiO is treated specially because the hot-source and cold-wall interfaces are physically different.

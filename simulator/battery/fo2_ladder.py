@@ -21,10 +21,16 @@ Tiers 1 and the atmosphere part of tier 3 reuse ``oxygen_condition`` routes.
 The Kress inverse lives in ``simulator.fe_redox``. The effusion closure is
 the existing oxygen-balance solver; this module only names the route.
 Tier 4 is ``intrinsic_melt_fO2``, the ledger diagnostic in this tree (the
-d-160 feedstock seeder is not on this commit). When earlier rungs are absent,
-use this stated last rung if composition and temperature permit, with a flag
-naming the unavailable earlier rungs. A row with no composition or temperature
-cannot be called.
+d-160 feedstock seeder is not on this commit). Current behavior: ``_tier4``
+uses this value when composition weights and positive temperature are present,
+except where ``_knudsen_blocks_intrinsic`` or metal-saturation activity
+refusal blocks it. ``fo2_tier_notice`` emits ``OUT_OF_CERTIFIED_BAND`` with
+reason ``fo2_tier=4; route=intrinsic_melt_fO2; borrowed`` for a borrowed value;
+it does not name skipped rungs. A ladder miss returns None, and callers that
+require shared fO2 refuse. This is not a universal call ban: printed fO2 can
+resolve without composition, and pure-phase thermochemistry does not require
+melt composition. Policy (d-460): when an otherwise callable row uses a
+fallback rung, its typed flag should name the unavailable earlier rung.
 """
 
 from __future__ import annotations
