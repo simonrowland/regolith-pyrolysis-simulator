@@ -216,7 +216,7 @@ def normalize_layered_wall(raw: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError("layered_wall source_tag must be a non-empty string")
     outer = raw.get("outer_temperature_C")
     if outer is not None:
-        outer = _finite_number(outer, "layered_wall.outer_temperature_C")
+        outer = _signed_finite(outer, "layered_wall.outer_temperature_C")
     outer_status = raw.get("outer_temperature_status")
     if outer_status is not None and (
         not isinstance(outer_status, str) or not outer_status.strip()
@@ -224,7 +224,7 @@ def normalize_layered_wall(raw: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError("layered_wall outer_temperature_status must be a string")
     enclosure = raw.get("enclosure_temperature_C")
     if enclosure is not None:
-        enclosure = _finite_number(enclosure, "layered_wall.enclosure_temperature_C")
+        enclosure = _signed_finite(enclosure, "layered_wall.enclosure_temperature_C")
     enclosure_status = raw.get("enclosure_temperature_status")
     if enclosure_status is not None and (
         not isinstance(enclosure_status, str) or not enclosure_status.strip()
@@ -329,14 +329,14 @@ def price_duct_wall(
         certified_length = False
         mass_units = "kg/m"
     elif length_basis == "configured":
-        used_length_m = _finite_number(length_m, "hot_duct_length_m")
+        used_length_m = _signed_finite(length_m, "hot_duct_length_m")
         if used_length_m <= 0.0:
             return _duct_closed("invalid_hardware_sizing_inputs")
         certified_length = True
         mass_units = "kg"
     else:
         raise ValueError("length_basis must be configured or per_metre")
-    radius_m = _finite_number(diameter_m, "pipe_diameter_m") / 2.0
+    radius_m = _signed_finite(diameter_m, "pipe_diameter_m") / 2.0
     if radius_m <= 0.0:
         return _duct_closed("gas_path_radius_invalid")
     catalog = _catalog(materials)
@@ -400,8 +400,8 @@ def flat_wall_conduction(
     ready, reasons = _ready_conduction_layers(layers)
     if reasons:
         return _conduction_unavailable(reasons)
-    t_in = _finite_number(t_in_C, "t_in_C")
-    t_out = _finite_number(t_out_C, "t_out_C")
+    t_in = _signed_finite(t_in_C, "t_in_C")
+    t_out = _signed_finite(t_out_C, "t_out_C")
     resistances = [
         layer["thickness_m"] / layer["conductivity_W_m_K"] for layer in ready
     ]
@@ -444,14 +444,14 @@ def cylindrical_wall_conduction(
     Conductivity of zero is refused for the same reason as the flat wall.
     """
 
-    radius = _finite_number(r_in_m, "gas_path_radius_m")
+    radius = _signed_finite(r_in_m, "gas_path_radius_m")
     if radius <= 0.0:
         return _conduction_unavailable(["gas_path_radius_invalid"])
     ready, reasons = _ready_conduction_layers(layers)
     if reasons:
         return _conduction_unavailable(reasons)
-    t_in = _finite_number(t_in_C, "t_in_C")
-    t_out = _finite_number(t_out_C, "t_out_C")
+    t_in = _signed_finite(t_in_C, "t_in_C")
+    t_out = _signed_finite(t_out_C, "t_out_C")
     resistances: list[float] = []
     cursor = radius
     for layer in ready:
@@ -677,11 +677,11 @@ def flue_gas_energy_balance(
     """
 
     wall = normalize_layered_wall(layered_wall)
-    temperature_C = _finite_number(gas_temperature_C, "gas_temperature_C")
+    temperature_C = _signed_finite(gas_temperature_C, "gas_temperature_C")
     temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
-    low_mbar = _finite_number(pressure_mbar_low, "pressure_mbar_low")
-    high_mbar = _finite_number(pressure_mbar_high, "pressure_mbar_high")
-    diameter_m = _finite_number(pipe_diameter_m, "pipe_diameter_m")
+    low_mbar = _signed_finite(pressure_mbar_low, "pressure_mbar_low")
+    high_mbar = _signed_finite(pressure_mbar_high, "pressure_mbar_high")
+    diameter_m = _signed_finite(pipe_diameter_m, "pipe_diameter_m")
     if low_mbar <= 0.0 or high_mbar <= 0.0 or diameter_m <= 0.0:
         raise ValueError("flue pressure and diameter must be positive")
     if temperature_K <= 0.0:
@@ -693,7 +693,7 @@ def flue_gas_energy_balance(
     if hold_temperature_C is None:
         face_C = temperature_C
     else:
-        face_C = _finite_number(hold_temperature_C, "hold_temperature_C")
+        face_C = _signed_finite(hold_temperature_C, "hold_temperature_C")
     catalog = _catalog(materials)
     resolved = [
         resolve_layer_properties(
@@ -933,7 +933,7 @@ def reprice_stage3_cases(
     cases: dict[str, Any] = {}
     for name, sio_area in sio_area_m2_by_case.items():
         case_areas = dict(areas)
-        case_areas[_STAGE3_AREA_KEY] = _finite_number(
+        case_areas[_STAGE3_AREA_KEY] = _signed_finite(
             sio_area, f"{name}.sio_stage3"
         )
         if case_areas[_STAGE3_AREA_KEY] < 0.0:
@@ -996,7 +996,7 @@ def _normalize_layer(key: str, role: str, raw: Any) -> dict[str, Any]:
     )
     thickness = raw.get("thickness_m")
     if thickness is not None:
-        thickness = _finite_number(thickness, f"layered_wall.{key}.thickness_m")
+        thickness = _signed_finite(thickness, f"layered_wall.{key}.thickness_m")
         if thickness <= 0.0:
             raise ValueError(f"layered_wall.{key}.thickness_m must be positive")
     thickness_status = _optional_status(
@@ -1073,7 +1073,7 @@ def _normalize_stage_bulk(raw: Any) -> dict[str, Any]:
         raise ValueError("sio_stage3 material_id must be a non-empty string")
     cost = entry.get("cost_per_kg_usd")
     if cost is not None:
-        cost = _finite_number(cost, "layered_wall.stage_bulk.sio_stage3.cost_per_kg_usd")
+        cost = _signed_finite(cost, "layered_wall.stage_bulk.sio_stage3.cost_per_kg_usd")
         if cost < 0.0:
             raise ValueError("sio_stage3 cost_per_kg_usd must be non-negative")
     cost_status = _optional_status(
@@ -1121,7 +1121,7 @@ def _optional_property(
         if status is not None or citation is not None:
             raise ValueError(f"{where} {status_key} requires {value_key}")
         return None, None, None
-    number = _finite_number(value, f"{where}.{value_key}")
+    number = _signed_finite(value, f"{where}.{value_key}")
     if number <= 0.0:
         raise ValueError(f"{where}.{value_key} must be positive")
     if status not in _PROPERTY_STATUSES:
@@ -1151,11 +1151,11 @@ def _optional_curve(raw: Any, where: str) -> list[dict[str, Any]] | None:
                 f"{where}.thermal_conductivity[{index}] must define "
                 "temperature_K, value_W_m_K, and citation"
             )
-        temperature = _finite_number(
+        temperature = _signed_finite(
             point["temperature_K"],
             f"{where}.thermal_conductivity[{index}].temperature_K",
         )
-        value = _finite_number(
+        value = _signed_finite(
             point["value_W_m_K"],
             f"{where}.thermal_conductivity[{index}].value_W_m_K",
         )
@@ -2034,7 +2034,7 @@ def _solve_wall_conduction(
         if enclosure is None:
             return _conduction_unavailable(["outer_temperature_unset"])
         try:
-            emissivity_value = _finite_number(emissivity, "emissivity")
+            emissivity_value = _signed_finite(emissivity, "emissivity")
         except (TypeError, ValueError):
             return _conduction_unavailable(["emissivity_invalid"])
         if not 0.0 < emissivity_value <= 1.0:
@@ -2101,8 +2101,8 @@ def _radiative_conduction(
     is re-checked against ε σ (T^4 - T_env^4) before it is returned.
     """
 
-    t_in = _finite_number(t_in_C, "t_in_C")
-    t_env = _finite_number(t_env_C, "enclosure_temperature_C")
+    t_in = _signed_finite(t_in_C, "t_in_C")
+    t_env = _signed_finite(t_env_C, "enclosure_temperature_C")
     if t_in <= t_env:
         result = _conduct_known(layers, t_in, t_in, radius_m)
         if result["status"] != "ok":
@@ -2364,9 +2364,13 @@ def equilibrium_pressure_pa(
     pO2_bar: float,
     source_activity: float,
 ) -> float:
-    """Equilibrium partial from the vapour-rail catalog, in pascals."""
+    """Equilibrium partial from the vapour-rail catalog, in pascals.
 
-    evaluator = _vapour_catalog().evaluator_for(species_id)
+    Hot-train applicability binds. A row that declares itself off the hot
+    train is refused by the catalog.
+    """
+
+    evaluator = _vapour_catalog().evaluator_for_hot_train(species_id)
     return float(
         evaluator.evaluate(
             temperature_K,
@@ -2695,7 +2699,7 @@ def _trace_for_stack(
     rows = []
     for sweep in sweeps:
         stream = _design_vapour_stream(
-            gas_temperature_C=_finite_number(
+            gas_temperature_C=_signed_finite(
                 sweep["gas_temperature_C"], "gas_temperature_C"
             ),
             hold_temperature_C=hold_temperature_C,
@@ -3156,7 +3160,7 @@ def felt_overheat_alternatives(
 
     wall = normalize_layered_wall(layered_wall)
     catalog = _catalog(materials)
-    rate = _finite_number(
+    rate = _signed_finite(
         import_delivery_cost_per_kg, "import_delivery_cost_per_kg"
     )
     rows: dict[str, Any] = {}
@@ -3492,7 +3496,7 @@ def _invert_design_partial(
         return {"status": "unavailable", "reason": "pO2_unset"}
     if float(partial) <= 0.0:
         return {"status": "unavailable", "reason": "partial_pressure_invalid"}
-    evaluator = _vapour_catalog().evaluator_for(species_id)
+    evaluator = _vapour_catalog().evaluator_for_hot_train(species_id)
     oxygen_dependent = abs(float(evaluator.pO2_exponent)) > 0.0 or (
         evaluator.o2_channel_term is not None
     )
@@ -4014,7 +4018,7 @@ def _design_vapour_stream(
             verdict="hot_face_hold_undetermined",
         )
         return common
-    hold = _finite_number(hold_temperature_C, "hold_temperature_C")
+    hold = _signed_finite(hold_temperature_C, "hold_temperature_C")
     delta = gas_temperature_C - hold
     cp_bounds = _sio_cp_bounds(gas_temperature_C + CELSIUS_TO_KELVIN_OFFSET)
     common["hold_temperature_C"] = hold
@@ -4206,7 +4210,7 @@ def in_situ_processing_cost_per_kg(
     1-2 MJ/kg. A result outside that band is flagged and still returned.
     """
 
-    electricity = _finite_number(
+    electricity = _signed_finite(
         electricity_usd_per_kWh, "electricity_cost_per_kWh"
     )
     if electricity < 0.0:
@@ -4714,7 +4718,7 @@ def _setpoint_areas(setpoints: Mapping[str, Any]) -> dict[str, float]:
     for key in _AREA_KEYS:
         if key not in raw:
             raise ValueError(f"setpoints stage area missing: {key}")
-        areas[key] = _finite_number(raw[key], f"stage_areas_m2.{key}")
+        areas[key] = _signed_finite(raw[key], f"stage_areas_m2.{key}")
     return areas
 
 
@@ -4762,7 +4766,7 @@ def _validated_areas(stage_areas_m2: Mapping[str, Any]) -> dict[str, float] | No
         return None
     areas = {}
     for key in _AREA_KEYS:
-        number = _finite_number(stage_areas_m2[key], f"stage_areas_m2.{key}")
+        number = _signed_finite(stage_areas_m2[key], f"stage_areas_m2.{key}")
         if number < 0.0:
             return None
         areas[key] = number
@@ -4778,7 +4782,7 @@ def _area_problem(stage_areas_m2: Mapping[str, Any]) -> str:
         if key not in stage_areas_m2:
             continue
         try:
-            number = _finite_number(stage_areas_m2[key], key)
+            number = _signed_finite(stage_areas_m2[key], key)
         except (TypeError, ValueError):
             reasons.append(f"collector_stage_area_invalid:{key}")
             continue
@@ -4881,13 +4885,9 @@ def _join(reasons: list[str]) -> str:
     return ";".join(ordered)
 
 
-def _finite_number(value: Any, name: str) -> float:
-    if isinstance(value, bool) or value is None:
-        raise TypeError(f"{name} must be numeric")
-    try:
-        number = float(value)
-    except (TypeError, ValueError) as exc:
-        raise TypeError(f"{name} must be numeric") from exc
-    if not math.isfinite(number):
-        raise ValueError(f"{name} must be finite")
-    return number
+def _signed_finite(value: Any, name: str) -> float:
+    # Import inside the call. cost_parameters loads this module while it is
+    # still initializing, so a module-level import cycles.
+    from simulator.cost_parameters import _finite_nonnegative
+
+    return _finite_nonnegative(value, name, signed=True)

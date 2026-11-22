@@ -1754,9 +1754,13 @@ def _truthy(value: Any) -> bool:
 
 
 def _normalize_compare(value: Any) -> Any:
+    # EvalSpec freezes a mapping to a mappingproxy and a list to a tuple.
+    # The bundle stores JSON, so the identity seam has to be plain dicts
+    # and lists. A mappingproxy left inside a tuple is not picklable, and
+    # the tuple does not match the stored list.
     if isinstance(value, Mapping):
         return {str(key): _normalize_compare(value[key]) for key in sorted(value)}
-    if isinstance(value, list):
+    if isinstance(value, (list, tuple)):
         return [_normalize_compare(item) for item in value]
     return value
 

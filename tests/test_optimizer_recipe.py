@@ -741,7 +741,15 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # canonical EvalSpec identity. The r4 area envelope moves bounds_digest
     # and the resolved-setpoints leaf inside that identity. This profile
     # leaves until_campaign_complete false, so that flag is omitted.
-    assert cache_key(spec) == "6886a667fb185ebf59ac4088db54a6c62b9d710caec851e89d59e4d8eb58ef26"
+    # 2026-11-22 t-1911: the layered wall and the derived in-situ bootstrap
+    # rate enter cost-parameter identity. That is the cost-model change
+    # (the single-wall area price is no longer the collector price). The
+    # canonical cost payload is plain JSON, the same shape pinned in
+    # tests/test_optimizer_evalspec.py; a mappingproxy does not reach
+    # cache_key. recipe_id and the searchable allowlist hash above are
+    # unchanged, and the setpoints.yaml edit in this offer is a comment.
+    # Studio measurement of cache_key(spec) at the t-1911 tip b33a9cae43.
+    assert cache_key(spec) == "c77dbea3f485cbd2e06acbb805734b32d5858c0204c105fa9c2cb9e8848f719f"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

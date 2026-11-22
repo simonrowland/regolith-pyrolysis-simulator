@@ -771,13 +771,27 @@ def _finite_nonnegative(
     name: str,
     *,
     positive: bool = False,
+    signed: bool = False,
 ) -> float:
+    """Finite number. The default refuses negatives; ``signed`` allows them.
+
+    Temperatures in °C use ``signed``. A price or a thickness uses the
+    default, and ``positive`` also refuses zero. ``signed`` and ``positive``
+    together are not a real call.
+    """
+
     if isinstance(value, bool):
         raise TypeError(f"{name} must be numeric")
     try:
         number = float(value)
     except (TypeError, ValueError) as exc:
         raise TypeError(f"{name} must be numeric") from exc
+    if signed:
+        if positive:
+            raise ValueError(f"{name} cannot be both signed and positive")
+        if not math.isfinite(number):
+            raise ValueError(f"{name} must be finite")
+        return number
     if not math.isfinite(number) or number < 0.0:
         raise ValueError(f"{name} must be finite and non-negative")
     if positive and number <= 0.0:
