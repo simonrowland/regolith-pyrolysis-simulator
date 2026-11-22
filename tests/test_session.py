@@ -887,12 +887,16 @@ def test_c0_gas_bearing_noop_adjustments_keep_the_startup_exit_deadline():
     _target_C, ramp_rate = sim.campaign_mgr._configured_temperature_ramp(
         CampaignPhase.C0
     )
+    # The deadline hour is the exit step: C0 ends and campaign_hour resets.
+    # The no-op walk is the hours still inside that window, checked at the
+    # first hour and the last hour. Both bounds come from startup_deadline.
+    preserved_hours = range(1, int(startup_deadline))
 
-    for completed_hour in range(1, 8):
+    for completed_hour in preserved_hours:
         snapshot = sim.step()
         assert snapshot.campaign == CampaignPhase.C0
         assert sim.melt.campaign_hour == completed_hour
-        if completed_hour not in {1, 7}:
+        if completed_hour not in {preserved_hours[0], preserved_hours[-1]}:
             continue
 
         session.adjust(
