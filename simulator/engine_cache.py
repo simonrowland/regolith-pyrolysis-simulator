@@ -4,8 +4,12 @@ The cache exists to speed up CI, gates, the accuracy scorecard, user runs,
 and the optimizer. Engines are stateless and deterministic: the same engine,
 chemistry version, and request always give the same prediction, so a cached
 value is the engine's answer. CI uses the cache read-only by default. The
-key is engine + version + request; do not add to it. Chemistry changes
-expire cached outputs only when the engine's chemistry version is bumped.
+key is engine + version + request; do not add to it. A species-local
+chemistry change (e.g. a re-pin that adds or fixes some species) does NOT
+bump the version: the superseded species' rows are expired and re-warmed
+(engine_cache_sync.py expire --species, t-1915). Bump the chemistry version
+only for a change that moves every output of the engine. The cache
+accumulates; never expire rows that do not need it.
 """
 
 from __future__ import annotations
