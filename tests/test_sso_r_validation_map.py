@@ -654,7 +654,7 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
             pinned_verdict,
             submitted_bulk_passes=submitted_bulk_passes,
         )
-        if len(pin_match_states) < 12:
+        if len(pin_match_states) < 64:
             pin_match_states.append(
                 (
                     repr(current_verdict),
