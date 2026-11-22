@@ -507,13 +507,21 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     resolved = []
     cleared_hours = []
     simulator_type = validation_map.PyrolysisSimulator
+    from simulator import engine_binding_admission
+
     original_establish = (
         simulator_type._establish_melt_redox_gate_authority_for_current_hour
     )
     original_resolve = simulator_type._resolved_melt_redox_gate_authority
+    original_pin_verdict = simulator_type._melt_redox_gate_current_pin_verdict
+    original_memo_admission = (
+        engine_binding_admission.gate_curve_memo_reuse_eligible
+    )
     original_clear = (
         simulator_type._clear_melt_redox_gate_authority_for_completed_hour
     )
+    pin_verdicts = []
+    memo_admission_results = []
 
     def fail_then_recover(self):
         from simulator.engine_binding_admission import (
@@ -587,6 +595,16 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
             resolved.append(authority)
         return authority
 
+    def record_pin_verdict(self):
+        verdict = original_pin_verdict(self)
+        pin_verdicts.append(verdict)
+        return verdict
+
+    def record_memo_admission(*args, **kwargs):
+        admitted = original_memo_admission(*args, **kwargs)
+        memo_admission_results.append(admitted)
+        return admitted
+
     def record_clear(self, completed_hour):
         nonlocal pin_window
         cleared_hours.append(int(completed_hour))
@@ -611,6 +629,16 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     )
     monkeypatch.setattr(
         simulator_type,
+        '_melt_redox_gate_current_pin_verdict',
+        record_pin_verdict,
+    )
+    monkeypatch.setattr(
+        engine_binding_admission,
+        'gate_curve_memo_reuse_eligible',
+        record_memo_admission,
+    )
+    monkeypatch.setattr(
+        simulator_type,
         '_clear_melt_redox_gate_authority_for_completed_hour',
         record_clear,
     )
@@ -627,7 +655,10 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     )
 
     assert row['row_passes_base_integrity'] is True
-    assert curve_calls == 1
+    assert curve_calls == 1, (
+        f'curve_calls={curve_calls}; pin_verdicts={pin_verdicts!r}; '
+        f'memo_admission_results={memo_admission_results!r}'
+    )
     assert len(established) == 1
     assert resolved
     assert all(authority is established[0] for authority in resolved)
