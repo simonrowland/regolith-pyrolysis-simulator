@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import contextvars
 import math
+import sys
+from collections import deque
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
@@ -128,6 +131,23 @@ class CapacityShadowRefusal:
     fo2_log: float | None = None
     pipe_piece: dict[str, Any] | None = None
     capture_fraction: dict[str, float] | None = None
+    # Collected on the slow path and attached only for this cap.
+    # None when the cap fired before Radau ran. accepted_step_sizes_s
+    # is the last _STIFFNESS_STEPS accepted steps, in seconds.
+    # rejected_steps counts error-test rejections, not Newton
+    # failures, and it is not the length of the dominator list.
+    # A dominator names the component with the largest |error|/scale
+    # on one of the last rejections: species, block (n, A, B, and G
+    # or R when the hour tracks them), the proposed value, and the
+    # atol/rtol scale that test used. The eigenvalue fields are |λ|
+    # of one production Jacobian at the last accepted state. No
+    # accepted step, or a Jacobian that itself hits the cap, leaves
+    # them unset.
+    accepted_step_sizes_s: list[float] | None = None
+    rejected_steps: int | None = None
+    rejected_error_dominators: list[dict[str, Any]] | None = None
+    jacobian_abs_eigenvalue_min: float | None = None
+    jacobian_abs_eigenvalue_max: float | None = None
 
 
 class CapacityCouplingRefusalError(RuntimeError):
@@ -900,6 +920,10 @@ _SLOW_EXTENT_ATOL_KG = 1.0e-18
 # these caps are the work cap on that path.
 _MAX_FLUX_EVALUATIONS = 250_000
 _MAX_INTEGRATOR_EVALUATIONS = 100_000
+# Trailing window on a work-cap refusal. The rejected-step count is
+# the full count. These bounds are the payload, not a step-size knob.
+_STIFFNESS_STEPS = 200
+_STIFFNESS_REJECTIONS = 16
 
 
 class _BalanceRefused(Exception):
@@ -930,13 +954,19 @@ def _shadow_from_balance(
     fo2_log: float | None = None,
     pipe_piece: dict[str, Any] | None = None,
     capture_fraction: dict[str, float] | None = None,
+    accepted_step_sizes_s: list[float] | None = None,
+    rejected_steps: int | None = None,
+    rejected_error_dominators: list[dict[str, Any]] | None = None,
+    jacobian_abs_eigenvalue_min: float | None = None,
+    jacobian_abs_eigenvalue_max: float | None = None,
 ) -> CapacityShadowRefusal:
     """Copy a balance refusal onto the shadow payload.
 
     The work cap names which counter fired and both counts. The path
     is the branch the law had entered. Other reasons leave the cap
     unset. The reason string is unchanged. A work-cap caller passes
-    the last accepted state; other callers leave it unset.
+    the last accepted state and, when Radau ran, its stiffness tape.
+    Other callers leave both unset.
     """
 
     return CapacityShadowRefusal(
@@ -953,6 +983,11 @@ def _shadow_from_balance(
         fo2_log=fo2_log,
         pipe_piece=pipe_piece,
         capture_fraction=capture_fraction,
+        accepted_step_sizes_s=accepted_step_sizes_s,
+        rejected_steps=rejected_steps,
+        rejected_error_dominators=rejected_error_dominators,
+        jacobian_abs_eigenvalue_min=jacobian_abs_eigenvalue_min,
+        jacobian_abs_eigenvalue_max=jacobian_abs_eigenvalue_max,
     )
 
 
@@ -984,6 +1019,8 @@ def _work_cap_payload(law: _HeadspaceLaw) -> dict[str, Any]:
     when that partial was not the one S was evaluated at. fO2 is the
     hour-open melt potential. The piece and the capture fraction are
     the ones that completed step stored. An unset one stays unset.
+    The stiffness tape is the slow path's. A cap that fired before
+    Radau ran leaves it unset, not an empty count.
     """
 
     balance: dict[str, dict[str, Any]] | None = None
@@ -1024,6 +1061,24 @@ def _work_cap_payload(law: _HeadspaceLaw) -> dict[str, Any]:
                 for name, rate in dict(law.paired_redox_mol_s or {}).items()
             }
     capture = law.accepted_capture_fractions
+    diagnostic = law.stiffness_diagnostic
+    if diagnostic is None:
+        step_sizes = None
+        rejected = None
+        dominators = None
+        eigenvalue_min = None
+        eigenvalue_max = None
+    else:
+        step_sizes = list(diagnostic["accepted_step_sizes_s"])
+        rejected = diagnostic["rejected_steps"]
+        raw_dominators = diagnostic["rejected_error_dominators"]
+        dominators = (
+            None
+            if raw_dominators is None
+            else [dict(row) for row in raw_dominators]
+        )
+        eigenvalue_min = diagnostic["jacobian_abs_eigenvalue_min"]
+        eigenvalue_max = diagnostic["jacobian_abs_eigenvalue_max"]
     return {
         "species_balance": balance,
         "redox_mol_s": redox,
@@ -1034,6 +1089,11 @@ def _work_cap_payload(law: _HeadspaceLaw) -> dict[str, Any]:
         "capture_fraction": (
             None if capture is None else dict(capture)
         ),
+        "accepted_step_sizes_s": step_sizes,
+        "rejected_steps": rejected,
+        "rejected_error_dominators": dominators,
+        "jacobian_abs_eigenvalue_min": eigenvalue_min,
+        "jacobian_abs_eigenvalue_max": eigenvalue_max,
     }
 
 
@@ -1192,6 +1252,8 @@ class _HeadspaceLaw:
         self.accepted_step_redox: dict[str, float] | None = None
         self.accepted_pipe_piece: tuple | None = None
         self.accepted_capture_fractions: dict[str, float] | None = None
+        # Slow-path tape. Set only when a work cap fires inside Radau.
+        self.stiffness_diagnostic: dict[str, Any] | None = None
         self._last_pipe_piece: tuple | None = None
         self.paired_redox_mol_s: dict[str, float] | None = None
         self.accepted_flux_partials: dict[str, float] | None = None
@@ -2224,6 +2286,298 @@ def _euler_one(
     return law.step_from_moles(n0, dt_s, moles, iterations, residual_pa)
 
 
+# The active slow solve. Nested _slow_converge calls stack this.
+_ACTIVE_STIFFNESS: contextvars.ContextVar = contextvars.ContextVar(
+    "headspace_radau_stiffness",
+    default=None,
+)
+_RADAU_NORM = None
+_RADAU_STEP_CODE = None
+_RADAU_ERROR_LINES: tuple[int, int] | None = None
+_RADAU_ERROR_LINES_READY = False
+
+
+def _prepare_radau_error_lines() -> tuple[int, int] | None:
+    """Line numbers of Radau's two error-norm calls.
+
+    The first is the error test. The second runs only when that test
+    already failed once and still fails, and it replaces the error.
+    A scipy that no longer has that pair records nothing: a missing
+    count stays unset rather than a zero.
+    """
+
+    global _RADAU_NORM, _RADAU_STEP_CODE, _RADAU_ERROR_LINES
+    global _RADAU_ERROR_LINES_READY
+    if _RADAU_ERROR_LINES_READY:
+        return _RADAU_ERROR_LINES
+    _RADAU_ERROR_LINES_READY = True
+    import inspect
+    import scipy.integrate._ivp.radau as radau
+
+    current = radau.norm
+    if current is _stiffness_norm:
+        return None
+    _RADAU_NORM = current
+    _RADAU_STEP_CODE = radau.Radau._step_impl.__code__
+    try:
+        source, start = inspect.getsourcelines(radau.Radau._step_impl)
+    except (OSError, TypeError):
+        return None
+    first = None
+    second = None
+    guard = False
+    for offset, line in enumerate(source):
+        text = line.strip()
+        if text.startswith("if rejected and error_norm > 1"):
+            guard = True
+        if "norm(error / scale)" in text or "norm(error/scale)" in text:
+            number = start + offset
+            if first is None:
+                first = number
+            elif guard and second is None:
+                second = number
+    if first is None or second is None:
+        return None
+    _RADAU_ERROR_LINES = (first, second)
+    return _RADAU_ERROR_LINES
+
+
+def _stiffness_norm(vector):
+    """radau.norm while a slow solve is recording error tests.
+
+    Newton convergence uses the same name on a stage matrix. Only the
+    one-dimensional call inside Radau._step_impl is an error test.
+    """
+
+    value = _RADAU_NORM(vector)
+    recorder = _ACTIVE_STIFFNESS.get()
+    if recorder is None:
+        return value
+    try:
+        recorder.observe(sys._getframe(1), vector, value)
+    except Exception:
+        recorder.mark_failed()
+    return value
+
+
+class _RadauNormTape:
+    """Install the error-norm hook for one slow solve and restore it."""
+
+    def __init__(self, recorder: "_StiffnessRecord") -> None:
+        self._recorder = recorder
+        self._token = None
+        self._previous = None
+
+    def __enter__(self) -> "_RadauNormTape":
+        import scipy.integrate._ivp.radau as radau
+
+        _prepare_radau_error_lines()
+        self._previous = radau.norm
+        self._token = _ACTIVE_STIFFNESS.set(self._recorder)
+        radau.norm = _stiffness_norm
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> bool:
+        import scipy.integrate._ivp.radau as radau
+
+        if self._previous is not None:
+            radau.norm = self._previous
+        if self._token is not None:
+            _ACTIVE_STIFFNESS.reset(self._token)
+        return False
+
+
+class _StiffnessRecord:
+    """Accepted steps and error-test rejections for one Radau call."""
+
+    def __init__(self, species, block_names) -> None:
+        self.species = tuple(species)
+        self.block_names = tuple(block_names)
+        self.count = len(self.species)
+        self.steps: deque = deque(maxlen=_STIFFNESS_STEPS)
+        self.dominators: deque = deque(maxlen=_STIFFNESS_REJECTIONS)
+        self.rejected = 0
+        self.last_y = None
+        self._pending = False
+        self._failed = False
+        self._lines = _prepare_radau_error_lines()
+        self._unavailable = self._lines is None or _RADAU_STEP_CODE is None
+
+    def mark_failed(self) -> None:
+        self._failed = True
+        self._pending = False
+
+    def begin_step(self) -> None:
+        self._pending = False
+
+    def accept(self, step_s: float, y) -> None:
+        import numpy as np
+
+        step = float(step_s)
+        if not math.isfinite(step) or step < 0.0:
+            return
+        self.steps.append(step)
+        self.last_y = np.array(y, dtype=float, copy=True)
+
+    def observe(self, frame, vector, value) -> None:
+        if self._failed or self._unavailable:
+            return
+        try:
+            self._observe(frame, vector, float(value))
+        except Exception:
+            self.mark_failed()
+
+    def _observe(self, frame, vector, value: float) -> None:
+        if frame.f_code is not _RADAU_STEP_CODE:
+            return
+        if getattr(vector, "ndim", None) != 1:
+            return
+        first, second = self._lines
+        lineno = frame.f_lineno
+        rejected = bool(frame.f_locals.get("rejected", False))
+        if lineno == second:
+            pending = self._pending
+            self._pending = False
+            if pending and value > 1.0:
+                self._commit(frame, vector)
+            return
+        if lineno != first:
+            return
+        if value > 1.0 and rejected:
+            self._pending = True
+            return
+        if value > 1.0:
+            self._commit(frame, vector)
+
+    def _name(self, index: int):
+        count = self.count
+        if count <= 0:
+            return None
+        block = index // count
+        species_index = index % count
+        if block >= len(self.block_names) or species_index >= count:
+            return None
+        return self.species[species_index], self.block_names[block]
+
+    def _commit(self, frame, vector) -> None:
+        import numpy as np
+
+        y_new = frame.f_locals.get("y_new")
+        scale = frame.f_locals.get("scale")
+        if y_new is None or scale is None:
+            self.mark_failed()
+            return
+        weighted = np.asarray(vector, dtype=float).reshape(-1)
+        proposed = np.asarray(y_new, dtype=float).reshape(-1)
+        denom = np.asarray(scale, dtype=float).reshape(-1)
+        if (
+            weighted.size == 0
+            or weighted.size != proposed.size
+            or weighted.size != denom.size
+        ):
+            self.mark_failed()
+            return
+        index = int(np.argmax(np.abs(weighted)))
+        named = self._name(index)
+        if named is None:
+            self.mark_failed()
+            return
+        component = float(proposed[index])
+        weight = float(weighted[index])
+        width = float(denom[index])
+        if not (
+            math.isfinite(component)
+            and math.isfinite(weight)
+            and math.isfinite(width)
+        ):
+            self.mark_failed()
+            return
+        species_name, block = named
+        self.rejected += 1
+        self.dominators.append({
+            "species": species_name,
+            "block": block,
+            "value": component,
+            "weighted_error": weight,
+            "scale": width,
+        })
+
+    def payload(self) -> dict[str, Any]:
+        steps = [float(step) for step in self.steps]
+        if self._failed or self._unavailable:
+            return {
+                "accepted_step_sizes_s": steps,
+                "rejected_steps": None,
+                "rejected_error_dominators": None,
+                "jacobian_abs_eigenvalue_min": None,
+                "jacobian_abs_eigenvalue_max": None,
+            }
+        return {
+            "accepted_step_sizes_s": steps,
+            "rejected_steps": self.rejected,
+            "rejected_error_dominators": [dict(row) for row in self.dominators],
+            "jacobian_abs_eigenvalue_min": None,
+            "jacobian_abs_eigenvalue_max": None,
+        }
+
+
+def _jacobian_abs_eigenvalue_span(jacobian, y):
+    """Largest and smallest |eigenvalue| of the production Jacobian.
+
+    One finite-difference evaluation at the last accepted state.
+    A non-finite matrix is unset, not a zero.
+    """
+
+    import numpy as np
+
+    matrix = np.asarray(jacobian(0.0, y), dtype=float)
+    if matrix.ndim != 2 or matrix.shape[0] != matrix.shape[1]:
+        return None
+    if not np.isfinite(matrix).all():
+        return None
+    try:
+        values = np.linalg.eigvals(matrix)
+    except np.linalg.LinAlgError:
+        return None
+    magnitudes = np.abs(values[np.isfinite(values)])
+    if magnitudes.size == 0:
+        return None
+    return float(magnitudes.min()), float(magnitudes.max())
+
+
+def _store_stiffness(law, recorder: _StiffnessRecord, jacobian) -> None:
+    """Attach the tape. A Jacobian that hits the cap leaves |λ| unset."""
+
+    diagnostic = recorder.payload()
+    if recorder.last_y is not None:
+        # The extra Jacobian calls the flux. A cap or a flux refusal
+        # here must not replace the work-cap refusal already in hand.
+        try:
+            span = _jacobian_abs_eigenvalue_span(jacobian, recorder.last_y)
+        except Exception:
+            span = None
+        if span is not None:
+            diagnostic["jacobian_abs_eigenvalue_min"] = span[0]
+            diagnostic["jacobian_abs_eigenvalue_max"] = span[1]
+    law.stiffness_diagnostic = diagnostic
+
+
+def _recording_radau(recorder: _StiffnessRecord):
+    """Radau that keeps each accepted step on this solve's tape."""
+
+    from scipy.integrate._ivp.radau import Radau
+
+    class _RecordingRadau(Radau):
+        def _step_impl(self):
+            recorder.begin_step()
+            accepted, message = Radau._step_impl(self)
+            if accepted:
+                recorder.accept(float(self.t - self.t_old), self.y)
+            return accepted, message
+
+    return _RecordingRadau
+
+
 def _slow_converge(
     law: _HeadspaceLaw,
     n0: Mapping[str, float],
@@ -2280,7 +2634,10 @@ def _slow_converge(
     count = len(species)
     # The holder is the hour. Other callers keep n, A, B only.
     track_extent = isinstance(law.extent_holder, dict)
-    blocks = 5 if track_extent else 3
+    # n, A, B, and with a holder G then R. The tape names blocks from
+    # this tuple, so the state width and the label are one list.
+    block_names = ("n", "A", "B", "G", "R") if track_extent else ("n", "A", "B")
+    blocks = len(block_names)
     # State is n, then A = ∫(q+S) dt, then B = ∫Q dt. A(0) = B(0) = 0.
     # With a holder, G = ∫gross dt (kg) and R = ∫S dt (mol) follow,
     # both starting at 0.
@@ -2498,25 +2855,32 @@ def _slow_converge(
         downstream_switch.direction = -1.0
         events = downstream_switch
 
+    recorder = _StiffnessRecord(species, block_names)
     try:
         solver_kwargs = {
-            "method": "Radau",
+            "method": _recording_radau(recorder),
             "rtol": _SLOW_RTOL,
             "atol": atol,
             "jac": jacobian,
         }
         if events is not None:
             solver_kwargs["events"] = events
-        solution = solve_ivp(
-            rhs,
-            (0.0, float(dt_s)),
-            y0,
-            **solver_kwargs,
-        )
-    except _BalanceRefused:
+        with _RadauNormTape(recorder):
+            solution = solve_ivp(
+                rhs,
+                (0.0, float(dt_s)),
+                y0,
+                **solver_kwargs,
+            )
+    except _BalanceRefused as refused:
         # The cap fired inside the right-hand side, so nfev is not
-        # back. The rhs counter is how far this attempt got.
+        # back. The rhs counter is how far this attempt got. The tape
+        # is the steps Radau had already accepted. The extra Jacobian
+        # for its eigenvalues can itself hit the flux cap; that leaves
+        # |λ| unset and does not replace this refusal.
         _remember_balance_iterations(law, law.integrator_evaluations)
+        if refused.reason == "headspace_balance_work_cap":
+            _store_stiffness(law, recorder, jacobian)
         raise
     iterations = max(int(solution.nfev), 1)
     _remember_balance_iterations(law, iterations)

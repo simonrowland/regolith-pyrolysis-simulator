@@ -3460,6 +3460,13 @@ def test_flux_cap_refuses_instead_of_running_on():
     assert refused.species_balance is not None
     assert math.isfinite(refused.species_balance["O2"]["partial_Pa"])
     assert refused.species_balance["O2"]["mol"] >= 0.0
+    # The flux cap fires before Radau. The stiffness tape is unset,
+    # not an empty count.
+    assert refused.accepted_step_sizes_s is None
+    assert refused.rejected_steps is None
+    assert refused.rejected_error_dominators is None
+    assert refused.jacobian_abs_eigenvalue_min is None
+    assert refused.jacobian_abs_eigenvalue_max is None
 
 
 def test_integrator_cap_refuses_instead_of_running_on():
@@ -3490,6 +3497,13 @@ def test_integrator_cap_refuses_instead_of_running_on():
     assert math.isfinite(refused.species_balance["O2"]["partial_Pa"])
     assert refused.redox_mol_s is not None
     assert math.isfinite(refused.redox_mol_s["O2"])
+    # Cap 2 fires inside the first Newton stage, before an accepted
+    # step and before an error test. The tape is collected and empty.
+    assert refused.accepted_step_sizes_s == []
+    assert refused.rejected_steps == 0
+    assert refused.rejected_error_dominators == []
+    assert refused.jacobian_abs_eigenvalue_min is None
+    assert refused.jacobian_abs_eigenvalue_max is None
 
 
 def test_work_cap_carries_the_buffer_stock_and_s():
@@ -3561,6 +3575,118 @@ def test_work_cap_carries_the_buffer_stock_and_s():
     assert refused.pipe_piece["binding"] == outflow.binding_cause
     assert refused.pipe_piece["empty_holdup"] is False
     assert refused.pipe_piece["capped"] is False
+    assert refused.accepted_step_sizes_s == []
+    assert refused.rejected_steps == 0
+    assert refused.rejected_error_dominators == []
+    assert refused.jacobian_abs_eigenvalue_min is None
+    assert refused.jacobian_abs_eigenvalue_max is None
+
+
+def test_work_cap_records_the_accepted_step_and_spectrum():
+    """The open approach to 20 Pa accepts steps before the cap.
+
+    O2 at 27.17 Pa plus K, zero source, downstream 20 Pa. The fast
+    root does not admit it. Radau's first steps stay on the smooth
+    side of the switch, so the error test does not reject them. The
+    cap stops the call after those steps. The refusal carries their
+    sizes and one production Jacobian's |λ| at the last of them.
+    The zero columns of A, B, G and R put the smallest |λ| at 0.
+    """
+
+    temperature_K = 1170.0 + 273.15
+    factor = GAS_CONSTANT * temperature_K / _HS_V_M3
+    opening = {
+        "O2": 27.174056558659704 / factor,
+        "K": 4.2e-4 / factor,
+    }
+
+    def zero(_partials: dict[str, float]) -> dict[str, float]:
+        return {"O2": 0.0, "K": 0.0}
+
+    with patch.object(capacity_coupling, "_MAX_INTEGRATOR_EVALUATIONS", 30):
+        refused = solve_capacity_shadow(
+            pre_holdup_mol=opening,
+            molar_mass_kg_mol={
+                "O2": _o2_molar_mass_kg(),
+                "K": MOLAR_MASS["K"] / 1000.0,
+            },
+            flux_kg_hr_at_partials=zero,
+            capacity=NoColdTrain("runtime_enforcement_disabled"),
+            head_bled_species_mol={},
+            external_o2_holdup_mol=0.0,
+            temperature_K=temperature_K,
+            volume_m3=_HS_V_M3,
+            dt_hr=1.0,
+            bleed_conductance_kg_s=0.0,
+            downstream_pressure_Pa=20.0,
+            k_relief_kg_hr_Pa=0.0,
+            p_open_Pa=1.0,
+            pipe_diameter_m=_HS_D_M,
+            pipe_length_m=_HS_L_M,
+            extent_holder={},
+            authoritative=True,
+        )
+    assert isinstance(refused, CapacityShadowRefusal)
+    assert refused.reason == "headspace_balance_work_cap"
+    assert refused.cap == "integrator"
+    assert refused.path == "radau_fallback"
+    assert refused.accepted_step_sizes_s
+    assert len(refused.accepted_step_sizes_s) <= 200
+    assert all(
+        math.isfinite(step) and step > 0.0
+        for step in refused.accepted_step_sizes_s
+    )
+    assert refused.rejected_steps == 0
+    assert refused.rejected_error_dominators == []
+    assert refused.jacobian_abs_eigenvalue_min == 0.0
+    assert refused.jacobian_abs_eigenvalue_max > 0.0
+
+
+def test_error_test_rejection_names_the_component():
+    """A step that crosses a jump in f fails Radau's error test.
+
+    The headspace Jacobian often burns the cap inside Newton before
+    that test runs. This call is the same recorder and the same
+    norm hook, on a scalar whose first crossing Radau does reject.
+    The named component is the one whose |error|/scale is largest.
+    """
+
+    import scipy.integrate._ivp.radau as radau
+    from scipy.integrate import solve_ivp
+
+    original_norm = radau.norm
+    recorder = capacity_coupling._StiffnessRecord(("O2",), ("n",))
+    calls = {"n": 0}
+
+    def fun(_time, state):
+        calls["n"] += 1
+        if calls["n"] > 40:
+            raise RuntimeError("stop")
+        return [-1.0 if state[0] > 0.0 else 1.0]
+
+    try:
+        with capacity_coupling._RadauNormTape(recorder):
+            solve_ivp(
+                fun,
+                (0.0, 2.0),
+                [1.0],
+                method=capacity_coupling._recording_radau(recorder),
+                rtol=1.0e-4,
+                atol=1.0e-4,
+            )
+    except RuntimeError as exc:
+        assert str(exc) == "stop"
+    assert radau.norm is original_norm
+    assert recorder.rejected >= 1
+    payload = recorder.payload()
+    assert payload["rejected_steps"] == recorder.rejected
+    row = payload["rejected_error_dominators"][-1]
+    assert row["species"] == "O2"
+    assert row["block"] == "n"
+    assert math.isfinite(row["value"])
+    assert abs(row["weighted_error"]) > 1.0
+    assert math.isfinite(row["scale"]) and row["scale"] > 0.0
+    assert payload["accepted_step_sizes_s"]
 
 
 def test_downstream_switch_publishes_inside_the_cap():
