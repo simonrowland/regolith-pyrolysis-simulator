@@ -516,7 +516,10 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     )
 
     def fail_then_recover(self):
-        from simulator.engine_binding_admission import write_gate_curve_memo_record
+        from simulator.engine_binding_admission import (
+            GateCurveEvidence,
+            write_gate_curve_memo_record,
+        )
 
         nonlocal curve_calls
 
@@ -537,6 +540,11 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
                 }
             return curve
 
+        # This callback stands in for a produced curve and does not start the
+        # MAGEMin backend. Give the fixture a stable same-process producer pin
+        # so this test isolates authority pinning, not cold-version refusal.
+        evidence = GateCurveEvidence("a" * 64, False)
+
         if not pin_window:
             curve = add_current_domain_diagnostic({
                 'source': 'test_setup_real_curve',
@@ -547,6 +555,7 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
             return write_gate_curve_memo_record(
                 self,
                 curve,
+                evidence=evidence,
                 provider_outcome="produced",
             )
         curve_calls += 1
@@ -561,6 +570,7 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
         return write_gate_curve_memo_record(
             self,
             curve,
+            evidence=evidence,
             provider_outcome="produced",
         )
 
