@@ -134,6 +134,12 @@ def _flag(flags, code):
     return matches[0]
 
 
+def _layer(layers, role):
+    found = [layer for layer in layers if layer.get("role") == role]
+    assert len(found) == 1
+    return found[0]
+
+
 def test_area_join_uses_the_condensation_registries() -> None:
     joined = {area_key for area_key, _number, _train in COLLECTOR_STAGE_JOIN}
     assert "terminal" not in joined
@@ -185,9 +191,16 @@ def test_missing_conductivity_density_and_thickness_refuse() -> None:
     assert stage["cost_usd"]["status"] == "unavailable"
     reason = stage["cost_usd"]["reason"]
     assert "thickness_unset:liner" in reason
-    assert "density_missing:liner" in reason
+    # Liner and structure density stay on the cited catalog rows when the
+    # override is cleared. Only the felt, whose material id is removed,
+    # is catalog_missing. The stage still refuses.
+    assert "density_missing:liner" not in reason
+    assert "density_missing:structure" not in reason
     assert "catalog_missing:insulation" in reason
+    assert "thickness_unset:insulation" in reason
+    assert "density_missing:insulation" in reason
     assert "source_unset:insulation" in reason
+    assert "thickness_unset:structure" in reason
     assert stage["imported_usd"]["value"] is None
 
     missing_k = flat_wall_conduction(
@@ -1014,13 +1027,12 @@ def test_felt_limit_thickness_meets_continuous_service_and_keeps_five_millimetre
     duct = alternatives["hot_duct"]
     cr = alternatives["cr_stage2"]
     parameters = cost_parameters_from_mapping()
+    liner = _layer(parameters.layered_wall["layers"], "liner")
 
     assert duct["felt_overheats_at_shipped_thickness"] is True
     assert cr["felt_overheats_at_shipped_thickness"] is True
     assert duct["shipped_liner_thickness_m"] == pytest.approx(0.005)
-    assert parameters.layered_wall["layers"]["liner"]["thickness_m"] == pytest.approx(
-        0.005
-    )
+    assert liner["thickness_m"] == pytest.approx(duct["shipped_liner_thickness_m"])
     for row in (duct, cr):
         assert row["felt_inner_C_at_solved_thickness"] == pytest.approx(limit, abs=0.05)
         assert row["minimum_liner_thickness_m"] > row["shipped_liner_thickness_m"]
@@ -1243,6 +1255,9 @@ def test_doloma_interlayer_holds_the_felt_and_undercuts_thick_ysz() -> None:
     report = shipped_design_report()
     limit = materials["kaowool_rcf_blanket"]["service_temp"]["continuous_C"]
     layers = cost_parameters_from_mapping().layered_wall["layers"]
+    liner = _layer(layers, "liner")
+    felt = _layer(layers, "insulation")
+    structure = _layer(layers, "structure")
     alternatives = report["felt_overheat_alternatives"]
     priced = alternatives["intermediate_dense_layer"]
     shipped_total = report["collector_stages"]["collector_stage_cost_usd"]
@@ -1254,17 +1269,17 @@ def test_doloma_interlayer_holds_the_felt_and_undercuts_thick_ysz() -> None:
     assert priced["fourth_shipped_role"] is False
     assert priced["replaces_75_mm_structure"] is False
     assert priced["shipped_layer_thickness_m"]["liner"] == pytest.approx(
-        layers["liner"]["thickness_m"]
+        liner["thickness_m"]
     )
     assert priced["shipped_layer_thickness_m"]["insulation"] == pytest.approx(
-        layers["felt"]["thickness_m"]
+        felt["thickness_m"]
     )
     assert priced["shipped_layer_thickness_m"]["structure"] == pytest.approx(
-        layers["structure"]["thickness_m"]
+        structure["thickness_m"]
     )
-    assert layers["liner"]["thickness_m"] == pytest.approx(0.005)
-    assert layers["felt"]["thickness_m"] == pytest.approx(0.025)
-    assert layers["structure"]["thickness_m"] == pytest.approx(0.075)
+    assert liner["thickness_m"] == pytest.approx(0.005)
+    assert felt["thickness_m"] == pytest.approx(0.025)
+    assert structure["thickness_m"] == pytest.approx(0.075)
     assert totals["cheaper_walk_label"] == "conservative_lower_k"
     assert totals["thinner_lower_k_does_not_hold_felt_if_material_is_higher_k"] is True
     assert low_total > shipped_total
