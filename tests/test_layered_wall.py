@@ -9,6 +9,7 @@ are test inputs; they are not catalog values.
 from __future__ import annotations
 
 import copy
+import itertools
 import math
 
 import pytest
@@ -1161,7 +1162,9 @@ def test_printed_duct_sio_dew_uses_c2a_floor_and_alkali_partials_stay_unprinted(
     assert unit_rows[0]["activity_flag"] == (
         "raoultian_pure_endmember_not_a_measured_melt_activity"
     )
-    for earlier, later in zip(unit_rows, unit_rows[1:], strict=True):
+    # pairwise yields one fewer pair than rows. A strict zip of the
+    # band against its tail is one shorter and always raises.
+    for earlier, later in itertools.pairwise(unit_rows):
         assert later["pO2_bar"] == pytest.approx(earlier["pO2_bar"] / 10.0)
         assert later["dew_temperature_C"] < earlier["dew_temperature_C"]
         checked = equilibrium_pressure_pa(
