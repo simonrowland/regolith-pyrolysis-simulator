@@ -506,6 +506,8 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     established = []
     resolved = []
     cleared_hours = []
+    establishment_states = []
+    resolution_states = []
     simulator_type = validation_map.PyrolysisSimulator
     original_establish = (
         simulator_type._establish_melt_redox_gate_authority_for_current_hour
@@ -579,12 +581,58 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
         pin_window = True
         authority = original_establish(self)
         established.append(authority)
+        tick_authority = getattr(
+            self,
+            '_melt_redox_gate_authority_this_tick',
+            None,
+        )
+        establishment_states.append(
+            (
+                type(authority).__name__,
+                getattr(self, '_melt_redox_gate_authority_tick_hour', None),
+                type(tick_authority).__name__,
+                repr(
+                    getattr(
+                        self,
+                        '_melt_redox_gate_authority_tick_verdict_identity',
+                        None,
+                    )
+                ),
+                type(
+                    getattr(self, '_last_reduced_real_replay_notices', None)
+                ).__name__,
+            )
+        )
         return authority
 
     def record_resolve(self, *args, **kwargs):
+        tick_authority = getattr(
+            self,
+            '_melt_redox_gate_authority_this_tick',
+            None,
+        )
+        if args:
+            authority_argument = type(args[0]).__name__
+        elif 'gate_authority' in kwargs:
+            authority_argument = type(kwargs['gate_authority']).__name__
+        else:
+            authority_argument = '<default>'
         authority = original_resolve(self, *args, **kwargs)
         if pin_window:
             resolved.append(authority)
+            if len(resolution_states) < 6:
+                resolution_states.append(
+                    (
+                        authority_argument,
+                        getattr(
+                            self,
+                            '_melt_redox_gate_authority_tick_hour',
+                            None,
+                        ),
+                        type(tick_authority).__name__,
+                        type(authority).__name__,
+                    )
+                )
         return authority
 
     def record_clear(self, completed_hour):
@@ -627,7 +675,10 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     )
 
     assert row['row_passes_base_integrity'] is True
-    assert curve_calls == 1
+    assert curve_calls == 1, (
+        f'curve_calls={curve_calls}; establishment_states='
+        f'{establishment_states!r}; resolution_states={resolution_states!r}'
+    )
     assert len(established) == 1
     assert resolved
     assert all(authority is established[0] for authority in resolved)
