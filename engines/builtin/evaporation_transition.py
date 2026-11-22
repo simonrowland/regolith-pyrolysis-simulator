@@ -64,10 +64,9 @@ sides; the provider must declare every account the proposal touches
 :class:`AccountFilterViolation`). The cleaned-melt is the debit; the
 condensation_train is credited with the condensed fraction (in mol if
 the species disproportionates, in kg otherwise -- the kernel's
-proposal layer is mol-native, so the provider converts); the overhead_gas
-is credited with uncondensed vapor and oxide-vapor O2; elemental metal
-evaporation parks parent-oxide oxygen in ``reservoir.fo2_buffer`` for the
-same-tick Fe redox re-speciation chain.
+proposal layer is mol-native, so the provider converts); uncondensed
+vapor is credited to overhead gas. Stoichiometric O2 is posted by
+``_stoich_o2_is_overhead`` and ``_stoich_o2_debit_account``.
 """
 
 from __future__ import annotations
@@ -467,25 +466,36 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             overhead_credit[species] = (
                 remaining_kg / vapor_formula.molar_mass_kg_per_mol()
             )
+        # The account is the stoich owner. A positive coproduct is a
+        # credit. A negative leg is a debit. This block does not
+        # restate the destination test.
+        from simulator.evaporation import (
+            _stoich_o2_debit_account,
+            _stoich_o2_is_overhead,
+        )
+
         if O2_kg > 0.0:
             o2_formula = resolve_species_formula("O2", registry)
             o2_mol = O2_kg / o2_formula.molar_mass_kg_per_mol()
-            if (
-                oxygen_destination == "reservoir.fo2_buffer"
-                or (
-                    not oxygen_destination
-                    and vapor_oxygen_atoms <= 0.0
-                )
+            if _stoich_o2_is_overhead(
+                O2_kg,
+                oxygen_destination,
+                vapor_oxygen_atoms,
             ):
-                credits["reservoir.fo2_buffer"] = {"O2": o2_mol}
-            else:
                 overhead_credit["O2"] = o2_mol
+            else:
+                credits["reservoir.fo2_buffer"] = {"O2": o2_mol}
         if overhead_credit:
             credits["process.overhead_gas"] = overhead_credit
         if O2_kg < 0.0:
             o2_formula = resolve_species_formula("O2", registry)
-            overhead_debit = debits.setdefault("process.overhead_gas", {})
-            overhead_debit["O2"] = (
+            debit_account = _stoich_o2_debit_account(
+                O2_kg,
+                oxygen_destination,
+                vapor_oxygen_atoms,
+            )
+            o2_debit = debits.setdefault(debit_account, {})
+            o2_debit["O2"] = (
                 abs(O2_kg) / o2_formula.molar_mass_kg_per_mol()
             )
 

@@ -278,9 +278,9 @@ def _stoich_o2_is_overhead(
     buffer only for an explicit buffer destination, or for an elemental
     vapour with no destination. Every other positive coproduct is
     overhead gas at once. A negative stoich O2 is an overhead debit
-    on every destination. The buffer credit and the overhead projector
-    both use this split. Changing one without the other counts the
-    coproduct twice.
+    on every destination. The buffer credit, the overhead projector,
+    and the transition all use this split. Changing one without the
+    other counts the coproduct twice.
     """
 
     if o2_kg_hr < 0.0:
@@ -291,6 +291,28 @@ def _stoich_o2_is_overhead(
         vapor_oxygen_atoms > 0.0
         or oxygen_destination == 'process.overhead_gas'
     )
+
+
+def _stoich_o2_debit_account(
+    o2_kg_hr: float,
+    oxygen_destination: str,
+    vapor_oxygen_atoms: float,
+) -> str:
+    """Account debited for a negative stoichiometric O2.
+
+    Empty when the leg is not a debit. The transition posts this
+    account. It does not choose one beside ``_stoich_o2_is_overhead``.
+    """
+
+    if float(o2_kg_hr) >= 0.0:
+        return ''
+    if _stoich_o2_is_overhead(
+        o2_kg_hr,
+        oxygen_destination,
+        vapor_oxygen_atoms,
+    ):
+        return 'process.overhead_gas'
+    return 'reservoir.fo2_buffer'
 
 
 def _buffer_destined_stoich_o2_mol(

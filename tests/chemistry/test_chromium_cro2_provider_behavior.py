@@ -113,7 +113,10 @@ def test_transition_o2_account_is_the_stoich_owner():
     """
 
     from simulator.accounting.formulas import resolve_species_formula
-    from simulator.evaporation import _stoich_o2_is_overhead
+    from simulator.evaporation import (
+        _stoich_o2_debit_account,
+        _stoich_o2_is_overhead,
+    )
 
     registry = _registry()
     provider = BuiltinEvaporationTransitionProvider()
@@ -128,11 +131,18 @@ def test_transition_o2_account_is_the_stoich_owner():
         formula = resolve_species_formula(species, registry)
         atoms = float(formula.elements.get("O", 0.0) or 0.0)
         o2_kg = 1.0 * o2_per
-        overhead = _stoich_o2_is_overhead(o2_kg, destination, atoms)
-        expected_account = (
-            "process.overhead_gas" if overhead else "reservoir.fo2_buffer"
-        )
-        expected_side = "debits" if o2_kg < 0.0 else "credits"
+        if o2_kg < 0.0:
+            expected_side = "debits"
+            expected_account = _stoich_o2_debit_account(
+                o2_kg, destination, atoms,
+            )
+        else:
+            expected_side = "credits"
+            expected_account = (
+                "process.overhead_gas"
+                if _stoich_o2_is_overhead(o2_kg, destination, atoms)
+                else "reservoir.fo2_buffer"
+            )
         sp_data = {"oxygen_destination": destination} if destination else {}
         request = IntentRequest(
             intent=ChemistryIntent.EVAPORATION_TRANSITION,
