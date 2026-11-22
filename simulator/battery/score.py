@@ -96,6 +96,7 @@ from simulator.battery.enums import (
     QuenchState,
     QuotedTargetKind,
     Quantity,
+    RelativeSeriesUnavailableReason,
     ReferenceStateConvention,
     Rail,
     RefusalReason,
@@ -220,6 +221,11 @@ from simulator.battery.records import (
     Residual,
     ResidualNumeric,
     ResidualRefusal,
+    RelativeSeriesAnchor,
+    RelativeSeriesClock,
+    RelativeSeriesComparison,
+    RelativeSeriesEvidence,
+    RelativeSeriesPoint,
     State,
     Uncertainty,
     Value,
@@ -312,6 +318,7 @@ from simulator.battery.source_lineage import (
 )
 from simulator.battery.validate import (
     Ancestry,
+    AncestryFailure,
     _ValidationIndexes,
     ValidationIssue,
     _BOUND_WORK_INPUTS,
@@ -5959,10 +5966,16 @@ def _has_ungrounded_kems_partial_pressure_calibration(
         or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
     ):
         return False
+    if experiment.experiment_id != observation.experiment_id:
+        return True
     calibration = (
         None if experiment.apparatus is None else experiment.apparatus.calibration
     )
-    return not _calibration_grounded(calibration)
+    return not _calibration_grounded(
+        calibration,
+        observation=observation,
+        experiment_id=experiment.experiment_id,
+    )
 
 
 def _kems_replicate_groups(
@@ -17421,29 +17434,232 @@ def _none_uncertainty() -> Uncertainty:
     return Uncertainty(kind=UncertaintyKind.NONE)
 
 
-def _printed_fo2_names_observation(reference: Observation) -> bool:
-    """The printed fO2 derivation lists this observation. A number does not.
+def _model_oxygen_control_lineage(
+    context: ScoreContext,
+    indexes: _ValidationIndexes,
+    input_ids: Iterable[str],
+    *,
+    seed: Iterable[str] = (),
+) -> Ancestry:
+    """Full observation lineage of control rows.
 
-    identity.fO2_Pa is a State and has no inputs. The name is the Located
-    inference on fO2_Pa or oxygen_partial_pressure_Pa. Inputs that do not
-    list this observation_id are not a name, including a unit conversion.
+    The caller reads a printed input list once and passes it here. A
+    derivation input that is not an observation, table, or registered asset
+    stays unresolved; it is not dropped as an external reference.
     """
+
+    ids = set(seed)
+    for input_id in input_ids:
+        lineage = _observation_lineage(
+            input_id,
+            context.observations,
+            indexes.table_ids,
+            experiments=context.experiments,
+            asset_ids=indexes.asset_ids,
+            _cache=indexes.observation_lineages,
+        )
+        if not lineage.complete or lineage.ids is None:
+            return lineage
+        ids.update(lineage.ids)
+    if not ids:
+        return Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
+    return Ancestry.of(ids)
+
+
+def _printed_fo2_names_observation(reference: Observation) -> bool:
+    """Whether the row's printed oxygen derivation directly names itself."""
+
     point = oxygen_pressure_point(reference)
-    if point is None or point.inference is None:
-        return False
-    return reference.observation_id in point.inference.inputs
+    return (
+        point is not None
+        and point.inference is not None
+        and reference.observation_id in point.inference.inputs
+    )
 
 
 def _is_selected_condition_observation(
-    reference: Observation, oxygen: SourceOxygenCondition
+    reference: Observation,
+    oxygen: SourceOxygenCondition,
+    lineage_ids: frozenset[str] | None = None,
 ) -> bool:
     """Identity with the selected condition: an input, or the condition itself."""
-    if reference.observation_id == oxygen.observation.observation_id:
+    source_ids = lineage_ids or frozenset({reference.observation_id})
+    if oxygen.observation.observation_id in source_ids:
         return True
-    if reference.observation_id in oxygen.used_observations:
+    if source_ids.intersection(oxygen.used_observations):
         return True
     derivation = oxygen.observation.derivation
-    return derivation is not None and reference.observation_id in derivation.inputs
+    return derivation is not None and bool(source_ids.intersection(derivation.inputs))
+
+
+def _score_relative_qms_series(
+    observed_series: Sequence[RelativeSeriesPoint],
+    model_series: Sequence[RelativeSeriesPoint],
+    anchor: RelativeSeriesAnchor,
+    clock: RelativeSeriesClock,
+    evidence: RelativeSeriesEvidence,
+    *,
+    context: ScoreContext,
+    reference: Observation,
+    source_trace: Observation,
+) -> RelativeSeriesComparison:
+    """Refuse every store row with AMBIGUOUS_RUN_IDENTITY.
+
+    Trace and oxygen checks still return their own reasons. The pure
+    comparator is not called.
+    """
+
+    from simulator.battery.fo2_ladder import printed_fo2_from_point
+    from simulator.battery.score_metrics import (
+        _relative_series_model_oxygen_unavailable_reason,
+    )
+
+    def unavailable(reason: RelativeSeriesUnavailableReason) -> RelativeSeriesComparison:
+        return RelativeSeriesComparison(unavailable_reason=reason)
+
+    if evidence.target_species in {"O", "O2"}:
+        rows = tuple(context.observations.values())
+        if (
+            context.observations.get(reference.observation_id) != reference
+            or not isinstance(reference.identity, Identity)
+            or reference.source_id is None
+        ):
+            return unavailable(RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN)
+        if (
+            context.observations.get(source_trace.observation_id) != source_trace
+            or source_trace.source_id != reference.source_id
+            or source_trace.experiment_id != reference.experiment_id
+            or any(
+                point.observation_id != source_trace.observation_id
+                for point in observed_series
+            )
+            or not isinstance(source_trace.identity, Identity)
+            or quantity_token(source_trace.identity) is not Quantity.ION_INTENSITY
+            or source_trace.identity.species is None
+            or source_trace.identity.species.formula != evidence.target_species
+        ):
+            return unavailable(RelativeSeriesUnavailableReason.SOURCE_TRACE_UNAVAILABLE)
+
+        experiment = context.experiments.get(reference.experiment_id)
+        if experiment is None:
+            return unavailable(RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN)
+        bench = _bench_for_score(experiment, context.benches)
+        validation_indexes = _build_validation_indexes(
+            context.works, context.observations, context.experiments
+        )
+        source_lineage = _observation_lineage(
+            source_trace.observation_id,
+            context.observations,
+            validation_indexes.table_ids,
+            experiments=context.experiments,
+            asset_ids=validation_indexes.asset_ids,
+            _cache=validation_indexes.observation_lineages,
+        )
+        model_inputs = evidence.model_oxygen_input_observation_ids
+        control_point = oxygen_pressure_point(reference)
+        if printed_fo2_from_point(reference, reference.identity, control_point):
+            control_inputs = (
+                ()
+                if control_point is None or control_point.inference is None
+                else control_point.inference.inputs
+            )
+            control_lineage = _model_oxygen_control_lineage(
+                context,
+                validation_indexes,
+                control_inputs,
+                seed=(reference.observation_id,),
+            )
+            direct_self_agreement = (
+                source_trace.observation_id in control_inputs
+                or (
+                    model_inputs is not None
+                    and source_trace.observation_id in model_inputs
+                )
+            )
+            if direct_self_agreement:
+                independent = False
+            elif not control_lineage.complete or control_lineage.ids is None:
+                return unavailable(
+                    RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
+                )
+            elif not source_lineage.complete or source_lineage.ids is None:
+                return unavailable(
+                    RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
+                )
+            else:
+                control_observations = control_lineage.ids.intersection(
+                    context.observations
+                )
+                trace_observations = source_lineage.ids.intersection(
+                    context.observations
+                )
+                independent = not bool(
+                    control_observations.intersection(trace_observations)
+                )
+                if model_inputs is not None:
+                    independent = independent and not bool(
+                        set(model_inputs).intersection(trace_observations)
+                    )
+            expected_inputs = frozenset()
+        else:
+            oxygen = resolve_source_oxygen(reference, rows, bench)
+            if not isinstance(oxygen, SourceOxygenCondition):
+                return unavailable(RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN)
+            # used_observations stops at partial-pressure rows. Walk those
+            # selected rows outward so a current named only on the pressure
+            # cannot validate itself.
+            selected_lineage = _model_oxygen_control_lineage(
+                context, validation_indexes, oxygen.used_observations
+            )
+            direct_self_agreement = (
+                (model_inputs is not None and source_trace.observation_id in model_inputs)
+                or _is_selected_condition_observation(source_trace, oxygen)
+                or _printed_fo2_names_observation(source_trace)
+            )
+            if direct_self_agreement:
+                independent = False
+            elif not selected_lineage.complete or selected_lineage.ids is None:
+                return unavailable(
+                    RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
+                )
+            elif not source_lineage.complete or source_lineage.ids is None:
+                return unavailable(
+                    RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
+                )
+            else:
+                trace_observations = source_lineage.ids.intersection(
+                    context.observations
+                )
+                independent = not (
+                    (
+                        model_inputs is not None
+                        and bool(set(model_inputs).intersection(trace_observations))
+                    )
+                    or _is_selected_condition_observation(
+                        source_trace, oxygen, trace_observations
+                    )
+                    or bool(selected_lineage.ids.intersection(trace_observations))
+                )
+            expected_inputs = oxygen.used_observations
+        evidence = replace(evidence, oxygen_independent=independent)
+        input_reason = _relative_series_model_oxygen_unavailable_reason(
+            observed_series,
+            model_series,
+            evidence,
+            expected_input_ids=expected_inputs,
+        )
+        if input_reason is not None:
+            return unavailable(input_reason)
+        if model_inputs is not None and any(
+            item not in context.observations for item in model_inputs
+        ):
+            return unavailable(
+                RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
+            )
+
+    # The store has no explicit per-run identity, so no store row is compared.
+    # t-1913 re-enables this once each physical run is stored on its own.
+    return unavailable(RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY)
 
 
 def hk_ratio_alpha_predictor_refusal(

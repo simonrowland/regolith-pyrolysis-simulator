@@ -53,6 +53,7 @@ from simulator.battery.enums import (
     Polymorph,
     PolymorphRejectionKind,
     Quantity,
+    RelativeSeriesUnavailableReason,
     QuotedTargetKind,
     QuenchDirection,
     QuenchState,
@@ -1879,6 +1880,86 @@ class Observation:
     def quench_direction(self) -> QuenchDirection | None:
         condition = (self.point_conditions or {}).get("quench_direction")
         return None if condition is None else condition.state.value
+
+
+@dataclass(frozen=True)
+class RelativeSeriesPoint:
+    run_id: str
+    coordinate: Decimal
+    value: Value
+    observable: str
+    boundary: str
+    coordinate_unit: str
+    locator: Locator | None = None
+    observation_id: str | None = None
+    uncertainty: Uncertainty | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "coordinate", as_decimal(self.coordinate))
+        if not self.coordinate.is_finite():
+            raise ValueError("relative-series coordinate must be finite")
+        if not self.run_id or not self.observable or not self.boundary or not self.coordinate_unit:
+            raise ValueError(
+                "relative-series point requires run, observable, boundary, and coordinate unit"
+            )
+
+
+@dataclass(frozen=True)
+class RelativeSeriesAnchor:
+    source_coordinate: Decimal
+    model_coordinate: Decimal
+    source_event: str
+    model_event: str
+    physical_event: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "source_coordinate", as_decimal(self.source_coordinate))
+        object.__setattr__(self, "model_coordinate", as_decimal(self.model_coordinate))
+        if not self.source_coordinate.is_finite() or not self.model_coordinate.is_finite():
+            raise ValueError("relative-series anchor coordinates must be finite")
+        if not self.source_event or not self.model_event or not self.physical_event:
+            raise ValueError("relative-series anchor requires both events and their match")
+
+
+@dataclass(frozen=True)
+class RelativeSeriesClock:
+    source_event: str
+    model_event: str
+    physical_event: str
+    mapping_supported: bool | None
+    locator: Locator | None
+
+
+@dataclass(frozen=True)
+class RelativeSeriesEvidence:
+    quantity: Quantity
+    model_quantity: Quantity
+    channel: str
+    target_species: str
+    boundary: str
+    target_isolated_or_interferences_corrected: bool | None
+    background_treatment_supported: bool | None
+    response_proportional_over_interval: bool | None
+    locator: Locator | None
+    oxygen_independent: bool | None = None
+    model_run_id: str | None = None
+    reference_run_id: str | None = None
+    model_oxygen_input_observation_ids: tuple[str, ...] | None = None
+
+
+@dataclass(frozen=True)
+class RelativeSeriesPointResidual:
+    source_coordinate: Decimal
+    model_coordinate: Decimal
+    residual_dex: Decimal | None
+    unavailable_reason: RelativeSeriesUnavailableReason | None = None
+    uncertainty: Uncertainty | None = None
+
+
+@dataclass(frozen=True)
+class RelativeSeriesComparison:
+    points: tuple[RelativeSeriesPointResidual, ...] = ()
+    unavailable_reason: RelativeSeriesUnavailableReason | None = None
 
 
 @dataclass(frozen=True)
