@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import copy
+from collections.abc import Mapping
+from math import isclose
 from pathlib import Path
 
 import pytest
@@ -11,6 +13,7 @@ from simulator.lab_geometry import parse_lab_geometry
 from simulator.lab_schedule import normalize_lab_schedule
 from simulator.teststand import parse_teststand
 from simulator import runner as runner_module
+from simulator.state import MeltState
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -580,11 +583,42 @@ def test_pomeroy_unreported_mass_digest_describes_the_paper() -> None:
     assert "simulator" not in sample_mass["source"]["digest"]
 
 
-def test_runtime_pressure_stays_within_each_printed_preset_range(
-    tmp_path: Path,
-) -> None:
+def test_runtime_pressure_stays_within_each_printed_preset_range() -> None:
     ranged_presets = 0
     rejected_mutations = 0
+
+    def resolve_runtime_pressure_samples(
+        preset,
+        schedule: Mapping,
+    ) -> list[float]:
+        setpoints = copy.deepcopy(runner_module.load_config_bundle().setpoints)
+        setpoints["lab_geometry"] = copy.deepcopy(preset.lab_geometry)
+        manager = runner_module.CampaignManager(setpoints)
+        manager.overrides["C0"] = {"lab_schedule": copy.deepcopy(schedule)}
+        duration_h = int(schedule["duration_h"])
+        pressures = []
+        for sample_time_h in range(duration_h + 1):
+            melt = MeltState()
+            manager.apply_lab_schedule_controls(
+                melt,
+                runner_module.CampaignPhase.C0,
+                sample_time_h=float(sample_time_h),
+            )
+            pressures.append(melt.p_total_mbar)
+        return pressures
+
+    def pressure_is_within_reported_range(
+        pressure: float,
+        reported_min: float,
+        reported_max: float,
+    ) -> bool:
+        return (
+            pressure >= reported_min
+            or isclose(pressure, reported_min, rel_tol=1e-12)
+        ) and (
+            pressure <= reported_max
+            or isclose(pressure, reported_max, rel_tol=1e-12)
+        )
 
     for preset_path in sorted(PRESET_DIR.glob("*.yaml")):
         source_schedule = load_yaml(preset_path)["lab_schedule"]
@@ -599,38 +633,41 @@ def test_runtime_pressure_stays_within_each_printed_preset_range(
         ranged_presets += 1
         reported_min = float(reported_pressure["reported_min_value"])
         reported_max = float(reported_pressure["reported_max_value"])
-        runtime_schedule = runner_module._load_vacuum_preset_run_spec(
+        preset = runner_module._load_vacuum_preset_run_spec(
             preset_path, "faithful"
-        ).lab_schedule
-        runtime_points = runtime_schedule["chamber_pressure_mbar"]
-        assert runtime_points, (
-            f"{preset_path.name} printed pressure range has no runtime points"
+        )
+        runtime_pressures = resolve_runtime_pressure_samples(
+            preset,
+            preset.lab_schedule,
         )
         assert all(
-            reported_min <= float(point["value"]) <= reported_max
-            for point in runtime_points
-        ), f"{preset_path.name} runtime pressure is outside its printed range"
+            pressure_is_within_reported_range(
+                pressure, reported_min, reported_max
+            )
+            for pressure in runtime_pressures
+        ), (
+            f"{preset_path.name} runtime pressure {runtime_pressures!r} is "
+            f"outside its printed range [{reported_min:g}, {reported_max:g}]"
+        )
 
         if not reported_min <= 1.0 <= reported_max:
-            mutated_document = load_yaml(preset_path)
-            for point in mutated_document["lab_schedule"][
+            mutated_schedule = copy.deepcopy(preset.lab_schedule)
+            for point in mutated_schedule[
                 "chamber_pressure_mbar"
             ]:
                 point["value"] = 1.0
-            mutated_path = tmp_path / f"{preset_path.stem}_pressure_mutation.yaml"
-            mutated_path.write_text(
-                yaml.safe_dump(mutated_document), encoding="utf-8"
+            mutated_pressures = resolve_runtime_pressure_samples(
+                preset,
+                mutated_schedule,
             )
-            mutated_schedule = runner_module._load_vacuum_preset_run_spec(
-                mutated_path, "faithful"
-            ).lab_schedule
-            mutated_points = mutated_schedule["chamber_pressure_mbar"]
             with pytest.raises(
                 AssertionError, match="outside printed range"
             ):
                 assert all(
-                    reported_min <= float(point["value"]) <= reported_max
-                    for point in mutated_points
+                    pressure_is_within_reported_range(
+                        pressure, reported_min, reported_max
+                    )
+                    for pressure in mutated_pressures
                 ), "mutated runtime pressure is outside printed range"
             rejected_mutations += 1
 
@@ -759,6 +796,17 @@ def test_benchtop_presets_report_stage0_refusal_and_defaults(
         }
         mass_notice = notices["mass_kg"]
         pressure_notice = notices["lab_schedule.chamber_pressure_mbar"]
+        pomeroy_surface_profiles = preset.lab_schedule[
+            "surface_temperature_C"
+        ]
+        assert {
+            surface_id: [point["value"] for point in points]
+            for surface_id, points in pomeroy_surface_profiles.items()
+        } == {
+            "crucible_wall": [200, 1200],
+            "cold_trap": [25, 25],
+            "rga_line": [25, 25],
+        }
         assert mass_notice["code"] == "knob_defaulted"
         assert mass_notice["value"] == pytest.approx(expected_mass_kg)
         assert mass_notice["out_of_domain"] is True
