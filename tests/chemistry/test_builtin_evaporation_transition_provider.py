@@ -7,8 +7,8 @@ Covers:
 * Capability profile: provider is authoritative for
   ``EVAPORATION_TRANSITION`` and declares the accounts the
   legacy transition touches (``process.cleaned_melt``,
-  ``process.overhead_gas``, ``process.condensation_train``,
-  ``reservoir.fo2_buffer``).
+  ``process.spent_reductant_residue``, ``process.overhead_gas``,
+  ``process.condensation_train``, ``reservoir.fo2_buffer``).
 * Account filter: the kernel filter scopes the provider's view to those
   declared accounts only -- a metal-phase seed must NOT cross the boundary.
 * Atom-balance gate: a malformed proposal that does NOT conserve atoms
@@ -96,11 +96,12 @@ def test_provider_declares_only_evaporation_transition_intent():
 
 
 @pytest.mark.xdist_group("serial")
-def test_provider_declares_four_evaporation_accounts():
+def test_provider_declares_evaporation_accounts():
     provider = BuiltinEvaporationTransitionProvider()
     profile = provider.capability_profile()
     assert profile.declared_accounts == frozenset({
         "process.cleaned_melt",
+        "process.spent_reductant_residue",
         "process.overhead_gas",
         "process.condensation_train",
         "reservoir.fo2_buffer",
@@ -117,7 +118,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """When other accounts hold material, the provider must see ONLY the
-    three declared evaporation accounts. The kernel account filter is the
+    declared evaporation accounts. The kernel account filter is the
     enforcer (binding spec §7)."""
 
     sim = _build_sim(
@@ -164,6 +165,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     assert seen_accounts, "provider was never dispatched"
     expected = frozenset({
         "process.cleaned_melt",
+        "process.spent_reductant_residue",
         "process.overhead_gas",
         "process.condensation_train",
         "reservoir.fo2_buffer",

@@ -3436,6 +3436,28 @@ class EvaporationMixin:
             species,
         )
 
+    def _melt_resident_debit_mol(self, transition, species: str) -> float:
+        """Parent-oxide mol a transition took from every melt-resident account.
+
+        The first account's debit is kept as returned. A later account is
+        added only when its debit is not 0.0, so a cleaned-melt-only
+        transition reports the same float as a single-account read.
+        """
+
+        total = None
+        for account in MELT_RESIDENT_OXIDE_ACCOUNTS:
+            part = self._transition_species_mol(
+                transition,
+                side='debits',
+                account=account,
+                species=species,
+            )
+            if total is None:
+                total = part
+            elif part != 0.0:
+                total = total + part
+        return 0.0 if total is None else total
+
     def _build_evaporation_aux_maps(
         self, vapor_pressures: dict,
     ) -> tuple[dict, dict, dict]:
@@ -4005,9 +4027,7 @@ class EvaporationMixin:
             evap_flux.species_kg_hr,
             dt_hr=dt_hr,
             phase_scalar=phase_scalar,
-            cleaned_melt_kg=self.atom_ledger.kg_by_account(
-                'process.cleaned_melt'
-            ),
+            melt_resident_kg=self._melt_resident_evaporable_kg(),
             available_o2_kg=float(
                 self.atom_ledger.kg_by_account('process.overhead_gas').get(
                     'O2', 0.0
@@ -4038,10 +4058,15 @@ class EvaporationMixin:
         *,
         dt_hr: float,
         phase_scalar: float,
-        cleaned_melt_kg: Mapping[str, float],
+        melt_resident_kg: Mapping[str, float],
         available_o2_kg: float,
     ) -> dict[str, float]:
-        """Pure frozen-inventory transform from raw HK rates to actual rates."""
+        """Pure frozen-inventory transform from raw HK rates to actual rates.
+
+        ``melt_resident_kg`` is the melt-resident parent inventory. With no
+        spent-reductant residue its values are the cleaned-melt kilograms,
+        and this depletion fraction is the historical one.
+        """
         if dt_hr <= 0.0 or not raw_rates_kg_hr:
             return {
                 str(species): max(0.0, float(rate))
@@ -4080,7 +4105,9 @@ class EvaporationMixin:
         max_fraction = math.nextafter(1.0, 0.0)
         for parent_oxide in sorted(parent_groups):
             entries = parent_groups[parent_oxide]
-            available_parent_kg = float(cleaned_melt_kg.get(parent_oxide, 0.0))
+            available_parent_kg = float(
+                melt_resident_kg.get(parent_oxide, 0.0)
+            )
             total_parent_draw_kg_hr = sum(
                 entry['parent_draw_kg_hr'] for entry in entries)
             if available_parent_kg <= 1e-12 or total_parent_draw_kg_hr <= 1e-12:
@@ -4420,8 +4447,7 @@ class EvaporationMixin:
         stoich = self._evaporation_stoich(species, sp_data)
         if stoich is None:
             return {}
-        available_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt').get(stoich['parent_oxide'], 0.0)
+        available_kg = self._melt_resident_parent_kg(stoich['parent_oxide'])
         if available_kg <= 1e-12:
             return {}
         remaining_kg_hr = route_result.remaining_by_species.get(
@@ -4570,12 +4596,7 @@ class EvaporationMixin:
         route_status = 'no_transition'
         if transition is not None:
             route_status = 'committed'
-            feo_debit_mol = self._transition_species_mol(
-                transition,
-                side='debits',
-                account='process.cleaned_melt',
-                species='FeO',
-            )
+            feo_debit_mol = self._melt_resident_debit_mol(transition, 'FeO')
             overhead_o2_mol = self._transition_species_mol(
                 transition,
                 side='credits',
@@ -4826,8 +4847,9 @@ class EvaporationMixin:
         \\goal BUILTIN-ENGINE-EXTRACTION (#7), third flip and the FIRST
         authoritative intent in the migration. The
         BuiltinEvaporationTransitionProvider builds a
-        :class:`LedgerTransitionProposal` (debit cleaned_melt, credit
-        overhead_gas + condensation_train); the kernel's commit_batch
+        :class:`LedgerTransitionProposal` (debit each melt-resident parent
+        account in proportion to its share, credit overhead_gas +
+        condensation_train); the kernel's commit_batch
         applies it to the AtomLedger after re-validating atom balance
         and the account-filter. This method:
 
@@ -4861,8 +4883,7 @@ class EvaporationMixin:
         if oxide_removed <= 1e-12:
             return (0.0, None) if return_transition else 0.0
 
-        available_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt').get(parent_oxide, 0.0)
+        available_kg = self._melt_resident_parent_kg(parent_oxide)
         if available_kg <= 1e-12:
             return (0.0, None) if return_transition else 0.0
 

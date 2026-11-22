@@ -7,7 +7,8 @@ exactly -- this is a refactor of where the LedgerTransition is built, not
 a re-derivation of the stoich math (which still routes through
 ``_evaporation_stoich`` at the caller). The provider:
 
-- reads ``process.cleaned_melt``, ``process.overhead_gas``,
+- reads the melt-resident oxide accounts (``process.cleaned_melt`` and
+  ``process.spent_reductant_residue``), ``process.overhead_gas``,
   ``process.condensation_train``, and ``reservoir.fo2_buffer`` from the
   account view -- the accounts the evaporation transition touches (see
   "Account declaration" below for the rationale),
@@ -33,8 +34,8 @@ a re-derivation of the stoich math (which still routes through
   * ``dt_hr`` -- the tick duration in hours (always 1.0 in the current
     simulator; passed through explicitly so the provider stays unit-
     correct if the simulator's tick step ever changes),
-  * ``available_kg`` -- the parent-oxide kg currently held in
-    ``process.cleaned_melt``. Grouped analytic depletion already applied
+  * ``available_kg`` -- the parent-oxide kg currently held across the
+    melt-resident accounts. Grouped analytic depletion already applied
     before dispatch; this only preserves the no-stock short-circuit.
 
 Returns an :class:`IntentResult` with ``transition`` populated by a
@@ -48,13 +49,16 @@ where ``ChemistryKernel.commit_batch`` actually engages -- atom-balance
 validation runs both at dispatch time (in ``validate_atom_balance``) and
 again at commit time (re-validated by ``commit_batch``).
 
-Account declaration: ``process.cleaned_melt``, ``process.overhead_gas``,
-``process.condensation_train``, ``reservoir.fo2_buffer``. The legacy
+Account declaration: the melt-resident oxide accounts
+(``process.cleaned_melt`` and ``process.spent_reductant_residue``),
+``process.overhead_gas``, ``process.condensation_train``,
+``reservoir.fo2_buffer``. The legacy
 :meth:`_credit_evaporation_transition` builds a single
 :class:`LedgerTransition` with these accounts on its debit/credit
 sides; the provider must declare every account the proposal touches
 (``validate_proposal_accounts`` enforces this with
-:class:`AccountFilterViolation`). The cleaned-melt is the debit; the
+:class:`AccountFilterViolation`). The parent oxide is debited from each
+melt-resident account in proportion to that account's share; the
 condensation_train is credited with the condensed fraction (in mol if
 the species disproportionates, in kg otherwise -- the kernel's
 proposal layer is mol-native, so the provider converts); the overhead_gas
@@ -85,6 +89,11 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.melt_resident import (
+    CLEANED_MELT_ACCOUNT,
+    MELT_RESIDENT_OXIDE_ACCOUNTS,
+    split_parent_debit_mol,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -102,7 +111,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
     name = "builtin-evaporation-transition"
 
     DECLARED_ACCOUNTS = frozenset({
-        "process.cleaned_melt",
+        *MELT_RESIDENT_OXIDE_ACCOUNTS,
         "process.overhead_gas",
         "process.condensation_train",
         "reservoir.fo2_buffer",
@@ -308,10 +317,12 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
 
         # ------------------------------------------------------------------
         # Build the mol-native proposal. Per-account species_mol dicts:
-        #   debits:  process.cleaned_melt -> {parent_oxide: mol}
+        #   debits:  each melt-resident account -> {parent_oxide: share}
         #   credits: process.condensation_train -> {product: mol, ...}
         #            process.overhead_gas        -> {species: mol, O2: mol}
         #            reservoir.fo2_buffer        -> {O2: mol}
+        # The share is split_parent_debit_mol. Credits are unchanged, and
+        # the parts sum to oxide_mol, so the atom proof is the same proof.
         # ------------------------------------------------------------------
         debits: dict[str, dict[str, float]] = {}
         credits: dict[str, dict[str, float]] = {}
@@ -319,7 +330,22 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         parent_oxide_formula = resolve_species_formula(parent_oxide, registry)
         oxide_mol = oxide_removed / parent_oxide_formula.molar_mass_kg_per_mol()
         if oxide_mol > 0.0:
-            debits["process.cleaned_melt"] = {parent_oxide: oxide_mol}
+            view_accounts = request.account_view.accounts
+            holdings: dict[str, float] = {}
+            for account in MELT_RESIDENT_OXIDE_ACCOUNTS:
+                species_mol = view_accounts.get(account)
+                if not isinstance(species_mol, Mapping):
+                    continue
+                amount = float(species_mol.get(parent_oxide, 0.0) or 0.0)
+                if amount > 0.0:
+                    holdings[account] = amount
+            split = split_parent_debit_mol(oxide_mol, holdings)
+            if not split:
+                # No positive melt-resident holding in the view. Callers
+                # that still pass available_kg keep the historical debit.
+                split = {CLEANED_MELT_ACCOUNT: oxide_mol}
+            for account, mol in split.items():
+                debits[account] = {parent_oxide: mol}
 
         # Once the parent debit clears the transition floor, retain every
         # positive stoichiometric leg. Dropping a smaller coproduct here makes

@@ -358,12 +358,12 @@ def test_picard_source_uses_frozen_inventory_depletion_vector():
         },
     )
     raw.update_totals()
-    frozen_melt = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    frozen_melt = sim._melt_resident_evaporable_kg()
     effective_rates = sim._analytic_evaporation_depletion_rates(
         raw.species_kg_hr,
         dt_hr=1.0,
         phase_scalar=1.0,
-        cleaned_melt_kg=frozen_melt,
+        melt_resident_kg=frozen_melt,
         available_o2_kg=0.0,
     )
     live_effective = sim._apply_analytic_evaporation_depletion(raw)

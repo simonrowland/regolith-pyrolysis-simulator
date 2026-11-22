@@ -7510,9 +7510,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if self._freeze_gate_enabled()
             else 1.0
         )
-        frozen_cleaned_melt_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt'
-        )
+        frozen_melt_resident_kg = self._melt_resident_evaporable_kg()
         frozen_overhead_o2_kg = float(
             self.atom_ledger.kg_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES, 0.0
@@ -7570,7 +7568,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 rates,
                 dt_hr=1.0,
                 phase_scalar=1.0,
-                cleaned_melt_kg=frozen_cleaned_melt_kg,
+                melt_resident_kg=frozen_melt_resident_kg,
                 available_o2_kg=frozen_overhead_o2_kg,
             )
             rates_cache[cache_key] = dict(rates)

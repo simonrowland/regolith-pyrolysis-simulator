@@ -7,6 +7,7 @@ projection and the evaporation stock both read the same two accounts.
 
 from __future__ import annotations
 
+import math
 from collections.abc import Mapping
 
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
@@ -79,3 +80,74 @@ def melt_resident_parent_kg(
     if total is None:
         return 0.0
     return total
+
+
+def split_parent_debit_mol(
+    oxide_mol: float,
+    holdings: Mapping[str, float],
+) -> dict[str, float]:
+    """Split one parent-oxide debit across the melt-resident accounts.
+
+    The evaporation rate is one number for the species in the melt. Each
+    melt-resident account holds a share of that species, and the debit
+    removes that share:
+
+        debit_mol(account) = oxide_mol * holding(account) / sum(holdings)
+
+    for every account whose holding of this species is positive. The last
+    positive account, in ``MELT_RESIDENT_OXIDE_ACCOUNTS`` order, receives
+    ``oxide_mol - assigned`` so the parts sum to ``oxide_mol`` exactly.
+    One ulp of remainder stays inside the 5e-12 % closure.
+
+    Mass is conserved because every part is the same species and therefore
+    the same molar mass. The credits are unchanged.
+    ``sum(debit_kg) = oxide_mol * M = oxide_removed``. Origin travels with
+    the account: feedstock Na stays feedstock and shuttle reagent Na stays
+    reagent. The accounts are not merged, so yield completeness still does
+    not count the residue as feedstock.
+
+    Limiting case: no residue, or the residue holding of this species is
+    not positive. The only positive account is ``process.cleaned_melt``,
+    and the returned debit is the original ``oxide_mol`` float with no
+    multiply. A run with no shuttle is byte-identical to today's
+    single-account debit. No positive holding returns an empty map; the
+    caller keeps the historical cleaned-melt debit when the view names
+    no stock.
+    """
+
+    if not math.isfinite(oxide_mol) or oxide_mol <= 0.0:
+        raise ValueError(
+            "parent debit mol must be a positive finite amount, "
+            f"got {oxide_mol!r}"
+        )
+    positive: list[tuple[str, float]] = []
+    for account in MELT_RESIDENT_OXIDE_ACCOUNTS:
+        if account not in holdings:
+            continue
+        amount = float(holdings[account])
+        if not math.isfinite(amount):
+            raise ValueError(
+                "melt-resident holding must be finite, "
+                f"account={account!r} amount={amount!r}"
+            )
+        if amount > 0.0:
+            positive.append((account, amount))
+    if not positive:
+        return {}
+    if (
+        len(positive) == 1
+        and positive[0][0] == CLEANED_MELT_ACCOUNT
+    ):
+        return {CLEANED_MELT_ACCOUNT: oxide_mol}
+    total = sum(amount for _account, amount in positive)
+    assigned = 0.0
+    debits: dict[str, float] = {}
+    last = len(positive) - 1
+    for index, (account, amount) in enumerate(positive):
+        if index == last:
+            debits[account] = oxide_mol - assigned
+        else:
+            part = oxide_mol * (amount / total)
+            debits[account] = part
+            assigned = assigned + part
+    return debits
