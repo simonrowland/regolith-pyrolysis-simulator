@@ -95,43 +95,78 @@ parameters:
     rationale: "Retained so saved v1 recipes still normalize. Not applied: the hot duct is priced as a layered cylindrical shell (t-1911). No vendor quote exists for this leftover placeholder."
     source_tag: "FLAGGED provisional (d-452): controller placeholder pending owner/vendor ratification; not the t-1911 duct price"
 
-  # Operator setting, not an optimizer knob (t-472). Null properties stay
-  # null: the loader must not invent a conductivity, density, thickness,
-  # felt source, or in-situ USD/kg.
+  # Operator setting, not an optimizer knob (t-472).
+  # In-situ USD/kg is derived when status is derived_sensible_enthalpy and
+  # value is null. The owner of the arithmetic is
+  # simulator.layered_wall.in_situ_processing_cost_per_kg. An owner number
+  # in value replaces the derivation. status owner_unset with value null
+  # stays null and is not refilled. Explicit 0 is a real price.
+  #
+  # Premise: the in-situ oxide is heated from the JANAF 298.15 K reference
+  # to a process temperature, and the electricity price buys that sensible
+  # enthalpy. Kiln losses are not cited, so the thermal efficiency is 1 and
+  # the result is a lower bound on processing energy.
+  # Algebra: specific energy [MJ/kg] = H(T) [kJ/mol] / M [g/mol], because
+  # kJ/g = MJ/kg. H(T) is the printed JANAF enthalpy increment, interpolated
+  # between the bracketing printed rows. Doloma is the mass-weighted
+  # CaO + MgO mix (Ca-027 and Mg-008) at 1400 C, the Díaz-Tato example
+  # "higher sintering temperatures, such as 1400 C", flagged
+  # cited_example_not_a_kiln_schedule. Silica uses JANAF O-037 quartz, not
+  # fused silica, at the fused-silica catalog max_operating temperature,
+  # flagged janaf_quartz_not_fused_silica and
+  # process_temperature_is_catalog_max_operating_not_a_cited_sinter.
+  # Heat of fusion is absent from those tables and is not added.
+  # USD/kg = specific energy / efficiency / (kJ per kWh) * electricity,
+  # with kJ per kWh owned by simulator.thermal_budget.KJ_PER_KWH (3600).
+  # Sanity: oxide sensible enthalpy to about 1600 C is about 1-2 MJ/kg.
+  # Doloma and silica are not one blended rate.
   in_situ_bootstrap_cost_per_kg:
     value: null
     units: USD/kg
-    status: owner_unset
-    rationale: "Owner-settable in-situ/bootstrap cost for rump ceramic and in-situ silica. No number is ratified."
-    source_tag: "FLAGGED t-1911: owner-settable; unset until the owner names a USD/kg. Not zero."
+    status: derived_sensible_enthalpy
+    rationale: "Derived doloma processing cost at the electricity price on this payload. Owner value replaces it. owner_unset null stays null."
+    source_tag: "FLAGGED t-1911: derived_sensible_enthalpy; efficiency 1 because kiln losses are not cited; not an owner-ratified USD/kg."
 
+  # Thicknesses are engineering defaults, owner-settable here. They are not
+  # copied into setpoints. Liner 5 mm is a dense 10YSZ tile, not a
+  # plasma-sprayed coat. Felt 25 mm is one blanket course. Structure 75 mm
+  # is the doloma pipe shell. Felt source imported is an engineering default:
+  # Kaowool is a shipped Earth blanket, not in-situ doloma. Enclosure 25 C
+  # is the JANAF reference temperature, used only when the owner outer
+  # temperature is null. Stage 3 keeps the 10 mm product-baffle slot above.
   layered_wall:
     source_tag: "FLAGGED t-1911 operator setting; not an optimizer knob (t-472)"
     outer_temperature_C: null
     outer_temperature_status: owner_unset
+    enclosure_temperature_C: 25
+    enclosure_temperature_status: engineering_default
     layers:
       liner:
         role: liner
         material_id: bulk_zirconia_ysz
         source: imported
-        thickness_m: null
+        thickness_m: 0.005
+        thickness_status: engineering_default
       felt:
         role: insulation
-        material_id: null
-        intended_material: "ceramic felt"
-        catalog_status: absent_from_wall_materials
-        source: null
-        thickness_m: null
+        material_id: kaowool_rcf_blanket
+        source: imported
+        source_status: engineering_default
+        thickness_m: 0.025
+        thickness_status: engineering_default
       structure:
         role: structure
         material_id: doloma
         source: in_situ
-        thickness_m: null
+        thickness_m: 0.075
+        thickness_status: engineering_default
     stage_bulk:
       sio_stage3:
         kind: in_situ_product_bulk
         material_id: fused_silica
         source: in_situ
+        cost_per_kg_usd: null
+        cost_status: derived_sensible_enthalpy
 
   shared_condenser_train_cost_per_kg_hr_usd:
     value: 2000.0

@@ -89,10 +89,23 @@ def test_yaml_defaults_load_with_recipe_default_provenance() -> None:
         "k_stage4b": pytest.approx(3210.0),
     }
     assert values["hot_duct_cost_per_m2_usd"] == pytest.approx(25000.0)
-    assert values["in_situ_bootstrap_cost_per_kg"] is None
+    from simulator.layered_wall import in_situ_processing_cost_per_kg
+
+    electricity = values["electricity_cost_per_kWh"]
+    assert values["in_situ_bootstrap_cost_per_kg"] == pytest.approx(
+        in_situ_processing_cost_per_kg("doloma", electricity)["usd_per_kg"]
+    )
     assert values["layered_wall"]["stage_bulk"]["sio_stage3"]["source"] == "in_situ"
+    assert values["layered_wall"]["stage_bulk"]["sio_stage3"]["cost_per_kg_usd"] == pytest.approx(
+        in_situ_processing_cost_per_kg("silica", electricity)["usd_per_kg"]
+    )
     assert values["layered_wall"]["layers"][0]["material_id"] == "bulk_zirconia_ysz"
-    assert values["layered_wall"]["layers"][1]["material_id"] is None
+    assert values["layered_wall"]["layers"][0]["thickness_m"] == pytest.approx(0.005)
+    felt = values["layered_wall"]["layers"][1]
+    assert felt["material_id"] == "kaowool_rcf_blanket"
+    assert felt["source"] == "imported"
+    assert felt["thickness_m"] == pytest.approx(0.025)
+    assert values["layered_wall"]["layers"][2]["thickness_m"] == pytest.approx(0.075)
     assert values["shared_condenser_train_cost_per_kg_hr_usd"] == pytest.approx(
         2000.0
     )

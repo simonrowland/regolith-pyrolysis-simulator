@@ -18,6 +18,7 @@ WALL_MATERIALS = {
     "plasma_sprayed_mullite",
     "silicon_carbide_coating",
     "mzo_coating",
+    "kaowool_rcf_blanket",
 }
 WALL_ATTACK_SPECIES = {"SiO", "alkali_NaK", "Fe_FeO"}
 WALL_STICKINESS_SPECIES = {"SiO", "alkali", "Fe"}

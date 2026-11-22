@@ -5,10 +5,13 @@ and a CaO-based structural shell. Stage 3 is not that stack: its capture
 surface is the fused-silica product, so its bulk is priced from the
 existing stage thickness and density slots as in-situ silica.
 
-Missing catalog numbers stay unavailable. This module does not invent a
-conductivity, a density, a thickness, or an in-situ USD/kg. Liner material
-is an operator setting (t-472), read from the cost block, and is not an
-optimizer knob.
+A missing catalog number stays unavailable. A cited conductivity may be
+interpolated inside its printed grid, or extended to the nearest printed
+point when the catalog says so, and both cases are flagged. The in-situ
+USD/kg is the JANAF sensible-enthalpy derivation when the cost entry asks
+for it. An explicit null with status owner_unset is not refilled. Liner
+material is an operator setting (t-472), read from the cost block, and is
+not an optimizer knob.
 """
 
 from __future__ import annotations
@@ -61,7 +64,9 @@ _LAYER_FIELDS = frozenset({
     "key",
     "material_id",
     "source",
+    "source_status",
     "thickness_m",
+    "thickness_status",
     "intended_material",
     "catalog_status",
     "density_kg_m3",
@@ -76,12 +81,31 @@ _WALL_FIELDS = frozenset({
     "source_tag",
     "outer_temperature_C",
     "outer_temperature_status",
+    "enclosure_temperature_C",
+    "enclosure_temperature_status",
     "layers",
     "stage_bulk",
 })
-_STAGE_BULK_FIELDS = frozenset({"kind", "material_id", "source"})
+_STAGE_BULK_FIELDS = frozenset({
+    "kind",
+    "material_id",
+    "source",
+    "cost_per_kg_usd",
+    "cost_status",
+})
 _CURVE_FIELDS = frozenset({"temperature_K", "value_W_m_K", "citation"})
 _N2_TABLE_ID = "N-023"
+_DERIVED_COST_STATUS = "derived_sensible_enthalpy"
+_OWNER_UNSET_STATUS = "owner_unset"
+_CONDUCTION_WALK_STATUSES = frozenset({"ok", "estimated_known_layers_only"})
+# Printed-grid match. 1000 C + 273.15 and the literal 1273.15 can differ
+# by a few ulps; this is a comparison tolerance, not a fabricated point.
+_TEMPERATURE_MATCH_K = 1e-6
+_DOLOMA_PROCESS_C = 1400.0
+_DOLOMA_COMPONENTS = (("CaO", "Ca-027"), ("MgO", "Mg-008"))
+_SILICA_COMPONENT = ("SiO2", "O-037")
+_THERMAL_EFFICIENCY = 1.0
+_EFFICIENCY_FLAG = "sensible_enthalpy_only_kiln_losses_not_cited"
 
 
 def normalize_layered_wall(raw: Mapping[str, Any]) -> dict[str, Any]:
@@ -107,10 +131,22 @@ def normalize_layered_wall(raw: Mapping[str, Any]) -> dict[str, Any]:
         not isinstance(outer_status, str) or not outer_status.strip()
     ):
         raise ValueError("layered_wall outer_temperature_status must be a string")
+    enclosure = raw.get("enclosure_temperature_C")
+    if enclosure is not None:
+        enclosure = _finite_number(enclosure, "layered_wall.enclosure_temperature_C")
+    enclosure_status = raw.get("enclosure_temperature_status")
+    if enclosure_status is not None and (
+        not isinstance(enclosure_status, str) or not enclosure_status.strip()
+    ):
+        raise ValueError(
+            "layered_wall enclosure_temperature_status must be a string"
+        )
     return {
         "source_tag": source_tag,
         "outer_temperature_C": outer,
         "outer_temperature_status": outer_status,
+        "enclosure_temperature_C": enclosure,
+        "enclosure_temperature_status": enclosure_status,
         "layers": _normalize_layers(raw.get("layers")),
         "stage_bulk": _normalize_stage_bulk(raw.get("stage_bulk", {})),
     }
@@ -380,7 +416,9 @@ def resolve_layer_properties(
         "key": layer.get("key", _KEY_BY_ROLE[layer["role"]]),
         "material_id": material_id,
         "source": layer.get("source"),
+        "source_status": layer.get("source_status"),
         "thickness_m": layer.get("thickness_m"),
+        "thickness_status": layer.get("thickness_status"),
         "intended_material": layer.get("intended_material"),
         "catalog_status": layer.get("catalog_status"),
         "unknown_reason": unknown,
@@ -415,11 +453,12 @@ def stack_failure_flags(
         flags.append({
             "code": "vapour_condensation_inside_insulation_unchecked",
             "status": "flagged",
+            "reason": "partial_pressure_unset",
             "detail": (
-                "The stack has a porous middle and no certified dew-point "
-                "barrier. Vapour that crosses the liner would condense inside "
-                "the felt where the wall drops through the dew point. No "
-                "condensation location is computed."
+                "The stack has a porous felt. A dew point is not computed: "
+                "the wall has no vapour partial pressure, and the live SiO, "
+                "Na, and K catalog quantities are equilibrium pressures, not "
+                "pure-component saturation."
             ),
             "citations": [],
         })
@@ -433,12 +472,20 @@ def stack_failure_flags(
                 "detail": "The hot-face liner thickness is unset.",
                 "citations": [],
             })
+        gas = liner.get("gas_tight") if isinstance(liner, Mapping) else None
+        intact = (
+            isinstance(gas, Mapping)
+            and gas.get("certified") is True
+            and gas.get("gas_tight") is True
+        )
+        if not intact:
             flags.append({
                 "code": "cao_shell_not_behind_intact_liner",
                 "status": "flagged",
                 "detail": (
-                    "Liner thickness is unset, so the CaO shell cannot be "
-                    "claimed to sit behind an intact liner."
+                    "Liner gas-tightness is not certified, so the CaO shell "
+                    "is not claimed to sit behind an intact liner. A set "
+                    "thickness does not certify that."
                 ),
                 "citations": [],
             })
@@ -512,12 +559,13 @@ def flue_gas_energy_balance(
 ) -> dict[str, Any]:
     """Compare duct loss with what the 5–15 mbar flue can be shown to carry.
 
-    Conductive loss uses the layered wall. A missing conductivity refuses
-    the loss. The gas side uses the ideal-gas density and the two printed
-    JANAF Cp rows that bracket the gas temperature. It does not interpolate.
-    Radiation delivered to the liner is unavailable; σT^4 is only an upper
-    bound. Stream power is unavailable while the mass flow is unset, so the
-    hot-face hold and the trace-heating power stay undetermined.
+    Conductive loss uses the layered wall. Layers with no conductivity are
+    omitted and the result is an estimate, not a bound. The gas side uses
+    the ideal-gas density and the two printed JANAF Cp rows that bracket
+    the gas temperature. It does not interpolate Cp. Radiation delivered
+    to the liner is unavailable; σT^4 is only a ceiling. Stream power is
+    unavailable while the mass flow is unset, so no trace-heating wattage
+    is emitted.
     """
 
     wall = normalize_layered_wall(layered_wall)
@@ -540,19 +588,12 @@ def flue_gas_energy_balance(
         )
         for layer in wall["layers"]
     ]
-    _ready, layer_reasons = _ready_conduction_layers(resolved)
-    conduction_reasons = list(layer_reasons)
-    if wall["outer_temperature_C"] is None:
-        conduction_reasons.append("outer_temperature_unset")
-    if conduction_reasons:
-        conduction = _conduction_unavailable(conduction_reasons)
-    else:
-        conduction = cylindrical_wall_conduction(
-            resolved,
-            radius_m,
-            temperature_C,
-            wall["outer_temperature_C"],
-        )
+    conduction = _solve_wall_conduction(
+        resolved,
+        temperature_C,
+        wall,
+        radius_m=radius_m,
+    )
     # The campaign carrier token has to be N2 before the N2 table applies.
     # "pN2" is not that token.
     if carrier_gas != "N2":
@@ -582,10 +623,13 @@ def flue_gas_energy_balance(
     # Units: σ in W/(m²·K⁴), T in K, q in W/m².
     # Sanity limit: the flux is zero at 0 K and scales as the fourth power.
     black_body = STEFAN_BOLTZMANN * temperature_K ** 4
-    if conduction["status"] != "ok":
+    if conduction["status"] not in _CONDUCTION_WALK_STATUSES:
         trace_reason = "conductive_loss_unavailable"
     else:
+        # A walk exists, including the known-layer estimate. Stream power
+        # and view factor are still unset, so the wattage stays refused.
         trace_reason = "mass_flow_unset"
+    loss_vs_black_body = _loss_vs_black_body(conduction, radius_m, black_body)
     return {
         "campaign": campaign,
         "carrier_gas": carrier_gas,
@@ -612,6 +656,7 @@ def flue_gas_energy_balance(
                 "factor 1. Not a furnace-to-liner coupling."
             ),
         },
+        "loss_vs_black_body": loss_vs_black_body,
         "verdict": "hot_face_hold_undetermined",
         "trace_heating_power_W_per_m": _unavailable(trace_reason, "W/m"),
         "trace_heating_verdict": "trace_heating_power_unavailable",
@@ -670,6 +715,14 @@ def shipped_design_report(
         ],
         "pressure_bands_without_flue_state": _bare_pressure_bands(setpoints),
         "in_situ_bootstrap_cost_per_kg": parameters.in_situ_bootstrap_cost_per_kg,
+        "in_situ_cost_derivation": {
+            "doloma": in_situ_processing_cost_per_kg(
+                "doloma", parameters.electricity_cost_per_kWh
+            ),
+            "silica": in_situ_processing_cost_per_kg(
+                "silica", parameters.electricity_cost_per_kWh
+            ),
+        },
     }
 
 
@@ -783,11 +836,17 @@ def _normalize_layer(key: str, role: str, raw: Any) -> dict[str, Any]:
     ):
         raise ValueError(f"layered_wall.{key} material_id must be a non-empty string or null")
     source = _optional_source(raw.get("source"), f"layered_wall.{key}.source")
+    source_status = _optional_status(
+        raw.get("source_status"), f"layered_wall.{key}.source_status"
+    )
     thickness = raw.get("thickness_m")
     if thickness is not None:
         thickness = _finite_number(thickness, f"layered_wall.{key}.thickness_m")
         if thickness <= 0.0:
             raise ValueError(f"layered_wall.{key}.thickness_m must be positive")
+    thickness_status = _optional_status(
+        raw.get("thickness_status"), f"layered_wall.{key}.thickness_status"
+    )
     density, density_status, density_citation = _optional_property(
         raw,
         value_key="density_kg_m3",
@@ -816,7 +875,9 @@ def _normalize_layer(key: str, role: str, raw: Any) -> dict[str, Any]:
         "role": role,
         "material_id": material_id,
         "source": source,
+        "source_status": source_status,
         "thickness_m": thickness,
+        "thickness_status": thickness_status,
         "intended_material": intended,
         "catalog_status": catalog_status,
         "density_kg_m3": density,
@@ -855,13 +916,31 @@ def _normalize_stage_bulk(raw: Any) -> dict[str, Any]:
     material_id = entry.get("material_id")
     if not isinstance(material_id, str) or not material_id.strip():
         raise ValueError("sio_stage3 material_id must be a non-empty string")
+    cost = entry.get("cost_per_kg_usd")
+    if cost is not None:
+        cost = _finite_number(cost, "layered_wall.stage_bulk.sio_stage3.cost_per_kg_usd")
+        if cost < 0.0:
+            raise ValueError("sio_stage3 cost_per_kg_usd must be non-negative")
+    cost_status = _optional_status(
+        entry.get("cost_status"), "layered_wall.stage_bulk.sio_stage3.cost_status"
+    )
     return {
         _STAGE3_AREA_KEY: {
             "kind": "in_situ_product_bulk",
             "material_id": material_id,
             "source": "in_situ",
+            "cost_per_kg_usd": cost,
+            "cost_status": cost_status,
         }
     }
+
+
+def _optional_status(value: Any, name: str) -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{name} must be a non-empty string or null")
+    return value
 
 
 def _optional_source(value: Any, name: str) -> str | None:
@@ -982,11 +1061,17 @@ def _price_product_bulk(
         }
     # Stage-3 mass uses the existing cost-parameter slots. Those slots are
     # flagged provisional handbook values, not a cited wall_materials density.
+    # Its USD/kg is the stage-bulk rate when that entry names one. The
+    # doloma scalar is the fallback only when the stage entry has no
+    # cost status, so the two oxides are not blended into one rate.
     mass_kg = area_m2 * thickness_m * float(density_kg_m3)
+    stage_rate, stage_rate_reason = _product_bulk_rate(
+        bulk, in_situ_bootstrap_cost_per_kg
+    )
     in_situ_usd = _price_known_mass(
         mass_kg,
-        in_situ_bootstrap_cost_per_kg,
-        "in_situ_cost_unset",
+        stage_rate,
+        stage_rate_reason,
     )
     cost = in_situ_usd if not _is_unavailable(in_situ_usd) else _unavailable(
         _stage_reason(area_key, [_reason_of(in_situ_usd)]),
@@ -1067,6 +1152,27 @@ def _price_layered_sheet(
         "cost_usd": cost,
         "reasons": [] if not _is_unavailable(cost) else [_reason_of(cost)],
     }
+
+
+def _product_bulk_rate(
+    bulk: Mapping[str, Any],
+    fallback: float | None,
+) -> tuple[float | None, str]:
+    """Stage-3 USD/kg. A number on the entry wins. Derived-but-unresolved refuses.
+
+    A null cost with no status keeps the doloma scalar so the test fixture
+    and an older wall still price. owner_unset null does not use that scalar.
+    """
+
+    cost = bulk.get("cost_per_kg_usd")
+    status = bulk.get("cost_status")
+    if cost is not None:
+        return float(cost), "in_situ_cost_unset"
+    if status == _DERIVED_COST_STATUS:
+        return None, "derived_cost_unresolved"
+    if status == _OWNER_UNSET_STATUS:
+        return None, "in_situ_cost_unset"
+    return fallback, "in_situ_cost_unset"
 
 
 def _layer_mass_reasons(layer: Mapping[str, Any]) -> list[str]:
@@ -1287,16 +1393,30 @@ def _resolve_density(
     layer: Mapping[str, Any],
     entry: Mapping[str, Any] | None,
 ) -> tuple[float | None, str | None, str | None]:
+    """An assumed layer override replaces the catalog. A cited disagreement raises.
+
+    The test wall carries assumed densities that are not the catalog
+    measurements. Those scalars are the test input. A cited override that
+    names a different number than the catalog is a conflict, not a silent pick.
+    """
+
     role = str(layer["role"])
     override = layer.get("density_kg_m3")
+    status = layer.get("density_status")
     catalog_value = entry.get("density_kg_m3") if isinstance(entry, Mapping) else None
-    if catalog_value is not None and override is not None:
-        if float(catalog_value) != float(override):
-            raise ValueError(f"density_conflict:{role}")
+    catalog_flag = None
+    if isinstance(entry, Mapping):
+        catalog_flag = entry.get("density_flag") or entry.get("density_status")
     if override is not None:
-        return float(override), None, str(layer.get("density_status"))
+        if (
+            status == "cited"
+            and catalog_value is not None
+            and float(catalog_value) != float(override)
+        ):
+            raise ValueError(f"density_conflict:{role}")
+        return float(override), None, str(status or "override")
     if catalog_value is not None:
-        return float(catalog_value), None, "catalog"
+        return float(catalog_value), None, str(catalog_flag or "catalog")
     return None, f"density_missing:{role}", None
 
 
@@ -1306,40 +1426,104 @@ def _resolve_conductivity(
     *,
     temperature_K: float | None,
 ) -> tuple[float | None, str | None, str | None]:
+    """An assumed scalar or curve replaces the catalog curve.
+
+    Mass pricing calls this without a temperature. A catalog curve then
+    returns thermal_conductivity_temperature_unset and does not wipe the
+    density. A cited scalar that disagrees with a catalog scalar or curve
+    raises. The shipped layers do not carry a conductivity override, so
+    they use the catalog.
+    """
+
     role = str(layer["role"])
     override_scalar = layer.get("conductivity_W_m_K")
     override_curve = layer.get("thermal_conductivity")
+    status = layer.get("conductivity_status")
     catalog_scalar = None
     catalog_curve = None
+    extension = None
     if isinstance(entry, Mapping):
         catalog_scalar = entry.get("conductivity_W_m_K")
         if catalog_scalar is None:
             catalog_scalar = entry.get("thermal_conductivity_W_m_K")
         catalog_curve = entry.get("thermal_conductivity")
-    if override_scalar is not None and catalog_scalar is not None:
-        if float(override_scalar) != float(catalog_scalar):
+        extension = entry.get("conductivity_extension")
+    has_override = override_scalar is not None or override_curve is not None
+    if has_override and status == "assumed":
+        if override_curve is not None:
+            return _select_curve(override_curve, temperature_K, role, extension=None)
+        return float(override_scalar), None, "assumed"
+    if has_override and status == "cited":
+        if override_scalar is not None and catalog_scalar is not None:
+            if float(override_scalar) != float(catalog_scalar):
+                raise ValueError(f"conductivity_conflict:{role}")
+        if override_scalar is not None and _is_curve(catalog_curve):
             raise ValueError(f"conductivity_conflict:{role}")
-    if override_curve is not None:
-        return _select_curve(override_curve, temperature_K, role)
-    if isinstance(catalog_curve, Sequence) and not isinstance(catalog_curve, (str, bytes)):
-        return _select_curve(catalog_curve, temperature_K, role)
-    if override_scalar is not None:
+        if override_curve is not None and (
+            catalog_scalar is not None or _is_curve(catalog_curve)
+        ):
+            raise ValueError(f"conductivity_conflict:{role}")
+        if override_curve is not None:
+            return _select_curve(
+                override_curve, temperature_K, role, extension=extension
+            )
+        return float(override_scalar), None, "cited"
+    if has_override:
+        if override_curve is not None:
+            return _select_curve(override_curve, temperature_K, role, extension=None)
         return float(override_scalar), None, "k_not_a_curve"
+    if _is_curve(catalog_curve):
+        return _select_curve(
+            catalog_curve, temperature_K, role, extension=extension
+        )
     if catalog_scalar is not None:
         return float(catalog_scalar), None, "k_not_a_curve"
     return None, f"thermal_conductivity_missing:{role}", None
+
+
+def _is_curve(value: Any) -> bool:
+    return isinstance(value, Sequence) and not isinstance(value, (str, bytes)) and bool(value)
 
 
 def _select_curve(
     curve: Sequence[Any],
     temperature_K: float | None,
     role: str,
+    *,
+    extension: str | None,
 ) -> tuple[float | None, str | None, str | None]:
+    """Piecewise-linear inside the printed grid. Nearest point only when asked.
+
+    Off-grid nearest-point use is the catalog's conductivity_extension, not
+    a silent extrapolation and not a fabricated grid point. Without that
+    flag, a temperature outside the printed span is not_on_cited_grid.
+    """
+
     if temperature_K is None:
         return None, f"thermal_conductivity_temperature_unset:{role}", None
-    for point in curve:
-        if float(point["temperature_K"]) == float(temperature_K):
-            return float(point["value_W_m_K"]), None, "cited_grid"
+    points = sorted(
+        (float(point["temperature_K"]), float(point["value_W_m_K"]))
+        for point in curve
+    )
+    target = float(temperature_K)
+    for printed_t, value in points:
+        if abs(printed_t - target) <= _TEMPERATURE_MATCH_K:
+            return value, None, "cited_grid"
+    below = None
+    above = None
+    for printed_t, value in points:
+        if printed_t < target and (below is None or printed_t > below[0]):
+            below = (printed_t, value)
+        elif printed_t > target and (above is None or printed_t < above[0]):
+            above = (printed_t, value)
+    if below is not None and above is not None:
+        span = above[0] - below[0]
+        fraction = (target - below[0]) / span
+        interpolated = below[1] + fraction * (above[1] - below[1])
+        return interpolated, None, "k_interpolated_not_on_printed_grid"
+    if extension == "nearest_cited_point":
+        nearest = min(points, key=lambda point: abs(point[0] - target))
+        return nearest[1], None, "k_extended_off_cited_temperature"
     return None, f"not_on_cited_grid:{role}", None
 
 
@@ -1525,6 +1709,10 @@ def _interface_row(
             "shell_temperature_status": "not_a_cao_shell",
             "conduction_status": "unavailable",
             "conduction_reason": "product_baffle_has_no_cited_conductivity",
+            "insulation_dew_point": {
+                "status": "not_applicable_no_insulation_layer",
+                "reason": "product_baffle_has_no_insulation_layer",
+            },
             "failure_flags": product_surface_flags(
                 product["material_id"], materials=materials
             ),
@@ -1537,31 +1725,24 @@ def _interface_row(
         )
         for layer in wall["layers"]
     ]
-    _ready, layer_reasons = _ready_conduction_layers(evaluated)
-    conduction_reasons = list(layer_reasons)
-    if wall["outer_temperature_C"] is None:
-        conduction_reasons.append("outer_temperature_unset")
-    if conduction_reasons:
-        conduction = _conduction_unavailable(conduction_reasons)
-    else:
-        conduction = flat_wall_conduction(
-            evaluated,
-            hot_face,
-            wall["outer_temperature_C"],
-        )
+    conduction = _solve_wall_conduction(evaluated, hot_face, wall)
+    walk = conduction["status"] in _CONDUCTION_WALK_STATUSES
+    temperatures = _temperatures_by_role(conduction) if walk else {}
     layer_rows = []
-    interfaces = (
-        conduction["interface_temperatures_C"] if conduction["status"] == "ok" else None
-    )
     for index, layer in enumerate(evaluated):
         service = layer["service"]
-        if interfaces is not None:
-            inner = interfaces[index]["temperature_C"]
-            outer = interfaces[index + 1]["temperature_C"]
+        pair = temperatures.get(layer["role"])
+        if pair is not None:
+            inner, outer = pair
             temperature_flags = _service_flags(inner, service)
         else:
-            inner = _unavailable(_reason_of(conduction), "C")
-            outer = _unavailable(_reason_of(conduction), "C")
+            reason = (
+                "structure_omitted_from_temperature_walk"
+                if walk
+                else _reason_of(conduction)
+            )
+            inner = _unavailable(reason, "C")
+            outer = _unavailable(reason, "C")
             temperature_flags = (
                 _service_flags(hot_face, service)
                 if index == 0
@@ -1571,12 +1752,18 @@ def _interface_row(
             "role": layer["role"],
             "material_id": layer.get("material_id"),
             "source": layer.get("source"),
+            "source_status": layer.get("source_status"),
             "thickness_m": layer.get("thickness_m"),
+            "thickness_status": layer.get("thickness_status"),
             "density_kg_m3": layer.get("density_kg_m3"),
             "density_reason": layer.get("density_reason"),
+            "density_flag": layer.get("density_flag"),
             "conductivity_W_m_K": layer.get("conductivity_W_m_K"),
             "conductivity_reason": layer.get("conductivity_reason"),
             "conductivity_flag": layer.get("conductivity_flag"),
+            "conductivity_evaluation": (
+                "k_evaluated_at_hot_face" if layer.get("conductivity_W_m_K") is not None else None
+            ),
             "service": service,
             "hot_face_flags": temperature_flags,
             "inner_temperature_C": inner,
@@ -1584,18 +1771,21 @@ def _interface_row(
         })
     structure = next(layer for layer in evaluated if layer["role"] == "structure")
     shell_status = "shell_temperature_unchecked"
-    if interfaces is not None and _is_cao_bearing(structure):
-        structure_index = next(
-            index for index, layer in enumerate(evaluated) if layer["role"] == "structure"
-        )
-        inner = interfaces[structure_index]["temperature_C"]
-        shell_flags = _service_flags(inner, structure["service"])
+    structure_pair = temperatures.get("structure")
+    if structure_pair is not None and _is_cao_bearing(structure):
+        shell_flags = _service_flags(structure_pair[0], structure["service"])
         if "hot_face_above_max_operating" in shell_flags:
             shell_status = "shell_above_max_operating"
         elif "service_temperature_missing" in shell_flags:
             shell_status = "structure_service_temperature_unchecked"
         else:
             shell_status = "shell_within_cited_service"
+    felt_pair = temperatures.get("insulation")
+    if felt_pair is None:
+        felt_inner = _unavailable("felt_temperature_unchecked", "C")
+        felt_outer = felt_inner
+    else:
+        felt_inner, felt_outer = felt_pair
     return {
         "stage": name,
         "train_key": train_key,
@@ -1606,11 +1796,529 @@ def _interface_row(
         "layers": layer_rows,
         "shell_temperature_status": shell_status,
         "conduction_status": conduction["status"],
+        "conduction_authority": conduction.get("authority"),
         "conduction_reason": (
-            None if conduction["status"] == "ok" else _reason_of(conduction)
+            None if walk else _reason_of(conduction)
         ),
+        "layers_omitted": conduction.get("layers_omitted"),
+        "boundary_temperature_C": conduction.get("boundary_temperature_C"),
+        "boundary_basis": conduction.get("boundary_basis"),
+        "insulation_dew_point": insulation_vapour_dew_point(felt_inner, felt_outer),
         "failure_flags": stack_failure_flags(evaluated),
     }
+
+
+def _solve_wall_conduction(
+    layers: Sequence[Mapping[str, Any]],
+    t_in_C: float,
+    wall: Mapping[str, Any],
+    *,
+    radius_m: float | None = None,
+) -> dict[str, Any]:
+    """Full series walk, or a known-layer estimate when a suffix has no k.
+
+    Dropping a layer with no conductivity and pinning the last known face
+    to the enclosure temperature is an estimate. It is not an upper bound:
+    an off-grid conductivity can be either high or low. A non-positive
+    conductivity or a gap that is not a suffix still refuses.
+    """
+
+    prefix = _known_conduction_prefix(layers)
+    if prefix["blocked"]:
+        return _conduction_unavailable(prefix["blocked"])
+    known = prefix["known"]
+    omitted = prefix["omitted"]
+    if not known:
+        reasons = [item["reason"] for item in omitted] or ["thermal_conductivity_missing"]
+        return _conduction_unavailable(reasons)
+    partial = bool(omitted)
+    boundary, basis = _conduction_boundary(wall, partial=partial)
+    if boundary is None:
+        return _conduction_unavailable(["outer_temperature_unset"])
+    if radius_m is None:
+        result = flat_wall_conduction(known, t_in_C, boundary)
+    else:
+        result = cylindrical_wall_conduction(known, radius_m, t_in_C, boundary)
+    if result["status"] != "ok":
+        return result
+    result["boundary_temperature_C"] = boundary
+    result["boundary_basis"] = basis
+    result["known_roles"] = [str(layer["role"]) for layer in known]
+    result["k_evaluation"] = "k_evaluated_at_hot_face"
+    if partial:
+        result["status"] = "estimated_known_layers_only"
+        result["layers_omitted"] = omitted
+        result["authority"] = "estimated_known_layers_only"
+        result["not_an_upper_bound"] = True
+    else:
+        result["authority"] = "all_layers"
+        result["layers_omitted"] = []
+        result["not_an_upper_bound"] = False
+    return result
+
+
+def _known_conduction_prefix(
+    layers: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    known: list[Mapping[str, Any]] = []
+    omitted: list[dict[str, str]] = []
+    blocked: list[str] = []
+    gap = False
+    for layer in layers:
+        role = str(layer.get("role") or "layer")
+        thickness = layer.get("thickness_m")
+        conductivity = layer.get("conductivity_W_m_K")
+        if thickness is not None and float(thickness) <= 0.0:
+            blocked.append(f"thickness_invalid:{role}")
+            continue
+        if conductivity is not None and float(conductivity) <= 0.0:
+            blocked.append(f"thermal_conductivity_invalid:{role}")
+            continue
+        ready = thickness is not None and conductivity is not None
+        if ready and not gap and not blocked:
+            known.append(layer)
+            continue
+        if ready:
+            blocked.append(f"conductivity_gap:{role}")
+            continue
+        gap = True
+        if thickness is None:
+            reason = f"thickness_unset:{role}"
+        else:
+            reason = str(
+                layer.get("conductivity_reason")
+                or f"thermal_conductivity_missing:{role}"
+            )
+        omitted.append({"role": role, "reason": reason})
+    if blocked:
+        return {"known": [], "omitted": omitted, "blocked": blocked}
+    return {"known": known, "omitted": omitted, "blocked": []}
+
+
+def _conduction_boundary(
+    wall: Mapping[str, Any],
+    *,
+    partial: bool,
+) -> tuple[float | None, str]:
+    """Owner outer temperature is the shell outer, not the felt outer.
+
+    A partial walk uses the enclosure temperature. Using the owner shell
+    outer as the felt outer would skip the unknown shell resistance and
+    pretend that temperature sat on the felt.
+    """
+
+    if not partial and wall.get("outer_temperature_C") is not None:
+        return float(wall["outer_temperature_C"]), "owner_outer_temperature"
+    enclosure = wall.get("enclosure_temperature_C")
+    if enclosure is not None:
+        status = wall.get("enclosure_temperature_status") or "enclosure_temperature"
+        return float(enclosure), str(status)
+    return None, "outer_temperature_unset"
+
+
+def _temperatures_by_role(conduction: Mapping[str, Any]) -> dict[str, tuple[float, float]]:
+    interfaces = conduction.get("interface_temperatures_C")
+    roles = conduction.get("known_roles") or []
+    if not isinstance(interfaces, Sequence) or len(interfaces) != len(roles) + 1:
+        return {}
+    return {
+        str(role): (
+            float(interfaces[index]["temperature_C"]),
+            float(interfaces[index + 1]["temperature_C"]),
+        )
+        for index, role in enumerate(roles)
+    }
+
+
+def _loss_vs_black_body(
+    conduction: Mapping[str, Any],
+    radius_m: float,
+    black_body_W_m2: float,
+) -> dict[str, Any]:
+    """Inner-surface flux against the black-body ceiling.
+
+    Premise: radial heat flow per metre is constant, so the flux the gas
+    path must supply is Q' / (2 π r_in). Algebra is that quotient.
+    Units: (W/m) / m = W/m². Sanity: a thin wall's inner flux approaches
+    the flat-wall flux. A known-layer estimate can sit either side of the
+    true loss, so a comparison with σT^4 is not a certified deficit and
+    is not a trace-heating wattage.
+    """
+
+    if conduction.get("status") not in _CONDUCTION_WALK_STATUSES:
+        return {
+            "status": "unavailable",
+            "reason": conduction.get("reason") or "conductive_loss_unavailable",
+        }
+    heat_flow = conduction.get("heat_flow_W_per_m")
+    if isinstance(heat_flow, (int, float)) and not isinstance(heat_flow, bool):
+        inner_flux = float(heat_flow) / (2.0 * math.pi * radius_m)
+        flux_basis = "cylindrical_inner_surface"
+    else:
+        heat_flux = conduction.get("heat_flux_W_m2")
+        if not isinstance(heat_flux, (int, float)) or isinstance(heat_flux, bool):
+            return {"status": "unavailable", "reason": "conductive_loss_unavailable"}
+        inner_flux = float(heat_flux)
+        flux_basis = "flat_flux"
+    relation = (
+        "estimated_loss_below_black_body_ceiling"
+        if inner_flux < black_body_W_m2
+        else "estimated_loss_above_black_body_ceiling"
+    )
+    return {
+        "status": conduction["status"],
+        "authority": conduction.get("authority"),
+        "inner_flux_W_m2": inner_flux,
+        "flux_basis": flux_basis,
+        "black_body_flux_W_m2": black_body_W_m2,
+        "relation": relation,
+        "not_an_upper_bound": bool(conduction.get("not_an_upper_bound")),
+        "not_a_certified_deficit": True,
+        "detail": (
+            "Off-grid conductivity can err either way. This comparison is "
+            "not an upper bound and not a trace-heating wattage."
+        ),
+    }
+
+
+def insulation_vapour_dew_point(
+    felt_inner_temperature_C: Any,
+    felt_outer_temperature_C: Any,
+) -> dict[str, Any]:
+    """Refuse a felt dew point. The wall has no vapour partial pressure.
+
+    Live SiO, Na, and K catalog rows are equilibrium pressures of oxide
+    reactions, not pure-component saturation. The felt temperatures are
+    returned beside the refusal. No Antoine coefficients are evaluated.
+    """
+
+    return {
+        "status": "unavailable",
+        "reason": "partial_pressure_unset",
+        "felt_inner_temperature_C": felt_inner_temperature_C,
+        "felt_outer_temperature_C": felt_outer_temperature_C,
+        "species": {
+            "SiO": {
+                "family": "oxide_vapors_sio_family",
+                "pressure_kind": "equilibrium_partial_pressure",
+                "reason": "equilibrium_not_pure_saturation",
+            },
+            "Na": {
+                "family": "metals_na_family",
+                "pressure_kind": "equilibrium_partial_pressure",
+                "reason": "equilibrium_not_pure_saturation",
+            },
+            "K": {
+                "family": "metals_k_family",
+                "pressure_kind": "equilibrium_partial_pressure",
+                "reason": "equilibrium_not_pure_saturation",
+            },
+        },
+    }
+
+
+def in_situ_processing_cost_per_kg(
+    material: str,
+    electricity_usd_per_kWh: float,
+) -> dict[str, Any]:
+    """Sensible-enthalpy processing cost of in-situ doloma or silica.
+
+    Premise: electricity buys the enthalpy to heat the oxide from the
+    JANAF 298.15 K reference to the process temperature. No kiln-loss
+    measurement is cited, so the thermal efficiency is 1 and the cost is
+    a lower bound. Doloma is a stoichiometric CaO+MgO mass mix, not a
+    measured doloma heat capacity. Silica uses the quartz crystal table.
+    The fused-silica liquid table is referenced to the liquid, and these
+    tables do not print a heat of fusion, so none is added.
+
+    Algebra: H is the JANAF enthalpy increment in kJ/mol, linear between
+    the printed neighbors. Specific energy in MJ/kg is H / M with M in
+    g/mol, because kJ/g = MJ/kg. The doloma mix weights those specific
+    energies by molar mass. USD/kg = specific energy / efficiency
+    * 1000 / (kJ per kWh) * electricity price. kJ per kWh is
+    simulator.thermal_budget.KJ_PER_KWH.
+
+    Units: (MJ/kg) * (1000 kJ/MJ) / (kJ/kWh) * (USD/kWh) = USD/kg.
+
+    Sanity: oxide sensible enthalpy from 25 C to about 1600 C is about
+    1-2 MJ/kg. A result outside that band is flagged and still returned.
+    """
+
+    electricity = _finite_number(
+        electricity_usd_per_kWh, "electricity_cost_per_kWh"
+    )
+    if electricity < 0.0:
+        raise ValueError("electricity_cost_per_kWh must be non-negative")
+    if material == "doloma":
+        return _doloma_processing_cost(electricity)
+    if material == "silica":
+        return _silica_processing_cost(electricity)
+    raise ValueError("in-situ processing material must be doloma or silica")
+
+
+def resolve_in_situ_bootstrap_rate(
+    value: Any,
+    status: Any,
+    electricity_usd_per_kWh: float,
+) -> Any:
+    """Fill the doloma rate only for a derived null. A number, including 0, wins.
+
+    owner_unset null stays null. The caller still rejects a negative number.
+    """
+
+    if value is not None:
+        return value
+    if status == _DERIVED_COST_STATUS:
+        return in_situ_processing_cost_per_kg(
+            "doloma", electricity_usd_per_kWh
+        )["usd_per_kg"]
+    return None
+
+
+def apply_derived_stage_cost(
+    wall: Mapping[str, Any],
+    electricity_usd_per_kWh: float,
+) -> dict[str, Any]:
+    """Fill stage-3 silica USD/kg when its status is derived and its value is null.
+
+    An owner number already on the entry is left alone. The doloma scalar
+    is not copied onto the silica entry.
+    """
+
+    stage_bulk: dict[str, Any] = {}
+    for key, entry in wall["stage_bulk"].items():
+        updated = dict(entry)
+        if (
+            key == _STAGE3_AREA_KEY
+            and updated.get("cost_status") == _DERIVED_COST_STATUS
+            and updated.get("cost_per_kg_usd") is None
+        ):
+            updated["cost_per_kg_usd"] = in_situ_processing_cost_per_kg(
+                "silica", electricity_usd_per_kWh
+            )["usd_per_kg"]
+        stage_bulk[key] = updated
+    rebuilt = dict(wall)
+    rebuilt["stage_bulk"] = stage_bulk
+    return rebuilt
+
+
+def _doloma_processing_cost(electricity_usd_per_kWh: float) -> dict[str, Any]:
+    temperature_K = _DOLOMA_PROCESS_C + CELSIUS_TO_KELVIN_OFFSET
+    flags = [
+        _EFFICIENCY_FLAG,
+        "cited_example_not_a_kiln_schedule",
+        "mass_weighted_janaf_not_measured_doloma_cp",
+    ]
+    components = []
+    total_mass = 0.0
+    weighted_energy = 0.0
+    for species, table_id in _DOLOMA_COMPONENTS:
+        row = _enthalpy_increment(table_id, temperature_K)
+        molar_mass = _molar_mass_g_per_mol(species)
+        specific = row["enthalpy_kJ_per_mol"] / molar_mass
+        components.append({
+            "species": species,
+            "table_id": table_id,
+            "molar_mass_g_per_mol": molar_mass,
+            "molar_mass_owner": "simulator.accounting.formulas.resolve_species_formula",
+            "specific_energy_MJ_per_kg": specific,
+            "enthalpy_kJ_per_mol": row["enthalpy_kJ_per_mol"],
+            "enthalpy_status": row["enthalpy_status"],
+            "neighbors": row["neighbors"],
+        })
+        total_mass += molar_mass
+        weighted_energy += molar_mass * specific
+        if row["fusion_transition"] is None:
+            flags.append("heat_of_fusion_not_in_table")
+        if row["enthalpy_status"] != "on_printed_grid":
+            flags.append(row["enthalpy_status"])
+    specific_energy = weighted_energy / total_mass
+    flags.append(_sanity_flag(specific_energy))
+    return _processing_record(
+        material="doloma",
+        electricity_usd_per_kWh=electricity_usd_per_kWh,
+        specific_energy_MJ_per_kg=specific_energy,
+        process_temperature_K=temperature_K,
+        process_temperature_citation=(
+            "Diaz-Tato et al., Technologies 2025, 13(11), 523: higher "
+            "sintering temperatures, such as 1400 C. An example, not a kiln schedule."
+        ),
+        components=components,
+        flags=_unique(flags),
+    )
+
+
+def _silica_processing_cost(electricity_usd_per_kWh: float) -> dict[str, Any]:
+    temperature_K = _silica_process_temperature_K()
+    species, table_id = _SILICA_COMPONENT
+    row = _enthalpy_increment(table_id, temperature_K)
+    molar_mass = _molar_mass_g_per_mol(species)
+    specific = row["enthalpy_kJ_per_mol"] / molar_mass
+    flags = [
+        _EFFICIENCY_FLAG,
+        "process_temperature_is_catalog_max_operating_not_a_cited_sinter",
+        "janaf_quartz_not_fused_silica",
+        _sanity_flag(specific),
+    ]
+    if row["fusion_transition"] is None:
+        flags.append("heat_of_fusion_not_in_table")
+    if row["enthalpy_status"] != "on_printed_grid":
+        flags.append(row["enthalpy_status"])
+    return _processing_record(
+        material="silica",
+        electricity_usd_per_kWh=electricity_usd_per_kWh,
+        specific_energy_MJ_per_kg=specific,
+        process_temperature_K=temperature_K,
+        process_temperature_citation=(
+            "fused_silica service_temp.max_operating_C from data/wall_materials.yaml. "
+            "Not a cited sinter temperature. JANAF table is O-037 quartz crystal."
+        ),
+        components=[{
+            "species": species,
+            "table_id": table_id,
+            "molar_mass_g_per_mol": molar_mass,
+            "molar_mass_owner": "simulator.accounting.formulas.resolve_species_formula",
+            "specific_energy_MJ_per_kg": specific,
+            "enthalpy_kJ_per_mol": row["enthalpy_kJ_per_mol"],
+            "enthalpy_status": row["enthalpy_status"],
+            "neighbors": row["neighbors"],
+        }],
+        flags=_unique(flags),
+    )
+
+
+def _processing_record(
+    *,
+    material: str,
+    electricity_usd_per_kWh: float,
+    specific_energy_MJ_per_kg: float,
+    process_temperature_K: float,
+    process_temperature_citation: str,
+    components: list[dict[str, Any]],
+    flags: list[str],
+) -> dict[str, Any]:
+    from simulator.thermal_budget import KJ_PER_KWH
+
+    usd_per_kg = (
+        specific_energy_MJ_per_kg
+        * 1000.0
+        / KJ_PER_KWH
+        / _THERMAL_EFFICIENCY
+        * electricity_usd_per_kWh
+    )
+    return {
+        "material": material,
+        "usd_per_kg": usd_per_kg,
+        "specific_energy_MJ_per_kg": specific_energy_MJ_per_kg,
+        "thermal_efficiency": _THERMAL_EFFICIENCY,
+        "thermal_efficiency_flag": _EFFICIENCY_FLAG,
+        "electricity_usd_per_kWh": electricity_usd_per_kWh,
+        "kj_per_kwh": KJ_PER_KWH,
+        "kj_per_kwh_owner": "simulator.thermal_budget.KJ_PER_KWH",
+        "process_temperature_K": process_temperature_K,
+        "process_temperature_citation": process_temperature_citation,
+        "components": components,
+        "flags": flags,
+    }
+
+
+def _silica_process_temperature_K() -> float:
+    from simulator.wall_advisor import load_wall_materials
+
+    service = load_wall_materials()["materials"]["fused_silica"]["service_temp"]
+    maximum = service.get("max_operating_C")
+    if maximum is None:
+        raise ValueError("fused_silica max_operating_C is unset")
+    return float(maximum) + CELSIUS_TO_KELVIN_OFFSET
+
+
+def _enthalpy_increment(table_id: str, temperature_K: float) -> dict[str, Any]:
+    from simulator.reference_data.janaf import (
+        TABLES_DIR,
+        load_table_document,
+        table_fusion_transition,
+    )
+
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    table = document["table"]
+    if table.get("table_id") != table_id:
+        raise ValueError(f"{table_id} table_id mismatch")
+    rows = []
+    for row in table["values"]:
+        enthalpy = row.get("enthalpy_increment")
+        temperature = row.get("temperature")
+        if not isinstance(enthalpy, Mapping) or not isinstance(temperature, Mapping):
+            continue
+        if enthalpy.get("value") is None:
+            continue
+        rows.append((
+            float(temperature["value"]),
+            float(enthalpy["value"]),
+            enthalpy.get("locator"),
+        ))
+    target = float(temperature_K)
+    below = None
+    above = None
+    exact = None
+    for printed_t, value, locator in rows:
+        if abs(printed_t - target) <= _TEMPERATURE_MATCH_K:
+            exact = (printed_t, value, locator)
+        elif printed_t < target and (below is None or printed_t > below[0]):
+            below = (printed_t, value, locator)
+        elif printed_t > target and (above is None or printed_t < above[0]):
+            above = (printed_t, value, locator)
+    if exact is not None:
+        enthalpy_value = exact[1]
+        status = "on_printed_grid"
+        neighbors: dict[str, Any] = {"exact": _enthalpy_point(*exact)}
+    elif below is None or above is None:
+        raise ValueError(f"{table_id} enthalpy bracket missing at {target}")
+    else:
+        fraction = (target - below[0]) / (above[0] - below[0])
+        enthalpy_value = below[1] + fraction * (above[1] - below[1])
+        status = "enthalpy_interpolated_between_printed_janaf_rows"
+        neighbors = {
+            "below": _enthalpy_point(*below),
+            "above": _enthalpy_point(*above),
+        }
+    return {
+        "enthalpy_kJ_per_mol": enthalpy_value,
+        "enthalpy_status": status,
+        "neighbors": neighbors,
+        "fusion_transition": table_fusion_transition(table),
+    }
+
+
+def _enthalpy_point(
+    temperature_K: float,
+    enthalpy_kJ_per_mol: float,
+    locator: Any,
+) -> dict[str, Any]:
+    return {
+        "temperature_K": temperature_K,
+        "enthalpy_kJ_per_mol": enthalpy_kJ_per_mol,
+        "locator": locator,
+    }
+
+
+def _molar_mass_g_per_mol(species: str) -> float:
+    from simulator.accounting.formulas import resolve_species_formula
+
+    return float(resolve_species_formula(species).molar_mass_g_per_mol())
+
+
+def _sanity_flag(specific_energy_MJ_per_kg: float) -> str:
+    if 1.0 <= specific_energy_MJ_per_kg <= 2.0:
+        return "specific_energy_within_1_to_2_MJ_per_kg_sanity"
+    return "specific_energy_outside_1_to_2_MJ_per_kg"
+
+
+def _unique(items: list[str]) -> list[str]:
+    ordered: list[str] = []
+    for item in items:
+        if item not in ordered:
+            ordered.append(item)
+    return ordered
 
 
 def _service_flags(temperature_C: float, service: Mapping[str, Any]) -> list[str]:

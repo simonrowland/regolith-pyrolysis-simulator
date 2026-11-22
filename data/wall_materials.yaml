@@ -395,6 +395,13 @@ reactive_exchange:
       - *rx_mzo_reducing_vacuum_uncharacterized
     Fe_FeO:
       - *rx_mzo_reducing_vacuum_uncharacterized
+  kaowool_rcf_blanket:
+    SiO:
+      - *rx_uncharacterized_reducing_vacuum
+    alkali_NaK:
+      - *rx_uncharacterized_reducing_vacuum
+    Fe_FeO:
+      - *rx_uncharacterized_reducing_vacuum
 
 equilibrium_phase_window:
   Na2O-SiO2:
@@ -746,6 +753,19 @@ materials:
   doloma:
     label: "Doloma / dolomitic refractory (CaO.MgO, magnesia-doloma)"
     role: "Basic structural refractory for clean-steel, cement-kiln, or basic-slag style liner service."
+    # Printed floor, not a measured point. Díaz-Tato et al., Technologies
+    # 2025, 13(11), 523, doi 10.3390/technologies13110523, Table 4: standard
+    # magnesia dolomite and sintered dolomite both print >3.00 g/cm3. The
+    # prose says calcined dolomitic bricks typically range from 2.6 to
+    # greater than 3.0 g/cm3. Mass that uses 3000 kg/m3 is a lower bound.
+    # Primary reference [86] was not opened. Other Table 4 rows are different
+    # products and are not averaged in. No citable doloma k(T) was found;
+    # the magnesia-iron spinel vendor conductivity is a different product
+    # and is not stored here.
+    density_kg_m3: 3000.0
+    density_status: cited_lower_bound
+    density_flag: cited_lower_bound
+    density_citation: "Diaz-Tato et al., Technologies 2025, 13(11), 523, doi 10.3390/technologies13110523, Table 4, bulk density >3.00 g/cm3 for standard magnesia dolomite and sintered dolomite. Primary [86] not opened."
     service_temp:
       continuous_C: 1700
       max_operating_C: 1700
@@ -1038,6 +1058,29 @@ materials:
   bulk_zirconia_ysz:
     label: "Zirconia / YSZ (bulk refractory zirconia, stabilized zirconia)"
     role: "Ultra-high-temperature insert, crucible, refractory board/fiber, or coating substrate."
+    # NASA/TM-2003-212896, Bansal and Zhu, December 2003. Table I sample
+    # A2-0 is 100 mol% 10YSZ (0 Al2O3), density 6.09 ± 0.05 g/cm3, printed
+    # page 3 (PDF page 7). Specimens at least 99% dense, hot pressed at
+    # 1500 C in vacuum. Table II prints thermal conductivity 2.2 W/m-K at
+    # 1000 C for A2-0, printed page 7 (PDF page 11). The mixture-rule
+    # sentence on that page uses 2.15 W/m-K; that figure is not the
+    # measurement. Composition is 10 mol% Y2O3, fully cubic, not 8YSZ.
+    # Printed page 6 says the 0, 5, and 10 mol% alumina composites changed
+    # only slightly with temperature. The summary says they did not show
+    # any change. One printed point is extended off that temperature with
+    # conductivity_extension nearest_cited_point. No other k points are
+    # invented. 99% dense is not a gas-tight certification.
+    density_kg_m3: 6090.0
+    density_uncertainty_kg_m3: 50.0
+    density_status: cited
+    density_flag: measured_bulk_density
+    density_citation: "NASA/TM-2003-212896, Bansal and Zhu, Table I sample A2-0, 100 mol% 10YSZ, 6.09 ± 0.05 g/cm3. Printed page 3."
+    conductivity_extension: nearest_cited_point
+    conductivity_composition_flag: "10 mol% Y2O3 fully cubic 10YSZ, not 8YSZ. One printed k point."
+    thermal_conductivity:
+      - temperature_K: 1273.15
+        value_W_m_K: 2.2
+        citation: "NASA/TM-2003-212896 Table II sample A2-0, 2.2 W/m-K at 1000 C. Printed page 7. Not the mixture-rule 2.15."
     service_temp:
       continuous_C: 2200
       max_operating_C: 2200
@@ -1924,3 +1967,169 @@ materials:
       note: >
         Turbine service and product-sheet evidence do not establish campaign
         life against SiO/Na/K/Fe deposits on a glassy regolith substrate.
+
+  kaowool_rcf_blanket:
+    label: "Kaowool refractory ceramic-fibre blanket (alumina-silica RCF)"
+    role: "Insulation blanket between the hot-face liner and the structural shell. Not a gas-tight liner and not structure."
+    # Morgan Thermal Ceramics Kaowool Blanket, code US 5-14-205, SDS 201,
+    # ASTM C201. Reseller reprint Soluciones Térmicas, page 2. Density grades
+    # 4, 6, and 8 pcf print as 64, 96, and 128 kg/m3. The conductivity table
+    # is printed only for 128 kg/m3, so that grade is stored and the other
+    # grades stay a range flag. Sheet values are typical averages, not a
+    # specification. Temperatures converted with the 273.15 K offset:
+    # 260 C, 538 C, 816 C, 1093 C.
+    density_kg_m3: 128.0
+    density_status: cited
+    density_flag: grade_with_printed_conductivity_table
+    density_grade_range_kg_m3: [64.0, 96.0, 128.0]
+    density_citation: "Morgan Thermal Ceramics Kaowool Blanket, code US 5-14-205, page 2. 8 pcf grade is 128 kg/m3, the only grade with a printed k table. Grades 4 and 6 pcf are 64 and 96 kg/m3."
+    conductivity_extension: nearest_cited_point
+    thermal_conductivity:
+      - temperature_K: 533.15
+        value_W_m_K: 0.06
+        citation: "Kaowool Blanket page 2, 128 kg/m3, 0.06 W/m·K at 260 C."
+      - temperature_K: 811.15
+        value_W_m_K: 0.12
+        citation: "Kaowool Blanket page 2, 128 kg/m3, 0.12 W/m·K at 538 C."
+      - temperature_K: 1089.15
+        value_W_m_K: 0.21
+        citation: "Kaowool Blanket page 2, 128 kg/m3, 0.21 W/m·K at 816 C."
+      - temperature_K: 1366.15
+        value_W_m_K: 0.3
+        citation: "Kaowool Blanket page 2, 128 kg/m3, 0.3 W/m·K at 1093 C. Printed as 0.3, not 0.30."
+    service_temp:
+      continuous_C: 1093
+      max_operating_C: 1260
+      peak_C: null
+      degradation_onset_C: null
+      evidence: direct
+      citations: ["Kaowool Blanket US 5-14-205 page 2: continuous use 1093 C (2000 F), classification 1260 C (2300 F)"]
+      note: >
+        Continuous use limit 1093 C and classification temperature 1260 C
+        are the datasheet ratings for this RCF blanket. Fibre class is RCF.
+        The printed composition is Al2O3 45, SiO2 50-55, Fe2O3 1.0, TiO2 2.2,
+        alkalies 0.2. Those oxides are the blanket chemistry, not a vapour-
+        attack measurement.
+    chemical_attack:
+      SiO:
+        severity: null
+        evidence: uncharacterized
+        citations: ["Kaowool Blanket US 5-14-205 page 2"]
+        note: >
+          The datasheet states composition and thermal ratings. It does not
+          state SiO vapour attack. No attack severity is inferred from the
+          alumina-silica fibre chemistry.
+      alkali_NaK:
+        severity: null
+        evidence: uncharacterized
+        citations: ["Kaowool Blanket US 5-14-205 page 2"]
+        note: >
+          The datasheet does not state Na or K vapour attack.
+      Fe_FeO:
+        severity: null
+        evidence: uncharacterized
+        citations: ["Kaowool Blanket US 5-14-205 page 2"]
+        note: >
+          The datasheet does not state Fe or FeO vapour attack.
+    stickiness:
+      SiO:
+        class: uncharacterized
+        evidence: uncharacterized
+        citations: ["Kaowool Blanket US 5-14-205 page 2"]
+        note: >
+          No SiO deposit adhesion measurement was found for this blanket.
+        surface_interaction:
+          arrival_mode: molecular_film
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.SiO
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Blanket datasheet is a thermal rating, not a deposit-retention measurement.'
+          regime: thin-film
+          source_ids: ['Kaowool-Blanket-5-14-205']
+          needs_experiment: true
+          needs_pdf_extraction: null
+      alkali:
+        class: uncharacterized
+        evidence: uncharacterized
+        citations: ["Kaowool Blanket US 5-14-205 page 2"]
+        note: >
+          No Na or K deposit adhesion measurement was found for this blanket.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref:
+              Na: data/materials.yaml::default_alpha_s_by_species.Na
+              K: data/materials.yaml::default_alpha_s_by_species.K
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Blanket datasheet is a thermal rating, not a deposit-retention measurement.'
+          regime: vacuum
+          source_ids: ['Kaowool-Blanket-5-14-205']
+          needs_experiment: true
+          needs_pdf_extraction: null
+      Fe:
+        class: uncharacterized
+        evidence: uncharacterized
+        citations: ["Kaowool Blanket US 5-14-205 page 2"]
+        note: >
+          No Fe deposit adhesion measurement was found for this blanket.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.Fe
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Blanket datasheet is a thermal rating, not a deposit-retention measurement.'
+          regime: vacuum
+          source_ids: ['Kaowool-Blanket-5-14-205']
+          needs_experiment: true
+          needs_pdf_extraction: null
+    service_life:
+      evidence: uncharacterized
+      citations: ["Kaowool Blanket US 5-14-205 page 2"]
+      note: >
+        The datasheet rates continuous use and classification temperature.
+        It does not state a regolith campaign life.
