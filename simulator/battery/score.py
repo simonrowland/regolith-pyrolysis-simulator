@@ -602,6 +602,8 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 )
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
+FLAGGED_STRATUM_ASSUMED = "assumed"
+FLAGGED_STRATUM_METHOD_IMPLIED = "method-implied"
 FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
@@ -2212,14 +2214,20 @@ def _unverified_apparatus_notices(
                     origin=reference.observation_id,
                 )
             )
-        elif flag == "effusion_regime_assumed":
+        elif flag in {"assumed", "method_implied"}:
+            condition = str(
+                detail.get("condition") or "free_molecular_effusion_regime"
+            )
+            original_reason = str(
+                detail.get("reason")
+                or "orifice and in-cell pressure sum are not printed"
+            )
             defaulted_notices.append(
                 Notice(
                     kind=NoticeKind.UNVERIFIED_APPARATUS,
                     affected_quantities=(quantity,),
                     reason=(
-                        "effusion_regime_assumed: "
-                        + str(detail.get("reason") or "orifice not printed")
+                        f"{flag}: {condition}; original_reason={original_reason}"
                     ),
                     origin=reference.observation_id,
                 )
@@ -2399,11 +2407,11 @@ def _unverified_apparatus_notices(
             )
         elif fact == "method_unknown" and unknown_method_activity:
             reason = (
-                "method_unknown: published activity has a typed condensed "
-                "reference but its experiment method is not stated"
+                "assumed:method_unknown; original_reason=published activity has a "
+                "typed condensed reference but its experiment method is not stated"
             )
         elif fact == "method_unknown":
-            reason = "method_unknown: " + str(
+            reason = "assumed:method_unknown; original_reason=" + str(
                 detail.get("reason") or "pressure series method is not stated"
             )
         else:
@@ -2529,6 +2537,17 @@ def _classify_flagged_notice_facts(
         for reason in unverified_apparatus
     ):
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
+    if any(
+        isinstance(reason, str)
+        and reason.startswith(("assumed:", "knob_defaulted:"))
+        for reason in unverified_apparatus
+    ):
+        strata.append(FLAGGED_STRATUM_ASSUMED)
+    if any(
+        isinstance(reason, str) and reason.startswith("method_implied:")
+        for reason in unverified_apparatus
+    ):
+        strata.append(FLAGGED_STRATUM_METHOD_IMPLIED)
     if NoticeKind.CELL_MATERIAL_INFERRED.value in kinds:
         strata.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:

@@ -5339,6 +5339,7 @@ def test_published_typed_activity_unknown_method_scores_flagged_and_pressure_unk
     quantity: Quantity,
 ) -> None:
     from simulator.battery.score import (
+        FLAGGED_STRATUM_ASSUMED,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         flagged_strata,
     )
@@ -5382,9 +5383,10 @@ def test_published_typed_activity_unknown_method_scores_flagged_and_pressure_unk
         for item in residual.notices
         if item.kind is NoticeKind.UNVERIFIED_APPARATUS
     )
-    assert "method_unknown" in notice.reason
+    assert notice.reason.startswith("assumed:method_unknown; original_reason=")
     assert flagged_strata(residual.notices) == (
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        FLAGGED_STRATUM_ASSUMED,
     )
 
     pressure_identities = (
@@ -5586,7 +5588,7 @@ def test_comparison_activity_cancels_cell_geometry_only_for_activity() -> None:
     full_gate = run_validity_gates(experiment, observation)
     assert full_gate.passed
     assert any(
-        check.name == "effusion_regime_assumed"
+        check.name == "assumed"
         for check in full_gate.checks
     )
 
@@ -5749,12 +5751,13 @@ def test_different_cell_comparison_activity_still_refuses_geometry() -> None:
         (Decimal("3.14e-7"), None),
     ),
 )
-def test_kems_activity_with_unverified_regime_scores_in_flagged_stratum(
+def test_kems_activity_with_method_implied_regime_scores_in_flagged_stratum(
     quantity: Quantity,
     orifice_area: Decimal | None,
     clausing: Decimal | None,
 ) -> None:
     from simulator.battery.score import (
+        FLAGGED_STRATUM_METHOD_IMPLIED,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         flagged_stratum_payloads,
         flagged_stratum_rows,
@@ -5784,7 +5787,7 @@ def test_kems_activity_with_unverified_regime_scores_in_flagged_stratum(
     gates = run_validity_gates(experiment, reference)
     assert gates.passed
     assert any(
-        check.name == "effusion_regime_assumed"
+        check.name == "method_implied"
         for check in gates.checks
     )
     context = _context(F.work(), experiment, reference, review="reviewed")
@@ -5809,9 +5812,17 @@ def test_kems_activity_with_unverified_regime_scores_in_flagged_stratum(
         if item.kind is NoticeKind.UNVERIFIED_APPARATUS
     ]
     assert any(
-        item.reason.startswith("effusion_regime_assumed:")
+        item.reason.startswith("method_implied:")
         for item in apparatus_notices
     )
+    method_notice = next(
+        item for item in apparatus_notices if item.reason.startswith("method_implied:")
+    )
+    assert "molecular_effusion_inside_cell" in method_notice.reason
+    assert "vacuum_outside" in method_notice.reason
+    assert "total_pressure=sum_of_partial_pressures" in method_notice.reason
+    assert "original_reason=" in method_notice.reason
+    assert FLAGGED_STRATUM_METHOD_IMPLIED in flagged_strata(residual.notices)
     assert FLAGGED_STRATUM_UNVERIFIED_APPARATUS in flagged_strata(
         residual.notices
     )
@@ -5824,6 +5835,12 @@ def test_kems_activity_with_unverified_regime_scores_in_flagged_stratum(
             (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
         )
     }[FLAGGED_STRATUM_UNVERIFIED_APPARATUS] == 1
+    assert {
+        row["stratum"]: row["n"]
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    }[FLAGGED_STRATUM_METHOD_IMPLIED] == 1
     payload = residual_to_plain(residual)
     for tier in ("measured", "compilation"):
         assert headline_payloads(
@@ -5835,6 +5852,12 @@ def test_kems_activity_with_unverified_regime_scores_in_flagged_stratum(
             (payload,), (Engine.INTERNAL_ANALYTICAL,)
         )
     }[FLAGGED_STRATUM_UNVERIFIED_APPARATUS] == 1
+    assert {
+        row["stratum"]: row["n"]
+        for row in flagged_stratum_payloads(
+            (payload,), (Engine.INTERNAL_ANALYTICAL,)
+        )
+    }[FLAGGED_STRATUM_METHOD_IMPLIED] == 1
 
     valueless = replace(
         reference,
@@ -8539,6 +8562,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
 
 def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
     from simulator.battery.score import (
+        FLAGGED_STRATUM_ASSUMED,
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
         FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
         FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION,
@@ -8548,6 +8572,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+        FLAGGED_STRATUM_METHOD_IMPLIED,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
         FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
@@ -8561,6 +8586,11 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
     facts = (
         (NoticeKind.UNVERIFIED_APPARATUS, "calibration_not_grounded:probe"),
         (NoticeKind.UNVERIFIED_APPARATUS, "apparatus_unverified:probe"),
+        (
+            NoticeKind.UNVERIFIED_APPARATUS,
+            "assumed:method_unknown; original_reason=probe",
+        ),
+        (NoticeKind.UNVERIFIED_APPARATUS, "method_implied:Knudsen effusion"),
         (NoticeKind.CELL_MATERIAL_INFERRED, "cell_material_inferred:probe"),
         (NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG, "catalogue_composition:probe"),
         (
@@ -8605,6 +8635,8 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
     expected = (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        FLAGGED_STRATUM_ASSUMED,
+        FLAGGED_STRATUM_METHOD_IMPLIED,
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
@@ -21367,6 +21399,7 @@ def test_knudsen_raw_rate_interval_evaluates_at_geometric_mean_diameter() -> Non
     """0.25-0.30 mm -> d_gm = 0.2739 mm and +/-0.079 dex (d-326)."""
 
     from simulator.battery.score import (
+        FLAGGED_STRATUM_ASSUMED,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         flagged_strata,
     )
@@ -21449,6 +21482,7 @@ def test_knudsen_raw_rate_interval_evaluates_at_geometric_mean_diameter() -> Non
     assert "real C < 1" in ideal.notice.reason
     assert flagged_strata((ideal.notice,)) == (
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        FLAGGED_STRATUM_ASSUMED,
     )
     for invalid_clausing in (Decimal("0"), Decimal("1.01")):
         with pytest.raises(ValueError, match="clausing_factor must be a point"):
@@ -21518,6 +21552,7 @@ def test_knudsen_raw_rate_interval_evaluates_at_geometric_mean_diameter() -> Non
 
 def test_point_orifice_geometry_is_unchanged_by_interval_rule() -> None:
     from simulator.battery.score import (
+        FLAGGED_STRATUM_ASSUMED,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         flagged_strata,
     )
@@ -21568,6 +21603,7 @@ def test_point_orifice_geometry_is_unchanged_by_interval_rule() -> None:
     assert reduced.notice.reason.startswith("knob_defaulted:clausing_factor=1")
     assert flagged_strata((reduced.notice,)) == (
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        FLAGGED_STRATUM_ASSUMED,
     )
 
     identity = replace(F.psat_identity("Ca"), quantity=Quantity.P_PARTIAL)
