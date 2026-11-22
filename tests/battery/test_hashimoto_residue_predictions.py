@@ -15,6 +15,7 @@ from simulator.battery.residue import (
     _HASHIMOTO_GEOMETRIES,
     _HASHIMOTO_PRIMARY_ALPHA_ARM,
     _HASHIMOTO_PRIMARY_GEOMETRY,
+    _hashimoto_geometry_areas,
     _hashimoto_primary_policy,
     _predict_hashimoto_residue_cohort,
 )
@@ -46,6 +47,18 @@ def _hashimoto_prediction_tuple_digest(predictions) -> str:
         records.append(record)
     encoded = json.dumps(records, sort_keys=True, separators=(",", ":"), default=str)
     return hashlib.sha256(encoded.encode()).hexdigest()
+
+
+def test_hashimoto_sphere_area_resolver_numeric_pin() -> None:
+    areas = _hashimoto_geometry_areas(
+        25.0e-6,
+        {"diameter": 4.0},
+    )
+
+    assert areas["sphere_constant"] == pytest.approx(
+        0.00002132398102968089, rel=1e-14
+    )
+    assert areas["sphere_shrinking"] == areas["sphere_constant"]
 
 
 pytestmark = pytest.mark.usefixtures("_close_openimcc_worker_between_tests")
