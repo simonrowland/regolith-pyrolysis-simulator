@@ -126,8 +126,8 @@ def test_species_record_follows_each_request_field(tmp_path, monkeypatch) -> Non
     recorded = _species_by_row(path)
     assert len(recorded) == len(_SPECIES_FIELDS) * 2
     assert {frozenset(names) for names in recorded.values()} == {
-        frozenset({"SiO2"}),
-        frozenset({"MgO"}),
+        frozenset({"sio2"}),
+        frozenset({"mgo"}),
     }
 
 
@@ -182,9 +182,9 @@ def test_expire_deletes_only_rows_that_name_the_species(tmp_path, monkeypatch) -
     assert applied["deleted_by_engine"]["openimcc"] == len(_SPECIES_FIELDS) + 2
     assert applied["vacuumed"] is True
     remaining = _species_by_row(path)
-    assert all(names == {"MgO"} or names == {"SiO2"} for names in remaining.values())
-    assert sum(names == {"MgO"} for names in remaining.values()) == len(_SPECIES_FIELDS)
-    assert {"SiO2"} in remaining.values()  # magemin, a different engine
+    assert all(names == {"mgo"} or names == {"sio2"} for names in remaining.values())
+    assert sum(names == {"mgo"} for names in remaining.values()) == len(_SPECIES_FIELDS)
+    assert {"sio2"} in remaining.values()  # magemin, a different engine
     engines = {engine for engine, _seq, _key in _output_rows(path)}
     assert engines == {"openimcc", "magemin"}
     openimcc_species = {
@@ -192,7 +192,7 @@ def test_expire_deletes_only_rows_that_name_the_species(tmp_path, monkeypatch) -
         for seq, names in remaining.items()
         if any(engine == "openimcc" and row_seq == seq for engine, row_seq, _key in _output_rows(path))
     }
-    assert openimcc_species == {frozenset({"MgO"})}
+    assert openimcc_species == {frozenset({"mgo"})}
     empty_rows = [
         row_seq
         for engine, row_seq, _key in _output_rows(path)
@@ -222,7 +222,7 @@ def test_multi_species_row_expires_when_either_name_is_given(
         path, engine="openimcc", species=(name,), apply=True
     )
     assert applied["deleted_by_engine"]["openimcc"] == 1
-    assert list(_species_by_row(path).values()) == [{"MgO"}]
+    assert list(_species_by_row(path).values()) == [{"mgo"}]
 
 
 def test_expire_all_includes_rows_with_no_species(tmp_path, monkeypatch) -> None:
@@ -548,10 +548,11 @@ def test_expire_matches_iron_total_and_case(tmp_path, monkeypatch) -> None:
         {"composition_wt_pct": {"Fe2O3": 3.0}, "marker": 3},
     )
     recorded = set().union(*_species_by_row(path).values())
-    assert recorded == {"FeO", "SiO2", "Fe2O3"}
+    assert recorded == {"feo_total", "sio2", "fe2o3"}
 
+    # The leaf matches the stored spelling. It does not expand oxide aliases.
     iron = engine_cache.expire_cache_file(path, engine="openimcc", species=("FeO",))
-    assert iron["matched_by_engine"]["openimcc"] == 1
+    assert iron["matched_by_engine"]["openimcc"] == 0
     spelled = engine_cache.expire_cache_file(
         path, engine="openimcc", species=("feo_total",)
     )
@@ -559,9 +560,31 @@ def test_expire_matches_iron_total_and_case(tmp_path, monkeypatch) -> None:
     silica = engine_cache.expire_cache_file(path, engine="openimcc", species=("SIO2",))
     assert silica["matched_by_engine"]["openimcc"] == 1
 
-    engine_cache.expire_cache_file(path, engine="openimcc", species=("FeO",), apply=True)
+    from scripts.engine_cache_sync import main
+
+    def _expire(species: str, apply: bool = False) -> dict:
+        stdout, stderr = io.StringIO(), io.StringIO()
+        argv = ["expire", str(path), "--engine", "openimcc", "--species", species]
+        if apply:
+            argv.append("--apply")
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            assert main(argv) == 0
+        assert stderr.getvalue().splitlines()[0] == "species-unknown rows: 0"
+        return json.loads(stdout.getvalue())
+
+    iron_cli = _expire("FeO")
+    assert iron_cli["matched_by_engine"]["openimcc"] == 1
+    assert "feo_total" in iron_cli["species"]
+    assert "fe2o3" not in iron_cli["species"]
+    silica_cli = _expire("sio2")
+    assert silica_cli["matched_by_engine"]["openimcc"] == 1
+    assert "sio2" in silica_cli["species"]
+    assert "feo_total" not in silica_cli["species"]
+
+    applied = _expire("FeO", apply=True)
+    assert applied["deleted_by_engine"]["openimcc"] == 1
     left = set().union(*_species_by_row(path).values())
-    assert left == {"SiO2", "Fe2O3"}
+    assert left == {"sio2", "fe2o3"}
 
 
 def test_migrate_skips_an_unreadable_key_and_warns(tmp_path) -> None:
@@ -601,7 +624,7 @@ def test_migrate_skips_an_unreadable_key_and_warns(tmp_path) -> None:
             name
             for (name,) in connection.execute("SELECT species FROM engine_output_species")
         }
-    assert names == {"MgO"}
+    assert names == {"mgo"}
 
 
 def test_migrate_aborts_when_a_row_changes_and_says_rerun(tmp_path, monkeypatch) -> None:

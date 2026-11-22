@@ -513,22 +513,19 @@ class EngineCacheSpeciesError(ValueError):
         super().__init__(f"engine cache species field {field!r}: {reason}")
 
 
-def _canonical_cache_species(name: str) -> str:
-    """Identity used in the side table and in expire --species.
+def _casefolded_species_name(name: str) -> str:
+    """Spelling stored for a request name, and the form expire matches.
 
-    ``canonical_melt_oxide_activity_name`` is the existing MELTS alias
-    map. It is case-insensitive, and it maps ``FeO_total`` to ``FeO``.
-    A name that map does not know is casefolded so the stored form and
-    the query still meet. This does not change ``engine_cache_key``.
-    The adapter keeps its own copy of the alias map so the provider can
-    import without that module; this call does not add a third copy.
+    The side table keeps the name the request used, casefolded. Oxide
+    aliases are not folded here. This module is a stdlib leaf, so it
+    cannot import the engine alias map. ``expire --species`` in
+    ``scripts/engine_cache_sync.py`` expands those spellings before it
+    calls in. A stored ``feo_total`` then expires when the operator
+    names ``FeO``. Folding that alias inside this module would either
+    import ``engines`` or copy the map, and a missed expansion would
+    keep serving the old row. This does not change ``engine_cache_key``.
     """
 
-    from engines.alphamelts.domain import canonical_melt_oxide_activity_name
-
-    canonical = canonical_melt_oxide_activity_name(name)
-    if canonical is not None:
-        return canonical
     folded = name.strip().casefold()
     if not folded:
         raise EngineCacheSpeciesError("species", "names must be non-empty strings")
@@ -538,7 +535,7 @@ def _canonical_cache_species(name: str) -> str:
 def _species_name(field: str, name: object) -> str:
     if not isinstance(name, str) or not name.strip():
         raise EngineCacheSpeciesError(field, "names must be non-empty strings")
-    return _canonical_cache_species(name)
+    return _casefolded_species_name(name)
 
 
 def _collect_species_fields(payload: Mapping[str, Any], found: set[str]) -> None:
@@ -2518,11 +2515,12 @@ def expire_cache_file(
 ) -> dict[str, Any]:
     """Delete one engine's rows whose recorded inputs include a named species.
 
-    Dry-run unless ``apply``. A blake2b key with no species rows is included
-    for any species list: its inputs are unknown, so a superseded species
-    would otherwise keep being served. A natural key that named no species
-    is not that case. ``all_rows`` deletes every row of that engine.
-    Nothing on the read or write path calls this.
+    Dry-run unless ``apply``. Names are matched casefolded, as stored.
+    This function does not expand oxide aliases. A blake2b key with no
+    species rows is included for any species list: its inputs are unknown,
+    so a superseded species would otherwise keep being served. A natural
+    key that named no species is not that case. ``all_rows`` deletes every
+    row of that engine. Nothing on the read or write path calls this.
     """
 
     if engine not in ENGINE_CHEMISTRY_VERSION:
@@ -2533,7 +2531,7 @@ def expire_cache_file(
     if species is not None:
         if not species or any(not isinstance(name, str) or not name.strip() for name in species):
             raise ValueError("expire species must be non-empty names")
-        names = tuple(dict.fromkeys(_canonical_cache_species(name) for name in species))
+        names = tuple(dict.fromkeys(_casefolded_species_name(name) for name in species))
     path = Path(path).expanduser()
     connection, has_cold = _maintenance_connection(path)
     try:
