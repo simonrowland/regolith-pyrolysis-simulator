@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+import traceback
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -510,6 +511,7 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     resolution_states = []
     pin_match_states = []
     curve_call_simulators = []
+    curve_call_stacks = []
     simulator_type = validation_map.PyrolysisSimulator
     original_establish = (
         simulator_type._establish_melt_redox_gate_authority_for_current_hour
@@ -567,6 +569,12 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
             )
         curve_calls += 1
         curve_call_simulators.append(id(self))
+        curve_call_stacks.append(
+            tuple(
+                (Path(frame.filename).name, frame.name, frame.lineno)
+                for frame in traceback.extract_stack(limit=12)
+            )
+        )
         if curve_calls == 1:
             raise ProviderUnavailableError('validation row pin failure')
         curve = add_current_domain_diagnostic({
@@ -714,7 +722,8 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
         f'curve_calls={curve_calls}; establishment_states='
         f'{establishment_states!r}; resolution_states={resolution_states!r}; '
         f'pin_match_states={pin_match_states!r}; '
-        f'curve_call_simulators={curve_call_simulators!r}'
+        f'curve_call_simulators={curve_call_simulators!r}; '
+        f'curve_call_stacks={curve_call_stacks!r}'
     )
     assert len(established) == 1
     assert resolved
