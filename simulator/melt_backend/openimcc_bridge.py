@@ -72,7 +72,7 @@ OPENIMCC_INSTALL_HINT = (
 )
 OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
-    "@bae51f7301155798b62e2bf41307bccfbbe7fad8"
+    "@045e025fd5158001908572fe2b8a841b2f95efbf"
 )
 DEFAULT_GAS_PACK_SELECTION = "default"
 

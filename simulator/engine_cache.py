@@ -369,7 +369,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v2: 2026-11-11 MAGEMin binary pin unchanged, b257r landing 982a8d9fa - d-367 mode-vector closure before liquid-fraction and composition extraction (cd48a78fe)
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
-# openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
+# openimcc v1: 2026-11-08 initial cache version at OpenIMCC 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84. Species-local pin moves stay on v1; the live commit is ENGINE_CHEMISTRY_VERSION_IDENTITY_AT["openimcc"], not this line.
 # magemin v3: 2026-11-17 MAGEMin build and patch changes altered native activities (7e55ce7f24, c204deaf36)
 # alphamelts v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
@@ -591,7 +591,7 @@ def _engine_cache_input_identity_digest(engine_id: str) -> bytes:
 
 ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     "openimcc": {
-        "identity": "commit:bae51f7301155798b62e2bf41307bccfbbe7fad8",
+        "identity": "commit:045e025fd5158001908572fe2b8a841b2f95efbf",
         "date": "2026-11-22",
     },
     "internal-analytical": {

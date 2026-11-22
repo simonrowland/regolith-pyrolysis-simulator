@@ -1757,6 +1757,8 @@ def test_openimcc_canonical_predictions_match_chemistry_version_pin(
     # OpenIMCC's 9c327c2..979adb2 bisect found zero numeric changes across
     # four text/identity commits, including c75456f's default redox-pack reissue.
     assert digest == engine_cache.OPENIMCC_CANONICAL_OUTPUT_SHA256, (
-        "OpenIMCC predictions changed: bump ENGINE_CHEMISTRY_VERSION[openimcc] "
-        "and re-pin"
+        "OpenIMCC predictions changed. Update the digest. "
+        "A species-local change expires the superseded species "
+        "(engine_cache_sync.py expire --species). "
+        "Bump ENGINE_CHEMISTRY_VERSION only for an engine-wide change."
     )

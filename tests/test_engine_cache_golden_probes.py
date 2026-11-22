@@ -223,8 +223,10 @@ def _assert_probe_matches_golden(engine: str, version: int, actual: str) -> None
         f"to {version}; review the numeric probe and update its pinned pair"
     )
     assert actual == expected_digest, (
-        f"{engine}: live numeric probe changed without its pinned version/digest "
-        f"pair; bump ENGINE_CHEMISTRY_VERSION after confirming the numeric change. "
+        f"{engine}: live numeric probe changed. Update the pinned digest pair. "
+        f"A species-local change expires the superseded species "
+        f"(engine_cache_sync.py expire --species). "
+        f"Bump ENGINE_CHEMISTRY_VERSION only for an engine-wide change. "
         f"Expected {expected_digest}, got {actual}"
     )
 
@@ -580,7 +582,7 @@ def test_numeric_probe_change_without_version_bump_fails_guard() -> None:
     version, digest = ENGINE_GOLDEN_PROBES["internal-analytical"]
     changed = "0" * len(digest)
     assert changed != digest
-    with pytest.raises(AssertionError, match="bump ENGINE_CHEMISTRY_VERSION"):
+    with pytest.raises(AssertionError, match="expire --species"):
         _assert_probe_matches_golden("internal-analytical", version, changed)
 
 
@@ -589,7 +591,7 @@ def test_real_cold_field_mutation_without_version_bump_fails_guard(
 ) -> None:
     result = _run_probe("thermoengine", request, tmp_path, mutate_cold=True)
     assert result["mutations"], "cold-field mutation did not reach the real result"
-    with pytest.raises(AssertionError, match="bump ENGINE_CHEMISTRY_VERSION"):
+    with pytest.raises(AssertionError, match="expire --species"):
         _assert_probe_matches_golden(
             "thermoengine", result["version"], result["digest"]
         )
