@@ -212,6 +212,18 @@ def _time_min(step_index: int, dt_s: float) -> float:
     return float(step_index) * float(dt_s) / (float(PROCESS_HOUR_S) / 60.0)
 
 
+def _reproduction_step_budget(spec: PresetRunSpec) -> int:
+    """Executor step count for one preset.
+
+    ``PresetRunSpec.hours`` is already that count: ``duration_step_count``
+    when the timestep is shorter than one hour, and ``int(duration_h)`` on
+    the one-hour path. Multiplying by ``PROCESS_HOUR_S / process_dt_s``
+    again asks for an hour of steps per process step.
+    """
+
+    return int(spec.hours)
+
+
 def _run_case(
     *,
     spec: PresetRunSpec,
@@ -265,9 +277,7 @@ def _run_case(
             f"unsupported pressure driver for reproduction: {pressure_driver!r}"
         )
 
-    duration_steps = int(
-        round(float(spec.hours) * float(PROCESS_HOUR_S) / float(spec.process_dt_s))
-    )
+    duration_steps = _reproduction_step_budget(spec)
     steps = duration_steps if max_steps is None else int(max_steps)
     if steps < 0 or steps > duration_steps:
         raise RobinotReproductionError(

@@ -22,6 +22,16 @@ RECORD_FIELDS = {
 }
 
 
+def test_robinot_step_budget_is_one_hour_of_process_steps() -> None:
+    spec = reproduction._preset_spec()
+
+    assert spec.process_dt_s == 60
+    assert spec.provenance["duration_h"] == 1.0
+    assert spec.step_count == 60
+    assert spec.hours == 60
+    assert reproduction._reproduction_step_budget(spec) == spec.hours
+
+
 def test_robinot_pyrometer_observation_uses_selected_preset_point() -> None:
     observation, reason = reproduction._reported_pyrometer_observation(
         reproduction._preset_spec()
