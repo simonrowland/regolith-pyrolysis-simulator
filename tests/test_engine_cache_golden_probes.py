@@ -20,6 +20,8 @@ import pytest
 
 from simulator import engine_cache
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 # The controller's full-suite loadgroup run exited a worker with this module
 # grouped, and completed without the group. Each probe is already isolated in

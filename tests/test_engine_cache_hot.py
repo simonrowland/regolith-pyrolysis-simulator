@@ -3,9 +3,13 @@
 import sqlite3
 import zlib
 
+import pytest
+
 from simulator import engine_cache
 from simulator.engine_cache import unpack
 from simulator.melt_backend.base import EquilibriumResult
+
+pytestmark = pytest.mark.engine_cache_off
 
 
 def test_equilibrium_hot_round_trip_is_exact_and_cold_is_numeric(tmp_path, monkeypatch):

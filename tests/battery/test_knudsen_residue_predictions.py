@@ -398,7 +398,24 @@ def _read_markova_residue_cache_in_fresh_process(
     temperature_K: float,
     inventory: dict[str, float],
 ) -> None:
+    # This child reads the cache file the parent stored. Same request, same
+    # answer. Put the previous value back so the assignment does not leak.
+    previous = os.environ.get("REGOLITH_ENGINE_CACHE")
     os.environ["REGOLITH_ENGINE_CACHE"] = cache_path
+    try:
+        _read_markova_residue_cache(result_path, temperature_K, inventory)
+    finally:
+        if previous is None:
+            os.environ.pop("REGOLITH_ENGINE_CACHE", None)
+        else:
+            os.environ["REGOLITH_ENGINE_CACHE"] = previous
+
+
+def _read_markova_residue_cache(
+    result_path: str,
+    temperature_K: float,
+    inventory: dict[str, float],
+) -> None:
     from simulator import engine_cache
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -602,6 +619,7 @@ def test_real_markova_first_interval_zeroes_omitted_al_and_keeps_exponent_refusa
     (1748.15, {"SiO2": 44.02, "Al2O3": 4.56, "FeO": 8.04, "MgO": 36.44, "CaO": 6.95}),
     (1749.15, {"SiO2": 52.32, "Al2O3": 19.13, "FeO": 9.37, "MgO": 6.25, "CaO": 12.93}),
 ))
+@pytest.mark.engine_cache_off
 def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     temperature_K,
     wt,
@@ -619,6 +637,7 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
         internal_analytical_residue_vapor_pressure,
     )
 
+    # First call is the live solve. The file below is this test's own cache.
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
     inventory, _channels, pressure = _real_analytical_cmas_pressure(temperature_K, inventory)

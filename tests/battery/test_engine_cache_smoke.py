@@ -11,8 +11,12 @@ import time
 import warnings
 import zlib
 
+import pytest
+
 from scripts import cache_smoke
 from simulator import engine_cache
+
+pytestmark = pytest.mark.engine_cache_off
 
 
 def test_every_engine_smoke_rows_are_identical(tmp_path: Path, monkeypatch) -> None:

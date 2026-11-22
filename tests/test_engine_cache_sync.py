@@ -14,6 +14,8 @@ import pytest
 from simulator import engine_cache as cache
 from simulator.engine_cache import EngineCacheValue, Provenance, pack, unpack
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 @pytest.fixture(autouse=True)
 def isolated_cache(monkeypatch):

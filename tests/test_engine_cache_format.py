@@ -7,6 +7,8 @@ import pytest
 
 from simulator import engine_cache
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 def test_binary_scalar_wire_pin_before_leaf_consolidation() -> None:
     from simulator.engine_cache import pack, unpack

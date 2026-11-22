@@ -26,6 +26,8 @@ from simulator.melt_backend.base import (
 )
 from simulator.engine_pool import EngineWorkerPool, WarmEngineWorker
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 def _cached_engine_call():
     call = getattr(engine_cache, "cached_engine_call", None)

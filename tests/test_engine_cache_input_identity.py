@@ -15,6 +15,8 @@ import pytest
 from simulator import engine_cache
 from simulator.engine_cache import EngineCacheValue
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 _EXPECTED_SOURCE_PATHS = {
     "pyproject.toml",

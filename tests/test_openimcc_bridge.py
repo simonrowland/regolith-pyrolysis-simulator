@@ -1498,6 +1498,7 @@ def test_candidate_redox_pack_keeps_the_raw_valence_amounts(
     ]
 
 
+@pytest.mark.engine_cache_off
 def test_openimcc_canonical_predictions_match_chemistry_version_pin(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1511,6 +1512,7 @@ def test_openimcc_canonical_predictions_match_chemistry_version_pin(
         evaluate_redox,
     )
 
+    # Live chemistry pin. A cached row could hide an unbumped chemistry change.
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     melt = bridge_evaluate(
         composition_mol={"SiO2": 0.7, "FeO": 0.2, "Na2O": 0.1},

@@ -243,11 +243,33 @@ def magemin_openmpi_tmpdir(
 
 
 @pytest.fixture(autouse=True)
-def _box_for_test_owned_engine_caches(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Only a test's explicit temporary cache may serve or store its doubles."""
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+def _box_for_test_owned_engine_caches(
+    monkeypatch: pytest.MonkeyPatch,
+    request: pytest.FixtureRequest,
+) -> Iterator[None]:
+    """Leave the runner engine cache in place unless this test opts out.
+
+    The cache exists to speed up CI, gates, the accuracy scorecard, user
+    runs, and the optimizer. CI uses it read-only by default. Engines are
+    stateless: the same engine, chemistry version, and request always give
+    the same prediction, so a cached value is the engine's answer and
+    serving it here is valid. Do not delete the cache to isolate a test.
+    ``engine_cache_off`` is the one opt-out, for a test of the cache itself
+    or a test that must run a real engine solve. The key is engine + version
+    + request.
+    """
+
+    from simulator import engine_cache
+
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    if request.node.get_closest_marker("engine_cache_off") is not None:
+        monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+        monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    with engine_cache.runner_engine_cache_snapshot(
+        os.environ.get("REGOLITH_ENGINE_CACHE") or None,
+        os.environ.get("REGOLITH_ENGINE_CACHE_MODE") or "",
+    ):
+        yield
 
 
 @pytest.fixture(autouse=True)

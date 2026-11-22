@@ -9,6 +9,8 @@ import pytest
 from simulator import engine_cache
 from simulator.diagnostic_helpers import binary_pot_battery as battery
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 @pytest.mark.parametrize("engine", tuple(engine_cache.ENGINE_CHEMISTRY_VERSION))
 def test_every_normalized_prediction_setting_changes_the_key(engine):
