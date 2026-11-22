@@ -56,7 +56,10 @@ def main(argv: list[str] | None = None) -> int:
     stats.add_argument("file", type=Path)
     expire = commands.add_parser(
         "expire",
-        help="delete one engine's rows whose recorded inputs include a named species",
+        help=(
+            "delete one engine's rows whose recorded inputs include a named "
+            "species, and that engine's species-unknown digest rows"
+        ),
     )
     expire.add_argument("file", type=Path)
     expire.add_argument("--engine", required=True)
@@ -80,6 +83,11 @@ def main(argv: list[str] | None = None) -> int:
         help="convert a schema-3 HOT/COLD pair in place without deleting values",
     )
     migrate.add_argument("file", type=Path)
+    migrate.add_argument(
+        "--no-vacuum",
+        action="store_true",
+        help="keep the freed pages. The default reclaims them",
+    )
     args = parser.parse_args(argv)
     try:
         if args.command in {"snapshot", "seed"}:
@@ -102,15 +110,46 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "prune":
             result = cache.prune_cache_file(args.file, apply=_apply(parser, args))
         elif args.command == "migrate":
-            result = cache.migrate_cache_file(args.file)
+            result = cache.migrate_cache_file(args.file, vacuum=not args.no_vacuum)
         else:
             result = cache.engine_cache_stats(args.file.expanduser())
     except (OSError, sqlite3.Error, ValueError, cache.EngineCacheSchemaMismatch) as exc:
         print(f"{type(exc).__name__}: {exc}", file=sys.stderr)
         return 1
-    unknown = result.get("species_unknown_rows") if isinstance(result, dict) else None
-    if args.command == "expire" and unknown is not None:
-        print(f"species-unknown rows: {unknown}", file=sys.stderr)
+    if isinstance(result, dict) and args.command == "expire":
+        unknown = result.get("species_unknown_rows")
+        if unknown is not None:
+            # First line, before the JSON, so the cost is not buried in it.
+            print(f"species-unknown rows: {unknown}", file=sys.stderr)
+            print(
+                "any expire --species on this engine will delete these rows",
+                file=sys.stderr,
+            )
+    if isinstance(result, dict) and args.command == "migrate" and result.get("migrated"):
+        unknown_by_engine = result.get("species_unknown_by_engine") or {}
+        listed = (
+            ", ".join(
+                f"{engine} {count}" for engine, count in sorted(unknown_by_engine.items())
+            )
+            or "0"
+        )
+        print(
+            f"species-unknown rows: {listed} per engine; "
+            "any expire --species on that engine will delete them; "
+            "prefer re-warming over migrating",
+            file=sys.stderr,
+        )
+        before = result.get("before") or {}
+        after = result.get("after") or {}
+        hot_before = (before.get("hot") or {}).get("database_bytes")
+        hot_after = (after.get("hot") or {}).get("database_bytes")
+        cold_before = (before.get("cold") or {}).get("database_bytes")
+        cold_after = (after.get("cold") or {}).get("database_bytes")
+        print(
+            f"migrate bytes: hot {hot_before} -> {hot_after}; "
+            f"cold {cold_before} -> {cold_after}",
+            file=sys.stderr,
+        )
     print(json.dumps(result, sort_keys=True))
     return 2 if args.command == "merge" and args.strict and result["conflicts"] else 0
 

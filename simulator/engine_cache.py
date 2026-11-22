@@ -513,10 +513,32 @@ class EngineCacheSpeciesError(ValueError):
         super().__init__(f"engine cache species field {field!r}: {reason}")
 
 
+def _canonical_cache_species(name: str) -> str:
+    """Identity used in the side table and in expire --species.
+
+    ``canonical_melt_oxide_activity_name`` is the existing MELTS alias
+    map. It is case-insensitive, and it maps ``FeO_total`` to ``FeO``.
+    A name that map does not know is casefolded so the stored form and
+    the query still meet. This does not change ``engine_cache_key``.
+    The adapter keeps its own copy of the alias map so the provider can
+    import without that module; this call does not add a third copy.
+    """
+
+    from engines.alphamelts.domain import canonical_melt_oxide_activity_name
+
+    canonical = canonical_melt_oxide_activity_name(name)
+    if canonical is not None:
+        return canonical
+    folded = name.strip().casefold()
+    if not folded:
+        raise EngineCacheSpeciesError("species", "names must be non-empty strings")
+    return folded
+
+
 def _species_name(field: str, name: object) -> str:
-    if not isinstance(name, str) or not name:
+    if not isinstance(name, str) or not name.strip():
         raise EngineCacheSpeciesError(field, "names must be non-empty strings")
-    return name
+    return _canonical_cache_species(name)
 
 
 def _collect_species_fields(payload: Mapping[str, Any], found: set[str]) -> None:
@@ -1390,27 +1412,29 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
             path, timeout=_TIMEOUT_MS / 1000, check_same_thread=False
         )
         connection.execute(f"PRAGMA busy_timeout={_TIMEOUT_MS}")
-        deadline = time.monotonic() + _TIMEOUT_MS / 1000
-        while True:
-            try:
-                mode = connection.execute("PRAGMA journal_mode").fetchone()[0]
-                if str(mode).lower() != "wal":
-                    connection.execute("PRAGMA journal_mode=WAL")
-                break
-            except sqlite3.OperationalError as exc:
-                if "locked" not in str(exc).lower() and "busy" not in str(exc).lower():
-                    connection.close()
-                    raise
-                if time.monotonic() >= deadline:
-                    connection.close()
-                    raise
-                time.sleep(0.01)
     try:
         incomplete = _check_cache_schema(connection, allow_empty=True)
         if incomplete and readonly:
             connection.close()
             return None
         if not readonly:
+            # journal_mode persists in the file. The schema check above
+            # raises before this, so a refused schema-3 open stays as it was.
+            deadline = time.monotonic() + _TIMEOUT_MS / 1000
+            while True:
+                try:
+                    mode = connection.execute("PRAGMA journal_mode").fetchone()[0]
+                    if str(mode).lower() != "wal":
+                        connection.execute("PRAGMA journal_mode=WAL")
+                    break
+                except sqlite3.OperationalError as exc:
+                    if "locked" not in str(exc).lower() and "busy" not in str(exc).lower():
+                        connection.close()
+                        raise
+                    if time.monotonic() >= deadline:
+                        connection.close()
+                        raise
+                    time.sleep(0.01)
             _initialize_cache(connection)
     except Exception:
         connection.close()
@@ -2309,12 +2333,18 @@ def _payload_bytes(path: Path) -> dict[str, int]:
         return report
 
 
-def migrate_cache_file(path: str | Path) -> dict[str, Any]:
+def migrate_cache_file(path: str | Path, *, vacuum: bool = True) -> dict[str, Any]:
     """Convert a schema-3 HOT/COLD pair in place. HOT key and value bytes stay.
 
     Old fingerprints are dropped. engine_build_id is the explicit
     ``unknown-pre-migration`` row: a schema-3 file did not record the open
-    identity per row. Natural keys gain species rows; blake2b keys do not.
+    identity per row. Natural keys gain species rows. A blake2b key does
+    not: its request cannot be recovered, so it is species-unknown and
+    ``expire --species`` on that engine deletes it.
+
+    Live warm files are re-warmed with this code instead of migrated, so
+    those rows record the species the request named. Vacuum reclaims the
+    freed key and fingerprint pages. ``vacuum=False`` skips that.
     """
 
     path = Path(path).expanduser()
@@ -2333,12 +2363,14 @@ def migrate_cache_file(path: str | Path) -> dict[str, Any]:
                 _check_cold_schema(connection)
             connection.close()
             connection = None
+            if vacuum:
+                _vacuum_cache_files(path)
             stats = engine_cache_stats(path)
             return {
                 "migrated": False,
                 "already_current": True,
                 "schema_version": _CACHE_SCHEMA_VERSION,
-                "vacuumed": False,
+                "vacuumed": bool(vacuum),
                 **stats,
             }
         if version != 3:
@@ -2395,12 +2427,25 @@ def migrate_cache_file(path: str | Path) -> dict[str, Any]:
         _create_species_table(connection)
         natural_keys = 0
         digest_keys = 0
-        for source_box, row_seq, key in connection.execute(
-            "SELECT source_box, row_seq, key FROM engine_outputs"
+        skipped_unreadable_keys = 0
+        species_unknown_by_engine: dict[str, int] = {}
+        for source_box, row_seq, key, engine in connection.execute(
+            "SELECT source_box, row_seq, key, engine FROM engine_outputs"
         ):
-            species = species_from_natural_key(bytes(key))
+            try:
+                species = species_from_natural_key(bytes(key))
+            except EngineCacheSpeciesError:
+                # A flag other than 0x00 or 0xff is not a request we can
+                # read. Skip the row and keep the migration. Expire does
+                # not treat it as a digest key.
+                skipped_unreadable_keys += 1
+                continue
             if species is None:
                 digest_keys += 1
+                engine_name = str(engine)
+                species_unknown_by_engine[engine_name] = (
+                    species_unknown_by_engine.get(engine_name, 0) + 1
+                )
                 continue
             natural_keys += 1
             _write_output_species(connection, str(source_box), int(row_seq), species)
@@ -2411,7 +2456,9 @@ def migrate_cache_file(path: str | Path) -> dict[str, Any]:
         ]
         if after_hot_keys != before_hot_keys:
             raise EngineCacheSchemaMismatch(
-                "engine_outputs", ("key", "value"), ("changed during migrate",)
+                "engine_outputs",
+                ("key", "value"),
+                ("changed during migrate; rerun with no writer",),
             )
         connection.execute(f"PRAGMA user_version={_CACHE_SCHEMA_VERSION}")
         connection.commit()
@@ -2424,18 +2471,41 @@ def migrate_cache_file(path: str | Path) -> dict[str, Any]:
             connection.close()
         raise
     connection.close()
+    connection = None
+    if vacuum:
+        _vacuum_cache_files(path)
     return {
         "migrated": True,
         "already_current": False,
         "schema_version": _CACHE_SCHEMA_VERSION,
         "natural_keys": natural_keys,
         "digest_keys": digest_keys,
+        "species_unknown_by_engine": species_unknown_by_engine,
+        "skipped_unreadable_keys": skipped_unreadable_keys,
         "unlinked_cold": unlinked,
         "before": before,
         "after": engine_cache_stats(path),
         "after_payload": _payload_bytes(path),
-        "vacuumed": False,
+        "vacuumed": bool(vacuum),
     }
+
+
+def _vacuum_cache_files(path: Path) -> None:
+    """Reclaim free pages in the HOT file and, when present, the COLD file."""
+
+    connection = sqlite3.connect(str(path), timeout=_TIMEOUT_MS / 1000)
+    try:
+        connection.execute("VACUUM")
+    finally:
+        connection.close()
+    cold = _cache_pair(path)[1]
+    if not cold.exists():
+        return
+    connection = sqlite3.connect(str(cold), timeout=_TIMEOUT_MS / 1000)
+    try:
+        connection.execute("VACUUM")
+    finally:
+        connection.close()
 
 
 def expire_cache_file(
@@ -2463,7 +2533,7 @@ def expire_cache_file(
     if species is not None:
         if not species or any(not isinstance(name, str) or not name.strip() for name in species):
             raise ValueError("expire species must be non-empty names")
-        names = tuple(dict.fromkeys(name.strip() for name in species))
+        names = tuple(dict.fromkeys(_canonical_cache_species(name) for name in species))
     path = Path(path).expanduser()
     connection, has_cold = _maintenance_connection(path)
     try:
@@ -2609,6 +2679,22 @@ def prune_cache_file(path: str | Path, *, apply: bool = False) -> dict[str, Any]
         connection.close()
 
 
+def _drop_attached_cold(
+    connection: sqlite3.Connection, pairs: list[tuple[str, int]]
+) -> None:
+    """Delete COLD values inside the caller's open transaction.
+
+    ``drop_chemistry_version`` stages the HOT and species deletes first.
+    A failure here rolls all three back. A second connection used to
+    commit the COLD delete later, so a crash between them left orphans.
+    """
+
+    connection.executemany(
+        "DELETE FROM cold.engine_values WHERE row_seq=?",
+        [(row_seq,) for _source_box, row_seq in pairs],
+    )
+
+
 def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
     path_value = _configured_engine_cache_path()
     if not path_value:
@@ -2625,22 +2711,30 @@ def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
     ]
     if not pairs:
         return 0
-    connection.executemany(
-        f"DELETE FROM {_SPECIES_TABLE} WHERE source_box=? AND row_seq=?",
-        pairs,
-    )
-    cursor = connection.execute(
-        f"DELETE FROM {_TABLE} WHERE engine=? AND chem_version=?",
-        (engine_id, str(chem_version)),
-    )
-    connection.commit()
     cold_path = _cache_pair(path)[1]
-    if cold_path.exists():
-        with closing(sqlite3.connect(cold_path, timeout=_TIMEOUT_MS / 1000)) as cold:
-            cold.executemany(
-                "DELETE FROM engine_values WHERE row_seq=?",
-                [(row_seq,) for _source_box, row_seq in pairs],
-            )
-            cold.commit()
+    has_cold = cold_path.exists()
+    if connection.in_transaction:
+        connection.commit()
+    if has_cold and not any(
+        row[1] == "cold" for row in connection.execute("PRAGMA database_list")
+    ):
+        connection.execute("ATTACH DATABASE ? AS cold", (str(cold_path.resolve()),))
+        _check_cold_schema(connection)
+    connection.execute("BEGIN IMMEDIATE")
+    try:
+        connection.executemany(
+            f"DELETE FROM {_SPECIES_TABLE} WHERE source_box=? AND row_seq=?",
+            pairs,
+        )
+        cursor = connection.execute(
+            f"DELETE FROM {_TABLE} WHERE engine=? AND chem_version=?",
+            (engine_id, str(chem_version)),
+        )
+        if has_cold:
+            _drop_attached_cold(connection, pairs)
+        connection.commit()
+    except BaseException:
+        connection.rollback()
+        raise
     _forget_process_cache(path)
     return cursor.rowcount

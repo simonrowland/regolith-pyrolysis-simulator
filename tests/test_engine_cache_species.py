@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import json
 import math
 import sqlite3
 import zlib
@@ -173,7 +174,7 @@ def test_expire_deletes_only_rows_that_name_the_species(tmp_path, monkeypatch) -
     assert len(_output_rows(path)) == before
 
     folded = engine_cache.expire_cache_file(path, engine="openimcc", species=("sio2",))
-    assert folded["matched_by_engine"]["openimcc"] == 0
+    assert folded["matched_by_engine"]["openimcc"] == len(_SPECIES_FIELDS) + 2
 
     applied = engine_cache.expire_cache_file(
         path, engine="openimcc", species=("SiO2",), apply=True
@@ -392,7 +393,12 @@ def test_migrate_keeps_every_hot_and_cold_value(tmp_path) -> None:
 
     assert report["migrated"] is True
     assert report["already_current"] is False
-    assert report["vacuumed"] is False
+    assert report["vacuumed"] is True
+    assert report["species_unknown_by_engine"] == {"magemin": 1}
+    assert report["skipped_unreadable_keys"] == 0
+    assert isinstance(report["before"]["hot"]["database_bytes"], int)
+    assert isinstance(report["after"]["hot"]["database_bytes"], int)
+    assert isinstance(report["after"]["cold"]["database_bytes"], int)
     assert report["natural_keys"] == 1
     assert report["digest_keys"] == 1
     assert report["unlinked_cold"] == 1
@@ -509,7 +515,7 @@ def test_expire_species_drops_migrated_digest_keys(tmp_path) -> None:
     stdout, stderr = io.StringIO(), io.StringIO()
     with redirect_stdout(stdout), redirect_stderr(stderr):
         assert main(["expire", str(path), "--engine", "openimcc", "--species", "SiO2"]) == 0
-    assert stderr.getvalue() == "species-unknown rows: 1\n"
+    assert stderr.getvalue().splitlines()[0] == "species-unknown rows: 1"
     assert len(_output_rows(path)) == 4
 
     applied = engine_cache.expire_cache_file(
@@ -519,6 +525,164 @@ def test_expire_species_drops_migrated_digest_keys(tmp_path) -> None:
     assert applied["species_unknown_rows"] == 1
     left = {bytes(key) for _engine, _seq, key in _output_rows(path)}
     assert left == {natural_key, empty_key, other_key}
+
+
+def test_expire_matches_iron_total_and_case(tmp_path, monkeypatch) -> None:
+    path = tmp_path / "names.sqlite"
+    _store(
+        monkeypatch,
+        path,
+        "openimcc",
+        {"composition_wt_pct": {"FeO_total": 10.0}, "marker": 1},
+    )
+    _store(
+        monkeypatch,
+        path,
+        "openimcc",
+        {"composition_wt_pct": {"sio2": 20.0}, "marker": 2},
+    )
+    _store(
+        monkeypatch,
+        path,
+        "openimcc",
+        {"composition_wt_pct": {"Fe2O3": 3.0}, "marker": 3},
+    )
+    recorded = set().union(*_species_by_row(path).values())
+    assert recorded == {"FeO", "SiO2", "Fe2O3"}
+
+    iron = engine_cache.expire_cache_file(path, engine="openimcc", species=("FeO",))
+    assert iron["matched_by_engine"]["openimcc"] == 1
+    spelled = engine_cache.expire_cache_file(
+        path, engine="openimcc", species=("feo_total",)
+    )
+    assert spelled["matched_by_engine"]["openimcc"] == 1
+    silica = engine_cache.expire_cache_file(path, engine="openimcc", species=("SIO2",))
+    assert silica["matched_by_engine"]["openimcc"] == 1
+
+    engine_cache.expire_cache_file(path, engine="openimcc", species=("FeO",), apply=True)
+    left = set().union(*_species_by_row(path).values())
+    assert left == {"SiO2", "Fe2O3"}
+
+
+def test_migrate_skips_an_unreadable_key_and_warns(tmp_path) -> None:
+    path = tmp_path / "flag.sqlite"
+    natural = engine_cache.engine_cache_key(
+        "openimcc", 1, {"composition_wt_pct": {"MgO": 1.0}}
+    )
+    first = engine_cache.ENGINE_CACHE_BOX_RANGES["laptop"][0]
+    with _schema_v3(path) as connection:
+        connection.execute(
+            "INSERT INTO engine_outputs VALUES (?,?,?,?,?,?,?)",
+            (natural, pack({"answer": 1}), "openimcc", "1", "laptop", first, 0),
+        )
+        connection.execute(
+            "INSERT INTO engine_outputs VALUES (?,?,?,?,?,?,?)",
+            (b"race-key", pack({"answer": 2}), "openimcc", "1", "laptop", first + 1, 0),
+        )
+        connection.execute("INSERT INTO box_sequences VALUES (?,?)", ("laptop", first + 2))
+
+    from scripts.engine_cache_sync import main
+
+    stdout, stderr = io.StringIO(), io.StringIO()
+    with redirect_stdout(stdout), redirect_stderr(stderr):
+        assert main(["migrate", str(path), "--no-vacuum"]) == 0
+    report = json.loads(stdout.getvalue())
+    assert report["skipped_unreadable_keys"] == 1
+    assert report["natural_keys"] == 1
+    assert report["vacuumed"] is False
+    assert report["species_unknown_by_engine"] == {}
+    assert "prefer re-warming over migrating" in stderr.getvalue()
+    assert "migrate bytes:" in stderr.getvalue()
+    assert "species-unknown rows: 0 per engine" in stderr.getvalue()
+    with sqlite3.connect(path) as connection:
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
+        assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 2
+        names = {
+            name
+            for (name,) in connection.execute("SELECT species FROM engine_output_species")
+        }
+    assert names == {"MgO"}
+
+
+def test_migrate_aborts_when_a_row_changes_and_says_rerun(tmp_path, monkeypatch) -> None:
+    path = tmp_path / "writer.sqlite"
+    key = engine_cache.engine_cache_key("openimcc", 1, {"temperature_K": 1700.0})
+    original = pack({"answer": 1})
+    first = engine_cache.ENGINE_CACHE_BOX_RANGES["laptop"][0]
+    with _schema_v3(path) as connection:
+        connection.execute(
+            "INSERT INTO engine_outputs VALUES (?,?,?,?,?,?,?)",
+            (key, original, "openimcc", "1", "laptop", first, 0),
+        )
+        connection.execute("INSERT INTO box_sequences VALUES (?,?)", ("laptop", first + 1))
+    real = engine_cache._create_species_table
+
+    def mutate(connection: sqlite3.Connection) -> None:
+        real(connection)
+        connection.execute("UPDATE engine_outputs SET value=?", (b"changed",))
+
+    monkeypatch.setattr(engine_cache, "_create_species_table", mutate)
+    with pytest.raises(engine_cache.EngineCacheSchemaMismatch, match="rerun with no writer"):
+        engine_cache.migrate_cache_file(path)
+    with sqlite3.connect(path) as connection:
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
+        assert connection.execute("SELECT value FROM engine_outputs").fetchone()[0] == original
+
+
+def test_refused_open_keeps_the_journal_mode(tmp_path) -> None:
+    path = tmp_path / "v3.sqlite"
+    with _schema_v3(path) as connection:
+        connection.execute("PRAGMA journal_mode=DELETE")
+        connection.execute(
+            "INSERT INTO engine_outputs VALUES (?,?,?,?,?,?,?)",
+            (b"01234567", pack({"answer": 1}), "openimcc", "1", "laptop", 1, 0),
+        )
+    try:
+        with pytest.raises(engine_cache.EngineCacheSchemaMismatch):
+            engine_cache._connect(path, readonly=False)
+    finally:
+        engine_cache._close_connections()
+    with sqlite3.connect(path) as connection:
+        mode = connection.execute("PRAGMA journal_mode").fetchone()[0]
+    assert str(mode).lower() == "delete"
+    assert not path.with_name(path.name + "-wal").exists()
+
+
+def test_drop_chemistry_version_rolls_back_hot_and_cold_together(
+    tmp_path, monkeypatch
+) -> None:
+    path = tmp_path / "drop.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache.cached_engine_call(
+        "openimcc",
+        {"composition_wt_pct": {"MgO": 1.0}},
+        lambda: engine_cache.EngineCacheValue(hot={"answer": 1}, cold={"enthalpy": 2.0}),
+    )
+    cold_path = path.with_name(path.name + ".cold")
+    assert cold_path.is_file()
+
+    def boom(_connection, _pairs) -> None:
+        raise sqlite3.OperationalError("injected between hot and cold")
+
+    original = engine_cache._drop_attached_cold
+    monkeypatch.setattr(engine_cache, "_drop_attached_cold", boom)
+    with pytest.raises(sqlite3.OperationalError, match="injected between hot and cold"):
+        engine_cache.drop_chemistry_version("openimcc", 1)
+    with sqlite3.connect(path) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 1
+        assert connection.execute("SELECT COUNT(*) FROM engine_output_species").fetchone()[0] == 1
+    with sqlite3.connect(cold_path) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM engine_values").fetchone()[0] == 1
+
+    monkeypatch.setattr(engine_cache, "_drop_attached_cold", original)
+    assert engine_cache.drop_chemistry_version("openimcc", 1) == 1
+    with sqlite3.connect(path) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 0
+        assert connection.execute("SELECT COUNT(*) FROM engine_output_species").fetchone()[0] == 0
+    with sqlite3.connect(cold_path) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM engine_values").fetchone()[0] == 0
 
 
 def test_migrate_refuses_user_version_2(tmp_path) -> None:
