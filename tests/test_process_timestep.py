@@ -6,13 +6,20 @@ same flux times dt. These tests do not regenerate a runner golden.
 
 from __future__ import annotations
 
+import copy
 import math
 import textwrap
 from pathlib import Path
 
 import pytest
 
+from simulator.accounting.formulas import resolve_species_formula
+from simulator.condensation import CondensationModel
 from simulator.energy import EnergyTracker
+from simulator.evaporation import (
+    _rescale_stage3_reactive_alkali,
+    _rescale_wall_reaction_booking,
+)
 from simulator.lab_schedule import (
     LabScheduleValidationError,
     interpolate_schedule_points,
@@ -1373,3 +1380,212 @@ def test_subhour_thermal_train_refuses_snapshot_hours():
     assert report["snapshot_count"] == 1
     assert report["run_hours"] == 1
     assert report["run_hours_basis"] == "one_hour_per_snapshot"
+
+
+# SiO oxidative design table: 1/2 mol O2 per mol vapour (section 3.4).
+_SIO_O2_PER_VAPOUR = 0.5
+_SIO_VAPOUR_MOL_PER_H = 60.0
+_OXYGEN_INVENTORY_MOL = 1.0
+_SHORT_DT_H = 1.0 / 60.0
+# Admitted Stage-3 parcel in test_stage3_na_gate_matches_liquid_activity_reference.
+# That Na/SiO mass ratio is favoured at 1e-8 bar. K is omitted so the
+# oxygen demand is the Na rate alone.
+_ADMITTED_NA_PER_SIO_KG = 0.0007
+
+
+def _kg_per_h(model: CondensationModel, species: str, mol_per_h: float) -> float:
+    molar_mass = resolve_species_formula(
+        species, model.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+    return mol_per_h * molar_mass
+
+
+def _oxidative_step_mol(route, dt_h: float, surface: str) -> tuple[float, float]:
+    """Step moles of the named surface's oxidative leg.
+
+    The hour path reads the route booking. A shorter step uses the
+    production rescaler, which is the one multiply by dt_h.
+    """
+
+    booking = copy.deepcopy(route.wall_reaction_booking_by_species["SiO"])
+    if dt_h != 1.0:
+        _rescale_wall_reaction_booking(booking, dt_h)
+    legs = [
+        leg for leg in booking["reaction_legs"]
+        if leg["reaction_id"] == "oxidative" and leg["surface"] == surface
+    ]
+    vapour = sum(float(leg["vapour_mol"]) for leg in legs)
+    oxygen = sum(float(leg["oxygen_debit_mol"]) for leg in legs)
+    return vapour, oxygen
+
+
+def _sio_oxygen_model(oxygen_mol: float) -> CondensationModel:
+    model = CondensationModel(CondensationTrain.create_default())
+    model.train.collection_route["stage3_route"] = "divert"
+    model.retained_vapor_mol["O2"] = oxygen_mol
+    return model
+
+
+def _isolate_capture_surface(monkeypatch, model: CondensationModel, surface: str) -> None:
+    """Force the named surface to see the whole supply.
+
+    The other surface contributes no deposit. This is transport
+    control: the production oxygen clip still assigns the capture.
+    """
+
+    if surface == "wall":
+        def candidates(**kwargs):
+            return {
+                str(name): float(kg)
+                for name, kg in kwargs["supply_by_segment_kg"].items()
+            }
+
+        def efficiency(**kwargs):
+            return 0.0
+    elif surface == "baffle":
+        def candidates(**kwargs):
+            return {}
+
+        def efficiency(**kwargs):
+            return 1.0
+    else:
+        raise AssertionError(surface)
+    monkeypatch.setattr(model, "_wall_deposit_candidates_by_segment_kg", candidates)
+    monkeypatch.setattr(model, "_condensation_efficiency", efficiency)
+
+
+class TestShortStepOxygenClip:
+    """Inventory mol and the mol/h vapour extent meet in one unit.
+
+    Review extents (ror-dtr2x1121), with the SiO design-table ratio
+    a = 1/2. 60 mol/h and 1 mol O2 at dt_h = 1/60 commits 1 mol of
+    vapour: min(60 * 1/60, 1 / (1/2)) = 1, and that vapour takes
+    0.5 mol O2. The same rates at dt_h = 1 commit the unscaled clip
+    min(60, 1 / (1/2)) = 2 mol vapour and 1 mol O2. Unbound oxygen
+    commits 60 mol/h * dt_h. Stage-3 Na at 240 mol/h commits 4 mol of
+    metal and 1 mol of O2 on the short step and on the hour.
+
+    Mutation: leave the clip comparing inventory mol with mol/h, then
+    multiply by dt. The short SiO case books 1/30 mol of vapour, not
+    1 mol. The short alkali case books 1/60 mol of O2, not 1 mol.
+    """
+
+    @pytest.mark.usefixtures("production_configured_condensation_route")
+    @pytest.mark.parametrize("surface", ["wall", "baffle"])
+    def test_short_step_limited_capture_commits_one_mol(self, monkeypatch, surface):
+        model = _sio_oxygen_model(_OXYGEN_INVENTORY_MOL)
+        _isolate_capture_surface(monkeypatch, model, surface)
+        route = model.route(
+            EvaporationFlux(species_kg_hr={
+                "SiO": _kg_per_h(model, "SiO", _SIO_VAPOUR_MOL_PER_H),
+            }),
+            MeltState(temperature_C=1600.0),
+            dt_h=_SHORT_DT_H,
+        )
+        vapour, oxygen = _oxidative_step_mol(route, _SHORT_DT_H, surface)
+        assert vapour == pytest.approx(1.0)
+        assert oxygen == pytest.approx(_SIO_O2_PER_VAPOUR)
+
+    @pytest.mark.usefixtures("production_configured_condensation_route")
+    @pytest.mark.parametrize("surface", ["wall", "baffle"])
+    def test_unbound_oxygen_commits_the_hourly_extent_times_dt(
+        self, monkeypatch, surface,
+    ):
+        model = _sio_oxygen_model(1000.0)
+        _isolate_capture_surface(monkeypatch, model, surface)
+        route = model.route(
+            EvaporationFlux(species_kg_hr={
+                "SiO": _kg_per_h(model, "SiO", _SIO_VAPOUR_MOL_PER_H),
+            }),
+            MeltState(temperature_C=1600.0),
+            dt_h=_SHORT_DT_H,
+        )
+        vapour, oxygen = _oxidative_step_mol(route, _SHORT_DT_H, surface)
+        assert vapour == pytest.approx(_SIO_VAPOUR_MOL_PER_H * _SHORT_DT_H)
+        assert oxygen == pytest.approx(vapour * _SIO_O2_PER_VAPOUR)
+
+    @pytest.mark.usefixtures("production_configured_condensation_route")
+    @pytest.mark.parametrize("surface", ["wall", "baffle"])
+    def test_hour_commits_the_unscaled_clip(self, monkeypatch, surface):
+        model = _sio_oxygen_model(_OXYGEN_INVENTORY_MOL)
+        _isolate_capture_surface(monkeypatch, model, surface)
+        route = model.route(
+            EvaporationFlux(species_kg_hr={
+                "SiO": _kg_per_h(model, "SiO", _SIO_VAPOUR_MOL_PER_H),
+            }),
+            MeltState(temperature_C=1600.0),
+            dt_h=1.0,
+        )
+        vapour, oxygen = _oxidative_step_mol(route, 1.0, surface)
+        assert vapour == pytest.approx(2.0)
+        assert oxygen == pytest.approx(1.0)
+
+    def test_short_step_alkali_commits_four_mol_metal_and_one_mol_oxygen(
+        self, monkeypatch,
+    ):
+        uptake, oxygen = _alkali_step(monkeypatch, dt_h=_SHORT_DT_H)
+        assert uptake == pytest.approx(4.0)
+        assert oxygen == pytest.approx(1.0)
+
+    def test_hour_alkali_commits_the_unscaled_clip(self, monkeypatch):
+        uptake, oxygen = _alkali_step(monkeypatch, dt_h=1.0)
+        assert uptake == pytest.approx(4.0)
+        assert oxygen == pytest.approx(1.0)
+
+    def test_non_positive_dt_is_refused(self):
+        model = CondensationModel(CondensationTrain.create_default())
+        flux = EvaporationFlux()
+        melt = MeltState()
+        for refused in (True, False, 0, 0.0, -1.0, float("nan"), float("inf"), "1"):
+            with pytest.raises(ValueError, match="dt_h"):
+                model.route(flux, melt, dt_h=refused)
+
+
+def _alkali_step(monkeypatch, *, dt_h: float) -> tuple[float, float]:
+    """Production Stage-3 Na uptake after one rescale by dt_h.
+
+    Partials are the favoured 1e-8 bar stream. The Na/SiO mass ratio
+    matches that admitted parcel, so the activity sign stays favoured.
+    Walls do not spend the oxygen inventory.
+    """
+
+    model = CondensationModel(CondensationTrain.create_default())
+    model.hard_stage3_gate = False
+    model.train.collection_route["stage3_route"] = "through"
+    model.pipe_segments = []
+    model.retained_vapor_mol = {"O2": _OXYGEN_INVENTORY_MOL}
+    po2_mbar = 1.0e-5
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={
+            "Na": 0.3,
+            "O2": po2_mbar,
+            "SiO": 0.7 - po2_mbar,
+        },
+        stage_area_m2_by_stage={str(index): 1.0 for index in range(8)},
+    )
+    na_kg_hr = _kg_per_h(model, "Na", 240.0)
+    sio_kg_hr = na_kg_hr / _ADMITTED_NA_PER_SIO_KG
+
+    def efficiency(**kwargs):
+        stage = kwargs["stage"]
+        species = kwargs["species"]
+        if int(stage.stage_number) == 3 and species in {"Na", "SiO"}:
+            return 1.0
+        return 0.0
+
+    monkeypatch.setattr(model, "_condensation_efficiency", efficiency)
+    monkeypatch.setattr(
+        "simulator.condensation._species_declares_wall_reactions",
+        lambda *args, **kwargs: False,
+    )
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": sio_kg_hr, "Na": na_kg_hr}),
+        MeltState(temperature_C=1650.0),
+        dt_h=dt_h,
+    )
+    reaction = dict(route.stage3_reactive_alkali_by_species["Na"])
+    if dt_h != 1.0:
+        _rescale_stage3_reactive_alkali(reaction, dt_h)
+    assert reaction["available_oxygen_mol"] == pytest.approx(_OXYGEN_INVENTORY_MOL)
+    return float(reaction["uptake_mol"]), float(reaction["oxygen_debit_mol"])

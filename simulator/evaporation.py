@@ -5733,7 +5733,8 @@ class EvaporationMixin:
                 campaign_hour=float(getattr(self.melt, 'campaign_hour', 0.0) or 0.0),
             )
         route_result = self.condensation_model.route(
-            evap_flux, self.melt)
+            evap_flux, self.melt, dt_h=self.process_dt_hr(),
+        )
 
         antoine_extrapolations = dict(
             getattr(route_result, 'antoine_extrapolations', {}) or {}
@@ -6047,16 +6048,23 @@ class EvaporationMixin:
             rate_kg_hr = (
                 native_fe_vapor_mol * fe_molar_mass / self.process_dt_hr()
             )
+            route_dt_h = self.process_dt_hr()
         else:
             # The metal-phase tap credits these step moles. The debit below
-            # is that step mass, not an hourly rate times dt.
+            # is that step mass, not an hourly rate times dt. The flux is
+            # step kilograms labeled kg/h, so the oxygen clip stays at one
+            # hour. A real dt would over-allow the clip, and this debit
+            # would then under-book.
             rate_kg_hr = native_fe_vapor_mol * fe_molar_mass
+            route_dt_h = 1.0
         evap_flux = EvaporationFlux(species_kg_hr={'Fe': rate_kg_hr})
         evap_flux.update_totals()
         self._configure_condensation_operating_conditions(evap_flux)
         if sample_time_h is not None:
             self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
-        route_result = self.condensation_model.route(evap_flux, self.melt)
+        route_result = self.condensation_model.route(
+            evap_flux, self.melt, dt_h=route_dt_h,
+        )
         if source_account == 'process.metal_phase':
             remaining_kg = float(
                 route_result.remaining_by_species.get('Fe', 0.0) or 0.0
