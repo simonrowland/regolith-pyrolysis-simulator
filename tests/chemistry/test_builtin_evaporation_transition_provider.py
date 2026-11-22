@@ -727,7 +727,7 @@ def test_provider_matches_legacy_credit_evaporation_transition_pattern(
         for lot in trans.debits:
             is_oxide_vapor_o2_reactant = (
                 trans.name in {"evaporate_CrO2", "evaporate_CrO3"}
-                and lot.account == "process.overhead_gas"
+                and lot.account == "reservoir.fo2_buffer"
                 and set(lot.species_kg) == {"O2"}
             )
             assert (

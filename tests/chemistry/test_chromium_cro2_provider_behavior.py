@@ -91,7 +91,8 @@ def test_evaporation_transition_debits_o2_reactant_for_cro2():
     transition = result.transition
     assert transition is not None
     assert transition.debits["process.cleaned_melt"]["Cr2O3"] == pytest.approx(0.5)
-    assert transition.debits["process.overhead_gas"]["O2"] == pytest.approx(0.25)
+    assert transition.debits["reservoir.fo2_buffer"]["O2"] == pytest.approx(0.25)
+    assert "O2" not in transition.debits.get("process.overhead_gas", {})
     assert transition.credits["process.overhead_gas"]["CrO2"] == pytest.approx(1.0)
 
 

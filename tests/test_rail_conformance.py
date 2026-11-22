@@ -2222,8 +2222,8 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
     assert set(releasing_debited_rates) == set(releasing_rates)
     sim._update_melt_composition(smoothed_releasing)
 
-    # AlO2 consumes O2, so evaluate it after the co-carriers have populated
-    # the physical overhead O2 reservoir rather than inventing external oxygen.
+    # AlO2 consumes O2 from the fO2 buffer. The elemental co-carriers
+    # credit that buffer; the clip does not read the overhead.
     smoothed_oxidizing = sim._apply_analytic_evaporation_depletion(
         _flux({"AlO2": requested_rates["AlO2"]})
     )

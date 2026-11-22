@@ -11447,7 +11447,7 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert evidence["metal_product_path"]["product_ledger_Fe_kg"] > 0.0
     fallback = evidence["prototype_alpha_fallback_provenance"]
     # CrO2 is predicted using the Cr proxy, but 0.5 Cr2O3 + 0.25 O2 -> CrO2
-    # consumes overhead O2. With no O2 inventory, depletion commits no CrO2;
+    # consumes buffer O2. With no O2 inventory, depletion commits no CrO2;
     # provider fallback warnings and committed-run authority have distinct scopes.
     assert "CrO2" not in execution.simulator._alpha_authority_status_by_species_engaged
     assert not any(

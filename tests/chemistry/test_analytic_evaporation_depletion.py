@@ -344,7 +344,7 @@ def test_depletion_output_ignores_tier_one_phase_context_fields(
     assert actual.total_kg_hr == expected.total_kg_hr
 
 
-def test_o2_consuming_vapors_share_overhead_o2_reactant(
+def test_o2_consuming_vapors_share_buffer_o2_reactant(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     sim = _build_sim(
@@ -355,7 +355,7 @@ def test_o2_consuming_vapors_share_overhead_o2_reactant(
     )
     available_o2_kg = 0.001
     sim.atom_ledger.load_external(
-        "process.overhead_gas", {"O2": available_o2_kg},
+        "reservoir.fo2_buffer", {"O2": available_o2_kg},
         source="test O2 reactant",
         material_origin="feedstock",
     )

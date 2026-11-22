@@ -718,6 +718,8 @@ from simulator.evaporation import (
     EvaporationMixin,
     _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
     _buffer_destined_stoich_o2_mol,
+    _buffer_oxidative_stoich_o2_mol,
+    _oxidative_vapour_o2_available_kg,
     attach_evaluated_transport_pO2,
     attach_pre_evaporation_melt_oxide_kg,
     attach_wall_supply_interval_physical_zero,
@@ -3291,17 +3293,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             account='process.overhead_gas',
             species=OXYGEN_SPECIES,
         )
-        net_overhead_o2_mol = overhead_o2_credit_mol - overhead_o2_debit_mol
-        # Actual ledger destination outranks carrier class. Premise: when a
-        # channel credits/debits O2 in process.overhead_gas, that physical O2
-        # transfer is the redox source even if the vapor itself is elemental
-        # (Ti is explicitly co-routed with TiO/TiO2). Algebra uses
-        # source=-net_overhead_O2 so release is reducing (negative) and uptake
-        # is oxidising (positive). Units remain mol O2 equivalent. Sanity:
-        # legacy Na/K buffer-routed channels have net=0 and retain the metal-loss
-        # branch; TiO2(g) has net=0 and no spurious source.
-        if abs(net_overhead_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL:
-            return {'redox_source:evaporative_oxygen_loss': -net_overhead_o2_mol}
+        buffer_o2_debit_mol = self._transition_species_mol(
+            transition,
+            side='debits',
+            account=FO2_BUFFER_ACCOUNT,
+            species=OXYGEN_SPECIES,
+        )
+        # Actual ledger destination outranks carrier class. A coproduct
+        # released to overhead is reducing. An oxidative debit is the
+        # fO2 buffer's, and that uptake is oxidising. This reader sums
+        # the oxygen the transition posted. It does not choose the account.
+        # Algebra: source = overhead_debit + buffer_debit - overhead_credit.
+        # Unit: mol O2. Limit: a posting inside the noop is not a source.
+        # Sanity: Na/K credit the buffer and keep the metal-loss branch.
+        # TiO2(g) posts no O2 and has no source. A buffer credit is not
+        # this debit.
+        net_posted_o2_mol = (
+            overhead_o2_credit_mol
+            - overhead_o2_debit_mol
+            - buffer_o2_debit_mol
+        )
+        if abs(net_posted_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL:
+            return {
+                'redox_source:evaporative_oxygen_loss': -net_posted_o2_mol,
+            }
         if vapor_oxygen_atoms > 0.0:
             return {}
 
@@ -8252,10 +8267,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else 1.0
         )
         frozen_melt_kg = self.atom_ledger.kg_by_account('process.cleaned_melt')
-        frozen_overhead_o2_kg = float(
-            self.atom_ledger.kg_by_account('process.overhead_gas').get(
-                OXYGEN_SPECIES, 0.0
-            )
+        # Hour-open buffer O2. The clip does not re-read a stock the
+        # solve is drawing down, and it does not read the overhead.
+        frozen_oxidant_o2_kg = _oxidative_vapour_o2_available_kg(
+            self.atom_ledger
         )
         frozen_pressures = dict(batch_pressures or {})
         owns_oxygen_drive = False
@@ -8270,6 +8285,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'owned': set(),
             'gross': {},
             'credit_mol': {},
+            'debit_mol': {},
             'excess_mol': {},
             # None until one route at the reference pressure
             # publishes a remainder. The bracket scales that
@@ -8352,7 +8368,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 dt_hr=1.0,
                 phase_scalar=1.0,
                 cleaned_melt_kg=frozen_melt_kg,
-                available_o2_kg=frozen_overhead_o2_kg,
+                available_o2_kg=frozen_oxidant_o2_kg,
                 supply_out=supply,
             )
             carried = {
@@ -8366,14 +8382,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         def _buffer_credit_mol(gross):
             # The buffer credit is the positive stoichiometric O2 the
-            # ledger posts to the fO2 buffer. A vapour coproduct is
-            # overhead gas at once and stays in q. Subtracting the
-            # projector's net O2 is not that split: an oxygen-consuming
-            # vapour drives the net through zero, and max(0, net) then
-            # leaves the coproduct in this credit as well as in q.
+            # ledger posts to the fO2 buffer. A vapour coproduct stays
+            # in q. An oxidative debit is not this credit: the
+            # transition posts it to the buffer, and the clip bounds
+            # that debit by the hour-open buffer stock.
             # Unit check: (kg/h) / (kg/mol) = mol/h, and the hour is
             # 1 h so the figure is mol this hour.
             return _buffer_destined_stoich_o2_mol(
+                gross,
+                stoich,
+                OXYGEN_MOLAR_MASS_KG_PER_MOL,
+                self.species_formula_registry,
+            )
+
+        def _buffer_debit_mol(gross):
+            # The oxidative debit is the buffer's other posting. The
+            # excess subtracts it. q does not carry it, and this
+            # credit function does not either.
+            # Unit check: (kg/h) / (kg/mol) = mol/h. The hour is 1 h.
+            return _buffer_oxidative_stoich_o2_mol(
                 gross,
                 stoich,
                 OXYGEN_MOLAR_MASS_KG_PER_MOL,
@@ -8571,19 +8598,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 projector_gross,
                 stoich,
             )
-            # Signed. A positive coproduct, the oxidative debit, and
-            # the condensation return are one net. Dropping a
-            # non-positive net leaves q without the vapour oxygen
-            # the ledger still posts.
-            # Algebra: n = n_projector + n_returned, kg/h = n * M.
+            # Overhead oxygen is the coproduct the projector still
+            # carries, plus the condensation return. The oxidative
+            # debit is the fO2 buffer's and is not in this sum.
+            # Algebra: n = max(0, n_projector + n_returned),
+            # kg/h = n * M.
             # Unit check: mol/h * kg/mol = kg/h.
-            # Limit: a zero net publishes no oxygen rate.
+            # Limit: no coproduct and no return publishes a zero rate.
+            # The overhead has no vapour sink.
             o2_mol_hr = (
                 float(overhead.get(OXYGEN_SPECIES, 0.0) or 0.0)
                 + returned_o2_mol_hr
             )
             source[OXYGEN_SPECIES] = (
-                o2_mol_hr * OXYGEN_MOLAR_MASS_KG_PER_MOL
+                max(0.0, o2_mol_hr) * OXYGEN_MOLAR_MASS_KG_PER_MOL
             )
             return source
 
@@ -8667,6 +8695,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 state['owned'] = owned
             state['gross'][key] = dict(gross)
             state['credit_mol'][key] = _buffer_credit_mol(gross)
+            state['debit_mol'][key] = _buffer_debit_mol(gross)
             return _headspace_source(gross, state['owned'])
 
         # Fe2O3 -> 2 FeO + 1/2 O2. The opening gross says whether
@@ -8684,11 +8713,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         def redox_at_partials(partials_Pa):
             # S is the hour's excess mol / 3600 s, plus the reducing
-            # overhead credit. The substep length is not in this rate.
-            # Credit at or below the noop does not saturate, and the
-            # buffer is not read into S then.
+            # overhead credit. The excess is the hour-open buffer,
+            # plus the buffer credit, minus the oxidative debit and
+            # the Fe uptake. The debit stays on the buffer. It is not
+            # a headspace source, and the settle posts this same
+            # excess. The substep length is not in this rate. Credit
+            # at or below the noop does not saturate, and the buffer
+            # is not read into S then.
             key = _partial_key(partials_Pa)
             credit_mol = float(state['credit_mol'].get(key, 0.0) or 0.0)
+            debit_mol = float(state['debit_mol'].get(key, 0.0) or 0.0)
             if not self._evaporative_redox_is_saturated(
                 internal_o2_capacity_mol=credit_mol,
             ):
@@ -8704,7 +8738,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 0.0,
                 float((diagnostic or {}).get('o2_debit_mol', 0.0) or 0.0),
             )
-            excess_mol = pre_buffer_mol + credit_mol - uptake_mol
+            excess_mol = (
+                pre_buffer_mol + credit_mol - debit_mol - uptake_mol
+            )
             if excess_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
                 state['excess_mol'][key] = 0.0
                 return {OXYGEN_SPECIES: reducing_rate}
@@ -9471,10 +9507,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         frozen_cleaned_melt_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt'
         )
-        frozen_overhead_o2_kg = float(
-            self.atom_ledger.kg_by_account('process.overhead_gas').get(
-                OXYGEN_SPECIES, 0.0
-            )
+        frozen_oxidant_o2_kg = _oxidative_vapour_o2_available_kg(
+            self.atom_ledger
         )
 
         rates_cache = {}
@@ -9554,7 +9588,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 dt_hr=1.0,
                 phase_scalar=1.0,
                 cleaned_melt_kg=frozen_cleaned_melt_kg,
-                available_o2_kg=frozen_overhead_o2_kg,
+                available_o2_kg=frozen_oxidant_o2_kg,
             )
             rates_cache[cache_key] = dict(rates)
             return rates

@@ -274,17 +274,16 @@ def _stoich_o2_is_overhead(
 ) -> bool:
     """Whether this stoichiometric O2 belongs to overhead gas.
 
-    The evaporation transition posts a positive coproduct to the fO2
-    buffer only for an explicit buffer destination, or for an elemental
-    vapour with no destination. Every other positive coproduct is
-    overhead gas at once. A negative stoich O2 is an overhead debit
-    on every destination. The buffer credit, the overhead projector,
+    A positive coproduct is overhead unless the destination is the
+    fO2 buffer, or the vapour is elemental and has no destination.
+    A negative stoich O2 is the oxidant the buffer supplied. It is
+    not an overhead debit. The buffer credit, the overhead projector,
     and the transition all use this split. Changing one without the
-    other counts the coproduct twice.
+    others counts the oxygen twice.
     """
 
     if o2_kg_hr < 0.0:
-        return True
+        return False
     if oxygen_destination == 'reservoir.fo2_buffer':
         return False
     return (
@@ -300,8 +299,9 @@ def _stoich_o2_debit_account(
 ) -> str:
     """Account debited for a negative stoichiometric O2.
 
-    Empty when the leg is not a debit. The transition posts this
-    account. It does not choose one beside ``_stoich_o2_is_overhead``.
+    Empty when the leg is not a debit. The oxidant is the fO2 buffer.
+    Overhead gas is not a vapour sink. The transition posts this
+    account and does not choose one beside ``_stoich_o2_is_overhead``.
     """
 
     if float(o2_kg_hr) >= 0.0:
@@ -315,6 +315,24 @@ def _stoich_o2_debit_account(
     return 'reservoir.fo2_buffer'
 
 
+def _oxidative_vapour_o2_available_kg(ledger) -> float:
+    """O2 kilograms an oxidative vapour may draw this tick.
+
+    The depletion clip is the supply bound. Its available stock is
+    this figure: the O2 held by the account a negative stoich debits.
+    Overhead gas is not that stock. A caller freezes the return at
+    the hour open when the solve must not see a moving inventory.
+    """
+
+    account = _stoich_o2_debit_account(-1.0, '', 1.0)
+    if not account:
+        return 0.0
+    held = ledger.kg_by_account(account)
+    if not isinstance(held, Mapping):
+        return 0.0
+    return float(held.get('O2', 0.0) or 0.0)
+
+
 def _buffer_destined_stoich_o2_mol(
     rates_kg_hr: Mapping[str, float],
     stoich_by_species: Mapping[str, Mapping[str, Any]],
@@ -324,10 +342,9 @@ def _buffer_destined_stoich_o2_mol(
     """Positive stoichiometric O2 the ledger posts to the fO2 buffer.
 
     Sorted names, then one fsum. A vapour coproduct is overhead gas
-    and is not this sum. The projector's net O2 is not the split: an
-    oxygen-consuming vapour drives that net through zero, and
-    subtracting max(0, net) leaves the coproduct in the buffer credit
-    while q still carries it.
+    and is not this sum. An oxidative debit is not this sum either:
+    the transition posts it to the buffer, and the projector does
+    not carry it.
     Algebra: n = fsum(rate * O2_per / M_O2) over buffer-destined
     species. Unit check: (kg/h) / (kg/mol) = mol/h.
     Limit: a non-positive rate or a non-positive coproduct adds nothing.
@@ -351,6 +368,48 @@ def _buffer_destined_stoich_o2_mol(
         ):
             continue
         terms.append(o2_kg_hr / o2_molar_mass_kg_per_mol)
+    return math.fsum(terms) if terms else 0.0
+
+
+def _buffer_oxidative_stoich_o2_mol(
+    rates_kg_hr: Mapping[str, float],
+    stoich_by_species: Mapping[str, Mapping[str, Any]],
+    o2_molar_mass_kg_per_mol: float,
+    registry: Mapping[str, Any],
+) -> float:
+    """Positive O2 moles an oxidative vapour takes from the fO2 buffer.
+
+    The credit sum is the other posting and stays positive. This sum
+    is the debit. The headspace excess subtracts it, so the exchange
+    is the buffer that remains. The oxygen is not a headspace source.
+    Algebra: n = fsum(-rate * O2_per / M_O2) over species whose debit
+    account is the buffer. Unit check: (kg/h) / (kg/mol) = mol/h.
+    Limit: a non-negative coproduct adds nothing. No buffer account
+    returns 0.
+    """
+
+    buffer_account = _stoich_o2_debit_account(-1.0, '', 1.0)
+    if not buffer_account:
+        return 0.0
+    terms: list[float] = []
+    for species in sorted(rates_kg_hr, key=str):
+        rate_kg_hr = max(0.0, float(rates_kg_hr[species]))
+        if rate_kg_hr <= 0.0:
+            continue
+        stoich = dict(stoich_by_species.get(species) or {})
+        o2_per = float(stoich.get('O2_per_product_kg') or 0.0)
+        if o2_per >= 0.0:
+            continue
+        o2_kg_hr = rate_kg_hr * o2_per
+        formula = resolve_species_formula(str(species), registry)
+        account = _stoich_o2_debit_account(
+            o2_kg_hr,
+            str(stoich.get('oxygen_destination') or ''),
+            float(formula.elements.get('O', 0.0) or 0.0),
+        )
+        if account != buffer_account:
+            continue
+        terms.append((-o2_kg_hr) / o2_molar_mass_kg_per_mol)
     return math.fsum(terms) if terms else 0.0
 
 
@@ -5691,10 +5750,8 @@ class EvaporationMixin:
             cleaned_melt_kg=self.atom_ledger.kg_by_account(
                 'process.cleaned_melt'
             ),
-            available_o2_kg=float(
-                self.atom_ledger.kg_by_account('process.overhead_gas').get(
-                    'O2', 0.0
-                )
+            available_o2_kg=_oxidative_vapour_o2_available_kg(
+                self.atom_ledger
             ),
             supply_out=supply_out,
         )

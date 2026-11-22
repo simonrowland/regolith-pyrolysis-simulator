@@ -1116,15 +1116,11 @@ class _HeadspaceLaw:
             if name not in self.masses or name not in self.redox_mol_s:
                 raise _BalanceRefused(f"missing_molar_mass:{name}")
             number = _as_finite(rate, f"evaporation_flux_not_finite:{name}")
-            # Chunk 4 removes the one-sided clamp. Vapour rates still
-            # publish max(0, rate). Overhead O2 is the signed net the
-            # headspace source already built: coproduct, oxidative
-            # debit, and the condensation return. Clamping that net
-            # drops it from q while the ledger still posts it.
-            if str(name) == OXYGEN_SPECIES:
-                out[str(name)] = number
-            else:
-                out[str(name)] = max(0.0, number)
+            # Chunk 4 removes the one-sided clamp. Until then every
+            # vapour rate, including overhead O2, publishes max(0, rate).
+            # The overhead has no vapour sink: the oxidative debit is
+            # the fO2 buffer's, and it is not in this flux.
+            out[str(name)] = max(0.0, number)
         # The callback just wrote the gross it projected, in kg/h.
         # kg/s = (kg/h) / 3600. 3600 is exact in binary64. A caller
         # with no holder leaves the snapshot empty, and the fast
@@ -1149,7 +1145,6 @@ class _HeadspaceLaw:
     def _source_mol_s(self, partials: Mapping[str, float]) -> dict[str, float]:
         # kg/h / (kg/mol) / (s/h) = mol/s. 3600 is exact in binary64.
         # Limit: a non-positive vapour rate contributes no moles.
-        # Overhead O2 keeps the sign the source published.
         flux = self._flux_kg_hr(partials)
         return {
             species: flux.get(species, 0.0) / self.masses[species] / 3600.0
