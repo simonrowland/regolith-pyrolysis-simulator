@@ -37,6 +37,20 @@ PER_HOUR_KEYS = {
     "condensation_train_kg_cumulative",
     "recycled_to_reagent_kg_cumulative",
     "vapor_species_kg_hr",
+    # Unconditional d-452 fields of build_per_hour_summary. The holdup
+    # notice is emitted only when the flag is true, so it stays in the
+    # diagnostic set.
+    "required_throat_diameter_m",
+    "required_throat_diameter_status",
+    "maximum_throat_diameter_m",
+    "slider_vane_open_fraction",
+    "required_slider_vane_open_fraction",
+    "required_slider_vane_open_fraction_status",
+    "train_mass_flow_kg_hr",
+    "train_peak_mass_flow_kg_hr",
+    "train_time_averaged_mass_flow_kg_hr",
+    "fixed_pressure_holdup_nonphysical",
+    "fixed_pressure_holdup_kg",
     "wall_deposit_delta_kg",
     "wall_deposit_cumulative_kg",
     "Kn",
@@ -78,6 +92,9 @@ PER_HOUR_DIAGNOSTIC_KEYS = {
     # typed refused status instead of letting the debit reader evaporate them
     # silently -- so the key showing up is the fix working, not a leak.
     "condensation_refusals_by_species",
+    "fixed_pressure_holdup_notice",
+    "metal_phase_stratification",
+    "evap_plane_selectivity",
 }
 
 
