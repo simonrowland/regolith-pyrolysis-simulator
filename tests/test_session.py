@@ -878,7 +878,12 @@ def test_c0_gas_bearing_noop_adjustments_keep_the_startup_exit_deadline():
     startup_prediction = deepcopy(sim.campaign_mgr.c0_exit_prediction)
     startup_deadline = startup_prediction["runtime_exit_window_hr"]
     assert startup_prediction["M_C0_gas_kg"] > 0.0
-    assert startup_deadline > 7.0
+    # C0 ramp is 200 C/h over temp_range_C [20, 950], so the temperature
+    # leg is (950-20)/200 = 4.65 h and ceilings to 5 h. The 12 cm throat
+    # made evacuation the longer leg (window > 7 h). The owner 0.5 m
+    # aperture raises Poiseuille capacity by (0.5/0.12)^4, so evacuation
+    # is no longer binding and the window is the ramp ceiling.
+    assert startup_deadline == 5.0
     _target_C, ramp_rate = sim.campaign_mgr._configured_temperature_ramp(
         CampaignPhase.C0
     )
@@ -967,8 +972,12 @@ def test_c0_reforecast_counts_alkali_already_lost_during_this_hold(
     projected_future_loss_kg = total_projected_loss_kg - prior_c0_loss_kg
     assert 0.0 < projected_future_loss_kg < feed_alkali_kg * budget_fraction
 
+    # The 0.5 m throat clears the load gas inside the first hour, so a
+    # start-temperature candidate now has a zero hold and adds no future
+    # alkali. Prior loss has to clear the budget by itself; leaving
+    # headroom of half the future projection lets that candidate pass.
     target_prior_loss_kg = (
-        feed_alkali_kg * budget_fraction - projected_future_loss_kg / 2.0
+        feed_alkali_kg * budget_fraction + projected_future_loss_kg
     )
     additional_prior_loss_kg = target_prior_loss_kg - prior_c0_loss_kg
     assert additional_prior_loss_kg > 0.0
@@ -1122,12 +1131,23 @@ def test_c0_adjustment_with_no_remaining_hold_candidate_exits_nonterminally():
     assert sim.melt.campaign == CampaignPhase.C0
     assert sim.melt.campaign_hour == 1
 
-    session.adjust(
-        "campaign_override",
-        1.5,
-        campaign="C0",
-        field="max_hours",
-    )
+    # The shipped 0.5 m throat clears this feedstock's load gas inside the
+    # first hour, so every temperature at or below the ramp start has a
+    # zero remaining window and fits a 0.5 h hold. Pin the hold-shortfall
+    # branch with a capacity that cannot evacuate, which is the condition
+    # the 12 cm throat used to supply. Capacity 0 makes t_evac infinite
+    # when load gas remains (core.py: gas_mass / capacity).
+    monkeypatch = pytest.MonkeyPatch()
+    monkeypatch.setattr(sim, "_c0_pipe_capacity_kg_hr", lambda _flux: 0.0)
+    try:
+        session.adjust(
+            "campaign_override",
+            1.5,
+            campaign="C0",
+            field="max_hours",
+        )
+    finally:
+        monkeypatch.undo()
     failed_prediction = sim.campaign_mgr.c0_exit_prediction
     assert failed_prediction["prediction_status"] == (
         "no_candidate_fits_remaining_budget"
