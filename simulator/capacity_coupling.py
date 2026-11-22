@@ -93,6 +93,12 @@ class CapacityShadowRefusal:
     reason: str
     iterations: int
     authoritative: bool = False
+    # Set on headspace_balance_work_cap. cap is "flux" or "integrator".
+    # Both counts are the evaluations that crossed the cap. Other
+    # refusals leave them unset.
+    cap: str | None = None
+    flux_evaluations: int | None = None
+    integrator_evaluations: int | None = None
 
 
 class CapacityCouplingRefusalError(RuntimeError):
@@ -861,9 +867,38 @@ _MAX_INTEGRATOR_EVALUATIONS = 100_000
 
 
 class _BalanceRefused(Exception):
-    def __init__(self, reason: str) -> None:
+    def __init__(
+        self,
+        reason: str,
+        *,
+        cap: str | None = None,
+        flux_evaluations: int | None = None,
+        integrator_evaluations: int | None = None,
+    ) -> None:
         self.reason = reason
+        self.cap = cap
+        self.flux_evaluations = flux_evaluations
+        self.integrator_evaluations = integrator_evaluations
         super().__init__(reason)
+
+
+def _shadow_from_balance(
+    refused: _BalanceRefused,
+    iterations: int = 0,
+) -> CapacityShadowRefusal:
+    """Copy a balance refusal onto the shadow payload.
+
+    The work cap names which counter fired and both counts. Other
+    reasons leave those fields unset. The reason string is unchanged.
+    """
+
+    return CapacityShadowRefusal(
+        refused.reason,
+        iterations,
+        cap=refused.cap,
+        flux_evaluations=refused.flux_evaluations,
+        integrator_evaluations=refused.integrator_evaluations,
+    )
 
 
 @dataclass
@@ -1021,7 +1056,12 @@ class _HeadspaceLaw:
 
         self.flux_evaluations += 1
         if self.flux_evaluations > _MAX_FLUX_EVALUATIONS:
-            raise _BalanceRefused("headspace_balance_work_cap")
+            raise _BalanceRefused(
+                "headspace_balance_work_cap",
+                cap="flux",
+                flux_evaluations=self.flux_evaluations,
+                integrator_evaluations=self.integrator_evaluations,
+            )
         try:
             raw = self.flux(partials)
         except EvaporationFluxRefusal:
@@ -1917,7 +1957,12 @@ def _slow_converge(
     def rhs(_time: float, state) -> list[float]:
         law.integrator_evaluations += 1
         if law.integrator_evaluations > _MAX_INTEGRATOR_EVALUATIONS:
-            raise _BalanceRefused("headspace_balance_work_cap")
+            raise _BalanceRefused(
+                "headspace_balance_work_cap",
+                cap="integrator",
+                flux_evaluations=law.flux_evaluations,
+                integrator_evaluations=law.integrator_evaluations,
+            )
         net, added, bled, _piece = rates_of(moles_of(state))
         return net + added + bled
 
@@ -3331,7 +3376,7 @@ def _build_law(
         )
         return law, n0
     except _BalanceRefused as refused:
-        return CapacityShadowRefusal(refused.reason, 0)
+        return _shadow_from_balance(refused)
 
 
 def _commit_headspace_balance(
@@ -3391,7 +3436,7 @@ def _commit_headspace_balance(
     except EvaporationFluxRefusal:
         raise
     except _BalanceRefused as refused:
-        return CapacityShadowRefusal(refused.reason, 0)
+        return _shadow_from_balance(refused)
     return _publish(
         law,
         step,
@@ -3450,5 +3495,5 @@ def diagnostic_backward_euler_headspace_step(
     except EvaporationFluxRefusal:
         raise
     except _BalanceRefused as refused:
-        return CapacityShadowRefusal(refused.reason, 0)
+        return _shadow_from_balance(refused)
     return _publish(law, step, capacity, vessel_rating_Pa)

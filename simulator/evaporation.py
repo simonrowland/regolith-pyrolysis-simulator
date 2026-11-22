@@ -6291,11 +6291,12 @@ class EvaporationMixin:
         available_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt').get(stoich['parent_oxide'], 0.0)
         from engines.builtin.evaporation_transition import (
-            evaporation_parent_is_below_floor,
+            evaporation_parent_debit_is_withheld,
         )
-        if evaporation_parent_is_below_floor(
+        if evaporation_parent_debit_is_withheld(
             rate_kg_hr * stoich['oxide_per_product_kg'],
             available_kg,
+            post_subfloor_coupled_legs=post_subfloor_coupled_legs,
         ):
             return {}
         remaining_kg_hr = route_result.remaining_by_species.get(
@@ -6748,7 +6749,7 @@ class EvaporationMixin:
             return (0.0, None) if return_transition else 0.0
 
         from engines.builtin.evaporation_transition import (
-            evaporation_parent_is_below_floor,
+            evaporation_parent_debit_is_withheld,
         )
 
         parent_oxide = stoich['parent_oxide']
@@ -6758,7 +6759,11 @@ class EvaporationMixin:
 
         available_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt').get(parent_oxide, 0.0)
-        if evaporation_parent_is_below_floor(oxide_removed, available_kg):
+        if evaporation_parent_debit_is_withheld(
+            oxide_removed,
+            available_kg,
+            post_subfloor_coupled_legs=post_subfloor_coupled_legs,
+        ):
             return (0.0, None) if return_transition else 0.0
 
         # Mirror the legacy validation: the AccountingError surface is

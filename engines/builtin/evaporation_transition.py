@@ -38,9 +38,11 @@ a re-derivation of the stoich math (which still routes through
     before dispatch; this only preserves the no-stock short-circuit.
   * ``post_subfloor_coupled_legs`` -- optional bool. Absent or false
     keeps the numerical floor: a coupled leg in ``(0, floor]`` returns
+    no transition, and a parent debit at or below the floor returns
     no transition. True is the headspace hour. That hour posts the
-    vapour and its stoichiometric oxygen even when a leg is below the
-    floor. The parent-stock check is unchanged.
+    vapour and its stoichiometric legs when the melt stock covers
+    the parent debit, even when a leg or the debit itself is below
+    the floor. A debit the melt does not cover still returns nothing.
 
 Returns an :class:`IntentResult` with ``transition`` populated by a
 :class:`LedgerTransitionProposal` (per-species debit/credit pair) and a
@@ -110,6 +112,58 @@ def evaporation_parent_is_below_floor(
     return (
         float(oxide_removed_kg) <= floor_kg
         or float(available_kg) <= floor_kg
+    )
+
+
+def evaporation_stock_covers_parent_debit(
+    oxide_removed_kg: float,
+    available_kg: float,
+) -> bool:
+    """The melt holds this parent debit, numerical floor or not.
+
+    Premise: the debit is ``oxide_removed_kg`` of the parent oxide.
+    Stock covers it when ``available_kg >= oxide_removed_kg > 0``.
+    A non-positive debit is not a parcel. A shortfall is not posted
+    in part: the caller skips the species.
+    Unit check: both arguments are kilograms.
+    Limit: equal stock and debit posts the whole stock. Zero stock
+    posts nothing.
+    """
+
+    removed = float(oxide_removed_kg)
+    available = float(available_kg)
+    return (
+        math.isfinite(removed)
+        and math.isfinite(available)
+        and removed > 0.0
+        and available >= removed
+    )
+
+
+def evaporation_parent_debit_is_withheld(
+    oxide_removed_kg: float,
+    available_kg: float,
+    *,
+    post_subfloor_coupled_legs: bool = False,
+    floor_kg: float = _NUMERICAL_FLOOR_KG,
+) -> bool:
+    """True when this parent debit must not be posted.
+
+    Absent the headspace flag, the kilogram floor withholds the
+    debit. The headspace hour withholds only a debit the melt does
+    not cover. A covered debit below the floor is posted: the floor
+    is not a second gas state.
+    """
+
+    if post_subfloor_coupled_legs:
+        return not evaporation_stock_covers_parent_debit(
+            oxide_removed_kg,
+            available_kg,
+        )
+    return evaporation_parent_is_below_floor(
+        oxide_removed_kg,
+        available_kg,
+        floor_kg,
     )
 
 
@@ -282,7 +336,11 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         product_kg = rate_kg_hr * dt_hr
         O2_kg = rate_kg_hr * dt_hr * O2_per_product_kg
 
-        if evaporation_parent_is_below_floor(oxide_removed, available_kg):
+        if evaporation_parent_debit_is_withheld(
+            oxide_removed,
+            available_kg,
+            post_subfloor_coupled_legs=post_subfloor_coupled_legs,
+        ):
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="ok",
@@ -367,8 +425,9 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         subfloor_legs = subfloor_legs_kg(coupled_leg_kg)
         # Absent or false: a leg in (0, floor] posts nothing, so one
         # side cannot land alone. The headspace hour sets the control
-        # and posts both legs. The parent-stock return above still
-        # applies to that hour.
+        # and posts every positive leg. The stock-cover return above
+        # is what still applies: a debit the melt does not hold is
+        # not posted.
         if subfloor_legs and not post_subfloor_coupled_legs:
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,

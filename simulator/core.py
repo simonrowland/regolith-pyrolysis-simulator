@@ -7947,6 +7947,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from engines.builtin.evaporation_transition import (
             _NUMERICAL_FLOOR_KG,
             evaporation_parent_is_below_floor,
+            evaporation_stock_covers_parent_debit,
         )
         from simulator.accounting.formulas import resolve_species_formula
         from simulator.capacity_coupling import (
@@ -8138,13 +8139,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     max(0.0, float(residual_fe_mol))
                     * molar_masses.get('Fe', 0.0),
                 )
-            return self._analytic_evaporation_depletion_rates(
+            # The debit map drops a product at or below the kilogram
+            # floor. That floor is not the gas. The supply keeps the
+            # computed rate, including a covered debit below the floor.
+            # A rate the debit kept is written back so the two agree.
+            # Unit: kg/h. Limit: a zero supply is not a source.
+            supply: dict[str, float] = {}
+            debit = self._analytic_evaporation_depletion_rates(
                 rates,
                 dt_hr=1.0,
                 phase_scalar=1.0,
                 cleaned_melt_kg=frozen_melt_kg,
                 available_o2_kg=frozen_overhead_o2_kg,
+                supply_out=supply,
             )
+            carried = {
+                str(species): float(rate)
+                for species, rate in supply.items()
+                if float(rate) > 0.0
+            }
+            for species, rate in debit.items():
+                carried[str(species)] = float(rate)
+            return carried
 
         def _buffer_credit_mol(gross):
             # Positive stoichiometric O2 minus the overhead-destined O2
@@ -8244,14 +8260,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         def _headspace_source(gross, names):
             # q_i is the vapor the commit will leave in the headspace.
-            # A gross at or below the rate floor is not posted, so q is 0.
-            # Above that floor, q = gross * (1 - f). A captured parcel
-            # at or below the same floor does not leave the overhead:
-            # the condensation debit does not fire, and q stays the gross.
-            # A parcel the evaporation transition skips (parent at the
-            # floor, or any coupled leg in (0, floor]) is not in q and
-            # is not in the projector. The commit passes remaining = rate,
-            # so those legs are the parent, the full vapor, and |O2|.
+            # A species the ledger cannot hold is not a source: no
+            # parent stoich, or a parent debit the melt does not cover.
+            # The kilogram floor is not that test. A covered debit
+            # below the floor is still the gas, and q is the gross.
+            # Above the floor, q = gross * (1 - f). A captured parcel
+            # at or below the floor does not leave the overhead: the
+            # condensation debit does not fire, and q stays the gross.
             # Overhead O2 is the projector on the parcels that post, plus
             # the O2 the condensation route will credit. A booking
             # replaces the static product map: CrO3's oxygen is that
@@ -8262,13 +8277,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # credits no O2. A wall that does post still returns oxygen.
             # Algebra: q = gross - captured, captured = 0 when
             # gross * f <= floor, else gross * f.
+            # Hold: available_kg >= rate * oxide_per > 0.
             # n_O2 = n_projector(posted) + Σ n_product(credited share).
             # Unit check: kg/h, and mol/h * kg/mol = kg/h.
             # Limit: f = 0 leaves the gross and returns no condensation
             # oxygen. f = 1 with products above the floor leaves no
             # vapor and still returns the product-map oxygen.
-            # The name set is frozen on the opening call. A name
-            # outside that set is not returned.
+            # A rate the melt cannot cover is 0 and is not in the
+            # projector. The name set is frozen on the opening call.
+            # A name outside that set is not returned.
             fractions = state['fractions']
             walls = state.get('wall_fraction') or {}
             bookings = state.get('wall_booking') or {}
@@ -8286,17 +8303,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 rate = max(0.0, float(gross.get(label, 0.0) or 0.0))
                 row = stoich.get(label)
                 parent = ''
+                oxide_per = 0.0
                 if isinstance(row, Mapping):
                     parent = str(row.get('parent_oxide') or '')
-                available_kg = float(frozen_melt_kg.get(parent, 0.0) or 0.0)
-                posts = self._evaporation_transition_posts_parcel(
-                    rate,
-                    row,
-                    available_kg,
+                    oxide_per = float(
+                        row.get('oxide_per_product_kg') or 0.0
+                    )
+                available_kg = (
+                    float(frozen_melt_kg.get(parent, 0.0) or 0.0)
+                    if parent
+                    else 0.0
                 )
-                if rate <= rate_floor_kg_hr or not posts:
+                # Premise: oxide_kg = rate * oxide_per over the 1 h tick.
+                # The melt holds the parcel when available >= oxide_kg > 0.
+                # The floor does not zero q. A species with no parent,
+                # or a debit the stock does not cover, is not carried.
+                oxide_removed = rate * oxide_per
+                holds = (
+                    bool(parent)
+                    and oxide_per > 0.0
+                    and evaporation_stock_covers_parent_debit(
+                        oxide_removed,
+                        available_kg,
+                    )
+                )
+                if rate <= 0.0 or not holds:
                     source[label] = 0.0
-                    if not posts:
+                    if rate > 0.0 and not holds:
                         dropped.add(label)
                     continue
                 if label in fractions:
@@ -8876,21 +8909,51 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # S's booking is the oxygen. The route's own remaining
         # and its own booking are not a second owner. On a shut
         # Radau hour q(end) is not the integral, so the remaining
-        # is n_end's added mass. A species the endpoint gross
-        # dropped is posted when that mass clears the rate floor
-        # and the parent debit clears the stock floor. A coupled
-        # leg below the floor is still posted: this hour's added
-        # mass is the authority, and the published partial is not
-        # reduced. The condenser is configured on this flux, so a
-        # posted species is added first. The subfloor post is only
-        # those integral species: an endpoint rate the solver already
-        # left out of q stays on the ordinary floor.
+        # is n_end's added mass. Every species in that added mass
+        # is posted when the melt covers the parent debit. The
+        # kilogram floor does not drop it. A species the ledger
+        # cannot hold is refused when its partial is above the
+        # pressure gate, not published against an empty account.
+        # A coupled leg below the floor is still posted. The
+        # condenser is configured on this flux, so a posted species
+        # is added first. An above-floor endpoint is replaced only
+        # when the integral exceeds it by more than the floor.
         source_kg = None
         post_subfloor_species: list[str] = []
         if solved is not None:
             from simulator.capacity_coupling import (
                 headspace_integral_added_kg,
             )
+            from simulator.physical_constants import GAS_CONSTANT as R_CODATA
+
+            def _added_pressure_Pa(species: str, kilograms: float) -> float:
+                # Premise: unposted added mass is a partial the ledger
+                # does not hold. P = (kg / M) * R * T / V.
+                # Unit check: (kg / (kg/mol)) * J/(mol·K) * K / m^3 = Pa.
+                # Limit: no mass is 0 Pa. No molar mass is not priced.
+                mass = float(molar_masses.get(str(species), 0.0) or 0.0)
+                if kilograms <= 0.0 or mass <= 0.0:
+                    return 0.0
+                volume_m3 = self._headspace_volume_m3()
+                temperature_K = self._headspace_temperature_K()
+                if volume_m3 <= 0.0 or temperature_K <= 0.0:
+                    return math.inf
+                return (
+                    (kilograms / mass)
+                    * R_CODATA
+                    * temperature_K
+                    / volume_m3
+                )
+
+            def _refuse_unposted(species: str, kilograms: float) -> None:
+                if _added_pressure_Pa(species, kilograms) <= DEFAULT_ABS_TOL_PA:
+                    return
+                raise CapacityCouplingRefusalError(
+                    CapacityShadowRefusal(
+                        f"headspace_species_ledger_cannot_hold:{species}",
+                        0,
+                    )
+                )
 
             source_kg = {
                 str(species): float(rate)
@@ -8911,24 +8974,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 current = float(
                     evap_flux.species_kg_hr.get(species, 0.0) or 0.0
                 )
-                if posted > current + rate_floor_kg_hr:
-                    row = stoich.get(str(species))
-                    parent = ""
-                    oxide_per = 0.0
-                    if isinstance(row, Mapping):
-                        parent = str(row.get("parent_oxide") or "")
-                        oxide_per = float(
-                            row.get("oxide_per_product_kg") or 0.0
-                        )
-                    available_kg = (
-                        float(frozen_melt_kg.get(parent, 0.0) or 0.0)
-                        if parent
-                        else 0.0
+                row = stoich.get(str(species))
+                parent = ""
+                oxide_per = 0.0
+                if isinstance(row, Mapping):
+                    parent = str(row.get("parent_oxide") or "")
+                    oxide_per = float(
+                        row.get("oxide_per_product_kg") or 0.0
                     )
-                    # No parent stock, or a parent leg at the floor:
-                    # there is no debit to post. A coupled leg under
-                    # the floor is still the solve's parcel. The
-                    # partial is not reduced to match a skipped ledger.
+                available_kg = (
+                    float(frozen_melt_kg.get(parent, 0.0) or 0.0)
+                    if parent
+                    else 0.0
+                )
+                # Premise: oxide_kg = posted * oxide_per. The tick is 1 h,
+                # so kilograms of vapour are kilograms of debit times
+                # 1/oxide_per. Stock covers it when available >= oxide_kg > 0.
+                # Unit check: kg * (kg oxide / kg vapour) = kg oxide.
+                # Limit: a zero integral covers nothing and posts nothing.
+                covers = (
+                    bool(parent)
+                    and oxide_per > 0.0
+                    and evaporation_stock_covers_parent_debit(
+                        posted * oxide_per,
+                        available_kg,
+                    )
+                )
+                if posted > current + rate_floor_kg_hr:
                     parent_blocks = (
                         bool(parent)
                         and oxide_per > 0.0
@@ -8937,11 +9009,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                             available_kg,
                         )
                     )
-                    if parent_blocks:
+                    if parent_blocks and not covers:
+                        _refuse_unposted(str(species), posted)
                         continue
                     source_kg[str(species)] = posted
                     evap_flux.species_kg_hr[str(species)] = posted
-                    if not self._evaporation_transition_posts_parcel(
+                    if parent_blocks or not self._evaporation_transition_posts_parcel(
                         posted,
                         row,
                         available_kg,
@@ -8949,6 +9022,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         post_subfloor_species.append(str(species))
                 else:
                     source_kg[str(species)] = posted
+                    # The endpoint filter dropped this rate. The solve
+                    # still added the mass. Post it when the melt covers
+                    # the debit. An endpoint already above the floor is
+                    # left on the comparison above.
+                    if (
+                        posted > 0.0
+                        and current <= rate_floor_kg_hr
+                        and str(species) not in evap_flux.species_kg_hr
+                    ):
+                        if covers:
+                            evap_flux.species_kg_hr[str(species)] = posted
+                            if not self._evaporation_transition_posts_parcel(
+                                posted,
+                                row,
+                                available_kg,
+                            ):
+                                post_subfloor_species.append(str(species))
+                        else:
+                            _refuse_unposted(str(species), posted)
             evap_flux.update_totals()
         self._ledger_committed_evap_flux_this_tick = evap_flux
         overhead_flux = evap_flux
