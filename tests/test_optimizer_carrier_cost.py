@@ -349,12 +349,19 @@ def test_hero_default_n2_carrier_cost_is_priced_and_flagged() -> None:
         cost_parameters=cost_parameters_from_mapping(),
     )
 
-    assert summary["carrier_mass_used_kg"] == pytest.approx(66.0)
-    assert summary["makeup_cost_usd"] == pytest.approx(6600.0)
-    assert summary["carrier_cost_usd"] == pytest.approx(6611.27, abs=0.01)
+    # Owner formula: 44 kg * feed_kg * (hours/150) * (mbar/10). The hero
+    # profile horizon is 360 h (d-452, until_campaign_complete, cycle cap
+    # 300 h), feed is 1 kg and pressure is 10 mbar, so mass is 44*2.4 =
+    # 105.6 kg and total_scale is 2.4. Makeup is the 0.01 loss fraction
+    # at $10,000/kg = 10560. Recycle electricity is the recirculated
+    # 104.544 kg times _carrier_refrigeration_kWh_per_kg("N2") times
+    # $0.15/kWh. Recounted from _carrier_gas_cost_summary.
+    assert summary["carrier_mass_used_kg"] == pytest.approx(105.6)
+    assert summary["makeup_cost_usd"] == pytest.approx(10560.0)
+    assert summary["carrier_cost_usd"] == pytest.approx(10578.0255849086, abs=1e-6)
     assert summary["earth_price_pending"] is True
     assert summary["carrier_mass_basis"] == "scaled_reference_estimate"
-    assert summary["carrier_mass_scale"]["total_scale"] == pytest.approx(1.5)
+    assert summary["carrier_mass_scale"]["total_scale"] == pytest.approx(2.4)
     assert summary["earth_price_source_tag"] == (
         "earth_price_pending_immaterial_vs_delivery"
     )
