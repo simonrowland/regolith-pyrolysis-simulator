@@ -213,6 +213,52 @@ def _assert_campaign_hourly_payload_is_bounded(
         )
 
 
+def _assert_consecutive_growth_is_bounded(
+    event: str,
+    samples: list[tuple[int, int]],
+) -> None:
+    """Flag a payload that grows on every consecutive hour.
+
+    Accumulation is a per-hour history or a diagnostic that lengthens
+    every hour, so each consecutive difference is at least
+    ``SAWTOOTH_SLOPE_BYTES_PER_HOUR``. One onset step followed by a flat
+    hour stays under that minimum and passes.
+
+    Least-squares cannot make this split on the tick steady window.
+    That window is three points. At df8da164a1 the C0 steady ticks are
+    (2, 14586), (3, 15115), (4, 15121): the evaporation block turns on
+    at hour 3 and stays (oxygen-reservoir exchange direction, the
+    evaporative-metal-loss redox term, and the evaporation energy
+    breakdown). The slope of those three points is 267.5 bytes/hour.
+    Green 919a36a964 carries the same block at hour 3 and drops it at
+    hour 4 (14148, 14148, 14598, 14304, 15008), so the sizes alternate.
+    Neither series is a history.
+
+    Blind spot: a rise only on alternate hours (up, hold, up, hold)
+    keeps a zero difference and passes. On a three-point window that
+    shape is the onset-then-flat case this gate must allow, so the
+    hole is not reachable there. On a longer window it would miss a
+    block that grows every other hour. Counting large rises to close
+    it would also reject green's alternation, which turns the same
+    evaporation block on and off. The injected hour-scaled padding is
+    checked directly on the serialized tick and summary, which is the
+    failure the byte gate stands in for.
+    """
+    ordered = sorted(samples)
+    assert len(ordered) >= 3, (event, ordered)
+    steps: list[float] = []
+    for (hour, size), (next_hour, next_size) in zip(ordered, ordered[1:]):
+        assert next_hour > hour, (event, ordered)
+        steps.append((next_size - size) / (next_hour - hour))
+    assert not all(
+        step >= SAWTOOTH_SLOPE_BYTES_PER_HOUR for step in steps
+    ), (
+        f"{event} payload grew every hour by at least "
+        f"{SAWTOOTH_SLOPE_BYTES_PER_HOUR:.0f} bytes "
+        f"(steps={steps}; samples={ordered})"
+    )
+
+
 def test_hourly_payload_gate_rejects_linear_1000_bytes_per_hour() -> None:
     with pytest.raises(AssertionError, match="grew 1000.0 bytes/hour"):
         _assert_hourly_payload_slope_is_bounded(
@@ -545,10 +591,13 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             tick_samples_by_campaign.setdefault(campaign, []).append(
                 (int(tick["hour"]), _nbytes(tick))
             )
-        # A d-252 campaign transition changes per-hour content by design.
-        # Each campaign's first and last ticks carry entry/exit content, so
-        # omit those one-off transition hours and compare steady hours for
-        # accumulation. Campaign labels come from each tick payload.
+        # Drop each campaign's first and last tick. Those hours carry
+        # entry and exit content. The step inside the remaining C0 window
+        # is not that. At df8da164a1 the steady C0 ticks are
+        # (2, 14586), (3, 15115), (4, 15121): evaporation state turns on
+        # at hour 3 and stays. Least-squares calls that 267.5 bytes/hour.
+        # Gate on a rise every consecutive hour instead. See
+        # _assert_consecutive_growth_is_bounded.
         steady_samples_by_campaign = {
             campaign: sorted(samples)[1:-1]
             for campaign, samples in tick_samples_by_campaign.items()
@@ -558,7 +607,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             steady_samples_by_campaign.items(), key=lambda item: len(item[1])
         )
         assert len(stable_campaign_samples) >= 3, tick_samples_by_campaign
-        _assert_hourly_payload_slope_is_bounded(
+        _assert_consecutive_growth_is_bounded(
             f"simulation_tick[{stable_campaign}]",
             stable_campaign_samples[:4],
         )
@@ -571,6 +620,8 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         )
         assert all(
             '"padding"' not in serialized
+            and "x" * 1000 not in serialized
+            and "y" * 1000 not in serialized
             for event, _hour, _size, serialized in wire_samples
             if event in {"simulation_tick", "per_hour_summary"}
         )
@@ -813,6 +864,46 @@ def test_hourly_payload_gate_allows_bounded_campaign_boundary_step() -> None:
             ("C2A_STAGED", 10, 7_198),
             ("C2A_STAGED", 11, 7_193),
             ("C2A_STAGED", 12, 7_200),
+        ],
+    )
+
+
+def test_tick_growth_gate_rejects_noisy_linear_thousand_bytes_per_hour() -> None:
+    """1000 bytes/hour with alternating +/-50 noise still rises every hour."""
+    series = []
+    for hour in range(1, 5):
+        noise = 50 if hour % 2 else -50
+        series.append((hour, 10_000 + 1_000 * hour + noise))
+    with pytest.raises(AssertionError, match="grew every hour"):
+        _assert_consecutive_growth_is_bounded("simulation_tick", series)
+
+
+def test_tick_growth_gate_rejects_rise_of_120_bytes_every_hour() -> None:
+    with pytest.raises(AssertionError, match="grew every hour"):
+        _assert_consecutive_growth_is_bounded(
+            "simulation_tick",
+            [(hour, 10_000 + 120 * hour) for hour in range(1, 5)],
+        )
+
+
+def test_tick_growth_gate_allows_evaporation_onset_then_flat() -> None:
+    """df8da164a1 C0 steady ticks: one onset step, then a flat hour."""
+    _assert_consecutive_growth_is_bounded(
+        "simulation_tick[C0]",
+        [(2, 14_586), (3, 15_115), (4, 15_121)],
+    )
+
+
+def test_tick_growth_gate_allows_alternating_evaporation_block() -> None:
+    """Green C0 ticks: the evaporation block turns on, off, then on."""
+    _assert_consecutive_growth_is_bounded(
+        "simulation_tick[C0]",
+        [
+            (1, 14_148),
+            (2, 14_148),
+            (3, 14_598),
+            (4, 14_304),
+            (5, 15_008),
         ],
     )
 
