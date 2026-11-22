@@ -38,10 +38,11 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
         "61b0c0bb1105c233265d2e0175899f2c28bb0db324798c8e850025c8864acac0"
     ),
     Engine.OPENIMCC: (
-        # Serialized while coefficient_sources[2] was still green's b9c49790....
-        # The 979adb2 full-table token 493c67d5... moves this line. Re-derive
-        # from test_declared_zero_offset_feo_standards_preserve_residual_bytes[openimcc-published-core].
-        "23d00bd8a218fca557c7b060458ceaaef1494017a76ee700dcee7ee9b7d6ea74"
+        # 23d00bd8a218fca557c7b060458ceaaef1494017a76ee700dcee7ee9b7d6ea74
+        # -> 339615442bf590ac233418e761c08ad6540bdacc13452bb9d8d87c471aa92cb6.
+        # The only serialized change is the condensate-table identity
+        # coefficient source (b9c49790... -> 493c67d5...). The value is unchanged.
+        "339615442bf590ac233418e761c08ad6540bdacc13452bb9d8d87c471aa92cb6"
     ),
 }
 # Green's OpenIMCC zero-offset row used default d066-v1 (version 1.0.3-d066-v1,
