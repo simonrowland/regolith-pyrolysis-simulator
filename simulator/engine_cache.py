@@ -307,7 +307,7 @@ def cacheable_refusal(result) -> bool:
     )
 
 ENGINE_CHEMISTRY_VERSION = {
-    "openimcc": 3,
+    "openimcc": 4,
     "internal-analytical": 3,
     "vaporock": 1,
     "magemin": 3,
@@ -334,6 +334,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # openimcc v2: 2026-11-17 OpenIMCC 9c327c2: binary-pot oxygen balance and residue, Knudsen, mass-loss and Hashimoto runtimes consume AlSiO/Si2O2 and use corrected multi-parent oxygen metadata
 # internal-analytical v3: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f); d-207 - phase-basis liquidus authority can lower the adapter vapour switch
 # openimcc v3: 2026-11-19 OpenIMCC 979adb2 re-pin (text/identity only) and species_thermo scoring (d-446)
+# openimcc v4: 2026-11-22 OpenIMCC bae51f7 re-pin: b9ec125 JANAF crystal-species fallback serves (cr) rows that refused at 979adb2; S/Sr metastable caps; R&H As/Sb/Sn/Te/Ce
 
 
 @dataclass(frozen=True)
@@ -557,8 +558,8 @@ def _engine_cache_input_identity_digest(engine_id: str) -> bytes:
 
 ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     "openimcc": {
-        "identity": "commit:979adb26079c8b94ab8dfc9586cef2e2120cf818",
-        "date": "2026-11-19",
+        "identity": "commit:bae51f7301155798b62e2bf41307bccfbbe7fad8",
+        "date": "2026-11-22",
     },
     "internal-analytical": {
         "identity": "source-sha256:f4f5c5a589b0d003be9d4260844c989ede3549901c3c22c70bb2d4a1e645122b",

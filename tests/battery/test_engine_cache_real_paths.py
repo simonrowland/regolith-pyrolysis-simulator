@@ -595,7 +595,7 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
     )
 
     expected_rebumped_versions = {
-        "openimcc": 3,
+        "openimcc": 4,
         "internal-analytical": 3,
     }
 
