@@ -66,16 +66,26 @@ def _default_stage_wall_thickness_m() -> float:
 
 
 def _default_in_situ_bootstrap_cost_per_kg() -> float | None:
-    entry = load_cost_parameters()["parameters"][_IN_SITU_COST_PARAMETER]
-    return _optional_nonnegative(entry.get("value"), _IN_SITU_COST_PARAMETER)
+    parameters = load_cost_parameters()["parameters"]
+    entry = parameters[_IN_SITU_COST_PARAMETER]
+    electricity = _parameter_value(parameters, "electricity_cost_per_kWh")
+    from simulator.layered_wall import resolve_in_situ_bootstrap_rate
+
+    resolved = resolve_in_situ_bootstrap_rate(
+        entry.get("value"),
+        entry.get("status"),
+        electricity,
+    )
+    return _optional_nonnegative(resolved, _IN_SITU_COST_PARAMETER)
 
 
 def _default_layered_wall() -> dict[str, Any]:
-    from simulator.layered_wall import normalize_layered_wall
+    from simulator.layered_wall import apply_derived_stage_cost, normalize_layered_wall
 
-    return normalize_layered_wall(
-        load_cost_parameters()["parameters"][_LAYERED_WALL_PARAMETER]
-    )
+    parameters = load_cost_parameters()["parameters"]
+    wall = normalize_layered_wall(parameters[_LAYERED_WALL_PARAMETER])
+    electricity = _parameter_value(parameters, "electricity_cost_per_kWh")
+    return apply_derived_stage_cost(wall, electricity)
 
 
 def _default_stage_bulk_densities() -> Mapping[str, float]:
@@ -442,14 +452,25 @@ def cost_parameter_values(payload: Mapping[str, Any] | None = None) -> dict[str,
         )
         for stage, entry in sorted(stage_densities.items())
     }
+    from simulator.layered_wall import (
+        apply_derived_stage_cost,
+        normalize_layered_wall,
+        resolve_in_situ_bootstrap_rate,
+    )
+
+    in_situ_entry = raw_parameters[_IN_SITU_COST_PARAMETER]
+    resolved_rate = resolve_in_situ_bootstrap_rate(
+        in_situ_entry.get("value"),
+        in_situ_entry.get("status"),
+        values["electricity_cost_per_kWh"],
+    )
     values[_IN_SITU_COST_PARAMETER] = _optional_nonnegative(
-        raw_parameters[_IN_SITU_COST_PARAMETER].get("value"),
+        resolved_rate,
         _IN_SITU_COST_PARAMETER,
     )
-    from simulator.layered_wall import normalize_layered_wall
-
-    values[_LAYERED_WALL_PARAMETER] = normalize_layered_wall(
-        raw_parameters[_LAYERED_WALL_PARAMETER]
+    values[_LAYERED_WALL_PARAMETER] = apply_derived_stage_cost(
+        normalize_layered_wall(raw_parameters[_LAYERED_WALL_PARAMETER]),
+        values["electricity_cost_per_kWh"],
     )
     return {
         "schema_version": OPTIMIZE_COSTS_SCHEMA_VERSION,

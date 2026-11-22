@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import math
 from types import SimpleNamespace
 from typing import Mapping
@@ -1155,6 +1156,9 @@ def test_marginal_cost_prices_electrical_and_evaporation_thermal_separately() ->
 
 
 def test_hardware_cost_prices_hot_duct_and_shared_train_capacity() -> None:
+    from simulator.cost_parameters import load_cost_parameters
+    from simulator.wall_advisor import load_wall_materials
+
     sim = SimpleNamespace(
         overhead_model=SimpleNamespace(
             pipe_diameter_m=0.5,
@@ -1165,22 +1169,60 @@ def test_hardware_cost_prices_hot_duct_and_shared_train_capacity() -> None:
             train_time_averaged_mass_flow_kg_hr=6.0,
         ),
     )
+    shipped_parameters = _furnace_test_cost_parameters()
     shipped = objective_module._duct_and_shared_train_hardware_cost_summary(
         sim,
-        cost_parameters=_furnace_test_cost_parameters(),
+        cost_parameters=shipped_parameters,
     )
     priced = objective_module._duct_and_shared_train_hardware_cost_summary(
         sim,
         cost_parameters=_priceable_cost_parameters(),
     )
 
+    # Cylinder law, written here. Density is the catalog figure. Thickness
+    # and source are the operator wall. This is not a second call of the
+    # duct pricer.
+    catalog = load_wall_materials()["materials"]
+    cursor = 0.5 / 2.0
+    length_m = 2.0
+    imported_kg = 0.0
+    in_situ_kg = 0.0
+    for layer in shipped_parameters.layered_wall["layers"]:
+        density = catalog[layer["material_id"]]["density_kg_m3"]
+        outer = cursor + layer["thickness_m"]
+        mass = math.pi * (outer ** 2 - cursor ** 2) * length_m * density
+        if layer["source"] == "imported":
+            imported_kg += mass
+        else:
+            assert layer["source"] == "in_situ"
+            in_situ_kg += mass
+        cursor = outer
+    expected_duct = (
+        imported_kg * shipped_parameters.import_delivery_cost_per_kg
+        + in_situ_kg * shipped_parameters.in_situ_bootstrap_cost_per_kg
+    )
+    yaml_electricity = load_cost_parameters()["parameters"][
+        "electricity_cost_per_kWh"
+    ]["value"]
+
     assert shipped["condenser_train_cost_usd"] == pytest.approx(200000.0)
     assert shipped["furnaces_per_shared_train"] == pytest.approx(10.0)
     assert shipped["per_furnace_train_share_kg_hr"] == pytest.approx(10.0)
     assert shipped["train_sizing_flow_kg_hr"] == pytest.approx(100.0)
-    assert shipped["hot_duct_cost_usd"]["status"] == "unavailable"
-    assert shipped["hardware_capital_cost_usd"]["status"] == "unavailable"
-    assert shipped["status"] == "unavailable"
+    assert isinstance(shipped["hot_duct_cost_usd"], float)
+    assert shipped["hot_duct_cost_usd"] == pytest.approx(expected_duct)
+    assert shipped["status"] == "ok"
+    assert shipped["hot_duct_wall"]["hot_duct_area_price_applied"] is False
+    assert shipped["hot_duct_wall"]["duct_price_basis"] == (
+        "layered_cylindrical_mass"
+    )
+    assert shipped["hardware_capital_cost_usd"] == pytest.approx(
+        shipped["hot_duct_cost_usd"] + shipped["condenser_train_cost_usd"]
+    )
+    # The dataclass electricity is this test's override. The doloma rate
+    # was filled by the default factory at the YAML electricity.
+    assert shipped_parameters.electricity_cost_per_kWh == pytest.approx(1.0)
+    assert yaml_electricity != shipped_parameters.electricity_cost_per_kWh
     assert priced["status"] == "ok"
     assert priced["hot_duct_lateral_area_m2"] == pytest.approx(math.pi)
     assert priced["condenser_train_cost_usd"] == pytest.approx(200000.0)
@@ -1204,6 +1246,9 @@ def test_hardware_cost_refuses_missing_sizing_inputs() -> None:
 
 
 def test_collector_hardware_cost_scales_with_configured_area() -> None:
+    from simulator.cost_parameters import load_cost_parameters
+    from simulator.layered_wall import in_situ_processing_cost_per_kg
+
     areas = _zero_collector_area_map()
     areas["sio_stage3"] = 2.0
     sim = SimpleNamespace(
@@ -1221,19 +1266,30 @@ def test_collector_hardware_cost_scales_with_configured_area() -> None:
     )
     before_stage = before["collector_stage_costs"]["sio_stage3"]
     after_stage = after["collector_stage_costs"]["sio_stage3"]
+    yaml_electricity = load_cost_parameters()["parameters"][
+        "electricity_cost_per_kWh"
+    ]["value"]
+    silica = in_situ_processing_cost_per_kg("silica", yaml_electricity)
+    mass = (
+        2.0
+        * parameters.condenser_stage_wall_thickness_m
+        * parameters.condenser_stage_bulk_density_kg_m3["sio_stage3"]
+    )
 
     assert before_stage["pricing"] == "in_situ_product_bulk"
     assert before_stage["imported_kg"] == 0.0
     assert before_stage["imported_usd"] == 0.0
-    assert before_stage["in_situ_usd"]["status"] == "unavailable"
-    assert "in_situ_cost_unset" in before_stage["in_situ_usd"]["reason"]
+    assert before_stage["in_situ_kg"] == pytest.approx(mass)
+    assert before_stage["in_situ_usd"] == pytest.approx(mass * silica["usd_per_kg"])
     assert after_stage["in_situ_kg"] == pytest.approx(before_stage["in_situ_kg"] * 2.0)
+    assert after_stage["in_situ_usd"] == pytest.approx(before_stage["in_situ_usd"] * 2.0)
     assert before_stage["wall_thickness_m"] == (
         parameters.condenser_stage_wall_thickness_m
     )
     assert before_stage["bulk_density_kg_m3"] == (
         parameters.condenser_stage_bulk_density_kg_m3["sio_stage3"]
     )
+    assert parameters.electricity_cost_per_kWh != yaml_electricity
 
 
 def test_collector_hardware_cost_refuses_missing_stage_area() -> None:
@@ -1256,9 +1312,13 @@ def test_stage3_in_situ_bulk_replaces_single_wall_import_price() -> None:
     """The pinned single-wall import price is replaced by source-split mass.
 
     Stage 3 keeps the existing thickness and density slots and is in-situ
-    silica. Its dollars stay unavailable while the owner rate is unset.
-    The shipped duct no longer multiplies lateral area by the placeholder.
+    silica at the derived processing cost. The shipped duct is cylindrical
+    layered mass. hot_duct_cost_per_m2_usd is not applied. An explicit
+    owner_unset null does not fall through to the doloma scalar.
     """
+
+    from simulator.cost_parameters import load_cost_parameters
+    from simulator.layered_wall import in_situ_processing_cost_per_kg
 
     areas = _zero_collector_area_map()
     areas["fe_stage1"] = 0.2
@@ -1284,15 +1344,59 @@ def test_stage3_in_situ_bulk_replaces_single_wall_import_price() -> None:
         cost_parameters=parameters,
     )
     stage3 = collector["collector_stage_costs"]["sio_stage3"]
+    yaml_electricity = load_cost_parameters()["parameters"][
+        "electricity_cost_per_kWh"
+    ]["value"]
+    silica = in_situ_processing_cost_per_kg("silica", yaml_electricity)
+    mass = (
+        areas["sio_stage3"]
+        * parameters.condenser_stage_wall_thickness_m
+        * parameters.condenser_stage_bulk_density_kg_m3["sio_stage3"]
+    )
 
     assert stage3["source"] == "in_situ"
     assert stage3["imported_kg"] == 0.0
     assert stage3["imported_usd"] == 0.0
-    assert stage3["in_situ_usd"]["status"] == "unavailable"
-    assert stage3["in_situ_usd"]["value"] is None
-    assert collector["hardware_capital_cost_usd"]["status"] == "unavailable"
-    assert duct["hot_duct_cost_usd"]["status"] == "unavailable"
+    assert stage3["in_situ_kg"] == pytest.approx(mass)
+    assert stage3["in_situ_usd"] == pytest.approx(mass * silica["usd_per_kg"])
+    assert stage3["in_situ_usd"] != pytest.approx(
+        mass * parameters.import_delivery_cost_per_kg
+    )
+    assert isinstance(collector["hardware_capital_cost_usd"], float)
+    assert collector["status"] == "ok"
+    assert isinstance(duct["hot_duct_cost_usd"], float)
+    assert duct["hot_duct_wall"]["hot_duct_area_price_applied"] is False
     assert duct["hot_duct_wall"]["duct_price_basis"] == "layered_cylindrical_mass"
+
+    unset_wall = copy.deepcopy(dict(parameters.layered_wall))
+    bulk = dict(unset_wall["stage_bulk"]["sio_stage3"])
+    bulk["cost_per_kg_usd"] = None
+    bulk["cost_status"] = "owner_unset"
+    unset_wall["stage_bulk"] = {"sio_stage3": bulk}
+    unset = CostParameters(
+        electricity_cost_per_kWh=1.0,
+        furnace_resinter_cost_usd=1.0,
+        depreciation_expense_per_run=1.0,
+        generic_reagent_cost_per_kg=1.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 1.0,
+            "K": 1.0,
+            "Mg": 1.0,
+            "Ca": 1.0,
+        },
+        in_situ_bootstrap_cost_per_kg=50.0,
+        layered_wall=unset_wall,
+    )
+    refused = objective_module._collector_stage_hardware_cost_summary(
+        SimpleNamespace(
+            condensation_model=SimpleNamespace(stage_area_m2_by_stage=areas),
+        ),
+        cost_parameters=unset,
+    )
+    refused_stage = refused["collector_stage_costs"]["sio_stage3"]
+    assert refused_stage["in_situ_usd"]["status"] == "unavailable"
+    assert "in_situ_cost_unset" in refused_stage["in_situ_usd"]["reason"]
+    assert refused["hardware_capital_cost_usd"]["status"] == "unavailable"
 
 
 def test_cost_objective_ranking_prices_pumping_sidecar() -> None:

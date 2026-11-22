@@ -1244,9 +1244,12 @@ condenser_geometry:
   # Run the area sizing to a fixed point because upstream areas change the
   # downstream peak fluxes; the controller r4 run converged in three passes at
   # the 0.5 m throat. Areas are absolute hardware and do not scale with throat.
-  # Price basis is the existing data/optimize_costs.yaml model:
-  # mass [kg] = A [m2] * 0.010 m * material density [kg/m3], then
-  # cost [USD] = mass * $10,000/kg. Thickness and densities remain FLAGGED.
+  # Price basis is the layered wall in data/optimize_costs.yaml (t-1911).
+  # Imported liner and felt, and the in-situ doloma structure, are priced by
+  # source. Stage 3 stays in-situ silica product bulk on the existing 10 mm
+  # slot. The single-wall product A * 0.010 m * density * $10,000/kg is not
+  # the collector price. Thicknesses and the in-situ rate remain operator
+  # settings and stay flagged.
   stage_areas_m2:
     fe_stage1: 38.829406624 # 90% Fe capture at peak design flux; fixed-point area.
     cr_stage2: 350.525053773 # Cr2O3 capture ceiling; 90% is unreachable, FLAGGED.

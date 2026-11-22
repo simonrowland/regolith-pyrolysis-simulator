@@ -28,6 +28,8 @@ from simulator.layered_wall import (
     cylindrical_wall_conduction,
     flat_wall_conduction,
     flue_gas_energy_balance,
+    in_situ_processing_cost_per_kg,
+    insulation_vapour_dew_point,
     interface_temperature_table,
     normalize_layered_wall,
     price_collector_stages,
@@ -157,9 +159,21 @@ def test_liner_material_is_not_an_optimizer_knob() -> None:
             assert token not in joined
 
 
+def _unset_property_wall() -> dict:
+    wall = _assumed_wall()
+    for layer in wall["layers"].values():
+        layer["thickness_m"] = None
+        layer["density_kg_m3"] = None
+        layer["density_status"] = None
+        layer["conductivity_W_m_K"] = None
+        layer["conductivity_status"] = None
+    wall["layers"]["felt"]["material_id"] = None
+    wall["layers"]["felt"]["source"] = None
+    return wall
+
+
 def test_missing_conductivity_density_and_thickness_refuse() -> None:
-    shipped = cost_parameters_from_mapping().layered_wall
-    priced = _price(shipped, _areas(fe_stage1=1.0), in_situ_rate=None)
+    priced = _price(_unset_property_wall(), _areas(fe_stage1=1.0), in_situ_rate=None)
     stage = priced["collector_stage_costs"]["fe_stage1"]
 
     assert priced["status"] == "unavailable"
@@ -232,18 +246,28 @@ def test_stage3_bulk_is_in_situ_silica_and_scales_with_area() -> None:
     assert before["material_id"] == "fused_silica"
     assert before["imported_kg"] == 0.0
     assert before["imported_usd"] == 0.0
+    silica = in_situ_processing_cost_per_kg(
+        "silica", parameters.electricity_cost_per_kWh
+    )
     assert before["in_situ_kg"] == pytest.approx(2.0 * thickness * density)
     assert after["in_situ_kg"] == pytest.approx(before["in_situ_kg"] * 2.0)
-    assert before["in_situ_usd"]["status"] == "unavailable"
-    assert before["in_situ_usd"]["value"] is None
-    assert before["in_situ_usd"]["reason"] == "in_situ_cost_unset"
+    assert before["in_situ_usd"] == pytest.approx(
+        before["in_situ_kg"] * silica["usd_per_kg"]
+    )
+    assert after["in_situ_usd"] == pytest.approx(before["in_situ_usd"] * 2.0)
     assert before["wall_thickness_certification"] == "uncertified_cost_parameter_slot"
     assert before["bulk_density_certification"] == "uncertified_cost_parameter_slot"
 
 
 def test_owner_set_in_situ_rate_prices_known_mass_and_zero_is_not_unset() -> None:
     parameters = cost_parameters_from_mapping()
-    wall = parameters.layered_wall
+    wall = copy.deepcopy(dict(parameters.layered_wall))
+    # No stage-specific rate: the scalar is the price. The shipped wall's
+    # derived silica number is a different test.
+    bulk = dict(wall["stage_bulk"]["sio_stage3"])
+    bulk["cost_per_kg_usd"] = None
+    bulk["cost_status"] = None
+    wall["stage_bulk"] = {"sio_stage3": bulk}
     area = 2.0
     thickness = parameters.condenser_stage_wall_thickness_m
     density = parameters.condenser_stage_bulk_density_kg_m3["sio_stage3"]
@@ -532,7 +556,23 @@ def test_interface_table_uses_cited_service_and_refuses_a_missing_outer_temperat
     assert table["hot_duct"]["shell_temperature_status"] == (
         "shell_temperature_unchecked"
     )
-    assert table["hot_duct"]["conduction_status"] == "unavailable"
+    assert table["hot_duct"]["conduction_status"] == "estimated_known_layers_only"
+    assert table["hot_duct"]["conduction_authority"] == "estimated_known_layers_only"
+    felt = next(
+        layer for layer in table["hot_duct"]["layers"] if layer["role"] == "insulation"
+    )
+    assert felt["outer_temperature_C"] == pytest.approx(
+        report["interface_temperatures"]["hot_duct"]["boundary_temperature_C"]
+    )
+    assert "hot_face_above_max_operating" in felt["hot_face_flags"]
+    assert felt["conductivity_flag"] == "k_extended_off_cited_temperature"
+    structure = next(
+        layer for layer in table["hot_duct"]["layers"] if layer["role"] == "structure"
+    )
+    assert structure["conductivity_W_m_K"] is None
+    assert structure["inner_temperature_C"]["reason"] == (
+        "structure_omitted_from_temperature_walk"
+    )
     assert table["sio_stage3"]["hot_face_C"] == silica["max_operating_C"]
     assert table["sio_stage3"]["hot_face_C"] > silica["continuous_C"]
     assert table["sio_stage3"]["hot_face_C"] > silica["degradation_onset_C"]
@@ -598,10 +638,14 @@ def test_flue_gas_balance_uses_printed_janaf_neighbors_and_ideal_gas_density() -
         low_density * 3.0
     )
     assert balance["verdict"] == "hot_face_hold_undetermined"
-    assert balance["trace_heating_power_W_per_m"]["reason"] == (
-        "conductive_loss_unavailable"
-    )
+    assert balance["conductive_loss"]["status"] == "estimated_known_layers_only"
+    assert balance["trace_heating_power_W_per_m"]["reason"] == "mass_flow_unset"
     assert balance["trace_heating_power_W_per_m"]["value"] is None
+    comparison = balance["loss_vs_black_body"]
+    assert comparison["not_an_upper_bound"] is True
+    assert comparison["not_a_certified_deficit"] is True
+    assert comparison["relation"] == "estimated_loss_below_black_body_ceiling"
+    assert comparison["inner_flux_W_m2"] < comparison["black_body_flux_W_m2"]
     assert balance["radiation_delivered_W_m2"]["reason"] == "view_factor_unset"
     assert len(balance["volumetric_heat_J_per_m3_K"]["by_pressure"]["low_mbar"]) == 2
 
@@ -633,7 +677,16 @@ def test_shipped_design_report_names_the_sweep_and_reprices_stage3_cases() -> No
     assert campaigns["C4"]["gas_temperature_C"] != campaigns["C6"]["gas_temperature_C"]
     assert bare["C2A_continuous"]["reason"] == "flue_gas_temperature_unset"
     assert bare["C2A_staged"]["carrier_gas"] == "pN2"
-    assert report["in_situ_bootstrap_cost_per_kg"] is None
+    doloma = report["in_situ_cost_derivation"]["doloma"]
+    silica = report["in_situ_cost_derivation"]["silica"]
+    assert report["in_situ_bootstrap_cost_per_kg"] == pytest.approx(doloma["usd_per_kg"])
+    assert doloma["usd_per_kg"] == pytest.approx(
+        doloma["specific_energy_MJ_per_kg"]
+        * 1000.0
+        / doloma["kj_per_kwh"]
+        / doloma["thermal_efficiency"]
+        * doloma["electricity_usd_per_kWh"]
+    )
     assert report["hot_duct_per_metre"]["duct_price_basis"] == (
         "layered_cylindrical_mass"
     )
@@ -654,10 +707,12 @@ def test_shipped_design_report_names_the_sweep_and_reprices_stage3_cases() -> No
         assert stage["in_situ_kg"] == pytest.approx(area * thickness * density)
         assert stage["imported_kg"] == 0.0
         assert stage["imported_usd"] == 0.0
-        assert stage["in_situ_usd"]["value"] is None
-        assert cases[name]["collector_stage_costs"]["fe_stage1"]["cost_usd"][
-            "status"
-        ] == "unavailable"
+        assert stage["in_situ_usd"] == pytest.approx(
+            stage["in_situ_kg"] * silica["usd_per_kg"]
+        )
+        fe_cost = cases[name]["collector_stage_costs"]["fe_stage1"]["cost_usd"]
+        assert isinstance(fe_cost, float)
+        assert fe_cost > 0.0
 
 
 def test_in_situ_rate_none_zero_and_positive_split_the_cost_key() -> None:
@@ -669,9 +724,42 @@ def test_in_situ_rate_none_zero_and_positive_split_the_cost_key() -> None:
     moved = copy.deepcopy(base)
     moved["parameters"]["layered_wall"]["outer_temperature_C"] = 25.0
 
-    assert cost_parameters_from_mapping(base).in_situ_bootstrap_cost_per_kg is None
+    electricity = base["parameters"]["electricity_cost_per_kWh"]["value"]
+    derived = cost_parameters_from_mapping(base)
+    assert derived.in_situ_bootstrap_cost_per_kg == pytest.approx(
+        in_situ_processing_cost_per_kg("doloma", electricity)["usd_per_kg"]
+    )
+    assert cost_parameters_from_mapping(zero).in_situ_bootstrap_cost_per_kg == 0.0
+    unset = copy.deepcopy(base)
+    unset["parameters"]["in_situ_bootstrap_cost_per_kg"]["status"] = "owner_unset"
+    unset["parameters"]["in_situ_bootstrap_cost_per_kg"]["value"] = None
+    unset["parameters"]["layered_wall"]["stage_bulk"]["sio_stage3"]["cost_status"] = (
+        "owner_unset"
+    )
+    unset["parameters"]["layered_wall"]["stage_bulk"]["sio_stage3"][
+        "cost_per_kg_usd"
+    ] = None
+    unset_parameters = cost_parameters_from_mapping(unset)
+    assert unset_parameters.in_situ_bootstrap_cost_per_kg is None
+    assert (
+        unset_parameters.layered_wall["stage_bulk"]["sio_stage3"]["cost_per_kg_usd"]
+        is None
+    )
+    doubled = copy.deepcopy(base)
+    doubled["parameters"]["electricity_cost_per_kWh"]["value"] = electricity * 2.0
+    doubled_parameters = cost_parameters_from_mapping(doubled)
+    assert doubled_parameters.in_situ_bootstrap_cost_per_kg == pytest.approx(
+        derived.in_situ_bootstrap_cost_per_kg * 2.0
+    )
+    assert doubled_parameters.layered_wall["stage_bulk"]["sio_stage3"][
+        "cost_per_kg_usd"
+    ] == pytest.approx(
+        derived.layered_wall["stage_bulk"]["sio_stage3"]["cost_per_kg_usd"] * 2.0
+    )
     assert cost_parameters_digest(base) != cost_parameters_digest(zero)
     assert cost_parameters_digest(zero) != cost_parameters_digest(positive)
+    assert cost_parameters_digest(base) != cost_parameters_digest(unset)
+    assert cost_parameters_digest(base) != cost_parameters_digest(doubled)
     digests = {
         "setpoints": "setpoints-digest",
         "feedstocks": "feedstock-digest",
@@ -697,3 +785,195 @@ def test_in_situ_rate_none_zero_and_positive_split_the_cost_key() -> None:
     assert cache_key(spec(base)) != cache_key(spec(zero))
     assert cache_key(spec(zero)) != cache_key(spec(positive))
     assert cache_key(spec(base)) != cache_key(spec(moved))
+    assert cache_key(spec(base)) != cache_key(spec(unset))
+    assert cache_key(spec(base)) != cache_key(spec(doubled))
+
+
+def _printed_enthalpy_rows(table_id: str) -> list[tuple[float, float]]:
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    rows = []
+    for row in document["table"]["values"]:
+        enthalpy = row.get("enthalpy_increment")
+        temperature = row.get("temperature")
+        if not isinstance(enthalpy, dict) or not isinstance(temperature, dict):
+            continue
+        if enthalpy.get("value") is None:
+            continue
+        rows.append((float(temperature["value"]), float(enthalpy["value"])))
+    return rows
+
+
+def _enthalpy_bracket(
+    rows: list[tuple[float, float]],
+    target_K: float,
+) -> tuple[tuple[float, float], tuple[float, float]]:
+    below = max((row for row in rows if row[0] < target_K), key=lambda row: row[0])
+    above = min((row for row in rows if row[0] > target_K), key=lambda row: row[0])
+    return below, above
+
+
+def _endpoint_usd(specific_energy_MJ_per_kg: float, record: dict) -> float:
+    from simulator.thermal_budget import KJ_PER_KWH
+
+    assert record["kj_per_kwh"] == KJ_PER_KWH
+    return (
+        specific_energy_MJ_per_kg
+        * 1000.0
+        / KJ_PER_KWH
+        / record["thermal_efficiency"]
+        * record["electricity_usd_per_kWh"]
+    )
+
+
+def test_processing_cost_lies_between_printed_janaf_neighbors() -> None:
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.reference_data.janaf import table_fusion_transition
+
+    electricity = cost_parameters_from_mapping().electricity_cost_per_kWh
+    doloma = in_situ_processing_cost_per_kg("doloma", electricity)
+    silica = in_situ_processing_cost_per_kg("silica", electricity)
+    molar_mass = {
+        species: float(resolve_species_formula(species).molar_mass_g_per_mol())
+        for species in ("CaO", "MgO", "SiO2")
+    }
+    for table_id in ("Ca-027", "Mg-008", "O-037"):
+        document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+        assert table_fusion_transition(document["table"]) is None
+
+    cao_below, cao_above = _enthalpy_bracket(
+        _printed_enthalpy_rows("Ca-027"), doloma["process_temperature_K"]
+    )
+    mgo_below, mgo_above = _enthalpy_bracket(
+        _printed_enthalpy_rows("Mg-008"), doloma["process_temperature_K"]
+    )
+    assert cao_below[0] == mgo_below[0]
+    assert cao_above[0] == mgo_above[0]
+    assert cao_below[1] < cao_above[1]
+    assert mgo_below[1] < mgo_above[1]
+    mix_mass = molar_mass["CaO"] + molar_mass["MgO"]
+    cool_specific = (cao_below[1] + mgo_below[1]) / mix_mass
+    hot_specific = (cao_above[1] + mgo_above[1]) / mix_mass
+    cool_usd = _endpoint_usd(cool_specific, doloma)
+    hot_usd = _endpoint_usd(hot_specific, doloma)
+    assert cool_usd < doloma["usd_per_kg"] < hot_usd
+
+    quartz_below, quartz_above = _enthalpy_bracket(
+        _printed_enthalpy_rows("O-037"), silica["process_temperature_K"]
+    )
+    assert quartz_below[1] < quartz_above[1]
+    cool_silica = _endpoint_usd(quartz_below[1] / molar_mass["SiO2"], silica)
+    hot_silica = _endpoint_usd(quartz_above[1] / molar_mass["SiO2"], silica)
+    assert cool_silica < silica["usd_per_kg"] < hot_silica
+    catalog_limit = load_wall_materials()["materials"]["fused_silica"]["service_temp"][
+        "max_operating_C"
+    ]
+    assert silica["process_temperature_K"] == pytest.approx(
+        float(catalog_limit) + CELSIUS_TO_KELVIN_OFFSET
+    )
+
+
+def test_cited_conductivity_interpolates_inside_the_grid_and_extends_outside() -> None:
+    catalog = load_wall_materials()["materials"]
+    felt = {
+        "role": "insulation",
+        "material_id": "kaowool_rcf_blanket",
+        "source": "imported",
+        "thickness_m": 0.025,
+    }
+    curve = sorted(
+        (float(point["temperature_K"]), float(point["value_W_m_K"]))
+        for point in catalog["kaowool_rcf_blanket"]["thermal_conductivity"]
+    )
+    midpoint = (curve[0][0] + curve[1][0]) / 2.0
+    interpolated = resolve_layer_properties(
+        felt, materials=catalog, temperature_K=midpoint
+    )
+    low_k, high_k = sorted((curve[0][1], curve[1][1]))
+    assert interpolated["conductivity_flag"] == "k_interpolated_not_on_printed_grid"
+    assert low_k < interpolated["conductivity_W_m_K"] < high_k
+    exact = resolve_layer_properties(
+        felt, materials=catalog, temperature_K=curve[0][0]
+    )
+    assert exact["conductivity_flag"] == "cited_grid"
+    assert exact["conductivity_W_m_K"] == pytest.approx(curve[0][1])
+    extended = resolve_layer_properties(
+        felt, materials=catalog, temperature_K=1873.15
+    )
+    assert extended["conductivity_flag"] == "k_extended_off_cited_temperature"
+    assert extended["conductivity_W_m_K"] == pytest.approx(curve[-1][1])
+    unpriced = resolve_layer_properties(felt, materials=catalog)
+    assert unpriced["density_kg_m3"] == pytest.approx(
+        catalog["kaowool_rcf_blanket"]["density_kg_m3"]
+    )
+    assert unpriced["conductivity_reason"].startswith(
+        "thermal_conductivity_temperature_unset"
+    )
+
+    ysz_point = catalog["bulk_zirconia_ysz"]["thermal_conductivity"][0]
+    liner = {
+        "role": "liner",
+        "material_id": "bulk_zirconia_ysz",
+        "source": "imported",
+        "thickness_m": 0.005,
+    }
+    off_grid = resolve_layer_properties(
+        liner,
+        materials=catalog,
+        temperature_K=float(ysz_point["temperature_K"]) + 100.0,
+    )
+    assert off_grid["conductivity_flag"] == "k_extended_off_cited_temperature"
+    assert off_grid["conductivity_W_m_K"] == pytest.approx(ysz_point["value_W_m_K"])
+    on_grid = resolve_layer_properties(
+        liner,
+        materials=catalog,
+        temperature_K=float(ysz_point["temperature_K"]),
+    )
+    assert on_grid["conductivity_flag"] == "cited_grid"
+    assert on_grid["conductivity_W_m_K"] == pytest.approx(ysz_point["value_W_m_K"])
+
+
+def test_cited_density_that_disagrees_with_the_catalog_raises() -> None:
+    catalog = load_wall_materials()["materials"]
+    catalog_density = catalog["bulk_zirconia_ysz"]["density_kg_m3"]
+    layer = {
+        "role": "liner",
+        "material_id": "bulk_zirconia_ysz",
+        "density_kg_m3": float(catalog_density) + 1.0,
+        "density_status": "cited",
+        "density_citation": "not the catalog number",
+    }
+    with pytest.raises(ValueError, match="density_conflict"):
+        resolve_layer_properties(layer, materials=catalog)
+
+
+def test_felt_dew_point_stays_refused_because_live_pressures_are_equilibrium() -> None:
+    import yaml
+
+    refused = insulation_vapour_dew_point(100.0, 40.0)
+    assert refused["status"] == "unavailable"
+    assert refused["reason"] == "partial_pressure_unset"
+    assert refused["felt_inner_temperature_C"] == pytest.approx(100.0)
+    assert refused["felt_outer_temperature_C"] == pytest.approx(40.0)
+
+    from pathlib import Path
+
+    catalog = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "data" / "vapor_pressures.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    families = catalog["families"]
+    expected = {
+        "SiO": "oxide_vapors_sio_family",
+        "Na": "metals_na_family",
+        "K": "metals_k_family",
+    }
+    for species, family in expected.items():
+        models = families[family]["physical_properties"]["species"][species][
+            "pressure_models"
+        ]
+        assert "equilibrium_partial_pressure" in {
+            model["pressure_kind"] for model in models
+        }
+        assert refused["species"][species]["family"] == family
+        assert refused["species"][species]["reason"] == "equilibrium_not_pure_saturation"
