@@ -315,8 +315,7 @@ def _untied_physical_run(
     reference = evidence.reference_run_id
     model_run = evidence.model_run_id
     return not (
-        len(observed) == 1
-        and reference is not None
+        reference is not None
         and model_run is not None
         and observed == {reference}
         and reference == model_run

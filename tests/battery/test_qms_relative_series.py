@@ -252,6 +252,23 @@ def test_tied_physical_run_scores_and_each_broken_tie_refuses():
         assert result.points == ()
 
 
+def test_tied_ids_with_one_unrelated_model_trajectory_refuse():
+    observed, model, anchor, clock, evidence = _inputs()
+    model = tuple(replace(point, run_id="unrelated-trajectory") for point in model)
+    assert evidence.reference_run_id == evidence.model_run_id
+    assert {point.run_id for point in observed} == {evidence.model_run_id}
+    assert {point.run_id for point in model} == {"unrelated-trajectory"}
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is (
+        RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
+    )
+    assert result.points == ()
+
+
 def test_mixed_sio_model_runs_are_typed_unavailable():
     observed, model, anchor, clock, evidence = _inputs()
     observed = tuple(replace(point, observable="SiO+") for point in observed)
@@ -314,8 +331,9 @@ def test_qms_channel_rules_have_one_owner():
     """One model-run refusal, and one read of the printed control point.
 
     A second MIXED_MODEL_RUNS return, a second direct oxygen_pressure_point
-    read, or a lookup hidden inside the printed-control predicate splits
-    the rule the reviews closed.
+    read, a lookup hidden inside the printed-control predicate, or a call
+    from the adapter into the pure comparator splits the rule the reviews
+    closed.
     """
 
     root = Path(relative_channel_point_residuals.__code__.co_filename).parent
@@ -365,6 +383,7 @@ def test_qms_channel_rules_have_one_owner():
     assert _called_names(walker).count("oxygen_pressure_point") == 0
     assert scorer_calls.count("oxygen_pressure_point") == 1
     assert "printed_fo2_from_point" in scorer_calls
+    assert "relative_channel_point_residuals" not in scorer_calls
     assert "_has_printed_fo2" not in scorer_calls
     assert "has_printed_fo2" not in scorer_calls
     definitions = _definitions(score_tree, ladder_tree, oxygen_tree)

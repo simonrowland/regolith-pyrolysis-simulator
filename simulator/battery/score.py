@@ -16949,7 +16949,11 @@ def _score_relative_qms_series(
     reference: Observation,
     source_trace: Observation,
 ) -> RelativeSeriesComparison:
-    """Bind trace and model oxygen inputs before the pure series comparator."""
+    """Refuse every store row with AMBIGUOUS_RUN_IDENTITY.
+
+    Trace and oxygen checks still return their own reasons. The pure
+    comparator is not called.
+    """
 
     from simulator.battery.fo2_ladder import printed_fo2_from_point
     from simulator.battery.score_metrics import (

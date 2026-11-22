@@ -148,9 +148,10 @@ def _single_physics_rung(notices):
 
 
 def _relative_qms_inputs(source_trace, model_input_ids, *, target_species="O2"):
+    run_id = "claimed-run"
     observed = tuple(
         RelativeSeriesPoint(
-            run_id=source_trace.experiment_id,
+            run_id=run_id,
             coordinate=Decimal(str(time_s)),
             value=Value(ValueKind.POINT, point=Decimal(str(signal))),
             observable=f"{target_species}+",
@@ -163,7 +164,7 @@ def _relative_qms_inputs(source_trace, model_input_ids, *, target_species="O2"):
     )
     model = tuple(
         RelativeSeriesPoint(
-            run_id="model-run",
+            run_id=run_id,
             coordinate=Decimal(str(time_s)),
             value=Value(ValueKind.POINT, point=Decimal(str(pressure))),
             observable=target_species,
@@ -196,7 +197,8 @@ def _relative_qms_inputs(source_trace, model_input_ids, *, target_species="O2"):
         background_treatment_supported=True,
         response_proportional_over_interval=True,
         locator=F.loc(page=1),
-        model_run_id="model-run",
+        model_run_id=run_id,
+        reference_run_id=run_id,
         model_oxygen_input_observation_ids=model_input_ids,
     )
     return observed, model, anchor, clock, evidence
@@ -1829,8 +1831,15 @@ def _printed_store_comparison(context, row):
             trace.observation_id: trace,
         },
     )
+    observed, model, anchor, clock, evidence = _relative_qms_inputs(trace, ())
+    assert evidence.reference_run_id == evidence.model_run_id == "claimed-run"
+    assert {point.run_id for point in (*observed, *model)} == {"claimed-run"}
     return _score_relative_qms_series(
-        *_relative_qms_inputs(trace, ()),
+        observed,
+        model,
+        anchor,
+        clock,
+        evidence,
         context=scoring,
         reference=reference,
         source_trace=trace,
@@ -2229,7 +2238,7 @@ def test_unresolved_selected_pressure_lineage_stays_unknown(source_context):
     assert result.points == ()
 
 
-def test_selected_pressure_not_reduced_from_the_trace_can_score(source_context):
+def test_selected_pressure_not_reduced_from_the_trace_refuses(source_context):
     context, reference, trace, pressure = _pressure_reduced_from_current(
         source_context, ()
     )
