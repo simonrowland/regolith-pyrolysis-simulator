@@ -7838,8 +7838,8 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
     # Al2O3(cr) Table 3 also computes, near -3.0 dex. That level is a real
     # E15 disagreement with Stolyarova 1996's absolute-pressure scale
     # (ion-current a(Al2O3) versus absolute p(Al)/p(O)), a certification
-    # flag, not a target value. Investigation:
-    # /Users/simonrowland/Repos/regolith-pyrolysis-simulator/docs-private/research/2026-11-22-pin-bae51f7/e15al2o3-report.tail
+    # flag, not a target value.
+    # Diagnosis: regolith-engine controller note 2026-11-22 (E15 Al2O3, Stolyarova 1996 Table 2/3).
     assert (
         "stolyarova_1996_table3_cao_activity_column_1_1933k | method 1 | "
         "CaO(cr) -> Ca(g) + O(g) | -0.227 ± 0.380 |"
