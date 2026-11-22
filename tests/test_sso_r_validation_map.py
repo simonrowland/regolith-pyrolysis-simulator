@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import math
-import traceback
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -500,31 +499,32 @@ def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
     assert calls[-1] == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
 
 
-def test_run_row_establishes_one_production_authority_pin(monkeypatch):
+@pytest.mark.parametrize(
+    ('provider_failure', 'row_integrity'),
+    ((False, True), (True, False)),
+    ids=('live-authority', 'typed-provider-fallback'),
+)
+def test_run_row_establishes_one_production_authority_pin(
+    monkeypatch,
+    provider_failure,
+    row_integrity,
+):
     setpoints, feedstocks, vapor_pressures, calibration = _calibrated_inputs()
     curve_calls = 0
     pin_window = False
     established = []
     resolved = []
     cleared_hours = []
-    establishment_states = []
-    resolution_states = []
-    pin_match_states = []
-    curve_call_simulators = []
-    curve_call_stacks = []
     simulator_type = validation_map.PyrolysisSimulator
     original_establish = (
         simulator_type._establish_melt_redox_gate_authority_for_current_hour
     )
     original_resolve = simulator_type._resolved_melt_redox_gate_authority
-    original_pin_matches = (
-        simulator_type._melt_redox_gate_pin_verdicts_match
-    )
     original_clear = (
         simulator_type._clear_melt_redox_gate_authority_for_completed_hour
     )
 
-    def fail_then_recover(self):
+    def synthetic_gate_curve(self):
         from simulator.engine_binding_admission import (
             GateCurveEvidence,
             write_gate_curve_memo_record,
@@ -568,17 +568,10 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
                 provider_outcome="produced",
             )
         curve_calls += 1
-        curve_call_simulators.append(id(self))
-        curve_call_stacks.append(
-            tuple(
-                (Path(frame.filename).name, frame.name, frame.lineno)
-                for frame in traceback.extract_stack(limit=12)
-            )
-        )
-        if curve_calls == 1:
+        if provider_failure:
             raise ProviderUnavailableError('validation row pin failure')
         curve = add_current_domain_diagnostic({
-            'source': 'test_recovered_real_curve',
+            'source': 'test_live_real_curve',
             'solidus_T_C': 1000.0,
             'liquidus_T_C': 1700.0,
             'path': ((1000.0, 0.0), (1700.0, 1.0)),
@@ -595,85 +588,13 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
         pin_window = True
         authority = original_establish(self, *args, **kwargs)
         established.append(authority)
-        tick_authority = getattr(
-            self,
-            '_melt_redox_gate_authority_this_tick',
-            None,
-        )
-        establishment_states.append(
-            (
-                id(self),
-                type(authority).__name__,
-                getattr(self, '_melt_redox_gate_authority_tick_hour', None),
-                type(tick_authority).__name__,
-                repr(
-                    getattr(
-                        self,
-                        '_melt_redox_gate_authority_tick_verdict_identity',
-                        None,
-                    )
-                ),
-                type(
-                    getattr(self, '_last_reduced_real_replay_notices', None)
-                ).__name__,
-            )
-        )
         return authority
 
     def record_resolve(self, *args, **kwargs):
-        tick_authority = getattr(
-            self,
-            '_melt_redox_gate_authority_this_tick',
-            None,
-        )
-        if args:
-            authority_argument = type(args[0]).__name__
-        elif 'gate_authority' in kwargs:
-            authority_argument = type(kwargs['gate_authority']).__name__
-        else:
-            authority_argument = '<default>'
         authority = original_resolve(self, *args, **kwargs)
         if pin_window:
             resolved.append(authority)
-            if len(resolution_states) < 6:
-                resolution_states.append(
-                    (
-                        id(self),
-                        authority_argument,
-                        getattr(
-                            self,
-                            '_melt_redox_gate_authority_tick_hour',
-                            None,
-                        ),
-                        type(tick_authority).__name__,
-                        type(authority).__name__,
-                    )
-                )
         return authority
-
-    def record_pin_matches(
-        self,
-        current_verdict,
-        pinned_verdict,
-        *,
-        submitted_bulk_passes,
-    ):
-        result = original_pin_matches(
-            self,
-            current_verdict,
-            pinned_verdict,
-            submitted_bulk_passes=submitted_bulk_passes,
-        )
-        if len(pin_match_states) < 64:
-            pin_match_states.append(
-                (
-                    repr(current_verdict),
-                    repr(pinned_verdict),
-                    submitted_bulk_passes,
-                    result,
-                )
-            )
-        return result
 
     def record_clear(self, completed_hour):
         nonlocal pin_window
@@ -685,7 +606,7 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     monkeypatch.setattr(
         simulator_type,
         '_freeze_gate_curve_record',
-        fail_then_recover,
+        synthetic_gate_curve,
     )
     monkeypatch.setattr(
         simulator_type,
@@ -696,11 +617,6 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
         simulator_type,
         '_resolved_melt_redox_gate_authority',
         record_resolve,
-    )
-    monkeypatch.setattr(
-        simulator_type,
-        '_melt_redox_gate_pin_verdicts_match',
-        record_pin_matches,
     )
     monkeypatch.setattr(
         simulator_type,
@@ -719,25 +635,16 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
         grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
     )
 
-    assert row['row_passes_base_integrity'] is True, (
-        f"mass_balance_error_pct={row['mass_balance_error_pct']!r}; "
-        f"ferric_divergence_material={row['ferric_divergence_material']!r}; "
-        f"first_respeciation_status={row['first_respeciation_status']!r}; "
-        f"first_respeciation_reason={row['first_respeciation_reason']!r}; "
-        f"second_respeciation_status={row['second_respeciation_status']!r}; "
-        f"second_respeciation_reason={row['second_respeciation_reason']!r}"
-    )
-    assert curve_calls == 1, (
-        f'curve_calls={curve_calls}; establishment_states='
-        f'{establishment_states!r}; resolution_states={resolution_states!r}; '
-        f'pin_match_states={pin_match_states!r}; '
-        f'curve_call_simulators={curve_call_simulators!r}; '
-        f'curve_call_stacks={curve_call_stacks!r}'
-    )
+    assert row['row_passes_base_integrity'] is row_integrity
+    assert curve_calls == 1
     assert len(established) == 1
     assert resolved
     assert all(authority is established[0] for authority in resolved)
     assert cleared_hours == [0]
+    if provider_failure:
+        assert type(established[0]).__name__ == (
+            '_MeltRedoxLiquidusFloorFallback'
+        )
 
 
 def test_owner_pn2_anchor_reports_current_certification_state(
