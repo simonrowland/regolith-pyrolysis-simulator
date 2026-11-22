@@ -40,6 +40,49 @@ def _apply(parser: argparse.ArgumentParser, args: argparse.Namespace) -> bool:
     return bool(args.apply)
 
 
+def _expire_species_spellings(names: tuple[str, ...]) -> tuple[str, ...]:
+    """Casefolded spellings the cache may have stored for these names.
+
+    The cache leaf stores each request name casefolded and does not import
+    the oxide alias map. ``canonical_melt_oxide_activity_name`` is that map:
+    ``FeO_total`` and ``FeOT`` are ``FeO``, and ``sio2`` is ``SiO2``. Walking
+    the helper's existing ``_OXIDE_ALIASES`` collects every spelling that
+    folds to the same oxide. That dict is the provider copy of the adapter
+    map, not a third table. A name the helper does not know stays its own
+    casefold, so an unknown species is still expired. The cache casefolds
+    again, which does not change these strings.
+    """
+
+    from engines.alphamelts.domain import (
+        _OXIDE_ALIASES,
+        canonical_melt_oxide_activity_name,
+    )
+
+    spellings: list[str] = []
+    for name in names:
+        folded = name.strip().casefold()
+        if not folded:
+            continue
+        found = {folded}
+        canonical = canonical_melt_oxide_activity_name(name)
+        if canonical is not None:
+            canonical_folded = canonical.strip().casefold()
+            if canonical_folded:
+                found.add(canonical_folded)
+            for alias, mapped in _OXIDE_ALIASES.items():
+                same = canonical_melt_oxide_activity_name(alias) == canonical
+                if not same:
+                    same = canonical_melt_oxide_activity_name(mapped) == canonical
+                if not same:
+                    continue
+                for spelling in (alias, mapped):
+                    spelling_folded = str(spelling).strip().casefold()
+                    if spelling_folded:
+                        found.add(spelling_folded)
+        spellings.extend(sorted(found))
+    return tuple(dict.fromkeys(spellings))
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -64,7 +107,13 @@ def main(argv: list[str] | None = None) -> int:
     expire.add_argument("file", type=Path)
     expire.add_argument("--engine", required=True)
     choice = expire.add_mutually_exclusive_group(required=True)
-    choice.add_argument("--species", help="comma-separated species names")
+    choice.add_argument(
+        "--species",
+        help=(
+            "comma-separated species names; each name includes the oxide "
+            "spellings canonical_melt_oxide_activity_name treats as the same"
+        ),
+    )
     choice.add_argument(
         "--all",
         action="store_true",
@@ -97,8 +146,8 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "expire":
             species = None
             if args.species is not None:
-                species = tuple(
-                    part.strip() for part in args.species.split(",") if part.strip()
+                species = _expire_species_spellings(
+                    tuple(part.strip() for part in args.species.split(",") if part.strip())
                 )
             result = cache.expire_cache_file(
                 args.file,
