@@ -356,3 +356,61 @@ def test_space_report_and_vacuum_is_explicit(tmp_path, monkeypatch):
     warnings.warn("sync-space " + json.dumps({k: result[k] for k in ("hot", "cold")}), stacklevel=1)
     assert result["vacuumed"] is False
     assert cache.merge_cache_files(master, [source], vacuum=True)["vacuumed"] is True
+
+
+def test_expire_cli_is_a_dry_run_until_apply(tmp_path, monkeypatch, capsys):
+    path = tmp_path / "cli.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "s1")
+    with cache._engine_cache_path_scope(path):
+        cache.cached_engine_call(
+            "openimcc",
+            {"composition_wt_pct": {"SiO2": 1.0}},
+            lambda: {"answer": 1},
+        )
+        cache.cached_engine_call(
+            "openimcc",
+            {"composition_wt_pct": {"MgO": 1.0}},
+            lambda: {"answer": 2},
+        )
+    cache._close_connections()
+    dry = invoke(capsys, "expire", path, "--engine", "openimcc", "--species", "SiO2,MgO")
+    assert dry["dry_run"] is True
+    assert dry["apply"] is False
+    assert dry["deleted_by_engine"]["openimcc"] == 0
+    assert dry["matched_by_engine"]["openimcc"] == 2
+    assert "openimcc" in dry["rows_by_engine"]
+    assert len(rows(path)) == 2
+    from scripts.engine_cache_sync import main
+
+    with pytest.raises(SystemExit) as caught:
+        main([
+            "expire", str(path), "--engine", "openimcc", "--species", "SiO2",
+            "--apply", "--dry-run",
+        ])
+    assert caught.value.code == 2
+    capsys.readouterr()
+    assert len(rows(path)) == 2
+    applied = invoke(
+        capsys, "expire", path, "--engine", "openimcc", "--species", "SiO2", "--apply"
+    )
+    assert applied["deleted_by_engine"]["openimcc"] == 1
+    assert applied["vacuumed"] is True
+    assert len(rows(path)) == 1
+
+
+def test_prune_cli_dry_run_prints_per_engine_counts(tmp_path, monkeypatch, capsys):
+    path = tmp_path / "prune.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "s1")
+    with cache._engine_cache_path_scope(path):
+        cache.cached_engine_call(
+            "openimcc", {"temperature_K": 1700.0}, lambda: {"answer": 1}
+        )
+    cache._close_connections()
+    with sqlite3.connect(path) as connection:
+        connection.execute("UPDATE engine_outputs SET chem_version='0'")
+    report = invoke(capsys, "prune", path)
+    assert report["dry_run"] is True
+    assert report["rows_by_engine"]["openimcc"] == 1
+    assert report["matched_by_engine"]["openimcc"] == 1
+    assert report["deleted_by_engine"]["openimcc"] == 0
+    assert len(rows(path)) == 1
