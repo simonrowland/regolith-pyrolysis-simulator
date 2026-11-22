@@ -522,7 +522,21 @@ def test_unreported_pomeroy_knobs_use_runner_defaults_and_report_them(
     notices = {
         notice["path"]: notice for notice in preset.provenance["notices"]
     }
+    surface_notices = {
+        f"lab_geometry.surfaces.{surface_id}.temperature_C": {
+            "code": "knob_defaulted",
+            "path": f"lab_geometry.surfaces.{surface_id}.temperature_C",
+            "value": 0.0,
+            "unit": "C",
+            "default_source": "LabSurface.to_pipe_segment.wall_temperature_C",
+            "source_class": "assumption_with_sensitivity_marker",
+            "sensitivity_marker": "defaulted_lab_surface_temperature",
+            "out_of_domain": True,
+        }
+        for surface_id in ("crucible_wall", "cold_trap", "rga_line")
+    }
     assert notices == {
+        **surface_notices,
         "lab_schedule.chamber_pressure_mbar": {
             "code": "knob_defaulted",
             "path": "lab_schedule.chamber_pressure_mbar",
