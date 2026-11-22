@@ -433,6 +433,82 @@ def test_radau_and_midpoint_hours_post_the_gross_integral():
     return rising_hour, falling_hour
 
 
+def test_c4_open_hour_posts_the_integrated_buffer_release():
+    """A finite capacity after the vapour commit still posts R.
+
+    The stored capacity is the noop, so the solve saturates and S
+    carries the buffer excess. The vapour commit writes a finite
+    capacity and the oxidative debit lowers fO2 under the ceiling, so
+    the settle's saturation check would post no exchange. The commit
+    posts the solve's integrated R. The pipe is open. Ledger overhead
+    O2 matches the published partial. The buffer ends at its opening
+    plus the parent-oxygen credits, minus the oxidative debits, minus
+    R, and it stays non-negative.
+    """
+
+    sim = _sim(CampaignPhase.C4, 1160.0, 20.0)
+    reservoir = sim.melt.oxygen_reservoir
+    upper = sim._melt_redox_fO2_upper_bound_log()
+    reservoir.melt_intrinsic_fO2_log = upper
+    reservoir.melt_redox_capacity_mol_per_ln_fO2 = 0.0
+    sim._melt_redox_source_capacity_mol_per_ln_fO2 = lambda **_kwargs: 1.0
+    opening = 5.0
+    _seed(sim, FO2_BUFFER_ACCOUNT, {OXYGEN_SPECIES: opening}, "c4 excess")
+
+    def law(_partials):
+        return {"Na2": 1.0e-8, "CrO3": 1.0e-2, "SiO": 1.0e-6}
+
+    hour = _step(
+        sim,
+        law,
+        lambda species: 0.5 if species == "CrO3" else 0.0,
+    )
+    assert hour.shut_path is None
+    assert hour.pipe > 0.0
+    assert 20.0 < hour.total_Pa < 40.0
+    _assert_closed(hour)
+    redox = hour.redox_mol[OXYGEN_SPECIES]
+    assert redox > 1.0
+    assert not sim._evaporative_redox_is_saturated()
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log < upper
+
+    credits = 0.0
+    debits = 0.0
+    exchanged = 0.0
+    exchanges = 0
+    for transition in sim.atom_ledger.transitions:
+        name = str(transition.name)
+        signed = _signed_account_o2_mol(sim, transition, FO2_BUFFER_ACCOUNT)
+        if name == "oxygen_reservoir_exchange":
+            exchanges += 1
+            exchanged += -signed
+            continue
+        if signed > 0.0:
+            credits += signed
+        elif signed < 0.0:
+            debits += -signed
+    assert exchanges == 1
+    assert abs(exchanged - redox) <= 1.0e-12 * redox
+    end_buffer = float(
+        sim.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
+            OXYGEN_SPECIES, 0.0
+        )
+        or 0.0
+    )
+    expected = opening + credits - debits - redox
+    assert end_buffer >= 0.0
+    assert abs(end_buffer - expected) <= 1.0e-12 * max(redox, 1.0), (
+        end_buffer,
+        expected,
+        credits,
+        debits,
+        redox,
+    )
+    assert hour.credit_accounts["Na2"][OXYGEN_SPECIES] == FO2_BUFFER_ACCOUNT
+    assert hour.credit_accounts["SiO"][OXYGEN_SPECIES] == "process.overhead_gas"
+    return hour
+
+
 def test_open_buffer_hour_posts_the_integral_of_s():
     """An open hour whose incoming headspace is not its end state.
 
@@ -1025,6 +1101,167 @@ def test_empty_buffer_drops_a_subfloor_oxidative_rate():
     return hour
 
 
+def test_oxidative_supplies_cannot_silently_overdraw_the_buffer():
+    """Every oxidative supply passes the empty-buffer gate.
+
+    A CrO3 rate of 1.1e-12 kg/h clears the product floor and misses
+    the parent-draw floor, so it used to stay out of both oxidative
+    lists. A parent stock of 5e-13 kg leaves a positive product the
+    debit map does not take. A saturated CrO2 draw clips to just
+    under the stock and used to leave a sub-floor CrO3 draw compared
+    with the opening stock. Each of those posted a negative buffer.
+    The gate zeros the supply that does not fit. A covered rate and
+    a non-oxidative SiO rate stay. The empty-buffer hour does not
+    post the 1.1e-12 kg/h CrO3.
+    """
+
+    sim = _sim(CampaignPhase.C4, 1250.0, 0.0)
+    melt_kg = dict(sim.atom_ledger.kg_by_account("process.cleaned_melt"))
+
+    def _supply(rates, available, melt=None):
+        out: dict[str, float] = {}
+        sim._analytic_evaporation_depletion_rates(
+            rates,
+            dt_hr=1.0,
+            phase_scalar=1.0,
+            cleaned_melt_kg=melt if melt is not None else melt_kg,
+            available_o2_kg=available,
+            supply_out=out,
+        )
+        return out
+
+    assert _supply({"CrO3": 1.1e-12}, 0.0)["CrO3"] == 0.0
+    assert _supply({"CrO3": 1.1e-12}, 1.0e-3)["CrO3"] == 1.1e-12
+
+    parent = ""
+    for bucket in ("metals", "oxide_vapors"):
+        row = (sim.vapor_pressures.get(bucket) or {}).get("CrO3") or {}
+        if row.get("parent_oxide"):
+            parent = str(row["parent_oxide"])
+            break
+    assert parent
+    thin = dict(melt_kg)
+    thin[parent] = 5.0e-13
+    assert _supply({"CrO3": 1.0e-6}, 0.0, thin).get("CrO3", 0.0) == 0.0
+    assert _supply({"CrO3": 1.0e-6}, 1.0e-3, thin)["CrO3"] > 0.0
+
+    clipped = _supply({"CrO2": 1.0, "CrO3": 5.0e-13}, 1.0e-6)
+    assert clipped.get("CrO3", 0.0) == 0.0
+    assert clipped["CrO2"] > 0.0
+    assert _supply({"SiO": 5.0e-13}, 0.0)["SiO"] == 5.0e-13
+
+    opening_kg = float(
+        sim.atom_ledger.kg_by_account(FO2_BUFFER_ACCOUNT).get(
+            OXYGEN_SPECIES, 0.0
+        )
+        or 0.0
+    )
+    assert opening_kg <= 1.0e-12, opening_kg
+    _seed_pa(sim, OXYGEN_SPECIES, 15.456162335355332, "parent-draw opening")
+
+    def law(_partials):
+        return {"CrO3": 1.1e-12}
+
+    hour = _step(sim, law, lambda _species: 0.0)
+    assert hour.shut_path is None
+    names = {str(transition.name) for transition in sim.atom_ledger.transitions}
+    assert "evaporate_CrO3" not in names
+    end_buffer_kg = float(
+        sim.atom_ledger.kg_by_account(FO2_BUFFER_ACCOUNT).get(
+            OXYGEN_SPECIES, 0.0
+        )
+        or 0.0
+    )
+    assert end_buffer_kg >= 0.0
+    return hour
+
+
+def test_refusing_solve_passes_its_iterations():
+    """A path-bearing nonconvergence reports the solver's iterations.
+
+    The shadow helper used to default the count to 0 when the caller
+    passed only the path. A failed Radau step's nfev is the count a
+    finished step reports. The commit copies that count onto the
+    refusal, with the flux and integrator counts beside it.
+    """
+
+    from unittest.mock import patch
+
+    import simulator.capacity_coupling as coupling
+    from simulator.thermal_train import NoColdTrain
+
+    molar = MOLAR_MASS["O2"] / 1000.0
+    temperature_K = 1904.7700354769336
+    volume_m3 = 0.08538380762699734
+
+    class _Failed:
+        success = False
+        nfev = 17
+        message = "forced"
+
+    def _fail(*_args, **_kwargs):
+        return _Failed()
+
+    built = coupling._build_law(
+        pre_holdup_mol={"O2": 1.0e-8},
+        molar_mass_kg_mol={"O2": molar},
+        flux_kg_hr_at_partials=lambda _partials: {"O2": 1.0e-6},
+        capacity=NoColdTrain("runtime_enforcement_disabled"),
+        temperature_K=temperature_K,
+        volume_m3=volume_m3,
+        dt_hr=1.0,
+        downstream_pressure_Pa=0.0,
+        pipe_diameter_m=0.12,
+        pipe_length_m=1.0,
+        outflow_cap_kg_s=None,
+        redox_source_mol_s=None,
+    )
+    assert not isinstance(built, coupling.CapacityShadowRefusal)
+    law, n0 = built
+    with patch("scipy.integrate.solve_ivp", _fail):
+        try:
+            coupling._slow_converge(law, n0, 3600.0)
+        except coupling._BalanceRefused as refused:
+            shadow = coupling._refused_shadow(law, refused)
+        else:
+            raise AssertionError("slow converge returned")
+    assert law.balance_path == "radau_fallback"
+    assert law.balance_iterations == 17
+    assert shadow.path == "radau_fallback"
+    assert shadow.iterations == 17
+
+    def _refuse(one_law, *_args, **_kwargs):
+        one_law.balance_path = "fast_root"
+        one_law.balance_iterations = 17
+        raise coupling._BalanceRefused(
+            "headspace_balance_nonconvergence",
+            flux_evaluations=11,
+            integrator_evaluations=13,
+        )
+
+    with patch.object(coupling, "_commit_one", _refuse):
+        committed = coupling._commit_headspace_balance(
+            pre_holdup_mol={"O2": 1.0e-8},
+            molar_mass_kg_mol={"O2": molar},
+            flux_kg_hr_at_partials=lambda _partials: {"O2": 1.0e-6},
+            capacity=NoColdTrain("runtime_enforcement_disabled"),
+            temperature_K=temperature_K,
+            volume_m3=volume_m3,
+            dt_hr=1.0,
+            downstream_pressure_Pa=0.0,
+            pipe_diameter_m=0.12,
+            pipe_length_m=1.0,
+            outflow_cap_kg_s=None,
+            redox_source_mol_s=None,
+            vessel_rating_Pa=None,
+        )
+    assert isinstance(committed, CapacityShadowRefusal)
+    assert committed.path == "fast_root"
+    assert committed.iterations == 17
+    assert committed.flux_evaluations == 11
+    assert committed.integrator_evaluations == 13
+
+
 def test_buffer_debit_is_the_redox_the_next_hour_reads():
     """A CrO3 debit reduces the buffer and lowers the melt fO2.
 
@@ -1209,6 +1446,25 @@ def test_balance_refusals_carry_the_buffer_write_log():
     assert nonconvergence.integrator_evaluations == 4
     assert nonconvergence.species_balance is not None
     assert nonconvergence.overhead_o2_writes
+
+    # The production caller used to pass the path and leave iterations
+    # at the default 0. That 0 replaced the stashed count. The path
+    # still wins. The count stays the one the solve wrote.
+    defaulted = sim._headspace_diagnostic_refusal(
+        CapacityShadowRefusal(
+            "headspace_balance_nonconvergence",
+            0,
+            path="radau_fallback",
+            flux_evaluations=11,
+            integrator_evaluations=13,
+        )
+    )
+    assert defaulted.reason == "headspace_balance_nonconvergence"
+    assert defaulted.path == "radau_fallback"
+    assert defaulted.iterations == 7
+    assert defaulted.flux_evaluations == 11
+    assert defaulted.integrator_evaluations == 13
+    assert defaulted.species_balance is not None
 
     bare = CapacityShadowRefusal("headspace_trial_committed", 0)
     assert sim._headspace_diagnostic_refusal(bare) is bare

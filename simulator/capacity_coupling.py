@@ -929,6 +929,24 @@ def _shadow_from_balance(
     )
 
 
+def _refused_shadow(
+    law: _HeadspaceLaw,
+    refused: _BalanceRefused,
+) -> CapacityShadowRefusal:
+    """Copy a refusal with the path and the iterations it had reached.
+
+    ``_shadow_from_balance`` defaults iterations to 0. Passing only
+    the path then reports that 0, and the hour wrapper treats it as
+    the solver's count. The law stores the count the branch reached.
+    An unset count stays 0.
+    """
+
+    count = law.balance_iterations
+    if not isinstance(count, int) or isinstance(count, bool) or count < 0:
+        count = 0
+    return _shadow_from_balance(refused, count, path=law.balance_path)
+
+
 @dataclass
 class _HeadspaceStep:
     moles: dict[str, float]
@@ -1026,8 +1044,10 @@ class _HeadspaceLaw:
         self.species_notices: dict[tuple[str, str], Mapping[str, Any]] = {}
         self.flux_evaluations = 0
         self.integrator_evaluations = 0
-        # Overwritten when the hour enters a branch. A refusal copies it.
+        # Overwritten when the hour enters a branch. A refusal copies
+        # both. None is an unset iteration count, not a solved 0.
         self.balance_path: str | None = None
+        self.balance_iterations: int | None = None
 
     def _remember_species_notices(
         self,
@@ -1632,6 +1652,14 @@ def _mark_balance_path(law: _HeadspaceLaw, path: str) -> None:
     law.balance_path = path
 
 
+def _remember_balance_iterations(law: _HeadspaceLaw, iterations: int) -> None:
+    # The count a refusal reports. A later branch overwrites it, the
+    # same way the path does. 0 is the unset default and is not stored.
+    count = int(iterations)
+    if count > 0:
+        law.balance_iterations = count
+
+
 def _remember_shut_path(law: _HeadspaceLaw, path: str) -> None:
     # One flag per hour. midpoint is the fast shut grid. radau_fallback
     # is the slow integral after that grid stays apart. The snapshot
@@ -2222,7 +2250,11 @@ def _slow_converge(
             jac=jacobian,
         )
     except _BalanceRefused:
+        # The cap fired inside the right-hand side, so nfev is not
+        # back. The rhs counter is how far this attempt got.
+        _remember_balance_iterations(law, law.integrator_evaluations)
         raise
+    _remember_balance_iterations(law, max(int(solution.nfev), 1))
     if not solution.success:
         raise _BalanceRefused("headspace_balance_nonconvergence")
     y_end = solution.y[:, -1]
@@ -3140,9 +3172,11 @@ def _sweep(
             )
             last_move = max(last_move, move)
             total_iterations += iterations
+            _remember_balance_iterations(law, total_iterations)
         scale = max(law.pressure_of(moles), 1.0)
         if last_move <= max(DEFAULT_ABS_TOL_PA, rel_tol * scale):
             return moles, max(total_iterations, 1), last_move
+    _remember_balance_iterations(law, total_iterations)
     raise _BalanceRefused("headspace_balance_nonconvergence")
 
 
@@ -3715,7 +3749,7 @@ def _commit_headspace_balance(
     except EvaporationFluxRefusal:
         raise
     except _BalanceRefused as refused:
-        return _shadow_from_balance(refused, path=law.balance_path)
+        return _refused_shadow(law, refused)
     return _publish(
         law,
         step,
@@ -3774,5 +3808,5 @@ def diagnostic_backward_euler_headspace_step(
     except EvaporationFluxRefusal:
         raise
     except _BalanceRefused as refused:
-        return _shadow_from_balance(refused, path=law.balance_path)
+        return _refused_shadow(law, refused)
     return _publish(law, step, capacity, vessel_rating_Pa)

@@ -3402,7 +3402,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             <= OXYGEN_RESERVOIR_NOOP_MOL
         )
 
-    def _settle_evaporative_redox_after_batch(self) -> None:
+    def _settle_evaporative_redox_after_batch(
+        self,
+        *,
+        post_exchange: bool = True,
+    ) -> None:
         # Parent/shared-O2 caps reserve inventory for the whole carrier batch.
         # Only after every carrier commits may Fe re-speciation consume FeO.
         saturated = self._evaporative_redox_is_saturated()
@@ -3417,32 +3421,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
                 fO2_log_override=self._melt_redox_fO2_upper_bound_log(),
             )
+            # A headspace hour posts the solve's integrated R on the
+            # vapour commit path. This settle does not choose a second
+            # exchange. A non-headspace hour still moves the buffer
+            # remainder, which is the exchange it had before.
+            # Unit check: the remainder is mol.
+            # Limit: a remainder at or below the noop posts nothing.
+            if not post_exchange:
+                return
             buffer_o2_mol = max(0.0, float(
                 self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(OXYGEN_SPECIES, 0.0)
             ))
-            # The headspace hour sources one excess. The exchange is
-            # that parcel, clamped to the buffer. A later credit the
-            # residual did not book stays in the buffer: it is not gas
-            # the solved pressure ignores. None means this settle is
-            # not the headspace hour, and the buffer remainder is the
-            # exchange, as before.
-            # Unit check: both amounts are mol.
-            # Limit: a sourced excess of 0 posts no exchange.
-            sourced = getattr(self, "_headspace_sourced_excess_mol", None)
-            if sourced is None:
-                excess_o2_mol = buffer_o2_mol
-            else:
-                excess_o2_mol = min(buffer_o2_mol, max(0.0, float(sourced)))
-            if excess_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+            if buffer_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL:
                 # Drain only this evaporation-owned carrier, including a
                 # solid/no-capacity or hot-band refusal. Bubbler passthrough
                 # has its own booking and must not be drained a second time.
                 # Move the SAME mol: ΔO_atoms = -2n + 2n = 0 exactly.
                 self._dispatch_and_commit(
                     ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
-                    control_inputs={'dn_to_headspace_mol': excess_o2_mol},
+                    control_inputs={'dn_to_headspace_mol': buffer_o2_mol},
                 )
-                diagnostic['excess_o2_to_headspace_mol'] = excess_o2_mol
+                diagnostic['excess_o2_to_headspace_mol'] = buffer_o2_mol
                 diagnostic.setdefault('flags', []).append('EXCESS_OXYGEN_TO_GAS')
                 self._fe_redox_respeciation_diagnostics_this_hr[-1].update(diagnostic)
         elif self._has_remaining_fe_redox_internal_o2_capacity():
@@ -4817,8 +4816,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _headspace_diagnostic_refusal(self, refusal):
         # Attach the inventory payload. A refusal that already carries
         # it, or a reason outside the two balance refusals, is unchanged.
-        # A path the solver set wins over the stashed terms. A bare
-        # negative bleed has no path; the terms the solve wrote supply it.
+        # A path the solver set wins over the stashed terms. The
+        # iteration count wins only when the solver passed one. The
+        # unset default is 0, and that 0 must not replace the stashed
+        # count. A bare negative bleed has no path; the terms the
+        # solve wrote supply both.
         from simulator.capacity_coupling import CapacityShadowRefusal
 
         if refusal.reason not in {
@@ -4836,7 +4838,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if refusal.path is not None:
             path = refusal.path
-            iterations = refusal.iterations
+            passed = refusal.iterations
+            if (
+                isinstance(passed, int)
+                and not isinstance(passed, bool)
+                and passed > 0
+            ):
+                iterations = passed
         self.atom_ledger._overhead_o2_write_listener = None
         return CapacityShadowRefusal(
             refusal.reason,
@@ -8256,10 +8264,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # capacity is a different condenser, and the ledger then posts a
         # vapor the residual never carried.
         self._effective_transport_capacity_this_tick = None
-        # None until this hour's residual publishes an excess. The
-        # settle reads it and then clears it, so a later non-headspace
-        # settle is not clamped to a stale parcel.
-        self._headspace_sourced_excess_mol = None
 
         from engines.builtin.evaporation_flux import (
             BuiltinEvaporationFluxProvider,
@@ -8822,10 +8826,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # overhead credit. The excess is the hour-open buffer,
             # plus the buffer credit, minus the oxidative debit and
             # the Fe uptake. The debit stays on the buffer. It is not
-            # a headspace source, and the settle posts this same
-            # excess. The substep length is not in this rate. Credit
-            # at or below the noop does not saturate, and the buffer
-            # is not read into S then.
+            # a headspace source. The commit posts the integral of
+            # this rate. The substep length is not in this rate.
+            # Credit at or below the noop does not saturate, and the
+            # buffer is not read into S then.
             key = _partial_key(partials_Pa)
             credit_mol = float(state['credit_mol'].get(key, 0.0) or 0.0)
             debit_mol = float(state['debit_mol'].get(key, 0.0) or 0.0)
@@ -9197,14 +9201,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 state.get('wall_accounts') or {}
             )
 
-        if solved is None:
-            self._headspace_sourced_excess_mol = None
-        elif saturation_possible:
+        if solved is not None and saturation_possible:
             # The published partials may not be a key the integral
             # stored. One evaluation fills gross for the frozen
-            # re-solve below. The excess at that partial is not the
-            # parcel: the settle posts the integral of S, written
-            # after the re-solve replaces `solved`.
+            # re-solve below. The parcel is the integral of S,
+            # posted after that re-solve replaces `solved`.
             root_key = _partial_key(solved.partial_pressures_Pa)
             if root_key not in state['excess_mol']:
                 flux_at_partials(solved.partial_pressures_Pa)
@@ -9486,12 +9487,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     pre_holdup_mol=pre_holdup,
                     molar_mass_kg_mol=molar_masses,
                 )
+        excess_integrated = 0.0
         if solved is not None:
-            # ∫S dt, moles. The reducing credit is already the else
-            # branch's overhead post. The excess is the rest, and it
-            # is the only parcel the saturated settle moves. On a fast
-            # root S is the end rate, so this is the endpoint excess.
-            # A shortfall inside the pressure gate is the tolerance.
+            # ∫S dt, moles. The reducing credit is the else branch's
+            # overhead post, not a buffer debit. The rest is the
+            # buffer release. On a saturated metal-loss hour that
+            # credit is zero, so the release is R. The commit posts
+            # it through the same dispatch as the vapour. The settle
+            # does not choose another exchange. On a fast root S is
+            # the end rate, so this is the endpoint excess. A
+            # shortfall inside the pressure gate is the tolerance.
             integrated = float(
                 dict(getattr(solved, "redox_added_mol", {}) or {}).get(
                     OXYGEN_SPECIES, 0.0,
@@ -9517,9 +9522,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         )
                     )
                 excess_integrated = 0.0
-            self._headspace_sourced_excess_mol = excess_integrated
-        self._settle_evaporative_redox_after_batch()
-        self._headspace_sourced_excess_mol = None
+        # Fe respeciation still runs here. A solved headspace hour
+        # does not let the settle post its own exchange.
+        self._settle_evaporative_redox_after_batch(
+            post_exchange=solved is None,
+        )
+        if excess_integrated > OXYGEN_RESERVOIR_NOOP_MOL:
+            # Algebra: n = ∫S dt − n_reducing. Unit: mol.
+            # Limit: at or below the noop posts nothing. A negative
+            # figure was clamped above and is not a buffer debit.
+            self._dispatch_and_commit(
+                ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
+                control_inputs={'dn_to_headspace_mol': excess_integrated},
+            )
         self._headspace_hour_settled = True
         self._remember_headspace_balance_terms(
             state.get("extent_holder") if solved is not None else None
