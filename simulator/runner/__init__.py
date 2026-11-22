@@ -135,7 +135,6 @@ from simulator.run_executor import (
     _safe_exception_text,
 )
 from simulator.lab_geometry import (
-    LAB_GEOMETRY_SCALE,
     LabGeometry,
     LabGeometryError,
     _lab_surface_temperature_default_notices,
@@ -542,7 +541,7 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
     schedule, pressure_notices = (
         campaign_manager._default_missing_lab_schedule_pressure(
             schedule,
-            enabled="chamber_pressure_mbar" not in schedule,
+            lab_geometry=geometry,
             duration_h=duration_h,
         )
     )
@@ -572,7 +571,14 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         ) from exc
 
     mass_g = lab_geometry.sample_mass_g
-    mass_defaulted = mass_g is None
+    default_mass_kg = PyrolysisRun(feedstock_id=feedstock_id).mass_kg
+    mass_kg, mass_defaulted, mass_notice = (
+        campaign_manager._default_missing_lab_sample_mass(
+            geometry,
+            sample_mass_g=mass_g,
+            default_mass_kg=default_mass_kg,
+        )
+    )
     hours = int(duration_h)
     if not math.isclose(duration_h, float(hours), rel_tol=0.0, abs_tol=1e-9):
         raise PresetRunnerError(
@@ -601,11 +607,6 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
     ):
         if key in preset:
             provenance[key] = copy.deepcopy(preset[key])
-    mass_kg = (
-        PyrolysisRun(feedstock_id=feedstock_id).mass_kg
-        if mass_defaulted
-        else float(mass_g) / 1000.0
-    )
     provenance.update(
         {
             "feedstock_id": feedstock_id,
@@ -617,19 +618,7 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         }
     )
     notices = list(pressure_notices)
-    if mass_defaulted:
-        mass_notice = {
-            "code": "knob_defaulted",
-            "path": "mass_kg",
-            "value": mass_kg,
-            "unit": "kg",
-            "default_source": "PyrolysisRun.mass_kg",
-        }
-        if (
-            lab_geometry.scale == LAB_GEOMETRY_SCALE
-            and lab_geometry.sample_mass_g is None
-        ):
-            mass_notice["out_of_domain"] = True
+    if mass_notice is not None:
         notices.append(mass_notice)
     notices.extend(
         _lab_surface_temperature_default_notices(

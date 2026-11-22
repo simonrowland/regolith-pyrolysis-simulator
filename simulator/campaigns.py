@@ -2602,16 +2602,9 @@ class CampaignManager:
     def _normalize_lab_schedule(self, raw: Any) -> Mapping:
         if not isinstance(raw, Mapping):
             return normalize_lab_schedule(raw)
-        use_gram_lab_default = (
-            isinstance(self.setpoints.get("lab_geometry"), Mapping)
-            and str(
-                self.setpoints["lab_geometry"].get("scale") or ""
-            ).strip()
-            == LAB_GEOMETRY_SCALE
-        )
         schedule, notices = self._default_missing_lab_schedule_pressure(
             raw,
-            enabled=use_gram_lab_default,
+            lab_geometry=self.setpoints.get("lab_geometry"),
         )
         for notice in notices:
             if notice not in self.lab_schedule_notices:
@@ -2622,11 +2615,14 @@ class CampaignManager:
         self,
         raw: Mapping,
         *,
-        enabled: bool = True,
+        lab_geometry: Mapping[str, Any] | None = None,
         duration_h: float | None = None,
     ) -> tuple[dict[str, Any], list[dict[str, object]]]:
         schedule = dict(raw)
-        if not enabled or "chamber_pressure_mbar" in schedule:
+        if (
+            not self._uses_gram_lab_defaults(lab_geometry)
+            or "chamber_pressure_mbar" in schedule
+        ):
             return schedule, []
 
         pressure_mbar = self._pressure_config_float(
@@ -2646,34 +2642,60 @@ class CampaignManager:
                 "unit": "mbar",
             },
         ]
+        notice = self._lab_knob_default_notice(
+            lab_geometry,
+            path="lab_schedule.chamber_pressure_mbar",
+            value=pressure_mbar,
+            unit="mbar",
+            default_source="campaigns.C0.p_total_mbar_default",
+        )
+        return schedule, [notice]
+
+    @staticmethod
+    def _uses_gram_lab_defaults(lab_geometry: Any) -> bool:
+        return (
+            isinstance(lab_geometry, Mapping)
+            and str(lab_geometry.get("scale") or "").strip()
+            == LAB_GEOMETRY_SCALE
+        )
+
+    def _lab_knob_default_notice(
+        self,
+        lab_geometry: Any,
+        *,
+        path: str,
+        value: float,
+        unit: str,
+        default_source: str,
+    ) -> dict[str, object]:
         notice: dict[str, object] = {
             "code": "knob_defaulted",
-            "path": "lab_schedule.chamber_pressure_mbar",
-            "value": pressure_mbar,
-            "unit": "mbar",
-            "default_source": "campaigns.C0.p_total_mbar_default",
+            "path": path,
+            "value": value,
+            "unit": unit,
+            "default_source": default_source,
         }
-        reported_profile = schedule.get("reported_exposure_profile")
-        reported_pressure = (
-            reported_profile.get("pressure_mbar")
-            if isinstance(reported_profile, Mapping)
-            else None
+        if self._uses_gram_lab_defaults(lab_geometry):
+            notice["out_of_domain"] = True
+        return notice
+
+    def _default_missing_lab_sample_mass(
+        self,
+        lab_geometry: Mapping[str, Any],
+        *,
+        sample_mass_g: float | None,
+        default_mass_kg: float,
+    ) -> tuple[float, bool, dict[str, object] | None]:
+        if sample_mass_g is not None:
+            return float(sample_mass_g) / 1000.0, False, None
+        notice = self._lab_knob_default_notice(
+            lab_geometry,
+            path="mass_kg",
+            value=default_mass_kg,
+            unit="kg",
+            default_source="PyrolysisRun.mass_kg",
         )
-        if isinstance(reported_pressure, Mapping):
-            try:
-                reported_min = float(reported_pressure["reported_min_value"])
-                reported_max = float(reported_pressure["reported_max_value"])
-            except (KeyError, TypeError, ValueError):
-                pass
-            else:
-                if (
-                    math.isfinite(reported_min)
-                    and math.isfinite(reported_max)
-                    and reported_min <= reported_max
-                    and not reported_min <= pressure_mbar <= reported_max
-                ):
-                    notice["out_of_domain"] = True
-        return schedule, [notice]
+        return default_mass_kg, True, notice
 
     def apply_lab_schedule_controls(
             self,

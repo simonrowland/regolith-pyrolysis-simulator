@@ -314,36 +314,32 @@ def _gram_lab_run(preset: dict, *, campaign: str) -> PyrolysisRun:
 
 
 def test_null_exposed_melt_area_defaults_to_sized_crucible_face() -> None:
-    for name in ("robinot_2026.yaml", "sesko_2024.yaml"):
-        preset = _vacuum_preset(name)
-        assert preset["lab_geometry"]["sample"].get("exposed_melt_area_m2") in (
-            None,
-            "",
-        )
-        run = _gram_lab_run(preset, campaign="C0")
-        session = SimSession()
-        session.start(run._session_config())
-        sim = session.simulator
-        crucible_area_m2 = sim._equipment.crucible.melt_surface_area_m2
-        assert crucible_area_m2 > 0.0
-        assert sim.melt.melt_surface_area_m2 == pytest.approx(crucible_area_m2)
-        if name == "sesko_2024.yaml":
-            normalized = sim.campaign_mgr._lab_schedule(
-                runner_module.CampaignPhase.C0
-            )
-            assert [point["value"] for point in normalized[
-                "chamber_pressure_mbar"
-            ]] == [pytest.approx(1.0e-3), pytest.approx(1.0e-2)]
-            assert sim.campaign_mgr.lab_schedule_notices == []
-            result = run._run_session(session)
-            runtime_notices = {
-                notice["path"]: notice
-                for notice in result["run_metadata"]["notices"]
-            }
-            assert "lab_schedule.chamber_pressure_mbar" not in runtime_notices
-            assert runtime_notices[
-                "lab_geometry.surfaces.quartz_window.temperature_C"
-            ]["value"] == pytest.approx(0.0)
+    preset = _vacuum_preset("sesko_2024.yaml")
+    assert preset["lab_geometry"]["sample"].get("exposed_melt_area_m2") in (
+        None,
+        "",
+    )
+    run = _gram_lab_run(preset, campaign="C0")
+    session = SimSession()
+    session.start(run._session_config())
+    sim = session.simulator
+    crucible_area_m2 = sim._equipment.crucible.melt_surface_area_m2
+    assert crucible_area_m2 > 0.0
+    assert sim.melt.melt_surface_area_m2 == pytest.approx(crucible_area_m2)
+    normalized = sim.campaign_mgr._lab_schedule(
+        runner_module.CampaignPhase.C0
+    )
+    assert [point["value"] for point in normalized[
+        "chamber_pressure_mbar"
+    ]] == [pytest.approx(1.0e-3), pytest.approx(1.0e-2)]
+    assert sim.campaign_mgr.lab_schedule_notices == []
+    result = run._run_session(session)
+    runtime_notices = {
+        notice["path"]: notice
+        for notice in result["run_metadata"]["notices"]
+    }
+    assert "lab_schedule.chamber_pressure_mbar" not in runtime_notices
+    assert "lab_geometry.surfaces.quartz_window.temperature_C" not in runtime_notices
 
     robinot = _vacuum_preset("robinot_2026.yaml")
     printed = copy.deepcopy(robinot)
@@ -435,12 +431,48 @@ def test_missing_pressure_default_is_limited_to_gram_lab() -> None:
     assert manager.lab_schedule_notices == []
 
 
+def test_preset_loader_keeps_missing_pressure_behind_gram_lab_gate(
+    tmp_path: Path,
+) -> None:
+    document = _vacuum_preset("pomeroy_cardiff_2006.yaml")
+    document["lab_geometry"]["scale"] = "pilot_scale"
+    preset_path = tmp_path / "non_gram_pomeroy.yaml"
+    preset_path.write_text(yaml.safe_dump(document), encoding="utf-8")
+
+    with pytest.raises(
+        runner_module.PresetRunnerError,
+        match="lab_schedule_chamber_pressure_mbar_must_be_points",
+    ):
+        runner_module._load_vacuum_preset_run_spec(preset_path, "faithful")
+
+    document["lab_schedule"]["chamber_pressure_mbar"] = [
+        {"t_h": 0.0, "value": 2.0, "unit": "mbar"},
+        {"t_h": 4.0, "value": 2.0, "unit": "mbar"},
+    ]
+    preset_path.write_text(yaml.safe_dump(document), encoding="utf-8")
+    preset = runner_module._load_vacuum_preset_run_spec(
+        preset_path, "faithful"
+    )
+    mass_notice = next(
+        notice
+        for notice in preset.provenance["notices"]
+        if notice["path"] == "mass_kg"
+    )
+    assert preset.mass_kg == pytest.approx(1000.0)
+    assert "out_of_domain" not in mass_notice
+    assert [
+        point["value"] for point in preset.lab_schedule["chamber_pressure_mbar"]
+    ] == [pytest.approx(2.0), pytest.approx(2.0)]
+
+
 def test_c0_start_installs_printed_area_before_the_bridge(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     robinot = _vacuum_preset("robinot_2026.yaml")
-    printed = copy.deepcopy(robinot)
-    printed["lab_geometry"]["sample"]["exposed_melt_area_m2"] = 0.000123
+    declared_area_m2 = robinot["lab_geometry"]["sample"][
+        "exposed_melt_area_m2"
+    ]
+    assert declared_area_m2 == pytest.approx(1.327e-4)
     forecast_areas: list[float] = []
     predict = PyrolysisSimulator._predict_c0_exit
 
@@ -449,15 +481,20 @@ def test_c0_start_installs_printed_area_before_the_bridge(
         return predict(simulator, *args, **kwargs)
 
     monkeypatch.setattr(PyrolysisSimulator, "_predict_c0_exit", capture_area)
-    run = _gram_lab_run(printed, campaign="C0")
+    run = _gram_lab_run(robinot, campaign="C0")
     session = SimSession()
     session.start(run._session_config())
-    assert forecast_areas == [pytest.approx(0.000123)]
+    assert forecast_areas == [pytest.approx(declared_area_m2)]
     melt_m2 = session.simulator.melt.melt_surface_area_m2
     sized_m2 = session.simulator._equipment.crucible.melt_surface_area_m2
-    assert melt_m2 == pytest.approx(0.000123)
+    assert melt_m2 == pytest.approx(declared_area_m2)
     assert melt_m2 != pytest.approx(sized_m2)
-    omitted = copy.deepcopy(printed)
+    declared_bridge = run._lab_area_bridge(crucible_face_area_m2=sized_m2)
+    assert declared_bridge["effective_exposed_area_m2"] == pytest.approx(
+        declared_area_m2
+    )
+    assert "notices" not in declared_bridge
+    omitted = copy.deepcopy(robinot)
     omitted["lab_geometry"]["sample"]["exposed_melt_area_m2"] = None
     omitted_session = SimSession()
     omitted_session.start(
@@ -470,7 +507,7 @@ def test_c0_start_installs_printed_area_before_the_bridge(
         omitted_sized_area_m2
     )
     assert forecast_areas == [
-        pytest.approx(0.000123),
+        pytest.approx(declared_area_m2),
         pytest.approx(omitted_sized_area_m2),
     ]
 
@@ -646,20 +683,8 @@ def test_preset_bridge_cli_maps_leg_and_records_provenance(tmp_path: Path):
         "geometry_id": "bridge_geometry",
         "effective_exposed_area_m2": 0.000123,
         "area_basis": "gram_lab_exposed_melt",
-        "notices": [
-            {
-                "code": "knob_defaulted",
-                "path": "lab_geometry.surfaces.witness.temperature_C",
-                "value": 0.0,
-                "unit": "C",
-                "default_source": (
-                    "LabSurface.to_pipe_segment.wall_temperature_C"
-                ),
-                "source_class": "assumption_with_sensitivity_marker",
-                "sensitivity_marker": "defaulted_lab_surface_temperature",
-            }
-        ],
     }
+    assert preset.get("notices", []) == []
     assert metadata["feedstock_id"] == "lunar_mare_low_ti"
     assert metadata["mass_kg"] == pytest.approx(0.002)
     assert metadata["hours_requested"] == 1

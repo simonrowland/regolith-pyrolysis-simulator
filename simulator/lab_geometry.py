@@ -243,9 +243,7 @@ def resolve_gram_lab_exposed_melt_area(
     return GramLabMeltAreaResolution(
         area_m2=area,
         defaulted=defaulted,
-        out_of_domain=(
-            defaulted and sample.get("mass_g") in (None, "")
-        ),
+        out_of_domain=defaulted,
     )
 
 
@@ -414,7 +412,7 @@ def _surface_temperature_resolution(
             return _required_finite(raw[key], f"{surface_id}.{key}"), False
     if temperature_profile:
         if allow_temperature_profiles:
-            return None, allow_temperature_default
+            return None, False
         raise LabGeometryError(
             "missing_lab_surface_temperature",
             f"{surface_id}: temperature_C or resolvable temperature_profile is required",

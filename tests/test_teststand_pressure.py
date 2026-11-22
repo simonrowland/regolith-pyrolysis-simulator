@@ -602,7 +602,7 @@ def test_every_vacuum_preset_resolves_to_imposed_pressure() -> None:
         for notice in sesko_apparatus.notices
     )
     sample = robinot["lab_geometry"]["sample"]
-    assert sample["exposed_melt_area_m2"] is None
+    assert sample["exposed_melt_area_m2"] == pytest.approx(1.327e-4)
     assert sample["pellet_diameter_mm"] == 13
     assert sample["pellet_height_mm"] == 10
     assert sample["mass_g"] == pytest.approx(3.38)

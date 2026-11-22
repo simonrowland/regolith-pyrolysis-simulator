@@ -526,27 +526,14 @@ def test_unreported_pomeroy_knobs_use_runner_defaults_and_report_them(
     notices = {
         notice["path"]: notice for notice in preset.provenance["notices"]
     }
-    surface_notices = {
-        f"lab_geometry.surfaces.{surface_id}.temperature_C": {
-            "code": "knob_defaulted",
-            "path": f"lab_geometry.surfaces.{surface_id}.temperature_C",
-            "value": 0.0,
-            "unit": "C",
-            "default_source": "LabSurface.to_pipe_segment.wall_temperature_C",
-            "source_class": "assumption_with_sensitivity_marker",
-            "sensitivity_marker": "defaulted_lab_surface_temperature",
-            "out_of_domain": True,
-        }
-        for surface_id in ("crucible_wall", "cold_trap", "rga_line")
-    }
     assert notices == {
-        **surface_notices,
         "lab_schedule.chamber_pressure_mbar": {
             "code": "knob_defaulted",
             "path": "lab_schedule.chamber_pressure_mbar",
             "value": expected_default_pressure_mbar,
             "unit": "mbar",
             "default_source": "campaigns.C0.p_total_mbar_default",
+            "out_of_domain": True,
         },
         "mass_kg": {
             "code": "knob_defaulted",
@@ -582,20 +569,22 @@ def test_unreported_pomeroy_knobs_use_runner_defaults_and_report_them(
     assert "lab_geometry.surfaces.crucible_wall.temperature_C" not in mutated_notices
 
 
-def test_runtime_pressure_stays_within_each_printed_preset_range() -> None:
+def test_pomeroy_unreported_mass_digest_describes_the_paper() -> None:
+    measurement = load_yaml(MEASUREMENTS_PATH)["measurements"][
+        "pomeroy_cardiff_2006_measurements"
+    ]
+    sample_mass = measurement["conditions_reported"]["sample_mass_g"]
+
+    assert sample_mass["reported_status"] == NOT_REPORTED
+    assert "paper does not state" in sample_mass["source"]["digest"]
+    assert "simulator" not in sample_mass["source"]["digest"]
+
+
+def test_runtime_pressure_stays_within_each_printed_preset_range(
+    tmp_path: Path,
+) -> None:
     ranged_presets = 0
     rejected_mutations = 0
-
-    def require_pressure_within_range(
-        points: list[dict], reported_min: float, reported_max: float
-    ) -> None:
-        assert points, "printed pressure range has no runtime pressure points"
-        for point in points:
-            value = float(point["value"])
-            assert reported_min <= value <= reported_max, (
-                f"runtime pressure {value} mbar is outside printed range "
-                f"{reported_min}..{reported_max} mbar"
-            )
 
     for preset_path in sorted(PRESET_DIR.glob("*.yaml")):
         source_schedule = load_yaml(preset_path)["lab_schedule"]
@@ -613,24 +602,36 @@ def test_runtime_pressure_stays_within_each_printed_preset_range() -> None:
         runtime_schedule = runner_module._load_vacuum_preset_run_spec(
             preset_path, "faithful"
         ).lab_schedule
-        require_pressure_within_range(
-            runtime_schedule["chamber_pressure_mbar"],
-            reported_min,
-            reported_max,
+        runtime_points = runtime_schedule["chamber_pressure_mbar"]
+        assert runtime_points, (
+            f"{preset_path.name} printed pressure range has no runtime points"
         )
+        assert all(
+            reported_min <= float(point["value"]) <= reported_max
+            for point in runtime_points
+        ), f"{preset_path.name} runtime pressure is outside its printed range"
 
         if not reported_min <= 1.0 <= reported_max:
-            mutated_points = copy.deepcopy(
-                runtime_schedule["chamber_pressure_mbar"]
-            )
-            for point in mutated_points:
+            mutated_document = load_yaml(preset_path)
+            for point in mutated_document["lab_schedule"][
+                "chamber_pressure_mbar"
+            ]:
                 point["value"] = 1.0
+            mutated_path = tmp_path / f"{preset_path.stem}_pressure_mutation.yaml"
+            mutated_path.write_text(
+                yaml.safe_dump(mutated_document), encoding="utf-8"
+            )
+            mutated_schedule = runner_module._load_vacuum_preset_run_spec(
+                mutated_path, "faithful"
+            ).lab_schedule
+            mutated_points = mutated_schedule["chamber_pressure_mbar"]
             with pytest.raises(
                 AssertionError, match="outside printed range"
             ):
-                require_pressure_within_range(
-                    mutated_points, reported_min, reported_max
-                )
+                assert all(
+                    reported_min <= float(point["value"]) <= reported_max
+                    for point in mutated_points
+                ), "mutated runtime pressure is outside printed range"
             rejected_mutations += 1
 
     assert ranged_presets > 0
@@ -691,10 +692,7 @@ def test_benchtop_presets_report_stage0_refusal_and_defaults(
         design.crucible.melt_surface_area_m2
     )
     assert area_notice["source_class"] == "assumption_with_sensitivity_marker"
-    if preset.provenance["sample_mass_g"] is None:
-        assert area_notice["out_of_domain"] is True
-    else:
-        assert "out_of_domain" not in area_notice
+    assert area_notice["out_of_domain"] is True
 
     if preset_path == SESKO_PRESET_PATH:
         assert preset.provenance["sample_mass_g"] == SESKO_SAMPLE_MASS_G
@@ -718,20 +716,21 @@ def test_benchtop_presets_report_stage0_refusal_and_defaults(
         ] == [SESKO_PRESSURE_RUNTIME_FLOOR_MBAR, SESKO_PRESSURE_REPORTED_MAX_MBAR]
         assert not any(
             notice["path"] == "lab_schedule.chamber_pressure_mbar"
-            for notice in preset.provenance["notices"]
+            for notice in preset.provenance.get("notices", [])
         )
         surface_notices = [
             notice
-            for notice in preset.provenance["notices"]
+            for notice in preset.provenance.get("notices", [])
             if notice["path"].startswith("lab_geometry.surfaces.")
         ]
-        assert {notice["path"] for notice in surface_notices} == {
-            "lab_geometry.surfaces.quartz_window.temperature_C",
-            "lab_geometry.surfaces.crucible_wall.temperature_C",
-            "lab_geometry.surfaces.chamber_wall.temperature_C",
-        }
-        assert all(notice["value"] == pytest.approx(0.0) for notice in surface_notices)
-        assert all("out_of_domain" not in notice for notice in surface_notices)
+        assert surface_notices == []
+        surface_schedule = preset.lab_schedule["surface_temperature_C"]
+        assert surface_schedule["crucible_wall"][0]["value"] == pytest.approx(
+            180.0
+        )
+        assert surface_schedule["quartz_window"][0]["value"] == pytest.approx(
+            25.0
+        )
     else:
         expected_mass_kg = runner_module.PyrolysisRun(
             feedstock_id=preset.feedstock_id
@@ -757,9 +756,6 @@ def test_benchtop_presets_report_stage0_refusal_and_defaults(
         assert set(notices) == {
             "mass_kg",
             "lab_schedule.chamber_pressure_mbar",
-            "lab_geometry.surfaces.crucible_wall.temperature_C",
-            "lab_geometry.surfaces.cold_trap.temperature_C",
-            "lab_geometry.surfaces.rga_line.temperature_C",
         }
         mass_notice = notices["mass_kg"]
         pressure_notice = notices["lab_schedule.chamber_pressure_mbar"]
@@ -770,15 +766,7 @@ def test_benchtop_presets_report_stage0_refusal_and_defaults(
         assert pressure_notice["value"] == pytest.approx(
             expected_pressure_mbar
         )
-        assert all(
-            notices[path]["value"] == pytest.approx(0.0)
-            and notices[path]["out_of_domain"] is True
-            for path in (
-                "lab_geometry.surfaces.crucible_wall.temperature_C",
-                "lab_geometry.surfaces.cold_trap.temperature_C",
-                "lab_geometry.surfaces.rga_line.temperature_C",
-            )
-        )
+        assert pressure_notice["out_of_domain"] is True
         assert area_notice["out_of_domain"] is True
 
     class ThermoEngineBackend:

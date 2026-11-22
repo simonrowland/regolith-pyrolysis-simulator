@@ -23,6 +23,7 @@ from simulator.lab_schedule import LabScheduleValidationError, normalize_lab_sch
 from simulator.equipment import EquipmentDesigner
 from simulator.lab_geometry import (
     LabGeometryError,
+    _lab_surface_temperature_default_notices,
     parse_lab_geometry,
     require_lab_pipe_length,
 )
@@ -314,6 +315,57 @@ def test_unreported_gram_lab_surface_uses_existing_temperature_default() -> None
         default_diameter_m=0.02,
     )
     assert segment.wall_temperature_C == pytest.approx(0.0)
+
+
+def test_profile_surface_notice_describes_the_temperature_used_at_runtime() -> None:
+    raw = dynamic_surface_geometry_fixture()
+    raw["sample"] = {"mass_g": 10.0}
+    schedule = dynamic_lab_schedule()
+    assert _lab_surface_temperature_default_notices(
+        raw,
+        sample_mass_g=10.0,
+        allow_temperature_profiles=True,
+    ) == []
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=2,
+        mass_kg=0.01,
+        backend_name="internal-analytical",
+        setpoints_patch={"lab_geometry": raw},
+        lab_schedule=schedule,
+        force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True,
+    )
+    sim = run._start_session().simulator
+    temperatures = sim._resolve_lab_surface_temperatures(
+        schedule["surface_temperature_C"],
+        sample_time_h=0.0,
+    )
+    assert temperatures == {"holder": 25.0, "condenser": 1500.0}
+
+    raw["surfaces"][0].pop("temperature_profile")
+    notices = _lab_surface_temperature_default_notices(
+        raw,
+        sample_mass_g=10.0,
+        allow_temperature_profiles=True,
+    )
+    assert notices == [
+        {
+            "code": "knob_defaulted",
+            "path": "lab_geometry.surfaces.holder.temperature_C",
+            "value": 0.0,
+            "unit": "C",
+            "default_source": "LabSurface.to_pipe_segment.wall_temperature_C",
+            "source_class": "assumption_with_sensitivity_marker",
+            "sensitivity_marker": "defaulted_lab_surface_temperature",
+        }
+    ]
+    geometry = parse_lab_geometry(raw, allow_temperature_profiles=True)
+    assert geometry is not None
+    holder = next(surface for surface in geometry.surfaces if surface.surface_id == "holder")
+    assert holder.temperature_C == pytest.approx(notices[0]["value"])
 
 
 def test_unreported_non_benchtop_surface_temperature_still_refuses() -> None:
