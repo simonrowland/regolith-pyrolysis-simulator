@@ -102,6 +102,14 @@ def _force_internal_analytical(monkeypatch) -> list:
 # payloads that made runs unusable.
 SAWTOOTH_SLOPE_BYTES_PER_HOUR = 100.0
 
+# One campaign change may add a fixed per-hour block. The measured
+# C0B -> C2A_STAGED wire step at df8da164a1 is +786 bytes: evap_plane
+# selectivity stays present (~580 bytes, five keys) instead of dropping
+# out, and c2a_staged_gas adds ~257 bytes. 2000 bytes is the next round
+# kilobyte above that step. A multi-kilobyte history copied onto the row
+# at the boundary still fails. This cap is not the slope bound.
+CAMPAIGN_BOUNDARY_STEP_BYTES = 2000
+
 
 def _assert_hourly_payload_slope_is_bounded(
     event: str,
@@ -143,6 +151,66 @@ def _assert_hourly_payload_slope_is_bounded(
     assert not all(interval_slope > 0.0 for interval_slope in interval_slopes), (
         f"{event} payload grew {slope:.1f} bytes/hour; samples={ordered}"
     )
+
+
+def _assert_campaign_hourly_payload_is_bounded(
+    event: str,
+    samples: list[tuple[str, int, int]],
+) -> None:
+    """Bound hour-count growth without folding in a campaign-start block.
+
+    ``samples`` are ``(campaign, hour, size)`` in emit order. Inside each
+    contiguous run of one campaign the ordinary slope gate applies, so a
+    list that lengthens every hour still fails at 100 bytes/hour (and a
+    strictly rising series fails below that). A size jump is allowed only
+    where the campaign label changes, and only up to
+    ``CAMPAIGN_BOUNDARY_STEP_BYTES``.
+
+    The whole-window slope does not do this. At df8da164a1 the hours 5–12
+    per_hour_summary sizes are flat inside C0B and inside C2A_STAGED, with
+    one +786 byte step between them, and the least-squares slope across
+    that window is 166.7. The same window at 919a36a964 alternates, because
+    ``evap_plane_selectivity`` is absent on the no-flux hours (10 and 12)
+    and present on the hours that have vapour-target flux (9 and 11). The
+    runner omits that block when ``target_species`` is empty, and the
+    diagnostic leaves ``target_species`` unset when total flux is at or
+    below the selectivity epsilon. t-1884 keeps a non-zero target flux on
+    every C2A hour, so the block stays (581–584 bytes, span 5, not a
+    lengthening list) and the window slope crosses 100. The drain, throat,
+    vane, and train-flow fields added with it are scalars. Their byte
+    counts jitter with numeric text; none is a per-hour history.
+    ``fixed_pressure_holdup_notice`` is one fixed string on the C0B hours
+    and absent outside them.
+    """
+    assert len(samples) >= 3, (event, samples)
+    runs: list[tuple[str, list[tuple[int, int]]]] = []
+    for campaign, hour, size in samples:
+        assert isinstance(campaign, str) and campaign, (
+            event,
+            (campaign, hour, size),
+        )
+        point = (hour, size)
+        if runs and runs[-1][0] == campaign:
+            runs[-1][1].append(point)
+        else:
+            runs.append((campaign, [point]))
+    for campaign, points in runs:
+        if len(points) < 3:
+            continue
+        _assert_hourly_payload_slope_is_bounded(
+            f"{event}[{campaign}]",
+            points,
+        )
+    for (left_name, left_points), (right_name, right_points) in zip(
+        runs, runs[1:]
+    ):
+        step = right_points[0][1] - left_points[-1][1]
+        assert abs(step) <= CAMPAIGN_BOUNDARY_STEP_BYTES, (
+            f"{event} campaign boundary {left_name}->{right_name} "
+            f"stepped {step} bytes "
+            f"(bound {CAMPAIGN_BOUNDARY_STEP_BYTES}); "
+            f"from {left_points[-1]} to {right_points[0]}"
+        )
 
 
 def test_hourly_payload_gate_rejects_linear_1000_bytes_per_hour() -> None:
@@ -452,13 +520,23 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         assert len(tick_payloads) >= 12, tick_payloads
         for event, hour, size, _serialized in wire_samples:
             assert size < 120_000, (event, hour, size)
-        summary_hourly = [
-            (hour, size)
-            for name, hour, size, _serialized in wire_samples
-            if name == "per_hour_summary" and hour is not None
-        ][:12]
-        _assert_hourly_payload_slope_is_bounded(
-            "per_hour_summary", summary_hourly[4:12]
+        # Same window as before: the first four of the twelve summaries are
+        # warm-up, and the gate looks at hours 5-12. Slope is per contiguous
+        # campaign inside that window. A whole-window slope treats the
+        # one-time C2A_STAGED block (evap_plane_selectivity staying on, plus
+        # c2a_staged_gas) as 166.7 bytes/hour of growth. See
+        # _assert_campaign_hourly_payload_is_bounded.
+        summary_hourly: list[tuple[str, int, int]] = []
+        for name, hour, size, serialized in wire_samples:
+            if name != "per_hour_summary" or hour is None:
+                continue
+            payload = json.loads(serialized)
+            campaign = payload.get("campaign")
+            assert isinstance(campaign, str) and campaign, (hour, size)
+            summary_hourly.append((campaign, hour, size))
+        _assert_campaign_hourly_payload_is_bounded(
+            "per_hour_summary",
+            summary_hourly[:12][4:12],
         )
         tick_samples_by_campaign: dict[str, list[tuple[int, int]]] = {}
         for tick in tick_payloads:
@@ -682,6 +760,61 @@ def test_hourly_payload_gate_rejects_sawtooth_growth() -> None:
                 (6, 49_999),
             ],
         )
+
+
+def test_hourly_payload_gate_rejects_cumulative_growth_within_one_campaign() -> None:
+    """A list that lengthens inside one campaign is still hour-count growth.
+
+    Splitting on the campaign label must not excuse it. The series rises
+    1000 bytes every hour under a single label, so the within-campaign
+    slope is 1000 and the 100 byte/hour bound still fires.
+    """
+    with pytest.raises(AssertionError, match="grew 1000.0 bytes/hour"):
+        _assert_campaign_hourly_payload_is_bounded(
+            "per_hour_summary",
+            [
+                ("C2A_STAGED", hour, 7_000 + 1_000 * hour)
+                for hour in range(9, 15)
+            ],
+        )
+
+
+def test_hourly_payload_gate_rejects_campaign_boundary_step_over_2kb() -> None:
+    """The boundary allowance is a cap, not an open door."""
+    with pytest.raises(AssertionError, match="stepped 3000 bytes"):
+        _assert_campaign_hourly_payload_is_bounded(
+            "per_hour_summary",
+            [
+                ("C0B", 6, 5_000),
+                ("C0B", 7, 5_000),
+                ("C0B", 8, 5_000),
+                ("C2A_STAGED", 9, 8_000),
+                ("C2A_STAGED", 10, 8_000),
+                ("C2A_STAGED", 11, 8_000),
+            ],
+        )
+
+
+def test_hourly_payload_gate_allows_bounded_campaign_boundary_step() -> None:
+    """The df8da164a1 C0B and C2A rows are flat, with one step between them.
+
+    The failing window was hours 5-12, slope 166.7 bytes/hour. These
+    seven samples are that window without the single C0 hour: inside
+    each campaign the slope is jitter (0.0 and 1.9), and the
+    C0B -> C2A_STAGED step is +786 bytes.
+    """
+    _assert_campaign_hourly_payload_is_bounded(
+        "per_hour_summary",
+        [
+            ("C0B", 6, 6_406),
+            ("C0B", 7, 6_428),
+            ("C0B", 8, 6_406),
+            ("C2A_STAGED", 9, 7_192),
+            ("C2A_STAGED", 10, 7_198),
+            ("C2A_STAGED", 11, 7_193),
+            ("C2A_STAGED", 12, 7_200),
+        ],
+    )
 
 
 def test_hourly_payload_gate_still_allows_flat_jitter() -> None:
