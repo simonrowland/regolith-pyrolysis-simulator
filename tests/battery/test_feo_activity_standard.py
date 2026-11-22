@@ -38,6 +38,9 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
         "61b0c0bb1105c233265d2e0175899f2c28bb0db324798c8e850025c8864acac0"
     ),
     Engine.OPENIMCC: (
+        # Serialized while coefficient_sources[2] was still green's b9c49790....
+        # The 979adb2 full-table token 493c67d5... moves this line. Re-derive
+        # from test_declared_zero_offset_feo_standards_preserve_residual_bytes[openimcc-published-core].
         "23d00bd8a218fca557c7b060458ceaaef1494017a76ee700dcee7ee9b7d6ea74"
     ),
 }
@@ -48,9 +51,9 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
 # uses published-core 1.0.2 (digest
 # ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c), whose
 # FeO standard is Fe-019 with exactly zero shift. The residual value is
-# unchanged. Serialized changes are coefficient_sources[0] (pack version
-# 1.0.3-d066-v1 -> 1.0.2), coefficient_sources[1] and [3] (pack/melt digest
-# 02c88c04... -> ae979b68...), and the new
+# unchanged. Serialized changes already in 23d00bd8 are coefficient_sources[0]
+# (pack version 1.0.3-d066-v1 -> 1.0.2), coefficient_sources[1] and [3]
+# (pack/melt digest 02c88c04... -> ae979b68...), and the
 # candidate_observation.provenance.feo_standard_normalisation record:
 # from_standard, to_standard, melt_pack_identity, delta_g_j_mol, log10_shift,
 # and temperature_K. The candidate and top-level notices remain empty; there
@@ -265,8 +268,10 @@ def test_openimcc_feo_row_refuses_missing_melt_binding() -> None:
 def test_openimcc_feo_row_refuses_a_changed_condensate_digest() -> None:
     identity = _melt_pack_identity("default")
     actual_digest = "a" * 64
+    # OpenIMCC 979adb2 PACKAGED_FULL_CONDENSATE_TABLE_DIGEST. Independent of
+    # the owner constant so this refusal does not echo that assignment.
     expected_digest = (
-        "b9c497901404b03b1d1e20bec58f2d4c0903f481af17ae82bfcf97ea7f4bf5e8"
+        "493c67d5ba23b75767cc3ce4bd6e571bd2400162b3affdbbc581a7b0ae75362e"
     )
     sources = _openimcc_sources(
         pack_version=identity["pack_version"],
@@ -288,6 +293,35 @@ def test_openimcc_feo_row_refuses_a_changed_condensate_digest() -> None:
         "expected_condensate_table_digest": expected_digest,
         "actual_condensate_table_digest": actual_digest,
     }
+
+
+@pytest.mark.parametrize("pack_name", ("default", "published-core"))
+def test_pinned_openimcc_package_condensate_digest_is_accepted(
+    pack_name: str,
+) -> None:
+    """The table load_gas_datapack() serves is the identity the resolver accepts."""
+
+    pytest.importorskip("openimcc")
+    from openimcc import load_gas_datapack
+
+    live_digest = load_gas_datapack().condensate_table_digest
+    assert live_digest == (
+        feo_standard_module._OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+    )
+    identity = _melt_pack_identity(pack_name)
+    standard, refusal = feo_standard_module._resolve_feo_activity_standard(
+        Engine.OPENIMCC,
+        _openimcc_sources(
+            pack_version=identity["pack_version"],
+            pack_digest=identity["binding_digest"],
+            condensate_digest=live_digest,
+        ),
+        melt_pack_identity=identity,
+        temperature_K=Decimal("1643.15"),
+    )
+
+    assert refusal is None
+    assert standard is not None
 
 
 def test_openimcc_feo_row_refuses_when_gas_load_loses_condensate_identity(

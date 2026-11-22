@@ -38,8 +38,12 @@ _INTERNAL_ANALYTICAL_FEO_STANDARD = _FeOActivityStandard(
 _OPENIMCC_PUBLISHED_CORE_PACK_DIGEST = (
     "ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c"
 )
+# Full condensate table served by OpenIMCC 979adb2 load_gas_datapack()
+# (condensate-default-v1.csv; openimcc PACKAGED_FULL_CONDENSATE_TABLE_DIGEST).
+# Green's 66ec4a3 table was b9c49790.... FeO(l) in the pinned table is the
+# DG46-MASSON65 row, not the JANAF row that digest covered.
 _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST = (
-    "b9c497901404b03b1d1e20bec58f2d4c0903f481af17ae82bfcf97ea7f4bf5e8"
+    "493c67d5ba23b75767cc3ce4bd6e571bd2400162b3affdbbc581a7b0ae75362e"
 )
 _FEO_ACTIVITY_CANONICAL_STANDARD = "Fe-019"
 _OPENIMCC_DEFAULT_PACK_VERSION = "1.0.6-d066-v4"
