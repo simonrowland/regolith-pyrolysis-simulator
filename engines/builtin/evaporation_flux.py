@@ -1375,6 +1375,46 @@ def _solid_host_bakeout_result(
     )
 
 
+def _equilibrium_exceeds_total_notice(
+    *,
+    species: str,
+    P_eq_Pa: float,
+    P_bulk_Pa: float,
+    imposed_total_Pa: float,
+) -> dict[str, Any]:
+    """Predict-and-flag when equilibrium pressure exceeds the imposed total.
+
+    Derivation. A quiescent Hertz–Knudsen film takes the drive as
+    ``max(0, P_eq - P_bulk)``. Continuum gas resistance is evaluated at
+    the imposed overhead pressure. That film exists only while a surface
+    partial of ``P_eq`` can sit under the imposed total. When
+    ``P_eq > P_total`` and ``P_total > 0``, no quiescent partial can:
+    the interface is supersaturated, and the rate is bulk-flow /
+    boiling-limited by heat supply and vapor removal. True vacuum
+    (``P_total <= 0``) is Hertz–Knudsen into vacuum and is not this
+    regime. This kernel has no boiling model. The published number
+    stays the series-resistance Hertz–Knudsen flux already computed
+    from that drive. Gas resistance only lowers the free-molecular
+    rate, so the number is the best interface bound available here,
+    not a boiling rate. Missing regime: ``bulk_flow_boiling_limited``.
+    """
+
+    return {
+        "kind": "evaporation_total_pressure_regime_notice",
+        "reason": "equilibrium_pressure_exceeds_imposed_total",
+        "evidence_tier": "PREDICT_AND_FLAG",
+        "authority_level": "extrapolated",
+        "doctrine_category": 2,
+        "species": str(species),
+        "P_eq_Pa": float(P_eq_Pa),
+        "P_bulk_Pa": float(P_bulk_Pa),
+        "imposed_total_Pa": float(imposed_total_Pa),
+        "bound": "hertz_knudsen_series_resistance",
+        "missing_regime": "bulk_flow_boiling_limited",
+        "ledger_yields_authorized": True,
+    }
+
+
 class BuiltinEvaporationFluxProvider(ChemistryProvider):
     """Authoritative ``EVAPORATION_FLUX`` provider (Hertz-Knudsen-Langmuir).
 
@@ -1797,6 +1837,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             str, dict[str, float | str | bool | None]
         ] = {}
         unmeasured_alpha_fallback_species: list[str] = []
+        total_pressure_regime_notices: list[dict[str, Any]] = []
         missing_molar_mass: dict[str, dict[str, float | str]] = {}
         missing_transport_parameters: dict[str, dict[str, float | str]] = {}
         computable_transport_species: set[str] = set()
@@ -1976,6 +2017,25 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     pO2_bar=pO2_bar,
                 )
             )
+            # P_eq above a finite imposed total is not Hertz–Knudsen into
+            # vacuum. Keep the series-resistance bound and flag the
+            # missing bulk-flow / boiling regime. Vacuum (imposed total
+            # <= 0) stays unmarked. The booked rate below is unchanged.
+            # commanded_pressure_pa is the deck or campaign total; when
+            # the key is absent the provider already fell back to the
+            # film overhead used as that total.
+            if (
+                commanded_pressure_pa > 0.0
+                and float(P_eq_Pa) > commanded_pressure_pa
+            ):
+                regime_notice = _equilibrium_exceeds_total_notice(
+                    species=str(species),
+                    P_eq_Pa=float(P_eq_Pa),
+                    P_bulk_Pa=float(P_bulk_Pa),
+                    imposed_total_Pa=commanded_pressure_pa,
+                )
+                series_diagnostic["total_pressure_regime_notice"] = regime_notice
+                total_pressure_regime_notices.append(regime_notice)
             series_flux_diagnostics[species] = series_diagnostic
             if J_kg_s_m2 <= 0:
                 zero_net_flux_kg_hr[str(species)] = 0.0
@@ -2023,6 +2083,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 "missing-species-state-dependent-melt-transfer-inputs"
             ),
         }
+        if total_pressure_regime_notices:
+            diagnostic["equilibrium_pressure_exceeds_total_notices"] = (
+                total_pressure_regime_notices
+            )
         if below_threshold_flux_kg_hr:
             diagnostic["below_threshold_evaporation_flux"] = {
                 "threshold_kg_hr": _NONTRIVIAL_FLUX_KG_HR,

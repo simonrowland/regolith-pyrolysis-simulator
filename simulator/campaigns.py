@@ -2434,7 +2434,10 @@ class CampaignManager:
             )
             self._power_temperature_for_step = annotated
             return (requested, ramp_rate)
-        if campaign == CampaignPhase.C0:
+        # A lab schedule's melt-temperature series is the deck's T, the
+        # same ownership the power driver returned above. The C0 cleanup
+        # forecast is a campaign-phase label and must not replace it.
+        if campaign == CampaignPhase.C0 and self._lab_schedule(campaign) is None:
             prediction = self.c0_exit_prediction
             predicted_exit_C = (
                 prediction.get("T_exit_C")

@@ -15318,8 +15318,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         Outside C0 the flux is returned unchanged. Ordinary evaporation
         there is still not clipped to pipe kg/h; saturation above 100%
         remains a next-step flag.
+
+        A benchtop lab schedule also leaves the flux unchanged. The deck
+        owns T and P, so booking follows the evaporation kernel's melt
+        state. This cap is a C0 campaign-phase label that schedule does
+        not represent. An argon cover is stamped CONTROLLED_O2, which
+        sets the pipe downstream pressure equal to the imposed total.
+        Poiseuille capacity is then identically zero and the scale
+        exact-zeros a debit the kernel already computed.
         """
         if self.melt.campaign != CampaignPhase.C0:
+            return evap_flux
+        lab_schedule = getattr(self.campaign_mgr, "_lab_schedule", None)
+        if callable(lab_schedule) and lab_schedule(self.melt.campaign) is not None:
             return evap_flux
         inlet = self._subsolidus_transport_inlet_flux(evap_flux)
         demand = float(inlet.total_kg_hr)
