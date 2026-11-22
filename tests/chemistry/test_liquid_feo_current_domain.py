@@ -182,7 +182,9 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
 
         monkeypatch.setattr(alphamelts, 'dispatch', measured_liquidus)
         resolved = sim._establish_melt_redox_gate_authority_for_current_hour()
-        assert resolved['source'] == 'gate_liquid_fraction'
+        assert resolved['source'].startswith(
+            'gate_liquid_fraction:fallback:alphamelts-diagnostic'
+        )
         assert resolved['liquidus_T_C'] == 1700.0
         assert resolved.get('is_liquidus_floor') is not True
         assert calls == [ChemistryIntent.GATE_LIQUID_FRACTION]

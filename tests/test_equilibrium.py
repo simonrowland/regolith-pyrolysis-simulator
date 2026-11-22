@@ -640,6 +640,9 @@ def _established_record_host(record):
     host._melt_redox_gate_current_pin_verdict = (
         PyrolysisSimulator._melt_redox_gate_current_pin_verdict.__get__(host)
     )
+    host._melt_redox_gate_pin_verdicts_match = (
+        PyrolysisSimulator._melt_redox_gate_pin_verdicts_match.__get__(host)
+    )
     establish_authority = (
         PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour
     )
