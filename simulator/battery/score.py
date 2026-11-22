@@ -927,7 +927,7 @@ def _engine_lacks_quantity_capability(
         return False
     if quantity in FUSION_QUANTITIES:
         return False
-    from simulator.battery.compilation_tier import _engine_thermo_quantities
+    from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
     return quantity not in _engine_thermo_quantities(engine)
 
@@ -14149,7 +14149,7 @@ def _predict_with_engine(
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     if engine is Engine.NASA_CEA_9 and quantity is not None:
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
+        from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
         if (
             quantity is not Quantity.FE3_FE2_RATIO
@@ -14289,7 +14289,7 @@ def _predict_with_engine(
     if wall_prediction is not None:
         return wall_prediction
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
+        from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
         if (
             quantity not in _engine_thermo_quantities(engine)
@@ -23813,7 +23813,7 @@ def _residual_engine_observable(row: Mapping[str, object]) -> bool:
             engine_value = Engine(engine)
         except ValueError:
             return True
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
+        from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
         return (
             quantity in _engine_thermo_quantities(engine_value)

@@ -64,10 +64,19 @@ _LACKS_FALSE_EVERY_ENGINE = frozenset(
 
 
 def test_engine_thermo_quantities_match_the_pin() -> None:
+    from simulator.battery.engine_capability import engine_thermo_quantities
+
     for engine in Engine:
-        assert _engine_thermo_quantities(engine) == _THERMO_PIN.get(
-            engine, frozenset()
-        )
+        pinned = _THERMO_PIN.get(engine, frozenset())
+        assert _engine_thermo_quantities(engine) == pinned
+        assert engine_thermo_quantities(engine) == pinned
+
+
+def test_capability_table_names_the_score_engines() -> None:
+    from simulator.battery.engine_capability import ENGINE_QUANTITIES
+    from simulator.battery.score import SCORE_ENGINE_SET
+
+    assert set(ENGINE_QUANTITIES) == set(SCORE_ENGINE_SET)
 
 
 def test_predict_time_capability_ladder_matches_the_pin() -> None:
