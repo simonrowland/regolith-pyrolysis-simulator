@@ -588,6 +588,7 @@ class AtomLedger:
             self._external_origin_atom_moles[origin],
             lot.atom_moles_for(self.registry),
         )
+        self._notify_overhead_o2_write(lot=lot)
         return lot
 
     def load_external_mol(
@@ -628,6 +629,7 @@ class AtomLedger:
             self._external_origin_atom_moles[origin],
             atoms,
         )
+        self._notify_overhead_o2_write(lot=lot)
         return lot
 
     def transfer(
@@ -722,6 +724,7 @@ class AtomLedger:
         self._transitions.append(transition)
         if _terminal_debit_capability is _C7_TERMINAL_SLAG_REWORK_CAPABILITY:
             self._terminal_debit_authorized_transition_ids.add(id(transition))
+        self._notify_overhead_o2_write(transition=transition)
         return transition
 
     def _record_gross_lot(self, direction: str, lot: MaterialLot) -> None:
@@ -771,6 +774,19 @@ class AtomLedger:
                 "origin_unattributed_atom_moles": event_unattributed,
             }
         )
+
+    def _notify_overhead_o2_write(
+        self,
+        *,
+        transition: LedgerTransition | None = None,
+        lot: MaterialLot | None = None,
+    ) -> None:
+        # Absent on every hour that is not collecting. The attribute is
+        # not ledger state: snapshot_atom_ledger drops it.
+        listener = getattr(self, "_overhead_o2_write_listener", None)
+        if listener is None:
+            return
+        listener(transition=transition, lot=lot)
 
     def move(
         self,
@@ -1822,7 +1838,11 @@ def snapshot_atom_ledger(ledger: Any) -> Any:
     """Return an independently owned copy of every mutable ledger container."""
 
     snapshot = shallow_copy(ledger)
-    snapshot.__dict__ = _clone_owned_ledger_state(ledger.__dict__, {})
+    state = dict(ledger.__dict__)
+    # The hour's O2 listener is a bound method, not a balance. A
+    # forecast clone must not keep calling the live recorder.
+    state.pop("_overhead_o2_write_listener", None)
+    snapshot.__dict__ = _clone_owned_ledger_state(state, {})
     return snapshot
 
 

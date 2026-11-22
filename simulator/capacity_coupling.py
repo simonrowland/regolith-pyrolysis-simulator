@@ -106,6 +106,15 @@ class CapacityShadowRefusal:
     cap: str | None = None
     flux_evaluations: int | None = None
     integrator_evaluations: int | None = None
+    # Solve path of the hour that refused: fast_root, explicit_euler,
+    # explicit_ladder, midpoint, radau_fallback, or backward_euler.
+    # None when the refusal is raised before a path is chosen.
+    # The inventory refusal also carries the per-species balance and
+    # the overhead-O2 writes. Other refusals leave those unset.
+    # Plain dicts and lists, so vars() serialises.
+    path: str | None = None
+    species_balance: dict[str, dict[str, Any]] | None = None
+    overhead_o2_writes: list[dict[str, Any]] | None = None
 
 
 class CapacityCouplingRefusalError(RuntimeError):
@@ -899,11 +908,14 @@ class _BalanceRefused(Exception):
 def _shadow_from_balance(
     refused: _BalanceRefused,
     iterations: int = 0,
+    *,
+    path: str | None = None,
 ) -> CapacityShadowRefusal:
     """Copy a balance refusal onto the shadow payload.
 
-    The work cap names which counter fired and both counts. Other
-    reasons leave those fields unset. The reason string is unchanged.
+    The work cap names which counter fired and both counts. The path
+    is the branch the law had entered. Other reasons leave the cap
+    unset. The reason string is unchanged.
     """
 
     return CapacityShadowRefusal(
@@ -912,6 +924,7 @@ def _shadow_from_balance(
         cap=refused.cap,
         flux_evaluations=refused.flux_evaluations,
         integrator_evaluations=refused.integrator_evaluations,
+        path=path,
     )
 
 
@@ -1012,6 +1025,8 @@ class _HeadspaceLaw:
         self.species_notices: dict[tuple[str, str], Mapping[str, Any]] = {}
         self.flux_evaluations = 0
         self.integrator_evaluations = 0
+        # Overwritten when the hour enters a branch. A refusal copies it.
+        self.balance_path: str | None = None
 
     def _remember_species_notices(
         self,
@@ -1383,6 +1398,7 @@ class _HeadspaceLaw:
         )
         redox_end: Mapping[str, float] | None = None
         rewrote = False
+        added_record: dict[str, float] = {}
         if added_mol is None:
             # Fast root. m_source = (q + S) * M * Δt. At the root
             # q + S = Q, so the bled mass is the hour's source plus
@@ -1411,6 +1427,7 @@ class _HeadspaceLaw:
             bled_mol = {}
             for species in self.species:
                 added = (source[species] + redox[species]) * dt_s
+                added_record[species] = added
                 bled = float(n0[species]) + added - published[species]
                 if (
                     bled < 0.0
@@ -1445,6 +1462,9 @@ class _HeadspaceLaw:
             bled_mol = {
                 species: bled_mol_in[species] for species in self.species
             }
+            added_record = {
+                species: float(added_mol[species]) for species in self.species
+            }
             # A slow caller that passes added_mol and omits the
             # integrals would post the endpoint. That is the leak.
             # A caller with no holder has nothing to track, and the
@@ -1471,6 +1491,41 @@ class _HeadspaceLaw:
         bled_kg = math.fsum(
             bled_mol[species] * self.masses[species] for species in self.species
         )
+        # The inventory refusal reads this. A success hour does not.
+        # The key is not a species and not a rate the flux callback reads.
+        holder = self.extent_holder
+        if isinstance(holder, dict):
+            gross = dict(vapour_extent_kg)
+            redox_map = dict(redox_added_mol)
+
+            def _stored(mapping: Mapping[str, float], species: str):
+                if species not in mapping:
+                    return None
+                return float(mapping[species])
+
+            holder["_balance_terms"] = {
+                "path": self.balance_path,
+                "iterations": int(iterations),
+                "n0_mol": {
+                    species: float(n0[species]) for species in self.species
+                },
+                "A_mol": {
+                    species: _stored(added_record, species)
+                    for species in self.species
+                },
+                "B_mol": {
+                    species: _stored(bled_mol, species)
+                    for species in self.species
+                },
+                "R_mol": {
+                    species: _stored(redox_map, species)
+                    for species in self.species
+                },
+                "G_kg": {
+                    species: _stored(gross, species)
+                    for species in self.species
+                },
+            }
         return _HeadspaceStep(
             moles=dict(published),
             partials=partials,
@@ -1565,6 +1620,13 @@ def _remember_sign_scan_fallback(law: _HeadspaceLaw, detail: str) -> None:
             "detail": detail,
         },
     ))
+
+
+def _mark_balance_path(law: _HeadspaceLaw, path: str) -> None:
+    # One string for the branch now running. A fall-through overwrites
+    # it, so the refusal names the path that refused, not the grid
+    # that returned.
+    law.balance_path = path
 
 
 def _remember_shut_path(law: _HeadspaceLaw, path: str) -> None:
@@ -1890,6 +1952,7 @@ def _one_euler(
 ) -> _HeadspaceStep:
     """One backward-Euler step. Never the fast root of G."""
 
+    _mark_balance_path(law, "backward_euler")
     if len(law.species) == 1:
         return _euler_one(law, n0, dt_s)
     return _euler_many(law, n0, dt_s, DEFAULT_REL_TOL, DEFAULT_MAX_ITERATIONS)
@@ -1998,6 +2061,7 @@ def _slow_converge(
     import numpy as np
     from scipy.integrate import solve_ivp
 
+    _mark_balance_path(law, "radau_fallback")
     species = law.species
     count = len(species)
     # The holder is the hour. Other callers keep n, A, B only.
@@ -2272,6 +2336,7 @@ def _closed_pipe_accumulation(
         return None
     if below_downstream and law.pressure_of(n0) > law.downstream_pa:
         return None
+    _mark_balance_path(law, "explicit_euler")
     partials_0 = law.partials_of(n0)
     source_0, outflow_0, _binding_0, _piece_0 = law._flows(partials_0)
     redox_0 = law._redox_rates(partials_0)
@@ -2373,6 +2438,11 @@ def _closed_pipe_refined(
     first pair within 1e-6 Pa. 64 steps is the last explicit
     spacing; a pair that still disagrees uses implicit midpoint.
     """
+
+    _mark_balance_path(
+        law,
+        "explicit_ladder" if explicit else "midpoint",
+    )
 
     def rates(amount: Mapping[str, float]) -> dict[str, float] | None:
         if any(value < 0.0 for value in amount.values()):
@@ -2541,6 +2611,7 @@ def _closed_pipe_midpoint(
     never stays shut returns None, and the open-pipe solver runs.
     """
 
+    _mark_balance_path(law, "midpoint")
     names = tuple(law.species)
     pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
     # Each accepted step may stop this far from the stage equation.
@@ -2689,6 +2760,7 @@ def _commit_one(
     closed = _closed_pipe_accumulation(law, n0, dt_s)
     if closed is not None:
         return closed
+    _mark_balance_path(law, "fast_root")
     samples = law.g_samples()
     crossings = _crossings(samples)
     if len(crossings) >= 2:
@@ -3246,6 +3318,7 @@ def _commit_many(
     closed = _closed_pipe_accumulation(law, n0, dt_s)
     if closed is not None:
         return closed
+    _mark_balance_path(law, "fast_root")
     fractions = _fractions_of(law, n0)
     if fractions is None:
         zero = {species: 0.0 for species in law.species}
@@ -3639,7 +3712,7 @@ def _commit_headspace_balance(
     except EvaporationFluxRefusal:
         raise
     except _BalanceRefused as refused:
-        return _shadow_from_balance(refused)
+        return _shadow_from_balance(refused, path=law.balance_path)
     return _publish(
         law,
         step,
@@ -3698,5 +3771,5 @@ def diagnostic_backward_euler_headspace_step(
     except EvaporationFluxRefusal:
         raise
     except _BalanceRefused as refused:
-        return _shadow_from_balance(refused)
+        return _shadow_from_balance(refused, path=law.balance_path)
     return _publish(law, step, capacity, vessel_rating_Pa)

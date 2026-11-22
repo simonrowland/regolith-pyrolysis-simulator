@@ -4532,18 +4532,216 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.capacity_coupling import (
             DEFAULT_ABS_TOL_PA,
             CapacityCouplingRefusalError,
-            CapacityShadowRefusal,
         )
 
         published_pa = float(self.overhead.pressure_mbar) * 100.0
         inventory_pa = self._headspace_inventory_pressure_Pa()
         if abs(published_pa - inventory_pa) > DEFAULT_ABS_TOL_PA:
             raise CapacityCouplingRefusalError(
-                CapacityShadowRefusal(
-                    "headspace_published_pressure_not_inventory",
-                    0,
-                )
+                self._headspace_inventory_mismatch_refusal()
             )
+
+    def _remember_headspace_balance_terms(self, holder) -> None:
+        # The solve wrote this on the extent holder. The refusal reads
+        # it after the holder is gone. A missing solve leaves it unset.
+        terms = None
+        if isinstance(holder, dict):
+            raw = holder.get("_balance_terms")
+            if isinstance(raw, dict):
+                terms = raw
+        self._headspace_balance_terms = terms
+
+    def _record_overhead_o2_write(self, *, transition=None, lot=None) -> None:
+        # One row per overhead O2 lot. Other lots return before the stack
+        # walk. Signed mol: a credit is positive, a debit is negative.
+        sink = getattr(self, "_headspace_overhead_o2_writes", None)
+        if not isinstance(sink, list):
+            return
+        registry = self.atom_ledger.registry
+
+        def o2_mol(item) -> float | None:
+            if str(item.account) != "process.overhead_gas":
+                return None
+            moles = item.species_moles_for(registry)
+            if OXYGEN_SPECIES not in moles:
+                return None
+            amount = float(moles[OXYGEN_SPECIES])
+            if amount == 0.0:
+                return None
+            return amount
+
+        rows: list[tuple[str, float]] = []
+        if transition is not None:
+            source = str(transition.name)
+            for sign, lots in (
+                (1.0, transition.credits),
+                (-1.0, transition.debits),
+            ):
+                for item in lots:
+                    amount = o2_mol(item)
+                    if amount is None:
+                        continue
+                    rows.append((source, sign * amount))
+        elif lot is not None:
+            amount = o2_mol(lot)
+            if amount is not None:
+                rows.append((str(lot.source or "load_external"), amount))
+        if not rows:
+            return
+        import traceback
+
+        site = "unknown"
+        for frame in reversed(traceback.extract_stack()[:-1]):
+            if frame.name in {
+                "_record_overhead_o2_write",
+                "_notify_overhead_o2_write",
+            }:
+                continue
+            filename = str(frame.filename).replace("\\", "/")
+            if filename.endswith("/ledger.py"):
+                continue
+            site = (
+                f"{filename.rsplit('/', 1)[-1]}:{frame.lineno}:{frame.name}"
+            )
+            break
+        for source, amount in rows:
+            sink.append({
+                "source": source,
+                "mol": amount,
+                "call_site": site,
+            })
+
+    def _headspace_inventory_mismatch_refusal(self):
+        # Attached only on this refusal. Success hours do not read it.
+        # Plain dicts and lists, so vars() and a dataclass field walker
+        # both serialise. None is an integral the solve did not stash.
+        from simulator.capacity_coupling import (
+            CapacityShadowRefusal,
+            headspace_committed_bleed_mol,
+        )
+        from simulator.physical_constants import GAS_CONSTANT as R_CODATA
+
+        terms = getattr(self, "_headspace_balance_terms", None)
+        if not isinstance(terms, dict):
+            terms = None
+        published = {
+            str(species): float(mbar) * 100.0
+            for species, mbar in dict(
+                getattr(self.overhead, "composition", {}) or {}
+            ).items()
+        }
+        ledger = {
+            str(species): float(mol)
+            for species, mol in self.atom_ledger.mol_by_account(
+                "process.overhead_gas"
+            ).items()
+        }
+        cursor = getattr(self, "_headspace_ledger_cursor", None)
+        if not isinstance(cursor, tuple) or len(cursor) != 2:
+            transition_at = 0
+            load_at = 0
+        else:
+            transition_at = int(cursor[0])
+            load_at = int(cursor[1])
+        credits: dict[str, dict[str, float]] = {}
+        registry = self.atom_ledger.registry
+
+        def add_credit(lot) -> None:
+            for species, mol in lot.species_moles_for(registry).items():
+                amount = float(mol)
+                if amount == 0.0:
+                    continue
+                account = str(lot.account)
+                bucket = credits.setdefault(str(species), {})
+                bucket[account] = bucket.get(account, 0.0) + amount
+
+        for transition in self.atom_ledger.transitions[transition_at:]:
+            for lot in transition.credits:
+                add_credit(lot)
+        for lot in self.atom_ledger.external_loads[load_at:]:
+            add_credit(lot)
+        bleed: dict[str, float] = {}
+        result = getattr(self, "_headspace_capacity_result", None)
+        bled = getattr(result, "bled_species_mol", None)
+        if isinstance(bled, Mapping):
+            volume_m3 = self._headspace_volume_m3()
+            temperature_K = self._headspace_temperature_K()
+            pa_per_mol = (
+                R_CODATA * temperature_K / volume_m3
+                if volume_m3 > 0.0 and temperature_K > 0.0
+                else math.nan
+            )
+            booked, _extra = headspace_committed_bleed_mol(
+                bled,
+                pa_per_mol=pa_per_mol,
+            )
+            bleed = {
+                str(species): float(mol) for species, mol in booked.items()
+            }
+        names = set(published) | set(ledger) | set(credits) | set(bleed)
+        if terms is not None:
+            for block in ("n0_mol", "A_mol", "B_mol", "R_mol", "G_kg"):
+                raw = terms.get(block)
+                if isinstance(raw, dict):
+                    names.update(str(species) for species in raw)
+
+        def term(block: str, species: str):
+            if terms is None:
+                return None
+            raw = terms.get(block)
+            if not isinstance(raw, dict) or species not in raw:
+                return None
+            value = raw[species]
+            if value is None:
+                return None
+            return float(value)
+
+        balance: dict[str, dict[str, Any]] = {}
+        for species in sorted(names):
+            balance[species] = {
+                "published_Pa": float(published.get(species, 0.0)),
+                "ledger_mol": float(ledger.get(species, 0.0)),
+                "n0_mol": term("n0_mol", species),
+                "A_mol": term("A_mol", species),
+                "B_mol": term("B_mol", species),
+                "R_mol": term("R_mol", species),
+                "G_kg": term("G_kg", species),
+                "credits_mol": {
+                    str(account): float(mol)
+                    for account, mol in sorted(credits.get(species, {}).items())
+                },
+                "bleed_posted_mol": float(bleed.get(species, 0.0)),
+            }
+        writes: list[dict[str, Any]] = []
+        for row in list(
+            getattr(self, "_headspace_overhead_o2_writes", None) or []
+        ):
+            if not isinstance(row, dict):
+                continue
+            writes.append({
+                "source": str(row.get("source", "")),
+                "mol": float(row.get("mol", 0.0)),
+                "call_site": str(row.get("call_site", "")),
+            })
+        path = None
+        iterations = 0
+        if terms is not None:
+            raw_path = terms.get("path")
+            if isinstance(raw_path, str):
+                path = raw_path
+            raw_iterations = terms.get("iterations")
+            if isinstance(raw_iterations, int) and not isinstance(
+                raw_iterations, bool
+            ):
+                iterations = raw_iterations
+        self.atom_ledger._overhead_o2_write_listener = None
+        return CapacityShadowRefusal(
+            "headspace_published_pressure_not_inventory",
+            iterations,
+            path=path,
+            species_balance=balance,
+            overhead_o2_writes=writes,
+        )
 
     def _headspace_solved_bleed_kg_s(self, result) -> float:
         # Display conductance for the hour that already bled the solved
@@ -9170,6 +9368,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._settle_evaporative_redox_after_batch()
         self._headspace_sourced_excess_mol = None
         self._headspace_hour_settled = True
+        self._remember_headspace_balance_terms(
+            state.get("extent_holder") if solved is not None else None
+        )
         inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
         return solved, evap_flux, overhead_flux, inlet_flux
 
@@ -17721,6 +17922,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     pass
             raise
         finally:
+            ledger = getattr(self, "atom_ledger", None)
+            if (
+                ledger is not None
+                and "_overhead_o2_write_listener" in ledger.__dict__
+            ):
+                ledger._overhead_o2_write_listener = None
+            if "_headspace_overhead_o2_writes" in self.__dict__:
+                self._headspace_overhead_o2_writes = None
             for history in terminal_refusal_histories:
                 if isinstance(
                     history,
@@ -17794,6 +18003,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._headspace_committed_gross_kg_hr = None
         self._headspace_overhead_flux_kg_hr = None
         self._headspace_hour_settled = False
+        # Writes from this hour only. The listener is not ledger state.
+        # step() clears it. The inventory refusal copies the list first.
+        self._headspace_balance_terms = None
+        self._headspace_overhead_o2_writes = []
+        self._headspace_ledger_cursor = (
+            len(self.atom_ledger.transitions),
+            len(self.atom_ledger.external_loads),
+        )
+        self.atom_ledger._overhead_o2_write_listener = (
+            self._record_overhead_o2_write
+        )
 
         # --- 1. Decision check ---
         self._restore_metal_phase_staging()
@@ -18214,6 +18434,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.overhead.composition.update(solved_mbar)
             self.overhead.pressure_mbar = math.fsum(solved_mbar.values())
             self._refuse_if_headspace_pressure_is_not_inventory()
+            # The list stops at the identity check. Later bleed
+            # projection is not part of the comparison.
+            self.atom_ledger._overhead_o2_write_listener = None
             notice = getattr(self, '_headspace_carry_shortfall', None)
             if notice is not None:
                 self.overhead.headspace_carry_shortfall = dict(notice)
@@ -18443,6 +18666,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self.is_complete():
             self._finalize_record()
 
+        self.atom_ledger._overhead_o2_write_listener = None
         return snapshot
 
     # ------------------------------------------------------------------
