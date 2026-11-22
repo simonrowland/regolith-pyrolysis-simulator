@@ -1138,6 +1138,49 @@ def test_collector_hardware_cost_refuses_missing_stage_area() -> None:
     )
 
 
+def test_single_wall_import_cost_hex_pin() -> None:
+    """Pin the t-1884 single-wall import price before the layered replacement.
+
+    The hex strings are this function's output at the pin commit. They are
+    not a second copy of the pricing rule for later tests to keep.
+    """
+
+    areas = {
+        "fe_stage1": 0.2,
+        "cr_stage2": 0.0,
+        "sio_stage3": 466.975203985,
+        "alkali_stage4": 0.0,
+        "k_stage4b": 0.0,
+    }
+    collector = objective_module._collector_stage_hardware_cost_summary(
+        SimpleNamespace(
+            condensation_model=SimpleNamespace(stage_area_m2_by_stage=areas),
+        ),
+        cost_parameters=_furnace_test_cost_parameters(),
+    )
+    duct = objective_module._duct_and_shared_train_hardware_cost_summary(
+        SimpleNamespace(
+            overhead_model=SimpleNamespace(
+                pipe_diameter_m=0.12,
+                pipe_length_m=1.0,
+            ),
+            overhead=SimpleNamespace(
+                train_peak_mass_flow_kg_hr=0.0,
+                train_time_averaged_mass_flow_kg_hr=0.0,
+            ),
+        ),
+        cost_parameters=_furnace_test_cost_parameters(),
+    )
+
+    assert collector["collector_stage_costs"]["fe_stage1"]["cost_usd"].hex() == (
+        "0x1.5f90000000000p+16"
+    )
+    assert collector["collector_stage_costs"]["sio_stage3"]["cost_usd"].hex() == (
+        "0x1.87e6b4381bda6p+26"
+    )
+    assert duct["hot_duct_cost_usd"].hex() == "0x1.268639437ef07p+13"
+
+
 def test_cost_objective_ranking_prices_pumping_sidecar() -> None:
     definitions = (
         ObjectiveDefinition(
