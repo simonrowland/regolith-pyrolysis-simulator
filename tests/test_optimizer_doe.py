@@ -98,11 +98,13 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         }
         for item in batch
     ]
-    # d-452 adds six unconditional throat/vane dimensions, shifting both
-    # conditional subspaces and the deterministic sample stream.
+    # d-452 adds six unconditional throat/vane dimensions. The stream hash
+    # moved again when the stage-area search high bound went from 10 m2 to
+    # 2000 m2 (d-283 r4). Dimensions stay [70, 76]. Recomputed from
+    # sample_recipe_candidates.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "c935b666fff4fbc2ee49328ff4ef0dd405968c6b902fc0dccaf9759dd12b116b"
+    ).hexdigest() == "430603fdf13206e14e8b4db89b58efad13561755a596bc2342341cdeee680143"
 
 
 def test_t155_conditional_lhc_stream_is_exactly_pinned():
@@ -124,10 +126,11 @@ def test_t155_conditional_lhc_stream_is_exactly_pinned():
         }
         for item in batch
     ]
-    # The same six aperture/vane dimensions move the deterministic LHC stream.
+    # Same r4 area envelope. The LHC unit-cube stream is scaled into the
+    # new [0.001, 2000] m2 bounds. Recomputed from sample_recipe_candidates.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "c22e81d974c2c8f7be8be3a6ce89b05181c9561765b21d6575bd593f5eeeb6c2"
+    ).hexdigest() == "3e47fefa50fddec7e67d7209ff6acc695814cf6223ed3545fcd66e8358141976"
 
 
 def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():

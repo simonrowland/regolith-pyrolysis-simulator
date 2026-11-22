@@ -126,16 +126,21 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # b8c8690e41376896aa578e93acb1db4c40a95b1fb46cbe8aa9a50b1c28ab55a0.
     # d-283/d-452: recomputed from load_config_bundle() after absolute collector
     # areas and the 0.5 m throat geometry were added to the resolved setpoints.
+    # d-283 r4 then replaced the 10 m2 area ceiling with 2000 m2, wrote the
+    # three-pass fixed-point areas, and added the Mn cartridge window plus
+    # the Stage-4 SiO impurity gate. Conditional subspace digests did not move.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "6b4380d2b57ddde6f1453afaa2c6fc07ece75d6e42a6e20047effda85a74c57d"
+        "c5c40b6c334bcef8ff84ee205ecb459337d5811e9b50a7a47dccda25d7c5f2bb"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
     # b-282: upstream wall search floor leaves the SiO-quiescent 1400 C
     # figure and becomes the coldest downstream collector interface (20 C).
     # d-283/d-452 add bounded stage areas, throat area, and per-stage vanes.
+    # The r4 envelope [0.001, 2000] m2 is the bounds-digest mover. Recounted
+    # from RecipeSchema().bounds_digest.
     assert schema.bounds_digest == (
-        "a402cd0bce53fc9ef5ea64c43e86415596cb62ef7a83b48c0a9fa152f0864cf2"
+        "cf22c51075092358be2256aa49863d749031404167bb31ae9f7733178161ce18"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
@@ -144,7 +149,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
     # tracks the schema. Recomputed from the production recipe resolver.
     assert empty.recipe_id(schema) == (
-        "ac9dcf952e171a3a80465ff581f66120fcaff0ffbe010d4e08caac0a0e7faafe"
+        "f211bd4b7ceae31bad7dad3d40b52afb481404f1d67dab2bf2e33b7cc72e0031"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -157,7 +162,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "07b3610fadb3f9434371cf6b9f842f267df11898e510dbccf199df9acaec937f"
+        "5229e14d6fe1893e1746a1f73f3008676fc93f6ff2d109f7e9f5b0241f6e7584"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -733,8 +738,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-11-12 b260: recomputed for t-1720 (d-389 carrier cost in the
     # objective).
     # d-283/d-452: recomputed through _build_eval_inputs with hardware costs in
-    # canonical EvalSpec identity.
-    assert cache_key(spec) == "e472fdfd1fff9d490dd37a7a031ebe6d6389445731c6a0562cd585668f2a1827"
+    # canonical EvalSpec identity. The r4 area envelope moves bounds_digest
+    # and the resolved-setpoints leaf inside that identity. This profile
+    # leaves until_campaign_complete false, so that flag is omitted.
+    assert cache_key(spec) == "6886a667fb185ebf59ac4088db54a6c62b9d710caec851e89d59e4d8eb58ef26"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -1820,9 +1827,11 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # b-282: the upstream-wall search floor moved from the uniform 1400 C
     # figure to the coldest downstream collector interface, so bounds_digest
     # and this versioned recipe id move with it.
+    # d-283 r4 moves bounds_digest, and this versioned id moves with it.
+    # Recounted from RecipePatch({PO2_DEFAULT: 9.0}).validated().recipe_id().
     assert (
         first.recipe_id()
-                == "30ad3f1cc8410a7de61d1f2a897fc9de836eb3f4406ce1bbdf4c5a6ac384826b"
+                == "65e487d819467e52cff7c1c09c056ea62a39e9618c505702903ca6b0f1e957c8"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

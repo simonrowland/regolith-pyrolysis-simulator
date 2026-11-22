@@ -25,11 +25,14 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     payload = json.loads(MANIFEST.read_text(encoding="utf-8"))
     digest = payload.pop("payload_digest")
     # d-283 adds five collector areas; d-452 adds throat and per-stage vane
-    # controls.
+    # controls. Regenerated with scripts/generate_optimizer_recipe_vocabulary.py
+    # after the stage-area search high bound moved from 10 m2 to 2000 m2.
+    # The five stage_areas_m2 rows are the only allowlist changes; subspace
+    # digests stay [70, 76].
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "38fdb04742f339a0497d746b073b65197a2e9bc3b1f37472882446836edfadb0"
+        "a2e815945eeba73ddbbd05f0e976e4a4587dbf558db95446977104ba38e7108a"
     )
-    assert digest == "c2d21d74c778db86a161dfc0c1dbf0759a1a7c72a8f00c0ad39ceafde12bff9f"
+    assert digest == "8b2c75c390474488d63ecfbebb1ce1cb18b9a8af8f8cd5f69271fd7d79328dd2"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (
