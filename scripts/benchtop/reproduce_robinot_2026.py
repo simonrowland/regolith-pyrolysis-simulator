@@ -23,6 +23,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from simulator.campaigns import CampaignManager
+from simulator.core import PyrolysisSimulator
 from simulator.diagnostic_helpers.reproduction_compare import (
     TimeSeriesComparisonRefusal,
     _interpolate_runtime_sample,
@@ -47,6 +48,12 @@ from simulator.runner import (
     _load_yaml,
 )
 from simulator.run_executor import RunExecutor
+from simulator.teststand import (
+    DRIVER_APPARATUS,
+    DRIVER_IMPOSED,
+    NORMAL_LITRE_TEMPERATURE_K,
+    _line_conductance_for_target_pressure_m3_s,
+)
 from simulator.thermal_budget import (
     FACE_FULL_SIDE,
     GAIER_LARGE_PARTICLE_SOLAR_ABSORPTANCE_HIGH,
@@ -64,6 +71,9 @@ PAPER_METRIC_DEFINITION = (
 _COMPARATOR_CASE_ID = "robinot_2026"
 _SOURCE_ID = "kems-044-robinot-2026"
 _ANALYZER_VISIBLE_SCOPE = "analyzer_visible_o2_in_argon_carrier"
+# This controller-steered speed belongs to the limiting-case comparison; the
+# printed NDX15 preset and imposed-pressure baseline remain unchanged.
+_ROBINOT_LIMITING_PUMP_SPEED_M3_H = 15.1
 
 
 class RobinotReproductionError(ValueError):
@@ -223,6 +233,7 @@ def _run_case(
     max_steps: int | None = None,
     face_set: str | None = None,
     solar_absorptance: float | None = None,
+    pressure_driver: str = DRIVER_IMPOSED,
 ) -> dict[str, Any]:
     schedule = deepcopy(dict(spec.lab_schedule))
     geometry = deepcopy(dict(spec.lab_geometry))
@@ -233,6 +244,31 @@ def _run_case(
         geometry["sample"]["radiating_face_set"] = face_set
     if solar_absorptance is not None:
         driver["solar_absorptance"] = float(solar_absorptance)
+    case_flags: list[str] = []
+    if pressure_driver == DRIVER_APPARATUS:
+        schedule["gas_boundary"]["pressure_control"]["pressure_driver"] = (
+            DRIVER_APPARATUS
+        )
+        pump = geometry["pump"]
+        pump["pumping_speed_m3_s"] = (
+            _ROBINOT_LIMITING_PUMP_SPEED_M3_H / float(PROCESS_HOUR_S)
+        )
+        pump["ultimate_pressure_pa"] = 0.0
+        pump["balance_temperature_K"] = NORMAL_LITRE_TEMPERATURE_K
+        pump["conductance_path"] = []
+        case_flags.extend(
+            [
+                "limiting_case_unrestricted_conductance",
+                "idealized_zero_ultimate_pressure",
+                "normal_state_balance_temperature_assumption",
+                "chamber_volume_not_required_for_steady_state",
+                "reconciliation_conductance_diagnostic_only",
+            ]
+        )
+    elif pressure_driver != DRIVER_IMPOSED:
+        raise RobinotReproductionError(
+            f"unsupported pressure driver for reproduction: {pressure_driver!r}"
+        )
 
     duration_steps = int(
         round(float(spec.hours) * float(PROCESS_HOUR_S) / float(spec.process_dt_s))
@@ -258,9 +294,11 @@ def _run_case(
     )
 
     power_records: list[dict[str, Any]] = []
+    teststand_pressure_records: list[dict[str, Any]] = []
     executions = []
     original_get_temp_target = CampaignManager.get_temp_target
     original_execute_session = RunExecutor.execute_session
+    original_step_one_hour = PyrolysisSimulator._step_one_hour
 
     def capture_power_temperature(
         manager: CampaignManager,
@@ -282,9 +320,26 @@ def _run_case(
         executions.append(execution)
         return execution
 
+    def capture_teststand_pressure(
+        simulator: PyrolysisSimulator,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        snapshot = original_step_one_hour(simulator, *args, **kwargs)
+        pressure_record = simulator.__dict__.get("last_teststand_pressure")
+        if isinstance(pressure_record, Mapping):
+            item = deepcopy(dict(pressure_record))
+            item["time_min"] = _time_min(
+                len(teststand_pressure_records) + 1,
+                spec.process_dt_s,
+            )
+            teststand_pressure_records.append(item)
+        return snapshot
+
     with (
         patch.object(CampaignManager, "get_temp_target", capture_power_temperature),
         patch.object(RunExecutor, "execute_session", capture_execution),
+        patch.object(PyrolysisSimulator, "_step_one_hour", capture_teststand_pressure),
     ):
         runtime_result = run.run()
     if not executions:
@@ -356,6 +411,29 @@ def _run_case(
         "rate_samples": rate_samples,
         "cumulative_samples": cumulative_samples,
         "power_temperature_records": power_records,
+        "teststand_pressure_records": teststand_pressure_records,
+        "flags": case_flags,
+        "pressure_case": {
+            "driver": pressure_driver,
+            "pump_speed_m3_h": (
+                _ROBINOT_LIMITING_PUMP_SPEED_M3_H
+                if pressure_driver == DRIVER_APPARATUS
+                else None
+            ),
+            "pump_speed_m3_s": (
+                _ROBINOT_LIMITING_PUMP_SPEED_M3_H / float(PROCESS_HOUR_S)
+                if pressure_driver == DRIVER_APPARATUS
+                else None
+            ),
+            "ultimate_pressure_pa": 0.0 if pressure_driver == DRIVER_APPARATUS else None,
+            "balance_temperature_K": (
+                NORMAL_LITRE_TEMPERATURE_K
+                if pressure_driver == DRIVER_APPARATUS
+                else None
+            ),
+            "conductance_path": [] if pressure_driver == DRIVER_APPARATUS else None,
+            "chamber_volume_m3": geometry["chamber"].get("volume_m3"),
+        },
     }
 
 
@@ -451,6 +529,11 @@ def _compare_trajectory(
             for point in observation_points
             if float(point["time_min"]) <= maximum_time
         ]
+        unavailable_points = (
+            observation_points[len(supported):]
+            if len(supported) >= 2
+            else observation_points
+        )
         runtime_samples = run_data[runtime_key]
         pressure_samples = [
             {
@@ -460,7 +543,7 @@ def _compare_trajectory(
             for sample in run_data["per_step"]
         ]
         initial_pressure_points = spec.lab_schedule.get("chamber_pressure_mbar", ())
-        if initial_pressure_points:
+        if mode == DRIVER_IMPOSED and initial_pressure_points:
             pressure_samples.insert(
                 0,
                 {
@@ -468,6 +551,20 @@ def _compare_trajectory(
                     "value_mbar": float(initial_pressure_points[0]["value"]),
                 },
             )
+        elif pressure_samples:
+            first_pressure = next(
+                (
+                    sample["value_mbar"]
+                    for sample in pressure_samples
+                    if sample.get("value_mbar") is not None
+                ),
+                None,
+            )
+            if first_pressure is not None:
+                pressure_samples.insert(
+                    0,
+                    {"time_min": 0.0, "value_mbar": first_pressure},
+                )
         locator = {
             "figure": "4a" if observable["source_pin"] == "f4a_csv" else "4b",
             "source_pin": observable["source_pin"],
@@ -518,7 +615,7 @@ def _compare_trajectory(
                     out_of_domain=runtime_summary["status"] != "ok",
                 )
             records.extend(_base_record(item, mode=mode) for item in comparison_records)
-        for point in observation_points[len(supported):]:
+        for point in unavailable_points:
             missing_record = compare_values(
                 case_id=_COMPARATOR_CASE_ID,
                 source_id=_SOURCE_ID,
@@ -641,11 +738,10 @@ def _temperature_records(
 def _mass_integral_record(
     spec: PresetRunSpec,
     run_data: Mapping[str, Any],
+    observations: Mapping[str, Any],
+    *,
+    mode: str,
 ) -> dict[str, Any]:
-    sidecar_path = ROOT / str(
-        spec.document["comparison_contract"]["observation_sidecar_path"]
-    )
-    observations = load_vacuum_pyrolysis_observations(sidecar_path)
     comparison = evaluate_vacuum_pyrolysis_comparison(
         spec.document,
         observations,
@@ -664,7 +760,7 @@ def _mass_integral_record(
         raise RobinotReproductionError(
             "the existing vacuum-pyrolysis comparator emitted no 35 mg O2 record"
         )
-    record = _base_record(match, mode="imposed")
+    record = _base_record(match, mode=mode)
     record.update(
         {
             "t": None,
@@ -689,7 +785,7 @@ def _residual_stats(records: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     groups: dict[str, list[float]] = defaultdict(list)
     missing: dict[str, int] = defaultdict(int)
     for record in records:
-        observable = str(record["observable"])
+        observable = f"{record['mode']}:{record['observable']}"
         residual = record.get("residual")
         if residual is None:
             missing[observable] += 1
@@ -747,17 +843,29 @@ def _run_notices_and_flags(
     run_data: Mapping[str, Any],
 ) -> list[dict[str, Any]]:
     found = _collect_notices_and_flags(run_data["result"], name)
+    found.extend(
+        _collect_notices_and_flags(
+            run_data.get("teststand_pressure_records") or (),
+            f"{name}.teststand_pressure",
+        )
+    )
+    for index, flag in enumerate(run_data.get("flags") or ()):
+        found.append(
+            {
+                "path": f"{name}.flags[{index}]",
+                "kind": "flag",
+                "value": flag,
+            }
+        )
     for index, record in enumerate(run_data["power_temperature_records"]):
         time_min = record.get("time_min")
-        for notice_index, notice in enumerate(record.get("notices") or ()):
-            found.append(
-                {
-                    "path": f"{name}.power_temperature[{index}].notices[{notice_index}]",
-                    "kind": "notice",
-                    "time_min": time_min,
-                    "value": notice,
-                }
-            )
+        power_diagnostics = _collect_notices_and_flags(
+            record,
+            f"{name}.power_temperature[{index}]",
+        )
+        for diagnostic in power_diagnostics:
+            diagnostic["time_min"] = time_min
+            found.append(diagnostic)
         for flag in ("exceeds_furnace_ceiling", "exceeds_furnace_max"):
             if flag in record:
                 found.append(
@@ -807,7 +915,7 @@ def _markdown_report(summary: Mapping[str, Any]) -> str:
     lines = [
         "# Robinot 2026 benchtop reproduction",
         "",
-        f"- Runtime status: `{summary['runs']['imposed']['runtime']['status']}`",
+        f"- Runtime status: `{summary['runs'][DRIVER_IMPOSED]['runtime']['status']}`",
         f"- Corpus input: `{summary['corpus']['root']}`",
         f"- Face set: `{summary['deck']['radiating_face_set']}`",
         f"- Process timestep: `{summary['deck']['process_dt_s']} s`",
@@ -843,28 +951,87 @@ def _markdown_report(summary: Mapping[str, Any]) -> str:
             for name in ("min", "max", "spread")
         ]
         lines.append(f"| {key} | " + " | ".join(cells) + " |")
-    lines.extend(["", "## Per-step pressure and trajectory records", ""])
+    limiting = summary["limiting_case"]
+    diagnostic = limiting["conductance_reconciliation_diagnostic"]
     lines.extend(
         [
-            "| t (min) | Chamber pressure (mbar) | O2 rate (mol/min) | "
-            "Cumulative O2 (mg) | T prediction (C) |",
-            "|---:|---:|---:|---:|---:|",
+            "",
+            "## Apparatus pressure limiting case",
+            "",
+            f"- Case: `{limiting['label']}`; bare pump speed "
+            f"{limiting['pump_speed_m3_h']:.6g} m³/h; unrestricted line; "
+            f"computed chamber-pressure records are in the paired table.",
+            f"- Conductance that would reconcile to "
+            f"{diagnostic['target_pressure_mbar']:.6g} mbar: "
+            f"{diagnostic['line_conductance_m3_s']:.6g} m³/s. This is a "
+            "diagnostic only and is not used in either scored run.",
         ]
     )
-    for point in summary["runs"]["imposed"]["per_step"]:
+    lines.extend(["", "## O2 residuals and chamber pressure by mode", ""])
+    lines.extend(
+        [
+            "| t (min) | Observable | Published | Imposed pressure (mbar) | "
+            "Imposed simulated | Imposed residual | Limiting pressure (mbar) | "
+            "Limiting simulated | Limiting residual |",
+            "|---:|---|---:|---:|---:|---:|---:|---:|---:|",
+        ]
+    )
+    paired_records: dict[tuple[str, float], dict[str, Any]] = {}
+    for record in summary["records"]:
+        if record.get("observable") not in {
+            "robinot_o2_ppm_time_series",
+            "robinot_cumulative_o2_mass_time_series",
+        } or not isinstance(record.get("t"), (int, float)):
+            continue
+        key = (str(record["observable"]), float(record["t"]))
+        pair = paired_records.setdefault(
+            key,
+            {"published": record.get("published"), "units": record.get("units")},
+        )
+        mode_key = "imposed" if record.get("mode") == DRIVER_IMPOSED else "limiting"
+        pair[f"{mode_key}_simulated"] = record.get("simulated")
+        pair[f"{mode_key}_residual"] = record.get("residual")
+        pair[f"{mode_key}_pressure_mbar"] = record.get("chamber_pressure_mbar")
+
+    def format_value(value: Any) -> str:
+        return "-" if value is None else f"{float(value):.6g}"
+
+    for (observable, time_min), pair in sorted(paired_records.items()):
         lines.append(
-            "| {t:.6g} | {p} | {r:.6g} | {m:.6g} | {temp:.6g} |".format(
-                t=point["t"],
-                p=(
-                    "-"
-                    if point["chamber_pressure_mbar"] is None
-                    else f"{point['chamber_pressure_mbar']:.6g}"
-                ),
-                r=point["o2_release_mol_min"],
-                m=point["cumulative_o2_mg"],
-                temp=point["melt_temperature_C"],
+            "| {time} | {observable} ({units}) | {published} | {ip} | {isv} | "
+            "{ir} | {lp} | {lsv} | {lr} |".format(
+                time=f"{time_min:.6g}",
+                observable=observable,
+                units=pair.get("units", ""),
+                published=format_value(pair.get("published")),
+                ip=format_value(pair.get("imposed_pressure_mbar")),
+                isv=format_value(pair.get("imposed_simulated")),
+                ir=format_value(pair.get("imposed_residual")),
+                lp=format_value(pair.get("limiting_pressure_mbar")),
+                lsv=format_value(pair.get("limiting_simulated")),
+                lr=format_value(pair.get("limiting_residual")),
             )
         )
+    lines.extend(["", "## Melt-temperature prediction and pyrometer observation", ""])
+    lines.extend(
+        [
+            "| Mode | t (min) | Predicted melt temperature (C) | Printed pyrometer observation (C) |",
+            "|---|---:|---:|---:|",
+        ]
+    )
+    for record in summary["records"]:
+        if record.get("observable") == "predicted_melt_temperature_C":
+            lines.append(
+                f"| {record['mode']} | {float(record['t']):.6g} | "
+                f"{float(record['simulated']):.6g} | - |"
+            )
+    for record in summary["records"]:
+        if record.get("observable") == "robinot_pyrometer_peak_temperature_C":
+            lines.append(
+                f"| {record['mode']} | peak | "
+                f"{format_value(record.get('simulated'))} | "
+                f"{format_value(record.get('published'))} |"
+            )
     lines.extend(["", "## Notices and flags", ""])
     notices = summary["notices_and_flags"]
     if not notices:
@@ -895,27 +1062,85 @@ def run_reproduction(
     corpus_root = Path(corpus_root).expanduser().resolve()
     spec = _preset_spec()
     corpus = _load_corpus(corpus_root, spec)
+    observation_sidecar = ROOT / str(
+        spec.document["comparison_contract"]["observation_sidecar_path"]
+    )
+    observations = load_vacuum_pyrolysis_observations(observation_sidecar)
+    measurement = observations.get("measurements", {}).get(
+        str(spec.document["measurement_id"]),
+        {},
+    )
+    reported_peak_temperature = next(
+        (
+            float(point["reported_value"])
+            for point in measurement.get("numerically_extractable_from_markdown", ())
+            if point.get("observable") == "peak_temperature"
+            and point.get("reported_unit") == "degC"
+        ),
+        None,
+    )
+    if reported_peak_temperature is None:
+        raise RobinotReproductionError(
+            "the observation sidecar does not define Robinot's peak pyrometer value"
+        )
     imposed_run = _run_case(
         spec=spec,
         corpus=corpus,
         max_steps=max_steps,
     )
+    limiting_mode = "limiting_case_unrestricted_conductance"
+    limiting_run = _run_case(
+        spec=spec,
+        corpus=corpus,
+        max_steps=max_steps,
+        pressure_driver=DRIVER_APPARATUS,
+    )
     records = _compare_trajectory(
         spec=spec,
         corpus=corpus,
         run_data=imposed_run,
-        mode="imposed",
+        mode=DRIVER_IMPOSED,
     )
-    pyrometer = float(spec.lab_schedule["furnace_ceiling_C"])
-    records.extend(_temperature_records(imposed_run, mode="imposed"))
+    records.extend(
+        _compare_trajectory(
+            spec=spec,
+            corpus=corpus,
+            run_data=limiting_run,
+            mode=limiting_mode,
+        )
+    )
+    records.extend(_temperature_records(imposed_run, mode=DRIVER_IMPOSED))
+    records.extend(_temperature_records(limiting_run, mode=limiting_mode))
     records.append(
         _pyrometer_record(
             imposed_run,
-            published_temperature_C=pyrometer,
-            mode="imposed",
+            published_temperature_C=reported_peak_temperature,
+            mode=DRIVER_IMPOSED,
         )
     )
-    records.append(_mass_integral_record(spec, imposed_run))
+    records.append(
+        _pyrometer_record(
+            limiting_run,
+            published_temperature_C=reported_peak_temperature,
+            mode=limiting_mode,
+        )
+    )
+    records.append(
+        _mass_integral_record(
+            spec,
+            imposed_run,
+            observations,
+            mode=DRIVER_IMPOSED,
+        )
+    )
+    records.append(
+        _mass_integral_record(
+            spec,
+            limiting_run,
+            observations,
+            mode=limiting_mode,
+        )
+    )
 
     sensitivity_runs: dict[str, dict[str, Any]] = {"imposed_hot_upper_default": imposed_run}
     if include_sensitivity:
@@ -943,9 +1168,27 @@ def run_reproduction(
     }
     notices_and_flags = [
         notice
-        for name, run_data in sensitivity_runs.items()
+        for name, run_data in {
+            **sensitivity_runs,
+            limiting_mode: limiting_run,
+        }.items()
         for notice in _run_notices_and_flags(name, run_data)
     ]
+    target_pressure_mbar = float(
+        spec.lab_schedule["chamber_pressure_mbar"][0]["value"]
+    )
+    limiting_pump_speed_m3_s = (
+        _ROBINOT_LIMITING_PUMP_SPEED_M3_H / float(PROCESS_HOUR_S)
+    )
+    reconciliation_conductance = _line_conductance_for_target_pressure_m3_s(
+        carrier_flow_nl_min=float(
+            spec.lab_schedule["gas_boundary"]["imposed_flow"]["value"]
+        ),
+        balance_temperature_K=NORMAL_LITRE_TEMPERATURE_K,
+        pump_speed_m3_s=limiting_pump_speed_m3_s,
+        target_pressure_pa=target_pressure_mbar * PA_PER_MBAR,
+        ultimate_pressure_pa=0.0,
+    )
     summary = {
         "schema_version": "robinot_2026_benchtop_reproduction.v1",
         "paper": {
@@ -976,7 +1219,33 @@ def run_reproduction(
             "process_dt_s": float(spec.process_dt_s),
             "unprinted_thermal_knobs": "left unset for owner defaults and notices",
         },
-        "runs": {"imposed": imposed_run},
+        "runs": {
+            DRIVER_IMPOSED: imposed_run,
+            limiting_mode: limiting_run,
+        },
+        "limiting_case": {
+            "label": limiting_mode,
+            "pressure_driver": DRIVER_APPARATUS,
+            "basis": "unrestricted line gives the bare-pump steady-state limit",
+            "pump_speed_m3_h": _ROBINOT_LIMITING_PUMP_SPEED_M3_H,
+            "pump_speed_m3_s": limiting_pump_speed_m3_s,
+            "ultimate_pressure_pa": 0.0,
+            "balance_temperature_K": NORMAL_LITRE_TEMPERATURE_K,
+            "conductance_path": [],
+            "chamber_volume_m3": None,
+            "conductance_reconciliation_diagnostic": {
+                "target_pressure_mbar": target_pressure_mbar,
+                "line_conductance_m3_s": reconciliation_conductance,
+                "used_in_scored_run": False,
+                "method_owner": "simulator.teststand",
+            },
+            "assumptions": [
+                "zero ultimate pressure is an explicit bare-pump limit, not a copied vacuum-limit value",
+                "normal-litre temperature is used for the gas balance",
+                "unrestricted conductance is represented by an empty declared path",
+                "steady-state pressure solve does not require chamber volume",
+            ],
+        },
         "records": records,
         "residual_statistics": _residual_stats(records),
         "sensitivity": {
@@ -997,8 +1266,18 @@ def run_reproduction(
             "runtime_sha256": content_digest(
                 {
                     "imposed": imposed_run["result"],
+                    "limiting_case": limiting_run["result"],
                     "power_temperature_records": imposed_run[
                         "power_temperature_records"
+                    ],
+                    "limiting_power_temperature_records": limiting_run[
+                        "power_temperature_records"
+                    ],
+                    "imposed_teststand_pressure_records": imposed_run[
+                        "teststand_pressure_records"
+                    ],
+                    "limiting_teststand_pressure_records": limiting_run[
+                        "teststand_pressure_records"
                     ],
                 }
             ),

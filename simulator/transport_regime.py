@@ -907,6 +907,36 @@ def series_effective_speed_m3_s(
     return 1.0 / (1.0 / pump_speed_m3_s + 1.0 / line_conductance_m3_s)
 
 
+def _line_conductance_for_effective_speed_m3_s(
+    pump_speed_m3_s: float,
+    effective_speed_m3_s: float,
+) -> float:
+    """Invert the pump/line series-speed law for a finite line."""
+    pump_speed = _require_positive(
+        pump_speed_m3_s,
+        name="pump_speed_m3_s",
+        category="invalid_pump_speed",
+    )
+    effective_speed = _require_positive(
+        effective_speed_m3_s,
+        name="effective_speed_m3_s",
+        category="invalid_effective_speed",
+    )
+    inverse_line_speed = 1.0 / effective_speed - 1.0 / pump_speed
+    if inverse_line_speed <= 0.0 or not math.isfinite(inverse_line_speed):
+        _refuse(
+            "effective_speed_not_below_pump_speed",
+            "a finite positive line requires an effective speed below pump speed",
+        )
+    line_speed = 1.0 / inverse_line_speed
+    if not math.isfinite(line_speed) or line_speed <= 0.0:
+        _refuse(
+            "invalid_conductance",
+            "the inverse series-speed result is not finite and positive",
+        )
+    return line_speed
+
+
 def _minimum_pressure_pa_for_knudsen(
     temperature_K: float,
     collision_diameter_m: float,

@@ -27,6 +27,7 @@ from simulator.transport_regime import (
     KnudsenRegime,
     TransportRegimeRefusal,
     beskok_karniadakis_rarefaction_factor,
+    _line_conductance_for_effective_speed_m3_s,
     long_tube_molecular_conductance_m3_s,
     molecular_aperture_conductance_m3_s,
     poiseuille_conductance_m3_s,
@@ -336,6 +337,65 @@ def advance_chamber_pressure(
         s_eff_m3_s=s_eff,
         pump_inlet_pressure_pa=inlet,
         notices=apparatus.notices,
+    )
+
+
+def _line_conductance_for_target_pressure_m3_s(
+    *,
+    carrier_flow_nl_min: float,
+    balance_temperature_K: float,
+    pump_speed_m3_s: float,
+    target_pressure_pa: float,
+    ultimate_pressure_pa: float,
+) -> float:
+    """Calculate the line conductance required for a target pressure.
+
+    This is a report-only inverse of the owner series-speed law. It does not
+    select or apply a conductance to an apparatus run.
+    """
+    flow_mol_s = normal_litres_per_minute_to_mol_per_s(carrier_flow_nl_min)
+    if flow_mol_s <= 0.0:
+        raise TeststandRefusal(
+            "invalid_carrier_flow",
+            "conductance reconciliation requires positive carrier flow",
+        )
+    temperature_K = _require_positive_number(
+        balance_temperature_K,
+        code="invalid_balance_temperature",
+        label="balance_temperature_K",
+    )
+    pump_speed = _require_positive_number(
+        pump_speed_m3_s,
+        code="invalid_pump_speed",
+        label="pump_speed_m3_s",
+    )
+    target_pressure = _require_positive_number(
+        target_pressure_pa,
+        code="invalid_target_pressure",
+        label="target_pressure_pa",
+    )
+    ultimate_pressure = _require_non_negative_number(
+        ultimate_pressure_pa,
+        code="invalid_ultimate_pressure",
+        label="ultimate_pressure_pa",
+    )
+    pressure_head = target_pressure - ultimate_pressure
+    if pressure_head <= 0.0:
+        raise TeststandRefusal(
+            "target_pressure_not_above_ultimate",
+            "target pressure must exceed pump ultimate pressure",
+        )
+    throughput = flow_mol_s * GAS_CONSTANT * temperature_K
+    required_effective_speed = throughput / pressure_head
+    if not math.isfinite(required_effective_speed) or required_effective_speed <= 0.0:
+        raise TeststandRefusal(
+            "invalid_required_effective_speed",
+            "the requested pressure does not yield a finite positive effective speed",
+        )
+    return _transport(
+        _line_conductance_for_effective_speed_m3_s,
+        pump_speed,
+        required_effective_speed,
     )
 
 

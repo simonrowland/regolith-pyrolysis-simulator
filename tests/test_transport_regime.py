@@ -13,6 +13,21 @@ ROOM_TEMPERATURE_K = 293.15
 FREE_MOLECULAR_KN = 10.0
 
 
+def test_inverse_series_speed_resolves_through_existing_owner_law():
+    pump_speed_m3_s = 15.1 / 3600.0
+    effective_speed_m3_s = 0.1 * pump_speed_m3_s
+
+    line_conductance_m3_s = tr._line_conductance_for_effective_speed_m3_s(
+        pump_speed_m3_s,
+        effective_speed_m3_s,
+    )
+
+    assert tr.series_effective_speed_m3_s(
+        pump_speed_m3_s,
+        line_conductance_m3_s,
+    ) == pytest.approx(effective_speed_m3_s)
+
+
 @pytest.mark.parametrize(
     (
         "species",

@@ -13,10 +13,11 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.physical_constants import GAS_CONSTANT, PA_PER_MBAR
 from simulator.state import CampaignPhase
 from simulator.teststand import (
     TeststandRefusal,
+    _line_conductance_for_target_pressure_m3_s,
     advance_chamber_pressure,
     apply_process_chamber_pressure,
     normal_litres_per_minute_to_mol_per_s,
@@ -103,6 +104,18 @@ def _advance(geometry: dict, **kwargs):
 
 def _diverges(actual: float, expected: float) -> None:
     assert abs(actual - expected) > abs(expected) * 1.0e-6
+
+
+def test_robinot_pressure_reconciliation_conductance_is_a_diagnostic() -> None:
+    conductance = _line_conductance_for_target_pressure_m3_s(
+        carrier_flow_nl_min=0.3,
+        balance_temperature_K=_T_K,
+        pump_speed_m3_s=15.1 / _HOUR_S,
+        target_pressure_pa=13.0 * PA_PER_MBAR,
+        ultimate_pressure_pa=0.0,
+    )
+
+    assert conductance == pytest.approx(4.296289484251e-4, rel=1e-10)
 
 
 def _orifice_conductance_m3_s(diameter_m: float, temperature_K: float) -> float:
