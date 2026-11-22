@@ -2196,7 +2196,7 @@ def test_same_hour_resolver_rejects_stale_mapping_and_floor_pins(
     )
 
 
-def test_pin_verdict_matches_only_gate_domain_fields_and_skips_non_magemin(
+def test_pin_verdict_uses_domain_identity_and_skips_non_magemin(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -2213,12 +2213,15 @@ def test_pin_verdict_matches_only_gate_domain_fields_and_skips_non_magemin(
     current = MAGEMinDomainIdentity(
         'extrapolated', 'clear', (30.0, 80.0), 'first diagnostic detail',
     )
-    same_gate_domain = MAGEMinDomainIdentity(
+    different_reason = MAGEMinDomainIdentity(
         'extrapolated', 'clear', (30.0, 80.0), 'second diagnostic detail',
     )
-    assert sim._melt_redox_gate_pin_verdicts_match(
+    assert current.matches(MAGEMinDomainIdentity(
+        'extrapolated', 'clear', (30.0, 80.0), 'first diagnostic detail',
+    ))
+    assert not sim._melt_redox_gate_pin_verdicts_match(
         current,
-        same_gate_domain,
+        different_reason,
         submitted_bulk_passes=True,
     )
     assert not sim._melt_redox_gate_pin_verdicts_match(
@@ -6080,6 +6083,14 @@ def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
     assert fallback_operation['transition_name'] == 'fe_redox_respeciation'
     assert fallback_authority['status'] == 'liquidus_unavailable_floor_fallback'
 
+    held_authority = sim._resolved_melt_redox_gate_authority()
+    assert held_authority is sim._melt_redox_gate_authority_this_tick
+    assert curve_calls == 1
+
+    sim._clear_melt_redox_gate_authority_for_completed_hour(
+        int(sim.melt.hour)
+    )
+    sim.melt.hour += 1
     recovered_operation = sim._apply_fe_redox_respeciation()
 
     assert curve_calls == 2
@@ -6131,6 +6142,17 @@ def test_full_tick_pins_failed_authority_and_poisoned_retry(
     )
     per_operation_sim._apply_fe_redox_respeciation()
     mixed_transition = per_operation_sim.atom_ledger.transitions[-1]
+    held_authority = (
+        per_operation_sim._resolved_melt_redox_gate_authority()
+    )
+    assert held_authority is (
+        per_operation_sim._melt_redox_gate_authority_this_tick
+    )
+    assert per_operation_calls == 1
+    per_operation_sim._clear_melt_redox_gate_authority_for_completed_hour(
+        int(per_operation_sim.melt.hour)
+    )
+    per_operation_sim.melt.hour += 1
     mixed_liquid_fraction = (
         per_operation_sim._freeze_gate_liquid_fraction_factor()
     )

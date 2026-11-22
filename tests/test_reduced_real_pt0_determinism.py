@@ -1999,6 +1999,111 @@ def test_equilibrium_replay_restores_requested_fo2_not_printed_echo(
     assert sim.melt.melt_fO2_log == requested_fO2_log
 
 
+def test_equilibrium_cache_hits_refresh_feo_liquidus_qualification(
+    tmp_path: Path,
+):
+    from simulator.fe_redox import (
+        LiquidFeODomain,
+        calphad_ferrous_feo_activity_diagnostic,
+    )
+    from simulator.melt_backend.magemin import MAGEMinDomainIdentity
+    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+
+    db_path = tmp_path / 'equilibrium-feo-domain.sqlite'
+    capture = PT0DeterminismStore('capture', db_path=db_path)
+    capture_sim, result = _pt0_equilibrium_capture_context(capture)
+    temperature_K = (
+        float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+    )
+    identity = MAGEMinDomainIdentity(
+        'in_band', 'not_applicable', None, None,
+    )
+    measured_domain = LiquidFeODomain(
+        below_liquidus=True,
+        temperature_K=temperature_K,
+        liquidus_T_C=float(result.temperature_C) + 100.0,
+        solidus_T_C=float(result.temperature_C) - 100.0,
+        source='liquidus_solidus:alphamelts:test',
+        domain_identity=identity,
+    )
+    domains = [measured_domain]
+    capture_sim.liquid_feo_domain_at = lambda _temperature_K: domains[0]
+    captured_activity = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=capture_sim.melt.composition_wt_pct(),
+        fO2_log=float(capture_sim._compute_intrinsic_melt_fO2()),
+        T_K=temperature_K,
+        pressure_bar=float(result.pressure_bar),
+        liquid_domain=measured_domain,
+    )
+    result.diagnostics = {'a_FeO_calphad': captured_activity}
+    capture.capture_equilibrium(capture_sim, result)
+    captured_key = capture._equilibrium_key(capture_sim)
+
+    no_pin_domain = LiquidFeODomain(
+        below_liquidus=None,
+        temperature_K=temperature_K,
+        liquidus_T_C=None,
+        solidus_T_C=None,
+        source='none:liquidus_gate_not_established',
+        domain_identity=identity,
+        liquidus_unknown=True,
+    )
+    domains[0] = no_pin_domain
+    no_pin_hit = capture.cached_equilibrium(capture_sim)
+    assert no_pin_hit is not None
+    assert capture._equilibrium_key(capture_sim) == captured_key
+    no_pin_activity = no_pin_hit.diagnostics['a_FeO_calphad']
+    assert no_pin_activity['a_FeO_authoritative'] == (
+        captured_activity['a_FeO_authoritative']
+    )
+    assert [notice['kind'] for notice in no_pin_activity['notices']] == [
+        'liquidus_unknown',
+    ]
+    assert no_pin_activity['notices'][0]['source'] == (
+        'none:liquidus_gate_not_established'
+    )
+
+    floor_domain = LiquidFeODomain(
+        below_liquidus=None,
+        temperature_K=temperature_K,
+        liquidus_T_C=1200.0,
+        solidus_T_C=1200.0,
+        source='kress91_liquid_calibration_floor',
+        domain_identity=identity,
+        liquidus_unknown=True,
+    )
+    domains[0] = floor_domain
+    floor_hit = capture.cached_equilibrium(capture_sim)
+    assert floor_hit is not None
+    assert capture._equilibrium_key(capture_sim) == captured_key
+    floor_activity = floor_hit.diagnostics['a_FeO_calphad']
+    assert floor_activity['a_FeO_authoritative'] == (
+        captured_activity['a_FeO_authoritative']
+    )
+    assert [notice['kind'] for notice in floor_activity['notices']] == [
+        'liquidus_unknown',
+    ]
+    assert floor_activity['notices'][0]['source'] == (
+        'kress91_liquid_calibration_floor'
+    )
+
+    replay = PT0DeterminismStore('replay', db_path=db_path)
+    replay_sim, _ = _pt0_equilibrium_capture_context(replay)
+    replay_sim.liquid_feo_domain_at = lambda _temperature_K: floor_domain
+    replayed = replay.replay_equilibrium(replay_sim)
+    assert replay._equilibrium_key(replay_sim) == captured_key
+    replayed_activity = replayed.diagnostics['a_FeO_calphad']
+    assert replayed_activity['a_FeO_authoritative'] == (
+        captured_activity['a_FeO_authoritative']
+    )
+    assert [notice['kind'] for notice in replayed_activity['notices']] == [
+        'liquidus_unknown',
+    ]
+    assert replayed_activity['notices'][0]['source'] == (
+        'kress91_liquid_calibration_floor'
+    )
+
+
 def test_unset_alphamelts_fo2_fields_do_not_change_other_cache_payloads():
     result = EquilibriumResult(
         temperature_C=1600.0,
@@ -4287,7 +4392,7 @@ def test_pt1_domain_gate_prediction_replays_with_qualification(
     )
 
 
-def test_pt0_gate_curve_codec_version_misses_markerless_rows(
+def test_pt0_gate_curve_decoder_refuses_markerless_rows(
     tmp_path: Path,
 ) -> None:
     db_path = tmp_path / 'markerless-gate-curve.db'
@@ -4315,8 +4420,11 @@ def test_pt0_gate_curve_codec_version_misses_markerless_rows(
     )
 
     replay = PT0DeterminismStore('replay', db_path=db_path)
+    payload = replay._lookup_first_available(
+        'freeze_gate_curve', (key,),
+    )
     with pytest.raises(PT0CacheMiss, match='cached replay miss'):
-        replay._lookup_first_available('freeze_gate_curve', (key,))
+        rrd._curve_from_payload(payload['curve'])
 
 
 def test_pt1_capture_equilibrium_rejects_internal_analytical_provider(

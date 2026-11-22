@@ -755,6 +755,34 @@ class PT0DeterminismStore:
         payload: Mapping[str, Any],
     ) -> EquilibriumResult:
         result = equilibrium_from_payload(payload)
+        result_diagnostics = dict(result.diagnostics or {})
+        feo_activity = result_diagnostics.get('a_FeO_calphad')
+        if isinstance(feo_activity, Mapping):
+            domain_at = getattr(sim, 'liquid_feo_domain_at', None)
+            if not callable(domain_at):
+                raise TypeError(
+                    'cached a_FeO_calphad requires the current '
+                    'liquid_feo_domain_at resolver'
+                )
+            from simulator.fe_redox import (
+                _with_liquid_model_below_liquidus_notice,
+            )
+
+            current_domain = domain_at(
+                float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+            )
+            current_qualification = _with_liquid_model_below_liquidus_notice(
+                {},
+                current_domain,
+            )
+            refreshed_feo_activity = dict(feo_activity)
+            current_notices = current_qualification.get('notices')
+            if current_notices:
+                refreshed_feo_activity['notices'] = current_notices
+            else:
+                refreshed_feo_activity.pop('notices', None)
+            result_diagnostics['a_FeO_calphad'] = refreshed_feo_activity
+            result.diagnostics = result_diagnostics
         sim._last_reduced_real_cache_state = self.last_cache_state
         sim._last_backend_status = getattr(result, "status", "ok")
         self._apply_equilibrium_cache_authority(sim, result)
@@ -936,7 +964,7 @@ class PT0DeterminismStore:
         self._store(
             "freeze_gate_curve",
             key,
-            canonical_replay_output_projection("freeze_gate_curve", sim, curve),
+            {"curve": _curve_payload(curve)},
             engine_version_provenance=_engine_version_provenance(
                 sim,
                 ChemistryIntent.GATE_LIQUID_FRACTION,
@@ -1269,13 +1297,6 @@ class PT0DeterminismStore:
                 entry.get("key", {}),
             ):
                 continue
-            if artifact == "freeze_gate_curve":
-                curve_payload = (entry.get("payload") or {}).get("curve")
-                if (
-                    not isinstance(curve_payload, Mapping)
-                    or type(curve_payload.get("is_liquidus_floor")) is not bool
-                ):
-                    continue
             if require_gate_curve_domain_diagnostic:
                 identity = _magemin_identity_from_replay_key(key)
                 curve_payload = (entry.get("payload") or {}).get("curve")
@@ -3982,7 +4003,12 @@ def canonical_replay_output_projection(
     result: Any,
 ) -> dict[str, Any]:
     if artifact == "freeze_gate_curve":
-        return {"curve": _curve_payload(result)}
+        return {
+            "curve": _curve_payload(
+                result,
+                include_liquidus_floor=False,
+            ),
+        }
     if artifact != "equilibrium_post_record":
         raise ValueError(f"unsupported PT-1 replay artifact: {artifact}")
     transition = getattr(result, "ledger_transition", None)
@@ -4348,7 +4374,11 @@ def _emit_repair_notices(
     return copy.deepcopy(collected)
 
 
-def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
+def _curve_payload(
+    curve: Mapping[str, Any],
+    *,
+    include_liquidus_floor: bool = True,
+) -> dict[str, Any]:
     is_liquidus_floor = curve.get("is_liquidus_floor", False)
     if type(is_liquidus_floor) is not bool:
         raise PT0CacheCollision(
@@ -4358,7 +4388,6 @@ def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
         "source": str(curve.get("source", "")),
         "solidus_T_C": _json_ready(curve.get("solidus_T_C")),
         "liquidus_T_C": _json_ready(curve.get("liquidus_T_C")),
-        "is_liquidus_floor": is_liquidus_floor,
         "path": [
             {
                 "temperature_C": _json_ready(point[0]),
@@ -4367,6 +4396,8 @@ def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
             for point in tuple(curve.get("path") or ())
         ],
     }
+    if include_liquidus_floor:
+        payload["is_liquidus_floor"] = is_liquidus_floor
     for notice_key in GATE_CURVE_NOTICE_KEYS:
         notice = curve.get(notice_key)
         if isinstance(notice, Mapping):

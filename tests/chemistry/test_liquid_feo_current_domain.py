@@ -65,7 +65,7 @@ def _liquid_feo_bulk(sim, silica_wt_pct):
 
 @pytest.mark.parametrize(
     'scenario',
-    (*_BASE_A_FEO, 'internal_analytical_liquidus_above'),
+    (*_BASE_A_FEO, 'alphamelts_liquidus_above'),
 )
 def test_liquid_feo_activity_uses_current_domain_on_production_paths(
     scenario,
@@ -77,10 +77,9 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
 ):
     provider = (
         'analytical'
-        if scenario in {
-            'internal_analytical_floor',
-            'internal_analytical_liquidus_above',
-        }
+        if scenario == 'internal_analytical_floor'
+        else 'alphamelts'
+        if scenario == 'alphamelts_liquidus_above'
         else 'magemin'
     )
     sim = _build_freeze_gate_sim(
@@ -116,9 +115,9 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         )
         monkeypatch.setattr(sim, '_pt0_store', lambda: None, raising=False)
     trace = (
-        None
-        if provider == 'analytical'
-        else _install_magemin_subprocess_gate(sim, monkeypatch)
+        _install_magemin_subprocess_gate(sim, monkeypatch)
+        if provider == 'magemin'
+        else None
     )
 
     if scenario == 'failed_same_hour_pin_refresh':
@@ -159,10 +158,34 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         assert resolved['curve']['liquidus_T_C'] < 1750.0
         assert getattr(sim, '_melt_redox_gate_authority_tick_hour', None) is None
         temperature_C = 1750.0
-    elif scenario == 'internal_analytical_liquidus_above':
+    elif scenario == 'alphamelts_liquidus_above':
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+        from simulator.chemistry.kernel.dto import IntentResult
+
         composition = _liquid_feo_bulk(sim, 50.0)
+        sim._register_freeze_gate_liquid_fraction_providers()
+        alphamelts = sim._chem_registry.fallback_for(
+            ChemistryIntent.GATE_LIQUID_FRACTION
+        )
+        calls = []
+
+        def measured_liquidus(request):
+            calls.append(request.intent)
+            return IntentResult(
+                intent=request.intent,
+                status='ok',
+                diagnostic={
+                    'solidus_T_C': 1300.0,
+                    'liquidus_T_C': 1700.0,
+                },
+            )
+
+        monkeypatch.setattr(alphamelts, 'dispatch', measured_liquidus)
         resolved = sim._establish_melt_redox_gate_authority_for_current_hour()
-        assert resolved['liquidus_T_C'] < 1750.0
+        assert resolved['source'] == 'gate_liquid_fraction'
+        assert resolved['liquidus_T_C'] == 1700.0
+        assert resolved.get('is_liquidus_floor') is not True
+        assert calls == [ChemistryIntent.GATE_LIQUID_FRACTION]
         temperature_C = 1750.0
     else:
         composition = _liquid_feo_bulk(sim, 85.0)
@@ -216,7 +239,7 @@ def test_liquid_feo_activity_uses_current_domain_on_production_paths(
         assert liquidus_unknown_notices[0]['authority'] == 'unknown'
         return
 
-    if scenario == 'internal_analytical_liquidus_above':
+    if scenario == 'alphamelts_liquidus_above':
         assert notices == []
         assert state['native_fe_activity'] == plain_activity
         return

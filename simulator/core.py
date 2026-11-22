@@ -5381,22 +5381,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> bool:
         if getattr(self, '_liquid_fraction_provider', None) != 'magemin':
             return True
-        if current_verdict is None:
-            return submitted_bulk_passes
-        if (
-            not submitted_bulk_passes
-            or pinned_verdict is None
-        ):
+        if not submitted_bulk_passes or current_verdict is None:
             return False
-        return (
-            current_verdict.reusable
-            and pinned_verdict.reusable
-            and current_verdict.silica_verdict
-            == pinned_verdict.silica_verdict
-            and current_verdict.projection_threshold_verdict
-            == pinned_verdict.projection_threshold_verdict
-            and current_verdict.certified_band == pinned_verdict.certified_band
-        )
+        return current_verdict.matches(pinned_verdict)
 
     def _establish_melt_redox_gate_authority_for_current_hour(
         self,

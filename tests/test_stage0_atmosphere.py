@@ -463,21 +463,18 @@ def test_c0_forecast_reuses_current_validated_gate_pin_without_resolution():
     assert _forecast_gate_parent_state_bytes(sim) == state_before
 
 
-def test_missing_pinned_silica_verdict_check_is_read_only(monkeypatch):
+def test_missing_pinned_silica_verdict_check_is_read_only():
     sim = _sim(
         {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
     )
     sim.load_batch("lunar")
     sim._liquid_fraction_provider = "magemin"
     sim._melt_redox_gate_authority_tick_verdict_identity = None
-    monkeypatch.setattr(
-        sim,
-        "_melt_redox_gate_current_pin_verdict",
-        lambda: (("magemin", True, None, None), True),
-    )
+    state_before = _forecast_gate_parent_state_bytes(sim)
 
     assert not sim._melt_redox_gate_verdict_matches_current()
     assert sim._melt_redox_gate_authority_tick_verdict_identity is None
+    assert _forecast_gate_parent_state_bytes(sim) == state_before
 
 
 def test_c0_forecast_without_registered_gate_provider_does_not_register(

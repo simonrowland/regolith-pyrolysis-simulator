@@ -11490,7 +11490,7 @@ def test_sso2_owner_gate_timeout_uses_flagged_floor_and_completes(monkeypatch):
     from simulator.engine_pool import EngineWorkerTimeout
 
     original_dispatch = PyrolysisSimulator._dispatch_only
-    original_gate_curve = PyrolysisSimulator._melt_redox_liquidus_gate_curve
+    original_gate_record = PyrolysisSimulator._freeze_gate_curve_record
     gate_calls = []
     timeout_curves = []
 
@@ -11500,17 +11500,18 @@ def test_sso2_owner_gate_timeout_uses_flagged_floor_and_completes(monkeypatch):
             raise EngineWorkerTimeout('magemin', 0.01, phase='call')
         return original_dispatch(self, intent, **kwargs)
 
-    def capture_gate_curve(self, *args, **kwargs):
-        curve = original_gate_curve(self, *args, **kwargs)
+    def capture_gate_record(self, *args, **kwargs):
+        record = original_gate_record(self, *args, **kwargs)
+        curve = record.get('curve') if isinstance(record, dict) else None
         if isinstance(curve, dict) and 'gate_provider_refusal' in curve:
             timeout_curves.append(curve)
-        return curve
+        return record
 
     monkeypatch.setattr(PyrolysisSimulator, '_dispatch_only', timeout_gate)
     monkeypatch.setattr(
         PyrolysisSimulator,
-        '_melt_redox_liquidus_gate_curve',
-        capture_gate_curve,
+        '_freeze_gate_curve_record',
+        capture_gate_record,
     )
     execution = build_sso2_owner_recipe_execution(hours=9)
 

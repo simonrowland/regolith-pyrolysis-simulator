@@ -664,6 +664,8 @@ def test_provider_diagnostic_shape_matches_alphamelts_keys():
         liquidus_T_C=1426.85,
         phases_present=('liquid',),
         phase_modes_wt_pct={'liquid': 100.0},
+        authority='extrapolated',
+        certified_band={'sio2_wt_pct': [30.0, 80.0]},
     ).as_diagnostic()
     for key in (
         'liquidus_T_K',
@@ -675,8 +677,12 @@ def test_provider_diagnostic_shape_matches_alphamelts_keys():
         'engine_version',
         'backend_status',
         'backend_warnings',
+        'authority',
+        'certified_band',
     ):
         assert key in diag, f'diagnostic missing key {key!r}'
+    assert diag['authority'] == 'extrapolated'
+    assert diag['certified_band'] == {'sio2_wt_pct': [30.0, 80.0]}
 
 
 def test_projected_phase_and_liquid_fields_pin_has_no_repair_warning():
@@ -808,16 +814,28 @@ def test_magemin_missing_silicate_still_refuses(composition):
 
 
 def test_magemin_silica_notice_survives_provider_dispatch(monkeypatch):
+    from simulator.accounting.formulas import resolve_species_formula
     from simulator.melt_backend.base import EquilibriumResult
 
     provider = MAGEMinShadowProvider(backend=object())
-    monkeypatch.setattr(provider, '_composition_wt_pct', lambda *_: {'SiO2': 85., 'Al2O3': 10., 'CaO': 5.})
     monkeypatch.setattr(provider, '_run_backend', lambda *a, **kw: EquilibriumResult(
         temperature_C=1500., pressure_bar=0.001, liquid_fraction=1., status='ok',
     ))
+    formula_registry = {}
+    composition_wt_pct = {'SiO2': 85., 'Al2O3': 10., 'CaO': 5.}
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
     request = IntentRequest(
         intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
-        account_view=ProviderAccountView(accounts={}, species_formula_registry={}),
+        account_view=ProviderAccountView(
+            accounts={'process.cleaned_melt': composition_mol},
+            species_formula_registry=formula_registry,
+        ),
         temperature_C=1500., pressure_bar=0.001,
     )
     result = provider.dispatch(request)
@@ -825,3 +843,65 @@ def test_magemin_silica_notice_survives_provider_dispatch(monkeypatch):
     assert result.diagnostic['liquid_fraction'] == 1.
     assert result.transition is None
     assert any('authority=extrapolated' in w for w in result.warnings)
+
+
+@pytest.mark.parametrize(
+    ('composition_wt_pct', 'expected_authority', 'expected_band'),
+    (
+        (
+            {'SiO2': 79.9, 'MgO': 19.6, 'MnO': 0.5},
+            'extrapolated',
+            {'sio2_wt_pct': [30.0, 80.0]},
+        ),
+        (
+            {'SiO2': 29.999, 'MgO': 69.501, 'MnO': 0.5},
+            None,
+            None,
+        ),
+    ),
+    ids=('evaluated-above-certified-band', 'evaluated-in-certified-band'),
+)
+def test_equilibrium_provider_qualifies_evaluated_bulk_after_mn_drop(
+    monkeypatch,
+    composition_wt_pct,
+    expected_authority,
+    expected_band,
+):
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.melt_backend.base import EquilibriumResult
+
+    formula_registry = {}
+    composition_mol = {
+        species: amount / resolve_species_formula(
+            species,
+            formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    request = IntentRequest(
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        account_view=ProviderAccountView(
+            accounts={'process.cleaned_melt': composition_mol},
+            species_formula_registry=formula_registry,
+        ),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+    provider = MAGEMinShadowProvider(backend=object())
+    monkeypatch.setattr(
+        provider,
+        '_run_backend',
+        lambda *_args, **_kwargs: EquilibriumResult(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            liquid_fraction=1.0,
+            status='ok',
+        ),
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == 'ok'
+    assert result.diagnostic.get('authority') == expected_authority
+    assert result.diagnostic.get('certified_band') == expected_band

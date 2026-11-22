@@ -141,6 +141,7 @@ def test_sr23_fixed_bound_curve_pin_has_no_repair_notice_or_cache_change() -> No
     curve = sim._freeze_gate_kress_floor_curve(notice, [])
 
     assert curve is not None
+    assert curve["is_liquidus_floor"] is True
     assert curve["source"] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
     assert curve["solidus_T_C"] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
     assert curve["liquidus_T_C"] == KRESS91_LIQUID_CALIBRATION_MIN_T_C + 1.0e-6
@@ -148,7 +149,7 @@ def test_sr23_fixed_bound_curve_pin_has_no_repair_notice_or_cache_change() -> No
         (KRESS91_LIQUID_CALIBRATION_MIN_T_C, 0.0),
         (KRESS91_LIQUID_CALIBRATION_MIN_T_C + 1.0e-6, 1.0),
     )
-    assert set(curve) == {
+    assert set(curve) - {"is_liquidus_floor"} == {
         "source",
         "solidus_T_C",
         "liquidus_T_C",
@@ -156,7 +157,9 @@ def test_sr23_fixed_bound_curve_pin_has_no_repair_notice_or_cache_change() -> No
         "composition_projected_notice",
     }
     assert "repair_notice" not in curve
-    assert _curve_payload(curve) == {
+    payload = _curve_payload(curve)
+    assert payload.pop("is_liquidus_floor") is True
+    assert payload == {
         "source": _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
         "solidus_T_C": KRESS91_LIQUID_CALIBRATION_MIN_T_C,
         "liquidus_T_C": KRESS91_LIQUID_CALIBRATION_MIN_T_C + 1.0e-6,

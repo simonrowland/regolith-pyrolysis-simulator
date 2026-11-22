@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+import traceback
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -497,6 +498,247 @@ def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
     ] > 0.0
     assert available_internal_o2_mol[-1] > 0.0
     assert calls[-1] == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
+
+
+def test_run_row_provider_failure_then_recovery_uses_one_pin(monkeypatch):
+    setpoints, feedstocks, vapor_pressures, calibration = _calibrated_inputs()
+    curve_calls = 0
+    pin_window = False
+    established = []
+    resolved = []
+    cleared_hours = []
+    establishment_states = []
+    resolution_states = []
+    pin_match_states = []
+    curve_call_simulators = []
+    curve_call_stacks = []
+    simulator_type = validation_map.PyrolysisSimulator
+    original_establish = (
+        simulator_type._establish_melt_redox_gate_authority_for_current_hour
+    )
+    original_resolve = simulator_type._resolved_melt_redox_gate_authority
+    original_pin_matches = (
+        simulator_type._melt_redox_gate_pin_verdicts_match
+    )
+    original_clear = (
+        simulator_type._clear_melt_redox_gate_authority_for_completed_hour
+    )
+
+    def fail_then_recover(self):
+        from simulator.engine_binding_admission import (
+            GateCurveEvidence,
+            write_gate_curve_memo_record,
+        )
+
+        nonlocal curve_calls
+
+        def add_current_domain_diagnostic(curve):
+            if getattr(self, '_liquid_fraction_provider', None) != 'magemin':
+                return curve
+            identity = getattr(
+                self,
+                '_freeze_gate_current_magemin_domain_identity',
+                None,
+            )
+            assert identity is not None
+            if identity.silica_verdict == 'extrapolated':
+                assert identity.certified_band is not None
+                curve['authority'] = 'extrapolated'
+                curve['certified_band'] = {
+                    'sio2_wt_pct': list(identity.certified_band),
+                }
+            return curve
+
+        # This callback stands in for a produced curve and does not start the
+        # MAGEMin backend. Give the fixture a stable same-process producer pin
+        # so this test isolates authority pinning, not cold-version refusal.
+        evidence = GateCurveEvidence("a" * 64, False)
+
+        if not pin_window:
+            curve = add_current_domain_diagnostic({
+                'source': 'test_setup_real_curve',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1700.0,
+                'path': ((1000.0, 0.0), (1700.0, 1.0)),
+            })
+            return write_gate_curve_memo_record(
+                self,
+                curve,
+                evidence=evidence,
+                provider_outcome="produced",
+            )
+        curve_calls += 1
+        curve_call_simulators.append(id(self))
+        curve_call_stacks.append(
+            tuple(
+                (Path(frame.filename).name, frame.name, frame.lineno)
+                for frame in traceback.extract_stack(limit=12)
+            )
+        )
+        if curve_calls == 1:
+            raise ProviderUnavailableError('validation row pin failure')
+        curve = add_current_domain_diagnostic({
+            'source': 'test_recovered_real_curve',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1700.0,
+            'path': ((1000.0, 0.0), (1700.0, 1.0)),
+        })
+        return write_gate_curve_memo_record(
+            self,
+            curve,
+            evidence=evidence,
+            provider_outcome="produced",
+        )
+
+    def record_establish(self, *args, **kwargs):
+        nonlocal pin_window
+        pin_window = True
+        authority = original_establish(self, *args, **kwargs)
+        established.append(authority)
+        tick_authority = getattr(
+            self,
+            '_melt_redox_gate_authority_this_tick',
+            None,
+        )
+        establishment_states.append(
+            (
+                id(self),
+                type(authority).__name__,
+                getattr(self, '_melt_redox_gate_authority_tick_hour', None),
+                type(tick_authority).__name__,
+                repr(
+                    getattr(
+                        self,
+                        '_melt_redox_gate_authority_tick_verdict_identity',
+                        None,
+                    )
+                ),
+                type(
+                    getattr(self, '_last_reduced_real_replay_notices', None)
+                ).__name__,
+            )
+        )
+        return authority
+
+    def record_resolve(self, *args, **kwargs):
+        tick_authority = getattr(
+            self,
+            '_melt_redox_gate_authority_this_tick',
+            None,
+        )
+        if args:
+            authority_argument = type(args[0]).__name__
+        elif 'gate_authority' in kwargs:
+            authority_argument = type(kwargs['gate_authority']).__name__
+        else:
+            authority_argument = '<default>'
+        authority = original_resolve(self, *args, **kwargs)
+        if pin_window:
+            resolved.append(authority)
+            if len(resolution_states) < 6:
+                resolution_states.append(
+                    (
+                        id(self),
+                        authority_argument,
+                        getattr(
+                            self,
+                            '_melt_redox_gate_authority_tick_hour',
+                            None,
+                        ),
+                        type(tick_authority).__name__,
+                        type(authority).__name__,
+                    )
+                )
+        return authority
+
+    def record_pin_matches(
+        self,
+        current_verdict,
+        pinned_verdict,
+        *,
+        submitted_bulk_passes,
+    ):
+        result = original_pin_matches(
+            self,
+            current_verdict,
+            pinned_verdict,
+            submitted_bulk_passes=submitted_bulk_passes,
+        )
+        if len(pin_match_states) < 64:
+            pin_match_states.append(
+                (
+                    repr(current_verdict),
+                    repr(pinned_verdict),
+                    submitted_bulk_passes,
+                    result,
+                )
+            )
+        return result
+
+    def record_clear(self, completed_hour):
+        nonlocal pin_window
+        cleared_hours.append(int(completed_hour))
+        result = original_clear(self, completed_hour)
+        pin_window = False
+        return result
+
+    monkeypatch.setattr(
+        simulator_type,
+        '_freeze_gate_curve_record',
+        fail_then_recover,
+    )
+    monkeypatch.setattr(
+        simulator_type,
+        '_establish_melt_redox_gate_authority_for_current_hour',
+        record_establish,
+    )
+    monkeypatch.setattr(
+        simulator_type,
+        '_resolved_melt_redox_gate_authority',
+        record_resolve,
+    )
+    monkeypatch.setattr(
+        simulator_type,
+        '_melt_redox_gate_pin_verdicts_match',
+        record_pin_matches,
+    )
+    monkeypatch.setattr(
+        simulator_type,
+        '_clear_melt_redox_gate_authority_for_completed_hour',
+        record_clear,
+    )
+
+    row = validation_map.run_row(
+        1650.0,
+        validation_map.GasPoint(1.0e-6, 10.0, 'n2_carrier'),
+        1.0,
+        calibration,
+        setpoints,
+        feedstocks,
+        vapor_pressures,
+        grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
+    )
+
+    assert row['row_passes_base_integrity'] is True, (
+        f"mass_balance_error_pct={row['mass_balance_error_pct']!r}; "
+        f"ferric_divergence_material={row['ferric_divergence_material']!r}; "
+        f"first_respeciation_status={row['first_respeciation_status']!r}; "
+        f"first_respeciation_reason={row['first_respeciation_reason']!r}; "
+        f"second_respeciation_status={row['second_respeciation_status']!r}; "
+        f"second_respeciation_reason={row['second_respeciation_reason']!r}"
+    )
+    assert curve_calls == 1, (
+        f'curve_calls={curve_calls}; establishment_states='
+        f'{establishment_states!r}; resolution_states={resolution_states!r}; '
+        f'pin_match_states={pin_match_states!r}; '
+        f'curve_call_simulators={curve_call_simulators!r}; '
+        f'curve_call_stacks={curve_call_stacks!r}'
+    )
+    assert len(established) == 1
+    assert resolved
+    assert all(authority is established[0] for authority in resolved)
+    assert cleared_hours == [0]
+
 
 
 @pytest.mark.parametrize(

@@ -291,28 +291,16 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             evaluated_silica_verdict,
         )
 
-        liquidus_intent = request.intent in (
-            ChemistryIntent.SILICATE_LIQUIDUS,
-            ChemistryIntent.GATE_LIQUID_FRACTION,
-        )
-        if liquidus_intent:
-            domain_diagnostic = evaluated_silica_verdict(
-                composition_mol_by_account,
-                str(_SHADOW_BACKEND_CONFIG.get(
-                    'database', DEFAULT_MAGEMIN_DATABASE,
-                )),
-                species_formula_registry=(
-                    request.account_view.species_formula_registry
-                ),
-                composition_mol_by_account=True,
-            ) or {}
-        else:
-            domain_diagnostic = (
-                MAGEMinDomainGate.silica_extrapolation_diagnostic(
-                    composition_wt_pct
-                )
-                or {}
-            )
+        domain_diagnostic = evaluated_silica_verdict(
+            composition_mol_by_account,
+            str(_SHADOW_BACKEND_CONFIG.get(
+                'database', DEFAULT_MAGEMIN_DATABASE,
+            )),
+            species_formula_registry=(
+                request.account_view.species_formula_registry
+            ),
+            composition_mol_by_account=True,
+        ) or {}
         if not domain_diagnostic:
             gate_warnings = [
                 warning
