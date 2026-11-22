@@ -47,6 +47,44 @@ if TYPE_CHECKING:
     )
 
 
+def _residue_adapter_binds(point, engine, experiment, quantity) -> bool:
+    """Whether a source-specific residue predictor will run for this pair.
+
+    Residue quantities are not in the generic capability table. Hashimoto
+    and Sossi bind only on openimcc and internal-analytical. Knudsen binds
+    on every engine when the experiment method is Knudsen effusion. The
+    three assignments below this predicate still decide which predictor
+    wins; this only keeps that pair inside the score loop.
+    """
+
+    from simulator.battery.enums import Engine, MethodToken, Quantity
+    from simulator.battery.identity import Identity
+
+    if quantity not in {
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        Quantity.ELEMENT_RETENTION_RATIO,
+    }:
+        return False
+    if not isinstance(point.identity, Identity):
+        return False
+    predictor = declared_residue_predictor(point.source_id)
+    if predictor == HASHIMOTO_RESIDUE_PREDICTOR and engine in {
+        Engine.OPENIMCC,
+        Engine.INTERNAL_ANALYTICAL,
+    }:
+        return True
+    if predictor == SOSSI_RESIDUE_PREDICTOR and engine in {
+        Engine.OPENIMCC,
+        Engine.INTERNAL_ANALYTICAL,
+    }:
+        return True
+    return bool(
+        experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    )
+
+
 def _residue_cohort_selection(
     selected_experiment_ids: frozenset[str] | None,
     test_experiment_ids: frozenset[str] | None,
@@ -400,6 +438,7 @@ def _score_store_with_decisions(
         _iter_compilation_series_cells,
         is_compilation_evidence,
     )
+    from simulator.battery.engine_capability import engine_covers_quantity
     from simulator.battery.validate import _bound_work_inputs
 
     provided_handles = dict(handles or {})
@@ -412,6 +451,7 @@ def _score_store_with_decisions(
     started = time.monotonic()
     last_progress = started
     done = 0
+    skipped_capability = 0
     total = sum(
         prepared.series_point_counts.get(obs.observation_id, 1) for obs in refs
     ) * max(len(engine_set), 1)
@@ -424,6 +464,8 @@ def _score_store_with_decisions(
         if _stream is not None:
             _stream.flush()
         progress = f"score progress {done}/{total} residuals"
+        if skipped_capability:
+            progress += f" skipped_capability={skipped_capability}"
         if _stream is not None:
             progress += f" written={_stream.count}"
         print(
@@ -504,6 +546,23 @@ def _score_store_with_decisions(
                         point_origin,
                         production_scoring=predict is None,
                     ):
+                        # An engine with no adapter for this quantity is a
+                        # capability-matrix cell, not a residual. Injected
+                        # predictors still see every engine. Residue adapters
+                        # stay in the loop even though the quantity is absent
+                        # from the generic table.
+                        if (
+                            predict is None
+                            and quantity is not None
+                            and not engine_covers_quantity(engine, quantity)
+                            and not _residue_adapter_binds(
+                                point, engine, experiment, quantity
+                            )
+                        ):
+                            done += 1
+                            skipped_capability += 1
+                            report_progress_if_due()
+                            continue
                         prediction = None
                         scoring_predict = (
                             partial(

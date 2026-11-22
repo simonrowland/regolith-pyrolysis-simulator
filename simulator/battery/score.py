@@ -23492,6 +23492,24 @@ def write_headline_summary_json(
     payload["assumed_band"] = _assumed_band_summary(
         (to_plain(row) for row in residuals), context.observations
     )
+    from simulator.battery.engine_capability import (
+        capability_summary,
+        residual_record_stats,
+    )
+
+    n_records, n_scored, n_refused, scored_ids = residual_record_stats(residuals)
+    payload.update(
+        capability_summary(
+            observations=context.observations,
+            origins=context.origins,
+            experiments=context.experiments,
+            engines=engines,
+            scored_observation_ids=scored_ids,
+            n_records=n_records,
+            n_scored_records=n_scored,
+            n_refused_records=n_refused,
+        )
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(payload, sort_keys=True, ensure_ascii=False, indent=2) + "\n",
@@ -23904,6 +23922,18 @@ def _render_score_report_from_payloads_legacy(
             pending += 1
         elif observation.admission.status is AdmissionStatus.ADMITTED:
             admitted += 1
+    from simulator.battery.engine_capability import capability_summary
+
+    capability = capability_summary(
+        observations=context.observations,
+        origins=context.origins,
+        experiments=context.experiments,
+        engines=engines,
+        scored_observation_ids=aggregate.numeric_observation_ids,
+        n_records=aggregate.count,
+        n_scored_records=aggregate.numeric_count,
+        n_refused_records=aggregate.refused_count,
+    )
     report = render_legacy_score_report_markdown(
         hostname=context.hostname,
         studio_hostname=studio_hostname,
@@ -23933,6 +23963,8 @@ def _render_score_report_from_payloads_legacy(
         status_diff=status_diff,
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
+        coverage=capability["coverage"],
+        capability_matrix=capability["capability_matrix"],
     )
     if shard_failures:
         report = (
@@ -24972,6 +25004,9 @@ class _ScorePayloadAccumulator:
         self.report_engine_names: set[str] = set()
         self.count = 0
         self.scored_count = 0
+        self.numeric_count = 0
+        self.refused_count = 0
+        self.numeric_observation_ids: set[str] = set()
         self.flagged_counts: dict[tuple[str, str, str], int] = defaultdict(int)
         self.flagged_values: dict[tuple[str, str, str], list[Decimal]] = defaultdict(list)
         self.compilation_groups: dict[
@@ -25266,6 +25301,14 @@ class _ScorePayloadAccumulator:
             except (TypeError, ValueError, ArithmeticError):
                 pass
         reference = metadata.reference
+        if (
+            isinstance(numeric_payload, Mapping)
+            and numeric_payload.get("value") is not None
+        ):
+            self.numeric_count += 1
+            self.numeric_observation_ids.add(str(reference))
+        if row.get("status") == ResidualStatus.REFUSED.value:
+            self.refused_count += 1
         engine = metadata.engine
         flags = metadata.flags
         flagged = bool(flags)
@@ -25555,6 +25598,20 @@ class _ScorePayloadAccumulator:
             static_refusals=self.static_refusals,
         )
         payload["assumed_band"] = self.assumed_bands.payload()
+        from simulator.battery.engine_capability import capability_summary
+
+        payload.update(
+            capability_summary(
+                observations=self.context.observations,
+                origins=self.context.origins,
+                experiments=self.context.experiments,
+                engines=self.engines,
+                scored_observation_ids=self.numeric_observation_ids,
+                n_records=self.count,
+                n_scored_records=self.numeric_count,
+                n_refused_records=self.refused_count,
+            )
+        )
         return payload
 
 
@@ -25565,6 +25622,7 @@ def write_headline_summary_from_payloads_json(
     engines: Sequence[Engine],
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
+    experiments: Mapping[str, object] | None = None,
     store_stamp: Mapping[str, object] | None = None,
 ) -> None:
     rows = tuple(rows)
@@ -25578,6 +25636,25 @@ def write_headline_summary_from_payloads_json(
         store_stamp=store_stamp,
     )
     payload["assumed_band"] = _assumed_band_summary(rows, observations)
+    if observations is not None:
+        from simulator.battery.engine_capability import (
+            capability_summary,
+            payload_record_stats,
+        )
+
+        n_records, n_scored, n_refused, scored_ids = payload_record_stats(rows)
+        payload.update(
+            capability_summary(
+                observations=observations,
+                origins=origins,
+                experiments=experiments,
+                engines=engines,
+                scored_observation_ids=scored_ids,
+                n_records=n_records,
+                n_scored_records=n_scored,
+                n_refused_records=n_refused,
+            )
+        )
     _write_headline_summary_payload_json(payload, path)
 
 
@@ -25664,6 +25741,7 @@ def render_score_report_from_payloads(
     mismatch_warning: str | None = None,
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
+    experiments: Mapping[str, object] | None = None,
 ) -> str:
     eligibility_census = eligibility_failure_census(
         rows,
@@ -25742,6 +25820,26 @@ def render_score_report_from_payloads(
         condition_lines: Sequence[str] | None = _condition_hull_lines(hulls)
     else:
         condition_lines = None
+    capability = None
+    if observations is not None:
+        from simulator.battery.engine_capability import (
+            capability_summary,
+            payload_record_stats,
+        )
+
+        n_records, n_scored_records, n_refused_records, scored_ids = payload_record_stats(
+            rows
+        )
+        capability = capability_summary(
+            observations=observations,
+            origins=origins,
+            experiments=experiments,
+            engines=engines,
+            scored_observation_ids=scored_ids,
+            n_records=n_records,
+            n_scored_records=n_scored_records,
+            n_refused_records=n_refused_records,
+        )
     refusal_counts = refusal_census_payloads(measured_rows)
     admit = admission_census_payloads(rows)
     notice_counts = notice_backlog_payloads(rows)
@@ -25777,6 +25875,8 @@ def render_score_report_from_payloads(
         status_diff=status_diff,
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
+        coverage=None if capability is None else capability["coverage"],
+        capability_matrix=None if capability is None else capability["capability_matrix"],
     )
     report = format_assumed_band_report(
         report, _assumed_band_summary(rows, observations)
