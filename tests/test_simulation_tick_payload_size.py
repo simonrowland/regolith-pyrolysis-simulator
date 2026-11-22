@@ -106,17 +106,16 @@ SAWTOOTH_SLOPE_BYTES_PER_HOUR = 100.0
 #   C0 6204; C0B 6406, 6428, 6406; C2A_STAGED 7192, 7198, 7193, 7200.
 # Junctions: hour 5->6 is +202, hour 8->9 is +786. Net rise is
 # 7200 - 6204 = +996.
-# Flat-run spans (max - min) are C0B 22 and C2A_STAGED 8. That span is
-# the numeric-text wobble of scalar fields on a row that is not gaining
-# a block. The margin is those two spans added, one for each endpoint.
+# The caps are a backstop against a multi-kilobyte copy or a stair-step,
+# sized to leave room for one more block of the largest measured
+# junction and one more copy of the measured window rise. They do not
+# separate a campaign-start block from a history of the same size.
+# The in-run slope gate and the every-hour tick gate do that.
 _C0_TO_C0B_STEP = 202
 _C0B_TO_C2A_STEP = 786
 _WINDOW_NET_RISE = 996
-_C0B_FLAT_SPAN = 6428 - 6406
-_C2A_FLAT_SPAN = 7200 - 7192
-_ENDPOINT_MARGIN = _C0B_FLAT_SPAN + _C2A_FLAT_SPAN
-CAMPAIGN_UNCHECKED_STEP_BYTES = _C0B_TO_C2A_STEP + _ENDPOINT_MARGIN
-CAMPAIGN_WINDOW_NET_RISE_BYTES = _WINDOW_NET_RISE + _ENDPOINT_MARGIN
+CAMPAIGN_UNCHECKED_STEP_BYTES = 2 * _C0B_TO_C2A_STEP
+CAMPAIGN_WINDOW_NET_RISE_BYTES = 2 * _WINDOW_NET_RISE
 assert _C0_TO_C0B_STEP <= CAMPAIGN_UNCHECKED_STEP_BYTES
 
 
@@ -175,7 +174,9 @@ def _assert_campaign_hourly_payload_is_bounded(
     shorter than three — is capped at ``CAMPAIGN_UNCHECKED_STEP_BYTES``.
     The net rise from the first sample to the last is capped at
     ``CAMPAIGN_WINDOW_NET_RISE_BYTES``, so a chain of one-hour campaigns
-    cannot stair-step under the per-step cap.
+    cannot stair-step under the per-step cap. Those caps leave room for
+    one more block of the measured size. They do not tell a fixed block
+    from a history; the slope gate and the every-hour tick gate do.
 
     Hours 5–12 at df8da164a1 are one C0 point (6204), C0B
     (6406, 6428, 6406), then C2A_STAGED (7192, 7198, 7193, 7200).
@@ -901,17 +902,18 @@ def test_hourly_payload_gate_rejects_one_hour_campaign_staircase() -> None:
 
 
 def test_hourly_payload_gate_rejects_net_rise_of_legal_steps() -> None:
-    """Each step is the measured +202 junction. The net rise is not.
+    """Each step is the measured +202 junction, under the step cap.
 
-    Six such steps sum to 1212, above the window net cap, so deleting
-    the net check would let this staircase pass.
+    Ten such steps sum to 2020, above the window net cap (1992). Each
+    run is one hour, so the slope gate does not see them. Deleting the
+    net check would let this staircase pass.
     """
-    with pytest.raises(AssertionError, match="net rise 1212 bytes"):
+    with pytest.raises(AssertionError, match="net rise 2020 bytes"):
         _assert_campaign_hourly_payload_is_bounded(
             "per_hour_summary",
             [
                 (f"C{index}", index, _C0_TO_C0B_STEP * index)
-                for index in range(7)
+                for index in range(11)
             ],
         )
 
