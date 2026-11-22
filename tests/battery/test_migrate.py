@@ -64,6 +64,7 @@ from simulator.battery.migrate import (
     QUEUE_SCHEMA_VERSION,
     DuplicateObservationIdError,
     _convert_compilation_amount,
+    _percent_composition_closure_error,
     FE3_FE2_RATIO_PRINTED_FIELDS,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
@@ -10240,6 +10241,18 @@ def test_printed_mole_fraction_composition_maps_without_wt_conversion(
     else:
         assert obs.identity.composition.is_value
         assert obs.identity.composition.value.as_map() == expected
+
+
+def test_percent_composition_closure_uses_printed_last_place_allowance() -> None:
+    assert (
+        _percent_composition_closure_error(
+            {"SiO2": Decimal("50.0"), "MgO": Decimal("49.9")}, "mole"
+        )
+        is None
+    )
+    assert _percent_composition_closure_error(
+        {"SiO2": Decimal("50.0"), "MgO": Decimal("49.8")}, "mole"
+    ) == "mole-percent composition does not close to 100 (sum=99.8)"
 
 
 def test_borisov_combined_iron_composition_migrates_without_a_redox_split(

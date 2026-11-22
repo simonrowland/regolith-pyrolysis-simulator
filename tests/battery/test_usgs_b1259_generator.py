@@ -104,6 +104,13 @@ def _observations_for(
     return result
 
 
+def test_published_cell_uncertainty_is_half_its_last_printed_place() -> None:
+    assert generator._published_cell_value({"as_published": "11.2"}) == (
+        Decimal("11.2"),
+        Decimal("0.05"),
+    )
+
+
 def test_tridymite_record_name_uses_the_closed_polymorph_alias() -> None:
     generated = _generation("b1259-ht-0114-tridymite")
     assert generated.observations
