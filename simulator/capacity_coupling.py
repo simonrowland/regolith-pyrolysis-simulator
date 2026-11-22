@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Any
 
@@ -65,6 +65,11 @@ class CapacityShadowResult:
     mass_closure_error_pct: float
     authoritative: bool = False
     species_notices: tuple[Mapping[str, Any], ...] = ()
+    # Kilograms of gross vapour the step integrated, and moles of S
+    # the step integrated. Empty on a shadow that did not track them.
+    # The hour posts these. It does not sample the endpoint.
+    vapour_extent_kg: Mapping[str, float] = field(default_factory=dict)
+    redox_added_mol: Mapping[str, float] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         for name in (
@@ -72,6 +77,8 @@ class CapacityShadowResult:
             "evaporation_flux_kg_hr",
             "bled_species_mol",
             "terminal_offgas_mol",
+            "vapour_extent_kg",
+            "redox_added_mol",
         ):
             object.__setattr__(
                 self,
@@ -479,6 +486,7 @@ def solve_capacity_shadow(
     authoritative: bool = False,
     rel_tol: float = DEFAULT_REL_TOL,
     max_iterations: int = DEFAULT_MAX_ITERATIONS,
+    extent_holder: dict | None = None,
 ) -> CapacityShadowResult | CapacityShadowRefusal:
     controls = {
         "cold_train_capacity": capacity,
@@ -548,6 +556,7 @@ def solve_capacity_shadow(
             authoritative=authoritative,
             rel_tol=rel_tol,
             max_iterations=max_iterations,
+            extent_holder=extent_holder,
         )
     if not isinstance(capacity, FiniteCapacity):
         oxygen = OxygenShadowPartition(0.0, 0.0, 0.0, 0.0, 0.0)
@@ -855,6 +864,11 @@ _MONOTONE_ABS = 1.0e-15
 # BDF at 1e-12 is still ~1e-4 Pa high on the choked megapascal piece.
 _SLOW_ATOL_PA = 1.0e-7
 _SLOW_RTOL = 1.0e-12
+# Gross extent is kilograms. 1e-18 kg of SiO is about 1.6e-12 Pa of
+# its stoichiometric O2 on this vessel, under the 1e-9 Pa ledger
+# gate. n, A, B and the redox integral keep the mole tolerance.
+# A scalar atol would retune those.
+_SLOW_EXTENT_ATOL_KG = 1.0e-18
 # One 1250 C hour dispatches the flux about 1253 times, and the
 # sign-scan fallback walks 4096 points. Hour 21 of the canonical
 # lunar walk stayed inside one Radau call for 34 minutes. The caps
@@ -915,6 +929,8 @@ class _HeadspaceStep:
     iterations: int
     binding: str
     residual_Pa: float
+    vapour_extent_kg: dict[str, float]
+    redox_added_mol: dict[str, float]
 
 
 def _ideal_gas_partials_Pa(
@@ -970,6 +986,7 @@ class _HeadspaceLaw:
         redox_mol_s_at_partials: (
             Callable[[Mapping[str, float]], Mapping[str, float]] | None
         ) = None,
+        extent_holder: dict | None = None,
     ) -> None:
         self.species = species
         self.masses = dict(masses)
@@ -985,6 +1002,11 @@ class _HeadspaceLaw:
             for species_name in species
         }
         self.redox_mol_s_at_partials = redox_mol_s_at_partials
+        # The hour's flux writes gross kilograms per hour here. Absent
+        # on every other caller, and those callers grow no extra states.
+        self.extent_holder = extent_holder
+        self._last_gross_kg_s: dict[str, float] = {}
+        self._last_redox_mol_s: dict[str, float] = {}
         # First notice per (species, reason). The sweep calls the pipe
         # on every trial; the hour keeps one flag, not one per sample.
         self.species_notices: dict[tuple[str, str], Mapping[str, Any]] = {}
@@ -1008,6 +1030,7 @@ class _HeadspaceLaw:
         # by the substep. A missing callback returns that constant map,
         # so a chunk-2 zero is unchanged.
         if self.redox_mol_s_at_partials is None:
+            self._last_redox_mol_s = self.redox_mol_s
             return self.redox_mol_s
         try:
             raw = self.redox_mol_s_at_partials(partials)
@@ -1025,6 +1048,7 @@ class _HeadspaceLaw:
             if label not in self.masses or label not in self.redox_mol_s:
                 raise _BalanceRefused(f"missing_molar_mass:{label}")
             out[label] = _as_finite(rate, f"redox_source_not_finite:{label}")
+        self._last_redox_mol_s = out
         return out
 
     def partials_of(self, moles: Mapping[str, float]) -> dict[str, float]:
@@ -1080,6 +1104,25 @@ class _HeadspaceLaw:
             # Chunk 4 removes the one-sided clamp. This chunk still
             # publishes max(0, rate).
             out[str(name)] = max(0.0, number)
+        # The callback just wrote the gross it projected, in kg/h.
+        # kg/s = (kg/h) / 3600. 3600 is exact in binary64. A caller
+        # with no holder leaves the snapshot empty, and the fast
+        # default extent is then zero. That caller does not post it.
+        gross_kg_s: dict[str, float] = {}
+        holder = self.extent_holder
+        if isinstance(holder, dict):
+            raw = holder.get("gross_kg_hr") or {}
+            if isinstance(raw, Mapping):
+                for name, rate in raw.items():
+                    label = str(name)
+                    if label not in self.masses:
+                        continue
+                    number = _as_finite(
+                        rate,
+                        f"evaporation_extent_not_finite:{label}",
+                    )
+                    gross_kg_s[label] = max(0.0, number) / 3600.0
+        self._last_gross_kg_s = gross_kg_s
         return out
 
     def _source_mol_s(self, partials: Mapping[str, float]) -> dict[str, float]:
@@ -1322,6 +1365,8 @@ class _HeadspaceLaw:
         *,
         added_mol: Mapping[str, float] | None = None,
         bled_mol_in: Mapping[str, float] | None = None,
+        vapour_extent_kg: Mapping[str, float] | None = None,
+        redox_added_mol: Mapping[str, float] | None = None,
     ) -> _HeadspaceStep:
         partials = self.partials_of(moles)
         source, outflow, binding, _piece = self._flows(partials)
@@ -1336,6 +1381,8 @@ class _HeadspaceLaw:
             published[species] * self.masses[species]
             for species in self.species
         )
+        redox_end: Mapping[str, float] | None = None
+        rewrote = False
         if added_mol is None:
             # Fast root. m_source = (q + S) * M * Δt. At the root
             # q + S = Q, so the bled mass is the hour's source plus
@@ -1344,6 +1391,7 @@ class _HeadspaceLaw:
             # Unit check: mol/s * kg/mol * s = kg.
             # Limit: already at the root, m0 = m_end and bled = (q + S) Δt.
             redox = self._redox_rates(partials)
+            redox_end = redox
             source_kg = math.fsum(
                 (source[species] + redox[species])
                 * self.masses[species]
@@ -1361,7 +1409,6 @@ class _HeadspaceLaw:
             # Limit: a positive drain is unchanged.
             pa_per_mol = GAS_CONSTANT * self.temperature_K / self.volume_m3
             bled_mol = {}
-            rewrote = False
             for species in self.species:
                 added = (source[species] + redox[species]) * dt_s
                 bled = float(n0[species]) + added - published[species]
@@ -1379,6 +1426,12 @@ class _HeadspaceLaw:
                     published[species] * self.masses[species]
                     for species in self.species
                 )
+                # The booked fast source stays the pre-rewrite rate.
+                # The extent the hour posts is the gross at the
+                # partials this step publishes. flux_kg_hr stays the
+                # pre-rewrite sample: saturation reads that rate.
+                self._flux_kg_hr(partials)
+                redox_end = self._redox_rates(partials)
         else:
             # Slow branch. added_mol is A_i(Δt) = ∫ (q_i + S_i) dt and
             # bled_mol_in is B_i(Δt) = ∫ Q_i dt, both in mol. The caller
@@ -1391,6 +1444,29 @@ class _HeadspaceLaw:
             )
             bled_mol = {
                 species: bled_mol_in[species] for species in self.species
+            }
+            # A slow caller that passes added_mol and omits the
+            # integrals would post the endpoint. That is the leak.
+            # A caller with no holder has nothing to track, and the
+            # end-rate default below is unread.
+            if self.extent_holder is not None and (
+                vapour_extent_kg is None or redox_added_mol is None
+            ):
+                raise _BalanceRefused("headspace_extent_missing")
+        if vapour_extent_kg is None:
+            # Fast root, or a diagnostic step with no holder. The
+            # integral of a rate the root held fixed is that rate
+            # times the step. Unit check: (kg/s) * s = kg.
+            vapour_extent_kg = {
+                name: float(self._last_gross_kg_s.get(name, 0.0)) * dt_s
+                for name in self.species
+            }
+        if redox_added_mol is None:
+            if redox_end is None:
+                redox_end = self._redox_rates(partials)
+            redox_added_mol = {
+                name: float(redox_end.get(name, 0.0)) * dt_s
+                for name in self.species
             }
         bled_kg = math.fsum(
             bled_mol[species] * self.masses[species] for species in self.species
@@ -1408,6 +1484,14 @@ class _HeadspaceLaw:
             iterations=iterations,
             binding=binding,
             residual_Pa=residual_Pa,
+            vapour_extent_kg={
+                str(name): float(kilograms)
+                for name, kilograms in dict(vapour_extent_kg).items()
+            },
+            redox_added_mol={
+                str(name): float(moles)
+                for name, moles in dict(redox_added_mol).items()
+            },
         )
 
 
@@ -1894,10 +1978,21 @@ def _slow_converge(
     so n_i(dt) = n0_i + A_i(dt) − B_i(dt) and the bled moles are
     B_i(dt). That identity is what is published, so the closure is
     exact in the booked moles, not only when q is constant.
-    atol on A and on B is the same per-species mole tolerance as n.
-    Unit check: (mol/s)·s = mol, and Pa·m³/(J/(mol·K)·K) = mol.
+    When the hour passed an extent holder, two more states ride the
+    same step. G_i is the gross vapour in kilograms and R_i is S in
+    moles. Neither enters dn/dt. Their columns stay zero.
+      dG_i/dt = gross_i
+      dR_i/dt = S_i
+    A caller with no holder keeps the three-block state, so its step
+    size is the one it had.
+    atol on A, on B and on R is the same per-species mole tolerance
+    as n. G's atol is _SLOW_EXTENT_ATOL_KG. A scalar atol would
+    retune n.
+    Unit check: (mol/s)·s = mol, (kg/s)·s = kg, and
+    Pa·m³/(J/(mol·K)·K) = mol.
     Limit: Q = 0 and constant q gives A = (q + S) dt, B = 0, and
     n = n0 + A, a degree-1 polynomial this order integrates in one step.
+    Constant gross gives G = gross·dt.
     """
 
     import numpy as np
@@ -1905,17 +2000,29 @@ def _slow_converge(
 
     species = law.species
     count = len(species)
+    # The holder is the hour. Other callers keep n, A, B only.
+    track_extent = isinstance(law.extent_holder, dict)
+    blocks = 5 if track_extent else 3
     # State is n, then A = ∫(q+S) dt, then B = ∫Q dt. A(0) = B(0) = 0.
+    # With a holder, G = ∫gross dt (kg) and R = ∫S dt (mol) follow,
+    # both starting at 0.
     y0 = (
         [float(n0[name]) for name in species]
-        + [0.0] * count
-        + [0.0] * count
+        + [0.0] * (count * (blocks - 1))
     )
     pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
     # Premise: each partial is held to 1e-7 Pa. Algebra: n = p V / (R T),
-    # so the mole tolerance is that pressure times V / (R T). A and B
-    # are moles, so they take that same tolerance.
+    # so the mole tolerance is that pressure times V / (R T). A, B and
+    # R are moles, so they take that same tolerance. G is kilograms.
     atol_mol = _SLOW_ATOL_PA / pa_per_mol
+    if track_extent:
+        atol = (
+            [atol_mol] * (3 * count)
+            + [_SLOW_EXTENT_ATOL_KG] * count
+            + [atol_mol] * count
+        )
+    else:
+        atol = atol_mol
 
     def moles_of(state) -> dict[str, float]:
         # A stage may step a draining inventory slightly negative.
@@ -1927,32 +2034,41 @@ def _slow_converge(
             for index, name in enumerate(species)
         }
 
-    def rates_of(
-        moles: Mapping[str, float],
-    ) -> tuple[list[float], list[float], list[float], tuple]:
+    def rates_of(moles: Mapping[str, float]):
         partials = law.partials_of(moles)
         source, outflow, _binding, piece = law._flows(partials)
         redox = law._redox_rates(partials)
         added: list[float] = []
         bled: list[float] = []
         net: list[float] = []
+        gross: list[float] = []
+        redox_rate: list[float] = []
         for name in species:
             inflow = source[name] + redox[name]
             removed = outflow[name]
             rate = inflow - removed
+            gross_kg_s = float(law._last_gross_kg_s.get(name, 0.0))
+            redox_mol_s = float(redox[name])
             if not (
                 math.isfinite(inflow)
                 and math.isfinite(removed)
                 and math.isfinite(rate)
+                and math.isfinite(gross_kg_s)
+                and math.isfinite(redox_mol_s)
             ):
                 raise _BalanceRefused("headspace_balance_nonconvergence")
             added.append(inflow)
             bled.append(removed)
             net.append(rate)
+            gross.append(gross_kg_s)
+            redox_rate.append(redox_mol_s)
         # Binding, blend bucket, cap. The empty-holdup flag is not a
         # kink a fill is forbidden to leave. Mole fraction is not a
         # piece: the mean free path is continuous across equal moles.
-        return net, added, bled, piece[:3]
+        # gross and redox_rate sit in front of the piece so a caller
+        # that only differentiates n, A and B still reads the same
+        # three lists. The piece is last.
+        return net, added, bled, gross, redox_rate, piece[:3]
 
     def rhs(_time: float, state) -> list[float]:
         law.integrator_evaluations += 1
@@ -1963,26 +2079,32 @@ def _slow_converge(
                 flux_evaluations=law.flux_evaluations,
                 integrator_evaluations=law.integrator_evaluations,
             )
-        net, added, bled, _piece = rates_of(moles_of(state))
-        return net + added + bled
+        packed = rates_of(moles_of(state))
+        # n, A, B. G and R only when the hour asked to track them.
+        # Leaving them out keeps the untracked rhs the three lists
+        # it integrated before.
+        if track_extent:
+            return packed[0] + packed[1] + packed[2] + packed[3] + packed[4]
+        return packed[0] + packed[1] + packed[2]
 
     def jacobian(_time: float, state):
         # |dn| starts at |n| * 1e-8 and shrinks until the sample stays
         # on this piece. A column of zeros is not the fallback: that
         # is the flat update a crossed stencil returned on the
-        # free-molecular piece. A and B do not enter the rates, so
-        # their columns stay zero.
+        # free-molecular piece. A, B, G and R do not enter the rates,
+        # so their columns stay zero.
         moles = moles_of(state)
-        base_net, base_added, base_bled, piece = rates_of(moles)
-        width_count = 3 * count
+        base = rates_of(moles)
+        piece = base[-1]
+        width_count = blocks * count
         matrix = np.zeros((width_count, width_count))
 
         def column_of(up, down, span: float) -> list[float]:
-            # up and down are (net, added, bled). One sample difference
-            # keeps ∂n/∂n_j = ∂A/∂n_j − ∂B/∂n_j.
+            # One sample difference. ∂n/∂n_j = ∂A/∂n_j − ∂B/∂n_j.
+            # G and R are differentiated the same way when tracked.
             return [
                 (up[block][index] - down[block][index]) / span
-                for block in range(3)
+                for block in range(blocks)
                 for index in range(count)
             ]
 
@@ -1994,38 +2116,26 @@ def _slow_converge(
                 up_moles = dict(moles)
                 up_moles[name] = amount + width
                 up = rates_of(up_moles)
-                up_ok = up[3] == piece
+                up_ok = up[-1] == piece
                 down = None
                 down_ok = False
                 if amount > width:
                     down_moles = dict(moles)
                     down_moles[name] = amount - width
                     down = rates_of(down_moles)
-                    down_ok = down[3] == piece
+                    down_ok = down[-1] == piece
                 if up_ok and down_ok and down is not None:
                     chosen = column_of(up, down, 2.0 * width)
                     break
                 if up_ok:
-                    chosen = column_of(
-                        up,
-                        (base_net, base_added, base_bled, piece),
-                        width,
-                    )
+                    chosen = column_of(up, base, width)
                     break
                 if down_ok and down is not None:
-                    chosen = column_of(
-                        (base_net, base_added, base_bled, piece),
-                        down,
-                        width,
-                    )
+                    chosen = column_of(base, down, width)
                     break
                 next_width = width * 0.1
                 if next_width < 1.0e-18:
-                    chosen = column_of(
-                        up,
-                        (base_net, base_added, base_bled, piece),
-                        width,
-                    )
+                    chosen = column_of(up, base, width)
                     break
                 width = next_width
             if chosen is None:
@@ -2041,7 +2151,7 @@ def _slow_converge(
             y0,
             method="Radau",
             rtol=_SLOW_RTOL,
-            atol=atol_mol,
+            atol=atol,
             jac=jacobian,
         )
     except _BalanceRefused:
@@ -2061,6 +2171,8 @@ def _slow_converge(
     added_mol: dict[str, float] = {}
     bled_mol: dict[str, float] = {}
     end: dict[str, float] = {}
+    extent_kg: dict[str, float] = {}
+    redox_mol: dict[str, float] = {}
     for index, name in enumerate(species):
         added = float(y_end[count + index])
         bled = float(y_end[2 * count + index])
@@ -2085,6 +2197,33 @@ def _slow_converge(
         added_mol[name] = added
         bled_mol[name] = bled
         end[name] = amount
+        if track_extent:
+            extent = float(y_end[3 * count + index])
+            redox_added = float(y_end[4 * count + index])
+            if not math.isfinite(extent) or not math.isfinite(redox_added):
+                raise _BalanceRefused("headspace_balance_nonconvergence")
+            # Gross and S are nonnegative. A kilogram undershoot is
+            # priced as moles of that species. R is already moles.
+            # Inside the partial floor the integral is zero. Past it
+            # the step failed.
+            mass = law.masses[name]
+            extent_mol = 0.0 if mass <= 0.0 else -extent / mass
+            if extent < 0.0:
+                if extent_mol * pa_per_mol > DEFAULT_ABS_TOL_PA:
+                    raise _BalanceRefused("headspace_balance_nonconvergence")
+                extent = 0.0
+            if redox_added < 0.0:
+                if -redox_added * pa_per_mol > DEFAULT_ABS_TOL_PA:
+                    raise _BalanceRefused("headspace_balance_nonconvergence")
+                redox_added = 0.0
+            extent_kg[name] = extent
+            redox_mol[name] = redox_added
+    extent_kwargs: dict = {}
+    if track_extent:
+        extent_kwargs = {
+            "vapour_extent_kg": extent_kg,
+            "redox_added_mol": redox_mol,
+        }
     return law.step_from_moles(
         n0,
         dt_s,
@@ -2093,6 +2232,7 @@ def _slow_converge(
         _SLOW_ATOL_PA,
         added_mol=added_mol,
         bled_mol_in=bled_mol,
+        **extent_kwargs,
     )
 
 
@@ -2135,6 +2275,11 @@ def _closed_pipe_accumulation(
     partials_0 = law.partials_of(n0)
     source_0, outflow_0, _binding_0, _piece_0 = law._flows(partials_0)
     redox_0 = law._redox_rates(partials_0)
+    # The admission check evaluates the end state next and overwrites
+    # these snapshots. The Euler integral is the opening rate times
+    # the step, the same rate added_mol books.
+    opening_gross_kg_s = dict(law._last_gross_kg_s)
+    opening_redox_mol_s = dict(law._last_redox_mol_s)
     if any(outflow_0[species] > 0.0 for species in law.species):
         return None
     added: dict[str, float] = {}
@@ -2187,6 +2332,14 @@ def _closed_pipe_accumulation(
                     mismatch_pa,
                     added_mol=added,
                     bled_mol_in={species: 0.0 for species in law.species},
+                    vapour_extent_kg={
+                        species: opening_gross_kg_s.get(species, 0.0) * dt_s
+                        for species in law.species
+                    },
+                    redox_added_mol={
+                        species: opening_redox_mol_s.get(species, 0.0) * dt_s
+                        for species in law.species
+                    },
                 )
     # The pipe can still be shut for the whole hour. An Euler step
     # that stays shut uses explicit RK4. One that would cross
@@ -2239,31 +2392,41 @@ def _closed_pipe_refined(
             out[species] = rate
         return out
 
-    def integrate(steps: int) -> dict[str, float] | None:
+    def integrate(steps: int):
         amount = {species: float(n0[species]) for species in law.species}
         span = dt_s / steps
+        gross_acc = {species: 0.0 for species in law.species}
+        redox_acc = {species: 0.0 for species in law.species}
         for _step in range(steps):
             k1 = rates(amount)
             if k1 is None:
                 return None
+            g1 = dict(law._last_gross_kg_s)
+            r1 = dict(law._last_redox_mol_s)
             k2 = rates({
                 species: amount[species] + 0.5 * span * k1[species]
                 for species in law.species
             })
             if k2 is None:
                 return None
+            g2 = dict(law._last_gross_kg_s)
+            r2 = dict(law._last_redox_mol_s)
             k3 = rates({
                 species: amount[species] + 0.5 * span * k2[species]
                 for species in law.species
             })
             if k3 is None:
                 return None
+            g3 = dict(law._last_gross_kg_s)
+            r3 = dict(law._last_redox_mol_s)
             k4 = rates({
                 species: amount[species] + span * k3[species]
                 for species in law.species
             })
             if k4 is None:
                 return None
+            g4 = dict(law._last_gross_kg_s)
+            r4 = dict(law._last_redox_mol_s)
             nxt: dict[str, float] = {}
             for species in law.species:
                 grown = amount[species] + span * (
@@ -2272,10 +2435,23 @@ def _closed_pipe_refined(
                 if grown < 0.0:
                     return None
                 nxt[species] = grown
+                # Same weights as n. kg/s * s = kg, mol/s * s = mol.
+                gross_acc[species] += span * (
+                    g1.get(species, 0.0)
+                    + 2.0 * g2.get(species, 0.0)
+                    + 2.0 * g3.get(species, 0.0)
+                    + g4.get(species, 0.0)
+                ) / 6.0
+                redox_acc[species] += span * (
+                    r1.get(species, 0.0)
+                    + 2.0 * r2.get(species, 0.0)
+                    + 2.0 * r3.get(species, 0.0)
+                    + r4.get(species, 0.0)
+                ) / 6.0
             amount = nxt
         if rates(amount) is None:
             return None
-        return amount
+        return amount, gross_acc, redox_acc
 
     def gap_pa(left: Mapping[str, float], right: Mapping[str, float]) -> float:
         pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
@@ -2296,11 +2472,12 @@ def _closed_pipe_refined(
     previous: dict[str, float] | None = None
     steps = 8
     while explicit and steps <= 64:
-        current = integrate(steps)
-        if current is None:
+        integrated = integrate(steps)
+        if integrated is None:
             previous = None
             steps *= 2
             continue
+        current, gross_acc, redox_acc = integrated
         if previous is not None:
             gap = gap_pa(previous, current)
             if gap <= DEFAULT_ABS_TOL_PA:
@@ -2315,6 +2492,8 @@ def _closed_pipe_refined(
                         for species in law.species
                     },
                     bled_mol_in={species: 0.0 for species in law.species},
+                    vapour_extent_kg=gross_acc,
+                    redox_added_mol=redox_acc,
                 )
         previous = current
         steps *= 2
@@ -2399,10 +2578,18 @@ def _closed_pipe_midpoint(
         # from a hundred-pascal residual takes about 50 passes.
         # Forty returned no shut grid, and the hour then paid for
         # Radau. Eighty covers that halving.
+        accepted_gross: dict[str, float] | None = None
+        accepted_redox: dict[str, float] | None = None
         for _pass in range(80):
             rate = rates(mid)
             if rate is None:
                 return None
+            # The rate that built this target. n_end − n = span · r(mid),
+            # so the gross and S integrals of the step are span times
+            # the same sample, not the end rate. The check at `end`
+            # below overwrites the law snapshot.
+            accepted_gross = dict(law._last_gross_kg_s)
+            accepted_redox = dict(law._last_redox_mol_s)
             target = {
                 name: base[name] + 0.5 * span * rate[name]
                 for name in names
@@ -2434,18 +2621,25 @@ def _closed_pipe_midpoint(
         }
         if any(end[name] < 0.0 for name in names):
             return None
-        if rates(end) is None:
+        if rates(end) is None or accepted_gross is None or accepted_redox is None:
             return None
-        return end
+        return end, accepted_gross, accepted_redox
 
     def grid(steps: int):
         span = dt_s / steps
         amount = {name: float(n0[name]) for name in names}
+        gross_acc = {name: 0.0 for name in names}
+        redox_acc = {name: 0.0 for name in names}
         for _step in range(steps):
-            amount = one_step(amount, span)
-            if amount is None:
+            stepped = one_step(amount, span)
+            if stepped is None:
                 return None
-        return amount
+            amount, gross_mid, redox_mid = stepped
+            for name in names:
+                # span · r(mid). kg/s · s = kg, mol/s · s = mol.
+                gross_acc[name] += span * float(gross_mid.get(name, 0.0))
+                redox_acc[name] += span * float(redox_mid.get(name, 0.0))
+        return amount, gross_acc, redox_acc
 
     previous = None
     saw_shut = False
@@ -2456,22 +2650,25 @@ def _closed_pipe_midpoint(
             previous = None
             steps *= 2
             continue
+        amount, gross_acc, redox_acc = current
         saw_shut = True
-        if previous is not None and gap_pa(previous, current) <= DEFAULT_ABS_TOL_PA:
+        if previous is not None and gap_pa(previous, amount) <= DEFAULT_ABS_TOL_PA:
             _remember_shut_path(law, "midpoint")
             return law.step_from_moles(
                 n0,
                 dt_s,
-                current,
+                amount,
                 steps,
-                gap_pa(previous, current),
+                gap_pa(previous, amount),
                 added_mol={
-                    name: current[name] - float(n0[name])
+                    name: amount[name] - float(n0[name])
                     for name in names
                 },
                 bled_mol_in={name: 0.0 for name in names},
+                vapour_extent_kg=gross_acc,
+                redox_added_mol=redox_acc,
             )
-        previous = current
+        previous = amount
         steps *= 2
     # The pipe stayed shut on a grid and no pair agreed within
     # 1e-6 Pa. The grid is the fast path. The slow integral is
@@ -3229,6 +3426,8 @@ def _publish(
         mass_closure_error_pct=closure,
         authoritative=authoritative,
         species_notices=tuple(law.species_notices.values()),
+        vapour_extent_kg=dict(step.vapour_extent_kg),
+        redox_added_mol=dict(step.redox_added_mol),
     )
 
 
@@ -3249,6 +3448,7 @@ def _build_law(
     redox_mol_s_at_partials: (
         Callable[[Mapping[str, float]], Mapping[str, float]] | None
     ) = None,
+    extent_holder: dict | None = None,
 ) -> tuple[_HeadspaceLaw, dict[str, float]] | CapacityShadowRefusal:
     try:
         if not all(
@@ -3373,6 +3573,7 @@ def _build_law(
             cap_kg_s=cap_kg_s,
             redox_mol_s=redox,
             redox_mol_s_at_partials=redox_mol_s_at_partials,
+            extent_holder=extent_holder,
         )
         return law, n0
     except _BalanceRefused as refused:
@@ -3400,6 +3601,7 @@ def _commit_headspace_balance(
     authoritative: bool = False,
     rel_tol: float = DEFAULT_REL_TOL,
     max_iterations: int = DEFAULT_MAX_ITERATIONS,
+    extent_holder: dict | None = None,
 ) -> CapacityShadowResult | CapacityShadowRefusal:
     built = _build_law(
         pre_holdup_mol=pre_holdup_mol,
@@ -3415,6 +3617,7 @@ def _commit_headspace_balance(
         outflow_cap_kg_s=outflow_cap_kg_s,
         redox_source_mol_s=redox_source_mol_s,
         redox_mol_s_at_partials=redox_mol_s_at_partials,
+        extent_holder=extent_holder,
     )
     if isinstance(built, CapacityShadowRefusal):
         return built

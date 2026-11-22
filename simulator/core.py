@@ -8080,6 +8080,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'wall_fraction': {},
             'wall_booking': {},
             'wall_accounts': {},
+            # The solver reads the gross this call projected. The
+            # integral of that gross is the reaction extent.
+            'extent_holder': {},
         }
         reservoir = self.melt.oxygen_reservoir
         saturation_possible = (
@@ -8359,6 +8362,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 for species, rate in gross.items()
                 if str(species) not in dropped
             }
+            # Same call as q. The kilogram floor does not drop a
+            # covered gross: the integral has to carry Na2.
+            holder = state.get('extent_holder')
+            if isinstance(holder, dict):
+                holder['gross_kg_hr'] = {
+                    str(species): float(rate)
+                    for species, rate in projector_gross.items()
+                    if str(species) != OXYGEN_SPECIES
+                }
             overhead = self._project_evaporation_overhead_source_mol_hr(
                 projector_gross,
                 stoich,
@@ -8535,6 +8547,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     redox_at_partials if saturation_possible else None
                 ),
                 authoritative=True,
+                extent_holder=state['extent_holder'],
             )
 
         capacity, cold_train = self._cold_train_capacity_policy()
@@ -8836,27 +8849,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if solved is None:
             self._headspace_sourced_excess_mol = None
         elif saturation_possible:
-            # Read the excess the residual just booked, before
-            # evaporation commits move the reservoir. mol this hour.
-            # The slow integral stores S at the stages it visited.
-            # The published partials are not one of those keys: on
-            # the C3_NA injection hour that lookup was 0 against
-            # 17195 stored vectors, the settle exchanged nothing,
-            # and the snapshot still reported the solved 100 Pa.
-            # One evaluation at the published partials is the parcel
-            # the fast booking uses, S = N/3600 s at that state.
-            # Algebra: N = pre_buffer + credit(P) − uptake(P).
-            # Unit check: mol this hour.
-            # Limit: an unsaturated partial stores 0 and posts nothing.
+            # The published partials may not be a key the integral
+            # stored. One evaluation fills gross for the frozen
+            # re-solve below. The excess at that partial is not the
+            # parcel: the settle posts the integral of S, written
+            # after the re-solve replaces `solved`.
             root_key = _partial_key(solved.partial_pressures_Pa)
             if root_key not in state['excess_mol']:
                 flux_at_partials(solved.partial_pressures_Pa)
                 redox_at_partials(solved.partial_pressures_Pa)
-            self._headspace_sourced_excess_mol = float(
-                state['excess_mol'].get(root_key, 0.0) or 0.0
-            )
-        else:
-            self._headspace_sourced_excess_mol = 0.0
 
         if solved is None:
             evap_flux = self._calculate_evaporation(equilibrium)
@@ -8905,20 +8906,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._commit_pending_subsolidus_release()
         self._effective_transport_capacity_this_tick = None
-        # S's vapor kg/h is the remainder the root carried, and
-        # S's booking is the oxygen. The route's own remaining
-        # and its own booking are not a second owner. On a shut
-        # Radau hour q(end) is not the integral, so the remaining
-        # is n_end's added mass. Every species in that added mass
-        # is posted when the melt covers the parent debit. The
-        # kilogram floor does not drop it. A species the ledger
-        # cannot hold is refused when its partial is above the
-        # pressure gate, not published against an empty account.
-        # A coupled leg below the floor is still posted. The
-        # condenser is configured on this flux, so a posted species
-        # is added first. The floor does not sit between an
-        # above-floor endpoint and a larger integral. That integral
-        # is the posted rate, and the overhead oxygen follows it.
+        # The reaction extent is the gross the step integrated.
+        # The vapour still in the headspace is the integral of q,
+        # which is n_end's added mass. Stoichiometric O2 follows
+        # the extent. The endpoint is not a second sample of either.
+        # A species the ledger cannot hold is refused when its
+        # partial is above the pressure gate. A coupled leg below
+        # the floor is still posted. The condenser is configured
+        # on this flux, so a posted species is added first.
         source_kg = None
         post_subfloor_species: list[str] = []
         if solved is not None:
@@ -8956,25 +8951,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     )
                 )
 
-            source_kg = {
-                str(species): float(rate)
-                for species, rate in (
-                    solved.evaporation_flux_kg_hr.items()
-                )
+            # Do not seed the rate from the endpoint. A species left
+            # there is the sample this hour no longer posts.
+            evap_flux.species_kg_hr = {}
+            source_kg = {}
+            extents = {
+                str(species): max(0.0, float(kilograms))
+                for species, kilograms in dict(
+                    getattr(solved, "vapour_extent_kg", {}) or {}
+                ).items()
                 if str(species) != OXYGEN_SPECIES
             }
-            for species, kilograms in headspace_integral_added_kg(
+            remaining_kg = headspace_integral_added_kg(
                 solved.partial_pressures_Pa,
                 pre_holdup,
                 solved.bled_species_mol,
                 molar_masses,
                 temperature_K=self._headspace_temperature_K(),
                 volume_m3=self._headspace_volume_m3(),
-            ).items():
-                posted = kilograms if kilograms > 0.0 else 0.0
-                current = float(
-                    evap_flux.species_kg_hr.get(species, 0.0) or 0.0
+            )
+            for species in sorted(set(extents) | set(remaining_kg)):
+                extent = max(0.0, float(extents.get(species, 0.0) or 0.0))
+                remaining = max(
+                    0.0,
+                    float(remaining_kg.get(species, 0.0) or 0.0),
                 )
+                if extent <= 0.0 and remaining <= 0.0:
+                    continue
                 row = stoich.get(str(species))
                 parent = ""
                 oxide_per = 0.0
@@ -8988,77 +8991,50 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if parent
                     else 0.0
                 )
-                # Premise: oxide_kg = posted * oxide_per. The tick is 1 h,
-                # so kilograms of vapour are kilograms of debit times
-                # 1/oxide_per. Stock covers it when available >= oxide_kg > 0.
+                # Premise: oxide_kg = extent * oxide_per. The tick is
+                # 1 h, so the integrated gross is the parent debit.
+                # Stock covers it when available >= oxide_kg > 0.
                 # Unit check: kg * (kg oxide / kg vapour) = kg oxide.
-                # Limit: a zero integral covers nothing and posts nothing.
+                # Limit: a zero extent covers nothing. A vapour
+                # integral with no extent is not a reaction.
                 covers = (
                     bool(parent)
                     and oxide_per > 0.0
+                    and extent > 0.0
                     and evaporation_stock_covers_parent_debit(
-                        posted * oxide_per,
+                        extent * oxide_per,
                         available_kg,
                     )
                 )
-                # Premise: overhead oxygen is O2_per times the posted
-                # rate. The solve added the integral. An above-floor
-                # endpoint is that rate only when the integral does
-                # not exceed it. A larger integral is posted, and the
-                # floor is not a gap that keeps the endpoint.
-                # Algebra: adopt when posted > current and the
-                # endpoint is above the floor, or when the integral
-                # clears the endpoint by more than the floor. A
-                # smaller subfloor integral stays on the else branch.
-                # Unit check: both sides are kilograms this hour.
-                # Limit: posted <= current leaves the endpoint. That
-                # rate is the reaction extent the projector
-                # integrated. source_kg stays the integral, the vapour
-                # still in the headspace after capture.
-                if (
-                    (posted > current and current > rate_floor_kg_hr)
-                    or posted > current + rate_floor_kg_hr
-                ):
-                    parent_blocks = (
-                        bool(parent)
-                        and oxide_per > 0.0
-                        and evaporation_parent_is_below_floor(
-                            posted * oxide_per,
-                            available_kg,
-                        )
-                    )
-                    if parent_blocks and not covers:
-                        _refuse_unposted(str(species), posted)
-                        continue
-                    source_kg[str(species)] = posted
-                    evap_flux.species_kg_hr[str(species)] = posted
-                    if parent_blocks or not self._evaporation_transition_posts_parcel(
-                        posted,
-                        row,
+                if extent <= 0.0:
+                    _refuse_unposted(str(species), remaining)
+                    continue
+                parent_blocks = (
+                    bool(parent)
+                    and oxide_per > 0.0
+                    and evaporation_parent_is_below_floor(
+                        extent * oxide_per,
                         available_kg,
-                    ):
-                        post_subfloor_species.append(str(species))
-                else:
-                    source_kg[str(species)] = posted
-                    # The endpoint filter dropped this rate. The solve
-                    # still added the mass. Post it when the melt covers
-                    # the debit. An endpoint already above the floor is
-                    # left on the comparison above.
-                    if (
-                        posted > 0.0
-                        and current <= rate_floor_kg_hr
-                        and str(species) not in evap_flux.species_kg_hr
-                    ):
-                        if covers:
-                            evap_flux.species_kg_hr[str(species)] = posted
-                            if not self._evaporation_transition_posts_parcel(
-                                posted,
-                                row,
-                                available_kg,
-                            ):
-                                post_subfloor_species.append(str(species))
-                        else:
-                            _refuse_unposted(str(species), posted)
+                    )
+                )
+                if parent_blocks and not covers:
+                    _refuse_unposted(str(species), extent)
+                    continue
+                source_kg[str(species)] = remaining
+                evap_flux.species_kg_hr[str(species)] = extent
+                if parent_blocks or not self._evaporation_transition_posts_parcel(
+                    extent,
+                    row,
+                    available_kg,
+                ):
+                    post_subfloor_species.append(str(species))
+            evap_flux.alpha_authority_status_by_species = {
+                species: status
+                for species, status in (
+                    evap_flux.alpha_authority_status_by_species.items()
+                )
+                if species in evap_flux.species_kg_hr
+            }
             evap_flux.update_totals()
         self._ledger_committed_evap_flux_this_tick = evap_flux
         overhead_flux = evap_flux
@@ -9159,6 +9135,38 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     pre_holdup_mol=pre_holdup,
                     molar_mass_kg_mol=molar_masses,
                 )
+        if solved is not None:
+            # ∫S dt, moles. The reducing credit is already the else
+            # branch's overhead post. The excess is the rest, and it
+            # is the only parcel the saturated settle moves. On a fast
+            # root S is the end rate, so this is the endpoint excess.
+            # A shortfall inside the pressure gate is the tolerance.
+            integrated = float(
+                dict(getattr(solved, "redox_added_mol", {}) or {}).get(
+                    OXYGEN_SPECIES, 0.0,
+                )
+                or 0.0
+            )
+            excess_integrated = integrated - float(reducing_overhead_mol)
+            if excess_integrated < 0.0:
+                from simulator.physical_constants import GAS_CONSTANT as R_CODATA
+
+                volume_m3 = self._headspace_volume_m3()
+                temperature_K = self._headspace_temperature_K()
+                short_pa = (
+                    -excess_integrated * R_CODATA * temperature_K / volume_m3
+                    if volume_m3 > 0.0 and temperature_K > 0.0
+                    else math.inf
+                )
+                if short_pa > DEFAULT_ABS_TOL_PA:
+                    raise CapacityCouplingRefusalError(
+                        CapacityShadowRefusal(
+                            "headspace_redox_integral_below_credit",
+                            0,
+                        )
+                    )
+                excess_integrated = 0.0
+            self._headspace_sourced_excess_mol = excess_integrated
         self._settle_evaporative_redox_after_batch()
         self._headspace_sourced_excess_mol = None
         self._headspace_hour_settled = True

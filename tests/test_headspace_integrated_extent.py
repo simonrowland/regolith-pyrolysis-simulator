@@ -1,0 +1,528 @@
+"""The headspace ledger posts the solve's integrated additions.
+
+Four constructed hours, each driven through ``_step_one_hour``. The
+vapour reaction extent is the integrated gross. The vapour still in
+the headspace is the integral of q. The redox parcel is the integral
+of S. The endpoint is recorded and not posted. The pressure gate on
+published versus ledger is 1e-9 Pa. These hours are not the canon walk.
+"""
+
+from __future__ import annotations
+
+import math
+from contextlib import contextmanager
+from dataclasses import dataclass, replace
+
+from engines.builtin.evaporation_transition import _NUMERICAL_FLOOR_KG
+from simulator.accounting.formulas import resolve_species_formula
+from simulator.capacity_coupling import headspace_integral_added_kg
+from simulator.chemistry.kernel.dto import IntentResult
+from simulator.core import FO2_BUFFER_ACCOUNT, OXYGEN_SPECIES
+from simulator.evaporation import production_vapor_molar_mass_g_per_mol
+from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
+from simulator.state import MOLAR_MASS, CampaignPhase
+from tests.chemistry.conftest import _build_sim, _load_yaml
+from tests.test_headspace_balance_hour import _hold_temperature, _seed
+
+# Published partials against the ledger. The production inventory
+# refusal is 1e-6 Pa. These hours are held to the tighter review gate.
+_PRESSURE_GATE_PA = 1.0e-9
+_ATOM_BOUND_MOL = 1.0e-12
+_POSTED_ABS_KG = 1.0e-18
+
+
+@dataclass(frozen=True)
+class Hour:
+    sim: object
+    partials_Pa: dict[str, float]
+    endpoint_kg_hr: dict[str, float]
+    extent_kg: dict[str, float]
+    posted_kg: dict[str, dict[str, float]]
+    credit_accounts: dict[str, dict[str, str]]
+    gaps_Pa: dict[str, float]
+    redox_mol: dict[str, float]
+    bled_mol: dict[str, float]
+    pipe: float
+    binding: str
+    iterations: int
+    shut_path: str | None
+    atom_worst_mol: float
+
+    @property
+    def total_Pa(self) -> float:
+        return math.fsum(self.partials_Pa.values())
+
+
+def _pressure_total(partials) -> float:
+    return math.fsum(
+        max(0.0, float(pressure)) for pressure in partials.values()
+    )
+
+
+def _sim(campaign: CampaignPhase, temperature_C: float, downstream_Pa: float):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        _load_yaml("vapor_pressures.yaml"),
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("setpoints.yaml"),
+    )
+    sim.melt.campaign = campaign
+    sim._configure_overhead_headspace(campaign)
+    # The overhead model is built on first use. The downstream pressure
+    # is a config value that use reads. Touching the private model here
+    # leaves it unset.
+    sim._overhead_headspace_config["downstream_pressure_bar"] = (
+        float(downstream_Pa) / PA_PER_BAR
+    )
+    _hold_temperature(sim, temperature_C)
+    return sim
+
+
+def _seed_pa(sim, species: str, pascals: float, source: str) -> None:
+    if pascals <= 0.0:
+        return
+    moles = (
+        pascals
+        * sim._headspace_volume_m3()
+        / (GAS_CONSTANT * sim._headspace_temperature_K())
+    )
+    _seed(sim, "process.overhead_gas", {species: moles}, source)
+
+
+@contextmanager
+def _patched(law, fraction_of):
+    """One flux law and one capture fraction, on both capture sites.
+
+    The residual reads ``headspace_capture_fractions``. The fixed point
+    remeasures ``CondensationModel.route``. The two fractions have to
+    agree or the capture move never falls inside the pressure gate.
+    """
+
+    from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+    from simulator.condensation import CondensationModel
+    import simulator.capacity_coupling as coupling
+
+    saved = (
+        BuiltinEvaporationFluxProvider.dispatch,
+        CondensationModel.route,
+        coupling.headspace_capture_fractions,
+    )
+
+    def dispatch(self, request):
+        partials = dict(
+            (getattr(request, "control_inputs", None) or {}).get(
+                "overhead_partials_Pa"
+            )
+            or {}
+        )
+        return IntentResult(
+            intent=request.intent,
+            status="ok",
+            diagnostic={"evaporation_flux_kg_hr": dict(law(partials))},
+        )
+
+    original_route = CondensationModel.route
+
+    def route(self, evap_flux, melt):
+        result = original_route(self, evap_flux, melt)
+        remaining = dict(getattr(result, "remaining_by_species", {}) or {})
+        for species, rate in dict(evap_flux.species_kg_hr).items():
+            label = str(species)
+            if label == OXYGEN_SPECIES:
+                continue
+            captured = min(1.0, max(0.0, float(fraction_of(label))))
+            remaining[label] = max(0.0, float(rate)) * (1.0 - captured)
+        return replace(result, remaining_by_species=remaining)
+
+    def fractions(gross, partials_Pa, *, capture_C, fractions_frozen):
+        del partials_Pa, capture_C, fractions_frozen
+        out = {}
+        for species, rate in dict(gross or {}).items():
+            label = str(species)
+            if label == OXYGEN_SPECIES:
+                continue
+            if float(rate or 0.0) <= 0.0:
+                out[label] = 0.0
+                continue
+            out[label] = min(1.0, max(0.0, float(fraction_of(label))))
+        return out
+
+    BuiltinEvaporationFluxProvider.dispatch = dispatch
+    CondensationModel.route = route
+    coupling.headspace_capture_fractions = fractions
+    try:
+        yield
+    finally:
+        (
+            BuiltinEvaporationFluxProvider.dispatch,
+            CondensationModel.route,
+            coupling.headspace_capture_fractions,
+        ) = saved
+
+
+def _molar_mass_kg(sim, species: str) -> float:
+    return resolve_species_formula(
+        species,
+        sim.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+
+
+def _posted(sim, parent: str) -> tuple[dict[str, float], dict[str, str]]:
+    """Kilograms and the account of each credited species on one evaporate."""
+
+    kilograms: dict[str, float] = {}
+    accounts: dict[str, str] = {}
+    for transition in sim.atom_ledger.transitions:
+        if f"evaporate_{parent}" not in (
+            transition.reason,
+            transition.name,
+        ):
+            continue
+        for lot in transition.credits:
+            for name, amount in dict(lot.species_kg).items():
+                label = str(name)
+                kilograms[label] = kilograms.get(label, 0.0) + float(amount)
+                if float(amount) > 0.0:
+                    accounts[label] = str(lot.account)
+    return kilograms, accounts
+
+
+def _record(sim) -> Hour:
+    cap = sim._headspace_capacity_result
+    assert cap is not None and cap.authoritative is True
+    published = {
+        str(species): float(mbar) * 100.0
+        for species, mbar in dict(sim.overhead.composition or {}).items()
+    }
+    hold = dict(sim.atom_ledger.mol_by_account("process.overhead_gas") or {})
+    per_mol = (
+        GAS_CONSTANT
+        * sim._headspace_temperature_K()
+        / sim._headspace_volume_m3()
+    )
+    ledger = {
+        str(species): float(moles) * per_mol
+        for species, moles in hold.items()
+        if float(moles) != 0.0
+    }
+    names = set(published) | set(ledger)
+    gaps = {
+        name: published.get(name, 0.0) - ledger.get(name, 0.0)
+        for name in names
+    }
+    registry = sim.species_formula_registry
+    worst = 0.0
+    for transition in sim.atom_ledger.transitions:
+        debit = transition.debit_atom_moles(registry)
+        credit = transition.credit_atom_moles(registry)
+        for element in set(debit) | set(credit):
+            worst = max(
+                worst,
+                abs(
+                    float(debit.get(element, 0.0))
+                    - float(credit.get(element, 0.0))
+                ),
+            )
+    paths = [
+        str(notice.get("detail"))
+        for notice in cap.species_notices
+        if notice.get("reason") == "shut_path"
+    ]
+    assert len(paths) <= 1
+    posted: dict[str, dict[str, float]] = {}
+    accounts: dict[str, dict[str, str]] = {}
+    for transition in sim.atom_ledger.transitions:
+        if not str(transition.reason).startswith("evaporate_"):
+            continue
+        parent = str(transition.reason).split("evaporate_", 1)[1]
+        kilograms, credited = _posted(sim, parent)
+        posted[parent] = kilograms
+        accounts[parent] = credited
+    return Hour(
+        sim=sim,
+        partials_Pa={
+            str(species): float(pressure)
+            for species, pressure in cap.partial_pressures_Pa.items()
+            if float(pressure) != 0.0
+        },
+        endpoint_kg_hr={
+            str(species): float(rate)
+            for species, rate in dict(
+                sim._headspace_committed_gross_kg_hr or {}
+            ).items()
+        },
+        extent_kg={
+            str(species): float(kilograms)
+            for species, kilograms in dict(cap.vapour_extent_kg).items()
+            if float(kilograms) > 0.0
+        },
+        posted_kg=posted,
+        credit_accounts=accounts,
+        gaps_Pa=gaps,
+        redox_mol={
+            str(species): float(moles)
+            for species, moles in dict(cap.redox_added_mol).items()
+            if float(moles) != 0.0
+        },
+        bled_mol={
+            str(species): float(moles)
+            for species, moles in dict(cap.bled_species_mol).items()
+        },
+        pipe=float(cap.saturation.pipe),
+        binding=str(cap.saturation.binding_cause),
+        iterations=int(cap.iterations),
+        shut_path=None if not paths else paths[0],
+        atom_worst_mol=worst,
+    )
+
+
+def _step(sim, law, fraction_of) -> Hour:
+    with _patched(law, fraction_of):
+        sim._step_one_hour()
+    return _record(sim)
+
+
+def _vapour_added_kg(sim, hour: Hour, species: str, pre_mol: float) -> float:
+    """∫q for one species, from the production holdup identity.
+
+    added = (n_end − n0 + bled) M. The end partial alone still holds
+    the opening seed, so it is not the hour's vapour integral.
+    """
+
+    mass_g = production_vapor_molar_mass_g_per_mol(
+        sim.vapor_pressures,
+        species,
+    )
+    assert mass_g is not None and mass_g > 0.0
+    added = headspace_integral_added_kg(
+        {species: hour.partials_Pa.get(species, 0.0)},
+        {species: pre_mol},
+        {species: hour.bled_mol.get(species, 0.0)},
+        {species: float(mass_g) / 1000.0},
+        temperature_K=sim._headspace_temperature_K(),
+        volume_m3=sim._headspace_volume_m3(),
+    )
+    return float(added.get(species, 0.0))
+
+
+def _assert_closed(hour: Hour) -> None:
+    assert hour.gaps_Pa, hour.gaps_Pa
+    worst = max(abs(gap) for gap in hour.gaps_Pa.values())
+    assert worst < _PRESSURE_GATE_PA, hour.gaps_Pa
+    assert abs(hour.gaps_Pa.get(OXYGEN_SPECIES, 0.0)) < _PRESSURE_GATE_PA
+    assert hour.atom_worst_mol < _ATOM_BOUND_MOL, hour.atom_worst_mol
+
+
+def _assert_posted_extent(hour: Hour, species: str) -> None:
+    extent = float(hour.extent_kg[species])
+    posted = float(hour.posted_kg[species][species])
+    assert abs(posted - extent) <= _POSTED_ABS_KG, (posted, extent)
+
+
+def test_sio_sliver_posts_the_integral_and_captured_cro_posts_the_gross():
+    """SiO's integral sits inside one floor above an above-floor endpoint.
+
+    CrO's gross is flat and fully captured, so the vapour left behind
+    is empty while the endpoint is the gross. Posting that vapour
+    integral would drop CrO's oxygen. Posting the endpoint on SiO
+    would drop the sliver.
+    """
+
+    def sio_law(partials):
+        total = _pressure_total(partials)
+        return {
+            "SiO": 1.2e-11 + 2.5e-12 * math.exp(-total / 4.0e-5),
+        }
+
+    sliver = _step(
+        _sim(CampaignPhase.C3_NA, 1150.0, 100.0),
+        sio_law,
+        lambda _species: 0.0,
+    )
+    endpoint = sliver.endpoint_kg_hr["SiO"]
+    extent = sliver.extent_kg["SiO"]
+    assert endpoint > _NUMERICAL_FLOOR_KG
+    assert 0.0 < extent - endpoint <= _NUMERICAL_FLOOR_KG
+    _assert_posted_extent(sliver, "SiO")
+    _assert_closed(sliver)
+    assert sliver.partials_Pa["SiO"] > 0.0
+    assert sliver.partials_Pa[OXYGEN_SPECIES] > 0.0
+    assert sliver.shut_path is None
+
+    def cro_law(_partials):
+        return {"CrO": 5.0e-12}
+
+    control = _step(
+        _sim(CampaignPhase.C3_NA, 1150.0, 100.0),
+        cro_law,
+        lambda species: 1.0 if species == "CrO" else 0.0,
+    )
+    assert control.extent_kg["CrO"] == control.endpoint_kg_hr["CrO"]
+    assert control.endpoint_kg_hr["CrO"] > _NUMERICAL_FLOOR_KG
+    assert control.partials_Pa.get("CrO", 0.0) == 0.0
+    remaining = _vapour_added_kg(control.sim, control, "CrO", 0.0)
+    assert remaining < control.extent_kg["CrO"]
+    _assert_posted_extent(control, "CrO")
+    _assert_closed(control)
+    assert control.partials_Pa[OXYGEN_SPECIES] > 1.0e-6
+    assert control.shut_path is None
+    return sliver, control
+
+
+def test_radau_and_midpoint_hours_post_the_gross_integral():
+    """Scenario A integrates below its endpoint. Scenario B captures half.
+
+    A shut rising SiO rate makes the gross integral smaller than the
+    endpoint. A falling rate with capture one half leaves a vapour
+    integral below the endpoint while the gross integral is above it.
+    The ledger posts the gross in both.
+    """
+
+    sim = _sim(CampaignPhase.C3_NA, 1150.0, 100.0)
+    per_mol = (
+        GAS_CONSTANT
+        * sim._headspace_temperature_K()
+        / sim._headspace_volume_m3()
+    )
+    sio_mass = MOLAR_MASS["SiO"] / 1000.0
+
+    def rising(partials):
+        pressure = max(0.0, float(partials.get("SiO", 0.0) or 0.0))
+        # The review's forcing: 5 * n * M per hour, n = P / (R T / V).
+        return {"SiO": 5.0 * (pressure / per_mol) * sio_mass}
+
+    _seed_pa(sim, "SiO", 0.1, "scenario A")
+    rising_hour = _step(sim, rising, lambda _species: 0.0)
+    assert rising_hour.shut_path == "radau_fallback"
+    assert (
+        rising_hour.extent_kg["SiO"] + _NUMERICAL_FLOOR_KG
+        < rising_hour.endpoint_kg_hr["SiO"]
+    )
+    _assert_posted_extent(rising_hour, "SiO")
+    _assert_closed(rising_hour)
+    assert rising_hour.partials_Pa["SiO"] > 1.0
+
+    other = _sim(CampaignPhase.C3_NA, 1150.0, 100.0)
+
+    def falling(partials):
+        total = _pressure_total(partials)
+        return {"SiO": 2.0e-10 / max(total, 1.0e-6)}
+
+    seed_pa = 1.0e-4
+    seed_mol = (
+        seed_pa
+        * other._headspace_volume_m3()
+        / (GAS_CONSTANT * other._headspace_temperature_K())
+    )
+    _seed_pa(other, "SiO", seed_pa, "scenario B")
+    falling_hour = _step(other, falling, lambda _species: 0.5)
+    assert falling_hour.shut_path == "midpoint"
+    extent = falling_hour.extent_kg["SiO"]
+    endpoint = falling_hour.endpoint_kg_hr["SiO"]
+    remaining = _vapour_added_kg(other, falling_hour, "SiO", seed_mol)
+    assert extent > endpoint
+    assert 0.0 < remaining < endpoint, (remaining, endpoint, extent)
+    assert remaining < extent
+    _assert_posted_extent(falling_hour, "SiO")
+    _assert_closed(falling_hour)
+    return rising_hour, falling_hour
+
+
+def test_open_buffer_hour_posts_the_integral_of_s():
+    """An open hour whose incoming headspace is not its end state.
+
+    Na2's oxygen credit follows total pressure. The pipe is open and
+    not on the fast root, so the integral of S is not the endpoint
+    excess. The saturated settle posts that integral. Na2's parent
+    oxygen is credited to the fO2 buffer.
+    """
+
+    sim = _sim(CampaignPhase.C4, 1160.0, 20.0)
+    reservoir = sim.melt.oxygen_reservoir
+    reservoir.melt_redox_capacity_mol_per_ln_fO2 = 0.0
+    assert sim._evaporative_redox_is_saturated(internal_o2_capacity_mol=1.0)
+
+    def law(partials):
+        return {"Na2": 1.0e-4 * math.exp(-_pressure_total(partials) / 40.0)}
+
+    _seed_pa(sim, "N2", 80.0, "open drain")
+    hour = _step(sim, law, lambda _species: 0.0)
+    assert hour.shut_path is None
+    assert 0.0 < hour.pipe < 0.95
+    assert 20.0 < hour.total_Pa < 30.0
+    assert hour.partials_Pa.get("N2", 0.0) < 1.0
+    extent = hour.extent_kg["Na2"]
+    endpoint = hour.endpoint_kg_hr["Na2"]
+    assert abs(extent - endpoint) > _NUMERICAL_FLOOR_KG
+    _assert_posted_extent(hour, "Na2")
+    posted = hour.posted_kg["Na2"]
+    accounts = hour.credit_accounts["Na2"]
+    assert accounts[OXYGEN_SPECIES] == FO2_BUFFER_ACCOUNT
+    assert accounts["Na2"] != FO2_BUFFER_ACCOUNT
+    o2_per_kg = posted[OXYGEN_SPECIES] / posted["Na2"]
+    end_mol = endpoint * o2_per_kg / _molar_mass_kg(hour.sim, OXYGEN_SPECIES)
+    redox = hour.redox_mol[OXYGEN_SPECIES]
+    per_mol = (
+        GAS_CONSTANT
+        * hour.sim._headspace_temperature_K()
+        / hour.sim._headspace_volume_m3()
+    )
+    # The endpoint sample times the booked oxygen ratio is S(end) * dt.
+    # The redox state is the integral. This hour keeps them apart.
+    assert abs(redox - end_mol) * per_mol > 1.0e-6, (redox, end_mol)
+    _assert_closed(hour)
+    assert hour.partials_Pa["Na2"] > 1.0
+    assert hour.partials_Pa[OXYGEN_SPECIES] > 1.0
+    return hour
+
+
+def _fast_law(partials) -> float:
+    return 2.0e-8 * math.exp(-_pressure_total(partials) / 2.0)
+
+
+def test_fast_root_books_the_end_rate_for_the_hour():
+    """The fast root holds q fixed, so the integral is the end rate.
+
+    The rate at the 5 Pa opening is not the rate at the drained end.
+    A slow integral of this law would not equal the endpoint. The
+    admitted root still books the end rate, bit for bit with the
+    endpoint sample, on a one-hour tick.
+    """
+
+    sim = _sim(CampaignPhase.C3_NA, 1150.0, 0.0)
+
+    def law(partials):
+        return {"SiO": _fast_law(partials)}
+
+    _seed_pa(sim, "SiO", 5.0, "fast opening")
+    hour = _step(sim, law, lambda _species: 0.0)
+    assert hour.shut_path is None
+    assert hour.pipe > 0.99
+    assert hour.total_Pa < 0.1
+    extent = hour.extent_kg["SiO"]
+    endpoint = hour.endpoint_kg_hr["SiO"]
+    assert extent == endpoint
+    opening = _fast_law({"SiO": 5.0})
+    assert abs(extent - opening) > 1.0e-9
+    assert abs(extent - _fast_law(hour.partials_Pa)) < 1.0e-15
+    _assert_posted_extent(hour, "SiO")
+    _assert_closed(hour)
+    return hour
+
+
+def open_fast_hour():
+    """Step the fast hour and return the simulator.
+
+    The base-versus-candidate dump reads published partials and ledger
+    moles from this hour. It does not read the extent fields.
+    """
+
+    sim = _sim(CampaignPhase.C3_NA, 1150.0, 0.0)
+
+    def law(partials):
+        return {"SiO": _fast_law(partials)}
+
+    _seed_pa(sim, "SiO", 5.0, "fast opening")
+    with _patched(law, lambda _species: 0.0):
+        sim._step_one_hour()
+    return sim
