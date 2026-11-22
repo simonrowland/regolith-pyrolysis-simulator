@@ -50,10 +50,12 @@ def _expire_species_spellings(names: tuple[str, ...]) -> tuple[str, ...]:
     folds to the same oxide. That dict is the provider copy of the adapter
     map, not a third table. Feedstock total-iron keys that the oxide map
     does not contain (``FeO_T``, ``FeO*``) come from
-    ``_TOTAL_IRON_AS_FEO_KEYS``. Those keys are already FeO-equivalent, so
-    a query the helper calls ``FeO`` includes them. Copying either list
-    would let the two drift, and ``expire --species FeO`` would keep
-    serving the missed spelling. A name neither source knows stays its
+    ``_TOTAL_IRON_AS_FEO_KEYS``. Those keys are already FeO-equivalent.
+    A query whose casefold is one of them is looked up as ``FeO`` before
+    expansion, and the original casefold stays in the match set. Without
+    that, the helper returns None for ``FeO_T`` and ``FeO*``, and the
+    expire would keep serving ``feo`` and ``feo_total``. Copying either
+    list would let the two drift. A name neither source knows stays its
     own casefold. The cache casefolds again, which does not change these
     strings.
     """
@@ -64,13 +66,19 @@ def _expire_species_spellings(names: tuple[str, ...]) -> tuple[str, ...]:
     )
     from simulator.feedstock_composition import _TOTAL_IRON_AS_FEO_KEYS
 
+    total_iron = {
+        str(key).strip().casefold()
+        for key in _TOTAL_IRON_AS_FEO_KEYS
+        if str(key).strip()
+    }
     spellings: list[str] = []
     for name in names:
         folded = name.strip().casefold()
         if not folded:
             continue
         found = {folded}
-        canonical = canonical_melt_oxide_activity_name(name)
+        lookup = "FeO" if folded in total_iron else name
+        canonical = canonical_melt_oxide_activity_name(lookup)
         if canonical is not None:
             canonical_folded = canonical.strip().casefold()
             if canonical_folded:
@@ -124,8 +132,9 @@ def main(argv: list[str] | None = None) -> int:
     choice.add_argument(
         "--species",
         help=(
-            "comma-separated species names; each name includes the oxide "
-            "spellings canonical_melt_oxide_activity_name treats as the same"
+            "comma-separated species names; FeO_T and FeO* are FeO, and "
+            "each name includes the oxide spellings "
+            "canonical_melt_oxide_activity_name treats as the same"
         ),
     )
     choice.add_argument(
@@ -143,7 +152,7 @@ def main(argv: list[str] | None = None) -> int:
     _add_apply_flags(prune)
     migrate = commands.add_parser(
         "migrate",
-        help="convert a schema-3 HOT/COLD pair in place without deleting values",
+        help="publish a schema-4 copy of a schema-3 HOT/COLD pair without deleting values",
     )
     migrate.add_argument("file", type=Path)
     migrate.add_argument(

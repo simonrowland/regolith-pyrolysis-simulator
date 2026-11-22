@@ -599,10 +599,13 @@ def species_from_natural_key(key: bytes) -> frozenset[str] | None:
     None means the key is the blake2b fallback (flag 0xff). The payload is
     not recoverable, so a migrated row has no species record. expire --species
     treats that row as species-unknown and deletes it: the species it served
-    cannot be shown to be unaffected. --all and prune still delete it too.
-    An empty frozenset is a real request that named no species; it is not
-    this case, and expire --species leaves it in place. A flag other than
-    0x00 or 0xff raises. expire counts that row and leaves it.
+    cannot be shown to be unaffected. A store of a blake2b request that named
+    no species writes one side row whose species text is empty, so that row
+    is known-empty and is not this None result. --all and prune still delete
+    either row when its chemistry version matches. An empty frozenset is a
+    real request that named no species; it is not this case, and expire
+    --species leaves it in place. A flag other than 0x00 or 0xff raises.
+    expire counts that row and leaves it.
     """
 
     if len(key) < _ENGINE_CACHE_KEY_PREFIX_BYTES:
@@ -1522,8 +1525,14 @@ def _insert_cache_row_if_absent(
     """Insert one output only when absent; report whether existing bytes conflict.
 
     ``species`` is recorded only for a new row. None leaves the side table
-    alone so a merge can copy the source rows, including species a blake2b
-    key can no longer decode.
+    alone so a merge can copy the source rows, and so a loaded blake2b key
+    stays species-unknown: this loader did not see the request. An empty
+    set on a blake2b key is a request that named nothing. One side row with
+    an empty species text marks it known-empty. expire --species matches
+    stored names, and ``_casefolded_species_name`` rejects the empty string,
+    so that marker is not a species and the row survives. A natural key
+    that named nothing has flag 0x00 and stays with no side row, because
+    ``species_from_natural_key`` can still read it.
     """
     row = connection.execute(
         f"SELECT value, provenance_id FROM {_TABLE} WHERE key=?", (digest,)
@@ -1555,6 +1564,19 @@ def _insert_cache_row_if_absent(
     )
     if species:
         _write_output_species(connection, source_box, row_seq, species)
+    elif (
+        species is not None
+        and len(digest) >= _ENGINE_CACHE_KEY_PREFIX_BYTES
+        and digest[3] == 0xFF
+    ):
+        # Same flag ``species_from_natural_key`` treats as unreadable.
+        # Without this row the key is indistinguishable from a migrated
+        # digest, and the next expire --species would delete a request
+        # that named nothing.
+        connection.execute(
+            f"INSERT INTO {_SPECIES_TABLE}(source_box, row_seq, species) VALUES (?,?,?)",
+            (source_box, row_seq, ""),
+        )
     return True, False
 
 
@@ -1934,6 +1956,8 @@ def load_cache_rows(
     try:
         for digest, value, engine, version, source_box, row_seq, provenance in values:
             decoded = species_from_natural_key(digest)
+            # None keeps a blake2b key species-unknown. An empty set would
+            # mean the request named nothing, which this loader cannot know.
             inserted, conflict = _insert_cache_row_if_absent(
                 connection,
                 digest,
@@ -1943,7 +1967,7 @@ def load_cache_rows(
                 source_box,
                 row_seq,
                 provenance=provenance,
-                species=frozenset() if decoded is None else decoded,
+                species=None if decoded is None else decoded,
             )
             inserted_count += int(inserted)
             if inserted:
@@ -2059,8 +2083,9 @@ def snapshot_cache(live: Path, out: Path) -> dict[str, Any]:
                 # A failed live solve may have committed COLD before rolling back HOT.
                 # COLD is keyed by row_seq. A value with no HOT row is the orphan
                 # a failed solve left behind; snapshot still drops those.
-                cold.execute("DELETE FROM engine_values WHERE NOT EXISTS ("
-                             "SELECT 1 FROM hot.engine_outputs h WHERE h.row_seq=engine_values.row_seq)")
+                cold.execute(
+                    _unmatched_cold_delete_sql(hot_schema="hot", cold_schema="main")
+                )
                 cold.commit()
     return engine_cache_stats(out)
 
@@ -2242,6 +2267,47 @@ def _rows_by_engine(connection: sqlite3.Connection) -> dict[str, int]:
     }
 
 
+def _unmatched_cold_delete_sql(*, hot_schema: str, cold_schema: str) -> str:
+    """COLD values whose row_seq has no HOT row.
+
+    Snapshot attaches the HOT file onto a COLD connection (``hot`` / ``main``).
+    Maintenance attaches COLD onto the HOT connection (``main`` / ``cold``).
+    Both are this predicate. A second copy would let one path keep a row
+    the other drops.
+    """
+
+    if hot_schema not in {"main", "hot"} or cold_schema not in {"main", "cold"}:
+        raise ValueError(f"unexpected cache schema {hot_schema!r}/{cold_schema!r}")
+    return (
+        f"DELETE FROM {cold_schema}.engine_values WHERE NOT EXISTS ("
+        f"SELECT 1 FROM {hot_schema}.engine_outputs AS h "
+        f"WHERE h.row_seq = {cold_schema}.engine_values.row_seq)"
+    )
+
+
+def _sweep_orphan_cold(connection: sqlite3.Connection) -> int:
+    """Delete COLD values with no HOT row. Returns how many went.
+
+    A failed paired delete leaves this residue. It is not a hit. The next
+    expire, prune, or drop removes it, including when that call matches
+    no HOT rows. Dry-run callers do not call this.
+    """
+
+    if connection.in_transaction:
+        connection.commit()
+    connection.execute("BEGIN IMMEDIATE")
+    try:
+        connection.execute(
+            _unmatched_cold_delete_sql(hot_schema="main", cold_schema="cold")
+        )
+        swept = int(connection.execute("SELECT changes()").fetchone()[0])
+        connection.commit()
+    except BaseException:
+        connection.rollback()
+        raise
+    return swept
+
+
 def _delete_cold_values(
     connection: sqlite3.Connection, pairs: list[tuple[str, int]]
 ) -> None:
@@ -2263,11 +2329,16 @@ def _delete_cached_rows(
     Two commits. SQLite does not guarantee that one COMMIT updates both
     a WAL database and an attached database: a crash can change one file
     and leave the other. The HOT row is what a hit serves, so it commits
-    first. The residue is a COLD value with no HOT row. That value is not
-    served, and snapshot drops it. Deleting COLD first would leave a HOT
+    first. A crash between the commits leaves a COLD value with no HOT
+    row. That value is not served. The caller sweeps it on this call when
+    the paired delete commits, and on the next expire, prune, or drop
+    when the paired delete raises. Deleting COLD first would leave a HOT
     row whose COLD value is already gone, and that row would still be a
-    hit. ``cold_delete`` is only the drop_chemistry_version seam. expire
-    and prune use the default delete.
+    hit: a stale serve. ``cold_delete`` is only the drop_chemistry_version
+    seam for the paired delete. The orphan sweep does not use it, so a
+    test that injects a failure there still leaves the orphan for the
+    retry. An empty ``pairs`` list returns without writing; the caller
+    still sweeps.
     """
 
     if not pairs:
@@ -2298,6 +2369,43 @@ def _delete_cached_rows(
     except BaseException:
         connection.rollback()
         raise
+
+
+def _apply_maintenance_deletes(
+    connection: sqlite3.Connection,
+    path: Path,
+    has_cold: bool,
+    pairs: list[tuple[str, int]],
+    *,
+    cold_delete: Callable[[sqlite3.Connection, list[tuple[str, int]]], None] | None = None,
+    vacuum: bool,
+) -> int:
+    """Delete matched HOT rows, then sweep COLD rows that have no HOT row.
+
+    Returns how many orphan COLD rows the sweep removed. Nothing on the
+    read or write path calls this. A failure of the paired COLD delete
+    does not sweep in this call: the HOT rows are already gone, so the
+    value is not served, and the next call's sweep removes the orphan.
+    The drop injection stays on the paired delete, so the retry can sweep
+    without running that hook again.
+    """
+
+    if not pairs and not has_cold:
+        return 0
+    try:
+        if pairs:
+            _delete_cached_rows(connection, has_cold, pairs, cold_delete=cold_delete)
+        swept = _sweep_orphan_cold(connection) if has_cold else 0
+    except BaseException:
+        _forget_process_cache(path)
+        raise
+    if pairs or swept:
+        if vacuum:
+            connection.execute("VACUUM main")
+            if has_cold:
+                connection.execute("VACUUM cold")
+        _forget_process_cache(path)
+    return swept
 
 
 def _migrate_cold_v3(connection: sqlite3.Connection) -> int:
@@ -2335,7 +2443,8 @@ def _migrate_cold_v3(connection: sqlite3.Connection) -> int:
     if unlinked_rows:
         # No HOT row has no row_seq. Negative sequences are outside every box
         # range, so they cannot be served as hits. Migration does not delete
-        # the value. Snapshot still drops a COLD row with no HOT row.
+        # the value. Snapshot drops a COLD row with no HOT row, and the next
+        # expire, prune, or drop sweeps it. The value stays until that call.
         build_id = _ensure_build_id(
             connection, "oldcold", "unlinked", _UNKNOWN_PRE_MIGRATION_BUILD
         )
@@ -2366,8 +2475,199 @@ def _payload_bytes(path: Path) -> dict[str, int]:
         return report
 
 
+def _fsync_path(path: Path) -> None:
+    descriptor = os.open(path, os.O_RDONLY)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def _copy_database_file(source: Path, destination: Path) -> None:
+    """Copy one database. DELETE journal mode keeps the bytes in the main file."""
+
+    for suffix in ("", "-wal", "-shm"):
+        side = Path(str(destination) + suffix)
+        if side.exists() or side.is_symlink():
+            side.unlink()
+    with closing(sqlite3.connect(str(source), timeout=_TIMEOUT_MS / 1000)) as src:
+        with closing(sqlite3.connect(str(destination), timeout=_TIMEOUT_MS / 1000)) as dst:
+            src.backup(dst)
+            dst.execute("PRAGMA journal_mode=DELETE")
+
+
+def _discard_unpublished_migration(
+    live: Path, hot_new: Path, cold_new: Path | None
+) -> None:
+    """Remove ``.v4-new`` copies when the live pair is still in place.
+
+    If publish already moved the live hot name to ``*.v3.bak``, that path
+    is absent. Leave the bak files and any remaining ``.v4-new`` files:
+    those are a complete old pair and a complete new pair.
+    """
+
+    if not live.exists():
+        return
+    cold = _cache_pair(live)[1]
+    for side in (hot_new, cold_new):
+        if side is None or not (side.exists() or side.is_symlink()):
+            continue
+        resolved = side.resolve()
+        if resolved == live.resolve():
+            continue
+        if cold.exists() and resolved == cold.resolve():
+            continue
+        side.unlink()
+
+
+def _publish_migrated_pair(live: Path, hot_new: Path, cold_new: Path | None) -> None:
+    """Fsync the schema-4 copies and put them at the live names.
+
+    Both originals move to ``*.v3.bak`` before either copy takes a live
+    name. Cold is renamed before hot. A crash leaves the complete old
+    pair (at the live names, or at the bak names) or the complete new
+    pair (at the ``.v4-new`` names, with cold already live and hot still
+    ``.v4-new``, or both live). It does not leave a schema-4 hot file
+    beside a schema-3 cold file: hot arrives last, and it is absent until
+    cold is already the new file. Bak files are removed only after both
+    renames have succeeded.
+    """
+
+    _fsync_path(hot_new)
+    if cold_new is not None:
+        _fsync_path(cold_new)
+    hot_bak = live.with_name(live.name + ".v3.bak")
+    os.replace(live, hot_bak)
+    cold_bak: Path | None = None
+    if cold_new is not None:
+        cold_live = _cache_pair(live)[1]
+        cold_bak = cold_live.with_name(cold_live.name + ".v3.bak")
+        os.replace(cold_live, cold_bak)
+        os.replace(cold_new, cold_live)
+    os.replace(hot_new, live)
+    _fsync_path(live.parent)
+    hot_bak.unlink()
+    if cold_bak is not None:
+        cold_bak.unlink()
+
+
+def _transform_v3_copy(hot_path: Path, cold_path: Path | None) -> dict[str, Any]:
+    """Schema-4 transform of a copied pair. The live files are not opened."""
+
+    connection = sqlite3.connect(str(hot_path), timeout=_TIMEOUT_MS / 1000)
+    try:
+        if connection.in_transaction:
+            connection.commit()
+        before: dict[str, Any] = {
+            "hot": _cache_space(connection, "main", _TABLE),
+            "hot_payload_bytes": int(connection.execute(
+                "SELECT COALESCE(SUM(length(key) + length(value)), 0) FROM engine_outputs"
+            ).fetchone()[0]),
+        }
+        has_cold = cold_path is not None
+        if has_cold:
+            connection.execute("ATTACH DATABASE ? AS oldcold", (str(cold_path.resolve()),))
+            cold_columns = [
+                row[1] for row in connection.execute("PRAGMA oldcold.table_info(engine_values)")
+            ]
+            if cold_columns != ["key", "value", "input_fingerprint"]:
+                raise EngineCacheSchemaMismatch(
+                    "cold.engine_values",
+                    ("key", "value", "input_fingerprint"),
+                    tuple(cold_columns),
+                )
+            before["cold"] = _cache_space(connection, "oldcold", "engine_values")
+            before["cold_value_bytes"] = int(connection.execute(
+                "SELECT COALESCE(SUM(length(value)), 0) FROM oldcold.engine_values"
+            ).fetchone()[0])
+            before["cold_key_bytes"] = int(connection.execute(
+                "SELECT COALESCE(SUM(length(key)), 0) FROM oldcold.engine_values"
+            ).fetchone()[0])
+            before["cold_fingerprint_bytes"] = int(connection.execute(
+                "SELECT COALESCE(SUM(COALESCE(length(input_fingerprint), 0)), 0) "
+                "FROM oldcold.engine_values"
+            ).fetchone()[0])
+        else:
+            before["cold"] = {"rows": 0, "database_bytes": 0, "bytes_per_row": None}
+            before["cold_value_bytes"] = 0
+            before["cold_key_bytes"] = 0
+            before["cold_fingerprint_bytes"] = 0
+        before_hot_keys = [
+            (bytes(key), bytes(value))
+            for key, value in connection.execute(
+                "SELECT key, value FROM engine_outputs ORDER BY row_seq"
+            )
+        ]
+        connection.execute("BEGIN")
+        _create_species_table(connection)
+        natural_keys = 0
+        digest_keys = 0
+        skipped_unreadable_keys = 0
+        species_unknown_by_engine: dict[str, int] = {}
+        for source_box, row_seq, key, engine in connection.execute(
+            "SELECT source_box, row_seq, key, engine FROM engine_outputs"
+        ):
+            try:
+                species = species_from_natural_key(bytes(key))
+            except EngineCacheSpeciesError:
+                # A flag other than 0x00 or 0xff is not a request we can
+                # read. Skip the row and keep the migration. Expire does
+                # not treat it as a digest key.
+                skipped_unreadable_keys += 1
+                continue
+            if species is None:
+                digest_keys += 1
+                engine_name = str(engine)
+                species_unknown_by_engine[engine_name] = (
+                    species_unknown_by_engine.get(engine_name, 0) + 1
+                )
+                continue
+            natural_keys += 1
+            _write_output_species(connection, str(source_box), int(row_seq), species)
+        unlinked = _migrate_cold_v3(connection) if has_cold else 0
+        after_hot_keys = [
+            (bytes(key), bytes(value))
+            for key, value in connection.execute(
+                "SELECT key, value FROM engine_outputs ORDER BY row_seq"
+            )
+        ]
+        if after_hot_keys != before_hot_keys:
+            raise EngineCacheSchemaMismatch(
+                "engine_outputs",
+                ("key", "value"),
+                ("changed during migrate; rerun with no writer",),
+            )
+        connection.execute(f"PRAGMA user_version={_CACHE_SCHEMA_VERSION}")
+        connection.commit()
+    except BaseException:
+        try:
+            connection.rollback()
+        except sqlite3.Error:
+            pass
+        connection.close()
+        raise
+    connection.close()
+    return {
+        "migrated": True,
+        "already_current": False,
+        "schema_version": _CACHE_SCHEMA_VERSION,
+        "natural_keys": natural_keys,
+        "digest_keys": digest_keys,
+        "species_unknown_by_engine": species_unknown_by_engine,
+        "skipped_unreadable_keys": skipped_unreadable_keys,
+        "unlinked_cold": unlinked,
+        "before": before,
+    }
+
+
 def migrate_cache_file(path: str | Path, *, vacuum: bool = True) -> dict[str, Any]:
-    """Convert a schema-3 HOT/COLD pair in place. HOT key and value bytes stay.
+    """Convert a schema-3 HOT/COLD pair by publishing a schema-4 copy.
+
+    The transform runs on ``*.v4-new`` files. On success both originals
+    move to ``*.v3.bak`` and the copies take their names, cold first.
+    A crash leaves the complete old pair or the complete new pair, not a
+    schema-4 hot file beside a schema-3 cold file. HOT key and value
+    bytes stay.
 
     Old fingerprints are dropped. engine_build_id is the explicit
     ``unknown-pre-migration`` row: a schema-3 file did not record the open
@@ -2415,86 +2715,6 @@ def migrate_cache_file(path: str | Path, *, vacuum: bool = True) -> dict[str, An
         found = tuple(row[1] for row in connection.execute("PRAGMA table_info(engine_outputs)"))
         if found != _V3_OUTPUT_COLUMNS:
             raise EngineCacheSchemaMismatch("engine_outputs", _V3_OUTPUT_COLUMNS, found)
-        if connection.in_transaction:
-            connection.commit()
-        before: dict[str, Any] = {
-            "hot": _cache_space(connection, "main", _TABLE),
-            "hot_payload_bytes": int(connection.execute(
-                "SELECT COALESCE(SUM(length(key) + length(value)), 0) FROM engine_outputs"
-            ).fetchone()[0]),
-        }
-        cold_path = _cache_pair(path)[1]
-        has_cold = cold_path.exists()
-        if has_cold:
-            connection.execute("ATTACH DATABASE ? AS oldcold", (str(cold_path.resolve()),))
-            cold_columns = [
-                row[1] for row in connection.execute("PRAGMA oldcold.table_info(engine_values)")
-            ]
-            if cold_columns != ["key", "value", "input_fingerprint"]:
-                raise EngineCacheSchemaMismatch(
-                    "cold.engine_values",
-                    ("key", "value", "input_fingerprint"),
-                    tuple(cold_columns),
-                )
-            before["cold"] = _cache_space(connection, "oldcold", "engine_values")
-            before["cold_value_bytes"] = int(connection.execute(
-                "SELECT COALESCE(SUM(length(value)), 0) FROM oldcold.engine_values"
-            ).fetchone()[0])
-            before["cold_key_bytes"] = int(connection.execute(
-                "SELECT COALESCE(SUM(length(key)), 0) FROM oldcold.engine_values"
-            ).fetchone()[0])
-            before["cold_fingerprint_bytes"] = int(connection.execute(
-                "SELECT COALESCE(SUM(COALESCE(length(input_fingerprint), 0)), 0) "
-                "FROM oldcold.engine_values"
-            ).fetchone()[0])
-        else:
-            before["cold"] = {"rows": 0, "database_bytes": 0, "bytes_per_row": None}
-            before["cold_value_bytes"] = 0
-            before["cold_key_bytes"] = 0
-            before["cold_fingerprint_bytes"] = 0
-        before_hot_keys = [
-            (bytes(key), bytes(value))
-            for key, value in connection.execute("SELECT key, value FROM engine_outputs ORDER BY row_seq")
-        ]
-        connection.execute("BEGIN")
-        _create_species_table(connection)
-        natural_keys = 0
-        digest_keys = 0
-        skipped_unreadable_keys = 0
-        species_unknown_by_engine: dict[str, int] = {}
-        for source_box, row_seq, key, engine in connection.execute(
-            "SELECT source_box, row_seq, key, engine FROM engine_outputs"
-        ):
-            try:
-                species = species_from_natural_key(bytes(key))
-            except EngineCacheSpeciesError:
-                # A flag other than 0x00 or 0xff is not a request we can
-                # read. Skip the row and keep the migration. Expire does
-                # not treat it as a digest key.
-                skipped_unreadable_keys += 1
-                continue
-            if species is None:
-                digest_keys += 1
-                engine_name = str(engine)
-                species_unknown_by_engine[engine_name] = (
-                    species_unknown_by_engine.get(engine_name, 0) + 1
-                )
-                continue
-            natural_keys += 1
-            _write_output_species(connection, str(source_box), int(row_seq), species)
-        unlinked = _migrate_cold_v3(connection) if has_cold else 0
-        after_hot_keys = [
-            (bytes(key), bytes(value))
-            for key, value in connection.execute("SELECT key, value FROM engine_outputs ORDER BY row_seq")
-        ]
-        if after_hot_keys != before_hot_keys:
-            raise EngineCacheSchemaMismatch(
-                "engine_outputs",
-                ("key", "value"),
-                ("changed during migrate; rerun with no writer",),
-            )
-        connection.execute(f"PRAGMA user_version={_CACHE_SCHEMA_VERSION}")
-        connection.commit()
     except BaseException:
         if connection is not None:
             try:
@@ -2504,19 +2724,25 @@ def migrate_cache_file(path: str | Path, *, vacuum: bool = True) -> dict[str, An
             connection.close()
         raise
     connection.close()
-    connection = None
+
+    hot_new = path.with_name(path.name + ".v4-new")
+    cold_live = _cache_pair(path)[1]
+    cold_new = (
+        cold_live.with_name(cold_live.name + ".v4-new") if cold_live.is_file() else None
+    )
+    try:
+        _copy_database_file(path, hot_new)
+        if cold_new is not None:
+            _copy_database_file(cold_live, cold_new)
+        migrated = _transform_v3_copy(hot_new, cold_new)
+        _publish_migrated_pair(path, hot_new, cold_new)
+    except BaseException:
+        _discard_unpublished_migration(path, hot_new, cold_new)
+        raise
     if vacuum:
         _vacuum_cache_files(path)
     return {
-        "migrated": True,
-        "already_current": False,
-        "schema_version": _CACHE_SCHEMA_VERSION,
-        "natural_keys": natural_keys,
-        "digest_keys": digest_keys,
-        "species_unknown_by_engine": species_unknown_by_engine,
-        "skipped_unreadable_keys": skipped_unreadable_keys,
-        "unlinked_cold": unlinked,
-        "before": before,
+        **migrated,
         "after": engine_cache_stats(path),
         "after_payload": _payload_bytes(path),
         "vacuumed": bool(vacuum),
@@ -2555,8 +2781,11 @@ def expire_cache_file(
     This function does not expand oxide aliases. A blake2b key with no
     species rows is included for any species list: its inputs are unknown,
     so a superseded species would otherwise keep being served. A natural
-    key that named no species is not that case. ``all_rows`` deletes every
-    row of that engine. Nothing on the read or write path calls this.
+    key that named no species is not that case, and neither is a blake2b
+    key that stored the empty known-empty marker. ``all_rows`` deletes
+    every row of that engine. ``apply`` also deletes COLD values that
+    have no HOT row, so a failed earlier delete can finish. A dry run
+    does not. Nothing on the read or write path calls this.
     """
 
     if engine not in ENGINE_CHEMISTRY_VERSION:
@@ -2596,16 +2825,11 @@ def expire_cache_file(
             unknown_pairs, unclassifiable_rows = _species_unknown_pairs(connection, engine)
             already = set(pairs)
             pairs.extend(pair for pair in unknown_pairs if pair not in already)
-        if apply and pairs:
-            try:
-                _delete_cached_rows(connection, has_cold, pairs)
-            except BaseException:
-                _forget_process_cache(path)
-                raise
-            connection.execute("VACUUM main")
-            if has_cold:
-                connection.execute("VACUUM cold")
-            _forget_process_cache(path)
+        swept = 0
+        if apply:
+            swept = _apply_maintenance_deletes(
+                connection, path, has_cold, pairs, vacuum=True
+            )
         matched_by_engine = {name: 0 for name in totals}
         matched_by_engine[engine] = len(pairs)
         return {
@@ -2620,7 +2844,7 @@ def expire_cache_file(
             "deleted_by_engine": {
                 name: (count if apply else 0) for name, count in matched_by_engine.items()
             },
-            "vacuumed": bool(apply and pairs),
+            "vacuumed": bool(apply and (pairs or swept)),
             "species_unknown_rows": None if all_rows else len(unknown_pairs),
             "unclassifiable_rows": None if all_rows else unclassifiable_rows,
         }
@@ -2635,7 +2859,9 @@ def _species_unknown_pairs(
 
     ``species_from_natural_key`` returns None only for the blake2b fallback.
     Migrate uses that same result to count digest keys and to skip species
-    rows. A natural key that named no species returns an empty set and stays.
+    rows. A store of a blake2b request that named nothing writes an empty
+    species marker, so that row has a side row and is not selected here.
+    A natural key that named no species returns an empty set and stays.
     A flag other than 0x00 or 0xff is counted and left. Deleting it would
     drop a row this code cannot show is the named species, and raising
     would abort the expire before any other row was removed.
@@ -2666,7 +2892,8 @@ def prune_cache_file(path: str | Path, *, apply: bool = False) -> dict[str, Any]
 
     The build id is not a predicate. An engine name this code does not
     version is left in place: it is not known to be disused. Dry-run unless
-    ``apply``. Nothing on the read or write path calls this.
+    ``apply``. ``apply`` also deletes COLD values that have no HOT row.
+    Nothing on the read or write path calls this.
     """
 
     path = Path(path).expanduser()
@@ -2693,16 +2920,11 @@ def prune_cache_file(path: str | Path, *, apply: bool = False) -> dict[str, Any]
             ).fetchall()
             matched_by_engine[engine] = len(found)
             pairs.extend((str(source_box), int(row_seq)) for source_box, row_seq in found)
-        if apply and pairs:
-            try:
-                _delete_cached_rows(connection, has_cold, pairs)
-            except BaseException:
-                _forget_process_cache(path)
-                raise
-            connection.execute("VACUUM main")
-            if has_cold:
-                connection.execute("VACUUM cold")
-            _forget_process_cache(path)
+        swept = 0
+        if apply:
+            swept = _apply_maintenance_deletes(
+                connection, path, has_cold, pairs, vacuum=True
+            )
         return {
             "command": "prune",
             "apply": bool(apply),
@@ -2713,7 +2935,7 @@ def prune_cache_file(path: str | Path, *, apply: bool = False) -> dict[str, Any]
                 engine: (count if apply else 0) for engine, count in matched_by_engine.items()
             },
             "skipped_unknown_engine": unknown,
-            "vacuumed": bool(apply and pairs),
+            "vacuumed": bool(apply and (pairs or swept)),
         }
     finally:
         connection.close()
@@ -2726,9 +2948,11 @@ def _drop_attached_cold(
 
     The HOT and species deletes are already committed. A failure here
     rolls back only this COLD delete, so the file keeps COLD values
-    with no HOT row. Those values are not hits. Snapshot drops them.
-    One COMMIT is not atomic across a WAL database and an attached
-    database, so the two deletes are not one transaction.
+    with no HOT row. Those values are not hits. The next expire, prune,
+    or drop sweeps them; this hook does not, so an injected failure
+    stays visible to that retry. One COMMIT is not atomic across a WAL
+    database and an attached database, so the two deletes are not one
+    transaction.
     """
 
     _delete_cold_values(connection, pairs)
@@ -2748,10 +2972,12 @@ def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
             (engine_id, str(chem_version)),
         )
     ]
-    if not pairs:
-        return 0
     cold_path = _cache_pair(path)[1]
     has_cold = cold_path.exists()
+    # No HOT rows and no COLD file: nothing to sweep. Returning here leaves
+    # the process cache alone, as a no-op drop did before the sweep existed.
+    if not pairs and not has_cold:
+        return 0
     if connection.in_transaction:
         connection.commit()
     if has_cold and not any(
@@ -2759,18 +2985,14 @@ def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
     ):
         connection.execute("ATTACH DATABASE ? AS cold", (str(cold_path.resolve()),))
         _check_cold_schema(connection)
-    try:
-        _delete_cached_rows(
-            connection,
-            has_cold,
-            pairs,
-            cold_delete=_drop_attached_cold,
-        )
-    except BaseException:
-        # The HOT delete may already be committed. Drop the process copy
-        # either way: a rolled-back delete reloads from the file, and a
-        # committed one must not keep serving.
-        _forget_process_cache(path)
-        raise
-    _forget_process_cache(path)
+    # The paired delete goes through ``_drop_attached_cold``. The sweep
+    # does not, so a retry after that hook fails still removes the orphan.
+    _apply_maintenance_deletes(
+        connection,
+        path,
+        has_cold,
+        pairs,
+        cold_delete=_drop_attached_cold,
+        vacuum=False,
+    )
     return len(pairs)
