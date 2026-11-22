@@ -1144,9 +1144,76 @@ def test_printed_duct_sio_dew_uses_c2a_floor_and_alkali_partials_stay_unprinted(
     assert "C2B" in sio["pO2_floor_citation"]
     assert "1e-8" in sio["pO2_floor_citation"]
     assert again == pytest.approx(sio["partial_pressure_Pa"], rel=1e-6)
+    assert sio["dew_is_pO2_ceiling"] is True
     assert sio["dew_temperature_C"] > felt["inner_temperature_C"]
     assert sio["depth_reason"] == "dew_before_the_felt"
     assert sio["depth_m"] is None
+    band = sio["dew_band"]
+    unit_rows = [row for row in band["rows"] if row["source_activity"] == 1.0]
+    crossing = band["unit_activity_crossing"]
+
+    assert band["status"] == "pO2_upper_bound_is_the_dew_ceiling"
+    assert band["melt_activity_printed"] is False
+    assert "numeric melt activity" in band["melt_activity_clearing"]
+    assert len(unit_rows) == 4
+    assert unit_rows[0]["pO2_bar"] == pytest.approx(sio["pO2_bar"])
+    assert unit_rows[0]["dew_temperature_C"] == pytest.approx(sio["dew_temperature_C"])
+    assert unit_rows[0]["activity_flag"] == (
+        "raoultian_pure_endmember_not_a_measured_melt_activity"
+    )
+    for earlier, later in zip(unit_rows, unit_rows[1:], strict=True):
+        assert later["pO2_bar"] == pytest.approx(earlier["pO2_bar"] / 10.0)
+        assert later["dew_temperature_C"] < earlier["dew_temperature_C"]
+        checked = equilibrium_pressure_pa(
+            "SiO",
+            later["dew_temperature_K"],
+            pO2_bar=later["pO2_bar"],
+            source_activity=1.0,
+        )
+        assert checked == pytest.approx(later["partial_pressure_Pa"], rel=1e-6)
+        if later["dew_temperature_C"] > felt["inner_temperature_C"]:
+            assert later["depth_reason"] == "dew_before_the_felt"
+        elif later["dew_temperature_C"] < felt["outer_temperature_C"]:
+            assert later["depth_reason"] == "dew_outside_the_felt"
+        else:
+            assert later["depth_status"] == "inside_felt"
+            assert later["depth_m"] is not None
+            assert 0.0 < later["depth_m"] < felt["thickness_m"]
+    assert crossing["status"] == "ok"
+    assert crossing["dew_temperature_C"] == pytest.approx(hot["hot_face_C"], abs=0.05)
+    assert crossing["pO2_bar"] < unit_rows[0]["pO2_bar"]
+    assert "only if pO2 <" in crossing["face_versus_dew"]
+    above = [row for row in unit_rows if row["pO2_bar"] > crossing["pO2_bar"]]
+    below = [row for row in unit_rows if row["pO2_bar"] < crossing["pO2_bar"]]
+    assert above and below
+    assert min(row["dew_temperature_C"] for row in above) > hot["hot_face_C"]
+    assert max(row["dew_temperature_C"] for row in below) < hot["hot_face_C"]
+    lower_activity = insulation_vapour_dew_point(
+        felt["inner_temperature_C"],
+        felt["outer_temperature_C"],
+        species_partials={
+            "SiO": {
+                "printed": True,
+                "partial_pressure_Pa": sio["partial_pressure_Pa"],
+                "pO2_mbar": 0.0,
+                "pO2_floor_bar": sio["pO2_bar"],
+                "source_activity": 0.5,
+            },
+            "Na": {"printed": False},
+            "K": {"printed": False},
+        },
+        felt_thickness_m=felt["thickness_m"],
+        geometry="cylindrical",
+        hot_face_C=hot["hot_face_C"],
+    )
+    supplied = lower_activity["species"]["SiO"]
+    unit_column = next(
+        row for row in supplied["dew_band"]["rows"]
+        if row["source_activity"] == 1.0 and row["grid"] == "pO2_ceiling"
+    )
+    assert supplied["dew_temperature_C"] > unit_column["dew_temperature_C"]
+    assert unit_column["dew_temperature_C"] == pytest.approx(sio["dew_temperature_C"])
+    assert supplied["dew_band"]["melt_activity_printed"] is True
     assert dew["species"]["Na"]["reason"] == "duct_inlet_partial_not_in_design_print"
     assert dew["species"]["K"]["reason"] == "duct_inlet_partial_not_in_design_print"
     assert "probe_d452_r4_sizing_v3.py" in dew["species"]["Na"]["clearing_print"]
