@@ -8431,6 +8431,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'mol': pre_buffer_mol,
             'signed_mol': signed_buffer_mol,
         }
+        # The work-cap refusal quotes this potential. The solve does
+        # not move it. An unset melt potential stays unset.
+        raw_fo2 = getattr(self.melt, 'fO2_log', None)
+        opening_fo2 = None
+        if (
+            isinstance(raw_fo2, (int, float))
+            and not isinstance(raw_fo2, bool)
+            and math.isfinite(float(raw_fo2))
+        ):
+            opening_fo2 = float(raw_fo2)
+        state['extent_holder']['_opening_fo2_log'] = opening_fo2
 
         def _dispatch_gross(partials_Pa):
             iteration_controls = dict(controls)
@@ -8794,6 +8805,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 _install_capture(gross, measured, capture_ref_Pa)
             state['fractions'] = _fractions_for(gross, partials_Pa)
+            # The work-cap stash reads the fraction this evaluation
+            # stored. A Jacobian probe overwrites the holder and does
+            # not replace the accepted step.
+            holder = state.get('extent_holder')
+            if isinstance(holder, dict):
+                holder['_capture_fractions'] = {
+                    str(species): float(fraction)
+                    for species, fraction in state['fractions'].items()
+                }
             if not state['recorded']:
                 # The first call is the opening inventory. Later root
                 # and admission calls must not overwrite it.

@@ -3501,9 +3501,13 @@ def test_work_cap_carries_the_buffer_stock_and_s():
     threshold_pa = 100.0
     holder = {
         "_opening_buffer_o2": {"mol": 0.0, "signed_mol": -1.0e-13},
+        "_opening_fo2_log": -9.5,
     }
 
     def flux(partials: dict[str, float]) -> dict[str, float]:
+        # The fraction this evaluation stored. A Jacobian probe writes
+        # the holder too, and must not replace the accepted step.
+        holder["_capture_fractions"] = {"O2": float(partials["O2"])}
         if partials["O2"] >= threshold_pa:
             return {"O2": 0.0}
         return {"O2": _SOURCE_02_KG_H}
@@ -3542,6 +3546,90 @@ def test_work_cap_carries_the_buffer_stock_and_s():
     assert refused.redox_mol_s["O2"] == 1.0e-6
     assert refused.buffer_o2_mol == 0.0
     assert refused.buffer_o2_mol_signed == -1.0e-13
+    assert refused.fo2_log == -9.5
+    assert refused.capture_fraction == {"O2": row["partial_Pa"]}
+    outflow = pipe_species_outflow_mol_s(
+        row["partial_Pa"],
+        0.0,
+        _HS_T_K,
+        {"O2": row["mol"]},
+        _HS_D_M,
+        _HS_L_M,
+        molar_mass_kg_mol={"O2": _o2_molar_mass_kg()},
+    )
+    assert refused.pipe_piece is not None
+    assert refused.pipe_piece["binding"] == outflow.binding_cause
+    assert refused.pipe_piece["empty_holdup"] is False
+    assert refused.pipe_piece["capped"] is False
+
+
+def test_downstream_switch_publishes_inside_the_cap():
+    """A negligible source at 1170 C drains onto the 20 Pa switch.
+
+    The walked hour opened near 27.17 Pa of O2 with a dust of K and
+    refused at the integrator cap while the accepted pressure sat on
+    20 Pa. Q is 0 on both sides of that pressure. The open integral
+    stops on the downward root and the shut path keeps the rest of
+    the hour. The published pressure is the downstream pressure, the
+    inventory is n0 + A - B, and the evaluation count stays under the
+    cap. A pure oxygen opening of the same hour still closes.
+    """
+
+    temperature_K = 1170.0 + 273.15
+    downstream_pa = 20.0
+    opening_o2_pa = 27.174056558659704
+    opening_k_pa = 4.2e-4
+    factor = GAS_CONSTANT * temperature_K / _HS_V_M3
+    oxygen = _o2_molar_mass_kg()
+    potassium = MOLAR_MASS["K"] / 1000.0
+
+    def _publish(holdup, flux):
+        holder: dict = {}
+        result = solve_capacity_shadow(
+            pre_holdup_mol=holdup,
+            molar_mass_kg_mol={"O2": oxygen, "K": potassium},
+            flux_kg_hr_at_partials=flux,
+            capacity=NoColdTrain("runtime_enforcement_disabled"),
+            head_bled_species_mol={},
+            external_o2_holdup_mol=0.0,
+            temperature_K=temperature_K,
+            volume_m3=_HS_V_M3,
+            dt_hr=1.0,
+            bleed_conductance_kg_s=0.0,
+            downstream_pressure_Pa=downstream_pa,
+            k_relief_kg_hr_Pa=0.0,
+            p_open_Pa=1.0,
+            pipe_diameter_m=_HS_D_M,
+            pipe_length_m=_HS_L_M,
+            extent_holder=holder,
+            authoritative=True,
+        )
+        assert isinstance(result, CapacityShadowResult)
+        assert result.authoritative
+        total = math.fsum(result.partial_pressures_Pa.values())
+        assert abs(total - downstream_pa) <= 1.0e-6
+        assert result.iterations < capacity_coupling._MAX_INTEGRATOR_EVALUATIONS
+        terms = holder["_balance_terms"]
+        for name, n0 in terms["n0_mol"].items():
+            identity = n0 + terms["A_mol"][name] - terms["B_mol"][name]
+            published = result.partial_pressures_Pa[name] / factor
+            assert published == identity
+        return result, terms
+
+    mixture, mixture_terms = _publish(
+        {
+            "O2": opening_o2_pa / factor,
+            "K": opening_k_pa / factor,
+        },
+        lambda _partials: {"O2": 0.0, "K": 0.0},
+    )
+    assert mixture_terms["path"] == "radau_fallback"
+    assert mixture.bled_species_mol["O2"] > 0.0
+
+    _publish(
+        {"O2": opening_o2_pa / factor},
+        lambda _partials: {"O2": 0.0},
+    )
 
 
 def test_closed_pipe_varying_source_matches_an_independent_integral():

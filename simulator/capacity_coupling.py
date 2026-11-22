@@ -115,13 +115,19 @@ class CapacityShadowRefusal:
     # accepted integrator state in species_balance (mol, partial_Pa),
     # S(P) in redox_mol_s, and the hour-open buffer stock. The release
     # refusal carries that post-vapour stock and leaves S unset.
-    # Plain dicts and lists, so vars() serialises.
+    # fo2_log is the melt potential the hour opened on. pipe_piece is
+    # the last accepted pipe piece (binding is the regime). capture
+    # fraction is the fraction that evaluation stored. Plain dicts
+    # and lists, so vars() serialises.
     path: str | None = None
     species_balance: dict[str, dict[str, Any]] | None = None
     overhead_o2_writes: list[dict[str, Any]] | None = None
     redox_mol_s: dict[str, float] | None = None
     buffer_o2_mol: float | None = None
     buffer_o2_mol_signed: float | None = None
+    fo2_log: float | None = None
+    pipe_piece: dict[str, Any] | None = None
+    capture_fraction: dict[str, float] | None = None
 
 
 class CapacityCouplingRefusalError(RuntimeError):
@@ -921,6 +927,9 @@ def _shadow_from_balance(
     redox_mol_s: dict[str, float] | None = None,
     buffer_o2_mol: float | None = None,
     buffer_o2_mol_signed: float | None = None,
+    fo2_log: float | None = None,
+    pipe_piece: dict[str, Any] | None = None,
+    capture_fraction: dict[str, float] | None = None,
 ) -> CapacityShadowRefusal:
     """Copy a balance refusal onto the shadow payload.
 
@@ -941,17 +950,40 @@ def _shadow_from_balance(
         redox_mol_s=redox_mol_s,
         buffer_o2_mol=buffer_o2_mol,
         buffer_o2_mol_signed=buffer_o2_mol_signed,
+        fo2_log=fo2_log,
+        pipe_piece=pipe_piece,
+        capture_fraction=capture_fraction,
     )
 
 
+def _pipe_piece_payload(piece: tuple | None) -> dict[str, Any] | None:
+    """The pipe piece as a JSON object. binding is the regime.
+
+    The tuple is (binding, blend bucket, cap, empty holdup). A missing
+    piece is unset, not a closed pipe.
+    """
+
+    if piece is None:
+        return None
+    binding, bucket, capped, empty = piece
+    return {
+        "binding": str(binding),
+        "blend_bucket": int(bucket),
+        "capped": bool(capped),
+        "empty_holdup": bool(empty),
+    }
+
+
 def _work_cap_payload(law: _HeadspaceLaw) -> dict[str, Any]:
-    """Last accepted state, S(P), and the hour-open buffer stock.
+    """Last accepted state, S(P), buffer stock, fO2, piece, capture.
 
     The cap check runs at the start of the next evaluation, so the
     stash is the previous completed step. A Jacobian probe does not
     replace that step. A flux cap that fires before any completed
     step uses the last completed flux partials and leaves S unset
-    when that partial was not the one S was evaluated at.
+    when that partial was not the one S was evaluated at. fO2 is the
+    hour-open melt potential. The piece and the capture fraction are
+    the ones that completed step stored. An unset one stays unset.
     """
 
     balance: dict[str, dict[str, Any]] | None = None
@@ -991,11 +1023,17 @@ def _work_cap_payload(law: _HeadspaceLaw) -> dict[str, Any]:
                 name: float(rate)
                 for name, rate in dict(law.paired_redox_mol_s or {}).items()
             }
+    capture = law.accepted_capture_fractions
     return {
         "species_balance": balance,
         "redox_mol_s": redox,
         "buffer_o2_mol": law.buffer_o2_mol,
         "buffer_o2_mol_signed": law.buffer_o2_mol_signed,
+        "fo2_log": law.fo2_log,
+        "pipe_piece": _pipe_piece_payload(law.accepted_pipe_piece),
+        "capture_fraction": (
+            None if capture is None else dict(capture)
+        ),
     }
 
 
@@ -1135,12 +1173,26 @@ class _HeadspaceLaw:
                 self.buffer_o2_mol = float(mol)
             if isinstance(signed, (int, float)) and not isinstance(signed, bool):
                 self.buffer_o2_mol_signed = float(signed)
+        # Hour-open melt fO2. The solve does not move it. Absent on a
+        # caller that does not pass one, and that absence stays unset.
+        self.fo2_log: float | None = None
+        if isinstance(extent_holder, dict) and "_opening_fo2_log" in extent_holder:
+            raw_fo2 = extent_holder.get("_opening_fo2_log")
+            if (
+                isinstance(raw_fo2, (int, float))
+                and not isinstance(raw_fo2, bool)
+                and math.isfinite(float(raw_fo2))
+            ):
+                self.fo2_log = float(raw_fo2)
         # Last completed integrator step. A later Jacobian probe must
         # not replace it: the cap fires on the next evaluation, and
         # the walk wants the step that was accepted.
         self.accepted_moles: dict[str, float] | None = None
         self.accepted_partials: dict[str, float] | None = None
         self.accepted_step_redox: dict[str, float] | None = None
+        self.accepted_pipe_piece: tuple | None = None
+        self.accepted_capture_fractions: dict[str, float] | None = None
+        self._last_pipe_piece: tuple | None = None
         self.paired_redox_mol_s: dict[str, float] | None = None
         self.accepted_flux_partials: dict[str, float] | None = None
         self.accepted_flux_key: tuple | None = None
@@ -1388,8 +1440,11 @@ class _HeadspaceLaw:
         else:
             bucket = 1
         # The floor flag is the n_i = 0 kink. A difference that steps
-        # off zero is not a derivative of the smooth piece.
+        # off zero is not a derivative of the smooth piece. The shut
+        # at P_down is not in this tuple: the slow stencil adds it
+        # to its own key, and the fast piece identity stays this one.
         piece = (binding, bucket, capped, pressure <= 0.0)
+        self._last_pipe_piece = piece
         return source, outflow_mol, binding, piece
 
     def _scalar_g(self, pressure_pa: float) -> float:
@@ -2288,10 +2343,25 @@ def _slow_converge(
         # Binding, blend bucket, cap. The empty-holdup flag is not a
         # kink a fill is forbidden to leave. Mole fraction is not a
         # piece: the mean free path is continuous across equal moles.
-        # gross and redox_rate sit in front of the piece so a caller
-        # that only differentiates n, A and B still reads the same
-        # three lists. The piece is last.
-        return net, added, bled, gross, redox_rate, piece[:3]
+        # The shut side is a different piece of the derivative.
+        # Premise: Q is 0 at and below P_down, and both the Poiseuille
+        # member (P^2 - P_down^2) and the effusion member
+        # (P - P_down) are 0 at P = P_down, so the value is continuous.
+        # The slope is not: dQ/dP is 0 on the shut side and finite on
+        # the open side. A central difference across that kink is
+        # neither slope.
+        # Algebra: the key gains (P <= P_down) when the duct has a
+        # positive downstream. P = Σ p_i.
+        # Unit check: the flag is dimensionless. The rates stay mol/s.
+        # Limit: P_down = 0 has no shut piece above the empty holdup,
+        # so the key stays the triple. A probe that stays on one side
+        # takes the same difference it took without the flag.
+        compared = piece[:3]
+        if law.diameter_m is not None and law.downstream_pa > 0.0:
+            compared = compared + (
+                law.pressure_of(moles) <= law.downstream_pa,
+            )
+        return net, added, bled, gross, redox_rate, compared
 
     def rhs(_time: float, state) -> list[float]:
         law.integrator_evaluations += 1
@@ -2310,6 +2380,18 @@ def _slow_converge(
         law.accepted_moles = dict(moles)
         law.accepted_partials = law.partials_of(moles)
         law.accepted_step_redox = dict(law.paired_redox_mol_s or {})
+        law.accepted_pipe_piece = law._last_pipe_piece
+        holder = law.extent_holder
+        if isinstance(holder, dict):
+            raw_capture = holder.get("_capture_fractions")
+            if isinstance(raw_capture, dict):
+                law.accepted_capture_fractions = {
+                    str(name): float(fraction)
+                    for name, fraction in raw_capture.items()
+                    if isinstance(fraction, (int, float))
+                    and not isinstance(fraction, bool)
+                    and math.isfinite(float(fraction))
+                }
         # n, A, B. G and R only when the hour asked to track them.
         # Leaving them out keeps the untracked rhs the three lists
         # it integrated before.
@@ -2374,25 +2456,123 @@ def _slow_converge(
                 matrix[row, column] = chosen[row]
         return matrix
 
+    # A holdup that opens above P_down can relax onto the switch.
+    # The event is not installed on a shut opening: the closed path
+    # already owns that hour, and a root that starts at the switch
+    # is not a downward crossing.
+    events = None
+    if (
+        law.diameter_m is not None
+        and law.downstream_pa > 0.0
+        and law.pressure_of(n0) > law.downstream_pa
+    ):
+
+        def downstream_switch(_time, state):
+            """Terminal root where the open pipe meets the shut pipe.
+
+            Premise: forward flow is zero at and below P_down. The
+            open law is continuous there. Poiseuille is
+            Q ~ (P^2 - P_down^2) and effusion is
+            Q_i = C_i * x_i * (P - P_down) / (R T). Both are 0 at
+            P = P_down, so the shut return of an empty rate does not
+            change the value. The slope does change, from 0 on the
+            shut side to a finite dQ/dP on the open side. Radau's
+            error test rejects a step that straddles that kink, and
+            a negligible source chatters on it until the work cap.
+            The equilibrium of that source is the switch, with zero
+            net flow.
+            Algebra: g = Σ p_i(n) - P_down. Direction is downward,
+            and the root is terminal. The remainder of the hour is
+            the shut-pipe accumulation, which integrates q + S with
+            Q held at 0 while the holdup stays at or below P_down.
+            Unit check: Pa - Pa = Pa.
+            Limit: P -> P_down from above gives Q -> 0, the same
+            flow the shut path books. P_down = 0 is not this event.
+            Every positive holdup is open, and the shut path
+            returns None.
+            """
+
+            return law.pressure_of(moles_of(state)) - law.downstream_pa
+
+        downstream_switch.terminal = True
+        downstream_switch.direction = -1.0
+        events = downstream_switch
+
     try:
+        solver_kwargs = {
+            "method": "Radau",
+            "rtol": _SLOW_RTOL,
+            "atol": atol,
+            "jac": jacobian,
+        }
+        if events is not None:
+            solver_kwargs["events"] = events
         solution = solve_ivp(
             rhs,
             (0.0, float(dt_s)),
             y0,
-            method="Radau",
-            rtol=_SLOW_RTOL,
-            atol=atol,
-            jac=jacobian,
+            **solver_kwargs,
         )
     except _BalanceRefused:
         # The cap fired inside the right-hand side, so nfev is not
         # back. The rhs counter is how far this attempt got.
         _remember_balance_iterations(law, law.integrator_evaluations)
         raise
-    _remember_balance_iterations(law, max(int(solution.nfev), 1))
+    iterations = max(int(solution.nfev), 1)
+    _remember_balance_iterations(law, iterations)
     if not solution.success:
         raise _BalanceRefused("headspace_balance_nonconvergence")
     y_end = solution.y[:, -1]
+    hit = (
+        solution.t_events is not None
+        and len(solution.t_events) > 0
+        and len(solution.t_events[0]) > 0
+    )
+    if hit:
+        return _land_open_pipe_on_downstream(
+            law,
+            n0,
+            dt_s,
+            y_end,
+            float(solution.t[-1]),
+            iterations,
+            track_extent=track_extent,
+        )
+    end, added_mol, bled_mol, extent_kwargs = _integrated_holdup(
+        law,
+        n0,
+        y_end,
+        track_extent=track_extent,
+    )
+    return law.step_from_moles(
+        n0,
+        dt_s,
+        end,
+        iterations,
+        _SLOW_ATOL_PA,
+        added_mol=added_mol,
+        bled_mol_in=bled_mol,
+        **extent_kwargs,
+    )
+
+
+def _integrated_holdup(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    y_end,
+    *,
+    track_extent: bool,
+) -> tuple[dict[str, float], dict[str, float], dict[str, float], dict]:
+    """n = n0 + A − B from one Radau state, with the partial floor.
+
+    The state is n, then A = ∫(q+S) dt, then B = ∫Q dt. With a
+    holder, G and R follow. The published moles are this identity,
+    not the n component, which a stage may have stepped negative.
+    """
+
+    species = law.species
+    count = len(species)
+    pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
     for value in y_end[:count]:
         amount = float(value)
         if not math.isfinite(amount):
@@ -2458,15 +2638,197 @@ def _slow_converge(
             "vapour_extent_kg": extent_kg,
             "redox_added_mol": redox_mol,
         }
+    return end, added_mol, bled_mol, extent_kwargs
+
+
+def _project_onto_downstream(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    end: Mapping[str, float],
+    added: Mapping[str, float],
+) -> tuple[dict[str, float], dict[str, float]]:
+    """Put the event holdup on P_down and keep n = n0 + A − B.
+
+    Premise: the terminal root is the switch. The collocation
+    polynomial at that root can miss it by a rounding, and the shut
+    path treats any pressure above P_down as still open.
+    Algebra: n' = n * P_down / P, then B' = n0 + A − n', so
+    n' = n0 + A − B'. A one-ulp overshoot is taken off the largest
+    holdup so the shut check sees P <= P_down.
+    Unit check: Pa / Pa = 1, and mol − mol = mol.
+    Limit: P = P_down leaves n and B unchanged. A root farther than
+    the 1e-6 Pa floor, or a non-positive pressure, is not this
+    switch, and it is a refusal. A holdup the bleed floor puts back
+    above the switch is the same refusal: the shut path would
+    otherwise return None and this event would be installed again.
+    """
+
+    target = law.downstream_pa
+    landed = {name: float(end[name]) for name in law.species}
+    pressure = law.pressure_of(landed)
+    # A non-positive root is not the switch. Skipping the distance
+    # check there would publish a vacuum holdup as if it were P_down.
+    if pressure != target and (
+        not math.isfinite(pressure)
+        or pressure <= 0.0
+        or abs(pressure - target) > DEFAULT_ABS_TOL_PA
+    ):
+        raise _BalanceRefused("headspace_balance_nonconvergence")
+    if pressure != target:
+        scale = target / pressure
+        landed = {
+            name: float(end[name]) * scale for name in law.species
+        }
+    pa_per_mol = GAS_CONSTANT * law.temperature_K / law.volume_m3
+    new_bled: dict[str, float] = {}
+    for name in law.species:
+        bleed = float(n0[name]) + float(added[name]) - landed[name]
+        if bleed < 0.0:
+            if -bleed * pa_per_mol > DEFAULT_ABS_TOL_PA:
+                raise _BalanceRefused("headspace_balance_nonconvergence")
+            bleed = 0.0
+            landed[name] = float(n0[name]) + float(added[name])
+        new_bled[name] = bleed
+    # The bleed floor can put one species back above the switch.
+    # Wider than the partial floor, this is not the root. A binary64
+    # overshoot is taken off the largest holdup, and its bleed is
+    # rewritten so n = n0 + A − B still holds. A holdup that is still
+    # above the switch would make the shut path return None and the
+    # open integral reinstall this same event.
+    if abs(law.pressure_of(landed) - target) > DEFAULT_ABS_TOL_PA:
+        raise _BalanceRefused("headspace_balance_nonconvergence")
+    for _ulp in range(4):
+        over = law.pressure_of(landed) - target
+        if over <= 0.0:
+            break
+        donor = max(landed, key=lambda name: landed[name])
+        landed[donor] = landed[donor] - over / pa_per_mol
+        if landed[donor] < 0.0:
+            landed[donor] = 0.0
+        new_bled[donor] = (
+            float(n0[donor]) + float(added[donor]) - landed[donor]
+        )
+    if law.pressure_of(landed) > target:
+        raise _BalanceRefused("headspace_balance_nonconvergence")
+    return landed, new_bled
+
+
+def _join_switch_remainder(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    landed: Mapping[str, float],
+    added: Mapping[str, float],
+    bled: Mapping[str, float],
+    extent_kwargs: dict,
+    rest: _HeadspaceStep,
+    open_iterations: int,
+    *,
+    track_extent: bool,
+) -> _HeadspaceStep:
+    """Book the open integral up to the switch plus the shut remainder.
+
+    The remainder's own step used the switch as its opening. Its
+    identity is n_end = n_switch + A_rest − B_rest, so
+    A_rest = n_end − n_switch + B_rest. The hour's identity is
+    n_end = n0 + (A_open + A_rest) − (B_open + B_rest).
+    """
+
+    added_total: dict[str, float] = {}
+    bled_total: dict[str, float] = {}
+    for name in law.species:
+        rest_added = (
+            float(rest.moles[name])
+            - float(landed[name])
+            + float(rest.bled_mol[name])
+        )
+        added_total[name] = float(added[name]) + rest_added
+        bled_total[name] = float(bled[name]) + float(rest.bled_mol[name])
+    kwargs = dict(extent_kwargs)
+    if track_extent:
+        event_gross = extent_kwargs["vapour_extent_kg"]
+        event_redox = extent_kwargs["redox_added_mol"]
+        kwargs = {
+            "vapour_extent_kg": {
+                name: float(event_gross[name])
+                + float(rest.vapour_extent_kg[name])
+                for name in law.species
+            },
+            "redox_added_mol": {
+                name: float(event_redox[name])
+                + float(rest.redox_added_mol[name])
+                for name in law.species
+            },
+        }
+    iterations = open_iterations + max(int(rest.iterations), 0)
+    _mark_balance_path(law, "radau_fallback")
+    _remember_balance_iterations(law, iterations)
     return law.step_from_moles(
         n0,
         dt_s,
-        end,
-        max(int(solution.nfev), 1),
+        rest.moles,
+        iterations,
         _SLOW_ATOL_PA,
-        added_mol=added_mol,
-        bled_mol_in=bled_mol,
-        **extent_kwargs,
+        added_mol=added_total,
+        bled_mol_in=bled_total,
+        **kwargs,
+    )
+
+
+def _land_open_pipe_on_downstream(
+    law: _HeadspaceLaw,
+    n0: Mapping[str, float],
+    dt_s: float,
+    y_hit,
+    t_hit: float,
+    open_iterations: int,
+    *,
+    track_extent: bool,
+) -> _HeadspaceStep:
+    """Stop the open integral at P_down and finish on the shut path.
+
+    A source that would open the pipe again is not clamped onto the
+    switch. The shut path returns None for that remainder, and the
+    open integral continues from the switch.
+    """
+
+    end, added, bled, extent_kwargs = _integrated_holdup(
+        law,
+        n0,
+        y_hit,
+        track_extent=track_extent,
+    )
+    landed, bled = _project_onto_downstream(law, n0, end, added)
+    remain = float(dt_s) - float(t_hit)
+    if remain <= 0.0:
+        _mark_balance_path(law, "radau_fallback")
+        _remember_balance_iterations(law, open_iterations)
+        return law.step_from_moles(
+            n0,
+            dt_s,
+            landed,
+            open_iterations,
+            _SLOW_ATOL_PA,
+            added_mol=added,
+            bled_mol_in=bled,
+            **extent_kwargs,
+        )
+    shut = _closed_pipe_accumulation(law, landed, remain)
+    if shut is None:
+        rest = _slow_converge(law, landed, remain)
+    else:
+        rest = shut
+    return _join_switch_remainder(
+        law,
+        n0,
+        dt_s,
+        landed,
+        added,
+        bled,
+        extent_kwargs,
+        rest,
+        open_iterations,
+        track_extent=track_extent,
     )
 
 
