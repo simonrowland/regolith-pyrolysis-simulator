@@ -2155,6 +2155,27 @@ class CondensationRouteResult:
         return (sio_condensed_kg * sio_to_sio2) / feedstock_kg
 
 
+def _stamp_efficiency_outcome_stage_identity(
+    payload: dict[str, Any],
+    stage: CondensationStage,
+) -> dict[str, Any]:
+    """Copy this stage's identity onto an efficiency outcome.
+
+    ``stage_key`` is written only when the stage has one, and only when
+    the payload has not already named one. ``sub_order`` is always
+    written, including 0. The alkali cyclone and the K trap share stage
+    number 4; an outcome that records the number and not the key is
+    joined onto both.
+    """
+
+    stage_key = getattr(stage, 'stage_key', '') or ''
+    if stage_key and 'stage_key' not in payload:
+        payload['stage_key'] = stage_key
+    if 'sub_order' not in payload:
+        payload['sub_order'] = int(stage.sub_order)
+    return payload
+
+
 class CondensationModel:
     """
     Routes evaporated species through the condensation train.
@@ -3352,11 +3373,10 @@ class CondensationModel:
                         'refusal_type': type(exc).__name__,
                         **({'parameter': exc.parameter} if isinstance(exc, DepositionInputRefusal) else {}),
                     }
-                    refused_stage_key = getattr(stage, 'stage_key', '') or ''
-                    if refused_stage_key:
-                        refusal_outcome['stage_key'] = refused_stage_key
                     efficiency_outcomes_by_species.setdefault(species, []).append(
-                        refusal_outcome
+                        _stamp_efficiency_outcome_stage_identity(
+                            refusal_outcome, stage,
+                        )
                     )
                     continue
                 deposit = supply * eta
@@ -4307,10 +4327,9 @@ class CondensationModel:
                     'eta': 0.0,
                     **detail,
                 }
-                stage_key = getattr(stage, 'stage_key', '') or ''
-                if stage_key and 'stage_key' not in payload:
-                    payload['stage_key'] = stage_key
-                efficiency_outcomes.append(payload)
+                efficiency_outcomes.append(
+                    _stamp_efficiency_outcome_stage_identity(payload, stage)
+                )
             return 0.0
 
         if not math.isfinite(float(residence_s)):
@@ -4577,15 +4596,17 @@ class CondensationModel:
         eta = (p_in - pressure_pa) / p_in
         notice = notices.get(f'{species}#wall:{midpoint_T_K}')
         if isinstance(notice, Mapping) and efficiency_outcomes is not None:
-            efficiency_outcomes.append({
-                **notice, 'status': 'extrapolated', 'authority_level': 'extrapolated',
-                'reason': 'antoine_psat_unavailable_at_T' if notice.get('status') == 'refused'
-                          else notice.get('reason', 'outside_source_temperature_band'),
-                'original_reason': notice.get('reason'),
-                'output_status': 'status_bearing', 'species': species,
-                'stage_number': int(stage.stage_number), 'T_cond_C': T_cond_C,
-                'flowing_pressure_pa': p_in, 'eta': eta,
-            })
+            efficiency_outcomes.append(
+                _stamp_efficiency_outcome_stage_identity({
+                    **notice, 'status': 'extrapolated', 'authority_level': 'extrapolated',
+                    'reason': 'antoine_psat_unavailable_at_T' if notice.get('status') == 'refused'
+                              else notice.get('reason', 'outside_source_temperature_band'),
+                    'original_reason': notice.get('reason'),
+                    'output_status': 'status_bearing', 'species': species,
+                    'stage_number': int(stage.stage_number), 'T_cond_C': T_cond_C,
+                    'flowing_pressure_pa': p_in, 'eta': eta,
+                }, stage)
+            )
         return eta
 
 

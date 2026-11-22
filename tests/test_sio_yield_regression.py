@@ -1022,21 +1022,17 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     )
     stage4_outcome = next(
         item for item in outcomes
-        if item.get("stage_number") == 4
+        if (item.get("stage_number"), item.get("stage_key"))
+        == (4, NA_COLLECTOR_STAGE_KEY)
         and item.get("status") == "extrapolated"
-        and item.get("stage_key") != K_TRAP_STAGE_KEY
     )
     trap_outcomes = [
         item for item in outcomes if item.get("stage_key") == K_TRAP_STAGE_KEY
     ]
-    # The trap's own row is the pass-through. The extrapolated stage-4 row
-    # has no stage_key: the efficiency writer stamps stage_key on
-    # _mint_zero and not on the extrapolated append. A join of unkeyed
-    # outcomes by stage number, which probe_d452_r14._stage_row does,
-    # attributes this cyclone eta to stage_4b_k_trap as well. That join
-    # already mirrored the cyclone at ae5998456. The trap area is unset
-    # on this map, so the numeric stage-4 key did not turn the trap into
-    # a second capture. Mass below counts the cyclone once.
+    # The trap's own row is the pass-through. Its area is unset on this
+    # map, so the numeric stage-4 key did not turn the trap into a second
+    # capture. The cyclone row carries the cyclone key. Mass below counts
+    # the cyclone once.
     assert trap_outcomes
     assert all(
         item["status"] == "pass_through"
@@ -1044,7 +1040,7 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
         and item["eta"] == 0.0
         for item in trap_outcomes
     )
-    assert "stage_key" not in stage4_outcome
+    assert stage4_outcome["stage_key"] == NA_COLLECTOR_STAGE_KEY
     assert not any(
         item.get("status") == "refused" and item.get("parameter") == "stage_area_m2"
         for item in outcomes
@@ -1166,6 +1162,76 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
         authority["retained_in_source_mass_kg_hr"]
     )
     assert authority["mass_closure_error_kg_hr"] <= 1.0e-12
+
+
+def test_extrapolated_cyclone_eta_stays_off_the_unconfigured_k_trap(
+    synthetic_sio_stage_authority,
+):
+    """A (stage_number, stage_key) join must not give the trap the cyclone eta.
+
+    The alkali cyclone captures. The K trap has no configured area, so
+    its own outcome is the pass-through. Both stages are stage number 4.
+    """
+
+    model = CondensationModel(CondensationTrain.create_default())
+    route = model.route(
+        synthetic_sio_stage_authority.flux(),
+        MeltState(),
+    )
+    cyclone = next(
+        stage for stage in model.train.stages
+        if stage.stage_key == NA_COLLECTOR_STAGE_KEY
+    )
+    trap = next(
+        stage for stage in model.train.stages
+        if stage.stage_key == K_TRAP_STAGE_KEY
+    )
+    assert int(cyclone.stage_number) == int(trap.stage_number)
+    assert cyclone.stage_key != trap.stage_key
+    assert model._stage_area_m2_for_stage(cyclone) == pytest.approx(
+        model.stage_area_m2_by_stage["alkali_stage4"]
+    )
+    assert model._stage_area_m2_for_stage(trap) is None
+    outcomes = route.condensation_authority_by_species["SiO"]["stage_outcomes"]
+
+    def joined(stage):
+        identity = (int(stage.stage_number), stage.stage_key)
+        return [
+            item for item in outcomes
+            if (item.get("stage_number"), item.get("stage_key")) == identity
+        ]
+
+    cyclone_rows = joined(cyclone)
+    trap_rows = joined(trap)
+    assert cyclone_rows
+    assert trap_rows
+    cyclone_capture = [
+        item for item in cyclone_rows if item.get("status") == "extrapolated"
+    ]
+    assert len(cyclone_capture) == 1
+    cyclone_eta = float(cyclone_capture[0]["eta"])
+    assert 0.0 < cyclone_eta <= 1.0
+    assert all(
+        item["stage_key"] == cyclone.stage_key
+        and item["sub_order"] == int(cyclone.sub_order)
+        for item in cyclone_rows
+    )
+    assert all(
+        item["stage_key"] == trap.stage_key
+        and item["sub_order"] == int(trap.sub_order)
+        and item["status"] == "pass_through"
+        and item["reason"] == "no_configured_capture_area"
+        and item["eta"] == 0.0
+        and item["eta"] != cyclone_eta
+        for item in trap_rows
+    )
+    stage_number = int(cyclone.stage_number)
+    assert all(
+        item.get("stage_key")
+        for item in outcomes
+        if item.get("stage_number") == stage_number
+    )
+    assert K_TRAP_STAGE_KEY not in route.condensed_by_stage_species
 
 
 def test_synthetic_sio_route_without_carrier_authority_stays_unavailable():
