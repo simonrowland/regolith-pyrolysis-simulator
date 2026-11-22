@@ -1940,6 +1940,7 @@ class RelativeSeriesEvidence:
     locator: Locator | None
     oxygen_independent: bool | None = None
     model_run_id: str | None = None
+    reference_run_id: str | None = None
     model_oxygen_input_observation_ids: tuple[str, ...] | None = None
 
 

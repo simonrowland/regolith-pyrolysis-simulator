@@ -146,6 +146,8 @@ def relative_channel_point_residuals(
     )
     if oxygen_reason is not None:
         return unavailable(oxygen_reason)
+    if _untied_physical_run(observed_series, model_series, evidence):
+        return unavailable(RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY)
     if evidence.model_quantity is not Quantity.P_PARTIAL:
         return unavailable(RelativeSeriesUnavailableReason.QUANTITY_UNSUPPORTED)
     if any(
@@ -297,6 +299,31 @@ def relative_channel_point_residuals(
     return RelativeSeriesComparison(points=tuple(point_residuals))
 
 
+def _untied_physical_run(
+    observed_series: Sequence[RelativeSeriesPoint],
+    model_series: Sequence[RelativeSeriesPoint],
+    evidence: RelativeSeriesEvidence,
+) -> bool:
+    """True unless the explicit observed, reference, and model ids are one run.
+
+    A missing id is untied. The caller passes those ids; nothing is read
+    from a stored row.
+    """
+
+    observed = {point.run_id for point in observed_series}
+    model = {point.run_id for point in model_series}
+    reference = evidence.reference_run_id
+    model_run = evidence.model_run_id
+    return not (
+        len(observed) == 1
+        and reference is not None
+        and model_run is not None
+        and observed == {reference}
+        and reference == model_run
+        and model == {model_run}
+    )
+
+
 def _relative_series_model_oxygen_unavailable_reason(
     observed_series: Sequence[RelativeSeriesPoint],
     model_series: Sequence[RelativeSeriesPoint],
@@ -328,12 +355,7 @@ def _relative_series_model_oxygen_unavailable_reason(
         return RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT
     if evidence.oxygen_independent is None:
         return RelativeSeriesUnavailableReason.OXYGEN_ELIGIBILITY_UNKNOWN
-    if (
-        evidence.model_run_id is None
-        or {point.run_id for point in model_series} != {evidence.model_run_id}
-        or input_ids is None
-        or len(set(input_ids)) != len(input_ids)
-    ):
+    if input_ids is None or len(set(input_ids)) != len(input_ids):
         return RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE
     if expected_input_ids is not None and set(input_ids) != expected_input_ids:
         return RelativeSeriesUnavailableReason.MODEL_OXYGEN_INPUTS_UNAVAILABLE

@@ -39,7 +39,7 @@ def _point(
     uncertainty: Uncertainty | None = None,
 ) -> RelativeSeriesPoint:
     return RelativeSeriesPoint(
-        run_id="source-run" if source else "model-run",
+        run_id="physical-run",
         coordinate=Decimal(coordinate),
         value=Value(ValueKind.POINT, point=Decimal(value)),
         observable=observable,
@@ -93,7 +93,8 @@ def _inputs():
         response_proportional_over_interval=True,
         locator=F.loc(page=1),
         oxygen_independent=True,
-        model_run_id="model-run",
+        model_run_id="physical-run",
+        reference_run_id="physical-run",
         model_oxygen_input_observation_ids=(),
     )
     return observed, model, anchor, clock, evidence
@@ -193,6 +194,62 @@ def test_single_sio_model_run_keeps_zero_anchor_residuals():
 
     assert result.unavailable_reason is None
     assert tuple(point.residual_dex for point in result.points) == (0, 0, 0)
+
+
+def test_tied_physical_run_scores_and_each_broken_tie_refuses():
+    observed, model, anchor, clock, evidence = _inputs()
+    scored = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+    assert scored.unavailable_reason is None
+    assert tuple(point.residual_dex for point in scored.points) == (
+        Decimal(0),
+        Decimal(0),
+        Decimal(0),
+    )
+
+    cases = (
+        relative_channel_point_residuals(
+            tuple(replace(point, run_id="other-observed") for point in observed),
+            model,
+            anchor,
+            clock,
+            evidence,
+        ),
+        relative_channel_point_residuals(
+            observed,
+            model,
+            anchor,
+            clock,
+            replace(evidence, reference_run_id="other-reference"),
+        ),
+        relative_channel_point_residuals(
+            observed,
+            tuple(replace(point, run_id="other-model") for point in model),
+            anchor,
+            clock,
+            replace(evidence, model_run_id="other-model"),
+        ),
+        relative_channel_point_residuals(
+            observed,
+            model,
+            anchor,
+            clock,
+            replace(evidence, reference_run_id=None),
+        ),
+        relative_channel_point_residuals(
+            observed,
+            model,
+            anchor,
+            clock,
+            replace(evidence, model_run_id=None),
+        ),
+    )
+    for result in cases:
+        assert result.unavailable_reason is (
+            RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
+        )
+        assert result.points == ()
 
 
 def test_mixed_sio_model_runs_are_typed_unavailable():

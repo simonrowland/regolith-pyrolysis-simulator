@@ -3,7 +3,6 @@
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
-import re
 
 import pytest
 
@@ -33,7 +32,6 @@ from simulator.battery.records import (
 from simulator.battery.score import (
     ScoreContext,
     _bench_for_score,
-    _sample_catalog_run_identity,
     compile_residual,
     load_score_context,
     predict_with_engine,
@@ -63,6 +61,14 @@ def demaria_context():
     return load_score_context(
         Path(__file__).resolve().parents[2],
         sources=("kems-022-demaria-1971",),
+    )
+
+
+@pytest.fixture(scope="module")
+def costa_context():
+    return load_score_context(
+        Path(__file__).resolve().parents[2],
+        sources=("kems-007-costa-2015",),
     )
 
 
@@ -1788,252 +1794,24 @@ def test_relative_qms_oxygen_inputs_cannot_validate_themselves(source_context):
     assert fallback.points == ()
 
 
-def test_relative_qms_refuses_cross_sample_demaria_pairing(demaria_context):
-    sample_12022 = _demaria_o_sample(demaria_context, "12022")
-    sample_12065 = _demaria_o_sample(demaria_context, "12065")
+def _printed_store_comparison(context, row):
+    """Printed O2 command on one store row. The adapter must still refuse it."""
+
     reference = replace(
-        sample_12022,
-        observation_id="relative-qms-demaria-12022-reference",
+        row,
+        observation_id=f"{row.observation_id}:printed-o2",
         identity=replace(
-            sample_12022.identity,
-            fO2_Pa=State.of(Decimal("1e-6")),
-        ),
-    )
-    # The store's row id selects sample 12065, but ion intensity has no
-    # composition identity axis to carry that sample into a QMS trace.
-    trace = replace(
-        sample_12065,
-        observation_id="relative-qms-demaria-12065-trace",
-        identity=replace(
-            sample_12065.identity,
-            quantity=Quantity.ION_INTENSITY,
-            composition=State.not_applicable(
-                "ion-intensity trace has no composition axis"
-            ),
-            fO2_Pa=None,
-        ),
-        point_conditions=None,
-        derived_from=None,
-        derivation=None,
-        value=Value(ValueKind.POINT, point=Decimal("2")),
-    )
-    context = replace(
-        demaria_context,
-        observations={
-            **demaria_context.observations,
-            reference.observation_id: reference,
-            trace.observation_id: trace,
-        },
-    )
-    observed, model, anchor, clock, evidence = _relative_qms_inputs(
-        trace, (), target_species="O"
-    )
-
-    result = _score_relative_qms_series(
-        observed,
-        model,
-        anchor,
-        clock,
-        evidence,
-        context=context,
-        reference=reference,
-        source_trace=trace,
-    )
-
-    assert result.unavailable_reason is (
-        RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
-    )
-    assert result.points == ()
-    assert len(_catalog_markers(context, reference.experiment_id)) == 2
-
-
-def _catalog_markers(context, experiment_id):
-    markers = {
-        _sample_catalog_run_identity(row)
-        for row in context.observations.values()
-        if row.experiment_id == experiment_id
-    }
-    markers.discard(None)
-    return markers
-
-
-def _row_labels(context, experiment_id):
-    labels = set()
-    for row in context.observations.values():
-        if row.experiment_id != experiment_id:
-            continue
-        match = re.search(r":row=([^:]+)", row.observation_id)
-        if match is not None:
-            labels.add(match.group(1))
-    return labels
-
-
-def _without_catalog_marker(observation):
-    from simulator.battery.records import Composition
-
-    identity = observation.identity
-    state = getattr(identity, "composition", None)
-    if (
-        state is None
-        or not state.is_value
-        or not isinstance(state.value, Composition)
-        or state.value.proxy_flag != "composition_from_sample_catalog"
-    ):
-        return observation
-    return replace(
-        observation,
-        identity=replace(
-            identity,
-            composition=replace(state, value=replace(state.value, proxy_flag=None)),
-        ),
-    )
-
-
-def _score_demaria_trace(context, reference, trace):
-    observed, model, anchor, clock, evidence = _relative_qms_inputs(
-        trace, (), target_species="O"
-    )
-    return _score_relative_qms_series(
-        observed,
-        model,
-        anchor,
-        clock,
-        evidence,
-        context=context,
-        reference=reference,
-        source_trace=trace,
-    ), observed
-
-
-def test_grouped_experiment_with_no_marker_refuses(demaria_context):
-    sample_12022 = _demaria_o_sample(demaria_context, "12022")
-    sample_12065 = _demaria_o_sample(demaria_context, "12065")
-    reference = _without_catalog_marker(
-        replace(
-            sample_12022,
-            observation_id="relative-qms-unmarked-12022-reference",
-            identity=replace(
-                sample_12022.identity,
-                fO2_Pa=State.of(Decimal("1e-6")),
-            ),
-        )
-    )
-    trace = replace(
-        sample_12065,
-        observation_id="relative-qms-unmarked-12065-trace",
-        identity=replace(
-            sample_12065.identity,
-            quantity=Quantity.ION_INTENSITY,
-            composition=State.not_applicable(
-                "ion-intensity trace has no composition axis"
-            ),
-            fO2_Pa=None,
-        ),
-        point_conditions=None,
-        derived_from=None,
-        derivation=None,
-        value=Value(ValueKind.POINT, point=Decimal("2")),
-    )
-    context = replace(
-        demaria_context,
-        observations={
-            **{
-                row.observation_id: _without_catalog_marker(row)
-                for row in demaria_context.observations.values()
-            },
-            reference.observation_id: reference,
-            trace.observation_id: trace,
-        },
-    )
-    assert _catalog_markers(context, reference.experiment_id) == set()
-    assert _row_labels(context, reference.experiment_id) == {"12022", "12065"}
-
-    result, observed = _score_demaria_trace(context, reference, trace)
-
-    assert observed[0].run_id == reference.experiment_id
-    assert result.unavailable_reason is (
-        RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
-    )
-    assert result.points == ()
-
-
-def test_grouped_experiment_with_one_marker_refuses(demaria_context):
-    sample = _demaria_o_sample(demaria_context, "12022")
-    kept = {
-        row.observation_id: row
-        for row in demaria_context.observations.values()
-        if row.experiment_id == sample.experiment_id
-        and ":row=12022:" in row.observation_id
-    }
-    reference = replace(
-        sample,
-        observation_id=sample.observation_id + ":scored",
-        identity=replace(sample.identity, fO2_Pa=State.of(Decimal("1e-6"))),
-    )
-    trace = replace(
-        sample,
-        observation_id="relative-qms-one-marker-trace",
-        identity=replace(
-            sample.identity,
-            quantity=Quantity.ION_INTENSITY,
-            composition=State.not_applicable(
-                "ion-intensity trace has no composition axis"
-            ),
-            fO2_Pa=None,
-        ),
-        point_conditions=None,
-        derived_from=None,
-        derivation=None,
-        value=Value(ValueKind.POINT, point=Decimal("2")),
-    )
-    context = replace(
-        demaria_context,
-        observations={
-            **kept,
-            reference.observation_id: reference,
-            trace.observation_id: trace,
-        },
-    )
-    assert len(_catalog_markers(context, sample.experiment_id)) == 1
-    assert _row_labels(context, sample.experiment_id) == {"12022"}
-
-    observed, model, anchor, clock, evidence = _relative_qms_inputs(
-        trace, (), target_species="O"
-    )
-    observed = tuple(replace(point, run_id="12022") for point in observed)
-    result = _score_relative_qms_series(
-        observed,
-        model,
-        anchor,
-        clock,
-        evidence,
-        context=context,
-        reference=reference,
-        source_trace=trace,
-    )
-
-    assert result.unavailable_reason is (
-        RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
-    )
-    assert result.points == ()
-
-
-def test_single_run_experiment_scores_with_its_own_run_id(source_context):
-    melt = _row(source_context, "kems-053-stolyarova-1991")
-    reference = replace(
-        melt,
-        observation_id=melt.observation_id + ":row=cell-run:",
-        identity=replace(
-            melt.identity,
+            row.identity,
             species=Species("O2", Phase.G),
             quantity=Quantity.P_PARTIAL,
             fO2_Pa=State.of(Decimal("4.2e-7")),
         ),
         point_conditions=None,
+        notices=(),
     )
     trace = replace(
         reference,
-        observation_id="relative-qms-cell-run-trace",
+        observation_id=f"{row.observation_id}:ion-trace",
         identity=replace(
             reference.identity,
             quantity=Quantity.ION_INTENSITY,
@@ -2043,79 +1821,56 @@ def test_single_run_experiment_scores_with_its_own_run_id(source_context):
         derivation=None,
         value=Value(ValueKind.POINT, point=Decimal("2")),
     )
-    context = replace(
-        source_context,
+    scoring = replace(
+        context,
         observations={
+            **context.observations,
             reference.observation_id: reference,
             trace.observation_id: trace,
         },
     )
-    assert _catalog_markers(context, reference.experiment_id) == set()
-    assert _row_labels(context, reference.experiment_id) == {"cell-run"}
-    observed, model, anchor, clock, evidence = _relative_qms_inputs(trace, ())
-    observed = tuple(replace(point, run_id="cell-run") for point in observed)
-    assert observed[0].run_id != reference.experiment_id
-
-    result = _score_relative_qms_series(
-        observed,
-        model,
-        anchor,
-        clock,
-        evidence,
-        context=context,
+    return _score_relative_qms_series(
+        *_relative_qms_inputs(trace, ()),
+        context=scoring,
         reference=reference,
         source_trace=trace,
     )
 
-    assert result.unavailable_reason is None
-    assert tuple(point.residual_dex for point in result.points) == (
-        Decimal(0),
-        Decimal(0),
-    )
 
-    missing_run = _score_relative_qms_series(
-        tuple(replace(point, run_id=reference.experiment_id) for point in observed),
-        model,
-        anchor,
-        clock,
-        evidence,
-        context=context,
-        reference=reference,
-        source_trace=trace,
+def test_adapter_refuses_demaria_store_row(demaria_context):
+    result = _printed_store_comparison(
+        demaria_context, _demaria_o_sample(demaria_context, "12022")
     )
-    assert missing_run.unavailable_reason is (
+    assert result.unavailable_reason is (
         RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
     )
-    assert missing_run.points == ()
+    assert result.points == ()
 
-    other = replace(
-        reference,
-        observation_id=reference.observation_id.replace(
-            ":row=cell-run:", ":row=other-run:"
-        ),
+
+def test_adapter_refuses_costa_store_row(costa_context):
+    row = next(
+        item for item in costa_context.observations.values()
+        if item.source_id == "kems-007-costa-2015"
+        and item.identity.species is not None
+        and item.identity.species.formula == "Fe"
+        and item.identity.quantity.is_value
+        and item.identity.quantity.value is Quantity.P_PARTIAL
     )
-    cross_context = replace(
-        context,
-        observations={**context.observations, other.observation_id: other},
-    )
-    assert _row_labels(cross_context, reference.experiment_id) == {
-        "cell-run",
-        "other-run",
-    }
-    cross = _score_relative_qms_series(
-        observed,
-        model,
-        anchor,
-        clock,
-        evidence,
-        context=cross_context,
-        reference=reference,
-        source_trace=trace,
-    )
-    assert cross.unavailable_reason is (
+    result = _printed_store_comparison(costa_context, row)
+    assert result.unavailable_reason is (
         RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
     )
-    assert cross.points == ()
+    assert result.points == ()
+
+
+def test_adapter_refuses_synthetic_single_experiment_store_row(source_context):
+    melt = _row(source_context, "kems-053-stolyarova-1991")
+    alone = replace(source_context, observations={melt.observation_id: melt})
+    result = _printed_store_comparison(alone, melt)
+    assert result.unavailable_reason is (
+        RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
+    )
+    assert result.points == ()
 
 
 def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
@@ -2166,11 +1921,11 @@ def test_relative_qms_keeps_an_explicit_fO2_command(source_context):
         source_trace=trace,
     )
 
-    assert result.unavailable_reason is None
-    assert reference.identity.fO2_Pa == State.of(command)
-    assert tuple(point.residual_dex for point in result.points) == (
-        Decimal(0), Decimal(0)
+    assert result.unavailable_reason is (
+        RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
     )
+    assert result.points == ()
+    assert reference.identity.fO2_Pa == State.of(command)
 
     trace_input = _score_relative_qms_series(
         observed,
@@ -2487,8 +2242,7 @@ def test_selected_pressure_not_reduced_from_the_trace_can_score(source_context):
         source_trace=trace,
     )
 
-    assert result.unavailable_reason is None
-    assert tuple(point.residual_dex for point in result.points) == (
-        Decimal(0),
-        Decimal(0),
+    assert result.unavailable_reason is (
+        RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY
     )
+    assert result.points == ()
