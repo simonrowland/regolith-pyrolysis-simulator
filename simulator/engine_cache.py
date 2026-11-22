@@ -1,11 +1,16 @@
 """One process-local HOT SQLite cache for engine outputs.
 
-Chemistry changes expire cached outputs only when the engine's manually
-maintained chemistry version is bumped.
+The cache exists to speed up CI, gates, the accuracy scorecard, user runs,
+and the optimizer. Engines are stateless and deterministic: the same engine,
+chemistry version, and request always give the same prediction, so a cached
+value is the engine's answer. CI uses the cache read-only by default. The
+key is engine + version + request; do not add to it. Chemistry changes
+expire cached outputs only when the engine's chemistry version is bumped.
 """
 
 from __future__ import annotations
 
+import functools
 import hashlib
 import importlib.metadata
 import inspect
@@ -20,6 +25,7 @@ import threading
 import time
 import tomllib
 import zlib
+from unittest.mock import Mock
 from collections import OrderedDict
 from collections.abc import Iterable, Iterator, Mapping
 from contextlib import ExitStack, closing, contextmanager
@@ -750,6 +756,10 @@ _ENGINE_CACHE_PATH_OVERRIDE: ContextVar[str | None | object] = ContextVar(
     "regolith_engine_cache_path_override",
     default=_ENGINE_CACHE_PATH_UNSET,
 )
+# Set by the pytest fixture from the runner environment. None outside pytest,
+# so scoring scripts keep the process mode and are not treated as test doubles.
+_RUNNER_CACHE_SNAPSHOT: tuple[str | None, str] | None = None
+_MISSING = object()
 
 ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS = {
     "openimcc": {
@@ -943,11 +953,260 @@ def _set_engine_cache_path_scope_state(
 
 
 def _configured_engine_cache_path() -> str | None:
-    """Return the configured cache path, or None when caching is disabled."""
+    """Return the configured cache path, or None when caching is disabled.
+
+    ``REGOLITH_ENGINE_CACHE`` is how CI, gates, the accuracy scorecard, user
+    runs, and the optimizer reuse engine work. CI sets it and opens the file
+    read-only. Unset or empty disables the cache. Do not clear it to isolate
+    a test: serving a cached row is valid. The key is engine + version +
+    request.
+    """
     path = _ENGINE_CACHE_PATH_OVERRIDE.get()
     if path is not _ENGINE_CACHE_PATH_UNSET:
         return path or None
     return _cache_environment_setting("REGOLITH_ENGINE_CACHE") or None
+
+
+@contextmanager
+def runner_engine_cache_snapshot(path: str | None, mode: str = "") -> Iterator[None]:
+    """Remember the runner cache file and mode for one test.
+
+    An explicit cache path that is not this file does not inherit ``mode``.
+    """
+
+    global _RUNNER_CACHE_SNAPSHOT
+    previous = _RUNNER_CACHE_SNAPSHOT
+    _RUNNER_CACHE_SNAPSHOT = (path or None, mode or "")
+    try:
+        yield
+    finally:
+        _RUNNER_CACHE_SNAPSHOT = previous
+
+
+def _configured_cache_mode() -> str:
+    """Return ``readonly`` or read/write.
+
+    CI sets ``REGOLITH_ENGINE_CACHE_MODE=readonly`` by default. A store in
+    that mode is a counted no-op; the shared file is never written. Any
+    other non-empty value is a typed refusal, not a silent read/write.
+    """
+
+    mode = (_cache_environment_setting("REGOLITH_ENGINE_CACHE_MODE", "") or "").lower()
+    if mode not in {"", "readonly"}:
+        raise ValueError(f"unknown engine cache mode {mode!r}")
+    return mode
+
+
+def _active_cache_is_runner_file(active_path: str) -> bool:
+    snapshot = _RUNNER_CACHE_SNAPSHOT
+    if snapshot is None or not snapshot[0]:
+        return False
+    override = _ENGINE_CACHE_PATH_OVERRIDE.get()
+    if override is not _ENGINE_CACHE_PATH_UNSET:
+        return (override or None) == snapshot[0]
+    return active_path == snapshot[0]
+
+
+def _engine_cache_is_readonly(active_path: str) -> bool:
+    """Read-only is the cache layer's rule, not a caller convention.
+
+    CI opens the runner file read-only by default. That file keeps the
+    runner mode, so a store attempt does not write it. A test-owned file
+    does not inherit that mode: the test's own cache stays writable unless
+    the test set a different mode itself.
+    """
+
+    mode = _configured_cache_mode()
+    snapshot = _RUNNER_CACHE_SNAPSHOT
+    if snapshot is None or _active_cache_is_runner_file(active_path):
+        return mode == "readonly"
+    if mode != (snapshot[1] or "").lower():
+        return mode == "readonly"
+    return False
+
+
+def _is_test_module(module: str | None) -> bool:
+    if not module:
+        return False
+    return (
+        module == "tests"
+        or module.startswith("tests.")
+        or module == "conftest"
+        or module.startswith("conftest.")
+        or module == "unittest.mock"
+        or module.startswith("unittest.mock.")
+    )
+
+
+def _function_is_double(func: Any) -> bool:
+    """True when this function was not compiled from a real adapter module.
+
+    A real adapter function's ``__module__`` is its package and its code
+    filename is that package's source file. Neither is ``tests``, ``conftest``,
+    or ``unittest.mock``. Replacing ``__module__`` cannot hide a test file,
+    and a real adapter file cannot acquire a ``tests`` path component.
+    """
+
+    if isinstance(func, Mock):
+        return True
+    module = getattr(func, "__module__", None)
+    if _is_test_module(module if isinstance(module, str) else None):
+        return True
+    code = getattr(func, "__code__", None)
+    filename = getattr(code, "co_filename", "") or ""
+    if not filename or filename.startswith("<"):
+        return True
+    parts = Path(filename).parts
+    return "tests" in parts or "conftest.py" in parts
+
+
+def _unwrap_callable(value: Any) -> Any:
+    if isinstance(value, (classmethod, staticmethod)):
+        return value.__func__
+    func = getattr(value, "__func__", None)
+    if inspect.isfunction(func):
+        return func
+    return value
+
+
+def _adapter_methods_replaced(obj: Any) -> bool:
+    """True when a snapshotted adapter method is no longer the class-body function."""
+
+    cls = obj if inspect.isclass(obj) else type(obj)
+    if inspect.isclass(obj):
+        instance_dict: Mapping[str, Any] = {}
+    else:
+        raw_dict = getattr(obj, "__dict__", None)
+        instance_dict = raw_dict if isinstance(raw_dict, dict) else {}
+    seen_names: set[str] = set()
+    for klass in cls.__mro__:
+        recorded = klass.__dict__.get("_real_adapter_methods")
+        if not isinstance(recorded, dict):
+            continue
+        for name, original in recorded.items():
+            if name in seen_names:
+                continue
+            seen_names.add(name)
+            if name in instance_dict:
+                current = instance_dict[name]
+            else:
+                current = getattr(cls, name, None)
+                if current is None:
+                    continue
+            func = _unwrap_callable(current)
+            if (
+                isinstance(current, Mock)
+                or isinstance(func, Mock)
+                or func is not original
+                or _function_is_double(func)
+            ):
+                return True
+    return False
+
+
+def _has_adapter_snapshot(obj: Any) -> bool:
+    if obj is None or isinstance(obj, (str, bytes, int, float, bool)):
+        return False
+    cls = obj if inspect.isclass(obj) else type(obj)
+    return any(
+        "_real_adapter_methods" in klass.__dict__
+        for klass in getattr(cls, "__mro__", ())
+    )
+
+
+def _callable_is_double(value: Any) -> bool:
+    if isinstance(value, Mock):
+        return True
+    if inspect.isclass(value):
+        return _is_test_module(getattr(value, "__module__", None)) or _adapter_methods_replaced(value)
+    func = _unwrap_callable(value)
+    if inspect.isfunction(func) or inspect.ismethod(value):
+        return _function_is_double(func)
+    return False
+
+
+def _instance_is_double(obj: Any, seen: set[int]) -> bool:
+    if obj is None or isinstance(obj, (str, bytes, int, float, bool, tuple, list, dict, set)):
+        return False
+    marker = id(obj)
+    if marker in seen:
+        return False
+    seen.add(marker)
+    if isinstance(obj, Mock):
+        return True
+    if inspect.isclass(obj):
+        return _is_test_module(getattr(obj, "__module__", None)) or _adapter_methods_replaced(obj)
+    if _is_test_module(getattr(type(obj), "__module__", None)):
+        return True
+    if _adapter_methods_replaced(obj):
+        return True
+    instance_dict = getattr(obj, "__dict__", None)
+    if not isinstance(instance_dict, dict):
+        return False
+    for value in instance_dict.values():
+        if isinstance(value, Mock) or _callable_is_double(value):
+            return True
+        if _has_adapter_snapshot(value) and _adapter_methods_replaced(value):
+            return True
+    return False
+
+
+def _function_closes_over_double(func: Any, seen: set[int], depth: int) -> bool:
+    if depth > 8 or not inspect.isfunction(func):
+        return False
+    marker = id(func)
+    if marker in seen:
+        return False
+    seen.add(marker)
+    if _function_is_double(func):
+        return True
+    globals_dict = getattr(func, "__globals__", {})
+    for name in func.__code__.co_names:
+        target = globals_dict.get(name, _MISSING)
+        if target is _MISSING:
+            continue
+        if _callable_is_double(target):
+            return True
+    closure = func.__closure__
+    if not closure:
+        return False
+    for cell in closure:
+        try:
+            closed = cell.cell_contents
+        except ValueError:
+            continue
+        if _value_is_double(closed, seen, depth + 1):
+            return True
+    return False
+
+
+def _value_is_double(value: Any, seen: set[int], depth: int) -> bool:
+    if isinstance(value, Mock):
+        return True
+    if isinstance(value, functools.partial):
+        if _value_is_double(value.func, seen, depth):
+            return True
+        keywords = value.keywords or {}
+        return any(_value_is_double(item, seen, depth + 1) for item in value.args) or any(
+            _value_is_double(item, seen, depth + 1) for item in keywords.values()
+        )
+    if inspect.ismethod(value):
+        func = value.__func__
+        if _function_is_double(func) or _instance_is_double(value.__self__, seen):
+            return True
+        return False
+    if inspect.isfunction(value):
+        return _function_closes_over_double(value, seen, depth)
+    return _instance_is_double(value, seen)
+
+
+def _solve_is_test_double(solve: Any) -> bool:
+    """True when ``solve`` is not the real registered engine adapter.
+
+    One check at the open/lookup seam. The cache key is unchanged.
+    """
+
+    return _value_is_double(solve, set(), 0)
 
 
 def _file_sha256(path: Path) -> str:
@@ -1521,15 +1780,36 @@ def _store_cold(
 
 
 def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
+    """Serve or store one engine result.
+
+    This is the open/lookup seam. Engines are stateless, and the key is
+    engine + chemistry version + request, so a cached value is the engine's
+    answer. Serving it in tests is valid. CI uses the runner file read-only
+    by default. Only ``engine_cache_off`` tests opt out.
+    """
+
     if _CACHE_BYPASSED.get():
         return live_hot(solve())
     path_value = _configured_engine_cache_path()
     if not path_value:
         return live_hot(solve())
-    mode = (_cache_environment_setting("REGOLITH_ENGINE_CACHE_MODE", "") or "").lower()
-    if mode not in {"", "readonly"}:
-        raise ValueError(f"unknown engine cache mode {mode!r}")
-    readonly = mode == "readonly"
+    readonly = _engine_cache_is_readonly(path_value)
+    if (
+        engine_id in ENGINE_CHEMISTRY_VERSION
+        and _active_cache_is_runner_file(path_value)
+        and _solve_is_test_double(solve)
+    ):
+        # One check, before lookup. A double is a mock, a test-module
+        # callable, or an adapter method that is no longer the class-body
+        # function. Real adapter functions are compiled from their packages,
+        # so this cannot flag them. Do not serve or store such a solve in
+        # the runner file. A test-owned file is unchanged: cache tests store
+        # synthetic solves there.
+        with _LOCK:
+            counts = _counter_bucket(engine_id)
+            counts["misses"] += 1
+            counts["not_stored:double"] = counts.get("not_stored:double", 0) + 1
+        return live_hot(solve())
     source_box = _cache_environment_setting("REGOLITH_ENGINE_CACHE_BOX", "") or ""
     if not readonly:
         if not source_box.strip():

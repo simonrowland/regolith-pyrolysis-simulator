@@ -15,6 +15,7 @@ from contextvars import copy_context
 from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
+import inspect
 import math
 import threading
 from typing import Any, Callable, ClassVar, Dict, List, Mapping, Optional, Sequence
@@ -1411,6 +1412,26 @@ class EquilibriumResult:
         self.liquid_fraction = liquid_fraction
 
 
+def _remember_real_adapter_methods(cls: type) -> None:
+    """Record the function objects the class body defined.
+
+    The engine cache uses ``is`` against this map. A real adapter still
+    carries those objects; a test that replaces a method does not. Nested
+    functions are created per call and are not recorded.
+    """
+
+    recorded: dict[str, Any] = {}
+    for name, value in cls.__dict__.items():
+        if isinstance(value, (classmethod, staticmethod)):
+            func = value.__func__
+        elif inspect.isfunction(value):
+            func = value
+        else:
+            continue
+        recorded[name] = func
+    cls._real_adapter_methods = recorded
+
+
 class MeltBackend(ABC):
     """
     Abstract interface for thermodynamic melt calculations.
@@ -1425,6 +1446,11 @@ class MeltBackend(ABC):
 
     backend_name = 'unknown'
     supports_intrinsic_fO2 = False
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        super().__init_subclass__(**kwargs)
+        _remember_real_adapter_methods(cls)
+
     # Dissolved S or Cl in the silicate liquid at an imposed gas fugacity.
     # equilibrate must accept sulfur_fugacity_bar or chloride_fugacity_bar
     # (bar, the printed pS2 or pCl2) and return that solute's weight percent
@@ -1570,6 +1596,9 @@ class MeltBackend(ABC):
         if enabled == ['silicate melt']:
             return 'silicate melt only'
         return ', '.join(enabled) if enabled else 'none'
+
+
+_remember_real_adapter_methods(MeltBackend)
 
 
 class InternalAnalyticalBackend(MeltBackend):

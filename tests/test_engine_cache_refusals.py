@@ -7,6 +7,8 @@ from engines.domain_reason import OutOfDomainReason, STABLE_OUT_OF_DOMAIN_REASON
 from simulator import engine_cache
 from simulator.melt_backend.base import _call_with_hard_timeout
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 def test_deterministic_refusal_allowlist_is_explicit():
     from simulator.engine_cache import (
@@ -444,3 +446,183 @@ def test_real_engine_basis_refusal_hits_before_the_worker_pipe(engine, compositi
     finally:
         _close_isolated_cell_workers()
         close_battery_engine_handle(handle)
+
+
+def _compile_adapter_solve(source: str, namespace: dict[str, object]) -> object:
+    """Compile a solve whose code file is the real cache module, not this test."""
+
+    from pathlib import Path
+
+    filename = str(Path(engine_cache.__file__).resolve())
+    exec(compile(source, filename, "exec"), namespace)
+    return namespace["_adapter_solve"]
+
+
+def test_readonly_store_attempt_is_a_counted_noop(tmp_path, monkeypatch) -> None:
+    path = tmp_path / "cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    assert engine_cache.cached_engine_call(
+        "openimcc", {"request": 1}, lambda: {"answer": 1}
+    ) == {"answer": 1}
+    with sqlite3.connect(path) as connection:
+        stored = connection.execute("SELECT key, value FROM engine_outputs").fetchall()
+    assert len(stored) == 1
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    calls: list[int] = []
+
+    def solve() -> dict[str, int]:
+        calls.append(1)
+        return {"answer": 2}
+
+    assert engine_cache.cached_engine_call("openimcc", {"request": 2}, solve) == {"answer": 2}
+    assert calls == [1]
+    with sqlite3.connect(path) as connection:
+        rows = connection.execute("SELECT key, value FROM engine_outputs").fetchall()
+    assert rows == stored
+    counts = engine_cache.engine_cache_counters()["openimcc"]
+    assert counts["stores"] == 0
+    assert counts["hits"] == 0
+    assert counts["misses"] == 1
+    assert counts["not_stored:readonly"] == 1
+
+
+def test_runner_cache_does_not_serve_or_store_a_double(tmp_path, monkeypatch) -> None:
+    path = tmp_path / "runner.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    namespace = dict(engine_cache.__dict__)
+    namespace["_probe_calls"] = []
+    real_seed = _compile_adapter_solve(
+        "def _adapter_solve():\n"
+        "    _probe_calls.append('seed')\n"
+        "    return {'answer': 'cached'}\n",
+        namespace,
+    )
+    with engine_cache.runner_engine_cache_snapshot(str(path), ""):
+        assert engine_cache.cached_engine_call(
+            "openimcc", {"request": 1}, real_seed
+        ) == {"answer": "cached"}
+    assert namespace["_probe_calls"] == ["seed"]
+    with sqlite3.connect(path) as connection:
+        seeded = connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0]
+    assert seeded == 1
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    calls: list[str] = []
+
+    def double() -> dict[str, str]:
+        calls.append("double")
+        return {"answer": "live"}
+
+    with engine_cache.runner_engine_cache_snapshot(str(path), "readonly"):
+        assert engine_cache.cached_engine_call(
+            "openimcc", {"request": 1}, double
+        ) == {"answer": "live"}
+        namespace["_probe_calls"] = []
+        real_hit = _compile_adapter_solve(
+            "def _adapter_solve():\n"
+            "    _probe_calls.append('hit')\n"
+            "    return {'answer': 'live'}\n",
+            namespace,
+        )
+        assert engine_cache.cached_engine_call(
+            "openimcc", {"request": 1}, real_hit
+        ) == {"answer": "cached"}
+        real_miss = _compile_adapter_solve(
+            "def _adapter_solve():\n"
+            "    _probe_calls.append('miss')\n"
+            "    return {'answer': 'new'}\n",
+            namespace,
+        )
+        assert engine_cache.cached_engine_call(
+            "openimcc", {"request": 2}, real_miss
+        ) == {"answer": "new"}
+    assert calls == ["double"]
+    assert namespace["_probe_calls"] == ["miss"]
+    with sqlite3.connect(path) as connection:
+        assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 1
+    counts = engine_cache.engine_cache_counters()["openimcc"]
+    assert counts["hits"] == 1
+    assert counts["stores"] == 0
+    assert counts["not_stored:double"] == 1
+    assert counts["not_stored:readonly"] == 1
+    assert counts["misses"] == counts["stores"] + (
+        counts["not_stored:double"] + counts["not_stored:readonly"]
+    )
+
+
+def test_replaced_adapter_method_and_mock_are_doubles(monkeypatch) -> None:
+    from unittest.mock import Mock
+
+    from simulator.melt_backend.base import InternalAnalyticalBackend
+
+    backend = InternalAnalyticalBackend.__new__(InternalAnalyticalBackend)
+    assert engine_cache._solve_is_test_double(backend.equilibrate) is False
+    monkeypatch.setattr(backend, "equilibrate", lambda *args, **kwargs: {"answer": 1})
+    assert engine_cache._solve_is_test_double(backend.equilibrate) is True
+
+    fresh = InternalAnalyticalBackend.__new__(InternalAnalyticalBackend)
+    assert engine_cache._solve_is_test_double(fresh.equilibrate) is False
+    monkeypatch.setattr(
+        InternalAnalyticalBackend,
+        "equilibrate",
+        lambda *args, **kwargs: {"answer": 2},
+    )
+    assert engine_cache._solve_is_test_double(fresh.equilibrate) is True
+    assert engine_cache._solve_is_test_double(Mock()) is True
+    assert engine_cache._solve_is_test_double(lambda: {"answer": 3}) is True
+
+
+def test_explicit_cache_overrides_runner_readonly(tmp_path, monkeypatch) -> None:
+    runner = tmp_path / "runner.sqlite"
+    owned = tmp_path / "owned.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(owned))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    with engine_cache.runner_engine_cache_snapshot(str(runner), "readonly"):
+        assert engine_cache.cached_engine_call(
+            "openimcc", {"request": 1}, lambda: {"answer": 1}
+        ) == {"answer": 1}
+    assert not runner.exists()
+    with sqlite3.connect(owned) as connection:
+        assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 1
+    counts = engine_cache.engine_cache_counters()["openimcc"]
+    assert counts["stores"] == 1
+    assert counts.get("not_stored:readonly", 0) == 0
+    assert counts.get("not_stored:double", 0) == 0
+
+
+def test_path_scope_overrides_runner_readonly(tmp_path, monkeypatch) -> None:
+    runner = tmp_path / "runner.sqlite"
+    owned = tmp_path / "owned.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(runner))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    with engine_cache.runner_engine_cache_snapshot(str(runner), "readonly"):
+        with engine_cache._engine_cache_path_scope(owned):
+            assert engine_cache.cached_engine_call(
+                "openimcc", {"request": 1}, lambda: {"answer": 1}
+            ) == {"answer": 1}
+    assert not runner.exists()
+    with sqlite3.connect(owned) as connection:
+        assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 1
