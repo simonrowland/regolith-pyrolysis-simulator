@@ -2177,7 +2177,7 @@ def _unverified_apparatus_notices(
     experiment: Experiment | None,
     gates: GateOutcome,
 ) -> tuple[Notice, ...]:
-    """Return apparatus notices for KEMS rows."""
+    """Return typed notices for source-reduced KEMS and defaulted apparatus facts."""
 
     if experiment is None:
         return ()
@@ -2189,6 +2189,41 @@ def _unverified_apparatus_notices(
         return ()
     if reference.admission.status is not AdmissionStatus.ADMITTED:
         return ()
+    defaulted_notices: list[Notice] = []
+    for candidate in gates.checks:
+        check = _require_gate_check(candidate)
+        detail = check.detail
+        if not isinstance(detail, Mapping) or not check.passed:
+            continue
+        flag = detail.get("flag")
+        if flag == "kems_calibration_by_source":
+            calibration_status = detail.get("calibration_record_status")
+            defaulted_notices.append(
+                Notice(
+                    kind=NoticeKind.UNVERIFIED_APPARATUS,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        "kems_calibration_by_source: "
+                        f"calibration_record_status={calibration_status or 'not_grounded'}; "
+                        "source already reports a "
+                        "reduced numeric quantity; scorer applies no sensitivity "
+                        "factor"
+                    ),
+                    origin=reference.observation_id,
+                )
+            )
+        elif flag == "effusion_regime_assumed":
+            defaulted_notices.append(
+                Notice(
+                    kind=NoticeKind.UNVERIFIED_APPARATUS,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        "effusion_regime_assumed: "
+                        + str(detail.get("reason") or "orifice not printed")
+                    ),
+                    origin=reference.observation_id,
+                )
+            )
     author_reported_pressure = (
         experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
@@ -2232,7 +2267,7 @@ def _unverified_apparatus_notices(
         not experiment.method.is_value
         or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
     ):
-        return ()
+        return tuple(defaulted_notices)
     kems_activity = (
         experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
@@ -2274,7 +2309,7 @@ def _unverified_apparatus_notices(
         or calibration_flagged_partial_pressure
         or calibration_flagged_activity
     ):
-        return ()
+        return tuple(defaulted_notices)
     allow_calibration = (
         author_reported_pressure
         or kems_activity
@@ -2313,8 +2348,8 @@ def _unverified_apparatus_notices(
             return ()
         missing[fact] = detail
     if not missing:
-        return ()
-    notices: list[Notice] = []
+        return tuple(defaulted_notices)
+    notices: list[Notice] = list(defaulted_notices)
     for fact in sorted(missing):
         detail = missing[fact]
         if fact == "in_cell_partial_pressure_sum":
@@ -12581,10 +12616,7 @@ def _predict_mass_loss_with_residue(
         elif reason == "initial_composition_invalid":
             refusal = RefusalReason.METRIC_DOMAIN
             execution = ExecutionState.NOT_PROBED
-        elif reason in {
-            "evaporation_coefficients_not_sourced", "alpha_not_sourced",
-            "area_shape_not_self_similar", "preheat_bound_not_negligible",
-        }:
+        elif reason == "preheat_bound_not_negligible":
             refusal = RefusalReason.UNDERDETERMINED_APPARATUS
             execution = ExecutionState.NOT_PROBED
         else:
@@ -12593,8 +12625,6 @@ def _predict_mass_loss_with_residue(
         detail: dict[str, object] = {"reason": reason, "detail": exc.detail}
         if reason.endswith("_not_stated"):
             detail["missing_input"] = exc.detail
-        elif reason in {"evaporation_coefficients_not_sourced", "alpha_not_sourced"}:
-            detail["missing_input"] = Quantity.EVAPORATION_COEFFICIENT_ALPHA
         if refusal is RefusalReason.UNSUPPORTED:
             detail.update({"engine": engine.value, "capability": exc.detail})
         payload = getattr(exc, "below_threshold_omissions", None)
@@ -12634,17 +12664,22 @@ def _predict_mass_loss_with_residue(
 
     notices = tuple(
         Notice(
-            kind=(NoticeKind.OUT_OF_CERTIFIED_BAND if (
+            kind=(NoticeKind.UNVERIFIED_APPARATUS if flag.startswith("knob_defaulted:")
+                  else NoticeKind.OUT_OF_CERTIFIED_BAND if (
                 "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
                 or flag.startswith("alpha_extrapolated:")
             ) else NoticeKind.FALLBACK),
             affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
             reason=flag,
-            origin=f"engine:{engine.value}",
+            origin=(
+                observation.observation_id
+                if flag.startswith("knob_defaulted:")
+                else f"engine:{engine.value}"
+            ),
         )
         for flag in result.engine_flags
         if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
-        or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
+        or flag.startswith(("alpha_extrapolated:", "mass_loss_", "knob_defaulted:"))
     ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
     domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
     return EnginePrediction(
@@ -17848,6 +17883,28 @@ def _compile_residual_with_lineage(
             exclusions=("duplicate_of",),
         )
 
+    if (
+        quantity in {Quantity.ION_INTENSITY, Quantity.ION_INTENSITY_RATIO}
+        and experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        and not _calibration_grounded(
+            None if experiment.apparatus is None else experiment.apparatus.calibration
+        )
+    ):
+        return _refused(
+            RefusalReason.UNDERDETERMINED_APPARATUS,
+            {
+                "reason": "ion_intensity_without_calibration",
+                "detail": (
+                    "raw ion intensity or intensity ratio without a printed "
+                    "reduction cannot be converted to pressure/activity without calibration"
+                ),
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            exclusions=("status_match_or_mismatch",),
+        )
+
     if _is_quantity_not_predicted(quantity):
         return _refused(
             RefusalReason.UNSUPPORTED,
@@ -18085,6 +18142,18 @@ def _compile_residual_with_lineage(
             limit = pressure_detail.get("pressure_limit_Pa")
             if limit is not None:
                 refusal_detail["limit_Pa"] = limit
+        apparatus_check = next(
+            (
+                check
+                for check in gates.checks
+                if check.name == gates.primary_check and not check.passed
+            ),
+            None,
+        )
+        if apparatus_check is not None:
+            reason = apparatus_check.detail.get("reason")
+            if isinstance(reason, str):
+                refusal_detail["reason"] = reason
         return _refused(
             gates.reason or RefusalReason.INVALID_SOURCE,
             refusal_detail,
