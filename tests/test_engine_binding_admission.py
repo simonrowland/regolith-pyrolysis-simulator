@@ -1093,6 +1093,7 @@ def test_gate_replay_skips_unadmitted_optional_fallback_candidate(
                 "source": "gate_liquid_fraction",
                 "solidus_T_C": 1000.0,
                 "liquidus_T_C": 1300.0,
+                "is_liquidus_floor": False,
                 "path": [],
             }
         }
