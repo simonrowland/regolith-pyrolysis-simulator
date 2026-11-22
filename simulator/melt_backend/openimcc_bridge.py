@@ -1455,10 +1455,11 @@ def _species_thermo_crystal_declared_interval(
     """Return the interval of the OpenIMCC-selected crystal thermo row."""
 
     module = _require_openimcc()
-    # OpenIMCC 979adb2's crystal no-continuation error omits its selected
-    # interval. Keep this private selector use in the bridge; OpenIMCC was
-    # asked on 2026-11-19 to put the interval on that error, after which this
-    # helper should read the error attribute instead.
+    # OpenIMCC 979adb2's crystal no-continuation error omitted its selected
+    # interval. bae51f7's ImccGasTemperatureOutsideDomainError carries
+    # declared_interval_K. This helper still reads the private selector;
+    # switching it to that attribute is outside this re-pin. OpenIMCC was
+    # asked on 2026-11-19 to put the interval on the error.
     row = module.gas._oxide_row_for_T(
         module.load_gas_datapack().oxide_df,
         f"{species}(cr)",

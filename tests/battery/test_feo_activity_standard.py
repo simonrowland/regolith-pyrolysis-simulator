@@ -47,8 +47,9 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
 }
 # Green's OpenIMCC zero-offset row used default d066-v1 (version 1.0.3-d066-v1,
 # digest 02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75).
-# The 979adb2 default d066-v4 has a nonzero DG46-MASSON65 FeO offset (the
-# pinned row is 10,240.4790568 J/mol at 1600 K), so this zero-offset witness
+# The default d066-v4 pack has a nonzero DG46-MASSON65 FeO offset (recorded
+# at 979adb2; no redox-pack file changes through bae51f7). The pinned row
+# is 10,240.4790568 J/mol at 1600 K, so this zero-offset witness
 # uses published-core 1.0.2 (digest
 # ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c), whose
 # FeO standard is Fe-019 with exactly zero shift. The residual value is
@@ -269,8 +270,9 @@ def test_openimcc_feo_row_refuses_missing_melt_binding() -> None:
 def test_openimcc_feo_row_refuses_a_changed_condensate_digest() -> None:
     identity = _melt_pack_identity("default")
     actual_digest = "a" * 64
-    # OpenIMCC 979adb2 PACKAGED_FULL_CONDENSATE_TABLE_DIGEST. Independent of
-    # the owner constant so this refusal does not echo that assignment.
+    # OpenIMCC bae51f7 PACKAGED_FULL_CONDENSATE_TABLE_DIGEST. The condensate
+    # CSV is unchanged from 979adb2. Independent of the owner constant so
+    # this refusal does not echo that assignment.
     expected_digest = (
         "493c67d5ba23b75767cc3ce4bd6e571bd2400162b3affdbbc581a7b0ae75362e"
     )
