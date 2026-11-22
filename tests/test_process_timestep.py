@@ -1541,6 +1541,56 @@ class TestShortStepOxygenClip:
                 model.route(flux, melt, dt_h=refused)
 
 
+def test_c0_forecast_adjustment_uses_the_float_campaign_hour(monkeypatch):
+    """A short C0 step budgets the fractional hour it has already run.
+
+    Exact zero still refreshes the full-budget exit. Hour 2 keeps the
+    same remaining budget as the integer clock. The notice hour stays
+    the truncated label the recorder stores.
+
+    Mutation: int(campaign_hour) before the zero check. A step at
+    1/60 h refreshes the full exit instead of budgeting max_hold - 1/60.
+    """
+
+    sim = _loaded_sim()
+    sim.melt.campaign = CampaignPhase.C0
+    recorded: list[float | None] = []
+    refreshes = {"n": 0}
+    max_hold = sim.campaign_mgr._max_hold_hr(CampaignPhase.C0)
+
+    def predict(**kwargs):
+        recorded.append(kwargs.get("remaining_hold_budget_hr"))
+        return {"prediction_status": "ok", "T_exit_C": 1.0}
+
+    def refresh():
+        refreshes["n"] += 1
+        sim.campaign_mgr.c0_exit_prediction = {"prediction_status": "ok"}
+
+    monkeypatch.setattr(sim, "_predict_c0_exit", predict)
+    monkeypatch.setattr(sim, "_refresh_c0_exit_prediction", refresh)
+
+    sim.melt.campaign_hour = 0
+    sim._handle_c0_forecast_adjustment("temperature_C")
+    assert refreshes["n"] == 1
+    assert recorded == []
+
+    sim.melt.campaign_hour = 0.0
+    sim._handle_c0_forecast_adjustment("temperature_C")
+    assert refreshes["n"] == 2
+    assert recorded == []
+
+    sim.melt.campaign_hour = _SHORT_DT_H
+    sim._handle_c0_forecast_adjustment("temperature_C")
+    assert refreshes["n"] == 2
+    assert recorded[-1] == pytest.approx(max_hold - _SHORT_DT_H)
+    assert sim.campaign_mgr.c0_forecast_adjustment_notices[-1]["campaign_hour"] == 0
+
+    sim.melt.campaign_hour = 2
+    sim._handle_c0_forecast_adjustment("temperature_C")
+    assert recorded[-1] == pytest.approx(max_hold - 2.0)
+    assert sim.campaign_mgr.c0_forecast_adjustment_notices[-1]["campaign_hour"] == 2
+
+
 def _alkali_step(monkeypatch, *, dt_h: float) -> tuple[float, float]:
     """Production Stage-3 Na uptake after one rescale by dt_h.
 

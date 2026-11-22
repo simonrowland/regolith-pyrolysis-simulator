@@ -13873,10 +13873,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _handle_c0_forecast_adjustment(self, adjusted_field: str) -> None:
         if self.melt.campaign != CampaignPhase.C0:
             return
-        # CampaignManager's endpoint logic reads this campaign-local counter;
-        # the core increments it only after a completed hourly snapshot.
-        campaign_hour = int(self.melt.campaign_hour)
-        if campaign_hour == 0:
+        # The elapsed campaign hour is the float clock. Exact zero still
+        # refreshes the full-budget exit. A stored integer hour is the
+        # same remaining budget as float(hour). The notice schema stays
+        # a whole hour; the recorders int() that label.
+        campaign_hour = float(self.melt.campaign_hour)
+        if campaign_hour == 0.0:
             self._refresh_c0_exit_prediction()
             return
         remaining_hold_budget_hr = max(
@@ -13912,12 +13914,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ):
             self.campaign_mgr.record_c0_remaining_budget_exit(
                 prediction,
-                campaign_hour=campaign_hour,
+                campaign_hour=int(campaign_hour),
                 remaining_budget_hr=remaining_hold_budget_hr,
             )
         notice = self.campaign_mgr.record_c0_forecast_adjustment(
             adjusted_field,
-            campaign_hour,
+            int(campaign_hour),
             loss_budget_re_evaluated=forecast_applied,
         )
         self._pending_c0_forecast_adjustment_notices.append(notice)
