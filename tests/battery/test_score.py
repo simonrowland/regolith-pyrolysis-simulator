@@ -10906,6 +10906,35 @@ def test_vapour_rail_is_only_vapour_pressures() -> None:
     assert no_headline_rail_reason(Quantity.VISCOSITY) == "no_headline_rail:viscosity"
 
 
+def test_unknown_quantity_refusal_does_not_fabricate_psat_request() -> None:
+    experiment = F.tabulation_experiment()
+    identity = replace(
+        F.psat_identity("Na"),
+        quantity=State.unknown("source does not identify the quantity"),
+    )
+    reference = F.observation(
+        "unknown-quantity",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="unknown-quantity-source",
+    )
+    residual, candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference),
+    )
+
+    assert candidate is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == "quantity_unknown"
+    assert residual.rail is None
+    assert "::quantity_unknown::none::openimcc" in residual.key
+    assert residual.candidate_request is None
+
+
 _SAMPLE_PHASE_NOT_MELT_OBSERVABLE = "sample_phase_not_melt_activity_observable"
 
 
