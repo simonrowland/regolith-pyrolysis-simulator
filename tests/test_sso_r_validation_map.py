@@ -522,6 +522,7 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     )
     pin_verdicts = []
     memo_admission_results = []
+    freeze_call_sites = []
 
     def fail_then_recover(self):
         from simulator.engine_binding_admission import (
@@ -567,6 +568,37 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
                 provider_outcome="produced",
             )
         curve_calls += 1
+        import traceback
+
+        freeze_call_sites.append(
+            {
+                'hour': getattr(getattr(self, 'melt', None), 'hour', None),
+                'campaign_hour': getattr(
+                    getattr(self, 'melt', None), 'campaign_hour', None
+                ),
+                'authority_hour': getattr(
+                    self, '_melt_redox_gate_authority_tick_hour', None
+                ),
+                'pinned_identity': repr(
+                    getattr(
+                        self,
+                        '_melt_redox_gate_authority_tick_verdict_identity',
+                        None,
+                    )
+                ),
+                'retained_identity': repr(
+                    getattr(
+                        self,
+                        '_liquid_feo_resolved_curve_domain_identity',
+                        None,
+                    )
+                ),
+                'stack': [
+                    (frame.name, frame.lineno)
+                    for frame in traceback.extract_stack(limit=9)[:-1]
+                ],
+            }
+        )
         if curve_calls == 1:
             raise ProviderUnavailableError('validation row pin failure')
         curve = add_current_domain_diagnostic({
@@ -657,7 +689,8 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     assert row['row_passes_base_integrity'] is True
     assert curve_calls == 1, (
         f'curve_calls={curve_calls}; pin_verdicts={pin_verdicts!r}; '
-        f'memo_admission_results={memo_admission_results!r}'
+        f'memo_admission_results={memo_admission_results!r}; '
+        f'freeze_call_sites={freeze_call_sites!r}'
     )
     assert len(established) == 1
     assert resolved
