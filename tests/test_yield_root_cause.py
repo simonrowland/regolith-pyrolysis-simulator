@@ -220,7 +220,13 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives(
     # (d-320) cuts the Stage-4 Na harvest 1.889 -> 0.0802 kg, so the zero-dose
     # C3 shuttle no longer rebuilds melt Na2O. C5 still reduces FeO. The pin
     # is the production value (train rpp nightly and the laptop run agree).
-    assert na2o_left == pytest.approx(0.07626529983087423, abs=1e-6)
+    # b-1281: that residue Na2O evaporates in C4 with the native Na2O.
+    # Studio gate at faa88e9ec6 measured 0.07626529983087423 ->
+    # 6.342945773165959e-05 kg. The C4 probe moved Na evaporated from
+    # 2.740 mol to 5.199 mol. C5 still does not reduce Na. The residue
+    # amalgamation mark attributes origins and does not change this mol;
+    # re-measure if a later gate moves it.
+    assert na2o_left == pytest.approx(6.342945773165959e-05, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT

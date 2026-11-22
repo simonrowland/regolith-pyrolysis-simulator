@@ -2956,7 +2956,10 @@ class ExtractionMixin:
         the snapshot retains the legacy total counters.
         """
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
-        from engines.builtin.metallothermic_step import REACTION_FAMILY_C3_NA
+        from engines.builtin.metallothermic_step import (
+            REACTION_FAMILY_C3_NA,
+            SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+        )
 
         if self.shuttle_Na_inventory_kg <= 0.01:
             return
@@ -3006,6 +3009,13 @@ class ExtractionMixin:
                 'reaction_family': REACTION_FAMILY_C3_NA,
                 'dt_hr': 1.0,
             },
+        )
+        # The stirred melt makes feedstock and reagent Na one well-mixed
+        # pool in the spent-reductant residue. A later partial evaporation
+        # withdraws that Na pro rata to its live origins. One live origin
+        # stays a tracked debit, so a pure-reagent residue is unchanged.
+        self.atom_ledger.mark_amalgamated_pool(
+            SPENT_REDUCTANT_RESIDUE_ACCOUNT, ('Na',),
         )
         self._record_stage_routed_metal_credits('C3', transition)
         self._apply_transition_redox_source_terms(

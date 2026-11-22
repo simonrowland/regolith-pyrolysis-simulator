@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import pytest
 
+from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.accounting.ledger import AtomLedger, LedgerTransition
 from simulator.accounting.lots import MaterialLot
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.state import MOLAR_MASS
+from simulator.state import MOLAR_MASS, CampaignPhase
 
 
 def _lot(account: str, species: str, amount_mol: float) -> MaterialLot:
@@ -259,3 +260,110 @@ def test_evaporated_shuttle_cations_allow_partial_withdrawal_from_overhead_gas(
         overhead_origins["reagent"] / 2.0
     )
     ledger.assert_balanced()
+
+
+def test_na_shuttle_residue_partial_evaporation_keeps_origin_shares():
+    """Mixed-origin residue Na evaporates pro rata once the shuttle marks it.
+
+    Recovered feedstock Na and the reagent dose share one reagent pool.
+    The Na shuttle credits both origins into spent-reductant residue.
+    A partial evaporation must withdraw each origin in that pool's ratio
+    and carry both onto the overhead gas, then into the condensation train.
+    """
+    from tests.chemistry.conftest import _build_sim, _load_yaml
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        _load_yaml("vapor_pressures.yaml"),
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("setpoints.yaml"),
+        additives_kg={"Na": 30.0},
+    )
+    sim.melt.temperature_C = 1150.0
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+    sim.atom_ledger.load_external(
+        "process.reagent_inventory",
+        {"Na": 5.0},
+        source="recovered_condensate",
+        material_origin="feedstock",
+    )
+    # The condensate transfer marks this pool; the dose draw does not.
+    sim.atom_ledger.mark_amalgamated_pool("process.reagent_inventory", ("Na",))
+    sim.shuttle_Na_inventory_kg = sim._sync_reagent_counter_from_ledger("Na")
+    sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
+
+    residue_origins = sim.atom_ledger.origin_atom_moles_by_account()[
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT
+    ]["Na"]
+    feedstock_before = float(residue_origins["feedstock"])
+    reagent_before = float(residue_origins["reagent"])
+    assert feedstock_before > 0.0
+    assert reagent_before > 0.0
+    residue_kg_before = sim.atom_ledger.kg_by_account(
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT
+    )["Na2O"]
+    assert residue_kg_before > 0.0
+
+    sodium_data = sim.vapor_pressures["metals"]["Na"]
+    stoich = sim._evaporation_stoich("Na", sodium_data)
+    cleaned_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
+        "Na2O", 0.0
+    )
+    sodium_kg = (
+        0.25
+        * (residue_kg_before + cleaned_kg)
+        / stoich["oxide_per_product_kg"]
+    )
+    sim.melt.campaign = CampaignPhase.C4
+    sim.melt.temperature_C = 1670.0
+    sim.melt.p_total_mbar = 0.2
+    transition = sim._credit_evaporation_transition(
+        "Na",
+        sodium_kg,
+        sodium_kg,
+        sodium_data,
+        apply_evaporative_redox_source_terms=False,
+        return_transition=True,
+    )[1]
+    assert transition is not None
+    residue_lot = next(
+        lot
+        for lot in transition.debits
+        if lot.account == SPENT_REDUCTANT_RESIDUE_ACCOUNT
+    )
+    withdrawn = residue_lot.origin_atom_moles
+    feedstock_withdrawn = float(withdrawn["feedstock"]["Na"])
+    reagent_withdrawn = float(withdrawn["reagent"]["Na"])
+    assert feedstock_withdrawn > 0.0
+    assert reagent_withdrawn > 0.0
+    assert feedstock_withdrawn < feedstock_before
+    assert reagent_withdrawn < reagent_before
+    assert feedstock_withdrawn / reagent_withdrawn == pytest.approx(
+        feedstock_before / reagent_before
+    )
+    assert residue_lot.attribution_method_by_element["Na"] == "pool_ratio"
+    assert (
+        sim.atom_ledger.kg_by_account(SPENT_REDUCTANT_RESIDUE_ACCOUNT)["Na2O"]
+        < residue_kg_before
+    )
+
+    overhead_origins = sim.atom_ledger.origin_atom_moles_by_account()[
+        "process.overhead_gas"
+    ]["Na"]
+    assert overhead_origins["feedstock"] > 0.0
+    assert overhead_origins["reagent"] > 0.0
+    overhead_na_kg = sim.atom_ledger.kg_by_account("process.overhead_gas")["Na"]
+    sim.atom_ledger.move(
+        "partial_sodium_condensation",
+        "process.overhead_gas",
+        "process.condensation_train",
+        {"Na": overhead_na_kg / 2.0},
+    )
+    condensed = sim.atom_ledger.origin_atom_moles_by_account()[
+        "process.condensation_train"
+    ]["Na"]
+    assert condensed["feedstock"] == pytest.approx(
+        overhead_origins["feedstock"] / 2.0
+    )
+    assert condensed["reagent"] == pytest.approx(overhead_origins["reagent"] / 2.0)
+    sim.atom_ledger.assert_balanced()
