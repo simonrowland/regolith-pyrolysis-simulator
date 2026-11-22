@@ -416,6 +416,24 @@ def test_missing_pressure_default_is_limited_to_gram_lab() -> None:
         manager._lab_schedule(runner_module.CampaignPhase.C0)
     assert manager.lab_schedule_notices == []
 
+    non_gram_run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=4,
+        setpoints_patch={
+            "lab_geometry": _runtime_geometry(
+                scale="industrial_pot",
+                exposed_melt_area_m2=0.000123,
+            ),
+        },
+        lab_schedule=schedule,
+    )
+    with pytest.raises(
+        LabScheduleValidationError,
+        match="lab_schedule_chamber_pressure_mbar_must_be_points",
+    ):
+        SimSession().start(non_gram_run._session_config())
+
     schedule["chamber_pressure_mbar"] = [
         {"t_h": 0.0, "value": 2.0, "unit": "mbar"},
         {"t_h": 4.0, "value": 2.0, "unit": "mbar"},
@@ -639,6 +657,19 @@ def test_preset_bridge_cli_maps_leg_and_records_provenance(tmp_path: Path):
         "geometry_id": "bridge_geometry",
         "effective_exposed_area_m2": 0.000123,
         "area_basis": "gram_lab_exposed_melt",
+        "notices": [
+            {
+                "code": "knob_defaulted",
+                "path": "lab_geometry.surfaces.witness.temperature_C",
+                "value": 0.0,
+                "unit": "C",
+                "default_source": (
+                    "LabSurface.to_pipe_segment.wall_temperature_C"
+                ),
+                "source_class": "assumption_with_sensitivity_marker",
+                "sensitivity_marker": "defaulted_lab_surface_temperature",
+            }
+        ],
     }
     assert metadata["feedstock_id"] == "lunar_mare_low_ti"
     assert metadata["mass_kg"] == pytest.approx(0.002)

@@ -2596,22 +2596,27 @@ class CampaignManager:
         if raw is None:
             return None
         if isinstance(raw, Mapping):
-            use_gram_lab_default = (
-                isinstance(self.setpoints.get("lab_geometry"), Mapping)
-                and str(
-                    self.setpoints["lab_geometry"].get("scale") or ""
-                ).strip()
-                == LAB_GEOMETRY_SCALE
-            )
-            schedule, notices = self._default_missing_lab_schedule_pressure(
-                raw,
-                enabled=use_gram_lab_default,
-            )
-            for notice in notices:
-                if notice not in self.lab_schedule_notices:
-                    self.lab_schedule_notices.append(notice)
-            return normalize_lab_schedule(schedule)
+            return self._normalize_lab_schedule(raw)
         raise ValueError('lab_schedule_must_be_mapping')
+
+    def _normalize_lab_schedule(self, raw: Any) -> Mapping:
+        if not isinstance(raw, Mapping):
+            return normalize_lab_schedule(raw)
+        use_gram_lab_default = (
+            isinstance(self.setpoints.get("lab_geometry"), Mapping)
+            and str(
+                self.setpoints["lab_geometry"].get("scale") or ""
+            ).strip()
+            == LAB_GEOMETRY_SCALE
+        )
+        schedule, notices = self._default_missing_lab_schedule_pressure(
+            raw,
+            enabled=use_gram_lab_default,
+        )
+        for notice in notices:
+            if notice not in self.lab_schedule_notices:
+                self.lab_schedule_notices.append(notice)
+        return normalize_lab_schedule(schedule)
 
     def _default_missing_lab_schedule_pressure(
         self,

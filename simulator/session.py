@@ -25,7 +25,7 @@ from simulator.backends import (
 )
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.feedstock_guard import BlockedFeedstockError, assert_feedstock_loadable
-from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY, normalize_lab_schedule
+from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY
 from simulator.scalar_boundary import is_declared_real_scalar, require_finite_float as _finite_float
 from simulator.campaigns import parse_campaign_override_value
 from simulator.condensation_routing import STAGE3_PURITY_FIELDS
@@ -497,7 +497,9 @@ class SimSession:
             target = sim.campaign_mgr.overrides.setdefault(str(campaign), {})
             for field_name, value in overrides.items():
                 if str(field_name) == LAB_SCHEDULE_OVERRIDE_KEY:
-                    target[str(field_name)] = normalize_lab_schedule(value)
+                    target[str(field_name)] = (
+                        sim.campaign_mgr._normalize_lab_schedule(value)
+                    )
                 elif str(field_name) == "carrier_gas":
                     target[str(field_name)] = value
                 else:
